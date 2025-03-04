@@ -1,5 +1,5 @@
+import { NextResponse } from 'next/server'
+
 export async function POST(req: Request) {
-  return new Response(JSON.stringify({ message: 'Payment system coming soon' }), {
-    status: 200,
-  });
+  return NextResponse.json({ message: 'Coming soon' })
 }

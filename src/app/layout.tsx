@@ -32,18 +32,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
-        {/* Add Roboto to the <head> section */}
-      </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} ${roboto.className} antialiased`}
-      >
-        <div className="max-w-5xl mx-auto px-8">
-          <Header />
-          {children}
-          <Footer />
-        </div>
-      </body>
+      <body>{children}</body>
     </html>
-  );
+  )
 }
