@@ -8,13 +8,11 @@ import CoffeeGDPCalculator from "@/components/interactiveGDPCalculator"
 import PopularTopics from "@/components/PopularTopics"
 import Link from 'next/link'
 import { Hero } from "@/components/hero"
-import DiagnosticQuizMacro from '@/components/diagnosticQuizMacro'
 import { FullExam } from '@/components/FullExam'
 import { macroSetOneQuestions } from '@/data/questionBanks/macroSetOne'
 import { ExamOptionsPreview } from "@/components/previews/ExamOptionsPreview"
 import { VideoLibraryPreview } from "@/components/previews/VideoLibraryPreview"
 import LiveTestMockup from '@/components/liveTestMockup'
-import { useState, useEffect } from 'react'
 import ExamDayCountdown from '@/components/ExamDayCountdown'
 const components = {
   types: {

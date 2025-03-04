@@ -80,20 +80,20 @@ export function Header() {
           </button>
           <div className="absolute h-4 w-full" />
           <div className="absolute left-0 hidden group-hover:block mt-2 w-64 bg-white border rounded-md shadow-lg">
-            <a 
+            <Link 
               href="/purchase/macro-exams"
               onClick={(e) => handleExamClick(e, 'macro')} 
               className="block px-4 py-2 hover:bg-gray-100 whitespace-nowrap"
             >
               AP Macro Practice Exams
-            </a>
-            <a 
+            </Link>
+            <Link 
               href="/purchase/micro-exams"
               onClick={(e) => handleExamClick(e, 'micro')} 
               className="block px-4 py-2 hover:bg-gray-100 whitespace-nowrap"
             >
               AP Micro Practice Exams
-            </a>
+            </Link>
           </div>
         </div>
       </nav>

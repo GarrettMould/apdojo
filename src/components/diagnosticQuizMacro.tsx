@@ -473,7 +473,7 @@ const macroQuestions: MacroQuestion[] = [
 ];
 
 
-const diagnosticQuizMacro = () => {
+export function DiagnosticQuizMacro() {
   const [selectedQuestions, setSelectedQuestions] = useState<MacroQuestion[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
@@ -689,6 +689,4 @@ const diagnosticQuizMacro = () => {
       )}
     </div>
   );
-};
-
-export default diagnosticQuizMacro;
+}
