@@ -1,29 +1,10 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import { Header } from "@/components/header"
-import { Roboto } from 'next/font/google'
-import { Footer } from "@/components/Footer"
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const roboto = Roboto({
-  weight: ['400', '700'],
-  subsets: ['latin'],
-})
+import './globals.css'
+import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: "AP Dojo",
-  description: "AP Dojo is a platform for AP students to learn and practice for their exams.",
-};
+  title: 'APDojo',
+  description: 'AP Economics Exam Prep',
+}
 
 export default function RootLayout({
   children,
@@ -32,7 +13,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {children}
+      </body>
     </html>
   )
 }
