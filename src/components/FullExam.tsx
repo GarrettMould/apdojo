@@ -809,24 +809,27 @@ export function FullExam({ questionBank }: FullExamProps) {
                         <div
                           key={idx}
                           className={`p-3 rounded-lg border ${
-                            isSelected && isCorrect ? 'bg-green-50 border-green-300' :
-                            isSelected && !isCorrect ? 'bg-red-50 border-red-300' :
                             isCorrectAnswer ? 'bg-green-50 border-green-300' :
+                            (isSelected && !isCorrectAnswer) ? 'bg-red-50 border-red-300' :
                             'bg-white border-gray-200'
                           }`}
                         >
-                          <div className="flex items-center gap-3">
-                            <div className="flex items-center gap-2">
-                              <span className="text-gray-700">
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="flex items-start gap-2 w-[85%]">
+                              <span className="text-gray-700 mt-0.5">
                                 {letter.toLowerCase()})
                               </span>
                               <span className={isCorrectAnswer ? 'font-medium' : ''}>
                                 {option}
                               </span>
                             </div>
-                            {isSelected && (
-                              <div className="ml-auto">
-                                <Check className="w-4 h-4 text-gray-500" />
+                            {(isCorrectAnswer || (isSelected && !isCorrectAnswer)) && (
+                              <div className="flex-shrink-0">
+                                {isCorrectAnswer ? (
+                                  <Check className="w-4 h-4 text-green-600" />
+                                ) : (
+                                  <X className="w-4 h-4 text-red-600" />
+                                )}
                               </div>
                             )}
                           </div>
