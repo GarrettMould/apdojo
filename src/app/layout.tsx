@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { HeaderWrapper } from '@/components/header-wrapper'
 import { Footer } from '@/components/Footer'
 import { PageContainer } from '@/components/ui/page-container'
+import { AuthProvider } from '@/contexts/AuthContext'
 
 export const metadata: Metadata = {
   title: 'APDojo',
@@ -17,13 +18,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen flex flex-col">
-        <HeaderWrapper />
-        <main className="flex-1">
-          <PageContainer>
-            {children}
-          </PageContainer>
-        </main>
-        <Footer />
+        <AuthProvider>
+          <HeaderWrapper />
+          <main className="flex-1">
+            <PageContainer>
+              {children}
+            </PageContainer>
+          </main>
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   )

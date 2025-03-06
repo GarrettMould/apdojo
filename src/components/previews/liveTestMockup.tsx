@@ -32,32 +32,62 @@ export default function LiveTestMockup() {
     unit: "Unit 5",
     options: [
       { id: 'a', text: 'An increase in government spending' },
-      { id: 'b', text: 'A contractionary monetary policy' },
+      { id: 'b', text: 'Contractionary monetary policy' },
       { id: 'c', text: 'A decrease in income tax rates' },
       { id: 'd', text: 'An increase in worker productivity' },
     ],
     selectedAnswer: 'a',
     correctAnswer: 'b',
-    explanation: 'A contractionary monetary policy (higher interest rates) reduces aggregate demand, which leads to lower inflation but higher unemployment - a movement along the short-run Phillips curve. The other options either shift the curve or move in the opposite direction.'
+    explanation: 'Contractionary monetary policy (higher interest rates) reduces aggregate demand, which leads to lower inflation but higher unemployment - a movement along the short-run Phillips curve. The other options either shift the curve or move in the opposite direction.'
   };
 
   useEffect(() => {
-    if (inView) {
-      const sequence = async () => {
+    let isMounted = true;
+
+    const sequence = async () => {
+      try {
+        if (!controls || !isMounted) return;
+
+        // Initial delay
         await new Promise(resolve => setTimeout(resolve, 300));
+        
+        if (!isMounted) return;
         await controls.start('select');
+        
+        if (!isMounted) return;
         await new Promise(resolve => setTimeout(resolve, 700));
         await controls.start('showResult');
+        
+        if (!isMounted) return;
         await new Promise(resolve => setTimeout(resolve, 700));
         await controls.start('showExplanation');
-      };
+      } catch (error) {
+        console.error('Animation sequence error:', error);
+      }
+    };
+
+    if (inView) {
       sequence();
     }
+
+    return () => {
+      isMounted = false;
+    };
   }, [inView, controls]);
 
   return (
     <div className="max-w-4xl mx-auto" ref={ref}>
-      <div className="bg-white rounded-xl shadow-xl border border-gray-200 p-12 mb-32 mt-12">
+      <motion.div 
+        className="bg-white rounded-xl shadow-xl border border-gray-200 p-12 mb-12 mt-12"
+        initial="initial"
+        animate={controls}
+        variants={{
+          initial: { height: 'auto' },
+          select: { height: 'auto' },
+          showResult: { height: 'auto' },
+          showExplanation: { height: 'auto' }
+        }}
+      >
         <MockupHeader />
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -154,20 +184,24 @@ export default function LiveTestMockup() {
 
           <motion.div
             variants={{
-              initial: { opacity: 0 },
+              initial: { height: 0, opacity: 0, margin: 0 },
+              select: { height: 0, opacity: 0, margin: 0 },
               showResult: { 
-                opacity: 1,
+                height: 'auto', 
+                opacity: 1, 
+                marginTop: '1.5rem',
                 transition: { delay: 1.4 }
               }
             }}
             initial="initial"
             animate={controls}
-            className="mt-6"
+            className="overflow-hidden"
           >
             <div className="relative group">
               <motion.div
                 variants={{
                   initial: { opacity: 0 },
+                  select: { opacity: 0 },
                   showResult: { 
                     opacity: 1,
                     backgroundColor: 'white'
@@ -230,16 +264,17 @@ export default function LiveTestMockup() {
 
           <motion.div
             variants={{
-              initial: { opacity: 0, height: 0, marginTop: 0 },
-              showResult: { opacity: 0, height: 0, marginTop: 0 },
+              initial: { height: 0, opacity: 0, margin: 0 },
+              select: { height: 0, opacity: 0, margin: 0 },
+              showResult: { height: 0, opacity: 0, margin: 0 },
               showExplanation: {
-                opacity: 1,
                 height: 'auto',
-                marginTop: 16,
+                opacity: 1,
+                marginTop: '1rem',
                 transition: { 
                   height: { duration: 0.2, delay: 2.1 },
                   opacity: { duration: 0.2, delay: 2.3 },
-                  marginTop: { duration: 0.2, delay: 2.1 }
+                  margin: { duration: 0.2, delay: 2.1 }
                 }
               }
             }}
@@ -252,7 +287,7 @@ export default function LiveTestMockup() {
             </div>
           </motion.div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

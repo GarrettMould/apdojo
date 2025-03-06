@@ -6,9 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Bookmark, BookmarkX, X, Clock, Maximize2, Minimize2, Calculator, Pen, Eraser, Expand, Trash2, Circle, CircleDot, Check, Lock } from 'lucide-react';
 import { StaticImageData } from 'next/image';
 import { redirectToCheckout } from '@/lib/stripe';
+import { useAuthContext } from '@/contexts/AuthContext';
+import { LoginModal, SignupModal } from './AuthModals';
 
 interface FullExamProps {
   questionBank: QuestionBank;
+  examType: 'macro' | 'micro';
+  questionType: 'mcq' | 'frq';
+  examNumber: string;
 }
 
 interface Answers {
@@ -23,7 +28,7 @@ interface StoredBookmarks {
   };
 }
 
-export function FullExam({ questionBank }: FullExamProps) {
+export function FullExam({ questionBank, examType, questionType, examNumber }: FullExamProps) {
   const [answers, setAnswers] = useState<Answers>({});
   const [showResults, setShowResults] = useState(false);
   const [showExplanations, setShowExplanations] = useState<{[key: number]: boolean}>({});
@@ -79,6 +84,10 @@ export function FullExam({ questionBank }: FullExamProps) {
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
+
+  const { user } = useAuthContext();
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showSignupModal, setShowSignupModal] = useState(false);
 
   const handleAnswer = (questionId: number, answerIndex: number) => {
     setAnswers({
@@ -367,11 +376,43 @@ export function FullExam({ questionBank }: FullExamProps) {
   };
 
   const handlePurchase = async () => {
-    await redirectToCheckout();
+    console.log('Current user state:', user); // Add debugging
+    
+    if (!user) {
+      console.log('No user found, showing login modal');
+      setShowLoginModal(true);
+      return;
+    }
+
+    console.log('User is logged in, proceeding to checkout');
+    try {
+      await redirectToCheckout(examType, questionType, examNumber);
+    } catch (error) {
+      console.error('Error during checkout:', error);
+    }
   };
 
   return (
     <>
+      {/* Add the modals */}
+      <LoginModal 
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        switchToSignup={() => {
+          setShowLoginModal(false);
+          setShowSignupModal(true);
+        }}
+      />
+
+      <SignupModal
+        isOpen={showSignupModal}
+        onClose={() => setShowSignupModal(false)}
+        switchToLogin={() => {
+          setShowSignupModal(false);
+          setShowLoginModal(true);
+        }}
+      />
+
       {/* Image Modal */}
       {showImageModal && selectedImage && (
         <div 
@@ -705,44 +746,89 @@ export function FullExam({ questionBank }: FullExamProps) {
                     </div>
                     <div className="relative group">
                       <Button
-                        onClick={handlePurchase}
-                        className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
+                        disabled
+                        variant="outline"
+                        className="bg-blue-600 hover:bg-blue-600 text-white flex items-center gap-2 opacity-60 cursor-not-allowed"
                       >
                         <Lock className="w-4 h-4" />
                         Show Explanation
                       </Button>
                       <div className="absolute right-0 top-full mt-2 w-64 p-2 bg-gray-800 text-white text-sm rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                        Purchase the exam to unlock explanations
+                        Purchase the full exam for explanations
                       </div>
                     </div>
                   </div>
                 </>
               ) : (
-                <div className="min-h-[400px] flex flex-col items-center justify-center p-8">
-                  <h3 className="text-xl font-bold mb-2">
-                    Want to see the full exam?
-                  </h3>
-                  <p className="text-gray-600 mb-4">
-                    Get access to all questions and detailed explanations.
-                  </p>
-                  <Button 
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
-                    onClick={() => alert('Payment integration coming soon!')}
-                  >
-                    Unlock Full Exam
-                  </Button>
+                <div className="relative">
+                  {/* Question 4 content - same styling as questions 1-3 */}
+                  <div className="relative">
+                    <div className="mb-4 flex justify-between items-center">
+                      <div className="flex items-center gap-3">
+                        <span className="font-bold text-gray-900">
+                          Question {currentQuestionIndex + 1} of 60
+                        </span>
+                        <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-semibold">
+                          Unit {questions[currentQuestionIndex].unit}
+                        </span>
+                      </div>
+                      <button
+                        disabled
+                        className="text-gray-400 transition-colors opacity-50"
+                      >
+                        <Bookmark className="w-5 h-5" />
+                      </button>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      {/* Question text */}
+                      <p className="text-lg font-medium">{questions[currentQuestionIndex].question}</p>
+                      
+                      {/* Question image (if exists) */}
+                      {questions[currentQuestionIndex].image && (
+                        <div className="my-4">
+                          <img 
+                            src={questions[currentQuestionIndex].image.src}
+                            alt="Question"
+                            className="max-h-[300px] object-contain rounded-lg"
+                          />
+                        </div>
+                      )}
+                      
+                      {/* Options */}
+                      <div className="space-y-3">
+                        {questions[currentQuestionIndex].options.map((option, optIndex) => (
+                          <div
+                            key={optIndex}
+                            className="p-3 border rounded border-gray-200"
+                          >
+                            <span className="mr-2">{String.fromCharCode(97 + optIndex)})</span>
+                            {option}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Overlay with content */}
+                  <div className="absolute inset-0 flex items-center justify-center backdrop-blur-sm">
+                    <div className="bg-gray-50 rounded-lg px-12 py-10 text-center shadow-sm border border-gray-100">
+                      <h3 className="text-3xl font-extrabold text-gray-900 mb-3">
+                        Want to see the full exam?
+                      </h3>
+                      <p className="text-lg text-gray-600 mb-8">
+                        Get access to all questions and detailed explanations.
+                      </p>
+                      <Button 
+                        className="bg-blue-600 hover:bg-blue-700 text-white text-base font-bold px-8 py-3"
+                        onClick={handlePurchase}
+                      >
+                        Unlock Full Exam
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               )}
-            </div>
-
-            {/* Temporary submit button */}
-            <div className="fixed right-8 top-1/2 transform -translate-y-1/2">
-              <Button
-                onClick={() => setShowResults(true)}
-                className="bg-green-600 hover:bg-green-700 text-white"
-              >
-                Submit Exam
-              </Button>
             </div>
           </>
         ) : (

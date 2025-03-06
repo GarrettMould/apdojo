@@ -3,7 +3,6 @@
 import { Hero } from "@/components/hero"
 import LiveTestMockup from '@/components/previews/liveTestMockup'
 import { ExamOptionsPreview } from "@/components/previews/ExamOptionsPreview"
-import { VideoLibraryPreview } from "@/components/previews/VideoLibraryPreview"
 import ExamDayCountdown from '@/components/ExamDayCountdown'
 
 export default function Home() {
@@ -13,7 +12,6 @@ export default function Home() {
       <LiveTestMockup />
       <ExamOptionsPreview />
       <ExamDayCountdown />
-      <VideoLibraryPreview />
     </main>
   )
 }
