@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import CoffeeLandFlag from '../../public/images/CoffeeLandFlag.png';
@@ -9,8 +9,6 @@ import Image from 'next/image';
 import { Button } from "@/components/ui/button"
 
 const CoffeeGDPCalculator = () => {
-  const [showInstructions, setShowInstructions] = useState(false);
-  const instructionsRef = useRef<HTMLDivElement>(null);
   const basePrice = 1;
   const baseQuantity = 100;
   const [currentPrice, setCurrentPrice] = useState(1);
@@ -20,22 +18,10 @@ const CoffeeGDPCalculator = () => {
   const realGDP = basePrice * currentQuantity;
   const nominalGDPChange = ((nominalGDP - (basePrice * baseQuantity)) / (basePrice * baseQuantity) * 100).toFixed(1);
   const realGDPChange = ((realGDP - (basePrice * baseQuantity)) / (basePrice * baseQuantity) * 100).toFixed(1);
-  
-  // Handle click outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (instructionsRef.current && !instructionsRef.current.contains(event.target as Node)) {
-        setShowInstructions(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   return (
     <div className="relative">
-      <Card className="shadow-[0_0_20px_rgba(0,0,0,0.1)]">
+      <Card className="shadow-[0_0_20px_rgba(0,0,0,0.1)] max-w-3xl mx-auto">
         <CardHeader className="border-b-2 border-dashed border-gray-200">
           <div className="flex items-center justify-center gap-4">
             <div className="w-24 h-20 relative">
@@ -145,37 +131,6 @@ const CoffeeGDPCalculator = () => {
           </div>
         </CardContent>
       </Card>
-
-      {/* Instructions Button and Panel */}
-      <div className="absolute -right-16 top-0">
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            setShowInstructions(true);
-          }}
-          className="bg-white text-gray-800 rounded-full w-10 h-10 flex items-center justify-center 
-          hover:bg-gray-50 transition-colors text-xl font-medium border-2 border-gray-300 
-          shadow-[0_0_10px_rgba(0,0,0,0.1)] hover:shadow-[0_0_15px_rgba(0,0,0,0.15)]"
-        >
-          ?
-        </button>
-        
-        {showInstructions && (
-          <div 
-            ref={instructionsRef} 
-            onClick={(e) => e.stopPropagation()}
-            className="absolute left-12 top-0 w-64 bg-white p-4 rounded-lg shadow-lg border-2 border-gray-200"
-          >
-            <h4 className="font-bold mb-2">How to Use:</h4>
-            <ul className="space-y-2 text-sm">
-              <li>• Adjust the price slider to see how changes in coffee prices affect GDP</li>
-              <li>• Move the quantity slider to simulate changes in coffee production</li>
-              <li>• Watch how Nominal and Real GDP respond differently to price vs. quantity changes</li>
-              <li>• Use the reset button to return to base year values</li>
-            </ul>
-          </div>
-        )}
-      </div>
     </div>
   );
 };

@@ -5,9 +5,13 @@ import { Footer } from '@/components/Footer'
 import { PageContainer } from '@/components/ui/page-container'
 import { AuthProvider } from '@/contexts/AuthContext'
 
-export const metadata: Metadata = {
-  title: 'APDojo',
-  description: 'AP Economics Exam Prep',
+export async function generateMetadata({ params }: { params: { type: string } }) {
+  const examType = params.type === 'macro-exams' ? 'Macroeconomics' : 'Microeconomics'
+  
+  return {
+    title: `AP Dojo | AP Economics Practice Exams`,
+    description: `Expert-crafted AP ${examType} practice exams with detailed solutions and video explanations.`
+  }
 }
 
 export default function RootLayout({

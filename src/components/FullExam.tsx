@@ -814,19 +814,19 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
                   <div className="absolute inset-0 flex items-center justify-center backdrop-blur-sm">
                     <div className="bg-gray-50 rounded-lg px-12 py-10 text-center shadow-sm border border-gray-100">
                       <h3 className="text-3xl font-extrabold text-gray-900 mb-3">
-                        Want to see the full exam?
-                      </h3>
+                    Want to see the full exam?
+                  </h3>
                       <p className="text-lg text-gray-600 mb-8">
-                        Get access to all questions and detailed explanations.
-                      </p>
-                      <Button 
+                    Get access to all questions and detailed explanations.
+                  </p>
+                  <Button 
                         className="bg-blue-600 hover:bg-blue-700 text-white text-base font-bold px-8 py-3"
                         onClick={handlePurchase}
-                      >
-                        Unlock Full Exam
-                      </Button>
-                    </div>
-                  </div>
+                  >
+                    Unlock Full Exam
+                  </Button>
+                </div>
+            </div>
                 </div>
               )}
             </div>

@@ -1,11 +1,10 @@
 'use client';
 
 import Link from "next/link"
-import Image from "next/image"
-import logo from '../../public/images/logo.png'
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useAuthContext } from '@/contexts/AuthContext'
+import { UserCircle } from 'lucide-react'
 
 export function Header() {
   const router = useRouter();
@@ -24,102 +23,131 @@ export function Header() {
     setIsMenuOpen(false);
   };
 
+  const handleToolsClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    router.push('/interactive-tools');
+    setIsMenuOpen(false);
+  };
+
+  const handleTutoringClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    router.push('/tutoring');
+    setIsMenuOpen(false);
+  };
+
   return (
-    <div className="relative">
-      <div className="flex items-center justify-between py-4">
+    <div className="w-full bg-white border-b">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between py-4">
       <div className="flex items-center space-x-4">
         <button 
           onClick={handleHomeClick}
-            className="hover:opacity-80 transition-opacity"
-          >
-            <Image
-              src={logo}
-              alt="AP Dojo"
-              width={100}
-              height={32}
-              className="h-8 w-auto"
-            />
+          className="hover:opacity-90 transition-opacity flex items-center"
+        >
+          <span className="text-3xl font-extrabold text-gray-900">AP</span>
+          <span className="ml-1 text-3xl font-extrabold text-blue-600">Dojo</span>
         </button>
       </div>
       
-        {/* Hamburger Menu Button - Only visible on mobile */}
-        <button 
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="lg:hidden p-2 hover:bg-gray-100 rounded-md"
-        >
-          {!isMenuOpen ? (
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          {/* Hamburger Menu Button - Only visible on mobile */}
+          <button 
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="lg:hidden p-2 hover:bg-gray-100 rounded-md"
+          >
+            {!isMenuOpen ? (
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            ) : (
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
-          ) : (
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          )}
+            )}
           </button>
 
-        {/* Desktop Navigation - Hidden on mobile */}
-        <nav className="hidden lg:flex items-center space-x-8">
-          <Link href="/tools" className="hover:text-blue-600 transition-colors font-bold">
-            Video Library
+          {/* Desktop Navigation - Updated with new links */}
+          <nav className="hidden lg:flex items-center space-x-8">
+            <Link 
+              href="/tutoring" 
+              onClick={handleTutoringClick}
+              className="hover:text-blue-600 transition-colors font-bold"
+            >
+              Private Tutoring
+            </Link>
+            <Link href="/tools" className="hover:text-blue-600 transition-colors font-bold">
+              Video Library
+            </Link>
+            <Link 
+              href="/interactive-tools" 
+              onClick={handleToolsClick}
+              className="hover:text-blue-600 transition-colors font-bold"
+            >
+          Interactive Tools
         </Link>
+            <Link href="/cheat-sheets" className="hover:text-blue-600 transition-colors font-bold">
+              Cheat Sheets
+            </Link>
         <div className="relative group">
-            <button className="hover:text-blue-600 transition-colors flex items-center space-x-1 font-bold">
+              <button className="hover:text-blue-600 transition-colors flex items-center space-x-1 font-bold">
             <span>Practice Exams</span>
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
             </svg>
           </button>
           <div className="absolute h-4 w-full" />
           <div className="absolute left-0 hidden group-hover:block mt-2 w-64 bg-white border rounded-md shadow-lg">
-              <Link 
-              href="/purchase/macro-exams"
-              onClick={(e) => handleExamClick(e, 'macro')} 
-                className="block px-4 py-2 hover:bg-gray-100 whitespace-nowrap font-bold"
-            >
-              AP Macro Practice Exams
-              </Link>
-              <Link 
-              href="/purchase/micro-exams"
-              onClick={(e) => handleExamClick(e, 'micro')} 
-                className="block px-4 py-2 hover:bg-gray-100 whitespace-nowrap font-bold"
-              >
-                AP Micro Practice Exams
-              </Link>
+                <Link 
+                  href="/purchase/macro-exams"
+                  onClick={(e) => handleExamClick(e, 'macro')} 
+                  className="block px-4 py-2 hover:bg-gray-100 whitespace-nowrap font-bold"
+                >
+                  AP Macro Practice Exams
+                </Link>
+                <Link 
+                  href="/purchase/micro-exams"
+                  onClick={(e) => handleExamClick(e, 'micro')} 
+                  className="block px-4 py-2 hover:bg-gray-100 whitespace-nowrap font-bold"
+                >
+                  AP Micro Practice Exams
+                </Link>
+              </div>
             </div>
-          </div>
-          {user ? (
-            <div className="flex items-center space-x-8">
-              <Link
-                href="/purchases"
-                className="hover:text-blue-600 transition-colors font-bold"
-              >
-                My Purchases
-              </Link>
-              <button
-                onClick={() => logout()}
-                className="px-6 py-2 text-sm font-bold text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                Sign Out
-              </button>
-            </div>
-          ) : (
-            <div className="flex items-center space-x-8">
-              <Link
-                href="/login"
-                className="hover:text-blue-600 transition-colors font-bold"
-              >
-                Login
-              </Link>
-              <Link
-                href="/signup"
-                className="px-8 py-2 text-sm font-bold text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                Sign Up
-              </Link>
-            </div>
-          )}
-        </nav>
+            {user ? (
+              <div className="flex items-center space-x-8">
+                <Link
+                  href="/my-purchases"
+                  className="hover:text-blue-600 transition-colors"
+                  title="My Profile"
+                >
+                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                    <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd" />
+                  </svg>
+                </Link>
+                <button
+                  onClick={() => logout()}
+                  className="px-6 py-2 text-sm font-bold text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-8">
+                <Link
+                  href="/login"
+                  className="hover:text-blue-600 transition-colors font-bold"
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/signup"
+                  className="px-8 py-2 text-sm font-bold text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  Sign Up
+                </Link>
+              </div>
+            )}
+          </nav>
+        </div>
       </div>
 
       {/* Mobile Menu - Only visible when menu is open */}
@@ -128,26 +156,47 @@ export function Header() {
           <div className="px-4 py-2">
             <div className="py-2">
               <Link 
+                href="/tutoring" 
+                onClick={handleTutoringClick}
+                className="block px-4 py-2 hover:bg-gray-100 font-bold"
+              >
+                Private Tutoring
+              </Link>
+              <Link 
                 href="/tools" 
                 className="block px-4 py-2 hover:bg-gray-100 font-bold"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Video Library
               </Link>
+              <Link 
+                href="/interactive-tools" 
+                onClick={handleToolsClick}
+                className="block px-4 py-2 hover:bg-gray-100 font-bold"
+              >
+                Interactive Tools
+              </Link>
+              <Link 
+                href="/cheat-sheets" 
+                className="block px-4 py-2 hover:bg-gray-100 font-bold"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Cheat Sheets
+              </Link>
             </div>
             
             <div className="py-2">
               <div className="font-bold mb-2">Practice Exams</div>
               <Link 
-                href="/purchase/macro-exams"
-                onClick={(e) => handleExamClick(e, 'macro')} 
+              href="/purchase/macro-exams"
+              onClick={(e) => handleExamClick(e, 'macro')} 
                 className="block px-4 py-2 hover:bg-gray-100 font-bold"
-              >
-                AP Macro Practice Exams
+            >
+              AP Macro Practice Exams
               </Link>
               <Link 
-                href="/purchase/micro-exams"
-                onClick={(e) => handleExamClick(e, 'micro')} 
+              href="/purchase/micro-exams"
+              onClick={(e) => handleExamClick(e, 'micro')} 
                 className="block px-4 py-2 hover:bg-gray-100 font-bold"
             >
               AP Micro Practice Exams
