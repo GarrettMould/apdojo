@@ -331,9 +331,11 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
                     ? 'bg-blue-200 text-blue-900 border border-blue-300'
                     : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'}
                   ${isBookmarked ? 'border-2 border-yellow-300/70' : ''}
-                  hover:scale-105 cursor-pointer
+                  ${questionIndex > 2 
+                    ? 'opacity-40 cursor-not-allowed' 
+                    : 'hover:scale-105 cursor-pointer'}
                 `}
-                onClick={() => setCurrentQuestionIndexWithTrack(questionIndex)}
+                onClick={() => questionIndex <= 2 && setCurrentQuestionIndexWithTrack(questionIndex)}
               >
                 {questionIndex + 1}
               </div>
@@ -389,26 +391,6 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
       console.error('Error during checkout:', error);
     }
   };
-
-  // Add timer effect to start countdown when component mounts
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft((prevTime) => {
-        if (prevTime <= 0) {
-          clearInterval(timer);
-          setShowResults(true); // Automatically show results when time runs out
-          return 0;
-        }
-        return prevTime - 1;
-      });
-    }, 1000);
-
-    // Show timer by default
-    setShowTimer(true);
-
-    // Cleanup function
-    return () => clearInterval(timer);
-  }, []); // Empty dependency array means this runs once on mount
 
   return (
     <>
@@ -680,91 +662,173 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
 
         {!showResults ? (
           <>
-            <div className="mb-8 border rounded-lg shadow-sm relative bg-white">
-              {/* Question header with unit and bookmark */}
-              <div className="p-6 border-b">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-3">
-                    <span className="font-bold text-gray-900">
-                      Question {currentQuestionIndex + 1} of 60
-                    </span>
-                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-semibold">
-                      Unit {questions[currentQuestionIndex].unit}
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => toggleBookmark(questions[currentQuestionIndex].id)}
-                    className="text-gray-400 hover:text-yellow-500 transition-colors"
-                  >
-                    {bookmarkedQuestions.has(questions[currentQuestionIndex].id) ? (
-                      <BookmarkX className="w-5 h-5 text-yellow-400 fill-yellow-400" />
-                    ) : (
-                      <Bookmark className="w-5 h-5" />
-                    )}
-                  </button>
-                </div>
-              </div>
-              
-              {/* Question content with fixed height and scrolling */}
-              <div className="h-[400px] overflow-y-auto px-6 py-4">
-                <div className="space-y-4">
-                  <p className="text-lg font-medium">{questions[currentQuestionIndex].question}</p>
-                  
-                  {questions[currentQuestionIndex].image && (
-                    <div className="my-4">
-                      <img 
-                        src={questions[currentQuestionIndex].image.src}
-                        alt="Question"
-                        className="max-h-[250px] object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
-                        onClick={() => {
-                          setSelectedImage(questions[currentQuestionIndex].image);
-                          setShowImageModal(true);
-                        }}
-                      />
+            <div className="mb-8 pb-6 border-b relative">
+              {currentQuestionIndex <= 2 ? (
+                <>
+                  <div className="mb-4 flex justify-between items-center">
+                    <div className="flex items-center gap-3">
+                      <span className="font-bold text-gray-900">
+                        Question {currentQuestionIndex + 1} of 60
+                      </span>
+                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-semibold">
+                        Unit {questions[currentQuestionIndex].unit}
+                      </span>
                     </div>
-                  )}
-                  
-                  <div className="space-y-3 pb-2">
-                    {questions[currentQuestionIndex].options.map((option, optIndex) => (
-                      <div
-                        key={optIndex}
-                        onClick={() => handleAnswer(questions[currentQuestionIndex].id, optIndex)}
-                        className={`
-                          p-3 border rounded cursor-pointer hover:bg-gray-50 transition-colors
-                          ${answers[questions[currentQuestionIndex].id] === String.fromCharCode(65 + optIndex) 
-                            ? 'border-blue-500 bg-blue-50 hover:bg-blue-50' 
-                            : 'border-gray-200'}
-                        `}
-                      >
-                        <span className="mr-2">{String.fromCharCode(97 + optIndex)})</span>
-                        {option}
-                      </div>
-                    ))}
+                    <button
+                      onClick={() => toggleBookmark(questions[currentQuestionIndex].id)}
+                      className="text-gray-400 hover:text-yellow-500 transition-colors"
+                    >
+                      {bookmarkedQuestions.has(questions[currentQuestionIndex].id) ? (
+                        <BookmarkX className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+                      ) : (
+                        <Bookmark className="w-5 h-5" />
+                      )}
+                    </button>
                   </div>
-                </div>
-              </div>
+                  
+                  <div className="space-y-4">
+                    {/* Question text */}
+                    <p className="text-lg font-medium">{questions[currentQuestionIndex].question}</p>
+                    
+                    {/* Question image (if exists) */}
+                    {questions[currentQuestionIndex].image && (
+                      <div className="my-4">
+                        <img 
+                          src={questions[currentQuestionIndex].image.src}
+                          alt="Question"
+                          className="max-h-[300px] object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
+                          onClick={() => {
+                            setSelectedImage(questions[currentQuestionIndex].image);
+                            setShowImageModal(true);
+                          }}
+                        />
+                      </div>
+                    )}
+                    
+                    {/* Options */}
+                    <div className="space-y-3">
+                      {questions[currentQuestionIndex].options.map((option, optIndex) => (
+                        <div
+                          key={optIndex}
+                          onClick={() => handleAnswer(questions[currentQuestionIndex].id, optIndex)}
+                          className={`
+                            p-3 border rounded cursor-pointer hover:bg-gray-50 transition-colors
+                            ${answers[questions[currentQuestionIndex].id] === String.fromCharCode(65 + optIndex) 
+                              ? 'border-blue-500 bg-blue-50 hover:bg-blue-50' 
+                              : 'border-gray-200'}
+                          `}
+                        >
+                          <span className="mr-2">{String.fromCharCode(97 + optIndex)})</span>
+                          {option}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
 
-              {/* Fixed navigation buttons */}
-              <div className="p-6 border-t bg-white">
-                <div className="flex gap-2">
-                  <Button
-                    onClick={goToPreviousQuestion}
-                    disabled={currentQuestionIndex === 0}
-                    variant="outline"
-                    className="w-28"
+                  <div className="flex justify-between items-center mt-6">
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={goToPreviousQuestion}
+                        disabled={currentQuestionIndex === 0}
+                        variant="outline"
+                        className="w-28"
+                      >
+                        Previous
+                      </Button>
+                      <Button
+                        onClick={goToNextQuestion}
+                        disabled={currentQuestionIndex >= 3}
+                        variant="outline"
+                        className="w-28"
+                      >
+                        Next
+                      </Button>
+                    </div>
+                    <div className="relative group">
+                      <Button
+                        disabled
+                        variant="outline"
+                        className="bg-blue-600 hover:bg-blue-600 text-white flex items-center gap-2 opacity-60 cursor-not-allowed"
+                      >
+                        <Lock className="w-4 h-4" />
+                        Show Explanation
+                      </Button>
+                      <div className="absolute right-0 top-full mt-2 w-64 p-2 bg-gray-800 text-white text-sm rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                        Purchase the full exam for explanations
+                      </div>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="relative">
+                  {/* Question 4 content - same styling as questions 1-3 */}
+                  <div className="relative">
+                    <div className="mb-4 flex justify-between items-center">
+                      <div className="flex items-center gap-3">
+                        <span className="font-bold text-gray-900">
+                          Question {currentQuestionIndex + 1} of 60
+                        </span>
+                        <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-semibold">
+                          Unit {questions[currentQuestionIndex].unit}
+                        </span>
+                      </div>
+                      <button
+                        disabled
+                        className="text-gray-400 transition-colors opacity-50"
+                      >
+                        <Bookmark className="w-5 h-5" />
+                      </button>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      {/* Question text */}
+                      <p className="text-lg font-medium">{questions[currentQuestionIndex].question}</p>
+                      
+                      {/* Question image (if exists) */}
+                      {questions[currentQuestionIndex].image && (
+                        <div className="my-4">
+                          <img 
+                            src={questions[currentQuestionIndex].image.src}
+                            alt="Question"
+                            className="max-h-[300px] object-contain rounded-lg"
+                          />
+                        </div>
+                      )}
+                      
+                      {/* Options */}
+                      <div className="space-y-3">
+                        {questions[currentQuestionIndex].options.map((option, optIndex) => (
+                          <div
+                            key={optIndex}
+                            className="p-3 border rounded border-gray-200"
+                          >
+                            <span className="mr-2">{String.fromCharCode(97 + optIndex)})</span>
+                            {option}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Overlay with content */}
+                  <div className="absolute inset-0 flex items-center justify-center backdrop-blur-sm">
+                    <div className="bg-gray-50 rounded-lg px-12 py-10 text-center shadow-sm border border-gray-100">
+                      <h3 className="text-3xl font-extrabold text-gray-900 mb-3">
+                    Want to see the full exam?
+                  </h3>
+                      <p className="text-lg text-gray-600 mb-8">
+                    Get access to all questions and detailed explanations.
+                  </p>
+                  <Button 
+                        className="bg-blue-600 hover:bg-blue-700 text-white text-base font-bold px-8 py-3"
+                        onClick={handlePurchase}
                   >
-                    Previous
-                  </Button>
-                  <Button
-                    onClick={goToNextQuestion}
-                    disabled={currentQuestionIndex === questions.length - 1}
-                    variant="outline"
-                    className="w-28"
-                  >
-                    Next
+                    Unlock Full Exam
                   </Button>
                 </div>
-              </div>
+            </div>
+                </div>
+              )}
             </div>
           </>
         ) : (
