@@ -681,7 +681,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
         {!showResults ? (
           <>
             <div className="mb-8 border rounded-lg shadow-sm relative bg-white">
-              {/* Question header with unit and bookmark */}
+              {/* Question header with unit and bookmark - fixed at top */}
               <div className="p-6 border-b">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-3">
@@ -705,8 +705,8 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
                 </div>
               </div>
               
-              {/* Question content with fixed height and scrolling */}
-              <div className="h-[500px] overflow-y-auto px-6 py-4">
+              {/* Question content with adjusted height and scrolling */}
+              <div className="h-[425px] overflow-y-auto px-6 py-4">
                 <div className="space-y-4">
                   <p className="text-lg font-medium">{questions[currentQuestionIndex].question}</p>
                   
@@ -715,7 +715,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
                       <img 
                         src={questions[currentQuestionIndex].image.src}
                         alt="Question"
-                        className="max-h-[300px] object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
+                        className="max-h-[225px] object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
                         onClick={() => {
                           setSelectedImage(questions[currentQuestionIndex].image);
                           setShowImageModal(true);
@@ -724,7 +724,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
                     </div>
                   )}
                   
-                  <div className="space-y-3">
+                  <div className="space-y-3 pb-2">
                     {questions[currentQuestionIndex].options.map((option, optIndex) => (
                       <div
                         key={optIndex}
@@ -744,7 +744,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
                 </div>
               </div>
 
-              {/* Fixed navigation buttons */}
+              {/* Navigation buttons - fixed at bottom */}
               <div className="p-6 border-t bg-white">
                 <div className="flex gap-2">
                   <Button
