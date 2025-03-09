@@ -41,6 +41,12 @@ export function Header() {
     setIsMenuOpen(false);
   };
 
+  const handlePracticeExamsClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    router.push('/purchase/macro-exams');
+    setIsMenuOpen(false);
+  };
+
   return (
     <div className="w-full bg-white border-b">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -80,7 +86,10 @@ export function Header() {
             >
               Private Tutoring
             </Link>
-            <Link href="/tools" className="hover:text-blue-600 transition-colors font-bold">
+            <Link 
+              href="/tools" 
+              className="hover:text-blue-600 transition-colors font-bold"
+            >
               Video Library
             </Link>
             <Link 
@@ -88,40 +97,22 @@ export function Header() {
               onClick={handleToolsClick}
               className="hover:text-blue-600 transition-colors font-bold"
             >
-          Interactive Tools
-        </Link>
+              Interactive Tools
+            </Link>
             <Link 
               href="/cheat-sheets" 
               onClick={handleCheatSheetsClick}
               className="hover:text-blue-600 transition-colors font-bold"
             >
               Cheat Sheets
-        </Link>
-        <div className="relative group">
-              <button className="hover:text-blue-600 transition-colors flex items-center space-x-1 font-bold">
-            <span>Practice Exams</span>
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-            </svg>
-          </button>
-          <div className="absolute h-4 w-full" />
-          <div className="absolute left-0 hidden group-hover:block mt-2 w-64 bg-white border rounded-md shadow-lg">
-                <Link 
-                  href="/purchase/macro-exams"
-                  onClick={(e) => handleExamClick(e, 'macro')} 
-                  className="block px-4 py-2 hover:bg-gray-100 whitespace-nowrap font-bold"
-                >
-                  AP Macro Practice Exams
-                </Link>
-                <Link 
-                  href="/purchase/micro-exams"
-                  onClick={(e) => handleExamClick(e, 'micro')} 
-                  className="block px-4 py-2 hover:bg-gray-100 whitespace-nowrap font-bold"
-                >
-                  AP Micro Practice Exams
-                </Link>
-              </div>
-            </div>
+            </Link>
+            <Link 
+              href="/purchase/macro-exams"
+              onClick={handlePracticeExamsClick}
+              className="hover:text-blue-600 transition-colors font-bold"
+            >
+              Practice Exams
+            </Link>
             {user ? (
               <div className="flex items-center space-x-8">
                 <Link
@@ -193,23 +184,12 @@ export function Header() {
               >
                 Cheat Sheets
               </Link>
-            </div>
-            
-            <div className="py-2">
-              <div className="font-bold mb-2">Practice Exams</div>
               <Link 
-              href="/purchase/macro-exams"
-              onClick={(e) => handleExamClick(e, 'macro')} 
+                href="/purchase/macro-exams"
+                onClick={handlePracticeExamsClick}
                 className="block px-4 py-2 hover:bg-gray-100 font-bold"
-            >
-              AP Macro Practice Exams
-              </Link>
-              <Link 
-              href="/purchase/micro-exams"
-              onClick={(e) => handleExamClick(e, 'micro')} 
-                className="block px-4 py-2 hover:bg-gray-100 font-bold"
-            >
-              AP Micro Practice Exams
+              >
+                Practice Exams
               </Link>
             </div>
           </div>

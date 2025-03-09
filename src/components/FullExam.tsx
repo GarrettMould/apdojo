@@ -706,7 +706,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
               </div>
               
               {/* Question content with fixed height and scrolling */}
-              <div className="h-[400px] overflow-y-auto px-6 py-4">
+              <div className="h-[500px] overflow-y-auto px-6 py-4">
                 <div className="space-y-4">
                   <p className="text-lg font-medium">{questions[currentQuestionIndex].question}</p>
                   
@@ -715,7 +715,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
                       <img 
                         src={questions[currentQuestionIndex].image.src}
                         alt="Question"
-                        className="max-h-[250px] object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
+                        className="max-h-[300px] object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
                         onClick={() => {
                           setSelectedImage(questions[currentQuestionIndex].image);
                           setShowImageModal(true);
@@ -724,7 +724,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
                     </div>
                   )}
                   
-                  <div className="space-y-3 pb-2">
+                  <div className="space-y-3">
                     {questions[currentQuestionIndex].options.map((option, optIndex) => (
                       <div
                         key={optIndex}
