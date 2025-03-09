@@ -9,8 +9,8 @@ export async function generateMetadata({ params }: { params: { type: string } })
   const examType = params.type === 'macro-exams' ? 'Macroeconomics' : 'Microeconomics'
   
   return {
-    title: `AP Dojo | AP Economics Practice Exams`,
-    description: `Expert-crafted AP ${examType} practice exams with detailed solutions and video explanations.`
+    title: `AP Dojo | Elite AP Tutoring & Top AP Economics Resources`,
+    description: `Unlock top AP scores with AP Dojo’s premium tutoring. Expert guidance, exclusive AP Economics resources, and personalized strategies for academic success`
   }
 }
 

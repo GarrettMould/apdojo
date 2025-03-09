@@ -35,6 +35,12 @@ export function Header() {
     setIsMenuOpen(false);
   };
 
+  const handleCheatSheetsClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    router.push('/cheat-sheets');
+    setIsMenuOpen(false);
+  };
+
   return (
     <div className="w-full bg-white border-b">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -84,9 +90,13 @@ export function Header() {
             >
           Interactive Tools
         </Link>
-            <Link href="/cheat-sheets" className="hover:text-blue-600 transition-colors font-bold">
+            <Link 
+              href="/cheat-sheets" 
+              onClick={handleCheatSheetsClick}
+              className="hover:text-blue-600 transition-colors font-bold"
+            >
               Cheat Sheets
-            </Link>
+        </Link>
         <div className="relative group">
               <button className="hover:text-blue-600 transition-colors flex items-center space-x-1 font-bold">
             <span>Practice Exams</span>
@@ -178,8 +188,8 @@ export function Header() {
               </Link>
               <Link 
                 href="/cheat-sheets" 
+                onClick={handleCheatSheetsClick}
                 className="block px-4 py-2 hover:bg-gray-100 font-bold"
-                onClick={() => setIsMenuOpen(false)}
               >
                 Cheat Sheets
               </Link>

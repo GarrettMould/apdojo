@@ -3,30 +3,40 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react'
-import { macroFlashcards } from '@/data/macroFlashcards'
 
-export default function Flashcards() {
+interface FlashcardsProps {
+  flashcards: {
+    [unit: string]: Array<{
+      term: string;
+      definition: string;
+    }>;
+  };
+}
+
+export default function Flashcards({ flashcards }: FlashcardsProps) {
+  const [selectedUnit, setSelectedUnit] = useState<string>(Object.keys(flashcards)[0])
+  const [currentCardIndex, setCurrentCardIndex] = useState(0)
+
+  // Rest of your component logic using flashcards[selectedUnit] instead of directly accessing the data
+  const units = Object.keys(flashcards)
+  const currentCards = flashcards[selectedUnit] || []
+
   // Get random unit and card index
   const getRandomUnit = () => {
-    const units = Object.keys(macroFlashcards)
+    const units = Object.keys(flashcards)
     const randomIndex = Math.floor(Math.random() * units.length)
     return units[randomIndex]
   }
 
   const getRandomCardIndex = (unitName: string) => {
-    const cards = macroFlashcards[unitName]
+    const cards = flashcards[unitName]
     return Math.floor(Math.random() * cards.length)
   }
 
   // Initialize with random values
   const initialUnit = getRandomUnit()
-  const [selectedUnit, setSelectedUnit] = useState<string>(initialUnit)
-  const [currentCardIndex, setCurrentCardIndex] = useState(getRandomCardIndex(initialUnit))
   const [isFlipped, setIsFlipped] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-
-  const units = Object.keys(macroFlashcards)
-  const currentCards = selectedUnit ? macroFlashcards[selectedUnit] : []
 
   const nextCard = () => {
     setIsFlipped(false)
@@ -118,7 +128,7 @@ export default function Flashcards() {
 
       {selectedUnit && (
         <div className="mt-6 text-center text-gray-600">
-          Card {currentCardIndex + 1} of {currentCards.length}
+          {currentCardIndex + 1} of {currentCards.length}
         </div>
       )}
     </div>

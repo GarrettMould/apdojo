@@ -6,8 +6,8 @@ import { ReviewsSection } from '@/components/ReviewsSection'
 
 export default function TutoringPage() {
   return (
-    <div className="max-w-7xl mx-auto px-4 py-12">
-      <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 text-center mb-6 leading-tight">
+    <div className="max-w-7xl mx-auto px-4 py-12 mt-12">
+      <h1 className="text-5xl font-extrabold tracking-tight text-gray-900 text-center mb-6 leading-tight">
         Private Tutoring for AP Economics
       </h1>
       
@@ -89,43 +89,45 @@ export default function TutoringPage() {
         </Card>
 
         {/* Full AP Exam Prep Card */}
-        <Card className="hover:shadow-lg transition-shadow flex flex-col h-full">
-          <div className="bg-gradient-to-b from-blue-500 to-blue-600 p-6 rounded-t-lg">
+        <Card className="hover:shadow-lg transition-shadow flex flex-col h-full opacity-75 overflow-hidden">
+          <div className="bg-gradient-to-b from-gray-400 to-gray-500 p-6 rounded-t-lg">
             <h3 className="text-2xl font-bold text-white">Full AP Exam Prep</h3>
           </div>
-          <div className="p-6 flex flex-col flex-grow">
+          <div className="p-6 pb-0 flex flex-col flex-grow">
             <div className="space-y-4 flex flex-col h-full">
               <div>
-                <p className="text-3xl font-bold">$1,000<span className="text-lg text-gray-500"> one-time payment</span></p>
-                <p className="text-gray-600 mt-4">Comprehensive preparation for serious AP students.</p>
+                <p className="text-3xl font-bold text-gray-400">$1,000<span className="text-lg text-gray-400"> one-time payment</span></p>
+                <p className="text-gray-500 mt-4">Comprehensive preparation for serious AP students.</p>
               </div>
 
               <div className="space-y-3 pt-4 flex-grow">
                 <div className="flex items-start gap-3">
-                  <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span>15 tutoring sessions</span>
+                  <Check className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <span className="text-gray-500">15 tutoring sessions</span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span>Full practice test access</span>
+                  <Check className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <span className="text-gray-500">Full practice test access</span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span>Premium cheat sheets</span>
+                  <Check className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <span className="text-gray-500">Premium cheat sheets</span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span>All interactive tools</span>
+                  <Check className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <span className="text-gray-500">All interactive tools</span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                  <span>Structured study plan</span>
+                  <Check className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <span className="text-gray-500">Structured study plan</span>
                 </div>
               </div>
 
-              <button className="w-full mt-6 px-6 py-3 text-sm font-bold text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                Get Started
-              </button>
+              <div className="bg-gradient-to-r from-blue-500 to-blue-600 -mx-6 p-4 rounded-b-lg">
+                <p className="text-white font-bold text-center">
+                  No longer available for the 2024 - 2025 academic year
+                </p>
+              </div>
             </div>
           </div>
         </Card>
