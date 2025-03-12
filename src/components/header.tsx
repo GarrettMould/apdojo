@@ -3,13 +3,13 @@
 import Link from "next/link"
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { useAuthContext } from '@/contexts/AuthContext'
-import { UserCircle } from 'lucide-react'
+// import { useAuthContext } from '@/contexts/AuthContext'
+// import { UserCircle } from 'lucide-react'
 
 export function Header() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user, logout } = useAuthContext();
+  // const { user, logout } = useAuthContext();
 
   const handleHomeClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -51,17 +51,17 @@ export function Header() {
     <div className="w-full bg-white border-b">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-4">
-      <div className="flex items-center space-x-4">
-        <button 
-          onClick={handleHomeClick}
-          className="hover:opacity-90 transition-opacity flex items-center"
-        >
-          <span className="text-3xl font-extrabold text-gray-900">AP</span>
-          <span className="ml-1 text-3xl font-extrabold text-blue-600">Dojo</span>
-        </button>
-      </div>
-      
-          {/* Hamburger Menu Button - Only visible on mobile */}
+          <div className="flex items-center space-x-4">
+            <button 
+              onClick={handleHomeClick}
+              className="hover:opacity-90 transition-opacity flex items-center"
+            >
+              <span className="text-3xl font-extrabold text-gray-900">AP</span>
+              <span className="ml-1 text-3xl font-extrabold text-blue-600">Dojo</span>
+            </button>
+          </div>
+          
+          {/* Hamburger Menu Button */}
           <button 
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="lg:hidden p-2 hover:bg-gray-100 rounded-md"
@@ -73,11 +73,11 @@ export function Header() {
             ) : (
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+              </svg>
             )}
           </button>
 
-          {/* Desktop Navigation - Updated with new links */}
+          {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-8">
             <Link 
               href="/tutoring" 
@@ -97,8 +97,8 @@ export function Header() {
               onClick={handleToolsClick}
               className="hover:text-blue-600 transition-colors font-bold"
             >
-          Interactive Tools
-        </Link>
+              Interactive Tools
+            </Link>
             <Link 
               href="/cheat-sheets" 
               onClick={handleCheatSheetsClick}
@@ -113,6 +113,7 @@ export function Header() {
             >
               Practice Exams
             </Link>
+            {/* Authentication UI removed temporarily
             {user ? (
               <div className="flex items-center space-x-8">
                 <Link
@@ -147,11 +148,12 @@ export function Header() {
                 </Link>
               </div>
             )}
+            */}
           </nav>
         </div>
       </div>
 
-      {/* Mobile Menu - Only visible when menu is open */}
+      {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-b shadow-lg z-50">
           <div className="px-4 py-2">
