@@ -10,7 +10,7 @@ export async function generateMetadata({ params }: { params: { type: string } })
   
   return {
     title: `AP Dojo | Elite AP Tutoring & Top AP Economics Resources`,
-    description: `Unlock top AP scores with AP Dojo’s premium tutoring. Expert guidance, exclusive AP Economics resources, and personalized strategies for academic success`
+    description: `Unlock top AP scores with AP Dojo's premium tutoring. Expert guidance, exclusive AP Economics resources, and personalized strategies for academic success`
   }
 }
 

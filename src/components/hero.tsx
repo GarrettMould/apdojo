@@ -6,22 +6,20 @@ export function Hero() {
   return (
     <section className="py-20 text-center max-w-3xl mx-auto relative">
       <h1 className="text-6xl font-extrabold tracking-tight drop-shadow-sm leading-tight">
-        Take a Free {' '}
-        <span className="text-blue-500">
-        AP Macro
-        </span>{' '}
-        Diagnostic Test
+      Ace Your <span className="text-blue-500">
+        AP Exams
+        </span>{' '} with Expert 1-on-1 Tutoring
       </h1>
       <p className="text-xl text-gray-600 mt-6">
-        Find your weak spots and get a customized study plan in minutes
+      Get personalized AP tutoring, interactive tools, and top-tier study resources—all designed to boost your confidence and scores.
       </p>
       <Button 
         asChild
         size="xl"
         className="mt-10"
       >
-        <Link href="/diagnostic">
-          Take Diagnostic Quiz
+        <Link href="/tutoring">
+          Book a Lesson
         </Link>
       </Button>
     </section>

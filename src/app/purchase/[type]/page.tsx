@@ -82,177 +82,297 @@ export default function PurchaseExams({ params }: PageProps) {
       />
 
       <div className="container max-w-4xl mx-auto px-4 py-16">
+        {/* Macro Section */}
+        <div className="mb-32">
       <div className="mb-16">
-          <h1 className="text-6xl font-extrabold tracking-tight text-center leading-tight">
-            <span className={titleColorClass}>AP {examType}</span>
-            <br />
-            Practice Exams
+            <h1 className="text-6xl font-extrabold tracking-tight text-center leading-tight">
+              <span className="text-blue-600">AP Macroeconomics</span>
+              <br />
+              Practice Exams
         </h1>
         <p className="text-gray-600 text-center mt-4 text-lg max-w-2xl mx-auto">
           Comprehensive exam preparation trusted by top-performing students nationwide. Created by AP® Economics experts and veteran teachers.
         </p>
       </div>
 
+          <div className="max-w-4xl mx-auto">
+            <div className="mb-16">
+              <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/10 backdrop-blur-sm border border-blue-200 rounded-2xl p-8">
+                <div className="flex gap-12">
+                  <div className="w-1/4">
+                    <h3 className="text-2xl font-extrabold tracking-tight text-gray-900 mb-3">
+                      MCQ Exams
+                    </h3>
+                    <p className="text-gray-600 text-sm leading-relaxed">
+                      Prep for the AP Macroeconomics exam with full-length practice tests
+                    </p>
+                  </div>
 
-     {/*<div className="mb-20">
-          <h2 className="text-5xl font-extrabold tracking-tight mb-12 text-center leading-tight">Why Top Schools and Students Choose AP Dojo</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          
-            <div className="text-center bg-white p-8 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-            <div className="bg-blue-50 p-3 rounded-full w-fit mx-auto mb-4">
-              <svg className="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-              </svg>
+                  <div className="flex-1">
+                    <div className="grid grid-cols-3 gap-4">
+                      {[1, 2, 3].map((num) => (
+                        <div 
+                          key={`mcq-${num}`} 
+                          className={`bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden ${num > 1 ? 'opacity-75' : ''}`}
+                        >
+                          <div className="p-4">
+                            <div className="flex items-center gap-2 mb-3">
+                              <h4 className="text-lg font-bold text-gray-900">
+                                Exam {num}
+                              </h4>
+                              {num > 1 && <Lock className="w-4 h-4 text-gray-400" />}
+                            </div>
+                            <div className="text-sm text-gray-500 mb-4">
+                              60 questions • 70 minutes
+                            </div>
+                            <Link 
+                              href={num === 1 ? `/preview/${resolvedParams.type}/mcq/${num}` : '#'}
+                              className={`w-full px-4 py-2 rounded-lg font-medium text-sm flex items-center justify-center gap-2 ${
+                                num === 1 
+                                  ? 'bg-blue-600 text-white hover:bg-blue-700 transition-colors' 
+                                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                              }`}
+                            >
+                              Start Exam
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                              </svg>
+                            </Link>
+                          </div>
+                        </div>
+                      ))}
+        </div>
+        </div>
+        </div>
+      </div>
             </div>
-              <h3 className="font-semibold text-lg mb-2 min-h-[3rem] flex items-center justify-center">Created by AP® Experts</h3>
-              <p className="text-gray-600">Crafted by experienced AP® Economics teachers and exam writers to align with the AP® Exam</p>
+
+            <div className="mb-16">
+              <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/10 backdrop-blur-sm border border-blue-200 rounded-2xl p-8">
+                <div className="flex gap-12">
+                  <div className="w-1/4">
+                    <h3 className="text-2xl font-extrabold tracking-tight text-gray-900 mb-3">
+                      FRQ Exams
+                    </h3>
+                    <p className="text-gray-600 text-sm leading-relaxed">
+                      Master free response questions with our practice sets
+                    </p>
           </div>
 
-         
-            <div className="text-center bg-white p-8 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-            <div className="bg-blue-50 p-3 rounded-full w-fit mx-auto mb-4">
-              <svg className="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  <div className="flex-1">
+                    <div className="grid grid-cols-3 gap-4">
+                      {[1, 2, 3].map((num) => (
+                        <div 
+                          key={`frq-${num}`} 
+                          className={`bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden ${num > 1 ? 'opacity-75' : ''}`}
+                        >
+                          <div className="p-4 flex flex-col h-full">
+                            <div>
+                              <div className="flex items-center gap-2 mb-3">
+                                <h4 className="text-lg font-bold text-gray-900">
+                                  Exam {num}
+                                </h4>
+                                {num > 1 && <Lock className="w-4 h-4 text-gray-400" />}
+                              </div>
+                              <div className="text-sm text-gray-500 mb-3">
+                                3 questions • 60 minutes
+                              </div>
+                              <div className="flex flex-wrap gap-1 mb-4">
+                                {num === 1 && (
+                                  <>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">AD-AS Model</span>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">Bank Sheets</span>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">Exchange Rates</span>
+                                  </>
+                                )}
+                                {num === 2 && (
+                                  <>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">Monetary Policy</span>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">Int'l Trade</span>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">Phillips Curve</span>
+                                  </>
+                                )}
+                                {num === 3 && (
+                                  <>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">Fiscal Policy</span>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">Growth</span>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">Financial Markets</span>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                            <div className="mt-auto">
+                              <Link 
+                                href={num === 1 ? `/preview/${resolvedParams.type}/frq/${num}` : '#'}
+                                className={`w-full px-4 py-2 rounded-lg font-medium text-sm flex items-center justify-center gap-2 ${
+                                  num === 1 
+                                    ? 'bg-blue-600 text-white hover:bg-blue-700 transition-colors' 
+                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                }`}
+                              >
+                                Start Exam
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
+                              </Link>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
             </div>
-              <h3 className="font-semibold text-lg mb-2 min-h-[3rem] flex items-center justify-center">Personalized Study Plan</h3>
-              <p className="text-gray-600">Tailored learning paths based on your exam results, to ensure you get the most out of your study time</p>
           </div>
-
-          
-            <div className="text-center bg-white p-8 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-            <div className="bg-blue-50 p-3 rounded-full w-fit mx-auto mb-4">
-              <svg className="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-              </svg>
-            </div>
-              <h3 className="font-semibold text-lg mb-2 min-h-[3rem] flex items-center justify-center">Video Explanations</h3>
-              <p className="text-gray-600">Clear, detailed video solutions to help you master the material in Study Mode</p>
           </div>
         </div>
-      </div>*/}
+      </div>
 
-        <div className="max-w-4xl mx-auto">
+        {/* Micro Section */}
+        <div className="mb-32">
         <div className="mb-16">
-          <h3 className="text-2xl font-extrabold tracking-tight text-gray-900 mb-8">Multiple Choice Exams (MCQs)</h3>
+            <h1 className="text-6xl font-extrabold tracking-tight text-center leading-tight">
+              <span className="text-green-600">AP Microeconomics</span>
+              <br />
+              Practice Exams
+            </h1>
+            <p className="text-gray-600 text-center mt-4 text-lg max-w-2xl mx-auto">
+              Comprehensive exam preparation trusted by top-performing students nationwide. Created by AP® Economics experts and veteran teachers.
+            </p>
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[1, 2, 3].map((num) => (
-              <div key={`mcq-${num}`} className={`bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden ${num > 1 ? 'opacity-75' : ''}`}>
-                <div className={`${num === 1 ? 'bg-gradient-to-br from-blue-500 to-blue-600' : 'bg-gradient-to-br from-gray-400 to-gray-500'} p-6`}>
-                  <div className="flex items-center justify-center gap-2">
-                  <h4 className="text-xl font-bold text-white text-center">MCQ Exam {num}</h4>
-                    {num > 1 && <Lock className="w-5 h-5 text-white" />}
+          <div className="max-w-4xl mx-auto">
+            {/* Micro MCQ Section */}
+            <div className="mb-16">
+              <div className="bg-gradient-to-br from-green-500/10 to-green-600/10 backdrop-blur-sm border border-green-200 rounded-2xl p-8">
+                <div className="flex gap-12">
+                  <div className="w-1/4">
+                    <h3 className="text-2xl font-extrabold tracking-tight text-gray-900 mb-3">
+                      MCQ Exams
+                    </h3>
+                    <p className="text-gray-600 text-sm leading-relaxed">
+                      Prep for the AP Microeconomics exam with full-length practice tests
+                    </p>
+                    </div>
+
+                  <div className="flex-1">
+                    <div className="grid grid-cols-3 gap-4">
+                      {[1, 2, 3].map((num) => (
+                        <div 
+                          key={`micro-mcq-${num}`} 
+                          className={`bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden ${num > 1 ? 'opacity-75' : ''}`}
+                        >
+                          <div className="p-4">
+                            <div className="flex items-center gap-2 mb-3">
+                              <h4 className="text-lg font-bold text-gray-900">
+                                Exam {num}
+                              </h4>
+                              {num > 1 && <Lock className="w-4 h-4 text-gray-400" />}
+                        </div>
+                            <div className="text-sm text-gray-500 mb-4">
+                              60 questions • 70 minutes
+                        </div>
+                            <Link 
+                              href={num === 1 ? `/preview/micro-exams/mcq/${num}` : '#'}
+                              className={`w-full px-4 py-2 rounded-lg font-medium text-sm flex items-center justify-center gap-2 ${
+                                num === 1 
+                                  ? 'bg-green-600 text-white hover:bg-green-700 transition-colors' 
+                                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                              }`}
+                            >
+                              Start Exam
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                          </svg>
+                            </Link>
+                        </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <p className="text-blue-100 text-center mt-2">60 questions • 70 minutes</p>
-                </div>
-                
-                <div className="p-6">
-                    <Link 
-                    href={num === 1 ? `/preview/${resolvedParams.type}/mcq/${num}` : '#'}
-                    className={`w-full px-6 py-3 rounded-lg font-medium flex items-center justify-center gap-2 ${
-                      num === 1 
-                        ? 'bg-blue-600 text-white hover:bg-blue-700 transition-colors' 
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    }`}
-                    >
-                      Start Exam
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                      </svg>
-                    </Link>
                 </div>
               </div>
-            ))}
           </div>
+          
+            {/* Micro FRQ Section */}
+            <div className="mb-16">
+              <div className="bg-gradient-to-br from-green-500/10 to-green-600/10 backdrop-blur-sm border border-green-200 rounded-2xl p-8">
+                <div className="flex gap-12">
+                  <div className="w-1/4">
+                    <h3 className="text-2xl font-extrabold tracking-tight text-gray-900 mb-3">
+                      FRQ Exams
+                    </h3>
+                    <p className="text-gray-600 text-sm leading-relaxed">
+                      Master free response questions with our practice sets
+                    </p>
         </div>
 
-        <div className="mb-16">
-          <h3 className="text-2xl font-extrabold tracking-tight text-gray-900 mb-8">Free Response Exams (FRQs)</h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="flex-1">
+                    <div className="grid grid-cols-3 gap-4">
             {[1, 2, 3].map((num) => (
-              <div key={`frq-${num}`} className={`bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden ${num > 1 ? 'opacity-75' : ''}`}>
-                <div className={`${num === 1 ? 'bg-gradient-to-br from-blue-500 to-blue-600' : 'bg-gradient-to-br from-gray-400 to-gray-500'} p-6`}>
-                  <div className="flex items-center justify-center gap-2">
-                  <h4 className="text-xl font-bold text-white text-center">FRQ Exam {num}</h4>
-                    {num > 1 && <Lock className="w-5 h-5 text-white" />}
+              <div 
+                          key={`micro-frq-${num}`} 
+                          className={`bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden ${num > 1 ? 'opacity-75' : ''}`}
+              >
+                          <div className="p-4 flex flex-col h-full">
+                  <div>
+                              <div className="flex items-center gap-2 mb-3">
+                                <h4 className="text-lg font-bold text-gray-900">
+                                  Exam {num}
+                                </h4>
+                                {num > 1 && <Lock className="w-4 h-4 text-gray-400" />}
                   </div>
-                  <p className={`${num === 1 ? 'text-blue-100' : 'text-gray-200'} text-center mt-2`}>3 questions • 60 minutes</p>
+                              <div className="text-sm text-gray-500 mb-3">
+                                3 questions • 60 minutes
                 </div>
-                
-                <div className="p-6">
-                  <ul className="space-y-2 mb-6 text-gray-600">
+                              <div className="flex flex-wrap gap-1 mb-4">
                   {num === 1 && (
                     <>
-                        <li className="flex items-center gap-2">
-                          <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
-                        AD-AS Model Analysis
-                      </li>
-                        <li className="flex items-center gap-2">
-                          <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
-                        Bank Balance Sheets
-                      </li>
-                        <li className="flex items-center gap-2">
-                          <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
-                        Exchange Rate Systems
-                      </li>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">Supply & Demand</span>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">Elasticity</span>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">Market Failure</span>
                     </>
                   )}
                   {num === 2 && (
                     <>
-                        <li className="flex items-center gap-2">
-                          <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
-                        Monetary Policy
-                      </li>
-                        <li className="flex items-center gap-2">
-                          <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
-                        International Trade
-                      </li>
-                        <li className="flex items-center gap-2">
-                          <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
-                        Phillips Curve Analysis
-                      </li>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">Perfect Competition</span>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">Monopoly</span>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">Game Theory</span>
                     </>
                   )}
                   {num === 3 && (
                     <>
-                        <li className="flex items-center gap-2">
-                          <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
-                        Fiscal Policy
-                      </li>
-                        <li className="flex items-center gap-2">
-                          <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
-                        Economic Growth
-                      </li>
-                        <li className="flex items-center gap-2">
-                          <span className="w-1.5 h-1.5 bg-blue-600 rounded-full"></span>
-                        Financial Markets
-                      </li>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">Factor Markets</span>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">Market Structure</span>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">Externalities</span>
                     </>
                   )}
-                </ul>
-
-                    <Link 
-                    href={num === 1 ? `/preview/${resolvedParams.type}/frq/${num}` : '#'}
-                    className={`w-full px-6 py-3 rounded-lg font-medium flex items-center justify-center gap-2 ${
-                      num === 1 
-                        ? 'bg-blue-600 text-white hover:bg-blue-700 transition-colors' 
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    }`}
-                    >
-                      Start Exam
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                      </svg>
-                    </Link>
+                              </div>
+                            </div>
+                            <div className="mt-auto">
+                              <Link 
+                                href={num === 1 ? `/preview/micro-exams/frq/${num}` : '#'}
+                                className={`w-full px-4 py-2 rounded-lg font-medium text-sm flex items-center justify-center gap-2 ${
+                                  num === 1 
+                                    ? 'bg-green-600 text-white hover:bg-green-700 transition-colors' 
+                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                }`}
+                              >
+                                Start Exam
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                </svg>
+                              </Link>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
-            ))}
+            </div>
           </div>
         </div>
-
-       
 
         {/* Bottom commitment section with gradient */}
         <div className="bg-gray-50 rounded-xl p-8 mt-12 text-center">
@@ -282,7 +402,6 @@ export default function PurchaseExams({ params }: PageProps) {
           </div>
         </div>
       </div>
-    </div>
     </>
   )
 } 

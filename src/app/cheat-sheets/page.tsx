@@ -1,8 +1,6 @@
 'use client';
 
-import { useState } from 'react';
 import { Download } from 'lucide-react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 
 type Unit = {
   number: number;
@@ -30,7 +28,7 @@ const microUnits: Unit[] = [
 
 export default function CheatSheetsPage() {
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12 mt-12">
+    <div className="max-w-6xl mx-auto px-4 py-12 mt-12">
       <h1 className="text-5xl font-extrabold tracking-tight text-gray-900 text-center mb-6">
         Unit Cheat Sheets
       </h1>
@@ -39,72 +37,87 @@ export default function CheatSheetsPage() {
         These Unit Cheat Sheets cover key terms, formulas, and graphs needed to master your AP economics exam.
       </p>
 
-      <Tabs defaultValue="macro" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-8 h-12">
-          <TabsTrigger 
-            value="macro" 
-            className="text-lg font-bold w-full h-full flex items-center justify-center
-              data-[state=active]:bg-blue-600 data-[state=active]:text-white
-              data-[state=inactive]:bg-gray-100"
-          >
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Macro Section */}
+        <div>
+          <h2 className="text-3xl font-extrabold text-blue-600 mb-6 text-center">
             AP Macroeconomics
-          </TabsTrigger>
-          <TabsTrigger 
-            value="micro" 
-            className="text-lg font-bold w-full h-full flex items-center justify-center
-              data-[state=active]:bg-blue-600 data-[state=active]:text-white
-              data-[state=inactive]:bg-gray-100"
-          >
-            AP Microeconomics
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="macro">
+          </h2>
           <div className="space-y-4">
             {macroUnits.map((unit) => (
               <div 
                 key={unit.number}
-                className="flex items-center justify-between p-4 bg-white rounded-lg border hover:shadow-md transition-shadow"
+                className="group flex bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-200 h-24"
               >
-                <div className="text-lg">
-                  <span className="font-bold text-blue-600">Unit {unit.number}:</span>
-                  <span className="ml-2 font-medium">{unit.title}</span>
+                <div className="w-20 bg-gradient-to-br from-blue-500/80 to-blue-700/90 flex items-center justify-center">
+                  <span className="text-white text-3xl font-bold">
+                    {unit.number}
+                  </span>
                 </div>
-                <button 
-                  onClick={() => window.open(unit.pdfUrl, '_blank')}
-                  className="p-2 text-gray-600 hover:text-blue-600 transition-colors"
-                  title={`Download Unit ${unit.number} Cheat Sheet`}
-                >
-                  <Download className="w-6 h-6" />
-                </button>
+                <div className="flex-1 p-6">
+                  <div className="flex h-full items-center justify-between gap-4">
+                    <div>
+                      <h3 className="font-bold text-gray-900 text-lg leading-tight max-w-[300px]">
+                        {unit.title}
+                      </h3>
+                      <div className="text-sm text-gray-500 mt-1">
+                        Key concepts, graphs, and formulas
+                      </div>
+                    </div>
+                    <button 
+                      onClick={() => window.open(unit.pdfUrl, '_blank')}
+                      className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-gray-50 text-gray-600 group-hover:bg-blue-600 group-hover:text-white transition-all duration-200"
+                      title={`Download Unit ${unit.number} Cheat Sheet`}
+                    >
+                      <Download className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
-        </TabsContent>
+        </div>
 
-        <TabsContent value="micro">
+        {/* Micro Section */}
+        <div>
+          <h2 className="text-3xl font-extrabold text-green-600 mb-6 text-center">
+            AP Microeconomics
+          </h2>
           <div className="space-y-4">
             {microUnits.map((unit) => (
               <div 
                 key={unit.number}
-                className="flex items-center justify-between p-4 bg-white rounded-lg border hover:shadow-md transition-shadow"
+                className="group flex bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-200 h-24"
               >
-                <div className="text-lg">
-                  <span className="font-bold text-blue-600">Unit {unit.number}:</span>
-                  <span className="ml-2 font-medium">{unit.title}</span>
+                <div className="w-20 bg-gradient-to-br from-green-500/80 to-green-700/90 flex items-center justify-center">
+                  <span className="text-white text-3xl font-bold">
+                    {unit.number}
+                  </span>
                 </div>
-                <button 
-                  onClick={() => window.open(unit.pdfUrl, '_blank')}
-                  className="p-2 text-gray-600 hover:text-blue-600 transition-colors"
-                  title={`Download Unit ${unit.number} Cheat Sheet`}
-                >
-                  <Download className="w-6 h-6" />
-                </button>
+                <div className="flex-1 p-6">
+                  <div className="flex h-full items-center justify-between gap-4">
+                    <div>
+                      <h3 className="font-bold text-gray-900 text-lg leading-tight max-w-[300px]">
+                        {unit.title}
+                      </h3>
+                      <div className="text-sm text-gray-500 mt-1">
+                        Key concepts, graphs, and formulas
+                      </div>
+                    </div>
+                    <button 
+                      onClick={() => window.open(unit.pdfUrl, '_blank')}
+                      className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-lg bg-gray-50 text-gray-600 group-hover:bg-green-600 group-hover:text-white transition-all duration-200"
+                      title={`Download Unit ${unit.number} Cheat Sheet`}
+                    >
+                      <Download className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
-        </TabsContent>
-      </Tabs>
+        </div>
+      </div>
     </div>
   )
 } 

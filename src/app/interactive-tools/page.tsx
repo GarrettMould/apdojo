@@ -3,6 +3,7 @@ import Link from 'next/link'
 const tools = [
   {
     title: 'Flashcards',
+    subject: ['macro', 'micro'],
     description: 'Study key economics concepts with interactive flashcards',
     icon: '🎴',
     href: '/interactive-tools/flashcards',
@@ -10,6 +11,7 @@ const tools = [
   },
   {
     title: 'GDP Calculator',
+    subject: ['macro'],
     description: 'Explore how changes in price and quantity affect Real vs. Nominal GDP using Coffee Land\'s economy',
     icon: '📊',
     href: '/interactive-tools/gdp-calculator',
@@ -17,6 +19,7 @@ const tools = [
   },
   {
     title: 'Supply & Demand Simulator',
+    subject: ['macro', 'micro'],
     description: 'Visualize how markets respond to changes in supply and demand',
     icon: '📈',
     href: '/interactive-tools/supply-demand',
@@ -24,6 +27,7 @@ const tools = [
   },
   {
     title: 'Phillips Curve Plotter',
+    subject: ['macro'],
     description: 'Explore the relationship between inflation and unemployment',
     icon: '📊',
     href: '/interactive-tools/phillips-curve',
@@ -53,7 +57,23 @@ export default function InteractiveToolsPage() {
               <Link href={tool.href} className="block">
                 <div className="flex flex-col h-full">
                   <div className="text-4xl mb-4">{tool.icon}</div>
-                  <h3 className="text-xl font-bold mb-2">{tool.title}</h3>
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="text-xl font-bold">{tool.title}</h3>
+                    <div className="flex gap-1">
+                      {tool.subject.map((subj) => (
+                        <span
+                          key={subj}
+                          className={`text-xs px-2 py-0.5 rounded font-medium ${
+                            subj === 'macro'
+                              ? 'bg-blue-100 text-blue-700'
+                              : 'bg-green-100 text-green-700'
+                          }`}
+                        >
+                          {subj === 'macro' ? 'Macro' : 'Micro'}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
                   <p className="text-gray-600">{tool.description}</p>
                   <div className="mt-4 text-blue-600 font-semibold group-hover:text-blue-700">
                     Try it now →
@@ -63,7 +83,23 @@ export default function InteractiveToolsPage() {
             ) : (
               <div className="flex flex-col h-full">
                 <div className="text-4xl mb-4">{tool.icon}</div>
-                <h3 className="text-xl font-bold mb-2">{tool.title}</h3>
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="text-xl font-bold">{tool.title}</h3>
+                  <div className="flex gap-1">
+                    {tool.subject.map((subj) => (
+                      <span
+                        key={subj}
+                        className={`text-xs px-2 py-0.5 rounded font-medium ${
+                          subj === 'macro'
+                            ? 'bg-blue-100 text-blue-700'
+                            : 'bg-green-100 text-green-700'
+                        }`}
+                      >
+                        {subj === 'macro' ? 'Macro' : 'Micro'}
+                      </span>
+                    ))}
+                  </div>
+                </div>
                 <p className="text-gray-600">{tool.description}</p>
                 <div className="mt-4 text-gray-500 font-semibold">
                   Coming Soon

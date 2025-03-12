@@ -89,6 +89,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
 
+  // Update the track size constant
+  const QUESTIONS_PER_TRACK = 15;  // This divides evenly into 60
+
   const handleAnswer = (questionId: number, answerIndex: number) => {
     setAnswers({
       ...answers,
@@ -290,7 +293,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
   // Update currentQuestionIndex to also handle track pagination
   const setCurrentQuestionIndexWithTrack = (index: number) => {
     setCurrentQuestionIndex(index);
-    setCurrentTrackPage(Math.floor(index / 20));
+    setCurrentTrackPage(Math.floor(index / QUESTIONS_PER_TRACK));
   };
 
   // Modify navigation functions to update track
@@ -308,14 +311,37 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
 
   // Modified helper function to render question indicators
   const renderQuestionIndicators = () => {
-    const startIndex = currentTrackPage * 20;
-    const endIndex = startIndex + 20;
+    const startIndex = currentTrackPage * QUESTIONS_PER_TRACK;
+    const endIndex = Math.min(startIndex + QUESTIONS_PER_TRACK, questions.length);
+    const totalPages = Math.ceil(questions.length / QUESTIONS_PER_TRACK);
 
     return (
       <div className="w-full max-w-4xl mx-auto mb-8">
         <div className="flex gap-2.5 p-4 bg-white rounded-xl shadow-sm border border-gray-100 justify-between">
-          {Array.from({ length: 20 }, (_, i) => {
+          {/* Previous Arrow */}
+          <div
+            onClick={() => {
+              if (currentTrackPage > 0) {
+                setCurrentTrackPage(currentTrackPage - 1);
+                // Remove the automatic question change
+              }
+            }}
+            className={`
+              w-[32px] h-[32px] flex items-center justify-center rounded-lg 
+              transition-all duration-200 ease-in-out text-sm font-medium
+              ${currentTrackPage === 0
+                ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
+                : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200 cursor-pointer hover:scale-105'
+              }
+            `}
+          >
+            ←
+          </div>
+
+          {/* Question Indicators */}
+          {Array.from({ length: QUESTIONS_PER_TRACK }, (_, i) => {
             const questionIndex = startIndex + i;
+            if (questionIndex >= questions.length) return null;
             const question = questions[questionIndex];
             const isBookmarked = question && bookmarkedQuestions.has(question.id);
             
@@ -339,6 +365,26 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
               </div>
             );
           })}
+
+          {/* Next Arrow */}
+          <div
+            onClick={() => {
+              if (currentTrackPage < totalPages - 1) {
+                setCurrentTrackPage(currentTrackPage + 1);
+                // Remove the automatic question change
+              }
+            }}
+            className={`
+              w-[32px] h-[32px] flex items-center justify-center rounded-lg 
+              transition-all duration-200 ease-in-out text-sm font-medium
+              ${currentTrackPage >= totalPages - 1
+                ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
+                : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200 cursor-pointer hover:scale-105'
+              }
+            `}
+          >
+            →
+          </div>
         </div>
       </div>
     );
@@ -684,87 +730,87 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
               {/* Question header with unit and bookmark - fixed at top */}
               <div className="p-6 border-b">
                 <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-3">
-                    <span className="font-bold text-gray-900">
-                      Question {currentQuestionIndex + 1} of 60
-                    </span>
-                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-semibold">
-                      Unit {questions[currentQuestionIndex].unit}
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => toggleBookmark(questions[currentQuestionIndex].id)}
-                    className="text-gray-400 hover:text-yellow-500 transition-colors"
-                  >
-                    {bookmarkedQuestions.has(questions[currentQuestionIndex].id) ? (
-                      <BookmarkX className="w-5 h-5 text-yellow-400 fill-yellow-400" />
-                    ) : (
-                      <Bookmark className="w-5 h-5" />
-                    )}
-                  </button>
+                    <div className="flex items-center gap-3">
+                      <span className="font-bold text-gray-900">
+                        Question {currentQuestionIndex + 1} of 60
+                      </span>
+                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-semibold">
+                        Unit {questions[currentQuestionIndex].unit}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => toggleBookmark(questions[currentQuestionIndex].id)}
+                      className="text-gray-400 hover:text-yellow-500 transition-colors"
+                    >
+                      {bookmarkedQuestions.has(questions[currentQuestionIndex].id) ? (
+                        <BookmarkX className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+                      ) : (
+                        <Bookmark className="w-5 h-5" />
+                      )}
+                    </button>
                 </div>
-              </div>
-              
+                  </div>
+                  
               {/* Question content with adjusted height and scrolling */}
               <div className="h-[425px] overflow-y-auto px-6 py-4">
-                <div className="space-y-4">
-                  <p className="text-lg font-medium">{questions[currentQuestionIndex].question}</p>
-                  
-                  {questions[currentQuestionIndex].image && (
-                    <div className="my-4">
-                      <img 
-                        src={questions[currentQuestionIndex].image.src}
-                        alt="Question"
+                  <div className="space-y-4">
+                    <p className="text-lg font-medium">{questions[currentQuestionIndex].question}</p>
+                    
+                    {questions[currentQuestionIndex].image && (
+                      <div className="my-4">
+                        <img 
+                          src={questions[currentQuestionIndex].image.src}
+                          alt="Question"
                         className="max-h-[225px] object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
-                        onClick={() => {
-                          setSelectedImage(questions[currentQuestionIndex].image);
-                          setShowImageModal(true);
-                        }}
-                      />
-                    </div>
-                  )}
-                  
-                  <div className="space-y-3 pb-2">
-                    {questions[currentQuestionIndex].options.map((option, optIndex) => (
-                      <div
-                        key={optIndex}
-                        onClick={() => handleAnswer(questions[currentQuestionIndex].id, optIndex)}
-                        className={`
-                          p-3 border rounded cursor-pointer hover:bg-gray-50 transition-colors
-                          ${answers[questions[currentQuestionIndex].id] === String.fromCharCode(65 + optIndex) 
-                            ? 'border-blue-500 bg-blue-50 hover:bg-blue-50' 
-                            : 'border-gray-200'}
-                        `}
-                      >
-                        <span className="mr-2">{String.fromCharCode(97 + optIndex)})</span>
-                        {option}
+                          onClick={() => {
+                            setSelectedImage(questions[currentQuestionIndex].image);
+                            setShowImageModal(true);
+                          }}
+                        />
                       </div>
-                    ))}
+                    )}
+                    
+                  <div className="space-y-3 pb-2">
+                      {questions[currentQuestionIndex].options.map((option, optIndex) => (
+                        <div
+                          key={optIndex}
+                          onClick={() => handleAnswer(questions[currentQuestionIndex].id, optIndex)}
+                          className={`
+                            p-3 border rounded cursor-pointer hover:bg-gray-50 transition-colors
+                            ${answers[questions[currentQuestionIndex].id] === String.fromCharCode(65 + optIndex) 
+                              ? 'border-blue-500 bg-blue-50 hover:bg-blue-50' 
+                              : 'border-gray-200'}
+                          `}
+                        >
+                          <span className="mr-2">{String.fromCharCode(97 + optIndex)})</span>
+                          {option}
+                        </div>
+                      ))}
                   </div>
-                </div>
-              </div>
+                    </div>
+                  </div>
 
               {/* Navigation buttons - fixed at bottom */}
               <div className="p-6 border-t bg-white">
-                <div className="flex gap-2">
-                  <Button
-                    onClick={goToPreviousQuestion}
-                    disabled={currentQuestionIndex === 0}
-                    variant="outline"
-                    className="w-28"
-                  >
-                    Previous
-                  </Button>
-                  <Button
-                    onClick={goToNextQuestion}
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={goToPreviousQuestion}
+                        disabled={currentQuestionIndex === 0}
+                        variant="outline"
+                        className="w-28"
+                      >
+                        Previous
+                      </Button>
+                      <Button
+                        onClick={goToNextQuestion}
                     disabled={currentQuestionIndex === questions.length - 1}
-                    variant="outline"
-                    className="w-28"
-                  >
-                    Next
-                  </Button>
-                </div>
-              </div>
+                        variant="outline"
+                        className="w-28"
+                      >
+                        Next
+                      </Button>
+                      </div>
+                    </div>
             </div>
           </>
         ) : (

@@ -97,8 +97,8 @@ export function Header() {
               onClick={handleToolsClick}
               className="hover:text-blue-600 transition-colors font-bold"
             >
-              Interactive Tools
-            </Link>
+          Interactive Tools
+        </Link>
             <Link 
               href="/cheat-sheets" 
               onClick={handleCheatSheetsClick}

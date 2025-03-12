@@ -510,7 +510,7 @@ export const macroSetTwoQuestions: QuestionBank = {
         "id": 33,
         "unit": 2,
         "unitName": "Economic Indicators and the Business Cycle",
-        "question": "The value-added by a single firm when calculating GDP is: calculated by:",
+        "question": "The value-added by a single firm when calculating GDP is calculated by:",
         "image": null,  "options": [
           "Summing the market value of all final goods and services produced by the firm",
           "Summing the value of all intermediate goods and services purchased by the firm",
