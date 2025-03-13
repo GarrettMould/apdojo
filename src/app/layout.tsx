@@ -26,7 +26,7 @@ export default function RootLayout({
           <HeaderWrapper />
           <main className="flex-1">
             <PageContainer>
-              {children}
+          {children}
             </PageContainer>
           </main>
           <Footer />

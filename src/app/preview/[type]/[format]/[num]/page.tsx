@@ -70,6 +70,8 @@ export default function ExamPreview({ params }: PageProps) {
         questionType={params.format}
         examNumber={params.num}
       />
+
+      
     </div>
   )
 } 

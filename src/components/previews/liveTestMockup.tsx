@@ -44,7 +44,7 @@ export default function LiveTestMockup() {
   useEffect(() => {
     let isMounted = true;
 
-    const sequence = async () => {
+      const sequence = async () => {
       try {
         if (!controls || !isMounted) return;
 
@@ -64,7 +64,7 @@ export default function LiveTestMockup() {
       } catch (error) {
         console.error('Animation sequence error:', error);
       }
-    };
+      };
 
     if (inView) {
       sequence();
@@ -78,7 +78,7 @@ export default function LiveTestMockup() {
   return (
     <div className="max-w-4xl mx-auto" ref={ref}>
       <motion.div 
-        className="bg-white rounded-xl shadow-xl border border-gray-200 p-12 mb-12 mt-12"
+        className="bg-white rounded-xl shadow-xl border border-gray-200 p-12 mb-12 "
         initial="initial"
         animate={controls}
         variants={{
@@ -99,7 +99,7 @@ export default function LiveTestMockup() {
               <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs font-semibold">
                 {sampleQuestion.unit}
               </span>
-            </div>
+          </div>
             <motion.span
               variants={{
                 initial: { opacity: 0 },
@@ -115,36 +115,36 @@ export default function LiveTestMockup() {
               Incorrect
             </motion.span>
           </div>
-
-          <div className="space-y-3">
+        
+        <div className="space-y-3">
             <p className="text-base font-medium">{sampleQuestion.text}</p>
           
             <div className="space-y-2">
-              {sampleQuestion.options.map((option) => (
-                <motion.div
-                  key={option.id}
-                  variants={{
+          {sampleQuestion.options.map((option) => (
+            <motion.div
+              key={option.id}
+              variants={{
                     initial: { 
                       backgroundColor: 'white',
                       borderColor: '#E5E7EB'
                     },
-                    select: {
-                      backgroundColor: option.id === sampleQuestion.selectedAnswer ? '#EBF5FF' : 'white',
+                select: {
+                  backgroundColor: option.id === sampleQuestion.selectedAnswer ? '#EBF5FF' : 'white',
                       borderColor: option.id === sampleQuestion.selectedAnswer ? '#3B82F6' : '#E5E7EB',
                       transition: { delay: 0.7 }
-                    },
-                    showResult: {
-                      backgroundColor: 
-                        option.id === sampleQuestion.correctAnswer ? '#F0FDF4' :
-                        option.id === sampleQuestion.selectedAnswer ? '#FEF2F2' : 'white',
-                      borderColor:
-                        option.id === sampleQuestion.correctAnswer ? '#22C55E' :
-                        option.id === sampleQuestion.selectedAnswer ? '#EF4444' : '#E5E7EB',
+                },
+                showResult: {
+                  backgroundColor: 
+                    option.id === sampleQuestion.correctAnswer ? '#F0FDF4' :
+                    option.id === sampleQuestion.selectedAnswer ? '#FEF2F2' : 'white',
+                  borderColor:
+                    option.id === sampleQuestion.correctAnswer ? '#22C55E' :
+                    option.id === sampleQuestion.selectedAnswer ? '#EF4444' : '#E5E7EB',
                       transition: { delay: 1.4 }
-                    }
-                  }}
-                  initial="initial"
-                  animate={controls}
+                }
+              }}
+              initial="initial"
+              animate={controls}
                   className="p-3 border rounded"
                 >
                   <div className="flex items-center justify-between gap-3">
@@ -177,10 +177,10 @@ export default function LiveTestMockup() {
                       </motion.div>
                   )}
                   </div>
-                </motion.div>
-              ))}
+            </motion.div>
+          ))}
             </div>
-          </div>
+        </div>
 
           <motion.div
             variants={{
@@ -198,8 +198,8 @@ export default function LiveTestMockup() {
             className="overflow-hidden"
           >
             <div className="relative group">
-              <motion.div
-                variants={{
+        <motion.div
+          variants={{
                   initial: { opacity: 0 },
                   select: { opacity: 0 },
                   showResult: { 
@@ -244,8 +244,8 @@ export default function LiveTestMockup() {
                       variants={{
                         initial: { opacity: 0 },
                         showResult: { opacity: 0 },
-                        showExplanation: { 
-                          opacity: 1,
+            showExplanation: {
+              opacity: 1,
                           transition: { 
                             delay: 2.1,
                             duration: 0.2
@@ -268,7 +268,7 @@ export default function LiveTestMockup() {
               select: { height: 0, opacity: 0, margin: 0 },
               showResult: { height: 0, opacity: 0, margin: 0 },
               showExplanation: {
-                height: 'auto',
+              height: 'auto',
                 opacity: 1,
                 marginTop: '1rem',
                 transition: { 
@@ -276,17 +276,17 @@ export default function LiveTestMockup() {
                   opacity: { duration: 0.2, delay: 2.3 },
                   margin: { duration: 0.2, delay: 2.1 }
                 }
-              }
-            }}
-            initial="initial"
-            animate={controls}
+            }
+          }}
+          initial="initial"
+          animate={controls}
             className="overflow-hidden"
-          >
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <p className="text-gray-700">{sampleQuestion.explanation}</p>
-            </div>
-          </motion.div>
-        </div>
+        >
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <p className="text-gray-700">{sampleQuestion.explanation}</p>
+          </div>
+        </motion.div>
+      </div>
       </motion.div>
     </div>
   );

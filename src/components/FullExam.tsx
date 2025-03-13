@@ -312,7 +312,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
     }
   };
 
-  // Modified helper function to render question indicators
+  // Modify the question track rendering for mobile
   const renderQuestionIndicators = () => {
     const startIndex = currentTrackPage * QUESTIONS_PER_TRACK;
     const endIndex = Math.min(startIndex + QUESTIONS_PER_TRACK, questions.length);
@@ -320,73 +320,83 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
 
     return (
       <div className="w-full max-w-4xl mx-auto mb-8">
-        <div className="flex gap-2.5 p-4 bg-white rounded-xl shadow-sm border border-gray-100 justify-between">
-          {/* Previous Arrow */}
-          <div
-            onClick={() => {
-              if (currentTrackPage > 0) {
-                setCurrentTrackPage(currentTrackPage - 1);
-                // Remove the automatic question change
-              }
-            }}
-            className={`
-              w-[32px] h-[32px] flex items-center justify-center rounded-lg 
-              transition-all duration-200 ease-in-out text-sm font-medium
-              ${currentTrackPage === 0
-                ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
-                : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200 cursor-pointer hover:scale-105'
-              }
-            `}
-          >
-            ←
-          </div>
+        {/* Single container for all elements */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+          <div className="flex items-center">
+            {/* Previous Arrow - Hidden on mobile */}
+            <div
+              onClick={() => {
+                if (currentTrackPage > 0) {
+                  setCurrentTrackPage(currentTrackPage - 1);
+                }
+              }}
+              className={`
+                hidden md:flex min-w-[32px] h-[32px] items-center justify-center rounded-lg
+                transition-all duration-200 ease-in-out text-sm font-medium mr-4
+                ${currentTrackPage === 0
+                  ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
+                  : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200 cursor-pointer hover:scale-105'
+                }
+              `}
+            >
+              ←
+            </div>
 
-          {/* Question Indicators */}
-          {Array.from({ length: QUESTIONS_PER_TRACK }, (_, i) => {
-            const questionIndex = startIndex + i;
-            if (questionIndex >= questions.length) return null;
-            const question = questions[questionIndex];
-            const isBookmarked = question && bookmarkedQuestions.has(question.id);
-            
-            return (
-              <div
-                key={questionIndex}
-                className={`
-                  w-[32px] h-[32px] flex items-center justify-center rounded-lg 
-                  transition-all duration-200 ease-in-out text-sm font-medium
-                  ${questionIndex === currentQuestionIndex 
-                    ? 'bg-blue-500 text-white shadow-sm scale-105' 
-                    : completedQuestions.has(questions[questionIndex]?.id)
-                    ? 'bg-blue-200 text-blue-900 border border-blue-300'
-                    : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'}
-                  ${isBookmarked ? 'border-2 border-yellow-300/70' : ''}
-                  hover:scale-105 cursor-pointer
-                `}
-                onClick={() => setCurrentQuestionIndexWithTrack(questionIndex)}
-              >
-                {questionIndex + 1}
-              </div>
-            );
-          })}
+            {/* Question Indicators - Scrollable on mobile */}
+            <div className="flex-1 flex md:justify-between overflow-x-auto md:overflow-x-visible gap-2 md:gap-0">
+              {Array.from({ length: QUESTIONS_PER_TRACK }, (_, i) => {
+                const questionIndex = startIndex + i;
+                if (questionIndex >= questions.length) return null;
+                const question = questions[questionIndex];
+                const isBookmarked = question && bookmarkedQuestions.has(question.id);
+                
+                // On mobile, only show questions near the current one
+                const shouldShow = window.innerWidth > 768 || 
+                  (questionIndex >= currentQuestionIndex - 4 && 
+                   questionIndex <= currentQuestionIndex + 4);
+                
+                if (!shouldShow) return null;
+                
+                return (
+                  <div
+                    key={questionIndex}
+                    className={`
+                      min-w-[32px] h-[32px] flex items-center justify-center rounded-lg 
+                      transition-all duration-200 ease-in-out text-sm font-medium flex-shrink-0
+                      ${questionIndex === currentQuestionIndex 
+                        ? 'bg-blue-500 text-white shadow-sm scale-105' 
+                        : completedQuestions.has(questions[questionIndex]?.id)
+                        ? 'bg-blue-200 text-blue-900 border border-blue-300'
+                        : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'}
+                      ${isBookmarked ? 'border-2 border-yellow-300/70' : ''}
+                      hover:scale-105 cursor-pointer
+                    `}
+                    onClick={() => setCurrentQuestionIndexWithTrack(questionIndex)}
+                  >
+                    {questionIndex + 1}
+                  </div>
+                );
+              })}
+            </div>
 
-          {/* Next Arrow */}
-          <div
-            onClick={() => {
-              if (currentTrackPage < totalPages - 1) {
-                setCurrentTrackPage(currentTrackPage + 1);
-                // Remove the automatic question change
-              }
-            }}
-            className={`
-              w-[32px] h-[32px] flex items-center justify-center rounded-lg 
-              transition-all duration-200 ease-in-out text-sm font-medium
-              ${currentTrackPage >= totalPages - 1
-                ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
-                : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200 cursor-pointer hover:scale-105'
-              }
-            `}
-          >
-            →
+            {/* Next Arrow - Hidden on mobile */}
+            <div
+              onClick={() => {
+                if (currentTrackPage < totalPages - 1) {
+                  setCurrentTrackPage(currentTrackPage + 1);
+                }
+              }}
+              className={`
+                hidden md:flex min-w-[32px] h-[32px] items-center justify-center rounded-lg
+                transition-all duration-200 ease-in-out text-sm font-medium ml-4
+                ${currentTrackPage >= totalPages - 1
+                  ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
+                  : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200 cursor-pointer hover:scale-105'
+                }
+              `}
+            >
+              →
+            </div>
           </div>
         </div>
       </div>
@@ -550,76 +560,26 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
           </div>
         )}
 
-        {!showTimer && (
-          <button
-            onClick={() => setShowTimer(true)}
-            className={`fixed right-8 ${
-              showDrawingPad ? 'top-8' : 'top-1/2 -translate-y-1/2'
-            } transform bg-white p-3 rounded-lg shadow-md border hover:bg-gray-50 transition-all duration-300`}
-          >
-            <Clock className="w-6 h-6" />
-          </button>
-        )}
-
-        {showCalculator && (
-          <div className="fixed left-8 top-1/2 transform -translate-y-1/2 scale-125 bg-white rounded-lg shadow-md border w-56">
-            <div className="absolute top-2 right-2 left-2 flex justify-end items-center">
-              <button 
-                onClick={() => setShowCalculator(false)}
-                className="text-gray-400 hover:text-gray-600 flex items-center"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="p-4 pt-8">
-              <div className="bg-gray-100 p-3 rounded mb-3 text-right font-mono text-2xl">
-                {getDisplayText()}
-              </div>
-              <div className="grid grid-cols-4 gap-2">
-                {[['C', '', '', ''],
-                  ['7', '8', '9', '÷'],
-                  ['4', '5', '6', '×'],
-                  ['1', '2', '3', '-'],
-                  ['0', '.', '=', '+']].map((row, i) => (
-                  row.map((btn, j) => (
-                    <button
-                      key={`${i}-${j}`}
-                      onClick={() => {
-                        if (btn === 'C') handleClear();
-                        else if (btn === '=') handleEquals();
-                        else if (btn === '.') handleDecimal();
-                        else if ('0123456789'.includes(btn)) handleNumber(btn);
-                        else if (btn !== '') handleOperation(btn);
-                      }}
-                      className={`p-2 text-center rounded ${
-                        btn === ''
-                          ? 'invisible'
-                          : btn === 'C'
-                          ? 'bg-red-500 text-white hover:bg-red-600'
-                          : '0123456789.'.includes(btn)
-                          ? 'bg-white hover:bg-gray-100'
-                          : btn === '='
-                          ? 'bg-blue-500 text-white hover:bg-blue-600'
-                          : 'bg-gray-200 hover:bg-gray-300'
-                      }`}
-                    >
-                      {btn}
-                    </button>
-                  ))
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {!showCalculator && (
-          <button
-            onClick={() => setShowCalculator(true)}
-            className="fixed left-8 top-1/2 transform -translate-y-1/2 bg-white p-3 rounded-lg shadow-md border hover:bg-gray-50"
-          >
-            <Calculator className="w-6 h-6" />
-          </button>
-        )}
+        {/* Tools Container - Only show on desktop */}
+        <div className="fixed hidden md:flex left-4 top-1/2 -translate-y-1/2 flex-col gap-4">
+          {!showTimer && (
+            <button
+              onClick={() => setShowTimer(true)}
+              className="bg-white p-3 rounded-lg shadow-md border hover:bg-gray-50 transition-all duration-300"
+            >
+              <Clock className="w-6 h-6" />
+            </button>
+          )}
+          
+          {!showCalculator && (
+            <button
+              onClick={() => setShowCalculator(true)}
+              className="bg-white p-3 rounded-lg shadow-md border hover:bg-gray-50"
+            >
+              <Calculator className="w-6 h-6" />
+            </button>
+          )}
+        </div>
 
         {showDrawingPad && (
           <div className={`fixed ${
@@ -720,10 +680,11 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
           </div>
         )}
 
+        {/* Hide drawing pad on mobile */}
         {!showDrawingPad && (
           <button
             onClick={() => toggleDrawingPad(true)}
-            className="fixed right-8 bottom-8 bg-white p-3 rounded-lg shadow-md border hover:bg-gray-50"
+            className="fixed right-8 bottom-8 bg-white p-3 rounded-lg shadow-md border hover:bg-gray-50 hidden md:flex"
           >
             <Pen className="w-6 h-6" />
           </button>
@@ -797,37 +758,37 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
 
               {/* Navigation buttons - fixed at bottom */}
               <div className="p-6 border-t bg-white">
-                    <div className="flex justify-between items-center">
-                      <div className="flex gap-2">
-                      <Button
-                        onClick={goToPreviousQuestion}
-                        disabled={currentQuestionIndex === 0}
-                        variant="outline"
-                        className="w-28"
-                      >
-                        Previous
-                      </Button>
-                      <Button
-                        onClick={goToNextQuestion}
-                        disabled={currentQuestionIndex === questions.length - 1}
-                        variant="outline"
-                        className="w-28"
-                      >
-                        Next
-                      </Button>
-                      </div>
-                      {currentQuestionIndex === questions.length - 1 && (
-                        <Button
-                          onClick={() => {
-                            setShowResults(true);
-                            setIsPaused(true);  // Pause the timer when submitting
-                          }}
-                          className="w-28 bg-blue-600 hover:bg-blue-700 text-white rounded-md"
-                        >
-                          Submit
-                        </Button>
-                      )}
-                    </div>
+                <div className="flex md:flex-row flex-col gap-3 md:justify-between md:items-center">
+                  <div className="flex md:flex-row flex-col gap-2">
+                    <Button
+                      onClick={goToPreviousQuestion}
+                      disabled={currentQuestionIndex === 0}
+                      variant="outline"
+                      className="w-full md:w-28"
+                    >
+                      Previous
+                    </Button>
+                    <Button
+                      onClick={goToNextQuestion}
+                      disabled={currentQuestionIndex === questions.length - 1}
+                      variant="outline"
+                      className="w-full md:w-28"
+                    >
+                      Next
+                    </Button>
+                  </div>
+                  {currentQuestionIndex === questions.length - 1 && (
+                    <Button
+                      onClick={() => {
+                        setShowResults(true);
+                        setIsPaused(true);
+                      }}
+                      className="w-full md:w-28 bg-blue-600 hover:bg-blue-700 text-white rounded-md"
+                    >
+                      Submit
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
           </>

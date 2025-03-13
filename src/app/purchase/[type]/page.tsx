@@ -204,7 +204,7 @@ export default function PurchaseExams({ params }: PageProps) {
                     </div>
                             <div className="mt-auto">
                               <Link 
-                                href={num === 1 ? `/preview/${resolvedParams.type}/frq/${num}` : '#'}
+                                href={num === 1 ? `/preview/macro-exams/frq/1` : '#'}
                                 className={`w-full px-4 py-2 rounded-md font-medium text-sm flex items-center justify-center gap-2 ${
                                   num === 1 
                                     ? 'bg-blue-600 text-white hover:bg-blue-700 transition-colors' 
