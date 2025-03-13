@@ -86,7 +86,7 @@ export default function Flashcards({ flashcards }: FlashcardsProps) {
       </div>
 
       {selectedUnit && (
-        <div className="flex items-center justify-center gap-6">
+        <div className="flex items-center justify-center gap-2 md:gap-6">
           <button
             onClick={previousCard}
             className="p-2 rounded-full hover:bg-gray-100 transition-colors"
@@ -94,7 +94,7 @@ export default function Flashcards({ flashcards }: FlashcardsProps) {
             <ChevronLeft className="w-6 h-6" />
           </button>
 
-          <div className="relative w-full max-w-2xl aspect-[3/2]">
+          <div className="relative w-full max-w-2xl md:aspect-[3/2] aspect-[4/5]">
             <div
               onClick={() => setIsFlipped(!isFlipped)}
               className={`w-full h-full cursor-pointer transition-all duration-500 [transform-style:preserve-3d] ${
@@ -102,15 +102,15 @@ export default function Flashcards({ flashcards }: FlashcardsProps) {
               }`}
             >
               {/* Front of card */}
-              <div className="absolute inset-0 backface-hidden bg-white rounded-xl shadow-lg border border-gray-200 p-8 flex items-center justify-center">
-                <h3 className="text-2xl font-bold text-center">
+              <div className="absolute inset-0 backface-hidden bg-white rounded-xl shadow-lg border border-gray-200 p-4 md:p-8 flex items-center justify-center">
+                <h3 className="text-lg md:text-2xl font-bold text-center break-words max-w-full overflow-auto">
                   {currentCards[currentCardIndex]?.term}
                 </h3>
               </div>
 
               {/* Back of card */}
-              <div className="absolute inset-0 backface-hidden [transform:rotateY(180deg)] bg-white rounded-xl shadow-lg border border-gray-200 p-8 flex items-center justify-center">
-                <p className="text-lg text-center">
+              <div className="absolute inset-0 backface-hidden [transform:rotateY(180deg)] bg-white rounded-xl shadow-lg border border-gray-200 p-4 md:p-8 flex items-center justify-center">
+                <p className="text-base md:text-lg text-center break-words max-w-full overflow-auto max-h-full">
                   {currentCards[currentCardIndex]?.definition}
                 </p>
               </div>
