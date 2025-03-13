@@ -7,12 +7,13 @@ export function Footer() {
       <PageContainer>
         <div className="py-8 flex items-center justify-between">
           {/* Logo */}
-          <div className="w-32">
-            {/* Placeholder logo - replace with your actual logo */}
-            <div className="w-full h-12 bg-gray-200 rounded flex items-center justify-center text-gray-500">
-              Logo
-            </div>
-          </div>
+          <div 
+          
+              className="hover:opacity-90 transition-opacity flex items-center"
+        >
+              <span className="text-2xl font-extrabold ">AP</span>
+              <span className="ml-1 text-2xl font-extrabold text-blue-600">Dojo</span>
+        </div>
 
           {/* Copyright and Trademark Notice */}
           <div className="text-xs text-gray-500 max-w-xl text-right">

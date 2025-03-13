@@ -7,7 +7,7 @@ export default function CalendlyWidget() {
     <InlineWidget
       url="https://calendly.com/garrettmould/apdojo" // Update this with your actual Calendly URL
       styles={{
-        height: '700px',
+        height: '800px',
         width: '100%',
       }}
       prefill={{

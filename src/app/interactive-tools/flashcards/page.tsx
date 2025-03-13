@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
 import Flashcards from '@/components/Flashcards'
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { useState, useEffect } from 'react'
 import { macroFlashcards } from '@/data/macroFlashcards'
 import { microFlashcards } from '@/data/microFlashcards'
@@ -24,40 +24,38 @@ export default function FlashcardsPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <Link 
-        href="/interactive-tools" 
-        className="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold mb-8 group"
-      >
-        <ChevronLeft className="w-4 h-4 mr-1 transition-transform group-hover:-translate-x-1" />
-        Return to Interactive Tools
-      </Link>
+    <div className="max-w-4xl mx-auto mt-4 px-4 py-8">
+      <div className="max-w-3xl mx-auto px-4">
+        <div className="flex items-center justify-between mb-8">
+          <Link 
+            href="/interactive-tools" 
+            className="group inline-flex items-center text-blue-600 hover:text-blue-800"
+          >
+            <ChevronLeft className="w-4 h-4 mr-1 transition-transform group-hover:-translate-x-1" />
+            Return to Interactive Tools
+          </Link>
 
-      <div className="flex flex-col items-center">
-        <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 text-center mb-6">
+          <Tabs defaultValue={currentSubject} onValueChange={(value) => setCurrentSubject(value as 'macro' | 'micro')}>
+            <TabsList className="bg-gray-100 p-1 rounded-md">
+              <TabsTrigger 
+                value="macro" 
+                className="px-3 py-1 text-sm rounded-sm data-[state=active]:bg-blue-500/20 data-[state=active]:text-blue-700"
+              >
+                Macro
+              </TabsTrigger>
+              <TabsTrigger 
+                value="micro" 
+                className="px-3 py-1 text-sm rounded-sm data-[state=active]:bg-blue-500/20 data-[state=active]:text-blue-700"
+              >
+                Micro
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+
+        <h1 className="text-4xl text-center font-bold text-gray-900 mt-12 mb-6">
           AP {subjectTitle} Flashcards
         </h1>
-
-        <Tabs 
-          defaultValue="macro" 
-          className="w-full max-w-2xl"
-          onValueChange={(value) => setCurrentSubject(value as 'macro' | 'micro')}
-        >
-          <TabsList className="grid grid-cols-2 w-full h-12 mb-6">
-            <TabsTrigger 
-              value="macro"
-              className="text-lg font-bold flex items-center justify-center h-full data-[state=active]:bg-blue-600 data-[state=active]:text-white"
-            >
-              AP Macro
-            </TabsTrigger>
-            <TabsTrigger 
-              value="micro"
-              className="text-lg font-bold flex items-center justify-center h-full data-[state=active]:bg-blue-600 data-[state=active]:text-white"
-            >
-              AP Micro
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
       </div>
       
       <Flashcards flashcards={flashcardsData} />

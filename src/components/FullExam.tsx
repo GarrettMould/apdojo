@@ -38,7 +38,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
   const questions = questionBank.questions;
 
   // Add timer state (in seconds)
-  const [timeLeft, setTimeLeft] = useState(60 * 60); // 60 minutes in seconds
+  const [timeLeft, setTimeLeft] = useState(70 * 60); // 70 minutes in seconds
   // Add timer visibility state
   const [showTimer, setShowTimer] = useState(false);
   const [isLargeTimer, setIsLargeTimer] = useState(false);
@@ -91,6 +91,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
 
   // Update the track size constant
   const QUESTIONS_PER_TRACK = 15;  // This divides evenly into 60
+
+  // Add a new state for timer paused status
+  const [isPaused, setIsPaused] = useState(false);
 
   const handleAnswer = (questionId: number, answerIndex: number) => {
     setAnswers({
@@ -436,14 +439,16 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
     }
   };
 
-  // Add timer effect to start countdown when component mounts
+  // Modify the timer effect
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft((prevTime) => {
-        if (prevTime <= 0) {
+        if (prevTime <= 0 || isPaused) {  // Add isPaused check
           clearInterval(timer);
-          setShowResults(true); // Automatically show results when time runs out
-          return 0;
+          if (prevTime <= 0) {
+            setShowResults(true);
+          }
+          return prevTime;
         }
         return prevTime - 1;
       });
@@ -454,7 +459,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
 
     // Cleanup function
     return () => clearInterval(timer);
-  }, []); // Empty dependency array means this runs once on mount
+  }, [isPaused]); // Add isPaused to dependencies
 
   return (
     <>
@@ -792,7 +797,8 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
 
               {/* Navigation buttons - fixed at bottom */}
               <div className="p-6 border-t bg-white">
-                    <div className="flex gap-2">
+                    <div className="flex justify-between items-center">
+                      <div className="flex gap-2">
                       <Button
                         onClick={goToPreviousQuestion}
                         disabled={currentQuestionIndex === 0}
@@ -803,14 +809,26 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
                       </Button>
                       <Button
                         onClick={goToNextQuestion}
-                    disabled={currentQuestionIndex === questions.length - 1}
+                        disabled={currentQuestionIndex === questions.length - 1}
                         variant="outline"
                         className="w-28"
                       >
                         Next
                       </Button>
                       </div>
+                      {currentQuestionIndex === questions.length - 1 && (
+                        <Button
+                          onClick={() => {
+                            setShowResults(true);
+                            setIsPaused(true);  // Pause the timer when submitting
+                          }}
+                          className="w-28 bg-blue-600 hover:bg-blue-700 text-white rounded-md"
+                        >
+                          Submit
+                        </Button>
+                      )}
                     </div>
+              </div>
             </div>
           </>
         ) : (

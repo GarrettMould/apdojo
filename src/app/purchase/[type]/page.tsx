@@ -82,11 +82,12 @@ export default function PurchaseExams({ params }: PageProps) {
       />
 
       <div className="container max-w-4xl mx-auto px-4 py-16">
+        
         {/* Macro Section */}
-        <div className="mb-32">
+        <div className="mb-8">
       <div className="mb-16">
             <h1 className="text-6xl font-extrabold tracking-tight text-center leading-tight">
-              <span className="text-blue-600">AP Macroeconomics</span>
+              Full-Length <br></br><span className="text-blue-600">AP Economics</span>
               <br />
               Practice Exams
         </h1>
@@ -96,24 +97,24 @@ export default function PurchaseExams({ params }: PageProps) {
       </div>
 
           <div className="max-w-4xl mx-auto">
-            <div className="mb-16">
-              <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/10 backdrop-blur-sm border border-blue-200 rounded-2xl p-8">
+            <div className="mb-8">
+              <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/10 backdrop-blur-sm border border-blue-200 rounded-md p-8">
                 <div className="flex gap-12">
                   <div className="w-1/4">
                     <h3 className="text-2xl font-extrabold tracking-tight text-gray-900 mb-3">
-                      MCQ Exams
+                      AP Macro <br></br>MCQ Exams
                     </h3>
                     <p className="text-gray-600 text-sm leading-relaxed">
                       Prep for the AP Macroeconomics exam with full-length practice tests
                     </p>
-                  </div>
+      </div>
 
                   <div className="flex-1">
                     <div className="grid grid-cols-3 gap-4">
                       {[1, 2, 3].map((num) => (
                         <div 
                           key={`mcq-${num}`} 
-                          className={`bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden ${num > 1 ? 'opacity-75' : ''}`}
+                          className={`bg-white rounded-md shadow-sm border border-gray-100 overflow-hidden ${num > 1 ? 'opacity-75' : ''}`}
                         >
                           <div className="p-4">
                             <div className="flex items-center gap-2 mb-3">
@@ -121,13 +122,13 @@ export default function PurchaseExams({ params }: PageProps) {
                                 Exam {num}
                               </h4>
                               {num > 1 && <Lock className="w-4 h-4 text-gray-400" />}
-                            </div>
+            </div>
                             <div className="text-sm text-gray-500 mb-4">
                               60 questions • 70 minutes
-                            </div>
+          </div>
                             <Link 
                               href={num === 1 ? `/preview/${resolvedParams.type}/mcq/${num}` : '#'}
-                              className={`w-full px-4 py-2 rounded-lg font-medium text-sm flex items-center justify-center gap-2 ${
+                              className={`w-full px-4 py-2 rounded-md font-medium text-sm flex items-center justify-center gap-2 ${
                                 num === 1 
                                   ? 'bg-blue-600 text-white hover:bg-blue-700 transition-colors' 
                                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
@@ -136,23 +137,23 @@ export default function PurchaseExams({ params }: PageProps) {
                               Start Exam
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                              </svg>
+              </svg>
                             </Link>
                           </div>
-                        </div>
+            </div>
                       ))}
-        </div>
-        </div>
+          </div>
+            </div>
+          </div>
         </div>
       </div>
-            </div>
 
-            <div className="mb-16">
-              <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/10 backdrop-blur-sm border border-blue-200 rounded-2xl p-8">
+            <div className="mb-8">
+              <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/10 backdrop-blur-sm border border-blue-200 rounded-md p-8">
                 <div className="flex gap-12">
                   <div className="w-1/4">
                     <h3 className="text-2xl font-extrabold tracking-tight text-gray-900 mb-3">
-                      FRQ Exams
+                      AP Macro <br></br> FRQ Exams
                     </h3>
                     <p className="text-gray-600 text-sm leading-relaxed">
                       Master free response questions with our practice sets
@@ -164,10 +165,10 @@ export default function PurchaseExams({ params }: PageProps) {
                       {[1, 2, 3].map((num) => (
                         <div 
                           key={`frq-${num}`} 
-                          className={`bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden ${num > 1 ? 'opacity-75' : ''}`}
+                          className={`bg-white rounded-md shadow-sm border border-gray-100 overflow-hidden ${num > 1 ? 'opacity-75' : ''}`}
                         >
                           <div className="p-4 flex flex-col h-full">
-                            <div>
+                    <div>
                               <div className="flex items-center gap-2 mb-3">
                                 <h4 className="text-lg font-bold text-gray-900">
                                   Exam {num}
@@ -180,31 +181,31 @@ export default function PurchaseExams({ params }: PageProps) {
                               <div className="flex flex-wrap gap-1 mb-4">
                                 {num === 1 && (
                                   <>
-                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">AD-AS Model</span>
-                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">Bank Sheets</span>
-                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">Exchange Rates</span>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded-sm text-xs text-gray-600">AD-AS Model</span>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded-sm text-xs text-gray-600">Bank Sheets</span>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded-sm text-xs text-gray-600">Exchange Rates</span>
                                   </>
                                 )}
                                 {num === 2 && (
                                   <>
-                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">Monetary Policy</span>
-                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">Int'l Trade</span>
-                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">Phillips Curve</span>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded-sm text-xs text-gray-600">Monetary Policy</span>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded-sm text-xs text-gray-600">Int'l Trade</span>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded-sm text-xs text-gray-600">Phillips Curve</span>
                                   </>
                                 )}
                                 {num === 3 && (
                                   <>
-                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">Fiscal Policy</span>
-                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">Growth</span>
-                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">Financial Markets</span>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded-sm text-xs text-gray-600">Fiscal Policy</span>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded-sm text-xs text-gray-600">Growth</span>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded-sm text-xs text-gray-600">Financial Markets</span>
                                   </>
                                 )}
                               </div>
-                            </div>
+                    </div>
                             <div className="mt-auto">
                               <Link 
                                 href={num === 1 ? `/preview/${resolvedParams.type}/frq/${num}` : '#'}
-                                className={`w-full px-4 py-2 rounded-lg font-medium text-sm flex items-center justify-center gap-2 ${
+                                className={`w-full px-4 py-2 rounded-md font-medium text-sm flex items-center justify-center gap-2 ${
                                   num === 1 
                                     ? 'bg-blue-600 text-white hover:bg-blue-700 transition-colors' 
                                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
@@ -213,41 +214,31 @@ export default function PurchaseExams({ params }: PageProps) {
                                 Start Exam
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
+                          </svg>
                               </Link>
                             </div>
                           </div>
                         </div>
                       ))}
+                        </div>
+                      </div>
+                        </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
-            </div>
-          </div>
-          </div>
-        </div>
-      </div>
 
         {/* Micro Section */}
         <div className="mb-32">
-        <div className="mb-16">
-            <h1 className="text-6xl font-extrabold tracking-tight text-center leading-tight">
-              <span className="text-green-600">AP Microeconomics</span>
-              <br />
-              Practice Exams
-            </h1>
-            <p className="text-gray-600 text-center mt-4 text-lg max-w-2xl mx-auto">
-              Comprehensive exam preparation trusted by top-performing students nationwide. Created by AP® Economics experts and veteran teachers.
-            </p>
-          </div>
-
+          
           <div className="max-w-4xl mx-auto">
             {/* Micro MCQ Section */}
-            <div className="mb-16">
-              <div className="bg-gradient-to-br from-green-500/10 to-green-600/10 backdrop-blur-sm border border-green-200 rounded-2xl p-8">
+            <div className="mb-8">
+              <div className="bg-gradient-to-br from-green-500/10 to-green-600/10 backdrop-blur-sm border border-green-200 rounded-md p-8">
                 <div className="flex gap-12">
                   <div className="w-1/4">
                     <h3 className="text-2xl font-extrabold tracking-tight text-gray-900 mb-3">
-                      MCQ Exams
+                      AP Micro <br></br>MCQ Exams
                     </h3>
                     <p className="text-gray-600 text-sm leading-relaxed">
                       Prep for the AP Microeconomics exam with full-length practice tests
@@ -259,34 +250,30 @@ export default function PurchaseExams({ params }: PageProps) {
                       {[1, 2, 3].map((num) => (
                         <div 
                           key={`micro-mcq-${num}`} 
-                          className={`bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden ${num > 1 ? 'opacity-75' : ''}`}
+                          className="bg-white rounded-md shadow-sm border border-gray-100 overflow-hidden opacity-75"
                         >
                           <div className="p-4">
                             <div className="flex items-center gap-2 mb-3">
                               <h4 className="text-lg font-bold text-gray-900">
                                 Exam {num}
                               </h4>
-                              {num > 1 && <Lock className="w-4 h-4 text-gray-400" />}
-                        </div>
+                              <Lock className="w-4 h-4 text-gray-400" />
+                            </div>
                             <div className="text-sm text-gray-500 mb-4">
                               60 questions • 70 minutes
-                        </div>
-                            <Link 
-                              href={num === 1 ? `/preview/micro-exams/mcq/${num}` : '#'}
-                              className={`w-full px-4 py-2 rounded-lg font-medium text-sm flex items-center justify-center gap-2 ${
-                                num === 1 
-                                  ? 'bg-green-600 text-white hover:bg-green-700 transition-colors' 
-                                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                              }`}
-                            >
+                            </div>
+                    <Link 
+                              href="#"
+                              className="w-full px-4 py-2 rounded-md font-medium text-sm flex items-center justify-center gap-2 bg-gray-300 text-gray-500 cursor-not-allowed"
+                    >
                               Start Exam
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                           </svg>
-                            </Link>
-                        </div>
-                        </div>
-                      ))}
+                    </Link>
+                  </div>
+              </div>
+            ))}
                     </div>
                   </div>
                 </div>
@@ -294,12 +281,12 @@ export default function PurchaseExams({ params }: PageProps) {
           </div>
           
             {/* Micro FRQ Section */}
-            <div className="mb-16">
-              <div className="bg-gradient-to-br from-green-500/10 to-green-600/10 backdrop-blur-sm border border-green-200 rounded-2xl p-8">
+            <div className="mb-8">
+              <div className="bg-gradient-to-br from-green-500/10 to-green-600/10 backdrop-blur-sm border border-green-200 rounded-md p-8">
                 <div className="flex gap-12">
                   <div className="w-1/4">
                     <h3 className="text-2xl font-extrabold tracking-tight text-gray-900 mb-3">
-                      FRQ Exams
+                      AP Micro <br></br> FRQ Exams
                     </h3>
                     <p className="text-gray-600 text-sm leading-relaxed">
                       Master free response questions with our practice sets
@@ -311,7 +298,7 @@ export default function PurchaseExams({ params }: PageProps) {
             {[1, 2, 3].map((num) => (
               <div 
                           key={`micro-frq-${num}`} 
-                          className={`bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden ${num > 1 ? 'opacity-75' : ''}`}
+                          className="bg-white rounded-md shadow-sm border border-gray-100 overflow-hidden opacity-75"
               >
                           <div className="p-4 flex flex-col h-full">
                   <div>
@@ -319,7 +306,7 @@ export default function PurchaseExams({ params }: PageProps) {
                                 <h4 className="text-lg font-bold text-gray-900">
                                   Exam {num}
                                 </h4>
-                                {num > 1 && <Lock className="w-4 h-4 text-gray-400" />}
+                                <Lock className="w-4 h-4 text-gray-400" />
                   </div>
                               <div className="text-sm text-gray-500 mb-3">
                                 3 questions • 60 minutes
@@ -327,35 +314,31 @@ export default function PurchaseExams({ params }: PageProps) {
                               <div className="flex flex-wrap gap-1 mb-4">
                   {num === 1 && (
                     <>
-                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">Supply & Demand</span>
-                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">Elasticity</span>
-                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">Market Failure</span>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded-sm text-xs text-gray-600">Supply & Demand</span>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded-sm text-xs text-gray-600">Elasticity</span>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded-sm text-xs text-gray-600">Market Failure</span>
                     </>
                   )}
                   {num === 2 && (
                     <>
-                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">Perfect Competition</span>
-                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">Monopoly</span>
-                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">Game Theory</span>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded-sm text-xs text-gray-600">Perfect Competition</span>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded-sm text-xs text-gray-600">Monopoly</span>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded-sm text-xs text-gray-600">Game Theory</span>
                     </>
                   )}
                   {num === 3 && (
                     <>
-                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">Factor Markets</span>
-                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">Market Structure</span>
-                                    <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">Externalities</span>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded-sm text-xs text-gray-600">Factor Markets</span>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded-sm text-xs text-gray-600">Market Structure</span>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded-sm text-xs text-gray-600">Externalities</span>
                     </>
                   )}
                               </div>
                             </div>
                             <div className="mt-auto">
                               <Link 
-                                href={num === 1 ? `/preview/micro-exams/frq/${num}` : '#'}
-                                className={`w-full px-4 py-2 rounded-lg font-medium text-sm flex items-center justify-center gap-2 ${
-                                  num === 1 
-                                    ? 'bg-green-600 text-white hover:bg-green-700 transition-colors' 
-                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                }`}
+                                href="#"
+                                className="w-full px-4 py-2 rounded-md font-medium text-sm flex items-center justify-center gap-2 bg-gray-300 text-gray-500 cursor-not-allowed"
                               >
                                 Start Exam
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -364,18 +347,18 @@ export default function PurchaseExams({ params }: PageProps) {
                               </Link>
                             </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
+              </div>
+            ))}
+          </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+        </div>
         </div>
 
         {/* Bottom commitment section with gradient */}
-        <div className="bg-gray-50 rounded-xl p-8 mt-12 text-center">
+        <div className="bg-gray-50 rounded-md p-8 mt-12 text-center">
           <h4 className="text-xl font-semibold mb-4">Our Commitment to Excellence</h4>
           <p className="text-gray-600 max-w-2xl mx-auto">
             Every exam is crafted by experienced AP® Economics teachers and reviewed by our academic board. We maintain the highest standards to ensure your student's success.
@@ -385,7 +368,7 @@ export default function PurchaseExams({ params }: PageProps) {
               <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              30-day money-back guarantee
+              AP® Exam Alignment
             </div>
             <div className="flex items-center gap-2">
               <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -49,18 +49,18 @@ export function Header() {
 
   return (
     <div className="w-full bg-white border-b">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-4">
-          <div className="flex items-center space-x-4">
-            <button 
-              onClick={handleHomeClick}
+      <div className="flex items-center space-x-4">
+        <button 
+          onClick={handleHomeClick}
               className="hover:opacity-90 transition-opacity flex items-center"
-            >
-              <span className="text-3xl font-extrabold text-gray-900">AP</span>
-              <span className="ml-1 text-3xl font-extrabold text-blue-600">Dojo</span>
-            </button>
-          </div>
-          
+        >
+              <span className="text-2xl font-extrabold ">AP</span>
+              <span className="ml-1 text-2xl font-extrabold text-blue-600">Dojo</span>
+        </button>
+      </div>
+      
           {/* Hamburger Menu Button */}
           <button 
             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -73,7 +73,7 @@ export function Header() {
             ) : (
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+            </svg>
             )}
           </button>
 
@@ -82,34 +82,36 @@ export function Header() {
             <Link 
               href="/tutoring" 
               onClick={handleTutoringClick}
-              className="hover:text-blue-600 transition-colors font-bold"
+              className="hover:text-blue-600 transition-colors font-bold text-gray-600"
             >
               Private Tutoring
             </Link>
+            {/* Video Library temporarily removed
             <Link 
               href="/tools" 
-              className="hover:text-blue-600 transition-colors font-bold"
+              className="hover:text-blue-600 transition-colors font-bold text-gray-600"
             >
               Video Library
             </Link>
+            */}
             <Link 
               href="/interactive-tools" 
               onClick={handleToolsClick}
-              className="hover:text-blue-600 transition-colors font-bold"
+              className="hover:text-blue-600 transition-colors font-bold text-gray-600"
             >
-              Interactive Tools
-            </Link>
+          Interactive Tools
+        </Link>
             <Link 
               href="/cheat-sheets" 
               onClick={handleCheatSheetsClick}
-              className="hover:text-blue-600 transition-colors font-bold"
+              className="hover:text-blue-600 transition-colors font-bold text-gray-600"
             >
               Cheat Sheets
             </Link>
             <Link 
               href="/purchase/macro-exams"
               onClick={handlePracticeExamsClick}
-              className="hover:text-blue-600 transition-colors font-bold"
+              className="hover:text-blue-600 transition-colors font-bold text-gray-600"
             >
               Practice Exams
             </Link>
@@ -165,6 +167,7 @@ export function Header() {
               >
                 Private Tutoring
               </Link>
+              {/* Video Library temporarily removed
               <Link 
                 href="/tools" 
                 className="block px-4 py-2 hover:bg-gray-100 font-bold"
@@ -172,6 +175,7 @@ export function Header() {
               >
                 Video Library
               </Link>
+              */}
               <Link 
                 href="/interactive-tools" 
                 onClick={handleToolsClick}

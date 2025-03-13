@@ -51,20 +51,25 @@ export default function ExamPreview({ params }: PageProps) {
   }
 
   return (
-    <div className="container max-w-6xl mx-auto px-4 py-12">
+    <div className="max-w-4xl mx-auto px-4 py-12">
       <div className="mb-8">
         <Link href={`/purchase/${params.type}`} className="text-blue-600 hover:text-blue-800">
-          ← Back to Purchase Page
+          ← Back to Exams Page
         </Link>
         <h1 className="text-4xl font-bold mt-4">
           AP {examType} {format} {params.num} 
         </h1>
         <p className="text-gray-600 mt-2">
-          This is a preview of the actual exam. Some questions and features may be hidden.
+          Complete all questions to submit and view your score. Explanations are available after you submit.
         </p>
       </div>
 
-      <FullExam questionBank={questionBank} />
+      <FullExam 
+        questionBank={questionBank} 
+        examType={params.type === 'macro-exams' ? 'macro' : 'micro'}
+        questionType={params.format}
+        examNumber={params.num}
+      />
     </div>
   )
 } 

@@ -10,6 +10,7 @@ import { useState } from 'react'
 import { LoginModal, SignupModal } from '@/components/AuthModals'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
+import CalendlyWidget from '@/components/CalendlyWidget'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
@@ -117,130 +118,98 @@ export default function TutoringPage() {
         </h1>
         
         <p className="text-xl text-gray-600 text-center max-w-3xl mx-auto mb-16">
-          Get personalized instruction from experienced AP Economics tutors. Whether you need help with specific concepts or comprehensive exam preparation, we offer flexible packages to meet your needs.
+        Get personalized instruction from an experienced AP Economics teacher and tutor who has helped hundreds of students achieve their desired score.
         </p>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          {/* Single Sessions Card */}
-          <Card className="hover:shadow-lg transition-shadow flex flex-col h-full">
-            <div className="bg-gradient-to-b from-blue-500 to-blue-600 p-6 rounded-t-lg">
-              <h3 className="text-2xl font-bold text-white">Single Sessions</h3>
-            </div>
-            <div className="p-6 flex flex-col flex-grow">
-              <div className="space-y-4 flex flex-col h-full">
-                <div>
-                  <p className="text-3xl font-bold">$50<span className="text-lg text-gray-500"> /session</span></p>
-                  <p className="text-gray-600 mt-4">Perfect for students who need quick help on specific topics.</p>
+        <div className="max-w-3xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Tutoring Card */}
+            <Card className="hover:shadow-lg transition-all duration-200 flex flex-col border border-gray-200">
+              <div className="p-6 text-center">
+                <div className="space-y-2">
+                  <h3 className="text-2xl font-bold text-gray-900">Single Session</h3>
+                  <div className="mt-4">
+                  <p className="text-3xl font-bold text-gray-900">$50<span className="text-lg text-gray-500"> /session</span></p>
+                </div>
+                  <p className="text-gray-600">Perfect for students who need quick help with specific topics.</p>
                 </div>
                 
-                <div className="space-y-3 pt-4 flex-grow">
-                  <div className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span>60-minute one-on-one sessions</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span>Flexible scheduling</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span>No long-term commitment</span>
-                  </div>
-                </div>
+                
 
-                <button 
-                  onClick={handleBookSession}
-                  className="w-full mt-6 px-6 py-3 text-sm font-bold text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                  Book a Session
-                </button>
-              </div>
-            </div>
-          </Card>
-
-          {/* Multi-Session Package Card */}
-          <Card className="hover:shadow-lg transition-shadow flex flex-col h-full opacity-75 overflow-hidden">
-            <div className="bg-gradient-to-b from-gray-400 to-gray-500 p-6 rounded-t-lg">
-              <h3 className="text-2xl font-bold text-white">Multi-Session Packages</h3>
-            </div>
-            <div className="p-6 pb-0 flex flex-col flex-grow">
-              <div className="space-y-4 flex flex-col h-full">
-                <div>
-                  <div className="space-y-2">
-                    <p className="text-lg text-gray-500"><span className="font-bold">3 Sessions:</span> $225 ($75/each)</p>
-                    <p className="text-lg text-gray-500"><span className="font-bold">5 Sessions:</span> $350 ($70/each)</p>
-                    <p className="text-lg text-gray-500"><span className="font-bold">10 Sessions:</span> $650 ($65/each)</p>
+                <div className="space-y-3 mt-6">
+                  <div className="flex items-start gap-3 justify-center">
+                    <Check className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-600">60-minute one-on-one sessions</span>
                   </div>
-                  <p className="text-gray-500 mt-4">Best for students wanting consistent tutoring at a lower rate.</p>
-                </div>
-
-                <div className="space-y-3 pt-4 flex-grow">
-                  <div className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-500">Discounted hourly rates</span>
+                  <div className="flex items-start gap-3 justify-center">
+                    <Check className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-600">Flexible scheduling</span>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-500">Book sessions as needed</span>
+                  <div className="flex items-start gap-3 justify-center">
+                    <Check className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
+                    <span className="text-gray-600">No long-term commitment</span>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-500">Valid for 6 months</span>
-                  </div>
-                </div>
-
-                <div className="bg-gradient-to-r from-blue-500 to-blue-600 -mx-6 p-4">
-                  <p className="text-white font-bold text-center">
-                    No longer available for the 2024 - 2025 academic year
-                  </p>
                 </div>
               </div>
-            </div>
-          </Card>
+            </Card>
 
-          {/* Full AP Exam Prep Card */}
-          <Card className="hover:shadow-lg transition-shadow flex flex-col h-full opacity-75 overflow-hidden">
-            <div className="bg-gradient-to-b from-gray-400 to-gray-500 p-6 rounded-t-lg">
-              <h3 className="text-2xl font-bold text-white">Full AP Exam Prep</h3>
-            </div>
-            <div className="p-6 pb-0 flex flex-col flex-grow">
-              <div className="space-y-4 flex flex-col h-full">
-                <div>
-                  <p className="text-3xl font-bold text-gray-400">$1,000<span className="text-lg text-gray-400"> one-time payment</span></p>
-                  <p className="text-gray-500 mt-4">Comprehensive preparation for serious AP students.</p>
-                </div>
-
-                <div className="space-y-3 pt-4 flex-grow">
-                  <div className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-500">15 tutoring sessions</span>
+            {/* Benefits List */}
+            <div className="flex flex-col justify-center">
+              <h3 className="text-lg font-semibold text-gray-900 mb-6 text-center ">
+                What's Included in Each Session
+              </h3>
+              <div className="space-y-6">
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-500">Full practice test access</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-500">Premium cheat sheets</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-500">All interactive tools</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-500">Structured study plan</span>
+                  <div className="text-center flex-1">
+                    <h4 className="text-gray-900 font-bold">AP College Board Practice Problems</h4>
+                    <p className="text-sm text-gray-600 mt-1">Work through official AP Economics questions with expert guidance</p>
                   </div>
                 </div>
 
-                <div className="bg-gradient-to-r from-blue-500 to-blue-600 -mx-6 p-4 rounded-b-lg">
-                  <p className="text-white font-bold text-center">
-                    No longer available for the 2024 - 2025 academic year
-                  </p>
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                  </div>
+                  <div className="text-center flex-1">
+                    <h4 className="text-gray-900 font-bold">Personalized Notes and Examples</h4>
+                    <p className="text-sm text-gray-600 mt-1">Receive custom study materials tailored to your learning style</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                  </div>
+                  <div className="text-center flex-1">
+                    <h4 className=" text-gray-900 font-bold">Strategic Test-Taking Techniques</h4>
+                    <p className="text-sm text-gray-600 mt-1">Learn proven strategies for maximizing your score on exam day</p>
+                  </div>
                 </div>
               </div>
             </div>
-          </Card>
+          </div>
+
+          {/* Calendly Widget */}
+          <div className="mt-32">
+            <h3 className="text-4xl font-extrabold text-gray-900 text-center mb-6">Booking Your Next Lesson is Simple!</h3>
+            <p className="text-xl text-gray-600 text-center font-semibold max-w-3xl mx-auto mb-16">
+              1️⃣ Choose a date and time <br></br>
+              2️⃣ Pay using Stripe <br></br>
+              3️⃣ Receive an automatically generated meeting link via email
+            </p>
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <CalendlyWidget />
+            </div>
+          </div>
         </div>
 
         <ReviewsSection />
