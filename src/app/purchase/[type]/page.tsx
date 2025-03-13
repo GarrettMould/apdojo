@@ -99,18 +99,18 @@ export default function PurchaseExams({ params }: PageProps) {
           <div className="max-w-4xl mx-auto">
             <div className="mb-8">
               <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/10 backdrop-blur-sm border border-blue-200 rounded-md p-8">
-                <div className="flex gap-12">
-                  <div className="w-1/4">
+                <div className="md:flex gap-12 block">
+                  <div className="md:w-1/4 w-full mb-8 md:mb-0 text-center md:text-left">
                     <h3 className="text-2xl font-extrabold tracking-tight text-gray-900 mb-3">
-                      AP Macro <br></br>MCQ Exams
+                      AP Macro <br className="hidden md:inline" />MCQ Exams
                     </h3>
                     <p className="text-gray-600 text-sm leading-relaxed">
                       Prep for the AP Macroeconomics exam with full-length practice tests
                     </p>
-      </div>
+                  </div>
 
-                  <div className="flex-1">
-                    <div className="grid grid-cols-3 gap-4">
+                  <div className="md:flex-1">
+                    <div className="grid md:grid-cols-3 grid-cols-1 gap-4">
                       {[1, 2, 3].map((num) => (
                         <div 
                           key={`mcq-${num}`} 
@@ -150,22 +150,22 @@ export default function PurchaseExams({ params }: PageProps) {
 
             <div className="mb-8">
               <div className="bg-gradient-to-br from-blue-500/10 to-blue-600/10 backdrop-blur-sm border border-blue-200 rounded-md p-8">
-                <div className="flex gap-12">
-                  <div className="w-1/4">
+                <div className="md:flex gap-12 block">
+                  <div className="md:w-1/4 w-full mb-8 md:mb-0 text-center md:text-left">
                     <h3 className="text-2xl font-extrabold tracking-tight text-gray-900 mb-3">
-                      AP Macro <br></br> FRQ Exams
+                      AP Macro <br className="hidden md:inline" /> FRQ Exams
                     </h3>
                     <p className="text-gray-600 text-sm leading-relaxed">
                       Master free response questions with our practice sets
                     </p>
           </div>
 
-                  <div className="flex-1">
-                    <div className="grid grid-cols-3 gap-4">
+                  <div className="md:flex-1">
+                    <div className="grid md:grid-cols-3 grid-cols-1 gap-4">
                       {[1, 2, 3].map((num) => (
                         <div 
                           key={`frq-${num}`} 
-                          className={`bg-white rounded-md shadow-sm border border-gray-100 overflow-hidden ${num > 1 ? 'opacity-75' : ''}`}
+                          className="bg-white rounded-md shadow-sm border border-gray-100 overflow-hidden opacity-75"
                         >
                           <div className="p-4 flex flex-col h-full">
                     <div>
@@ -173,7 +173,7 @@ export default function PurchaseExams({ params }: PageProps) {
                                 <h4 className="text-lg font-bold text-gray-900">
                                   Exam {num}
                                 </h4>
-                                {num > 1 && <Lock className="w-4 h-4 text-gray-400" />}
+                                <Lock className="w-4 h-4 text-gray-400" />
                               </div>
                               <div className="text-sm text-gray-500 mb-3">
                                 3 questions • 60 minutes
@@ -204,12 +204,8 @@ export default function PurchaseExams({ params }: PageProps) {
                     </div>
                             <div className="mt-auto">
                               <Link 
-                                href={num === 1 ? `/preview/macro-exams/frq/1` : '#'}
-                                className={`w-full px-4 py-2 rounded-md font-medium text-sm flex items-center justify-center gap-2 ${
-                                  num === 1 
-                                    ? 'bg-blue-600 text-white hover:bg-blue-700 transition-colors' 
-                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                }`}
+                                href="#"
+                                className="w-full px-4 py-2 rounded-md font-medium text-sm flex items-center justify-center gap-2 bg-gray-300 text-gray-500 cursor-not-allowed"
                               >
                                 Start Exam
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -235,18 +231,18 @@ export default function PurchaseExams({ params }: PageProps) {
             {/* Micro MCQ Section */}
             <div className="mb-8">
               <div className="bg-gradient-to-br from-green-500/10 to-green-600/10 backdrop-blur-sm border border-green-200 rounded-md p-8">
-                <div className="flex gap-12">
-                  <div className="w-1/4">
+                <div className="md:flex gap-12 block">
+                  <div className="md:w-1/4 w-full mb-8 md:mb-0 text-center md:text-left">
                     <h3 className="text-2xl font-extrabold tracking-tight text-gray-900 mb-3">
-                      AP Micro <br></br>MCQ Exams
+                      AP Micro <br className="hidden md:inline" />MCQ Exams
                     </h3>
                     <p className="text-gray-600 text-sm leading-relaxed">
                       Prep for the AP Microeconomics exam with full-length practice tests
                     </p>
                     </div>
 
-                  <div className="flex-1">
-                    <div className="grid grid-cols-3 gap-4">
+                  <div className="md:flex-1">
+                    <div className="grid md:grid-cols-3 grid-cols-1 gap-4">
                       {[1, 2, 3].map((num) => (
                         <div 
                           key={`micro-mcq-${num}`} 
@@ -283,18 +279,18 @@ export default function PurchaseExams({ params }: PageProps) {
             {/* Micro FRQ Section */}
             <div className="mb-8">
               <div className="bg-gradient-to-br from-green-500/10 to-green-600/10 backdrop-blur-sm border border-green-200 rounded-md p-8">
-                <div className="flex gap-12">
-                  <div className="w-1/4">
+                <div className="md:flex gap-12 block">
+                  <div className="md:w-1/4 w-full mb-8 md:mb-0 text-center md:text-left">
                     <h3 className="text-2xl font-extrabold tracking-tight text-gray-900 mb-3">
-                      AP Micro <br></br> FRQ Exams
+                      AP Micro <br className="hidden md:inline" /> FRQ Exams
                     </h3>
                     <p className="text-gray-600 text-sm leading-relaxed">
                       Master free response questions with our practice sets
                     </p>
         </div>
 
-                  <div className="flex-1">
-                    <div className="grid grid-cols-3 gap-4">
+                  <div className="md:flex-1">
+                    <div className="grid md:grid-cols-3 grid-cols-1 gap-4">
             {[1, 2, 3].map((num) => (
               <div 
                           key={`micro-frq-${num}`} 

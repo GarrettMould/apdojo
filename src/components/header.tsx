@@ -48,7 +48,7 @@ export function Header() {
   };
 
   return (
-    <div className="w-full bg-white border-b">
+    <div className="w-full bg-white border-b relative">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-4">
       <div className="flex items-center space-x-4">
@@ -157,7 +157,7 @@ export function Header() {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-b shadow-lg z-50">
+        <div className="lg:hidden fixed top-[61px] left-0 right-0 bg-white border-b shadow-lg z-50">
           <div className="px-4 py-2">
             <div className="py-2">
               <Link 
