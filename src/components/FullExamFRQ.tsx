@@ -11,14 +11,14 @@ interface SubPart {
   label: string;
   text: string;
   answerType: 'draw' | 'text';
-  answer?: string;
+  answer?: StaticImageData | string;
 }
 
 interface Part {
   label: string;
   text: string;
   answerType: 'draw' | 'text' | null;
-  answer?: string | StaticImageData;
+  answer?: StaticImageData | string;
   subparts?: SubPart[];
 }
 
@@ -42,6 +42,10 @@ interface ResultsViewProps {
   drawingAnswers: Record<string, string>;
   onReturn: () => void;
 }
+
+const isStaticImageData = (value: any): value is StaticImageData => {
+  return value && typeof value === 'object' && 'src' in value;
+};
 
 export function FullExamFRQ({ questions }: FullExamFRQProps) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -125,45 +129,49 @@ export function FullExamFRQ({ questions }: FullExamFRQProps) {
                 </div>
 
                 {/* User's Response */}
-                {part.answerType && (
+                {part.answerType === 'text' ? (
                   <div className="ml-8">
-                    {part.answerType === 'text' ? (
-                      <div className="p-3 bg-gray-50 rounded-md border border-gray-200">
-                        {textAnswers[`${currentQuestionIndex}-${part.label}`] || 'No response provided'}
-                      </div>
-                    ) : part.answerType === 'draw' ? (
-                      <div className="flex flex-col sm:flex-row gap-4">
-                        <div className="w-full sm:w-1/2">
-                          <div className="h-[400px] bg-white rounded-md border border-gray-200">
-                            {drawingAnswers[`${currentQuestionIndex}-${part.label}`] && (
-                              <img 
-                                src={drawingAnswers[`${currentQuestionIndex}-${part.label}`]}
-                                alt="Your drawing"
-                                className="w-full h-full object-contain"
-                              />
-                            )}
-                          </div>
-                        </div>
-                        {part.answer && typeof part.answer === 'object' && 'src' in part.answer ? (
-                          <div className="w-full sm:w-1/2">
-                            <div className="mb-2 font-medium text-green-600">Correct Response:</div>
-                            <div className="h-[400px] bg-white rounded-md border border-gray-200">
-                              <img 
-                                src={part.answer.src}
-                                alt="Correct drawing"
-                                className="w-full h-full object-contain"
-                              />
-                            </div>
-                          </div>
+                    <div className="mb-2 font-medium text-gray-600">Your Response:</div>
+                    <div className="p-3 bg-gray-50 rounded-md border border-gray-200">
+                      {textAnswers[`${currentQuestionIndex}-${part.label}`] || 'No response provided'}
+                    </div>
+                  </div>
+                ) : part.answerType === 'draw' ? (
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="w-full sm:w-1/2">
+                      <div className="mb-2 font-medium text-gray-600">Your Response:</div>
+                      <div className="h-[400px] bg-white rounded-md border border-gray-200">
+                        {drawingAnswers[`${currentQuestionIndex}-${part.label}`] ? (
+                          <img 
+                            src={drawingAnswers[`${currentQuestionIndex}-${part.label}`]}
+                            alt="Your drawing"
+                            className="w-full h-full object-contain"
+                          />
                         ) : (
-                          <div className="w-full sm:w-1/2 p-3 bg-green-50 rounded-md border border-green-200">
-                            {part.answer}
+                          <div className="w-full h-full flex items-center justify-center text-gray-500">
+                            No drawing provided
                           </div>
                         )}
                       </div>
-                    ) : null}
+                    </div>
+                    {part.answer && (
+                      <div className="w-full sm:w-1/2">
+                        <div className="mb-2 font-medium text-green-600">Correct Response:</div>
+                        <div className="h-[400px] bg-white rounded-md border border-gray-200">
+                          {typeof part.answer === 'object' ? (
+                            <img 
+                              src={part.answer.src}
+                              alt="Correct drawing"
+                              className="w-full h-full object-contain"
+                            />
+                          ) : (
+                            <div className="p-3">{part.answer}</div>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
+                ) : null}
 
                 {/* Remove the old Correct Answer section for drawing questions */}
                 {part.answerType === 'text' && part.answer && (
@@ -185,33 +193,63 @@ export function FullExamFRQ({ questions }: FullExamFRQProps) {
                           <p className="text-gray-900">{subpart.text}</p>
                         </div>
 
-                        {/* User's Response */}
-                        <div className="ml-8">
-                          <div className="mb-2 font-medium text-gray-600">Your Response:</div>
-                          {subpart.answerType === 'text' ? (
-                            <div className="p-3 bg-gray-50 rounded-md border border-gray-200">
-                              {textAnswers[`${currentQuestionIndex}-${part.label}-${subpart.label}`] || 'No response provided'}
-                            </div>
-                          ) : subpart.answerType === 'draw' ? (
-                            <div className="h-[400px] bg-white rounded-md border border-gray-200">
-                              {drawingAnswers[`${currentQuestionIndex}-${part.label}-${subpart.label}`] && (
-                                <img 
-                                  src={drawingAnswers[`${currentQuestionIndex}-${part.label}-${subpart.label}`]}
-                                  alt="Your drawing"
-                                  className="w-full h-full object-contain"
-                                />
-                              )}
-                            </div>
-                          ) : null}
-                        </div>
-
-                        {/* Correct Answer */}
-                        {subpart.answer && (
+                        {/* Only render response if there's an answerType */}
+                        {subpart.answerType && (
                           <div className="ml-8">
-                            <div className="mb-2 font-medium text-green-600">Correct Answer:</div>
-                            <div className="p-3 bg-green-50 rounded-md border border-green-200">
-                              {subpart.answer}
-                            </div>
+                            <div className="mb-2 font-medium text-gray-600">Your Response:</div>
+                            {subpart.answerType === 'text' ? (
+                              <div className="p-3 bg-gray-50 rounded-md border border-gray-200">
+                                {textAnswers[`${currentQuestionIndex}-${part.label}-${subpart.label}`] || 'No response provided'}
+                              </div>
+                            ) : subpart.answerType === 'draw' ? (
+                              <div className="flex flex-col sm:flex-row gap-4">
+                                <div className={`w-full ${showResults ? 'sm:w-1/2' : ''}`}>
+                                  {showResults ? (
+                                    <>
+                                      <div className="mb-2 font-medium text-gray-600">Your Response:</div>
+                                      <div className="h-[400px] bg-white rounded-md border border-gray-200">
+                                        {drawingAnswers[`${currentQuestionIndex}-${part.label}-${subpart.label}`] ? (
+                                          <img 
+                                            src={drawingAnswers[`${currentQuestionIndex}-${part.label}-${subpart.label}`]}
+                                            alt="Your drawing"
+                                            className="w-full h-full object-contain"
+                                          />
+                                        ) : (
+                                          <div className="w-full h-full flex items-center justify-center text-gray-500">
+                                            No drawing provided
+                                          </div>
+                                        )}
+                                      </div>
+                                    </>
+                                  ) : (
+                                    <div className="h-[400px] relative border-2 border-black rounded-md overflow-hidden">
+                                      <DrawingPad
+                                        isLarge={true}
+                                        className="w-full relative"
+                                        onSave={(data) => handleDrawingAnswer(`${currentQuestionIndex}-${part.label}-${subpart.label}`, data)}
+                                        initialData={drawingAnswers[`${currentQuestionIndex}-${part.label}-${subpart.label}`]}
+                                      />
+                                    </div>
+                                  )}
+                                </div>
+                                {showResults && subpart.answer && (
+                                  <div className="w-full sm:w-1/2">
+                                    <div className="mb-2 font-medium text-green-600">Correct Response:</div>
+                                    <div className="h-[400px] bg-white rounded-md border border-gray-200">
+                                      {typeof subpart.answer === 'object' ? (
+                                        <img 
+                                          src={subpart.answer.src}
+                                          alt="Correct drawing"
+                                          className="w-full h-full object-contain"
+                                        />
+                                      ) : (
+                                        <div className="p-3">{subpart.answer}</div>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            ) : null}
                           </div>
                         )}
                       </div>
@@ -244,14 +282,6 @@ export function FullExamFRQ({ questions }: FullExamFRQProps) {
                 Next
               </Button>
             </div>
-            {currentQuestionIndex === questions.questions.length - 1 && (
-              <Button
-                onClick={handleSubmit}
-                className="w-full sm:w-28 bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                Submit
-              </Button>
-            )}
           </div>
         </div>
       </div>
@@ -388,13 +418,52 @@ export function FullExamFRQ({ questions }: FullExamFRQProps) {
                                 className="w-full"
                               />
                             ) : subpart.answerType === 'draw' ? (
-                              <div className="h-[400px] relative border-2 border-black rounded-md overflow-hidden">
-                                <DrawingPad
-                                  isLarge={true}
-                                  className="w-full relative"
-                                  initialData={drawingAnswers[`${currentQuestionIndex}-${part.label}-${subpart.label}`]}
-                                  onSave={(data) => handleDrawingAnswer(`${currentQuestionIndex}-${part.label}-${subpart.label}`, data)}
-                                />
+                              <div className="flex flex-col sm:flex-row gap-4">
+                                <div className={`w-full ${showResults ? 'sm:w-1/2' : ''}`}>
+                                  {showResults ? (
+                                    <>
+                                      <div className="mb-2 font-medium text-gray-600">Your Response:</div>
+                                      <div className="h-[400px] bg-white rounded-md border border-gray-200">
+                                        {drawingAnswers[`${currentQuestionIndex}-${part.label}-${subpart.label}`] ? (
+                                          <img 
+                                            src={drawingAnswers[`${currentQuestionIndex}-${part.label}-${subpart.label}`]}
+                                            alt="Your drawing"
+                                            className="w-full h-full object-contain"
+                                          />
+                                        ) : (
+                                          <div className="w-full h-full flex items-center justify-center text-gray-500">
+                                            No drawing provided
+                                          </div>
+                                        )}
+                                      </div>
+                                    </>
+                                  ) : (
+                                    <div className="h-[400px] relative border-2 border-black rounded-md overflow-hidden">
+                                      <DrawingPad
+                                        isLarge={true}
+                                        className="w-full relative"
+                                        onSave={(data) => handleDrawingAnswer(`${currentQuestionIndex}-${part.label}-${subpart.label}`, data)}
+                                        initialData={drawingAnswers[`${currentQuestionIndex}-${part.label}-${subpart.label}`]}
+                                      />
+                                    </div>
+                                  )}
+                                </div>
+                                {showResults && subpart.answer && (
+                                  <div className="w-full sm:w-1/2">
+                                    <div className="mb-2 font-medium text-green-600">Correct Response:</div>
+                                    <div className="h-[400px] bg-white rounded-md border border-gray-200">
+                                      {typeof subpart.answer === 'object' ? (
+                                        <img 
+                                          src={subpart.answer.src}
+                                          alt="Correct drawing"
+                                          className="w-full h-full object-contain"
+                                        />
+                                      ) : (
+                                        <div className="p-3">{subpart.answer}</div>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             ) : null}
                           </div>

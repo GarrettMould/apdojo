@@ -117,7 +117,7 @@ export const frqSetOneQuestions = {
       
       {
         questionNumber: 3,
-        prompt: "Assume that the banking system has limited reserves at that banks must hold a minimum of 10% of their deposits as reserves. Now suppose that the country’s central bank purchases $5 billion worth of government bonds from commercial banks.",
+        prompt: "Assume that the banking system has limited reserves at that banks must hold a minimum of 10% of their deposits as reserves. Now suppose that the country's central bank purchases $5 billion worth of government bonds from commercial banks.",
         image: null,
         parts: [
           {
@@ -164,13 +164,13 @@ export const frqSetOneQuestions = {
             subparts: [
               {
                 label: "i",
-                text: "Draw a single correctly labeled graph of both the short-run Phillips curve and the long-run Phillips curve. Label the short-run equilibrium prior to the central bank’s policy action as Point X.",
-                  answerType: "draw",
-                  answer: macroSetOneFRQA3CI,
+                text: "Draw a single correctly labeled graph of both the short-run Phillips curve and the long-run Phillips curve. Label the short-run equilibrium prior to the central bank's policy action as Point X.",
+                answerType: "draw",
+                answer: macroSetOneFRQA3CII,
               },
               {
                 label: "ii",
-                text: "Add a point, Y, to the graph above that represents the country’s short-run equilibrium after the central bank’s policy action.",
+                text: "Add a point, Y, to the graph above that represents the country's short-run equilibrium after the central bank's policy action.",
                 answerType: null,
                 answer: macroSetOneFRQA3CII,
               }
