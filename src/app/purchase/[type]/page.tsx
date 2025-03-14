@@ -165,15 +165,15 @@ export default function PurchaseExams({ params }: PageProps) {
                       {[1, 2, 3].map((num) => (
                         <div 
                           key={`frq-${num}`} 
-                          className="bg-white rounded-md shadow-sm border border-gray-100 overflow-hidden opacity-75"
+                          className={`bg-white rounded-md shadow-sm border border-gray-100 overflow-hidden ${num > 1 ? 'opacity-75' : ''}`}
                         >
                           <div className="p-4 flex flex-col h-full">
-                    <div>
+                            <div>
                               <div className="flex items-center gap-2 mb-3">
                                 <h4 className="text-lg font-bold text-gray-900">
                                   Exam {num}
                                 </h4>
-                                <Lock className="w-4 h-4 text-gray-400" />
+                                {num > 1 && <Lock className="w-4 h-4 text-gray-400" />}
                               </div>
                               <div className="text-sm text-gray-500 mb-3">
                                 3 questions • 60 minutes
@@ -201,16 +201,20 @@ export default function PurchaseExams({ params }: PageProps) {
                                   </>
                                 )}
                               </div>
-                    </div>
+                            </div>
                             <div className="mt-auto">
                               <Link 
-                                href="#"
-                                className="w-full px-4 py-2 rounded-md font-medium text-sm flex items-center justify-center gap-2 bg-gray-300 text-gray-500 cursor-not-allowed"
+                                href={num === 1 ? `/preview/${resolvedParams.type}/frq/${num}` : '#'}
+                                className={`w-full px-4 py-2 rounded-md font-medium text-sm flex items-center justify-center gap-2 ${
+                                  num === 1 
+                                    ? 'bg-blue-600 text-white hover:bg-blue-700 transition-colors' 
+                                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                }`}
                               >
                                 Start Exam
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                          </svg>
+                                </svg>
                               </Link>
                             </div>
                           </div>
