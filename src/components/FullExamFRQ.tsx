@@ -18,7 +18,7 @@ interface Part {
   label: string;
   text: string;
   answerType: 'draw' | 'text' | null;
-  answer?: string;
+  answer?: string | StaticImageData;
   subparts?: SubPart[];
 }
 
@@ -127,31 +127,50 @@ export function FullExamFRQ({ questions }: FullExamFRQProps) {
                 {/* User's Response */}
                 {part.answerType && (
                   <div className="ml-8">
-                    <div className="mb-2 font-medium text-gray-600">Your Response:</div>
                     {part.answerType === 'text' ? (
                       <div className="p-3 bg-gray-50 rounded-md border border-gray-200">
                         {textAnswers[`${currentQuestionIndex}-${part.label}`] || 'No response provided'}
                       </div>
                     ) : part.answerType === 'draw' ? (
-                      <div className="h-[400px] bg-white rounded-md border border-gray-200">
-                        {drawingAnswers[`${currentQuestionIndex}-${part.label}`] && (
-                          <img 
-                            src={drawingAnswers[`${currentQuestionIndex}-${part.label}`]}
-                            alt="Your drawing"
-                            className="w-full h-full object-contain"
-                          />
+                      <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="w-full sm:w-1/2">
+                          <div className="h-[400px] bg-white rounded-md border border-gray-200">
+                            {drawingAnswers[`${currentQuestionIndex}-${part.label}`] && (
+                              <img 
+                                src={drawingAnswers[`${currentQuestionIndex}-${part.label}`]}
+                                alt="Your drawing"
+                                className="w-full h-full object-contain"
+                              />
+                            )}
+                          </div>
+                        </div>
+                        {part.answer && typeof part.answer === 'object' && 'src' in part.answer ? (
+                          <div className="w-full sm:w-1/2">
+                            <div className="mb-2 font-medium text-green-600">Correct Response:</div>
+                            <div className="h-[400px] bg-white rounded-md border border-gray-200">
+                              <img 
+                                src={part.answer.src}
+                                alt="Correct drawing"
+                                className="w-full h-full object-contain"
+                              />
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="w-full sm:w-1/2 p-3 bg-green-50 rounded-md border border-green-200">
+                            {part.answer}
+                          </div>
                         )}
                       </div>
                     ) : null}
                   </div>
                 )}
 
-                {/* Correct Answer */}
-                {part.answer && (
+                {/* Remove the old Correct Answer section for drawing questions */}
+                {part.answerType === 'text' && part.answer && (
                   <div className="ml-8">
                     <div className="mb-2 font-medium text-green-600">Correct Answer:</div>
                     <div className="p-3 bg-green-50 rounded-md border border-green-200">
-                      {part.answer}
+                      {typeof part.answer === 'string' ? part.answer : 'No response provided'}
                     </div>
                   </div>
                 )}

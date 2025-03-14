@@ -182,8 +182,8 @@ export default function PurchaseExams({ params }: PageProps) {
                                 {num === 1 && (
                                   <>
                                     <span className="px-2 py-0.5 bg-gray-100 rounded-sm text-xs text-gray-600">AD-AS Model</span>
-                                    <span className="px-2 py-0.5 bg-gray-100 rounded-sm text-xs text-gray-600">Bank Sheets</span>
-                                    <span className="px-2 py-0.5 bg-gray-100 rounded-sm text-xs text-gray-600">Exchange Rates</span>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded-sm text-xs text-gray-600">Forex Market</span>
+                                    <span className="px-2 py-0.5 bg-gray-100 rounded-sm text-xs text-gray-600">Phillips Curve</span>
                                   </>
                                 )}
                                 {num === 2 && (

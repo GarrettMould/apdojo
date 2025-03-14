@@ -1,4 +1,10 @@
 import macroSetOneFRQ2 from '../../../../../public/images/macroSetOneFRQ2.png';
+import macroSetOneFRQA1A from '../../../../../public/images/macroSetOneFRQA1A.png';
+import macroSetOneFRQA1E from '../../../../../public/images/macroSetOneFRQA1E.png';
+import macroSetOneFRQA3CI from '../../../../../public/images/macroSetOneFRQA3CI.png';
+import macroSetOneFRQA3CII from '../../../../../public/images/macroSetOneFRQA3CII.png';
+
+
 export const frqSetOneQuestions = {
   examTitle: "AP Macroeconomics FRQ Exam 1",
     questions: [
@@ -11,6 +17,7 @@ export const frqSetOneQuestions = {
             label: "A",
             text: "Draw a single correctly labeled AD-AS graph for Japan and label the current equilibrium output as Y* and the current price level PL*",
             answerType: "draw",
+            answer: macroSetOneFRQA1A,
             subparts: [
               {
                 label: "i",
@@ -48,7 +55,7 @@ export const frqSetOneQuestions = {
             label: "E",
             text: "Based on the change in real interest rates from part D), show the change that will occur in the foreign exchange market for the Japanese Yen.",
             answerType: "draw",
-            answer: "Your graph of the foreign exchange market should show the Yen depreciating due to a decrease in demand for the Yen.",
+            answer: macroSetOneFRQA1E,
           }
         ]
       },
@@ -158,14 +165,14 @@ export const frqSetOneQuestions = {
               {
                 label: "i",
                 text: "Draw a single correctly labeled graph of both the short-run Phillips curve and the long-run Phillips curve. Label the short-run equilibrium prior to the central bank’s policy action as Point X.",
-                answerType: "draw",
-                answer: "Your graph should show Point X on the short-run Phillips curve, to the right of the long-run Phillips curve, signalling low inflation and high unemployment.",
+                  answerType: "draw",
+                  answer: macroSetOneFRQA3CI,
               },
               {
                 label: "ii",
                 text: "Add a point, Y, to the graph above that represents the country’s short-run equilibrium after the central bank’s policy action.",
                 answerType: null,
-                answer: "Your graph should show Point Y at the intersection of the short-run Phillips curve and the long-run Phillips curve, signalling that the economy is back in long-run equilibrium.",
+                answer: macroSetOneFRQA3CII,
               }
             ]
           }
