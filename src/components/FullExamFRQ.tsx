@@ -196,11 +196,13 @@ export function FullExamFRQ({ questions }: FullExamFRQProps) {
                         {/* Only render response if there's an answerType */}
                         {subpart.answerType && (
                           <div className="ml-8">
-                            <div className="mb-2 font-medium text-gray-600">Your Response:</div>
                             {subpart.answerType === 'text' ? (
-                              <div className="p-3 bg-gray-50 rounded-md border border-gray-200">
-                                {textAnswers[`${currentQuestionIndex}-${part.label}-${subpart.label}`] || 'No response provided'}
-                              </div>
+                              <>
+                                <div className="mb-2 font-medium text-gray-600">Your Response:</div>
+                                <div className="p-3 bg-gray-50 rounded-md border border-gray-200">
+                                  {textAnswers[`${currentQuestionIndex}-${part.label}-${subpart.label}`] || 'No response provided'}
+                                </div>
+                              </>
                             ) : subpart.answerType === 'draw' ? (
                               <div className="flex flex-col sm:flex-row gap-4">
                                 <div className={`w-full ${showResults ? 'sm:w-1/2' : ''}`}>
