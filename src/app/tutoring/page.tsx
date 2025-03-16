@@ -124,19 +124,17 @@ export default function TutoringPage() {
         </p>
 
         <div className="max-w-3xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Tutoring Card */}
-            <Card className="hover:shadow-lg transition-all duration-200 flex flex-col border border-gray-200">
-              <div className="p-6 text-center">
+          <Card className="hover:shadow-lg transition-all duration-200 flex flex-col border border-gray-200">
+            <div className="grid md:grid-cols-2 divide-x">
+              {/* Tutoring Card */}
+              <div className="p-6 text-center flex flex-col justify-between h-full">
                 <div className="space-y-2">
-                  <h3 className="text-2xl font-bold text-gray-900">Single Session</h3>
+                  <h3 className="text-lg font-semibold text-gray-900">Single Session</h3>
                   <div className="mt-4">
-                  <p className="text-3xl font-bold text-gray-900">$50<span className="text-lg text-gray-500"> /session</span></p>
-                </div>
+                    <p className="text-3xl font-bold text-gray-900">$50<span className="text-lg text-gray-500"> /session</span></p>
+                  </div>
                   <p className="text-gray-600">Perfect for students who need quick help with specific topics.</p>
                 </div>
-                
-                
 
                 <div className="space-y-3 mt-6">
                   <div className="flex items-start gap-3 justify-center">
@@ -153,91 +151,91 @@ export default function TutoringPage() {
                   </div>
                 </div>
               </div>
-            </Card>
 
-            {/* Benefits List */}
-            <div className="flex flex-col justify-center">
-              <h3 className="text-lg font-semibold text-gray-900 mb-6 text-center ">
-                What's Included in Each Session
-              </h3>
-              <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                    </svg>
-                  </div>
-                  <div className="text-center flex-1">
-                    <h4 className="text-gray-900 font-bold">AP College Board Practice Problems</h4>
-                    <p className="text-sm text-gray-600 mt-1">Work through official AP Economics questions with expert guidance</p>
-                  </div>
-                </div>
+              {/* Benefits List */}
+              <div className="flex flex-col justify-between p-6 h-full">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-6 text-center">
+                    What's Included in Each Session
+                  </h3>
+                  <div className="space-y-6">
+                    <div className="flex items-start gap-4">
+                      <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-gray-900 font-bold">AP College Board Practice Problems</h4>
+                        <p className="text-sm text-gray-600 mt-1">Work through official AP Economics questions with expert guidance</p>
+                      </div>
+                    </div>
 
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                    </svg>
-                  </div>
-                  <div className="text-center flex-1">
-                    <h4 className="text-gray-900 font-bold">Personalized Notes and Examples</h4>
-                    <p className="text-sm text-gray-600 mt-1">Receive custom study materials tailored to your learning style</p>
-                  </div>
-                </div>
+                    <div className="flex items-start gap-4">
+                      <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-gray-900 font-bold">Personalized Notes and Examples</h4>
+                        <p className="text-sm text-gray-600 mt-1">Receive custom study materials tailored to your learning style</p>
+                      </div>
+                    </div>
 
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                    </svg>
-                  </div>
-                  <div className="text-center flex-1">
-                    <h4 className=" text-gray-900 font-bold">Strategic Test-Taking Techniques</h4>
-                    <p className="text-sm text-gray-600 mt-1">Learn proven strategies for maximizing your score on exam day</p>
+                    <div className="flex items-start gap-4">
+                      <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-gray-900 font-bold">Strategic Test-Taking Techniques</h4>
+                        <p className="text-sm text-gray-600 mt-1">Learn proven strategies for maximizing your score on exam day</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-
-          
-
-          {/* Calendly Widget */}
-          <div className="mt-32">
-            <h3 className="text-4xl font-extrabold text-gray-900 text-center mb-12">Booking Your Next Lesson is Simple!</h3>
-            <div className="max-w-2xl mx-auto mb-16">
-              <div className="space-y-6 flex flex-col items-center">
-                <div className="flex items-center gap-6 w-full max-w-md">
-                  <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                    <span className="text-xl font-bold text-blue-600">1</span>
-                  </div>
-                  <p className="text-lg font-bold text-gray-900">Choose a date and time</p>
-                </div>
-                <div className="flex items-center gap-6 w-full max-w-md">
-                  <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                    <span className="text-xl font-bold text-blue-600">2</span>
-                  </div>
-                  <p className="text-lg font-bold text-gray-900">Pay using Stripe</p>
-                </div>
-                <div className="flex items-center gap-6 w-full max-w-md">
-                  <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                    <span className="text-xl font-bold text-blue-600">3</span>
-                  </div>
-                  <p className="text-lg font-bold text-gray-900">Receive an automatically generated meeting link via email</p>
-                </div>
-              </div>
-              <div className="mt-8 text-center">
-                <p className="text-gray-600">Questions about Booking? Email <a href="mailto:garrett@apdojo.com" className="text-blue-600 hover:text-blue-700 transition-colors">garrett@apdojo.com</a></p>
-              </div>
-            </div>
-            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-              <CalendlyWidget />
-            </div>
-          </div>
+          </Card>
         </div>
 
-        <ReviewsSection />
+        {/* Calendly Widget */}
+        <div className="mt-32">
+          <h3 className="text-4xl font-extrabold text-gray-900 text-center mb-12">Booking Your Next Lesson is Simple!</h3>
+          <div className="max-w-2xl mx-auto mb-16">
+            <div className="space-y-6 flex flex-col items-center">
+              <div className="flex items-center gap-6 w-full max-w-md">
+                <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                  <span className="text-xl font-bold text-blue-600">1</span>
+                </div>
+                <p className="text-lg font-bold text-gray-900">Choose a date and time</p>
+              </div>
+              <div className="flex items-center gap-6 w-full max-w-md">
+                <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                  <span className="text-xl font-bold text-blue-600">2</span>
+                </div>
+                <p className="text-lg font-bold text-gray-900">Pay using Stripe</p>
+              </div>
+              <div className="flex items-center gap-6 w-full max-w-md">
+                <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                  <span className="text-xl font-bold text-blue-600">3</span>
+                </div>
+                <p className="text-lg font-bold text-gray-900">Receive an automatically generated meeting link via email</p>
+              </div>
+            </div>
+            <div className="mt-8 text-center">
+              <p className="text-gray-600">Questions about Booking? Email <a href="mailto:garrett@apdojo.com" className="text-blue-600 hover:text-blue-700 transition-colors">garrett@apdojo.com</a></p>
+            </div>
+          </div>
+          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <CalendlyWidget />
+          </div>
+        </div>
       </div>
+
+      <ReviewsSection />
     </>
   )
 } 

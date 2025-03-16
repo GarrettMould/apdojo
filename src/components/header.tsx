@@ -48,7 +48,7 @@ export function Header() {
   };
 
   return (
-    <div className="w-full bg-white border-b relative">
+    <div className="w-full bg-white border-b relative z-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-4">
       <div className="flex items-center space-x-4">
@@ -156,13 +156,13 @@ export function Header() {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="lg:hidden fixed top-[61px] left-0 right-0 bg-white border-b shadow-lg z-50">
+        <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-b shadow-lg">
           <div className="px-4 py-2">
             <div className="py-2">
               <Link 
                 href="/tutoring" 
                 onClick={handleTutoringClick}
-                className="block px-4 py-2 hover:bg-gray-100 font-bold   text-sm"
+                className="block px-4 py-2 hover:bg-gray-100 font-bold text-sm"
               >
                 Private Tutoring
               </Link>
@@ -178,20 +178,20 @@ export function Header() {
               <Link 
                 href="/interactive-tools" 
                 onClick={handleToolsClick}
-                className="block px-4 py-2 hover:bg-gray-100 font-bold   text-sm"
+                className="block px-4 py-2 hover:bg-gray-100 font-bold text-sm"
               >
                 Interactive Tools
               </Link>
               <Link 
                 href="/cheat-sheets" 
                 onClick={handleCheatSheetsClick}
-                className="block px-4 py-2 hover:bg-gray-100 font-bold   text-sm"
+                className="block px-4 py-2 hover:bg-gray-100 font-bold text-sm"
               >
                 Cheat Sheets
               </Link>
               <Link 
-                href="/purchase"
-                className="block px-4 py-2 hover:bg-gray-100 font-bold text-blue-500 text-sm"
+                href="/purchase/exams"
+                className="block px-4 py-2 hover:bg-gray-100 font-bold text-sm"
               >
                 Practice Exams
               </Link>

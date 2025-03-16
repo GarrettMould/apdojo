@@ -15,7 +15,7 @@ export function Hero() {
       </p>
       <Link 
         href="/tutoring"
-        className="inline-block px-8 py-3 mt-10 text-lg font-bold text-white bg-blue-500 rounded-md hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        className="inline-block px-8 py-3 mt-10 text-lg font-bold text-white bg-blue-500 rounded-md hover:bg-blue-600 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
       >
         Book a Lesson
       </Link>

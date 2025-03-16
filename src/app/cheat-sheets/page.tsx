@@ -46,20 +46,20 @@ export default function CheatSheetsPage() {
           {macroUnits.map((unit) => (
             <div 
               key={unit.number}
-              className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-500 transition-colors duration-200"
+              className="flex items-center justify-between p-4 min-h-[4.5rem] bg-white border border-gray-200 rounded-lg hover:border-blue-500 transition-colors duration-200"
             >
               <div className="flex items-center gap-4">
-                <div className="w-8 h-8 rounded-full bg-gray-100/80 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-gray-100/80 flex items-center justify-center flex-shrink-0">
                   <Folder className="w-4 h-4 text-blue-500" fill="currentColor" />
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-sm font-bold text-blue-500">Unit {unit.number}</span>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+                  <span className="text-sm font-bold text-blue-500 whitespace-nowrap">Unit {unit.number}</span>
                   <span className="text-sm font-bold text-gray-900">{unit.title}</span>
                 </div>
               </div>
               <button 
                 onClick={() => window.open(unit.pdfUrl, '_blank')}
-                className="p-2 text-gray-500 hover:text-blue-600 transition-colors"
+                className="p-2 text-gray-500 hover:text-blue-600 transition-colors flex-shrink-0"
                 title={`Download Unit ${unit.number} Cheat Sheet`}
               >
                 <Download className="w-5 h-5" />
@@ -78,20 +78,20 @@ export default function CheatSheetsPage() {
           {microUnits.map((unit) => (
             <div 
               key={unit.number}
-              className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg hover:border-green-500 transition-colors duration-200"
+              className="flex items-center justify-between p-4 min-h-[4.5rem] bg-white border border-gray-200 rounded-lg hover:border-green-500 transition-colors duration-200"
             >
               <div className="flex items-center gap-4">
-                <div className="w-8 h-8 rounded-full bg-gray-100/80 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-gray-100/80 flex items-center justify-center flex-shrink-0">
                   <Folder className="w-4 h-4 text-green-500" fill="currentColor" />
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-sm font-bold text-green-500">Unit {unit.number}</span>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+                  <span className="text-sm font-bold text-green-500 whitespace-nowrap">Unit {unit.number}</span>
                   <span className="text-sm font-bold text-gray-900">{unit.title}</span>
                 </div>
               </div>
               <button 
                 onClick={() => window.open(unit.pdfUrl, '_blank')}
-                className="p-2 text-gray-500 hover:text-green-600 transition-colors"
+                className="p-2 text-gray-500 hover:text-green-600 transition-colors flex-shrink-0"
                 title={`Download Unit ${unit.number} Cheat Sheet`}
               >
                 <Download className="w-5 h-5" />
