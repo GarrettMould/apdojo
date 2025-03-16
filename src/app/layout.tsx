@@ -4,6 +4,7 @@ import { HeaderWrapper } from '@/components/header-wrapper'
 import { Footer } from '@/components/Footer'
 import { PageContainer } from '@/components/ui/page-container'
 import { AuthProvider } from '@/contexts/AuthContext'
+import { Analytics } from "@vercel/analytics/react"
 
 export async function generateMetadata({ params }: { params: { type: string } }) {
   const examType = params.type === 'macro-exams' ? 'Macroeconomics' : 'Microeconomics'
@@ -27,6 +28,7 @@ export default function RootLayout({
           <main className="flex-1">
             <PageContainer>
           {children}
+          <Analytics />
             </PageContainer>
           </main>
           <Footer />
