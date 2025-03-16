@@ -292,17 +292,7 @@ export function FullExamFRQ({ questions }: FullExamFRQProps) {
 
   return (
     <div className="w-full max-w-4xl mx-auto p-6">
-      <div className="mb-6">
-        <a 
-          href={`/purchase/macro-exams`} 
-          className="text-blue-600 hover:text-blue-800"
-        >
-          ← Back to Exams Page
-        </a>
-        <h1 className="text-4xl font-bold mt-4">
-          {questions.examTitle}
-        </h1>
-      </div>
+    
 
       {showResults ? (
         <ResultsView

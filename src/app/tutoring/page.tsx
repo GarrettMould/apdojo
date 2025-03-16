@@ -12,6 +12,8 @@ import { loadStripe } from '@stripe/stripe-js'
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import CalendlyWidget from '@/components/CalendlyWidget'
 
+
+
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
 function SetupPaymentForm({ onSuccess }: { onSuccess: () => void }) {
@@ -198,14 +200,36 @@ export default function TutoringPage() {
             </div>
           </div>
 
+          
+
           {/* Calendly Widget */}
           <div className="mt-32">
-            <h3 className="text-4xl font-extrabold text-gray-900 text-center mb-6">Booking Your Next Lesson is Simple!</h3>
-            <p className="text-xl text-gray-600 text-center font-semibold max-w-3xl mx-auto mb-16">
-              1️⃣ Choose a date and time <br></br>
-              2️⃣ Pay using Stripe <br></br>
-              3️⃣ Receive an automatically generated meeting link via email
-            </p>
+            <h3 className="text-4xl font-extrabold text-gray-900 text-center mb-12">Booking Your Next Lesson is Simple!</h3>
+            <div className="max-w-2xl mx-auto mb-16">
+              <div className="space-y-6 flex flex-col items-center">
+                <div className="flex items-center gap-6 w-full max-w-md">
+                  <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                    <span className="text-xl font-bold text-blue-600">1</span>
+                  </div>
+                  <p className="text-lg font-bold text-gray-900">Choose a date and time</p>
+                </div>
+                <div className="flex items-center gap-6 w-full max-w-md">
+                  <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                    <span className="text-xl font-bold text-blue-600">2</span>
+                  </div>
+                  <p className="text-lg font-bold text-gray-900">Pay using Stripe</p>
+                </div>
+                <div className="flex items-center gap-6 w-full max-w-md">
+                  <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                    <span className="text-xl font-bold text-blue-600">3</span>
+                  </div>
+                  <p className="text-lg font-bold text-gray-900">Receive an automatically generated meeting link via email</p>
+                </div>
+              </div>
+              <div className="mt-8 text-center">
+                <p className="text-gray-600">Questions about Booking? Email <a href="mailto:garrett@apdojo.com" className="text-blue-600 hover:text-blue-700 transition-colors">garrett@apdojo.com</a></p>
+              </div>
+            </div>
             <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
               <CalendlyWidget />
             </div>

@@ -1,14 +1,14 @@
-import { QuestionBank } from './types';
-import macroSetTwoQ17 from '../../../public/images/macroSetTwoQ17.png';
-import macroSetTwoQ20 from '../../../public/images/macroSetTwoQ20.png';
-import macroSetTwoQ21 from '../../../public/images/macroSetTwoQ21.png';
-import macroSetTwoQ24 from '../../../public/images/macroSetTwoQ24.png';
-import macroSetTwoQ28 from '../../../public/images/macroSetTwoQ28.png';
-import macroSetTwoQ30 from '../../../public/images/macroSetTwoQ30.png';
-import macroSetTwoQ31 from '../../../public/images/macroSetTwoQ31.png';
-import macroSetTwoQ39 from '../../../public/images/macroSetTwoQ39.png';
-import macroSetTwoQ42 from '../../../public/images/macroSetTwoQ42.png';
-import macroSetTwoQ46 from '../../../public/images/macroSetTwoQ46.png';
+import { QuestionBank } from '../../types';
+import macroSetTwoQ17 from '../../../../../public/images/macroSetTwoQ17.png';
+import macroSetTwoQ20 from '../../../../../public/images/macroSetTwoQ20.png';
+import macroSetTwoQ21 from '../../../../../public/images/macroSetTwoQ21.png';
+import macroSetTwoQ24 from '../../../../../public/images/macroSetTwoQ24.png';
+import macroSetTwoQ28 from '../../../../../public/images/macroSetTwoQ28.png';
+import macroSetTwoQ30 from '../../../../../public/images/macroSetTwoQ30.png';
+import macroSetTwoQ31 from '../../../../../public/images/macroSetTwoQ31.png';
+import macroSetTwoQ39 from '../../../../../public/images/macroSetTwoQ39.png';
+import macroSetTwoQ42 from '../../../../../public/images/macroSetTwoQ42.png';
+import macroSetTwoQ46 from '../../../../../public/images/macroSetTwoQ46.png';
 
 
 

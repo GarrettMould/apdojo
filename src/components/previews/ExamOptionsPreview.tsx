@@ -9,7 +9,7 @@ export function ExamOptionsPreview() {
       
       <div className="flex flex-col items-center gap-4 max-w-xl mx-auto">
         <Link 
-          href="/purchase/macro-exams"
+          href="/purchase"
           className="w-full p-6 bg-white border-2 border-black rounded-lg hover:bg-gray-50 hover:border-blue-500 transition-all"
         >
           <h2 className="text-2xl font-semibold text-center">
@@ -18,7 +18,7 @@ export function ExamOptionsPreview() {
         </Link>
 
         <Link 
-          href="/purchase/micro-exams"
+          href="/purchase"
           className="w-full p-6 bg-white border-2 border-black rounded-lg hover:bg-gray-50 hover:border-green-500 transition-all"
         >
           <h2 className="text-2xl font-semibold text-center">

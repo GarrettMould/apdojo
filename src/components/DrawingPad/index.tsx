@@ -20,6 +20,40 @@ export function DrawingPad({ isLarge = false, className = '', initialData, onSav
   const [tool, setTool] = useState<'pen' | 'eraser' | 'line'>('pen');
   const [lineStart, setLineStart] = useState<{ x: number; y: number } | null>(null);
 
+  const clearCanvas = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    onSave('');
+  };
+
+  // Effect to handle initialData changes
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Clear the canvas first
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // If there's initialData, draw it
+    if (initialData) {
+      const img = new Image();
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0);
+      };
+      img.src = initialData;
+    }
+  }, [initialData, isLarge]); // Add isLarge to dependencies since it affects canvas dimensions
+
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -112,31 +146,6 @@ export function DrawingPad({ isLarge = false, className = '', initialData, onSav
 
     setIsDrawing(false);
   };
-
-  const clearCanvas = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    onSave('');
-  };
-
-  useEffect(() => {
-    if (initialData && canvasRef.current) {
-      const img = new Image();
-      img.onload = () => {
-        const ctx = canvasRef.current?.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(img, 0, 0);
-        }
-      };
-      img.src = initialData;
-    }
-  }, [initialData]);
 
   const getPenCursor = () => {
     const size = 10;

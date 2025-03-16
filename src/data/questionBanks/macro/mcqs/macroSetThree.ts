@@ -1,4 +1,4 @@
-import { QuestionBank } from './types';
+import { QuestionBank } from '../../types';
 
 
 

@@ -43,7 +43,7 @@ export function Header() {
 
   const handlePracticeExamsClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    router.push('/purchase/macro-exams');
+    router.push('/purchase');
     setIsMenuOpen(false);
   };
 
@@ -109,8 +109,7 @@ export function Header() {
               Cheat Sheets
             </Link>
             <Link 
-              href="/purchase/macro-exams"
-              onClick={handlePracticeExamsClick}
+              href="/purchase/exams"
               className="hover:text-blue-600 transition-colors font-bold text-gray-600"
             >
               Practice Exams
@@ -191,8 +190,7 @@ export function Header() {
                 Cheat Sheets
               </Link>
               <Link 
-                href="/purchase/macro-exams"
-                onClick={handlePracticeExamsClick}
+                href="/purchase"
                 className="block px-4 py-2 hover:bg-gray-100 font-bold"
               >
                 Practice Exams

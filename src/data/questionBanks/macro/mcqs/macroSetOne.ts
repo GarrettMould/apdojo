@@ -1,13 +1,13 @@
-import { QuestionBank } from './types';
-import macroSetOneQ1 from '../../../public/images/macroSetOneQ1.png';
-import macroSetOneQ31 from '../../../public/images/macroSetOneQ31.png';	
-import macroSetOneQ34 from '../../../public/images/macroSetOneQ34.png';
-import macroSetOneQ37 from '../../../public/images/macroSetOneQ37.png';
-import macroSetOneQ40 from '../../../public/images/macroSetOneQ40.png';
-import macroSetOneQ41 from '../../../public/images/macroSetOneQ41.png';
-import macroSetOneQ48 from '../../../public/images/macroSetOneQ48.png';
-import macroSetOneQ53 from '../../../public/images/macroSetOneQ53.png';
-import macroSetOneQ57 from '../../../public/images/macroSetOneQ57.png';
+import { QuestionBank } from '../../types';
+import macroSetOneQ1 from '../../../../../public/images/macroSetOneQ1.png';
+import macroSetOneQ31 from '../../../../../public/images/macroSetOneQ31.png';	
+import macroSetOneQ34 from '../../../../../public/images/macroSetOneQ34.png';
+import macroSetOneQ37 from '../../../../../public/images/macroSetOneQ37.png';
+import macroSetOneQ40 from '../../../../../public/images/macroSetOneQ40.png';
+import macroSetOneQ41 from '../../../../../public/images/macroSetOneQ41.png';
+import macroSetOneQ48 from '../../../../../public/images/macroSetOneQ48.png';
+import macroSetOneQ53 from '../../../../../public/images/macroSetOneQ53.png';
+import macroSetOneQ57 from '../../../../../public/images/macroSetOneQ57.png';
 // Fisher-Yates shuffle function
 function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array];
