@@ -136,18 +136,18 @@ export default function TutoringPage() {
                   <p className="text-gray-600">Perfect for students who need quick help with specific topics.</p>
                 </div>
 
-                <div className="space-y-3 mt-6">
+                <div className="space-y-2 mt-4">
                   <div className="flex items-start gap-3 justify-center">
                     <Check className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-600">60-minute one-on-one sessions</span>
+                    <span className="text-gray-600 text-sm">60-minute one-on-one sessions</span>
                   </div>
                   <div className="flex items-start gap-3 justify-center">
                     <Check className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-600">Flexible scheduling</span>
+                    <span className="text-gray-600 text-sm">Flexible scheduling</span>
                   </div>
                   <div className="flex items-start gap-3 justify-center">
                     <Check className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-600">No long-term commitment</span>
+                    <span className="text-gray-600 text-sm">No long-term commitment</span>
                   </div>
                 </div>
               </div>
@@ -155,10 +155,10 @@ export default function TutoringPage() {
               {/* Benefits List */}
               <div className="flex flex-col justify-between p-6 h-full">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-6 text-center">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
                     What's Included in Each Session
                   </h3>
-                  <div className="space-y-6">
+                  <div className="space-y-4">
                     <div className="flex items-start gap-4">
                       <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
                         <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -166,8 +166,8 @@ export default function TutoringPage() {
                         </svg>
                       </div>
                       <div className="flex-1">
-                        <h4 className="text-gray-900 font-bold">AP College Board Practice Problems</h4>
-                        <p className="text-sm text-gray-600 mt-1">Work through official AP Economics questions with expert guidance</p>
+                        <h4 className="text-sm font-bold text-gray-900">AP College Board Practice Problems</h4>
+                        <p className="text-xs text-gray-600 mt-0.5">Work through official AP Economics questions with expert guidance</p>
                       </div>
                     </div>
 
@@ -178,8 +178,8 @@ export default function TutoringPage() {
                         </svg>
                       </div>
                       <div className="flex-1">
-                        <h4 className="text-gray-900 font-bold">Personalized Notes and Examples</h4>
-                        <p className="text-sm text-gray-600 mt-1">Receive custom study materials tailored to your learning style</p>
+                        <h4 className="text-sm font-bold text-gray-900">Personalized Notes and Examples</h4>
+                        <p className="text-xs text-gray-600 mt-0.5">Receive custom study materials tailored to your learning style</p>
                       </div>
                     </div>
 
@@ -190,8 +190,8 @@ export default function TutoringPage() {
                         </svg>
                       </div>
                       <div className="flex-1">
-                        <h4 className="text-gray-900 font-bold">Strategic Test-Taking Techniques</h4>
-                        <p className="text-sm text-gray-600 mt-1">Learn proven strategies for maximizing your score on exam day</p>
+                        <h4 className="text-sm font-bold text-gray-900">Strategic Test-Taking Techniques</h4>
+                        <p className="text-xs text-gray-600 mt-0.5">Learn proven strategies for maximizing your score on exam day</p>
                       </div>
                     </div>
                   </div>

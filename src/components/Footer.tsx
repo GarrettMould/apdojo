@@ -53,7 +53,7 @@ export function Footer() {
               </p>
               <a 
                 href="mailto:garrett@apdojo.com"
-                className="text-sm text-gray-500 hover:text-blue-600 transition-colors flex items-center gap-2"
+                className="text-sm text-gray-500 hover:text-blue-600 transition-colors flex items-center gap-2 mt-4"
               >
                 <Mail className="w-4 h-4" />
                 <span>garrett@apdojo.com</span>

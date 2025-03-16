@@ -19,7 +19,7 @@ export function ReviewsSection() {
 
   return (
     <>
-      <section className="mt-24">
+      <section className="mt-24 mb-24">
         <h2 className="text-3xl font-bold text-center mb-12">What Students Are Saying</h2>
         
         <div className="grid md:grid-cols-3 gap-8">
