@@ -6,22 +6,19 @@ export function Hero() {
   return (
     <section className="py-20 text-center max-w-3xl mx-auto relative">
       <h1 className="text-6xl font-extrabold tracking-tight drop-shadow-sm leading-tight">
-      Ace Your <span className="text-blue-500">
-        AP Exams
+        Ace Your <span className="text-blue-500">
+          AP Exams
         </span>{' '} with Expert 1-on-1 Tutoring
       </h1>
       <p className="text-xl text-gray-600 mt-6">
-      Get personalized AP tutoring, interactive tools, and top-tier study resources—all designed to boost your confidence and scores.
+        Get personalized AP tutoring, interactive tools, and top-tier study resources—all designed to boost your confidence and scores.
       </p>
-      <Button 
-        asChild
-        size="xl"
-        className="mt-10"
+      <Link 
+        href="/tutoring"
+        className="inline-block px-8 py-3 mt-10 text-lg font-bold text-white bg-blue-500 rounded-md hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
       >
-        <Link href="/tutoring">
-          Book a Lesson
-        </Link>
-      </Button>
+        Book a Lesson
+      </Link>
     </section>
   )
 } 

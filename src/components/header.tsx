@@ -57,7 +57,7 @@ export function Header() {
               className="hover:opacity-90 transition-opacity flex items-center"
         >
               <span className="text-2xl font-extrabold ">AP</span>
-              <span className="ml-1 text-2xl font-extrabold text-blue-600">Dojo</span>
+              <span className="ml-1 text-2xl font-extrabold text-blue-500 ">Dojo</span>
         </button>
       </div>
       
@@ -82,14 +82,14 @@ export function Header() {
             <Link 
               href="/tutoring" 
               onClick={handleTutoringClick}
-              className="hover:text-blue-600 transition-colors font-bold text-gray-600"
+              className="hover:text-blue-700 transition-colors font-bold  text-sm"
             >
               Private Tutoring
             </Link>
             {/* Video Library temporarily removed
             <Link 
               href="/tools" 
-              className="hover:text-blue-600 transition-colors font-bold text-gray-600"
+              className="hover:  transition-colors font-bold text-gray-600"
             >
               Video Library
             </Link>
@@ -97,20 +97,20 @@ export function Header() {
             <Link 
               href="/interactive-tools" 
               onClick={handleToolsClick}
-              className="hover:text-blue-600 transition-colors font-bold text-gray-600"
+              className="hover:text-blue-700 transition-colors font-bold   text-sm"
             >
-          Interactive Tools
-        </Link>
+              Interactive Tools
+            </Link>
             <Link 
               href="/cheat-sheets" 
               onClick={handleCheatSheetsClick}
-              className="hover:text-blue-600 transition-colors font-bold text-gray-600"
+              className="hover:text-blue-700 transition-colors font-bold   text-sm"
             >
               Cheat Sheets
             </Link>
             <Link 
               href="/purchase/exams"
-              className="hover:text-blue-600 transition-colors font-bold text-gray-600"
+              className="hover:text-blue-700 transition-colors font-bold   text-sm"
             >
               Practice Exams
             </Link>
@@ -119,7 +119,7 @@ export function Header() {
               <div className="flex items-center space-x-8">
                 <Link
                   href="/my-purchases"
-                  className="hover:text-blue-600 transition-colors"
+                  className="hover:  transition-colors"
                   title="My Profile"
                 >
                   <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
@@ -137,7 +137,7 @@ export function Header() {
               <div className="flex items-center space-x-8">
                 <Link
                   href="/login"
-                  className="hover:text-blue-600 transition-colors font-bold"
+                  className="hover:  transition-colors font-bold"
                 >
                   Login
                 </Link>
@@ -162,7 +162,7 @@ export function Header() {
               <Link 
                 href="/tutoring" 
                 onClick={handleTutoringClick}
-                className="block px-4 py-2 hover:bg-gray-100 font-bold"
+                className="block px-4 py-2 hover:bg-gray-100 font-bold   text-sm"
               >
                 Private Tutoring
               </Link>
@@ -178,20 +178,20 @@ export function Header() {
               <Link 
                 href="/interactive-tools" 
                 onClick={handleToolsClick}
-                className="block px-4 py-2 hover:bg-gray-100 font-bold"
+                className="block px-4 py-2 hover:bg-gray-100 font-bold   text-sm"
               >
                 Interactive Tools
               </Link>
               <Link 
                 href="/cheat-sheets" 
                 onClick={handleCheatSheetsClick}
-                className="block px-4 py-2 hover:bg-gray-100 font-bold"
+                className="block px-4 py-2 hover:bg-gray-100 font-bold   text-sm"
               >
                 Cheat Sheets
               </Link>
               <Link 
                 href="/purchase"
-                className="block px-4 py-2 hover:bg-gray-100 font-bold"
+                className="block px-4 py-2 hover:bg-gray-100 font-bold text-blue-500 text-sm"
               >
                 Practice Exams
               </Link>

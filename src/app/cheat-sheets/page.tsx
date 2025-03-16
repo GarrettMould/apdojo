@@ -1,6 +1,6 @@
 'use client';
 
-import { Download } from 'lucide-react';
+import { Download, Folder } from 'lucide-react';
 
 type Unit = {
   number: number;
@@ -39,7 +39,7 @@ export default function CheatSheetsPage() {
 
       {/* Macro Section */}
       <div className="mb-16">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">
+        <h2 className="text-2xl font-extrabold text-gray-900 mb-6">
           AP Macroeconomics
         </h2>
         <div className="space-y-3">
@@ -49,10 +49,13 @@ export default function CheatSheetsPage() {
               className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg hover:border-blue-500 transition-colors duration-200"
             >
               <div className="flex items-center gap-4">
-                <span className="text-sm font-medium text-blue-600">Unit {unit.number}</span>
-                <h3 className="font-medium text-gray-900">
-                  {unit.title}
-                </h3>
+                <div className="w-8 h-8 rounded-full bg-gray-100/80 flex items-center justify-center">
+                  <Folder className="w-4 h-4 text-blue-500" fill="currentColor" />
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-bold text-blue-500">Unit {unit.number}</span>
+                  <span className="text-sm font-bold text-gray-900">{unit.title}</span>
+                </div>
               </div>
               <button 
                 onClick={() => window.open(unit.pdfUrl, '_blank')}
@@ -68,7 +71,7 @@ export default function CheatSheetsPage() {
 
       {/* Micro Section */}
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">
+        <h2 className="text-2xl font-extrabold text-gray-900 mb-6">
           AP Microeconomics
         </h2>
         <div className="space-y-3">
@@ -78,10 +81,13 @@ export default function CheatSheetsPage() {
               className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg hover:border-green-500 transition-colors duration-200"
             >
               <div className="flex items-center gap-4">
-                <span className="text-sm font-medium text-green-600">Unit {unit.number}</span>
-                <h3 className="font-medium text-gray-900">
-                  {unit.title}
-                </h3>
+                <div className="w-8 h-8 rounded-full bg-gray-100/80 flex items-center justify-center">
+                  <Folder className="w-4 h-4 text-green-500" fill="currentColor" />
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-bold text-green-500">Unit {unit.number}</span>
+                  <span className="text-sm font-bold text-gray-900">{unit.title}</span>
+                </div>
               </div>
               <button 
                 onClick={() => window.open(unit.pdfUrl, '_blank')}
