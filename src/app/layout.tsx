@@ -25,10 +25,10 @@ export default function RootLayout({
       <body className="min-h-screen flex flex-col">
         <AuthProvider>
           <HeaderWrapper />
-          <main className="flex-1">
+          <main className="flex-1 w-full bg-gradient-to-b from-gray-100 via-white to-white via-5%">
             <PageContainer>
-          {children}
-          <Analytics />
+              {children}
+              <Analytics />
             </PageContainer>
           </main>
           <Footer />

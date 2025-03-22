@@ -54,14 +54,19 @@ export function DrawingPad({ isLarge = false, className = '', initialData, onSav
     }
   }, [initialData, isLarge]); // Add isLarge to dependencies since it affects canvas dimensions
 
-  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const startDrawing = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault(); // Prevent scrolling
     const canvas = canvasRef.current;
     if (!canvas) return;
-
+    
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
+    const x = 'touches' in e 
+      ? e.touches[0].clientX - rect.left 
+      : (e as React.MouseEvent).clientX - rect.left;
+    const y = 'touches' in e 
+      ? e.touches[0].clientY - rect.top 
+      : (e as React.MouseEvent).clientY - rect.top;
+    
     if (tool === 'line') {
       setLineStart({ x, y });
       setIsDrawing(true);
@@ -73,18 +78,23 @@ export function DrawingPad({ isLarge = false, className = '', initialData, onSav
     lastPos.current = { x, y };
   };
 
-  const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const draw = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault(); // Prevent scrolling
     const canvas = canvasRef.current;
-    if (!canvas) return;
-
+    if (!canvas || !isDrawing || !lastPos.current) return;
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
+    const x = 'touches' in e 
+      ? e.touches[0].clientX - rect.left 
+      : (e as React.MouseEvent).clientX - rect.left;
+    const y = 'touches' in e 
+      ? e.touches[0].clientY - rect.top 
+      : (e as React.MouseEvent).clientY - rect.top;
+    
     if (tool === 'line' && lineStart && isDrawing) {
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-
       if (!lastPos.current) {
         lastPos.current = { x: 0, y: 0 };
         lastPos.current.imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
@@ -103,11 +113,6 @@ export function DrawingPad({ isLarge = false, className = '', initialData, onSav
       return;
     }
 
-    if (!isDrawing || !lastPos.current) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
     ctx.beginPath();
     ctx.moveTo(lastPos.current.x, lastPos.current.y);
     ctx.lineTo(x, y);
@@ -120,7 +125,7 @@ export function DrawingPad({ isLarge = false, className = '', initialData, onSav
     onSave(canvas.toDataURL());
   };
 
-  const stopDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const stopDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     if (tool === 'line' && lineStart && isDrawing) {
       const canvas = canvasRef.current;
       if (!canvas) return;
@@ -129,8 +134,12 @@ export function DrawingPad({ isLarge = false, className = '', initialData, onSav
       if (!ctx) return;
 
       const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      const x = 'touches' in e 
+        ? e.changedTouches[0].clientX - rect.left
+        : (e as React.MouseEvent).clientX - rect.left;
+      const y = 'touches' in e 
+        ? e.changedTouches[0].clientY - rect.top
+        : (e as React.MouseEvent).clientY - rect.top;
 
       ctx.beginPath();
       ctx.moveTo(lineStart.x, lineStart.y);
@@ -241,18 +250,22 @@ export function DrawingPad({ isLarge = false, className = '', initialData, onSav
         ref={canvasRef}
         width={isLarge ? 600 : 300}
         height={isLarge ? 400 : 200}
-        className="bg-white"
+        className="bg-white mt-10"
         style={{ 
           cursor: tool === 'line' 
             ? 'crosshair' 
             : tool === 'eraser' 
               ? getEraserCursor()
-              : getPenCursor()
+              : getPenCursor(),
+          touchAction: 'none' // Prevent default touch actions
         }}
         onMouseDown={startDrawing}
         onMouseMove={draw}
         onMouseUp={stopDrawing}
         onMouseLeave={stopDrawing}
+        onTouchStart={startDrawing}
+        onTouchMove={draw}
+        onTouchEnd={stopDrawing}
       />
     </div>
   );

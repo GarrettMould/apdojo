@@ -1,101 +1,143 @@
-'use client'
+import { Play, X } from 'lucide-react'
+import { videos } from "../../data/videos"
 import { useState } from 'react'
 
-// Mock data - replace with real data later
-const videos = [
-  { id: 1, title: "Supply and Demand", description: "Learn the fundamentals of market equilibrium", tags: ["Micro", "Macro"] },
-  { id: 2, title: "GDP Calculation", description: "Step-by-step guide to calculating GDP", tags: ["Macro"] },
-  { id: 3, title: "Monetary Policy", description: "How the Federal Reserve influences the economy", tags: ["Macro"] },
-  { id: 4, title: "Fiscal Policy", description: "Government spending and taxation effects", tags: ["Macro"] },
-  { id: 5, title: "Phillips Curve", description: "Understanding inflation and unemployment relationship", tags: ["Macro"] },
-  { id: 6, title: "Exchange Rates", description: "How currency markets work", tags: ["Macro"] },
-]
-
-export function VideoLibraryPreview() {
-  const [startIndex, setStartIndex] = useState(0)
-  const videosPerPage = 3
-  
-  const handleNext = () => {
-    setStartIndex((prevIndex) => 
-      (prevIndex + 1) >= videos.length ? 0 : prevIndex + 1
-    )
-  }
-
-  const handlePrev = () => {
-    setStartIndex((prevIndex) => 
-      prevIndex === 0 ? videos.length - 1 : prevIndex - 1
-    )
-  }
-
-  const getCurrentVideos = () => {
-    const result = []
-    for (let i = 0; i < videosPerPage; i++) {
-      const index = (startIndex + i) % videos.length
-      result.push(videos[index])
-    }
-    return result
-  }
-
-  const currentVideos = getCurrentVideos()
+const VideoCard = ({ title, description, tags, subject, videoUrl, thumbnail }: {
+  title: string;
+  description: string;
+  tags: string[];
+  subject: string;
+  videoUrl: string;
+  thumbnail?: string;
+}) => {
+  const [showVideo, setShowVideo] = useState(false);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12">
-      <h2 className="text-3xl font-bold text-center mb-12">Popular Videos</h2>
-      
-      <div className="relative px-24">
-        <button 
-          onClick={handlePrev}
-          className="absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black text-white flex items-center justify-center font-bold text-2xl"
-        >
-          <span className="rotate-180">➔</span>
-        </button>
-        
-        <button 
-          onClick={handleNext}
-          className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black text-white flex items-center justify-center font-bold text-2xl"
-        >
-          ➔
-        </button>
-
-        {/* Video Grid */}
-        <div className="grid grid-cols-3 gap-8">
-          {currentVideos.map((video) => (
-            <div 
-              key={video.id}
-              className="group cursor-pointer transition-transform hover:scale-105"
+    <>
+      <div className="w-full max-w-[320px] h-[28rem] bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden flex flex-col">
+        {/* Thumbnail Container with Play Button Overlay */}
+        <div className="relative w-full h-48 bg-gray-200 group">
+          {thumbnail ? (
+            <img 
+              src={thumbnail} 
+              alt={title} 
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-200" />
+          )}
+          
+          {/* Permanent play button overlay */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-12 h-12 bg-black/50 rounded-full flex items-center justify-center">
+              <Play className="w-6 h-6 text-white" />
+            </div>
+          </div>
+          
+          {/* Hover effect overlay */}
+          <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-colors">
+            <button 
+              onClick={() => setShowVideo(true)}
+              className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center transform scale-90 opacity-0 group-hover:opacity-100 group-hover:scale-100 transition-all"
             >
-              {/* Video Placeholder */}
-              <div className="aspect-video bg-gray-200 mb-4 rounded-lg overflow-hidden">
-                <div className="w-full h-full flex items-center justify-center text-gray-400">
-                  Video Preview
-                </div>
-              </div>
-              
-              {/* Video Info */}
-              <h3 className="font-semibold text-lg mb-2 group-hover:text-blue-600">
-                {video.title}
-              </h3>
-              <div className="flex gap-1 mb-2">
-                {video.tags.map(tag => (
-                  <span 
-                    key={tag}
-                    className={`text-sm px-2 py-0.5 rounded ${
-                      tag === 'Macro' 
-                        ? 'bg-blue-100 text-blue-600' 
-                        : 'bg-green-100 text-green-600'
-                    }`}
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-              <p className="text-sm text-gray-600">
-                {video.description}
-              </p>
+              <Play className="w-6 h-6 text-white" />
+            </button>
+          </div>
+        </div>
+
+        {/* Content Section */}
+        <div className="p-6 flex flex-col flex-1">
+          {/* Subject with colored dot */}
+          <div className="flex items-center gap-2 mb-2">
+            <div className={`w-2 h-2 rounded-full ${
+              subject.includes('Macro') ? 'bg-blue-500' : 'bg-green-500'
+            }`} />
+            <p className="text-sm text-gray-900 font-medium">
+              {subject}
+            </p>
+          </div>
+
+          {/* Title with fixed height container */}
+          <div className="h-14 mb-3 overflow-hidden">
+            <h3 className="text-lg font-bold text-gray-900 line-clamp-2">
+              {title}
+            </h3>
+          </div>
+
+          {/* Description */}
+          <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+            {description}
+          </p>
+
+          {/* Tags at bottom */}
+          <div className="mt-auto flex gap-2 overflow-hidden">
+            {tags.slice(0, 2).map((tag, index) => (
+              <span 
+                key={index} 
+                className="px-2 py-1 bg-gray-100 rounded-md text-xs text-gray-600 whitespace-nowrap"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Video Modal */}
+      {showVideo && (
+        <div 
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          onClick={() => setShowVideo(false)}
+        >
+          <div 
+            className="relative bg-black rounded-lg overflow-hidden w-full max-w-4xl"
+            onClick={e => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setShowVideo(false)}
+              className="absolute top-2 right-2 md:top-4 md:right-4 text-white hover:text-gray-300 z-10"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <video 
+              controls 
+              autoPlay 
+              className="w-full"
+              playsInline
+            >
+              <source src={videoUrl} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
+
+const VideoLibraryPreview = () => {
+  const previewVideos = videos.slice(0, 3)
+
+  return (
+    <div className="relative w-screen -ml-[50vw] left-1/2 bg-gray-50 mb-20 mt-20">
+      <div className="w-full py-12 px-4 max-w-7xl mx-auto">
+        <div className="flex flex-col md:flex-row justify-center gap-8 flex-wrap">
+          {previewVideos.map((video) => (
+            <div key={video.id} className="w-full md:w-auto flex justify-center">
+              <VideoCard
+                title={video.title}
+                description={video.description}
+                tags={video.tags}
+                subject={video.subject}
+                videoUrl={video.videoUrl}
+                thumbnail={video.thumbnail}
+              />
             </div>
           ))}
         </div>
       </div>
     </div>
   )
-} 
+}
+
+export default VideoLibraryPreview

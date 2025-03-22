@@ -13,9 +13,15 @@ function MockupHeader() {
       <h2 className="text-5xl font-extrabold tracking-tight text-gray-900 mb-4">
         Real-Time Feedback
       </h2>
-      <p className="text-lg text-gray-600">
+      <p className="text-lg text-gray-600 mb-8">
         Get instant feedback on your answers and detailed explanations
       </p>
+      <Button 
+        className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-6 text-lg font-semibold rounded-lg"
+        onClick={() => window.location.href = '/purchase/exams'}
+      >
+        Practice Tests
+      </Button>
     </div>
   );
 }
