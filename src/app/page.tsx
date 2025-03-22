@@ -2,7 +2,7 @@
 
 import { Hero } from "@/components/hero"
 import LiveTestMockup from '@/components/previews/liveTestMockup'
-import VideoLibraryPreview from "@/components/previews/videoLibraryPreview"
+import VideoLibraryPreview from "@/components/previews/VideoLibraryPreview"
 
 export default function Home() {
   return (
