@@ -830,21 +830,20 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
                     )}
                     
                   <div className="space-y-3 pb-2">
-                      {questions[currentQuestionIndex].options.map((option, optIndex) => (
-                        <div
-                          key={optIndex}
-                          onClick={() => handleAnswer(questions[currentQuestionIndex].id, optIndex)}
-                          className={`
-                            p-3 border rounded cursor-pointer hover:bg-gray-50 transition-colors
-                            ${answers[questions[currentQuestionIndex].id] === String.fromCharCode(65 + optIndex) 
-                              ? 'border-blue-500 bg-blue-50 hover:bg-blue-50' 
-                              : 'border-gray-200'}
-                          `}
-                        >
-                          <span className="mr-2">{String.fromCharCode(97 + optIndex)})</span>
-                          {option}
-                        </div>
-                      ))}
+                    {questions[currentQuestionIndex].options.map((option, optIndex) => (
+                      <button
+                        key={optIndex}
+                        onClick={() => handleAnswer(questions[currentQuestionIndex].id, optIndex)}
+                        className={`w-full text-left p-3 md:p-3.5 rounded-md text-sm font-medium transition-all duration-200 border ${
+                          answers[questions[currentQuestionIndex].id] === String.fromCharCode(65 + optIndex)
+                            ? 'bg-blue-50 text-gray-900 border-blue-200 shadow-sm'
+                            : 'bg-gray-50 hover:bg-gray-100 hover:shadow-sm border-transparent'
+                        }`}
+                      >
+                        <span className="mr-2">{String.fromCharCode(97 + optIndex)})</span>
+                        {option}
+                      </button>
+                    ))}
                   </div>
                     </div>
                   </div>

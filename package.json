@@ -37,6 +37,7 @@
     "next": "15.1.7",
     "next-sanity": "^9.8.59",
     "node-llama-cpp": "^3.6.0",
+    "plyr-react": "^5.3.0",
     "react": "^19.0.0",
     "react-calendly": "^4.3.1",
     "react-dom": "^19.0.0",

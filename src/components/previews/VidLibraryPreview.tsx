@@ -47,7 +47,7 @@ const VideoCard = ({ title, description, tags, subject, unit, videoUrl, thumbnai
           {/* Updated play button overlay */}
           <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-black/20 to-transparent">
             <div className="w-12 h-12 bg-blue-500/90 rounded-full flex items-center justify-center border-2 border-blue-500">
-              <Play className="w-6 h-6 text-white" />
+              <Play className="w-6 h-6 text-white fill-current" />
             </div>
           </div>
           
@@ -57,7 +57,7 @@ const VideoCard = ({ title, description, tags, subject, unit, videoUrl, thumbnai
               onClick={() => setShowVideo(true)}
               className="w-14 h-14 bg-blue-500/90 rounded-full flex items-center justify-center transform scale-90 opacity-0 group-hover:opacity-100 group-hover:scale-100 transition-all shadow-lg border-2 border-blue-500"
             >
-              <Play className="w-7 h-7 text-white" />
+              <Play className="w-7 h-7 text-white fill-current" />
             </button>
           </div>
         </div>
@@ -120,7 +120,7 @@ const VideoLibraryPreview = () => {
             <span className="text-blue-500">Master</span> Tough Topics with Ease
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-          Master complex economic concepts with our simple explanations. Plus, test your understanding with practice problems after each lesson!
+          Understandcomplex economic concepts with AP Dojo`s simple explanations. Plus, test your understanding with practice problems after each video!
           </p>
         </div>
         
