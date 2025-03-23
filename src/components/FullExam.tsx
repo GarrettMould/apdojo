@@ -28,6 +28,22 @@ interface StoredBookmarks {
   };
 }
 
+// Add this type definition
+type Operator = '×' | '÷' | '+' | '-';
+
+// Update the precedence object with type
+const precedence: Record<Operator, number> = {
+  '×': 2,
+  '÷': 2,
+  '+': 1,
+  '-': 1,
+};
+
+// Update the isOperator function to be a type guard
+const isOperator = (char: string): char is Operator => {
+  return ['+', '-', '×', '÷'].includes(char);
+};
+
 export function FullExam({ questionBank, examType, questionType, examNumber }: FullExamProps) {
   const [answers, setAnswers] = useState<Answers>({});
   const [showResults, setShowResults] = useState(false);
@@ -36,12 +52,6 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
   
   // Remove the shuffling logic and just use the pre-shuffled questions
   const questions = questionBank.questions;
-
-  // Add timer state (in seconds)
-  const [timeLeft, setTimeLeft] = useState(70 * 60); // 70 minutes in seconds
-  // Add timer visibility state
-  const [showTimer, setShowTimer] = useState(false);
-  const [isLargeTimer, setIsLargeTimer] = useState(false);
 
   // Add calculator states
   const [showCalculator, setShowCalculator] = useState(false);
@@ -78,13 +88,6 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState<StaticImageData | null>(null);
 
-  // Add helper function to format time
-  const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-  };
-
   const { user } = useAuthContext();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
@@ -92,8 +95,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
   // Update the track size constant
   const QUESTIONS_PER_TRACK = 15;  // This divides evenly into 60
 
-  // Add a new state for timer paused status
-  const [isPaused, setIsPaused] = useState(false);
+  // Add these new states
+  const [expression, setExpression] = useState<string[]>([]);
+  const [openParenCount, setOpenParenCount] = useState(0);
 
   const handleAnswer = (questionId: number, answerIndex: number) => {
     setAnswers({
@@ -130,84 +134,141 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
     });
   };
 
-  // Add calculator functions
+  // Update the calculator display function
+  const getDisplayText = () => {
+    return expression.join(' ');
+  };
+
+  // Update calculator functions
   const handleNumber = (num: string) => {
-    if (newNumber) {
-      setCalculatorDisplay(num);
-      setNewNumber(false);
-    } else {
-      setCalculatorDisplay(calculatorDisplay === '0' ? num : calculatorDisplay + num);
+    if (num === '(') {
+      setExpression(prev => [...prev, '(']);
+      setOpenParenCount(prev => prev + 1);
+      return;
     }
+
+    if (num === ')' && openParenCount > 0) {
+      setExpression(prev => [...prev, ')']);
+      setOpenParenCount(prev => prev - 1);
+      return;
+    }
+
+    if (num === '(' || num === ')') return;
+
+    setExpression(prev => {
+      const last = prev[prev.length - 1];
+      if (!last || last === '(' || isOperator(last)) {
+        return [...prev, num];
+      }
+      return [...prev.slice(0, -1), last + num];
+    });
   };
 
   const handleOperation = (op: string) => {
-    const current = parseFloat(calculatorDisplay);
-    
-    if (previousValue === null) {
-      setPreviousValue(current);
-    } else if (operation) {
-      const result = calculate(previousValue, current, operation);
-      setPreviousValue(result);
-      setCalculatorDisplay(String(result));
-    }
-    
-    setOperation(op);
-    setNewNumber(true);
-  };
-
-  const calculate = (a: number, b: number, op: string): number => {
-    switch (op) {
-      case '+': return a + b;
-      case '-': return a - b;
-      case '×': return a * b;
-      case '÷': return a / b;
-      default: return b;
-    }
-  };
-
-  const handleEquals = () => {
-    if (previousValue === null || !operation) return;
-    
-    const current = parseFloat(calculatorDisplay);
-    const result = calculate(previousValue, current, operation);
-    
-    setCalculatorDisplay(String(result));
-    setPreviousValue(null);
-    setOperation(null);
-    setNewNumber(true);
+    setExpression(prev => {
+      const last = prev[prev.length - 1];
+      if (!last || last === '(' || isOperator(last)) return prev;
+      return [...prev, op];
+    });
   };
 
   const handleClear = () => {
-    setCalculatorDisplay('0');
-    setPreviousValue(null);
-    setOperation(null);
-    setNewNumber(true);
+    setExpression([]);
+    setOpenParenCount(0);
   };
 
-  // Add decimal point handler
   const handleDecimal = () => {
-    if (newNumber) {
-      setCalculatorDisplay('0.');
-      setNewNumber(false);
-    } else if (!calculatorDisplay.includes('.')) {
-      setCalculatorDisplay(calculatorDisplay + '.');
-    }
+    setExpression(prev => {
+      const last = prev[prev.length - 1];
+      if (!last || last === '(' || isOperator(last)) {
+        return [...prev, '0.'];
+      }
+      if (!last.includes('.')) {
+        return [...prev.slice(0, -1), last + '.'];
+      }
+      return prev;
+    });
   };
 
-  // Modify the calculator display to show operation
-  const getDisplayText = () => {
-    const formatNumber = (num: string) => {
-      const number = parseFloat(num);
-      const roundedNumber = Math.round(number * 10) / 10; // Round to 1 decimal place
-      const [integerPart, decimalPart] = roundedNumber.toString().split('.');
-      const formattedInteger = Number(integerPart).toLocaleString();
-      return decimalPart ? `${formattedInteger}.${decimalPart}` : formattedInteger;
+  const evaluateExpression = (exp: string[]): number => {
+    const precedence = {
+      '×': 2,
+      '÷': 2,
+      '+': 1,
+      '-': 1,
     };
 
-    if (previousValue !== null && operation) {
-      return `${formatNumber(previousValue.toString())} ${operation} ${newNumber ? '' : formatNumber(calculatorDisplay)}`;
+    const applyOp = (a: number, b: number, op: string): number => {
+      switch (op) {
+        case '+': return a + b;
+        case '-': return a - b;
+        case '×': return a * b;
+        case '÷': return b === 0 ? NaN : a / b;
+        default: return NaN;
+      }
+    };
+
+    const evaluate = (tokens: string[]): number => {
+      const values: number[] = [];
+      const ops: (Operator | '(')[] = [];
+
+      for (let i = 0; i < tokens.length; i++) {
+        const token = tokens[i];
+
+        if (token === '(') {
+          ops.push(token);
+        }
+        else if (token === ')') {
+          while (ops.length && ops[ops.length - 1] !== '(') {
+            const b = values.pop() ?? 0;
+            const a = values.pop() ?? 0;
+            const op = ops.pop() as Operator;
+            values.push(applyOp(a, b, op));
+          }
+          ops.pop(); // Remove '('
+        }
+        else if (isOperator(token)) {
+          while (ops.length && ops[ops.length - 1] !== '(' && 
+                 precedence[ops[ops.length - 1] as Operator] >= precedence[token as Operator]) {
+            const b = values.pop() ?? 0;
+            const a = values.pop() ?? 0;
+            const op = ops.pop() as Operator;
+            values.push(applyOp(a, b, op));
+          }
+          ops.push(token as Operator);
+        }
+        else {
+          values.push(parseFloat(token));
+        }
+      }
+
+      while (ops.length) {
+        const b = values.pop() ?? 0;
+        const a = values.pop() ?? 0;
+        const op = ops.pop() as Operator;
+        values.push(applyOp(a, b, op));
+      }
+
+      return values[0] || 0;
+    };
+
+    return evaluate(exp);
+  };
+
+  const handleEquals = () => {
+    if (expression.length === 0) return;
+    
+    try {
+      const result = evaluateExpression(expression);
+      if (isNaN(result)) {
+        setExpression(['Error']);
+      } else {
+        setExpression([result.toString()]);
+      }
+    } catch (error) {
+      setExpression(['Error']);
     }
-    return formatNumber(calculatorDisplay);
+    setOpenParenCount(0);
   };
 
   // Add drawing functions
@@ -405,17 +466,14 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
 
   // Add effect to reset tools state when component unmounts/remounts
   useEffect(() => {
-    setShowTimer(false);
     setShowCalculator(false);
     setShowDrawingPad(false);
     
-    // Cleanup function will run when component unmounts
     return () => {
-      setShowTimer(false);
       setShowCalculator(false);
       setShowDrawingPad(false);
     };
-  }, []); // Empty dependency array means this only runs on mount/unmount
+  }, []);
 
   // Add reset function for drawing tools
   const resetDrawingTools = () => {
@@ -448,28 +506,6 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
       console.error('Error during checkout:', error);
     }
   };
-
-  // Modify the timer effect
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft((prevTime) => {
-        if (prevTime <= 0 || isPaused) {  // Add isPaused check
-          clearInterval(timer);
-          if (prevTime <= 0) {
-            setShowResults(true);
-          }
-          return prevTime;
-        }
-        return prevTime - 1;
-      });
-    }, 1000);
-
-    // Show timer by default
-    setShowTimer(true);
-
-    // Cleanup function
-    return () => clearInterval(timer);
-  }, [isPaused]); // Add isPaused to dependencies
 
   return (
     <>
@@ -522,55 +558,8 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
       
       {/* Main exam container */}
       <div className="w-full max-w-4xl mx-auto p-6 border rounded-lg shadow-sm relative">
-        {showTimer && (
-          <div className={`fixed right-8 ${
-            showDrawingPad ? 'top-8' : 'top-1/2 -translate-y-1/2'
-          } transform ${
-            isLargeTimer ? '-translate-x-1/2' : ''
-          } bg-white rounded-lg shadow-md border ${
-            isLargeTimer ? 'scale-[2]' : ''
-          } ${timeLeft < 540 ? 'bg-red-100' : ''} transition-all duration-300`}>
-            <div className="absolute top-2 right-2 left-2 flex justify-between items-center">
-              <button 
-                onClick={() => setIsLargeTimer(!isLargeTimer)}
-                className="text-gray-400 hover:text-gray-600 flex items-center"
-              >
-                {isLargeTimer ? (
-                  <Minimize2 className="w-4 h-4" />
-                ) : (
-                  <Maximize2 className="w-4 h-4" />
-                )}
-              </button>
-              <button 
-                onClick={() => {
-                  setShowTimer(false);
-                  setIsLargeTimer(false);
-                }}
-                className="text-gray-400 hover:text-gray-600 flex items-center"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="p-4 pt-8">
-              <div className="text-xl font-bold text-gray-700 text-center">Time Left</div>
-              <div className="text-2xl font-mono text-center">
-                {formatTime(timeLeft)}
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Tools Container - Only show on desktop */}
         <div className="fixed hidden md:flex left-4 top-1/2 -translate-y-1/2 flex-col gap-4">
-          {!showTimer && (
-            <button
-              onClick={() => setShowTimer(true)}
-              className="bg-white p-3 rounded-lg shadow-md border hover:bg-gray-50 transition-all duration-300"
-            >
-              <Clock className="w-6 h-6" />
-            </button>
-          )}
-          
           {!showCalculator && (
             <button
               onClick={() => setShowCalculator(true)}
@@ -670,12 +659,46 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
               ref={canvasRef}
               width={isLargeDrawingPad ? 600 : 300}
               height={isLargeDrawingPad ? 400 : 200}
-              className="bg-white mt-10"
+              className="bg-white mt-10 touch-none"
               style={{ cursor: isEraser ? getEraserCursor() : getPenCursor(penColor) }}
               onMouseDown={startDrawing}
               onMouseMove={draw}
               onMouseUp={stopDrawing}
               onMouseLeave={stopDrawing}
+              onTouchStart={(e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const rect = canvasRef.current?.getBoundingClientRect();
+                if (rect) {
+                  const x = touch.clientX - rect.left;
+                  const y = touch.clientY - rect.top;
+                  setIsDrawing(true);
+                  lastPosRef.current = { x, y };
+                }
+              }}
+              onTouchMove={(e) => {
+                e.preventDefault();
+                if (!isDrawing || !lastPosRef.current || !canvasRef.current) return;
+                const touch = e.touches[0];
+                const rect = canvasRef.current.getBoundingClientRect();
+                const x = touch.clientX - rect.left;
+                const y = touch.clientY - rect.top;
+                const ctx = canvasRef.current.getContext('2d');
+                if (ctx) {
+                  ctx.beginPath();
+                  ctx.moveTo(lastPosRef.current.x, lastPosRef.current.y);
+                  ctx.lineTo(x, y);
+                  ctx.strokeStyle = isEraser ? '#ffffff' : penColor;
+                  ctx.lineWidth = isEraser ? eraserSize : 2;
+                  ctx.lineCap = 'round';
+                  ctx.stroke();
+                  lastPosRef.current = { x, y };
+                }
+              }}
+              onTouchEnd={(e) => {
+                e.preventDefault();
+                stopDrawing();
+              }}
             />
           </div>
         )}
@@ -684,10 +707,80 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
         {!showDrawingPad && (
           <button
             onClick={() => toggleDrawingPad(true)}
-            className="fixed right-8 bottom-8 bg-white p-3 rounded-lg shadow-md border hover:bg-gray-50 hidden md:flex"
+            className="fixed right-8 bottom-8 bg-white p-3 rounded-lg shadow-md border hover:bg-gray-50 md:hidden"
           >
             <Pen className="w-6 h-6" />
           </button>
+        )}
+
+        {showCalculator && (
+          <div className="fixed left-8 top-1/2 -translate-y-1/2 bg-white rounded-lg shadow-md border z-50 min-w-[300px]">
+            <div className="absolute top-2 right-2 left-2 flex justify-end items-center">
+              <button
+                onClick={() => setShowCalculator(false)}
+                className="text-gray-400 hover:text-gray-600 p-2"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Calculator Display */}
+            <div className="p-6 pt-10">
+              <div className="bg-gray-100 p-3 rounded text-right text-2xl font-mono mb-4 h-14 flex items-center justify-end">
+                {getDisplayText()}
+              </div>
+
+              {/* Calculator Buttons */}
+              <div className="grid grid-cols-4 gap-2">
+                <button onClick={handleClear} className="p-4 text-lg bg-gray-200 rounded hover:bg-gray-300">C</button>
+                <button className="p-4 text-lg bg-gray-100 rounded hover:bg-gray-200" onClick={() => handleNumber('(')}>(</button>
+                <button className="p-4 text-lg bg-gray-100 rounded hover:bg-gray-200" onClick={() => handleNumber(')')}>)</button>
+                <button className="p-4 text-lg bg-gray-100 rounded hover:bg-gray-200" onClick={() => handleOperation('÷')}>÷</button>
+
+                {[7, 8, 9].map(num => (
+                  <button
+                    key={num}
+                    onClick={() => handleNumber(num.toString())}
+                    className="p-4 text-lg bg-white rounded hover:bg-gray-100"
+                  >
+                    {num}
+                  </button>
+                ))}
+                <button className="p-4 text-lg bg-gray-100 rounded hover:bg-gray-200" onClick={() => handleOperation('×')}>×</button>
+
+                {[4, 5, 6].map(num => (
+                  <button
+                    key={num}
+                    onClick={() => handleNumber(num.toString())}
+                    className="p-4 text-lg bg-white rounded hover:bg-gray-100"
+                  >
+                    {num}
+                  </button>
+                ))}
+                <button className="p-4 text-lg bg-gray-100 rounded hover:bg-gray-200" onClick={() => handleOperation('-')}>−</button>
+
+                {[1, 2, 3].map(num => (
+                  <button
+                    key={num}
+                    onClick={() => handleNumber(num.toString())}
+                    className="p-4 text-lg bg-white rounded hover:bg-gray-100"
+                  >
+                    {num}
+                  </button>
+                ))}
+                <button className="p-4 text-lg bg-gray-100 rounded hover:bg-gray-200" onClick={() => handleOperation('+')}>+</button>
+
+                <button
+                  onClick={() => handleNumber('0')}
+                  className="p-4 text-lg bg-white rounded hover:bg-gray-100"
+                >
+                  0
+                </button>
+                <button className="p-4 text-lg bg-white rounded hover:bg-gray-100" onClick={handleDecimal}>.</button>
+                <button className="p-4 text-lg bg-blue-500 text-white rounded hover:bg-blue-600 col-span-2" onClick={handleEquals}>=</button>
+              </div>
+            </div>
+          </div>
         )}
 
         {!showResults ? (
@@ -779,10 +872,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
                   </div>
                   {currentQuestionIndex === questions.length - 1 && (
                     <Button
-                      onClick={() => {
-                        setShowResults(true);
-                        setIsPaused(true);
-                      }}
+                      onClick={() => setShowResults(true)}
                       className="w-full md:w-28 bg-blue-600 hover:bg-blue-700 text-white rounded-md"
                     >
                       Submit

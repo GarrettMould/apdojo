@@ -17,7 +17,7 @@ export default function MicroMCQPreview({ params }: { params: { num: string } })
         >
           ← Back to Exams Page
         </Link>
-        <h1 className="text-4xl font-bold mt-4">
+        <h1 className="text-4xl font-extrabold mt-4">
           AP Microeconomics MCQ {params.num}
         </h1>
         <p className="text-gray-600 mt-2">

@@ -250,14 +250,14 @@ export function DrawingPad({ isLarge = false, className = '', initialData, onSav
         ref={canvasRef}
         width={isLarge ? 600 : 300}
         height={isLarge ? 400 : 200}
-        className="bg-white mt-10"
+        className="bg-white"
         style={{ 
           cursor: tool === 'line' 
             ? 'crosshair' 
             : tool === 'eraser' 
               ? getEraserCursor()
               : getPenCursor(),
-          touchAction: 'none' // Prevent default touch actions
+          touchAction: 'none'
         }}
         onMouseDown={startDrawing}
         onMouseMove={draw}
