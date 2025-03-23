@@ -6,26 +6,6 @@ import { useInView } from 'react-intersection-observer';
 import { Check, X } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
-// Separate the header into its own component
-function MockupHeader() {
-  return (
-    <div className="text-center mb-10">
-      <h2 className="text-5xl font-extrabold tracking-tight text-gray-900 mb-4">
-        Real-Time Feedback
-      </h2>
-      <p className="text-lg text-gray-600 mb-8">
-        Get instant feedback on your answers and detailed explanations
-      </p>
-      <Button 
-        className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-6 text-lg font-semibold rounded-lg"
-        onClick={() => window.location.href = '/purchase/exams'}
-      >
-        Practice Tests
-      </Button>
-    </div>
-  );
-}
-
 export default function LiveTestMockup() {
   const controls = useAnimation();
   const [ref, inView] = useInView({
@@ -83,8 +63,23 @@ export default function LiveTestMockup() {
 
   return (
     <div className="max-w-4xl mx-auto" ref={ref}>
+      <div className="text-center mb-10">
+        <h2 className="text-6xl font-extrabold tracking-tight drop-shadow-sm leading-tight mb-6">
+          Full <span className="text-blue-500">AP Exams</span> with Feedback
+        </h2>
+        <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
+          Practice with complete AP-style tests and get instant, detailed feedback on every question
+        </p>
+        <Button 
+          className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-6 text-lg font-semibold rounded-lg"
+          onClick={() => window.location.href = '/purchase/exams'}
+        >
+          Practice Tests
+        </Button>
+      </div>
+
       <motion.div 
-        className="bg-white rounded-xl shadow-xl border border-gray-200 p-12 mb-12 "
+        className="bg-white rounded-xl shadow-xl border border-gray-200 p-12 mb-12"
         initial="initial"
         animate={controls}
         variants={{
@@ -94,8 +89,6 @@ export default function LiveTestMockup() {
           showExplanation: { height: 'auto' }
         }}
       >
-        <MockupHeader />
-
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="mb-4 flex justify-between items-center">
             <div className="flex items-center gap-2">

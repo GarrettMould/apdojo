@@ -1,22 +1,37 @@
 import { Play, X } from 'lucide-react'
 import { videos } from "../../data/videos"
 import { useState } from 'react'
+import { VideoModal } from '@/components/VideoModal'
 
-const VideoCard = ({ title, description, tags, subject, videoUrl, thumbnail }: {
+const VideoCard = ({ title, description, tags, subject, unit, videoUrl, thumbnail, questions }: {
   title: string;
   description: string;
   tags: string[];
   subject: string;
+  unit: string;
   videoUrl: string;
   thumbnail?: string;
+  questions: any[];
 }) => {
   const [showVideo, setShowVideo] = useState(false);
 
+  // Updated helper function to include AP
+  const getShortSubject = (subject: string) => {
+    return subject.toLowerCase().includes('macro') ? 'AP Macro' : 'AP Micro';
+  };
+
   return (
     <>
-      <div className="w-full max-w-[320px] h-[28rem] bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden flex flex-col">
+      <div className="w-full max-w-[320px] h-[28rem] bg-white rounded-xl shadow-lg overflow-hidden flex flex-col">
         {/* Thumbnail Container with Play Button Overlay */}
-        <div className="relative w-full h-48 bg-gray-200 group">
+        <div className="relative w-full h-48 bg-gray-100 group">
+          {/* Add subtle pattern background */}
+          <div className="absolute inset-0 opacity-10" 
+            style={{ 
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.4' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E")` 
+            }} 
+          />
+          
           {thumbnail ? (
             <img 
               src={thumbnail} 
@@ -24,37 +39,36 @@ const VideoCard = ({ title, description, tags, subject, videoUrl, thumbnail }: {
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full bg-gray-200" />
+            <div className="w-full h-full flex items-center justify-center">
+              <div className="text-gray-400">No thumbnail</div>
+            </div>
           )}
           
-          {/* Permanent play button overlay */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-12 h-12 bg-black/50 rounded-full flex items-center justify-center">
+          {/* Updated play button overlay */}
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-black/20 to-transparent">
+            <div className="w-12 h-12 bg-blue-500/90 rounded-full flex items-center justify-center border-2 border-blue-500">
               <Play className="w-6 h-6 text-white" />
             </div>
           </div>
           
-          {/* Hover effect overlay */}
-          <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/20 transition-colors">
+          {/* Updated hover effect overlay */}
+          <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/40 transition-colors">
             <button 
               onClick={() => setShowVideo(true)}
-              className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center transform scale-90 opacity-0 group-hover:opacity-100 group-hover:scale-100 transition-all"
+              className="w-14 h-14 bg-blue-500/90 rounded-full flex items-center justify-center transform scale-90 opacity-0 group-hover:opacity-100 group-hover:scale-100 transition-all shadow-lg border-2 border-blue-500"
             >
-              <Play className="w-6 h-6 text-white" />
+              <Play className="w-7 h-7 text-white" />
             </button>
           </div>
         </div>
 
         {/* Content Section */}
-        <div className="p-6 flex flex-col flex-1">
-          {/* Subject with colored dot */}
-          <div className="flex items-center gap-2 mb-2">
-            <div className={`w-2 h-2 rounded-full ${
-              subject.includes('Macro') ? 'bg-blue-500' : 'bg-green-500'
-            }`} />
-            <p className="text-sm text-gray-900 font-medium">
-              {subject}
-            </p>
+        <div className="p-6 flex flex-col flex-1 border-t border-gray-100">
+          {/* Subject + Unit tag with AP included */}
+          <div className="mb-3">
+            <span className="inline-flex px-2.5 py-1 rounded-md text-sm font-medium bg-blue-50 text-blue-500">
+              {getShortSubject(subject)} • Unit {unit}
+            </span>
           </div>
 
           {/* Title with fixed height container */}
@@ -85,31 +99,11 @@ const VideoCard = ({ title, description, tags, subject, videoUrl, thumbnail }: {
 
       {/* Video Modal */}
       {showVideo && (
-        <div 
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-          onClick={() => setShowVideo(false)}
-        >
-          <div 
-            className="relative bg-black rounded-lg overflow-hidden w-full max-w-4xl"
-            onClick={e => e.stopPropagation()}
-          >
-            <button
-              onClick={() => setShowVideo(false)}
-              className="absolute top-2 right-2 md:top-4 md:right-4 text-white hover:text-gray-300 z-10"
-            >
-              <X className="w-6 h-6" />
-            </button>
-            <video 
-              controls 
-              autoPlay 
-              className="w-full"
-              playsInline
-            >
-              <source src={videoUrl} type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          </div>
-        </div>
+        <VideoModal
+          videoUrl={videoUrl}
+          questions={questions}
+          onClose={() => setShowVideo(false)}
+        />
       )}
     </>
   )
@@ -121,6 +115,15 @@ const VideoLibraryPreview = () => {
   return (
     <div className="relative w-screen -ml-[50vw] left-1/2 bg-gray-50 mb-20 mt-20">
       <div className="w-full py-12 px-4 max-w-7xl mx-auto">
+        <div className="text-center mb-12">
+          <h2 className="text-5xl font-extrabold tracking-tight drop-shadow-sm leading-tight mb-4">
+            <span className="text-blue-500">Master</span> Tough Topics with Ease
+          </h2>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          Master complex economic concepts with our simple explanations. Plus, test your understanding with practice problems after each lesson!
+          </p>
+        </div>
+        
         <div className="flex flex-col md:flex-row justify-center gap-8 flex-wrap">
           {previewVideos.map((video) => (
             <div key={video.id} className="w-full md:w-auto flex justify-center">
@@ -129,8 +132,10 @@ const VideoLibraryPreview = () => {
                 description={video.description}
                 tags={video.tags}
                 subject={video.subject}
+                unit={video.unit}
                 videoUrl={video.videoUrl}
                 thumbnail={video.thumbnail}
+                questions={video.questions}
               />
             </div>
           ))}
