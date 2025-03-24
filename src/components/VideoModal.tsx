@@ -67,7 +67,7 @@ export const VideoModal = ({ videoUrl, questions, onClose }: VideoModalProps) =>
         </div>
 
         {/* Questions Sidebar */}
-        <div className="w-full md:w-96 bg-white flex flex-col flex-1 md:flex-none">
+        <div className="w-full md:w-96 bg-white flex flex-col flex-1 md:flex-none h-[60vh] md:h-full">
           {/* Fixed Header */}
           <div className="sticky top-0 bg-white p-4 md:p-6 border-b z-10">
             <button

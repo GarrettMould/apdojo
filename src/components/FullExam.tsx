@@ -99,6 +99,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
   const [expression, setExpression] = useState<string[]>([]);
   const [openParenCount, setOpenParenCount] = useState(0);
 
+  // Add this state to store the canvas image data
+  const [canvasHistory, setCanvasHistory] = useState<ImageData | null>(null);
+
   const handleAnswer = (questionId: number, answerIndex: number) => {
     setAnswers({
       ...answers,
@@ -674,6 +677,12 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
                   const y = touch.clientY - rect.top;
                   setIsDrawing(true);
                   lastPosRef.current = { x, y };
+                  
+                  // Store the current canvas state
+                  const ctx = canvasRef.current?.getContext('2d');
+                  if (ctx && canvasRef.current) {
+                    setCanvasHistory(ctx.getImageData(0, 0, canvasRef.current!.width, canvasRef.current!.height));
+                  }
                 }
               }}
               onTouchMove={(e) => {
@@ -685,6 +694,11 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
                 const y = touch.clientY - rect.top;
                 const ctx = canvasRef.current.getContext('2d');
                 if (ctx) {
+                  // Restore previous canvas state if exists
+                  if (canvasHistory) {
+                    ctx.putImageData(canvasHistory, 0, 0);
+                  }
+                  
                   ctx.beginPath();
                   ctx.moveTo(lastPosRef.current.x, lastPosRef.current.y);
                   ctx.lineTo(x, y);
@@ -698,6 +712,11 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
               onTouchEnd={(e) => {
                 e.preventDefault();
                 stopDrawing();
+                // Update canvas history with final state
+                const ctx = canvasRef.current?.getContext('2d');
+                if (ctx && canvasRef.current) {
+                  setCanvasHistory(ctx.getImageData(0, 0, canvasRef.current.width, canvasRef.current.height));
+                }
               }}
             />
           </div>
