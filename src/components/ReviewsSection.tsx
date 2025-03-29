@@ -20,7 +20,9 @@ export function ReviewsSection() {
   return (
     <>
       <section className="mt-24 mb-24">
-        <h2 className="text-3xl font-bold text-center mb-12">What Students Are Saying</h2>
+      <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 text-center mb-12 leading-tight">
+          What Students are Saying
+        </h1>
         
         <div className="grid md:grid-cols-3 gap-8">
           {displayedReviews.map((review, index) => (

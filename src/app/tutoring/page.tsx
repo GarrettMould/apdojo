@@ -61,6 +61,8 @@ export default function TutoringPage() {
   const [showSignupModal, setShowSignupModal] = useState(false)
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [setupIntent, setSetupIntent] = useState<{ clientSecret: string } | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
 
   const handleBookSession = () => {
     if (!user) {
@@ -68,6 +70,58 @@ export default function TutoringPage() {
       return
     }
     window.location.href = '/availability'
+  }
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setLoading(true)
+    setSubmitStatus('idle')
+    
+    // Store the form reference
+    const form = e.currentTarget
+    
+    const formData = new FormData(form)
+    const data = {
+      name: formData.get('name'),
+      email: formData.get('email'),
+      subject: formData.get('subject'),
+      dates: formData.get('dates'),
+      message: formData.get('message'),
+    }
+
+    try {
+      const response = await fetch(`${window.location.origin}/api/send-email`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      })
+
+      // First check if response is ok before trying to parse JSON
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // Try to parse JSON response
+      try {
+        const result = await response.json();
+        if (result.success) {
+          setSubmitStatus('success')
+          form.reset() // Use the stored form reference
+        } else {
+          throw new Error(result.error || 'Unknown error occurred')
+        }
+      } catch (parseError) {
+        console.error('Response parsing error:', parseError);
+        throw new Error('Invalid response from server');
+      }
+    } catch (error) {
+      console.error('Form submission error:', error)
+      setSubmitStatus('error')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -116,27 +170,27 @@ export default function TutoringPage() {
 
       <div className="max-w-7xl mx-auto px-4 py-12 mt-12">
         <h1 className="text-5xl font-extrabold tracking-tight text-gray-900 text-center mb-6 leading-tight">
-          Private Tutoring for AP Economics
+          <span className="text-blue-500">Private Tutoring</span> for AP Economics
         </h1>
         
         <p className="text-xl text-gray-600 text-center max-w-3xl mx-auto mb-16">
-        Get personalized instruction from an experienced AP Economics teacher and tutor who has helped hundreds of students achieve their desired score.
+          Get personalized instruction from an experienced AP Economics teacher and tutor who has helped hundreds of students achieve their desired score.
         </p>
 
         <div className="max-w-3xl mx-auto">
           <Card className="hover:shadow-lg transition-all duration-200 flex flex-col border border-gray-200">
             <div className="grid md:grid-cols-2 divide-x">
-            {/* Tutoring Card */}
-              <div className="p-6 text-center flex flex-col justify-between h-full">
-                <div className="space-y-2">
+              {/* Tutoring Card */}
+              <div className="p-8 text-center flex flex-col justify-between h-full">
+                <div className="space-y-3">
                   <h3 className="text-lg font-semibold text-gray-900">Single Session</h3>
-                  <div className="mt-4">
+                  <div className="mt-6">
                   <p className="text-3xl font-bold text-gray-900">$50<span className="text-lg text-gray-500"> /session</span></p>
                 </div>
                   <p className="text-gray-600">Perfect for students who need quick help with specific topics.</p>
                 </div>
                 
-                <div className="space-y-2 mt-4">
+                <div className="space-y-3 mt-6">
                   <div className="flex items-start gap-3 justify-center">
                     <Check className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
                     <span className="text-gray-600 text-sm">60-minute one-on-one sessions</span>
@@ -152,13 +206,13 @@ export default function TutoringPage() {
                 </div>
               </div>
 
-            {/* Benefits List */}
-              <div className="flex flex-col justify-between p-6 h-full">
+              {/* Benefits List */}
+              <div className="flex flex-col justify-between p-8 h-full">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-6 text-center">
                 What's Included in Each Session
               </h3>
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                 <div className="flex items-start gap-4">
                   <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
                     <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -199,43 +253,133 @@ export default function TutoringPage() {
               </div>
             </div>
           </Card>
-          </div>
-
-          {/* Calendly Widget */}
-          <div className="mt-32">
-          <h3 className="text-4xl font-extrabold text-gray-900 text-center mb-12">Booking Your Next Lesson is Simple!</h3>
-          <div className="max-w-2xl mx-auto mb-16">
-            <div className="space-y-6 flex flex-col items-center">
-              <div className="flex items-center gap-6 w-full max-w-md">
-                <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                  <span className="text-xl font-bold text-blue-600">1</span>
-                </div>
-                <p className="text-lg font-bold text-gray-900">Choose a date and time</p>
-              </div>
-              <div className="flex items-center gap-6 w-full max-w-md">
-                <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                  <span className="text-xl font-bold text-blue-600">2</span>
-                </div>
-                <p className="text-lg font-bold text-gray-900">Pay using Stripe</p>
-              </div>
-              <div className="flex items-center gap-6 w-full max-w-md">
-                <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                  <span className="text-xl font-bold text-blue-600">3</span>
-                </div>
-                <p className="text-lg font-bold text-gray-900">Receive an automatically generated meeting link via email</p>
-              </div>
-            </div>
-            <div className="mt-8 text-center">
-              <p className="text-gray-600">Questions about Booking? Email <a href="mailto:garrett@apdojo.com" className="text-blue-600 hover:text-blue-700 transition-colors">garrett@apdojo.com</a></p>
-            </div>
-          </div>
-            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-              <CalendlyWidget />
-            </div>
-          </div>
         </div>
 
-        <ReviewsSection />
+        {/* Contact Form Section */}
+        <div className="mt-32">
+          <h3 className="text-4xl font-extrabold text-gray-900 text-center mb-12">Request a Tutoring Session</h3>
+          <div className="max-w-2xl mx-auto">
+            <form 
+              onSubmit={handleSubmit}
+              className="space-y-6 bg-white p-8 rounded-lg border border-gray-200"
+            >
+              <div>
+                <label htmlFor="name" className="block text-md font-extrabold text-blue-700 mb-1">
+                  Name <span className="text-gray-400">(∗)</span>
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="email" className="block text-md font-extrabold text-blue-700 mb-1">
+                  Email <span className="text-gray-400">(∗)</span>
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="subject" className="block text-md font-extrabold text-blue-700 mb-1">Subject</label>
+                <div className="relative">
+                  <select
+                    id="subject"
+                    name="subject"
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 focus:outline-none bg-white appearance-none cursor-pointer pr-10"
+                  >
+                    <option value="AP Macroeconomics">AP Macroeconomics</option>
+                    <option value="AP Microeconomics">AP Microeconomics</option>
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                      <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="dates" className="block text-md font-extrabold text-blue-700 mb-1">Preferred Dates & Times</label>
+                <textarea
+                  id="dates"
+                  name="dates"
+                  rows={3}
+                  placeholder="Please list your preferred dates and times for tutoring"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="message" className="block text-md font-extrabold text-blue-700 mb-1">Additional Notes</label>
+                <textarea
+                  id="message"
+                  name="message"
+                  rows={4}
+                  placeholder="Any specific topics you'd like to cover or questions you have"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
+                />
+              </div>
+
+              <p className="text-sm text-gray-400 italic">
+                <span className="text-gray-400">(∗)</span> indicates a required field
+              </p>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full px-6 py-3 bg-blue-600 text-white font-extrabold rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
+              >
+                {loading ? 'Sending...' : 'Send Request'}
+              </button>
+
+              {submitStatus === 'success' && (
+                <div className="bg-blue-50 border border-blue-200 p-6 rounded-lg shadow-sm">
+                  <div className="flex flex-col items-center gap-2">
+                    <svg 
+                      className="w-12 h-12 text-blue-600" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                    >
+                      <path 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        strokeWidth={2} 
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" 
+                      />
+                    </svg>
+                    <h4 className="text-xl font-extrabold text-blue-700">
+                      Request Sent Successfully!
+                    </h4>
+                    <p className=" text-center">
+                      Thank you for your interest. We'll get back to you shortly.
+                    </p>
+                  </div>
+                </div>
+              )}
+              
+              {submitStatus === 'error' && (
+                <p className="text-red-600 text-center font-medium mt-4">
+                  Sorry, there was an error sending your request. Please try again.
+                </p>
+              )}
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <ReviewsSection />
     </>
-  )
+  );
 } 

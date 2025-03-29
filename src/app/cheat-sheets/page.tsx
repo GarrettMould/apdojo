@@ -30,7 +30,7 @@ export default function CheatSheetsPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-12 mt-12">
       <h1 className="text-5xl font-extrabold tracking-tight text-gray-900 text-center mb-6">
-        Unit Cheat Sheets
+        Unit <span className="text-blue-500">Cheat Sheets</span>
       </h1>
       
       <p className="text-xl text-gray-600 text-center mb-16">

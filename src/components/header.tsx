@@ -47,6 +47,12 @@ export function Header() {
     setIsMenuOpen(false);
   };
 
+  const handleVideoLibraryClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    router.push('/videos/macro');
+    setIsMenuOpen(false);
+  };
+
   return (
     <div className="w-full bg-white border-b relative z-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -82,18 +88,17 @@ export function Header() {
             <Link 
               href="/tutoring" 
               onClick={handleTutoringClick}
-              className="hover:text-blue-700 transition-colors font-bold  text-sm"
+              className="hover:text-blue-700 transition-colors font-bold text-sm"
             >
               Private Tutoring
             </Link>
-            {/* Video Library temporarily removed
             <Link 
-              href="/tools" 
-              className="hover:  transition-colors font-bold text-gray-600"
+              href="/videos/macro" 
+              onClick={handleVideoLibraryClick}
+              className="hover:text-blue-700 transition-colors font-bold text-sm"
             >
               Video Library
             </Link>
-            */}
             <Link 
               href="/interactive-tools" 
               onClick={handleToolsClick}
@@ -166,15 +171,13 @@ export function Header() {
               >
                 Private Tutoring
               </Link>
-              {/* Video Library temporarily removed
               <Link 
-                href="/tools" 
-                className="block px-4 py-2 hover:bg-gray-100 font-bold"
-                onClick={() => setIsMenuOpen(false)}
+                href="/videos/macro" 
+                onClick={handleVideoLibraryClick}
+                className="block px-4 py-2 hover:bg-gray-100 font-bold text-sm"
               >
                 Video Library
               </Link>
-              */}
               <Link 
                 href="/interactive-tools" 
                 onClick={handleToolsClick}

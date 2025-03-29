@@ -2,6 +2,7 @@ import { Play, X } from 'lucide-react'
 import { videos } from "../../data/videos"
 import { useState } from 'react'
 import { VideoModal } from '@/components/VideoModal'
+import Link from 'next/link'
 
 const VideoCard = ({ title, description, tags, subject, unit, videoUrl, thumbnail, questions }: {
   title: string;
@@ -66,7 +67,7 @@ const VideoCard = ({ title, description, tags, subject, unit, videoUrl, thumbnai
         <div className="p-6 flex flex-col flex-1 border-t border-gray-100">
           {/* Subject + Unit tag with AP included */}
           <div className="mb-3">
-            <span className="inline-flex px-2.5 py-1 rounded-md text-sm font-medium bg-blue-50 text-blue-500">
+            <span className="inline-flex px-2.5 py-1 rounded-md text-sm font-medium bg-gray-100 text-gray-600">
               {getShortSubject(subject)} • Unit {unit}
             </span>
           </div>
@@ -88,7 +89,11 @@ const VideoCard = ({ title, description, tags, subject, unit, videoUrl, thumbnai
             {tags.slice(0, 2).map((tag, index) => (
               <span 
                 key={index} 
-                className="px-2 py-1 bg-gray-100 rounded-md text-xs text-gray-600 whitespace-nowrap"
+                className={`px-2 py-1 rounded-md text-xs font-medium whitespace-nowrap ${
+                  subject.toLowerCase().includes('macro')
+                    ? 'bg-blue-100 text-blue-600'
+                    : 'bg-green-100 text-green-600'
+                }`}
               >
                 {tag}
               </span>
@@ -114,14 +119,11 @@ const VideoLibraryPreview = () => {
 
   return (
     <div className="relative w-screen -ml-[50vw] left-1/2 bg-gray-50 mb-20 mt-20">
-      <div className="w-full py-12 px-4 max-w-7xl mx-auto">
-        <div className="text-center mb-12">
+      <div className="w-full py-16 sm:py-20 px-4 max-w-7xl mx-auto">
+        <div className="text-center mb-16 sm:mb-20">
           <h2 className="text-5xl font-extrabold tracking-tight drop-shadow-sm leading-tight mb-4">
             <span className="text-blue-500">Master</span> Tough Topics with Ease
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-          Understandcomplex economic concepts with AP Dojo`s simple explanations. Plus, test your understanding with practice problems after each video!
-          </p>
         </div>
         
         <div className="flex flex-col md:flex-row justify-center gap-8 flex-wrap">
@@ -139,6 +141,27 @@ const VideoLibraryPreview = () => {
               />
             </div>
           ))}
+        </div>
+
+        {/* New Buttons Section with increased top margin */}
+        <div className="mt-16 sm:mt-20 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <Link
+            href="/videos/macro"
+            className="px-8 py-4 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600 transition-colors shadow-sm"
+          >
+            Full AP Macro Video Library
+          </Link>
+          <div className="relative">
+            <button
+              disabled
+              className="px-8 py-4 bg-white text-gray-400 border-2 border-gray-300 rounded-lg font-semibold cursor-not-allowed"
+            >
+              Full AP Micro Video Library
+            </button>
+            <div className="absolute -top-3 -right-3 bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-bold">
+              Coming Soon
+            </div>
+          </div>
         </div>
       </div>
     </div>

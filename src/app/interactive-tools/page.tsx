@@ -40,7 +40,7 @@ export default function InteractiveToolsPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 mt-12">
       <h1 className="text-5xl font-extrabold tracking-tight text-gray-900 text-center mb-12">
-        Interactive Study Tools
+        Interactive <span className="text-blue-500">Study Tools</span>
       </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
