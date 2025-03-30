@@ -3,6 +3,7 @@ export type Question = {
   text: string;
   options: string[];
   correctAnswer: number;
+  image?: string;
 }
 
 export type Video = {
@@ -233,6 +234,150 @@ export const videos: Video[] = [
             text: "A sudden increase in input prices will cause which of the following changes on the Phillips Curve?",
             options: ["A rightward shift of the SRPC", "A leftward shift of the LRPC", "A leftward shift of the SRPC", "A downward movement along the SRPC"],
             correctAnswer: 0
+          }
+        ],
+      }, 
+      {
+        id: "8",
+        title: "It's All Connected: The Business Cycle Graph, The AD-AS Model, and the PPC",
+        description: "Learn about the connection between the business cycles graph, the AS-AS graph, the a country's PPC",
+        subject: "AP Macroeconomics", 
+        unit: "2",
+        tags: ["Business Cycles", "AD-AS", "PPC"],
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/its+all+connected.mp4",
+        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/biz+cycles+thumbnail.jpg",
+        accessLevel: "free",
+        questions: [
+          {
+            id: "1",
+            text: "Which of the following is true when an economy is in the expansion phase of the business cycle?",
+            options: ["Unemployment is increasing and output is falling", "The price has has already peaked", "Unemployment is falling and output is increasing", "Both unemployment and output are increasing"],
+            correctAnswer: 2
+          },
+          {
+            id: "2",
+            text: "The trough on the business cycle corresponds to which of the following on the AD-AS graph?",
+            options: ["An inflationary gap", "Long-run equilibrium", "Underutilization", "Recessionary gap"],
+            correctAnswer: 3
+          },
+          {
+            id: "3",
+            text: "How can a country experiencing a recessionary gap be represented on a production possibilities curve (PPC)?",
+  options: [
+    "A point on the PPC, indicating full employment of resources",
+    "A point outside the PPC, indicating overproduction",
+    "A point inside the PPC, indicating underutilization of resources",
+    "A shift of the PPC outward, indicating long-run economic growth"
+  ],
+            correctAnswer: 2
+          }
+        ],
+      }, 
+      {
+        id: "9",
+        title: "Comparative Advantage: Output Questions",
+        description: "Learn how to identify and solve output comparative advantage questions",
+        subject: "AP Macroeconomics", 
+        unit: "1",
+        tags: ["Comparative Advantage", "Opportunity Cost"],
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/comp+adv+output.mp4",
+        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/comp+adv+output+thumbnail.jpg",
+        accessLevel: "free",
+        questions: [
+          {
+            id: "1",
+            text: "What is Liz's opportunity cost of producing one bracelet?",
+            image: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/video9Q1.png",
+            options: ["1.67 necklaces", "0.67 necklaces", "0.75 bracelets", "1.5 necklaces"],
+            correctAnswer: 1
+          },
+          {
+            id: "2",
+            text: "Who has the comparative advantage in the production of necklaces?",
+            image: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/video9Q1.png",
+            options: ["Liz", "Sam", "Neither has a comparative advantage"],
+            correctAnswer: 0
+          },
+          {
+            id: "3",
+            text: "If Liz and Sam decided to specialize and trade, who should produces each item?",
+            options: ["Sam should produce both items", "Liz should produce bracelets and Sam should produce necklaces", "Sam should produce both items", "Liz should produce necklaces and Sam should produce bracelets"],
+            correctAnswer: 3
+          }
+        ],
+      }, 
+      {
+        id: "10",
+        title: "Comparative Advantage: Input Questions",
+        description: "Learn how to identify and solve input comparative advantage questions",
+        subject: "AP Macroeconomics", 
+        unit: "1",
+        tags: ["Comparative Advantage", "Opportunity Cost"],
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/comp+adv+inpt.mp4",
+        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/comp+adv+input+thumbnail.jpg",
+        accessLevel: "free",
+        questions: [
+          {
+            id: "1",
+            text: "The table below should the number of labor hours it takes a farmer and a rancher to produce one bushel of wheat or one pound of beef. Who has the comparative advantage in producing beef?",
+            image: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/video10Q1.png",
+            options: ["The farmer", "The rancher", "Neither, because they have the same opportunity cost", "It is impossible to determine"],
+            correctAnswer: 0
+          },
+          {
+            id: "2",
+            text: "Two countries, Alpha and Beta, produce cars and computers. The table below shows the number of labor hours required to produce one unit of each good. Which country has a comparative advantage in producing computers?",
+            image: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/video10Q2.png",
+            options: ["Beta", "Alpha", "Neither, because both are equally efficient", "It is impossible to determine"],
+            correctAnswer: 1
+          },
+          {
+            id: "3",
+            text: "If Country X has the comparative advantage in producing lumber and Country Y has the comparative advantage in producing steel, then which of the following is true?",
+            options: ["Country X must have the absolute advantage in producing lumber", "Country Y must have the absolute advantage in producing steel", "Country X gives up less steel when it produces a unit of lumber", "Country Y can produce more units of steel per hour than units of lumber per hour"],
+            correctAnswer: 2
+          }
+        ],
+      }, 
+      {
+        id: "11",
+        title: "Nominal vs. Real GDP",
+        description: "Understand the key difference between nominal and real GDP",
+        subject: "AP Macroeconomics", 
+        unit: "2",
+        tags: ["GDP", "Inflation"],
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/ngdp+and+rgdp.mp4",
+        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/real+nom+gdp+thumbnail.jpg",
+        accessLevel: "free",
+        questions: [
+          {
+            id: "1",
+            text: "Which of the following best describes the difference between nominal GDP and real GDP?",
+            options: [
+              "Nominal GDP is adjusted for inflation, while real GDP is not.",
+              "Real GDP is measured using current prices, while nominal GDP is measured using constant prices.",
+              "Nominal GDP is measured using current prices, while real GDP is measured using constant prices.",
+              "Real GDP will always be less than nominal GDP."
+            ],
+            correctAnswer: 2
+          },
+          {
+            id: "2",
+            text: "If nominal GDP increases but real GDP remains unchanged, what must have happened?",
+            options: [
+              "Output increased while prices remained constant.",
+              "Both output and prices increased.",
+              "Output remained constant while prices increased.",
+              "There was deflation in the economy."
+            ],
+            correctAnswer: 2
+          },
+          {
+            id: "3",
+            text: "A sudden increase in input prices will cause which of the following changes on the Phillips Curve?",
+            image: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/video11Q3.png",
+            options: ["$265", "$136.5", "$255", "$177.50"],
+            correctAnswer: 3
           }
         ],
       }

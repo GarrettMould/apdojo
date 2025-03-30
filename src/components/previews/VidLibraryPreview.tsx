@@ -119,14 +119,14 @@ const VideoLibraryPreview = () => {
 
   return (
     <div className="relative w-screen -ml-[50vw] left-1/2 bg-gray-50 mb-20 mt-20">
-      <div className="w-full py-16 sm:py-20 px-4 max-w-7xl mx-auto">
-        <div className="text-center mb-16 sm:mb-20">
+      <div className="w-full py-16 px-4 max-w-7xl mx-auto">
+        <div className="text-center mb-16">
           <h2 className="text-5xl font-extrabold tracking-tight drop-shadow-sm leading-tight mb-4">
             <span className="text-blue-500">Master</span> Tough Topics with Ease
           </h2>
         </div>
         
-        <div className="flex flex-col md:flex-row justify-center gap-8 flex-wrap">
+        <div className="flex flex-col md:flex-row justify-center gap-8 flex-wrap mb-16">
           {previewVideos.map((video) => (
             <div key={video.id} className="w-full md:w-auto flex justify-center">
               <VideoCard
@@ -143,8 +143,7 @@ const VideoLibraryPreview = () => {
           ))}
         </div>
 
-        {/* New Buttons Section with increased top margin */}
-        <div className="mt-16 sm:mt-20 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="mt-16 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
             href="/videos/macro"
             className="px-8 py-4 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600 transition-colors shadow-sm"

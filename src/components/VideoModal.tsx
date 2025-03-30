@@ -8,6 +8,7 @@ type Question = {
   text: string;
   options: string[];
   correctAnswer: number;
+  image?: string;
 }
 
 type VideoModalProps = {
@@ -20,6 +21,7 @@ export const VideoModal = ({ videoUrl, questions, onClose }: VideoModalProps) =>
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, number>>({});
   const [submittedAnswers, setSubmittedAnswers] = useState<Record<string, number>>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [expandedImage, setExpandedImage] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // Add useEffect to handle body scroll locking
@@ -43,6 +45,11 @@ export const VideoModal = ({ videoUrl, questions, onClose }: VideoModalProps) =>
   const handleSubmit = () => {
     setSubmittedAnswers(selectedAnswers);
     setIsSubmitted(true);
+  };
+
+  // Add handler for image expansion
+  const handleImageClick = (imageUrl: string) => {
+    setExpandedImage(imageUrl);
   };
 
   return (
@@ -98,6 +105,20 @@ export const VideoModal = ({ videoUrl, questions, onClose }: VideoModalProps) =>
                   className="p-4 md:p-5 rounded-lg border bg-white shadow-sm hover:shadow-md transition-shadow"
                 >
                   <p className="text-base font-semibold mb-3 md:mb-4 text-gray-900">{question.text}</p>
+                  
+                  {question.image && (
+                    <div 
+                      onClick={() => handleImageClick(question.image!)}
+                      className="cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98]"
+                    >
+                      <img 
+                        src={question.image} 
+                        alt="Question diagram"
+                        className="w-full rounded-md mb-4 border border-gray-200"
+                      />
+                    </div>
+                  )}
+
                   <div className="space-y-2 md:space-y-2.5">
                     {question.options.map((option, index) => (
                       <button
@@ -140,6 +161,31 @@ export const VideoModal = ({ videoUrl, questions, onClose }: VideoModalProps) =>
             </button>
           </div>
         </div>
+
+        {/* Image Expansion Modal */}
+        {expandedImage && (
+          <div 
+            className="fixed inset-0 bg-black/80 z-[60] flex items-center justify-center p-4"
+            onClick={() => setExpandedImage(null)}
+          >
+            <button
+              onClick={() => setExpandedImage(null)}
+              className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors"
+            >
+              <X className="w-8 h-8" />
+            </button>
+            <div 
+              className="relative max-w-[90vw] max-h-[90vh]"
+              onClick={e => e.stopPropagation()}
+            >
+              <img
+                src={expandedImage}
+                alt="Expanded diagram"
+                className="w-full h-full object-contain rounded-lg"
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
