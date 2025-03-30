@@ -374,7 +374,7 @@ export const videos: Video[] = [
           },
           {
             id: "3",
-            text: "A sudden increase in input prices will cause which of the following changes on the Phillips Curve?",
+            text: "The table below shows the price and quantity of apples and bananas produced in Fruitland over two years. Using Year 1 as the base year, calculate Fruitland`s RGDP in Year 2.",
             image: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/video11Q3.png",
             options: ["$265", "$136.5", "$255", "$177.50"],
             correctAnswer: 3
