@@ -20,7 +20,6 @@ export default function Signup() {
   const [hasUpperCase, setHasUpperCase] = useState(false)
   const [hasLowerCase, setHasLowerCase] = useState(false)
   const [hasNumber, setHasNumber] = useState(false)
-  const [hasSpecialChar, setHasSpecialChar] = useState(false)
   const [passwordsMatch, setPasswordsMatch] = useState(false)
 
   // Check password requirements
@@ -29,12 +28,11 @@ export default function Signup() {
     setHasUpperCase(/[A-Z]/.test(password))
     setHasLowerCase(/[a-z]/.test(password))
     setHasNumber(/[0-9]/.test(password))
-    setHasSpecialChar(/[!@#$%^&*]/.test(password))
     setPasswordsMatch(password === confirmPassword && password !== '')
   }, [password, confirmPassword])
 
   const isValidPassword = hasMinLength && hasUpperCase && hasLowerCase && 
-    hasNumber && hasSpecialChar && passwordsMatch
+    hasNumber && passwordsMatch
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -50,18 +48,35 @@ export default function Signup() {
       await signup(email, password)
       router.push('/')
     } catch (err: any) {
-      setError(err.message || 'Failed to create an account')
+      // User-friendly error messages
+      if (err instanceof FirebaseError) {
+        switch (err.code) {
+          case 'auth/invalid-email':
+            setError('Please enter a valid email address');
+            break;
+          case 'auth/email-already-in-use':
+            setError('An account already exists with this email');
+            break;
+          case 'auth/weak-password':
+            setError('Please choose a stronger password');
+            break;
+          default:
+            setError('An error occurred. Please try again.');
+        }
+      } else {
+        setError('An error occurred. Please try again.');
+      }
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white py-12 px-4 sm:px-6 lg:px-8 mt-16">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 mt-6">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Create an AP Dojo account
+          <h2 className="mt-6 text-center text-3xl font-extrabold tracking-tight text-gray-900">
+            Create an <span className="text-blue-500">AP Dojo</span> account
           </h2>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
@@ -107,7 +122,7 @@ export default function Signup() {
           </div>
 
           <div className="text-base space-y-2">
-            <p className="font-medium text-gray-700">Password requirements:</p>
+            <p className="font-semibold text-gray-900">Password requirements:</p>
             <ul className="space-y-1 text-gray-600">
               <li className={hasMinLength ? "text-green-600" : ""}>
                 ✓ At least 8 characters
@@ -120,9 +135,6 @@ export default function Signup() {
               </li>
               <li className={hasNumber ? "text-green-600" : ""}>
                 ✓ At least one number
-              </li>
-              <li className={hasSpecialChar ? "text-green-600" : ""}>
-                ✓ At least one special character (!@#$%^&*)
               </li>
               <li className={passwordsMatch ? "text-green-600" : ""}>
                 ✓ Passwords match

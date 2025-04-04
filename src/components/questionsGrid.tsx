@@ -1,99 +1,261 @@
 'use client'
 
 import { conceptChecks } from '@/data/conceptChecks'
-import { ArrowRight, X, ChevronRight } from 'lucide-react'
+import { ArrowRight, X, ChevronRight, ClipboardCheck } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
+import { useAuthContext } from '@/contexts/AuthContext'
+import { FeedbackModal } from './FeedbackModal'
+import { LoginModal, SignupModal } from '@/components/AuthModals'
+
+// Add these types at the top of the file
+type Unit = {
+  id: string;
+  name: string;
+};
+
+// Update the type to include unit
+type Question = {
+  text: string;
+  tags: string[];
+  relevantLessons: string[];
+  unit: number;
+};
+
+// Add this new component at the top of the file
+const FeedbackProgressBar = ({ status }: { status: 'incorrect' | 'partial' | 'correct' }) => {
+  const bars = [
+    { filled: status === 'incorrect' || status === 'partial' || status === 'correct' },
+    { filled: status === 'partial' || status === 'correct' },
+    { filled: status === 'correct' }
+  ];
+
+  const getColor = (status: 'incorrect' | 'partial' | 'correct') => {
+    switch (status) {
+      case 'incorrect': return 'bg-red-500';
+      case 'partial': return 'bg-yellow-500';
+      case 'correct': return 'bg-green-500';
+    }
+  };
+
+  return (
+    <div className="flex gap-1.5">
+      {bars.map((bar, index) => (
+        <div 
+          key={index}
+          className={`h-2 w-12 rounded-full transition-all duration-300 ${
+            bar.filled 
+              ? getColor(status) 
+              : 'bg-gray-200'
+          }`}
+        />
+      ))}
+    </div>
+  );
+};
 
 // Move QuestionCard outside of QuestionsGrid
 const QuestionCard = ({ 
   question, 
   tags, 
   relevantLessons,
-  onQuestionClick 
+  unit,
+  onSubmit,
 }: { 
   question: string; 
   tags: string[];
   relevantLessons: string[];
-  onQuestionClick: (question: string, tags: string[], relevantLessons: string[]) => void;
+  unit: number;
+  onSubmit: (question: string, answer: string, tags: string[], relevantLessons: string[], unit: number) => void;
 }) => {
-  const tagsContainerRef = useRef<HTMLDivElement>(null);
-  const [visibleTags, setVisibleTags] = useState<string[]>([]);
+  const [answer, setAnswer] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showSignupModal, setShowSignupModal] = useState(false);
+  const { user } = useAuthContext();
 
-  useEffect(() => {
-    if (!tagsContainerRef.current) return;
+  const handleSubmit = async () => {
+    if (!answer.trim()) return;
     
-    const container = tagsContainerRef.current;
-    const containerWidth = container.clientWidth;
-    
-    const measureDiv = document.createElement('div');
-    measureDiv.style.visibility = 'hidden';
-    measureDiv.style.position = 'absolute';
-    measureDiv.style.whiteSpace = 'nowrap';
-    document.body.appendChild(measureDiv);
-
-    measureDiv.innerHTML = `
-      <span class="px-2 py-1 bg-gray-100 rounded-md text-xs text-gray-600">
-        ${tags[0]}
-      </span>
-    `;
-    const firstTagWidth = measureDiv.firstElementChild?.getBoundingClientRect().width || 0;
-
-    let secondTagWidth = 0;
-    if (tags.length > 1) {
-      measureDiv.innerHTML = `
-        <span class="px-2 py-1 bg-gray-100 rounded-md text-xs text-gray-600">
-          ${tags[1]}
-        </span>
-      `;
-      secondTagWidth = measureDiv.firstElementChild?.getBoundingClientRect().width || 0;
+    // Check if user is logged in
+    if (!user) {
+      setShowLoginModal(true);
+      return;
     }
 
-    document.body.removeChild(measureDiv);
+    try {
+      setIsLoading(true);
+      const response = await fetch('/api/check-answer', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          question,
+          userAnswer: answer,
+          tags,
+          type: 'ai_tutor',
+          options: [],
+          selectedAnswer: answer,
+          correctAnswer: ''
+        }),
+      });
 
-    const gapWidth = 8;
-    const totalWidth = firstTagWidth + gapWidth + secondTagWidth;
-    
-    if (totalWidth <= containerWidth && tags.length > 1) {
-      setVisibleTags([tags[0], tags[1]]);
-    } else {
-      setVisibleTags([tags[0]]);
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      // Call onSubmit which triggers the modal
+    await onSubmit(question, answer, tags, relevantLessons, unit);
+      
+      // Only reset the answer and loading state after the modal is shown
+      setAnswer('');
+    } catch (error) {
+      console.error('Error submitting answer:', error);
+      throw error;
+    } finally {
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 100);
     }
-  }, [tags]);
+  };
 
   return (
-    <div className="w-96 h-48 bg-white rounded-lg shadow-md border-2 border-grey-500 p-6 flex flex-col">
-      <div ref={tagsContainerRef} className="flex gap-2 mb-3 h-7 overflow-hidden">
-        {visibleTags.map((tag, index) => (
+    <div className="w-full bg-white rounded-lg shadow-md border border-gray-200 p-4 md:p-6">
+      <div className="flex flex-col space-y-4">
+        {/* Update tags container */}
+        <div className="flex flex-wrap gap-1.5 md:gap-2">
+          {tags.map((tag, index) => (
           <span 
             key={index}
-            className="px-2 py-1 bg-gray-100 rounded-md text-xs text-gray-600 whitespace-nowrap"
+              className={`px-2 py-1 rounded-md text-xs font-medium ${
+                tag.startsWith('Unit ')
+                  ? 'bg-gray-100 text-gray-600'
+                  : 'bg-blue-50 text-blue-600'
+              }`}
           >
             {tag}
           </span>
         ))}
       </div>
 
-      <div className="h-12 overflow-hidden mb-3">
-        <p className="text-sm font-bold text-gray-900 line-clamp-2">
+        {/* Update question text container */}
+        <div className="w-full md:max-w-[calc(100%-100px)]">
+          <p className="text-base md:text-lg font-semibold text-gray-900">
           {question}
         </p>
-      </div>
+        </div>
 
-      <div className="mt-auto flex gap-2">
+        {/* Update input section */}
+        <div className="flex flex-col sm:flex-row gap-2 w-full">
         <input
           type="text"
-          className="flex-1 px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 px-4 py-3 border border-gray-200 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Type your answer..."
-          onClick={(e) => {
-            e.preventDefault()
-            onQuestionClick(question, tags, relevantLessons)
-          }}
-          readOnly
-        />
-        <button className="p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">
-          <ArrowRight className="w-5 h-5" />
+            value={answer}
+            onChange={(e) => setAnswer(e.target.value)}
+            disabled={isLoading}
+          />
+          <button 
+            onClick={handleSubmit}
+            className={`sm:w-auto w-full relative group px-4 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors flex items-center justify-center ${
+              isLoading ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <>
+                <ClipboardCheck className="w-6 h-6 stroke-[2]" />
+                <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap bg-gray-800 text-white text-sm px-3 py-1.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  Get feedback & see sample answer
+                  {/* Triangle pointer */}
+                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-800 rotate-45" />
+                </div>
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Updated Login/Signup Modals */}
+      <LoginModal 
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        switchToSignup={() => {
+          setShowLoginModal(false);
+          setShowSignupModal(true);
+        }}
+        onAuthSuccess={() => {
+          setShowLoginModal(false);
+          // No automatic submission after login
+        }}
+      />
+
+      <SignupModal
+        isOpen={showSignupModal}
+        onClose={() => setShowSignupModal(false)}
+        switchToLogin={() => {
+          setShowSignupModal(false);
+          setShowLoginModal(true);
+        }}
+        onAuthSuccess={() => {
+          setShowSignupModal(false);
+          // No automatic submission after signup
+        }}
+      />
+    </div>
+  );
+};
+
+// Add this new component
+const UnitFilter = ({ 
+  units, 
+  selectedUnits, 
+  onUnitToggle 
+}: { 
+  units: Unit[];
+  selectedUnits: string[];
+  onUnitToggle: (unitId: string) => void;
+}) => {
+  return (
+    <div className="mb-8">
+      {/* Update main heading for mobile */}
+      <h2 className="text-2xl md:text-4xl text-center font-extrabold tracking-wide mb-6 md:mb-10">
+        <span className="text-blue-500 text-4xl md:text-6xl">AP Macro</span><br></br> Comprehension Checks
+      </h2>
+
+      {/* Update filter section spacing */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-0 mb-4">
+        <h3 className="text-md font-semibold text-gray-900">Filter by Unit</h3>
+        {selectedUnits.length > 0 && (
+          <button
+            onClick={() => selectedUnits.forEach(id => onUnitToggle(id))}
+            className="sm:ml-3 px-3 py-1 bg-blue-50 text-blue-600 font-medium rounded-md hover:bg-blue-100 transition-colors"
+          >
+            Clear filters
+          </button>
+        )}
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {units.map((unit) => (
+          <button
+            key={unit.id}
+            onClick={() => onUnitToggle(unit.id)}
+            className={`
+              px-3 py-1.5 rounded-md text-sm font-medium transition-all flex-grow sm:flex-grow-0
+              ${selectedUnits.includes(unit.id)
+                ? 'bg-blue-100 text-blue-700'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }
+            `}
+          >
+            {unit.name}
         </button>
+        ))}
       </div>
     </div>
   );
@@ -102,15 +264,16 @@ const QuestionCard = ({
 export function QuestionsGrid() {
   // First, define the helper functions
   const getAllMacroQuestions = () => {
-    const allQuestions: Array<{
-      text: string;
-      tags: string[];
-      relevantLessons: string[];
-    }> = [];
+    const allQuestions: Question[] = [];
     
-    Object.values(conceptChecks.macroeconomics).forEach(unit => {
-      unit.questions.forEach(question => {
-        allQuestions.push(question);
+    Object.entries(conceptChecks.macroeconomics).forEach(([unitNumber, unitData]) => {
+      const unitTag = `Unit ${unitNumber} - ${unitData.title}`; // Changed format to use hyphen
+      unitData.questions.forEach(question => {
+        allQuestions.push({
+          ...question,
+          unit: parseInt(unitNumber),
+          tags: [unitTag, ...question.tags]
+        });
       });
     });
     
@@ -123,235 +286,230 @@ export function QuestionsGrid() {
     return shuffled.slice(0, count);
   };
 
+  // Update the units array in the QuestionsGrid component
+  const units: Unit[] = [
+    { id: 'unit1', name: 'Basic Economic Concepts' },
+    { id: 'unit2', name: 'Economic Indicators and International Trade' },
+    { id: 'unit3', name: 'National Income and Price Determination' },
+    { id: 'unit4', name: 'Financial Sector' },
+    { id: 'unit5', name: 'Long-Run Consequences of Stabilization Policies' },
+    { id: 'unit6', name: 'Open Economy—International Trade and Finance' },
+  ];
+
+  // Add state for selected units
+  const [selectedUnits, setSelectedUnits] = useState<string[]>([]);
+
+  // Add toggle function for units
+  const handleUnitToggle = (unitId: string) => {
+    setSelectedUnits(prev => 
+      prev.includes(unitId)
+        ? prev.filter(id => id !== unitId)
+        : [...prev, unitId]
+    );
+  };
+
+  // Update the filtering logic to use unit numbers and shuffle filtered results
+  const getFilteredQuestions = () => {
+    const allQuestions = getAllMacroQuestions();
+    if (selectedUnits.length === 0) return allQuestions;
+    
+    // First filter the questions
+    const filteredQuestions = allQuestions.filter(question => 
+      selectedUnits.some(unitId => {
+        const selectedUnitNumber = parseInt(unitId.replace('unit', ''));
+        return question.unit === selectedUnitNumber;
+      })
+    );
+    
+    // Then shuffle the filtered questions
+    return filteredQuestions.sort(() => Math.random() - 0.5);
+  };
+
+  // Add state for visible questions count
+  const [visibleCount, setVisibleCount] = useState(3);
+  
+  // Update your randomQuestions state to get more initially but show less
+  const [questions, setQuestions] = useState(() => getRandomQuestions(12));
+
+  // Update effect to maintain full question set but respect visible count
+  useEffect(() => {
+    const filteredQuestions = getFilteredQuestions();
+    setQuestions(filteredQuestions);
+    setVisibleCount(3); // Reset to show only 3 when filters change
+  }, [selectedUnits]);
+
+  // Add load more function
+  const handleLoadMore = () => {
+    setVisibleCount(prev => Math.min(prev + 3, questions.length));
+  };
+
   // Then declare state variables
-  const [randomQuestions] = useState(() => getRandomQuestions(12));
-  const [answers, setAnswers] = useState<{ [key: string]: string }>({});
   const [activeQuestion, setActiveQuestion] = useState<{ 
     question: string; 
+    answer: string;
     tags: string[];
     relevantLessons: string[];
+    unit: number;
   } | null>(null);
-  const [currentAnswer, setCurrentAnswer] = useState('');
-  const [feedback, setFeedback] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [feedback, setFeedback] = useState<{
+    status: 'incorrect' | 'partial' | 'correct';
+    message: string;
+  } | null>(null);
 
-  const handleSubmitAnswer = async () => {
-    if (!currentAnswer.trim() || !activeQuestion) return
-
-    setIsSubmitting(true)
-    setFeedback(null)
+  const handleSubmitAnswer = async (question: string, answer: string, tags: string[], relevantLessons: string[], unit: number) => {
+    setActiveQuestion({ 
+      question, 
+      answer, 
+      tags, 
+      relevantLessons,
+      unit  // directly use the unit passed from the question
+    });
+    setFeedback(null);
 
     try {
-      console.log('Sending request with:', {
-        question: activeQuestion.question,
-        userAnswer: currentAnswer,
-        tags: activeQuestion.tags,
-      })
-
       const response = await fetch('/api/check-answer', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          question: activeQuestion.question,
-          userAnswer: currentAnswer,
-          tags: activeQuestion.tags,
+          question,
+          userAnswer: answer,
+          tags,
         }),
-      })
+      });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        console.error('API Error:', {
-          status: response.status,
-          statusText: response.statusText,
-          data: errorData
-        })
-        throw new Error(`API error: ${response.status} ${response.statusText}`)
+        throw new Error(`API error: ${response.status}`);
       }
 
-      const data = await response.json()
-      console.log('Received response:', data)
-      setFeedback(data.feedback)
+      const data = await response.json();
       
-      setAnswers(prev => ({
-        ...prev,
-        [activeQuestion.question]: currentAnswer
-      }))
-    } catch (error) {
-      console.error('Detailed error:', error)
-      setFeedback('Sorry, there was an error checking your answer. Please try again.')
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
+      let status: 'incorrect' | 'partial' | 'correct';
+      const feedbackLower = data.feedback.toLowerCase();
 
-  const handleQuestionClick = (question: string, tags: string[], relevantLessons: string[]) => {
-    setActiveQuestion({ question, tags, relevantLessons });
+      if (feedbackLower.includes('incorrect') || feedbackLower.includes('error')) {
+        status = 'incorrect';
+      } else if (feedbackLower.includes('partially correct') || 
+                 feedbackLower.includes('could be improved') || 
+                 (feedbackLower.includes('correct') && feedbackLower.includes('but'))) {
+        status = 'partial';
+      } else if (feedbackLower.includes('correct')) {
+        status = 'correct';
+      } else {
+        status = 'incorrect';
+      }
+
+      setFeedback({
+        status,
+        message: data.feedback
+      });
+    } catch (error) {
+      console.error('Error:', error);
+      setFeedback({
+        status: 'incorrect',
+        message: 'Sorry, there was an error checking your answer. Please try again.'
+      });
+    }
+  };
+
+  // Add useEffect for handling body scroll
+  useEffect(() => {
+    if (activeQuestion && feedback) {
+      // Prevent scrolling on the background
+      document.body.style.overflow = 'hidden';
+      // Add padding to prevent layout shift when scrollbar disappears
+      document.body.style.paddingRight = '15px'; // Approximate scrollbar width
+    } else {
+      // Restore scrolling when modal is closed
+      document.body.style.overflow = 'unset';
+      document.body.style.paddingRight = '0px';
+    }
+
+    // Cleanup function to restore scrolling when component unmounts
+    return () => {
+      document.body.style.overflow = 'unset';
+      document.body.style.paddingRight = '0px';
+    };
+  }, [activeQuestion, feedback]);
+
+  // Sample study resources based on the active question
+  const getStudyResources = (relevantLessons: string[]) => {
+    return relevantLessons.map(lesson => ({
+      title: lesson,
+      type: 'notes' as const,
+      link: '#'
+    }));
   };
 
   return (
-    <>
-      <div className="w-full py-12 mr-72">
-        {/* First Row */}
-        <div className="flex justify-center gap-8 mb-8">
-          {randomQuestions.slice(0, 4).map((question, index) => (
+    <div className="py-12 md:py-24 w-screen bg-gray-50" style={{ marginLeft: 'calc(-50vw + 50%)', marginRight: 'calc(-50vw + 50%)' }}>
+      <div className="container mx-auto px-4 md:px-0">
+      {/* Combined Questions Container */}
+        <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg border border-gray-100 p-4 md:p-8">
+        {/* Filter section */}
+        <UnitFilter 
+          units={units}
+          selectedUnits={selectedUnits}
+          onUnitToggle={handleUnitToggle}
+        />
+        
+        {/* Questions Grid */}
+        <div className="space-y-4">
+          {questions.length > 0 ? (
+              <>
+                {questions.slice(0, visibleCount).map((question, index) => (
             <QuestionCard 
-              key={`row1-${index}`}
+                key={index}
               question={question.text}
               tags={question.tags}
               relevantLessons={question.relevantLessons}
-              onQuestionClick={handleQuestionClick}
-            />
-          ))}
-        </div>
-
-        {/* Second Row */}
-        <div className="flex justify-center gap-8 mb-8">
-          {randomQuestions.slice(4, 8).map((question, index) => (
-            <QuestionCard 
-              key={`row2-${index}`}
-              question={question.text}
-              tags={question.tags}
-              relevantLessons={question.relevantLessons}
-              onQuestionClick={handleQuestionClick}
-            />
-          ))}
-        </div>
-
-        {/* Third Row */}
-        <div className="flex justify-center gap-8">
-          {randomQuestions.slice(8, 12).map((question, index) => (
-            <QuestionCard 
-              key={`row3-${index}`}
-              question={question.text}
-              tags={question.tags}
-              relevantLessons={question.relevantLessons}
-              onQuestionClick={handleQuestionClick}
-            />
-          ))}
+              unit={question.unit}
+              onSubmit={handleSubmitAnswer}
+              />
+                ))}
+                
+                {/* Load More Button */}
+                {visibleCount < questions.length && (
+                  <div className="flex justify-center mt-12">
+                    <button
+                      onClick={handleLoadMore}
+                      className="mt-6 px-6 py-3 bg-white text-blue-600 font-medium border border-blue-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-all duration-200"
+                    >
+                      Load More Questions
+                    </button>
+                  </div>
+                )}
+              </>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-gray-500 text-lg">
+                No questions found for the selected filters.
+              </p>
+              <button
+                onClick={() => setSelectedUnits([])}
+                className="mt-4 text-blue-500 hover:text-blue-600 font-medium"
+              >
+                Clear filters
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Updated Modal */}
-      {activeQuestion && (
-        <div 
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
-          onClick={() => {
-            setActiveQuestion(null)
-            setFeedback(null)
-            setCurrentAnswer('')
+      {/* Feedback Modal */}
+        <FeedbackModal 
+          isOpen={!!activeQuestion && !!feedback}
+          onClose={() => {
+            setActiveQuestion(null);
+            setFeedback(null);
           }}
-        >
-          <div 
-            className="w-[32rem] max-h-[90vh] bg-white rounded-lg shadow-xl flex flex-col relative"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Scrollable content */}
-            <div className="flex-1 overflow-y-auto p-6">
-              <div className="flex flex-col">
-                {/* Tags */}
-                <div className="flex gap-2 mb-4">
-                  {activeQuestion.tags.map((tag, index) => (
-                    <span 
-                      key={index} 
-                      className="px-2 py-1 bg-gray-100 rounded-md text-xs text-gray-600"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-
-                {/* Question */}
-                <div className="mb-6">
-                  <p className="text-lg font-bold text-gray-900">
-                    {activeQuestion.question}
-                  </p>
-                </div>
-
-                {/* Answer Input and Submit */}
-                <div className="flex gap-2 mb-6">
-                  <input
-                    type="text"
-                    className={`flex-1 px-4 py-3 border border-gray-200 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                      feedback ? 'bg-gray-50 cursor-not-allowed' : ''
-                    }`}
-                    placeholder="Type your answer..."
-                    value={currentAnswer}
-                    onChange={(e) => setCurrentAnswer(e.target.value)}
-                    disabled={feedback !== null}
-                    autoFocus
-                  />
-                  <button 
-                    className={`px-4 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors ${
-                      isSubmitting || feedback ? 'opacity-50 cursor-not-allowed' : ''
-                    }`}
-                    onClick={handleSubmitAnswer}
-                    disabled={isSubmitting || feedback !== null}
-                  >
-                    {isSubmitting ? (
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                      <ArrowRight className="w-5 h-5 stroke-[3]" />
-                    )}
-                  </button>
-                </div>
-
-                {/* Feedback Sections */}
-                {feedback && (
-                  <div className="space-y-6">
-                    {/* AI Tutor Feedback */}
-                    <div className="rounded-lg border border-gray-200 overflow-hidden">
-                      <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
-                        <h3 className="font-semibold text-gray-900">AI Tutor Feedback</h3>
-                      </div>
-                      <div className="p-4 bg-white">
-                        <div 
-                          className="text-gray-700 prose prose-sm max-w-none"
-                          dangerouslySetInnerHTML={{ __html: feedback || '' }}
+          question={activeQuestion?.question || ''}
+          selectedAnswer={activeQuestion?.answer}
+          feedback={feedback || { status: 'incorrect', message: '' }}
+          unit={activeQuestion?.unit || 1}
                         />
                       </div>
-                    </div>
-
-                    {/* Topics to Review - Now only shows after feedback exists */}
-                    <div className="rounded-lg border border-blue-200 overflow-hidden">
-                      <div className="bg-blue-50 px-4 py-2 border-b border-blue-200">
-                        <h3 className="font-semibold text-gray-900">Topics to Review</h3>
-                      </div>
-                      <div className="p-4 bg-white">
-                        <ul className="space-y-2">
-                          {activeQuestion.relevantLessons.map((lesson, index) => (
-                            <li 
-                              key={index}
-                              className="text-sm text-gray-700 flex items-center gap-2 hover:text-blue-600 transition-colors cursor-pointer"
-                            >
-                              <div className="w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0" />
-                              {lesson}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Sticky footer */}
-            <div className="flex-shrink-0 bg-blue-500 py-6 px-4 rounded-b-lg">
-              <a 
-                href="#" 
-                className="flex items-center justify-center gap-2 transition-transform hover:translate-x-1 group"
-              >
-                <span className="text-md font-bold text-white">
-                  Explore more AP Macroeconomics questions
-                </span>
-                <ChevronRight className="w-5 h-5 text-white stroke-[3]" />
-              </a>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
-  )
+    </div>
+  );
 }

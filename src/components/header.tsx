@@ -1,15 +1,17 @@
 'use client';
 
 import Link from "next/link"
+import dojoIcon from "../../public/images/dojoIcon.png"
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-// import { useAuthContext } from '@/contexts/AuthContext'
-// import { UserCircle } from 'lucide-react'
+import { useAuthContext } from '@/contexts/AuthContext'
+import { UserCircle } from 'lucide-react'
 
 export function Header() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  // const { user, logout } = useAuthContext();
+  const { user, logout } = useAuthContext();
 
   const handleHomeClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -25,7 +27,7 @@ export function Header() {
 
   const handleToolsClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    router.push('/interactive-tools');
+    router.push('/interactive-tools/flashcards');
     setIsMenuOpen(false);
   };
 
@@ -60,10 +62,19 @@ export function Header() {
       <div className="flex items-center space-x-4">
         <button 
           onClick={handleHomeClick}
-              className="hover:opacity-90 transition-opacity flex items-center"
+              className="hover:opacity-90 transition-opacity flex items-center gap-4"
         >
-              <span className="text-2xl font-extrabold ">AP</span>
-              <span className="ml-1 text-2xl font-extrabold text-blue-500 ">Dojo</span>
+          <Image 
+            src={dojoIcon}
+            alt="Dojo Icon"
+            width={40}
+            height={40}
+            className="object-contain"
+          />
+          <div className="flex items-center">
+            <span className="text-2xl font-extrabold">AP</span>
+            <span className="ml-1 text-2xl font-extrabold text-blue-500">Dojo</span>
+          </div>
         </button>
       </div>
       
@@ -85,13 +96,14 @@ export function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-8">
-            <Link 
+            {/* Comment out private tutoring link */}
+            {/* <Link 
               href="/tutoring" 
               onClick={handleTutoringClick}
               className="hover:text-blue-700 transition-colors font-bold text-sm"
             >
               Private Tutoring
-            </Link>
+            </Link> */}
             <Link 
               href="/videos/macro" 
               onClick={handleVideoLibraryClick}
@@ -100,16 +112,16 @@ export function Header() {
               Video Library
             </Link>
             <Link 
-              href="/interactive-tools" 
+              href="/interactive-tools/flashcards"
               onClick={handleToolsClick}
-              className="hover:text-blue-700 transition-colors font-bold   text-sm"
+              className="hover:text-blue-700 transition-colors font-bold text-sm"
             >
-              Interactive Tools
+              Flashcards
             </Link>
             <Link 
               href="/cheat-sheets" 
-              onClick={handleCheatSheetsClick}
-              className="hover:text-blue-700 transition-colors font-bold   text-sm"
+              onClick={() => setIsMenuOpen(false)}
+              className="hover:text-blue-700 transition-colors font-bold text-sm"
             >
               Cheat Sheets
             </Link>
@@ -119,18 +131,18 @@ export function Header() {
             >
               Practice Exams
             </Link>
-            {/* Authentication UI removed temporarily
             {user ? (
               <div className="flex items-center space-x-8">
-                <Link
+                {/* Comment out profile icon/link */}
+                {/* <Link
                   href="/my-purchases"
-                  className="hover:  transition-colors"
+                  className="hover:text-blue-700 transition-colors"
                   title="My Profile"
                 >
                   <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
                     <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd" />
                   </svg>
-                </Link>
+                </Link> */}
                 <button
                   onClick={() => logout()}
                   className="px-6 py-2 text-sm font-bold text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -142,7 +154,7 @@ export function Header() {
               <div className="flex items-center space-x-8">
                 <Link
                   href="/login"
-                  className="hover:  transition-colors font-bold"
+                  className="text-blue-600 hover:text-blue-700 transition-colors font-bold text-sm"
                 >
                   Login
                 </Link>
@@ -154,7 +166,6 @@ export function Header() {
                 </Link>
               </div>
             )}
-            */}
           </nav>
         </div>
       </div>
@@ -165,35 +176,35 @@ export function Header() {
           <div className="px-4 py-2">
             <div className="py-2">
               <Link 
-                href="/tutoring" 
-                onClick={handleTutoringClick}
-                className="block px-4 py-2 hover:bg-gray-100 font-bold text-sm"
-              >
-                Private Tutoring
-              </Link>
-              <Link 
                 href="/videos/macro" 
-                onClick={handleVideoLibraryClick}
+                onClick={(e) => {
+                  handleVideoLibraryClick(e);
+                  setIsMenuOpen(false);
+                }}
                 className="block px-4 py-2 hover:bg-gray-100 font-bold text-sm"
               >
                 Video Library
               </Link>
               <Link 
-                href="/interactive-tools" 
-                onClick={handleToolsClick}
+                href="/interactive-tools/flashcards"
+                onClick={(e) => {
+                  handleToolsClick(e);
+                  setIsMenuOpen(false);
+                }}
                 className="block px-4 py-2 hover:bg-gray-100 font-bold text-sm"
               >
-                Interactive Tools
+                Flashcards
               </Link>
               <Link 
                 href="/cheat-sheets" 
-                onClick={handleCheatSheetsClick}
+                onClick={() => setIsMenuOpen(false)}
                 className="block px-4 py-2 hover:bg-gray-100 font-bold text-sm"
               >
                 Cheat Sheets
               </Link>
               <Link 
                 href="/purchase/exams"
+                onClick={() => setIsMenuOpen(false)}
                 className="block px-4 py-2 hover:bg-gray-100 font-bold text-sm"
               >
                 Practice Exams

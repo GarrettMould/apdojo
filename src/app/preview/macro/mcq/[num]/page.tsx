@@ -17,19 +17,23 @@ export default function MacroMCQPreview({ params }: { params: { num: string } })
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
-      <div className="mb-6">
+      <div>
         <Link 
           href="/purchase/exams"
-          className="text-blue-600 hover:text-blue-800"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm hover:shadow group"
         >
-          ← Back to Exams Page
+          <span className="text-lg transition-transform group-hover:-translate-x-1">←</span>
+          Back to Exams
         </Link>
-        <h1 className="text-4xl font-extrabold mt-4">
-          AP Macroeconomics MCQ {params.num}
-        </h1>
-        <p className="text-gray-600 mt-2">
-          Complete all questions to submit and view your score. Explanations are available after you submit.
-        </p>
+        <div className="space-y-4 mt-8">
+          <h1 className="text-4xl font-extrabold tracking-tight">
+            <span className="text-blue-500">AP Macroeconomics</span>{" "}
+            MCQ {params.num}
+          </h1>
+          <p className="text-gray-600 leading-relaxed">
+            Complete all questions to submit and view your score. Explanations are available after you submit.
+          </p>
+        </div>
       </div>
 
       <FullExam 

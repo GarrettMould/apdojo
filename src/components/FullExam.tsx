@@ -3,11 +3,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Question, QuestionBank } from '@/data/questionBanks/types';
 import { Button } from "@/components/ui/button";
-import { Bookmark, BookmarkX, X, Clock, Maximize2, Minimize2, Calculator, Pen, Eraser, Expand, Trash2, Circle, CircleDot, Check, Lock } from 'lucide-react';
+import { Bookmark, BookmarkX, X, Clock, Maximize2, Minimize2, Calculator, Pen, Eraser, Expand, Trash2, Circle, CircleDot, Check, Lock, Brain } from 'lucide-react';
 import { StaticImageData } from 'next/image';
 import { redirectToCheckout } from '@/lib/stripe';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { LoginModal, SignupModal } from './AuthModals';
+import { MCQFeedbackModal } from './MCQFeedbackModal';
+import { AssessmentResultsPanel } from './AssessmentResultsPanel';
 
 interface FullExamProps {
   questionBank: QuestionBank;
@@ -42,6 +44,37 @@ const precedence: Record<Operator, number> = {
 // Update the isOperator function to be a type guard
 const isOperator = (char: string): char is Operator => {
   return ['+', '-', '×', '÷'].includes(char);
+};
+
+const FeedbackProgressBar = ({ status }: { status: 'incorrect' | 'partial' | 'correct' }) => {
+  const bars = [
+    { filled: status === 'incorrect' || status === 'partial' || status === 'correct' },
+    { filled: status === 'partial' || status === 'correct' },
+    { filled: status === 'correct' }
+  ];
+
+  const getColor = (status: 'incorrect' | 'partial' | 'correct') => {
+    switch (status) {
+      case 'incorrect': return 'bg-red-500';
+      case 'partial': return 'bg-yellow-500';
+      case 'correct': return 'bg-green-500';
+    }
+  };
+
+  return (
+    <div className="flex gap-1.5">
+      {bars.map((bar, index) => (
+        <div 
+          key={index}
+          className={`h-2 w-12 rounded-full transition-all duration-300 ${
+            bar.filled 
+              ? getColor(status) 
+              : 'bg-gray-200'
+          }`}
+        />
+      ))}
+    </div>
+  );
 };
 
 export function FullExam({ questionBank, examType, questionType, examNumber }: FullExamProps) {
@@ -101,6 +134,19 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
 
   // Add this state to store the canvas image data
   const [canvasHistory, setCanvasHistory] = useState<ImageData | null>(null);
+
+  // Add these new state variables inside the FullExam component
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [feedbackData, setFeedbackData] = useState<{
+    status: 'incorrect' | 'partial' | 'correct';
+    message: string;
+  } | null>(null);
+
+  // Add this state for the tooltip
+  const [showTooltip, setShowTooltip] = useState(false);
+
+  // First, add a new state for loading
+  const [isAILoading, setIsAILoading] = useState(false);
 
   const handleAnswer = (questionId: number, answerIndex: number) => {
     setAnswers({
@@ -386,80 +432,110 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
       <div className="w-full max-w-4xl mx-auto mb-8">
         {/* Single container for all elements */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-          <div className="flex items-center">
-            {/* Previous Arrow - Hidden on mobile */}
-            <div
-              onClick={() => {
-                if (currentTrackPage > 0) {
-                  setCurrentTrackPage(currentTrackPage - 1);
-                }
-              }}
-              className={`
-                hidden md:flex min-w-[32px] h-[32px] items-center justify-center rounded-lg
-                transition-all duration-200 ease-in-out text-sm font-medium mr-4
-                ${currentTrackPage === 0
-                  ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
-                  : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200 cursor-pointer hover:scale-105'
-                }
-              `}
-            >
-              ←
+          {/* Mobile Question Navigation */}
+          <div className="md:hidden">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm font-medium text-gray-600">
+                Question {currentQuestionIndex + 1} of {questions.length}
+              </span>
+              <span className="text-sm font-medium text-blue-600">
+                {completedQuestions.size} Answered
+              </span>
             </div>
-
-            {/* Question Indicators - Scrollable on mobile */}
-            <div className="flex-1 flex md:justify-between overflow-x-auto md:overflow-x-visible gap-2 md:gap-0">
-              {Array.from({ length: QUESTIONS_PER_TRACK }, (_, i) => {
-                const questionIndex = startIndex + i;
-                if (questionIndex >= questions.length) return null;
-                const question = questions[questionIndex];
-                const isBookmarked = question && bookmarkedQuestions.has(question.id);
-                
-                // On mobile, only show questions near the current one
-                const shouldShow = window.innerWidth > 768 || 
-                  (questionIndex >= currentQuestionIndex - 4 && 
-                   questionIndex <= currentQuestionIndex + 4);
-                
-                if (!shouldShow) return null;
-                
-                return (
-                  <div
-                    key={questionIndex}
-                    className={`
-                      min-w-[32px] h-[32px] flex items-center justify-center rounded-lg 
-                      transition-all duration-200 ease-in-out text-sm font-medium flex-shrink-0
-                      ${questionIndex === currentQuestionIndex 
-                        ? 'bg-blue-500 text-white shadow-sm scale-105' 
-                        : completedQuestions.has(questions[questionIndex]?.id)
-                        ? 'bg-blue-200 text-blue-900 border border-blue-300'
-                        : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'}
-                      ${isBookmarked ? 'border-2 border-yellow-300/70' : ''}
-                      hover:scale-105 cursor-pointer
-                    `}
-                    onClick={() => setCurrentQuestionIndexWithTrack(questionIndex)}
-                  >
-                    {questionIndex + 1}
-                  </div>
-                );
-              })}
+            <div className="relative">
+              <select
+                value={currentQuestionIndex}
+                onChange={(e) => setCurrentQuestionIndexWithTrack(Number(e.target.value))}
+                className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
+              >
+                {questions.map((_, idx) => {
+                  const isCompleted = completedQuestions.has(questions[idx].id);
+                  const isBookmarked = bookmarkedQuestions.has(questions[idx].id);
+                  return (
+                    <option key={idx} value={idx}>
+                      Question {idx + 1}
+                      {isCompleted ? ' ✓' : ''}
+                      {isBookmarked ? ' ★' : ''}
+                    </option>
+                  );
+                })}
+              </select>
+              {/* Custom dropdown arrow */}
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
             </div>
+          </div>
 
-            {/* Next Arrow - Hidden on mobile */}
-            <div
-              onClick={() => {
-                if (currentTrackPage < totalPages - 1) {
-                  setCurrentTrackPage(currentTrackPage + 1);
-                }
-              }}
-              className={`
-                hidden md:flex min-w-[32px] h-[32px] items-center justify-center rounded-lg
-                transition-all duration-200 ease-in-out text-sm font-medium ml-4
-                ${currentTrackPage >= totalPages - 1
-                  ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
-                  : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200 cursor-pointer hover:scale-105'
-                }
-              `}
-            >
-              →
+          {/* Desktop Question Indicators - Keep existing desktop version */}
+          <div className="hidden md:block">
+            <div className="flex items-center">
+              <div
+                onClick={() => {
+                  if (currentTrackPage > 0) {
+                    setCurrentTrackPage(currentTrackPage - 1);
+                  }
+                }}
+                className={`
+                  flex min-w-[32px] h-[32px] items-center justify-center rounded-lg
+                  transition-all duration-200 ease-in-out text-sm font-medium mr-4
+                  ${currentTrackPage === 0
+                    ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
+                    : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200 cursor-pointer hover:scale-105'
+                  }
+                `}
+              >
+                ←
+              </div>
+
+              <div className="flex-1 flex justify-between">
+                {Array.from({ length: QUESTIONS_PER_TRACK }, (_, i) => {
+                  const questionIndex = startIndex + i;
+                  if (questionIndex >= questions.length) return null;
+                  const question = questions[questionIndex];
+                  const isBookmarked = question && bookmarkedQuestions.has(question.id);
+                  
+                  return (
+                    <div
+                      key={questionIndex}
+                      className={`
+                        min-w-[32px] h-[32px] flex items-center justify-center rounded-lg 
+                        transition-all duration-200 ease-in-out text-sm font-medium
+                        ${questionIndex === currentQuestionIndex 
+                          ? 'bg-blue-500 text-white shadow-sm scale-105' 
+                          : completedQuestions.has(questions[questionIndex]?.id)
+                          ? 'bg-blue-200 text-blue-900 border border-blue-300'
+                          : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'}
+                        ${isBookmarked ? 'border-2 border-yellow-300/70' : ''}
+                        hover:scale-105 cursor-pointer
+                      `}
+                      onClick={() => setCurrentQuestionIndexWithTrack(questionIndex)}
+                    >
+                      {questionIndex + 1}
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div
+                onClick={() => {
+                  if (currentTrackPage < totalPages - 1) {
+                    setCurrentTrackPage(currentTrackPage + 1);
+                  }
+                }}
+                className={`
+                  flex min-w-[32px] h-[32px] items-center justify-center rounded-lg
+                  transition-all duration-200 ease-in-out text-sm font-medium ml-4
+                  ${currentTrackPage >= totalPages - 1
+                    ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
+                    : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200 cursor-pointer hover:scale-105'
+                  }
+                `}
+              >
+                →
+              </div>
             </div>
           </div>
         </div>
@@ -510,6 +586,84 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
     }
   };
 
+  const handleAITutorClick = async () => {
+    try {
+      setIsAILoading(true); // Set loading state when starting
+      const currentQuestion = questions[currentQuestionIndex];
+      
+      const response = await fetch('/api/check-answer', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'ai_tutor',
+          questionType: questionType,
+          question: currentQuestion.question,
+          options: currentQuestion.options,
+          correctAnswer: currentQuestion.correctAnswer,
+          explanation: currentQuestion.explanation,
+          unit: currentQuestion.unit,
+          unitName: currentQuestion.unitName,
+          userAnswer: answers[currentQuestion.id] || '',
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      let status: 'incorrect' | 'partial' | 'correct';
+      const feedbackLower = data.feedback.toLowerCase();
+
+      if (feedbackLower.includes('incorrect') || feedbackLower.includes('error')) {
+        status = 'incorrect';
+      } else if (feedbackLower.includes('partially correct') || 
+                 feedbackLower.includes('could be improved') || 
+                 (feedbackLower.includes('correct') && feedbackLower.includes('but'))) {
+        status = 'partial';
+      } else {
+        status = 'correct';
+      }
+
+      setFeedbackData({
+        status,
+        message: data.feedback
+      });
+      setShowFeedbackModal(true);
+    } catch (error) {
+      console.error('Error connecting to AI:', error);
+      setFeedbackData({
+        status: 'incorrect',
+        message: 'Sorry, there was an error getting feedback. Please try again.'
+      });
+      setShowFeedbackModal(true);
+    } finally {
+      setIsAILoading(false); // Reset loading state when done
+    }
+  };
+
+  // Sample study resources (you can modify these based on your needs)
+  const studyResources = [
+    {
+      title: 'Video: Understanding Aggregate Demand',
+      type: 'video' as const,
+      link: '#'
+    },
+    {
+      title: 'Note Sheet: Government Spending Effects',
+      type: 'notes' as const,
+      link: '#'
+    },
+    {
+      title: 'Practice Problems: Fiscal Policy',
+      type: 'practice' as const,
+      link: '#'
+    }
+  ];
+
   return (
     <>
       {/* Add the modals */}
@@ -556,283 +710,116 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
         </div>
       )}
 
+      {/* Replace the existing feedback modal with the new component */}
+              <MCQFeedbackModal 
+          isOpen={showFeedbackModal}
+          onClose={() => setShowFeedbackModal(false)}
+          question={questions[currentQuestionIndex]?.question}
+          selectedAnswer={answers[questions[currentQuestionIndex]?.id] ? 
+            `${answers[questions[currentQuestionIndex].id]}) ${
+              questions[currentQuestionIndex].options[
+                answers[questions[currentQuestionIndex].id].charCodeAt(0) - 65
+              ]
+            }` : undefined
+          }
+          correctAnswer={questions[currentQuestionIndex]?.correctAnswer ? 
+            `${questions[currentQuestionIndex].correctAnswer}) ${
+              questions[currentQuestionIndex].options[
+                questions[currentQuestionIndex].correctAnswer.charCodeAt(0) - 65
+              ]
+            }` : undefined
+          }
+          feedback={feedbackData || { status: 'incorrect', message: '' }}
+          studyResources={studyResources}
+          subject={examType}
+          unitNumber={questions[currentQuestionIndex]?.unit || 1}
+        />
+
+      <div className="container mx-auto px-4 py-12">
       {/* Question track outside main container */}
       {!showResults && renderQuestionIndicators()}
       
       {/* Main exam container */}
-      <div className="w-full max-w-4xl mx-auto p-6 border rounded-lg shadow-sm relative">
-        {/* Tools Container - Only show on desktop */}
-        <div className="fixed hidden md:flex left-4 top-1/2 -translate-y-1/2 flex-col gap-4">
-          {!showCalculator && (
-            <button
-              onClick={() => setShowCalculator(true)}
-              className="bg-white p-3 rounded-lg shadow-md border hover:bg-gray-50"
-            >
-              <Calculator className="w-6 h-6" />
-            </button>
-          )}
-        </div>
-
-        {showDrawingPad && (
-          <div className={`fixed ${
-            isLargeDrawingPad ? 'right-8' : 'right-8'
-          } bottom-8 bg-white rounded-lg shadow-md border ${
-            isLargeDrawingPad ? 'w-[600px] h-[400px]' : 'w-[300px] h-[200px]'
-          } z-50`}>
-            <div className="absolute top-2 right-2 left-2 flex justify-between items-center">
-              <div className="flex gap-2">
-                <div className="relative group">
-                  <button
-                    onClick={() => setIsEraser(false)}
-                    className={`p-1 rounded ${!isEraser ? 'bg-blue-100' : 'hover:bg-gray-100'}`}
-                  >
-                    <Pen className="w-4 h-4 fill-current" style={{ color: penColor }} />
-                  </button>
-                  <div className="absolute left-0 top-full mt-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-100">
-                    <div className="pt-2">
-                      <div className="bg-white rounded-lg shadow-lg border p-2 flex flex-col gap-2">
-                        {['#000000', '#FF0000', '#0000FF', '#008000'].map((color) => (
-                          <button
-                            key={color}
-                            onClick={() => {
-                              setPenColor(color);
-                              setIsEraser(false);
-                            }}
-                            className={`w-6 h-6 rounded-full border-2 border-gray-900 hover:ring-2 hover:ring-offset-2 hover:ring-blue-500 ${
-                              penColor === color && !isEraser ? 'ring-2 ring-offset-2 ring-blue-500' : ''
-                            }`}
-                            style={{ backgroundColor: color }}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="relative group">
-                  <button
-                    onClick={() => setIsEraser(true)}
-                    className={`p-1 rounded ${isEraser ? 'bg-blue-100' : 'hover:bg-gray-100'}`}
-                  >
-                    <Eraser className="w-4 h-4" />
-                  </button>
-                  {isEraser && (
-                    <div className="absolute left-0 top-full mt-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-100">
-                      <div className="pt-2">
-                        <div className="bg-white rounded-lg shadow-lg border p-2">
-                          <input
-                            type="range"
-                            min="10"
-                            max="50"
-                            value={eraserSize}
-                            onChange={(e) => setEraserSize(Number(e.target.value))}
-                            className="w-32"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <button
-                  onClick={clearCanvas}
-                  className="p-1 rounded hover:bg-gray-100"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setIsLargeDrawingPad(!isLargeDrawingPad)}
-                  className="p-1 rounded hover:bg-gray-100"
-                >
-                  {isLargeDrawingPad ? (
-                    <Minimize2 className="w-4 h-4" />
-                  ) : (
-                    <Expand className="w-4 h-4" />
-                  )}
-                </button>
-                <button
-                  onClick={() => toggleDrawingPad(false)}
-                  className="p-1 rounded hover:bg-gray-100"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-            <canvas
-              ref={canvasRef}
-              width={isLargeDrawingPad ? 600 : 300}
-              height={isLargeDrawingPad ? 400 : 200}
-              className="bg-white mt-10 touch-none"
-              style={{ cursor: isEraser ? getEraserCursor() : getPenCursor(penColor) }}
-              onMouseDown={startDrawing}
-              onMouseMove={draw}
-              onMouseUp={stopDrawing}
-              onMouseLeave={stopDrawing}
-              onTouchStart={(e) => {
-                e.preventDefault();
-                const touch = e.touches[0];
-                const rect = canvasRef.current?.getBoundingClientRect();
-                if (rect) {
-                  const x = touch.clientX - rect.left;
-                  const y = touch.clientY - rect.top;
-                  setIsDrawing(true);
-                  lastPosRef.current = { x, y };
-                  
-                  // Store the current canvas state
-                  const ctx = canvasRef.current?.getContext('2d');
-                  if (ctx && canvasRef.current) {
-                    setCanvasHistory(ctx.getImageData(0, 0, canvasRef.current!.width, canvasRef.current!.height));
-                  }
-                }
-              }}
-              onTouchMove={(e) => {
-                e.preventDefault();
-                if (!isDrawing || !lastPosRef.current || !canvasRef.current) return;
-                const touch = e.touches[0];
-                const rect = canvasRef.current.getBoundingClientRect();
-                const x = touch.clientX - rect.left;
-                const y = touch.clientY - rect.top;
-                const ctx = canvasRef.current.getContext('2d');
-                if (ctx) {
-                  // Restore previous canvas state if exists
-                  if (canvasHistory) {
-                    ctx.putImageData(canvasHistory, 0, 0);
-                  }
-                  
-                  ctx.beginPath();
-                  ctx.moveTo(lastPosRef.current.x, lastPosRef.current.y);
-                  ctx.lineTo(x, y);
-                  ctx.strokeStyle = isEraser ? '#ffffff' : penColor;
-                  ctx.lineWidth = isEraser ? eraserSize : 2;
-                  ctx.lineCap = 'round';
-                  ctx.stroke();
-                  lastPosRef.current = { x, y };
-                }
-              }}
-              onTouchEnd={(e) => {
-                e.preventDefault();
-                stopDrawing();
-                // Update canvas history with final state
-                const ctx = canvasRef.current?.getContext('2d');
-                if (ctx && canvasRef.current) {
-                  setCanvasHistory(ctx.getImageData(0, 0, canvasRef.current.width, canvasRef.current.height));
-                }
-              }}
-            />
-          </div>
-        )}
-
-        {/* Hide drawing pad on mobile */}
-        {!showDrawingPad && (
-          <button
-            onClick={() => toggleDrawingPad(true)}
-            className="fixed right-8 bottom-8 bg-white p-3 rounded-lg shadow-md border hover:bg-gray-50 md:hidden"
-          >
-            <Pen className="w-6 h-6" />
-          </button>
-        )}
-
-        {showCalculator && (
-          <div className="fixed left-8 top-1/2 -translate-y-1/2 bg-white rounded-lg shadow-md border z-50 min-w-[300px]">
-            <div className="absolute top-2 right-2 left-2 flex justify-end items-center">
-              <button
-                onClick={() => setShowCalculator(false)}
-                className="text-gray-400 hover:text-gray-600 p-2"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Calculator Display */}
-            <div className="p-6 pt-10">
-              <div className="bg-gray-100 p-3 rounded text-right text-2xl font-mono mb-4 h-14 flex items-center justify-end">
-                {getDisplayText()}
-              </div>
-
-              {/* Calculator Buttons */}
-              <div className="grid grid-cols-4 gap-2">
-                <button onClick={handleClear} className="p-4 text-lg bg-gray-200 rounded hover:bg-gray-300">C</button>
-                <button className="p-4 text-lg bg-gray-100 rounded hover:bg-gray-200" onClick={() => handleNumber('(')}>(</button>
-                <button className="p-4 text-lg bg-gray-100 rounded hover:bg-gray-200" onClick={() => handleNumber(')')}>)</button>
-                <button className="p-4 text-lg bg-gray-100 rounded hover:bg-gray-200" onClick={() => handleOperation('÷')}>÷</button>
-
-                {[7, 8, 9].map(num => (
-                  <button
-                    key={num}
-                    onClick={() => handleNumber(num.toString())}
-                    className="p-4 text-lg bg-white rounded hover:bg-gray-100"
-                  >
-                    {num}
-                  </button>
-                ))}
-                <button className="p-4 text-lg bg-gray-100 rounded hover:bg-gray-200" onClick={() => handleOperation('×')}>×</button>
-
-                {[4, 5, 6].map(num => (
-                  <button
-                    key={num}
-                    onClick={() => handleNumber(num.toString())}
-                    className="p-4 text-lg bg-white rounded hover:bg-gray-100"
-                  >
-                    {num}
-                  </button>
-                ))}
-                <button className="p-4 text-lg bg-gray-100 rounded hover:bg-gray-200" onClick={() => handleOperation('-')}>−</button>
-
-                {[1, 2, 3].map(num => (
-                  <button
-                    key={num}
-                    onClick={() => handleNumber(num.toString())}
-                    className="p-4 text-lg bg-white rounded hover:bg-gray-100"
-                  >
-                    {num}
-                  </button>
-                ))}
-                <button className="p-4 text-lg bg-gray-100 rounded hover:bg-gray-200" onClick={() => handleOperation('+')}>+</button>
-
-                <button
-                  onClick={() => handleNumber('0')}
-                  className="p-4 text-lg bg-white rounded hover:bg-gray-100"
-                >
-                  0
-                </button>
-                <button className="p-4 text-lg bg-white rounded hover:bg-gray-100" onClick={handleDecimal}>.</button>
-                <button className="p-4 text-lg bg-blue-500 text-white rounded hover:bg-blue-600 col-span-2" onClick={handleEquals}>=</button>
-              </div>
-            </div>
-          </div>
-        )}
-
+        <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg border border-gray-100 p-8">
         {!showResults ? (
           <>
-            <div className="mb-8 border rounded-lg shadow-sm relative bg-white">
-              {/* Question header with unit and bookmark - fixed at top */}
-              <div className="p-6 border-b">
-                <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-3">
-                      <span className="font-bold text-gray-900">
-                        Question {currentQuestionIndex + 1} of 60
-                      </span>
-                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-semibold">
-                        Unit {questions[currentQuestionIndex].unit}
-                      </span>
+              <div className="mb-8 bg-white rounded-lg shadow-md border border-gray-200 p-6">
+                {/* Question header with unit and bookmark */}
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 sm:gap-0 mb-6">
+                  {/* Left side with question number and unit */}
+                  <div className="flex items-center gap-2">
+                    <span className="px-3 py-1.5 bg-gray-50 text-gray-600 rounded-md text-xs sm:text-sm font-medium">
+                      Question {currentQuestionIndex + 1} of 60
+                    </span>
+                    <span className="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-md text-xs sm:text-sm font-medium">
+                      Unit {questions[currentQuestionIndex].unit}
+                    </span>
+                  </div>
+
+                  {/* Right side with brain and bookmark icons */}
+                  <div className="flex items-center gap-3">
+                    <div className="relative">
+                      <button
+                        className={`p-2 rounded-lg transition-colors bg-blue-500 text-white hover:bg-blue-600 ${
+                          !answers[questions[currentQuestionIndex].id] ? 'cursor-not-allowed opacity-80' : ''
+                        }`}
+                        onClick={(e) => {
+                          if (!answers[questions[currentQuestionIndex].id]) {
+                            e.preventDefault();
+                            setShowTooltip(true);
+                            setTimeout(() => setShowTooltip(false), 3000);
+                            return;
+                          }
+                          handleAITutorClick();
+                        }}
+                        onMouseEnter={() => {
+                          if (!answers[questions[currentQuestionIndex].id]) {
+                            setShowTooltip(true);
+                          }
+                        }}
+                        onMouseLeave={() => setShowTooltip(false)}
+                        disabled={isAILoading}
+                      >
+                        {isAILoading ? (
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <Brain className="w-5 h-5" />
+                        )}
+                      </button>
+                      
+                      {/* Tooltip */}
+                      {showTooltip && !answers[questions[currentQuestionIndex].id] && (
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 px-3 py-2 bg-white text-gray-700 text-sm rounded-lg shadow-lg border border-gray-200">
+                          <div className="relative">
+                            Select an answer to use AI Dojo Feedback
+                            {/* Arrow */}
+                            <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white border-b border-r border-gray-200 rotate-45" />
+                          </div>
+                        </div>
+                      )}
                     </div>
                     <button
                       onClick={() => toggleBookmark(questions[currentQuestionIndex].id)}
-                      className="text-gray-400 hover:text-yellow-500 transition-colors"
+                      className={`p-2 rounded-lg transition-all duration-200 ${
+                        bookmarkedQuestions.has(questions[currentQuestionIndex].id)
+                          ? 'bg-yellow-100 text-yellow-600 hover:bg-yellow-200 shadow-sm'
+                          : 'bg-yellow-50 text-yellow-500 hover:bg-yellow-100'
+                      }`}
                     >
                       {bookmarkedQuestions.has(questions[currentQuestionIndex].id) ? (
-                        <BookmarkX className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+                        <Bookmark className="w-5 h-5 fill-current" />
                       ) : (
                         <Bookmark className="w-5 h-5" />
                       )}
                     </button>
-                </div>
                   </div>
+                </div>
                   
-              {/* Question content with adjusted height and scrolling */}
-              <div className="h-[425px] overflow-y-auto px-6 py-4">
-                  <div className="space-y-4">
-                    <p className="text-lg font-medium">{questions[currentQuestionIndex].question}</p>
+                {/* Question content */}
+                <div className="space-y-6">
+                  <p className="text-lg font-medium font-serif leading-relaxed text-gray-800">
+                    {questions[currentQuestionIndex].question}
+                  </p>
                     
                     {questions[currentQuestionIndex].image && (
                       <div className="my-4">
@@ -848,34 +835,36 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
                       </div>
                     )}
                     
-                  <div className="space-y-3 pb-2">
+                  <div className="space-y-3">
                     {questions[currentQuestionIndex].options.map((option, optIndex) => (
                       <button
                         key={optIndex}
                         onClick={() => handleAnswer(questions[currentQuestionIndex].id, optIndex)}
-                        className={`w-full text-left p-3 md:p-3.5 rounded-md text-sm font-medium transition-all duration-200 border ${
+                        className={`w-full text-left p-4 rounded-lg text-sm font-medium transition-all duration-200 border ${
                           answers[questions[currentQuestionIndex].id] === String.fromCharCode(65 + optIndex)
-                            ? 'bg-blue-50 text-gray-900 border-blue-200 shadow-sm'
-                            : 'bg-gray-50 hover:bg-gray-100 hover:shadow-sm border-transparent'
+                            ? 'bg-blue-50 text-gray-900 border-blue-200 shadow-sm hover:bg-blue-100'
+                            : 'bg-gray-50/50 hover:bg-gray-100 border-transparent hover:border-gray-200 hover:shadow-sm'
                         }`}
                       >
-                        <span className="mr-2">{String.fromCharCode(97 + optIndex)})</span>
-                        {option}
+                        <div className="flex items-center gap-3">
+                          <span className="w-6 h-6 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-600 font-medium">
+                            {String.fromCharCode(97 + optIndex)}
+                          </span>
+                          <span className="flex-1">{option}</span>
+                        </div>
                       </button>
                     ))}
-                  </div>
                     </div>
                   </div>
 
-              {/* Navigation buttons - fixed at bottom */}
-              <div className="p-6 border-t bg-white">
-                <div className="flex md:flex-row flex-col gap-3 md:justify-between md:items-center">
+                {/* Navigation buttons */}
+                <div className="mt-8 flex md:flex-row flex-col gap-3 md:justify-between md:items-center">
                   <div className="flex md:flex-row flex-col gap-2">
                     <Button
                       onClick={goToPreviousQuestion}
                       disabled={currentQuestionIndex === 0}
                       variant="outline"
-                      className="w-full md:w-28"
+                      className="w-full md:w-32 bg-white hover:bg-gray-50 border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-md transition-all duration-200"
                     >
                       Previous
                     </Button>
@@ -883,7 +872,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
                       onClick={goToNextQuestion}
                       disabled={currentQuestionIndex === questions.length - 1}
                       variant="outline"
-                      className="w-full md:w-28"
+                      className="w-full md:w-32 bg-white hover:bg-gray-50 border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-md transition-all duration-200"
                     >
                       Next
                     </Button>
@@ -896,24 +885,18 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
                       Submit
                     </Button>
                   )}
-                </div>
               </div>
             </div>
           </>
         ) : (
           <div className="space-y-8">
-            {/* Results Header */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Exam Results</h2>
-              <div className="flex items-center gap-4">
-                <div className="bg-blue-50 text-blue-800 px-4 py-2 rounded-lg font-semibold text-lg">
-                  Score: {Math.round(calculateScore())}%
-                </div>
-                <div className="text-gray-500">
-                  {questions.filter((q) => answers[q.id] === q.correctAnswer).length} correct out of {questions.length}
-                </div>
-              </div>
-            </div>
+            <AssessmentResultsPanel 
+              totalQuestions={questions.length}
+              correctAnswers={questions.filter((q) => answers[q.id] === q.correctAnswer).length}
+              questions={questions}
+              answers={answers}
+              examType={examType}
+            />
             
             {/* Questions Review */}
             {questions.map((question) => {
@@ -935,7 +918,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
                         {isCorrect ? 'Correct' : 'Incorrect'}
                       </span>
                     </div>
-                    <p className="text-lg font-medium text-gray-900">{question.question}</p>
+                      <p className="text-lg font-medium font-serif leading-relaxed text-gray-900">{question.question}</p>
                     
                     {/* Add image display */}
                     {question.image && (
@@ -1017,6 +1000,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
             })}
           </div>
         )}
+        </div>
       </div>
     </>
   );

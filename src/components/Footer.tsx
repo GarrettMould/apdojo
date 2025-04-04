@@ -1,18 +1,28 @@
 import Image from 'next/image'
+import dojoIcon from "../../public/images/dojoIcon.png"
 import { PageContainer } from '@/components/ui/page-container'
 import { Mail } from 'lucide-react'
 import Link from 'next/link'
 
 export function Footer() {
   return (
-    <footer className="border-t bg-gray-50">
+    <footer className="border-t relative z-50 bg-white">
       <PageContainer>
         {/* Main Row */}
         <div className="pt-12 pb-8 flex flex-col sm:flex-row items-start justify-between gap-12">
           {/* Logo */}
-          <div className="hover:opacity-90 transition-opacity flex items-center">
-            <span className="text-4xl font-extrabold">AP</span>
-            <span className="ml-1.5 text-4xl font-extrabold text-blue-600">Dojo</span>
+          <div className="hover:opacity-90 transition-opacity flex items-center gap-4">
+            <Image 
+              src={dojoIcon}
+              alt="Dojo Icon"
+              width={40}
+              height={40}
+              className="object-contain"
+            />
+            <div className="flex items-center">
+              <span className="text-4xl font-extrabold">AP</span>
+              <span className="ml-1.5 text-4xl font-extrabold text-blue-500">Dojo</span>
+            </div>
           </div>
 
           {/* Menu and Contact */}
@@ -20,17 +30,18 @@ export function Footer() {
             {/* Navigation Links */}
             <div className="flex flex-col gap-3">
               <span className="text-sm font-bold text-gray-900">Menu</span>
-              <Link 
+              {/* Comment out private tutoring link */}
+              {/* <Link 
                 href="/tutoring" 
                 className="text-sm text-gray-500 hover:text-blue-600 transition-colors"
               >
                 Private Tutoring
-              </Link>
+              </Link> */}
               <Link 
-                href="/interactive-tools" 
+                href="/interactive-tools/flashcards" 
                 className="text-sm text-gray-500 hover:text-blue-600 transition-colors"
               >
-                Interactive Tools
+                Flashcards
               </Link>
               <Link 
                 href="/cheat-sheets" 

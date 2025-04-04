@@ -27,14 +27,7 @@ export default function FlashcardsPage() {
     <div className="max-w-4xl mx-auto mt-4 px-4 py-8">
       <div className="max-w-3xl mx-auto px-4">
         <div className="flex items-center justify-between mb-8">
-          <Link 
-            href="/interactive-tools" 
-            className="group inline-flex items-center text-blue-600 hover:text-blue-800"
-          >
-            <ChevronLeft className="w-4 h-4 mr-1 transition-transform group-hover:-translate-x-1" />
-            Return to Interactive Tools
-          </Link>
-
+          
           <Tabs defaultValue={currentSubject} onValueChange={(value) => setCurrentSubject(value as 'macro' | 'micro')}>
             <TabsList className="bg-gray-100 p-1 rounded-md">
               <TabsTrigger 
@@ -53,12 +46,15 @@ export default function FlashcardsPage() {
           </Tabs>
         </div>
 
-        <h1 className="text-4xl text-center font-bold text-gray-900 mt-12 mb-6">
-          AP {subjectTitle} Flashcards
+        <h1 className="text-4xl text-center font-extrabold tracking-tight text-gray-900 mt-12 mb-6">
+          <span className="text-blue-500">AP {subjectTitle}</span> Flashcards
         </h1>
       </div>
       
-      <Flashcards flashcards={flashcardsData} />
+      <Flashcards 
+        key={currentSubject}
+        flashcards={flashcardsData} 
+      />
     </div>
   )
 } 

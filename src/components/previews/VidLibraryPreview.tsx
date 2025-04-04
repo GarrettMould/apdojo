@@ -115,11 +115,12 @@ const VideoCard = ({ title, description, tags, subject, unit, videoUrl, thumbnai
 }
 
 const VideoLibraryPreview = () => {
-  const previewVideos = videos.slice(0, 3)
+  const startIndex = Math.max(0, videos.length - 3);
+  const previewVideos = videos.slice(startIndex);
 
   return (
-    <div className="relative w-screen -ml-[50vw] left-1/2 bg-gray-50 mb-20 mt-20">
-      <div className="w-full py-16 px-4 max-w-7xl mx-auto">
+    <div className="relative w-screen -ml-[50vw] left-1/2 bg-gray-50 -mb-[1px] py-24">
+      <div className="w-full px-4 max-w-7xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-5xl font-extrabold tracking-tight drop-shadow-sm leading-tight mb-4">
             <span className="text-blue-500">Master</span> Tough Topics with Ease

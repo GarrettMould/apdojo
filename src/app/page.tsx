@@ -1,15 +1,17 @@
 'use client'
 
-import { Hero } from "@/components/hero"
-import LiveTestMockup from '@/components/previews/liveTestMockup'
 import VideoLibraryPreview from "@/components/previews/VidLibraryPreview"
+import { QuestionsGrid } from "@/components/questionsGrid"
+import { ExamsPreview } from "../components/previews/examsPreview"
+import { Hero } from "@/components/hero"
 
 export default function Home() {
   return (
     <main>
-      <Hero />
+      <Hero></Hero>
+      <QuestionsGrid></QuestionsGrid>
+      <ExamsPreview></ExamsPreview>
       <VideoLibraryPreview />
-      <LiveTestMockup />
     </main>
   )
 }

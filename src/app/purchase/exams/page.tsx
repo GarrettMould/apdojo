@@ -10,34 +10,29 @@ export default function PurchaseExams() {
   const { user } = useAuthContext();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
-  const [pendingPurchase, setPendingPurchase] = useState<{
+  const [pendingExam, setPendingExam] = useState<{
     examType: 'macro' | 'micro';
     questionType: 'mcq' | 'frq';
     examNumber: string;
   } | null>(null);
 
-  const handlePurchase = async (examType: 'macro' | 'micro', questionType: 'mcq' | 'frq', examNumber: string) => {
+  const handleExamStart = (e: React.MouseEvent, examType: 'macro' | 'micro', questionType: 'mcq' | 'frq', examNumber: string) => {
+    e.preventDefault();
+    
     if (!user) {
-      setPendingPurchase({ examType, questionType, examNumber });
+      setPendingExam({ examType, questionType, examNumber });
       setShowLoginModal(true);
       return;
     }
 
-    try {
-      await redirectToCheckout(examType, questionType, examNumber);
-    } catch (error) {
-      console.error('Error during checkout:', error);
-    }
+    // If user is logged in, proceed to exam
+    window.location.href = `/preview/${examType}/${questionType}/${examNumber}`;
   };
 
   const handleAuthSuccess = () => {
-    if (pendingPurchase) {
-      redirectToCheckout(
-        pendingPurchase.examType,
-        pendingPurchase.questionType,
-        pendingPurchase.examNumber
-      );
-      setPendingPurchase(null);
+    if (pendingExam) {
+      window.location.href = `/preview/${pendingExam.examType}/${pendingExam.questionType}/${pendingExam.examNumber}`;
+      setPendingExam(null);
     }
   };
 
@@ -45,7 +40,10 @@ export default function PurchaseExams() {
     <>
       <LoginModal 
         isOpen={showLoginModal}
-        onClose={() => setShowLoginModal(false)}
+        onClose={() => {
+          setShowLoginModal(false);
+          setPendingExam(null);
+        }}
         switchToSignup={() => {
           setShowLoginModal(false);
           setShowSignupModal(true);
@@ -55,7 +53,10 @@ export default function PurchaseExams() {
 
       <SignupModal
         isOpen={showSignupModal}
-        onClose={() => setShowSignupModal(false)}
+        onClose={() => {
+          setShowSignupModal(false);
+          setPendingExam(null);
+        }}
         switchToLogin={() => {
           setShowSignupModal(false);
           setShowLoginModal(true);
@@ -108,7 +109,8 @@ export default function PurchaseExams() {
                           60 questions • 70 minutes
                         </div>
                         <Link 
-                          href={num === 1 ? `/preview/macro/mcq/${num}` : '#'}
+                          href="#"
+                          onClick={(e) => num === 1 ? handleExamStart(e, 'macro', 'mcq', '1') : null}
                           className={`w-full px-4 py-2 rounded-md font-medium text-sm flex items-center justify-center gap-2 ${
                             num === 1 
                               ? 'bg-blue-600 text-white hover:bg-blue-700 transition-colors' 
@@ -185,7 +187,8 @@ export default function PurchaseExams() {
                         </div>
                         <div className="mt-auto">
                           <Link 
-                            href={num === 1 ? `/preview/macro/frq/${num}` : '#'}
+                            href="#"
+                            onClick={(e) => num === 1 ? handleExamStart(e, 'macro', 'frq', '1') : null}
                             className={`w-full px-4 py-2 rounded-md font-medium text-sm flex items-center justify-center gap-2 ${
                               num === 1 
                                 ? 'bg-blue-600 text-white hover:bg-blue-700 transition-colors' 
@@ -242,7 +245,12 @@ export default function PurchaseExams() {
                             </div>
                             <Link 
                               href="#"
-                              className="w-full px-4 py-2 rounded-md font-medium text-sm flex items-center justify-center gap-2 bg-gray-300 text-gray-500 cursor-not-allowed"
+                              onClick={(e) => num === 1 ? handleExamStart(e, 'micro', 'mcq', '1') : null}
+                              className={`w-full px-4 py-2 rounded-md font-medium text-sm flex items-center justify-center gap-2 ${
+                                num === 1 
+                                  ? 'bg-green-600 text-white hover:bg-green-700 transition-colors' 
+                                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                              }`}
                             >
                               Start Exam
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -315,7 +323,8 @@ export default function PurchaseExams() {
                             </div>
                             <div className="mt-auto">
                               <Link 
-                                href={num === 1 ? `/preview/micro/frq/${num}` : '#'}
+                                href="#"
+                                onClick={(e) => num === 1 ? handleExamStart(e, 'micro', 'frq', '1') : null}
                                 className={`w-full px-4 py-2 rounded-md font-medium text-sm flex items-center justify-center gap-2 ${
                                   num === 1 
                                     ? 'bg-green-600 text-white hover:bg-green-700 transition-colors' 
