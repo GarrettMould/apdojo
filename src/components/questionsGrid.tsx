@@ -10,7 +10,7 @@ import { LoginModal, SignupModal } from '@/components/AuthModals'
 
 // Add these types at the top of the file
 type Unit = {
-  id: string;
+  id: number;
   name: string;
 };
 
@@ -18,7 +18,7 @@ type Unit = {
 type Question = {
   text: string;
   tags: string[];
-  relevantLessons: string[];
+  lessonIDS: string[];
   unit: number;
 };
 
@@ -58,13 +58,13 @@ const FeedbackProgressBar = ({ status }: { status: 'incorrect' | 'partial' | 'co
 const QuestionCard = ({ 
   question, 
   tags, 
-  relevantLessons,
+  lessonIDs,
   unit,
   onSubmit,
 }: { 
   question: string; 
   tags: string[];
-  relevantLessons: string[];
+  lessonIDs: string[];
   unit: number;
   onSubmit: (question: string, answer: string, tags: string[], relevantLessons: string[], unit: number) => void;
 }) => {
@@ -108,7 +108,7 @@ const QuestionCard = ({
       const data = await response.json();
       
       // Call onSubmit which triggers the modal
-    await onSubmit(question, answer, tags, relevantLessons, unit);
+    await onSubmit(question, answer, tags, lessonIDs, unit);
       
       // Only reset the answer and loading state after the modal is shown
       setAnswer('');
@@ -215,25 +215,54 @@ const QuestionCard = ({
 const UnitFilter = ({ 
   units, 
   selectedUnits, 
-  onUnitToggle 
+  onUnitToggle,
+  currentSubject,
+  onClearFilters,
+  onSubjectToggle
 }: { 
   units: Unit[];
-  selectedUnits: string[];
-  onUnitToggle: (unitId: string) => void;
+  selectedUnits: number[];
+  onUnitToggle: (unitId: number) => void;
+  currentSubject: 'macro' | 'micro';
+  onClearFilters: () => void;
+  onSubjectToggle: () => void;
 }) => {
   return (
     <div className="mb-8">
-      {/* Update main heading for mobile */}
+      {/* Header sections remain the same */}
       <h2 className="text-2xl md:text-4xl text-center font-extrabold tracking-wide mb-6 md:mb-10">
-        <span className="text-blue-500 text-4xl md:text-6xl">AP Macro</span><br></br> Comprehension Checks
+        <span className={`text-4xl md:text-6xl block mb-2 ${
+          currentSubject === 'macro' 
+            ? 'text-blue-500' 
+            : 'text-green-500'
+        }`}>
+          AP {currentSubject === 'macro' ? 'Macro' : 'Micro'}
+        </span>
+        <span className="block">
+          Comprehension Checks
+        </span>
       </h2>
+      
+      {/* Update the toggle button here */}
+      <div className="flex justify-center mb-8">
+        <button
+          onClick={() => onSubjectToggle()}
+          className={`px-6 py-2 rounded-md font-medium transition-colors shadow-sm ${
+            currentSubject === 'macro'
+              ? 'bg-blue-500 text-white hover:bg-blue-600'
+              : 'bg-green-500 text-white hover:bg-green-600'
+          }`}
+        >
+          Switch to AP {currentSubject === 'macro' ? 'Micro' : 'Macro'}
+        </button>
+      </div>
 
-      {/* Update filter section spacing */}
+      {/* Filter section continues */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-0 mb-4">
         <h3 className="text-md font-semibold text-gray-900">Filter by Unit</h3>
         {selectedUnits.length > 0 && (
           <button
-            onClick={() => selectedUnits.forEach(id => onUnitToggle(id))}
+            onClick={onClearFilters}
             className="sm:ml-3 px-3 py-1 bg-blue-50 text-blue-600 font-medium rounded-md hover:bg-blue-100 transition-colors"
           >
             Clear filters
@@ -254,20 +283,39 @@ const UnitFilter = ({
             `}
           >
             {unit.name}
-        </button>
+          </button>
         ))}
       </div>
     </div>
   );
 };
 
+// Replace the hardcoded microUnits and macroUnits arrays with this function
+const getUnits = (subject: 'macro' | 'micro'): Unit[] => {
+  const subjectData = subject === 'macro' 
+    ? conceptChecks.macroeconomics 
+    : conceptChecks.microeconomics;
+  
+  return Object.entries(subjectData).map(([unitNumber, unitData]) => ({
+    id: parseInt(unitNumber),
+    name: unitData.title
+  }));
+};
+
 export function QuestionsGrid() {
-  // First, define the helper functions
-  const getAllMacroQuestions = () => {
+  // Add state for current subject
+  const [currentSubject, setCurrentSubject] = useState<'macro' | 'micro'>('macro');
+
+  // Update getAllQuestions to handle both subjects
+  const getAllQuestions = () => {
     const allQuestions: Question[] = [];
     
-    Object.entries(conceptChecks.macroeconomics).forEach(([unitNumber, unitData]) => {
-      const unitTag = `Unit ${unitNumber} - ${unitData.title}`; // Changed format to use hyphen
+    const subjectData = currentSubject === 'macro' 
+      ? conceptChecks.macroeconomics 
+      : conceptChecks.microeconomics;
+    
+    Object.entries(subjectData).forEach(([unitNumber, unitData]) => {
+      const unitTag = `Unit ${unitNumber} - ${unitData.title}`;
       unitData.questions.forEach(question => {
         allQuestions.push({
           ...question,
@@ -280,49 +328,37 @@ export function QuestionsGrid() {
     return allQuestions;
   };
 
+  // Update getRandomQuestions to use the new getAllQuestions function
   const getRandomQuestions = (count: number) => {
-    const allQuestions = getAllMacroQuestions();
+    const allQuestions = getAllQuestions();
     const shuffled = [...allQuestions].sort(() => Math.random() - 0.5);
     return shuffled.slice(0, count);
   };
 
-  // Update the units array in the QuestionsGrid component
-  const units: Unit[] = [
-    { id: 'unit1', name: 'Basic Economic Concepts' },
-    { id: 'unit2', name: 'Economic Indicators and International Trade' },
-    { id: 'unit3', name: 'National Income and Price Determination' },
-    { id: 'unit4', name: 'Financial Sector' },
-    { id: 'unit5', name: 'Long-Run Consequences of Stabilization Policies' },
-    { id: 'unit6', name: 'Open Economy—International Trade and Finance' },
-  ];
+  // Replace the hardcoded units arrays and selection with this:
+  const units = getUnits(currentSubject);
 
   // Add state for selected units
-  const [selectedUnits, setSelectedUnits] = useState<string[]>([]);
+  const [selectedUnits, setSelectedUnits] = useState<number[]>([]);
 
   // Add toggle function for units
-  const handleUnitToggle = (unitId: string) => {
-    setSelectedUnits(prev => 
-      prev.includes(unitId)
+  const handleUnitToggle = (unitId: number) => {
+    setSelectedUnits(prev => {
+      const newSelectedUnits = prev.includes(unitId)
         ? prev.filter(id => id !== unitId)
-        : [...prev, unitId]
-    );
+        : [...prev, unitId];
+      return newSelectedUnits;
+    });
   };
 
-  // Update the filtering logic to use unit numbers and shuffle filtered results
+  // Update getFilteredQuestions to handle numeric units consistently
   const getFilteredQuestions = () => {
-    const allQuestions = getAllMacroQuestions();
+    const allQuestions = getAllQuestions();
     if (selectedUnits.length === 0) return allQuestions;
     
-    // First filter the questions
-    const filteredQuestions = allQuestions.filter(question => 
-      selectedUnits.some(unitId => {
-        const selectedUnitNumber = parseInt(unitId.replace('unit', ''));
-        return question.unit === selectedUnitNumber;
-      })
+    return allQuestions.filter(question => 
+      selectedUnits.includes(question.unit)  // Both are now numbers, so direct comparison works
     );
-    
-    // Then shuffle the filtered questions
-    return filteredQuestions.sort(() => Math.random() - 0.5);
   };
 
   // Add state for visible questions count
@@ -331,12 +367,11 @@ export function QuestionsGrid() {
   // Update your randomQuestions state to get more initially but show less
   const [questions, setQuestions] = useState(() => getRandomQuestions(12));
 
-  // Update effect to maintain full question set but respect visible count
+  // Add useEffect to update questions whenever selectedUnits changes
   useEffect(() => {
     const filteredQuestions = getFilteredQuestions();
     setQuestions(filteredQuestions);
-    setVisibleCount(3); // Reset to show only 3 when filters change
-  }, [selectedUnits]);
+  }, [selectedUnits, currentSubject]);  // Also depend on currentSubject
 
   // Add load more function
   const handleLoadMore = () => {
@@ -442,62 +477,79 @@ export function QuestionsGrid() {
     }));
   };
 
+  // Add a clear filters function
+  const handleClearFilters = () => {
+    setSelectedUnits([]);
+    // Update questions when filters are cleared
+    const allQuestions = getAllQuestions();
+    setQuestions(allQuestions);
+  };
+
+  // Update the subject toggle handler
+  const handleSubjectToggle = () => {
+    setCurrentSubject(prev => prev === 'macro' ? 'micro' : 'macro');
+    setSelectedUnits([]); // Clear filters
+    setVisibleCount(3); // Reset visible count
+  };
+
   return (
     <div className="py-12 md:py-24 w-screen bg-gray-50" style={{ marginLeft: 'calc(-50vw + 50%)', marginRight: 'calc(-50vw + 50%)' }}>
       <div className="container mx-auto px-4 md:px-0">
-      {/* Combined Questions Container */}
         <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg border border-gray-100 p-4 md:p-8">
-        {/* Filter section */}
-        <UnitFilter 
-          units={units}
-          selectedUnits={selectedUnits}
-          onUnitToggle={handleUnitToggle}
-        />
-        
-        {/* Questions Grid */}
-        <div className="space-y-4">
-          {questions.length > 0 ? (
-              <>
-                {questions.slice(0, visibleCount).map((question, index) => (
-            <QuestionCard 
-                key={index}
-              question={question.text}
-              tags={question.tags}
-              relevantLessons={question.relevantLessons}
-              unit={question.unit}
-              onSubmit={handleSubmitAnswer}
-              />
-                ))}
-                
-                {/* Load More Button */}
-                {visibleCount < questions.length && (
-                  <div className="flex justify-center mt-12">
-                    <button
-                      onClick={handleLoadMore}
-                      className="mt-6 px-6 py-3 bg-white text-blue-600 font-medium border border-blue-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-all duration-200"
-                    >
-                      Load More Questions
-                    </button>
-                  </div>
-                )}
-              </>
-          ) : (
-            <div className="text-center py-12">
-              <p className="text-gray-500 text-lg">
-                No questions found for the selected filters.
-              </p>
-              <button
-                onClick={() => setSelectedUnits([])}
-                className="mt-4 text-blue-500 hover:text-blue-600 font-medium"
-              >
-                Clear filters
-              </button>
-            </div>
-          )}
+          {/* Pass currentSubject and the toggle handler to UnitFilter */}
+          <UnitFilter 
+            units={units}
+            selectedUnits={selectedUnits}
+            onUnitToggle={handleUnitToggle}
+            currentSubject={currentSubject}
+            onClearFilters={handleClearFilters}
+            onSubjectToggle={handleSubjectToggle}
+          />
+          
+          {/* Questions Grid */}
+          <div className="space-y-4">
+            {questions.length > 0 ? (
+                <>
+                  {questions.slice(0, visibleCount).map((question, index) => (
+              <QuestionCard 
+                  key={index}
+                question={question.text}
+                tags={question.tags}
+                lessonIDs={question.lessonIDS}
+                unit={question.unit}
+                  onSubmit={handleSubmitAnswer}
+                />
+                  ))}
+                  
+                  {/* Load More Button */}
+                  {visibleCount < questions.length && (
+                    <div className="flex justify-center mt-12">
+                      <button
+                        onClick={handleLoadMore}
+                        className="mt-6 px-6 py-3 bg-white text-blue-600 font-medium border border-blue-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-all duration-200"
+                      >
+                        Load More Questions
+                      </button>
+                    </div>
+                  )}
+                </>
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-gray-500 text-lg">
+                  No questions found for the selected filters.
+                </p>
+                <button
+                  onClick={() => setSelectedUnits([])}
+                  className="mt-4 text-blue-500 hover:text-blue-600 font-medium"
+                >
+                  Clear filters
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* Feedback Modal */}
+        {/* Feedback Modal */}
         <FeedbackModal 
           isOpen={!!activeQuestion && !!feedback}
           onClose={() => {
@@ -508,8 +560,8 @@ export function QuestionsGrid() {
           selectedAnswer={activeQuestion?.answer}
           feedback={feedback || { status: 'incorrect', message: '' }}
           unit={activeQuestion?.unit || 1}
-                        />
-                      </div>
+        />
+      </div>
     </div>
   );
 }

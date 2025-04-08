@@ -245,9 +245,9 @@ export default function PurchaseExams() {
                             </div>
                             <Link 
                               href="#"
-                              onClick={(e) => num === 1 ? handleExamStart(e, 'micro', 'mcq', '1') : null}
+                              onClick={(e) => num === 0 ? handleExamStart(e, 'micro', 'mcq', '1') : null}
                               className={`w-full px-4 py-2 rounded-md font-medium text-sm flex items-center justify-center gap-2 ${
-                                num === 1 
+                                num === 0 
                                   ? 'bg-green-600 text-white hover:bg-green-700 transition-colors' 
                                   : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                               }`}

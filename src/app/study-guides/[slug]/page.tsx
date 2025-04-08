@@ -4,85 +4,105 @@ import { useParams } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
-const guides = {
-  'macro-1': {
+type GuideType = {
+  title: string;
+  pdfUrl: string;
+  subject: string;
+  unitNumber: number;
+  slug: string;
+};
+
+const guides: Record<string, GuideType> = {
+  'AP-macroeconomics-unit-1': {
     title: "Basic Economic Concepts",
     pdfUrl: "/cheat-sheets/macro/AP_Dojo_Macro_U1.pdf",
     subject: "Macroeconomics",
-    unitNumber: 1
+    unitNumber: 1,
+    slug: 'AP-macroeconomics-unit-1'
   },
-  'macro-2': {
+  'AP-macroeconomics-unit-2': {
     title: "Economic Indicators and the Business Cycle",
     pdfUrl: "/cheat-sheets/macro/AP_Dojo_Macro_U2.pdf",
     subject: "Macroeconomics",
-    unitNumber: 2
+    unitNumber: 2,
+    slug: 'AP-macroeconomics-unit-2'
   },
-  'macro-3': {
+  'AP-macroeconomics-unit-3': {
     title: "National Income and Price Determination",
     pdfUrl: "/cheat-sheets/macro/AP_Dojo_Macro_U3.pdf",
     subject: "Macroeconomics",
-    unitNumber: 3
+    unitNumber: 3,
+    slug: 'AP-macroeconomics-unit-3'
   },
-  'macro-4': {
+  'AP-macroeconomics-unit-4': {
     title: "Financial Sector",
     pdfUrl: "/cheat-sheets/macro/AP_Dojo_Macro_U4.pdf",
     subject: "Macroeconomics",
-    unitNumber: 4
+    unitNumber: 4,
+    slug: 'AP-macroeconomics-unit-4'
   },
-  'macro-5': {
+  'AP-macroeconomics-unit-5': {
     title: "Long-Run Consequences of Stabilization Policies",
     pdfUrl: "/cheat-sheets/macro/AP_Dojo_Macro_U5.pdf",
     subject: "Macroeconomics",
-    unitNumber: 5
+    unitNumber: 5,
+    slug: 'AP-macroeconomics-unit-5'
   },
-  'macro-6': {
+  'AP-macroeconomics-unit-6': {
     title: "Open Economy—International Trade and Finance",
     pdfUrl: "/cheat-sheets/macro/AP_Dojo_Macro_U6.pdf",
     subject: "Macroeconomics",
-    unitNumber: 6
+    unitNumber: 6,
+    slug: 'AP-macroeconomics-unit-6'
   },
-  'micro-1': {
+  'AP-microeconomics-unit-1': {
     title: "Basic Economic Concepts",
     pdfUrl: "/cheat-sheets/micro/AP_Dojo_Micro_U1.pdf",
     subject: "Microeconomics",
-    unitNumber: 1
+    unitNumber: 1,
+    slug: 'AP-microeconomics-unit-1'
   },
-  'micro-2': {
+  'AP-microeconomics-unit-2': {
     title: "Supply and Demand",
     pdfUrl: "/cheat-sheets/micro/AP_Dojo_Micro_U2.pdf",
     subject: "Microeconomics",
-    unitNumber: 2
+    unitNumber: 2,
+    slug: 'AP-microeconomics-unit-2'
   },
-  'micro-3': {
+  'AP-microeconomics-unit-3': {
     title: "Production, Cost, and the Perfect Competition Model",
     pdfUrl: "/cheat-sheets/micro/AP_Dojo_Micro_U3.pdf",
     subject: "Microeconomics",
-    unitNumber: 3
+    unitNumber: 3,
+    slug: 'AP-microeconomics-unit-3'
   },
-  'micro-4': {
+  'AP-microeconomics-unit-4': {
     title: "Imperfect Competition",
     pdfUrl: "/cheat-sheets/micro/AP_Dojo_Micro_U4.pdf",
     subject: "Microeconomics",
-    unitNumber: 4
+    unitNumber: 4,
+    slug: 'AP-microeconomics-unit-4'
   },
-  'micro-5': {
+  'AP-microeconomics-unit-5': {
     title: "Factor Markets",
     pdfUrl: "/cheat-sheets/micro/AP_Dojo_Micro_U5.pdf",
     subject: "Microeconomics",
-    unitNumber: 5
+    unitNumber: 5,
+    slug: 'AP-microeconomics-unit-5'
   },
-  'micro-6': {
+  'AP-microeconomics-unit-6': {
     title: "Market Failure and the Role of Government",
     pdfUrl: "/cheat-sheets/micro/AP_Dojo_Micro_U6.pdf",
     subject: "Microeconomics",
-    unitNumber: 6
+    unitNumber: 6,
+    slug: 'AP-microeconomics-unit-6'
   }
 };
 
 export default function StudyGuidePage() {
   const params = useParams();
-  const guideId = params.unit as string;
-  const guide = guides[guideId as keyof typeof guides];
+  const slug = params.slug as string;
+  const guide = guides[slug];
 
   if (!guide) {
     return (

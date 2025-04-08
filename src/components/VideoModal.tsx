@@ -1,7 +1,8 @@
 'use client';
-
+import dojoIcon from "../../public/images/dojoIcon.png"
 import { useState, useRef, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, Check } from 'lucide-react';
+import Image from 'next/image';
 
 type Question = {
   id: string;
@@ -81,15 +82,24 @@ export const VideoModal = ({ videoUrl, questions, onClose }: VideoModalProps) =>
           <div className="sticky top-0 bg-white p-4 md:p-6 border-b z-10">
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 md:top-6 md:right-6 text-gray-900 hover:text-gray-600 transition-colors"
+              className="absolute top-4 md:top-6 right-4 md:right-6 text-gray-900 hover:text-gray-600 transition-colors"
             >
               <X className="w-7 h-7" />
             </button>
             
             <div>
-              <h3 className="font-extrabold text-xl md:text-2xl mb-1">
-                AP <span className="text-blue-500">Dojo</span>
-              </h3>
+              <div className="flex items-center gap-4 mb-1">
+                <Image 
+                  src={dojoIcon}
+                  alt="Dojo Icon"
+                  width={32}
+                  height={32}
+                  className="object-contain"
+                />
+                <h3 className="font-extrabold text-xl md:text-2xl">
+                  AP <span className="text-blue-500">Dojo</span>
+                </h3>
+              </div>
               <h4 className="font-bold text-lg md:text-xl">
                 Comprehension Check
               </h4>
@@ -125,19 +135,30 @@ export const VideoModal = ({ videoUrl, questions, onClose }: VideoModalProps) =>
                         key={index}
                         onClick={() => handleAnswerSelect(question.id, index)}
                         disabled={isSubmitted}
-                        className={`w-full text-left p-3 md:p-3.5 rounded-md text-sm font-medium transition-all duration-200 border ${
+                        className={`w-full text-left p-3.5 rounded-md text-sm font-medium transition-all duration-200 border ${
                           isSubmitted
                             ? index === question.correctAnswer
-                              ? 'bg-green-100 text-gray-900 shadow-sm border-transparent'
-                              : index === submittedAnswers[question.id]
-                                ? 'bg-red-100 text-gray-900 shadow-sm border-transparent'
+                              ? 'bg-blue-50 text-gray-900 shadow-sm border-blue-200'
+                              : index === selectedAnswers[question.id]
+                                ? 'bg-gray-100 text-gray-900 shadow-sm border-gray-200'
                                 : 'bg-gray-50 text-gray-900 border-transparent'
                             : selectedAnswers[question.id] === index
                               ? 'bg-blue-50 text-gray-900 border-blue-200 shadow-sm'
                               : 'bg-gray-50 hover:bg-gray-100 hover:shadow-sm border-transparent'
                         }`}
                       >
-                        {option}
+                        <div className="flex items-center gap-3">
+                          <span className="flex-1 min-w-0 break-words pr-2">{option}</span>
+                          <div className="flex-shrink-0">
+                            {isSubmitted && (
+                              index === question.correctAnswer 
+                                ? <Check className="w-5 h-5 text-blue-500" /> 
+                                : index === selectedAnswers[question.id] 
+                                  ? <X className="w-5 h-5 text-gray-400" />
+                                  : null
+                            )}
+                          </div>
+                        </div>
                       </button>
                     ))}
                   </div>

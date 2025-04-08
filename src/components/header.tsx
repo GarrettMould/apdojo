@@ -131,6 +131,12 @@ export function Header() {
             >
               Practice Exams
             </Link>
+            {/*<Link 
+              href="/quizMeTester"
+              className="hover:text-blue-700 transition-colors font-bold text-sm"
+            >
+              Quiz.Me
+            </Link>*/}
             {user ? (
               <div className="flex items-center space-x-8">
                 {/* Comment out profile icon/link */}
@@ -202,13 +208,43 @@ export function Header() {
               >
                 Cheat Sheets
               </Link>
-              <Link 
+              {/*<Link 
                 href="/purchase/exams"
                 onClick={() => setIsMenuOpen(false)}
                 className="block px-4 py-2 hover:bg-gray-100 font-bold text-sm"
               >
                 Practice Exams
-              </Link>
+              </Link>*/}
+              {!user ? (
+                <div className="border-t mt-2 pt-2">
+                  <Link
+                    href="/login"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="block px-4 py-2 hover:bg-gray-100 font-bold text-sm text-blue-600 mb-3"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href="/signup"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="inline-block px-6 py-2 hover:bg-blue-700 font-bold text-sm bg-blue-600 text-white rounded-md ml-4"
+                  >
+                    Sign Up
+                  </Link>
+                </div>
+              ) : (
+                <div className="border-t mt-2 pt-2">
+                  <button
+                    onClick={() => {
+                      logout();
+                      setIsMenuOpen(false);
+                    }}
+                    className="block w-full text-left px-4 py-2 hover:bg-gray-100 font-bold text-sm text-blue-600"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

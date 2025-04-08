@@ -22,8 +22,12 @@ export function Hero() {
 
   return (
     <section className="text-center max-w-3xl mx-auto relative py-12 md:py-24 px-4 md:px-0" id="hero-section">
-      <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tight leading-[1.2] text-gray-900">
-        Crush your <span className="text-blue-500">AP Econ Exam</span> with Smarter Study Tools
+      <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tight text-gray-900 leading-[1.3] whitespace-pre-line">
+        {`Crush your`}
+        <span className="text-blue-500">{`
+        AP Econ Exam`}</span>
+        {`
+        with Smarter Study Tools`}
       </h1>
       <p className="text-base sm:text-lg md:text-xl text-gray-600 mt-4 md:mt-6 font-medium">
         Access all the resources you need to ace your AP economics exam, including{' '}

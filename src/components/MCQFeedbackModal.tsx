@@ -1,5 +1,5 @@
 import { Check, X } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface MCQFeedbackModalProps {
   isOpen: boolean;
@@ -31,6 +31,8 @@ export function MCQFeedbackModal({
   subject,
   unitNumber
 }: MCQFeedbackModalProps) {
+  const [currentSubject, setCurrentSubject] = useState<'micro' | 'macro'>(subject);
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -44,7 +46,11 @@ export function MCQFeedbackModal({
   }, [isOpen]);
 
   const getStudyGuideLink = () => {
-    return `/study-guides/${subject.toLowerCase()}-${unitNumber}`;
+    return `/study-guides/${currentSubject.toLowerCase()}-${unitNumber}`;
+  };
+
+  const toggleSubject = () => {
+    setCurrentSubject(prev => prev === 'micro' ? 'macro' : 'micro');
   };
 
   if (!isOpen) return null;
@@ -130,7 +136,7 @@ export function MCQFeedbackModal({
               </div>
               <div className="p-4 bg-white">
                 <ul className="space-y-3">
-                  {/* Study Guide Link - Always First */}
+                  {/* Study Guide Link */}
                   <li className="flex items-center gap-3 text-sm">
                     <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
                       <svg
@@ -157,25 +163,9 @@ export function MCQFeedbackModal({
                       Unit {unitNumber} Study Guide
                     </a>
                   </li>
-
-                  {/* Existing Study Resources */}
-                  {studyResources.map((resource, index) => (
-                    <li key={index} className="flex items-center gap-3 text-sm">
-                      <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
-                        {/* Keep existing resource icons */}
-                      </div>
-                      <a 
-                        href={resource.link} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="text-blue-600 hover:text-blue-800 font-medium"
-                      >
-                        {resource.title}
-                      </a>
-                    </li>
-                  ))}
                 </ul>
               </div>
+
             </div>
 
             {/* Close button */}

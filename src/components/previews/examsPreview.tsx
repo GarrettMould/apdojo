@@ -1,10 +1,65 @@
 'use client';
 
 import { Brain, Bookmark, Check, X } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
 import underline from "../../../public/images/underline.svg"
 import Link from 'next/link';
 
+// Custom hook for intersection observer
+const useInView = (options = {}) => {
+  const [isInView, setIsInView] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      setIsInView(entry.isIntersecting);
+    }, options);
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => {
+      if (ref.current) {
+        observer.unobserve(ref.current);
+      }
+    };
+  }, [options]);
+
+  return [ref, isInView] as const;
+};
+
 export function ExamsPreview() {
+  const [containerRef, isInView] = useInView({ threshold: 0.3 });
+  const [animationState, setAnimationState] = useState<'initial' | 'clicked' | 'loading' | 'feedback'>('initial');
+  
+  // Reset animation when component leaves viewport
+  useEffect(() => {
+    if (!isInView) {
+      setAnimationState('initial');
+    }
+  }, [isInView]);
+
+  // Start animation sequence when component comes into view
+  useEffect(() => {
+    if (isInView) {
+      // Brain icon click
+      setTimeout(() => {
+        setAnimationState('clicked');
+      }, 1000);
+
+      // Show loading state
+      setTimeout(() => {
+        setAnimationState('loading');
+      }, 2000);
+
+      // Show feedback
+      setTimeout(() => {
+        setAnimationState('feedback');
+      }, 3500);
+    }
+  }, [isInView]);
+
   // Sample question data
   const sampleQuestion = {
     question: "If the Federal Reserve increases the money supply, which of the following is most likely to occur in the short run?",
@@ -23,7 +78,7 @@ export function ExamsPreview() {
   };
 
   return (
-    <div className="w-full py-12 md:py-24">
+    <div className="w-full py-12 md:py-24" ref={containerRef}>
       <div className="w-full">
         <div className="max-w-[1400px] mx-auto px-4">
           {/* Update headline for mobile */}
@@ -51,8 +106,18 @@ export function ExamsPreview() {
                       </span>
                     </div>
                     <div className="flex items-center gap-2 ml-2">
-                      <div className="p-1.5 md:p-2 rounded-lg bg-blue-500 text-white">
-                        <Brain className="w-4 h-4 md:w-5 md:h-5" />
+                      <div 
+                        className={`p-1.5 md:p-2 rounded-lg transition-all duration-300 ${
+                          animationState === 'clicked' || animationState === 'loading'
+                            ? 'bg-blue-600 scale-95'
+                            : 'bg-blue-500 hover:scale-105'
+                        }`}
+                      >
+                        {animationState === 'loading' ? (
+                          <div className="w-4 h-4 md:w-5 md:h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <Brain className="w-4 h-4 md:w-5 md:h-5 text-white" />
+                        )}
                       </div>
                       <div className="p-1.5 md:p-2 rounded-lg bg-yellow-50 text-yellow-500">
                         <Bookmark className="w-4 h-4 md:w-5 md:h-5" />
@@ -91,7 +156,11 @@ export function ExamsPreview() {
             </div>
 
             {/* AI Feedback Preview (Right side) */}
-            <div className="xl:w-1/3">
+            <div className={`xl:w-1/3 transition-all duration-500 ${
+              animationState === 'feedback' 
+                ? 'opacity-100 translate-x-0' 
+                : 'opacity-0 translate-x-8'
+            }`}>
               <div className="w-full bg-white rounded-lg shadow-xl border border-gray-100 h-auto md:h-[520px]">
                 <div className="p-4 md:p-6">
                   <div className="flex flex-col space-y-3 md:space-y-4">
