@@ -7,6 +7,9 @@ import ReactMarkdown from 'react-markdown'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { FeedbackModal } from './FeedbackModal'
 import { LoginModal, SignupModal } from '@/components/AuthModals'
+import { db } from '@/lib/firebase'
+import { doc, setDoc, getDoc, collection, query, where, getDocs, orderBy } from 'firebase/firestore'
+import { testPerformanceService, TestPerformance } from '@/services/testPerformance'
 
 // Add these types at the top of the file
 type Unit = {
@@ -303,7 +306,7 @@ const getUnits = (subject: 'macro' | 'micro'): Unit[] => {
 };
 
 export function QuestionsGrid() {
-  // Add state for current subject
+  const { user } = useAuthContext();
   const [currentSubject, setCurrentSubject] = useState<'macro' | 'micro'>('macro');
 
   // Update getAllQuestions to handle both subjects
@@ -397,11 +400,12 @@ export function QuestionsGrid() {
       answer, 
       tags, 
       relevantLessons,
-      unit  // directly use the unit passed from the question
+      unit
     });
     setFeedback(null);
 
     try {
+      const startTime = Date.now();
       const response = await fetch('/api/check-answer', {
         method: 'POST',
         headers: {
@@ -419,6 +423,7 @@ export function QuestionsGrid() {
       }
 
       const data = await response.json();
+      const timeSpent = Date.now() - startTime;
       
       let status: 'incorrect' | 'partial' | 'correct';
       const feedbackLower = data.feedback.toLowerCase();
@@ -439,6 +444,37 @@ export function QuestionsGrid() {
         status,
         message: data.feedback
       });
+
+      // Save performance data if user is logged in
+      if (user) {
+        const isCorrect = status === 'correct';
+        const performanceData: TestPerformance = {
+          userId: user.uid,
+          examType: currentSubject,
+          examNumber: '1', // You might want to make this dynamic
+          timestamp: Date.now(),
+          totalQuestions: 1,
+          correctAnswers: isCorrect ? 1 : 0,
+          timeSpent,
+          unitPerformance: {
+            [unit.toString()]: {
+              total: 1,
+              correct: isCorrect ? 1 : 0,
+              percentage: isCorrect ? 100 : 0
+            }
+          },
+          questionDetails: {
+            [question]: {
+              userAnswer: answer,
+              isCorrect,
+              timeSpent,
+              unitNumber: unit
+            }
+          }
+        };
+
+        await testPerformanceService.saveTestPerformance(performanceData);
+      }
     } catch (error) {
       console.error('Error:', error);
       setFeedback({

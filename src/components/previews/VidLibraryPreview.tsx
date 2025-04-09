@@ -4,11 +4,11 @@ import { useState } from 'react'
 import { VideoModal } from '@/components/VideoModal'
 import Link from 'next/link'
 
-const VideoCard = ({ title, description, tags, subject, unit, videoUrl, thumbnail, questions }: {
+const VideoCard = ({ title, description, tags, subjects, unit, videoUrl, thumbnail, questions }: {
   title: string;
   description: string;
   tags: string[];
-  subject: string;
+  subjects: string[];
   unit: string;
   videoUrl: string;
   thumbnail?: string;
@@ -16,9 +16,11 @@ const VideoCard = ({ title, description, tags, subject, unit, videoUrl, thumbnai
 }) => {
   const [showVideo, setShowVideo] = useState(false);
 
-  // Updated helper function to include AP
-  const getShortSubject = (subject: string) => {
-    return subject.toLowerCase().includes('macro') ? 'AP Macro' : 'AP Micro';
+  // Updated helper function to handle array and include AP
+  const getShortSubject = (subjects: string[]) => {
+    // Use the first subject by default
+    const primarySubject = subjects[0];
+    return primarySubject.toLowerCase().includes('macro') ? 'AP Macro' : 'AP Micro';
   };
 
   return (
@@ -68,7 +70,7 @@ const VideoCard = ({ title, description, tags, subject, unit, videoUrl, thumbnai
           {/* Subject + Unit tag with AP included */}
           <div className="mb-3">
             <span className="inline-flex px-2.5 py-1 rounded-md text-sm font-medium bg-gray-100 text-gray-600">
-              {getShortSubject(subject)} • Unit {unit}
+              {getShortSubject(subjects)} • Unit {unit}
             </span>
           </div>
 
@@ -90,7 +92,7 @@ const VideoCard = ({ title, description, tags, subject, unit, videoUrl, thumbnai
               <span 
                 key={index} 
                 className={`px-2 py-1 rounded-md text-xs font-medium whitespace-nowrap ${
-                  subject.toLowerCase().includes('macro')
+                  subjects[0].toLowerCase().includes('macro')
                     ? 'bg-blue-100 text-blue-600'
                     : 'bg-green-100 text-green-600'
                 }`}
@@ -134,7 +136,7 @@ const VideoLibraryPreview = () => {
                 title={video.title}
                 description={video.description}
                 tags={video.tags}
-                subject={video.subject}
+                subjects={video.subjects}
                 unit={video.unit}
                 videoUrl={video.videoUrl}
                 thumbnail={video.thumbnail}
@@ -151,17 +153,12 @@ const VideoLibraryPreview = () => {
           >
             Full AP Macro Video Library
           </Link>
-          <div className="relative">
-            <button
-              disabled
-              className="px-8 py-4 bg-white text-gray-400 border-2 border-gray-300 rounded-lg font-semibold cursor-not-allowed"
-            >
-              Full AP Micro Video Library
-            </button>
-            <div className="absolute -top-3 -right-3 bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-bold">
-              Coming Soon
-            </div>
-          </div>
+          <Link
+            href="/videos/micro"
+            className="px-8 py-4 bg-green-500 text-white rounded-lg font-semibold hover:bg-green-600 transition-colors shadow-sm"
+          >
+            Full AP Micro Video Library
+          </Link>
         </div>
       </div>
     </div>

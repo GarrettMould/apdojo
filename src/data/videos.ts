@@ -10,7 +10,7 @@ export type Video = {
   id: string;
   title: string;
   description: string;
-  subject: string;
+  subjects: string[];
   unit: string;
   videoUrl: string;
   thumbnail?: string;
@@ -24,7 +24,7 @@ export const videos: Video[] = [
       id: "1",
       title: "Fiscal Policy & Long-Run Self-Adjustment",
       description: "Learn about how an economy returns to long-run equilibrium from an output gap.",
-      subject: "AP Macroeconomics",
+      subjects: ["AP Macroeconomics"],
       unit: "3",
       tags: ["Fiscal Policy", "Long-Run Self-Adjustment"],
       videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/fiscalpolicylrsa.mp4",
@@ -55,7 +55,7 @@ export const videos: Video[] = [
       id: "2",
       title: "Open Market Operations",
       description: "Learn how buying and selling government bonds actually leads to changes in the money supply.",
-      subject: "AP Macroeconomics",
+      subjects: ["AP Macroeconomics"],
       unit: "4",
       tags: ["Open Market Operations", "Monetary Policy"],
       videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/openmarketoperations.mp4",
@@ -86,7 +86,7 @@ export const videos: Video[] = [
         id: "3",
         title: "Shifters in the Foreign Exchange Market",
         description: "Learn how to conceptually understand the shifts in the foreign exchange market.",
-        subject: "AP Macroeconomics", 
+        subjects: ["AP Macroeconomics"],
         unit: "6",
         tags: ["Forex Market", "Interest Rates"],
         videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/forex.mp4",
@@ -117,7 +117,7 @@ export const videos: Video[] = [
         id: "4",
         title: "The Crowding Out Effect",
         description: "Learn how government borrowing can lead to a decrease in private investment.",
-        subject: "AP Macroeconomics", 
+        subjects: ["AP Macroeconomics"],
         unit: "5",
         tags: ["Crowding Out", "Interest Rates", "Investment"],
         videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/crowding+out+effect.mp4",
@@ -148,7 +148,7 @@ export const videos: Video[] = [
         id: "5",
         title: "Policy Action and Currency Value",
         description: "Learn how fiscal and monetary policy actions can lead to changes in the value of a currency.",
-        subject: "AP Macroeconomics", 
+        subjects: ["AP Macroeconomics"],
         unit: "6",
         tags: ["Forex Market", "Fiscal Policy", "Monetary Policy"],
         videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/policy+action+and+currency+Value.mp4",
@@ -179,7 +179,7 @@ export const videos: Video[] = [
         id: "6",
         title: "Phillips Curve and AD-AS Graph (AD Shifts)",
         description: "Learn about the connection between the Phillips Curve and the AD-AS graph",
-        subject: "AP Macroeconomics", 
+        subjects: ["AP Macroeconomics"],
         unit: "5",
         tags: ["Phillips Curve", "AD-AS", "Monetary Policy", "Fiscal Policy"],
         videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/phillips+curve+ad+as+ad+shift.mp4",
@@ -210,7 +210,7 @@ export const videos: Video[] = [
         id: "7",
         title: "Phillips Curve and AD-AS Graph (SRAS Shifts)",
         description: "Learn about the connection between the Phillips Curve and the AD-AS graph",
-        subject: "AP Macroeconomics", 
+        subjects: ["AP Macroeconomics"],
         unit: "5",
         tags: ["Phillips Curve", "AD-AS", "Monetary Policy", "Fiscal Policy"],
         videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/phillips+curve+ad+as+sras+shift.mp4",
@@ -241,7 +241,7 @@ export const videos: Video[] = [
         id: "8",
         title: "It's All Connected: The Business Cycle Graph, The AD-AS Model, and the PPC",
         description: "Learn about the connection between the business cycles graph, the AS-AS graph, the a country's PPC",
-        subject: "AP Macroeconomics", 
+        subjects: ["AP Macroeconomics"],
         unit: "2",
         tags: ["Business Cycles", "AD-AS", "PPC"],
         videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/its+all+connected.mp4",
@@ -277,7 +277,7 @@ export const videos: Video[] = [
         id: "9",
         title: "Comparative Advantage: Output Questions",
         description: "Learn how to identify and solve output comparative advantage questions",
-        subject: "AP Macroeconomics", 
+        subjects: ["AP Macroeconomics", "AP Microeconomics"],
         unit: "1",
         tags: ["Comparative Advantage", "Opportunity Cost"],
         videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/comp+adv+output.mp4",
@@ -310,7 +310,7 @@ export const videos: Video[] = [
         id: "10",
         title: "Comparative Advantage: Input Questions",
         description: "Learn how to identify and solve input comparative advantage questions",
-        subject: "AP Macroeconomics", 
+        subjects: ["AP Macroeconomics", "AP Microeconomics"],
         unit: "1",
         tags: ["Comparative Advantage", "Opportunity Cost"],
         videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/comp+adv+inpt.mp4",
@@ -343,7 +343,7 @@ export const videos: Video[] = [
         id: "11",
         title: "Nominal vs. Real GDP",
         description: "Understand the key difference between nominal and real GDP",
-        subject: "AP Macroeconomics", 
+        subjects: ["AP Macroeconomics"],
         unit: "2",
         tags: ["GDP", "Inflation"],
         videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/ngdp+and+rgdp.mp4",
@@ -380,6 +380,90 @@ export const videos: Video[] = [
             correctAnswer: 3
           }
         ],
-      }
+      }, 
+      {
+        id: "12",
+        title: "Marginal Costs and Average Costs",
+        description: "Steph Curry helps us understand the relationship between marginal costs and average costs",
+        subjects: ["AP Microeconomics"],
+        unit: "3",
+        tags: ["Marginal Costs", "Short-Run Production"],
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/marginal+and+average.mp4",
+        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/TN_marginal_average_costs.jpg",
+        accessLevel: "free",
+        questions: [
+          {
+            id: "1",
+            text: "When a firm produces 10 units of output, its marginal cost is $45 and its average total cost is $49. Which of the following is true?",
+            options: [
+              "If the firm reduces output to 9 units, ATC will increase",
+              "If the firm reduces output to 9 units, AFC will increase.",
+              "If the firm increases output to 11 units, MC will remain constant.",
+              "If the firm increases output to 11 units, marginal revenue will increase."
+            ],
+            correctAnswer: 0
+          },
+          {
+            id: "2",
+            text: "Why does marginal cost (MC) intersect average total cost (ATC) at its lowest point?",
+            options: [
+              "Because MC increases as output increases.",
+              "Because ATC is always greater than MC.",
+              "Because when MC is below ATC, it pulls the average down, and when it`s above, it pulls the average up.",
+              "Because when MC is below ATC, it pulls the average up, and when it`s above, it pulls the average down."
+            ],
+            correctAnswer: 2
+          },
+          {
+            id: "3",
+            text: "A firm's average total cost (ATC) at 20 units is $12. If the marginal cost (MC) of the 21st unit is less than $12, what will happen to ATC?",
+            options: ["It will increase", "It will decrease", "It will remain constant", "It depends on the fixed costs"],
+            correctAnswer: 3
+          }
+        ],
+      }, 
+      {
+        id: "13",
+        title: "Marginal Product and Marginal Costs",
+        description: "Understand the relationship between the MP curve and the MC curve",
+        subjects: ["AP Microeconomics"],
+        unit: "3",
+        tags: ["Specialization", "Diminishing Returns"],
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/marginalproductmarginalcost.mp4",
+        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/TN_marginal_product_marginal_costs.jpg",
+        accessLevel: "free",
+        questions: [
+          {
+            id: "1",
+            text: "Which of the following best explains the relationship between Marginal Product (MP) and Marginal Cost (MC)?",
+            options: [
+              "When MP increases, MC increases",
+              "When MP decreases, MC stays constant",
+              "When MP increases, MC decreases",
+              "There is no relationship between MP and MC"
+            ],
+            correctAnswer: 2
+          },
+          {
+            id: "2",
+            text: "Suppose a worker adds 4 units of output to total product. The wage paid to the worker is $40. Is labor is the only variable cost, what is the marginal cost (MC) of each unit produced by this worker?",
+            options: [
+              "$10",
+              "$4",
+              "$16",
+              "$40"
+            ],
+            correctAnswer: 0
+          },
+          {
+            id: "3",
+            text: "Assuming labor is the only variable cost, at what point do marginal costs begin to increase?  ",
+            image: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/video13Q3.png",
+            options: ["At the 2nd worker", "At the 3rd worker", "At the 5th worker", "At the 6th worker"],
+            correctAnswer: 1
+          }
+        ],
+      }, 
+      
   ];
   

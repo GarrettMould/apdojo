@@ -5,6 +5,7 @@ import { videos, Video } from '@/data/videos';
 import { Play } from 'lucide-react';
 import { VideoModal } from '@/components/VideoModal';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface FullVideoLibraryProps {
   subject: 'AP Macroeconomics' | 'AP Microeconomics';
@@ -12,9 +13,10 @@ interface FullVideoLibraryProps {
 
 export function FullVideoLibrary({ subject }: FullVideoLibraryProps) {
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
+  const router = useRouter();
   
-  // Filter videos by subject
-  const subjectVideos = videos.filter(video => video.subject === subject);
+  // Filter videos by subject (check if subjects array includes the current subject)
+  const subjectVideos = videos.filter(video => video.subjects.includes(subject));
 
   // Group videos by unit and filter out empty units
   const videosByUnit = Array.from({ length: 6 }, (_, i) => i + 1)
@@ -23,6 +25,23 @@ export function FullVideoLibrary({ subject }: FullVideoLibraryProps) {
       videos: subjectVideos.filter(video => Number(video.unit) === unitNum)
     }))
     .filter(({ videos }) => videos.length > 0); // Only keep units with videos
+    
+  // Helper to determine the opposite subject for the toggle button
+  const getOppositeSubject = () => {
+    return subject === 'AP Macroeconomics' ? 'AP Microeconomics' : 'AP Macroeconomics';
+  };
+  
+  // Handle the subject toggle
+  const handleToggleSubject = () => {
+    const newPath = subject === 'AP Macroeconomics' ? '/videos/micro' : '/videos/macro';
+    router.push(newPath);
+  };
+  
+  // Determine color classes based on subject
+  const subjectColor = subject.includes('Macro') ? 'text-blue-500' : 'text-green-500';
+  const buttonColorOutline = subject.includes('Macro') 
+    ? 'border-green-500 text-green-500 hover:bg-green-50' 
+    : 'border-blue-500 text-blue-500 hover:bg-blue-50';
 
   return (
     <>
@@ -31,23 +50,18 @@ export function FullVideoLibrary({ subject }: FullVideoLibraryProps) {
         <div className="mb-12 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-             <span className='text-blue-500'>{subject}</span> Video Library
+             <span className={subjectColor}>{subject}</span> Video Library
             </h1>
             <p className="mt-4 text-lg text-gray-600">
               Watch comprehensive video lessons organized by unit
             </p>
           </div>
-          <div className="relative">
-            <button
-              disabled
-              className="px-4 py-2 text-sm font-bold text-gray-400 bg-transparent border-2 border-gray-300 rounded-md cursor-not-allowed"
-            >
-              Switch to AP Micro
-            </button>
-            <div className="absolute -top-3 -right-3 bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-bold">
-              Coming Soon
-            </div>
-          </div>
+          <button
+            onClick={handleToggleSubject}
+            className={`px-4 py-2 text-sm font-bold bg-transparent border-2 rounded-md transition-colors ${buttonColorOutline}`}
+          >
+            Switch to {getOppositeSubject().replace('AP ', '')}
+          </button>
         </div>
 
         {/* Videos by Unit */}
