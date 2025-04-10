@@ -2,14 +2,15 @@
 
 import { conceptChecks } from '@/data/conceptChecks'
 import { ArrowRight, X, ChevronRight, ClipboardCheck } from 'lucide-react'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { FeedbackModal } from './FeedbackModal'
 import { LoginModal, SignupModal } from '@/components/AuthModals'
-import { db } from '@/lib/firebase'
-import { doc, setDoc, getDoc, collection, query, where, getDocs, orderBy } from 'firebase/firestore'
+// import { db } from '@/lib/firebase'
+// import { doc, setDoc, getDoc, collection, query, where, getDocs, orderBy } from 'firebase/firestore'
 import { testPerformanceService, TestPerformance } from '@/services/testPerformance'
+import React from 'react'
 
 // Add these types at the top of the file
 type Unit = {
@@ -58,7 +59,7 @@ const FeedbackProgressBar = ({ status }: { status: 'incorrect' | 'partial' | 'co
 };
 
 // Move QuestionCard outside of QuestionsGrid
-const QuestionCard = ({ 
+const QuestionCard = React.memo(({ 
   question, 
   tags, 
   lessonIDs,
@@ -212,7 +213,7 @@ const QuestionCard = ({
       />
     </div>
   );
-};
+});
 
 // Add this new component
 const UnitFilter = ({ 
@@ -374,7 +375,7 @@ export function QuestionsGrid() {
   useEffect(() => {
     const filteredQuestions = getFilteredQuestions();
     setQuestions(filteredQuestions);
-  }, [selectedUnits, currentSubject]);  // Also depend on currentSubject
+  }, [selectedUnits, currentSubject]);  // Ensure only necessary dependencies are included
 
   // Add load more function
   const handleLoadMore = () => {
@@ -394,7 +395,7 @@ export function QuestionsGrid() {
     message: string;
   } | null>(null);
 
-  const handleSubmitAnswer = async (question: string, answer: string, tags: string[], relevantLessons: string[], unit: number) => {
+  const handleSubmitAnswer = useCallback(async (question: string, answer: string, tags: string[], relevantLessons: string[], unit: number) => {
     setActiveQuestion({ 
       question, 
       answer, 
@@ -473,7 +474,7 @@ export function QuestionsGrid() {
           }
         };
 
-        await testPerformanceService.saveTestPerformance(performanceData);
+        // await testPerformanceService.saveTestPerformance(performanceData);
       }
     } catch (error) {
       console.error('Error:', error);
@@ -482,7 +483,7 @@ export function QuestionsGrid() {
         message: 'Sorry, there was an error checking your answer. Please try again.'
       });
     }
-  };
+  }, [user, currentSubject]);
 
   // Add useEffect for handling body scroll
   useEffect(() => {
@@ -527,6 +528,10 @@ export function QuestionsGrid() {
     setSelectedUnits([]); // Clear filters
     setVisibleCount(3); // Reset visible count
   };
+
+  const filteredQuestions = useMemo(() => getFilteredQuestions(), [selectedUnits, currentSubject]);
+
+  console.log('QuestionsGrid re-rendered');
 
   return (
     <div className="py-12 md:py-24 w-screen bg-gray-50" style={{ marginLeft: 'calc(-50vw + 50%)', marginRight: 'calc(-50vw + 50%)' }}>
