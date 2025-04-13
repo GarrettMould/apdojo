@@ -6,10 +6,18 @@ import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { LoginModal, SignupModal } from '@/components/AuthModals';
 import { useRouter } from 'next/navigation';
+import AP_Macro_Graphs from "../../../public/cheat-sheets/macro/AP_Dojo_Macro_Graphs_TN.png"
 
 type Unit = {
   number: number;
   title: string;
+  pdfUrl: string;
+  subject: 'macro' | 'micro';
+}
+
+type FeaturedSheet = {
+  title: string;
+  description: string;
   pdfUrl: string;
   subject: 'macro' | 'micro';
 }
@@ -31,6 +39,13 @@ const microUnits: Unit[] = [
   { number: 5, title: "Factor Markets", pdfUrl: "/cheat-sheets/micro/AP_Dojo_Micro_U5.pdf", subject: 'micro' },
   { number: 6, title: "Market Failure and the Role of Government", pdfUrl: "/cheat-sheets/micro/AP_Dojo_Micro_U6.pdf", subject: 'micro' },
 ];
+
+const featuredSheet: FeaturedSheet = {
+  title: "AP Macroeconomics Graph Bank",
+  description: "",
+  pdfUrl: "/cheat-sheets/macro/AP_Dojo_Macro_Graphs.pdf",
+  subject: 'macro'
+};
 
 export default function CheatSheetsPage() {
   const { user } = useAuthContext();
@@ -94,30 +109,6 @@ export default function CheatSheetsPage() {
         These Unit Cheat Sheets cover key terms, formulas, and graphs needed to master your AP economics exam.
       </p>
 
-      {/* PDF Preview Modal */}
-      {selectedPdf && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg w-full max-w-5xl h-[90vh] flex flex-col">
-            <div className="flex justify-between items-center p-4 border-b">
-              <h3 className="font-bold text-lg">Cheat Sheet Preview</h3>
-              <button 
-                onClick={() => setSelectedPdf(null)}
-                className="p-2 hover:bg-gray-100 rounded-lg"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="flex-1 w-full h-full">
-              <iframe
-                src={`${selectedPdf}#view=FitH`}
-                className="w-full h-full"
-                title="PDF Preview"
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Macro Section */}
       <div className="mb-16">
         <h2 className="text-2xl font-extrabold text-gray-900 mb-6">
@@ -157,7 +148,62 @@ export default function CheatSheetsPage() {
             </div>
           ))}
         </div>
+        
+        {/* Featured Graph Bank - Full Width */}
+        <div className="mt-8 bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+          <div className="p-6">
+            <h3 className="text-2xl font-extrabold text-gray-900 mb-3">
+              {featuredSheet.title}
+            </h3>
+            <div className="space-y-6">
+              {/* Thumbnail Preview */}
+              <div className="aspect-[1.414/1] bg-gray-50 rounded-lg overflow-hidden shadow-md">
+                <img
+                  src={AP_Macro_Graphs.src}
+                  alt="Graph Bank Preview"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              
+              {/* Actions - Only Download Button */}
+              <button
+                onClick={() => handleAction('download', {
+                  ...featuredSheet,
+                  number: 0
+                })}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+              >
+                <Download className="w-5 h-5" strokeWidth={2.5} />
+                <span className="font-semibold">Download PDF</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
+
+      {/* PDF Preview Modal */}
+      {selectedPdf && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg w-full max-w-5xl h-[90vh] flex flex-col">
+            <div className="flex justify-between items-center p-4 border-b">
+              <h3 className="font-bold text-lg">Cheat Sheet Preview</h3>
+              <button 
+                onClick={() => setSelectedPdf(null)}
+                className="p-2 hover:bg-gray-100 rounded-lg"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="flex-1 w-full h-full">
+              <iframe
+                src={`${selectedPdf}#view=FitH`}
+                className="w-full h-full"
+                title="PDF Preview"
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Micro Section */}
       <div>
