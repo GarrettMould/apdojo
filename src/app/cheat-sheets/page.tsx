@@ -43,7 +43,7 @@ const microUnits: Unit[] = [
 const featuredSheet: FeaturedSheet = {
   title: "AP Macroeconomics Graph Bank",
   description: "",
-  pdfUrl: "/cheat-sheets/macro/AP_Dojo_Macro_Graphs.pdf",
+  pdfUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/AP_Dojo_Macro_Graphs.pdf",
   subject: 'macro'
 };
 
