@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     
     // Case 1: AI Tutor for MCQ
     if (body.type === 'ai_tutor' && body.questionType === 'mcq') {
-      prompt = `As an AP Economics tutor, provide a brief, focused explanation for this multiple choice question. Keep explanations concise and AP-style (1-2 sentences per section).
+      prompt = `As an AP Economics tutor, provide a focused, direct explanation for this multiple choice question. Be concise and AP-style (1-2 sentences).
 
 Question: ${body.question}
 
@@ -34,11 +34,10 @@ Correct Answer: ${body.correctAnswer}
 
 Unit ${body.unit}: ${body.unitName}
 
-Please provide a concise explanation in this format:
+Provide a direct explanation without introductory phrases. Start immediately with the explanation. For example, instead of "The correct answer is C because..." or "This is correct because...", just state the explanation directly.
 
-<br><br>
-
-(1-2 sentences explaining why the correct answer is right)`
+Example format:
+"Explanation: [direct explanation without introductory phrases]"`
 
 
     // Case 2: AI Tutor for FRQ

@@ -131,12 +131,20 @@ export function Header() {
             >
               Practice Exams
             </Link>
-            {/*<Link 
+            {/* Commenting out Quiz.Me link
+            <Link 
               href="/quizMeTester"
               className="hover:text-blue-700 transition-colors font-bold text-sm"
             >
               Quiz.Me
-            </Link>*/}
+            </Link>
+            */}
+            <Link 
+              href="/unitMCQPracticePage"
+              className="hover:text-blue-700 transition-colors font-bold text-sm"
+            >
+              Unit MCQs
+            </Link>
             {user ? (
               <div className="flex items-center space-x-8">
                 {/* Comment out profile icon/link */}
@@ -208,13 +216,29 @@ export function Header() {
               >
                 Cheat Sheets
               </Link>
-              {/*<Link 
+              <Link 
                 href="/purchase/exams"
                 onClick={() => setIsMenuOpen(false)}
                 className="block px-4 py-2 hover:bg-gray-100 font-bold text-sm"
               >
                 Practice Exams
-              </Link>*/}
+              </Link>
+              {/* Commenting out Quiz.Me link
+              <Link 
+                href="/quizMeTester"
+                onClick={() => setIsMenuOpen(false)}
+                className="block px-4 py-2 hover:bg-gray-100 font-bold text-sm"
+              >
+                Quiz.Me
+              </Link>
+              */}
+              <Link 
+                href="/unitMCQPracticePage"
+                onClick={() => setIsMenuOpen(false)}
+                className="block px-4 py-2 hover:bg-gray-100 font-bold text-sm"
+              >
+                Unit MCQs
+              </Link>
               {!user ? (
                 <div className="border-t mt-2 pt-2">
                   <Link

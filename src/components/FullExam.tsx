@@ -3,13 +3,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Question, QuestionBank } from '@/data/questionBanks/types';
 import { Button } from "@/components/ui/button";
-import { Bookmark, BookmarkX, X, Clock, Maximize2, Minimize2, Calculator, Pen, Eraser, Expand, Trash2, Circle, CircleDot, Check, Lock, Brain } from 'lucide-react';
+import { Bookmark, BookmarkX, X, Clock, Maximize2, Minimize2, Calculator, Pen, Eraser, Expand, Trash2, Circle, CircleDot, Check, Lock, Brain, FileText, ChevronLeft, ChevronRight, Triangle } from 'lucide-react';
 import { StaticImageData } from 'next/image';
 import { redirectToCheckout } from '@/lib/stripe';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { LoginModal, SignupModal } from './AuthModals';
 import { MCQFeedbackModal } from './MCQFeedbackModal';
 import { AssessmentResultsPanel } from './AssessmentResultsPanel';
+import { videos } from '@/data/videos';
 
 interface FullExamProps {
   questionBank: QuestionBank;
@@ -125,8 +126,27 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
 
-  // Update the track size constant
-  const QUESTIONS_PER_TRACK = 15;  // This divides evenly into 60
+  // Update the track size constant to be responsive
+  const getQuestionsPerTrack = () => {
+    if (typeof window === 'undefined') return 20; // Default for SSR
+    
+    const width = window.innerWidth;
+    if (width < 768) return 8;    // Mobile
+    if (width < 1024) return 12;  // Tablet
+    return 20;                    // Desktop
+  };
+
+  const [questionsPerTrack, setQuestionsPerTrack] = useState(getQuestionsPerTrack());
+
+  // Add effect to update questions per track on resize
+  useEffect(() => {
+    const handleResize = () => {
+      setQuestionsPerTrack(getQuestionsPerTrack());
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Add these new states
   const [expression, setExpression] = useState<string[]>([]);
@@ -147,6 +167,32 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
 
   // First, add a new state for loading
   const [isAILoading, setIsAILoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Add state for video modal
+  const [showVideoModal, setShowVideoModal] = useState(false);
+
+  // Add state for video loading
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+
+  // Add state for video loading
+  const [isVideoLoading, setIsVideoLoading] = useState(false);
+
+  // Add effect to control body scrolling when the video modal is open
+  useEffect(() => {
+    if (showVideoModal) {
+      // Disable scrolling
+      document.body.style.overflow = 'hidden';
+    } else {
+      // Enable scrolling
+      document.body.style.overflow = '';
+    }
+
+    // Cleanup function to reset the overflow style when the component unmounts or the modal closes
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [showVideoModal]);
 
   const handleAnswer = (questionId: number, answerIndex: number) => {
     setAnswers({
@@ -406,7 +452,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
   // Update currentQuestionIndex to also handle track pagination
   const setCurrentQuestionIndexWithTrack = (index: number) => {
     setCurrentQuestionIndex(index);
-    setCurrentTrackPage(Math.floor(index / QUESTIONS_PER_TRACK));
+    setCurrentTrackPage(Math.floor(index / questionsPerTrack));
   };
 
   // Modify navigation functions to update track
@@ -424,9 +470,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
 
   // Modify the question track rendering for mobile
   const renderQuestionIndicators = () => {
-    const startIndex = currentTrackPage * QUESTIONS_PER_TRACK;
-    const endIndex = Math.min(startIndex + QUESTIONS_PER_TRACK, questions.length);
-    const totalPages = Math.ceil(questions.length / QUESTIONS_PER_TRACK);
+    const startIndex = currentTrackPage * questionsPerTrack;
+    const endIndex = Math.min(startIndex + questionsPerTrack, questions.length);
+    const totalPages = Math.ceil(questions.length / questionsPerTrack);
 
     return (
       <div className="w-full max-w-4xl mx-auto mb-8">
@@ -480,18 +526,18 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
                 }}
                 className={`
                   flex min-w-[32px] h-[32px] items-center justify-center rounded-lg
-                  transition-all duration-200 ease-in-out text-sm font-medium mr-4
+                  transition-all duration-200 ease-in-out text-sm font-medium mr-2
                   ${currentTrackPage === 0
                     ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
                     : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200 cursor-pointer hover:scale-105'
                   }
                 `}
               >
-                ←
+                <Triangle className="w-4 h-4 text-blue-600 -rotate-90" />
               </div>
 
-              <div className="flex-1 flex justify-between">
-                {Array.from({ length: QUESTIONS_PER_TRACK }, (_, i) => {
+              <div className="flex-1 flex flex-wrap justify-center gap-1.5">
+                {Array.from({ length: questionsPerTrack }, (_, i) => {
                   const questionIndex = startIndex + i;
                   if (questionIndex >= questions.length) return null;
                   const question = questions[questionIndex];
@@ -501,13 +547,13 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
                     <div
                       key={questionIndex}
                       className={`
-                        min-w-[32px] h-[32px] flex items-center justify-center rounded-lg 
+                        min-w-[28px] h-[28px] flex items-center justify-center rounded-lg 
                         transition-all duration-200 ease-in-out text-sm font-medium
                         ${questionIndex === currentQuestionIndex 
-                          ? 'bg-blue-500 text-white shadow-sm scale-105' 
+                          ? 'border-2 border-blue-500 bg-blue-50 text-blue-900 shadow-sm scale-105' 
                           : completedQuestions.has(questions[questionIndex]?.id)
-                          ? 'bg-blue-200 text-blue-900 border border-blue-300'
-                          : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'}
+                            ? 'border-2 border-blue-400 text-blue-900'
+                            : 'border-2 border-gray-200 text-gray-700 hover:bg-gray-50'}
                         ${isBookmarked ? 'border-2 border-yellow-300/70' : ''}
                         hover:scale-105 cursor-pointer
                       `}
@@ -527,14 +573,14 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
                 }}
                 className={`
                   flex min-w-[32px] h-[32px] items-center justify-center rounded-lg
-                  transition-all duration-200 ease-in-out text-sm font-medium ml-4
+                  transition-all duration-200 ease-in-out text-sm font-medium ml-2
                   ${currentTrackPage >= totalPages - 1
                     ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
                     : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200 cursor-pointer hover:scale-105'
                   }
                 `}
               >
-                →
+                <Triangle className="w-4 h-4 text-blue-600 rotate-90" />
               </div>
             </div>
           </div>
@@ -645,24 +691,28 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
     }
   };
 
-  // Sample study resources (you can modify these based on your needs)
+  const getRelatedVideos = (lessonIds: string[], examType: 'macro' | 'micro') => {
+    const subjectName = examType === 'macro' ? 'AP Macroeconomics' : 'AP Microeconomics';
+    return videos.filter(video => 
+      video.lessonIDS.some(id => lessonIds.includes(id)) && video.subjects.includes(subjectName)
+    );
+  };
+
+  const currentQuestion = questions[currentQuestionIndex];
+  const relatedVideos = getRelatedVideos(currentQuestion.lessonIDS, examType);
+
+  const subjectFullName = examType === 'macro' ? 'macroeconomics' : 'microeconomics';
+
   const studyResources = [
     {
-      title: 'Video: Understanding Aggregate Demand',
-      type: 'video' as const,
-      link: '#'
-    },
-    {
-      title: 'Note Sheet: Government Spending Effects',
+      title: `Cheat Sheet: Unit ${currentQuestion.unit} - ${currentQuestion.unitName} `,
       type: 'notes' as const,
-      link: '#'
-    },
-    {
-      title: 'Practice Problems: Fiscal Policy',
-      type: 'practice' as const,
-      link: '#'
+      link: `/study-guides/AP-${subjectFullName}-unit-${currentQuestion.unit}`,
     }
   ];
+
+  const startIndex = currentTrackPage * questionsPerTrack;
+  const totalPages = Math.ceil(questions.length / questionsPerTrack);
 
   return (
     <>
@@ -710,6 +760,42 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
         </div>
       )}
 
+      {/* Video Modal */}
+      {showVideoModal && relatedVideos.length > 0 && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+          onClick={() => setShowVideoModal(false)}
+        >
+          <div className="relative max-w-4xl max-h-[90vh] bg-white p-4 rounded-lg">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowVideoModal(false);
+              }}
+              className="absolute top-2 right-2 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 z-10"
+              style={{ margin: '8px' }}
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <video 
+              controls 
+              className="w-full"
+              onLoadedData={() => {
+                setIsVideoLoaded(true);
+                setIsVideoLoading(false); // Stop loading spinner
+              }}
+              onError={() => {
+                console.error('Error loading video');
+                setIsVideoLoading(false); // Stop loading spinner
+              }}
+            >
+              <source src={relatedVideos[0].videoUrl} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </div>
+      )}
+
       {/* Replace the existing feedback modal with the new component */}
               <MCQFeedbackModal 
           isOpen={showFeedbackModal}
@@ -735,98 +821,96 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
           unitNumber={questions[currentQuestionIndex]?.unit || 1}
         />
 
-      <div className="container mx-auto px-4 py-12">
-      {/* Question track outside main container */}
-      {!showResults && renderQuestionIndicators()}
-      
-      {/* Main exam container */}
-        <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg border border-gray-100 p-8">
+      <div className="container mx-auto px-4 py-12 max-w-[2800px]">
         {!showResults ? (
           <>
-              <div className="mb-8 bg-white rounded-lg shadow-md border border-gray-200 p-6">
-                {/* Question header with unit and bookmark */}
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 sm:gap-0 mb-6">
-                  {/* Left side with question number and unit */}
-                  <div className="flex items-center gap-2">
-                    <span className="px-3 py-1.5 bg-gray-50 text-gray-600 rounded-md text-xs sm:text-sm font-medium">
-                      Question {currentQuestionIndex + 1} of 60
-                    </span>
-                    <span className="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-md text-xs sm:text-sm font-medium">
-                      Unit {questions[currentQuestionIndex].unit}
-                    </span>
-                  </div>
+            {/* Question grid */}
+            <div className="mb-8 bg-white rounded-lg shadow-md border border-gray-200 p-8">
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => {
+                    if (currentTrackPage > 0) {
+                      setCurrentTrackPage(currentTrackPage - 1);
+                    }
+                  }}
+                  className={`
+                    flex min-w-[32px] h-[32px] items-center justify-center rounded-lg
+                    transition-all duration-200 ease-in-out text-sm font-medium
+                    ${currentTrackPage === 0
+                      ? 'border-2 border-gray-200 text-gray-400 cursor-not-allowed'
+                      : 'bg-blue-500 text-white hover:bg-blue-600 cursor-pointer hover:scale-105'
+                    }
+                  `}
+                >
+                  <Triangle className="w-4 h-4 -rotate-90" />
+                </button>
 
-                  {/* Right side with brain and bookmark icons */}
-                  <div className="flex items-center gap-3">
-                    <div className="relative">
-                      <button
-                        className={`p-2 rounded-lg transition-colors bg-blue-500 text-white hover:bg-blue-600 ${
-                          !answers[questions[currentQuestionIndex].id] ? 'cursor-not-allowed opacity-80' : ''
-                        }`}
-                        onClick={(e) => {
-                          if (!answers[questions[currentQuestionIndex].id]) {
-                            e.preventDefault();
-                            setShowTooltip(true);
-                            setTimeout(() => setShowTooltip(false), 3000);
-                            return;
-                          }
-                          handleAITutorClick();
-                        }}
-                        onMouseEnter={() => {
-                          if (!answers[questions[currentQuestionIndex].id]) {
-                            setShowTooltip(true);
-                          }
-                        }}
-                        onMouseLeave={() => setShowTooltip(false)}
-                        disabled={isAILoading}
+                <div className="flex-1 flex justify-between gap-2">
+                  {Array.from({ length: questionsPerTrack }, (_, i) => {
+                    const questionIndex = startIndex + i;
+                    if (questionIndex >= questions.length) return null;
+                    const question = questions[questionIndex];
+                    const isBookmarked = question && bookmarkedQuestions.has(question.id);
+                    
+                    return (
+                      <div
+                        key={questionIndex}
+                        className={`
+                          min-w-[32px] h-[32px] flex items-center justify-center rounded-lg 
+                          transition-all duration-200 ease-in-out text-sm font-medium
+                          ${questionIndex === currentQuestionIndex 
+                            ? 'border-2 border-blue-500 bg-blue-50 text-blue-900 shadow-sm scale-105' 
+                            : completedQuestions.has(questions[questionIndex]?.id)
+                              ? 'border-2 border-blue-400 text-blue-900'
+                              : 'border-2 border-gray-200 text-gray-700 hover:bg-gray-50'}
+                          ${isBookmarked ? 'border-2 border-yellow-300/70' : ''}
+                          hover:scale-105 cursor-pointer
+                        `}
+                        onClick={() => setCurrentQuestionIndexWithTrack(questionIndex)}
                       >
-                        {isAILoading ? (
-                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        ) : (
-                          <Brain className="w-5 h-5" />
-                        )}
-                      </button>
-                      
-                      {/* Tooltip */}
-                      {showTooltip && !answers[questions[currentQuestionIndex].id] && (
-                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 px-3 py-2 bg-white text-gray-700 text-sm rounded-lg shadow-lg border border-gray-200">
-                          <div className="relative">
-                            Select an answer to use AI Dojo Feedback
-                            {/* Arrow */}
-                            <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white border-b border-r border-gray-200 rotate-45" />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                    <button
-                      onClick={() => toggleBookmark(questions[currentQuestionIndex].id)}
-                      className={`p-2 rounded-lg transition-all duration-200 ${
-                        bookmarkedQuestions.has(questions[currentQuestionIndex].id)
-                          ? 'bg-yellow-100 text-yellow-600 hover:bg-yellow-200 shadow-sm'
-                          : 'bg-yellow-50 text-yellow-500 hover:bg-yellow-100'
-                      }`}
-                    >
-                      {bookmarkedQuestions.has(questions[currentQuestionIndex].id) ? (
-                        <Bookmark className="w-5 h-5 fill-current" />
-                      ) : (
-                        <Bookmark className="w-5 h-5" />
-                      )}
-                    </button>
-                  </div>
+                        {questionIndex + 1}
+                      </div>
+                    );
+                  })}
                 </div>
-                  
-                {/* Question content */}
-                <div className="space-y-6">
-                  <p className="text-lg font-medium font-serif leading-relaxed text-gray-800">
-                    {questions[currentQuestionIndex].question}
-                  </p>
+
+                <button
+                  onClick={() => {
+                    if (currentTrackPage < totalPages - 1) {
+                      setCurrentTrackPage(currentTrackPage + 1);
+                    }
+                  }}
+                  className={`
+                    flex min-w-[32px] h-[32px] items-center justify-center rounded-lg
+                    transition-all duration-200 ease-in-out text-sm font-medium
+                    ${currentTrackPage >= totalPages - 1
+                      ? 'border-2 border-gray-200 text-gray-400 cursor-not-allowed'
+                      : 'bg-blue-500 text-white hover:bg-blue-600 cursor-pointer hover:scale-105'
+                    }
+                  `}
+                >
+                  <Triangle className="w-4 h-4 rotate-90" />
+                </button>
+              </div>
+            </div>
+          
+            {/* Main exam container */}
+            <div className="flex flex-col lg:flex-row gap-6">
+              {/* Question container (75% width) */}
+              <div className="w-full lg:w-3/4">
+                <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-4 lg:p-8">
+                  {/* Question content */}
+                  <div className="space-y-6 px-8">
+                    <p className="text-lg font-medium font-serif leading-relaxed text-gray-800">
+                      {questions[currentQuestionIndex].question}
+                    </p>
                     
                     {questions[currentQuestionIndex].image && (
                       <div className="my-4">
                         <img 
                           src={questions[currentQuestionIndex].image.src}
                           alt="Question"
-                        className="max-h-[225px] object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
+                          className="max-h-[225px] object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
                           onClick={() => {
                             setSelectedImage(questions[currentQuestionIndex].image);
                             setShowImageModal(true);
@@ -835,56 +919,138 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
                       </div>
                     )}
                     
-                  <div className="space-y-3">
-                    {questions[currentQuestionIndex].options.map((option, optIndex) => (
-                      <button
-                        key={optIndex}
-                        onClick={() => handleAnswer(questions[currentQuestionIndex].id, optIndex)}
-                        className={`w-full text-left p-4 rounded-lg text-sm font-medium transition-all duration-200 border ${
-                          answers[questions[currentQuestionIndex].id] === String.fromCharCode(65 + optIndex)
-                            ? 'bg-blue-50 text-gray-900 border-blue-200 shadow-sm hover:bg-blue-100'
-                            : 'bg-gray-50/50 hover:bg-gray-100 border-transparent hover:border-gray-200 hover:shadow-sm'
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className="w-6 h-6 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-600 font-medium">
-                            {String.fromCharCode(97 + optIndex)}
-                          </span>
-                          <span className="flex-1">{option}</span>
-                        </div>
-                      </button>
-                    ))}
+                    {/* Answer Options */}
+                    <div className="space-y-4">
+                      {questions[currentQuestionIndex].options.map((option, optIndex) => (
+                        <button
+                          key={optIndex}
+                          onClick={() => handleAnswer(questions[currentQuestionIndex].id, optIndex)}
+                          className={`w-full text-left p-4 rounded-lg text-sm font-medium transition-all duration-200 border ${
+                            answers[questions[currentQuestionIndex].id]
+                              ? optIndex === (answers[questions[currentQuestionIndex].id]?.charCodeAt(0) - 65)
+                                ? 'bg-blue-50 text-gray-900 shadow-sm border-blue-200'
+                                : 'bg-transparent text-gray-900 border-gray-200'
+                              : 'bg-transparent hover:bg-gray-50 border-gray-200 hover:border-gray-300 hover:shadow-sm'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className="w-6 h-6 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-600 font-medium">
+                              {String.fromCharCode(65 + optIndex)}
+                            </span>
+                            <span className="flex-1">{option}</span>
+                          </div>
+                        </button>
+                      ))}
                     </div>
                   </div>
+                </div>
+              </div>
 
-                {/* Navigation buttons */}
-                <div className="mt-8 flex md:flex-row flex-col gap-3 md:justify-between md:items-center">
-                  <div className="flex md:flex-row flex-col gap-2">
-                    <Button
-                      onClick={goToPreviousQuestion}
+              {/* Sidebar (25% width) */}
+              <div className="w-full lg:w-1/4 bg-white rounded-lg shadow-md border border-gray-200 p-4 lg:p-6 h-fit">
+                {/* Study Resources section */}
+                <div className="space-y-4">
+                  <h3 className="font-extrabold tracking-tight text-gray-900 text-sm">Study Resources</h3>
+                  
+                  {/* Unit Cheat Sheet Button */}
+                  <a
+                    href={`/study-guides/AP-${subjectFullName}-unit-${questions[currentQuestionIndex].unit}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full p-3 lg:p-4 rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 bg-white hover:bg-gray-50 group block"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-gray-100 text-gray-600 group-hover:bg-gray-200 transition-colors">
+                        <FileText className="w-5 h-5" />
+                      </div>
+                      <span className="font-medium text-gray-900">
+                        Unit {questions[currentQuestionIndex].unit} Study Guide
+                      </span>
+                    </div>
+                  </a>
+
+                  {/* AI Dojo Button */}
+                  <button
+                    onClick={handleAITutorClick}
+                    disabled={isAILoading || !answers[questions[currentQuestionIndex].id]}
+                    className={`w-full p-3 lg:p-4 rounded-lg border transition-all duration-200 bg-white group relative
+                      ${error 
+                        ? 'border-red-200 hover:border-red-300' 
+                        : answers[questions[currentQuestionIndex].id]
+                          ? 'border-gray-200 hover:border-gray-300'
+                          : 'border-gray-200 opacity-70 cursor-not-allowed hover:opacity-100'} 
+                      hover:bg-gray-50`}
+                  >
+                    <div className="flex items-center gap-3 justify-start">
+                      <div className={`p-2 rounded-lg text-white transition-colors
+                        ${error 
+                          ? 'bg-red-500 group-hover:bg-red-600' 
+                          : answers[questions[currentQuestionIndex].id]
+                            ? 'bg-blue-500 group-hover:bg-blue-600'
+                            : 'bg-blue-500 opacity-70 group-hover:opacity-100'}`}
+                      >
+                        {isAILoading ? (
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <Brain className="w-5 h-5" />
+                        )}
+                      </div>
+                      <span className={`font-medium text-left ${error ? 'text-red-600' : answers[questions[currentQuestionIndex].id] ? 'text-gray-900' : 'text-gray-900 opacity-70 group-hover:opacity-100'}`}>
+                        {isAILoading 
+                          ? 'Getting Explanation...' 
+                          : error 
+                            ? 'Try Again' 
+                            : 'Explain with AI Dojo'}
+                      </span>
+                    </div>
+                  </button>
+                </div>
+
+                {/* Navigation and Submit Buttons */}
+                <div className="mt-6 lg:mt-8 space-y-4">
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        if (currentQuestionIndex > 0) {
+                          setCurrentQuestionIndex(currentQuestionIndex - 1);
+                        }
+                      }}
                       disabled={currentQuestionIndex === 0}
-                      variant="outline"
-                      className="w-full md:w-32 bg-white hover:bg-gray-50 border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-md transition-all duration-200"
+                      className={`
+                        flex-1 p-2.5 lg:p-3 rounded-lg border-2 text-sm font-medium transition-all duration-200
+                        ${currentQuestionIndex === 0
+                          ? 'border-gray-200 text-gray-400 cursor-not-allowed'
+                          : 'border-gray-300 text-gray-700 hover:bg-gray-50 cursor-pointer'
+                        }
+                      `}
                     >
                       Previous
-                    </Button>
-                    <Button
-                      onClick={goToNextQuestion}
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (currentQuestionIndex < questions.length - 1) {
+                          setCurrentQuestionIndex(currentQuestionIndex + 1);
+                        }
+                      }}
                       disabled={currentQuestionIndex === questions.length - 1}
-                      variant="outline"
-                      className="w-full md:w-32 bg-white hover:bg-gray-50 border-gray-200 hover:border-gray-300 shadow-sm hover:shadow-md transition-all duration-200"
+                      className={`
+                        flex-1 p-2.5 lg:p-3 rounded-lg border-2 text-sm font-medium transition-all duration-200
+                        ${currentQuestionIndex === questions.length - 1
+                          ? 'border-gray-200 text-gray-400 cursor-not-allowed'
+                          : 'border-gray-300 text-gray-700 hover:bg-gray-50 cursor-pointer'
+                        }
+                      `}
                     >
                       Next
-                    </Button>
+                    </button>
                   </div>
-                  {currentQuestionIndex === questions.length - 1 && (
-                    <Button
-                      onClick={() => setShowResults(true)}
-                      className="w-full md:w-28 bg-blue-600 hover:bg-blue-700 text-white rounded-md"
-                    >
-                      Submit
-                    </Button>
-                  )}
+                  <button
+                    onClick={() => setShowResults(true)}
+                    className="w-full p-3 rounded-lg border-2 text-sm font-medium transition-all duration-200 border-blue-500 text-blue-600 hover:bg-blue-50 cursor-pointer"
+                  >
+                    Submit Exam
+                  </button>
+                </div>
               </div>
             </div>
           </>
@@ -918,7 +1084,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
                         {isCorrect ? 'Correct' : 'Incorrect'}
                       </span>
                     </div>
-                      <p className="text-lg font-medium font-serif leading-relaxed text-gray-900">{question.question}</p>
+                    <p className="text-lg font-medium font-serif leading-relaxed text-gray-900">{question.question}</p>
                     
                     {/* Add image display */}
                     {question.image && (
@@ -1000,7 +1166,6 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
             })}
           </div>
         )}
-        </div>
       </div>
     </>
   );

@@ -9,6 +9,7 @@ export interface Question {
   options: string[];
   correctAnswer: string;
   explanation: string;
+  lessonIDS: string[];
 }
 
 export interface QuestionBank {

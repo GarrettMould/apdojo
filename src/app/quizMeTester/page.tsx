@@ -5,8 +5,15 @@ import { X, Brain, Check } from 'lucide-react';
 import dojoIcon from "../../../public/images/dojoIcon.png"
 import Image from 'next/image';
 import type { StaticImageData } from 'next/image';
-import { allContent } from '@/data/allContent';
+// import { allContent } from '@/data/allContent'; // Assuming you might remove this if Notion replaces it
 import React from 'react';
+
+// --- Notion Imports ---
+import { NotionRenderer } from 'react-notion-x';
+import type { ExtendedRecordMap } from 'notion-types';
+// Required CSS for react-notion-x (import in your global CSS or layout)
+// import 'react-notion-x/src/styles.css'; 
+// --- End Notion Imports ---
 
 type Question = {
   id: string;
@@ -205,20 +212,61 @@ export default function QuizMeTester() {
   const [activeSection, setActiveSection] = useState<{ id: string; lessonID: string; title: string } | null>(null);
   const subject = 'macro'; // We can make this dynamic later
 
-  // Sample questions (will be replaced with AI-generated ones)
-  const sampleQuestions: Question[] = [
-    {
-      id: '1',
-      text: 'What happens to quantity demanded when price increases?',
-      options: [
-        'It increases',
-        'It decreases',
-        'It stays the same',
-        'It becomes elastic'
-      ],
-      correctAnswer: 1
-    }
-  ];
+  // --- Notion State ---
+  const [recordMap, setRecordMap] = useState<ExtendedRecordMap | null>(null);
+  const [isNotionLoading, setIsNotionLoading] = useState(true);
+  const [notionError, setNotionError] = useState<string | null>(null);
+  // --- End Notion State ---
+
+  // --- Fetch Notion Data ---
+  useEffect(() => {
+    const fetchNotionPage = async () => {
+      // **** Replace with your actual Notion Page ID ****
+      const pageId = '1d1978a4ef8380a3b5bad3b781cdfd94'; 
+      
+      if (!pageId) {
+          setNotionError("Please set your Notion Page ID in the code.");
+          setIsNotionLoading(false);
+          console.error("Error: Notion Page ID not set.");
+          return;
+      }
+
+      setIsNotionLoading(true);
+      setNotionError(null);
+      
+      try {
+        // Use a simple fetch to an API route that encapsulates notion-client logic
+        // This is generally safer than exposing NotionAPI directly on the client
+        const response = await fetch(`/api/get-notion-page?pageId=${pageId}`);
+        
+        // Get the raw text first
+        const rawResponseText = await response.text();
+        console.log("Raw API Response Text:", rawResponseText); 
+        console.log("Response Status:", response.status);
+        console.log("Response OK?:", response.ok);
+
+        // Now, try to parse *only if* the response was okay
+        if (!response.ok) {
+          // Use the raw text in the error if possible
+          throw new Error(`Error fetching Notion page: ${response.statusText} - ${rawResponseText.substring(0, 100)}`); 
+        }
+        
+        // Attempt to parse the raw text
+        const data = JSON.parse(rawResponseText); 
+        setRecordMap(data);
+        
+      } catch (err: any) {
+        console.error("Error fetching/parsing Notion page:", err);
+        // The error might already include the raw text if parsing failed above
+        setNotionError(err.message || 'Failed to load or parse Notion content.'); 
+      } finally {
+        setIsNotionLoading(false);
+      }
+    };
+
+    fetchNotionPage();
+  }, []); // Empty dependency array ensures this runs once on mount
+  // --- End Fetch Notion Data ---
 
   const handleAnswerSelect = (questionId: string, answerIndex: number) => {
     setSelectedAnswers(prev => ({
@@ -265,10 +313,13 @@ export default function QuizMeTester() {
     const selection = window.getSelection();
     if (selection) {
       const selectedText = selection.toString().trim();
-      setIsLoading(true);
+      if (!selectedText) return; // Don't generate if selection is empty
+
+      setIsLoading(true); // Use general loading for quiz generation
       setShowQuiz(true);
       setSelectionCoords(null);
       selection.removeAllRanges();
+      setActiveSection(null); // Reset active section when generating from selection
 
       try {
         const response = await fetch('/api/generate-quiz', {
@@ -290,7 +341,8 @@ export default function QuizMeTester() {
         setIsSubmitted(false);
       } catch (error) {
         console.error('Error generating quiz:', error);
-        // Optionally show an error message to the user
+        // Optionally show an error message to the user in the quiz modal
+        setQuestions([]); // Clear questions on error
       } finally {
         setIsLoading(false);
       }
@@ -316,513 +368,42 @@ export default function QuizMeTester() {
   return (
     <div className="min-h-screen bg-white" style={{ marginLeft: 'calc(-50vw + 50%)', marginRight: 'calc(-50vw + 50%)' }}>
       <div className="max-w-3xl mx-auto px-4 py-12">
-        <div className="text-center mb-12">
-          <h1 className="text-3xl md:text-4xl font-black mb-2">
-            AP <span className="text-blue-500">Macro</span>
+
+        {/* --- Add the H1 Title Here --- */}
+        <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-8 pb-2 border-b border-gray-200">
+          AP Macroeconomics Unit 1 – <span className="text-blue-600">Basic Economic Concepts</span>
           </h1>
-          <h2 className="text-lg md:text-xl font-medium text-gray-600">
-            Unit 1 Cheat Sheet
-          </h2>
-        </div>
-        
-        <div className="space-y-16">
-          <CheatSheetSection 
-            id="scarcity" 
-            lessonIDS={["1.1"]} 
-            title="Scarcity"
-            setShowQuiz={setShowQuiz}
-            setIsLoading={setIsLoading}
-            setQuestions={setQuestions}
-            setSelectedAnswers={setSelectedAnswers}
-            setIsSubmitted={setIsSubmitted}
-            setActiveSection={setActiveSection}
-            subject={subject}
-            images={[allContent.macroeconomics[1].images[0]]}
-          >
-            <div>
-              <p className="font-semibold mb-2">Definition:</p>
-              <p className="mb-4">Scarcity is the fundamental economic problem of having unlimited wants and needs in a world with limited resources.</p>
-              
-              <div className="mb-4">
-                <p className="font-semibold mb-2">Key Concepts:</p>
-                <p className="font-medium">Economic Resources (Factors of Production):</p>
-                <ul className="list-disc pl-8 mb-4">
-                  <li><span className="font-medium">Land</span> - Natural resources (oil, timber, water, minerals)</li>
-                  <li><span className="font-medium">Labor</span> - Human effort and work</li>
-                  <li><span className="font-medium">Capital</span> - Man-made goods used to produce other goods and services (machinery, tools, buildings)</li>
-                  <li><span className="font-medium">Entrepreneurship</span> - The ability to organize the other factors of production</li>
-                </ul>
-              </div>
-              
-              <div className="mb-4">
-                <p className="font-semibold mb-2">Why Scarcity Matters:</p>
-                <ul className="list-disc pl-8">
-                  <li>Necessitates choices and trade-offs</li>
-                  <li>Creates opportunity costs when allocating resources</li>
-                  <li>Drives the need for economic systems to determine what, how, and for whom to produce</li>
-                </ul>
-              </div>
-              
-              <div>
-                <p className="font-semibold mb-2">Examples:</p>
-                <ul className="list-disc pl-8">
-                  <li>A student with limited study time must choose which subjects to prioritize</li>
-                  <li>A nation with limited funding must decide between defense spending or healthcare</li>
-                  <li>A business with finite capital deciding whether to invest in new technology or hire more workers</li>
-                </ul>
-              </div>
-            </div>
-          </CheatSheetSection>
-          
-          <CheatSheetSection 
-            id="opportunity-cost-ppc" 
-            lessonIDS={["1.2"]} 
-            title="Opportunity Cost and the Production Possibilities Curve (PPC)"
-            setShowQuiz={setShowQuiz}
-            setIsLoading={setIsLoading}
-            setQuestions={setQuestions}
-            setSelectedAnswers={setSelectedAnswers}
-            setIsSubmitted={setIsSubmitted}
-            setActiveSection={setActiveSection}
-            subject={subject}
-            images={[
-              {
-                src: allContent.macroeconomics[1].images[1],
-                caption: "Figure 1: PPC with Constant Opportunity Cost",
-                width: "600px",
-                placement: "after-paragraph",
-                paragraphId: "ppc-intro"
-              },
-              {
-                src: allContent.macroeconomics[1].images[2],
-                caption: "Figure 2: PPC with Increasing Opportunity Cost",
-                width: "600px",
-                placement: "inline" // Will appear at the end of the section
-              }
-            ]}
-          >
-            <div>
-              <p id="ppc-intro" className="mb-4">
-                <span className="font-semibold">Production Possibilities Curve (PPC):</span> 
-                A model that shows the maximum combinations of two goods that can be produced 
-                given available resources and technology.
-              </p>
-              
-              <div className="mb-4">
-                <p className="font-semibold mb-2">Key Characteristics of the PPC:</p>
-                <ul className="list-disc pl-8">
-                  <li>Points on the curve = efficient production (full employment of resources)</li>
-                  <li>Points inside the curve = inefficient production (underutilization of resources)</li>
-                  <li>Points outside the curve = unattainable with current resources and technology</li>
-                  <li>Bowed outward shape (concave to origin) = increasing opportunity costs</li>
-                </ul>
-              </div>
-              
-              <div className="mb-4">
-                <p className="font-semibold mb-2">PPC Shifts:</p>
-                <p className="font-medium">Outward shift (economic growth): More of both goods can be produced due to:</p>
-                <ul className="list-disc pl-8 mb-4">
-                  <li>Increase in resources (more labor, capital, land)</li>
-                  <li>Technological advancements</li>
-                  <li>Improved education/training</li>
-                </ul>
-                
-                <p className="font-medium">Inward shift: Less of both goods can be produced due to:</p>
-                <ul className="list-disc pl-8">
-                  <li>Decrease in resources</li>
-                  <li>Natural disasters</li>
-                  <li>War or conflict</li>
-                </ul>
-              </div>
-              
-              <div>
-                <p className="font-semibold mb-2">Example:</p>
-                <p>Country producing computers and wheat</p>
-                <ul className="list-disc pl-8">
-                  <li>As more resources shift to computer production, increasingly productive wheat-producing land must be given up</li>
-                  <li>Results in increasing opportunity costs (giving up more wheat for each additional computer)</li>
-                </ul>
-              </div>
-            </div>
-          </CheatSheetSection>
-          
-          <CheatSheetSection 
-            id="comparative-advantage" 
-            lessonIDS={["1.3"]} 
-            title="Comparative Advantage and Gains from Trade"
-            setShowQuiz={setShowQuiz}
-            setIsLoading={setIsLoading}
-            setQuestions={setQuestions}
-            setSelectedAnswers={setSelectedAnswers}
-            setIsSubmitted={setIsSubmitted}
-            setActiveSection={setActiveSection}
-            subject={subject}
-            images={allContent.macroeconomics[1].images.slice(2)}
-          >
-            <div>
-              <p className="mb-4"><span className="font-semibold">Absolute Advantage:</span> The ability to produce more of a good or service with the same amount of resources.</p>
-              
-              <p className="mb-4"><span className="font-semibold">Comparative Advantage:</span> The ability to produce a good or service at a lower opportunity cost than another producer.</p>
-              
-              <div className="mb-4">
-                <p className="font-semibold mb-2">Key Principles:</p>
-                <ul className="list-disc pl-8">
-                  <li>Countries benefit by specializing in goods for which they have a comparative advantage</li>
-                  <li>Trade allows countries to consume beyond their individual production possibilities</li>
-                  <li>Total production increases when producers specialize according to comparative advantage</li>
-                </ul>
-              </div>
-              
-              <div className="mb-4">
-                <p className="font-semibold mb-2">Calculating Comparative Advantage:</p>
-                <ol className="list-decimal pl-8">
-                  <li>Determine opportunity cost for each producer</li>
-                  <li>The producer with the lower opportunity cost has the comparative advantage</li>
-                </ol>
-              </div>
-              
-              <div>
-                <p className="font-semibold mb-2">Example:</p>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full border-collapse border border-gray-300 mb-4">
-                    <thead>
-                      <tr className="bg-gray-100">
-                        <th className="border border-gray-300 px-4 py-2"></th>
-                        <th className="border border-gray-300 px-4 py-2">Computers (per hour)</th>
-                        <th className="border border-gray-300 px-4 py-2">Wheat (tons per hour)</th>
-                        <th className="border border-gray-300 px-4 py-2">Opportunity Cost of 1 Computer</th>
-                        <th className="border border-gray-300 px-4 py-2">Opportunity Cost of 1 ton of Wheat</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td className="border border-gray-300 px-4 py-2 font-medium">Country A</td>
-                        <td className="border border-gray-300 px-4 py-2">10</td>
-                        <td className="border border-gray-300 px-4 py-2">5</td>
-                        <td className="border border-gray-300 px-4 py-2">0.5 tons of wheat</td>
-                        <td className="border border-gray-300 px-4 py-2">2 computers</td>
-                      </tr>
-                      <tr>
-                        <td className="border border-gray-300 px-4 py-2 font-medium">Country B</td>
-                        <td className="border border-gray-300 px-4 py-2">5</td>
-                        <td className="border border-gray-300 px-4 py-2">15</td>
-                        <td className="border border-gray-300 px-4 py-2">3 tons of wheat</td>
-                        <td className="border border-gray-300 px-4 py-2">0.33 computers</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <ul className="list-disc pl-8">
-                  <li>Country A has comparative advantage in computers (lower opportunity cost of 0.5 vs 3)</li>
-                  <li>Country B has comparative advantage in wheat (lower opportunity cost of 0.33 vs 2)</li>
-                  <li>Both benefit from specialization and trade</li>
-                </ul>
-              </div>
-            </div>
-          </CheatSheetSection>
-          
-          <CheatSheetSection 
-            id="demand" 
-            lessonIDS={["1.4"]} 
-            title="Demand"
-            setShowQuiz={setShowQuiz}
-            setIsLoading={setIsLoading}
-            setQuestions={setQuestions}
-            setSelectedAnswers={setSelectedAnswers}
-            setIsSubmitted={setIsSubmitted}
-            setActiveSection={setActiveSection}
-            subject={subject}
-            images={allContent.macroeconomics[1].images.slice(3)}
-          >
-            <div>
-              <p className="mb-4"><span className="font-semibold">Definition:</span> The willingness and ability of consumers to purchase a good or service at various price levels.</p>
-              
-              <p className="mb-4"><span className="font-semibold">Law of Demand:</span> As price increases, quantity demanded decreases (inverse relationship), ceteris paribus (all else equal).</p>
-              
-              <div className="mb-4">
-                <p className="font-semibold mb-2">Demand Schedule and Curve:</p>
-                <ul className="list-disc pl-8">
-                  <li>Demand schedule: Table showing quantities demanded at different prices</li>
-                  <li>Demand curve: Graphical representation (downward sloping)</li>
-                </ul>
-              </div>
-              
-              <div className="mb-4">
-                <p className="font-semibold mb-2">Determinants of Demand (Factors that Shift the Demand Curve):</p>
-                
-                <div className="mb-3">
-                  <p className="font-medium">1. Consumer Income</p>
-                  <ul className="list-disc pl-8">
-                    <li>Normal goods: Income ↑, Demand ↑</li>
-                    <li>Inferior goods: Income ↑, Demand ↓</li>
-                  </ul>
-                </div>
-                
-                <div className="mb-3">
-                  <p className="font-medium">2. Prices of Related Goods</p>
-                  <ul className="list-disc pl-8">
-                    <li>Substitutes (replace each other): If price of substitute ↑, Demand ↑</li>
-                    <li>Complements (used together): If price of complement ↑, Demand ↓</li>
-                  </ul>
-                </div>
-                
-                <div className="mb-3">
-                  <p className="font-medium">3. Consumer Preferences/Tastes</p>
-                  <ul className="list-disc pl-8">
-                    <li>Positive change in preference: Demand ↑</li>
-                    <li>Negative change in preference: Demand ↓</li>
-                  </ul>
-                </div>
-                
-                <div className="mb-3">
-                  <p className="font-medium">4. Consumer Expectations</p>
-                  <ul className="list-disc pl-8">
-                    <li>Expected future price increase: Current demand ↑</li>
-                    <li>Expected future price decrease: Current demand ↓</li>
-                  </ul>
-                </div>
-                
-                <div>
-                  <p className="font-medium">5. Number of Buyers</p>
-                  <ul className="list-disc pl-8">
-                    <li>More buyers: Market demand ↑</li>
-                    <li>Fewer buyers: Market demand ↓</li>
-                  </ul>
-                </div>
-              </div>
-              
-              <div>
-                <p className="font-semibold mb-2">Change in Demand vs. Change in Quantity Demanded:</p>
-                <ul className="list-disc pl-8">
-                  <li><span className="font-medium">Change in demand:</span> Shift of entire demand curve (caused by non-price factors)</li>
-                  <li><span className="font-medium">Change in quantity demanded:</span> Movement along the demand curve (caused by price change)</li>
-                </ul>
-              </div>
-            </div>
-          </CheatSheetSection>
-          
-          <CheatSheetSection 
-            id="supply" 
-            lessonIDS={["1.5"]} 
-            title="Supply"
-            setShowQuiz={setShowQuiz}
-            setIsLoading={setIsLoading}
-            setQuestions={setQuestions}
-            setSelectedAnswers={setSelectedAnswers}
-            setIsSubmitted={setIsSubmitted}
-            setActiveSection={setActiveSection}
-            subject={subject}
-            images={allContent.macroeconomics[1].images.slice(4)}
-          >
-            <div>
-              <p className="mb-4"><span className="font-semibold">Definition:</span> The willingness and ability of producers to offer goods or services for sale at various price levels.</p>
-              
-              <p className="mb-4"><span className="font-semibold">Law of Supply:</span> As price increases, quantity supplied increases (direct relationship), ceteris paribus.</p>
-              
-              <div className="mb-4">
-                <p className="font-semibold mb-2">Supply Schedule and Curve:</p>
-                <ul className="list-disc pl-8">
-                  <li>Supply schedule: Table showing quantities supplied at different prices</li>
-                  <li>Supply curve: Graphical representation (upward sloping)</li>
-                </ul>
-              </div>
-              
-              <div className="mb-4">
-                <p className="font-semibold mb-2">Determinants of Supply (Factors that Shift the Supply Curve):</p>
-                
-                <div className="mb-3">
-                  <p className="font-medium">1. Cost of Resources/Inputs</p>
-                  <ul className="list-disc pl-8">
-                    <li>Input costs ↑: Supply ↓</li>
-                    <li>Input costs ↓: Supply ↑</li>
-                  </ul>
-                </div>
-                
-                <div className="mb-3">
-                  <p className="font-medium">2. Technology</p>
-                  <ul className="list-disc pl-8">
-                    <li>Improved technology: Supply ↑</li>
-                    <li>Deteriorating technology: Supply ↓</li>
-                  </ul>
-                </div>
-                
-                <div className="mb-3">
-                  <p className="font-medium">3. Taxes and Subsidies</p>
-                  <ul className="list-disc pl-8">
-                    <li>Higher taxes: Supply ↓</li>
-                    <li>Subsidies: Supply ↑</li>
-                  </ul>
-                </div>
-                
-                <div className="mb-3">
-                  <p className="font-medium">4. Producer Expectations</p>
-                  <ul className="list-disc pl-8">
-                    <li>Expected future price increase: Current supply ↓</li>
-                    <li>Expected future price decrease: Current supply ↑</li>
-                  </ul>
-                </div>
-                
-                <div className="mb-3">
-                  <p className="font-medium">5. Number of Sellers</p>
-                  <ul className="list-disc pl-8">
-                    <li>More sellers: Market supply ↑</li>
-                    <li>Fewer sellers: Market supply ↓</li>
-                  </ul>
-                </div>
-                
-                <div>
-                  <p className="font-medium">6. Price of Related Goods in Production</p>
-                  <ul className="list-disc pl-8">
-                    <li>Higher prices for alternatives to produce: Supply ↑</li>
-                    <li>Lower prices for alternatives to produce: Supply ↓</li>
-                  </ul>
-                </div>
-              </div>
-              
-              <div>
-                <p className="font-semibold mb-2">Change in Supply vs. Change in Quantity Supplied:</p>
-                <ul className="list-disc pl-8">
-                  <li><span className="font-medium">Change in supply:</span> Shift of entire supply curve (caused by non-price factors)</li>
-                  <li><span className="font-medium">Change in quantity supplied:</span> Movement along the supply curve (caused by price change)</li>
-                </ul>
-              </div>
-            </div>
-          </CheatSheetSection>
-          
-          <CheatSheetSection 
-            id="market-equilibrium" 
-            lessonIDS={["1.6"]} 
-            title="Market Equilibrium, Disequilibrium, and Changes in Equilibrium"
-            setShowQuiz={setShowQuiz}
-            setIsLoading={setIsLoading}
-            setQuestions={setQuestions}
-            setSelectedAnswers={setSelectedAnswers}
-            setIsSubmitted={setIsSubmitted}
-            setActiveSection={setActiveSection}
-            subject={subject}
-            images={allContent.macroeconomics[1].images.slice(5)}
-          >
-            <div>
-              <p className="mb-4"><span className="font-semibold">Market Equilibrium:</span> The condition where quantity demanded equals quantity supplied; there is no tendency for price to change.</p>
-              
-              <div className="mb-4">
-                <p className="font-semibold mb-2">Key Features:</p>
-                <ul className="list-disc pl-8">
-                  <li>Equilibrium price: Price where Qd = Qs</li>
-                  <li>Equilibrium quantity: Amount bought and sold at equilibrium price</li>
-                  <li>No surplus or shortage exists</li>
-                  <li>No pressure for price to change</li>
-                </ul>
-              </div>
-              
-              <div className="mb-4">
-                <p className="font-semibold mb-2">Disequilibrium:</p>
-                
-                <div className="mb-3">
-                  <p className="font-medium">1. Surplus (Excess Supply):</p>
-                  <ul className="list-disc pl-8">
-                    <li>Occurs when price &gt; equilibrium price</li>
-                    <li>Quantity supplied &gt; quantity demanded</li>
-                    <li>Sellers cannot sell all their goods</li>
-                    <li>Downward pressure on price</li>
-                  </ul>
-                </div>
-                
-                <div>
-                  <p className="font-medium">2. Shortage (Excess Demand):</p>
-                  <ul className="list-disc pl-8">
-                    <li>Occurs when price &lt; equilibrium price</li>
-                    <li>Quantity demanded &gt; quantity supplied</li>
-                    <li>Buyers cannot purchase all they want</li>
-                    <li>Upward pressure on price</li>
-                  </ul>
-                </div>
-              </div>
-              
-              <div className="mb-4">
-                <p className="font-semibold mb-2">Changes in Equilibrium:</p>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full border-collapse border border-gray-300 mb-4">
-                    <thead>
-                      <tr className="bg-gray-100">
-                        <th className="border border-gray-300 px-4 py-2">Change</th>
-                        <th className="border border-gray-300 px-4 py-2">Effect on Equilibrium Price</th>
-                        <th className="border border-gray-300 px-4 py-2">Effect on Equilibrium Quantity</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td className="border border-gray-300 px-4 py-2">Demand ↑</td>
-                        <td className="border border-gray-300 px-4 py-2">Price ↑</td>
-                        <td className="border border-gray-300 px-4 py-2">Quantity ↑</td>
-                      </tr>
-                      <tr>
-                        <td className="border border-gray-300 px-4 py-2">Demand ↓</td>
-                        <td className="border border-gray-300 px-4 py-2">Price ↓</td>
-                        <td className="border border-gray-300 px-4 py-2">Quantity ↓</td>
-                      </tr>
-                      <tr>
-                        <td className="border border-gray-300 px-4 py-2">Supply ↑</td>
-                        <td className="border border-gray-300 px-4 py-2">Price ↓</td>
-                        <td className="border border-gray-300 px-4 py-2">Quantity ↑</td>
-                      </tr>
-                      <tr>
-                        <td className="border border-gray-300 px-4 py-2">Supply ↓</td>
-                        <td className="border border-gray-300 px-4 py-2">Price ↑</td>
-                        <td className="border border-gray-300 px-4 py-2">Quantity ↓</td>
-                      </tr>
-                      <tr>
-                        <td className="border border-gray-300 px-4 py-2">Both Demand and Supply ↑</td>
-                        <td className="border border-gray-300 px-4 py-2">Ambiguous (depends on magnitude)</td>
-                        <td className="border border-gray-300 px-4 py-2">Quantity ↑</td>
-                      </tr>
-                      <tr>
-                        <td className="border border-gray-300 px-4 py-2">Both Demand and Supply ↓</td>
-                        <td className="border border-gray-300 px-4 py-2">Ambiguous (depends on magnitude)</td>
-                        <td className="border border-gray-300 px-4 py-2">Quantity ↓</td>
-                      </tr>
-                      <tr>
-                        <td className="border border-gray-300 px-4 py-2">Demand ↑, Supply ↓</td>
-                        <td className="border border-gray-300 px-4 py-2">Price ↑</td>
-                        <td className="border border-gray-300 px-4 py-2">Ambiguous</td>
-                      </tr>
-                      <tr>
-                        <td className="border border-gray-300 px-4 py-2">Demand ↓, Supply ↑</td>
-                        <td className="border border-gray-300 px-4 py-2">Price ↓</td>
-                        <td className="border border-gray-300 px-4 py-2">Ambiguous</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-              
-              <div className="mb-4">
-                <p className="font-semibold mb-2">Example:</p>
-                <p>If consumer income increases (shifting demand right) and a technological improvement occurs (shifting supply right), the equilibrium quantity will definitely increase, but the price effect depends on which shift is larger.</p>
-              </div>
-              
-              <div>
-                <p className="font-semibold mb-2">Market Intervention:</p>
-                
-                <div className="mb-3">
-                  <p className="font-medium">1. Price Ceiling: Maximum legal price (e.g., rent control)</p>
-                  <ul className="list-disc pl-8">
-                    <li>If set below equilibrium: Creates shortage, black markets</li>
-                    <li>If set above equilibrium: No effect</li>
-                  </ul>
-                </div>
-                
-                <div>
-                  <p className="font-medium">2. Price Floor: Minimum legal price (e.g., minimum wage)</p>
-                  <ul className="list-disc pl-8">
-                    <li>If set above equilibrium: Creates surplus</li>
-                    <li>If set below equilibrium: No effect</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </CheatSheetSection>
-        </div>
+        {/* --- End H1 Title --- */}
+
+        {/* --- Render Notion Content --- */}
+        {isNotionLoading && (
+           <div className="text-center py-10">Loading Notion Content...</div>
+        )}
+        {notionError && (
+           <div className="text-center py-10 text-red-500">Error: {notionError}</div>
+        )}
+        {recordMap && (
+          <NotionRenderer 
+             recordMap={recordMap} 
+             fullPage={true} // Assuming your Notion page content starts *after* the title
+             darkMode={false} 
+             // Add other NotionRenderer props as needed
+          />
+        )}
+        {/* --- End Render Notion Content --- */}
+
+        {/* --- Keep or remove existing CheatSheetSections --- */}
+        {/* <div className="space-y-16"> */}
+          {/* 
+             If you want to keep the old sections *in addition* to Notion, 
+             render them here. Otherwise, remove this part.
+          */}
+          {/* <CheatSheetSection id="scarcity" ... /> */}
+          {/* <CheatSheetSection id="opportunity-cost-ppc" ... /> */}
+          {/* ... other sections ... */}
+        {/* </div> */}
+        {/* --- End existing sections --- */}
+
       </div>
 
       {/* Floating Quiz Icon */}
@@ -835,13 +416,13 @@ export default function QuizMeTester() {
             top: `${selectionCoords.y}px`,
             transform: 'translate(-50%, -100%)',
           }}
-          className="bg-blue-500 text-white p-3 rounded-full shadow-lg hover:bg-blue-600 transition-all duration-200 animate-fade-in flex items-center gap-2 hover:scale-110"
+          className="fixed z-50 bg-blue-500 text-white p-3 rounded-full shadow-lg hover:bg-blue-600 transition-all duration-200 animate-fade-in flex items-center gap-2 hover:scale-110" // Added fixed and z-index
         >
           <Brain className="w-5 h-5" />
         </button>
       )}
 
-      {/* Quiz Modal */}
+      {/* Quiz Modal (keep as is) */}
       {showQuiz && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
           <div 
@@ -886,7 +467,7 @@ export default function QuizMeTester() {
             {/* Questions - Now in a scrollable container */}
             <div className="flex-1 overflow-y-auto">
               <div className="p-6">
-                {isLoading ? (
+                {isLoading ? ( // Using general isLoading for quiz generation
                   <div className="flex flex-col items-center justify-center py-12">
                     <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
                     <p className="mt-4 text-gray-600 font-medium">Generating your quiz...</p>
@@ -909,13 +490,13 @@ export default function QuizMeTester() {
                               className={`w-full text-left p-3.5 rounded-md text-sm font-medium transition-all duration-200 border ${
                                 isSubmitted
                                   ? index === question.correctAnswer
-                                    ? 'bg-blue-50 text-gray-900 shadow-sm border-blue-200'
+                                    ? 'bg-blue-50 text-gray-900 shadow-sm border-blue-200' // Correct answer style
                                     : index === selectedAnswers[question.id]
-                                      ? 'bg-gray-100 text-gray-900 shadow-sm border-gray-200'
-                                      : 'bg-gray-50 text-gray-900 border-transparent'
+                                      ? 'bg-red-50 text-gray-900 shadow-sm border-red-200' // Incorrect selected answer style
+                                      : 'bg-gray-50 text-gray-900 border-transparent' // Other options style
                                   : selectedAnswers[question.id] === index
-                                    ? 'bg-blue-50 text-gray-900 border-blue-200 shadow-sm'
-                                    : 'bg-gray-50 hover:bg-gray-100 hover:shadow-sm border-transparent'
+                                    ? 'bg-blue-50 text-gray-900 border-blue-200 shadow-sm' // Selected answer style
+                                    : 'bg-gray-50 hover:bg-gray-100 hover:shadow-sm border-transparent' // Default button style
                               }`}
                             >
                               <div className="flex items-center gap-3">
@@ -925,7 +506,7 @@ export default function QuizMeTester() {
                                     index === question.correctAnswer 
                                       ? <Check className="w-5 h-5 text-blue-500" /> 
                                       : index === selectedAnswers[question.id] 
-                                        ? <X className="w-5 h-5 text-gray-400" />
+                                        ? <X className="w-5 h-5 text-red-500" /> // Show X for incorrect selected
                                         : null
                                   )}
                                 </div>
@@ -933,8 +514,12 @@ export default function QuizMeTester() {
                             </button>
                           ))}
                         </div>
+                        {/* Optional: Add feedback display here if your API provides it */}
                       </div>
                     ))}
+                    {questions.length === 0 && !isLoading && (
+                       <div className="text-center py-10 text-gray-500">No quiz questions generated.</div>
+                    )}
                   </div>
                 )}
               </div>
@@ -944,11 +529,11 @@ export default function QuizMeTester() {
             <div className="sticky bottom-0 bg-white border-t p-6 z-20">
               <button
                 onClick={handleSubmit}
-                disabled={isSubmitted || Object.keys(selectedAnswers).length !== questions.length}
-                className={`w-full py-2.5 rounded font-medium text-sm
+                disabled={isLoading || isSubmitted || Object.keys(selectedAnswers).length !== questions.length || questions.length === 0}
+                className={`w-full py-2.5 rounded font-medium text-sm transition-colors
                   ${isSubmitted
                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : Object.keys(selectedAnswers).length === questions.length
+                    : (Object.keys(selectedAnswers).length === questions.length && questions.length > 0 && !isLoading)
                       ? 'bg-blue-500 text-white hover:bg-blue-600'
                       : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                   }`}
@@ -963,14 +548,42 @@ export default function QuizMeTester() {
   );
 }
 
-// Add this to your global CSS or in a style tag
-const styles = `
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translate(-50%, -80%); }
-    to { opacity: 1; transform: translate(-50%, -100%); }
+
+// Ensure necessary CSS is included for react-notion-x
+// You might need to import these in your global CSS file or layout component:
+// import 'react-notion-x/src/styles.css' // core styles
+// import 'prismjs/themes/prism-tomorrow.css' // syntax highlighting
+// import 'katex/dist/katex.min.css' // Used for math equations
+
+// You'll also need an API route to fetch the Notion data securely
+
+// --- Example API Route (e.g., src/app/api/get-notion-page/route.ts) ---
+/*
+import { NextResponse } from 'next/server';
+import { NotionAPI } from 'notion-client';
+
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const pageId = searchParams.get('pageId');
+
+  if (!pageId) {
+    return NextResponse.json({ error: 'Missing pageId parameter' }, { status: 400 });
   }
-  
-  .animate-fade-in {
-    animation: fadeIn 0.2s ease-out forwards;
+
+  try {
+    const notion = new NotionAPI({
+      // Optional: Provide authToken if you need to access private pages
+      // authToken: process.env.NOTION_TOKEN_V2, 
+      // activeUser: process.env.NOTION_ACTIVE_USER 
+    });
+    const recordMap = await notion.getPage(pageId);
+    return NextResponse.json(recordMap);
+  } catch (error: any) {
+    console.error(`Error fetching Notion page ${pageId}:`, error);
+    return NextResponse.json(
+      { error: `Failed to fetch Notion page: ${error.message || 'Unknown error'}` },
+      { status: 500 }
+    );
   }
-`;
+}
+*/

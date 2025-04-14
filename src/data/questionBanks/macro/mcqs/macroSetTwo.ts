@@ -29,6 +29,7 @@ export const macroSetTwoQuestions: QuestionBank = {
     {
         "id": 1,
         "unit": 1,
+        "lessonIDS": ["1.3"],
         "unitName": "Basic Economic Concepts",
         "question": "If two countries specialize in the production of goods in which they have a comparative advantage and trade with each other, which of the following will occur?",
         "image": null,  "options": [
@@ -44,6 +45,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 2,
         "unit": 1,
+        "lessonIDS": ["1.3"],
         "unitName": "Basic Economic Concepts",
         "question": "Country A can produce 10 computers or 20 tons of wheat per worker, while Country B can produce 5 computers or 15 tons of wheat per worker. Based on this information:",
         "image": null,  "options": [
@@ -59,6 +61,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 3,
         "unit": 1,
+        "lessonIDS": ["1.2"],
         "unitName": "Basic Economic Concepts",
         "question": "Which of the following would most likely cause a nation's production possibilities frontier to shift inward?",
         "image": null,  "options": [
@@ -74,6 +77,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 4,
         "unit": 3,
+        "lessonIDS": ["3.6"],
         "unitName": "National Income and Price Determination",
         "question": "A negative supply shock will most likely cause an increase in which of the following?",
         "image": null,  "options": [
@@ -89,6 +93,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 5,
         "unit": 2,
+        "lessonIDS": ["2.6"],
         "unitName": "Economic Indicators and the Business Cycle",
         "question": "In a country, nominal GDP increased by 8% while the GDP deflator increased by 5%. What was the approximate growth rate of real GDP?",
         "image": null,  "options": [
@@ -104,6 +109,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 6,
         "unit": 2,
+        "lessonIDS": ["2.7"],
         "unitName": "Economic Indicators and the Business Cycle",
         "question": "Which phase of the business cycle is characterized by declining real GDP, rising unemployment, and decreasing business investment?",
         "image": null,  "options": [
@@ -119,6 +125,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 7,
         "unit": 2,
+        "lessonIDS": ["2.1"],
         "unitName": "Economic Indicators and the Business Cycle",
         "question": "Which of the following transactions would be counted in the calculation of GDP?",
         "image": null,  "options": [
@@ -134,6 +141,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 8,
         "unit": 2,
+        "lessonIDS": ["2.4"],
         "unitName": "Economic Indicators and the Business Cycle",
         "question": "If the price of a market basket increases from $220 to $242 in one year, what is the inflation rate for that year?",
         "image": null,  "options": [
@@ -149,6 +157,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 9,
         "unit": 3,
+        "lessonIDS": ["3.2"],
         "unitName": "National Income and Price Determination",
         "question": "If the marginal propensity to consume in an economy is 0.6, then a $5 billion increase in taxes will reduce equilibrium GDP by:",
         "image": null,  "options": [
@@ -164,6 +173,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 10,
         "unit": 3,
+        "lessonIDS": ["3.2"],
         "unitName": "National Income and Price Determination",
         "question": "If the government increase spending by $100 billion while at the same time increasing taxes by the same amount, what will be the short-run impact to the aggregate demand and short-run aggregate supply curves?",
         "image": null,  "options": [
@@ -179,6 +189,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 11,
         "unit": 3,
+        "lessonIDS": ["3.7"],
         "unitName": "National Income and Price Determination",
         "question": "Which of the following describes the process by which the economy depicted will return to long-run equilibrium in the absence of any fiscal or monetary policy intervention?",
         "image": null,  "options": [
@@ -194,6 +205,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 12,
         "unit": 3,
+        "lessonIDS": ["3.8"],
         "unitName": "National Income and Price Determination",
         "question": "When the economy is experiencing an inflationary gap, which fiscal policy approach would be most appropriate?",
         "image": null,  "options": [
@@ -209,6 +221,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 13,
         "unit": 2,
+        "lessonIDS": ["2.1"],
         "unitName": "Economic Indicators and the Business Cycle",
         "question": "A decrease in inventories is a leading indicator of a recession, as it represents a decrease in which of the following components of GDP?",
         "image": null,  "options": [
@@ -223,8 +236,9 @@ export const macroSetTwoQuestions: QuestionBank = {
       },
       {
         "id": 14,
-        "unit": 3,
-        "unitName": "National Income and Price Determination",
+        "unit": 5,
+        "lessonIDS": ["5.6"],
+        "unitName": "Long-Run Consequences of Stabilization Policies",
         "question": "If a nation adopts commits to welcoming skilled immigrants from countries around the world, what impact will this likely have on the nation's long-run aggregate supply curve and production possibilities frontier?",
         "image": null,  "options": [
           "LRAS would shift right, but the PPF would remain unchanged",
@@ -239,6 +253,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 15,
         "unit": 4,
+        "lessonIDS": ["4.4"],
         "unitName": "Financial Sector",
         "question": "Lindsay finds a $100 bill on the ground. She decides to deposit it in her checking account. What is the immediate impact on the money supply?",
         "image": null,  "options": [
@@ -254,6 +269,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 16,
         "unit": 4,
+        "lessonIDS": ["4.6"],
         "unitName": "Financial Sector",
         "question": "To reduce high inflation, which combination of monetary policy tools would a central bank most likely use?",
         "image": null,  "options": [
@@ -269,6 +285,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 17,
         "unit": 4,
+        "lessonIDS": ["4.6"],
         "unitName": "Financial Sector",
         "question": "Which of the following ample reserves monetary policy tools is shown in the diagram?",
         "image": macroSetTwoQ17,  "options": [
@@ -284,6 +301,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 18,
         "unit": 4,
+        "lessonIDS": ["4.6"],
         "unitName": "Financial Sector",
         "question": "When the Federal Reserve conducts an open market purchase, it:",
         "image": null,  "options": [
@@ -298,8 +316,9 @@ export const macroSetTwoQuestions: QuestionBank = {
       },
       {
         "id": 19,
-        "unit": 4,
-        "unitName": "Financial Sector",
+        "unit": 5,
+        "lessonIDS": ["5.3"],
+        "unitName": "Long-Run Consequences of Stabilization Policies",
         "question": "According to the quantity theory of money, if the velocity of money remains constant and the money supply increase by 5%, what will happen to the price level?",
         "image": null,  "options": [
           "The price level will remain constant",
@@ -314,6 +333,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 20,
         "unit": 4,
+        "lessonIDS": ["4.5"],
         "unitName": "Financial Sector",
         "question": "The change in money demand shown on the following diagram could be due to which of the following?",
         "image": macroSetTwoQ20,  "options": [
@@ -328,8 +348,9 @@ export const macroSetTwoQuestions: QuestionBank = {
       },
       {
         "id": 21,
-        "unit": 5,
-        "unitName": "Long-Run Consequences of Stabilization Policies",
+        "unit": 3,
+        "lessonIDS": ["3.8"],
+        "unitName": "National Income and Price Determination",
         "question": "At which of the following points would the government be most likely to increase expenditures and decrease taxes?",
         "image": macroSetTwoQ21,  "options": [
           "Point R",
@@ -344,6 +365,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 22,
         "unit": 5,
+        "lessonIDS": ["5.4"],
         "unitName": "Long-Run Consequences of Stabilization Policies",
         "question": "A government budget deficit can best be described as:",
         "image": null,  "options": [
@@ -359,6 +381,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 23,
         "unit": 5,
+        "lessonIDS": ["5.7"],
         "unitName": "Long-Run Consequences of Stabilization Policies",
         "question": "Which economic policy would most directly contribute to an increase in an economy's long-run aggregate supply?",
         "image": null,  "options": [
@@ -374,6 +397,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 24,
         "unit": 5,
+        "lessonIDS": ["5.2"],
         "unitName": "Long-Run Consequences of Stabilization Policies",
         "question": "If a nation is currently operating at Point X on the following diagram, an increase in short-run aggregate supply would lead to which corresponding change on the Phillips Curve?",
         "image": macroSetTwoQ24,  "options": [
@@ -388,8 +412,9 @@ export const macroSetTwoQuestions: QuestionBank = {
       },
       {
         "id": 25,
-        "unit": 5,
-        "unitName": "Long-Run Consequences of Stabilization Policies",
+        "unit": 3,
+        "lessonIDS": ["3.9"],
+        "unitName": "National Income and Price Determination",
         "question": "Which statement accurately describes the economic concept of policy lags?",
         "image": null,  "options": [
           "The delay between a policy change and its effects on the economy",
@@ -404,6 +429,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 26,
         "unit": 6,
+        "lessonIDS": ["6.6"],
         "unitName": "Open Economy-International Trade and Finance",
         "question": "If a country's interest rates fall relative to those in other countries, what would likely happen to its currency value, assuming free capital mobility?",
         "image": null,  "options": [
@@ -419,6 +445,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 27,
         "unit": 6,
+        "lessonIDS": ["6.1"],
         "unitName": "Open Economy-International Trade and Finance",
         "question": "If a country is running a large trade deficit, which of the following must be true?",
         "image": null,  "options": [
@@ -434,6 +461,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 28,
         "unit": 6,
+        "lessonIDS": ["6.3"],
         "unitName": "Open Economy-International Trade and Finance",
         "question": "Which change could explain the change in the foreign exchange market for the Malaysian Ringgits and Indian Rupees?",
         "image": macroSetTwoQ28,  "options": [
@@ -449,6 +477,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 29,
         "unit": 6,
+        "lessonIDS": ["6.2"],
         "unitName": "Open Economy-International Trade and Finance",
         "question": "The exchange rate for one Canadian Dollar was 0.65 Euros in 2021 and it increased to 0.75 Euros in 2022. Which of the following is true for the Euro in 2022?",
         "image": null,  "options": [
@@ -464,6 +493,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 30,
         "unit": 1,
+        "lessonIDS": ["1.3"],
         "unitName": "Basic Economic Concepts",
         "question": "The diagram shows the number of cell phones and computers produced per hour by two countries, Delta and Omega, using the same resources. Which of the following can be accurately concluded from the data?",
         "image": macroSetTwoQ30,  "options": [
@@ -479,6 +509,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 31,
         "unit": 1,
+        "lessonIDS": ["1.2"],
         "unitName": "Basic Economic Concepts",
         "question": "The graph below shows the production possibilities frontier for two countries, Macroland and Microland, who produce two goods using equal resources. Which of the following statements is true based on the data provided?",
         "image": macroSetTwoQ31,  "options": [
@@ -494,6 +525,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 32,
         "unit": 1,
+        "lessonIDS": ["1.6"],
         "unitName": "Basic Economic Concepts",
         "question": "Determine which combination of demand and supply curves shifts is most likely to result in an indeterminate change to the price of a good:",
         "image": null,  "options": [
@@ -509,6 +541,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 33,
         "unit": 2,
+        "lessonIDS": ["2.1"],
         "unitName": "Economic Indicators and the Business Cycle",
         "question": "The value-added by a single firm when calculating GDP is calculated by:",
         "image": null,  "options": [
@@ -524,6 +557,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 34,
         "unit": 2,
+        "lessonIDS": ["2.3"],
         "unitName": "Economic Indicators and the Business Cycle",
         "question": "A worker who lost her job due to changes in technology making her skills obsolete would be classified as experiencing:",
         "image": null,  "options": [
@@ -539,6 +573,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 35,
         "unit": 2,
+        "lessonIDS": ["2.6"],
         "unitName": "Economic Indicators and the Business Cycle",
         "question": "If nominal GDP is $18 trillion and real GDP is $15 trillion, what is the GDP deflator?",
         "image": null,  "options": [
@@ -554,6 +589,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 36,
         "unit": 3,
+        "lessonIDS": ["3.2"],
         "unitName": "National Income and Price Determination",
         "question": "If government spending increases by $30 billion with no change in taxes, what is the maximum potential change in aggregate demand if the marginal propensity to consume is 0.75?",
         "image": null,  "options": [
@@ -569,6 +605,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 37,
         "unit": 3,
+        "lessonIDS": ["3.6"],
         "unitName": "National Income and Price Determination",
         "question": "If an economy at full employment experiences a negative supply shock, in the short run this would most likely result in:",
         "image": null,  "options": [
@@ -584,6 +621,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 38,
         "unit": 3,
+        "lessonIDS": ["3.8"],
         "unitName": "National Income and Price Determination",
         "question": "Which of the following is an example of a discretionary fiscal policy?",
         "image": null,  "options": [
@@ -599,6 +637,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 39,
         "unit": 4,
+        "lessonIDS": ["4.7"],
         "unitName": "Financial Sector",
         "question": "The graph below shows the market for loanable funds in Macroland. If the current real interest rate is 3%, which of the following is true?",
         "image": macroSetTwoQ39, "options": [
@@ -614,6 +653,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 40,
         "unit": 4,
+        "lessonIDS": ["4.4"],
         "unitName": "Financial Sector",
         "question": "If a new demand deposit leads to money supply expansion that is less than the value predicted by the money multiplier, this might be due to:",
         "image": null,  "options": [
@@ -629,6 +669,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
         "id": 41,
         "unit": 4,
+        "lessonIDS": ["4.5"],
         "unitName": "Financial Sector",
         "question": "If the central bank decreases the money supply while the demand for money remains constant, what happens to the equilibrium interest rate?",
         "image": null,  "options": [
@@ -644,6 +685,7 @@ export const macroSetTwoQuestions: QuestionBank = {
       {
     "id": 42,
     "unit": 3,
+    "lessonIDS": ["3.2"],
     "unitName": "National Income and Price Determination",
     "question": "The diagram below shows changes in Peter's disposable income and his consumption. Use this data to calculate Peter's marginal propensity to consume (MPC) and marginal propensity to save (MPS).",
     "image": macroSetTwoQ42,  "options": [
@@ -659,6 +701,7 @@ export const macroSetTwoQuestions: QuestionBank = {
   {
     "id": 43,
     "unit": 6,
+    "lessonIDS": ["6.5"],
     "unitName": "Open Economy-International Trade and Finance",
     "question": "A country's currency appreciates. What is the most likely effect on its economy in the short run?",
     "image": null,  "options": [
@@ -674,6 +717,7 @@ export const macroSetTwoQuestions: QuestionBank = {
   {
     "id": 44,
     "unit": 4,
+    "lessonIDS": ["4.6"],
     "unitName": "Financial Sector",
     "question": "A central bank is using monetary policy to reduce unemployment that is above the natural rate. Which of the following describes the likely effect of this policy on nominal interest rates, price level, and unemployment?",
     "image": null,  "options": [
@@ -689,6 +733,7 @@ export const macroSetTwoQuestions: QuestionBank = {
   {
     "id": 45,
     "unit": 5,
+    "lessonIDS": ["5.4"],
     "unitName": "Long-Run Consequences of Stabilization Policies",
     "question": "Out of the following government actions, which one will NOT lead to an increase in the country's level of national debt?",
     "image": null,  "options": [
@@ -704,6 +749,7 @@ export const macroSetTwoQuestions: QuestionBank = {
   {
     "id": 46,
     "unit": 2,
+    "lessonIDS": ["2.1"],
     "unitName": "Economic Indicators and the Business Cycle",
     "question": "Use the data in the table below to calculate Starland's 2014 GDP using the expenditure approach.",
     "image": macroSetTwoQ46,  "options": [
@@ -719,6 +765,7 @@ export const macroSetTwoQuestions: QuestionBank = {
   {
     "id": 47,
     "unit": 3,
+    "lessonIDS": ["3.1"],
     "unitName": "National Income and Price Determination",
     "question": "One reason that the aggregate demand curve is downward sloping is because as the price level increases:",
     "image": null,  "options": [
@@ -734,6 +781,7 @@ export const macroSetTwoQuestions: QuestionBank = {
   {
     "id": 48,
     "unit": 5,
+    "lessonIDS": ["5.7"],
     "unitName": "Long-Run Consequences of Stabilization Policies",
     "question": "Which of the following policies would most likely increase a country's long-run productivity growth?",
     "image": null,  "options": [
@@ -749,6 +797,7 @@ export const macroSetTwoQuestions: QuestionBank = {
   {
     "id": 49,
     "unit": 6,
+    "lessonIDS": ["6.3"],
     "unitName": "Open Economy-International Trade and Finance",
     "question": "Under a system of floating exchange rates, a country experiencing significant inflation relative to its trading partners would most likely see its currency:",
     "image": null,  "options": [
@@ -764,6 +813,7 @@ export const macroSetTwoQuestions: QuestionBank = {
   {
     "id": 50,
     "unit": 4,
+    "lessonIDS": ["4.6"],
     "unitName": "Financial Sector",
     "question": "If a central bank is concerned about potential financial instability due to excessive leverage in the banking system, which policy tool would be most appropriate to address this concern?",
     "image": null,  "options": [
@@ -779,6 +829,7 @@ export const macroSetTwoQuestions: QuestionBank = {
   {
     "id": 51,
     "unit": 1,
+    "lessonIDS": ["1.4"],
     "unitName": "Basic Economic Concepts",
     "question": "Which of the following best describes the difference between a movement along a demand curve and a shift of the demand curve?",
     "image": null,  "options": [
@@ -794,6 +845,7 @@ export const macroSetTwoQuestions: QuestionBank = {
   {
     "id": 52,
     "unit": 2,
+    "lessonIDS": ["2.2"],
     "unitName": "Economic Indicators and the Business Cycle",
     "question": "Which of the following would NOT be counted in this year's GDP figures?",
     "image": null,  "options": [
@@ -809,6 +861,7 @@ export const macroSetTwoQuestions: QuestionBank = {
   {
     "id": 53,
     "unit": 3,
+    "lessonIDS": ["3.9"],
     "unitName": "National Income and Price Determination",
     "question": "How will automatic stabilizers affect the economy during an inflationary gap?",
     "image": null,  "options": [
@@ -824,6 +877,7 @@ export const macroSetTwoQuestions: QuestionBank = {
   {
     "id": 54,
     "unit": 5,
+    "lessonIDS": ["5.2"],
     "unitName": "Long-Run Consequences of Stabilization Policies",
     "question": "A decrease in government spending will most likely lead to which change on the Phillips curve graph?",
     "image": null,  "options": [
@@ -839,6 +893,7 @@ export const macroSetTwoQuestions: QuestionBank = {
   {
     "id": 55,
     "unit": 6,
+    "lessonIDS": ["1.3"],
     "unitName": "Open Economy-International Trade and Finance",
     "question": "Country A and Country B both produce computers and clothing. Country A can produce 8 computers or 24 units of clothing per hour. Country B can produce 6 computers or 12 units of clothing per hour. Based on this information:",
     "image": null,  "options": [
@@ -854,6 +909,7 @@ export const macroSetTwoQuestions: QuestionBank = {
   {
     "id": 56,
     "unit": 4,
+    "lessonIDS": ["4.6"],
     "unitName": "Financial Sector",
     "question": "For a country with an ample reserves banking system, which monetary policy action would be most effective in reducing unemployment?",
     "image": null,  "options": [
@@ -869,6 +925,7 @@ export const macroSetTwoQuestions: QuestionBank = {
   {
     "id": 57,
     "unit": 6,
+    "lessonIDS": ["6.2"],
     "unitName": "Basic Economic Concepts",
     "question": "In a foreign exchange market with a free floating exchange rate, the market exchange rate is determined by:",
     "image": null,  "options": [
@@ -884,6 +941,7 @@ export const macroSetTwoQuestions: QuestionBank = {
   {
     "id": 58,
     "unit": 2,
+    "lessonIDS": ["2.4"],
     "unitName": "Economic Indicators and the Business Cycle",
     "question": "If the CPI was 210 last year and is 218.4 this year, what is the inflation rate?",
     "image": null,  "options": [
@@ -899,6 +957,7 @@ export const macroSetTwoQuestions: QuestionBank = {
   {
     "id": 59,
     "unit": 3,
+    "lessonIDS": ["3.5"],
     "unitName": "National Income and Price Determination",
     "question": "If the economy is operating at potential GDP, what else can be said about the economy?",
     "image": null,  "options": [
@@ -914,6 +973,7 @@ export const macroSetTwoQuestions: QuestionBank = {
   {
     "id": 60,
     "unit": 5,
+    "lessonIDS": ["5.3"],
     "unitName": "Long-Run Consequences of Stabilization Policies",
     "question": "If an economy has flexible wages and prices, and the central bank implements expansionary monetary policy, which of the following describes the long-run effect on output and unemployment in the country?",
     "image": null,  "options": [

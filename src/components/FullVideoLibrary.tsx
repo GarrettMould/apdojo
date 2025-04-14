@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { videos, Video } from '@/data/videos';
 import { Play } from 'lucide-react';
 import { VideoModal } from '@/components/VideoModal';
@@ -43,6 +43,11 @@ export function FullVideoLibrary({ subject }: FullVideoLibraryProps) {
     ? 'border-green-500 text-green-500 hover:bg-green-50' 
     : 'border-blue-500 text-blue-500 hover:bg-blue-50';
 
+  // Function to handle video selection
+  const handleVideoSelect = (video: Video) => {
+    setSelectedVideo(video);
+  };
+
   return (
     <>
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
@@ -81,7 +86,7 @@ export function FullVideoLibrary({ subject }: FullVideoLibraryProps) {
                 {videos.map((video) => (
                   <div
                     key={video.id}
-                    onClick={() => setSelectedVideo(video)}
+                    onClick={() => handleVideoSelect(video)}
                     className="w-full max-w-[320px] bg-white rounded-xl shadow-lg overflow-hidden flex flex-col cursor-pointer"
                   >
                     {/* Thumbnail Container with Play Button Overlay */}
