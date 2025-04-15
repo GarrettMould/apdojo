@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { X } from 'lucide-react';
@@ -82,75 +82,47 @@ function LoginPromptModal({ isOpen, onClose }: LoginPromptModalProps) {
   );
 }
 
-export default function UnitMCQPracticePage() {
-  const { user } = useAuthContext();
+function UnitMCQPracticeContent() {
   const searchParams = useSearchParams();
-  const initialSubject = searchParams.get('subject') || 'macro';
+  const { user } = useAuthContext();
+  const subjectParam = searchParams.get('subject');
+  const subject = (subjectParam === 'micro' || subjectParam === 'macro') ? subjectParam : 'macro';
 
-  const [subject, setSubject] = useState<'macro' | 'micro'>(initialSubject as 'macro' | 'micro');
-  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
-  const [guestAnswerCount, setGuestAnswerCount] = useState(0);
+  const units = subject === 'micro' ? microUnitsData : macroUnitsData;
+  const initialUnit = units[0]?.id ?? (subject === 'micro' ? 2 : 1);
 
-  const [currentMacroUnit, setCurrentMacroUnit] = useState(1);
-  const [currentMacroQuestionIndex, setCurrentMacroQuestionIndex] = useState(0);
-  const [answeredMacroQuestions, setAnsweredMacroQuestions] = useState<Record<number, AnsweredQuestionState>>({});
-
-  const [currentMicroUnit, setCurrentMicroUnit] = useState(2);
-  const [currentMicroQuestionIndex, setCurrentMicroQuestionIndex] = useState(0);
-  const [answeredMicroQuestions, setAnsweredMicroQuestions] = useState<Record<number, AnsweredQuestionState>>({});
+  const [currentUnit, setCurrentUnit] = useState<number>(initialUnit);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
+  const [answeredQuestions, setAnsweredQuestions] = useState<Record<number, AnsweredQuestionState>>({});
 
   useEffect(() => {
-    const subjectParam = searchParams.get('subject');
-    if (subjectParam === 'micro' || subjectParam === 'macro') {
-      setSubject(subjectParam);
-      setGuestAnswerCount(0);
-    }
-  }, [searchParams]);
+    console.log(`Subject changed to: ${subject}`);
+    const newUnits = subject === 'micro' ? microUnitsData : macroUnitsData;
+    const newInitialUnit = newUnits[0]?.id ?? (subject === 'micro' ? 2 : 1);
+    console.log(`Setting initial unit to: ${newInitialUnit}`);
+    setCurrentUnit(newInitialUnit);
+    setCurrentQuestionIndex(0);
+    setAnsweredQuestions({});
+  }, [subject]);
 
-  const isMicro = subject === 'micro';
-  const currentUnit = isMicro ? currentMicroUnit : currentMacroUnit;
-  const setCurrentUnit = isMicro ? setCurrentMicroUnit : setCurrentMacroUnit;
-  const currentQuestionIndex = isMicro ? currentMicroQuestionIndex : currentMacroQuestionIndex;
-  const setCurrentQuestionIndex = isMicro ? setCurrentMicroQuestionIndex : setCurrentMacroQuestionIndex;
-  const answeredQuestions = isMicro ? answeredMicroQuestions : answeredMacroQuestions;
-  const setAnsweredQuestions = isMicro ? setAnsweredMicroQuestions : setAnsweredMacroQuestions;
-  const units = isMicro ? microUnitsData : macroUnitsData;
   const currentQuestions = units.find(unit => unit.id === currentUnit)?.questions || [];
 
   const handleAnswer = (questionId: number, answerLetter: string, isCorrect: boolean) => {
-    if (!user) {
-      const alreadyAnswered = answeredQuestions.hasOwnProperty(questionId);
-      
-      if (!alreadyAnswered && guestAnswerCount >= 2) {
-        setShowLoginPrompt(true);
-        return;
-      }
-
-      if (!alreadyAnswered) {
-        setGuestAnswerCount(prev => prev + 1);
-      }
-    }
-    
     setAnsweredQuestions(prev => ({
       ...prev,
-      [questionId]: { selectedLetter: answerLetter, isCorrect: isCorrect }
+      [questionId]: { selectedLetter: answerLetter, isCorrect }
     }));
-  };
-
-  const handleUnitChange = (unitId: number) => {
-    setCurrentUnit(unitId);
-    setGuestAnswerCount(0);
   };
 
   const handleNextQuestion = () => {
     if (currentQuestionIndex < currentQuestions.length - 1) {
-      setCurrentQuestionIndex(prev => prev + 1);
+      setCurrentQuestionIndex(prevIndex => prevIndex + 1);
     }
   };
 
   const handlePreviousQuestion = () => {
     if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(prev => prev - 1);
+      setCurrentQuestionIndex(prevIndex => prevIndex - 1);
     }
   };
 
@@ -158,19 +130,27 @@ export default function UnitMCQPracticePage() {
     setCurrentQuestionIndex(index);
   };
 
-  const pageTitle = isMicro ? 'AP Microeconomics' : 'AP Macroeconomics';
-  const titleColor = isMicro ? 'text-green-500' : 'text-blue-500';
+  const handleUnitChange = (unitId: number) => {
+    if (unitId !== currentUnit) {
+      console.log(`Unit changed to: ${unitId}`);
+      setCurrentUnit(unitId);
+      setCurrentQuestionIndex(0);
+    }
+  };
+
+  const pageTitle = subject === 'micro' ? 'AP Microeconomics' : 'AP Macroeconomics';
+  const titleColor = subject === 'micro' ? 'text-green-500' : 'text-blue-500';
 
   return (
-    <div className="max-w-7xl mx-auto px-0 py-16">
-      <div className="px-4">
-        <h1 className="text-6xl font-extrabold tracking-tight leading-tight mb-8 text-center">
-          <span className={titleColor}>{pageTitle}</span>{' '}
-          <div className="text-gray-900">MCQ Practice Questions</div>
+    <div className="bg-white min-h-screen pt-8 pb-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight leading-tight mb-8 text-center">
+          <span className={titleColor}>{pageTitle}</span>
+          <div className="text-gray-900 text-4xl md:text-5xl mt-1">MCQ Practice Questions</div>
         </h1>
 
-        <UnitMCQs 
-          currentUnit={currentUnit} 
+        <UnitMCQs
+          currentUnit={currentUnit}
           currentQuestionIndex={currentQuestionIndex}
           isLoggedIn={!!user}
           onAnswer={handleAnswer}
@@ -182,11 +162,27 @@ export default function UnitMCQPracticePage() {
           units={units}
         />
       </div>
-
-      <LoginPromptModal 
-        isOpen={showLoginPrompt} 
-        onClose={() => setShowLoginPrompt(false)} 
-      />
     </div>
+  );
+}
+
+function PageLoadingFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="text-center">
+         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+        <p className="text-xl font-medium text-gray-600">
+          Loading Practice Questions...
+        </p>
+      </div>
+    </div>
+  );
+}
+
+export default function UnitMCQPracticePage() {
+  return (
+    <Suspense fallback={<PageLoadingFallback />}>
+      <UnitMCQPracticeContent />
+    </Suspense>
   );
 }
