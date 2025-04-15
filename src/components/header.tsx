@@ -4,19 +4,34 @@ import Link from "next/link"
 import dojoIcon from "../../public/images/dojoIcon.png"
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAuthContext } from '@/contexts/AuthContext'
-import { UserCircle } from 'lucide-react'
+import { UserCircle, ChevronDown } from 'lucide-react'
 
 export function Header() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMcqDropdownOpen, setIsMcqDropdownOpen] = useState(false);
   const { user, logout } = useAuthContext();
+  const mcqDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (mcqDropdownRef.current && !mcqDropdownRef.current.contains(event.target as Node)) {
+        setIsMcqDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const handleHomeClick = (e: React.MouseEvent) => {
     e.preventDefault();
     router.push('/');
     setIsMenuOpen(false);
+    setIsMcqDropdownOpen(false);
   };
 
   const handleExamClick = (e: React.MouseEvent, subject: string) => {
@@ -29,6 +44,7 @@ export function Header() {
     e.preventDefault();
     router.push('/interactive-tools/flashcards');
     setIsMenuOpen(false);
+    setIsMcqDropdownOpen(false);
   };
 
   const handleTutoringClick = (e: React.MouseEvent) => {
@@ -41,18 +57,21 @@ export function Header() {
     e.preventDefault();
     router.push('/cheat-sheets');
     setIsMenuOpen(false);
+    setIsMcqDropdownOpen(false);
   };
 
   const handlePracticeExamsClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    router.push('/purchase');
+    router.push('/purchase/exams');
     setIsMenuOpen(false);
+    setIsMcqDropdownOpen(false);
   };
 
   const handleVideoLibraryClick = (e: React.MouseEvent) => {
     e.preventDefault();
     router.push('/videos/macro');
     setIsMenuOpen(false);
+    setIsMcqDropdownOpen(false);
   };
 
   return (
@@ -120,13 +139,14 @@ export function Header() {
             </Link>
             <Link 
               href="/cheat-sheets" 
-              onClick={() => setIsMenuOpen(false)}
+              onClick={handleCheatSheetsClick}
               className="hover:text-blue-700 transition-colors font-bold text-sm"
             >
               Cheat Sheets
             </Link>
             <Link 
               href="/purchase/exams"
+              onClick={handlePracticeExamsClick}
               className="hover:text-blue-700 transition-colors font-bold   text-sm"
             >
               Practice Exams
@@ -139,12 +159,33 @@ export function Header() {
               Quiz.Me
             </Link>
             */}
-            <Link 
-              href="/unitMCQPracticePage"
-              className="hover:text-blue-700 transition-colors font-bold text-sm"
-            >
-              Unit MCQs
-            </Link>
+            <div className="relative" ref={mcqDropdownRef}>
+              <button 
+                onClick={() => setIsMcqDropdownOpen(!isMcqDropdownOpen)}
+                className="flex items-center gap-1 hover:text-blue-700 transition-colors font-bold text-sm focus:outline-none"
+              >
+                Unit MCQs
+                <ChevronDown className={`w-4 h-4 transition-transform ${isMcqDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {isMcqDropdownOpen && (
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-10">
+                  <Link
+                    href="/unitMCQPracticePage?subject=macro"
+                    onClick={() => setIsMcqDropdownOpen(false)}
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-blue-600"
+                  >
+                    AP Macro MCQs
+                  </Link>
+                  <Link
+                    href="/unitMCQPracticePage?subject=micro"
+                    onClick={() => setIsMcqDropdownOpen(false)}
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-blue-600"
+                  >
+                    AP Micro MCQs
+                  </Link>
+                </div>
+              )}
+            </div>
             {user ? (
               <div className="flex items-center space-x-8">
                 {/* Comment out profile icon/link */}
@@ -211,34 +252,43 @@ export function Header() {
               </Link>
               <Link 
                 href="/cheat-sheets" 
-                onClick={() => setIsMenuOpen(false)}
+                onClick={(e) => {
+                    handleCheatSheetsClick(e);
+                    setIsMenuOpen(false);
+                }}
                 className="block px-4 py-2 hover:bg-gray-100 font-bold text-sm"
               >
                 Cheat Sheets
               </Link>
               <Link 
                 href="/purchase/exams"
-                onClick={() => setIsMenuOpen(false)}
+                 onClick={(e) => {
+                    handlePracticeExamsClick(e);
+                    setIsMenuOpen(false);
+                 }}
                 className="block px-4 py-2 hover:bg-gray-100 font-bold text-sm"
               >
                 Practice Exams
               </Link>
-              {/* Commenting out Quiz.Me link
+              
+              {/* Unit MCQs Dropdown - Mobile */}
+              <div className="block px-4 py-2 font-bold text-sm text-gray-500">Unit MCQs</div>
               <Link 
-                href="/quizMeTester"
+                href="/unitMCQPracticePage?subject=macro"
                 onClick={() => setIsMenuOpen(false)}
-                className="block px-4 py-2 hover:bg-gray-100 font-bold text-sm"
+                className="block pl-8 pr-4 py-2 hover:bg-gray-100 font-medium text-sm text-gray-700 hover:text-blue-600"
               >
-                Quiz.Me
+                AP Macro MCQs
               </Link>
-              */}
               <Link 
-                href="/unitMCQPracticePage"
+                href="/unitMCQPracticePage?subject=micro"
                 onClick={() => setIsMenuOpen(false)}
-                className="block px-4 py-2 hover:bg-gray-100 font-bold text-sm"
+                className="block pl-8 pr-4 py-2 hover:bg-gray-100 font-medium text-sm text-gray-700 hover:text-blue-600"
               >
-                Unit MCQs
+                AP Micro MCQs
               </Link>
+              
+               {/* ... (Mobile Auth buttons remain the same) ... */}
               {!user ? (
                 <div className="border-t mt-2 pt-2">
                   <Link

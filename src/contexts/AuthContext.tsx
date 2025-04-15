@@ -19,10 +19,14 @@ export function useAuthContext() {
   if (!context) {
     return {
       user: null,
-      loading: false,
-      signup: async () => {},
-      login: async () => {},
-      logout: async () => {},
+      loading: true,
+      signup: async () => { throw new Error('AuthProvider not found'); },
+      login: async () => { throw new Error('AuthProvider not found'); },
+      logout: async () => { throw new Error('AuthProvider not found'); },
+      showLoginModal: false,
+      setShowLoginModal: () => {},
+      showSignupModal: false,
+      setShowSignupModal: () => {},
     }
   }
   return context

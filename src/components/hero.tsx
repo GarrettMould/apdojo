@@ -9,6 +9,7 @@ import { ChevronDown } from 'lucide-react'
 export function Hero() {
   const { user } = useAuthContext();
 
+  // Uncommented handleScrollDown for original layout
   const handleScrollDown = () => {
     const heroSection = document.querySelector('section');
     if (heroSection) {
@@ -21,7 +22,8 @@ export function Hero() {
   };
 
   return (
-    <section className="text-center max-w-3xl mx-auto relative py-12 md:py-24 px-4 md:px-0" id="hero-section">
+    <section className="text-center flex flex-col items-center py-16 md:py-24"> {/* Restored original padding/centering */}
+      {/* Original Content - Now Active */}
       <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tight text-gray-900 leading-[1.3] whitespace-pre-line">
         {`Crush your`}
         <span className="text-blue-500">{`
@@ -29,7 +31,7 @@ export function Hero() {
         {`
         with Smarter Study Tools`}
       </h1>
-      <p className="text-base sm:text-lg md:text-xl text-gray-600 mt-4 md:mt-6 font-medium">
+      <p className="text-base sm:text-lg md:text-xl text-gray-600 mt-4 md:mt-6 font-medium max-w-3xl mx-auto"> {/* Added max-width and margin for centering */}
         Access all the resources you need to ace your AP economics exam, including{' '}
         <span className="text-blue-500 font-semibold">full-length practice exams</span>,{' '}
         <span className="text-blue-500 font-semibold">AI tutor help</span>, expert{' '}
@@ -56,6 +58,33 @@ export function Hero() {
           Join AP Dojo (It's Free)
         </Link>
       )}
+
+      {/* Two-Column Layout - Now Commented Out */}
+      {/*
+      <div className="w-full md:w-1/2 bg-blue-100 flex items-center justify-center p-8 cursor-pointer hover:bg-blue-200 transition-colors duration-300">
+        <div className="text-center">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-blue-800 mb-4">
+            AP Macroeconomics
+          </h2>
+          <p className="text-lg text-blue-700 mb-6">
+            Explore fiscal policy, monetary policy, inflation, unemployment, and more.
+          </p>
+          <span className="text-blue-600 font-semibold">Enter Course &rarr;</span>
+        </div>
+      </div>
+
+      <div className="w-full md:w-1/2 bg-green-100 flex items-center justify-center p-8 cursor-pointer hover:bg-green-200 transition-colors duration-300">
+        <div className="text-center">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-green-800 mb-4">
+            AP Microeconomics
+          </h2>
+          <p className="text-lg text-green-700 mb-6">
+            Dive into supply and demand, market structures, factor markets, and market failures.
+          </p>
+          <span className="text-green-600 font-semibold">Enter Course &rarr;</span>
+        </div>
+      </div>
+      */}
     </section>
   )
 } 

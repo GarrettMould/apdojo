@@ -827,7 +827,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
             {/* Question grid */}
             <div className="mb-8 bg-white rounded-lg shadow-md border border-gray-200 p-8">
               <div className="flex items-center gap-4">
-                <button
+                      <button
                   onClick={() => {
                     if (currentTrackPage > 0) {
                       setCurrentTrackPage(currentTrackPage - 1);
@@ -843,8 +843,8 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
                   `}
                 >
                   <Triangle className="w-4 h-4 -rotate-90" />
-                </button>
-
+                      </button>
+                      
                 <div className="flex-1 flex justify-between gap-2">
                   {Array.from({ length: questionsPerTrack }, (_, i) => {
                     const questionIndex = startIndex + i;
@@ -869,12 +869,12 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
                         onClick={() => setCurrentQuestionIndexWithTrack(questionIndex)}
                       >
                         {questionIndex + 1}
-                      </div>
+                          </div>
                     );
                   })}
-                </div>
+                        </div>
 
-                <button
+                    <button
                   onClick={() => {
                     if (currentTrackPage < totalPages - 1) {
                       setCurrentTrackPage(currentTrackPage + 1);
@@ -890,27 +890,27 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
                   `}
                 >
                   <Triangle className="w-4 h-4 rotate-90" />
-                </button>
-              </div>
-            </div>
-          
+                    </button>
+                  </div>
+                </div>
+                  
             {/* Main exam container */}
             <div className="flex flex-col lg:flex-row gap-6">
               {/* Question container (75% width) */}
               <div className="w-full lg:w-3/4">
                 <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-4 lg:p-8">
-                  {/* Question content */}
+                {/* Question content */}
                   <div className="space-y-6 px-8">
-                    <p className="text-lg font-medium font-serif leading-relaxed text-gray-800">
-                      {questions[currentQuestionIndex].question}
-                    </p>
+                  <p className="text-lg font-medium font-serif leading-relaxed text-gray-800">
+                    {questions[currentQuestionIndex].question}
+                  </p>
                     
                     {questions[currentQuestionIndex].image && (
                       <div className="my-4">
                         <img 
                           src={questions[currentQuestionIndex].image.src}
                           alt="Question"
-                          className="max-h-[225px] object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
+                        className="max-h-[225px] object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
                           onClick={() => {
                             setSelectedImage(questions[currentQuestionIndex].image);
                             setShowImageModal(true);
@@ -921,30 +921,30 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
                     
                     {/* Answer Options */}
                     <div className="space-y-4">
-                      {questions[currentQuestionIndex].options.map((option, optIndex) => (
-                        <button
-                          key={optIndex}
-                          onClick={() => handleAnswer(questions[currentQuestionIndex].id, optIndex)}
-                          className={`w-full text-left p-4 rounded-lg text-sm font-medium transition-all duration-200 border ${
+                    {questions[currentQuestionIndex].options.map((option, optIndex) => (
+                      <button
+                        key={optIndex}
+                        onClick={() => handleAnswer(questions[currentQuestionIndex].id, optIndex)}
+                        className={`w-full text-left p-4 rounded-lg text-sm font-medium transition-all duration-200 border ${
                             answers[questions[currentQuestionIndex].id]
                               ? optIndex === (answers[questions[currentQuestionIndex].id]?.charCodeAt(0) - 65)
                                 ? 'bg-blue-50 text-gray-900 shadow-sm border-blue-200'
                                 : 'bg-transparent text-gray-900 border-gray-200'
                               : 'bg-transparent hover:bg-gray-50 border-gray-200 hover:border-gray-300 hover:shadow-sm'
-                          }`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <span className="w-6 h-6 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-600 font-medium">
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="w-6 h-6 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-600 font-medium">
                               {String.fromCharCode(65 + optIndex)}
-                            </span>
-                            <span className="flex-1">{option}</span>
-                          </div>
-                        </button>
-                      ))}
+                          </span>
+                          <span className="flex-1">{option}</span>
+                        </div>
+                      </button>
+                    ))}
                     </div>
                   </div>
-                </div>
-              </div>
+                    </div>
+                  </div>
 
               {/* Sidebar (25% width) */}
               <div className="w-full lg:w-1/4 bg-white rounded-lg shadow-md border border-gray-200 p-4 lg:p-6 h-fit">
@@ -1045,7 +1045,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
                     </button>
                   </div>
                   <button
-                    onClick={() => setShowResults(true)}
+                      onClick={() => setShowResults(true)}
                     className="w-full p-3 rounded-lg border-2 text-sm font-medium transition-all duration-200 border-blue-500 text-blue-600 hover:bg-blue-50 cursor-pointer"
                   >
                     Submit Exam
@@ -1084,7 +1084,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
                         {isCorrect ? 'Correct' : 'Incorrect'}
                       </span>
                     </div>
-                    <p className="text-lg font-medium font-serif leading-relaxed text-gray-900">{question.question}</p>
+                      <p className="text-lg font-medium font-serif leading-relaxed text-gray-900">{question.question}</p>
                     
                     {/* Add image display */}
                     {question.image && (

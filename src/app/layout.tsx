@@ -1,11 +1,18 @@
 import './globals.css'
 import type { Metadata } from 'next'
-import { HeaderWrapper } from '@/components/header-wrapper'
-import { Footer } from '@/components/Footer'
-import { PageContainer } from '@/components/ui/page-container'
 import { AuthProvider } from '@/contexts/AuthContext'
-import { Analytics } from "@vercel/analytics/react"
+// Remove client-specific imports 
+// import { HeaderWrapper } from '@/components/header-wrapper' 
+// import { Footer } from '@/components/Footer'
+// import { PageContainer } from '@/components/ui/page-container'
+// import { useAuthContext } from '@/contexts/AuthContext' 
+// import { LoginModal, SignupModal } from '@/components/AuthModals' 
+// import { Analytics } from "@vercel/analytics/react"
 
+// Import the new client wrapper component
+import { LayoutClientWrapper } from '@/components/LayoutClientWrapper'
+
+// generateMetadata remains active in this Server Component
 export async function generateMetadata({ params }: { params: { type: string } }) {
   const examType = params.type === 'macro-exams' ? 'Macroeconomics' : 'Microeconomics'
   
@@ -15,25 +22,24 @@ export async function generateMetadata({ params }: { params: { type: string } })
   }
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+// Remove the old LayoutClientContent definition entirely
+/*
+'use client'; 
+function LayoutClientContent({ children }: { children: React.ReactNode }) {
+  // ... removed ...
+}
+*/
+
+// RootLayout remains a Server Component
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className="min-h-screen flex flex-col">
         <AuthProvider>
-          <HeaderWrapper />
-          <main className="flex-1 w-full bg-gradient-to-b from-gray-100 via-white to-white via-5%">
-            <PageContainer>
-              {children}
-              <Analytics />
-            </PageContainer>
-          </main>
-          <Footer />
+          {/* Use the new dedicated client component wrapper */}
+          <LayoutClientWrapper>{children}</LayoutClientWrapper>
         </AuthProvider>
       </body>
     </html>
-  )
+  );
 }

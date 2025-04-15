@@ -12,6 +12,8 @@ import { auth } from '@/lib/firebase'
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showSignupModal, setShowSignupModal] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -32,6 +34,8 @@ export function useAuth() {
 
   const logout = async () => {
     setUser(null)
+    setShowLoginModal(false);
+    setShowSignupModal(false);
     return signOut(auth)
   }
 
@@ -40,6 +44,10 @@ export function useAuth() {
     loading,
     signup,
     login,
-    logout
+    logout,
+    showLoginModal,
+    setShowLoginModal,
+    showSignupModal,
+    setShowSignupModal
   }
 } 
