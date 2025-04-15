@@ -1,13 +1,7 @@
 import './globals.css'
 import type { Metadata } from 'next'
 import { AuthProvider } from '@/contexts/AuthContext'
-// Remove client-specific imports 
-// import { HeaderWrapper } from '@/components/header-wrapper' 
-// import { Footer } from '@/components/Footer'
-// import { PageContainer } from '@/components/ui/page-container'
-// import { useAuthContext } from '@/contexts/AuthContext' 
-// import { LoginModal, SignupModal } from '@/components/AuthModals' 
-// import { Analytics } from "@vercel/analytics/react"
+
 
 // Import the new client wrapper component
 import { LayoutClientWrapper } from '@/components/LayoutClientWrapper'
