@@ -161,6 +161,7 @@ function UnitMCQPracticeContent() {
       console.log(`Unit changed to: ${unitId}`);
       setCurrentUnit(unitId);
       setCurrentQuestionIndex(0);
+      setAnsweredQuestions({});
     }
   };
 
