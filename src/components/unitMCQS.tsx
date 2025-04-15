@@ -272,29 +272,34 @@ const QuestionCard = ({
                 </div>
               </div>
             ) : (
-              // --- Login Form --- 
+              // --- Login Form ---
               <div className="text-center">
                  <h3 className="text-xl md:text-2xl font-extrabold tracking-tight text-gray-800 mb-5">
                    Login to <span className="text-blue-600">Unlock Resources</span>
                  </h3>
                  <form onSubmit={handleLoginSubmit} className="space-y-4">
-                    <input 
-                      type="email"
-                      placeholder="Email Address"
-                      value={loginEmail}
-                      onChange={(e) => setLoginEmail(e.target.value)}
-                      required
-                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm"
-                    />
-                    <input 
-                      type="password"
-                      placeholder="Password"
-                      value={loginPassword}
-                      onChange={(e) => setLoginPassword(e.target.value)}
-                      required
-                      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm"
-                    />
-                    {loginError && <p className="text-red-500 text-sm text-left">{loginError}</p>}
+                    {/* Input Group Wrapper for Login */}
+                    <div className="rounded-md shadow-sm -space-y-px">
+                      <input
+                        type="email"
+                        placeholder="Email Address"
+                        value={loginEmail}
+                        onChange={(e) => setLoginEmail(e.target.value)}
+                        required
+                        // Grouped input styles for login email
+                        className="appearance-none rounded-none relative block w-full px-4 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                      />
+                      <input
+                        type="password"
+                        placeholder="Password"
+                        value={loginPassword}
+                        onChange={(e) => setLoginPassword(e.target.value)}
+                        required
+                        // Grouped input styles for login password
+                        className="appearance-none rounded-none relative block w-full px-4 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                      />
+                    </div>
+                    {loginError && <p className="text-red-500 text-sm text-left pt-1">{loginError}</p>} {/* Adjusted error spacing */}
                     <button type="submit" disabled={loginLoading} className="w-full px-6 py-3 text-sm font-bold text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center">
                       {loginLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Login
                     </button>
@@ -310,90 +315,100 @@ const QuestionCard = ({
         </div>
       )}
 
+      {/* Main Question Content - Now conditionally renders placeholder or actual content */}
       <div className={`space-y-8 ${shouldBlur ? 'blur-sm' : ''}`}>
-        <div className="flex items-center gap-2">
-          <span className="px-3 py-1.5 bg-gray-50 text-gray-600 rounded-md text-xs sm:text-sm font-medium">
-            Question {currentIndex + 1} of {totalQuestions}
-          </span>
-          <span className="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-md text-xs sm:text-sm font-medium">
-            Unit {question.unit}
-          </span>
-        </div>
-        <p className="text-lg font-medium font-serif leading-relaxed text-gray-800">
-          {question.question}
-        </p>
-        {question.image && (
-          <div className="my-6">
-            <img 
-              src={question.image.src}
-              alt="Question"
-              className="max-h-[225px] object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
-            />
-          </div>
-        )}
-
-        {/* --- Conditional Display: Explanation OR Answer Options --- */}
-        {isSubmitted && aiExplanation ? (
-          // --- Display Explanation Mode --- 
-          // (Check simplified to just isSubmitted && aiExplanation) 
-          <div className="mt-6 pt-6 border-t border-gray-200 space-y-6">
-             {/* Correct Answer Summary */}
-             <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-              <h4 className="font-semibold text-gray-900 mb-2 text-sm">Correct Answer</h4>
-              <div className="flex items-center gap-3">
-                <span className="w-6 h-6 flex items-center justify-center rounded-full bg-white border border-green-200 text-green-600 font-medium">
-                  {question.correctAnswer}
-                </span>
-                <span className="font-medium text-gray-900">
-                  {question.options[correctAnswerIndex ?? 0]} 
-                </span>
-              </div>
-            </div>
-            {/* Explanation Box */}
-            <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <h4 className="font-semibold text-gray-900 mb-2 text-sm">Explanation</h4>
-              <p className="text-gray-900">{aiExplanation}</p>
-            </div>
-          </div>
+        {shouldBlur ? (
+          // --- Placeholder for Blurred Content ---
+          <div className="min-h-[500px]"></div>
         ) : (
-           // --- Display Answer Options Mode --- 
-           // (No loading indicator needed here anymore) 
+          // --- Actual Question Content ---
           <>
-            {/* Answer Options */}
-            <div className="space-y-4">
-              {question.options.map((option, optIndex) => (
-                <button
-                  key={optIndex}
-                  onClick={() => handleAnswerSelect(optIndex)}
-                  disabled={isSubmitted || shouldBlur} 
-                  className={`w-full text-left p-4 rounded-lg text-sm font-medium transition-all duration-200 border ${isSubmitted ? 
-                    optIndex === correctAnswerIndex
-                      ? 'bg-green-50 text-gray-900 shadow-sm border-green-200 cursor-default' 
-                      : optIndex === selectedAnswerIndex
-                        ? 'bg-red-50 text-gray-900 shadow-sm border-red-200 cursor-default' 
-                        : 'bg-transparent text-gray-900 border-gray-200 cursor-default' 
-                    : 'bg-transparent hover:bg-gray-50 border-gray-200 hover:border-gray-300 hover:shadow-sm' 
-                    } ${shouldBlur ? 'cursor-not-allowed' : ''}`}
-                >
-                  <div className="flex items-center gap-3">
-                    <span className={`w-6 h-6 flex items-center justify-center rounded-full border font-medium ${isSubmitted ? (optIndex === correctAnswerIndex ? 'bg-green-100 border-green-300 text-green-700' : optIndex === selectedAnswerIndex ? 'bg-red-100 border-red-300 text-red-700' : 'bg-white border-gray-300 text-gray-500') : 'bg-white border-gray-300 text-gray-600'}`}>
-                      {String.fromCharCode(65 + optIndex)}
-                    </span>
-                    <span className={`flex-1 ${isSubmitted ? 'text-gray-800' : 'text-gray-900'}`}>{option}</span>
-                    {isSubmitted && (
-                      <div className="flex-shrink-0">
-                        {optIndex === correctAnswerIndex
-                          ? <Check className="w-5 h-5 text-green-500" />
-                          : optIndex === selectedAnswerIndex
-                            ? <X className="w-5 h-5 text-red-500" />
-                            : null
-                        }
-                      </div>
-                    )}
-                  </div>
-                </button>
-              ))}
+            {/* Question Header (Counter, Unit) */}
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1.5 bg-gray-50 text-gray-600 rounded-md text-xs sm:text-sm font-medium">
+                Question {currentIndex + 1} of {totalQuestions}
+              </span>
+              <span className="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-md text-xs sm:text-sm font-medium">
+                Unit {question.unit}
+              </span>
             </div>
+            {/* Question Text */}
+            <p className="text-lg font-medium font-serif leading-relaxed text-gray-800">
+              {question.question}
+            </p>
+            {/* Question Image */}
+            {question.image && (
+              <div className="my-6">
+                <img
+                  src={question.image.src}
+                  alt="Question"
+                  className="max-h-[225px] object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
+                />
+              </div>
+            )}
+
+            {/* Conditional Display: Explanation OR Answer Options */}
+            {isSubmitted && aiExplanation ? (
+              // --- Display Explanation Mode ---
+              <div className="mt-6 pt-6 border-t border-gray-200 space-y-6">
+                {/* Correct Answer Summary */}
+                 <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                  <h4 className="font-semibold text-gray-900 mb-2 text-sm">Correct Answer</h4>
+                  <div className="flex items-center gap-3">
+                    <span className="w-6 h-6 flex items-center justify-center rounded-full bg-white border border-green-200 text-green-600 font-medium">
+                      {question.correctAnswer}
+                    </span>
+                    <span className="font-medium text-gray-900">
+                      {question.options[correctAnswerIndex ?? 0]}
+                    </span>
+                  </div>
+                </div>
+                {/* Explanation Box */}
+                <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <h4 className="font-semibold text-gray-900 mb-2 text-sm">Explanation</h4>
+                  <p className="text-gray-900">{aiExplanation}</p>
+                </div>
+              </div>
+            ) : (
+              // --- Display Answer Options Mode ---
+              <>
+                {/* Answer Options */}
+                <div className="space-y-4">
+                  {question.options.map((option, optIndex) => (
+                    <button
+                      key={optIndex}
+                      onClick={() => handleAnswerSelect(optIndex)}
+                      disabled={isSubmitted || shouldBlur}
+                      className={`w-full text-left p-4 rounded-lg text-sm font-medium transition-all duration-200 border ${isSubmitted ?
+                        optIndex === correctAnswerIndex
+                          ? 'bg-green-50 text-gray-900 shadow-sm border-green-200 cursor-default'
+                          : optIndex === selectedAnswerIndex
+                            ? 'bg-red-50 text-gray-900 shadow-sm border-red-200 cursor-default'
+                            : 'bg-transparent text-gray-900 border-gray-200 cursor-default'
+                        : 'bg-transparent hover:bg-gray-50 border-gray-200 hover:border-gray-300 hover:shadow-sm'
+                        } ${shouldBlur ? 'cursor-not-allowed' : ''}`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className={`w-6 h-6 flex items-center justify-center rounded-full border font-medium ${isSubmitted ? (optIndex === correctAnswerIndex ? 'bg-green-100 border-green-300 text-green-700' : optIndex === selectedAnswerIndex ? 'bg-red-100 border-red-300 text-red-700' : 'bg-white border-gray-300 text-gray-500') : 'bg-white border-gray-300 text-gray-600'}`}>
+                          {String.fromCharCode(65 + optIndex)}
+                        </span>
+                        <span className={`flex-1 ${isSubmitted ? 'text-gray-800' : 'text-gray-900'}`}>{option}</span>
+                        {isSubmitted && (
+                          <div className="flex-shrink-0">
+                            {optIndex === correctAnswerIndex
+                              ? <Check className="w-5 h-5 text-green-500" />
+                              : optIndex === selectedAnswerIndex
+                                ? <X className="w-5 h-5 text-red-500" />
+                                : null
+                            }
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
           </>
         )}
       </div>

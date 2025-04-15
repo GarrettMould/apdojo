@@ -8,6 +8,8 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import { UnitMCQs } from '@/components/unitMCQS';
 import { unit1Questions, unit2Questions, unit3Questions, unit4Questions, unit5Questions, unit6Questions, microUnit2Questions, microUnit3Questions, microUnit4Questions, microUnit5Questions, microUnit6Questions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question as QuestionType } from '@/data/questionBanks/types';
+import { db } from '@/lib/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const macroUnitsData = [
   { id: 1, name: 'Unit 1', questions: unit1Questions },
@@ -107,11 +109,35 @@ function UnitMCQPracticeContent() {
 
   const currentQuestions = units.find(unit => unit.id === currentUnit)?.questions || [];
 
-  const handleAnswer = (questionId: number, answerLetter: string, isCorrect: boolean) => {
+  const handleAnswer = async (questionId: number, answerLetter: string, isCorrect: boolean) => {
     setAnsweredQuestions(prev => ({
       ...prev,
       [questionId]: { selectedLetter: answerLetter, isCorrect }
     }));
+
+    if (user) {
+      try {
+        const answerData = {
+          userId: user.uid,
+          questionId: questionId,
+          unitId: currentUnit,
+          subject: subject,
+          selectedAnswer: answerLetter,
+          isCorrect: isCorrect,
+          timestamp: serverTimestamp()
+        };
+
+        const userAnswersColRef = collection(db, 'users', user.uid, 'mcqAnswers');
+
+        await addDoc(userAnswersColRef, answerData);
+        console.log('MCQ answer saved to Firestore for user:', user.uid);
+
+      } catch (error) {
+        console.error("Error saving MCQ answer to Firestore:", error);
+      }
+    } else {
+      console.log("User not logged in, answer not saved to Firestore.");
+    }
   };
 
   const handleNextQuestion = () => {
@@ -142,9 +168,9 @@ function UnitMCQPracticeContent() {
   const titleColor = subject === 'micro' ? 'text-green-500' : 'text-blue-500';
 
   return (
-    <div className="bg-white min-h-screen pt-8 pb-12">
+    <div className="bg-transparent min-h-screen pt-16 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight leading-tight mb-8 text-center">
+        <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight leading-tight mb-6 text-center">
           <span className={titleColor}>{pageTitle}</span>
           <div className="text-gray-900 text-4xl md:text-5xl mt-1">MCQ Practice Questions</div>
         </h1>
