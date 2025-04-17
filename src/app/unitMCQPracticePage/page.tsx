@@ -6,18 +6,20 @@ import Link from 'next/link';
 import { X } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { UnitMCQs } from '@/components/unitMCQS';
-import { unit1Questions, unit2Questions, unit3Questions, unit4Questions, unit5Questions, unit6Questions, microUnit2Questions, microUnit3Questions, microUnit4Questions, microUnit5Questions, microUnit6Questions } from '@/data/unitPracticeProblems/unitPracticeProblems';
+import { macroUnit1Questions, macroUnit2Questions, macroUnit3Questions, macroUnit4Questions, macroUnit5Questions, macroUnit6Questions, microUnit2Questions, microUnit3Questions, microUnit4Questions, microUnit5Questions, microUnit6Questions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question as QuestionType } from '@/data/questionBanks/types';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { UnitMCQDashboard } from '@/components/unitMCQDashboard';
+import dojoIcon from "../../../public/images/dojoIcon.png"
 
 const macroUnitsData = [
-  { id: 1, name: 'Unit 1', questions: unit1Questions },
-  { id: 2, name: 'Unit 2', questions: unit2Questions },
-  { id: 3, name: 'Unit 3', questions: unit3Questions },
-  { id: 4, name: 'Unit 4', questions: unit4Questions },
-  { id: 5, name: 'Unit 5', questions: unit5Questions },
-  { id: 6, name: 'Unit 6', questions: unit6Questions },
+  { id: 1, name: 'Unit 1', questions: macroUnit1Questions },
+  { id: 2, name: 'Unit 2', questions: macroUnit2Questions },
+  { id: 3, name: 'Unit 3', questions: macroUnit3Questions },
+  { id: 4, name: 'Unit 4', questions: macroUnit4Questions },
+  { id: 5, name: 'Unit 5', questions: macroUnit5Questions },
+  { id: 6, name: 'Unit 6', questions: macroUnit6Questions },
 ];
 
 const microUnitsData = [
@@ -96,6 +98,8 @@ function UnitMCQPracticeContent() {
   const [currentUnit, setCurrentUnit] = useState<number>(initialUnit);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [answeredQuestions, setAnsweredQuestions] = useState<Record<number, AnsweredQuestionState>>({});
+  const [dojoProgress, setDojoProgress] = useState<number>(50);
+  const [correctStreak, setCorrectStreak] = useState<number>(0);
 
   useEffect(() => {
     console.log(`Subject changed to: ${subject}`);
@@ -105,15 +109,62 @@ function UnitMCQPracticeContent() {
     setCurrentUnit(newInitialUnit);
     setCurrentQuestionIndex(0);
     setAnsweredQuestions({});
+    setDojoProgress(50);
+    setCorrectStreak(0);
   }, [subject]);
 
-  const currentQuestions = units.find(unit => unit.id === currentUnit)?.questions || [];
+  const currentUnitData = units.find(unit => unit.id === currentUnit);
+  const currentQuestions = currentUnitData?.questions || [];
+  const currentUnitName = currentUnitData?.name || 'Loading...';
 
-  const handleAnswer = async (questionId: number, answerLetter: string, isCorrect: boolean) => {
+  const handleAnswer = async (questionId: number, answerLetter: string, isCorrect: boolean, lessonIDS: string[]) => {
+    // Define base points
+    const baseCorrectPoints = 5;
+    const baseIncorrectPoints = -3;
+    let pointsChange = 0;
+
+    // Log streak *before* potential update
+    // console.log(`handleAnswer - BEFORE update - correctStreak: ${correctStreak}, isCorrect: ${isCorrect}`);
+
+    // Calculate points change based on correctness and streak
+    if (isCorrect) {
+      // Apply multiplier based on the streak *before* this correct answer
+      if (correctStreak >= 5) {
+        pointsChange = baseCorrectPoints * 1.5;
+      } else if (correctStreak >= 3) {
+        pointsChange = baseCorrectPoints * 1.2;
+      } else {
+        pointsChange = baseCorrectPoints;
+      }
+      // Increment streak *after* calculating points for this answer
+      setCorrectStreak(prevStreak => {
+          // console.log(`handleAnswer - INCREMENTING streak from ${prevStreak} to ${prevStreak + 1}`); // Log inside setter
+          return prevStreak + 1;
+      });
+    } else {
+      // Incorrect answer resets streak and applies penalty
+      pointsChange = baseIncorrectPoints;
+      // Only reset if streak is not already 0
+      if (correctStreak > 0) {
+          // console.log(`handleAnswer - RESETTING streak from ${correctStreak} to 0`); // Log inside setter condition
+          setCorrectStreak(0);
+      }
+    }
+
+    // Update local answered state
     setAnsweredQuestions(prev => ({
       ...prev,
       [questionId]: { selectedLetter: answerLetter, isCorrect }
     }));
+
+    // Update Dojo Progress state using the calculated pointsChange
+    setDojoProgress(prevProgress => {
+      const newProgress = prevProgress + pointsChange;
+      const clampedProgress = Math.max(0, Math.min(100, newProgress));
+       // Log the streak value as it's seen by the progress update logic
+      // console.log(`handleAnswer - Updating progress - currentStreak value: ${correctStreak}, Points: ${pointsChange.toFixed(1)}, Progress: ${prevProgress} -> ${clampedProgress}`);
+      return clampedProgress;
+    });
 
     if (user) {
       try {
@@ -124,6 +175,7 @@ function UnitMCQPracticeContent() {
           subject: subject,
           selectedAnswer: answerLetter,
           isCorrect: isCorrect,
+          lessonIDS: lessonIDS,
           timestamp: serverTimestamp()
         };
 
@@ -162,6 +214,8 @@ function UnitMCQPracticeContent() {
       setCurrentUnit(unitId);
       setCurrentQuestionIndex(0);
       setAnsweredQuestions({});
+      setDojoProgress(50);
+      setCorrectStreak(0);
     }
   };
 
@@ -171,11 +225,6 @@ function UnitMCQPracticeContent() {
   return (
     <div className="bg-transparent min-h-screen pt-16 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight leading-tight mb-6 text-center">
-          <span className={titleColor}>{pageTitle}</span>
-          <div className="text-gray-900 text-4xl md:text-5xl mt-1">MCQ Practice Questions</div>
-        </h1>
-
         <UnitMCQs
           currentUnit={currentUnit}
           currentQuestionIndex={currentQuestionIndex}
@@ -187,6 +236,8 @@ function UnitMCQPracticeContent() {
           onUnitChange={handleUnitChange}
           answeredQuestions={answeredQuestions}
           units={units}
+          dojoProgress={dojoProgress}
+          correctStreak={correctStreak}
         />
       </div>
     </div>

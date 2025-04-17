@@ -2,9 +2,12 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Question as QuestionType } from '@/data/questionBanks/types';
-import { Check, X, Brain, FileText, ChevronDown, Triangle, Loader2 } from 'lucide-react';
+import { Check, X, Brain, FileText, ChevronDown, Triangle, Loader2, Play } from 'lucide-react';
 import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
+import Image from 'next/image';
+
+import dojoIcon from "../../public/images/dojoIcon.png";
 
 // Type definition consistent with the parent page
 interface AnsweredQuestionState {
@@ -16,27 +19,31 @@ interface UnitMCQsProps {
   currentUnit: number;
   currentQuestionIndex: number;
   isLoggedIn: boolean;
-  onAnswer: (questionId: number, answerLetter: string, isCorrect: boolean) => void; 
+  onAnswer: (questionId: number, answerLetter: string, isCorrect: boolean, lessonIDS: string[]) => void; 
   onNextQuestion: () => void;
   onPreviousQuestion: () => void;
   onQuestionSelect: (index: number) => void;
   onUnitChange: (unitId: number) => void;
   answeredQuestions: Record<number, AnsweredQuestionState>; 
   units: Array<{ id: number; name: string; questions: QuestionType[] }>;
+  dojoProgress: number;
+  correctStreak: number;
 }
 
 interface QuestionCardProps {
   question: QuestionType;
   currentIndex: number;
   totalQuestions: number;
-  onAnswerSelect: (questionId: number, answerLetter: string, answerText: string) => void;
+  onAnswerSelect: (questionId: number, answerLetter: string, answerText: string, lessonIDS: string[]) => void;
   initialSelectedLetter?: string; 
-  isAnswered: boolean; 
+  isAnswered: boolean;
   aiExplanation?: string;
   isLoadingAI: boolean;
   isLoggedIn: boolean;
   signup: (email: string, password: string) => Promise<any>;
   login: (email: string, password: string) => Promise<any>;
+  dojoProgress: number;
+  correctStreak: number;
 }
 
 const QuestionCard = ({ 
@@ -50,9 +57,10 @@ const QuestionCard = ({
   isLoadingAI,
   isLoggedIn,
   signup,
-  login
+  login,
+  dojoProgress,
+  correctStreak
 }: QuestionCardProps) => {
-
   const letterToIndex = (letter?: string): number | null => {
     if (!letter) return null;
     const index = letter.charCodeAt(0) - 65;
@@ -140,9 +148,10 @@ const QuestionCard = ({
     setSelectedAnswerIndex(index);
     setIsSubmitted(true);
     onAnswerSelect(
-      question.id, 
+      question.id,
       String.fromCharCode(65 + index),
-      question.options[index]
+      question.options[index],
+      question.lessonIDS
     );
   };
 
@@ -315,7 +324,7 @@ const QuestionCard = ({
         </div>
       )}
 
-      {/* Main Question Content - Now conditionally renders placeholder or actual content */}
+      {/* Main Question Content */}
       <div className={`space-y-8 ${shouldBlur ? 'blur-sm' : ''}`}>
         {shouldBlur ? (
           // --- Placeholder for Blurred Content ---
@@ -323,15 +332,68 @@ const QuestionCard = ({
         ) : (
           // --- Actual Question Content ---
           <>
-            {/* Question Header (Counter, Unit) */}
-            <div className="flex items-center gap-2">
-              <span className="px-3 py-1.5 bg-gray-50 text-gray-600 rounded-md text-xs sm:text-sm font-medium">
-                Question {currentIndex + 1} of {totalQuestions}
-              </span>
-              <span className="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-md text-xs sm:text-sm font-medium">
-                Unit {question.unit}
-              </span>
+            {/* Combined Header Row: Badges and Progress Bar - Align items to end */}
+            <div className="flex items-end justify-between gap-4 w-full mb-6"> 
+              {/* Left Side: Badges (Only Unit now) */}
+              <div className="flex items-center flex-shrink-0"> 
+                {/* Remove the Question Count Badge */}
+                {/* <span className="px-3 py-1.5 bg-gray-50 text-gray-600 rounded-md text-xs sm:text-sm font-medium whitespace-nowrap"> */}
+                {/*   Question {currentIndex + 1} of {totalQuestions} */}
+                {/* </span> */}
+                {/* Enhance the Unit Badge */}
+                <span className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-base font-bold whitespace-nowrap"> {/* Increased size, weight, padding, changed styling slightly */}
+                  Unit {question.unit}
+                </span>
+              </div>
+
+              {/* Right Side: Dojo Progress Section */}
+              <div className="flex flex-col items-end flex-grow min-w-0"> {/* Use flex-col for streak + bar, flex-grow to take space, min-w-0 */}
+                {/* Streak Message (aligned right) */}
+                <div className="text-right text-sm font-medium mb-1 h-5 text-gray-600"> {/* Height prevents layout shift, adjusted margin */}
+                  {correctStreak >= 5 && (
+                    <span className="text-orange-500 animate-pulse-intense">🔥 5+ Streak (x1.5)</span> // Shortened text
+                  )}
+                  {correctStreak >= 3 && correctStreak < 5 && (
+                    <span className="text-yellow-500 animate-pulse-normal">⚡ 3+ Streak (x1.2)</span> // Shortened text
+                  )}
+                  {correctStreak < 3 && (
+                     <span>&nbsp;</span> // Placeholder to maintain height
+                  )}
+                </div>
+
+                {/* Container for bar and right logo */}
+                <div className="flex items-center justify-end w-full gap-3"> {/* Changed justify-between to justify-end */}
+                   {/* Wrapper for positioning context and halo - use flex-grow */}
+                   <div className="h-2 relative flex-grow"> {/* Changed h-3 to h-2 */}
+                      {/* Halo Element - adjust inset */}
+                      <div
+                         className={`absolute inset-[-3px] rounded-full bg-gradient-to-r from-yellow-400/30 via-orange-500/30 to-red-500/30 blur -z-10 ${ /* Changed inset */
+                           correctStreak >= 5 ? 'animate-halo-intense' : correctStreak >= 3 ? 'animate-halo-normal' : 'opacity-0' 
+                         }`}
+                      ></div>
+
+                      {/* Original Horizontal Meter Bar (Visible Track) */}
+                      <div className="absolute inset-0 h-full bg-gray-200 rounded-full overflow-hidden">
+                        {/* Filled part - No animation here */}
+                        <div
+                            className="absolute top-0 left-0 h-full bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 rounded-full transition-all duration-500 ease-out"
+                            style={{ width: `${dojoProgress}%` }}
+                        ></div>
+                      </div>
+                   </div>
+
+                   {/* Right Logo (Next Belt?) */}
+                   <Image
+                     src={dojoIcon}
+                     alt="Next Dojo Belt Icon"
+                     width={32} // Slightly smaller?
+                     height={32}
+                     className="shrink-0"
+                   />
+                </div>
+              </div>
             </div>
+
             {/* Question Text */}
             <p className="text-lg font-medium font-serif leading-relaxed text-gray-800">
               {question.question}
@@ -426,7 +488,9 @@ export function UnitMCQs({
   onQuestionSelect,
   onUnitChange,
   answeredQuestions,
-  units
+  units,
+  dojoProgress,
+  correctStreak
 }: UnitMCQsProps) {
   const { login, signup } = useAuthContext();
   const [aiExplanations, setAiExplanations] = useState<Record<number, string>>({});
@@ -459,20 +523,22 @@ export function UnitMCQs({
     setIsUnitDropdownOpen(false);
   };
 
-  const handleAnswerSelection = (questionId: number, answerLetter: string, answerText: string) => {
+  const handleAnswerSelection = (questionId: number, answerLetter: string, answerText: string, lessonIDS: string[]) => {
     const isCorrect = answerLetter === currentQuestion?.correctAnswer;
     if (currentQuestion) {
-         onAnswer(questionId, answerLetter, isCorrect); 
+         onAnswer(questionId, answerLetter, isCorrect, lessonIDS); 
     }
   };
 
   const handleNextQuestion = () => {
-    setExplanationError(null); 
+    const numQuestions = currentQuestions.length;
+    if (numQuestions === 0) return; // Avoid errors if no questions
     onNextQuestion();
   };
 
   const handlePreviousQuestion = () => {
-    setExplanationError(null); 
+    const numQuestions = currentQuestions.length;
+    if (numQuestions === 0) return; // Avoid errors if no questions
     onPreviousQuestion();
   };
 
@@ -525,14 +591,16 @@ export function UnitMCQs({
               isLoggedIn={isLoggedIn}
               signup={signup}
               login={login}
+              dojoProgress={dojoProgress}
+              correctStreak={correctStreak}
             />
           )}
         </div>
 
-        <div className="w-full lg:w-1/4 bg-white rounded-lg shadow-md border border-gray-200 p-4 lg:p-6 h-fit">
+        <div className="w-full lg:w-1/4 bg-white rounded-lg shadow-md border border-gray-200 p-4 lg:p-6">
           <div className="space-y-4 mb-8">
-            <div className="flex items-center gap-2">
-              <h3 className="font-extrabold tracking-tight text-gray-900">Unit {currentUnit} MCQs</h3>
+            <div className="flex items-center gap-4">
+              <h3 className="font-extrabold tracking-tight text-gray-900 text-2xl">Unit {currentUnit} MCQs</h3>
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setIsUnitDropdownOpen(!isUnitDropdownOpen)}
@@ -592,15 +660,13 @@ export function UnitMCQs({
             <div className="flex gap-2 mt-4">
               <button
                 onClick={handlePreviousQuestion}
-                disabled={currentQuestionIndex === 0}
-                className={`flex-1 p-2 rounded-md font-medium text-sm transition-colors ${currentQuestionIndex === 0 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
+                className={`flex-1 p-2 rounded-md font-semibold text-sm transition-colors bg-blue-500 text-white hover:bg-blue-600`}
               >
                 Previous
               </button>
               <button
                 onClick={handleNextQuestion}
-                disabled={currentQuestionIndex === currentQuestions.length - 1}
-                className={`flex-1 p-2 rounded-md font-medium text-sm transition-colors ${currentQuestionIndex === currentQuestions.length - 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
+                className={`flex-1 p-2 rounded-md font-semibold text-sm transition-colors bg-blue-500 text-white hover:bg-blue-600`}
               >
                 Next
               </button>
@@ -608,7 +674,7 @@ export function UnitMCQs({
           </div>
 
           <div className="space-y-4">
-             <h3 className="font-extrabold tracking-tight text-gray-900">Study Resources</h3>
+             <h3 className="font-extrabold tracking-tight text-gray-900 text-xl">Study Resources</h3>
             <a
               href={`/study-guides/AP-macroeconomics-unit-${currentUnit}`}
               target="_blank"
@@ -619,29 +685,28 @@ export function UnitMCQs({
                 <div className="p-2 rounded-lg bg-gray-100 text-gray-600 group-hover:bg-gray-200 transition-colors">
                   <FileText className="w-5 h-5" />
                 </div>
-                <span className="font-medium text-gray-900">
+                <span className="font-semibold text-gray-900">
                   Unit {currentUnit} Study Guide
                 </span>
               </div>
             </a>
+
+           
+
             <button
               onClick={handleAIExplanation}
-              disabled={isLoadingExplanation || !currentAnswerState} 
               className={`w-full p-4 rounded-lg border transition-all duration-200 bg-white group relative
                 ${explanationError 
                   ? 'border-red-200 hover:border-red-300' 
-                  : currentAnswerState 
-                    ? 'border-gray-200 hover:border-gray-300'
-                    : 'border-gray-200 opacity-50 cursor-not-allowed'} 
+                  : 'border-gray-200 hover:border-gray-300' } 
                 hover:bg-gray-50`}
             >
               <div className="flex items-center gap-3 justify-start">
                 <div className={`p-2 rounded-lg text-white transition-colors
                   ${explanationError 
                     ? 'bg-red-500 group-hover:bg-red-600' 
-                    : currentAnswerState 
-                      ? 'bg-blue-500 group-hover:bg-blue-600'
-                      : 'bg-blue-300'}`}
+                    : 'bg-blue-500 group-hover:bg-blue-600'}
+                `}
                 >
                   {isLoadingExplanation ? (
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -649,7 +714,7 @@ export function UnitMCQs({
                     <Brain className="w-5 h-5" />
                   )}
                 </div>
-                <span className={`font-medium text-left ${explanationError ? 'text-red-600' : currentAnswerState ? 'text-gray-900' : 'text-gray-500'}`}>
+                <span className={`font-semibold text-left ${explanationError ? 'text-red-600' : 'text-gray-900'}`}>
                   {isLoadingExplanation 
                     ? 'Getting Explanation...' 
                     : explanationError 
@@ -657,11 +722,6 @@ export function UnitMCQs({
                       : 'Explain with AI Dojo'}
                 </span>
               </div>
-              {!currentAnswerState && (
-                <div className="absolute bottom-full left-0 mb-2 w-full px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
-                  Please answer the question first to get an explanation
-                </div>
-              )}
             </button>
             {explanationError && (
               <div className="px-4 py-2 bg-red-50 border border-red-200 rounded-md">
@@ -676,6 +736,24 @@ export function UnitMCQs({
     </div>
   );
 }
+
+const haloPulseStyles = `
+  @keyframes halo-normal {
+    0%, 100% { opacity: 0; transform: scale(0.95); }
+    50% { opacity: 1; transform: scale(1.05); } /* Fade in and slightly grow */
+  }
+  .animate-halo-normal {
+    animation: halo-normal 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  @keyframes halo-intense {
+    0%, 100% { opacity: 0; transform: scale(0.98); }
+    50% { opacity: 1; transform: scale(1.15); } /* Fade in and grow larger */
+  }
+  .animate-halo-intense {
+    animation: halo-intense 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; /* Slightly faster */
+  }
+`;
 
 const styles = `
   @keyframes slideDown {
@@ -696,6 +774,16 @@ const styles = `
 
 if (typeof document !== 'undefined') {
   const styleSheet = document.createElement('style');
-  styleSheet.textContent = styles;
-  document.head.appendChild(styleSheet);
+  styleSheet.id = 'dojo-halo-pulse-styles'; // New ID
+  if (!document.getElementById(styleSheet.id)) {
+    styleSheet.textContent = haloPulseStyles;
+    document.head.appendChild(styleSheet);
+  }
+
+  const pulseSheet = document.createElement('style');
+  pulseSheet.id = 'dojo-pulse-styles';
+  if (!document.getElementById(pulseSheet.id)) {
+    pulseSheet.textContent = styles;
+    document.head.appendChild(pulseSheet);
+  }
 }

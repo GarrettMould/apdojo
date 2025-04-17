@@ -534,7 +534,7 @@ export function QuestionsGrid() {
   console.log('QuestionsGrid re-rendered');
 
   return (
-    <div className="py-12 md:py-24 w-screen bg-gray-50" style={{ marginLeft: 'calc(-50vw + 50%)', marginRight: 'calc(-50vw + 50%)' }}>
+    <div className="mt-[40vh] py-12 md:py-24 w-screen bg-gray-50" style={{ marginLeft: 'calc(-50vw + 50%)', marginRight: 'calc(-50vw + 50%)' }}>
       <div className="container mx-auto px-4 md:px-0">
         <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg border border-gray-100 p-4 md:p-8">
           {/* Pass currentSubject and the toggle handler to UnitFilter */}
