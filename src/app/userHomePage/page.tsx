@@ -142,13 +142,6 @@ function UserHomePageContent() {
       return; 
     }
 
-    // Handle unauthenticated user
-    if (!user) {
-      console.log('[Home Page Effect] No user found, redirecting to login.');
-      router.push('/login');
-      return; 
-    }
-    
     // Handle authenticated user, check setup steps
     if (userData) {
         console.log('[Home Page Effect] User data loaded, checking setup steps...');

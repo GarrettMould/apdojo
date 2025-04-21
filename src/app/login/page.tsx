@@ -21,7 +21,7 @@ export default function Login() {
       setError('')
       setLoading(true)
       await login(email, password)
-      router.push('/')
+      router.push('/userHomePage')
     } catch (error) {
       setError('Failed to sign in. Please check your credentials.')
     } finally {
