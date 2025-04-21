@@ -220,48 +220,30 @@ const UnitFilter = ({
   units, 
   selectedUnits, 
   onUnitToggle,
-  currentSubject,
+  userSubject,
   onClearFilters,
-  onSubjectToggle
 }: { 
   units: Unit[];
   selectedUnits: number[];
   onUnitToggle: (unitId: number) => void;
-  currentSubject: 'macro' | 'micro';
+  userSubject: 'macro' | 'micro';
   onClearFilters: () => void;
-  onSubjectToggle: () => void;
 }) => {
   return (
     <div className="mb-8">
-      {/* Header sections remain the same */}
       <h2 className="text-2xl md:text-4xl text-center font-extrabold tracking-wide mb-6 md:mb-10">
         <span className={`text-4xl md:text-6xl block mb-2 ${
-          currentSubject === 'macro' 
+          userSubject === 'macro' 
             ? 'text-blue-500' 
             : 'text-green-500'
         }`}>
-          AP {currentSubject === 'macro' ? 'Macro' : 'Micro'}
+          AP {userSubject === 'macro' ? 'Macro' : 'Micro'}
         </span>
         <span className="block">
           Comprehension Checks
         </span>
       </h2>
       
-      {/* Update the toggle button here */}
-      <div className="flex justify-center mb-8">
-        <button
-          onClick={() => onSubjectToggle()}
-          className={`px-6 py-2 rounded-md font-medium transition-colors shadow-sm ${
-            currentSubject === 'macro'
-              ? 'bg-blue-500 text-white hover:bg-blue-600'
-              : 'bg-green-500 text-white hover:bg-green-600'
-          }`}
-        >
-          Switch to AP {currentSubject === 'macro' ? 'Micro' : 'Macro'}
-        </button>
-      </div>
-
-      {/* Filter section continues */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-0 mb-4">
         <h3 className="text-md font-semibold text-gray-900">Filter by Unit</h3>
         {selectedUnits.length > 0 && (
@@ -307,14 +289,14 @@ const getUnits = (subject: 'macro' | 'micro'): Unit[] => {
 };
 
 export function QuestionsGrid() {
-  const { user } = useAuthContext();
-  const [currentSubject, setCurrentSubject] = useState<'macro' | 'micro'>('macro');
+  const { user, userData } = useAuthContext();
+  
+  const subject = useMemo(() => userData?.selectedSubject || 'macro', [userData]);
 
-  // Update getAllQuestions to handle both subjects
-  const getAllQuestions = () => {
+  const getAllQuestions = useCallback(() => {
     const allQuestions: Question[] = [];
     
-    const subjectData = currentSubject === 'macro' 
+    const subjectData = subject === 'macro' 
       ? conceptChecks.macroeconomics 
       : conceptChecks.microeconomics;
     
@@ -330,22 +312,18 @@ export function QuestionsGrid() {
     });
     
     return allQuestions;
-  };
+  }, [subject]);
 
-  // Update getRandomQuestions to use the new getAllQuestions function
-  const getRandomQuestions = (count: number) => {
+  const getRandomQuestions = useCallback((count: number) => {
     const allQuestions = getAllQuestions();
     const shuffled = [...allQuestions].sort(() => Math.random() - 0.5);
     return shuffled.slice(0, count);
-  };
+  }, [getAllQuestions]);
 
-  // Replace the hardcoded units arrays and selection with this:
-  const units = getUnits(currentSubject);
+  const units = useMemo(() => getUnits(subject), [subject]);
 
-  // Add state for selected units
   const [selectedUnits, setSelectedUnits] = useState<number[]>([]);
 
-  // Add toggle function for units
   const handleUnitToggle = (unitId: number) => {
     setSelectedUnits(prev => {
       const newSelectedUnits = prev.includes(unitId)
@@ -355,34 +333,28 @@ export function QuestionsGrid() {
     });
   };
 
-  // Update getFilteredQuestions to handle numeric units consistently
-  const getFilteredQuestions = () => {
+  const getFilteredQuestions = useCallback(() => {
     const allQuestions = getAllQuestions();
     if (selectedUnits.length === 0) return allQuestions;
     
     return allQuestions.filter(question => 
-      selectedUnits.includes(question.unit)  // Both are now numbers, so direct comparison works
+      selectedUnits.includes(question.unit)
     );
-  };
+  }, [selectedUnits, getAllQuestions]);
 
-  // Add state for visible questions count
   const [visibleCount, setVisibleCount] = useState(3);
   
-  // Update your randomQuestions state to get more initially but show less
-  const [questions, setQuestions] = useState(() => getRandomQuestions(12));
+  const [questions, setQuestions] = useState<Question[]>([]);
 
-  // Add useEffect to update questions whenever selectedUnits changes
   useEffect(() => {
-    const filteredQuestions = getFilteredQuestions();
-    setQuestions(filteredQuestions);
-  }, [selectedUnits, currentSubject]);  // Ensure only necessary dependencies are included
+    setQuestions(getFilteredQuestions());
+    setVisibleCount(3);
+  }, [selectedUnits, subject, getFilteredQuestions]);
 
-  // Add load more function
   const handleLoadMore = () => {
-    setVisibleCount(prev => Math.min(prev + 3, questions.length));
+    setVisibleCount(prev => Math.min(prev + questions.length, questions.length));
   };
 
-  // Then declare state variables
   const [activeQuestion, setActiveQuestion] = useState<{ 
     question: string; 
     answer: string;
@@ -451,7 +423,7 @@ export function QuestionsGrid() {
         const isCorrect = status === 'correct';
         const performanceData: TestPerformance = {
           userId: user.uid,
-          examType: currentSubject,
+          examType: subject,
           examNumber: '1', // You might want to make this dynamic
           timestamp: Date.now(),
           totalQuestions: 1,
@@ -483,9 +455,8 @@ export function QuestionsGrid() {
         message: 'Sorry, there was an error checking your answer. Please try again.'
       });
     }
-  }, [user, currentSubject]);
+  }, [user, subject]);
 
-  // Add useEffect for handling body scroll
   useEffect(() => {
     if (activeQuestion && feedback) {
       // Prevent scrolling on the background
@@ -505,7 +476,6 @@ export function QuestionsGrid() {
     };
   }, [activeQuestion, feedback]);
 
-  // Sample study resources based on the active question
   const getStudyResources = (relevantLessons: string[]) => {
     return relevantLessons.map(lesson => ({
       title: lesson,
@@ -514,56 +484,41 @@ export function QuestionsGrid() {
     }));
   };
 
-  // Add a clear filters function
   const handleClearFilters = () => {
     setSelectedUnits([]);
-    // Update questions when filters are cleared
-    const allQuestions = getAllQuestions();
-    setQuestions(allQuestions);
   };
 
-  // Update the subject toggle handler
-  const handleSubjectToggle = () => {
-    setCurrentSubject(prev => prev === 'macro' ? 'micro' : 'macro');
-    setSelectedUnits([]); // Clear filters
-    setVisibleCount(3); // Reset visible count
-  };
+  const filteredQuestions = useMemo(() => getFilteredQuestions(), [selectedUnits, subject, getFilteredQuestions]);
 
-  const filteredQuestions = useMemo(() => getFilteredQuestions(), [selectedUnits, currentSubject]);
-
-  console.log('QuestionsGrid re-rendered');
+  console.log('QuestionsGrid re-rendered, subject:', subject);
 
   return (
-    <div className="mt-[40vh] py-12 md:py-24 w-screen bg-gray-50" style={{ marginLeft: 'calc(-50vw + 50%)', marginRight: 'calc(-50vw + 50%)' }}>
+    <div className="py-12 md:py-24 w-screen bg-gray-50" style={{ marginLeft: 'calc(-50vw + 50%)', marginRight: 'calc(-50vw + 50%)' }}>
       <div className="container mx-auto px-4 md:px-0">
         <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg border border-gray-100 p-4 md:p-8">
-          {/* Pass currentSubject and the toggle handler to UnitFilter */}
           <UnitFilter 
             units={units}
             selectedUnits={selectedUnits}
             onUnitToggle={handleUnitToggle}
-            currentSubject={currentSubject}
+            userSubject={subject}
             onClearFilters={handleClearFilters}
-            onSubjectToggle={handleSubjectToggle}
           />
           
-          {/* Questions Grid */}
           <div className="space-y-4">
-            {questions.length > 0 ? (
+            {filteredQuestions.length > 0 ? (
                 <>
-                  {questions.slice(0, visibleCount).map((question, index) => (
-              <QuestionCard 
-                  key={index}
-                question={question.text}
-                tags={question.tags}
-                lessonIDs={question.lessonIDS}
-                unit={question.unit}
-                  onSubmit={handleSubmitAnswer}
-                />
+                  {filteredQuestions.slice(0, visibleCount).map((question, index) => (
+                    <QuestionCard 
+                      key={`${subject}-${index}`}
+                      question={question.text}
+                      tags={question.tags}
+                      lessonIDs={question.lessonIDS}
+                      unit={question.unit}
+                      onSubmit={handleSubmitAnswer}
+                    />
                   ))}
                   
-                  {/* Load More Button */}
-                  {visibleCount < questions.length && (
+                  {visibleCount < filteredQuestions.length && (
                     <div className="flex justify-center mt-12">
                       <button
                         onClick={handleLoadMore}
@@ -590,7 +545,6 @@ export function QuestionsGrid() {
           </div>
         </div>
 
-        {/* Feedback Modal */}
         <FeedbackModal 
           isOpen={!!activeQuestion && !!feedback}
           onClose={() => {

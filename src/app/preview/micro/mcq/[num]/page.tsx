@@ -11,12 +11,6 @@ export default function MicroMCQPreview({ params }: { params: { num: string } })
     <div className="py-8">
       <div className="max-w-4xl mx-auto px-4">
       <div className="mb-6">
-        <Link 
-          href="/purchase/exams"
-          className="text-blue-600 hover:text-blue-800"
-        >
-          ← Back to Exams Page
-        </Link>
         <h1 className="text-4xl font-extrabold mt-4">
           AP Microeconomics MCQ {params.num}
         </h1>

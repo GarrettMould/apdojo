@@ -1,8 +1,9 @@
 import microSetOneFRQ1 from '../../../../../public/images/microSetOneFRQ1.png';
 import microSetOneFRQ1A2A from '../../../../../public/images/microSetOneFRQ1A2A.png';
 import microSetOneFRQ1A3A from '../../../../../public/images/microSetOneFRQ1A3A.png';
+import { QuestionBank, StaticImageData } from '@/data/questionBanks/types';
 
-export const frqSetOneQuestions = {
+export const frqSetOneQuestions: QuestionBank = {
   examTitle: "AP Microeconomics FRQ Exam 1",
     questions: [
       {
@@ -137,4 +138,5 @@ export const frqSetOneQuestions = {
       }
     ]
   };
+  
   

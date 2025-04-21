@@ -1,8 +1,63 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image'; // Import Image component
 import dojoIcon from "../../public/images/dojoIcon.png"
+import { useAuthContext } from '@/contexts/AuthContext'; // <-- Import AuthContext
+
+// --- Define Interfaces & Calculation Function --- 
+interface McqAnswer {
+  id?: string;
+  questionId: string | number;
+  isCorrect: boolean;
+  unitId: number;
+  lessonIDS: string[];
+  timestamp?: any;
+}
+
+interface UnitPerformanceInfo {
+  unitId: number;
+  percentage: number;
+  totalAnswers: number;
+  correctAnswers: number;
+}
+
+interface UnitStats {
+  correct: number;
+  total: number;
+}
+
+function calculateAllUnitStats(answers: McqAnswer[]): UnitPerformanceInfo[] {
+  if (!answers || answers.length === 0) return [];
+  const unitStats: { [key: number]: UnitStats } = {};
+  answers.forEach(answer => {
+    if (typeof answer.unitId === 'number') {
+      const unitId = answer.unitId;
+      if (!unitStats[unitId]) {
+        unitStats[unitId] = { correct: 0, total: 0 };
+      }
+      unitStats[unitId].total++;
+      if (answer.isCorrect) {
+        unitStats[unitId].correct++;
+      }
+    }
+  });
+  const unitsWithStats = Object.entries(unitStats)
+    .map(([unitIdStr, stats]): UnitPerformanceInfo => {
+      const unitId = parseInt(unitIdStr, 10);
+      const percentage = stats.total > 0 ? (stats.correct / stats.total) * 100 : 0;
+      return {
+        unitId: unitId,
+        percentage: percentage,
+        totalAnswers: stats.total,
+        correctAnswers: stats.correct,
+      };
+    });
+  unitsWithStats.sort((a, b) => a.unitId - b.unitId);
+  return unitsWithStats;
+}
+// --- End Definitions ---
+
 interface UnitMCQDashboardProps {
   currentUnitName?: string; // Optional for now, make required later
   // Add other props as needed for actual data, e.g., userId
@@ -10,11 +65,31 @@ interface UnitMCQDashboardProps {
 
 // Example function structure - adjust props as needed
 export function UnitMCQDashboard({ currentUnitName }: UnitMCQDashboardProps) {
+  console.log("[Dashboard] Component Rendered");
+  const { user, mcqAnswersData, loadingMcqData } = useAuthContext(); // <-- Get data from context
+
+  // --- State for Unit Performance --- 
+  const [unitPerformance, setUnitPerformance] = useState<UnitPerformanceInfo[]>([]);
+  const [isCalculating, setIsCalculating] = useState(false);
+
+  // --- Effect to Calculate Performance --- 
+  useEffect(() => {
+    if (!loadingMcqData && user && mcqAnswersData) { // Check if data is available
+      setIsCalculating(true);
+      const timer = setTimeout(() => { // Prevent blocking render thread
+        const results = calculateAllUnitStats(mcqAnswersData);
+        setUnitPerformance(results);
+        setIsCalculating(false);
+      }, 50);
+      return () => clearTimeout(timer);
+    } else {
+      setUnitPerformance([]); // Clear performance if no data/user
+    }
+  }, [mcqAnswersData, user, loadingMcqData]); // Dependencies
 
   // --- Placeholder Data ---
   // Replace these with actual state fetched from Firestore later
   const sessionPercentage = 70;
-  const weakSpots = ['3.7', '3.5', '3.1']; // Example lesson IDs
   const dojoProgress = 65; // Example progress percentage (0-100)
 
   return (
@@ -28,7 +103,10 @@ export function UnitMCQDashboard({ currentUnitName }: UnitMCQDashboardProps) {
           <h2 className="text-lg font-semibold text-gray-800">AP Dojo Learner Dashboard</h2>
         </div>
         <div className="text-sm font-medium text-gray-600 whitespace-nowrap">
-          Current Unit: <span className="font-semibold text-gray-800">{currentUnitName || 'Unit X'}</span>
+          {/* Display current unit if passed, otherwise maybe hide */}
+          {currentUnitName && (
+            <>Current Unit: <span className="font-semibold text-gray-800">{currentUnitName}</span></>
+          )}
         </div>
       </div>
 
@@ -44,20 +122,29 @@ export function UnitMCQDashboard({ currentUnitName }: UnitMCQDashboardProps) {
             <p className="text-sm text-gray-500 mt-1">Accuracy</p>
           </div>
 
-          {/* Column 2: Weak Spots */}
+          {/* Column 2: Unit Performance */}
           <div className="p-4 border border-gray-200 rounded-lg bg-white">
-            <h3 className="text-md font-semibold text-gray-700 mb-3 uppercase tracking-wide">Focus Areas</h3>
-            <ul className="space-y-2">
-              {weakSpots.map((spot, index) => (
-                <li key={index} className="text-sm text-gray-600 flex items-center bg-gray-50 p-2 rounded">
-                  <span className="mr-2 text-gray-400 font-medium">{index + 1}.</span>
-                  Lesson {spot}
-                </li>
-              ))}
-              {weakSpots.length === 0 && (
-                  <p className="text-sm text-gray-400 italic mt-2">Keep practicing to identify focus areas!</p>
-              )}
-            </ul>
+            <h3 className="text-md font-semibold text-gray-700 mb-3 uppercase tracking-wide">Unit Performance</h3>
+            {isCalculating ? (
+              <p className="text-sm text-gray-400 italic">Calculating...</p>
+            ) : unitPerformance.length > 0 ? (
+              <ul className="space-y-2 max-h-48 overflow-y-auto pr-2"> {/* Added scroll */} 
+                {unitPerformance.map((unitInfo) => (
+                  <li key={unitInfo.unitId} className="text-sm text-gray-600 flex items-center justify-between bg-gray-50 p-2 rounded">
+                    <span className="font-medium">Unit {unitInfo.unitId}</span>
+                    <span className={`font-semibold px-1.5 py-0.5 rounded text-xs ${ 
+                      unitInfo.percentage < 50 ? 'bg-red-100 text-red-700' :
+                      unitInfo.percentage < 75 ? 'bg-yellow-100 text-yellow-700' :
+                      'bg-green-100 text-green-700'
+                    }`}> 
+                      {unitInfo.percentage.toFixed(0)}% ({unitInfo.correctAnswers}/{unitInfo.totalAnswers})
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-gray-400 italic mt-2">No unit performance data yet. Answer some MCQs!</p>
+            )}
           </div>
 
           {/* Column 3: Empty Placeholder */}

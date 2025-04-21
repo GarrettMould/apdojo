@@ -2,6 +2,15 @@
 const nextConfig = {
   images: {
     domains: ['cdn.sanity.io'], // For Sanity images
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'apdojovideos.s3.ap-southeast-2.amazonaws.com',
+        port: '', // Leave empty for default port (443 for https)
+        pathname: '/**', // Allow any path within this hostname
+      },
+      // Add other domains here if needed
+    ],
   },
   eslint: {
     ignoreDuringBuilds: true,

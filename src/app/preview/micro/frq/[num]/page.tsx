@@ -13,13 +13,6 @@ export default function MicroFRQPreview({ params }: { params: { num: string } })
     <div className="py-8">
       <div className="max-w-4xl mx-auto px-4">
       <div>
-        <Link 
-          href="/purchase/exams"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm hover:shadow group"
-        >
-          <span className="text-lg transition-transform group-hover:-translate-x-1">←</span>
-          Back to Exams
-        </Link>
           <div className="space-y-4 mt-8">
             <h1 className="text-4xl font-extrabold tracking-tight">
               <span className="text-blue-500">AP Microeconomics</span>{" "}

@@ -2,10 +2,12 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Question as QuestionType } from '@/data/questionBanks/types';
-import { Check, X, Brain, FileText, ChevronDown, Triangle, Loader2, Play } from 'lucide-react';
+import { Unit } from '@/data/cheatSheets';
+import { Check, X, Brain, FileText, ChevronDown, Triangle, Loader2, Play, RefreshCw, ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
 import Image from 'next/image';
+import { Button } from '@/components/ui/button';
 
 import dojoIcon from "../../public/images/dojoIcon.png";
 
@@ -25,15 +27,21 @@ interface UnitMCQsProps {
   onQuestionSelect: (index: number) => void;
   onUnitChange: (unitId: number) => void;
   answeredQuestions: Record<number, AnsweredQuestionState>; 
-  units: Array<{ id: number; name: string; questions: QuestionType[] }>;
+  units: Unit[];
   dojoProgress: number;
   correctStreak: number;
+  isWeakestUnitsMode: boolean;
+  totalQuestions: number;
+  unitName: string;
+  questions: QuestionType[];
+  subject: 'macro' | 'micro';
+  practiceUnitIds: number[];
 }
 
 interface QuestionCardProps {
   question: QuestionType;
   currentIndex: number;
-  totalQuestions: number;
+
   onAnswerSelect: (questionId: number, answerLetter: string, answerText: string, lessonIDS: string[]) => void;
   initialSelectedLetter?: string; 
   isAnswered: boolean;
@@ -44,6 +52,10 @@ interface QuestionCardProps {
   login: (email: string, password: string) => Promise<any>;
   dojoProgress: number;
   correctStreak: number;
+  totalQuestions: number;
+  isDoubleXpOffer: boolean;
+  onDoubleXpChoice: (accepted: boolean) => void;
+  highlightedIndex: number | null;
 }
 
 const QuestionCard = ({ 
@@ -59,7 +71,11 @@ const QuestionCard = ({
   signup,
   login,
   dojoProgress,
-  correctStreak
+  correctStreak,
+  totalQuestions: cardTotalQuestions,
+  isDoubleXpOffer,
+  onDoubleXpChoice,
+  highlightedIndex
 }: QuestionCardProps) => {
   const letterToIndex = (letter?: string): number | null => {
     if (!letter) return null;
@@ -219,7 +235,7 @@ const QuestionCard = ({
   const shouldBlur = !isLoggedIn && currentIndex >= 2;
 
   return (
-    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-8 relative">
+    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6 md:p-8 relative">
       {/* Overlay: Renders Signup or Login Form */}
       {shouldBlur && (
         <div className="absolute inset-0 bg-white bg-opacity-90 backdrop-blur-sm z-10 flex items-center justify-center p-4 rounded-lg">
@@ -325,89 +341,56 @@ const QuestionCard = ({
       )}
 
       {/* Main Question Content */}
-      <div className={`space-y-8 ${shouldBlur ? 'blur-sm' : ''}`}>
+      <div className={`space-y-6 ${shouldBlur ? 'blur-sm' : ''}`}>
         {shouldBlur ? (
           // --- Placeholder for Blurred Content ---
           <div className="min-h-[500px]"></div>
+        ) : isDoubleXpOffer ? (
+            // --- RENDER DOUBLE XP OFFER --- 
+            <div className="flex flex-col items-center justify-center min-h-[300px]"> {/* Adjust min-height as needed */} 
+                <h2 className="text-3xl font-bold text-gray-800 mb-4 text-center">
+                    Feeling Lucky?
+                </h2>
+                <p className="text-gray-600 mb-8 text-center">
+                    Double XP for the next question? Or play it safe?
+                </p>
+                {/* Attached Buttons - Secondary Style */} 
+                <div className="w-full max-w-sm h-14 flex items-stretch overflow-hidden rounded-lg">
+                   <button 
+                      onClick={() => onDoubleXpChoice(true)} // Accept
+                      className="flex-1 h-full py-2 rounded-l-lg rounded-r-none text-blue-500 border-2 border-blue-500 border-r-0 font-semibold text-lg hover:bg-blue-50 transition-colors text-center"
+                   >
+                     Double XP
+                   </button>
+                   <button 
+                      onClick={() => onDoubleXpChoice(false)} // Decline
+                      className="flex-1 h-full py-2 rounded-r-lg rounded-l-none text-blue-500 border-2 border-blue-500 border-l font-semibold text-lg hover:bg-blue-50 transition-colors text-center"
+                   >
+                     Keep Normal
+                   </button>
+                 </div>
+            </div>
         ) : (
           // --- Actual Question Content ---
           <>
-            {/* Combined Header Row: Badges and Progress Bar - Align items to end */}
-            <div className="flex items-end justify-between gap-4 w-full mb-6"> 
-              {/* Left Side: Badges (Only Unit now) */}
-              <div className="flex items-center flex-shrink-0"> 
-                {/* Remove the Question Count Badge */}
-                {/* <span className="px-3 py-1.5 bg-gray-50 text-gray-600 rounded-md text-xs sm:text-sm font-medium whitespace-nowrap"> */}
-                {/*   Question {currentIndex + 1} of {totalQuestions} */}
-                {/* </span> */}
-                {/* Enhance the Unit Badge */}
-                <span className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-base font-bold whitespace-nowrap"> {/* Increased size, weight, padding, changed styling slightly */}
-                  Unit {question.unit}
-                </span>
-              </div>
-
-              {/* Right Side: Dojo Progress Section */}
-              <div className="flex flex-col items-end flex-grow min-w-0"> {/* Use flex-col for streak + bar, flex-grow to take space, min-w-0 */}
-                {/* Streak Message (aligned right) */}
-                <div className="text-right text-sm font-medium mb-1 h-5 text-gray-600"> {/* Height prevents layout shift, adjusted margin */}
-                  {correctStreak >= 5 && (
-                    <span className="text-orange-500 animate-pulse-intense">🔥 5+ Streak (x1.5)</span> // Shortened text
-                  )}
-                  {correctStreak >= 3 && correctStreak < 5 && (
-                    <span className="text-yellow-500 animate-pulse-normal">⚡ 3+ Streak (x1.2)</span> // Shortened text
-                  )}
-                  {correctStreak < 3 && (
-                     <span>&nbsp;</span> // Placeholder to maintain height
-                  )}
-                </div>
-
-                {/* Container for bar and right logo */}
-                <div className="flex items-center justify-end w-full gap-3"> {/* Changed justify-between to justify-end */}
-                   {/* Wrapper for positioning context and halo - use flex-grow */}
-                   <div className="h-2 relative flex-grow"> {/* Changed h-3 to h-2 */}
-                      {/* Halo Element - adjust inset */}
-                      <div
-                         className={`absolute inset-[-3px] rounded-full bg-gradient-to-r from-yellow-400/30 via-orange-500/30 to-red-500/30 blur -z-10 ${ /* Changed inset */
-                           correctStreak >= 5 ? 'animate-halo-intense' : correctStreak >= 3 ? 'animate-halo-normal' : 'opacity-0' 
-                         }`}
-                      ></div>
-
-                      {/* Original Horizontal Meter Bar (Visible Track) */}
-                      <div className="absolute inset-0 h-full bg-gray-200 rounded-full overflow-hidden">
-                        {/* Filled part - No animation here */}
-                        <div
-                            className="absolute top-0 left-0 h-full bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 rounded-full transition-all duration-500 ease-out"
-                            style={{ width: `${dojoProgress}%` }}
-                        ></div>
-                      </div>
-                   </div>
-
-                   {/* Right Logo (Next Belt?) */}
-                   <Image
-                     src={dojoIcon}
-                     alt="Next Dojo Belt Icon"
-                     width={32} // Slightly smaller?
-                     height={32}
-                     className="shrink-0"
-                   />
-                </div>
-              </div>
-            </div>
-
             {/* Question Text */}
-            <p className="text-lg font-medium font-serif leading-relaxed text-gray-800">
+            <p className="text-base md:text-lg font-medium font-serif leading-relaxed text-gray-800">
               {question.question}
             </p>
-            {/* Question Image */}
+
+            {/* --- ADDED: Question Image Display --- */}
             {question.image && (
-              <div className="my-6">
+              <div className="my-4 rounded-lg overflow-hidden border border-gray-200"> { /* Added margin, rounded corners, border */ }
+                {/* Using standard img tag assuming image prop holds a URL string for now */}
+                {/* If image is StaticImageData, might need Next <Image> component */}
                 <img
-                  src={question.image.src}
-                  alt="Question"
-                  className="max-h-[225px] object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
+                  src={typeof question.image === 'string' ? question.image : (question.image as any).src} // Attempt to handle both string and object cases
+                  alt={question.unitName || 'Question related image'} // Added fallback alt text
+                  className="max-h-60 w-auto mx-auto object-contain" // Limit height, center, maintain aspect ratio
                 />
               </div>
             )}
+            {/* --- End Image Display --- */}
 
             {/* Conditional Display: Explanation OR Answer Options */}
             {isSubmitted && aiExplanation ? (
@@ -435,39 +418,46 @@ const QuestionCard = ({
               // --- Display Answer Options Mode ---
               <>
                 {/* Answer Options */}
-                <div className="space-y-4">
-                  {question.options.map((option, optIndex) => (
-                    <button
-                      key={optIndex}
-                      onClick={() => handleAnswerSelect(optIndex)}
-                      disabled={isSubmitted || shouldBlur}
-                      className={`w-full text-left p-4 rounded-lg text-sm font-medium transition-all duration-200 border ${isSubmitted ?
-                        optIndex === correctAnswerIndex
-                          ? 'bg-green-50 text-gray-900 shadow-sm border-green-200 cursor-default'
-                          : optIndex === selectedAnswerIndex
-                            ? 'bg-red-50 text-gray-900 shadow-sm border-red-200 cursor-default'
-                            : 'bg-transparent text-gray-900 border-gray-200 cursor-default'
-                        : 'bg-transparent hover:bg-gray-50 border-gray-200 hover:border-gray-300 hover:shadow-sm'
-                        } ${shouldBlur ? 'cursor-not-allowed' : ''}`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className={`w-6 h-6 flex items-center justify-center rounded-full border font-medium ${isSubmitted ? (optIndex === correctAnswerIndex ? 'bg-green-100 border-green-300 text-green-700' : optIndex === selectedAnswerIndex ? 'bg-red-100 border-red-300 text-red-700' : 'bg-white border-gray-300 text-gray-500') : 'bg-white border-gray-300 text-gray-600'}`}>
-                          {String.fromCharCode(65 + optIndex)}
-                        </span>
-                        <span className={`flex-1 ${isSubmitted ? 'text-gray-800' : 'text-gray-900'}`}>{option}</span>
-                        {isSubmitted && (
-                          <div className="flex-shrink-0">
-                            {optIndex === correctAnswerIndex
-                              ? <Check className="w-5 h-5 text-green-500" />
-                              : optIndex === selectedAnswerIndex
-                                ? <X className="w-5 h-5 text-red-500" />
-                                : null
+                <div className="space-y-3">
+                  {question.options.map((option, optIndex) => {
+                     const isHighlighted = !isSubmitted && highlightedIndex === optIndex;
+                     return (
+                        <button
+                          key={optIndex}
+                          onClick={() => handleAnswerSelect(optIndex)}
+                          disabled={isSubmitted || shouldBlur}
+                          className={`w-full text-left p-3 rounded-lg text-sm font-medium transition-all duration-150 border flex items-center gap-3
+                            ${isSubmitted ? 
+                              (optIndex === correctAnswerIndex ? 'bg-green-50 text-gray-900 shadow-sm border-green-200 cursor-default' : 
+                              optIndex === selectedAnswerIndex ? 'bg-red-50 text-gray-900 shadow-sm border-red-200 cursor-default' : 
+                              'bg-transparent text-gray-900 border-gray-200 cursor-default') 
+                            : isHighlighted ? 
+                              'bg-gray-100 border-gray-400 shadow-sm' // Highlight style
+                            : 
+                              'bg-transparent hover:bg-gray-50 border-gray-200 hover:border-gray-300 hover:shadow-sm' // Default non-submitted style
                             }
-                          </div>
-                        )}
-                      </div>
-                    </button>
-                  ))}
+                            ${shouldBlur ? 'cursor-not-allowed' : ''}`}
+                        >
+                           {/* Letter bubble */}
+                          <span className={`w-6 h-6 flex items-center justify-center rounded-full border text-xs font-medium flex-shrink-0 ${isSubmitted ? (optIndex === correctAnswerIndex ? 'bg-green-100 border-green-300 text-green-700' : optIndex === selectedAnswerIndex ? 'bg-red-100 border-red-300 text-red-700' : 'bg-white border-gray-300 text-gray-500') : isHighlighted ? 'bg-white border-gray-400 text-gray-700' : 'bg-white border-gray-300 text-gray-600'}`}> 
+                            {String.fromCharCode(65 + optIndex)}
+                          </span>
+                           {/* Option Text - Reduced Size */}
+                          <span className={`flex-1 text-sm ${isSubmitted ? 'text-gray-800' : isHighlighted ? 'text-gray-900' : 'text-gray-900'}`}>{option}</span>
+                          {/* Feedback Icon */}
+                          {isSubmitted && (
+                            <div className="flex-shrink-0">
+                              {optIndex === correctAnswerIndex
+                                ? <Check className="w-5 h-5 text-green-500" />
+                                : optIndex === selectedAnswerIndex
+                                  ? <X className="w-5 h-5 text-red-500" />
+                                  : null
+                              }
+                            </div>
+                          )}
+                        </button>
+                     );
+                    })}
                 </div>
               </>
             )}
@@ -490,14 +480,25 @@ export function UnitMCQs({
   answeredQuestions,
   units,
   dojoProgress,
-  correctStreak
+  correctStreak,
+  isWeakestUnitsMode,
+  totalQuestions,
+  unitName,
+  questions,
+  subject,
+  practiceUnitIds,
 }: UnitMCQsProps) {
-  const { login, signup } = useAuthContext();
+  const { login, signup, userData, loadingUserData } = useAuthContext();
   const [aiExplanations, setAiExplanations] = useState<Record<number, string>>({});
   const [isLoadingExplanation, setIsLoadingExplanation] = useState(false);
   const [explanationError, setExplanationError] = useState<string | null>(null);
   const [isUnitDropdownOpen, setIsUnitDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [displayDoubleXpOffer, setDisplayDoubleXpOffer] = useState(false);
+  const [isNextQuestionDoubleXp, setIsNextQuestionDoubleXp] = useState(false);
+  const DOUBLE_XP_CHANCE = 0.15;
+  const [highlightedIndex, setHighlightedIndex] = useState<number | null>(null);
+  const [showAiTooltip, setShowAiTooltip] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -511,9 +512,9 @@ export function UnitMCQs({
     };
   }, []);
 
-  const currentQuestions = units.find(unit => unit.id === currentUnit)?.questions || [];
-  const currentQuestion = currentQuestions[currentQuestionIndex];
+  const currentQuestion = questions[currentQuestionIndex];
   const currentAnswerState = currentQuestion ? answeredQuestions[currentQuestion.id] : undefined;
+  const displayUnitId = currentQuestion?.unit ?? currentUnit;
 
   const handleUnitChange = (unitId: number) => {
     setAiExplanations({});
@@ -521,30 +522,24 @@ export function UnitMCQs({
     setIsLoadingExplanation(false);
     onUnitChange(unitId);
     setIsUnitDropdownOpen(false);
+    setHighlightedIndex(null);
   };
 
   const handleAnswerSelection = (questionId: number, answerLetter: string, answerText: string, lessonIDS: string[]) => {
     const isCorrect = answerLetter === currentQuestion?.correctAnswer;
     if (currentQuestion) {
          onAnswer(questionId, answerLetter, isCorrect, lessonIDS); 
+         setHighlightedIndex(null);
     }
   };
 
-  const handleNextQuestion = () => {
-    const numQuestions = currentQuestions.length;
-    if (numQuestions === 0) return; // Avoid errors if no questions
-    onNextQuestion();
-  };
-
-  const handlePreviousQuestion = () => {
-    const numQuestions = currentQuestions.length;
-    if (numQuestions === 0) return; // Avoid errors if no questions
-    onPreviousQuestion();
-  };
-
   const handleQuestionSelect = (index: number) => {
-    setExplanationError(null); 
-    onQuestionSelect(index);
+    if (index >= 0 && index < totalQuestions) {
+        onQuestionSelect(index);
+        setHighlightedIndex(null);
+    } else {
+        console.warn("Attempted to select invalid question index:", index);
+    }
   };
 
   const handleAIExplanation = () => {
@@ -573,16 +568,117 @@ export function UnitMCQs({
     }, 1500); 
   };
 
+  const proceedToActualNextQuestion = () => {
+     if (totalQuestions === 0) return;
+     const nextIndex = currentQuestionIndex + 1;
+     if (nextIndex >= totalQuestions) {
+       handleQuestionSelect(0); // Wrap to start
+     } else {
+       handleQuestionSelect(nextIndex);
+     }
+  };
+
+  const handleDoubleXpChoice = (accepted: boolean) => {
+      setIsNextQuestionDoubleXp(accepted);
+      setDisplayDoubleXpOffer(false);
+      proceedToActualNextQuestion();
+  };
+
+  const handlePreviousQuestion = () => {
+    console.log("Handling Previous Question Request");
+    onPreviousQuestion();
+  };
+
+  const handleNextQuestion = () => {
+    console.log("Handling Next Question Request");
+    if (!displayDoubleXpOffer && Math.random() < DOUBLE_XP_CHANCE) {
+        setDisplayDoubleXpOffer(true); 
+        return; 
+    }
+    proceedToActualNextQuestion(); 
+  };
+
+  // --- Updated useEffect for Keyboard Navigation --- 
+  useEffect(() => {
+    /* // --- START COMMENT OUT - Keyboard Navigation --- 
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Ignore if focused on input/button or if an overlay/offer is active
+      const target = event.target as HTMLElement;
+      if (displayDoubleXpOffer || target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON') {
+        return;
+      }
+
+      const numOptions = currentQuestion?.options?.length ?? 0;
+      if (numOptions === 0) return; // No options to navigate
+
+      if (event.key === 'ArrowLeft') {
+        handlePreviousQuestion();
+      } else if (event.key === 'ArrowRight') {
+        handleNextQuestion();
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        setHighlightedIndex(prevIndex => {
+          if (prevIndex === null) return numOptions - 1; // Highlight D first
+          if (prevIndex === 0) return numOptions - 1;    // Wrap from A to D
+          return prevIndex - 1;                   // Go up
+        });
+      } else if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        setHighlightedIndex(prevIndex => {
+          if (prevIndex === null) return 0; // Highlight A first
+          if (prevIndex === numOptions - 1) return 0; // Wrap from D to A
+          return prevIndex + 1;                   // Go down
+        });
+      } else if (event.key === 'Enter') {
+        if (highlightedIndex !== null && !currentAnswerState) { // Only submit if highlighted and not already answered
+           event.preventDefault();
+           console.log("Enter pressed, submitting option:", highlightedIndex); // Debug
+           // Find the actual answer details for the highlighted index
+           const letter = String.fromCharCode(65 + highlightedIndex);
+           const text = currentQuestion.options[highlightedIndex];
+           const lessonIds = currentQuestion.lessonIDS;
+           handleAnswerSelection(currentQuestion.id, letter, text, lessonIds);
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+    // --- END COMMENT OUT - Keyboard Navigation --- */ 
+  }, [handlePreviousQuestion, handleNextQuestion, currentQuestion, highlightedIndex, displayDoubleXpOffer, currentAnswerState, handleAnswerSelection]); // Added dependencies
+
+  // --- NEW useEffect to Disable Body Scroll --- 
+  useEffect(() => {
+    /* // --- START COMMENT OUT - Scroll Lock --- 
+    // Store original overflow style
+    const originalOverflow = document.body.style.overflow;
+    // Disable scrolling
+    document.body.style.overflow = 'hidden';
+    console.log("Body scroll disabled"); // Debug
+
+    // Cleanup function to restore scroll
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      console.log("Body scroll enabled"); // Debug
+    };
+    // --- END COMMENT OUT - Scroll Lock --- */
+  }, []); // Empty dependency array runs only on mount and unmount
+
   return (
-    <div className="container mx-auto px-4 py-12">
-      <div className="flex flex-col lg:flex-row gap-6">
-        <div className="w-full lg:w-3/4">
+    <div className="container mx-auto px-4 pt-4 pb-12 relative">
+      {/* Use Flexbox for columns */}
+      {/* Adjusted column widths lg:w-3/5 and lg:w-2/5 */}
+      <div className="flex flex-col lg:flex-row gap-6 lg:items-stretch">
+        
+        {/* Left Column: Question Card */}
+        <div className="w-full lg:w-3/5">
           {currentQuestion && (
             <QuestionCard 
               key={`${currentUnit}-${currentQuestion.id}`} 
               question={currentQuestion} 
               currentIndex={currentQuestionIndex}
-              totalQuestions={currentQuestions.length}
               onAnswerSelect={handleAnswerSelection}
               initialSelectedLetter={currentAnswerState?.selectedLetter}
               isAnswered={!!currentAnswerState} 
@@ -593,70 +689,64 @@ export function UnitMCQs({
               login={login}
               dojoProgress={dojoProgress}
               correctStreak={correctStreak}
+              totalQuestions={totalQuestions}
+              isDoubleXpOffer={displayDoubleXpOffer}
+              onDoubleXpChoice={handleDoubleXpChoice}
+              highlightedIndex={highlightedIndex}
             />
           )}
         </div>
 
-        <div className="w-full lg:w-1/4 bg-white rounded-lg shadow-md border border-gray-200 p-4 lg:p-6">
-          <div className="space-y-4 mb-8">
-            <div className="flex items-center gap-4">
-              <h3 className="font-extrabold tracking-tight text-gray-900 text-2xl">Unit {currentUnit} MCQs</h3>
-              <div className="relative" ref={dropdownRef}>
-                <button
-                  onClick={() => setIsUnitDropdownOpen(!isUnitDropdownOpen)}
-                  className="p-1.5 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition-colors"
-                >
-                  <Triangle className="w-2 h-2 rotate-180 fill-current" />
-                </button>
-                {isUnitDropdownOpen && (
-                  <div className="absolute left-0 mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-10">
-                    {units.map(unit => (
-                      <button
-                        key={unit.id}
-                        onClick={() => handleUnitChange(unit.id)}
-                        className={`w-full text-left px-4 py-2 text-sm transition-colors ${
-                          currentUnit === unit.id
-                            ? 'bg-blue-50 text-blue-600'
-                            : 'text-gray-700 hover:bg-gray-50'
-                        }`}
-                      >
-                        {unit.name}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+        {/* Right Column: Controls and Resources */}
+        {/* Adjusted column width lg:w-2/5 */}
+        <div className="w-full lg:w-2/5 bg-white rounded-lg shadow-md border border-gray-200 p-4 lg:p-6 flex flex-col h-full">
+          {/* Top Section: Headline, Tags, Navigation */}
+          <div className="mb-6"> {/* Reduced bottom margin */} 
+            <div className="flex items-center gap-4 mb-3"> {/* Added bottom margin */}
+              <h3 className="font-extrabold tracking-tight text-gray-900 text-2xl">
+                  <span className="text-blue-600">Focused</span> Practice
+              </h3>
+              {/* Keep dropdown for now, might remove later if tags are sufficient */}
+              {!isWeakestUnitsMode && (
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={() => setIsUnitDropdownOpen(!isUnitDropdownOpen)}
+                    className="p-1.5 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition-colors"
+                  >
+                    <Triangle className="w-2 h-2 rotate-180 fill-current" />
+                  </button>
+                  {isUnitDropdownOpen && (
+                    <div className="absolute left-0 mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-10">
+                      {units.map(unit => (
+                        <button
+                          key={unit.number}
+                          onClick={() => handleUnitChange(unit.number)}
+                          className={`w-full text-left px-4 py-2 text-sm transition-colors ${
+                            currentUnit === unit.number
+                              ? 'bg-blue-50 text-blue-600'
+                              : 'text-gray-700 hover:bg-gray-50'
+                          }`}
+                        >
+                          {unit.title}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
-            <div className="flex flex-wrap gap-2">
-              {currentQuestions.map((question, index) => {
-                  const answerState = answeredQuestions[question.id];
-                  const isCurrent = currentQuestionIndex === index;
-                  let bgColor = 'bg-white';
-                  let borderColor = 'border-gray-300'; // Default border
 
-                  if (answerState) { // If the question has been answered
-                      borderColor = answerState.isCorrect ? 'border-green-500' : 'border-red-500'; 
-                      bgColor = answerState.isCorrect ? 'bg-green-50' : 'bg-red-50';
-                  } else {
-                    // Keep default border and bg for unanswered
-                  }
-                  
-                  if (isCurrent) { // Apply blue border if it's the current question
-                      borderColor = 'border-blue-500';
-                      // If current and answered, keep the green/red bg, else use blue-50 for current+unanswered
-                      bgColor = answerState ? bgColor : 'bg-blue-50'; 
-                  }
-                  
-                  return (
-                      <button
-                        key={question.id}
-                        onClick={() => handleQuestionSelect(index)}
-                        className={`w-8 h-8 rounded border-2 ${borderColor} ${bgColor} transition-colors`}
-                        aria-label={`Question ${index + 1}`}
-                      />
-                  );
-              })}
-            </div>
+            {/* --- Unit Tags --- */}
+            {practiceUnitIds && practiceUnitIds.length > 0 && (
+                <div className="flex flex-wrap gap-1 mb-4"> {/* Container for tags */} 
+                    {practiceUnitIds.map(unitId => (
+                        <span key={unitId} className="inline-block bg-gray-100 text-gray-700 text-xs font-medium px-2 py-0.5 rounded-full">
+                            Unit {unitId}
+                        </span>
+                    ))}
+                </div>
+            )}
+
             <div className="flex gap-2 mt-4">
               <button
                 onClick={handlePreviousQuestion}
@@ -673,63 +763,86 @@ export function UnitMCQs({
             </div>
           </div>
 
-          <div className="space-y-4">
-             <h3 className="font-extrabold tracking-tight text-gray-900 text-xl">Study Resources</h3>
+          {/* Middle Section: Study Resources (Takes remaining space) */}
+          <div className="space-y-3 flex-grow"> {/* Added flex-grow */}
+             {/* Reduced heading size */}
+             <h3 className="font-extrabold tracking-tight text-gray-900 text-lg mb-3">Study Resources</h3>
+            
+            {/* Study Guide Link - Reduced padding */} 
             <a
-              href={`/study-guides/AP-macroeconomics-unit-${currentUnit}`}
+              href={`/study-guides/AP-macroeconomics-unit-${displayUnitId}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full p-4 rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 bg-white hover:bg-gray-50 group block"
+              className="w-full p-3 rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 bg-white hover:bg-gray-50 group block"
             >
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-gray-100 text-gray-600 group-hover:bg-gray-200 transition-colors">
-                  <FileText className="w-5 h-5" />
-                </div>
-                <span className="font-semibold text-gray-900">
-                  Unit {currentUnit} Study Guide
-                </span>
-              </div>
+               <div className="flex items-center gap-3 justify-start">
+                 <div className="p-1.5 rounded-lg bg-gray-100 text-gray-600 group-hover:bg-gray-200 transition-colors"> {/* Reduced icon padding */} 
+                   <FileText className="w-5 h-5" />
+                 </div>
+                 <span className="font-semibold text-sm text-gray-900"> {/* Reduced text size */} 
+                   Unit {displayUnitId} Study Guide
+                 </span>
+               </div>
             </a>
 
-           
-
-            <button
-              onClick={handleAIExplanation}
-              className={`w-full p-4 rounded-lg border transition-all duration-200 bg-white group relative
-                ${explanationError 
-                  ? 'border-red-200 hover:border-red-300' 
-                  : 'border-gray-200 hover:border-gray-300' } 
-                hover:bg-gray-50`}
+            {/* AI Explanation Button - Reduced padding */}
+            <div 
+               className="relative" 
+               onMouseEnter={() => { if (!currentAnswerState) setShowAiTooltip(true); }}
+               onMouseLeave={() => setShowAiTooltip(false)}
             >
-              <div className="flex items-center gap-3 justify-start">
-                <div className={`p-2 rounded-lg text-white transition-colors
-                  ${explanationError 
-                    ? 'bg-red-500 group-hover:bg-red-600' 
-                    : 'bg-blue-500 group-hover:bg-blue-600'}
-                `}
-                >
-                  {isLoadingExplanation ? (
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  ) : (
-                    <Brain className="w-5 h-5" />
-                  )}
+              <button
+                onClick={handleAIExplanation}
+                disabled={!currentAnswerState}
+                className={`w-full p-3 rounded-lg border transition-all duration-200 bg-white group relative
+                  ${explanationError ? 'border-red-200 hover:border-red-300' : 'border-gray-200 hover:border-gray-300'} 
+                  hover:bg-gray-50
+                  disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white`}
+              >
+                <div className="flex items-center gap-3 justify-start">
+                  <div className={`p-1.5 rounded-lg text-white transition-colors ${explanationError ? 'bg-red-500 group-hover:bg-red-600' : 'bg-blue-500 group-hover:bg-blue-600'} group-disabled:bg-gray-400`}>
+                    {isLoadingExplanation ? (
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <Brain className="w-5 h-5" />
+                    )}
+                  </div>
+                  <span className={`font-semibold text-sm text-left ${explanationError ? 'text-red-600' : 'text-gray-900'} group-disabled:text-gray-500`}>
+                    Explain with AI Dojo
+                  </span>
                 </div>
-                <span className={`font-semibold text-left ${explanationError ? 'text-red-600' : 'text-gray-900'}`}>
-                  {isLoadingExplanation 
-                    ? 'Getting Explanation...' 
-                    : explanationError 
-                      ? 'Try Again' 
-                      : 'Explain with AI Dojo'}
-                </span>
-              </div>
-            </button>
-            {explanationError && (
-              <div className="px-4 py-2 bg-red-50 border border-red-200 rounded-md">
-                <p className="text-sm text-red-600">
-                  {explanationError}
-                </p>
-              </div>
-            )}
+              </button>
+
+              {/* Tooltip */}
+              {showAiTooltip && (
+                 <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-max max-w-xs px-3 py-1.5 bg-gray-800 text-white text-xs rounded shadow-lg z-10">
+                   Choose an answer before using AI Dojo
+                   <div className="absolute left-1/2 transform -translate-x-1/2 top-full w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-gray-800"></div>
+                 </div>
+              )}
+            </div>
+            
+             {/* Conditional Error Message */} 
+             {explanationError && (
+               <div className="px-3 py-1.5 bg-red-50 border border-red-200 rounded-md"> {/* Reduced padding */} 
+                 <p className="text-xs text-red-600"> {/* Reduced text size */} 
+                   {explanationError}
+                 </p>
+               </div>
+             )}
+
+          </div>
+
+          {/* Footer Section: Change Units Link */}
+          <div className="mt-auto pt-6"> {/* Increased top padding */} 
+             {/* Change Units Link - Adjusted size/styling */}
+             <Link 
+                 href={`/select-practice-units?subject=${subject}`}
+                 className="inline-flex items-center justify-center w-full text-base text-gray-900 hover:underline" /* Increased size */ 
+             >
+                 <RefreshCw className="w-5 h-5 mr-2 text-blue-600" /> {/* Kept icon blue, increased size */} 
+                 Change Units
+             </Link>
           </div>
         </div>
       </div>
@@ -737,53 +850,49 @@ export function UnitMCQs({
   );
 }
 
-const haloPulseStyles = `
-  @keyframes halo-normal {
-    0%, 100% { opacity: 0; transform: scale(0.95); }
-    50% { opacity: 1; transform: scale(1.05); } /* Fade in and slightly grow */
-  }
-  .animate-halo-normal {
-    animation: halo-normal 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-
-  @keyframes halo-intense {
-    0%, 100% { opacity: 0; transform: scale(0.98); }
-    50% { opacity: 1; transform: scale(1.15); } /* Fade in and grow larger */
-  }
-  .animate-halo-intense {
-    animation: halo-intense 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; /* Slightly faster */
-  }
-`;
-
-const styles = `
+// Corrected styles string literal
+const styles = ` 
   @keyframes slideDown {
-    from {
-      opacity: 0;
-      transform: translateY(-20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   .animate-slide-down {
     animation: slideDown 0.3s ease-out forwards;
   }
+
+  @keyframes pulse-intense {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+  }
+
+  .animate-pulse-intense {
+    animation: pulse-intense 1s ease-in-out infinite;
+  }
+
+  @keyframes pulse-normal {
+    0% { opacity: 0.7; }
+    50% { opacity: 1; }
+    100% { opacity: 0.7; }
+  }
+
+  .animate-pulse-normal {
+    animation: pulse-normal 1.5s ease-in-out infinite;
+  }
+
+  @keyframes progress-pulse {
+    0% { transform: scaleX(1); }
+    50% { transform: scaleX(1.1); }
+    100% { transform: scaleX(1); }
+  }
 `;
 
 if (typeof document !== 'undefined') {
   const styleSheet = document.createElement('style');
-  styleSheet.id = 'dojo-halo-pulse-styles'; // New ID
+  styleSheet.id = 'progress-pulse-styles';
   if (!document.getElementById(styleSheet.id)) {
-    styleSheet.textContent = haloPulseStyles;
+    styleSheet.textContent = styles;
     document.head.appendChild(styleSheet);
-  }
-
-  const pulseSheet = document.createElement('style');
-  pulseSheet.id = 'dojo-pulse-styles';
-  if (!document.getElementById(pulseSheet.id)) {
-    pulseSheet.textContent = styles;
-    document.head.appendChild(pulseSheet);
   }
 }

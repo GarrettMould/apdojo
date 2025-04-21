@@ -47,7 +47,7 @@ export function Hero() {
             }}
           >
             <Link href="/unitMCQPracticePage?subject=macro"> 
-              Try MCQ Cram Mode
+              Try Focused Practice Mode
             </Link>
           </Button>
         </div>
@@ -59,8 +59,8 @@ export function Hero() {
           className="w-full bg-contain bg-top bg-no-repeat"
           style={{ 
             backgroundImage: `url(${heroBG.src})`,
-            height: '120vh',
-            marginBottom: '-80vh'
+            height: '120vh'
+            
           }}
         />
       </div>

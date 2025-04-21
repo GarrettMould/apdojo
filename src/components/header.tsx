@@ -6,19 +6,43 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
 import { useAuthContext } from '@/contexts/AuthContext'
-import { UserCircle, ChevronDown } from 'lucide-react'
+import { User, ChevronDown, LogOut, MessageSquare, Share2, Loader2 } from 'lucide-react'
+import { Button } from "@/components/ui/button";
+
+// --- Simple Progress Bar Component ---
+interface ProgressBarProps {
+  progress: number; // Percentage 0-100
+}
+
+const GlobalProgressBar: React.FC<ProgressBarProps> = ({ progress }) => {
+  const clampedProgress = Math.max(0, Math.min(100, progress));
+  return (
+    <div className="h-1.5 w-24 bg-gray-200 rounded-full overflow-hidden">
+      <div 
+        className="h-full bg-blue-500 rounded-full transition-all duration-300 ease-out"
+        style={{ width: `${clampedProgress}%` }}
+      />
+    </div>
+  );
+};
+// --- End Progress Bar Component ---
 
 export function Header() {
   const router = useRouter();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isMcqDropdownOpen, setIsMcqDropdownOpen] = useState(false);
-  const { user, logout } = useAuthContext();
-  const mcqDropdownRef = useRef<HTMLDivElement>(null);
+  const {
+    user, loading, logout, 
+    loadingUnitXPData, // Keep for loader logic
+    totalXP, globalLevel, globalProgress, // <-- Use new level/progress state
+    correctStreak, // <-- Get streak 
+    isNextQuestionDoubleXp // <-- Get double XP flag
+  } = useAuthContext();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const profileDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (mcqDropdownRef.current && !mcqDropdownRef.current.contains(event.target as Node)) {
-        setIsMcqDropdownOpen(false);
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target as Node)) {
+        setIsProfileOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -29,55 +53,20 @@ export function Header() {
 
   const handleHomeClick = (e: React.MouseEvent) => {
     e.preventDefault();
+    router.push(user ? '/userHomePage' : '/');
+    setIsProfileOpen(false);
+  };
+
+  const handleLogout = () => {
+    logout();
+    setIsProfileOpen(false);
     router.push('/');
-    setIsMenuOpen(false);
-    setIsMcqDropdownOpen(false);
-  };
-
-  const handleExamClick = (e: React.MouseEvent, subject: string) => {
-    e.preventDefault();
-    router.push(`/purchase/${subject}-exams`);
-    setIsMenuOpen(false);
-  };
-
-  const handleToolsClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    router.push('/interactive-tools/flashcards');
-    setIsMenuOpen(false);
-    setIsMcqDropdownOpen(false);
-  };
-
-  const handleTutoringClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    router.push('/tutoring');
-    setIsMenuOpen(false);
-  };
-
-  const handleCheatSheetsClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    router.push('/cheat-sheets');
-    setIsMenuOpen(false);
-    setIsMcqDropdownOpen(false);
-  };
-
-  const handlePracticeExamsClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    router.push('/purchase/exams');
-    setIsMenuOpen(false);
-    setIsMcqDropdownOpen(false);
-  };
-
-  const handleVideoLibraryClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    router.push('/videos/macro');
-    setIsMenuOpen(false);
-    setIsMcqDropdownOpen(false);
   };
 
   return (
-    <div className="w-full bg-white border-b relative z-50">
+    <div className="w-full bg-white border-b sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between py-4">
+        <div className="flex items-center justify-between py-3">
       <div className="flex items-center space-x-4">
         <button 
           onClick={handleHomeClick}
@@ -86,243 +75,115 @@ export function Header() {
           <Image 
             src={dojoIcon}
             alt="Dojo Icon"
-            width={40}
-            height={40}
+                width={36}
+                height={36}
             className="object-contain"
           />
           <div className="flex items-center">
-            <span className="text-2xl font-extrabold">AP</span>
-            <span className="ml-1 text-2xl font-extrabold text-blue-500">Dojo</span>
+                <span className="text-xl font-extrabold">AP</span>
+                <span className="ml-1 text-xl font-extrabold text-blue-500">Dojo</span>
           </div>
         </button>
       </div>
       
-          {/* Hamburger Menu Button */}
-          <button 
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="lg:hidden p-2 hover:bg-gray-100 rounded-md"
-          >
-            {!isMenuOpen ? (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            ) : (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-            )}
-          </button>
+          <div className="flex items-center space-x-4">
+             {loading ? (
+                 // Primary loading state (Auth check)
+                 <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+             ) : user ? (
+                 // User is logged in
+                 <>
+                   {loadingUnitXPData ? (
+                       // Loading XP specifically (still relevant until totalXP/level is calculated)
+                       <Loader2 className="h-5 w-5 animate-spin text-gray-400 mr-2" />
+                   ) : (
+                       // XP/Level data is loaded, show the info
+                       <div className="flex items-center space-x-3">
+                         {/* --- Streak/Double XP Status (Moved & Styled) --- */}
+                         <span className={`text-xs font-bold mr-2 ${
+                           isNextQuestionDoubleXp 
+                             ? 'text-purple-600 animate-pulse'
+                             : correctStreak >= 3 
+                               ? 'bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent animate-pulse'
+                               : ''
+                         }`}>
+                            {isNextQuestionDoubleXp ? '(Double XP!)' :
+                             correctStreak >= 5 ? '(5+ Streak - 2x XP!)' :
+                             correctStreak >= 3 ? '(3+ Streak - 1.5x XP!)' :
+                             ''}
+                         </span>
+                         {/* --- End Status --- */}
+                         <span className="text-xs font-medium text-gray-500">Lvl {globalLevel}</span>
+                         <GlobalProgressBar progress={globalProgress} />
+                         <span className="text-sm font-semibold text-gray-700">
+                             {totalXP} XP
+                         </span>
+                       </div>
+                   )}
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-8">
-            {/* Comment out private tutoring link */}
-            {/* <Link 
-              href="/tutoring" 
-              onClick={handleTutoringClick}
-              className="hover:text-blue-700 transition-colors font-bold text-sm"
-            >
-              Private Tutoring
-            </Link> */}
-            <Link 
-              href="/videos/macro" 
-              onClick={handleVideoLibraryClick}
-              className="hover:text-blue-700 transition-colors font-bold text-sm"
-            >
-              Video Library
-            </Link>
-            <Link 
-              href="/interactive-tools/flashcards"
-              onClick={handleToolsClick}
-              className="hover:text-blue-700 transition-colors font-bold text-sm"
-            >
-              Flashcards
-            </Link>
-            <Link 
-              href="/cheat-sheets" 
-              onClick={handleCheatSheetsClick}
-              className="hover:text-blue-700 transition-colors font-bold text-sm"
-            >
-              Cheat Sheets
-            </Link>
-            <Link 
-              href="/purchase/exams"
-              onClick={handlePracticeExamsClick}
-              className="hover:text-blue-700 transition-colors font-bold   text-sm"
-            >
-              Practice Exams
-            </Link>
-            {/* Commenting out Quiz.Me link
-            <Link 
-              href="/quizMeTester"
-              className="hover:text-blue-700 transition-colors font-bold text-sm"
-            >
-              Quiz.Me
-            </Link>
-            */}
-            <div className="relative" ref={mcqDropdownRef}>
-              <button 
-                onClick={() => setIsMcqDropdownOpen(!isMcqDropdownOpen)}
-                className="flex items-center gap-1 hover:text-blue-700 transition-colors font-bold text-sm focus:outline-none"
-              >
-                Unit MCQs
-                <ChevronDown className={`w-4 h-4 transition-transform ${isMcqDropdownOpen ? 'rotate-180' : ''}`} />
-              </button>
-              {isMcqDropdownOpen && (
-                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-10">
-                  <Link
-                    href="/unitMCQPracticePage?subject=macro"
-                    onClick={() => setIsMcqDropdownOpen(false)}
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-blue-600"
-                  >
-                    AP Macro MCQs
-                  </Link>
-                  <Link
-                    href="/unitMCQPracticePage?subject=micro"
-                    onClick={() => setIsMcqDropdownOpen(false)}
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-blue-600"
-                  >
-                    AP Micro MCQs
-                  </Link>
-                </div>
-              )}
-            </div>
-            {user ? (
-              <div className="flex items-center space-x-8">
-                {/* Comment out profile icon/link */}
-                {/* <Link
-                  href="/my-purchases"
-                  className="hover:text-blue-700 transition-colors"
-                  title="My Profile"
-                >
-                  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-                    <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clipRule="evenodd" />
-                  </svg>
-                </Link> */}
+                   {/* Profile Dropdown - always show if user exists and not in primary loading state */}
+                   <div className="relative" ref={profileDropdownRef}>
+                       <button 
+                         onClick={() => setIsProfileOpen(!isProfileOpen)}
+                         className="p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-500"
+                         aria-label="User menu"
+                       >
+                          <User className="w-5 h-5 text-gray-600" />
+                       </button>
+                       {isProfileOpen && (
+                           <div 
+                             className="absolute top-full right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-20"
+                             role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabIndex={-1}
+                           >
+                               <button 
+                                   disabled
+                                   className="w-full text-left flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                                   role="menuitem" tabIndex={-1}
+                               >
+                                  <MessageSquare className="w-4 h-4" />
+                                  Give Feedback
+                               </button>
+                                <button 
+                                   disabled
+                                   className="w-full text-left flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                                   role="menuitem" tabIndex={-1}
+                               >
+                                  <Share2 className="w-4 h-4" />
+                                  Share with Friend
+                               </button>
+                               <div className="border-t border-gray-100 my-1"></div>
                 <button
-                  onClick={() => logout()}
-                  className="px-6 py-2 text-sm font-bold text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                   onClick={handleLogout}
+                                   className="w-full text-left flex items-center gap-2 px-4 py-2 text-sm text-blue-600 hover:bg-blue-50"
+                                   role="menuitem" tabIndex={-1}
                 >
-                  Sign Out
+                                   <LogOut className="w-4 h-4" />
+                                   Log Out
                 </button>
               </div>
+                       )}
+                   </div>
+                 </>
             ) : (
-              <div className="flex items-center space-x-8">
+                 // User is null and not loading: Show Login/Signup
+                 <div className="flex items-center space-x-4">
                 <Link
                   href="/login"
-                  className="text-blue-600 hover:text-blue-700 transition-colors font-bold text-sm"
+                     className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors"
                 >
                   Login
                 </Link>
                 <Link
                   href="/signup"
-                  className="px-8 py-2 text-sm font-bold text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                     className="px-4 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
                 >
                   Sign Up
                 </Link>
               </div>
             )}
-          </nav>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-b shadow-lg">
-          <div className="px-4 py-2">
-            <div className="py-2">
-              <Link 
-                href="/videos/macro" 
-                onClick={(e) => {
-                  handleVideoLibraryClick(e);
-                  setIsMenuOpen(false);
-                }}
-                className="block px-4 py-2 hover:bg-gray-100 font-bold text-sm"
-              >
-                Video Library
-              </Link>
-              <Link 
-                href="/interactive-tools/flashcards"
-                onClick={(e) => {
-                  handleToolsClick(e);
-                  setIsMenuOpen(false);
-                }}
-                className="block px-4 py-2 hover:bg-gray-100 font-bold text-sm"
-              >
-                Flashcards
-              </Link>
-              <Link 
-                href="/cheat-sheets" 
-                onClick={(e) => {
-                    handleCheatSheetsClick(e);
-                    setIsMenuOpen(false);
-                }}
-                className="block px-4 py-2 hover:bg-gray-100 font-bold text-sm"
-              >
-                Cheat Sheets
-              </Link>
-              <Link 
-                href="/purchase/exams"
-                 onClick={(e) => {
-                    handlePracticeExamsClick(e);
-                    setIsMenuOpen(false);
-                 }}
-                className="block px-4 py-2 hover:bg-gray-100 font-bold text-sm"
-              >
-                Practice Exams
-              </Link>
-              
-              {/* Unit MCQs Dropdown - Mobile */}
-              <div className="block px-4 py-2 font-bold text-sm text-gray-500">Unit MCQs</div>
-              <Link 
-                href="/unitMCQPracticePage?subject=macro"
-                onClick={() => setIsMenuOpen(false)}
-                className="block pl-8 pr-4 py-2 hover:bg-gray-100 font-medium text-sm text-gray-700 hover:text-blue-600"
-              >
-                AP Macro MCQs
-              </Link>
-              <Link 
-                href="/unitMCQPracticePage?subject=micro"
-                onClick={() => setIsMenuOpen(false)}
-                className="block pl-8 pr-4 py-2 hover:bg-gray-100 font-medium text-sm text-gray-700 hover:text-blue-600"
-              >
-                AP Micro MCQs
-              </Link>
-              
-               {/* ... (Mobile Auth buttons remain the same) ... */}
-              {!user ? (
-                <div className="border-t mt-2 pt-2">
-                  <Link
-                    href="/login"
-                    onClick={() => setIsMenuOpen(false)}
-                    className="block px-4 py-2 hover:bg-gray-100 font-bold text-sm text-blue-600 mb-3"
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    href="/signup"
-                    onClick={() => setIsMenuOpen(false)}
-                    className="inline-block px-6 py-2 hover:bg-blue-700 font-bold text-sm bg-blue-600 text-white rounded-md ml-4"
-                  >
-                    Sign Up
-                  </Link>
-                </div>
-              ) : (
-                <div className="border-t mt-2 pt-2">
-                  <button
-                    onClick={() => {
-                      logout();
-                      setIsMenuOpen(false);
-                    }}
-                    className="block w-full text-left px-4 py-2 hover:bg-gray-100 font-bold text-sm text-blue-600"
-                  >
-                    Sign Out
-                  </button>
-                </div>
-              )}
-            </div>
           </div>
         </div>
-      )}
+      </div>
     </div>
   )
 } 

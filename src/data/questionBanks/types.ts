@@ -1,8 +1,12 @@
 import { StaticImageData } from 'next/image';
 
+export type { StaticImageData };
+
 export interface Question {
   id: number;
+  questionNumber?: number;
   unit: number;
+  subject: 'ap_macroeconomics' | 'ap_microeconomics';
   unitName: string;
   question: string;
   image: StaticImageData | null;
