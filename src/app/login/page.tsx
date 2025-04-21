@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuthContext } from '@/contexts/AuthContext'
 import Link from 'next/link'
@@ -11,21 +11,27 @@ export default function Login() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [resetSent, setResetSent] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [loadingSubmit, setLoadingSubmit] = useState(false)
   const router = useRouter()
-  const { login } = useAuthContext()
+  const { login, user, loading: authLoading } = useAuthContext()
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      console.log('[Login Page Effect] User found, redirecting to /userHomePage');
+      router.push('/userHomePage');
+    }
+  }, [user, authLoading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
       setError('')
-      setLoading(true)
+      setLoadingSubmit(true)
       await login(email, password)
-      router.push('/userHomePage')
     } catch (error) {
       setError('Failed to sign in. Please check your credentials.')
     } finally {
-      setLoading(false)
+      setLoadingSubmit(false)
     }
   }
 
@@ -38,13 +44,13 @@ export default function Login() {
 
     try {
       setError('')
-      setLoading(true)
+      setLoadingSubmit(true)
       await sendPasswordResetEmail(auth, email)
       setResetSent(true)
     } catch (error) {
       setError('Failed to send reset email. Please check your email address.')
     } finally {
-      setLoading(false)
+      setLoadingSubmit(false)
     }
   }
 
@@ -78,7 +84,7 @@ export default function Login() {
                 placeholder="Email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                disabled={loading}
+                disabled={loadingSubmit}
               />
             </div>
             <div>
@@ -89,7 +95,7 @@ export default function Login() {
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                disabled={loading}
+                disabled={loadingSubmit}
               />
             </div>
           </div>
@@ -98,11 +104,11 @@ export default function Login() {
             <button
               type="submit"
               className={`group relative w-full flex justify-center py-3 px-4 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-                loading ? 'opacity-50 cursor-not-allowed' : ''
+                loadingSubmit ? 'opacity-50 cursor-not-allowed' : ''
               }`}
-              disabled={loading}
+              disabled={loadingSubmit}
             >
-              {loading ? 'Signing in...' : 'Sign in'}
+              {loadingSubmit ? 'Signing in...' : 'Sign in'}
             </button>
           </div>
         </form>
@@ -117,7 +123,7 @@ export default function Login() {
             <button
               onClick={handleForgotPassword}
               className="font-medium text-blue-600 hover:text-blue-500"
-              disabled={loading}
+              disabled={loadingSubmit}
             >
               Forgot your password?
             </button>
