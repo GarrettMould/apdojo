@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -117,7 +117,8 @@ const AnimatedQuestionPreview = ({ question, animationState, currentProgress }: 
   );
 };
 
-export default function UserHomePage() {
+// --- Renamed Component --- 
+function UserHomePageContent() {
   const { user, mcqAnswersData, loadingMcqData, userData, loadingUserData, unitXPData, loadingUnitXPData } = useAuthContext();
   const router = useRouter();
   
@@ -601,5 +602,23 @@ export default function UserHomePage() {
         </div>
        </div>
     </div>
+  );
+}
+
+// --- Loading Fallback Component --- 
+function HomePageLoadingFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+    </div>
+  );
+}
+
+// --- NEW Default Export with Suspense --- 
+export default function UserHomePage() {
+  return (
+    <Suspense fallback={<HomePageLoadingFallback />}>
+      <UserHomePageContent />
+    </Suspense>
   );
 }
