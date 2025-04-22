@@ -215,9 +215,10 @@ export function useAuth() {
         // --- Fetch User Document Data (including new fields) --- 
         const userDocRef = doc(db, 'users', firebaseUser.uid);
         console.log("[useAuth] Setting up user document listener for:", firebaseUser.uid);
-        const unsubscribeUser = onSnapshot(userDocRef, (userDocSnap) => {
-            console.log("[useAuth] User document snapshot received. Exists:", userDocSnap.exists()); // Log snapshot received
+        const unsubscribeUser = onSnapshot(userDocRef, async (userDocSnap) => {
+            console.log("[useAuth] User document snapshot received. Exists:", userDocSnap.exists());
             if (userDocSnap.exists()) {
+                // Document exists - proceed as normal
                 const fetchedUserData = userDocSnap.data() as UserData;
                 setUserData(fetchedUserData);
                 console.log("[useAuth] User document data updated:", fetchedUserData);
@@ -258,14 +259,40 @@ export function useAuth() {
                      // We might not need to explicitly set it to false here unless there's a specific edge case.
                 }
             } else {
-                console.log("[useAuth] User document does not exist.");
-                setUserData(null);
-                setUnitXPData([]); // Clear XP if user doc gone
-                console.log("[useAuth] Setting loadingUnitXPData to FALSE (user doc doesn't exist)."); // Log state update
-                setLoadingUnitXPData(false); // <-- Set FALSE if doc gone
+                // --- Document MISSING - Create it! ---
+                console.warn("[useAuth] User document does not exist. Creating default document for user:", firebaseUser.uid);
+                try {
+                    const defaultUserData = {
+                        uid: firebaseUser.uid,
+                        email: firebaseUser.email || '', // Get from auth user
+                        displayName: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User', // Get from auth user or derive
+                        createdAt: serverTimestamp(),
+                        // Set flags to false to trigger setup flow
+                        hasCompletedSubjectSelection: false,
+                        hasCompletedInitialUnitSelection: false,
+                        initialPracticeUnitIds: [],
+                        hasCompletedQuizTutorial: false // Add any other necessary default fields
+                    };
+                    await setDoc(userDocRef, defaultUserData); // Create the document
+                    console.log("[useAuth] Default user document created successfully.");
+                    // Set state based on the *newly created* default data
+                    // Or set to null to force re-check? Let's try setting default data:
+                    setUserData(defaultUserData as UserData);
+                    // Still need to clear/set XP data based on this default state (likely no subject yet)
+                    setUnitXPData([]);
+                    setLoadingUnitXPData(false);
+                } catch (createError) {
+                    console.error("[useAuth] CRITICAL: Failed to create missing user document:", createError);
+                    // If creation fails, we have a bigger problem. Set userData to null.
+                    setUserData(null);
+                    setUnitXPData([]);
+                    setLoadingUnitXPData(false);
+                }
+                // --- End Document Creation ---
             }
-            console.log("[useAuth] Setting loadingUserData to FALSE."); // Log user data load completion
-            setLoadingUserData(false); // User data fetch attempt complete
+            // Set loading false AFTER processing snapshot (or creating doc)
+            console.log("[useAuth] Setting loadingUserData to FALSE.");
+            setLoadingUserData(false);
         }, (error) => {
             console.error("[useAuth] Error listening to user document:", error);
             setUserData(null);
