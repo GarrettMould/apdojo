@@ -119,52 +119,65 @@ const AnimatedQuestionPreview = ({ question, animationState, currentProgress }: 
 
 // --- Renamed Component --- 
 function UserHomePageContent() {
-  const { user, mcqAnswersData, loadingMcqData, userData, loadingUserData, unitXPData, loadingUnitXPData } = useAuthContext();
+  const { user, loading: authLoading, mcqAnswersData, loadingMcqData, userData, loadingUserData, unitXPData, loadingUnitXPData } = useAuthContext();
   const router = useRouter();
   
   const [focusUnitIds, setFocusUnitIds] = useState<number[]>([]);
   const [recommendationSourceIds, setRecommendationSourceIds] = useState<number[]>([]);
 
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(true);
   const [recommendedVideos, setRecommendedVideos] = useState<VideoType[]>([]);
   const [recommendedCheatSheets, setRecommendedCheatSheets] = useState<CheatSheetUnitType[]>([]);
   const [animationState, setAnimationState] = useState<'initial' | 'answered' | 'progressed'>('initial');
   const [currentProgress, setCurrentProgress] = useState(30);
+  const [error, setError] = useState('');
 
   const searchParams = useSearchParams();
 
   // --- Modified useEffect for Redirection & Data Loading --- 
   useEffect(() => {
-    // Initial loading state covers auth and user data
-    if (loadingUserData || loadingMcqData) { 
-      console.log('[Home Page Effect] Waiting for user data and MCQ data...');
-      setIsProcessing(true); // Show loading state
+    // Wait for all relevant loading states to be false
+    if (authLoading || loadingUserData || loadingMcqData) { 
+      console.log('[Home Page Effect] Waiting for auth/user/mcq data...');
+      // Keep isProcessing true while loading
+      setIsProcessing(true);
       return; 
     }
+    
+    // --- User Check (Failsafe) ---
+    // At this point, all loading is false. Check user existence.
+    if (!user) {
+        // This case should ideally be handled by the root page component,
+        // but as a failsafe, redirect if somehow reached here without a user.
+        console.log('[Home Page Effect] No user found after loading, redirecting to login.');
+        router.push('/login');
+        return; // Prevent further execution
+    }
 
-    // Handle authenticated user, check setup steps
+    // --- UserData Check ---
+    // Now we know user exists and loading is done. Check userData.
     if (userData) {
+        setError(''); // Clear any previous error
         console.log('[Home Page Effect] User data loaded, checking setup steps...');
+        // --- Setup Checks ---
         if (!userData.selectedSubject) {
             console.log('[Home Page Effect] No selected subject, redirecting to /select-subject');
             router.push('/select-subject');
-            return; // Stop further processing in this effect run
+            return; // Stop further processing
         }
         if (!userData.hasCompletedInitialUnitSelection) {
             console.log('[Home Page Effect] Initial units not selected, redirecting to /initial-unit-selection');
             router.push('/initial-unit-selection'); 
             return; // Stop further processing
         }
-        // --- If setup is complete, proceed with existing logic --- 
-        console.log('[Home Page Effect] User setup complete. Determining focus/recommendation units...');
+        
+        // --- Setup Complete: Run Main Logic ---
+        console.log('[Home Page Effect] User setup complete. Running main logic...');
         const currentSubject = userData?.selectedSubject || 'macro'; 
         const relevantUnitsData = currentSubject === 'micro' ? allMicroCheatSheets : allMacroCheatSheets;
-    
-        // Timer logic remains, but ensure setIsProcessing(false) is inside or after it
         const timer = setTimeout(() => {
             let finalFocusIds: number[] = [];
             let finalRecommendationIds: number[] = [];
-    
             if (userData.hasCompletedInitialUnitSelection && userData.initialPracticeUnitIds && userData.initialPracticeUnitIds.length > 0) {
                 finalFocusIds = userData.initialPracticeUnitIds;
                 finalRecommendationIds = userData.initialPracticeUnitIds;
@@ -174,10 +187,8 @@ function UserHomePageContent() {
                  finalFocusIds = defaultIds;
                  finalRecommendationIds = defaultIds;
             }
-            
             setFocusUnitIds(finalFocusIds);
             setRecommendationSourceIds(finalRecommendationIds);
-    
             if (finalRecommendationIds.length > 0) {
                  const filteredVideos = allVideos.filter(video => {
                     const videoSubjectMatch = video.subjects.includes(currentSubject === 'macro' ? 'AP Macroeconomics' : 'AP Microeconomics');
@@ -186,7 +197,6 @@ function UserHomePageContent() {
                     return videoSubjectMatch && unitIdMatch;
                 }).slice(0, 4);
                 setRecommendedVideos(filteredVideos);
-    
                 const filteredCheatSheets = relevantUnitsData.filter(sheet =>
                     finalRecommendationIds.includes(sheet.number)
                 ).slice(0, 4);
@@ -195,20 +205,25 @@ function UserHomePageContent() {
                 setRecommendedVideos([]);
                 setRecommendedCheatSheets([]);
             }
-    
-            setIsProcessing(false); // Ensure processing is set to false here
+            setIsProcessing(false); // Ensure processing is set to false HERE
             console.log('[Home Page Effect] Processing finished.');
         }, 50); 
-        return () => clearTimeout(timer);
+        // Cleanup timer on effect re-run or unmount
+        return () => clearTimeout(timer); 
+        // --- End Main Logic ---
+
     } else {
-      // Should theoretically be covered by loadingUserData check, but as a fallback:
-      console.log('[Home Page Effect] User exists but userData is null/undefined after loading. Redirecting to login as failsafe.');
-      router.push('/login');
-      setIsProcessing(false); // Ensure loading stops
+        // --- Handle Missing UserData After Load --- 
+        // User exists, loading is done, but userData is still null/undefined.
+        // This indicates a problem like a missing Firestore document.
+        // Display error instead of redirecting to prevent loop.
+        console.error('[Home Page Effect] Error: User exists but Firestore userData is missing after loading.');
+        setError('Could not load your profile data. Please check your connection or contact support if the issue persists.'); 
+        setIsProcessing(false); // Stop the main loading spinner
     }
 
   // Update dependencies
-  }, [user, loadingUserData, userData, loadingMcqData, router]); 
+  }, [user, authLoading, loadingUserData, userData, loadingMcqData, router]); 
 
   // --- Animation effect depends on focusUnitIds ---
   useEffect(() => {
@@ -553,7 +568,7 @@ function UserHomePageContent() {
     );
   };
 
-  // --- Conditional Rendering based on Loading/Processing State --- 
+  // --- Conditional Rendering based on Loading/Error State --- 
   if (isProcessing) { 
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -561,8 +576,19 @@ function UserHomePageContent() {
       </div>
     );
   }
+  
+  if (error) { // <-- Display error if present
+    return (
+        <div className="min-h-screen flex items-center justify-center p-4 text-center">
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative" role="alert">
+                <strong className="font-bold">Error:</strong>
+                <span className="block sm:inline ml-2">{error}</span>
+            </div>
+        </div>
+    );
+  }
 
-  // --- Main component return (only renders if not loading/redirecting) --- 
+  // --- Main component return (only renders if not loading/error/redirecting) --- 
   return (
     <div className="min-h-screen pt-20 pb-16">
        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
