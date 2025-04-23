@@ -2,7 +2,8 @@
 import React, { createContext, useContext, ReactNode } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import type { AuthContextValue, UserData, UnitXPData } from '@/hooks/useAuth'
-import { User } from 'firebase/auth'
+import { User, GoogleAuthProvider, signInWithPopup } from 'firebase/auth'
+import { auth } from "@/lib/firebase" // Make sure auth is exported from your firebase config
 
 const AuthContext = createContext<AuthContextValue | null>(null)
 

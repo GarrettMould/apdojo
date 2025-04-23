@@ -38,6 +38,8 @@ export function Header() {
   } = useAuthContext();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileDropdownRef = useRef<HTMLDivElement>(null);
+  const [isAnimatingLevelUp, setIsAnimatingLevelUp] = useState(false); // State for level up animation
+  const prevLevelRef = useRef<number | null>(null); // Ref to store previous level
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -51,14 +53,29 @@ export function Header() {
     };
   }, []);
 
+  // Effect to detect level up and trigger animation
+  useEffect(() => {
+    if (globalLevel !== null && globalLevel !== undefined) {
+      const prevLevel = prevLevelRef.current;
+      if (prevLevel !== null && globalLevel > prevLevel) {
+        setIsAnimatingLevelUp(true);
+        const timer = setTimeout(() => {
+          setIsAnimatingLevelUp(false);
+        }, 1000); // Animation duration
+        return () => clearTimeout(timer); // Cleanup timeout on unmount or level change
+      }
+      prevLevelRef.current = globalLevel; // Update previous level
+    }
+  }, [globalLevel]);
+
   const handleHomeClick = (e: React.MouseEvent) => {
     e.preventDefault();
     router.push(user ? '/userHomePage' : '/');
     setIsProfileOpen(false);
   };
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     setIsProfileOpen(false);
     router.push('/');
   };
@@ -67,24 +84,24 @@ export function Header() {
     <div className="w-full bg-white border-b sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-3">
-      <div className="flex items-center space-x-4">
-        <button 
-          onClick={handleHomeClick}
+          <div className="flex items-center space-x-4">
+            <button 
+              onClick={handleHomeClick}
               className="hover:opacity-90 transition-opacity flex items-center gap-4"
-        >
-          <Image 
-            src={dojoIcon}
-            alt="Dojo Icon"
+            >
+              <Image 
+                src={dojoIcon}
+                alt="Dojo Icon"
                 width={36}
                 height={36}
-            className="object-contain"
-          />
-          <div className="flex items-center">
+                className="object-contain"
+              />
+              <div className="flex items-center">
                 <span className="text-xl font-extrabold">AP</span>
                 <span className="ml-1 text-xl font-extrabold text-blue-500">Dojo</span>
+              </div>
+            </button>
           </div>
-        </button>
-      </div>
       
           <div className="flex items-center space-x-4">
              {loading ? (
@@ -113,11 +130,29 @@ export function Header() {
                              ''}
                          </span>
                          {/* --- End Status --- */}
-                         <span className="text-xs font-medium text-gray-500">Lvl {globalLevel}</span>
+                         {/* Level Tag */}
+                         <span
+                           className={`px-2 py-0.5 text-xs font-medium rounded bg-gray-200 text-gray-700 transition-transform duration-500 ease-out ${isAnimatingLevelUp ? 'scale-125' : ''}`}
+                         >
+                           Level {globalLevel}
+                         </span>
                          <GlobalProgressBar progress={globalProgress} />
                          <span className="text-sm font-semibold text-gray-700">
                              {totalXP} XP
                          </span>
+                         {/* --- TEMPORARY TEST BUTTON --- */}
+                         {/*
+                         <button
+                           onClick={() => {
+                             setIsAnimatingLevelUp(true);
+                             setTimeout(() => setIsAnimatingLevelUp(false), 1000);
+                           }}
+                           className="ml-2 px-2 py-1 text-xs bg-yellow-300 text-yellow-800 rounded hover:bg-yellow-400"
+                         >
+                           Test Lvl Up Anim
+                         </button>
+                         */}
+                         {/* --- END TEMPORARY TEST BUTTON --- */}
                        </div>
                    )}
 
@@ -152,35 +187,35 @@ export function Header() {
                                   Share with Friend
                                </button>
                                <div className="border-t border-gray-100 my-1"></div>
-                <button
+                               <button 
                                    onClick={handleLogout}
                                    className="w-full text-left flex items-center gap-2 px-4 py-2 text-sm text-blue-600 hover:bg-blue-50"
                                    role="menuitem" tabIndex={-1}
-                >
+                               >
                                    <LogOut className="w-4 h-4" />
                                    Log Out
-                </button>
-              </div>
+                               </button>
+                           </div>
                        )}
                    </div>
                  </>
-            ) : (
+             ) : (
                  // User is null and not loading: Show Login/Signup
                  <div className="flex items-center space-x-4">
-                <Link
-                  href="/login"
+                   <Link
+                     href="/login"
                      className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors"
-                >
-                  Login
-                </Link>
-                <Link
-                  href="/signup"
+                   >
+                     Login
+                   </Link>
+                   <Link
+                     href="/signup"
                      className="px-4 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-                >
-                  Sign Up
-                </Link>
-              </div>
-            )}
+                   >
+                     Sign Up
+                   </Link>
+                 </div>
+             )}
           </div>
         </div>
       </div>

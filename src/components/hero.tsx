@@ -60,7 +60,6 @@ export function Hero() {
           style={{ 
             backgroundImage: `url(${heroBG.src})`,
             height: '120vh'
-            
           }}
         />
       </div>

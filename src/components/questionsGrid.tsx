@@ -418,6 +418,51 @@ export function QuestionsGrid() {
         message: data.feedback
       });
 
+      // --- *** NEW: Calculate and Update XP *** ---
+      if (user) { // Only proceed if user is logged in
+        let xpChange = 0;
+        switch (status) {
+          case 'correct':
+            xpChange = 20;
+            break;
+          case 'partial':
+            xpChange = 10;
+            break;
+          case 'incorrect':
+            xpChange = -2; // Or 0 if you don't want negative XP
+            break;
+        }
+
+        if (xpChange !== 0) {
+          /* // Commented out API call to update unit XP
+          try {
+            const xpUpdateResponse = await fetch('/api/update-unit-xp', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                userId: user.uid,
+                unitId: unit,
+                xpAmount: xpChange,
+              }),
+            });
+
+            if (!xpUpdateResponse.ok) {
+              const errorData = await xpUpdateResponse.json();
+              console.error(`Failed to update Unit ${unit} XP: ${xpUpdateResponse.status}`, errorData.error || 'Unknown error');
+            } else {
+              console.log(`Unit ${unit} XP update request sent for user ${user.uid} with amount ${xpChange}`);
+              // UI should update via listener detecting change in unit XP data
+            }
+          } catch (xpError) {
+            console.error(`Error calling /api/update-unit-xp for unit ${unit}:`, xpError);
+          }
+          */
+        }
+      }
+      // --- *** End XP Update *** ---
+
       // Save performance data if user is logged in
       if (user) {
         const isCorrect = status === 'correct';
