@@ -5,6 +5,11 @@ import { macroSetTwoQuestions } from '../questionBanks/macro/mcqs/macroSetTwo';
 import allQS139 from "../../../public/images/allQS139.png"
 import allQS140 from "../../../public/images/allQS140.png"
 import allQS141 from "../../../public/images/allQS141.png"
+import allQS142 from "../../../public/images/allQS142.png"
+import allQS143 from "../../../public/images/allQS143.png"
+import allQS144 from "../../../public/images/allQS144.png"
+import allQS145 from "../../../public/images/allQS145.png"
+import allQS146 from "../../../public/images/allQS146.png"
 // Create arrays for each unit
 const unit1Questions = macroSetTwoQuestions.questions.filter(q => q.unit === 1);
 const unit2Questions = macroSetTwoQuestions.questions.filter(q => q.unit === 2);
@@ -5026,5 +5031,648 @@ export const allQuestions: QuestionType[] = [
     ],
     "correctAnswer": "B",
     "explanation": "The graph shows that the marginal social benefit (MSB) is greater than the marginal private benefit (MPB), indicating a positive externality in consumption. The market equilibrium (where MPB intersects MPC) results in a quantity below the socially optimal level (where MSB intersects MSC/MPC). To correct this under-consumption, the government can provide a per-unit subsidy to consumers, effectively increasing the marginal private benefit and shifting the demand curve towards the MSB curve, thus encouraging consumption towards the optimal quantity."
-  }
+  }, 
+  {
+    "id": 142,
+    "subject": "ap_macroeconomics",
+    "unit": 5, // Phillips Curve is typically in Unit 5
+    "lessonIDS": ["5.2"], // Corresponds to Phillips Curve topic
+    "unitName": "Long-Run Consequences of Stabilization Policies",
+    "question": "Based on the Phillips curve diagram above, which of the following is true for an economy currently operating at point B?",
+    "image": allQS142, // Reference to the image file
+    "options": [
+      "The economy is operating at the natural rate of unemployment.",
+      "The economy is experiencing an inflationary gap.",
+      "The actual unemployment rate is higher than the natural rate of unemployment.",
+      "An increase in expected inflation has shifted the short-run Phillips curve upwards.",
+      "Nominal wages are rising rapidly due to high aggregate demand."
+    ],
+    "correctAnswer": "C",
+    "explanation": "The Long-Run Phillips Curve (LRPC) is vertical at the natural rate of unemployment (NRU). Point A represents long-run equilibrium where the economy is at the NRU. Point B lies on the Short-Run Phillips Curve (SRPC) to the right of the LRPC, indicating that the actual unemployment rate at point B is greater than the natural rate of unemployment. This situation corresponds to a recessionary gap."
+  }, 
+  {
+    "id": 143,
+    "subject": "ap_macroeconomics",
+    "unit": 4, // Money Market and Monetary Policy are typically in Unit 4
+    "lessonIDS": ["4.5", "4.6"], // Covers Money Market and Monetary Policy Tools
+    "unitName": "Financial Sector",
+    "question": "Which of the following monetary policy actions by a central bank could cause the change in the money market illustrated by the shift from MS1 to MS2 in the graph above?",
+    "image": allQS143, // Reference to the image file
+    "options": [
+      "Increasing the required reserve ratio.",
+      "Increasing the discount rate.",
+      "Selling government securities on the open market.",
+      "Buying government securities on the open market.",
+      "Increasing the interest rate paid on reserves."
+    ],
+    "correctAnswer": "D",
+    "explanation": "The graph shows an increase in the money supply, represented by the rightward shift from MS1 to MS2. This leads to a lower nominal interest rate. Buying government securities (bonds) on the open market is an expansionary monetary policy action. When the central bank buys bonds, it pays for them by crediting the reserves of commercial banks, increasing the monetary base and enabling banks to increase lending, which expands the money supply."
+  }, 
+  {
+    "id": 144,
+    "subject": "ap_macroeconomics",
+    "unit": 4, // Banks and Money Creation are typically in Unit 4
+    "lessonIDS": ["4.4"], // Corresponds to Money Creation / Bank Balance Sheets
+    "unitName": "Financial Sector",
+    "question": "Assume the required reserve ratio is 10 percent. Based on the bank's balance sheet shown above, what is the maximum amount of additional loans this bank can currently make?",
+    "image": allQS144, // Reference to the image file
+    "options": [
+      "$20,000",
+      "$40,000",
+      "$60,000",
+      "$140,000",
+      "$200,000"
+    ],
+    "correctAnswer": "B",
+    "explanation": "First, calculate the required reserves: 10% of Demand Deposits ($200,000) = 0.10 * $200,000 = $20,000. Next, find the excess reserves by subtracting required reserves from actual reserves: Excess Reserves = Actual Reserves - Required Reserves = $60,000 - $20,000 = $40,000. A bank can lend out its excess reserves, so the maximum amount of additional loans is $40,000."
+  }, 
+  {
+    "id": 145,
+    "subject": "ap_macroeconomics",
+    "unit": 3, // AD-AS model and Automatic Stabilizers are typically in Unit 3
+    "lessonIDS": ["3.5", "3.9"], // Identifying Gaps and Automatic Stabilizers
+    "unitName": "National Income and Price Determination",
+    "question": "The AD-AS model above depicts an economy experiencing a recessionary gap. In this situation, how would automatic stabilizers, such as the income tax system and unemployment benefits, affect the economy?",
+    "image": allQS145, // Reference to the image file
+    "options": [
+      "They would automatically increase tax revenues and decrease transfer payments, worsening the recession.",
+      "They would automatically decrease tax revenues and increase transfer payments, lessening the severity of the recession.",
+      "They would require the central bank to automatically decrease the money supply.",
+      "They would require the legislature to enact new tax cuts or spending programs.",
+      "They would likely have no significant impact during a recessionary gap."
+    ],
+    "correctAnswer": "B",
+    "explanation": "The graph shows a recessionary gap because the short-run equilibrium (intersection of AD and SRAS) is at a Real GDP level below the Long-Run Aggregate Supply (LRAS). Automatic stabilizers work counter-cyclically without new legislative action. During a recession, incomes fall, leading to lower income tax collections. Simultaneously, unemployment rises, leading to increased government spending on unemployment benefits (a transfer payment). Both lower taxes and higher transfers help support disposable income and consumption, thus cushioning the fall in aggregate demand and lessening the severity of the recession."
+  }, 
+  {
+    "id": 146,
+    "subject": "ap_macroeconomics",
+    "unit": 2, // GDP calculation is typically in Unit 2
+    "lessonIDS": ["2.1"], // Corresponds to Calculating GDP
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "Based on the data provided in the table for the year 2019 (in billions of dollars), what was the Gross Domestic Product (GDP) calculated using the expenditure approach?",
+    "image": allQS146, // Reference to the image file
+    "options": [
+      "$590 billion",
+      "$605 billion",
+      "$630 billion",
+      "$670 billion",
+      "$690 billion"
+    ],
+    "correctAnswer": "A",
+    "explanation": "The expenditure approach calculates GDP using the formula: GDP = Consumption (C) + Private Investment (I) + Government Spending (G) + Net Exports (NX). Net Exports (NX) = Exports (X) - Imports (M). Using the data: NX = $25 - $40 = -$15 billion. Therefore, GDP = $450 + $75 + $80 + (-$15) = $590 billion. Taxes are not directly included in the expenditure calculation of GDP."
+  }, 
+      // --- Unit 1: Basic Economic Concepts ---
+    {
+      "id": 147,
+      "subject": "ap_macroeconomics",
+      "unit": 1,
+      "lessonIDS": ["1.1"],
+      "unitName": "Basic Economic Concepts",
+      "question": "Which of the following best represents the factor of production known as 'capital' in economics?",
+      "image": null,
+      "options": [
+        "Money held by businesses.",
+        "Shares of stock in a company.",
+        "Machinery and equipment used to produce goods.",
+        "Unskilled labor available in the workforce.",
+        "Naturally occurring mineral deposits."
+      ],
+      "correctAnswer": "C",
+      "explanation": "In economics, capital refers to manufactured goods used to produce other goods and services. Machinery, tools, equipment, and factory buildings are examples of physical capital. Money and stocks are financial assets, labor is human effort, and mineral deposits are natural resources or land."
+    },
+    {
+      "id": 148,
+      "subject": "ap_macroeconomics",
+      "unit": 1,
+      "lessonIDS": ["1.1"],
+      "unitName": "Basic Economic Concepts",
+      "question": "In a pure market economy, the fundamental questions of what to produce, how to produce, and for whom to produce are primarily answered by:",
+      "image": null,
+      "options": [
+        "Government planning committees.",
+        "Traditional customs and beliefs.",
+        "The interactions of individual buyers and sellers in markets.",
+        "The decisions of the largest corporations.",
+        "International trade organizations."
+      ],
+      "correctAnswer": "C",
+      "explanation": "A key characteristic of a market economy is decentralized decision-making. Prices and quantities are determined by the forces of supply and demand, reflecting the voluntary choices of individual consumers and producers responding to price signals."
+    },
+    {
+      "id": 149,
+      "subject": "ap_macroeconomics",
+      "unit": 1,
+      "lessonIDS": ["1.3"],
+      "unitName": "Basic Economic Concepts",
+      "question": "Country X can produce 50 units of wheat or 25 units of cloth. Country Y can produce 60 units of wheat or 20 units of cloth. Which country has the absolute advantage in producing wheat?",
+      "image": null,
+      "options": [
+        "Country X",
+        "Country Y",
+        "Both countries",
+        "Neither country",
+        "Cannot be determined"
+      ],
+      "correctAnswer": "B",
+      "explanation": "Absolute advantage refers to the ability to produce more of a good or service using the same amount of resources or the same amount using fewer resources. Country Y can produce 60 units of wheat, while Country X can produce only 50. Therefore, Country Y has the absolute advantage in wheat production."
+    },
+    {
+      "id": 150,
+      "subject": "ap_macroeconomics",
+      "unit": 1,
+      "lessonIDS": ["1.3"],
+      "unitName": "Basic Economic Concepts",
+      "question": "If two countries specialize based on comparative advantage and engage in trade, which of the following is likely to occur?",
+      "image": null,
+      "options": [
+        "The global production possibilities frontier will shift inward.",
+        "Each country will produce less of the good in which it has a comparative advantage.",
+        "Both countries can potentially consume combinations of goods outside their individual production possibilities curves.",
+        "Opportunity costs for both countries will increase.",
+        "One country will benefit significantly, while the other will likely be worse off."
+      ],
+      "correctAnswer": "C",
+      "explanation": "Trade allows countries to consume beyond their own production capabilities. By specializing in goods where they have a lower opportunity cost, meaning comparative advantage, and trading for other goods, both countries can achieve higher levels of consumption than would be possible in isolation."
+    },
+    {
+      "id": 151,
+      "subject": "ap_macroeconomics",
+      "unit": 1,
+      "lessonIDS": ["1.1", "1.4", "1.5"],
+      "unitName": "Basic Economic Concepts",
+      "question": "In the simple circular flow model, households supply which of the following to the factor market?",
+      "image": null,
+      "options": [
+        "Goods and services",
+        "Factors of production such as labor, land, capital, and entrepreneurship",
+        "Money payments for goods and services",
+        "Taxes",
+        "Savings"
+      ],
+      "correctAnswer": "B",
+      "explanation": "In the circular flow model, households own the factors of production. They supply these factors like their labor, land they own, capital they provide, or entrepreneurial skills to firms through the factor market in exchange for income like wages, rent, interest, or profit."
+    },
+  
+    // --- Unit 2: Economic Indicators and the Business Cycle ---
+    {
+      "id": 152,
+      "subject": "ap_macroeconomics",
+      "unit": 2,
+      "lessonIDS": ["2.1"],
+      "unitName": "Economic Indicators and the Business Cycle",
+      "question": "Which of the following is included in the calculation of Gross Domestic Product using the income approach?",
+      "image": null,
+      "options": [
+        "Household consumption spending",
+        "Government transfer payments",
+        "Wages and salaries paid to workers",
+        "Private investment spending",
+        "Value of intermediate goods"
+      ],
+      "correctAnswer": "C",
+      "explanation": "The income approach calculates GDP by summing all the incomes earned from producing goods and services within a country. This includes wages and salaries which are compensation of employees, rent, interest, and profits. Consumption, investment, and government purchases are part of the expenditure approach. Transfer payments and intermediate goods are excluded from GDP calculations."
+    },
+    {
+      "id": 153,
+      "subject": "ap_macroeconomics",
+      "unit": 2,
+      "lessonIDS": ["2.3"],
+      "unitName": "Economic Indicators and the Business Cycle",
+      "question": "If a significant number of unemployed individuals stop looking for work because they believe jobs are not available, how does this affect the official unemployment rate and the labor force participation rate?",
+      "image": null,
+      "options": [
+        "Unemployment rate increases; Labor force participation rate increases.",
+        "Unemployment rate decreases; Labor force participation rate decreases.",
+        "Unemployment rate increases; Labor force participation rate decreases.",
+        "Unemployment rate decreases; Labor force participation rate increases.",
+        "Both rates remain unchanged."
+      ],
+      "correctAnswer": "B",
+      "explanation": "Individuals who are not actively seeking work are classified as not in the labor force, even if they want a job; these are sometimes called discouraged workers. When they stop looking, they are no longer counted as unemployed, causing the unemployment rate which is Unemployed divided by Labor Force to decrease. Since they also leave the labor force, the labor force participation rate which is Labor Force divided by Adult Population also decreases."
+    },
+    {
+      "id": 154,
+      "subject": "ap_macroeconomics",
+      "unit": 2,
+      "lessonIDS": ["2.5"],
+      "unitName": "Economic Indicators and the Business Cycle",
+      "question": "The costs associated with businesses frequently changing their listed prices due to high and variable inflation are known as:",
+      "image": null,
+      "options": [
+        "Shoe-leather costs",
+        "Menu costs",
+        "Unit-of-account costs",
+        "Substitution bias costs",
+        "Wealth redistribution costs"
+      ],
+      "correctAnswer": "B",
+      "explanation": "Menu costs refer to the real costs incurred by firms when they have to update price lists, menus, catalogs, and other postings due to inflation. Shoe-leather costs relate to the time and effort people spend trying to counteract inflation's effect on holding money."
+    },
+    {
+      "id": 155,
+      "subject": "ap_macroeconomics",
+      "unit": 2,
+      "lessonIDS": ["2.6"],
+      "unitName": "Economic Indicators and the Business Cycle",
+      "question": "If the nominal wage increases by 5% and the overall price level increases by 3%, the real wage has:",
+      "image": null,
+      "options": [
+        "Increased by 2%",
+        "Increased by 8%",
+        "Decreased by 2%",
+        "Decreased by 8%",
+        "Remained unchanged"
+      ],
+      "correctAnswer": "A",
+      "explanation": "The real wage reflects the purchasing power of the nominal wage. It is calculated approximately as the percentage change in the nominal wage minus the percentage change in the price level or inflation rate. Real Wage Change is approximately the percentage change in Nominal Wage minus the percentage change in Price Level equals 5% minus 3% equals 2% increase."
+    },
+    {
+      "id": 156,
+      "subject": "ap_macroeconomics",
+      "unit": 2,
+      "lessonIDS": ["2.7"],
+      "unitName": "Economic Indicators and the Business Cycle",
+      "question": "Which phase of the business cycle is characterized by falling real GDP, rising unemployment, and declining business profits?",
+      "image": null,
+      "options": [
+        "Peak",
+        "Expansion",
+        "Trough",
+        "Contraction or Recession",
+        "Recovery"
+      ],
+      "correctAnswer": "D",
+      "explanation": "A contraction, or recession, is the phase of the business cycle where economic activity declines. This is typically marked by falling real GDP, increasing unemployment rates as firms lay off workers, and reduced profits due to lower sales."
+    },
+  
+    // --- Unit 3: National Income and Price Determination ---
+    {
+      "id": 157,
+      "subject": "ap_macroeconomics",
+      "unit": 3,
+      "lessonIDS": ["3.1"],
+      "unitName": "National Income and Price Determination",
+      "question": "Which of the following effects helps explain the downward slope of the aggregate demand curve?",
+      "image": null,
+      "options": [
+        "The substitution effect",
+        "The sticky-wage effect",
+        "The interest-rate effect",
+        "The diminishing marginal product effect",
+        "The multiplier effect"
+      ],
+      "correctAnswer": "C",
+      "explanation": "The downward slope of the AD curve is explained by the wealth effect, the interest-rate effect, and the exchange-rate effect. The interest-rate effect suggests that a lower price level reduces the demand for money, lowering the interest rate, which stimulates investment spending and thus increases the quantity of goods and services demanded."
+    },
+    {
+      "id": 158,
+      "subject": "ap_macroeconomics",
+      "unit": 3,
+      "lessonIDS": ["3.2"],
+      "unitName": "National Income and Price Determination",
+      "question": "If the marginal propensity to consume is 0.75, what is the value of the simple tax multiplier?",
+      "image": null,
+      "options": [
+        "4",
+        "-4",
+        "3",
+        "-3",
+        "1.33"
+      ],
+      "correctAnswer": "D",
+      "explanation": "The simple tax multiplier measures the change in aggregate demand resulting from a change in lump-sum taxes. Its formula is negative MPC divided by MPS, where MPS is 1 minus MPC. Given MPC = 0.75, MPS = 1 minus 0.75 = 0.25. Tax Multiplier = negative 0.75 divided by 0.25 = negative 3."
+    },
+    {
+      "id": 159,
+      "subject": "ap_macroeconomics",
+      "unit": 3,
+      "lessonIDS": ["3.2", "3.8"],
+      "unitName": "National Income and Price Determination",
+      "question": "If the government increases both its spending and taxes by the same amount, say $50 billion, what is the expected impact on aggregate demand according to the balanced-budget multiplier concept?",
+      "image": null,
+      "options": [
+        "Aggregate demand will increase by more than $50 billion.",
+        "Aggregate demand will increase by exactly $50 billion.",
+        "Aggregate demand will remain unchanged.",
+        "Aggregate demand will decrease by exactly $50 billion.",
+        "Aggregate demand will decrease by more than $50 billion."
+      ],
+      "correctAnswer": "B",
+      "explanation": "The balanced-budget multiplier states that an equal increase or decrease in government spending and net taxes leads to an increase or decrease in aggregate demand equal to the size of the change in spending or taxes. The multiplier value is 1 because the spending multiplier is larger in absolute value than the tax multiplier by exactly one."
+    },
+    {
+      "id": 160,
+      "subject": "ap_macroeconomics",
+      "unit": 3,
+      "lessonIDS": ["3.4"],
+      "unitName": "National Income and Price Determination",
+      "question": "Which of the following would cause a shift in the Long-Run Aggregate Supply curve to the right?",
+      "image": null,
+      "options": [
+        "An increase in the aggregate price level.",
+        "A decrease in nominal wages.",
+        "An increase in government spending.",
+        "An increase in the economy's stock of physical capital.",
+        "A decrease in consumer confidence."
+      ],
+      "correctAnswer": "D",
+      "explanation": "The LRAS curve represents the economy's potential output, which depends on the availability and productivity of its resources like land, labor, capital, and technology. An increase in the stock of physical capital, such as machinery or infrastructure, enhances productive capacity, shifting the LRAS curve to the right."
+    },
+    {
+      "id": 161,
+      "subject": "ap_macroeconomics",
+      "unit": 3,
+      "lessonIDS": ["3.7"],
+      "unitName": "National Income and Price Determination",
+      "question": "If an economy is operating in a recessionary gap and there is no government intervention, how is the economy expected to return to long-run equilibrium according to the flexible wage theory?",
+      "image": null,
+      "options": [
+        "Nominal wages will rise, shifting SRAS left.",
+        "Aggregate demand will automatically increase.",
+        "Nominal wages will fall, shifting SRAS right.",
+        "The LRAS curve will shift to the left.",
+        "The central bank will decrease the money supply."
+      ],
+      "correctAnswer": "C",
+      "explanation": "In a recessionary gap, high unemployment puts downward pressure on nominal wages. As wages fall, production costs decrease, causing the Short-Run Aggregate Supply curve to shift to the right, eventually restoring the economy to long-run equilibrium at potential output, possibly at a lower price level."
+    },
+  
+    // --- Unit 4: Financial Sector ---
+    {
+      "id": 162,
+      "subject": "ap_macroeconomics",
+      "unit": 4,
+      "lessonIDS": ["4.3"],
+      "unitName": "Financial Sector",
+      "question": "Which of the following is included in the M1 measure of the money supply but NOT in M2?",
+      "image": null,
+      "options": [
+        "Savings deposits",
+        "Small-denomination time deposits",
+        "Money market mutual funds",
+        "Demand deposits",
+        "None of the above; M1 is a subset of M2."
+      ],
+      "correctAnswer": "E",
+      "explanation": "M1 includes the most liquid forms of money: currency in circulation, demand deposits, traveler's checks, and other checkable deposits. M2 includes all of M1 PLUS less liquid assets like savings deposits, small-time deposits, and money market mutual funds for individuals. Therefore, everything in M1 is also in M2."
+    },
+    { // REPLACEMENT for original 163 (Deposit Insurance)
+      "id": 163,
+      "subject": "ap_macroeconomics",
+      "unit": 4,
+      "lessonIDS": ["4.4"],
+      "unitName": "Financial Sector",
+      "question": "Suppose a bank has $100,000 in demand deposits, actual reserves of $15,000, and the required reserve ratio is 10%. If a customer withdraws $1,000 in cash, what is the immediate effect on the bank's excess reserves?",
+      "image": null,
+      "options": [
+        "Excess reserves decrease by $100.",
+        "Excess reserves decrease by $900.",
+        "Excess reserves decrease by $1,000.",
+        "Excess reserves increase by $900.",
+        "Excess reserves remain unchanged."
+      ],
+      "correctAnswer": "B",
+      "explanation": "Initially, required reserves are 10% of $100,000 = $10,000. Initial excess reserves are $15,000 - $10,000 = $5,000. After the $1,000 cash withdrawal, demand deposits fall to $99,000 and actual reserves fall to $14,000. New required reserves are 10% of $99,000 = $9,900. New excess reserves are $14,000 - $9,900 = $4,100. The change in excess reserves is $4,100 - $5,000 = -$900."
+    },
+    { // REPLACEMENT for original 164 (CB Independence)
+      "id": 164,
+      "subject": "ap_macroeconomics",
+      "unit": 4,
+      "lessonIDS": ["4.7", "6.6"], // Links LF Market and Capital Flows
+      "unitName": "Financial Sector",
+      "question": "If international investors perceive increased risk in a country and rapidly sell off their financial assets located there, this capital flight will most likely affect the country's market for loanable funds by:",
+      "image": null,
+      "options": [
+        "Decreasing the supply of loanable funds and increasing the real interest rate.",
+        "Increasing the supply of loanable funds and decreasing the real interest rate.",
+        "Decreasing the demand for loanable funds and decreasing the real interest rate.",
+        "Increasing the demand for loanable funds and increasing the real interest rate.",
+        "Having no effect on the loanable funds market."
+      ],
+      "correctAnswer": "A",
+      "explanation": "Capital flight represents a decrease in capital inflows or an increase in capital outflows. This reduces the funds available for lending within the country, decreasing the supply of loanable funds. A leftward shift in the supply of loanable funds leads to a higher equilibrium real interest rate and a lower equilibrium quantity of funds loaned."
+    },
+    {
+      "id": 165,
+      "subject": "ap_macroeconomics",
+      "unit": 4,
+      "lessonIDS": ["4.7"],
+      "unitName": "Financial Sector",
+      "question": "Which of the following would most likely cause an increase in the supply of loanable funds?",
+      "image": null,
+      "options": [
+        "An increase in government budget deficits.",
+        "An increase in perceived business investment opportunities.",
+        "An increase in private saving rates.",
+        "An increase in expected inflation.",
+        "A decrease in capital inflows from abroad."
+      ],
+      "correctAnswer": "C",
+      "explanation": "The supply of loanable funds primarily comes from saving, both private and public. An increase in the private saving rate means households are saving more at any given real interest rate, shifting the supply curve for loanable funds to the right."
+    },
+    {
+      "id": 166,
+      "subject": "ap_macroeconomics",
+      "unit": 5, 
+      "lessonIDS": ["5.3"],
+      "unitName": "Financial Sector",
+      "question": "According to the quantity theory of money, if the money supply grows by 6%, the velocity of money is constant, and real GDP grows by 2%, the inflation rate will be approximately:",
+      "image": null,
+      "options": [
+        "2%",
+        "3%",
+        "4%",
+        "6%",
+        "8%"
+      ],
+      "correctAnswer": "C",
+      "explanation": "The equation of exchange in growth rates states that the percentage change in Money Supply plus the percentage change in Velocity equals the percentage change in Price Level plus the percentage change in Real GDP. If velocity is constant, its percentage change is 0. So, percentage change in Money Supply equals percentage change in Price Level plus percentage change in Real GDP. Plugging in the values: 6% = percentage change in Price Level + 2%. Solving for the inflation rate gives 4%."
+    },
+  
+    // --- Unit 5: Long-Run Consequences of Stabilization Policies ---
+    {
+      "id": 167,
+      "subject": "ap_macroeconomics",
+      "unit": 5,
+      "lessonIDS": ["5.2"],
+      "unitName": "Long-Run Consequences of Stabilization Policies",
+      "question": "The Non-Accelerating Inflation Rate of Unemployment is generally understood to be the same as:",
+      "image": null,
+      "options": [
+        "Zero unemployment.",
+        "The cyclical rate of unemployment.",
+        "The structural rate of unemployment.",
+        "The natural rate of unemployment.",
+        "The frictional rate of unemployment."
+      ],
+      "correctAnswer": "D",
+      "explanation": "The Non-Accelerating Inflation Rate of Unemployment, or NAIRU, represents the unemployment rate consistent with stable inflation in the long run. It is equivalent to the natural rate of unemployment, which includes frictional and structural unemployment but excludes cyclical unemployment."
+    },
+    {
+      "id": 168,
+      "subject": "ap_macroeconomics",
+      "unit": 5,
+      "lessonIDS": ["5.2"],
+      "unitName": "Long-Run Consequences of Stabilization Policies",
+      "question": "If an economy is operating to the left of its long-run Phillips curve, it indicates that:",
+      "image": null,
+      "options": [
+        "The economy is in long-run equilibrium.",
+        "The economy is experiencing a recessionary gap.",
+        "The actual unemployment rate is below the natural rate of unemployment.",
+        "Expected inflation is equal to actual inflation.",
+        "There has been a favorable supply shock."
+      ],
+      "correctAnswer": "C",
+      "explanation": "The long-run Phillips curve is vertical at the natural rate of unemployment. Operating to the left of this curve means the current unemployment rate is lower than the natural rate, which corresponds to an inflationary gap where output is above potential."
+    },
+    { // REPLACEMENT for original 169 (Debt-to-GDP)
+      "id": 169,
+      "subject": "ap_macroeconomics",
+      "unit": 5,
+      "lessonIDS": ["5.2"],
+      "unitName": "Long-Run Consequences of Stabilization Policies",
+      "question": "Which of the following events would most likely cause the short-run Phillips curve to shift downwards or to the left?",
+      "image": null,
+      "options": [
+        "An increase in aggregate demand.",
+        "An increase in expected inflation.",
+        "A decrease in aggregate demand.",
+        "A decrease in expected inflation.",
+        "An adverse supply shock, such as rising oil prices."
+      ],
+      "correctAnswer": "D",
+      "explanation": "A downward or leftward shift of the short-run Phillips curve indicates that for any given unemployment rate, the inflation rate is lower, or for any given inflation rate, the unemployment rate is lower. This is primarily caused by a decrease in expected inflation or a positive supply shock."
+    },
+    { // REPLACEMENT for original 170 (Laffer Curve)
+      "id": 170,
+      "subject": "ap_macroeconomics",
+      "unit": 5,
+      "lessonIDS": ["5.5"],
+      "unitName": "Long-Run Consequences of Stabilization Policies",
+      "question": "The 'crowding out' effect suggests that an increase in government budget deficit spending financed through borrowing will lead to:",
+      "image": null,
+      "options": [
+        "Lower real interest rates and increased private investment.",
+        "Higher real interest rates and decreased private investment.",
+        "An increase in the supply of loanable funds and lower real interest rates.",
+        "A decrease in aggregate demand and lower price levels.",
+        "An appreciation of the domestic currency and increased net exports."
+      ],
+      "correctAnswer": "B",
+      "explanation": "Crowding out occurs when increased government borrowing to finance deficits increases the demand for loanable funds. This drives up the real interest rate, making it more costly for private firms to borrow and invest, thus potentially reducing private investment spending."
+    },
+    { // REPLACEMENT for original 171 (Ricardian Equivalence)
+      "id": 171,
+      "subject": "ap_macroeconomics",
+      "unit": 5,
+      "lessonIDS": ["5.6"],
+      "unitName": "Long-Run Consequences of Stabilization Policies",
+      "question": "An increase in which of the following is most likely to enhance labor productivity and contribute to long-run economic growth?",
+      "image": null,
+      "options": [
+        "The general price level.",
+        "Government transfer payments.",
+        "The amount of physical capital per worker.",
+        "Cyclical unemployment.",
+        "Nominal wages."
+      ],
+      "correctAnswer": "C",
+      "explanation": "Long-run economic growth is driven by increases in labor productivity. Providing workers with more and better physical capital such as tools, machinery, and infrastructure directly increases the amount of output they can produce per hour worked, thus boosting productivity and potential GDP."
+    },
+  
+    // --- Unit 6: Open Economy - International Trade and Finance ---
+    {
+      "id": 172,
+      "subject": "ap_macroeconomics",
+      "unit": 6,
+      "lessonIDS": ["6.1"],
+      "unitName": "Open Economy - International Trade and Finance",
+      "question": "Which of the following transactions would typically be recorded in a country's Capital Account section of the Balance of Payments?",
+      "image": null,
+      "options": [
+        "Export of software services.",
+        "Purchase of foreign stocks by domestic residents.",
+        "Payment of dividends to foreign investors.",
+        "Debt forgiveness granted to a foreign government.",
+        "Import of merchandise goods."
+      ],
+      "correctAnswer": "D",
+      "explanation": "The Capital Account, typically very small for most countries, primarily records non-produced, non-financial asset transfers and capital transfers like debt forgiveness or migrants' financial transfers. Exports and imports of goods and services and income payments like dividends are in the Current Account. Purchases of financial assets like stocks or bonds are in the Financial Account."
+    },
+    {
+      "id": 173,
+      "subject": "ap_macroeconomics",
+      "unit": 6,
+      "lessonIDS": ["6.2", "6.3"],
+      "unitName": "Open Economy - International Trade and Finance",
+      "question": "Under a freely floating or flexible exchange rate system, the value of a country's currency is primarily determined by:",
+      "image": null,
+      "options": [
+        "The country's central bank.",
+        "The supply and demand for the currency in the foreign exchange market.",
+        "An international agreement setting fixed parities.",
+        "The country's trade balance.",
+        "The level of gold reserves held by the country."
+      ],
+      "correctAnswer": "B",
+      "explanation": "In a floating exchange rate system, the exchange rate adjusts continuously based on the market forces of supply and demand for the currency relative to other currencies, without direct intervention by the central bank to maintain a specific rate."
+    },
+    {
+      "id": 174,
+      "subject": "ap_macroeconomics",
+      "unit": 6,
+      "lessonIDS": ["6.3", "4.6"],
+      "unitName": "Open Economy - International Trade and Finance",
+      "question": "If the central bank of Country Z wants to prevent its currency from appreciating against the currency of Country W under a managed float system, it should:",
+      "image": null,
+      "options": [
+        "Buy its own currency using foreign currency.",
+        "Sell its own currency and buy foreign currency.",
+        "Increase domestic interest rates.",
+        "Impose tariffs on imports from Country W.",
+        "Decrease government spending."
+      ],
+      "correctAnswer": "B",
+      "explanation": "To prevent its currency from appreciating or getting stronger, the central bank needs to increase the supply of its currency in the foreign exchange market. Selling its own currency increases its supply, putting downward pressure on its value, while simultaneously buying foreign currency."
+    },
+    {
+      "id": 175,
+      "subject": "ap_macroeconomics",
+      "unit": 6,
+      "lessonIDS": ["6.6"],
+      "unitName": "Open Economy - International Trade and Finance",
+      "question": "Besides relative interest rates, which factor is likely to cause a significant increase in net financial capital inflows into a country?",
+      "image": null,
+      "options": [
+        "Increased political instability in the country.",
+        "Expectations of future depreciation of the country's currency.",
+        "Increased perceived riskiness of the country's assets.",
+        "Strong expectations of future economic growth and profitability in the country.",
+        "High domestic inflation rates relative to other countries."
+      ],
+      "correctAnswer": "D",
+      "explanation": "Foreign investors are attracted to countries where they expect high returns and relatively low risk. Strong prospects for economic growth and corporate profitability make a country's assets like stocks and direct investments more attractive, leading to increased capital inflows."
+    },
+    {
+      "id": 176,
+      "subject": "ap_macroeconomics",
+      "unit": 6,
+      "lessonIDS": ["1.3", "6.5"],
+      "unitName": "Open Economy - International Trade and Finance",
+      "question": "The imposition of a protective tariff on imported goods is most likely to cause which of the following in the short run in the country imposing the tariff?",
+      "image": null,
+      "options": [
+        "A decrease in the price of domestically produced substitute goods.",
+        "An increase in imports of the good.",
+        "A decrease in domestic production of the good.",
+        "An increase in the price consumers pay for the imported good.",
+        "An appreciation of the country's currency."
+      ],
+      "correctAnswer": "D",
+      "explanation": "A tariff is a tax on imported goods. This tax increases the cost of importing the good, leading to a higher price paid by domestic consumers for the imported item. It also tends to decrease the quantity of imports and increase domestic production of substitute goods."
+    }
+  
+  
 ];

@@ -53,8 +53,6 @@ interface QuestionCardProps {
   dojoProgress: number;
   correctStreak: number;
   totalQuestions: number;
-  isDoubleXpOffer: boolean;
-  onDoubleXpChoice: (accepted: boolean) => void;
   highlightedIndex: number | null;
 }
 
@@ -73,8 +71,6 @@ const QuestionCard = ({
   dojoProgress,
   correctStreak,
   totalQuestions: cardTotalQuestions,
-  isDoubleXpOffer,
-  onDoubleXpChoice,
   highlightedIndex
 }: QuestionCardProps) => {
   const letterToIndex = (letter?: string): number | null => {
@@ -345,31 +341,6 @@ const QuestionCard = ({
         {shouldBlur ? (
           // --- Placeholder for Blurred Content ---
           <div className="min-h-[500px]"></div>
-        ) : isDoubleXpOffer ? (
-            // --- RENDER DOUBLE XP OFFER --- 
-            <div className="flex flex-col items-center justify-center min-h-[300px]"> {/* Adjust min-height as needed */} 
-                <h2 className="text-3xl font-bold text-gray-800 mb-4 text-center">
-                    Feeling Lucky?
-                </h2>
-                <p className="text-gray-600 mb-8 text-center">
-                    Double XP for the next question? Or play it safe?
-                </p>
-                {/* Attached Buttons - Secondary Style */} 
-                <div className="w-full max-w-sm h-14 flex items-stretch overflow-hidden rounded-lg">
-                   <button 
-                      onClick={() => onDoubleXpChoice(true)} // Accept
-                      className="flex-1 h-full py-2 rounded-l-lg rounded-r-none text-blue-500 border-2 border-blue-500 border-r-0 font-semibold text-lg hover:bg-blue-50 transition-colors text-center"
-                   >
-                     Double XP
-                   </button>
-                   <button 
-                      onClick={() => onDoubleXpChoice(false)} // Decline
-                      className="flex-1 h-full py-2 rounded-r-lg rounded-l-none text-blue-500 border-2 border-blue-500 border-l font-semibold text-lg hover:bg-blue-50 transition-colors text-center"
-                   >
-                     Keep Normal
-                   </button>
-                 </div>
-            </div>
         ) : (
           // --- Actual Question Content ---
           <>
@@ -494,8 +465,6 @@ export function UnitMCQs({
   const [explanationError, setExplanationError] = useState<string | null>(null);
   const [isUnitDropdownOpen, setIsUnitDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const [displayDoubleXpOffer, setDisplayDoubleXpOffer] = useState(false);
-  const [isNextQuestionDoubleXp, setIsNextQuestionDoubleXp] = useState(false);
   const DOUBLE_XP_CHANCE = 0.15;
   const [highlightedIndex, setHighlightedIndex] = useState<number | null>(null);
   const [showAiTooltip, setShowAiTooltip] = useState(false);
@@ -578,12 +547,6 @@ export function UnitMCQs({
      }
   };
 
-  const handleDoubleXpChoice = (accepted: boolean) => {
-      setIsNextQuestionDoubleXp(accepted);
-      setDisplayDoubleXpOffer(false);
-      proceedToActualNextQuestion();
-  };
-
   const handlePreviousQuestion = () => {
     console.log("Handling Previous Question Request");
     onPreviousQuestion();
@@ -591,10 +554,6 @@ export function UnitMCQs({
 
   const handleNextQuestion = () => {
     console.log("Handling Next Question Request");
-    if (!displayDoubleXpOffer && Math.random() < DOUBLE_XP_CHANCE) {
-        setDisplayDoubleXpOffer(true); 
-        return; 
-    }
     proceedToActualNextQuestion(); 
   };
 
@@ -647,7 +606,7 @@ export function UnitMCQs({
       document.removeEventListener('keydown', handleKeyDown);
     };
     // --- END COMMENT OUT - Keyboard Navigation --- */ 
-  }, [handlePreviousQuestion, handleNextQuestion, currentQuestion, highlightedIndex, displayDoubleXpOffer, currentAnswerState, handleAnswerSelection]); // Added dependencies
+  }, [handlePreviousQuestion, handleNextQuestion, currentQuestion, highlightedIndex, currentAnswerState, handleAnswerSelection]); // Added dependencies
 
   // --- NEW useEffect to Disable Body Scroll --- 
   useEffect(() => {
@@ -690,8 +649,6 @@ export function UnitMCQs({
               dojoProgress={dojoProgress}
               correctStreak={correctStreak}
               totalQuestions={totalQuestions}
-              isDoubleXpOffer={displayDoubleXpOffer}
-              onDoubleXpChoice={handleDoubleXpChoice}
               highlightedIndex={highlightedIndex}
             />
           )}
