@@ -1,12 +1,13 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuthContext } from '@/contexts/AuthContext'
 import Link from 'next/link'
 import { sendPasswordResetEmail } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 
-export default function Login() {
+// Define the component containing the logic that uses useSearchParams
+function LoginPageContent() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -150,4 +151,16 @@ export default function Login() {
       </div>
     </div>
   )
+}
+
+// The default export now wraps the actual content in Suspense
+export default function Login() {
+  // Simple fallback, you can replace with a loading spinner component if desired
+  const fallbackUI = <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  
+  return (
+    <Suspense fallback={fallbackUI}>
+      <LoginPageContent />
+    </Suspense>
+  );
 } 
