@@ -6,11 +6,34 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button'; // Assuming Shadcn UI
-import { Loader2, Target, Film, Library, FileText, Lock, ClipboardList, Check, TrendingDown, BookOpen } from 'lucide-react'; // Icons
+import { Loader2, Target, Film, Library, FileText, Lock, ClipboardList, Check, TrendingDown, BookOpen, Users, Copy, Send, CheckCircle2 } from 'lucide-react'; // Icons
 import { videos as allVideos, Video as VideoType } from '@/data/videos'; // <-- Import real videos and type
 import { macroUnits as allMacroCheatSheets, microUnits as allMicroCheatSheets, Unit as CheatSheetUnitType } from '@/data/cheatSheets';
 import type { UnitXPData } from '@/hooks/useAuth'; // Import UnitXPData if needed for typing state, otherwise context provides it
 import { useSearchParams } from 'next/navigation';
+import quizPreview from "../../../public/images/quizPreview.png"
+import { Input } from "@/components/ui/input"; // Assuming Input is used
+import { useInView } from 'react-intersection-observer';
+import { Checkbox } from "@/components/ui/checkbox";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { motion } from 'framer-motion';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label"; // Needed for RadioGroup
+import BoardDisplay from '@/components/board/BoardDisplay'; // <-- Import BoardDisplay
+
+// Firestore imports needed for fetching challenges AND UPDATING
+import { db } from '@/lib/firebase';
+import { collection, query, where, getDocs, QuerySnapshot, DocumentData, doc, runTransaction, increment } from 'firebase/firestore';
 
 // --- Types (copied from unitMCQPracticePage) ---
 interface McqAnswer {
@@ -21,6 +44,36 @@ interface McqAnswer {
   lessonIDS: string[];
   timestamp?: any;
 }
+
+// --- ADD Quiz Challenge Interface (essential for state typing) ---
+interface QuizQuestion { // Basic structure needed if not imported
+  id: string | number;
+  question: string;
+  options: string[];
+  correctAnswer: number;
+  unit: number;
+  lessonIDS: string[];
+  image?: string;
+}
+
+interface QuizChallenge { // Defined here, ensure fields match Firestore
+  id: string; // Add id field to store document ID
+  generatedByUserId: string;
+  createdAt: any; // Firestore Timestamp
+  subject: 'macro' | 'micro';
+  status: string;
+  numQuestions: number;
+  quizQuestions: QuizQuestion[];
+  originatorScore: number | null;
+  originatorTime: number | null;
+  opponentUserId: string | null;
+  opponentScore: number | null;
+  opponentTime: number | null;
+  winnerUserId: string | null;
+  xpAwarded: boolean;
+  mode: 'challenge' | 'cooperate';
+}
+// --- END Quiz Challenge Interface ---
 
 // --- Helper Components for Animation ---
 
@@ -119,7 +172,7 @@ const AnimatedQuestionPreview = ({ question, animationState, currentProgress }: 
 
 // --- Renamed Component --- 
 function UserHomePageContent() {
-  const { user, loading: authLoading, mcqAnswersData, loadingMcqData, userData, loadingUserData, unitXPData, loadingUnitXPData } = useAuthContext();
+  const { user, loading: authLoading, mcqAnswersData, loadingMcqData, userData, loadingUserData } = useAuthContext();
   const router = useRouter();
   
   const [focusUnitIds, setFocusUnitIds] = useState<number[]>([]);
@@ -132,7 +185,59 @@ function UserHomePageContent() {
   const [currentProgress, setCurrentProgress] = useState(30);
   const [error, setError] = useState('');
 
+  // --- State for Challenge Feature ---
+  const [isGeneratingChallenge, setIsGeneratingChallenge] = useState(false);
+  const [challengeLink, setChallengeLink] = useState<string | null>(null);
+  const [challengeError, setChallengeError] = useState<string | null>(null);
+  const [linkCopied, setLinkCopied] = useState(false);
+  const [challengeUnitSelection, setChallengeUnitSelection] = useState<number[]>([]);
+  // --- NEW State for Modal ---
+  const [isChallengeModalOpen, setIsChallengeModalOpen] = useState(false);
+
+  // --- NEW State for Challenge Results --- 
+  const [completedChallenges, setCompletedChallenges] = useState<QuizChallenge[]>([]);
+  const [loadingChallenges, setLoadingChallenges] = useState(true); // Start true
+  // State for Claim XP button - stores loading status per challenge ID
+  const [claimXpLoading, setClaimXpLoading] = useState<Record<string, boolean>>({});
+  const [claimXpError, setClaimXpError] = useState<string | null>(null);
+  // --- END State for Challenge Results ---
+
+  // --- NEW State for Dismissed Messages ---
+  // Initial state setup - reading from localStorage
+  const [dismissedMessageIds, setDismissedMessageIds] = useState<string[]>(() => {
+      // Check if window is defined (runs only on client-side)
+      if (typeof window !== 'undefined') {
+          const savedDismissed = localStorage.getItem('dismissedChallengeMessages');
+          try {
+              return savedDismissed ? JSON.parse(savedDismissed) : [];
+          } catch (e) {
+              console.error("Error parsing dismissed messages from localStorage", e);
+              return []; // Fallback to empty array on error
+          }
+      }
+      return []; // Default empty array if not on client
+  });
+  // --- END State for Dismissed Messages ---
+
+  // --- NEW State for Typing Animation ---
+  const [animatedPlaceholder, setAnimatedPlaceholder] = useState('');
+  const placeholderTarget = 'getauniquequizlink';
+
+  // --- Intersection Observer Setup ---
+  const {
+     ref: placeholderRef, // Ref to attach to the placeholder element
+     inView: isPlaceholderVisible // Boolean indicating if the element is in view
+  } = useInView({
+    triggerOnce: true, // Only trigger the animation once
+    threshold: 0.1, // Trigger when 10% of the element is visible
+  });
+  // --- End Intersection Observer Setup ---
+
   const searchParams = useSearchParams();
+
+  // --- State for Modal Stages & Quiz Length ---
+  const [modalStage, setModalStage] = useState<1 | 2>(1);
+  const [selectedLength, setSelectedLength] = useState<5 | 10>(5); // Default to 5
 
   // --- Modified useEffect for Redirection & Data Loading --- 
   useEffect(() => {
@@ -241,64 +346,108 @@ function UserHomePageContent() {
     }
   }, [focusUnitIds]); // Depend only on focusUnitIds
 
+  // --- Updated useEffect for Typing Animation ---
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout | null = null;
+    let currentIndex = 0;
+
+    // Start animation only if placeholder is visible, no link, not generating
+    if (isPlaceholderVisible && !challengeLink && !isGeneratingChallenge) {
+      // Reset only if starting animation
+      if (animatedPlaceholder !== placeholderTarget) {
+         setAnimatedPlaceholder('');
+         intervalId = setInterval(() => {
+           setAnimatedPlaceholder(prev => placeholderTarget.substring(0, prev.length + 1));
+           currentIndex++;
+           if (currentIndex >= placeholderTarget.length && intervalId) {
+             clearInterval(intervalId);
+           }
+         }, 180); // Slower typing speed (180ms)
+      }
+    } else if (challengeLink || isGeneratingChallenge) {
+       // If link exists or generating, clear placeholder animation
+       setAnimatedPlaceholder('');
+    }
+
+    // Cleanup
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+    // Depend on visibility trigger, link status, and generation status
+  }, [isPlaceholderVisible, challengeLink, isGeneratingChallenge]);
+  // --- End Updated useEffect ---
+
+  // --- NEW useEffect for Fetching Completed Challenges --- 
+  useEffect(() => {
+    if (!user || !userData) {
+      // Don't fetch if user or essential data isn't loaded
+      // Set loading to false if we know we can't fetch
+      if (!authLoading && !loadingUserData) {
+          setLoadingChallenges(false);
+      }
+      return;
+    }
+
+    const fetchCompletedChallenges = async () => {
+      setLoadingChallenges(true);
+      setCompletedChallenges([]); // Clear previous results
+      console.log('[Challenge Fetch] Fetching completed challenges for user:', user.uid);
+
+      const challengesRef = collection(db, 'quizChallenges');
+      // Query 1: User is the originator
+      const q1 = query(challengesRef,
+                       where('generatedByUserId', '==', user.uid),
+                       where('status', '==', 'completed')
+                      );
+      // Query 2: User is the opponent
+      const q2 = query(challengesRef,
+                       where('opponentUserId', '==', user.uid),
+                       where('status', '==', 'completed')
+                      );
+
+      try {
+        const [originatorSnap, opponentSnap] = await Promise.all([
+          getDocs(q1),
+          getDocs(q2)
+        ]);
+
+        const challengesMap = new Map<string, QuizChallenge>();
+
+        const processSnapshot = (snapshot: QuerySnapshot<DocumentData>) => {
+          snapshot.forEach((doc) => {
+            if (!challengesMap.has(doc.id)) { // Avoid duplicates if user played themself
+                 challengesMap.set(doc.id, { id: doc.id, ...doc.data() } as QuizChallenge);
+            }
+          });
+        };
+
+        processSnapshot(originatorSnap);
+        processSnapshot(opponentSnap);
+
+        const allCompleted = Array.from(challengesMap.values());
+        console.log('[Challenge Fetch] Found completed challenges:', allCompleted);
+        setCompletedChallenges(allCompleted);
+
+      } catch (error) {
+        console.error("[Challenge Fetch] Error fetching completed challenges:", error);
+        // Optionally set an error state here
+      } finally {
+        setLoadingChallenges(false);
+      }
+    };
+
+    fetchCompletedChallenges();
+
+    // Dependency array: run when user or their main data changes
+  }, [user, userData, authLoading, loadingUserData]);
+  // --- END NEW useEffect --- 
+
   // --- Determine Subject and Units Data --- 
   const subject = userData?.selectedSubject || 'macro';
   // const displayUnitsData: UnitDetailsType[] = subject === 'micro' ? allMicroCheatSheets : allMacroCheatSheets;
   // displayUnitsData might not be needed anymore if UnitPerformanceDisplay is removed
-
-  // --- NEW Function to render Weakest XP Units Section ---
-  const renderWeakestXPUnitsSection = () => {
-    if (loadingUnitXPData) {
-      return (
-        <div className="flex items-center justify-center p-6 bg-gray-50 rounded-lg border border-gray-200 text-gray-500 h-24">
-          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-          <span>Loading performance data...</span>
-        </div>
-      );
-    }
-
-    // Condition: Only show if we have XP data for at least 3 units
-    if (!unitXPData || unitXPData.length < 3) {
-      return null; // Render nothing if condition not met
-    }
-
-    // Calculate weakest 3 units based on XP
-    const weakestUnits = [...unitXPData]
-      .sort((a, b) => a.totalXP - b.totalXP) // Sort ascending by XP
-      .slice(0, 3); // Take the first 3
-
-    return (
-      // Main container
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6 relative">
-        {/* Title */} 
-        <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-4">
-           <TrendingDown className="w-5 h-5 text-red-500" />
-           Areas to Focus On (Lowest XP)
-        </h2>
-
-        {/* "See full stats" link - Commented Out */}
-        {/* 
-        <a 
-          href="#" 
-          onClick={(e) => e.preventDefault()} 
-          className="absolute top-4 right-4 text-xs font-medium text-blue-600 hover:underline"
-        >
-           See full stats
-        </a> 
-        */}
-
-        {/* Grid for the 3 cards */} 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {weakestUnits.map((unit) => (
-            <div key={unit.unitId} className="bg-gray-50 rounded-md border border-gray-200 p-4">
-              <h3 className="text-sm font-medium text-gray-600 mb-1">Unit {unit.unitId}</h3>
-              <p className="text-xl font-semibold text-gray-800">{unit.totalXP} <span className="text-xs font-normal text-gray-500">XP</span></p>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  };
 
   // RENAMED: Function to render the initial/selected units focus section
   const renderFocusPracticeSection = () => {
@@ -374,6 +523,436 @@ function UserHomePageContent() {
         </div>
     );
   };
+
+  // --- NEW Function to get subject units ---
+  const getSubjectUnits = () => {
+       const currentSubject = userData?.selectedSubject || 'macro';
+       return currentSubject === 'micro' ? allMicroCheatSheets : allMacroCheatSheets;
+   };
+
+  // Handler for checkbox changes within the modal - accept boolean | 'indeterminate'
+  const handleUnitCheckboxChange = (unitId: number, checked: boolean | 'indeterminate') => {
+       // Only process boolean values
+       if (typeof checked === 'boolean') {
+           if (checked === true) {
+                // Clear error when user interacts after an error occurred
+                if (challengeError) setChallengeError(null);
+                setChallengeUnitSelection(prev => [...prev, unitId].sort((a, b) => a - b));
+           } else {
+                setChallengeUnitSelection(prev => prev.filter(id => id !== unitId));
+           }
+       }
+       // Ignore 'indeterminate' state for selection logic
+   };
+
+  // --- Helper Function: Number Icon ---
+  const StageNumberIcon = ({ number }: { number: number }) => (
+    <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+      <span className="text-white font-bold text-sm">{number}</span>
+    </div>
+  );
+
+  // --- Handler Function for Challenge Generation (updated) ---
+  const handleGenerateChallenge = async () => { // No longer takes length directly, reads from state
+    console.log('[handleGenerateChallenge] Starting...');
+    if (!user || !userData?.selectedSubject) {
+      console.log('[handleGenerateChallenge] Missing user or subject.');
+      setChallengeError('Please ensure you are logged in and have selected a subject.');
+      return; // Return early, don't proceed
+    }
+    if (!selectedLength) { // Added check for selected length
+        setChallengeError('Please select a quiz length.');
+        return; // Return early
+    }
+
+    setIsGeneratingChallenge(true);
+    setChallengeError(null);
+    setLinkCopied(false); // Reset copy state
+    let generatedLinkId: string | null = null; // Temp variable
+
+    try {
+      const requestBody: { userId: string; subject: string; numQuestions: number; unitIds?: number[] } = {
+        userId: user.uid,
+        subject: userData.selectedSubject,
+        numQuestions: selectedLength, // Use state value
+      };
+      if (challengeUnitSelection.length > 0) {
+        requestBody.unitIds = challengeUnitSelection;
+      }
+      console.log('[handleGenerateChallenge] Generating challenge with body:', requestBody);
+
+      const response = await fetch('/api/generate-challenge-quiz', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody),
+      });
+      console.log('[handleGenerateChallenge] Challenge API response status:', response.status);
+
+       if (!response.ok) {
+          let errorText = 'API request failed';
+          try { errorText = await response.text(); } catch (e) {}
+          console.error('[handleGenerateChallenge] API Error Response Text:', errorText);
+          throw new Error(`Failed to generate challenge. Status: ${response.status}`);
+       }
+
+       const data = await response.json();
+       console.log('[handleGenerateChallenge] Challenge API response data:', data);
+
+       if (!data.success) {
+         console.error('[handleGenerateChallenge] Challenge generation failed (data.success false):', data.error);
+         throw new Error(data.error || 'Failed to generate challenge.');
+       }
+
+       if (data.challengeId) {
+         const link = `${window.location.origin}/quiz-challenge/${data.challengeId}`;
+         console.log('[handleGenerateChallenge] Challenge link generated:', link);
+         generatedLinkId = link; // Store link temporarily
+         setChallengeLink(link); // Keep setting state for potential future use
+         // DO NOT reset unit selection here, happens on modal close
+       } else {
+          console.error('[handleGenerateChallenge] Challenge ID missing despite success response');
+          throw new Error('Challenge ID not received from server.');
+       }
+     } catch (err: any) {
+       console.error("[handleGenerateChallenge] Challenge generation error caught:", err);
+       setChallengeError(err.message || 'An unexpected error occurred.');
+       // Reset generating state ONLY on error, success moves to next stage
+       setIsGeneratingChallenge(false);
+       return; // Stop execution on error
+     } 
+     // Don't set generating false here on success, it resets after stage change
+     // If successful, move to stage 2
+     console.log('[handleGenerateChallenge] Success, moving to stage 2.');
+     setModalStage(2); 
+     setIsGeneratingChallenge(false); // Set loading OFF *after* stage change confirmed
+  };
+
+  // --- Handler for the primary footer button --- 
+  const handleFooterButtonClick = () => {
+      if (modalStage === 1) {
+          // Trigger generation, which will change stage on success
+          handleGenerateChallenge(); 
+      } else if (modalStage === 2 && challengeLink) {
+          // Navigate to the quiz
+          router.push(challengeLink);
+      }
+  };
+
+  // --- Copy Link Handler (remains the same, triggered on main page) ---
+  const handleCopyLink = () => {
+    if (challengeLink) {
+      navigator.clipboard.writeText(challengeLink).then(() => {
+        setLinkCopied(true);
+        setTimeout(() => setLinkCopied(false), 2000); // Reset after 2s
+      }, (err) => {
+        console.error('Failed to copy link: ', err);
+        setChallengeError('Failed to copy link automatically. Please copy it manually.');
+      });
+    }
+  };
+  // --- End Copy Link Handler ---
+
+  // --- Function to handle XP claim (Implementation) --- 
+  const handleClaimXp = async (challengeId: string, isTie: boolean) => {
+    if (!user || !userData) { // Ensure user and userData are loaded
+        console.error("[handleClaimXp] User or userData not available.");
+        setClaimXpError("Cannot claim XP. User data not loaded.");
+        return;
+    }
+
+    console.log(`[handleClaimXp] Attempting to claim XP for challenge ${challengeId}, isTie: ${isTie}`);
+    setClaimXpLoading(prev => ({ ...prev, [challengeId]: true }));
+    setClaimXpError(null); // Clear previous errors
+
+    const xpAmount = isTie ? 50 : 100;
+    const challengeRef = doc(db, "quizChallenges", challengeId);
+    const userRef = doc(db, "users", user.uid);
+
+    try {
+        await runTransaction(db, async (transaction) => {
+            console.log(`[handleClaimXp] Running transaction for ${challengeId}`);
+            const challengeDoc = await transaction.get(challengeRef);
+            const userDoc = await transaction.get(userRef); // Read user doc within transaction
+
+            if (!challengeDoc.exists()) {
+                throw new Error("Challenge document not found!");
+            }
+            if (!userDoc.exists()) {
+                // This shouldn't happen if userData is loaded, but safety check
+                throw new Error("User document not found!");
+            }
+
+            const challengeData = challengeDoc.data() as QuizChallenge;
+            // const currentTotalXP = userDoc.data()?.totalXP ?? 0; // No longer needed directly
+
+            // --- Double-check eligibility within transaction --- 
+            const isWinner = challengeData.winnerUserId === user.uid;
+            const canClaimTie = isTie && challengeData.winnerUserId === null;
+
+            if ((!isWinner && !canClaimTie) || challengeData.xpAwarded) {
+                 console.warn(`[handleClaimXp] Claim condition not met inside transaction for ${challengeId}. Winner: ${isWinner}, Tie: ${canClaimTie}, Awarded: ${challengeData.xpAwarded}`);
+                 throw new Error("XP already awarded or conditions not met.");
+            }
+            // --- End eligibility check ---
+
+            console.log(`[handleClaimXp] Conditions met. Updating challenge ${challengeId} (xpAwarded: true) and user ${user.uid} totalXP by ${xpAmount}.`);
+            // Update challenge document
+            transaction.update(challengeRef, { xpAwarded: true });
+
+            // --- START CHANGE: Update totalXP on main user doc --- 
+            // Update user document using increment for atomicity
+            transaction.update(userRef, { totalXP: increment(xpAmount) });
+            // --- END CHANGE ---
+        });
+
+        console.log(`[handleClaimXp] Transaction successful for ${challengeId}`);
+
+        // --- Optimistic UI Update --- 
+        // Update local state to immediately hide the button
+        setCompletedChallenges(prevChallenges =>
+            prevChallenges.map(c =>
+                c.id === challengeId ? { ...c, xpAwarded: true } : c
+            )
+        );
+        // --- setUserData update REMOVED --- 
+        // if (setUserData && userData) {
+        //      setUserData({ ...userData, totalXP: (userData.totalXP || 0) + xpAmount });
+        // }
+
+    } catch (error: any) {
+        console.error("[handleClaimXp] Transaction failed:", error);
+        setClaimXpError(error.message || "Failed to claim XP. Please try again.");
+    } finally {
+        console.log(`[handleClaimXp] Resetting loading state for ${challengeId}`);
+        setClaimXpLoading(prev => ({ ...prev, [challengeId]: false }));
+    }
+  };
+  // --- END Function to handle XP claim --- 
+
+  // --- NEW Function to handle Message Dashboard Actions ---
+  const handleMessageAction = async (challengeId: string, canClaim: boolean, isTie: boolean) => {
+    if (canClaim) {
+        await handleClaimXp(challengeId, isTie); // Attempt to claim XP first
+        // We'll dismiss regardless of claim success/failure, as user acknowledged it
+    }
+    // Add to dismissed list to remove from dashboard
+    setDismissedMessageIds(prev => [...prev, challengeId]);
+    console.log(`[handleMessageAction] Dismissed message for challenge: ${challengeId}`);
+  };
+  // --- END Function for Message Dashboard Actions ---
+
+  // Add useEffect to update localStorage when state changes
+  useEffect(() => {
+      // Check if window is defined
+      if (typeof window !== 'undefined') {
+          localStorage.setItem('dismissedChallengeMessages', JSON.stringify(dismissedMessageIds));
+      }
+  }, [dismissedMessageIds]); // Run this effect whenever dismissedMessageIds changes
+
+  // --- START RE-INSERTION: Render Messages Dashboard Function ---
+  const renderMessagesDashboard = () => {
+    // --- REMOVE Temporary Code Block --- 
+    /*
+    // Sample data for a won challenge where XP is claimable
+    const sampleWonChallenge: QuizChallenge = { ... }; // Contents omitted for brevity
+    ...
+    return (
+        <div className="p-4 bg-gray-50 ...">
+            ...
+        </div>
+    );
+    */
+    // --- END OF TEMPORARY CODE ---
+
+    // --- UNCOMMENT Original Code --- 
+    if (loadingChallenges) {
+      return (
+        // Keep outer container styling consistent
+        <div className="p-4 text-center text-gray-500 text-sm italic bg-gray-50 rounded-lg border border-gray-200 min-h-[80px] flex items-center justify-center"> 
+          <Loader2 className="h-5 w-5 animate-spin inline mr-2" />
+          Loading messages...
+        </div>
+      );
+    }
+
+    const activeMessages = completedChallenges.filter(c => !dismissedMessageIds.includes(c.id));
+
+    // --- Outer container is now ALWAYS rendered --- 
+    return (
+      <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 min-h-[80px]"> 
+        {activeMessages.length === 0 ? (
+          // --- Condition 1: No messages --- 
+          <div className="h-full flex items-center justify-center"> 
+            <p className="text-center text-gray-500 text-sm italic">
+              No new messages or alerts.
+            </p>
+          </div>
+        ) : (
+          // --- Condition 2: Show messages --- 
+          <div className="flex flex-nowrap overflow-x-auto gap-4 pb-1"> 
+            {activeMessages.map((challenge) => {
+              const isOriginator = user?.uid === challenge.generatedByUserId;
+              const yourScore = isOriginator ? challenge.originatorScore : challenge.opponentScore;
+              const numQuestions = challenge.numQuestions ?? 5;
+              const didWin = challenge.winnerUserId === user?.uid;
+              const didLose = challenge.winnerUserId !== null && challenge.winnerUserId !== user?.uid;
+              const isTie = challenge.winnerUserId === null;
+
+              let title = "Challenge Result";
+              let titleColor = "text-gray-600";
+              if (didWin) { title = "Winner!"; titleColor = "text-green-600"; }
+              else if (isTie) { title = "It's a Tie!"; titleColor = "text-blue-600"; }
+              else if (didLose) { title = "Better Luck Next Time!"; titleColor = "text-gray-600"; }
+
+              const canClaim = (didWin || isTie) && !challenge.xpAwarded;
+              const xpAmount = isTie ? 50 : 100;
+              const buttonText = canClaim ? `Claim XP (+${xpAmount})` : "Remove Alert";
+              const buttonVariant : "default" | "secondary" = canClaim ? "default" : "secondary"; // Explicit type for variant
+              const buttonClasses = canClaim ? "bg-yellow-500 hover:bg-yellow-600 text-white" : "bg-gray-200 hover:bg-gray-300 text-gray-700"; // Added secondary style
+
+              return (
+                <div key={challenge.id} className="border rounded-lg p-4 bg-white shadow-md w-60 flex-shrink-0 flex flex-col justify-between space-y-3">
+                  <h3 className={`text-lg font-bold text-center ${titleColor}`}>{title}</h3>
+                  <div className="text-center text-sm text-gray-700">
+                      Your Score: <strong className="text-base text-black">{yourScore ?? '-'} / {numQuestions}</strong>
+                  </div>
+                  <div className="pt-2 text-center">
+                    <Button
+                      onClick={() => handleMessageAction(challenge.id, canClaim, isTie)}
+                      disabled={claimXpLoading[challenge.id]}
+                      size="sm"
+                      variant={buttonVariant}
+                      className={buttonClasses}
+                    >
+                      {claimXpLoading[challenge.id] && canClaim ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : null}
+                      {buttonText}
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+    // --- End of Original Code Re-activation ---
+  };
+  // --- END RE-INSERTION --- 
+
+  // --- Helper Function for Ordinal Date Suffix ---
+  function getOrdinalSuffix(day: number): string {
+    if (day > 3 && day < 21) return 'th'; // Covers 11th, 12th, 13th
+    switch (day % 10) {
+      case 1:  return "st";
+      case 2:  return "nd";
+      case 3:  return "rd";
+      default: return "th";
+    }
+  }
+  // --- END Helper Function ---
+
+  // --- START REPLACEMENT: Function to Render Challenge Results Section (Table Format) --- 
+  const renderChallengeResultsSection = () => {
+    if (loadingChallenges) {
+      return (
+        <div className="p-4 text-center text-gray-500">
+          <Loader2 className="h-5 w-5 animate-spin inline mr-2" />
+          Loading challenge history...
+        </div>
+      );
+    }
+
+    if (completedChallenges.length === 0) {
+      return (
+        <div className="p-4 text-center text-gray-500 text-sm italic bg-gray-50 rounded-lg border border-gray-200">
+          No completed challenges found in your history.
+        </div>
+      );
+    }
+
+    const sortedChallenges = [...completedChallenges].sort((a, b) => {
+        const timeA = a.createdAt?.seconds ?? 0;
+        const timeB = b.createdAt?.seconds ?? 0;
+        return timeB - timeA; // Sort descending
+    });
+
+    return (
+      <div className="overflow-x-auto bg-white rounded-lg border border-gray-200 shadow-sm">
+        <table className="min-w-full divide-y divide-gray-200 text-sm">
+          <thead className="bg-gray-50">
+            <tr>
+              <th scope="col" className="px-4 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">
+                Date
+              </th>
+              <th scope="col" className="px-4 py-2 text-left font-medium text-gray-500 uppercase tracking-wider">
+                Units
+              </th>
+              <th scope="col" className="px-4 py-2 text-center font-medium text-gray-500 uppercase tracking-wider">
+                Score
+              </th>
+              <th scope="col" className="px-4 py-2 text-center font-medium text-gray-500 uppercase tracking-wider">
+                Result
+              </th>
+              <th scope="col" className="px-4 py-2 text-center font-medium text-gray-500 uppercase tracking-wider">
+                XP Earned
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {sortedChallenges.map((challenge) => {
+              const isOriginator = user?.uid === challenge.generatedByUserId;
+              const yourScore = isOriginator ? challenge.originatorScore : challenge.opponentScore;
+              const numQuestions = challenge.numQuestions ?? 5;
+              const didWin = challenge.winnerUserId === user?.uid;
+              const didLose = challenge.winnerUserId !== null && challenge.winnerUserId !== user?.uid;
+              const isTie = challenge.winnerUserId === null;
+
+              let resultText = "Completed";
+              let resultColor = "text-gray-600";
+              if (didWin) { resultText = "Win"; resultColor = "text-green-600 font-semibold"; }
+              else if (isTie) { resultText = "Tie"; resultColor = "text-blue-600 font-semibold"; }
+              else if (didLose) { resultText = "Loss"; resultColor = "text-red-600 font-semibold"; }
+
+              // Extract units covered and format text
+              const unitsCovered = Array.from(new Set(challenge.quizQuestions?.map(q => q.unit) ?? [])).sort((a,b) => a-b).join(', ');
+              const unitsText = unitsCovered || 'N/A'; // Remove "Unit(s) " prefix
+
+              // Format date using helper (Remove year)
+              const date = challenge.createdAt?.toDate();
+              let dateCompleted = 'N/A';
+              if (date) {
+                  const day = date.getDate();
+                  const month = date.toLocaleDateString(undefined, { month: 'long' });
+                  const suffix = getOrdinalSuffix(day);
+                  dateCompleted = `${month} ${day}${suffix}`; // REMOVE year from output
+              }
+
+              // Determine XP Won (logic remains same, text format changed)
+              let xpWon = 0;
+              if (challenge.xpAwarded) {
+                 if (didWin) xpWon = 100;
+                 else if (isTie) xpWon = 50;
+              }
+              const xpText = `${xpWon} XP`; // Show 0 XP if not awarded or lost
+
+              return (
+                <tr key={challenge.id}>
+                  <td className="px-4 py-2 whitespace-nowrap text-gray-800">{dateCompleted}</td>
+                  <td className="px-4 py-2 whitespace-nowrap text-gray-500">{unitsText}</td>
+                  <td className="px-4 py-2 whitespace-nowrap text-center text-gray-800"><strong className="text-black">{yourScore ?? '-'} / {numQuestions}</strong></td>
+                  <td className={`px-4 py-2 whitespace-nowrap text-center ${resultColor}`}>{resultText}</td>
+                  <td className="px-4 py-2 whitespace-nowrap text-center font-medium text-yellow-600">{xpText}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+  // --- END REPLACEMENT: Function to Render Challenge Results Section --- 
 
   // --- Updated Combined Content Area Section --- 
   const renderContentAreaSection = () => {
@@ -588,7 +1167,7 @@ function UserHomePageContent() {
     );
   }
 
-  // --- Main component return (only renders if not loading/error/redirecting) --- 
+  // --- Main component return (structure updated) --- 
   return (
     <div className="min-h-screen pt-20 pb-16">
        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -598,8 +1177,24 @@ function UserHomePageContent() {
             Welcome back!
           </h1>
 
-          {/* Weakest XP Section */}
-          {renderWeakestXPUnitsSection()} 
+          {/* REMOVE First Call to renderContentAreaSection */}
+          {/* {renderContentAreaSection()} */}
+
+          {/* <<< BoardDisplay Component Temporarily Commented Out >>> */}
+          {/* 
+          <div className="mt-8">
+             <h2 className="text-2xl font-semibold mb-4">My Blocks Board</h2>
+             <BoardDisplay />
+          </div>
+          */}
+
+          {/* Messages Dashboard Section */}
+          <section aria-labelledby="messages-dashboard-heading" className="space-y-3">
+              <h2 id="messages-dashboard-heading" className="text-lg font-semibold text-gray-800">
+                  Messages & Alerts
+              </h2>
+              {renderMessagesDashboard()}
+          </section>
 
           {/* Focus Section */}
           <section aria-labelledby="focus-units-heading">
@@ -607,10 +1202,180 @@ function UserHomePageContent() {
                {renderFocusPracticeSection()} 
           </section>
 
+          {/* --- NEW Unified Challenge Zone Section --- */}
+          <section aria-labelledby="unified-challenge-zone-heading">
+            <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+              {/* Shared Header */}
+              <div className="bg-gray-100 px-6 py-3 border-b border-gray-200 flex items-center gap-2">
+                <Users className="w-5 h-5 text-purple-600" />
+                <h2 id="unified-challenge-zone-heading" className="text-lg font-semibold text-gray-800">
+                  Challenge Zone
+                </h2>
+              </div>
+              {/* Content Area */}
+              
+              <div className="p-6 pt-6 space-y-6">  {/* REVERTED top padding */}
+                  {/* --- Create Challenge Subsection --- */}
+                  <div className="space-y-5">
+                      {/* MODIFIED Heading Styling */}
+                      <h3 className="text-base font-semibold text-gray-700">
+                          Create a Challenge - 
+                          <span className="font-medium"> Generate a quiz link, send it to a friend, and </span> {/* Normal weight, inherits color */} 
+                          <span className="text-purple-500 font-bold">battle for XP</span> {/* Bold and purple */} 
+                          <span className="font-medium"> — may the smartest win!</span> {/* Normal weight, inherits color */} 
+                      </h3>
+                      {/* Button Group with Dialog Trigger */}
+                      <div className="flex rounded-md shadow-sm">
+                          {/* Update onOpenChange to reset stage */}
+                          <Dialog open={isChallengeModalOpen} onOpenChange={(open) => {
+                              setIsChallengeModalOpen(open);
+                              if (!open) { // Reset stage and other states
+                                  setModalStage(1);
+                                  setChallengeLink(null);
+                                  setChallengeError(null);
+                                  setChallengeUnitSelection([]);
+                                  setSelectedLength(5); // Reset length
+                                  setLinkCopied(false);
+                                  setIsGeneratingChallenge(false);
+                              }
+                          }}>
+                              <DialogTrigger asChild>
+                                  <Button
+                                      className="flex-1 relative inline-flex items-center justify-center px-4 py-2 rounded-l-md rounded-r-none border border-gray-300 bg-purple-600 text-white text-sm font-semibold hover:bg-purple-700 focus:z-10 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500 disabled:opacity-50"
+                                      size="lg"
+                                  >
+                                      Challenge
+                                  </Button>
+                              </DialogTrigger>
+                              <DialogContent className="sm:max-w-[480px]">
+                                  <DialogHeader>
+                                      {/* Title remains the same */}
+                                      <DialogTitle className="text-2xl font-extrabold tracking-tight text-gray-800">Create <span className="text-blue-500">Challenge Quiz</span></DialogTitle>
+                                      {/* Description removed or adjusted based on stage? Let's keep it simple for now */}
+                                  </DialogHeader>
+
+                                  {/* --- Stage 1 Content --- */}
+                                  {modalStage === 1 && (
+                                      <div className="py-4 space-y-6"> {/* Increased spacing */}
+                                          {/* Instruction 1 */}
+                                          <div className="flex items-center gap-3">
+                                              <StageNumberIcon number={1} />
+                                              <p className="text-sm text-gray-700 font-medium">Choose quiz length and units.</p>
+                                          </div>
+                                          {/* Length Selection */}
+                                          <div>
+                                              <Label className="text-sm font-medium text-gray-700 pb-2 block">Quiz Length</Label>
+                                              <RadioGroup defaultValue="5" value={selectedLength.toString()} onValueChange={(value) => setSelectedLength(parseInt(value) as 5 | 10)} className="flex gap-4">
+                                                  <div className="flex items-center space-x-2">
+                                                      <RadioGroupItem value="5" id="len-5" />
+                                                      <Label htmlFor="len-5">5 Questions</Label>
+                                                  </div>
+                                                  <div className="flex items-center space-x-2">
+                                                      <RadioGroupItem value="10" id="len-10" />
+                                                      <Label htmlFor="len-10">10 Questions</Label>
+                                                  </div>
+                                              </RadioGroup>
+                                          </div>
+                                          {/* Unit Selection */}
+                                          <ScrollArea className="max-h-[30vh] border rounded-md p-4 bg-gray-50"> {/* Adjusted max-h */}
+                                              <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                                                  {/* START INSERTION */}
+                                                  {getSubjectUnits().map((unit) => (
+                                                      <div key={unit.number} className="flex items-center space-x-2">
+                                                          <Checkbox
+                                                              id={`unit-${unit.number}`}
+                                                              checked={challengeUnitSelection.includes(unit.number)}
+                                                              onCheckedChange={(checked) => handleUnitCheckboxChange(unit.number, checked)}
+                                                          />
+                                                          <Label
+                                                              htmlFor={`unit-${unit.number}`}
+                                                              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                                          >
+                                                              Unit {unit.number}
+                                                          </Label>
+                                                      </div>
+                                                  ))}
+                                                  {/* END INSERTION */}
+                                              </div>
+                                          </ScrollArea>
+                                           {/* Display Generation Error */}
+                                          {challengeError && (
+                                               <p className="text-sm text-red-600 bg-red-50 p-2 rounded border border-red-200 text-center">Error: {challengeError}</p>
+                                          )}
+                                      </div>
+                                  )}
+
+                                  {/* --- Stage 2 Content --- */}
+                                  {modalStage === 2 && (
+                                      <div className="py-4 space-y-6"> {/* Increased spacing */}
+                                          {/* Instruction 2 */}
+                                          <div className="flex items-center gap-3">
+                                              <StageNumberIcon number={2} />
+                                              <p className="text-sm text-gray-700 font-medium">Copy the quiz link and then begin.<br/>(You can share with a friend now or later)</p>
+                                          </div>
+                                          {/* Link Display & Copy Button */}
+                                          {challengeLink && (
+                                              <div className="flex items-center gap-2 border border-gray-300 bg-gray-100 rounded-md overflow-hidden"> 
+                                                  <p className="text-base text-gray-800 font-semibold flex-grow min-w-0 pl-3 py-3 break-words"> 
+                                                      {challengeLink}
+                                                  </p>
+                                                  <Button
+                                                      variant="ghost"
+                                                      size="sm"
+                                                      onClick={handleCopyLink}
+                                                      className="flex-shrink-0 px-2 py-1 h-auto text-gray-600 hover:text-gray-900 mr-1" /* ADDED mr-1 */
+                                                      aria-label={linkCopied ? 'Link Copied' : 'Copy Link'}
+                                                  >
+                                                      {linkCopied ? (
+                                                          <CheckCircle2 className="w-4 h-4 text-green-600" />
+                                                      ) : (
+                                                          <Copy className="w-4 h-4" />
+                                                      )}
+                                                  </Button>
+                                              </div>
+                                          )}
+                                          {/* Error display if generation failed but somehow reached stage 2? Unlikely */}
+                                          {challengeError && (
+                                               <p className="text-sm text-red-600 bg-red-50 p-2 rounded border border-red-200 text-center">Error: {challengeError}</p>
+                                          )}
+                                      </div>
+                                  )}
+
+                                  {/* --- Footer Button (Unified) --- */}
+                                  <DialogFooter className="pt-4 flex w-full">
+                                      <Button
+                                          type="button"
+                                          onClick={handleFooterButtonClick} // Use unified handler
+                                          disabled={isGeneratingChallenge || (modalStage === 2 && !challengeLink)} // Disable while generating or if link missing in stage 2
+                                          className={`w-full bg-blue-500 hover:bg-blue-600 text-white`} // Always blue now
+                                          size="lg"
+                                      >
+                                          {isGeneratingChallenge 
+                                              ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</> 
+                                              : modalStage === 1 
+                                                  ? 'Next' 
+                                                  : 'Start Quiz'}
+                                      </Button>
+                                  </DialogFooter>
+                              </DialogContent>
+                          </Dialog>
+                          {/* ... Cooperate Button ... */}
+                      </div>
+                  </div>
+                  {/* --- Completed Challenges Subsection --- */}
+                  <div className="space-y-3 border-t border-gray-200 pt-6"> {/* Added border-t and pt-6 for separation */}
+                      <h3 className="text-base font-semibold text-gray-700">Completed Challenges</h3>
+                      {renderChallengeResultsSection()} {/* Added the call here */}
+                  </div>
+              </div>
+            </div>
+          </section>
+          {/* --- END Unified Challenge Zone Section --- */}
+
           {/* Study Resources Section */}
           <section aria-labelledby="content-area-heading">
               <h2 id="content-area-heading" className="sr-only">Content Area</h2>
-              {renderContentAreaSection()}
+              {renderContentAreaSection()} {/* Keep this second call */} 
           </section>
 
           {/* Placeholder for Future Sections */}

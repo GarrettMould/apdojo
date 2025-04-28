@@ -83,3 +83,38 @@ body {
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
 }
+
+@layer utilities {
+  /* Increase border thickness for specific checkboxes */
+  button[role="checkbox"][data-state].w-6.h-6 {
+    border-width: 2px !important; /* Force thicker border */
+  }
+
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+
+  /* Add custom scrollbar styles if needed, e.g., for Webkit */
+  /* Example:
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555; 
+  }
+  */
+}

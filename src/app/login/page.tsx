@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuthContext } from '@/contexts/AuthContext'
 import Link from 'next/link'
 import { sendPasswordResetEmail } from 'firebase/auth'
@@ -13,14 +13,24 @@ export default function Login() {
   const [resetSent, setResetSent] = useState(false)
   const [loadingSubmit, setLoadingSubmit] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { login, user, loading: authLoading } = useAuthContext()
 
   useEffect(() => {
-    if (!authLoading && user) {
-      console.log('[Login Page Effect] User found, redirecting to /userHomePage');
+    // Only redirect away from login page IF:
+    // 1. Auth is not loading
+    // 2. User is logged in
+    // 3. There is NO 'redirect' query parameter present
+    const redirectParam = searchParams.get('redirect');
+    if (!authLoading && user && !redirectParam) {
+      console.log('[Login Page Effect] User logged in and NO redirect param, pushing to /userHomePage');
       router.push('/userHomePage');
+    } else if (!authLoading && user && redirectParam) {
+        console.log('[Login Page Effect] User logged in WITH redirect param, letting handleSubmit handle navigation.');
+        // Do nothing here - handleSubmit already called router.replace()
     }
-  }, [user, authLoading, router]);
+    // If !user or authLoading, do nothing (stay on login page)
+  }, [user, authLoading, router, searchParams]); // Added searchParams dependency
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -28,6 +38,14 @@ export default function Login() {
       setError('')
       setLoadingSubmit(true)
       await login(email, password)
+      const redirectPath = searchParams.get('redirect')
+      if (redirectPath) {
+        console.log('Login page redirecting to:', redirectPath)
+        router.replace(redirectPath)
+      } else {
+        console.log('Login page redirecting to default /userHomePage')
+        router.push('/userHomePage')
+      }
     } catch (error) {
       setError('Failed to sign in. Please check your credentials.')
     } finally {

@@ -29,8 +29,6 @@ export function useAuthContext(): AuthContextValue {
       logout: async () => { throw new Error('AuthProvider not found'); },
       mcqAnswersData: null,
       loadingMcqData: true,
-      unitXPData: null,
-      loadingUnitXPData: true,
       userData: null,
       loadingUserData: true,
       lastSelectedPracticeUnits: null,
@@ -41,7 +39,9 @@ export function useAuthContext(): AuthContextValue {
       correctStreak: 0,
       setCorrectStreak: (streak: number | ((prev: number) => number)) => { console.warn('AuthProvider not found, cannot set correct streak'); },
       isNextQuestionDoubleXp: false,
-      setIsNextQuestionDoubleXp: (isDouble: boolean | ((prev: boolean) => boolean)) => { console.warn('AuthProvider not found, cannot set is next question double XP'); }
+      setIsNextQuestionDoubleXp: (isDouble: boolean | ((prev: boolean) => boolean)) => { console.warn('AuthProvider not found, cannot set is next question double XP'); },
+      unitPerformanceStats: null,
+      loadingUnitPerformance: true,
     }
   }
   return context

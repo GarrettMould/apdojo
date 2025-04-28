@@ -3,11 +3,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Question as QuestionType } from '@/data/questionBanks/types';
 import { Unit } from '@/data/cheatSheets';
-import { Check, X, Brain, FileText, ChevronDown, Triangle, Loader2, Play, RefreshCw, ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
+import { Check, X, Brain, FileText, ChevronDown, Triangle, Loader2, Play, RefreshCw, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Clipboard } from 'lucide-react';
 import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
+import { db } from '@/lib/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import html2canvas from 'html2canvas';
 
 import dojoIcon from "../../public/images/dojoIcon.png";
 
@@ -41,7 +44,7 @@ interface UnitMCQsProps {
 interface QuestionCardProps {
   question: QuestionType;
   currentIndex: number;
-
+  totalQuestions: number;
   onAnswerSelect: (questionId: number, answerLetter: string, answerText: string, lessonIDS: string[]) => void;
   initialSelectedLetter?: string; 
   isAnswered: boolean;
@@ -52,7 +55,6 @@ interface QuestionCardProps {
   login: (email: string, password: string) => Promise<any>;
   dojoProgress: number;
   correctStreak: number;
-  totalQuestions: number;
   highlightedIndex: number | null;
 }
 
@@ -70,7 +72,6 @@ const QuestionCard = ({
   login,
   dojoProgress,
   correctStreak,
-  totalQuestions: cardTotalQuestions,
   highlightedIndex
 }: QuestionCardProps) => {
   const letterToIndex = (letter?: string): number | null => {
@@ -108,6 +109,8 @@ const QuestionCard = ({
 
   // Add state for password requirement visibility
   const [showPasswordReqs, setShowPasswordReqs] = useState(false);
+
+  const cardRef = useRef<HTMLDivElement>(null);
 
   // Effect to sync internal state and reset forms/validation/mode
   useEffect(() => {
@@ -230,8 +233,91 @@ const QuestionCard = ({
 
   const shouldBlur = !isLoggedIn && currentIndex >= 2;
 
+  // Function to capture the card as an image
+  const handleSaveToBoard = async () => {
+    if (!cardRef.current) {
+      console.error("Card element ref not found for capture.");
+      alert("Failed to capture card: Element not ready.");
+      return;
+    }
+
+    try {
+      console.log("Attempting to capture card element...");
+      const canvas = await html2canvas(cardRef.current, {
+        useCORS: true, // Allow capturing external images if any are present
+        logging: true, // Enable logging for debugging
+        // Optional: Set background color if transparency is an issue
+        // backgroundColor: '#ffffff', 
+      });
+      console.log("Canvas generated.");
+
+      const imageDataUrl = canvas.toDataURL('image/png');
+      console.log("Captured Image Data URL (first 100 chars):", imageDataUrl.substring(0, 100) + "...");
+
+      // --- TEMPORARY FRONTEND ACTION --- 
+      // alert(`Question Card Captured! ...`); // Optional: Remove or keep the alert
+
+      // --- Save image data to localStorage (Temporary Solution) ---
+      try {
+         // Retrieve existing images or initialize an empty array
+         const boardBlocksRaw = localStorage.getItem('tempBoardBlocks');
+         let boardBlocks = boardBlocksRaw ? JSON.parse(boardBlocksRaw) : [];
+         
+         // Ensure it's an array (handle potential data corruption)
+         if (!Array.isArray(boardBlocks)) {
+             console.warn('localStorage tempBoardBlocks was not an array, resetting.');
+             boardBlocks = [];
+         }
+
+         // Define a structure for the image block
+         const newImageBlock = {
+             id: `img-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`, // Unique ID
+             type: 'image_capture', // Identify block type
+             imageUrl: imageDataUrl, // The captured Base64 data
+             title: `Question ${question.id} Capture`, // Simple title
+             userId: 'local', // Indicate it's local
+             createdAt: new Date().toISOString() // Add timestamp
+         };
+
+         // Add the new block
+         boardBlocks.push(newImageBlock);
+
+         // Optional: Limit the number of stored images to prevent localStorage bloat
+         const MAX_LOCAL_BLOCKS = 10;
+         if (boardBlocks.length > MAX_LOCAL_BLOCKS) {
+             boardBlocks = boardBlocks.slice(-MAX_LOCAL_BLOCKS); // Keep only the last X items
+         }
+
+         // Save back to localStorage
+         localStorage.setItem('tempBoardBlocks', JSON.stringify(boardBlocks));
+         console.log(`Saved image block ${newImageBlock.id} to localStorage (temporary)`);
+         alert('Question Card image saved to temporary local board!'); // Give feedback
+
+      } catch (e) {
+         console.error("Error saving captured image to localStorage:", e);
+         alert("Could not save image to temporary local board storage.");
+      }
+
+    } catch (error) {
+      console.error('Error capturing QuestionCard with html2canvas:', error);
+      alert("Failed to capture QuestionCard image. See console for details.");
+    }
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6 md:p-8 relative">
+    <div ref={cardRef} className="bg-white rounded-lg shadow-md border border-gray-200 p-6 md:p-8 relative">
+      {/* Comment out the Save to Board button */}
+      {/* 
+      <Button
+        variant="outline"
+        className="absolute top-3 right-3 z-20 bg-white/80 hover:bg-white h-8 w-8 p-0"
+        onClick={handleSaveToBoard}
+        title="Save Card Image to Board (Temporary)"
+      >
+        <Clipboard className="h-4 w-4" />
+      </Button>
+      */}
+
       {/* Overlay: Renders Signup or Login Form */}
       {shouldBlur && (
         <div className="absolute inset-0 bg-white bg-opacity-90 backdrop-blur-sm z-10 flex items-center justify-center p-4 rounded-lg">
@@ -459,7 +545,7 @@ export function UnitMCQs({
   subject,
   practiceUnitIds,
 }: UnitMCQsProps) {
-  const { login, signup, userData, loadingUserData } = useAuthContext();
+  const { login, signup, userData, loadingUserData, user } = useAuthContext();
   const [aiExplanations, setAiExplanations] = useState<Record<number, string>>({});
   const [isLoadingExplanation, setIsLoadingExplanation] = useState(false);
   const [explanationError, setExplanationError] = useState<string | null>(null);
@@ -494,11 +580,68 @@ export function UnitMCQs({
     setHighlightedIndex(null);
   };
 
-  const handleAnswerSelection = (questionId: number, answerLetter: string, answerText: string, lessonIDS: string[]) => {
-    const isCorrect = answerLetter === currentQuestion?.correctAnswer;
-    if (currentQuestion) {
-         onAnswer(questionId, answerLetter, isCorrect, lessonIDS); 
-         setHighlightedIndex(null);
+  const handleAnswerSelection = async (questionId: number, answerLetter: string, answerText: string, lessonIDS: string[]) => {
+    if (!currentQuestion) return; // Ensure currentQuestion is available
+
+    const isCorrect = answerLetter === currentQuestion.correctAnswer;
+    const unitId = currentQuestion.unit; // Get unitId from the question data
+
+    // Update local state for immediate UI feedback
+    onAnswer(questionId, answerLetter, isCorrect, lessonIDS);
+    setHighlightedIndex(null);
+
+    // --- Backend Updates (Only if logged in) --- 
+    if (user) { 
+        
+        // 1. Update mcqAnswerStatus Map (via API)
+        try {
+            fetch('/api/update-mcq-status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: user.uid,
+                    questionId: questionId,
+                    isCorrect: isCorrect
+                }),
+            })
+            .then(response => { 
+                if (!response.ok) {
+                    response.json().then(err => console.error(`Failed to update MCQ status for ${questionId}: ${response.status}`, err));
+                } else {
+                    console.log(`MCQ status update request sent for ${questionId}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error calling /api/update-mcq-status:', error);
+            });
+        } catch (error) {
+            console.error('Sync Error trying to call /api/update-mcq-status:', error);
+        }
+
+        // 2. Update Total XP (via API)
+        // (Keep your existing XP calculation and fetch call to /api/update-total-xp here...)
+        // If XP logic needs to move here, it would go here.
+
+        // 3. --- >>> Write Detailed Answer to mcqAnswers Subcollection <<< ---
+        try {
+            console.log(`Attempting to write detailed answer log for user ${user.uid}, question ${questionId}`);
+            const userAnswersColRef = collection(db, 'users', user.uid, 'mcqAnswers');
+            const answerData = {
+                questionId: questionId,      // Use the actual number ID
+                isCorrect: isCorrect,
+                unitId: unitId,              // Store the unit ID
+                lessonIDS: lessonIDS,        // Store the lesson IDs array
+                timestamp: serverTimestamp() // Use Firestore server timestamp
+            };
+            await addDoc(userAnswersColRef, answerData);
+            console.log(`Successfully wrote detailed answer log for question ${questionId}`);
+        } catch (error) {
+            console.error('Error writing detailed answer log to Firestore:', error);
+        }
+        // --- >>> End Subcollection Write <<< ---
+
+    } else {
+        console.warn("User not logged in. Skipping backend updates.");
     }
   };
 

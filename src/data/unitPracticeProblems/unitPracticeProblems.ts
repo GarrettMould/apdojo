@@ -5672,7 +5672,2894 @@ export const allQuestions: QuestionType[] = [
       ],
       "correctAnswer": "D",
       "explanation": "A tariff is a tax on imported goods. This tax increases the cost of importing the good, leading to a higher price paid by domestic consumers for the imported item. It also tends to decrease the quantity of imports and increase domestic production of substitute goods."
-    }
+    }, 
+      {
+        "id": 177,
+        "subject": "ap_microeconomics",
+        "unit": 3,
+        "lessonIDS": ["3.1"],
+        "unitName": "Production, Cost, and the Perfect Competition Model",
+        "question": "When a firm hires additional units of a variable input, like labor, while keeping fixed inputs constant, the marginal product of the variable input eventually decreases. This concept is known as:",
+        "image": null,
+        "options": [
+          "Diseconomies of scale affecting long-run costs", // Slightly lengthened
+          "The law of diminishing marginal utility",
+          "The law of diminishing marginal product", // Correct
+          "Constant returns to scale in production", // Slightly lengthened
+          "Decreasing marginal cost"
+        ],
+        "correctAnswer": "C",
+        "explanation": "The law of diminishing marginal product states that as more units of a variable input are added to fixed inputs, the additional output produced from each new unit of the variable input will eventually decline."
+      },
+      {
+        "id": 178,
+        "subject": "ap_microeconomics",
+        "unit": 3,
+        "lessonIDS": ["3.2"],
+        "unitName": "Production, Cost, and the Perfect Competition Model",
+        "question": "Which cost measure is calculated by dividing the change in total cost by the change in output?",
+        "image": null,
+        "options": [
+          "Average fixed cost per unit",
+          "Average variable cost of production",
+          "Average total cost overall",
+          "Marginal cost", // Correct
+          "Total variable cost for all units"
+        ],
+        "correctAnswer": "D",
+        "explanation": "Marginal cost (MC) is the additional cost incurred from producing one more unit of output. It is calculated as the change in total cost divided by the change in quantity (output)."
+      },
+      {
+        "id": 179,
+        "subject": "ap_microeconomics",
+        "unit": 3,
+        "lessonIDS": ["3.2"],
+        "unitName": "Production, Cost, and the Perfect Competition Model",
+        "question": "A firm's total fixed costs are $1,000. If the firm produces 100 units of output, and its average variable cost is $5, what is its average total cost?",
+        "image": null,
+        "options": [
+          "$5",
+          "$10",
+          "$15", // Correct
+          "$50",
+          "$105"
+        ],
+        "correctAnswer": "C",
+        "explanation": "Average Fixed Cost (AFC) = Total Fixed Cost / Quantity = $1,000 / 100 = $10. Average Total Cost (ATC) = Average Fixed Cost (AFC) + Average Variable Cost (AVC) = $10 + $5 = $15." // Lengths are numbers, inherently balanced.
+      },
+      {
+        "id": 180,
+        "subject": "ap_microeconomics",
+        "unit": 3,
+        "lessonIDS": ["3.2"],
+        "unitName": "Production, Cost, and the Perfect Competition Model",
+        "question": "As a firm increases its output in the short run, its average fixed cost will:",
+        "image": null,
+        "options": [
+          "Remain constant regardless of output level",
+          "Increase continuously due to rising total costs",
+          "Decrease continuously", // Correct
+          "Decrease initially, then increase reflecting diminishing returns",
+          "Increase initially, then decrease as capacity is reached"
+        ],
+        "correctAnswer": "C",
+        "explanation": "Average fixed cost (AFC) is calculated as Total Fixed Cost (TFC) divided by Quantity (Q). Since TFC is constant in the short run, AFC must decrease as Q increases because the constant fixed cost is spread over more units of output."
+      },
+      {
+        "id": 181,
+        "subject": "ap_microeconomics",
+        "unit": 3,
+        "lessonIDS": ["3.2"],
+        "unitName": "Production, Cost, and the Perfect Competition Model",
+        "question": "If a firm's marginal cost is less than its average variable cost, and output increases, what will happen to the average variable cost?",
+        "image": null,
+        "options": [
+          "Average variable cost will increase rapidly.",
+          "Average variable cost will decrease.", // Correct
+          "Average variable cost will remain constant.",
+          "Average variable cost will equal the marginal cost exactly.",
+          "The effect on average variable cost cannot be determined."
+        ],
+        "correctAnswer": "B",
+        "explanation": "When the marginal cost (the cost of the next unit) is below the current average variable cost, producing that next unit pulls the average down. Therefore, average variable cost will decrease." // Lengths seem reasonably balanced.
+      },
+      {
+        "id": 182,
+        "subject": "ap_microeconomics",
+        "unit": 3,
+        "lessonIDS": ["3.3"],
+        "unitName": "Production, Cost, and the Perfect Competition Model",
+        "question": "Diseconomies of scale occur when a firm increases all its inputs, and its output:",
+        "image": null,
+        "options": [
+          "Increases by the same percentage as the inputs.",
+          "Increases by a larger percentage than the inputs.",
+          "Increases by a smaller percentage than the inputs.", // Correct
+          "Remains constant despite input increases.",
+          "Decreases due to management inefficiency." // Lengthened plausible distractor
+        ],
+        "correctAnswer": "C",
+        "explanation": "Diseconomies of scale exist when increasing all inputs by a certain percentage leads to a smaller percentage increase in output. This results in rising long-run average total costs, often due to coordination problems in large organizations."
+      },
+      {
+        "id": 183,
+        "subject": "ap_microeconomics",
+        "unit": 3,
+        "lessonIDS": ["3.3"],
+        "unitName": "Production, Cost, and the Perfect Competition Model",
+        "question": "Which of the following best describes the long run in production and cost analysis?",
+        "image": null,
+        "options": [
+          "A specific period, usually defined as one fiscal year.",
+          "A period where only labor and material inputs can be changed.",
+          "A period where technology is fixed but the scale of operation can vary.",
+          "A period where all inputs, including plant size and capital, are variable.", // Correct (slightly longer)
+          "A period sufficiently short that fixed costs are irrelevant."
+        ],
+        "correctAnswer": "D",
+        "explanation": "The long run is defined as a time horizon long enough for a firm to vary all of its inputs, including its scale of operations (plant size, capital stock). There are no fixed inputs in the long run."
+      },
+      {
+        "id": 184,
+        "subject": "ap_microeconomics",
+        "unit": 3,
+        "lessonIDS": ["3.4"],
+        "unitName": "Production, Cost, and the Perfect Competition Model",
+        "question": "A firm's total revenue is $500,000. Its explicit costs are $300,000. The owner could have earned $150,000 working elsewhere. What is the firm's economic profit?",
+        "image": null,
+        "options": [
+          "$50,000", // Correct
+          "$150,000",
+          "$200,000",
+          "$350,000",
+          "$650,000"
+        ],
+        "correctAnswer": "A",
+        "explanation": "Economic Profit = Total Revenue - Explicit Costs - Implicit Costs. Implicit costs represent the opportunity cost of resources used, such as the owner's forgone salary ($150,000). Economic Profit = $500,000 - $300,000 - $150,000 = $50,000." // Lengths are numbers, inherently balanced.
+      },
+      {
+        "id": 185,
+        "subject": "ap_microeconomics",
+        "unit": 3,
+        "lessonIDS": ["3.4"],
+        "unitName": "Production, Cost, and the Perfect Competition Model",
+        "question": "Accounting profit is typically defined as total revenue minus:",
+        "image": null,
+        "options": [
+          "Implicit opportunity costs only",
+          "Explicit costs only", // Correct
+          "Both explicit costs and implicit opportunity costs", // Lengthened distractor
+          "Marginal costs associated with the last unit produced",
+          "Variable costs incurred during production"
+        ],
+        "correctAnswer": "B",
+        "explanation": "Accounting profit considers only the explicit, out-of-pocket costs incurred by a firm (like wages, rent, materials). It does not subtract implicit costs, which are the opportunity costs of using owner-supplied resources."
+      },
+      {
+        "id": 186,
+        "subject": "ap_microeconomics",
+        "unit": 3,
+        "lessonIDS": ["3.5"],
+        "unitName": "Production, Cost, and the Perfect Competition Model",
+        "question": "To maximize profit, a firm should produce the quantity of output where:",
+        "image": null,
+        "options": [
+          "Total revenue is exactly equal to total cost.",
+          "Marginal revenue equals marginal cost.", // Correct
+          "Average total cost reaches its lowest possible point.",
+          "Price charged equals the average total cost.",
+          "Total revenue generated is maximized."
+        ],
+        "correctAnswer": "B",
+        "explanation": "The universal rule for profit maximization is to produce up to the point where the additional revenue from selling one more unit (Marginal Revenue, MR) equals the additional cost of producing that unit (Marginal Cost, MC)."
+      },
+      {
+        "id": 187,
+        "subject": "ap_microeconomics",
+        "unit": 3,
+        "lessonIDS": ["3.7"],
+        "unitName": "Production, Cost, and the Perfect Competition Model",
+        "question": "Which of the following is a defining characteristic of a perfectly competitive industry?",
+        "image": null,
+        "options": [
+          "Substantial barriers preventing new firms from entering.",
+          "Firms sell highly differentiated and unique products.",
+          "A small number of large firms dominate the market.",
+          "Each individual firm faces a downward-sloping demand curve.",
+          "Firms produce a standardized or homogeneous product." // Correct
+        ],
+        "correctAnswer": "E",
+        "explanation": "Perfect competition requires several conditions, including a large number of small firms, easy entry and exit, and firms producing identical (homogeneous) products, making them perfect substitutes for each other." // Balanced lengths.
+      },
+      {
+        "id": 188,
+        "subject": "ap_microeconomics",
+        "unit": 3,
+        "lessonIDS": ["3.7"],
+        "unitName": "Production, Cost, and the Perfect Competition Model",
+        "question": "For a perfectly competitive firm, the demand curve it faces is:",
+        "image": null,
+        "options": [
+          "Perfectly inelastic, vertical at the market quantity",
+          "Unit elastic across its entire range",
+          "Perfectly elastic", // Correct
+          "Downward sloping, same as the market demand curve",
+          "Upward sloping, reflecting increasing costs"
+        ],
+        "correctAnswer": "C",
+        "explanation": "A perfectly competitive firm is a price taker, meaning it can sell all it wants at the prevailing market price but nothing at a higher price. This translates to a perfectly elastic (horizontal) demand curve at the market price."
+      },
+      {
+        "id": 189,
+        "subject": "ap_microeconomics",
+        "unit": 3,
+        "lessonIDS": ["3.5", "3.7"],
+        "unitName": "Production, Cost, and the Perfect Competition Model",
+        "question": "A perfectly competitive firm maximizes profit by producing the quantity where:",
+        "image": null,
+        "options": [
+          "Market price equals its average fixed cost.",
+          "Market price equals its average variable cost.",
+          "Market price equals its marginal cost.", // Correct
+          "Marginal revenue equals average total cost.",
+          "Total revenue equals total variable cost."
+        ],
+        "correctAnswer": "C",
+        "explanation": "The general profit maximization rule is MR = MC. For a perfectly competitive firm, price equals marginal revenue (P = MR) because the firm is a price taker. Therefore, the profit-maximizing condition for a perfectly competitive firm is P = MC."
+      },
+      {
+        "id": 190,
+        "subject": "ap_microeconomics",
+        "unit": 3,
+        "lessonIDS": ["3.6"],
+        "unitName": "Production, Cost, and the Perfect Competition Model",
+        "question": "In the short run, a perfectly competitive firm will choose to shut down and produce zero output if the market price is less than its minimum:",
+        "image": null,
+        "options": [
+          "Marginal cost for the first unit.",
+          "Average total cost.",
+          "Average fixed cost.",
+          "Average variable cost.", // Correct
+          "Total cost at the potential shutdown point."
+        ],
+        "correctAnswer": "D",
+        "explanation": "The shutdown rule states that a firm should cease production in the short run if the price falls below the minimum average variable cost (AVC). At prices below minimum AVC, the firm cannot even cover its variable costs per unit, and its losses would be smaller if it shut down (losing only its fixed costs)."
+      },
+      {
+        "id": 191,
+        "subject": "ap_microeconomics",
+        "unit": 3,
+        "lessonIDS": ["3.6"],
+        "unitName": "Production, Cost, and the Perfect Competition Model",
+        "question": "If a perfectly competitive firm is producing where price is $10, average total cost is $12, and average variable cost is $8, the firm is:",
+        "image": null,
+        "options": [
+          "Earning an economic profit and should increase output.",
+          "Incurring a loss but should continue to operate in the short run.", // Correct (Longer)
+          "Incurring a loss and should shut down immediately to minimize losses.", // Lengthened distractor
+          "Breaking even, earning precisely zero economic profit.",
+          "Earning an accounting profit but possibly an economic loss."
+        ],
+        "correctAnswer": "B",
+        "explanation": "The firm is incurring a loss because Price ($10) is less than Average Total Cost ($12). However, since Price ($10) is greater than Average Variable Cost ($8), the firm is covering its variable costs and contributing $2 per unit towards its fixed costs. Shutting down would mean losing all fixed costs, so continuing to operate minimizes losses in the short run." // Revised options for length balance.
+      },
+      {
+        "id": 192,
+        "subject": "ap_microeconomics",
+        "unit": 3,
+        "lessonIDS": ["3.7"],
+        "unitName": "Production, Cost, and the Perfect Competition Model",
+        "question": "In a perfectly competitive market in long-run equilibrium, which of the following is true for a typical firm?",
+        "image": null,
+        "options": [
+          "Price equals minimum average total cost.", // Correct
+          "Economic profits are positive, encouraging entry.",
+          "Price is significantly greater than marginal cost.",
+          "Average total cost is greater than marginal cost.",
+          "Firms are operating with considerable excess capacity."
+        ],
+        "correctAnswer": "A",
+        "explanation": "Due to free entry and exit, economic profits are driven to zero in the long run for perfectly competitive firms. This occurs at the output level where price equals marginal cost equals the minimum point of the average total cost curve (P = MC = min ATC). This point also represents productive efficiency."
+      },
+      {
+        "id": 193,
+        "subject": "ap_microeconomics",
+        "unit": 3,
+        "lessonIDS": ["3.7"],
+        "unitName": "Production, Cost, and the Perfect Competition Model",
+        "question": "If perfectly competitive firms are currently earning positive economic profits, what will happen in the long run?",
+        "image": null,
+        "options": [
+          "Existing firms will exit the industry due to high competition.", // Lengthened distractor
+          "New firms will enter the industry, increasing market supply and decreasing market price.", // Correct (Longer)
+          "The market demand curve will shift significantly to the left.",
+          "Firms will reduce their output levels voluntarily.",
+          "The long-run average total cost curve for all firms will shift upward."
+        ],
+        "correctAnswer": "B",
+        "explanation": "Positive economic profits act as a signal, attracting new firms to enter the perfectly competitive industry due to the absence of entry barriers. This entry increases the market supply, which pushes the market price down until economic profits return to zero (normal profit)." // Adjusted lengths.
+      },
+      {
+        "id": 194,
+        "subject": "ap_microeconomics",
+        "unit": 3,
+        "lessonIDS": ["3.6", "3.7"],
+        "unitName": "Production, Cost, and the Perfect Competition Model",
+        "question": "The short-run supply curve for a perfectly competitive firm is represented by the portion of its:",
+        "image": null,
+        "options": [
+          "Average total cost curve located above its marginal cost curve.",
+          "Average variable cost curve located above its marginal cost curve.",
+          "Marginal cost curve above minimum average variable cost.", // Correct
+          "Marginal cost curve above minimum average total cost.",
+          "Average fixed cost curve as output increases."
+        ],
+        "correctAnswer": "C",
+        "explanation": "A perfectly competitive firm produces where P = MC, as long as P is greater than or equal to its minimum AVC (the shutdown point). Therefore, the firm's short-run supply curve is its marginal cost curve above the minimum point of the average variable cost curve."
+      },
+      {
+        "id": 195,
+        "subject": "ap_microeconomics",
+        "unit": 3,
+        "lessonIDS": ["3.2"],
+        "unitName": "Production, Cost, and the Perfect Competition Model",
+        "question": "If a firm's total cost is $500 when it produces 10 units and $540 when it produces 11 units, the marginal cost of the 11th unit is:",
+        "image": null,
+        "options": [
+          "$40", // Correct
+          "$49.09",
+          "$50",
+          "$54",
+          "$540"
+        ],
+        "correctAnswer": "A",
+        "explanation": "Marginal cost is the change in total cost resulting from producing one additional unit. MC = Change in TC / Change in Q = ($540 - $500) / (11 - 10) = $40 / 1 = $40." // Lengths are numbers, inherently balanced.
+      },
+      {
+        "id": 196,
+        "subject": "ap_microeconomics",
+        "unit": 3,
+        "lessonIDS": ["3.7"],
+        "unitName": "Production, Cost, and the Perfect Competition Model",
+        "question": "Assume a perfectly competitive market is in long-run equilibrium. If market demand permanently decreases, what will happen to the number of firms and the equilibrium price in the long run?",
+        "image": null,
+        "options": [
+          "Number of firms increases; Price increases.",
+          "Number of firms decreases; Price returns to the original level.", // Correct
+          "Number of firms stays the same; Price decreases.",
+          "Number of firms increases; Price decreases.",
+          "Number of firms decreases; Price decreases permanently below the original level." // Lengthened distractor
+        ],
+        "correctAnswer": "B",
+        "explanation": "A decrease in demand lowers the market price, causing short-run losses for firms. In the long run, firms will exit the industry due to these losses. Exit decreases market supply, causing the price to rise back up towards the original minimum average total cost level, restoring zero economic profit for the remaining firms."
+      },
+        {
+          "id": 197,
+          "subject": "ap_microeconomics",
+          "unit": 2,
+          "lessonIDS": ["2.1"],
+          "unitName": "Supply and Demand",
+          "question": "If consumer incomes decrease and good Z is an inferior good, which change will occur in the market for good Z?",
+          "image": null,
+          "options": [
+            "Demand will decrease.",
+            "Demand will increase.", // Correct
+            "Supply will decrease.",
+            "Supply will increase.",
+            "Both demand and supply will decrease significantly." // Longer distractor
+          ],
+          "correctAnswer": "B",
+          "explanation": "An inferior good is one for which demand increases as consumer income decreases. Therefore, a decrease in consumer incomes will cause the demand curve for good Z to shift to the right."
+        },
+        {
+          "id": 198,
+          "subject": "ap_microeconomics",
+          "unit": 2,
+          "lessonIDS": ["2.1"],
+          "unitName": "Supply and Demand",
+          "question": "Consider the market for smartphones. If the price of wireless earbuds, a complement to smartphones, increases sharply, what is the likely impact on the demand for smartphones?",
+          "image": null,
+          "options": [
+            "Demand for smartphones increases.",
+            "Demand for smartphones decreases.", // Correct
+            "Quantity demanded for smartphones increases.",
+            "Quantity demanded for smartphones decreases.",
+            "No impact on smartphone demand occurs."
+          ],
+          "correctAnswer": "B",
+          "explanation": "Complementary goods are consumed together. If the price of a complement (wireless earbuds) increases, the overall cost of using the related good (smartphones with earbuds) rises, leading to a decrease in demand for smartphones (a leftward shift of the demand curve)."
+        },
+        {
+          "id": 199,
+          "subject": "ap_microeconomics",
+          "unit": 2,
+          "lessonIDS": ["2.2"],
+          "unitName": "Supply and Demand",
+          "question": "Which of the following events would cause a rightward shift in the supply curve for cotton?",
+          "image": null,
+          "options": [
+            "An increase in the price of cotton.",
+            "A decrease in the price of fertilizer used to grow cotton.", // Correct
+            "A decrease in the number of cotton farmers.",
+            "An increase in the wages paid to cotton pickers.",
+            "The expectation of much higher cotton prices next year." // Longer distractor
+          ],
+          "correctAnswer": "B",
+          "explanation": "A decrease in the price of an input (like fertilizer) lowers production costs. This makes producers willing to supply more cotton at every price, shifting the supply curve to the right."
+        },
+        {
+          "id": 200,
+          "subject": "ap_microeconomics",
+          "unit": 2,
+          "lessonIDS": ["2.7"],
+          "unitName": "Supply and Demand",
+          "question": "If the current market price for a good is above the equilibrium price, which situation exists and what will happen?",
+          "image": null,
+          "options": [
+            "A shortage exists, and the price will tend to rise.",
+            "A surplus exists, and the price will tend to fall.", // Correct
+            "Equilibrium exists, and the price will remain constant.",
+            "A shortage exists, and the price will tend to fall.",
+            "A surplus exists, and the price will tend to rise."
+          ],
+          "correctAnswer": "B",
+          "explanation": "When the market price is above equilibrium, the quantity supplied exceeds the quantity demanded, resulting in a surplus. Market forces (sellers competing to sell excess inventory) will push the price down toward the equilibrium level."
+        },
+        {
+          "id": 201,
+          "subject": "ap_microeconomics",
+          "unit": 2,
+          "lessonIDS": ["2.3"],
+          "unitName": "Supply and Demand",
+          "question": "If the price elasticity of demand for gasoline is 0.2, a 10% increase in the price of gasoline will cause the quantity demanded to:",
+          "image": null,
+          "options": [
+            "Decrease by 0.2%",
+            "Decrease by 2%", // Correct
+            "Decrease by 5%",
+            "Decrease by 20%",
+            "Increase by 2%"
+          ],
+          "correctAnswer": "B",
+          "explanation": "Price elasticity of demand (PED) = % Change in Quantity Demanded / % Change in Price. Rearranging, % Change in Quantity Demanded = PED * % Change in Price. So, % Change in Qd = 0.2 * 10% = 2%. Since price increased, quantity demanded decreases."
+        },
+        {
+          "id": 202,
+          "subject": "ap_microeconomics",
+          "unit": 2,
+          "lessonIDS": ["2.3"],
+          "unitName": "Supply and Demand",
+          "question": "A local pizza restaurant finds that when it lowers its price per pizza from $12 to $10, its total revenue increases. This indicates that, in this price range, the demand for its pizza is:",
+          "image": null,
+          "options": [
+            "Price inelastic",
+            "Price elastic", // Correct
+            "Unit price elastic",
+            "Perfectly price inelastic",
+            "Derived demand"
+          ],
+          "correctAnswer": "B",
+          "explanation": "According to the total revenue test, if price decreases and total revenue increases, demand must be price elastic (PED > 1). The percentage increase in quantity demanded is larger than the percentage decrease in price."
+        },
+        {
+          "id": 203,
+          "subject": "ap_microeconomics",
+          "unit": 2,
+          "lessonIDS": ["2.3"],
+          "unitName": "Supply and Demand",
+          "question": "Which of the following goods is likely to have the most price inelastic demand?",
+          "image": null,
+          "options": [
+            "A specific brand of luxury sports car",
+            "Airline tickets for a vacation planned months in advance",
+            "Insulin for a person with diabetes", // Correct
+            "Gourmet coffee beans",
+            "A specific type of breakfast cereal with many competitors" // Longer distractor
+          ],
+          "correctAnswer": "C",
+          "explanation": "Demand tends to be more inelastic for goods that are necessities and have few close substitutes. Insulin is a necessity for diabetics with very few, if any, substitutes, making its demand highly price inelastic."
+        },
+        {
+          "id": 204,
+          "subject": "ap_microeconomics",
+          "unit": 2,
+          "lessonIDS": ["2.4"],
+          "unitName": "Supply and Demand",
+          "question": "If the price elasticity of supply for handmade wooden chairs is 0.8, and the price increases by 20%, the quantity supplied will:",
+          "image": null,
+          "options": [
+            "Increase by 8%",
+            "Increase by 16%", // Correct
+            "Increase by 20%",
+            "Increase by 25%",
+            "Decrease by 16%"
+          ],
+          "correctAnswer": "B",
+          "explanation": "Price elasticity of supply (PES) = % Change in Quantity Supplied / % Change in Price. Rearranging, % Change in Quantity Supplied = PES * % Change in Price. So, % Change in Qs = 0.8 * 20% = 16%. Since price increased, quantity supplied increases."
+        },
+        {
+          "id": 205,
+          "subject": "ap_microeconomics",
+          "unit": 2,
+          "lessonIDS": ["2.5"],
+          "unitName": "Supply and Demand",
+          "question": "The cross-price elasticity of demand between peanut butter and jelly is likely to be:",
+          "image": null,
+          "options": [
+            "Positive, because they are substitutes.",
+            "Negative, because they are complements.", // Correct
+            "Zero, because they are unrelated.",
+            "Positive, because they are both normal goods.",
+            "Negative, because one is an inferior good."
+          ],
+          "correctAnswer": "B",
+          "explanation": "Peanut butter and jelly are typically consumed together, making them complements. An increase in the price of one (e.g., peanut butter) would lead to a decrease in the quantity demanded of the other (jelly). Complements have a negative cross-price elasticity."
+        },
+        {
+          "id": 206,
+          "subject": "ap_microeconomics",
+          "unit": 2,
+          "lessonIDS": ["2.5"],
+          "unitName": "Supply and Demand",
+          "question": "If a 5% increase in consumer income leads to a 10% decrease in the quantity demanded of canned soup, what is the income elasticity of demand for canned soup, and what type of good is it?",
+          "image": null,
+          "options": [
+            "Income elasticity is 0.5; it is a normal good.",
+            "Income elasticity is -0.5; it is an inferior good.",
+            "Income elasticity is 2; it is a normal good.",
+            "Income elasticity is -2; it is an inferior good.", // Correct
+            "Income elasticity is -2; it is a substitute good."
+          ],
+          "correctAnswer": "D",
+          "explanation": "Income Elasticity of Demand = % Change in Quantity Demanded / % Change in Income = -10% / +5% = -2. Since the income elasticity is negative, canned soup is an inferior good (demand decreases as income increases)."
+        },
+        {
+          "id": 207,
+          "subject": "ap_microeconomics",
+          "unit": 2,
+          "lessonIDS": ["2.6"],
+          "unitName": "Supply and Demand",
+          "question": "Consumer surplus in a market is represented graphically by the area:",
+          "image": null,
+          "options": [
+            "Below the demand curve and above the supply curve.",
+            "Above the demand curve and below the equilibrium price.",
+            "Below the equilibrium price and above the supply curve.",
+            "Below the demand curve and above the equilibrium price.", // Correct
+            "Between the supply and demand curves, to the right of equilibrium."
+          ],
+          "correctAnswer": "D",
+          "explanation": "Consumer surplus measures the benefit buyers receive from participating in a market. It is the difference between what they are willing to pay (represented by the height of the demand curve) and what they actually pay (the market price), summed over all units purchased. Graphically, this is the area below the demand curve and above the market price."
+        },
+        {
+          "id": 208,
+          "subject": "ap_microeconomics",
+          "unit": 2,
+          "lessonIDS": ["2.6"],
+          "unitName": "Supply and Demand",
+          "question": "If the market price of a concert ticket is $50, but a consumer is willing to pay up to $80, this consumer's individual consumer surplus is:",
+          "image": null,
+          "options": [
+            "$30", // Correct
+            "$50",
+            "$80",
+            "$130",
+            "$0"
+          ],
+          "correctAnswer": "A",
+          "explanation": "Consumer surplus for an individual is the difference between their willingness to pay and the actual price paid. In this case, $80 (willingness to pay) - $50 (price) = $30."
+        },
+        {
+          "id": 209,
+          "subject": "ap_microeconomics",
+          "unit": 2,
+          "lessonIDS": ["2.8"],
+          "unitName": "Supply and Demand",
+          "question": "An effective (binding) price ceiling imposed on a competitive market will typically result in:",
+          "image": null,
+          "options": [
+            "A surplus of the good.",
+            "A shortage of the good.", // Correct
+            "An increase in the quantity supplied.",
+            "A decrease in the quantity demanded.",
+            "The market reaching equilibrium efficiently." // Longer distractor
+          ],
+          "correctAnswer": "B",
+          "explanation": "An effective price ceiling is set below the equilibrium price. At this artificially low price, the quantity demanded exceeds the quantity supplied, creating a market shortage."
+        },
+        {
+          "id": 210,
+          "subject": "ap_microeconomics",
+          "unit": 2,
+          "lessonIDS": ["2.8"],
+          "unitName": "Supply and Demand",
+          "question": "Suppose the government imposes a per-unit excise tax on the producers of widgets. How will this tax affect the market equilibrium price and quantity?",
+          "image": null,
+          "options": [
+            "Price increases; Quantity increases.",
+            "Price decreases; Quantity decreases.",
+            "Price increases; Quantity decreases.", // Correct
+            "Price decreases; Quantity increases.",
+            "Price remains constant; Quantity decreases."
+          ],
+          "correctAnswer": "C",
+          "explanation": "A per-unit tax on producers effectively increases their cost of production, shifting the supply curve to the left (or upward). This leads to a higher equilibrium price paid by consumers and a lower equilibrium quantity traded in the market."
+        },
+        {
+          "id": 211,
+          "subject": "ap_microeconomics",
+          "unit": 2,
+          "lessonIDS": ["2.9"],
+          "unitName": "Supply and Demand",
+          "question": "If a country imposes a tariff on imported sugar, which group is most likely to benefit in that country?",
+          "image": null,
+          "options": [
+            "Domestic consumers of sugar.",
+            "Foreign producers of sugar.",
+            "Domestic producers of sugar.", // Correct
+            "Workers in industries that use sugar as an input.",
+            "The government of the exporting country."
+          ],
+          "correctAnswer": "C",
+          "explanation": "A tariff on imported sugar raises the domestic price of sugar. This benefits domestic sugar producers because they can now sell their sugar at a higher price and face less competition from imports, leading to an increase in their producer surplus."
+        },
+        {
+          "id": 212,
+          "subject": "ap_microeconomics",
+          "unit": 2,
+          "lessonIDS": ["2.9"],
+          "unitName": "Supply and Demand",
+          "question": "Compared to free trade, imposing a binding import quota on a good will generally lead to:",
+          "image": null,
+          "options": [
+            "A lower domestic price and higher consumer surplus.",
+            "A lower domestic price and lower producer surplus.",
+            "A higher domestic price and lower total economic surplus.", // Correct
+            "A higher domestic price and higher total economic surplus.",
+            "No change in domestic price but lower imports."
+          ],
+          "correctAnswer": "C",
+          "explanation": "A binding import quota restricts the quantity of a good that can be imported. This reduction in supply raises the domestic price of the good. While domestic producers benefit, the loss in consumer surplus typically outweighs the gain in producer surplus (and any quota rent), resulting in a decrease in total economic surplus and a deadweight loss."
+        },
+        {
+          "id": 213,
+          "subject": "ap_microeconomics",
+          "unit": 2,
+          "lessonIDS": ["2.8"],
+          "unitName": "Supply and Demand",
+          "question": "If the demand for a product is perfectly inelastic and the supply curve is upward sloping, who bears the entire burden of a per-unit excise tax imposed on sellers?",
+          "image": null,
+          "options": [
+            "Sellers bear the entire burden.",
+            "Buyers bear the entire burden.", // Correct
+            "The burden is shared equally.",
+            "The government bears the burden.",
+            "The burden cannot be determined."
+          ],
+          "correctAnswer": "B",
+          "explanation": "Perfectly inelastic demand means consumers will buy the same quantity regardless of the price. When a tax is imposed on sellers, they can pass the full amount of the tax onto consumers in the form of a higher price without losing any sales quantity. Therefore, buyers bear the entire tax burden."
+        },
+        {
+          "id": 214,
+          "subject": "ap_microeconomics",
+          "unit": 2,
+          "lessonIDS": ["2.6", "2.8"],
+          "unitName": "Supply and Demand",
+          "question": "The imposition of an effective price floor on agricultural products typically leads to:",
+          "image": null,
+          "options": [
+            "A decrease in producer surplus and a market shortage.",
+            "An increase in producer surplus for those who sell, but a market surplus overall.", // Correct
+            "A decrease in the quantity supplied by farmers.",
+            "An increase in consumer surplus due to lower effective prices.",
+            "An elimination of deadweight loss in the market."
+          ],
+          "correctAnswer": "B",
+          "explanation": "An effective price floor is set above the equilibrium price, causing quantity supplied to exceed quantity demanded (a surplus). Sellers who can sell at the higher price benefit (increased producer surplus for them), but overall market efficiency decreases (deadweight loss), and consumer surplus decreases."
+        },
+        {
+          "id": 215,
+          "subject": "ap_microeconomics",
+          "unit": 2,
+          "lessonIDS": ["2.7", "2.2", "2.1"],
+          "unitName": "Supply and Demand",
+          "question": "Consider the market for electric cars. If the government offers a significant subsidy to buyers of electric cars, while simultaneously the cost of batteries (a key input) decreases, what is the expected effect on the equilibrium price and quantity of electric cars?",
+          "image": null,
+          "options": [
+            "Price will increase; Quantity will increase.",
+            "Price will decrease; Quantity will decrease.",
+            "Price effect is indeterminate; Quantity will increase.", // Correct
+            "Price will increase; Quantity effect is indeterminate.",
+            "Price will decrease; Quantity effect is indeterminate."
+          ],
+          "correctAnswer": "C",
+          "explanation": "The buyer subsidy increases demand (shifts right), putting upward pressure on price and quantity. The decrease in battery costs increases supply (shifts right), putting downward pressure on price and upward pressure on quantity. Both effects increase equilibrium quantity. However, the effect on equilibrium price is indeterminate because the demand shift pushes price up while the supply shift pushes price down."
+        },
+        {
+          "id": 216,
+          "subject": "ap_microeconomics",
+          "unit": 2,
+          "lessonIDS": ["2.6"],
+          "unitName": "Supply and Demand",
+          "question": "Total economic surplus in a market is maximized when:",
+          "image": null,
+          "options": [
+            "Producer surplus is maximized, regardless of consumer surplus.",
+            "Consumer surplus is maximized, regardless of producer surplus.",
+            "The market produces the quantity where marginal benefit equals marginal cost.", // Correct
+            "The government intervenes with price controls.",
+            "The price elasticity of demand equals the price elasticity of supply."
+          ],
+          "correctAnswer": "C",
+          "explanation": "Total economic surplus, the sum of consumer surplus and producer surplus, represents the total net benefit to society from market activity. This surplus is maximized at the competitive equilibrium quantity where the marginal benefit to consumers equals the marginal cost to producers, indicating allocative efficiency."
+        }, 
+          {
+            "id": 217,
+            "subject": "ap_microeconomics",
+            "unit": 5,
+            "lessonIDS": ["5.1"],
+            "unitName": "Factor Markets",
+            "question": "The demand for accountants is considered a derived demand primarily because it depends on the:",
+            "image": null,
+            "options": [
+              "Supply of accounting graduates.",
+              "Willingness of individuals to become accountants.",
+              "Demand for the accounting services accountants provide.", // Correct
+              "Cost of accounting software and technology.",
+              "Wage rate paid to experienced accountants."
+            ],
+            "correctAnswer": "C",
+            "explanation": "Derived demand means the demand for a factor of production (like accountants' labor) is derived from the demand for the good or service that factor produces (accounting services)."
+          },
+          {
+            "id": 218,
+            "subject": "ap_microeconomics",
+            "unit": 5,
+            "lessonIDS": ["5.1"],
+            "unitName": "Factor Markets",
+            "question": "Which term refers to the additional output produced when one more unit of a variable input, such as labor, is employed?",
+            "image": null,
+            "options": [
+              "Average product",
+              "Marginal revenue product",
+              "Marginal product", // Correct
+              "Total product",
+              "Marginal factor cost"
+            ],
+            "correctAnswer": "C",
+            "explanation": "Marginal product (specifically, marginal product of labor in this case) measures the change in total output resulting from hiring one additional unit of labor."
+          },
+          {
+            "id": 219,
+            "subject": "ap_microeconomics",
+            "unit": 5,
+            "lessonIDS": ["5.1", "5.3"],
+            "unitName": "Factor Markets",
+            "question": "For a firm selling its product in a perfectly competitive market, the marginal revenue product of an input is calculated by multiplying the input's marginal product by the:",
+            "image": null,
+            "options": [
+              "Input's price",
+              "Average total cost",
+              "Average variable cost",
+              "Product's price", // Correct
+              "Marginal cost of the product"
+            ],
+            "correctAnswer": "D",
+            "explanation": "Marginal Revenue Product (MRP) is the change in total revenue from employing one more unit of an input. MRP = Marginal Product (MP) x Marginal Revenue (MR). In a perfectly competitive product market, MR equals the product's price (P). Therefore, MRP = MP x P."
+          },
+          {
+            "id": 220,
+            "subject": "ap_microeconomics",
+            "unit": 5,
+            "lessonIDS": ["5.3"],
+            "unitName": "Factor Markets",
+            "question": "A profit-maximizing firm hires inputs in a competitive factor market up to the point where the input's:",
+            "image": null,
+            "options": [
+              "Marginal product equals its price.",
+              "Marginal revenue product equals its price (marginal factor cost).", // Correct
+              "Average product equals its price.",
+              "Marginal product equals marginal revenue product.",
+              "Price equals the firm's marginal revenue."
+            ],
+            "correctAnswer": "B",
+            "explanation": "The profit-maximization rule for hiring inputs is to employ units until the Marginal Revenue Product (MRP) of the input equals its Marginal Factor Cost (MFC). In a perfectly competitive factor market, the MFC is simply the market price (e.g., wage rate) of the input."
+          },
+          {
+            "id": 221,
+            "subject": "ap_microeconomics",
+            "unit": 5,
+            "lessonIDS": ["5.2"],
+            "unitName": "Factor Markets",
+            "question": "An increase in the productivity of labor, perhaps due to technological advancements, will cause which change in the labor market?",
+            "image": null,
+            "options": [
+              "A decrease in the supply of labor.",
+              "An increase in the supply of labor.",
+              "A decrease in the demand for labor.",
+              "An increase in the demand for labor.", // Correct
+              "A decrease in both demand and supply of labor."
+            ],
+            "correctAnswer": "D",
+            "explanation": "Increased labor productivity means each worker produces more output (higher Marginal Product). This increases the Marginal Revenue Product (MRP = MP x P) of labor, causing the demand curve for labor (which is the MRP curve) to shift to the right."
+          },
+          {
+            "id": 222,
+            "subject": "ap_microeconomics",
+            "unit": 5,
+            "lessonIDS": ["5.2"],
+            "unitName": "Factor Markets",
+            "question": "Which of the following events would most likely lead to a decrease in the equilibrium wage rate for coal miners?",
+            "image": null,
+            "options": [
+              "An increase in the demand for coal.",
+              "A decrease in the supply of coal miners due to stricter safety regulations.",
+              "An increase in the price of natural gas, a substitute energy source.",
+              "A decrease in the demand for coal due to environmental concerns.", // Correct
+              "An increase in the productivity of coal miners."
+            ],
+            "correctAnswer": "D",
+            "explanation": "A decrease in the demand for the final product (coal) leads to a decrease in the derived demand for the labor used to produce it (coal miners). This leftward shift in the labor demand curve results in a lower equilibrium wage rate and lower employment."
+          },
+          {
+            "id": 223,
+            "subject": "ap_microeconomics",
+            "unit": 5,
+            "lessonIDS": ["5.3"],
+            "unitName": "Factor Markets",
+            "question": "Suppose a firm uses labor and capital. The price of labor is $20, and its marginal product is 40 units. The price of capital is $50. To minimize costs for its current output level, the marginal product of capital should be:",
+            "image": null,
+            "options": [
+              "20 units",
+              "40 units",
+              "50 units",
+              "80 units",
+              "100 units" // Correct
+            ],
+            "correctAnswer": "E",
+            "explanation": "The least-cost combination rule states that MP_L / P_L = MP_K / P_K. Plugging in the values: 40 / $20 = MP_K / $50. This simplifies to 2 = MP_K / $50. Solving for MP_K gives MP_K = 2 * $50 = 100 units."
+          },
+          {
+            "id": 224,
+            "subject": "ap_microeconomics",
+            "unit": 5,
+            "lessonIDS": ["5.3"],
+            "unitName": "Factor Markets",
+            "question": "A firm is employing labor and capital such that the marginal product per dollar spent on labor is 5 utils, and the marginal product per dollar spent on capital is 3 utils. To minimize costs while producing the same output, the firm should:",
+            "image": null,
+            "options": [
+              "Use more labor and less capital.", // Correct
+              "Use less labor and more capital.",
+              "Use less of both inputs.",
+              "Use more of both inputs.",
+              "Make no change to input usage." // Short distractor
+            ],
+            "correctAnswer": "A",
+            "explanation": "The least-cost rule requires the marginal product per dollar spent to be equal across all inputs (MP_L/P_L = MP_K/P_K). Since the MP per dollar for labor (5) is greater than for capital (3), the firm gets more 'bang for its buck' from labor. It should substitute towards labor and away from capital until the ratios are equal."
+          },
+          {
+            "id": 225,
+            "subject": "ap_microeconomics",
+            "unit": 5,
+            "lessonIDS": ["5.4"],
+            "unitName": "Factor Markets",
+            "question": "Which market structure is characterized by a single buyer of a specific factor of production?",
+            "image": null,
+            "options": [
+              "Monopoly",
+              "Oligopoly",
+              "Perfect competition",
+              "Monopolistic competition",
+              "Monopsony" // Correct
+            ],
+            "correctAnswer": "E",
+            "explanation": "A monopsony is a market structure where there is only one buyer for a particular input (factor of production). This gives the buyer significant market power over the price paid for the input."
+          },
+          {
+            "id": 226,
+            "subject": "ap_microeconomics",
+            "unit": 5,
+            "lessonIDS": ["5.4"],
+            "unitName": "Factor Markets",
+            "question": "For a monopsonistic employer, the marginal factor cost (MFC) of labor is:",
+            "image": null,
+            "options": [
+              "Equal to the wage rate.",
+              "Less than the wage rate.",
+              "Greater than the wage rate.", // Correct
+              "Equal to the marginal revenue product.",
+              "Perfectly elastic."
+            ],
+            "correctAnswer": "C",
+            "explanation": "Because a monopsonist faces an upward-sloping labor supply curve, it must offer a higher wage to attract additional workers. Crucially, it must pay this higher wage to all existing workers as well, not just the new one. This makes the cost of hiring one more worker (MFC) greater than the wage paid to that worker."
+          },
+          {
+            "id": 227,
+            "subject": "ap_microeconomics",
+            "unit": 5,
+            "lessonIDS": ["5.4"],
+            "unitName": "Factor Markets",
+            "question": "Compared to a perfectly competitive labor market, a monopsonist will hire:",
+            "image": null,
+            "options": [
+              "More workers and pay a higher wage.",
+              "More workers and pay a lower wage.",
+              "Fewer workers and pay a higher wage.",
+              "Fewer workers and pay a lower wage.", // Correct
+              "The same number of workers but pay a lower wage."
+            ],
+            "correctAnswer": "D",
+            "explanation": "A monopsonist maximizes profit by hiring where MRP = MFC. Since MFC is above the labor supply curve, this intersection occurs at a lower quantity of labor compared to the competitive outcome (where MRP = Supply = Wage). The monopsonist then pays the lower wage indicated by the supply curve at that reduced quantity."
+          },
+          {
+            "id": 228,
+            "subject": "ap_microeconomics",
+            "unit": 5,
+            "lessonIDS": ["5.1", "5.3"],
+            "unitName": "Factor Markets",
+            "question": "A firm produces widgets using labor. The marginal product of the 5th worker is 10 widgets per hour. Widgets sell for $3 each in a competitive market. What is the marginal revenue product of the 5th worker?",
+            "image": null,
+            "options": [
+              "$3 per hour",
+              "$10 per hour",
+              "$13 per hour",
+              "$30 per hour", // Correct
+              "$3.33 per hour"
+            ],
+            "correctAnswer": "D",
+            "explanation": "Marginal Revenue Product (MRP) = Marginal Product (MP) x Price (P). MRP = 10 widgets/hour * $3/widget = $30 per hour."
+          },
+          {
+            "id": 229,
+            "subject": "ap_microeconomics",
+            "unit": 5,
+            "lessonIDS": ["5.3"],
+            "unitName": "Factor Markets",
+            "question": "If a firm hires labor in a perfectly competitive market where the wage is $25 per hour, and the marginal revenue product of the last worker hired is $20 per hour, the firm should:",
+            "image": null,
+            "options": [
+              "Hire more workers to increase profit.",
+              "Hire fewer workers to increase profit.", // Correct
+              "Keep the same number of workers as profits are maximized.",
+              "Increase the price of its product.",
+              "Decrease the wage rate it pays."
+            ],
+            "correctAnswer": "B",
+            "explanation": "A firm maximizes profit by hiring labor until MRP = Wage (MFC). Here, MRP ($20) < Wage ($25). The cost of the last worker ($25) is greater than the revenue they generate ($20). The firm should reduce employment until MRP equals the wage."
+          },
+          {
+            "id": 230,
+            "subject": "ap_microeconomics",
+            "unit": 5,
+            "lessonIDS": ["5.2"],
+            "unitName": "Factor Markets",
+            "question": "Which factor would likely increase the elasticity of demand for labor in a particular industry?",
+            "image": null,
+            "options": [
+              "A decrease in the elasticity of demand for the final product.",
+              "A smaller proportion of total costs accounted for by labor.",
+              "Greater difficulty in substituting capital for labor.",
+              "A longer time period being considered.", // Correct
+              "A decrease in the number of substitute inputs available." // Longer distractor
+            ],
+            "correctAnswer": "D",
+            "explanation": "The demand for labor is generally more elastic in the long run than in the short run. Over longer periods, firms have more time to adjust production processes and substitute between inputs (like capital and labor) in response to wage changes."
+          },
+          {
+            "id": 231,
+            "subject": "ap_microeconomics",
+            "unit": 5,
+            "lessonIDS": ["5.2"],
+            "unitName": "Factor Markets",
+            "question": "If the government mandates new safety training for all construction workers, increasing their skills and productivity, how might this impact the labor market for these workers?",
+            "image": null,
+            "options": [
+              "Demand increases, Supply decreases, Wage effect indeterminate.",
+              "Demand increases, Supply may increase or decrease, Wage likely increases.", // Correct ( nuanced )
+              "Demand decreases, Supply increases, Wage decreases.",
+              "Demand decreases, Supply decreases, Wage effect indeterminate.",
+              "Demand and Supply remain unchanged, Wage decreases."
+            ],
+            "correctAnswer": "B",
+            "explanation": "Increased productivity shifts the labor demand curve right (higher MRP). The training might increase the desirability/qualification (shifting supply left) or attract more workers (shifting supply right). However, the strong increase in demand due to higher productivity generally leads to an increase in the equilibrium wage, regardless of the exact supply shift."
+          },
+          {
+            "id": 232,
+            "subject": "ap_microeconomics",
+            "unit": 5,
+            "lessonIDS": ["5.3"],
+            "unitName": "Factor Markets",
+            "question": "A firm uses capital (K) and labor (L). Currently, MPk/Pk > MPl/Pl. To produce the same output at a lower cost, the firm should use:",
+            "image": null,
+            "options": [
+              "More K and more L.",
+              "Less K and less L.",
+              "More K and less L.", // Correct
+              "Less K and more L.",
+              "The current combination, as it is already optimal."
+            ],
+            "correctAnswer": "C",
+            "explanation": "The condition MPk/Pk > MPl/Pl means the firm gets more marginal product per dollar spent on capital than on labor. To minimize cost for a given output, the firm should substitute towards the relatively more productive input (per dollar) and away from the relatively less productive input. Thus, it should use more capital and less labor."
+          },
+          {
+            "id": 233,
+            "subject": "ap_microeconomics",
+            "unit": 5,
+            "lessonIDS": ["5.4"],
+            "unitName": "Factor Markets",
+            "question": "A key difference between a firm hiring labor in a perfectly competitive market versus a monopsony market is that the monopsonist faces:",
+            "image": null,
+            "options": [
+              "A perfectly elastic labor supply curve.",
+              "A marginal factor cost curve below the labor supply curve.",
+              "An upward-sloping labor supply curve.", // Correct (and MFC above it)
+              "A downward-sloping marginal revenue product curve.", // Both face this
+              "A need to pay workers their marginal revenue product."
+            ],
+            "correctAnswer": "C",
+            "explanation": "A perfectly competitive firm faces a perfectly elastic (horizontal) labor supply at the market wage. A monopsonist, being the sole buyer, faces the entire upward-sloping market labor supply curve, meaning it must raise wages to attract more workers."
+          },
+          {
+            "id": 234,
+            "subject": "ap_microeconomics",
+            "unit": 5,
+            "lessonIDS": ["5.2"],
+            "unitName": "Factor Markets",
+            "question": "If the price of capital, a substitute input for labor, decreases significantly, what is the likely effect on the demand for labor?",
+            "image": null,
+            "options": [
+              "Demand for labor will increase due to the output effect.",
+              "Demand for labor will decrease due to the substitution effect.", // Correct (primary effect)
+              "Demand for labor will remain unchanged.",
+              "Supply of labor will decrease.",
+              "The effect is indeterminate without knowing the output effect's strength." // Longer, plausible distractor
+            ],
+            "correctAnswer": "B",
+            "explanation": "When the price of a substitute input (capital) falls, firms have an incentive to substitute away from the relatively more expensive input (labor) towards the cheaper input (capital). This substitution effect causes the demand for labor to decrease (shift left)."
+          },
+          {
+            "id": 235,
+            "subject": "ap_microeconomics",
+            "unit": 5,
+            "lessonIDS": ["5.3"],
+            "unitName": "Factor Markets",
+            "question": "Consider a firm where the marginal product of the last worker hired is 5 units, the product price is $10, and the wage rate is $60. This firm is:",
+            "image": null,
+            "options": [
+              "Maximizing profit.",
+              "Hiring too much labor.", // Correct
+              "Hiring too little labor.",
+              "Experiencing diminishing marginal product.", // Likely true, but not the hiring decision issue
+              "Operating in a monopsony market."
+            ],
+            "correctAnswer": "B",
+            "explanation": "The firm's Marginal Revenue Product (MRP) = MP x P = 5 x $10 = $50. The Marginal Factor Cost (MFC) is the wage rate, $60. Since MRP ($50) < MFC ($60), the cost of the last worker exceeds the revenue generated. The firm should hire fewer workers."
+          },
+          {
+            "id": 236,
+            "subject": "ap_microeconomics",
+            "unit": 5,
+            "lessonIDS": ["5.2"],
+            "unitName": "Factor Markets",
+            "question": "An increase in immigration into a country is likely to affect the labor market by:",
+            "image": null,
+            "options": [
+              "Increasing labor demand and increasing wages.",
+              "Decreasing labor demand and decreasing wages.",
+              "Increasing labor supply and decreasing wages.", // Correct
+              "Decreasing labor supply and increasing wages.",
+              "Increasing both labor demand and labor supply, making the wage effect indeterminate." // Longer distractor
+            ],
+            "correctAnswer": "C",
+            "explanation": "Immigration increases the number of available workers at any given wage rate, shifting the labor supply curve to the right. Assuming labor demand remains unchanged, this leads to a lower equilibrium wage rate and higher equilibrium employment."
+          }, 
+            {
+              "id": 237,
+              "subject": "ap_microeconomics",
+              "unit": 4,
+              "lessonIDS": ["4.1"],
+              "unitName": "Imperfect Competition",
+              "question": "Which characteristic distinguishes imperfectly competitive firms from perfectly competitive firms?",
+              "image": null,
+              "options": [
+                "The goal of profit maximization.",
+                "The existence of marginal costs.",
+                "The ability to influence the market price of their product.", // Correct
+                "Operation in the short run versus the long run.",
+                "The presence of variable inputs in production."
+              ],
+              "correctAnswer": "C",
+              "explanation": "Perfectly competitive firms are price takers, meaning they accept the market price. Imperfectly competitive firms (monopoly, oligopoly, monopolistic competition) have some degree of market power, allowing them to influence price."
+            },
+            {
+              "id": 238,
+              "subject": "ap_microeconomics",
+              "unit": 4,
+              "lessonIDS": ["4.2"],
+              "unitName": "Imperfect Competition",
+              "question": "Significant barriers to entry are a key characteristic of which market structure?",
+              "image": null,
+              "options": [
+                "Perfect competition only.",
+                "Monopolistic competition only.",
+                "Both perfect competition and monopolistic competition.",
+                "Oligopoly and monopoly.", // Correct
+                "Monopolistic competition and oligopoly."
+              ],
+              "correctAnswer": "D",
+              "explanation": "Barriers to entry, which prevent or discourage new firms from entering a market, are defining features of both oligopoly (significant barriers) and monopoly (high or complete barriers). Perfect and monopolistic competition feature low or no significant barriers to entry."
+            },
+            {
+              "id": 239,
+              "subject": "ap_microeconomics",
+              "unit": 4,
+              "lessonIDS": ["4.2"],
+              "unitName": "Imperfect Competition",
+              "question": "For a single-price monopolist, why is the marginal revenue curve always below the demand curve?",
+              "image": null,
+              "options": [
+                "Because the monopolist must increase the price on all previous units to sell more.",
+                "Because the firm faces perfectly elastic demand from consumers.",
+                "Because marginal cost is increasing.",
+                "Because the monopolist must lower the price on all units to sell an additional unit.", // Correct
+                "Because average total cost is decreasing due to economies of scale." // Longer distractor
+              ],
+              "correctAnswer": "D",
+              "explanation": "A monopolist faces the downward-sloping market demand curve. To sell one more unit, it must lower the price not only for that unit but for all preceding units as well (price effect). This means the additional revenue gained (marginal revenue) is less than the price of the last unit sold."
+            },
+            {
+              "id": 240,
+              "subject": "ap_microeconomics",
+              "unit": 4,
+              "lessonIDS": ["4.2"],
+              "unitName": "Imperfect Competition",
+              "question": "A profit-maximizing single-price monopolist will set its output level where:",
+              "image": null,
+              "options": [
+                "Price equals marginal cost.",
+                "Marginal revenue equals marginal cost.", // Correct
+                "Demand equals average total cost.",
+                "Marginal revenue equals zero.",
+                "Price equals minimum average total cost."
+              ],
+              "correctAnswer": "B",
+              "explanation": "Like all profit-maximizing firms, a monopolist produces the quantity where marginal revenue (MR) equals marginal cost (MC). The price is then determined by finding the point on the demand curve corresponding to that quantity."
+            },
+            {
+              "id": 241,
+              "subject": "ap_microeconomics",
+              "unit": 4,
+              "lessonIDS": ["4.2"],
+              "unitName": "Imperfect Competition",
+              "question": "Compared to the socially optimal (allocatively efficient) level of output, a single-price monopolist typically produces:",
+              "image": null,
+              "options": [
+                "More output and charges a lower price.",
+                "Less output and charges a higher price.", // Correct
+                "The same output but charges a higher price.",
+                "Less output and charges the same price.",
+                "More output and charges a higher price."
+              ],
+              "correctAnswer": "B",
+              "explanation": "Allocative efficiency occurs where Price (reflecting marginal benefit) equals Marginal Cost. A single-price monopolist maximizes profit where MR = MC, which occurs at a lower quantity than where P = MC. The monopolist then charges a price higher than MC, leading to underproduction relative to the social optimum and deadweight loss."
+            },
+            {
+              "id": 242,
+              "subject": "ap_microeconomics",
+              "unit": 4,
+              "lessonIDS": ["4.2"],
+              "unitName": "Imperfect Competition",
+              "question": "A natural monopoly exists when, over the relevant range of market demand:",
+              "image": null,
+              "options": [
+                "Marginal cost is decreasing.",
+                "Average total cost is decreasing.", // Correct
+                "The demand curve is perfectly inelastic.",
+                "Marginal revenue is positive.",
+                "Barriers to entry are created by government patents."
+              ],
+              "correctAnswer": "B",
+              "explanation": "A natural monopoly arises when economies of scale are so significant that one firm can supply the entire market at a lower average total cost than two or more firms could. This implies the long-run average total cost curve is downward sloping over the entire range of market demand."
+            },
+            {
+              "id": 243,
+              "subject": "ap_microeconomics",
+              "unit": 4,
+              "lessonIDS": ["4.3"],
+              "unitName": "Imperfect Competition",
+              "question": "Which condition is necessary for a firm to practice price discrimination?",
+              "image": null,
+              "options": [
+                "The firm must be perfectly competitive.",
+                "The firm must face identical demand curves from all customer groups.",
+                "The firm must be able to prevent resale of its product between customer groups.", // Correct
+                "The firm must be experiencing economies of scale.",
+                "The firm must produce where marginal revenue equals zero."
+              ],
+              "correctAnswer": "C",
+              "explanation": "To successfully price discriminate, a firm needs market power, the ability to segment its customers based on willingness to pay (different elasticities), and crucially, the ability to prevent low-price buyers from reselling the product to high-price buyers (arbitrage)."
+            },
+            {
+              "id": 244,
+              "subject": "ap_microeconomics",
+              "unit": 4,
+              "lessonIDS": ["4.3"],
+              "unitName": "Imperfect Competition",
+              "question": "A firm that engages in perfect price discrimination charges each customer:",
+              "image": null,
+              "options": [
+                "A price equal to marginal cost.",
+                "A price equal to average total cost.",
+                "The same price, maximizing total revenue.",
+                "Their maximum willingness to pay.", // Correct
+                "A price based on the elasticity of supply."
+              ],
+              "correctAnswer": "D",
+              "explanation": "Perfect price discrimination involves charging every single customer the highest price they are willing to pay for each unit consumed. This allows the firm to capture all consumer surplus as profit and produce the allocatively efficient quantity."
+            },
+            {
+              "id": 245,
+              "subject": "ap_microeconomics",
+              "unit": 4,
+              "lessonIDS": ["4.4"],
+              "unitName": "Imperfect Competition",
+              "question": "Which market structure is characterized by many firms selling differentiated products with easy entry and exit?",
+              "image": null,
+              "options": [
+                "Perfect competition",
+                "Monopoly",
+                "Oligopoly",
+                "Monopolistic competition", // Correct
+                "Monopsony"
+              ],
+              "correctAnswer": "D",
+              "explanation": "Monopolistic competition features a large number of firms, low barriers to entry and exit (similar to perfect competition), but crucially, firms sell products that are differentiated through branding, features, or location, giving them some degree of market power."
+            },
+            {
+              "id": 246,
+              "subject": "ap_microeconomics",
+              "unit": 4,
+              "lessonIDS": ["4.4"],
+              "unitName": "Imperfect Competition",
+              "question": "In long-run equilibrium, a monopolistically competitive firm produces an output level where:",
+              "image": null,
+              "options": [
+                "Price equals marginal cost and average total cost is minimized.",
+                "Price equals marginal cost and economic profit is positive.",
+                "Price equals average total cost, and price is greater than marginal cost.", // Correct
+                "Marginal revenue equals average total cost and economic profit is zero.",
+                "Price equals minimum average variable cost and profits are maximized."
+              ],
+              "correctAnswer": "C",
+              "explanation": "Due to easy entry, monopolistically competitive firms earn zero economic profit in the long run, meaning price equals average total cost (P = ATC). However, because they face a downward-sloping demand curve due to product differentiation, they maximize profit where MR = MC, which occurs at an output where P > MC. They also typically operate with excess capacity (not at minimum ATC)."
+            },
+            {
+              "id": 247,
+              "subject": "ap_microeconomics",
+              "unit": 4,
+              "lessonIDS": ["4.4"],
+              "unitName": "Imperfect Competition",
+              "question": "Product differentiation is a key characteristic of which market structure(s)?",
+              "image": null,
+              "options": [
+                "Perfect competition only.",
+                "Monopoly only.",
+                "Monopolistic competition and oligopoly.", // Correct
+                "Perfect competition and monopolistic competition.",
+                "Oligopoly and monopoly."
+              ],
+              "correctAnswer": "C",
+              "explanation": "Product differentiation, where firms distinguish their products from competitors' through branding, quality, features, or service, is central to monopolistic competition. It can also exist in oligopolies, although some oligopolies may feature homogeneous products."
+            },
+            {
+              "id": 248,
+              "subject": "ap_microeconomics",
+              "unit": 4,
+              "lessonIDS": ["4.4"],
+              "unitName": "Imperfect Competition",
+              "question": "Excess capacity in monopolistic competition refers to the fact that firms, in long-run equilibrium, produce:",
+              "image": null,
+              "options": [
+                "More output than is allocatively efficient.",
+                "Less output than the level that minimizes average total cost.", // Correct
+                "More output than the level that minimizes average total cost.",
+                "An output level where marginal cost exceeds price.",
+                "An output level where price equals marginal cost exactly."
+              ],
+              "correctAnswer": "B",
+              "explanation": "In long-run equilibrium, a monopolistically competitive firm operates where P = ATC on the downward-sloping portion of its ATC curve, not at the minimum point of ATC. This means it produces less output than the quantity that would achieve productive efficiency (minimum ATC), resulting in excess capacity."
+            },
+            {
+              "id": 249,
+              "subject": "ap_microeconomics",
+              "unit": 4,
+              "lessonIDS": ["4.5"],
+              "unitName": "Imperfect Competition",
+              "question": "The most distinguishing characteristic of oligopoly is:",
+              "image": null,
+              "options": [
+                "A single seller dominating the entire market.",
+                "Firms selling completely identical products with no differentiation.",
+                "The absence of any significant barriers to entry or exit.",
+                "Firms recognizing their strategic interdependence.", // Correct
+                "Demand being perfectly elastic for each individual firm."
+              ],
+              "correctAnswer": "D",
+              "explanation": "Oligopoly is defined by a few dominant firms where each firm's actions (regarding price, output, advertising) significantly affect its rivals, and each firm considers these rivals' potential reactions when making decisions. This is known as strategic interdependence."
+            },
+            {
+              "id": 250,
+              "subject": "ap_microeconomics",
+              "unit": 4,
+              "lessonIDS": ["4.5"],
+              "unitName": "Imperfect Competition",
+              "question": "A group of firms that formally agree to coordinate their production and pricing decisions to act like a monopolist is called:",
+              "image": null,
+              "options": [
+                "A monopsony",
+                "A natural monopoly",
+                "A cartel", // Correct
+                "A monopolistically competitive group",
+                "A perfectly competitive alliance"
+              ],
+              "correctAnswer": "C",
+              "explanation": "A cartel is an explicit agreement among competing firms, typically in an oligopoly, to fix prices, limit output, or divide markets, effectively attempting to act collectively as a monopoly to maximize joint profits. Such agreements are often illegal."
+            },
+            {
+              "id": 251,
+              "subject": "ap_microeconomics",
+              "unit": 4,
+              "lessonIDS": ["4.5"],
+              "unitName": "Imperfect Competition",
+              "question": "In game theory, a dominant strategy is one that:",
+              "image": null,
+              "options": [
+                "Guarantees the highest possible payoff for both players combined.",
+                "Is the best choice for a player regardless of the strategy chosen by the other player.", // Correct
+                "Leads to a Nash equilibrium only if both players have one.",
+                "Involves cooperating with the other player to achieve a mutually beneficial outcome.",
+                "Changes depending on the rival player's anticipated move." // Longer distractor
+              ],
+              "correctAnswer": "B",
+              "explanation": "A dominant strategy exists for a player if that strategy yields a better payoff than any other strategy they could choose, no matter what strategy the opposing player selects."
+            },
+            {
+              "id": 252,
+              "subject": "ap_microeconomics",
+              "unit": 4,
+              "lessonIDS": ["4.5"],
+              "unitName": "Imperfect Competition",
+              "question": "A Nash equilibrium in a game occurs when:",
+              "image": null,
+              "options": [
+                "Each player chooses their dominant strategy, if available.",
+                "The sum of the payoffs for all players is maximized.",
+                "No player can improve their outcome by unilaterally changing their strategy, given the other players' strategies.", // Correct
+                "One player forces the other player into making a suboptimal choice.",
+                "Both players agree to cooperate before making their choices."
+              ],
+              "correctAnswer": "C",
+              "explanation": "A Nash equilibrium represents a stable outcome where each player is doing the best they can (maximizing their own payoff) given the actions of all other players. No player has an incentive to deviate from their chosen strategy alone."
+            },
+            {
+              "id": 253,
+              "subject": "ap_microeconomics",
+              "unit": 4,
+              "lessonIDS": ["4.1"],
+              "unitName": "Imperfect Competition",
+              "question": "Allocative inefficiency in imperfectly competitive markets arises primarily because:",
+              "image": null,
+              "options": [
+                "Firms earn zero economic profit in the long run.",
+                "Firms fail to minimize average total cost.",
+                "Price is greater than marginal cost at the profit-maximizing output.", // Correct
+                "Marginal revenue is equal to price for these firms.",
+                "Significant barriers to entry prevent competition completely." // Longer distractor
+              ],
+              "correctAnswer": "C",
+              "explanation": "Allocative efficiency occurs when resources are allocated such that Price (representing marginal social benefit) equals Marginal Cost. Imperfectly competitive firms maximize profit where MR = MC, but because their demand curve is downward sloping (P > MR), they produce where P > MC, meaning the value society places on the last unit exceeds the cost of producing it."
+            },
+            {
+              "id": 254,
+              "subject": "ap_microeconomics",
+              "unit": 4,
+              "lessonIDS": ["4.2"],
+              "unitName": "Imperfect Competition",
+              "question": "A single-price monopolist maximizes total revenue when it produces the quantity where:",
+              "image": null,
+              "options": [
+                "Marginal revenue equals marginal cost.",
+                "Marginal revenue equals zero.", // Correct
+                "Price equals marginal cost.",
+                "Average total cost is minimized.",
+                "Demand is unit elastic." // Closely related, but MR=0 is the direct rule
+              ],
+              "correctAnswer": "B",
+              "explanation": "Total revenue is maximized when producing one more unit adds zero additional revenue, which means marginal revenue (MR) is equal to zero. This typically occurs at the midpoint of a linear demand curve, where demand is unit elastic."
+            },
+            {
+              "id": 255,
+              "subject": "ap_microeconomics",
+              "unit": 4,
+              "lessonIDS": ["4.4"],
+              "unitName": "Imperfect Competition",
+              "question": "Compared to a perfectly competitive firm in long-run equilibrium, a monopolistically competitive firm in long-run equilibrium will charge:",
+              "image": null,
+              "options": [
+                "A lower price and produce more output.",
+                "The same price and produce the same output.",
+                "A higher price and produce less output.", // Correct
+                "A higher price and produce the same output.",
+                "A lower price and produce less output."
+              ],
+              "correctAnswer": "C",
+              "explanation": "Both firms earn zero economic profit in the long run (P=ATC). However, the monopolistically competitive firm faces a downward-sloping demand curve and operates with excess capacity (not at min ATC), resulting in P > MC and typically a lower quantity and higher price compared to the perfectly competitive outcome where P = MC = min ATC."
+            },
+            {
+              "id": 256,
+              "subject": "ap_microeconomics",
+              "unit": 4,
+              "lessonIDS": ["4.5"],
+              "unitName": "Imperfect Competition",
+              "question": "Interdependence among firms is a key feature primarily associated with which market structure?",
+              "image": null,
+              "options": [
+                "Perfect competition",
+                "Monopoly",
+                "Oligopoly", // Correct
+                "Monopolistic competition",
+                "Natural monopoly"
+              ],
+              "correctAnswer": "C",
+              "explanation": "Strategic interdependence, where firms must consider the actions and reactions of their few competitors when making decisions about price, output, or advertising, is the hallmark of an oligopoly."
+            }, 
+              {
+                "id": 257,
+                "subject": "ap_macroeconomics",
+                "unit": 6,
+                "lessonIDS": ["6.1"],
+                "unitName": "Open Economy - International Trade and Finance",
+                "question": "Which of the following transactions would be recorded as a debit in the United States current account?",
+                "image": null,
+                "options": [
+                  "A U.S. resident purchases souvenirs while traveling in France.", // Correct
+                  "A French company buys software from a U.S. developer.",
+                  "The U.S. government receives interest payments on loans made to other countries.",
+                  "A German tourist pays for a hotel stay in New York City.",
+                  "A U.S. resident receives a dividend payment from a foreign company."
+                ],
+                "correctAnswer": "A",
+                "explanation": "The current account records flows of goods, services, income, and transfers. Spending by U.S. residents on foreign goods or services (like tourism abroad) represents an import of services and is recorded as a debit (outflow of funds) in the U.S. current account."
+              },
+              {
+                "id": 258,
+                "subject": "ap_macroeconomics",
+                "unit": 6,
+                "lessonIDS": ["6.1"],
+                "unitName": "Open Economy - International Trade and Finance",
+                "question": "A country's balance on the financial account (formerly capital and financial account) is primarily determined by the difference between:",
+                "image": null,
+                "options": [
+                  "Exports and imports of goods.",
+                  "Exports and imports of services.",
+                  "Income received from abroad and income paid to foreigners.",
+                  "Its sales of assets to foreigners and its purchases of assets from foreigners.", // Correct
+                  "Net unilateral transfers."
+                ],
+                "correctAnswer": "D",
+                "explanation": "The financial account records transactions involving the purchase and sale of financial and real assets, such as stocks, bonds, and direct investments. A surplus occurs when foreign purchases of domestic assets exceed domestic purchases of foreign assets (a net capital inflow)."
+              },
+              {
+                "id": 259,
+                "subject": "ap_macroeconomics",
+                "unit": 6,
+                "lessonIDS": ["6.1"],
+                "unitName": "Open Economy - International Trade and Finance",
+                "question": "If a country has a financial account surplus, it implies that:",
+                "image": null,
+                "options": [
+                  "Its exports exceed its imports.",
+                  "Its current account must also be in surplus.",
+                  "It is experiencing a net financial capital inflow.", // Correct
+                  "It is experiencing a net financial capital outflow.",
+                  "Its net investment income from abroad is positive."
+                ],
+                "correctAnswer": "C",
+                "explanation": "A financial account surplus means that the inflow of funds from foreigners buying the country's assets is greater than the outflow of funds from residents buying foreign assets. This represents a net inflow of financial capital."
+              },
+              {
+                "id": 260,
+                "subject": "ap_macroeconomics",
+                "unit": 6,
+                "lessonIDS": ["6.2"],
+                "unitName": "Open Economy - International Trade and Finance",
+                "question": "If the exchange rate between the US dollar and the Japanese yen changes from $1 = 110 yen to $1 = 100 yen, which of the following has occurred?",
+                "image": null,
+                "options": [
+                  "The dollar has appreciated.",
+                  "The yen has depreciated.",
+                  "The dollar has depreciated.", // Correct
+                  "Both currencies have appreciated.",
+                  "Relative price levels must have changed." // Longer distractor
+                ],
+                "correctAnswer": "C",
+                "explanation": "Previously, $1 could buy 110 yen. Now, $1 can only buy 100 yen. This means the dollar has weakened, or depreciated, relative to the yen. Conversely, the yen has appreciated relative to the dollar."
+              },
+              {
+                "id": 261,
+                "subject": "ap_macroeconomics",
+                "unit": 6,
+                "lessonIDS": ["6.3"],
+                "unitName": "Open Economy - International Trade and Finance",
+                "question": "An increase in consumer preference in the United States for goods produced in Mexico will affect the foreign exchange market by:",
+                "image": null,
+                "options": [
+                  "Increasing the supply of US dollars and decreasing the demand for Mexican pesos.",
+                  "Increasing the demand for US dollars and increasing the supply of Mexican pesos.",
+                  "Increasing the supply of US dollars and increasing the demand for Mexican pesos.", // Correct
+                  "Decreasing the demand for US dollars and decreasing the supply of Mexican pesos.",
+                  "Causing no change in either market initially." // Short distractor
+                ],
+                "correctAnswer": "C",
+                "explanation": "To buy more Mexican goods, US consumers need pesos. They supply US dollars to the foreign exchange market to buy pesos. This increases the supply of dollars and simultaneously increases the demand for pesos."
+              },
+              {
+                "id": 262,
+                "subject": "ap_macroeconomics",
+                "unit": 6,
+                "lessonIDS": ["6.3"],
+                "unitName": "Open Economy - International Trade and Finance",
+                "question": "Which of the following would most likely cause the demand curve for the Euro to shift to the left in the foreign exchange market?",
+                "image": null,
+                "options": [
+                  "An increase in real interest rates within the Eurozone.",
+                  "A decrease in incomes in the United States.", // Correct
+                  "An increase in European preferences for US goods.",
+                  "Expectations that the Euro will appreciate in the future.",
+                  "A decrease in the European price level relative to the US."
+                ],
+                "correctAnswer": "B",
+                "explanation": "A decrease in incomes in the United States would lead US consumers to buy fewer goods overall, including fewer imports from the Eurozone. This reduced demand for European goods translates into a decreased demand for Euros needed to purchase them, shifting the demand curve for Euros left."
+              },
+              {
+                "id": 263,
+                "subject": "ap_macroeconomics",
+                "unit": 6,
+                "lessonIDS": ["6.4"],
+                "unitName": "Open Economy - International Trade and Finance",
+                "question": "If the inflation rate in Country A is significantly higher than in Country B, what is the expected effect on the nominal exchange rate between their currencies under a flexible exchange rate system?",
+                "image": null,
+                "options": [
+                  "Country A's currency will appreciate.",
+                  "Country B's currency will depreciate.",
+                  "Country A's currency will depreciate.", // Correct
+                  "The exchange rate will remain stable due to purchasing power parity.",
+                  "Both currencies will depreciate against a third currency." // Longer distractor
+                ],
+                "correctAnswer": "C",
+                "explanation": "Higher inflation in Country A makes its goods relatively more expensive. This reduces foreign demand for A's goods (decreasing demand for A's currency) and increases A's residents' demand for relatively cheaper foreign goods (increasing supply of A's currency). Both effects cause Country A's currency to depreciate."
+              },
+              {
+                "id": 264,
+                "subject": "ap_macroeconomics",
+                "unit": 6,
+                "lessonIDS": ["6.4", "4.6"],
+                "unitName": "Open Economy - International Trade and Finance",
+                "question": "Expansionary monetary policy conducted by the U.S. Federal Reserve will most likely lead to which combination of effects on U.S. real interest rates and the international value of the dollar?",
+                "image": null,
+                "options": [
+                  "Interest rates decrease; Dollar appreciates.",
+                  "Interest rates decrease; Dollar depreciates.", // Correct
+                  "Interest rates increase; Dollar appreciates.",
+                  "Interest rates increase; Dollar depreciates.",
+                  "Interest rates unchanged; Dollar depreciates."
+                ],
+                "correctAnswer": "B",
+                "explanation": "Expansionary monetary policy lowers nominal and real interest rates in the short run. Lower real interest rates reduce the demand for U.S. assets by foreign investors (decreasing demand for dollars) and increase U.S. investors' demand for foreign assets (increasing supply of dollars), causing the dollar to depreciate."
+              },
+              {
+                "id": 265,
+                "subject": "ap_macroeconomics",
+                "unit": 6,
+                "lessonIDS": ["6.4", "3.8"],
+                "unitName": "Open Economy - International Trade and Finance",
+                "question": "An increase in government budget deficit spending financed by borrowing tends to cause which sequence of effects in an open economy?",
+                "image": null,
+                "options": [
+                  "Lower real interest rates, capital outflow, currency depreciation.",
+                  "Lower real interest rates, capital inflow, currency appreciation.",
+                  "Higher real interest rates, capital outflow, currency depreciation.",
+                  "Higher real interest rates, capital inflow, currency appreciation.", // Correct
+                  "No change in real interest rates, but currency depreciation."
+                ],
+                "correctAnswer": "D",
+                "explanation": "Increased government borrowing increases the demand for loanable funds, raising real interest rates. Higher real interest rates attract foreign financial capital (inflow), increasing the demand for the domestic currency and causing it to appreciate."
+              },
+              {
+                "id": 266,
+                "subject": "ap_macroeconomics",
+                "unit": 6,
+                "lessonIDS": ["6.6"],
+                "unitName": "Open Economy - International Trade and Finance",
+                "question": "Which of the following describes a financial capital inflow for the United States?",
+                "image": null,
+                "options": [
+                  "A U.S. company builds a factory in Mexico.",
+                  "A U.S. resident buys bonds issued by the German government.",
+                  "A Japanese bank purchases U.S. Treasury bonds.", // Correct
+                  "A U.S. tourist spends money in Italy.",
+                  "The U.S. sends foreign aid to Egypt."
+                ],
+                "correctAnswer": "C",
+                "explanation": "A financial capital inflow occurs when foreign entities purchase domestic assets. A Japanese bank buying U.S. Treasury bonds represents foreigners acquiring U.S. financial assets, resulting in an inflow of funds to the U.S. financial account."
+              },
+              {
+                "id": 267,
+                "subject": "ap_macroeconomics",
+                "unit": 6,
+                "lessonIDS": ["6.5"],
+                "unitName": "Open Economy - International Trade and Finance",
+                "question": "If the U.S. dollar appreciates relative to the currencies of its major trading partners, what is the likely impact on U.S. aggregate demand?",
+                "image": null,
+                "options": [
+                  "Aggregate demand will increase due to higher export revenues.",
+                  "Aggregate demand will decrease due to a fall in net exports.", // Correct
+                  "Aggregate demand will remain unchanged, but SRAS will shift left.",
+                  "Aggregate demand will increase due to cheaper imports boosting consumption.",
+                  "Aggregate demand will decrease due to resulting higher interest rates." // Longer distractor
+                ],
+                "correctAnswer": "B",
+                "explanation": "An appreciating dollar makes U.S. exports more expensive for foreigners (decreasing exports) and makes imports cheaper for U.S. residents (increasing imports). The resulting decrease in net exports (X-M) reduces aggregate demand."
+              },
+              {
+                "id": 268,
+                "subject": "ap_macroeconomics",
+                "unit": 6,
+                "lessonIDS": ["6.5"],
+                "unitName": "Open Economy - International Trade and Finance",
+                "question": "A depreciation of a country's currency is likely to have what effect on its domestic price level in the short run?",
+                "image": null,
+                "options": [
+                  "Decrease the price level due to cheaper imports.",
+                  "Increase the price level due to increased aggregate demand.", // Correct
+                  "Have no effect on the domestic price level.",
+                  "Decrease the price level due to lower export demand.",
+                  "Increase the price level only if the central bank intervenes."
+                ],
+                "correctAnswer": "B",
+                "explanation": "Currency depreciation makes exports cheaper and imports more expensive, leading to an increase in net exports. This rise in net exports boosts aggregate demand, putting upward pressure on the domestic price level in the short run."
+              },
+              {
+                "id": 269,
+                "subject": "ap_macroeconomics",
+                "unit": 6,
+                "lessonIDS": ["6.4", "6.6"],
+                "unitName": "Open Economy - International Trade and Finance",
+                "question": "An increase in real interest rates in the United States relative to other countries would likely lead to:",
+                "image": null,
+                "options": [
+                  "A surplus in the U.S. current account.",
+                  "A decrease in the demand for U.S. dollars.",
+                  "An increase in U.S. financial capital outflows.",
+                  "An increase in the demand for U.S. financial assets by foreigners.", // Correct
+                  "Depreciation of the U.S. dollar."
+                ],
+                "correctAnswer": "D",
+                "explanation": "Higher real returns make U.S. financial assets (like bonds) more attractive to foreign investors compared to assets elsewhere. This increased attractiveness leads to greater demand for these U.S. assets, resulting in financial capital inflows."
+              },
+              {
+                "id": 270,
+                "subject": "ap_macroeconomics",
+                "unit": 6,
+                "lessonIDS": ["6.1"],
+                "unitName": "Open Economy - International Trade and Finance",
+                "question": "Net exports are calculated as:",
+                "image": null,
+                "options": [
+                  "Imports minus exports.",
+                  "Exports minus imports.", // Correct
+                  "Exports plus imports.",
+                  "Capital inflows minus capital outflows.",
+                  "Current account balance minus financial account balance."
+                ],
+                "correctAnswer": "B",
+                "explanation": "Net exports (NX), a component of both the current account and the calculation of GDP via the expenditures approach, is defined as the value of a country's total exports minus the value of its total imports."
+              },
+              {
+                "id": 271,
+                "subject": "ap_macroeconomics",
+                "unit": 6,
+                "lessonIDS": ["6.3"],
+                "unitName": "Open Economy - International Trade and Finance",
+                "question": "If the demand for British pounds decreases in the foreign exchange market, while the supply remains constant, the pound will:",
+                "image": null,
+                "options": [
+                  "Appreciate relative to other currencies.",
+                  "Depreciate relative to other currencies.", // Correct
+                  "Remain unchanged in value.",
+                  "Cause British interest rates to rise.",
+                  "Lead to an increase in British exports automatically." // Longer distractor
+                ],
+                "correctAnswer": "B",
+                "explanation": "A decrease in demand for a currency, holding supply constant, means fewer entities want to buy that currency at any given exchange rate. This reduced demand leads to a fall in the equilibrium price (exchange rate) of the currency, meaning it depreciates."
+              },
+              {
+                "id": 272,
+                "subject": "ap_macroeconomics",
+                "unit": 6,
+                "lessonIDS": ["6.2"],
+                "unitName": "Open Economy - International Trade and Finance",
+                "question": "Suppose 1 Euro costs 1.10 US dollars. If a bottle of French wine costs 20 Euros in Paris, what is its cost in US dollars?",
+                "image": null,
+                "options": [
+                  "$18.18",
+                  "$20.00",
+                  "$21.10",
+                  "$22.00", // Correct
+                  "$31.00"
+                ],
+                "correctAnswer": "D",
+                "explanation": "To find the dollar cost, multiply the price in Euros by the dollar cost per Euro: Cost in USD = Price in Euros * (USD/Euro) = 20 Euros * ($1.10 / 1 Euro) = $22.00."
+              },
+              {
+                "id": 273,
+                "subject": "ap_macroeconomics",
+                "unit": 6,
+                "lessonIDS": ["6.4"],
+                "unitName": "Open Economy - International Trade and Finance",
+                "question": "Assume flexible exchange rates. If Country Z experiences rapid technological progress leading to faster economic growth than its trading partners, its currency is likely to:",
+                "image": null,
+                "options": [
+                  "Appreciate due to increased demand for its exports.",
+                  "Depreciate due to increased demand for imports.", // Correct (Income effect often dominates)
+                  "Appreciate due to increased capital inflows seeking higher returns.",
+                  "Depreciate due to lower relative interest rates.",
+                  "The effect is indeterminate as growth affects both imports and capital flows." // Highly plausible distractor
+                ],
+                "correctAnswer": "B",
+                "explanation": "Faster economic growth increases incomes in Country Z. Higher incomes typically lead to increased demand for all goods, including imports. To buy more imports, residents supply more of their own currency, causing it to depreciate (this income effect often outweighs effects from exports or capital flows in basic models)."
+              },
+              {
+                "id": 274,
+                "subject": "ap_macroeconomics",
+                "unit": 6,
+                "lessonIDS": ["6.5"],
+                "unitName": "Open Economy - International Trade and Finance",
+                "question": "If the Japanese yen depreciates relative to the US dollar, which group would benefit the most?",
+                "image": null,
+                "options": [
+                  "US consumers buying Japanese cars.", // Correct
+                  "Japanese consumers buying US electronics.",
+                  "US tourists planning trips to Japan.", // Benefits, but consumers buying goods is more direct
+                  "Japanese firms exporting goods to the US.", // Benefits, but US consumers get cheaper goods
+                  "US firms exporting goods to Japan."
+                ],
+                "correctAnswer": "A",
+                "explanation": "When the yen depreciates, it takes fewer dollars to buy a yen. This makes Japanese goods cheaper for US consumers, increasing their purchasing power for those goods."
+              },
+              {
+                "id": 275,
+                "subject": "ap_macroeconomics",
+                "unit": 6,
+                "lessonIDS": ["6.1"],
+                "unitName": "Open Economy - International Trade and Finance",
+                "question": "Which of the following is recorded as a credit in the U.S. Financial Account?",
+                "image": null,
+                "options": [
+                  "U.S. imports of French wine.",
+                  "A U.S. company pays dividends to its German shareholders.",
+                  "A Mexican company purchases a manufacturing plant in the U.S.", // Correct
+                  "A U.S. tourist spends money in Japan.",
+                  "The U.S. government provides aid to Egypt."
+                ],
+                "correctAnswer": "C",
+                "explanation": "The financial account records purchases/sales of assets. When a foreign entity (Mexican company) buys a U.S. asset (manufacturing plant - a form of foreign direct investment), it represents a financial capital inflow to the U.S. and is recorded as a credit in the U.S. financial account."
+              },
+              {
+                "id": 276,
+                "subject": "ap_macroeconomics",
+                "unit": 6,
+                "lessonIDS": ["6.3", "6.4"],
+                "unitName": "Open Economy - International Trade and Finance",
+                "question": "If investors widely expect the British pound to depreciate in the near future, what is the likely immediate impact in the foreign exchange market?",
+                "image": null,
+                "options": [
+                  "Increased demand for pounds, causing appreciation.",
+                  "Increased supply of pounds, causing depreciation.", // Correct
+                  "Decreased demand for pounds and decreased supply, effect indeterminate.",
+                  "Increased demand for pounds and increased supply, effect indeterminate.",
+                  "No change until the depreciation actually occurs."
+                ],
+                "correctAnswer": "B",
+                "explanation": "If investors expect the pound to depreciate (lose value), those holding pounds will try to sell them before the value drops, increasing the supply of pounds. Simultaneously, those considering buying pounds will wait, decreasing the demand. Both effects put downward pressure on the pound's current exchange rate, leading to immediate depreciation."
+              }, 
+                {
+                  "id": 277,
+                  "subject": "ap_macroeconomics",
+                  "unit": 5,
+                  "lessonIDS": ["5.1"],
+                  "unitName": "Long-Run Consequences of Stabilization Policies",
+                  "question": "If a government pursues expansionary fiscal policy while the central bank simultaneously undertakes contractionary monetary policy, what is the likely effect on real interest rates and real GDP in the short run?",
+                  "image": null,
+                  "options": [
+                    "Real interest rates decrease; Real GDP increases.",
+                    "Real interest rates increase; Real GDP effect is indeterminate.", // Correct
+                    "Real interest rates decrease; Real GDP decreases.",
+                    "Real interest rates increase; Real GDP increases.",
+                    "Real interest rates indeterminate; Real GDP decreases." // Longer distractor
+                  ],
+                  "correctAnswer": "B",
+                  "explanation": "Expansionary fiscal policy (increased spending/lower taxes) tends to increase real interest rates (via loanable funds market) and increase real GDP (via AD). Contractionary monetary policy (selling bonds/raising administered rates) increases real interest rates and decreases real GDP (via AD). Both policies raise interest rates. The effect on real GDP is indeterminate as the policies push it in opposite directions."
+                },
+                {
+                  "id": 278,
+                  "subject": "ap_macroeconomics",
+                  "unit": 5,
+                  "lessonIDS": ["5.1"],
+                  "unitName": "Long-Run Consequences of Stabilization Policies",
+                  "question": "Which combination of fiscal and monetary policy actions would unambiguously lead to a decrease in aggregate demand in the short run?",
+                  "image": null,
+                  "options": [
+                    "Decreasing taxes and buying government securities.",
+                    "Increasing government spending and selling government securities.",
+                    "Decreasing government spending and selling government securities.", // Correct
+                    "Decreasing government spending and buying government securities.",
+                    "Increasing taxes and buying government securities."
+                  ],
+                  "correctAnswer": "C",
+                  "explanation": "Decreasing government spending is contractionary fiscal policy, reducing aggregate demand. Selling government securities (open market sale) is contractionary monetary policy, increasing interest rates and reducing investment/consumption, thus reducing aggregate demand. Both actions reduce aggregate demand."
+                },
+                {
+                  "id": 279,
+                  "subject": "ap_macroeconomics",
+                  "unit": 5,
+                  "lessonIDS": ["5.2"],
+                  "unitName": "Long-Run Consequences of Stabilization Policies",
+                  "question": "A movement downward and to the right along a stable short-run Phillips curve is typically associated with:",
+                  "image": null,
+                  "options": [
+                    "An increase in aggregate demand.",
+                    "A decrease in aggregate demand.", // Correct
+                    "An adverse supply shock.",
+                    "A favorable supply shock.",
+                    "An increase in expected inflation."
+                  ],
+                  "correctAnswer": "B",
+                  "explanation": "The short-run Phillips curve shows an inverse relationship between inflation and unemployment. A decrease in aggregate demand leads to lower inflation and higher unemployment, corresponding to a movement downward and to the right along the SRPC."
+                },
+                {
+                  "id": 280,
+                  "subject": "ap_macroeconomics",
+                  "unit": 5,
+                  "lessonIDS": ["5.2"],
+                  "unitName": "Long-Run Consequences of Stabilization Policies",
+                  "question": "Which of the following would cause the short-run Phillips curve to shift to the right?",
+                  "image": null,
+                  "options": [
+                    "A decrease in the expected inflation rate.",
+                    "An increase in aggregate demand.",
+                    "An increase in the natural rate of unemployment.", // Correct (or adverse supply shock)
+                    "A decrease in aggregate demand.",
+                    "A favorable supply shock like falling oil prices." // Longer distractor
+                  ],
+                  "correctAnswer": "C",
+                  "explanation": "A rightward shift of the SRPC means a higher inflation rate is associated with any given unemployment rate, or higher unemployment for any given inflation rate. This can be caused by an increase in expected inflation or an adverse supply shock. An increase in the natural rate of unemployment would also shift the LRPC right, implying the SRPC must also shift right to intersect it."
+                },
+                {
+                  "id": 281,
+                  "subject": "ap_macroeconomics",
+                  "unit": 5,
+                  "lessonIDS": ["5.2"],
+                  "unitName": "Long-Run Consequences of Stabilization Policies",
+                  "question": "The concept illustrated by the vertical long-run Phillips curve is that:",
+                  "image": null,
+                  "options": [
+                    "There is a permanent trade-off between inflation and unemployment.",
+                    "Monetary policy can permanently reduce unemployment below the natural rate.",
+                    "In the long run, the unemployment rate returns to the natural rate regardless of the stable inflation rate.", // Correct
+                    "Fiscal policy has no impact on inflation or unemployment in the long run.",
+                    "The natural rate of unemployment decreases as inflation increases."
+                  ],
+                  "correctAnswer": "C",
+                  "explanation": "The vertical LRPC at the natural rate of unemployment indicates that in the long run, when expected inflation adjusts to actual inflation, there is no trade-off between inflation and unemployment. Expansionary policies may temporarily reduce unemployment below the natural rate but only at the cost of accelerating inflation."
+                },
+                {
+                  "id": 282,
+                  "subject": "ap_macroeconomics",
+                  "unit": 5,
+                  "lessonIDS": ["5.2"],
+                  "unitName": "Long-Run Consequences of Stabilization Policies",
+                  "question": "Stagflation, a combination of high inflation and high unemployment, is typically caused by:",
+                  "image": null,
+                  "options": [
+                    "A decrease in aggregate demand.",
+                    "An increase in aggregate demand.",
+                    "A favorable supply shock.",
+                    "An adverse supply shock.", // Correct
+                    "Expansionary monetary policy."
+                  ],
+                  "correctAnswer": "D",
+                  "explanation": "An adverse supply shock, such as a sharp increase in oil prices, shifts the short-run aggregate supply curve leftward. This leads to a higher price level (inflation) and lower output (higher unemployment) simultaneously, a condition known as stagflation. This corresponds to a rightward shift of the SRPC."
+                },
+                {
+                  "id": 283,
+                  "subject": "ap_macroeconomics",
+                  "unit": 5,
+                  "lessonIDS": ["5.3"],
+                  "unitName": "Long-Run Consequences of Stabilization Policies",
+                  "question": "According to the quantity theory of money, if velocity is constant and real GDP grows by 3%, a 5% increase in the money supply will lead to an inflation rate of approximately:",
+                  "image": null,
+                  "options": [
+                    "2%", // Correct
+                    "3%",
+                    "5%",
+                    "8%",
+                    "-2%"
+                  ],
+                  "correctAnswer": "A",
+                  "explanation": "Using the equation of exchange in growth rates (%ΔM + %ΔV = %ΔP + %ΔY), with %ΔV = 0, we have %ΔM = %ΔP + %ΔY. Plugging in the values: 5% = %ΔP + 3%. Therefore, the inflation rate (%ΔP) is 5% - 3% = 2%."
+                },
+                {
+                  "id": 284,
+                  "subject": "ap_macroeconomics",
+                  "unit": 5,
+                  "lessonIDS": ["5.3"],
+                  "unitName": "Long-Run Consequences of Stabilization Policies",
+                  "question": "If nominal GDP is $20 trillion and the money supply is $4 trillion, the velocity of money is:",
+                  "image": null,
+                  "options": [
+                    "0.2",
+                    "4",
+                    "5", // Correct
+                    "16",
+                    "80"
+                  ],
+                  "correctAnswer": "C",
+                  "explanation": "The equation of exchange is MV = PY, where PY is nominal GDP. Rearranging, Velocity (V) = Nominal GDP / Money Supply (M). V = $20 trillion / $4 trillion = 5."
+                },
+                {
+                  "id": 285,
+                  "subject": "ap_macroeconomics",
+                  "unit": 5,
+                  "lessonIDS": ["5.4"],
+                  "unitName": "Long-Run Consequences of Stabilization Policies",
+                  "question": "The government budget is balanced when:",
+                  "image": null,
+                  "options": [
+                    "The national debt is zero.",
+                    "Government outlays equal tax revenues.", // Correct
+                    "The money supply equals money demand.",
+                    "Exports equal imports.",
+                    "The current account equals the financial account."
+                  ],
+                  "correctAnswer": "B",
+                  "explanation": "A balanced budget occurs in a given fiscal year when the government's total spending (purchases plus transfer payments) is exactly equal to its total tax revenues."
+                },
+                {
+                  "id": 286,
+                  "subject": "ap_macroeconomics",
+                  "unit": 5,
+                  "lessonIDS": ["5.4"],
+                  "unitName": "Long-Run Consequences of Stabilization Policies",
+                  "question": "If a government begins with no debt and runs a budget deficit of $100 billion in year 1 and a budget surplus of $50 billion in year 2, what is the national debt at the end of year 2?",
+                  "image": null,
+                  "options": [
+                    "$0",
+                    "$50 billion", // Correct
+                    "$100 billion",
+                    "$150 billion",
+                    "-$50 billion"
+                  ],
+                  "correctAnswer": "B",
+                  "explanation": "The national debt is the accumulation of past deficits minus surpluses. Starting at $0, adding a $100 billion deficit brings the debt to $100 billion. Then, a $50 billion surplus reduces the debt by that amount. Debt at end of Year 2 = $100 billion - $50 billion = $50 billion."
+                },
+                {
+                  "id": 287,
+                  "subject": "ap_macroeconomics",
+                  "unit": 5,
+                  "lessonIDS": ["5.5"],
+                  "unitName": "Long-Run Consequences of Stabilization Policies",
+                  "question": "Increased government borrowing to finance budget deficits leads to the crowding-out effect by:",
+                  "image": null,
+                  "options": [
+                    "Decreasing the money supply and raising nominal interest rates.",
+                    "Increasing the demand for loanable funds and raising real interest rates.", // Correct
+                    "Decreasing aggregate demand and lowering real interest rates.",
+                    "Increasing the supply of loanable funds and lowering real interest rates.",
+                    "Shifting the short-run Phillips curve outwards."
+                  ],
+                  "correctAnswer": "B",
+                  "explanation": "Government borrowing adds to the demand for loanable funds. This increased demand shifts the demand curve rightward, leading to higher equilibrium real interest rates. These higher rates discourage, or 'crowd out,' private investment spending."
+                },
+                {
+                  "id": 288,
+                  "subject": "ap_macroeconomics",
+                  "unit": 5,
+                  "lessonIDS": ["5.5"],
+                  "unitName": "Long-Run Consequences of Stabilization Policies",
+                  "question": "Which component of aggregate demand is most likely to be negatively affected by the crowding-out effect?",
+                  "image": null,
+                  "options": [
+                    "Consumption spending",
+                    "Investment spending", // Correct
+                    "Government spending",
+                    "Net exports",
+                    "Transfer payments"
+                  ],
+                  "correctAnswer": "B",
+                  "explanation": "The crowding-out effect operates through higher real interest rates caused by government borrowing. Higher interest rates make it more expensive for businesses to borrow for capital projects, thus primarily reducing gross private domestic investment spending."
+                },
+                {
+                  "id": 289,
+                  "subject": "ap_macroeconomics",
+                  "unit": 5,
+                  "lessonIDS": ["5.6"],
+                  "unitName": "Long-Run Consequences of Stabilization Policies",
+                  "question": "Which factor contributes most directly to increasing labor productivity and fostering long-run economic growth?",
+                  "image": null,
+                  "options": [
+                    "An increase in the aggregate price level.",
+                    "A decrease in nominal wages.",
+                    "An increase in the stock of physical capital per worker.", // Correct
+                    "Expansionary monetary policy.",
+                    "An increase in government transfer payments." // Longer distractor
+                  ],
+                  "correctAnswer": "C",
+                  "explanation": "Labor productivity (output per worker) increases when workers have more or better tools, machinery, and infrastructure (physical capital) to work with. Increases in physical capital per worker are a key driver of long-run economic growth."
+                },
+                {
+                  "id": 290,
+                  "subject": "ap_macroeconomics",
+                  "unit": 5,
+                  "lessonIDS": ["5.6"],
+                  "unitName": "Long-Run Consequences of Stabilization Policies",
+                  "question": "Long-run economic growth is represented graphically by a:",
+                  "image": null,
+                  "options": [
+                    "Rightward shift of the aggregate demand curve.",
+                    "Movement up along the short-run aggregate supply curve.",
+                    "Rightward shift of the long-run aggregate supply curve.", // Correct
+                    "Leftward shift of the short-run Phillips curve.",
+                    "Downward shift of the production possibilities curve."
+                  ],
+                  "correctAnswer": "C",
+                  "explanation": "Long-run economic growth signifies an increase in the economy's potential output. This is shown as a rightward shift in the vertical long-run aggregate supply (LRAS) curve and an outward shift of the production possibilities curve."
+                },
+                {
+                  "id": 291,
+                  "subject": "ap_macroeconomics",
+                  "unit": 5,
+                  "lessonIDS": ["5.7"],
+                  "unitName": "Long-Run Consequences of Stabilization Policies",
+                  "question": "Policies such as investment tax credits or reduced corporate income taxes are primarily intended to promote long-run economic growth by:",
+                  "image": null,
+                  "options": [
+                    "Increasing short-run aggregate demand significantly.",
+                    "Decreasing the natural rate of unemployment directly.",
+                    "Encouraging investment in physical capital and technology.", // Correct
+                    "Reducing the government budget deficit immediately.",
+                    "Shifting the short-run Phillips curve downwards." // Shorter distractor
+                  ],
+                  "correctAnswer": "C",
+                  "explanation": "These are examples of supply-side fiscal policies. By reducing the cost or increasing the after-tax return on investment, they aim to incentivize firms to acquire more physical capital and adopt new technologies, thereby increasing potential output and fostering long-run growth (shifting LRAS right)."
+                },
+                {
+                  "id": 292,
+                  "subject": "ap_macroeconomics",
+                  "unit": 5,
+                  "lessonIDS": ["5.1"],
+                  "unitName": "Long-Run Consequences of Stabilization Policies",
+                  "question": "If expansionary fiscal policy increases real GDP, while contractionary monetary policy decreases real GDP, what is the overall impact on real GDP when both policies are enacted simultaneously?",
+                  "image": null,
+                  "options": [
+                    "Real GDP increases.",
+                    "Real GDP decreases.",
+                    "Real GDP remains unchanged.",
+                    "The effect on real GDP is indeterminate.", // Correct
+                    "Nominal GDP increases but real GDP decreases."
+                  ],
+                  "correctAnswer": "D",
+                  "explanation": "Expansionary fiscal policy shifts aggregate demand right, increasing real GDP. Contractionary monetary policy shifts aggregate demand left, decreasing real GDP. Since the two policies push real GDP in opposite directions, the net effect is uncertain without knowing the relative magnitudes of the policies."
+                },
+                {
+                  "id": 293,
+                  "subject": "ap_macroeconomics",
+                  "unit": 5,
+                  "lessonIDS": ["5.2"],
+                  "unitName": "Long-Run Consequences of Stabilization Policies",
+                  "question": "If policymakers attempt to maintain the unemployment rate below the natural rate of unemployment through persistent increases in aggregate demand, the likely long-run result will be:",
+                  "image": null,
+                  "options": [
+                    "A permanent reduction in unemployment.",
+                    "A decrease in the price level.",
+                    "An accelerating rate of inflation.", // Correct
+                    "A leftward shift in the long-run Phillips curve.",
+                    "Deflation and stable unemployment rates." // Longer distractor
+                  ],
+                  "correctAnswer": "C",
+                  "explanation": "While expansionary AD policy can temporarily push unemployment below the NRU, this leads to rising inflation expectations. To keep unemployment low, policymakers must continually increase AD faster, leading to ever-higher (accelerating) inflation in the long run, with unemployment eventually returning to the NRU."
+                },
+                {
+                  "id": 294,
+                  "subject": "ap_macroeconomics",
+                  "unit": 5,
+                  "lessonIDS": ["5.4"],
+                  "unitName": "Long-Run Consequences of Stabilization Policies",
+                  "question": "Which statement accurately describes the relationship between the government budget deficit and the national debt?",
+                  "image": null,
+                  "options": [
+                    "The national debt is the deficit measured over one year.",
+                    "The deficit is the total accumulation of past debts.",
+                    "A budget surplus decreases the national debt.", // Correct
+                    "A balanced budget eliminates the national debt.",
+                    "The national debt only includes borrowing from foreign countries."
+                  ],
+                  "correctAnswer": "C",
+                  "explanation": "The national debt represents the total amount owed by the government from all past borrowing (accumulated deficits minus any accumulated surpluses). A budget surplus (tax revenues exceed outlays) in a given year allows the government to pay down some of its existing debt, thus reducing the national debt."
+                },
+                {
+                  "id": 295,
+                  "subject": "ap_macroeconomics",
+                  "unit": 5,
+                  "lessonIDS": ["5.6"],
+                  "unitName": "Long-Run Consequences of Stabilization Policies",
+                  "question": "Which of the following government policies would be most likely to increase long-run economic growth?",
+                  "image": null,
+                  "options": [
+                    "Increasing unemployment benefits.",
+                    "Providing subsidies for education and research.", // Correct
+                    "Imposing higher tariffs on imported capital goods.",
+                    "Increasing consumption taxes.",
+                    "Reducing the length of patents for new inventions."
+                  ],
+                  "correctAnswer": "B",
+                  "explanation": "Long-run economic growth depends on factors like human capital accumulation and technological progress. Subsidies for education enhance human capital (skills), while subsidies for research and development encourage technological advancements, both contributing to a higher potential output (shifting LRAS right)."
+                },
+                {
+                  "id": 296,
+                  "subject": "ap_macroeconomics",
+                  "unit": 5,
+                  "lessonIDS": ["5.3"],
+                  "unitName": "Long-Run Consequences of Stabilization Policies",
+                  "question": "The velocity of money is best defined as:",
+                  "image": null,
+                  "options": [
+                    "The rate at which the central bank prints currency.",
+                    "The average number of times a unit of money changes hands in transactions for final goods and services.", // Correct
+                    "The required reserve ratio set by the central bank for commercial banks.",
+                    "The rate of growth of real GDP adjusted for inflation changes.",
+                    "The speed at which inflation erodes purchasing power." // Longer distractor
+                  ],
+                  "correctAnswer": "B",
+                  "explanation": "Velocity measures how quickly money circulates within the economy to facilitate transactions included in nominal GDP. A higher velocity implies each dollar is used more frequently during a given period."
+                }, 
+                  {
+                    "id": 297,
+                    "subject": "ap_macroeconomics",
+                    "unit": 4,
+                    "lessonIDS": ["4.1"],
+                    "unitName": "Financial Sector",
+                    "question": "Which of the following best describes the primary difference between a bond and a stock?",
+                    "image": null,
+                    "options": [
+                      "A bond represents ownership, while a stock represents debt.",
+                      "A bond typically pays dividends, while a stock pays interest.",
+                      "A stock represents ownership (equity), while a bond represents debt (a loan).", // Correct
+                      "Stocks are issued only by governments, bonds only by corporations.",
+                      "Bonds offer higher potential returns but greater risk than stocks."
+                    ],
+                    "correctAnswer": "C",
+                    "explanation": "A stock represents partial ownership (equity) in a corporation, giving the holder potential voting rights and a claim on profits (dividends). A bond represents a loan made by an investor to a borrower (corporation or government), which obligates the borrower to repay the principal plus periodic interest payments."
+                  },
+                  {
+                    "id": 298,
+                    "subject": "ap_macroeconomics",
+                    "unit": 4,
+                    "lessonIDS": ["4.1"],
+                    "unitName": "Financial Sector",
+                    "question": "Liquidity, in the context of financial assets, refers to the:",
+                    "image": null,
+                    "options": [
+                      "Total value of the asset.",
+                      "Expected rate of return on the asset.",
+                      "Ease with which an asset can be converted into a medium of exchange without significant loss of value.", // Correct
+                      "Risk associated with holding the asset.",
+                      "Interest rate paid by the asset."
+                    ],
+                    "correctAnswer": "C",
+                    "explanation": "Liquidity measures how quickly and easily an asset can be converted into cash (the most common medium of exchange) with minimal loss of its purchasing power or value."
+                  },
+                  {
+                    "id": 299,
+                    "subject": "ap_macroeconomics",
+                    "unit": 4,
+                    "lessonIDS": ["4.2"],
+                    "unitName": "Financial Sector",
+                    "question": "If the nominal interest rate is 8% and the expected inflation rate is 3%, the expected real interest rate is approximately:",
+                    "image": null,
+                    "options": [
+                      "3%",
+                      "5%", // Correct
+                      "8%",
+                      "11%",
+                      "-5%"
+                    ],
+                    "correctAnswer": "B",
+                    "explanation": "The expected real interest rate is approximately equal to the nominal interest rate minus the expected inflation rate. Real Interest Rate ≈ Nominal Interest Rate - Expected Inflation Rate = 8% - 3% = 5%."
+                  },
+                  {
+                    "id": 300,
+                    "subject": "ap_macroeconomics",
+                    "unit": 4,
+                    "lessonIDS": ["4.2"],
+                    "unitName": "Financial Sector",
+                    "question": "Suppose you took out a loan with a fixed nominal interest rate. If the actual inflation rate ends up being higher than what was expected when the loan was made, who benefits?",
+                    "image": null,
+                    "options": [
+                      "The borrower benefits.", // Correct
+                      "The lender benefits.",
+                      "Both benefit equally.",
+                      "Neither benefits.",
+                      "The government benefits through higher taxes."
+                    ],
+                    "correctAnswer": "A",
+                    "explanation": "Higher-than-expected inflation means the borrower repays the loan with dollars that have less purchasing power than anticipated. This reduces the real value of the loan repayment, benefiting the borrower at the expense of the lender, who receives back less valuable dollars."
+                  },
+                  {
+                    "id": 301,
+                    "subject": "ap_macroeconomics",
+                    "unit": 4,
+                    "lessonIDS": ["4.3"],
+                    "unitName": "Financial Sector",
+                    "question": "Using money to compare the market values of different goods and services best illustrates which function of money?",
+                    "image": null,
+                    "options": [
+                      "Medium of exchange",
+                      "Store of value",
+                      "Unit of account", // Correct
+                      "Standard of deferred payment",
+                      "Measure of liquidity"
+                    ],
+                    "correctAnswer": "C",
+                    "explanation": "The unit of account function of money allows us to measure and compare the values of diverse goods and services using a common denominator (e.g., dollars, euros), simplifying economic calculations and comparisons."
+                  },
+                  {
+                    "id": 302,
+                    "subject": "ap_macroeconomics",
+                    "unit": 4,
+                    "lessonIDS": ["4.3"],
+                    "unitName": "Financial Sector",
+                    "question": "Which of the following assets is included in the M1 measure of the money supply?",
+                    "image": null,
+                    "options": [
+                      "Savings accounts",
+                      "Small-denomination time deposits (CDs)",
+                      "Money market mutual funds held by individuals",
+                      "Currency held by the public and checkable deposits.", // Correct
+                      "Corporate bonds held by commercial banks." // Longer distractor
+                    ],
+                    "correctAnswer": "D",
+                    "explanation": "M1 is the narrowest measure of money supply, including the most liquid assets used for transactions: currency in circulation, checkable deposits (demand deposits), and traveler's checks."
+                  },
+                  {
+                    "id": 303,
+                    "subject": "ap_macroeconomics",
+                    "unit": 4,
+                    "lessonIDS": ["4.4"],
+                    "unitName": "Financial Sector",
+                    "question": "A commercial bank's reserves are considered which part of its balance sheet?",
+                    "image": null,
+                    "options": [
+                      "An asset", // Correct
+                      "A liability",
+                      "Net worth",
+                      "A contra-asset",
+                      "Owner's equity"
+                    ],
+                    "correctAnswer": "A",
+                    "explanation": "Reserves (both required and excess), whether held as vault cash or deposits at the central bank, are assets for a commercial bank because they represent funds the bank owns or has claim to."
+                  },
+                  {
+                    "id": 304,
+                    "subject": "ap_macroeconomics",
+                    "unit": 4,
+                    "lessonIDS": ["4.4"],
+                    "unitName": "Financial Sector",
+                    "question": "If the required reserve ratio is 20%, and a bank has $100,000 in demand deposits and $30,000 in total reserves, how much are its excess reserves?",
+                    "image": null,
+                    "options": [
+                      "$10,000", // Correct
+                      "$20,000",
+                      "$30,000",
+                      "$70,000",
+                      "$130,000"
+                    ],
+                    "correctAnswer": "A",
+                    "explanation": "Required Reserves = Required Reserve Ratio * Demand Deposits = 0.20 * $100,000 = $20,000. Excess Reserves = Total Reserves - Required Reserves = $30,000 - $20,000 = $10,000."
+                  },
+                  {
+                    "id": 305,
+                    "subject": "ap_macroeconomics",
+                    "unit": 4,
+                    "lessonIDS": ["4.4"],
+                    "unitName": "Financial Sector",
+                    "question": "Assuming banks hold no excess reserves and individuals hold no currency, if the required reserve ratio is 10%, what is the maximum possible expansion of the money supply resulting from a $1,000 new deposit into the banking system?",
+                    "image": null,
+                    "options": [
+                      "$100",
+                      "$1,000",
+                      "$9,000",
+                      "$10,000", // Correct (Total MS); or $9,000 if asking for *increase*
+                      "$900"
+                    ],
+                    "correctAnswer": "D", // Assuming question asks for total potential money supply based on the deposit
+                    "explanation": "The simple money multiplier is 1 / Required Reserve Ratio = 1 / 0.10 = 10. The maximum potential money supply that can be supported by the initial $1,000 deposit (which becomes reserves) is Multiplier * Initial Deposit = 10 * $1,000 = $10,000. (Note: If the question asked for the *increase* or *change*, it would be $9,000, as the initial $1,000 was already money)."
+                  },
+                  {
+                    "id": 306,
+                    "subject": "ap_macroeconomics",
+                    "unit": 4,
+                    "lessonIDS": ["4.5"],
+                    "unitName": "Financial Sector",
+                    "question": "The opportunity cost of holding money in the form of cash increases when:",
+                    "image": null,
+                    "options": [
+                      "The nominal interest rate decreases.",
+                      "The nominal interest rate increases.", // Correct
+                      "The price level decreases.",
+                      "The money supply increases.",
+                      "Consumer confidence declines sharply." // Longer distractor
+                    ],
+                    "correctAnswer": "B",
+                    "explanation": "The opportunity cost of holding money (which typically earns no interest) is the interest income forgone by not holding interest-bearing assets (like bonds). When nominal interest rates rise, the potential interest income given up increases, thus raising the opportunity cost of holding cash."
+                  },
+                  {
+                    "id": 307,
+                    "subject": "ap_macroeconomics",
+                    "unit": 4,
+                    "lessonIDS": ["4.5"],
+                    "unitName": "Financial Sector",
+                    "question": "In the money market model, an increase in the aggregate price level will typically lead to:",
+                    "image": null,
+                    "options": [
+                      "A decrease in money demand and a lower nominal interest rate.",
+                      "An increase in money supply and a lower nominal interest rate.",
+                      "An increase in money demand and a higher nominal interest rate.", // Correct
+                      "A decrease in money supply and a higher nominal interest rate.",
+                      "No change in money demand but a higher nominal interest rate."
+                    ],
+                    "correctAnswer": "C",
+                    "explanation": "A higher price level increases the amount of money needed for transactions. This increases the demand for money (shifts the MD curve right). Holding the money supply constant, this leads to a higher equilibrium nominal interest rate."
+                  },
+                  {
+                    "id": 308,
+                    "subject": "ap_macroeconomics",
+                    "unit": 4,
+                    "lessonIDS": ["4.6"],
+                    "unitName": "Financial Sector",
+                    "question": "Which of the following is an example of contractionary monetary policy by a central bank?",
+                    "image": null,
+                    "options": [
+                      "Decreasing the discount rate.",
+                      "Buying government securities on the open market.",
+                      "Decreasing the required reserve ratio.",
+                      "Selling government securities on the open market.", // Correct
+                      "Lowering administered interest rates like the interest on reserves." // Longer distractor
+                    ],
+                    "correctAnswer": "D",
+                    "explanation": "Contractionary monetary policy aims to decrease the money supply and raise interest rates to curb inflation. Selling government securities (bonds) removes reserves from the banking system, reducing banks' ability to lend and thus contracting the money supply."
+                  },
+                  {
+                    "id": 309,
+                    "subject": "ap_macroeconomics",
+                    "unit": 4,
+                    "lessonIDS": ["4.6"],
+                    "unitName": "Financial Sector",
+                    "question": "In a banking system with ample reserves, the primary tool used by the central bank to influence the policy interest rate (like the federal funds rate) is typically:",
+                    "image": null,
+                    "options": [
+                      "Changing the required reserve ratio.",
+                      "Large-scale open market operations.",
+                      "Adjusting administered interest rates such as the interest rate on reserves.", // Correct
+                      "Changing the M1 money supply target.",
+                      "Setting foreign exchange rate targets."
+                    ],
+                    "correctAnswer": "C",
+                    "explanation": "In an ample reserves system, traditional open market operations are less effective for fine-tuning the policy rate. Instead, central banks primarily manage the policy rate by adjusting administered rates like the interest paid on reserve balances (IORB) or the rate offered on overnight reverse repurchase agreements (ON RRP), which influence banks' incentives to lend or hold reserves."
+                  },
+                  {
+                    "id": 310,
+                    "subject": "ap_macroeconomics",
+                    "unit": 4,
+                    "lessonIDS": ["4.6", "5.1"],
+                    "unitName": "Financial Sector",
+                    "question": "A decrease in the money supply engineered by the central bank is likely to cause which effect in the short run?",
+                    "image": null,
+                    "options": [
+                      "Lower nominal interest rates and increased aggregate demand.",
+                      "Higher nominal interest rates and decreased aggregate demand.", // Correct
+                      "Higher nominal interest rates and increased aggregate demand.",
+                      "Lower nominal interest rates and decreased aggregate demand.",
+                      "No change in interest rates but decreased aggregate supply."
+                    ],
+                    "correctAnswer": "B",
+                    "explanation": "A decrease in the money supply (MS shifts left) leads to higher nominal interest rates in the money market. Higher interest rates discourage investment and interest-sensitive consumption, causing aggregate demand to decrease (shift left)."
+                  },
+                  {
+                    "id": 311,
+                    "subject": "ap_macroeconomics",
+                    "unit": 4,
+                    "lessonIDS": ["4.7"],
+                    "unitName": "Financial Sector",
+                    "question": "The demand curve for loanable funds is downward sloping primarily because as the real interest rate falls:",
+                    "image": null,
+                    "options": [
+                      "Private saving increases.",
+                      "Government budget deficits decrease.",
+                      "The expected profitability of investment projects increases.",
+                      "More potential investment projects become profitable to undertake.", // Correct
+                      "Foreign capital inflows decrease significantly." // Longer distractor
+                    ],
+                    "correctAnswer": "D",
+                    "explanation": "The real interest rate represents the cost of borrowing for firms undertaking investment projects. As the real interest rate falls, more projects that previously had an expected rate of return below the interest rate now become profitable, increasing the quantity of loanable funds demanded for investment."
+                  },
+                  {
+                    "id": 312,
+                    "subject": "ap_macroeconomics",
+                    "unit": 4,
+                    "lessonIDS": ["4.7"],
+                    "unitName": "Financial Sector",
+                    "question": "An increase in household saving would affect the loanable funds market by:",
+                    "image": null,
+                    "options": [
+                      "Increasing the demand for loanable funds and increasing the real interest rate.",
+                      "Decreasing the demand for loanable funds and decreasing the real interest rate.",
+                      "Increasing the supply of loanable funds and decreasing the real interest rate.", // Correct
+                      "Decreasing the supply of loanable funds and increasing the real interest rate.",
+                      "Increasing both supply and demand, leaving the real interest rate unchanged."
+                    ],
+                    "correctAnswer": "C",
+                    "explanation": "Household saving is a primary source of the supply of loanable funds. An increase in saving shifts the supply curve for loanable funds to the right, leading to a lower equilibrium real interest rate and a higher equilibrium quantity of funds loaned."
+                  },
+                  {
+                    "id": 313,
+                    "subject": "ap_macroeconomics",
+                    "unit": 4,
+                    "lessonIDS": ["4.7", "5.5"],
+                    "unitName": "Financial Sector",
+                    "question": "If a government increases its borrowing to finance infrastructure spending, what is the likely impact on the loanable funds market and private investment?",
+                    "image": null,
+                    "options": [
+                      "Demand for funds decreases, real interest rate falls, private investment increases.",
+                      "Supply of funds increases, real interest rate falls, private investment increases.",
+                      "Demand for funds increases, real interest rate rises, private investment decreases.", // Correct
+                      "Supply of funds decreases, real interest rate rises, private investment decreases.",
+                      "Demand and supply increase equally, no change in real interest rate or investment."
+                    ],
+                    "correctAnswer": "C",
+                    "explanation": "Government borrowing increases the demand for loanable funds (shifts demand right). This leads to a higher real interest rate. The higher real interest rate increases the cost of borrowing for private firms, causing a decrease in private investment spending (crowding out)."
+                  },
+                  {
+                    "id": 314,
+                    "subject": "ap_macroeconomics",
+                    "unit": 4,
+                    "lessonIDS": ["4.1"],
+                    "unitName": "Financial Sector",
+                    "question": "Which type of financial asset represents a claim to partial ownership in a corporation?",
+                    "image": null,
+                    "options": [
+                      "Corporate bond",
+                      "Government bond",
+                      "Stock", // Correct
+                      "Certificate of Deposit (CD)",
+                      "Savings account"
+                    ],
+                    "correctAnswer": "C",
+                    "explanation": "Stock represents equity or ownership in a corporation. Bondholders are creditors (lenders) to the corporation, while stockholders are part owners."
+                  },
+                  {
+                    "id": 315,
+                    "subject": "ap_macroeconomics",
+                    "unit": 4,
+                    "lessonIDS": ["4.4"],
+                    "unitName": "Financial Sector",
+                    "question": "If the simple money multiplier is 4, what is the required reserve ratio?",
+                    "image": null,
+                    "options": [
+                      "4%",
+                      "10%",
+                      "15%",
+                      "20%",
+                      "25%" // Correct
+                    ],
+                    "correctAnswer": "E",
+                    "explanation": "The simple money multiplier is calculated as 1 / Required Reserve Ratio (RRR). If the multiplier is 4, then 4 = 1 / RRR. Solving for RRR gives RRR = 1 / 4 = 0.25, or 25%."
+                  },
+                  {
+                    "id": 316,
+                    "subject": "ap_macroeconomics",
+                    "unit": 4,
+                    "lessonIDS": ["4.7"],
+                    "unitName": "Financial Sector",
+                    "question": "A decrease in foreign financial capital inflows into a country will affect its loanable funds market by:",
+                    "image": null,
+                    "options": [
+                      "Increasing the supply of loanable funds, lowering the real interest rate.",
+                      "Decreasing the supply of loanable funds, raising the real interest rate.", // Correct
+                      "Increasing the demand for loanable funds, raising the real interest rate.",
+                      "Decreasing the demand for loanable funds, lowering the real interest rate.",
+                      "Having no significant impact on the domestic loanable funds market." // Longer distractor
+                    ],
+                    "correctAnswer": "B",
+                    "explanation": "Financial capital inflows from abroad represent a source of saving available to the domestic loanable funds market, thus contributing to the supply of loanable funds. A decrease in these inflows shifts the supply curve for loanable funds to the left, resulting in a higher equilibrium real interest rate."
+                  }, 
+                    {
+                      "id": 317,
+                      "subject": "ap_macroeconomics",
+                      "unit": 3,
+                      "lessonIDS": ["3.1"],
+                      "unitName": "National Income and Price Determination",
+                      "question": "The interest rate effect suggests that the aggregate demand curve slopes downward because a lower price level leads to:",
+                      "image": null,
+                      "options": [
+                        "Increased real wealth, stimulating consumption spending.",
+                        "Lower interest rates, stimulating investment spending.", // Correct
+                        "Increased exports as domestic goods become relatively cheaper.",
+                        "Decreased money demand and decreased aggregate quantity demanded.",
+                        "Higher government spending due to automatic stabilizers."
+                      ],
+                      "correctAnswer": "B",
+                      "explanation": "The interest rate effect posits that a lower price level reduces the demand for money, which lowers the nominal interest rate. Lower interest rates encourage borrowing for investment and some types of consumption, thus increasing the aggregate quantity of goods and services demanded."
+                    },
+                    {
+                      "id": 318,
+                      "subject": "ap_macroeconomics",
+                      "unit": 3,
+                      "lessonIDS": ["3.1"],
+                      "unitName": "National Income and Price Determination",
+                      "question": "Which of the following would cause a leftward shift of the aggregate demand curve?",
+                      "image": null,
+                      "options": [
+                        "An increase in consumer confidence about future income.",
+                        "A decrease in income taxes.",
+                        "An increase in government spending on infrastructure.",
+                        "A decrease in net export spending.", // Correct
+                        "An increase in the overall price level." // Movement along curve
+                      ],
+                      "correctAnswer": "D",
+                      "explanation": "A decrease in net export spending, caused by factors like decreased foreign income or an appreciation of the domestic currency, reduces overall demand for domestically produced goods and services, shifting the aggregate demand curve to the left."
+                    },
+                    {
+                      "id": 319,
+                      "subject": "ap_macroeconomics",
+                      "unit": 3,
+                      "lessonIDS": ["3.3"],
+                      "unitName": "National Income and Price Determination",
+                      "question": "The short-run aggregate supply curve is upward sloping primarily because:",
+                      "image": null,
+                      "options": [
+                        "Potential output increases as the price level rises.",
+                        "Nominal wages and other input prices are often fixed or slow to adjust in the short run.", // Correct
+                        "The spending multiplier increases as the price level rises.",
+                        "Higher price levels reduce the real interest rate.",
+                        "Technology improves quickly when prices rise." // Shorter distractor
+                      ],
+                      "correctAnswer": "B",
+                      "explanation": "In the short run, many input costs, especially nominal wages, are 'sticky'. When the overall price level rises, output prices increase relative to these sticky input costs, making production more profitable and inducing firms to increase their quantity supplied."
+                    },
+                    {
+                      "id": 320,
+                      "subject": "ap_macroeconomics",
+                      "unit": 3,
+                      "lessonIDS": ["3.3"],
+                      "unitName": "National Income and Price Determination",
+                      "question": "Which of the following events would cause the short-run aggregate supply curve to shift to the left?",
+                      "image": null,
+                      "options": [
+                        "A decrease in the expected price level.",
+                        "An increase in labor productivity.",
+                        "A widespread increase in nominal wages.", // Correct
+                        "A decrease in corporate income taxes.",
+                        "A fall in the aggregate price level." // Movement along curve
+                      ],
+                      "correctAnswer": "C",
+                      "explanation": "An increase in nominal wages raises the cost of production for firms across the economy. At any given output price level, firms are willing to supply less output, causing the short-run aggregate supply curve to shift to the left."
+                    },
+                    {
+                      "id": 321,
+                      "subject": "ap_macroeconomics",
+                      "unit": 3,
+                      "lessonIDS": ["3.4"],
+                      "unitName": "National Income and Price Determination",
+                      "question": "The long-run aggregate supply curve is vertical at the level of potential output because in the long run:",
+                      "image": null,
+                      "options": [
+                        "Aggregate demand is constant.",
+                        "The money supply is fixed.",
+                        "All input prices are fully flexible and adjust to changes in the price level.", // Correct
+                        "Technology limits the amount that can be produced.",
+                        "Government spending equals tax revenue exactly." // Longer distractor
+                      ],
+                      "correctAnswer": "C",
+                      "explanation": "In the long run, all prices, including nominal wages and other input costs, are assumed to be fully flexible. Therefore, changes in the overall price level do not affect the economy's underlying productive capacity (potential output), which depends on resources, technology, and institutions. The LRAS curve is vertical at potential output."
+                    },
+                    {
+                      "id": 322,
+                      "subject": "ap_macroeconomics",
+                      "unit": 3,
+                      "lessonIDS": ["3.5"],
+                      "unitName": "National Income and Price Determination",
+                      "question": "If an economy's short-run equilibrium output is greater than its potential output, the economy is experiencing:",
+                      "image": null,
+                      "options": [
+                        "A recessionary gap.",
+                        "An inflationary gap.", // Correct
+                        "Long-run equilibrium.",
+                        "Stagflation.",
+                        "Zero cyclical unemployment."
+                      ],
+                      "correctAnswer": "B",
+                      "explanation": "An inflationary gap occurs when the short-run equilibrium level of real GDP is above the economy's potential output level (full-employment output). This implies that the unemployment rate is below the natural rate."
+                    },
+                    {
+                      "id": 323,
+                      "subject": "ap_macroeconomics",
+                      "unit": 3,
+                      "lessonIDS": ["3.7"],
+                      "unitName": "National Income and Price Determination",
+                      "question": "Assume an economy is in long-run equilibrium. A sudden increase in consumer optimism leads to a short-run increase in aggregate demand. Without government intervention, how will the economy adjust back to long-run equilibrium?",
+                      "image": null,
+                      "options": [
+                        "Nominal wages will fall, shifting SRAS right.",
+                        "Nominal wages will rise, shifting SRAS left.", // Correct
+                        "The LRAS curve will shift to the right.",
+                        "Aggregate demand will automatically shift back left.",
+                        "The price level will fall continuously."
+                      ],
+                      "correctAnswer": "B",
+                      "explanation": "The increase in AD creates an inflationary gap (output above potential, low unemployment). The tight labor market puts upward pressure on nominal wages. As wages rise, production costs increase, causing the SRAS curve to shift leftward until the economy returns to potential output at a higher price level."
+                    },
+                    {
+                      "id": 324,
+                      "subject": "ap_macroeconomics",
+                      "unit": 3,
+                      "lessonIDS": ["3.2"],
+                      "unitName": "National Income and Price Determination",
+                      "question": "If the marginal propensity to save (MPS) is 0.2, what is the value of the simple spending multiplier?",
+                      "image": null,
+                      "options": [
+                        "0.2",
+                        "0.8",
+                        "1.25",
+                        "4",
+                        "5" // Correct
+                      ],
+                      "correctAnswer": "E",
+                      "explanation": "The simple spending multiplier is calculated as 1 / MPS. Given MPS = 0.2, the multiplier is 1 / 0.2 = 5."
+                    },
+                    {
+                      "id": 325,
+                      "subject": "ap_macroeconomics",
+                      "unit": 3,
+                      "lessonIDS": ["3.2"],
+                      "unitName": "National Income and Price Determination",
+                      "question": "Assume the marginal propensity to consume (MPC) is 0.8. A $100 billion decrease in lump-sum taxes will lead to a maximum increase in real GDP of:",
+                      "image": null,
+                      "options": [
+                        "$80 billion",
+                        "$100 billion",
+                        "$400 billion", // Correct
+                        "$500 billion",
+                        "$125 billion"
+                      ],
+                      "correctAnswer": "C",
+                      "explanation": "The tax multiplier is -MPC / (1 - MPC) = -MPC / MPS. Here, MPC = 0.8, so MPS = 0.2. Tax multiplier = -0.8 / 0.2 = -4. A decrease in taxes of $100 billion will increase real GDP by: (-$100 billion) * (-4) = +$400 billion."
+                    },
+                    {
+                      "id": 326,
+                      "subject": "ap_macroeconomics",
+                      "unit": 3,
+                      "lessonIDS": ["3.8"],
+                      "unitName": "National Income and Price Determination",
+                      "question": "Which of the following represents an expansionary fiscal policy action?",
+                      "image": null,
+                      "options": [
+                        "Increasing the reserve requirement.",
+                        "Decreasing government spending on defense.",
+                        "Increasing personal income tax rates.",
+                        "Decreasing personal income tax rates.", // Correct
+                        "Selling government bonds by the central bank."
+                      ],
+                      "correctAnswer": "D",
+                      "explanation": "Expansionary fiscal policy aims to increase aggregate demand, typically during a recession. Decreasing personal income taxes increases households' disposable income, leading to higher consumption spending and shifting AD to the right."
+                    },
+                    {
+                      "id": 327,
+                      "subject": "ap_macroeconomics",
+                      "unit": 3,
+                      "lessonIDS": ["3.8"],
+                      "unitName": "National Income and Price Determination",
+                      "question": "If an economy is experiencing high inflation due to excess aggregate demand, an appropriate discretionary fiscal policy response would be to:",
+                      "image": null,
+                      "options": [
+                        "Increase government spending.",
+                        "Decrease income taxes.",
+                        "Increase income taxes or decrease government spending.", // Correct
+                        "Decrease the money supply.",
+                        "Increase transfer payments."
+                      ],
+                      "correctAnswer": "C",
+                      "explanation": "To combat demand-pull inflation (caused by excess AD), contractionary fiscal policy is needed. This involves either increasing taxes (to reduce disposable income and consumption) or decreasing government spending, both of which shift the AD curve to the left."
+                    },
+                    {
+                      "id": 328,
+                      "subject": "ap_macroeconomics",
+                      "unit": 3,
+                      "lessonIDS": ["3.6"],
+                      "unitName": "National Income and Price Determination",
+                      "question": "A simultaneous increase in both aggregate demand and short-run aggregate supply will necessarily result in:",
+                      "image": null,
+                      "options": [
+                        "An increase in the price level.",
+                        "A decrease in the price level.",
+                        "An increase in real GDP.", // Correct
+                        "A decrease in real GDP.",
+                        "No change in the price level but lower real GDP." // Longer distractor
+                      ],
+                      "correctAnswer": "C",
+                      "explanation": "An increase in aggregate demand (rightward shift) pushes both price level and real GDP up. An increase in short-run aggregate supply (rightward shift) pushes price level down and real GDP up. Since both shifts increase real GDP, the overall effect on real GDP is unambiguously an increase. The effect on the price level is indeterminate."
+                    },
+                    {
+                      "id": 329,
+                      "subject": "ap_macroeconomics",
+                      "unit": 3,
+                      "lessonIDS": ["3.6"],
+                      "unitName": "National Income and Price Determination",
+                      "question": "Which of the following would lead to a decrease in the aggregate price level but an increase in real GDP in the short run?",
+                      "image": null,
+                      "options": [
+                        "A decrease in aggregate demand.",
+                        "An increase in aggregate demand.",
+                        "A decrease in short-run aggregate supply.",
+                        "An increase in short-run aggregate supply.", // Correct
+                        "A decrease in long-run aggregate supply."
+                      ],
+                      "correctAnswer": "D",
+                      "explanation": "An increase in short-run aggregate supply (a rightward shift), perhaps due to falling input prices or increased productivity, leads to a lower equilibrium price level and a higher equilibrium real GDP."
+                    },
+                    {
+                      "id": 330,
+                      "subject": "ap_macroeconomics",
+                      "unit": 3,
+                      "lessonIDS": ["3.9"],
+                      "unitName": "National Income and Price Determination",
+                      "question": "Which of the following is the best example of an automatic stabilizer in fiscal policy?",
+                      "image": null,
+                      "options": [
+                        "A decision by Congress to cut taxes during a recession.",
+                        "The central bank buying bonds to lower interest rates.",
+                        "Unemployment benefits increasing as more people lose jobs during a recession.", // Correct
+                        "A law passed to increase defense spending.",
+                        "Tariffs automatically rising when imports increase."
+                      ],
+                      "correctAnswer": "C",
+                      "explanation": "Automatic stabilizers are features of the tax and transfer system that automatically work counter-cyclically without requiring new legislation. When unemployment rises during a recession, government spending on unemployment benefits automatically increases, cushioning the fall in aggregate demand."
+                    },
+                    {
+                      "id": 331,
+                      "subject": "ap_macroeconomics",
+                      "unit": 3,
+                      "lessonIDS": ["3.9"],
+                      "unitName": "National Income and Price Determination",
+                      "question": "During an economic expansion with rising incomes, a progressive income tax system acts as an automatic stabilizer by:",
+                      "image": null,
+                      "options": [
+                        "Automatically increasing government spending.",
+                        "Automatically decreasing the national debt.",
+                        "Automatically increasing tax revenues and dampening aggregate demand.", // Correct
+                        "Automatically decreasing tax revenues and boosting aggregate demand.",
+                        "Requiring legislative action to change tax rates." // Shorter distractor
+                      ],
+                      "correctAnswer": "C",
+                      "explanation": "In a progressive tax system, as incomes rise during an expansion, individuals move into higher tax brackets, and overall tax revenue increases automatically. This withdrawal of purchasing power slightly dampens the growth in aggregate demand, acting as a stabilizing force."
+                    },
+                    {
+                      "id": 332,
+                      "subject": "ap_macroeconomics",
+                      "unit": 3,
+                      "lessonIDS": ["3.2"],
+                      "unitName": "National Income and Price Determination",
+                      "question": "If the marginal propensity to save is 0.1, and autonomous investment spending increases by $50 billion, the maximum possible change in real GDP will be:",
+                      "image": null,
+                      "options": [
+                        "An increase of $5 billion.",
+                        "A decrease of $50 billion.",
+                        "An increase of $450 billion.",
+                        "An increase of $500 billion.", // Correct
+                        "An increase of $50 billion."
+                      ],
+                      "correctAnswer": "D",
+                      "explanation": "The spending multiplier is 1 / MPS = 1 / 0.1 = 10. The maximum change in real GDP is the multiplier times the initial change in autonomous spending: 10 * $50 billion = $500 billion increase."
+                    },
+                    {
+                      "id": 333,
+                      "subject": "ap_macroeconomics",
+                      "unit": 3,
+                      "lessonIDS": ["3.1"],
+                      "unitName": "National Income and Price Determination",
+                      "question": "A decrease in business inventories is counted as:",
+                      "image": null,
+                      "options": [
+                        "Positive investment spending.",
+                        "Negative investment spending.", // Correct
+                        "An increase in consumption.",
+                        "A decrease in government purchases.",
+                        "Not part of GDP calculation."
+                      ],
+                      "correctAnswer": "B",
+                      "explanation": "Investment (I) in the GDP expenditure approach includes changes in business inventories. A decrease in inventories means businesses sold more than they produced in that period, so the change in inventories is negative, reducing the investment component of GDP."
+                    },
+                    {
+                      "id": 334,
+                      "subject": "ap_macroeconomics",
+                      "unit": 3,
+                      "lessonIDS": ["3.8"],
+                      "unitName": "National Income and Price Determination",
+                      "question": "Contractionary fiscal policy is most appropriate when the economy is experiencing:",
+                      "image": null,
+                      "options": [
+                        "High unemployment and low inflation.",
+                        "A recessionary gap.",
+                        "High inflation and low unemployment.", // Correct
+                        "Stagflation.",
+                        "A balanced budget."
+                      ],
+                      "correctAnswer": "C",
+                      "explanation": "Contractionary fiscal policy (increasing taxes, decreasing government spending) aims to reduce aggregate demand. This is appropriate when the economy is experiencing demand-pull inflation (high inflation typically associated with output above potential and low unemployment)."
+                    },
+                    {
+                      "id": 335,
+                      "subject": "ap_macroeconomics",
+                      "unit": 3,
+                      "lessonIDS": ["3.7"],
+                      "unitName": "National Income and Price Determination",
+                      "question": "Which of the following best describes the process of long-run self-correction if an economy is operating with a recessionary gap?",
+                      "image": null,
+                      "options": [
+                        "Nominal wages rise, shifting SRAS left.",
+                        "Aggregate demand increases automatically.",
+                        "Nominal wages fall, shifting SRAS right.", // Correct
+                        "Potential output decreases.",
+                        "Prices fall, causing AD to shift right significantly." // Longer distractor
+                      ],
+                      "correctAnswer": "C",
+                      "explanation": "In a recessionary gap, unemployment is high, putting downward pressure on nominal wages. As wages fall over time, firms' production costs decrease, shifting the SRAS curve to the right, moving the economy back toward potential output."
+                    },
+                    {
+                      "id": 336,
+                      "subject": "ap_macroeconomics",
+                      "unit": 3,
+                      "lessonIDS": ["3.3"],
+                      "unitName": "National Income and Price Determination",
+                      "question": "A significant improvement in production technology across many industries will likely affect the aggregate supply curves by:",
+                      "image": null,
+                      "options": [
+                        "Shifting SRAS left and LRAS left.",
+                        "Shifting SRAS right and LRAS right.", // Correct
+                        "Shifting SRAS right but leaving LRAS unchanged.",
+                        "Shifting LRAS right but leaving SRAS unchanged.",
+                        "Shifting SRAS left but LRAS right."
+                      ],
+                      "correctAnswer": "B",
+                      "explanation": "Technological improvements increase productivity, lowering production costs in the short run (shifting SRAS right) and increasing the economy's overall potential output in the long run (shifting LRAS right)."
+                    }
+                ]
+              
+            
+          
+        
+      
+    
+    
   
   
-];

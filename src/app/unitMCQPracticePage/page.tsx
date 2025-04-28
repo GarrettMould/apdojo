@@ -286,11 +286,11 @@ function UnitMCQPracticeContent() {
     user, 
     mcqAnswersData, 
     loadingMcqData, 
-    unitXPData, 
     correctStreak,
     setCorrectStreak,
     isNextQuestionDoubleXp,
-    setIsNextQuestionDoubleXp
+    setIsNextQuestionDoubleXp,
+    userData
   } = useAuthContext();
   
   // Determine Subject from params or default
@@ -345,59 +345,69 @@ function UnitMCQPracticeContent() {
   useEffect(() => {
     console.log(`[Practice Page Effect] Preparing question set. Mode: ${practiceMode}, Subject: ${subject}`);
     setIsLoadingQuestionSet(true);
-    setCorrectStreak(0); // <-- Reset streak when mode/units change
-    let filteredQuestions: QuestionType[] = [];
+    setCorrectStreak(0); // Reset streak when mode/units change
+    
     let relevantUnitIds: number[] = [];
 
+    // Determine relevant unit IDs based on mode
     if (practiceMode === 'weakest') {
-        if (weakestUnitIds.length > 0) {
-            relevantUnitIds = weakestUnitIds;
-            console.log("[Practice Page Effect] Determined relevant units (weakest):", relevantUnitIds);
-        } else {
-             console.log("[Practice Page Effect] Weakest mode selected, but no weakest IDs determined yet.");
-             // Keep relevantUnitIds empty, will result in empty question set until IDs are calculated
-        }
+        relevantUnitIds = weakestUnitIds.length > 0 ? weakestUnitIds : [];
     } else if (practiceMode === 'custom') {
-        if (customUnitIds.length > 0) {
-            relevantUnitIds = customUnitIds;
-            console.log("[Practice Page Effect] Determined relevant units (custom):", relevantUnitIds);
-        } else {
-             console.log("[Practice Page Effect] Custom mode selected, but no unit IDs provided.");
-             // Keep relevantUnitIds empty
-        }
+        relevantUnitIds = customUnitIds.length > 0 ? customUnitIds : [];
     } else { // singleUnit mode
         relevantUnitIds = [currentUnit];
-        console.log("[Practice Page Effect] Determined relevant units (singleUnit):", relevantUnitIds);
     }
 
     // Filter the single allQuestions array based on subject and relevant units
+    let baseFilteredQuestions: QuestionType[] = [];
     if (relevantUnitIds.length > 0) {
         const subjectInDataFormat = subject === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics';
-        filteredQuestions = allQuestions.filter(q =>
-            q.subject === subjectInDataFormat && // Compare with correct format
-            relevantUnitIds.includes(q.unit) // Match one of the relevant units
+        baseFilteredQuestions = allQuestions.filter(q =>
+            q.subject === subjectInDataFormat && 
+            relevantUnitIds.includes(q.unit) 
         );
-        console.log(`[Practice Page Effect] Filtered ${filteredQuestions.length} questions for subject ${subject} and units [${relevantUnitIds.join(',')}]`);
-
-        // Shuffle if needed for specific modes
-        if (practiceMode === 'weakest' || practiceMode === 'custom') {
-            filteredQuestions = shuffleArray(filteredQuestions);
-            console.log(`[Practice Page Effect] Shuffled questions for mode: ${practiceMode}`);
-        }
+        console.log(`[Practice Page Effect] Filtered ${baseFilteredQuestions.length} base questions for subject ${subject} and units [${relevantUnitIds.join(',')}]`);
     } else {
-        console.log(`[Practice Page Effect] No relevant units determined for mode: ${practiceMode}. Setting empty question set.`);
-        // Keep filteredQuestions as empty array
+        console.log(`[Practice Page Effect] No relevant units determined for mode: ${practiceMode}.`);
     }
 
-    setQuestionsForPractice(filteredQuestions);
+    // --- Filter based on mcqAnswerStatus --- 
+    const answerStatusMap = userData?.mcqAnswerStatus || {}; // Get status map from context/userData
+    console.log(`[Practice Page Effect] User has status entries for ${Object.keys(answerStatusMap).length} MCQs.`);
+    
+    const unviewedOrIncorrectQuestions = baseFilteredQuestions.filter(q => 
+        !answerStatusMap.hasOwnProperty(q.id) || // Question not answered yet
+        answerStatusMap[q.id] === false          // Question answered incorrectly
+    );
+    const correctlyAnsweredQuestions = baseFilteredQuestions.filter(q => 
+        answerStatusMap.hasOwnProperty(q.id) && // Question has been answered
+        answerStatusMap[q.id] === true           // And was answered correctly
+    );
+    console.log(`[Practice Page Effect] Split into ${unviewedOrIncorrectQuestions.length} unviewed/incorrect and ${correctlyAnsweredQuestions.length} correct.`);
+
+    // Shuffle both lists
+    const shuffledUnviewedOrIncorrect = shuffleArray(unviewedOrIncorrectQuestions);
+    const shuffledCorrectlyAnswered = shuffleArray(correctlyAnsweredQuestions);
+
+    // Combine: Prioritize unviewed or incorrectly answered questions
+    const finalQuestions = [...shuffledUnviewedOrIncorrect, ...shuffledCorrectlyAnswered];
+    // --- End Filtering based on mcqAnswerStatus ---
+
+    setQuestionsForPractice(finalQuestions);
     setCurrentQuestionIndex(0);
     setAnsweredQuestions({}); // Reset answers when question set changes
     setIsLoadingQuestionSet(false);
     console.log("[Practice Page Effect] Question set preparation complete.");
 
-  }, [practiceMode, subject, weakestUnitIds.join(','), customUnitIds.join(','), currentUnit]); // Refined dependencies
+  }, [
+    practiceMode, 
+    subject, 
+    weakestUnitIds.join(','), 
+    customUnitIds.join(','), 
+    currentUnit 
+  ]); 
 
-  // --- Effect to Reset Streak on Unmount --- 
+  // --- Effect to Reset Streak on Unmount ---
   useEffect(() => {
     // This function runs when the component unmounts
     return () => {
@@ -460,67 +470,60 @@ function UnitMCQPracticeContent() {
           return Math.max(0, Math.min(100, newProgress));
       });
 
-      // 5. Update Firestore XP (with floor logic)
-      const questionData = questionsForPractice.find(q => q.id === questionId);
-      const actualUnitId = questionData?.unit; // Get unit directly from the question object
+      // 5. Update Firestore XP (with floor logic based on totalXP)
+      if (user) { 
+        // --- START CHANGE: Use totalXP for floor logic ---
+        const currentTotalXPValue = userData?.totalXP ?? 0; // Get totalXP from context
+        let adjustedPointsChange = finalPointsChange;
 
-      if (user && actualUnitId !== undefined) { 
-        let adjustedPointsChange = finalPointsChange; // Start with calculated change
+        // Calculate potential new total XP
+        const potentialNewTotalXP = currentTotalXPValue + finalPointsChange;
 
-        // Find current XP from context data
-        const currentUnitXP = unitXPData?.find(xp => xp.unitId === actualUnitId);
-        const currentXPValue = currentUnitXP?.totalXP ?? 0; // Default to 0 if not found
-
-        // Calculate potential new XP
-        const potentialNewXP = currentXPValue + finalPointsChange;
-
-        // Apply floor logic: if potential is negative, adjust change to hit 0
-        if (potentialNewXP < 0) {
-            adjustedPointsChange = 0 - currentXPValue; // Change needed to reach exactly 0
-            console.log(`XP floor applied. Original change: ${finalPointsChange}, Adjusted change: ${adjustedPointsChange}`);
+        // Apply floor logic for totalXP: if potential is negative, adjust change to hit 0
+        if (potentialNewTotalXP < 0) {
+            adjustedPointsChange = 0 - currentTotalXPValue; // Change needed to reach exactly 0
+            console.log(`Total XP floor applied. Original change: ${finalPointsChange}, Adjusted change: ${adjustedPointsChange}`);
         }
+        // --- END CHANGE ---
 
-        // Only update Firestore if there's actually a change to make
+        // --- START CHANGE: API call to update total XP ---
         if (adjustedPointsChange !== 0) {
             try {
-                const unitXPRef = doc(db, 'users', user.uid, 'unitXP', actualUnitId.toString());
-                await updateDoc(unitXPRef, {
-                    totalXP: increment(adjustedPointsChange),
-                    lastUpdated: serverTimestamp()
-                });
-                console.log(`Firestore XP updated for Unit ${actualUnitId} by ${adjustedPointsChange}`);
+                console.log(`Attempting to update totalXP by ${adjustedPointsChange} for user ${user.uid}`); // Add log
 
-                // Save answer log (consider moving this outside the conditional update if needed)
-                const answerData = {
-                    userId: user.uid,
-                    questionId: questionId,
-                    unitId: actualUnitId,
-                    subject: subject,
-                    selectedAnswer: answerLetter,
-                    isCorrect: isCorrect,
-                    lessonIDS: lessonIDS || [], 
-                    timestamp: serverTimestamp(),
-                    xpChange: adjustedPointsChange // Log adjusted change
-                };
-                const userAnswersColRef = collection(db, 'users', user.uid, 'mcqAnswers');
-                await addDoc(userAnswersColRef, answerData);
-                // console.log(`Answer log saved for Q:${questionId}, Unit:${actualUnitId}`);
+                // Call the NEW API endpoint
+                fetch('/api/update-total-xp', { // <-- CHANGE Endpoint URL
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: user.uid,
+                        xpAmount: adjustedPointsChange // <-- Send only userId and amount
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                         response.json().then(err => console.error(`API Error updating total XP: ${response.status}`, err));
+                    } else {
+                         console.log(`API request sent to update total XP by ${adjustedPointsChange}`);
+                    }
+                })
+                .catch(apiError => {
+                     console.error('Fetch Error calling /api/update-total-xp:', apiError);
+                });
+                 // --- END CHANGE ---
+
+                // TODO: Consider if the mcqAnswer log still needs unitId or if it should be removed/changed
+                // const answerData = { ... };
+                // await addDoc(userAnswersColRef, answerData);
 
             } catch (error) {
-                // Check if error is because the unitXP doc doesn't exist yet (shouldn't happen after select-subject)
-                if (error instanceof Error && error.message.includes("No document to update")) {
-                    console.warn(`UnitXP document for Unit ${actualUnitId} not found. Might need initialization.`);
-                    // Optionally, attempt to create it here? Or rely on initialization step.
-                } else {
-                   console.error("Error updating XP or saving answer log:", error);
-                }
+                 console.error("Sync Error during XP update/log attempt (before fetch):", error);
             }
         } else {
-             console.log(`No XP change needed for Unit ${actualUnitId} (already at floor or no change).`);
+             console.log(`No total XP change needed (already at floor or no change).`);
         }
       } else {
-          if (!user) console.warn("User not logged in, XP not updated, answer log not saved.");
-          if (actualUnitId === undefined) console.warn(`Could not determine unit ID for Q:${questionId} in current practice set, XP not updated, answer log not saved.`);
+          console.warn("User not logged in, XP not updated, answer log not saved.");
       }
     };
 
