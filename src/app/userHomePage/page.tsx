@@ -777,20 +777,25 @@ function UserHomePageContent() {
 
     const activeMessages = completedChallenges.filter(c => !dismissedMessageIds.includes(c.id));
 
-    // --- Outer container is now ALWAYS rendered --- 
+    // Sort active messages by date (most recent first) and limit to 4
+    const sortedAndLimitedMessages = activeMessages
+        .sort((a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0))
+        .slice(0, 4); // Display only the first 4
+
+    // Outer container is now ALWAYS rendered
     return (
-      <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 min-h-[80px]"> 
-        {activeMessages.length === 0 ? (
-          // --- Condition 1: No messages --- 
-          <div className="h-full flex items-center justify-center"> 
+      <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 min-h-[80px]">
+        {sortedAndLimitedMessages.length === 0 ? (
+          // Condition 1: No messages
+          <div className="h-full flex items-center justify-center">
             <p className="text-center text-gray-500 text-sm italic">
               No new messages or alerts.
             </p>
           </div>
         ) : (
-          // --- Condition 2: Show messages --- 
-          <div className="flex flex-nowrap overflow-x-auto gap-4 pb-1"> 
-            {activeMessages.map((challenge) => {
+          // Condition 2: Show messages
+          <div className="flex flex-wrap gap-4 pb-1">
+            {sortedAndLimitedMessages.map((challenge) => {
               const isOriginator = user?.uid === challenge.generatedByUserId;
               const yourScore = isOriginator ? challenge.originatorScore : challenge.opponentScore;
               const numQuestions = challenge.numQuestions ?? 5;
@@ -811,12 +816,12 @@ function UserHomePageContent() {
               const buttonClasses = canClaim ? "bg-yellow-500 hover:bg-yellow-600 text-white" : "bg-gray-200 hover:bg-gray-300 text-gray-700"; // Added secondary style
 
               return (
-                <div key={challenge.id} className="border rounded-lg p-4 bg-white shadow-md w-60 flex-shrink-0 flex flex-col justify-between space-y-3">
-                  <h3 className={`text-lg font-bold text-center ${titleColor}`}>{title}</h3>
-                  <div className="text-center text-sm text-gray-700">
-                      Your Score: <strong className="text-base text-black">{yourScore ?? '-'} / {numQuestions}</strong>
+                <div key={challenge.id} className="border rounded-lg p-3 bg-white shadow-md w-48 flex-shrink-0 flex flex-col justify-between space-y-2">
+                  <h3 className={`text-base font-bold text-center text-black`}>{title}</h3>
+                  <div className="text-center text-xs text-gray-700">
+                      Your Score: <strong className="text-sm text-black">{yourScore ?? '-'} / {numQuestions}</strong>
                   </div>
-                  <div className="pt-2 text-center">
+                  <div className="text-center">
                     <Button
                       onClick={() => handleMessageAction(challenge.id, canClaim, isTie)}
                       disabled={claimXpLoading[challenge.id]}
