@@ -20,8 +20,9 @@ const initializeFirebaseAdmin = async () => {
       credential: admin.credential.cert({
         projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
         clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        // Re-add the newline replacement
-        privateKey: privateKey.replace(/\n/g, '\n') 
+        // Remove the newline replacement again for testing
+        // privateKey: privateKey.replace(/\n/g, '\n') 
+        privateKey: privateKey
       })
     })
     console.log('Firebase Admin initialized successfully')
