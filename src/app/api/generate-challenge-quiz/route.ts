@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { db, firebaseAdminInitPromise } from '@/lib/firebase-admin'; 
+import { db as adminDb } from '@/lib/firebase-admin'; 
 import { FieldValue } from 'firebase-admin/firestore';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems'; // Assuming this exports the full list
 import type { Question as QuestionType } from '@/data/questionBanks/types'; // Ensure this type matches your structure
@@ -39,22 +39,12 @@ function mapQuestionForChallenge(q: QuestionType): any {
     };
 }
 
-export async function POST(request: Request) {
-  try {
-    // Await the initialization promise at the very beginning
-    if (firebaseAdminInitPromise) {
-        console.log('Waiting for Firebase Admin initialization...');
-        await firebaseAdminInitPromise;
-        console.log('Firebase Admin initialization awaited.');
-    } else {
-         // This case should ideally not happen if the import worked
-         console.error("Firebase Admin init promise was not available! This indicates an issue with firebase-admin.ts execution.");
-         // Just throw the error if the promise is missing, as relying on a direct check is unreliable here.
-         throw new Error("Firebase Admin initialization failed: Promise missing.");
-    }
 
+export async function POST(request: Request) {
+  let creatorUserId: string | null = null;
+  try {
     const body = await request.json();
-    const creatorUserId = body.userId; // Now safe to access body
+    creatorUserId = body.userId; // User creating the challenge
     const subject = body.subject; // 'macro' or 'micro'
     const unitIds: number[] | undefined = body.unitIds; // Read optional unitIds
     const numQuestionsParam = body.numQuestions; // Read numQuestions from body
@@ -132,7 +122,7 @@ export async function POST(request: Request) {
     };
 
     // Add to Firestore
-    const challengeRef = await db.collection('quizChallenges').add(newChallengeData);
+    const challengeRef = await adminDb.collection('quizChallenges').add(newChallengeData);
     const challengeId = challengeRef.id;
 
     console.log(`Created quiz challenge ${challengeId} for user ${creatorUserId}`);
@@ -152,12 +142,8 @@ export async function POST(request: Request) {
     if (error instanceof SyntaxError && error.message.includes('JSON')) {
       errorMessage = 'Invalid JSON payload received.';
       statusCode = 400;
-    } else if (error.code === 16 || error.message.includes('UNAUTHENTICATED')) {
-      // More specific handling for the auth error if it somehow persists
-      errorMessage = 'Authentication failed when contacting database.';
-      statusCode = 500; // Keep as internal server error
-      console.error('Persistent UNAUTHENTICATED error despite waiting for init.');
     }
+    // Add more specific error handling if needed
 
     return NextResponse.json({ 
         error: errorMessage, 
