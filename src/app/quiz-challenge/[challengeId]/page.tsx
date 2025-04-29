@@ -496,7 +496,7 @@ export default function QuizChallengePage() {
                 {/* --- Styled Your Score Section --- */}
                 <p className="text-2xl font-extrabold text-black mb-2">Your Score</p>
                 <div className="text-2xl font-bold text-gray-800 select-none border border-gray-200 shadow-sm rounded-lg bg-white w-24 h-24 flex items-center justify-center mx-auto">
-                    <span className="blur-md">
+                    <span>
                         {finalScore} / {challengeData?.numQuestions ?? 5}
                     </span>
                 </div>
