@@ -1193,13 +1193,14 @@ function UserHomePageContent() {
           </div>
           */}
 
-          {/* Messages Dashboard Section */}
+          {/* --- Messages Dashboard Section START COMMENTED OUT ---
           <section aria-labelledby="messages-dashboard-heading" className="space-y-3">
               <h2 id="messages-dashboard-heading" className="text-lg font-semibold text-gray-800">
                   Messages & Alerts
               </h2>
               {renderMessagesDashboard()}
           </section>
+          --- Messages Dashboard Section END COMMENTED OUT --- */}
 
           {/* Focus Section */}
           <section aria-labelledby="focus-units-heading">
