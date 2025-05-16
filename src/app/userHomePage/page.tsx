@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button'; // Assuming Shadcn UI
-import { Loader2, Target, Film, Library, FileText, Lock, ClipboardList, Check, TrendingDown, BookOpen, Users, Copy, Send, CheckCircle2 } from 'lucide-react'; // Icons
+import { Loader2, Target, Film, Library, FileText, Lock, ClipboardList, Check, TrendingDown, BookOpen, Users, Copy, Send, CheckCircle2, Presentation } from 'lucide-react'; // Icons
 import { videos as allVideos, Video as VideoType } from '@/data/videos'; // <-- Import real videos and type
 import { macroUnits as allMacroCheatSheets, microUnits as allMicroCheatSheets, Unit as CheatSheetUnitType } from '@/data/cheatSheets';
 import type { UnitXPData } from '@/hooks/useAuth'; // Import UnitXPData if needed for typing state, otherwise context provides it
@@ -1140,10 +1140,11 @@ function UserHomePageContent() {
                              <p className="text-xs text-gray-500">Instant FRQ Feedback</p> 
                          </div>
                      </Link>
-                     {/* --- End AI FRQ Helper Card --- */}
+                     {/* --- END AI FRQ Helper Card --- */}
+                     
                      {/* Adjusted placeholders */} 
                      <div className="hidden md:block"></div> 
-                     <div className="hidden md:block"></div> 
+                     <div className="hidden md:block"></div>
                  </div>
             </div>
 

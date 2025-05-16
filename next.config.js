@@ -9,6 +9,12 @@ const nextConfig = {
         port: '', // Leave empty for default port (443 for https)
         pathname: '/**', // Allow any path within this hostname
       },
+      {
+        protocol: 'https',
+        hostname: 'apdojowhiteboards.s3.ap-southeast-2.amazonaws.com',
+        port: '', 
+        pathname: '/**', 
+      },
       // Add other domains here if needed
     ],
   },

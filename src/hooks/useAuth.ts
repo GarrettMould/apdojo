@@ -134,13 +134,20 @@ export interface AuthContextValue {
   globalProgress: number;
   totalXP: number;
   correctStreak: number;
-  setCorrectStreak: (streak: number) => void;
+  setCorrectStreak: (streak: number | ((prev: number) => number)) => void;
   isNextQuestionDoubleXp: boolean;
-  setIsNextQuestionDoubleXp: (isNext: boolean) => void;
+  setIsNextQuestionDoubleXp: (isNext: boolean | ((prev: boolean) => boolean)) => void;
   // --- ADD: Unit Performance Stats ---
   unitPerformanceStats: UnitPerformanceStat[] | null;
   loadingUnitPerformance: boolean;
   // --- END: Unit Performance Stats ---
+
+  // --- ADD: Modal State and Setters ---
+  showLoginModal: boolean;
+  setShowLoginModal: React.Dispatch<React.SetStateAction<boolean>>;
+  showSignupModal: boolean;
+  setShowSignupModal: React.Dispatch<React.SetStateAction<boolean>>;
+  // --- END: Modal State and Setters ---
 }
 
 // --- ADD: Helper Function to Calculate Unit Performance ---
@@ -424,7 +431,11 @@ export function useAuth() {
         isNextQuestionDoubleXp: isNextQuestionDoubleXp, 
         setIsNextQuestionDoubleXp: setIsNextQuestionDoubleXp,
         unitPerformanceStats,
-        loadingUnitPerformance
+        loadingUnitPerformance,
+        showLoginModal,
+        setShowLoginModal,
+        showSignupModal,
+        setShowSignupModal
       };
     } catch (error) {
       console.error("Signup failed:", error);
@@ -462,7 +473,11 @@ export function useAuth() {
           isNextQuestionDoubleXp: isNextQuestionDoubleXp, 
           setIsNextQuestionDoubleXp: setIsNextQuestionDoubleXp,
           unitPerformanceStats,
-          loadingUnitPerformance
+          loadingUnitPerformance,
+          showLoginModal,
+          setShowLoginModal,
+          showSignupModal,
+          setShowSignupModal
         };
     } catch (error) {
         console.error("Login failed:", error);
@@ -498,7 +513,11 @@ export function useAuth() {
     isNextQuestionDoubleXp,
     setIsNextQuestionDoubleXp,
     unitPerformanceStats,
-    loadingUnitPerformance
+    loadingUnitPerformance,
+    showLoginModal,
+    setShowLoginModal,
+    showSignupModal,
+    setShowSignupModal
   };
 
   return value;

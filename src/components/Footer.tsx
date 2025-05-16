@@ -55,6 +55,12 @@ export function Footer() {
               >
                 Practice Exams
               </Link>
+              <Link 
+                href="/feedback" 
+                className="text-sm text-gray-500 hover:text-blue-600 transition-colors"
+              >
+                Leave Feedback
+              </Link>
             </div>
 
             {/* Contact */}

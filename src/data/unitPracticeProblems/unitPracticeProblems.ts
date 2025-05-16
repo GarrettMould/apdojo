@@ -2345,23 +2345,6 @@ const microUnit6Questions = [
     "explanation": "With a positive production externality, the marginal social cost is lower than the marginal private cost. The market produces where marginal private benefit equals marginal private cost, which is less than the socially optimal quantity where marginal social benefit equals marginal social cost. The market underproduces the good." // Reworded slightly to remove acronyms in parentheses
   },
   {
-    "id": 135,
-    "unit": 6,
-    "lessonIDS": ["6.2"],
-    "unitName": "Market Failure and the Role of Government",
-    "question": "According to the Coase Theorem, private bargaining between parties can lead to an efficient resolution of externality problems if:",
-    "image": null,
-    "options": [
-      "The government imposes a corrective tax.",
-      "There are many parties involved in the negotiation.",
-      "Property rights are clearly defined and transaction costs are low.",
-      "The externality is positive rather than negative.",
-      "One party has significantly more information than the other."
-    ],
-    "correctAnswer": "C",
-    "explanation": "The Coase Theorem posits that private solutions to externalities are possible and efficient if property rights are well-defined and enforceable, and the costs associated with bargaining are negligible." // Removed (transaction costs)
-  },
-  {
     "id": 136,
     "unit": 6,
     "lessonIDS": ["6.3"],

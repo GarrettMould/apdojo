@@ -28,13 +28,21 @@ export function LayoutClientWrapper({ children }: { children: React.ReactNode })
 
   return (
     <>
-      <HeaderWrapper />
-      <main className="flex-1 w-full bg-gradient-to-b from-gray-100 via-white to-white via-5%">
+      {/* Fixed Header */}
+      <div className="fixed top-0 left-0 right-0 z-50">
+        <HeaderWrapper />
+      </div>
+
+      {/* Main content area with padding ONLY for fixed header */}
+      {/* Assuming header is h-16 (4rem) */}
+      <main className="flex-1 w-full bg-gradient-to-b from-gray-100 via-white to-white via-5% pt-16 overflow-y-auto">
         <PageContainer>
           {children}
           <Analytics />
         </PageContainer>
       </main>
+
+      {/* Footer (Not Fixed) */}
       <Footer />
 
       {/* Render Modals Conditionally */}
