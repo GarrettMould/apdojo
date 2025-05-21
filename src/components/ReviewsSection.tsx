@@ -20,75 +20,77 @@ export function ReviewsSection() {
   return (
     <>
       <section className="mt-24 mb-24">
-      <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 text-center mb-12 leading-tight">
-          What Students are Saying
-        </h1>
-        
-        <div className="grid md:grid-cols-3 gap-8">
-          {displayedReviews.map((review, index) => (
-            <Card 
-              key={index} 
-              className={`p-6 h-[320px] flex flex-col ${
-                index % 2 === 0 
-                  ? 'bg-white' 
-                  : 'bg-gradient-to-br from-blue-600 to-blue-700 text-white'
-              }`}
-            >
-              <div className="space-y-4 flex flex-col">
-                <div className="flex gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <Star 
-                      key={i} 
-                      className="w-5 h-5 fill-yellow-400 text-yellow-400"
-                    />
-                  ))}
-                </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 text-center mb-12 leading-tight">
+            <span className="text-blue-500">Success Stories</span> from AP Exam Takers
+          </h1>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            {displayedReviews.map((review, index) => (
+              <Card 
+                key={index} 
+                className={`p-6 h-[320px] flex flex-col ${
+                  index % 2 === 0 
+                    ? 'bg-white' 
+                    : 'bg-gradient-to-br from-blue-600 to-blue-700 text-white'
+                }`}
+              >
+                <div className="space-y-4 flex flex-col">
+                  <div className="flex gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star 
+                        key={i} 
+                        className="w-5 h-5 fill-yellow-400 text-yellow-400"
+                      />
+                    ))}
+                  </div>
 
-                {review.title && (
-                  <h3 className={`text-xl font-semibold ${
-                    index % 2 === 0 ? 'text-gray-900' : 'text-white'
-                  }`}>
-                    {review.title}
-                  </h3>
-                )}
-                
-                <div className="flex-grow">
-                  <p className={`italic line-clamp-4 ${
-                    index % 2 === 0 ? 'text-gray-600' : 'text-white/90'
-                  }`}>
-                    "{review.text}"
-                  </p>
-                  {review.text.length > 200 && (
-                    <button 
-                      onClick={() => setSelectedReview(review)}
-                      className={`text-sm mt-2 ${
-                        index % 2 === 0 ? 'text-blue-600' : 'text-white/90'
-                      } hover:underline`}
-                    >
-                      Read More...
-                    </button>
+                  {review.title && (
+                    <h3 className={`text-xl font-semibold ${
+                      index % 2 === 0 ? 'text-gray-900' : 'text-white'
+                    }`}>
+                      {review.title}
+                    </h3>
                   )}
+                  
+                  <div className="flex-grow">
+                    <p className={`italic line-clamp-4 ${
+                      index % 2 === 0 ? 'text-gray-600' : 'text-white/90'
+                    }`}>
+                      "{review.text}"
+                    </p>
+                    {review.text.length > 200 && (
+                      <button 
+                        onClick={() => setSelectedReview(review)}
+                        className={`text-sm mt-2 ${
+                          index % 2 === 0 ? 'text-blue-600' : 'text-white/90'
+                        } hover:underline`}
+                      >
+                        Read More...
+                      </button>
+                    )}
+                  </div>
+                  
+                  <div className={`flex items-center justify-between text-base font-bold ${
+                    index % 2 === 0 ? 'text-gray-900' : 'text-white'
+                  } mt-auto`}>
+                    <span>{review.author}</span>
+                    <span>{review.lessonCount} lessons</span>
+                  </div>
                 </div>
-                
-                <div className={`flex items-center justify-between text-base font-bold ${
-                  index % 2 === 0 ? 'text-gray-900' : 'text-white'
-                } mt-auto`}>
-                  <span>{review.author}</span>
-                  <span>{review.lessonCount} lessons</span>
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
+              </Card>
+            ))}
+          </div>
 
-        <div className="text-center mt-8">
-          <Button 
-            variant="outline"
-            onClick={() => setShowAll(!showAll)}
-            className="mt-8"
-          >
-            {showAll ? 'Show Less' : 'See More Reviews'}
-          </Button>
+          <div className="text-center mt-8">
+            <Button 
+              variant="outline"
+              onClick={() => setShowAll(!showAll)}
+              className="mt-8"
+            >
+              {showAll ? 'Show Less' : 'See More Reviews'}
+            </Button>
+          </div>
         </div>
       </section>
 

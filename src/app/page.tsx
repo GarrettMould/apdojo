@@ -4,6 +4,7 @@ import VideoLibraryPreview from "@/components/previews/VidLibraryPreview"
 import { QuestionsGrid } from "@/components/questionsGrid"
 import { ExamsPreview } from "../components/previews/examsPreview"
 import { Hero } from "@/components/hero"
+import { ReviewsSection } from "@/components/ReviewsSection"
 import { useAuthContext } from "@/contexts/AuthContext"
 import UserHomePage from "@/app/userHomePage/page"
 import { Loader2 } from "lucide-react"
@@ -25,6 +26,7 @@ export default function Home() {
     return (
       <main>
         <Hero />
+        <ReviewsSection />
       </main>
     )
   }

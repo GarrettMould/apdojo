@@ -5,8 +5,9 @@ import Image from 'next/image'; // Using next/image for optimization
 import { whiteboardImages, WhiteboardImage, keyTerms, KeyTerm } from "@/data/allContent";
 import { allQuestions } from "@/data/unitPracticeProblems/unitPracticeProblems"; // Re-import allQuestions
 import { Question as QuestionType } from '@/data/questionBanks/types'; // Re-import QuestionType
-import { X, Check, ChevronLeft, ChevronRight, ChevronDown, Brain } from 'lucide-react'; // Re-add Check, Add Chevrons, Add ChevronDown, Added Brain
+import { X, Check, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react'; // Remove Brain from imports
 import { useInView } from 'react-intersection-observer'; // Keep if needed for LessonSection (not currently used)
+import { microLessons } from '@/data/lessons'; // Import micro lessons
 
 // Helper function to sort lesson IDs like "1.1", "1.10", "2.1"
 const sortLessonIDs = (a: string, b: string): number => {
@@ -21,6 +22,7 @@ const sortLessonIDs = (a: string, b: string): number => {
 // --- Define structure for aggregated content --- 
 interface LessonContent {
   lessonId: string;
+  lessonName: string;
   terms: KeyTerm[];
   whiteboards: WhiteboardImage[];
 }
@@ -45,26 +47,30 @@ function ImageGallery({ images, setExpandedImage, lessonId }: ImageGalleryProps)
   const currentImage = images[currentIndex];
 
   const goToPrevious = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent modal from opening when clicking arrow
+    e.stopPropagation();
     setCurrentIndex(prevIndex => (prevIndex === 0 ? images.length - 1 : prevIndex - 1));
   };
 
   const goToNext = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent modal from opening when clicking arrow
+    e.stopPropagation();
     setCurrentIndex(prevIndex => (prevIndex === images.length - 1 ? 0 : prevIndex + 1));
   };
 
-  const handleBrainClick = (e: React.MouseEvent, image: WhiteboardImage) => {
-    e.stopPropagation(); // Prevent modal from opening
-    console.log('Brain icon clicked for image:', image.title || image.id);
-    // TODO: Implement API call to Llama for MCQ generation
-  };
-
   return (
-    <div className="w-full max-w-3xl mx-auto text-center"> {/* Added text-center for counter */}
+    <div className="w-full max-w-3xl mx-auto text-center flex items-center justify-center gap-4"> {/* Added flex for arrows */}
+      {/* Previous Button - Outside image */}
+      {images.length > 1 && (
+        <button 
+          onClick={goToPrevious} 
+          className="p-3 bg-gray-200/60 hover:bg-gray-300/80 text-gray-800 rounded-full transition-colors duration-200 focus:outline-none shadow-md"
+          aria-label="Previous image"
+        >
+          <ChevronLeft className="w-8 h-8" />
+        </button>
+      )}
       <div 
         className="relative group shadow-md hover:shadow-lg rounded-lg overflow-hidden border border-gray-200 hover:border-blue-400 transition-all duration-200 cursor-pointer" 
-        onClick={() => setExpandedImage(currentImage)} // Click on image area still opens modal
+        onClick={() => setExpandedImage(currentImage)}
       >
         <Image
           src={currentImage.imageUrl}
@@ -73,47 +79,17 @@ function ImageGallery({ images, setExpandedImage, lessonId }: ImageGalleryProps)
           height={576} 
           sizes="(max-width: 768px) 100vw, (max-width: 1024px) 80vw, 800px" 
           className="w-full h-auto block bg-gray-100" 
-          key={currentImage.id}
         />
-        
-        {/* Previous Button - Positioned on the left side */}
-        {images.length > 1 && (
-          <button 
-            onClick={goToPrevious} 
-            className="absolute top-1/2 left-2 -translate-y-1/2 z-10 p-3 bg-gray-200/60 hover:bg-gray-300/80 text-gray-800 rounded-full transition-colors duration-200 focus:outline-none shadow-md"
-            aria-label="Previous image"
-          >
-            <ChevronLeft className="w-8 h-8" /> {/* Larger icon */}
-          </button>
-        )}
-
-        {/* Next Button - Positioned on the right side */}
-        {images.length > 1 && (
-          <button 
-            onClick={goToNext} 
-            className="absolute top-1/2 right-2 -translate-y-1/2 z-10 p-3 bg-gray-200/60 hover:bg-gray-300/80 text-gray-800 rounded-full transition-colors duration-200 focus:outline-none shadow-md"
-            aria-label="Next image"
-          >
-            <ChevronRight className="w-8 h-8" /> {/* Larger icon */}
-          </button>
-        )}
-
-        {/* Brain Icon Button for MCQ Generation */}
-        <button
-          onClick={(e) => handleBrainClick(e, currentImage)}
-          className="absolute top-3 right-3 z-20 p-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded-md shadow-md transition-colors"
-          title="Generate MCQ for this image"
-        >
-          <Brain className="w-5 h-5" /> {/* Icon color is inherited from text-white */}
-        </button>
-
       </div>
-
-      {/* Image Counter - Centered below */}
+      {/* Next Button - Outside image */}
       {images.length > 1 && (
-        <div className="mt-3 text-sm font-medium text-gray-700">
-          Image {currentIndex + 1} of {images.length}
-        </div>
+        <button 
+          onClick={goToNext} 
+          className="p-3 bg-gray-200/60 hover:bg-gray-300/80 text-gray-800 rounded-full transition-colors duration-200 focus:outline-none shadow-md"
+          aria-label="Next image"
+        >
+          <ChevronRight className="w-8 h-8" />
+        </button>
       )}
     </div>
   );
@@ -124,65 +100,83 @@ function ImageGallery({ images, setExpandedImage, lessonId }: ImageGalleryProps)
 interface LessonSectionProps {
   lesson: LessonContent;
   setExpandedImage: (image: WhiteboardImage | null) => void;
+  questions: QuestionType[];
 }
 
-function LessonSection({ lesson, setExpandedImage }: LessonSectionProps) {
-  // Handler for Brain Icon click on single image
-  const handleSingleImageBrainClick = (e: React.MouseEvent, image: WhiteboardImage) => {
-    e.stopPropagation();
-    console.log('Brain icon clicked for single image:', image.title || image.id);
-    // TODO: Implement API call to Llama for MCQ generation
+function LessonSection({ lesson, setExpandedImage, questions }: LessonSectionProps) {
+  console.log('Rendering LessonSection for:', lesson.lessonId, lesson.lessonName);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [quickCheckAnswers, setQuickCheckAnswers] = useState<Record<string | number, QuickCheckAnswerState>>({});
+
+  const handleQuickCheckAnswer = (questionId: string | number, answerLetter: string, isCorrect: boolean) => {
+    setQuickCheckAnswers(prev => ({
+      ...prev,
+      [questionId]: { selectedLetter: answerLetter, isCorrect }
+    }));
   };
+
+  const handleNextQuestion = () => {
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
+    }
+  };
+
+  const handlePreviousQuestion = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(prev => prev - 1);
+    }
+  };
+
+  const currentQuestion = questions[currentQuestionIndex];
 
   return (
     <section aria-labelledby={`lesson-heading-${lesson.lessonId}`} className="mb-10"> 
       <h3 
         id={`lesson-heading-${lesson.lessonId}`} 
-        className="text-xl font-semibold mb-4 border-b pb-1 text-gray-700" 
+        className="text-xl font-bold mb-6 text-gray-800 border-b border-gray-200 pb-2" 
       >
-        Lesson {lesson.lessonId}
+        {lesson.lessonId} - {lesson.lessonName}
       </h3>
       {lesson.terms.length > 0 && (
-        <div className="mb-6 pl-4">
-          <h4 className="text-md font-semibold mb-2 text-gray-600">Key Terms</h4>
-          <div className="space-y-3 text-md">
-            {lesson.terms.map(term => (
-              <div key={term.id}>
-                <strong className="text-gray-900 underline decoration-blue-500 underline-offset-2">{term.term}:</strong>
-                <span className="text-gray-700 ml-1">{term.definition}</span>
-              </div>
-            ))}
+        <div className="mb-8 bg-white rounded-lg shadow-sm">
+          <div className="p-6">
+            <div className="grid gap-4">
+              {lesson.lessonId.startsWith('2.')
+                ? lesson.terms.map((term) => (
+                    <div key={term.id} className="">
+                      <span className="text-black font-bold border-b-4 border-blue-200 pb-1">{term.term}</span>
+                      <p className="text-gray-600 text-sm mt-2">{term.definition}</p>
+                    </div>
+                  ))
+                : lesson.terms.map(term => (
+                    <div key={term.id} className="">
+                      <h5 className="inline-block bg-blue-50 text-blue-800 font-semibold px-2 py-0.5 rounded mb-1 text-base">
+                        {term.term}
+                      </h5>
+                      <p className="text-gray-600 text-sm leading-relaxed mt-2">{term.definition}</p>
+                    </div>
+                  ))}
+            </div>
           </div>
         </div>
       )}
       {lesson.whiteboards.length > 0 && (
-        <div className="mt-4 pl-4">
-          <h4 className="text-md font-semibold mb-3 text-gray-600">Whiteboards</h4>
+        <div className="mt-6">
           {lesson.whiteboards.length === 1 ? (
             // Render single image directly
             <div 
               key={lesson.whiteboards[0].id} 
               className="relative cursor-pointer w-full max-w-3xl mx-auto group shadow-md hover:shadow-lg rounded-lg overflow-hidden border border-gray-200 hover:border-blue-400 transition-all duration-200"
-              // onClick for modal is now on this div, but Brain button needs to stop propagation
+              onClick={() => setExpandedImage(lesson.whiteboards[0])}
             >
-              <div onClick={() => setExpandedImage(lesson.whiteboards[0])}> {/* Wrap image in a div for modal click, so button is separate */}
-                <Image
-                  src={lesson.whiteboards[0].imageUrl}
-                  alt={lesson.whiteboards[0].title || `Whiteboard for Lesson ${lesson.whiteboards[0].lessonIDs.join(', ')}`}
-                  width={1024} 
-                  height={576} 
-                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 80vw, 800px" 
-                  className="w-full h-auto block bg-gray-100" 
-                />
-              </div>
-              {/* Brain Icon Button for Single Image */}
-              <button
-                onClick={(e) => handleSingleImageBrainClick(e, lesson.whiteboards[0])}
-                className="absolute top-3 right-3 z-20 p-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded-md shadow-md transition-colors"
-                title="Generate MCQ for this image"
-              >
-                <Brain className="w-5 h-5" /> {/* Icon color is inherited from text-white */}
-              </button>
+              <Image
+                src={lesson.whiteboards[0].imageUrl}
+                alt={lesson.whiteboards[0].title || `Whiteboard for Lesson ${lesson.whiteboards[0].lessonIDs.join(', ')}`}
+                width={1024} 
+                height={576} 
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 80vw, 800px" 
+                className="w-full h-auto block bg-gray-100" 
+              />
             </div>
           ) : (
             // Render ImageGallery for multiple images
@@ -194,21 +188,66 @@ function LessonSection({ lesson, setExpandedImage }: LessonSectionProps) {
           )}
         </div>
       )}
+
+      {/* Questions Section */}
+      {questions.length > 0 && (
+        <div className="mt-8 border-t border-gray-200 pt-6 px-2">
+          <div className="max-w-3xl mx-auto">
+            <h4 className="text-xl font-semibold mb-4 text-gray-800 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+              </svg>
+              Quick Check
+            </h4>
+            <SimpleMcqDisplay
+              question={currentQuestion}
+              onAnswerSelect={handleQuickCheckAnswer}
+              currentAnswer={quickCheckAnswers[currentQuestion.id]}
+            />
+            <div className="flex items-center justify-between mt-4">
+              <a
+                onClick={handlePreviousQuestion}
+                className={`text-sm font-medium cursor-pointer ${
+                  currentQuestionIndex === 0
+                    ? 'text-gray-400 pointer-events-none'
+                    : 'text-blue-600 hover:text-blue-800'
+                }`}
+              >
+                ← Previous Question
+              </a>
+              <span className="text-sm text-gray-500">
+                Question {currentQuestionIndex + 1} of {questions.length}
+              </span>
+              <a
+                onClick={handleNextQuestion}
+                className={`text-sm font-medium cursor-pointer ${
+                  currentQuestionIndex === questions.length - 1
+                    ? 'text-gray-400 pointer-events-none'
+                    : 'text-blue-600 hover:text-blue-800'
+                }`}
+              >
+                Next Question →
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
-// --- End LessonSection Component ---
 
 // --- Re-add Simple MCQ Display Component --- 
 interface QuickCheckAnswerState {
   selectedLetter: string;
   isCorrect: boolean;
 }
+
 interface SimpleMcqDisplayProps {
   question: QuestionType;
   onAnswerSelect: (questionId: string | number, answerLetter: string, isCorrect: boolean) => void; 
   currentAnswer?: QuickCheckAnswerState; 
 }
+
 function SimpleMcqDisplay({ question, onAnswerSelect, currentAnswer }: SimpleMcqDisplayProps) {
   const isSubmitted = !!currentAnswer; 
   const letterToIndex = (letter?: string): number | null => {
@@ -231,16 +270,10 @@ function SimpleMcqDisplay({ question, onAnswerSelect, currentAnswer }: SimpleMcq
     onAnswerSelect(question.id, selectedLetter, isCorrect);
   };
 
-  // Return a React Fragment to avoid adding an unnecessary DOM element
   return (
-    <> 
-      {/* Question Text - Smaller text */}
-      <p className="text-sm font-medium font-serif leading-relaxed text-gray-800 mb-4">
-        {question.question}
-      </p>
-      
-      {/* Answer Options */}
-      <div className="space-y-2 mb-4">
+    <div className="mb-6">
+      <div className="font-semibold text-base mb-4 text-gray-900">{question.question}</div>
+      <div className="space-y-2">
         {question.options.map((option, optIndex) => {
           const letter = String.fromCharCode(65 + optIndex);
           const isCorrectOption = optIndex === correctAnswerIndex;
@@ -248,286 +281,304 @@ function SimpleMcqDisplay({ question, onAnswerSelect, currentAnswer }: SimpleMcq
           
           return (
             <button
-              key={optIndex}
+              key={letter}
               onClick={() => handleSelect(optIndex)}
-              disabled={isSubmitted} 
-              className={`w-full text-left p-2.5 rounded-lg text-sm font-medium border flex items-center gap-3 transition-all duration-150 
-                          ${isSubmitted ? 
-                            (isCorrectOption ? 'bg-green-50 text-gray-900 shadow-sm border-green-200 cursor-default' : 
-                            isSelectedOption ? 'bg-red-50 text-gray-900 shadow-sm border-red-200 cursor-default' : 
-                            'bg-white text-gray-900 border-gray-200 cursor-default') 
-                          : 
-                            'bg-white hover:bg-gray-50 border-gray-200 hover:border-gray-300 hover:shadow-sm' 
-                          }`}
+              className={`block w-full text-left px-4 py-3 rounded-lg border transition-colors duration-150 text-base font-medium
+                ${isSubmitted ? (
+                  isCorrectOption ? 'bg-green-100 border-green-400 text-green-900' :
+                  isSelectedOption ? 'bg-red-100 border-red-400 text-red-900' :
+                  'bg-white border-gray-200'
+                ) : isSelectedOption ? (
+                  isCorrectOption ? 'bg-green-100 border-green-400 text-green-900' :
+                  'bg-red-100 border-red-400 text-red-900'
+                ) : 'bg-white border-gray-200 hover:bg-blue-50'}
+                focus:outline-none`}
+              disabled={isSubmitted}
             >
-              <span className={`w-5 h-5 flex items-center justify-center rounded-full border text-xs font-medium flex-shrink-0 ${isSubmitted ? (isCorrectOption ? 'bg-green-100 border-green-300 text-green-700' : isSelectedOption ? 'bg-red-100 border-red-300 text-red-700' : 'bg-white border-gray-300 text-gray-500') : 'bg-white border-gray-300 text-gray-600'}`}>
-                {letter}
-              </span>
-              <span className={`flex-1 text-xs ${isSubmitted ? 'text-gray-800' : 'text-gray-900'}`}>{option}</span>
-              {isSubmitted && (
-                <div className="flex-shrink-0">
-                  {isCorrectOption ? <Check className="w-4 h-4 text-green-500" /> : isSelectedOption ? <X className="w-4 h-4 text-red-500" /> : null}
-                </div>
-              )}
+              <span className="mr-3 font-bold">{letter}.</span>{option}
             </button>
           );
         })}
       </div>
-
-      {/* Explanation - Smaller text */}
-      {question.explanation && isSubmitted && (
-          <details open className="mt-4 pt-4 border-t border-gray-200 text-xs text-gray-600">
-            <summary className="cursor-pointer hover:underline font-medium text-gray-700 text-sm">Explanation</summary>
-            <p className="pt-2 text-gray-800">{question.explanation}</p>
-          </details>
+      {currentAnswer && (
+        <div className="mt-4 p-4 rounded-lg text-base bg-white border border-gray-200">
+          <div className="font-bold mb-2">
+            {currentAnswer.isCorrect ? 'Correct!' : 'Incorrect'}
+          </div>
+          {question.explanation && (
+            <div className="text-base">{question.explanation}</div>
+          )}
+        </div>
       )}
-    </>
+    </div>
   );
 }
-// --- End SimpleMcqDisplay Component ---
 
-// --- Sidebar Component --- 
-interface SidebarProps {
-  selectedLessonId: string | null;
-  onLessonSelect: (lessonId: string) => void;
-  availableLessonIds: string[];
-  questions: QuestionType[];
-  quickCheckAnswers: Record<string | number, QuickCheckAnswerState>;
-  handleQuickCheckAnswer: (questionId: string | number, answerLetter: string, isCorrect: boolean) => void;
-}
-
-function Sidebar(props: SidebarProps) {
-  const { 
-    selectedLessonId, 
-    onLessonSelect, 
-    availableLessonIds, 
-    questions, 
-    quickCheckAnswers, 
-    handleQuickCheckAnswer
-  } = props;
-
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  
-  // Filter questions AND apply the cap of 4
-  const lessonQuestions = questions
-    .filter(q => selectedLessonId && q.lessonIDS.includes(selectedLessonId))
-    .slice(0, 4); // Limit to the first 4 questions
-    
-  const questionToShow = lessonQuestions[currentQuestionIndex];
-
-  useEffect(() => {
-    setCurrentQuestionIndex(0);
-  }, [selectedLessonId]);
-
-  const handleNext = () => {
-    if (currentQuestionIndex < lessonQuestions.length - 1) {
-      setCurrentQuestionIndex(prev => prev + 1);
-    }
-  };
-
-  const handlePrevious = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(prev => prev - 1);
-    }
-  };
-
-  const handleDropdownChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    onLessonSelect(event.target.value);
-  };
-
+// --- Chat Sidebar Component ---
+function ChatSidebar() {
   return (
-    <aside 
-      className={`fixed top-16 left-0 h-screen w-80 flex-shrink-0 bg-slate-50 shadow-lg z-40 p-6 overflow-y-auto`}
-    >
-      <div className="mb-6 relative">
-        <select 
-          id="lesson-select"
-          value={selectedLessonId || ''}
-          onChange={handleDropdownChange}
-          className="appearance-none bg-transparent border-none font-bold text-lg text-gray-800 pl-0 pr-6 py-2 focus:outline-none focus:ring-0 w-full cursor-pointer"
-        >
-          {availableLessonIds.sort(sortLessonIDs).map(id => (
-            <option key={id} value={id} className="font-normal text-base">Lesson {id}</option>
-          ))}
-        </select>
-        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-1 text-gray-700">
-           <ChevronDown className="h-5 w-5" aria-hidden="true" />
+    <aside className="h-[calc(100vh-4rem)] w-80 bg-white border-l border-gray-200 flex flex-col pt-6">
+      {/* Chat Header */}
+      <div className="p-4 border-b border-gray-200">
+        <h3 className="text-lg font-semibold text-gray-900">AI Assistant</h3>
+        <p className="text-sm text-gray-500">Coming soon: Get help with your AP Microeconomics questions</p>
+      </div>
+
+      {/* Chat Messages Area */}
+      <div className="flex-1 p-4 overflow-y-auto">
+        <div className="space-y-4">
+          {/* Placeholder Messages */}
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+              <span className="text-blue-600 text-sm font-medium">AI</span>
+            </div>
+            <div className="bg-gray-50 rounded-lg p-3 max-w-[80%]">
+              <p className="text-sm text-gray-700">Hi! I'm your AI study assistant. I'll be here soon to help you with AP Microeconomics concepts and practice questions.</p>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+              <span className="text-blue-600 text-sm font-medium">AI</span>
+            </div>
+            <div className="bg-gray-50 rounded-lg p-3 max-w-[80%]">
+              <p className="text-sm text-gray-700">You'll be able to ask me questions about any topic, and I'll help explain concepts, provide examples, and guide you through practice problems.</p>
+            </div>
+          </div>
         </div>
       </div>
 
-      {!selectedLessonId ? (
-        <p className="text-gray-600 italic mt-4">Please select a lesson above.</p> 
-      ) : lessonQuestions.length > 0 ? (
-         <>
-           {lessonQuestions.length > 1 && ( 
-              <div className="flex justify-between items-center mb-4">
-                <button
-                  onClick={handlePrevious}
-                  disabled={currentQuestionIndex === 0}
-                  className="p-2 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-gray-600 hover:text-gray-900"
-                  aria-label="Previous question"
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <span className="text-sm font-medium text-gray-500">
-                  Question {currentQuestionIndex + 1} of {lessonQuestions.length}
-                </span>
-                <button
-                  onClick={handleNext}
-                  disabled={currentQuestionIndex === lessonQuestions.length - 1}
-                  className="p-2 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-gray-600 hover:text-gray-900"
-                  aria-label="Next question"
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </div>
-           )}
-
-           {questionToShow && ( 
-             <SimpleMcqDisplay
-               key={`${selectedLessonId}-${questionToShow.id}`}
-               question={questionToShow}
-               onAnswerSelect={handleQuickCheckAnswer}
-               currentAnswer={quickCheckAnswers[questionToShow.id]}
-             />
-           )}
-         </>
-      ) : (
-        <p className="text-gray-600 italic mt-4">No quick check questions available for Lesson {selectedLessonId} yet.</p>
-      )}
+      {/* Chat Input Area */}
+      <div className="p-4 border-t border-gray-200">
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Ask a question..."
+            disabled
+            className="w-full px-4 py-2 pr-12 rounded-lg border border-gray-300 bg-gray-50 text-gray-500 cursor-not-allowed"
+          />
+          <button
+            disabled
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 disabled:opacity-50"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clipRule="evenodd" />
+            </svg>
+          </button>
+        </div>
+        <p className="text-xs text-gray-500 mt-2 text-center">AI chat feature coming soon!</p>
+      </div>
     </aside>
   );
 }
-// --- End Sidebar Component ---
 
+// --- Unit Navigation Sidebar Component ---
+function UnitNavigationSidebar() {
+  const units = [
+    { number: 1, title: "Basic Economic Concepts" },
+    { number: 2, title: "Supply and Demand" },
+    { number: 3, title: "Production, Cost, and the Perfect Competition Model" },
+    { number: 4, title: "Imperfect Competition" },
+    { number: 5, title: "Factor Markets" },
+    { number: 6, title: "Market Failure and the Role of Government" }
+  ];
+
+  return (
+    <aside className="h-[calc(100vh-4rem)] w-64 bg-white border-r border-gray-200 overflow-y-auto pt-6">
+      <div className="p-4">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">AP Micro Units</h2>
+        <nav className="space-y-1">
+          {units.map(unit => (
+            <div
+              key={unit.number}
+              className="group flex items-center px-3 py-2 text-sm font-medium rounded-md cursor-not-allowed"
+            >
+              <span className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 group-hover:bg-gray-200">
+                {unit.number}
+              </span>
+              <span className="ml-3 text-gray-600 group-hover:text-gray-900">
+                {unit.title}
+              </span>
+            </div>
+          ))}
+        </nav>
+      </div>
+    </aside>
+  );
+}
+
+// --- Main Page Component ---
 export default function WhiteboardsPage() {
   const [expandedImage, setExpandedImage] = useState<WhiteboardImage | null>(null);
-  const [quickCheckAnswers, setQuickCheckAnswers] = useState<Record<string | number, QuickCheckAnswerState>>({});
-  
-  // Add useEffect for scroll locking
+  const [structuredData, setStructuredData] = useState<UnitData[]>([]);
+  const [selectedUnit, setSelectedUnit] = useState<number>(2); // Default to Unit 2
+  const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
+
   useEffect(() => {
-    if (expandedImage) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
+    const unitMap = new Map<number, UnitData>();
+
+    const structuredUnitData = (): UnitData[] => {
+      // Create a new unit entry
+      const unitData: UnitData = {
+        unit: selectedUnit,
+        lessons: microLessons
+          .filter(lesson => lesson.unit === selectedUnit)
+          .map(lesson => ({
+            lessonId: lesson.lessonNumber,
+            lessonName: lesson.lessonName,
+            terms: [],
+            whiteboards: []
+          }))
+      };
+
+      console.log('Created unit data:', unitData);
+
+      // Add whiteboard images to lessons
+      whiteboardImages.forEach(image => {
+        image.lessonIDs.forEach(lessonId => {
+          const lessonIndex = unitData.lessons.findIndex(l => l.lessonId === lessonId);
+          if (lessonIndex !== -1) {
+            unitData.lessons[lessonIndex].whiteboards.push(image);
+          }
+        });
+      });
+
+      // Add key terms to lessons
+      keyTerms.forEach(term => {
+        term.lessonIDs.forEach(lessonId => {
+          const lessonIndex = unitData.lessons.findIndex(l => l.lessonId === lessonId);
+          if (lessonIndex !== -1) {
+            unitData.lessons[lessonIndex].terms.push(term);
+          }
+        });
+      });
+
+      // Sort lessons
+      unitData.lessons.sort((a, b) => sortLessonIDs(a.lessonId, b.lessonId));
+      
+      return [unitData];
     };
-  }, [expandedImage]);
 
-  // --- Filter Content for Unit 2 --- 
-  const targetUnit = 2;
-  const unit2Questions = allQuestions.filter(q => q.subject === 'ap_microeconomics' && q.unit === targetUnit);
-  const unit2Terms = keyTerms.filter(term => term.subject === 'ap_microeconomics' && term.unit === targetUnit);
-  const unit2Whiteboards = whiteboardImages.filter(img => img.subject === 'ap_microeconomics' && img.unit === targetUnit);
+    setStructuredData(structuredUnitData());
+  }, [selectedUnit]);
 
-  const availableQuizLessonIds = Array.from(new Set(unit2Questions.flatMap(q => q.lessonIDS)));
-
-  const [selectedQuizLessonId, setSelectedQuizLessonId] = useState<string | null>(() => {
-      const sortedIds = availableQuizLessonIds.sort(sortLessonIDs);
-      return sortedIds.length > 0 ? sortedIds[0] : null;
-  });
-
-  const structuredUnitData: UnitData[] = (() => { 
-    const contentByUnitLesson = new Map<number, Map<string, { terms: KeyTerm[], whiteboards: WhiteboardImage[] }>>();
-    const ensureEntry = (unit: number, lessonId: string) => {
-      if (unit !== targetUnit) return null; 
-      if (!contentByUnitLesson.has(unit)) contentByUnitLesson.set(unit, new Map());
-      if (!contentByUnitLesson.get(unit)!.has(lessonId)) contentByUnitLesson.get(unit)!.set(lessonId, { terms: [], whiteboards: [] });
-      return contentByUnitLesson.get(unit)!.get(lessonId)!;
-    };
-    unit2Terms.forEach(term => { term.lessonIDs.forEach(lessonId => ensureEntry(term.unit, lessonId)?.terms.push(term)); });
-    unit2Whiteboards.forEach(img => { img.lessonIDs.forEach(lessonId => ensureEntry(img.unit, lessonId)?.whiteboards.push(img)); });
-    const result: UnitData[] = [];
-    if (contentByUnitLesson.has(targetUnit)) {
-        const lessonsMap = contentByUnitLesson.get(targetUnit)!;
-        const sortedLessonIds = Array.from(lessonsMap.keys()).sort(sortLessonIDs);
-        const lessons: LessonContent[] = sortedLessonIds.map(lessonId => ({
-          lessonId: lessonId,
-          terms: lessonsMap.get(lessonId)!.terms,
-          whiteboards: lessonsMap.get(lessonId)!.whiteboards
-        }));
-        if (lessons.length > 0) result.push({ unit: targetUnit, lessons }); 
-    }
-    return result;
-  })();
-
-  const handleQuizLessonSelect = (lessonId: string) => {
-    setSelectedQuizLessonId(lessonId);
+  const getCurrentLesson = () => {
+    if (!structuredData.length || !structuredData[0].lessons.length) return null;
+    return structuredData[0].lessons[currentLessonIndex];
   };
 
-  const handleQuickCheckAnswer = (questionId: string | number, answerLetter: string, isCorrect: boolean) => {
-    setQuickCheckAnswers(prev => ({
-      ...prev,
-      [questionId]: { selectedLetter: answerLetter, isCorrect: isCorrect }
-    }));
+  const handlePreviousLesson = () => {
+    setCurrentLessonIndex(prev => Math.max(0, prev - 1));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleNextLesson = () => {
+    if (!structuredData.length) return;
+    setCurrentLessonIndex(prev => Math.min(structuredData[0].lessons.length - 1, prev + 1));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const currentLesson = getCurrentLesson();
+
+  // Get questions for each lesson
+  const getQuestionsForLesson = (lessonId: string): QuestionType[] => {
+    return allQuestions.filter(q => 
+      q.lessonIDS.includes(lessonId) && 
+      q.subject === 'ap_microeconomics' &&
+      q.unit === selectedUnit
+    );
   };
 
   return (
-    <div className="relative min-h-screen"> 
-      
-      {/* Sidebar component no longer receives sidebarStyle prop */}
-      <Sidebar 
-        selectedLessonId={selectedQuizLessonId}
-        onLessonSelect={handleQuizLessonSelect}
-        availableLessonIds={availableQuizLessonIds} 
-        questions={unit2Questions} 
-        quickCheckAnswers={quickCheckAnswers} 
-        handleQuickCheckAnswer={handleQuickCheckAnswer} 
-      />
+    <div className="min-h-screen bg-white flex">
+      {/* Left Sidebar */}
+      <div className="w-64 flex-shrink-0 fixed top-16 left-0 h-[calc(100vh-4rem)]">
+        <UnitNavigationSidebar />
+      </div>
 
-      {/* Main content with margin matching sidebar width and reduced padding */}
-      <main className="ml-80 px-2 py-8"> {/* Back to ml-80, changed px-4 to px-2 */}
-        <h1 className="text-3xl font-extrabold tracking-tight mb-12 text-center text-gray-900">
-          AP <span className="text-blue-500">Dojo</span> Whiteboards - Unit {targetUnit}
-        </h1>
-        {structuredUnitData.length === 0 ? (
-          <p className="text-center text-gray-500">No content available for Unit {targetUnit} yet.</p>
-        ) : (
-          <div className="max-w-5xl">
-            {structuredUnitData.map(unitData => (
-              <section key={`unit-${unitData.unit}`} className="mb-16">
-                <h2 className="text-2xl md:text-3xl font-bold mb-8 border-b-2 border-gray-300 pb-3 text-gray-800">
-                  Unit {unitData.unit}
-                </h2>
-                {unitData.lessons.map(lesson => (
-                  <LessonSection
-                    key={lesson.lessonId} 
-                    lesson={lesson}
-                    setExpandedImage={setExpandedImage} 
-                  />
-                ))}
-              </section>
-            ))}
+      {/* Main Content */}
+      <main className="flex-1 py-8 px-6 ml-64 mr-80">
+        <div className="max-w-[1200px] mx-auto">
+          <div className="mb-8">
+            <div className="text-sm text-gray-500 mb-6">
+              AP Micro → Unit {selectedUnit} → {currentLesson?.lessonId} - {currentLesson?.lessonName}
+            </div>
+            <h1 className="text-3xl font-extrabold mb-2">
+              <span>AP</span> <span className="text-blue-500">Dojo</span> - <span>Unit Study Guides</span>
+            </h1>
           </div>
-        )}
+          
+          {currentLesson && (
+            <LessonSection
+              key={currentLesson.lessonId}
+              lesson={currentLesson}
+              setExpandedImage={setExpandedImage}
+              questions={getQuestionsForLesson(currentLesson.lessonId)}
+            />
+          )}
+
+          {/* Lesson Navigation */}
+          {structuredData.length > 0 && structuredData[0].lessons.length > 0 && (
+            <div className="mt-8 flex items-center justify-between border-t border-gray-200 pt-6">
+              <button
+                onClick={handlePreviousLesson}
+                disabled={currentLessonIndex === 0}
+                className={`px-6 py-3 rounded-lg text-base font-medium flex items-center gap-2 ${
+                  currentLessonIndex === 0
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
+                }`}
+              >
+                <ChevronLeft className="w-5 h-5" />
+                {currentLessonIndex > 0 && (
+                  <span>
+                    {structuredData[0].lessons[currentLessonIndex - 1].lessonId} - {structuredData[0].lessons[currentLessonIndex - 1].lessonName}
+                  </span>
+                )}
+              </button>
+
+              <button
+                onClick={handleNextLesson}
+                disabled={currentLessonIndex === structuredData[0].lessons.length - 1}
+                className={`px-6 py-3 rounded-lg text-base font-medium flex items-center gap-2 ${
+                  currentLessonIndex === structuredData[0].lessons.length - 1
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
+                }`}
+              >
+                {currentLessonIndex < structuredData[0].lessons.length - 1 && (
+                  <span>
+                    {structuredData[0].lessons[currentLessonIndex + 1].lessonId} - {structuredData[0].lessons[currentLessonIndex + 1].lessonName}
+                  </span>
+                )}
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
+          )}
+        </div>
       </main>
 
+      {/* Chat Sidebar */}
+      <div className="w-80 flex-shrink-0 fixed top-16 right-0 h-[calc(100vh-4rem)]">
+        <ChatSidebar />
+      </div>
+
+      {/* Modal for expanded image */}
       {expandedImage && (
-        <div 
-          className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4 cursor-zoom-out"
-          onClick={() => setExpandedImage(null)} 
-        >
-          <button
-            onClick={(e) => { e.stopPropagation(); setExpandedImage(null); }} 
-            className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors bg-black/50 rounded-full p-2 z-[101]"
-            aria-label="Close image viewer"
-          >
-            <X className="w-6 h-6" />
-          </button>
-          <div 
-            className="relative max-w-[95vw] max-h-[90vh] z-[101]"
-            onClick={e => e.stopPropagation()} 
-          >
+        <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4" onClick={() => setExpandedImage(null)}>
+          <div className="relative max-w-4xl w-full" onClick={e => e.stopPropagation()}>
+            <button
+              onClick={() => setExpandedImage(null)}
+              className="absolute -top-12 right-0 text-white hover:text-gray-300"
+              aria-label="Close"
+            >
+              <X className="w-8 h-8" />
+            </button>
             <Image
               src={expandedImage.imageUrl}
-              alt={`Expanded view: ${expandedImage.title || `Whiteboard for Lesson ${expandedImage.lessonIDs.join(', ')}`}`}
-              width={1920} 
-              height={1080} 
-              sizes="95vw" 
-              className="w-auto h-auto max-w-full max-h-[90vh] object-contain rounded-lg block" 
-              priority 
+              alt={expandedImage.title || 'Expanded whiteboard view'}
+              width={1024}
+              height={576}
+              className="w-full h-auto"
             />
           </div>
         </div>

@@ -35,11 +35,10 @@ export function LayoutClientWrapper({ children }: { children: React.ReactNode })
 
       {/* Main content area with padding ONLY for fixed header */}
       {/* Assuming header is h-16 (4rem) */}
-      <main className="flex-1 w-full bg-gradient-to-b from-gray-100 via-white to-white via-5% pt-16 overflow-y-auto">
-        <PageContainer>
-          {children}
-          <Analytics />
-        </PageContainer>
+      <main className="flex-1 w-full bg-white pt-16 overflow-y-auto">
+        {/* REMOVE PageContainer here to allow full width */}
+        {children}
+        <Analytics />
       </main>
 
       {/* Footer (Not Fixed) */}

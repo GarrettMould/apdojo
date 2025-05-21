@@ -127,9 +127,9 @@ export function Header() {
   };
 
   return (
-    <div className="w-full bg-white border-b sticky top-0 z-50">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between py-3">
+    <div className="w-full bg-white border-b sticky top-0 z-[100]">
+      <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between py-5">
           <div className="flex items-center space-x-4">
             <button 
               onClick={handleHomeClick}

@@ -1141,10 +1141,23 @@ function UserHomePageContent() {
                          </div>
                      </Link>
                      {/* --- END AI FRQ Helper Card --- */}
+
+                     {/* --- ADDED BACK: Whiteboards Card (Conditional) --- */}
+                     {userData?.selectedSubject === 'micro' && (
+                        <Link href="/whiteboards"
+                              className="flex items-center gap-3 group rounded-lg p-4 border border-gray-200 hover:shadow-md transition-shadow hover:border-lime-300 bg-gray-50 hover:bg-white h-full">
+                            <Presentation className="w-6 h-6 text-lime-600 flex-shrink-0" />
+                            <div className="flex-grow min-w-0">
+                                <h4 className="text-sm font-medium text-gray-800 group-hover:text-lime-700 transition-colors truncate">Micro Whiteboards</h4>
+                                <p className="text-xs text-gray-500">Visual Explanations</p>
+                            </div>
+                        </Link>
+                     )}
+                     {/* --- END Whiteboards Card --- */}
                      
                      {/* Adjusted placeholders */} 
                      <div className="hidden md:block"></div> 
-                     <div className="hidden md:block"></div>
+                     {userData?.selectedSubject !== 'micro' && <div className="hidden md:block"></div>} {/* Show 4th placeholder only if whiteboard isn't shown */}
                  </div>
             </div>
 
