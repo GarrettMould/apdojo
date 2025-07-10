@@ -28,9 +28,12 @@ export function Hero() {
       {/* Heading Section - Wider width to match heroBG */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:pt-20 pb-8 text-center">
         <h1 className="text-[2.5rem] sm:text-[3.5rem] md:text-[5rem] font-extrabold tracking-tight leading-none">
-          <span style={{ textShadow: '0 0 15px rgba(59, 130, 246, 0.8)' }} className="text-blue-500">
-            Smarter
-          </span>{' '}
+          <div className="relative inline-block">
+            <span style={{ textShadow: '0 0 15px rgba(59, 130, 246, 0.8)' }} className="text-blue-500">
+              Smarter
+            </span>
+          </div>
+          {' '}
           Study Tools
         </h1>
       </div>
@@ -41,13 +44,10 @@ export function Hero() {
           <Button 
             asChild
             size="lg"
-            className="w-full shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5 py-6 sm:py-7 md:py-8 text-lg sm:text-xl font-bold text-white"
-            style={{
-              background: 'linear-gradient(135deg, rgb(59, 130, 246) 0%, rgba(59, 130, 246, 0.7) 100%)',
-            }}
+            className="w-full shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5 py-6 sm:py-7 md:py-8 text-lg sm:text-xl font-bold text-white bg-blue-500 hover:bg-blue-600"
           >
-            <Link href="/unitMCQPracticePage?subject=macro"> 
-              Try Focused Practice Mode
+            <Link href="/CourseExplorer">
+              Explore AP Dojo Courses
             </Link>
           </Button>
         </div>
@@ -59,7 +59,7 @@ export function Hero() {
           className="w-full bg-contain bg-top bg-no-repeat"
           style={{ 
             backgroundImage: `url(${heroBG.src})`,
-            height: '120vh'
+            height: '80vh'
           }}
         />
       </div>

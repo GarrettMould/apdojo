@@ -39,6 +39,8 @@ interface UnitMCQsProps {
   questions: QuestionType[];
   subject: 'macro' | 'micro';
   practiceUnitIds: number[];
+  onGuestLimitReached: (currentIndex: number) => void;
+  isParentModalOpen: boolean;
 }
 
 interface QuestionCardProps {
@@ -56,6 +58,8 @@ interface QuestionCardProps {
   dojoProgress: number;
   correctStreak: number;
   highlightedIndex: number | null;
+  onGuestLimitReached: (currentIndex: number) => void;
+  isParentModalOpen: boolean;
 }
 
 const QuestionCard = ({ 
@@ -72,7 +76,9 @@ const QuestionCard = ({
   login,
   dojoProgress,
   correctStreak,
-  highlightedIndex
+  highlightedIndex,
+  onGuestLimitReached,
+  isParentModalOpen
 }: QuestionCardProps) => {
   const letterToIndex = (letter?: string): number | null => {
     if (!letter) return null;
@@ -117,6 +123,7 @@ const QuestionCard = ({
     const currentSelectedIndex = letterToIndex(initialSelectedLetter);
     setSelectedAnswerIndex(currentSelectedIndex);
     setIsSubmitted(isAnswered);
+    setShowInternalOverlay(false);
     
     // Reset common overlay state
     setOverlayMode('signup'); // Default to signup when question changes
@@ -231,7 +238,23 @@ const QuestionCard = ({
     }
   };
 
-  const shouldBlur = !isLoggedIn && currentIndex >= 2;
+  const shouldBlurContent = !isLoggedIn && currentIndex >= 2;
+
+  // Effect to call onGuestLimitReached when limit is hit
+  useEffect(() => {
+    if (!isLoggedIn && currentIndex >= 2) {
+      onGuestLimitReached(currentIndex);
+      // Only show internal overlay if parent modal is also being shown or expected to be shown
+      setShowInternalOverlay(isParentModalOpen);
+    }
+  }, [isLoggedIn, currentIndex, onGuestLimitReached, isParentModalOpen]);
+
+  // Effect to hide internal overlay if parent modal is closed
+  useEffect(() => {
+    if (!isParentModalOpen) {
+      setShowInternalOverlay(false);
+    }
+  }, [isParentModalOpen]);
 
   // Function to capture the card as an image
   const handleSaveToBoard = async () => {
@@ -304,220 +327,106 @@ const QuestionCard = ({
     }
   };
 
+  const [showInternalOverlay, setShowInternalOverlay] = useState(false);
+
   return (
     <div ref={cardRef} className="bg-white rounded-lg shadow-md border border-gray-200 p-6 md:p-8 relative">
-      {/* Comment out the Save to Board button */}
-      {/* 
-      <Button
-        variant="outline"
-        className="absolute top-3 right-3 z-20 bg-white/80 hover:bg-white h-8 w-8 p-0"
-        onClick={handleSaveToBoard}
-        title="Save Card Image to Board (Temporary)"
-      >
-        <Clipboard className="h-4 w-4" />
-      </Button>
-      */}
-
-      {/* Overlay: Renders Signup or Login Form */}
-      {shouldBlur && (
-        <div className="absolute inset-0 bg-white bg-opacity-90 backdrop-blur-sm z-10 flex items-center justify-center p-4 rounded-lg">
-          <div className="bg-white p-6 md:p-8 rounded-lg shadow-xl border border-gray-200 max-w-md w-full">
-            
-            {overlayMode === 'signup' ? (
-              // --- Signup Form --- 
-              <div className="text-center">
-                <h3 className="text-xl md:text-2xl font-extrabold tracking-tight text-gray-800 mb-5">
-                  Unlock <span className="text-blue-600">AP Dojo</span> MCQs & Other Free Study Resources
-                </h3>
-                <form onSubmit={handleSignupSubmit} className="space-y-3">
-                  <div className="rounded-md shadow-sm -space-y-px">
-                    <input 
-                      type="email"
-                      placeholder="Email Address"
-                      value={signupEmail}
-                      onChange={(e) => setSignupEmail(e.target.value)}
-                      required
-                      className="appearance-none rounded-none relative block w-full px-4 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                    />
-                    <input 
-                      type="password"
-                      placeholder="Password"
-                      value={signupPassword}
-                      onChange={(e) => setSignupPassword(e.target.value)}
-                      onFocus={() => setShowPasswordReqs(true)}
-                      required
-                      className="appearance-none rounded-none relative block w-full px-4 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                    />
-                    <input 
-                      type="password"
-                      placeholder="Confirm Password"
-                      value={signupConfirmPassword}
-                      onChange={(e) => setSignupConfirmPassword(e.target.value)}
-                      onFocus={() => setShowPasswordReqs(true)} 
-                      required
-                      className="appearance-none rounded-none relative block w-full px-4 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                    />
-                  </div>
-                  {showPasswordReqs && (
-                    <div className="text-xs text-left space-y-1 pt-1">
-                      <p className={`transition-colors ${hasMinLength ? "text-green-600" : "text-gray-500"}`}>{hasMinLength ? '✓' : '•'} At least 8 characters</p>
-                      <p className={`transition-colors ${hasUpperCase ? "text-green-600" : "text-gray-500"}`}>{hasUpperCase ? '✓' : '•'} At least one uppercase letter</p>
-                      <p className={`transition-colors ${hasLowerCase ? "text-green-600" : "text-gray-500"}`}>{hasLowerCase ? '✓' : '•'} At least one lowercase letter</p>
-                      <p className={`transition-colors ${hasNumber ? "text-green-600" : "text-gray-500"}`}>{hasNumber ? '✓' : '•'} At least one number</p>
-                      <p className={`transition-colors ${passwordsMatch ? "text-green-600" : "text-gray-500"}`}>{passwordsMatch ? '✓' : '•'} Passwords match</p>
-                    </div>
-                  )}
-                  {signupError && <p className="text-red-500 text-sm text-left pt-1">{signupError}</p>}
-                  <button type="submit" disabled={signupLoading || !isValidSignupPassword} className="w-full px-6 py-3 text-sm font-bold text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center">
-                    {signupLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Sign up
-                  </button>
-                </form>
-                <div className="mt-4 text-center">
-                  <button onClick={() => setOverlayMode('login')} className="text-sm text-blue-600 hover:underline focus:outline-none">
-                    Already have an account? Login
-                  </button>
-                </div>
-              </div>
-            ) : (
-              // --- Login Form ---
-              <div className="text-center">
-                 <h3 className="text-xl md:text-2xl font-extrabold tracking-tight text-gray-800 mb-5">
-                   Login to <span className="text-blue-600">Unlock Resources</span>
-                 </h3>
-                 <form onSubmit={handleLoginSubmit} className="space-y-4">
-                    {/* Input Group Wrapper for Login */}
-                    <div className="rounded-md shadow-sm -space-y-px">
-                      <input
-                        type="email"
-                        placeholder="Email Address"
-                        value={loginEmail}
-                        onChange={(e) => setLoginEmail(e.target.value)}
-                        required
-                        // Grouped input styles for login email
-                        className="appearance-none rounded-none relative block w-full px-4 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                      />
-                      <input
-                        type="password"
-                        placeholder="Password"
-                        value={loginPassword}
-                        onChange={(e) => setLoginPassword(e.target.value)}
-                        required
-                        // Grouped input styles for login password
-                        className="appearance-none rounded-none relative block w-full px-4 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                      />
-                    </div>
-                    {loginError && <p className="text-red-500 text-sm text-left pt-1">{loginError}</p>} {/* Adjusted error spacing */}
-                    <button type="submit" disabled={loginLoading} className="w-full px-6 py-3 text-sm font-bold text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center">
-                      {loginLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />} Login
-                    </button>
-                 </form>
-                 <div className="mt-4 text-center">
-                   <button onClick={() => setOverlayMode('signup')} className="text-sm text-blue-600 hover:underline focus:outline-none">
-                     Don't have an account? Sign Up Free
-                   </button>
-                 </div>
-              </div>
-            )}
+      {/* Overlay: Simplified or removed if parent modal is sufficient */} 
+      {showInternalOverlay && (
+        <div className="absolute inset-0 bg-white bg-opacity-80 backdrop-blur-sm z-10 flex items-center justify-center p-4 rounded-lg">
+          <div className="text-center">
+            <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-4" />
+            <p className="text-lg font-semibold text-gray-700">Loading options...</p>
+            {/* Or a message like: "Please complete your selection via the plan modal." */}
           </div>
         </div>
       )}
 
-      {/* Main Question Content */}
-      <div className={`space-y-6 ${shouldBlur ? 'blur-sm' : ''}`}>
-        {shouldBlur ? (
-          // --- Placeholder for Blurred Content ---
-          <div className="min-h-[500px]"></div>
+      {/* Main Question Content - will be blurred by CSS if showInternalOverlay is true and CSS is set up for it */}
+      <div className={`space-y-6 ${showInternalOverlay ? 'blur-sm' : ''}`}> 
+        {/* Question Text */}
+        <p className="text-base md:text-lg font-medium font-serif leading-relaxed text-gray-800">
+          {question.question}
+        </p>
+
+        {/* --- ADDED: Question Image Display --- */}
+        {question.image && (
+          <div className="my-4 rounded-lg overflow-hidden border border-gray-200">
+            <img
+              src={typeof question.image === 'string' ? question.image : (question.image as any).src} 
+              alt={question.unitName || 'Question related image'} 
+              className="max-h-60 w-auto mx-auto object-contain"
+            />
+          </div>
+        )}
+        {/* --- End Image Display --- */}
+
+        {isSubmitted && aiExplanation ? (
+          // --- Display Explanation Mode ---
+          <div className="mt-6 pt-6 border-t border-gray-200 space-y-6">
+            {/* Correct Answer Summary */}
+             <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+              <h4 className="font-semibold text-gray-900 mb-2 text-sm">Correct Answer</h4>
+              <div className="flex items-center gap-3">
+                <span className="w-6 h-6 flex items-center justify-center rounded-full bg-white border border-green-200 text-green-600 font-medium">
+                  {question.correctAnswer}
+                </span>
+                <span className="font-medium text-gray-900">
+                  {question.options[correctAnswerIndex ?? 0]}
+                </span>
+              </div>
+            </div>
+            {/* Explanation Box */}
+            <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <h4 className="font-semibold text-gray-900 mb-2 text-sm">Explanation</h4>
+              <p className="text-gray-900">{aiExplanation}</p>
+            </div>
+          </div>
         ) : (
-          // --- Actual Question Content ---
+          // --- Display Answer Options Mode ---
           <>
-            {/* Question Text */}
-            <p className="text-base md:text-lg font-medium font-serif leading-relaxed text-gray-800">
-              {question.question}
-            </p>
-
-            {/* --- ADDED: Question Image Display --- */}
-            {question.image && (
-              <div className="my-4 rounded-lg overflow-hidden border border-gray-200"> { /* Added margin, rounded corners, border */ }
-                {/* Using standard img tag assuming image prop holds a URL string for now */}
-                {/* If image is StaticImageData, might need Next <Image> component */}
-                <img
-                  src={typeof question.image === 'string' ? question.image : (question.image as any).src} // Attempt to handle both string and object cases
-                  alt={question.unitName || 'Question related image'} // Added fallback alt text
-                  className="max-h-60 w-auto mx-auto object-contain" // Limit height, center, maintain aspect ratio
-                />
-              </div>
-            )}
-            {/* --- End Image Display --- */}
-
-            {/* Conditional Display: Explanation OR Answer Options */}
-            {isSubmitted && aiExplanation ? (
-              // --- Display Explanation Mode ---
-              <div className="mt-6 pt-6 border-t border-gray-200 space-y-6">
-                {/* Correct Answer Summary */}
-                 <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-                  <h4 className="font-semibold text-gray-900 mb-2 text-sm">Correct Answer</h4>
-                  <div className="flex items-center gap-3">
-                    <span className="w-6 h-6 flex items-center justify-center rounded-full bg-white border border-green-200 text-green-600 font-medium">
-                      {question.correctAnswer}
-                    </span>
-                    <span className="font-medium text-gray-900">
-                      {question.options[correctAnswerIndex ?? 0]}
-                    </span>
-                  </div>
-                </div>
-                {/* Explanation Box */}
-                <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  <h4 className="font-semibold text-gray-900 mb-2 text-sm">Explanation</h4>
-                  <p className="text-gray-900">{aiExplanation}</p>
-                </div>
-              </div>
-            ) : (
-              // --- Display Answer Options Mode ---
-              <>
-                {/* Answer Options */}
-                <div className="space-y-3">
-                  {question.options.map((option, optIndex) => {
-                     const isHighlighted = !isSubmitted && highlightedIndex === optIndex;
-                     return (
-                        <button
-                          key={optIndex}
-                          onClick={() => handleAnswerSelect(optIndex)}
-                          disabled={isSubmitted || shouldBlur}
-                          className={`w-full text-left p-3 rounded-lg text-sm font-medium transition-all duration-150 border flex items-center gap-3
-                            ${isSubmitted ? 
-                              (optIndex === correctAnswerIndex ? 'bg-green-50 text-gray-900 shadow-sm border-green-200 cursor-default' : 
-                              optIndex === selectedAnswerIndex ? 'bg-red-50 text-gray-900 shadow-sm border-red-200 cursor-default' : 
-                              'bg-transparent text-gray-900 border-gray-200 cursor-default') 
-                            : isHighlighted ? 
-                              'bg-gray-100 border-gray-400 shadow-sm' // Highlight style
-                            : 
-                              'bg-transparent hover:bg-gray-50 border-gray-200 hover:border-gray-300 hover:shadow-sm' // Default non-submitted style
-                            }
-                            ${shouldBlur ? 'cursor-not-allowed' : ''}`}
-                        >
-                           {/* Letter bubble */}
-                          <span className={`w-6 h-6 flex items-center justify-center rounded-full border text-xs font-medium flex-shrink-0 ${isSubmitted ? (optIndex === correctAnswerIndex ? 'bg-green-100 border-green-300 text-green-700' : optIndex === selectedAnswerIndex ? 'bg-red-100 border-red-300 text-red-700' : 'bg-white border-gray-300 text-gray-500') : isHighlighted ? 'bg-white border-gray-400 text-gray-700' : 'bg-white border-gray-300 text-gray-600'}`}> 
-                            {String.fromCharCode(65 + optIndex)}
-                          </span>
-                           {/* Option Text - Reduced Size */}
-                          <span className={`flex-1 text-sm ${isSubmitted ? 'text-gray-800' : isHighlighted ? 'text-gray-900' : 'text-gray-900'}`}>{option}</span>
-                          {/* Feedback Icon */}
-                          {isSubmitted && (
-                            <div className="flex-shrink-0">
-                              {optIndex === correctAnswerIndex
-                                ? <Check className="w-5 h-5 text-green-500" />
-                                : optIndex === selectedAnswerIndex
-                                  ? <X className="w-5 h-5 text-red-500" />
-                                  : null
-                              }
-                            </div>
-                          )}
-                        </button>
-                     );
-                    })}
-                </div>
-              </>
-            )}
+            {/* Answer Options */}
+            <div className="space-y-3">
+              {question.options.map((option, optIndex) => {
+                 const isHighlighted = !isSubmitted && highlightedIndex === optIndex;
+                 return (
+                    <button
+                      key={optIndex}
+                      onClick={() => handleAnswerSelect(optIndex)}
+                      disabled={isSubmitted || showInternalOverlay}
+                      className={`w-full text-left p-3 rounded-lg text-sm font-medium transition-all duration-150 border flex items-center gap-3
+                        ${isSubmitted ? 
+                          (optIndex === correctAnswerIndex ? 'bg-green-50 text-gray-900 shadow-sm border-green-200 cursor-default' : 
+                          optIndex === selectedAnswerIndex ? 'bg-red-50 text-gray-900 shadow-sm border-red-200 cursor-default' : 
+                          'bg-transparent text-gray-900 border-gray-200 cursor-default') 
+                        : isHighlighted ? 
+                          'bg-gray-100 border-gray-400 shadow-sm' // Highlight style
+                        : 
+                          'bg-transparent hover:bg-gray-50 border-gray-200 hover:border-gray-300 hover:shadow-sm' // Default non-submitted style
+                        }
+                        ${showInternalOverlay ? 'cursor-not-allowed' : ''}`}
+                    >
+                       {/* Letter bubble */}
+                      <span className={`w-6 h-6 flex items-center justify-center rounded-full border text-xs font-medium flex-shrink-0 ${isSubmitted ? (optIndex === correctAnswerIndex ? 'bg-green-100 border-green-300 text-green-700' : optIndex === selectedAnswerIndex ? 'bg-red-100 border-red-300 text-red-700' : 'bg-white border-gray-300 text-gray-500') : isHighlighted ? 'bg-white border-gray-400 text-gray-700' : 'bg-white border-gray-300 text-gray-600'}`}> 
+                        {String.fromCharCode(65 + optIndex)}
+                      </span>
+                       {/* Option Text - Reduced Size */}
+                      <span className={`flex-1 text-sm ${isSubmitted ? 'text-gray-800' : isHighlighted ? 'text-gray-900' : 'text-gray-900'}`}>{option}</span>
+                      {/* Feedback Icon */}
+                      {isSubmitted && (
+                        <div className="flex-shrink-0">
+                          {optIndex === correctAnswerIndex
+                            ? <Check className="w-5 h-5 text-green-500" />
+                            : optIndex === selectedAnswerIndex
+                              ? <X className="w-5 h-5 text-red-500" />
+                              : null
+                          }
+                        </div>
+                      )}
+                    </button>
+                 );
+                })}
+            </div>
           </>
         )}
       </div>
@@ -544,6 +453,8 @@ export function UnitMCQs({
   questions,
   subject,
   practiceUnitIds,
+  onGuestLimitReached,
+  isParentModalOpen
 }: UnitMCQsProps) {
   const { login, signup, userData, loadingUserData, user } = useAuthContext();
   const [aiExplanations, setAiExplanations] = useState<Record<number, string>>({});
@@ -793,6 +704,8 @@ export function UnitMCQs({
               correctStreak={correctStreak}
               totalQuestions={totalQuestions}
               highlightedIndex={highlightedIndex}
+              onGuestLimitReached={onGuestLimitReached}
+              isParentModalOpen={isParentModalOpen}
             />
           )}
         </div>
@@ -804,7 +717,7 @@ export function UnitMCQs({
           <div className="mb-6"> {/* Reduced bottom margin */} 
             <div className="flex items-center gap-4 mb-3"> {/* Added bottom margin */}
               <h3 className="font-extrabold tracking-tight text-gray-900 text-2xl">
-                  <span className="text-blue-600">Focused</span> Practice
+                  <span className="text-blue-600">Unit MCQ</span> Practice
               </h3>
               {/* Keep dropdown for now, might remove later if tags are sufficient */}
               {!isWeakestUnitsMode && (
@@ -850,13 +763,15 @@ export function UnitMCQs({
             <div className="flex gap-2 mt-4">
               <button
                 onClick={handlePreviousQuestion}
-                className={`flex-1 p-2 rounded-md font-semibold text-sm transition-colors bg-blue-500 text-white hover:bg-blue-600`}
+                disabled={currentQuestionIndex === 0}
+                className={`flex-1 p-2 rounded-md font-semibold text-sm transition-colors bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed`}
               >
                 Previous
               </button>
               <button
                 onClick={handleNextQuestion}
-                className={`flex-1 p-2 rounded-md font-semibold text-sm transition-colors bg-blue-500 text-white hover:bg-blue-600`}
+                disabled={currentQuestionIndex === totalQuestions - 1 || totalQuestions === 0}
+                className={`flex-1 p-2 rounded-md font-semibold text-sm transition-colors bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed`}
               >
                 Next
               </button>

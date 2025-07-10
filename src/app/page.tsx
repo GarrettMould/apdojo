@@ -8,6 +8,9 @@ import { ReviewsSection } from "@/components/ReviewsSection"
 import { useAuthContext } from "@/contexts/AuthContext"
 import UserHomePage from "@/app/userHomePage/page"
 import { Loader2 } from "lucide-react"
+import { UniversityLogos } from "@/components/UniversityLogos"
+import { MainFeaturesPreview } from "@/components/previews/MainFeaturesPreview"
+import { PaymentPlanPreview } from "@/components/previews/PaymentPlanPreview"
 
 export default function Home() {
   const { user, loading } = useAuthContext();
@@ -24,8 +27,11 @@ export default function Home() {
     return <UserHomePage />;
   } else {
     return (
-      <main>
+      <main className="overflow-x-hidden">
         <Hero />
+        <MainFeaturesPreview />
+        <PaymentPlanPreview />
+        <UniversityLogos />
         <ReviewsSection />
       </main>
     )

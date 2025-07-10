@@ -10,6 +10,7 @@ export type Video = {
   id: string;
   title: string;
   description: string;
+  videoSlug: string;
   subjects: string[];
   unit: string;
   videoUrl: string;
@@ -23,8 +24,9 @@ export type Video = {
 export const videos: Video[] = [
     {
       id: "1",
-      title: "Fiscal Policy & Long-Run Self-Adjustment",
+      title: "3.8: Fiscal Policy & Long-Run Self-Adjustment",
       description: "Learn about how an economy returns to long-run equilibrium from an output gap.",
+      videoSlug: "fiscal-policy-long-run-self-adjustment",
       subjects: ["AP Macroeconomics"],
       unit: "3",
       lessonIDS: ["3.8", "3.7"],
@@ -55,8 +57,9 @@ export const videos: Video[] = [
     },
     {
       id: "2",
-      title: "Open Market Operations",
+      title: "4.6: Open Market Operations",
       description: "Learn how buying and selling government bonds actually leads to changes in the money supply.",
+      videoSlug: "open-market-operations",
       subjects: ["AP Macroeconomics"],
       unit: "4",
       lessonIDS: ["4.6"],
@@ -87,8 +90,9 @@ export const videos: Video[] = [
     }, 
     {
         id: "3",
-        title: "Shifters in the Foreign Exchange Market",
+        title: "6.6: Shifters in the Foreign Exchange Market",
         description: "Learn how to conceptually understand the shifts in the foreign exchange market.",
+        videoSlug: "foreign-exchange-market-shifters",
         subjects: ["AP Macroeconomics"],
         unit: "6",
         lessonIDS: ["6.6"],
@@ -119,8 +123,9 @@ export const videos: Video[] = [
       }, 
       {
         id: "4",
-        title: "The Crowding Out Effect",
+        title: "5.5: The Crowding Out Effect",
         description: "Learn how government borrowing can lead to a decrease in private investment.",
+        videoSlug: "crowding-out-effect",
         subjects: ["AP Macroeconomics"],
         unit: "5",
         lessonIDS: ["5.5"],
@@ -151,8 +156,9 @@ export const videos: Video[] = [
       }, 
       {
         id: "5",
-        title: "Policy Action and Currency Value",
+        title: "6.4: Policy Action and Currency Value",
         description: "Learn how fiscal and monetary policy actions can lead to changes in the value of a currency.",
+        videoSlug: "policy-action-currency-value",
         subjects: ["AP Macroeconomics"],
         unit: "6",
         lessonIDS: ["6.4"],
@@ -183,8 +189,9 @@ export const videos: Video[] = [
       }, 
       {
         id: "6",
-        title: "Phillips Curve and AD-AS Graph (AD Shifts)",
+        title: "5.2: Phillips Curve and AD-AS Graph (AD Shifts)",
         description: "Learn about the connection between the Phillips Curve and the AD-AS graph",
+        videoSlug: "phillips-curve-ad-as-ad-shifts",
         subjects: ["AP Macroeconomics"],
         unit: "5",
         lessonIDS: ["5.2"],
@@ -215,8 +222,9 @@ export const videos: Video[] = [
       }, 
       {
         id: "7",
-        title: "Phillips Curve and AD-AS Graph (SRAS Shifts)",
+        title: "5.2:Phillips Curve and AD-AS Graph (SRAS Shifts)",
         description: "Learn about the connection between the Phillips Curve and the AD-AS graph",
+        videoSlug: "phillips-curve-ad-as-sras-shifts",
         subjects: ["AP Macroeconomics"],
         unit: "5",
         lessonIDS: ["5.2"],
@@ -247,8 +255,9 @@ export const videos: Video[] = [
       }, 
       {
         id: "8",
-        title: "It's All Connected: The Business Cycle Graph, The AD-AS Model, and the PPC",
+        title: "2.7:It's All Connected: The Business Cycle Graph, The AD-AS Model, and the PPC",
         description: "Learn about the connection between the business cycles graph, the AS-AS graph, the a country's PPC",
+        videoSlug: "business-cycle-ad-as-ppc-connections",
         subjects: ["AP Macroeconomics"],
         unit: "2",
         lessonIDS: ["2.7"],
@@ -284,8 +293,9 @@ export const videos: Video[] = [
       }, 
       {
         id: "9",
-        title: "Comparative Advantage: Output Questions",
+        title: "1.3: Comparative Advantage: Output Questions",
         description: "Learn how to identify and solve output comparative advantage questions",
+        videoSlug: "comparative-advantage-output-questions",
         subjects: ["AP Macroeconomics", "AP Microeconomics"],
         lessonIDS: ["1.3"],
         unit: "1",
@@ -298,7 +308,7 @@ export const videos: Video[] = [
             id: "1",
             text: "What is Liz's opportunity cost of producing one bracelet?",
             image: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/video9Q1.png",
-            options: ["1.67 necklaces", "0.67 necklaces", "0.75 bracelets", "1.5 necklaces"],
+            options: ["1.67 necklaces", "0.60 necklaces", "0.75 bracelets", "1.5 necklaces"],
             correctAnswer: 1
           },
           {
@@ -318,8 +328,9 @@ export const videos: Video[] = [
       }, 
       {
         id: "10",
-        title: "Comparative Advantage: Input Questions",
+        title: "1.3: Comparative Advantage: Input Questions",
         description: "Learn how to identify and solve input comparative advantage questions",
+        videoSlug: "comparative-advantage-input-questions",
         subjects: ["AP Macroeconomics", "AP Microeconomics"],
         unit: "1",
         lessonIDS: ["1.3"],
@@ -352,8 +363,9 @@ export const videos: Video[] = [
       }, 
       {
         id: "11",
-        title: "Nominal vs. Real GDP",
+        title: "2.6: Nominal vs. Real GDP",
         description: "Understand the key difference between nominal and real GDP",
+        videoSlug: "nominal-vs-real-gdp",
         subjects: ["AP Macroeconomics"],
         unit: "2",
         lessonIDS: ["2.6"],
@@ -395,8 +407,9 @@ export const videos: Video[] = [
       }, 
       {
         id: "12",
-        title: "Marginal Costs and Average Costs",
+        title: "3.2: Marginal Costs and Average Costs",
         description: "Steph Curry helps us understand the relationship between marginal costs and average costs",
+        videoSlug: "marginal-costs-average-costs",
         subjects: ["AP Microeconomics"],
         unit: "3",
         lessonIDS: ["3.2"],
@@ -437,8 +450,9 @@ export const videos: Video[] = [
       }, 
       {
         id: "13",
-        title: "Marginal Product and Marginal Costs",
+        title: "3.1: Marginal Product and Marginal Costs",
         description: "Understand the relationship between the MP curve and the MC curve",
+        videoSlug: "marginal-product-marginal-costs",
         subjects: ["AP Microeconomics"],
         unit: "3",
         lessonIDS: ["3.1"],
@@ -478,6 +492,228 @@ export const videos: Video[] = [
           }
         ],
       }, 
-      
+      {
+        id: "14",
+        title: "1.1: Scarcity",
+        description: "Understand the fundamental problem of economics.",
+        videoSlug: "scarcity-fundamental-problem",
+        subjects: ["AP Microeconomics", "AP Macroeconomics"],
+        unit: "1",
+        lessonIDS: ["1.1"],
+        tags: ["Scarcity"],
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.1+-+Scarcity.mp4",
+        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.1+-+Scarcity.jpg",
+        accessLevel: "free",
+        questions: [
+          {  
+            id: "1",
+            text: "The fundamental problem of economics is that:",
+            options: [
+              "Governments do not collect enough in taxes to cover spending.",
+              "Resources are limited, but human wants and needs are unlimited.",
+              "Companies must specialize in producing specific goods rather than diversifying.",
+              "An individual's income is insufficient to purchase everything they desire."
+            ],
+            correctAnswer: 1
+          },
+          {
+            id: "2",
+            text: "Which of the following topics is most likely to be studied in macroeconomics?",
+            options: [
+              "The production decisions of a single technology company.",
+              "How an individual student allocates their time between various activities.",
+              "The effect of a government borrowing to cover a budget deficit on the national economy.",
+              "The market forces determining the price of cellular phones."
+            ],
+            correctAnswer: 2
+          },
+          {
+            id: "2",
+            text: "Which of the following is the best example of an economy facing the problem of scarcity?",
+            options: [
+              "A company decides to produce laptops instead of phones.",
+              "A student chooses to study for an exam instead of going out with friends.",
+              "A government must decide between funding new roads or increasing military spending due to a limited budget.",
+              "A consumer chooses a less expensive brand of phone to save money."
+            ],
+            correctAnswer: 2
+          },
+        ],
+      }, 
+      {
+        id: "15",
+        title: "1.4: Demand",
+        description: "Learn about the law of demand, demand curves, and demand schedules.",
+        videoSlug: "demand-law-curves-schedules",
+        subjects: ["AP Macroeconomics"],
+        unit: "1",
+        lessonIDS: ["1.4"],
+        tags: ["Demand", "Law of Demand"],
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.4+-+Demand.mp4",
+        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.4+-+Demand.jpg",
+        accessLevel: "free",
+        questions: [
+          {
+            id: "1",
+            text: "The law of demand establishes which of the following relationships?",
+            options: [
+              "A direct relationship between price and quantity demanded.",
+              "An inverse relationship between income and quantity demanded.",
+              "An inverse relationship between price and quantity demanded.",
+              "A direct relationship between price and demand."
+            ],
+            correctAnswer: 2
+          },
+          {
+            id: "2",
+            text: "A decrease in the price of a popular video game will most likely lead to which of the following?",
+            options: [
+              "A rightward shift of the demand curve for the video game.",
+              "A leftward shift of the demand curve for the video game.",
+              "An increase in the quantity demanded for the video game.",
+              "A decrease in the quantity demanded for the video game."
+            ],
+            correctAnswer: 2
+          },
+          {
+            id: "3",
+            text: "If a country's population increases significantly, how would this affect the market demand curve for a normal good like housing?",
+            options: [
+              "The demand curve will shift to the left.",
+              "There will be a movement down along the demand curve.",
+              "There will be a movement up along the demand curve.",
+              "The demand curve will shift to the right."
+            ],
+            correctAnswer: 3
+          },
+          {
+            id: "4",
+            text: "If consumers widely expect the price of new cars to decrease significantly in the next six months, which of the following will most likely happen to the demand for cars today?",
+            options: [
+              "The demand curve for cars will shift to the left.",
+              "The demand curve for cars will shift to the right.",
+              "The quantity demanded for cars will increase.",
+              "Demand will not change, but quantity supplied will decrease."
+            ],
+            correctAnswer: 0
+          },
+        ],
+      }, 
+      {
+        id: "16",
+        title: "2.1: The Circular Flow Model",
+        description: "Learn about the circular flow model, the product and factor markets, and various leakages and injections.",
+        videoSlug: "circular-flow-model-markets",
+        subjects: ["AP Macroeconomics"],
+        unit: "2",
+        lessonIDS: ["2.1"],
+        tags: ["Circular Flow Model", "Injections", "Leakages"],
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.1+-+Circular+Flow+Model.mp4",
+        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.1+-+Circular+Flow+Model.jpg",
+        accessLevel: "free",
+        questions: [
+          {
+            id: "1",
+            text: "In the factor market, which of the following is true?",
+            options: [
+              "Households purchase goods and services from firms.",
+              "Firms provide goods and services to households.",
+              "Households supply labor and other resources to firms.",
+              "Firms pay taxes to the government."
+            ],
+            correctAnswer: 2
+          },
+          {
+            id: "2",
+            text: "In the circular flow model, which of the following is considered an 'injection'?",
+            options: [
+              "Household savings.",
+              "Taxes paid to the government.",
+              "Spending on imported goods.",
+              "Government spending."
+            ],
+            correctAnswer: 3
+          },
+          {
+            id: "3",
+            text: "In the circular flow model, which sector is primarily responsible for channeling household savings back into the flow as business investment?",
+            options: [
+              "The government",
+              "The product market",
+              "The factor market",
+              "The financial sector"
+            ],
+            correctAnswer: 3
+          }
+        ],
+      }, 
+      {
+        id: "17",
+        title: "1.5: Supply",
+        description: "Learn about the law of supply, supply curves, and supply schedules.",
+        videoSlug: "supply-law-curves-schedules",
+        subjects: ["AP Macroeconomics"],
+        unit: "1",
+        lessonIDS: ["1.5"],
+        tags: ["Supply", "Law of Supply"],
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.5+-+Supply.mp4",
+        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.5+-+Supply.jpg",
+        accessLevel: "free",
+        questions: [
+          {
+            id: "1",
+            text: "The law of supply indicates that, all other things being equal:",
+            options: [
+              "An increase in the price of a good will decrease the quantity supplied.",
+              "An increase in the price of a good will increase the quantity supplied.",
+              "An increase in the cost of an input will increase the supply of the good.",
+              "A decrease in the price of a good will cause the supply curve to shift to the left."
+            ],
+            correctAnswer: 1
+          },
+          {
+            id: "2",
+            text: "An increase in the market price of automobiles will cause which of the following to occur in the short run?",
+            options: [
+              "A rightward shift of the supply curve for automobiles.",
+              "A leftward shift of the supply curve for automobiles.",
+              "A movement up along the supply curve for automobiles.",
+              "A movement down along the supply curve for automobiles."
+            ],
+            correctAnswer: 2
+          },
+          {
+            id: "3",
+            text: "A technological innovation that lowers the cost of producing computer chips will have what effect on the market for computers?",
+            options: [
+              "It will cause the supply curve for computers to shift to the right.",
+              "It will cause the supply curve for computers to shift to the left.",
+              "It will cause the demand curve for computers to shift to the right.",
+              "It will cause a decrease in the quantity supplied of computers."
+            ],
+            correctAnswer: 0
+          },
+          {
+            id: "4",
+            text: "If the cost of steel, a key input in car manufacturing, increases significantly, what will be the likely effect on the supply of cars?",
+            options: [
+              "The quantity of cars supplied will increase.",
+              "The supply curve for cars will shift to the right.",
+              "The supply curve for cars will shift to the left.",
+              "The demand curve for cars will shift to the left."
+            ],
+            correctAnswer: 2
+          },
+        ],
+      }, 
   ];
+  
+const macroUnitVideos = videos
+  .filter(v => v.unit === '1' && v.subjects.includes('AP Macroeconomics'))
+  .sort((a, b) => {
+    // Extract the first lessonID and compare as floats
+    const aLesson = a.lessonIDS[0] ? parseFloat(a.lessonIDS[0]) : 0;
+    const bLesson = b.lessonIDS[0] ? parseFloat(b.lessonIDS[0]) : 0;
+    return aLesson - bLesson;
+  });
   

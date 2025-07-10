@@ -65,25 +65,24 @@ const QuestionCard = React.memo(({
   lessonIDs,
   unit,
   onSubmit,
+  onGuestActionAttempt
 }: { 
   question: string; 
   tags: string[];
   lessonIDs: string[];
   unit: number;
   onSubmit: (question: string, answer: string, tags: string[], relevantLessons: string[], unit: number) => void;
+  onGuestActionAttempt: () => void;
 }) => {
   const [answer, setAnswer] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [showSignupModal, setShowSignupModal] = useState(false);
   const { user } = useAuthContext();
 
   const handleSubmit = async () => {
     if (!answer.trim()) return;
     
-    // Check if user is logged in
     if (!user) {
-      setShowLoginModal(true);
+      onGuestActionAttempt();
       return;
     }
 
@@ -111,14 +110,11 @@ const QuestionCard = React.memo(({
 
       const data = await response.json();
       
-      // Call onSubmit which triggers the modal
-    await onSubmit(question, answer, tags, lessonIDs, unit);
+      await onSubmit(question, answer, tags, lessonIDs, unit);
       
-      // Only reset the answer and loading state after the modal is shown
       setAnswer('');
     } catch (error) {
       console.error('Error submitting answer:', error);
-      throw error;
     } finally {
       setTimeout(() => {
         setIsLoading(false);
@@ -184,33 +180,6 @@ const QuestionCard = React.memo(({
           </button>
         </div>
       </div>
-
-      {/* Updated Login/Signup Modals */}
-      <LoginModal 
-        isOpen={showLoginModal}
-        onClose={() => setShowLoginModal(false)}
-        switchToSignup={() => {
-          setShowLoginModal(false);
-          setShowSignupModal(true);
-        }}
-        onAuthSuccess={() => {
-          setShowLoginModal(false);
-          // No automatic submission after login
-        }}
-      />
-
-      <SignupModal
-        isOpen={showSignupModal}
-        onClose={() => setShowSignupModal(false)}
-        switchToLogin={() => {
-          setShowSignupModal(false);
-          setShowLoginModal(true);
-        }}
-        onAuthSuccess={() => {
-          setShowSignupModal(false);
-          // No automatic submission after signup
-        }}
-      />
     </div>
   );
 });
@@ -288,10 +257,10 @@ const getUnits = (subject: 'macro' | 'micro'): Unit[] => {
   }));
 };
 
-export function QuestionsGrid() {
+export function QuestionsGrid({ onGuestActionAttempt }: { onGuestActionAttempt?: () => void }) {
   const { user, userData } = useAuthContext();
   
-  const subject = useMemo(() => userData?.selectedSubject || 'macro', [userData]);
+  const subject = useMemo(() => userData?.selectedSubject || 'micro', [userData]);
 
   const getAllQuestions = useCallback(() => {
     const allQuestions: Question[] = [];
@@ -560,6 +529,11 @@ export function QuestionsGrid() {
                       lessonIDs={question.lessonIDS}
                       unit={question.unit}
                       onSubmit={handleSubmitAnswer}
+                      onGuestActionAttempt={() => {
+                        if (onGuestActionAttempt) {
+                          onGuestActionAttempt();
+                        }
+                      }}
                     />
                   ))}
                   

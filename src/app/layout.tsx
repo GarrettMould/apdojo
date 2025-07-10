@@ -1,10 +1,9 @@
 import './globals.css'
 import type { Metadata } from 'next'
 import { AuthProvider } from '@/contexts/AuthContext'
-
-
-// Import the new client wrapper component
 import { LayoutClientWrapper } from '@/components/LayoutClientWrapper'
+import { FixedSidebar } from '@/components/FixedSidebar'
+import { LayoutWrapper } from '@/components/LayoutWrapper'
 
 // generateMetadata remains active in this Server Component
 export async function generateMetadata({ params }: { params: { type: string } }) {
@@ -30,8 +29,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className="min-h-screen flex flex-col">
         <AuthProvider>
-          {/* Use the new dedicated client component wrapper */}
-          <LayoutClientWrapper>{children}</LayoutClientWrapper>
+          <div className="flex">
+            <FixedSidebar />
+            <LayoutWrapper>
+              <LayoutClientWrapper>{children}</LayoutClientWrapper>
+            </LayoutWrapper>
+          </div>
         </AuthProvider>
       </body>
     </html>

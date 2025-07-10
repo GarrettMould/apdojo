@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuthContext } from '@/contexts/AuthContext';
+import { SubscriptionOfferPrompt } from './SubscriptionOfferPrompt';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -262,6 +263,55 @@ export function SignupModal({ isOpen, onClose, switchToLogin, onAuthSuccess }: A
               Already have an account? Sign in
             </button>
           </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+// New SelectPlanModal Component
+interface SelectPlanModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  switchToSignup: () => void; // To switch to SignupModal
+  switchToLogin: () => void;  // To switch to LoginModal
+  // onPlanSelected?: (planId: string) => void; // Optional: if you want to pass plan info back
+}
+
+export function SelectPlanModal({
+  isOpen,
+  onClose,
+  switchToSignup,
+  switchToLogin,
+}: SelectPlanModalProps) {
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  return (
+    <>
+      <div className="fixed -top-10 left-0 right-0 bottom-0 bg-black/50 backdrop-blur-sm z-[100]" onClick={onClose} />
+      <div className="fixed inset-0 flex items-center justify-center z-[101] p-4">
+        <div className="bg-transparent w-full max-w-3xl relative">
+          <button onClick={onClose} className="absolute top-10 right-14 text-gray-400 hover:text-gray-600 z-20">
+            <X className="w-6 h-6" />
+          </button>
+          
+          <SubscriptionOfferPrompt 
+            onSelectPlan={(planId: string) => {
+              console.log('Plan selected in modal:', planId);
+              switchToSignup(); 
+            }}
+          />
         </div>
       </div>
     </>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { X, Loader2 } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
@@ -14,6 +14,7 @@ import dojoIcon from "../../../public/images/dojoIcon.png"
 import { Button } from "@/components/ui/button";
 import { videos as allVideos, Video } from '@/data/videos';
 import { macroUnits as allMacroUnitsData, microUnits as allMicroUnitsData } from '@/data/cheatSheets';
+import { LoginModal, SignupModal, SelectPlanModal } from '@/components/AuthModals';
 
 // Assuming this matches the structure in useAuth.ts and Firestore
 interface McqAnswer {
@@ -280,7 +281,11 @@ function shuffleArray<T>(array: T[]): T[] {
   return array;
 }
 
+// Define GUEST_QUESTION_LIMIT if it's not already defined globally or imported
+const GUEST_QUESTION_LIMIT = 3; // Or whatever your limit is (QuestionCard uses currentIndex >= 2, which is the 3rd question)
+
 function UnitMCQPracticeContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const { 
     user, 
@@ -327,6 +332,10 @@ function UnitMCQPracticeContent() {
   const [isLoadingQuestionSet, setIsLoadingQuestionSet] = useState(true); // Combined loading state
 
   const [showDoubleXpModal, setShowDoubleXpModal] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showSignupModal, setShowSignupModal] = useState(false);
+  const [showSelectPlanModal, setShowSelectPlanModal] = useState(false);
+  const [lastQuestionIndexModalShownFor, setLastQuestionIndexModalShownFor] = useState<number | null>(null);
 
   const DOUBLE_XP_CHANCE = 0.15; // 15% chance
 
@@ -600,61 +609,125 @@ function UnitMCQPracticeContent() {
       practiceMode === 'singleUnit' ? [currentUnit] : // Include currentUnit for single mode display
       []; // Default empty
 
+  const handleGuestLimitReached = (questionIndex: number) => {
+    if (questionIndex !== lastQuestionIndexModalShownFor) {
+      setShowSelectPlanModal(true);
+    }
+    setLastQuestionIndexModalShownFor(questionIndex);
+  };
+
+  const handleAuthSuccess = () => {
+    setShowLoginModal(false);
+    setShowSignupModal(false);
+    setShowSelectPlanModal(false);
+    setLastQuestionIndexModalShownFor(null); // Reset this state
+    // Potentially refresh user data or trigger other actions as needed
+    if (userData) {
+      // ... existing code ...
+    }
+  };
+
   return (
-    <div className="bg-transparent min-h-screen pt-16 pb-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Display Loading State */}
-        {isLoadingQuestionSet && (
-          <div className="text-center text-gray-500 my-4 p-6 bg-white rounded shadow">
-            <Loader2 className="h-6 w-6 animate-spin inline-block mr-2" />
-            Loading questions for {practiceMode} mode...
-          </div>
-        )}
-
-        {/* Display Practice Component when ready */}
-        {!isLoadingQuestionSet && questionsForPractice.length > 0 && (
-          <UnitMCQs
-            // Pass 0 or a specific ID depending on mode if needed by component?
-            // For sidebar link, UnitMCQs now determines unit from current question
-            currentUnit={practiceMode === 'singleUnit' ? currentUnit : 0} 
-            currentQuestionIndex={currentQuestionIndex}
-            isLoggedIn={!!user}
-            onAnswer={handleAnswer}
-            onNextQuestion={handleNextQuestion}
-            questions={questionsForPractice}
-            onPreviousQuestion={handlePreviousQuestion}
-            onQuestionSelect={handleQuestionSelect}
-            onUnitChange={handleUnitChange} // Still needed for dropdown in single unit mode?
-            answeredQuestions={answeredQuestions}
-            units={unitsData}
-            dojoProgress={dojoProgress}
-            correctStreak={correctStreak}
-            // Indicate mode if needed (e.g., to hide unit dropdown)
-            isWeakestUnitsMode={practiceMode === 'weakest' || practiceMode === 'custom'} 
-            totalQuestions={totalQuestionsInSet}
-            unitName={currentUnitName}
-            subject={subject} 
-            practiceUnitIds={relevantUnitIdsForDisplay}
-          />
-        )}
-
-        {/* Display message if no questions could be loaded */}
-        {!isLoadingQuestionSet && questionsForPractice.length === 0 && (
-          <div className="text-center text-red-500 my-4 p-6 bg-white rounded shadow">
-            Could not load questions for the selected mode or units.
-            {practiceMode !== 'singleUnit' && <p className="text-sm text-gray-600 mt-2">You may need to answer more questions first to determine weakest units.</p>} 
-            {/* Add link back to homepage or unit selection? */} 
-          </div>
-        )}
-
-      </div>
-      {/* Render the Double XP Modal */}
-      <DoubleXpModal
-          isOpen={showDoubleXpModal}
-          onAccept={handleAcceptDoubleXp}
-          onDecline={handleDeclineDoubleXp}
+    <>
+      <LoginModal 
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        switchToSignup={() => { 
+            setShowLoginModal(false); 
+            setShowSelectPlanModal(false); // Close plan modal if open
+            setShowSignupModal(true); 
+        }}
+        onAuthSuccess={handleAuthSuccess}
       />
-    </div>
+      <SignupModal 
+        isOpen={showSignupModal}
+        onClose={() => setShowSignupModal(false)}
+        switchToLogin={() => { 
+            setShowSignupModal(false); 
+            setShowSelectPlanModal(false); // Close plan modal if open
+            setShowLoginModal(true); 
+        }}
+        onAuthSuccess={handleAuthSuccess}
+      />
+      <SelectPlanModal 
+        isOpen={showSelectPlanModal}
+        onClose={() => {
+          setShowSelectPlanModal(false);
+          if (currentQuestionIndex > 0) {
+            handleQuestionSelect(currentQuestionIndex - 1);
+            setLastQuestionIndexModalShownFor(null); // Reset if navigated away
+          } else {
+            // If modal was for Q0 (index 0) and we didn't navigate,
+            // lastQuestionIndexModalShownFor remains 0 (set by handleGuestLimitReached).
+            // This prevents an immediate loop on Q0.
+          }
+        }}
+        switchToLogin={() => { 
+            setShowSelectPlanModal(false); 
+            setShowLoginModal(true); 
+        }}
+        switchToSignup={() => { 
+            setShowSelectPlanModal(false); 
+            setShowSignupModal(true); 
+        }}
+        // onAuthSuccessAfterPlan prop might be needed if SelectPlanModal handles auth directly
+        // and you need to perform actions in this parent component after that.
+      />
+
+      <div className="bg-transparent min-h-screen pt-16 pb-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Display Loading State */}
+          {isLoadingQuestionSet && (
+            <div className="text-center text-gray-500 my-4 p-6 bg-white rounded shadow">
+              <Loader2 className="h-6 w-6 animate-spin inline-block mr-2" />
+              Loading questions for {practiceMode} mode...
+            </div>
+          )}
+
+          {/* Display Practice Component when ready */}
+          {!isLoadingQuestionSet && questionsForPractice.length > 0 && (
+            <UnitMCQs
+              currentUnit={practiceMode === 'singleUnit' ? currentUnit : 0} 
+              currentQuestionIndex={currentQuestionIndex}
+              isLoggedIn={!!user}
+              onAnswer={handleAnswer}
+              onNextQuestion={handleNextQuestion}
+              questions={questionsForPractice}
+              onPreviousQuestion={handlePreviousQuestion}
+              onQuestionSelect={handleQuestionSelect}
+              onUnitChange={handleUnitChange}
+              answeredQuestions={answeredQuestions}
+              units={unitsData}
+              dojoProgress={dojoProgress}
+              correctStreak={correctStreak}
+              isWeakestUnitsMode={practiceMode === 'weakest' || practiceMode === 'custom'} 
+              totalQuestions={totalQuestionsInSet}
+              unitName={currentUnitName}
+              subject={subject} 
+              practiceUnitIds={relevantUnitIdsForDisplay}
+              onGuestLimitReached={handleGuestLimitReached}
+              isParentModalOpen={showSelectPlanModal}
+            />
+          )}
+
+          {/* Display message if no questions could be loaded */}
+          {!isLoadingQuestionSet && questionsForPractice.length === 0 && (
+            <div className="text-center text-red-500 my-4 p-6 bg-white rounded shadow">
+              Could not load questions for the selected mode or units.
+              {practiceMode !== 'singleUnit' && <p className="text-sm text-gray-600 mt-2">You may need to answer more questions first to determine weakest units.</p>} 
+              {/* Add link back to homepage or unit selection? */} 
+            </div>
+          )}
+
+        </div>
+        {/* Render the Double XP Modal */}
+        <DoubleXpModal
+            isOpen={showDoubleXpModal}
+            onAccept={handleAcceptDoubleXp}
+            onDecline={handleDeclineDoubleXp}
+        />
+      </div>
+    </>
   );
 }
 

@@ -117,4 +117,16 @@ body {
     background: #555; 
   }
   */
+
+  @keyframes scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); } /* Scroll by half the width for seamless loop */
+  }
+  .animate-scroll {
+    animation: scroll 40s linear infinite;
+  }
+  /* For pausing on hover, if desired */
+  /* .group:hover .animate-scroll {
+    animation-play-state: paused;
+  } */
 }

@@ -16,7 +16,15 @@ export default function FlashcardsPage() {
     setMounted(true)
   }, [])
 
-  const selectedSubject = userData?.selectedSubject
+  // Get effective subject (only for logged-in users)
+  const getEffectiveSubject = () => {
+    if (user && userData?.selectedSubject) {
+      return userData.selectedSubject;
+    }
+    return null;
+  };
+
+  const selectedSubject = getEffectiveSubject();
   const flashcardsData = 
       selectedSubject === 'macro' ? macroFlashcards : 
       selectedSubject === 'micro' ? microFlashcards : 
@@ -31,7 +39,8 @@ export default function FlashcardsPage() {
     return null // or a loading state
   }
 
-  if (loadingUserData) {
+  // Show loading state while user data is loading (only for logged-in users)
+  if (user && loadingUserData) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-blue-500"/>
@@ -40,7 +49,8 @@ export default function FlashcardsPage() {
     )
   }
 
-  if (!selectedSubject) {
+  // Show subject selection prompt if no subject is selected (for logged-in users)
+  if (user && !selectedSubject) {
     return (
       <div className="min-h-screen flex items-center justify-center text-center p-4">
         <div>

@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { videos, Video } from '@/data/videos';
 import { Play } from 'lucide-react';
-import { VideoModal } from '@/components/VideoModal';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -12,7 +11,6 @@ interface FullVideoLibraryProps {
 }
 
 export function FullVideoLibrary({ subject }: FullVideoLibraryProps) {
-  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const router = useRouter();
   
   // Filter videos by subject (check if subjects array includes the current subject)
@@ -43,138 +41,135 @@ export function FullVideoLibrary({ subject }: FullVideoLibraryProps) {
     ? 'border-green-500 text-green-500 hover:bg-green-50' 
     : 'border-blue-500 text-blue-500 hover:bg-blue-50';
 
-  // Function to handle video selection
+  // Function to handle video selection - navigate to video page
   const handleVideoSelect = (video: Video) => {
-    setSelectedVideo(video);
+    const subjectPath = subject === 'AP Macroeconomics' ? 'macro' : 'micro';
+    router.push(`/videos/${subjectPath}/${video.videoSlug}`);
   };
 
   return (
     <>
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
-        {/* Header */}
-        <div className="mb-12 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-             <span className={subjectColor}>{subject}</span> Video Library
-            </h1>
-            <p className="mt-4 text-lg text-gray-600">
-              Watch comprehensive video lessons organized by unit
-            </p>
-          </div>
-          <button
-            onClick={handleToggleSubject}
-            className={`px-4 py-2 text-sm font-bold bg-transparent border-2 rounded-md transition-colors ${buttonColorOutline}`}
-          >
-            Switch to {getOppositeSubject().replace('AP ', '')}
-          </button>
-        </div>
-
-        {/* Videos by Unit */}
-        <div className="space-y-16">
-          {videosByUnit.map(({ unit, videos }) => (
-            <div key={unit} className="space-y-6">
-              {/* Unit Header */}
-              <div className="flex items-center gap-4">
-                <h2 className="text-xl font-bold text-gray-900">
-                  Unit {unit}
-                </h2>
-                <div className="h-px flex-1 bg-gray-200" />
+      <div className="py-12 md:py-24 w-screen bg-gray-50" style={{ marginLeft: 'calc(-50vw + 50%)', marginRight: 'calc(-50vw + 50%)' }}>
+        <div className="container mx-auto px-4 md:px-0">
+          <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg border border-gray-100 p-4 md:p-8">
+            {/* Header */}
+            <div className="mb-12 flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+                 <span className={subjectColor}>{subject}</span> Video Library
+                </h1>
+                <p className="mt-4 text-lg text-gray-600">
+                  Watch comprehensive video lessons organized by unit
+                </p>
               </div>
-
-              {/* Video Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {videos.map((video) => (
-                  <div
-                    key={video.id}
-                    onClick={() => handleVideoSelect(video)}
-                    className="w-full max-w-[320px] bg-white rounded-xl shadow-lg overflow-hidden flex flex-col cursor-pointer"
-                  >
-                    {/* Thumbnail Container with Play Button Overlay */}
-                    <div className="relative w-full h-48 bg-gray-100 group">
-                      {/* Add subtle pattern background */}
-                      <div className="absolute inset-0 opacity-10" 
-                        style={{ 
-                          backgroundImage: `url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.4' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E")` 
-                        }} 
-                      />
-                      
-                      <img
-                        src={video.thumbnail || '/default-thumbnail.jpg'}
-                        alt={video.title}
-                        className="w-full h-full object-cover"
-                      />
-                      
-                      {/* Play button overlay */}
-                      <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-black/20 to-transparent">
-                        <div className="w-12 h-12 bg-blue-500/90 rounded-full flex items-center justify-center border-2 border-blue-500">
-                          <Play className="w-6 h-6 text-white fill-current" />
-                        </div>
-                      </div>
-                      {/* Premium Badge */}
-                      {video.accessLevel === 'premium' && (
-                        <div className="absolute top-2 right-2 bg-yellow-400 text-yellow-900 px-2 py-1 rounded text-xs font-semibold">
-                          Premium
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Content Section */}
-                    <div className="p-6 flex flex-col flex-1 border-t border-gray-100">
-                      {/* Subject + Unit tag */}
-                      <div className="mb-4">
-                        <span className="inline-flex px-2.5 py-1 rounded-md text-sm font-medium bg-gray-100 text-gray-600">
-                          {subject.includes('Macro') ? 'AP Macro' : 'AP Micro'} • Unit {video.unit}
-                        </span>
-                      </div>
-
-                      {/* Title */}
-                      <h3 className="text-lg font-bold text-gray-900 mb-3 line-clamp-2">
-                        {video.title}
-                      </h3>
-
-                      {/* Description */}
-                      <p className="text-sm text-gray-600 mb-6 line-clamp-2">
-                        {video.description}
-                      </p>
-
-                      {/* Tags at bottom */}
-                      <div className="mt-auto flex flex-wrap gap-2">
-                        {video.tags.map((tag) => (
-                          <span
-                            key={tag}
-                            className={`px-2.5 py-1 rounded-md text-xs font-medium ${
-                              subject.includes('Macro')
-                                ? 'bg-blue-100 text-blue-600'
-                                : 'bg-green-100 text-green-600'
-                            }`}
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                
-                {videos.length === 0 && (
-                  <div className="col-span-full text-center py-8 text-gray-500">
-                    No videos available for this unit yet.
-                  </div>
-                )}
-              </div>
+              <button
+                onClick={handleToggleSubject}
+                className={`px-4 py-2 text-sm font-bold bg-transparent border-2 rounded-md transition-colors ${buttonColorOutline}`}
+              >
+                Switch to {getOppositeSubject().replace('AP ', '')}
+              </button>
             </div>
-          ))}
+
+            {/* Videos by Unit */}
+            <div className="space-y-16">
+              {videosByUnit.map(({ unit, videos }) => (
+                <div key={unit} className="space-y-6">
+                  {/* Unit Header */}
+                  <div className="flex items-center gap-4">
+                    <h2 className="text-xl font-bold text-gray-900">
+                      Unit {unit}
+                    </h2>
+                    <div className="h-px flex-1 bg-gray-200" />
+                  </div>
+
+                  {/* Video Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {videos.map((video) => (
+                      <div
+                        key={video.id}
+                        onClick={() => handleVideoSelect(video)}
+                        className="w-full max-w-[320px] bg-white rounded-xl shadow-lg overflow-hidden flex flex-col cursor-pointer"
+                      >
+                        {/* Thumbnail Container with Play Button Overlay */}
+                        <div className="relative w-full h-48 bg-gray-100 group">
+                          {/* Add subtle pattern background */}
+                          <div className="absolute inset-0 opacity-10" 
+                            style={{ 
+                              backgroundImage: `url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.4' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E")` 
+                            }} 
+                          />
+                          
+                          <img
+                            src={video.thumbnail || '/default-thumbnail.jpg'}
+                            alt={video.title}
+                            className="w-full h-full object-cover"
+                          />
+                          
+                          {/* Play button overlay */}
+                          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-black/20 to-transparent">
+                            <div className="w-12 h-12 bg-blue-500/90 rounded-full flex items-center justify-center border-2 border-blue-500">
+                              <Play className="w-6 h-6 text-white fill-current" />
+                            </div>
+                          </div>
+                          {/* Premium Badge */}
+                          {video.accessLevel === 'premium' && (
+                            <div className="absolute top-2 right-2 bg-yellow-400 text-yellow-900 px-2 py-1 rounded text-xs font-semibold">
+                              Premium
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Content Section */}
+                        <div className="p-6 flex flex-col flex-1 border-t border-gray-100">
+                          {/* Subject + Unit tag */}
+                          <div className="mb-4">
+                            <span className="inline-flex px-2.5 py-1 rounded-md text-sm font-medium bg-gray-100 text-gray-600">
+                              {subject.includes('Macro') ? 'AP Macro' : 'AP Micro'} • Unit {video.unit}
+                            </span>
+                          </div>
+
+                          {/* Title */}
+                          <h3 className="text-lg font-bold text-gray-900 mb-3 line-clamp-2">
+                            {video.title}
+                          </h3>
+
+                          {/* Description */}
+                          <p className="text-sm text-gray-600 mb-6 line-clamp-2">
+                            {video.description}
+                          </p>
+
+                          {/* Tags at bottom */}
+                          <div className="mt-auto flex flex-wrap gap-2">
+                            {video.tags.map((tag) => (
+                              <span
+                                key={tag}
+                                className={`px-2.5 py-1 rounded-md text-xs font-medium ${
+                                  subject.includes('Macro')
+                                    ? 'bg-blue-100 text-blue-600'
+                                    : 'bg-green-100 text-green-600'
+                                }`}
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    
+                    {videos.length === 0 && (
+                      <div className="col-span-full text-center py-8 text-gray-500">
+                        No videos available for this unit yet.
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Video Modal */}
-      {selectedVideo && (
-        <VideoModal
-          videoUrl={selectedVideo.videoUrl}
-          questions={selectedVideo.questions}
-          onClose={() => setSelectedVideo(null)}
-        />
-      )}
     </>
   );
 }

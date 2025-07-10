@@ -5,7 +5,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import heroBG from "../../../public/images/heroBG.png"
 import { useAuthContext } from '@/contexts/AuthContext';
-import { LoginModal, SignupModal } from '@/components/AuthModals';
+import { LoginModal, SignupModal, SelectPlanModal } from '@/components/AuthModals';
 import { useRouter } from 'next/navigation';
 import AP_Macro_Graphs from "../../../public/cheat-sheets/macro/AP_Dojo_Macro_Graphs_TN.png"
 import { macroUnits as allMacroUnits, microUnits as allMicroUnits, Unit } from '@/data/cheatSheets';
@@ -31,7 +31,15 @@ export default function CheatSheetsPage() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
 
-  const selectedSubject = userData?.selectedSubject;
+  // Get effective subject (only for logged-in users)
+  const getEffectiveSubject = () => {
+    if (user && userData?.selectedSubject) {
+      return userData.selectedSubject;
+    }
+    return null;
+  };
+
+  const selectedSubject = getEffectiveSubject();
 
   const handleAction = (type: 'view' | 'download', unit: Unit) => {
     if (!user) {
@@ -53,7 +61,8 @@ export default function CheatSheetsPage() {
     router.refresh();
   };
 
-  if (loadingUserData) {
+  // Show loading state while user data is loading (only for logged-in users)
+  if (user && loadingUserData) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
@@ -61,7 +70,8 @@ export default function CheatSheetsPage() {
     );
   }
 
-  if (!selectedSubject) {
+  // Show subject selection prompt if no subject is selected (for logged-in users)
+  if (user && !selectedSubject) {
     return (
       <div className="min-h-screen flex items-center justify-center text-center p-4">
         <div>

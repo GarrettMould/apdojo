@@ -12,7 +12,16 @@ function SelectPracticeUnitsContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { lastSelectedPracticeUnits, setLastSelectedPracticeUnits } = useAuthContext();
-    const subject = searchParams.get('subject') || 'macro';
+    const { user } = useAuthContext();
+    
+    // Get subject from URL params (only for logged-in users)
+    const getEffectiveSubject = () => {
+        const urlSubject = searchParams.get('subject');
+        if (urlSubject) return urlSubject;
+        return null;
+    };
+
+    const subject = getEffectiveSubject();
 
     const [selectedUnits, setSelectedUnits] = useState<number[]>([]);
     const [unitsData, setUnitsData] = useState<UnitDetailsType[]>([]);
@@ -27,6 +36,8 @@ function SelectPracticeUnitsContent() {
     }, []);
 
     useEffect(() => {
+        if (!subject) return; // Early return if no subject
+        
         setIsLoading(true);
         const data = (subject === 'micro' ? allMicroCheatSheets : allMacroCheatSheets).slice(0, 6);
         setUnitsData(data);
@@ -44,8 +55,8 @@ function SelectPracticeUnitsContent() {
             } catch (error) {
                  console.error("[Select Practice Units] Error parsing 'currentUnits' URL param:", error);
             }
-        } else if (lastSelectedPracticeUnits && lastSelectedPracticeUnits[subject]) {
-            initialSelected = lastSelectedPracticeUnits[subject];
+        } else if (lastSelectedPracticeUnits && lastSelectedPracticeUnits[subject as 'macro' | 'micro']) {
+            initialSelected = lastSelectedPracticeUnits[subject as 'macro' | 'micro'];
             console.log('[Select Practice Units] Initialized selected units from context:', initialSelected);
         } else {
              console.log('[Select Practice Units] Initialized selected units empty (no param/context).');
@@ -64,7 +75,7 @@ function SelectPracticeUnitsContent() {
     };
 
     const handleStartPractice = () => {
-        if (selectedUnits.length > 0) {
+        if (selectedUnits.length > 0 && subject) {
             setLastSelectedPracticeUnits(subject as 'macro' | 'micro', selectedUnits);
             
             const unitsQueryParam = selectedUnits.join(',');
@@ -72,9 +83,18 @@ function SelectPracticeUnitsContent() {
         }
     };
 
-    if (isLoading) {
+    // Show loading if no subject available
+    if (!subject) {
         return (
             <div className="min-h-screen flex items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-blue-500"/>
+            </div>
+        );
+    }
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
                 <Loader2 className="h-8 w-8 animate-spin text-blue-500"/>
             </div>
         );
@@ -83,49 +103,66 @@ function SelectPracticeUnitsContent() {
     const displayUnits = unitsData.slice(0, 6);
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-start pt-16 sm:pt-20 px-4 sm:px-6 lg:px-8">
-            <div className="w-full max-w-xl mx-auto">
-                <h1 className="text-3xl font-bold text-center text-gray-900 mb-2">Choose Units to Practice</h1>
-                <p className="text-center text-sm text-gray-600 mb-6">Select the {subject === 'micro' ? 'Microeconomics' : 'Macroeconomics'} units you want to focus on.</p>
-
-                <div className="flex flex-col mb-6 border-2 border-gray-300 rounded-lg overflow-hidden">
-                    {displayUnits.map((unit, index) => {
-                        const isSelected = selectedUnits.includes(unit.number);
-                        const isFirst = index === 0;
-                        const isLast = index === displayUnits.length - 1;
-
-                        return (
-                            <label
-                                key={unit.number}
-                                className={`w-full p-4 transition-colors duration-150 flex items-center justify-between cursor-pointer ${!isLast ? 'border-b border-gray-200' : ''} 
-                                   ${isSelected 
-                                       ? 'bg-blue-50 z-10'
-                                       : 'bg-white hover:bg-gray-50'}`}
-                            >
-                                <span className={`font-medium text-base ${isSelected ? 'text-blue-700' : 'text-gray-800'}`}>
-                                    Unit {unit.number}: {unit.title} 
-                                </span>
-                                <input
-                                    type="checkbox"
-                                    checked={isSelected}
-                                    onChange={() => handleUnitToggle(unit.number)}
-                                    className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer"
-                                />
-                            </label>
-                        );
-                    })}
-                </div>
-
-                <div className="text-center">
-                    <Button
-                        onClick={handleStartPractice}
-                        disabled={selectedUnits.length === 0}
-                        className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300"
-                    >
-                        Start Focused Practice
-                    </Button>
-                </div>
+        <div className="flex flex-col items-center justify-center bg-gray-50 py-16 px-2 sm:px-4 lg:px-6">
+          <div className="max-w-xl w-full space-y-3 p-3 bg-white rounded-lg shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300">
+            <div className="text-center">
+              <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 mb-1">
+                Choose Your <span className="text-blue-500">Units</span>
+              </h2>
+              <p className="text-sm text-gray-600">
+                Select the {subject === 'micro' ? 'Microeconomics' : 'Macroeconomics'} units you want to focus on.
+              </p>
             </div>
+
+            <div className="space-y-2">
+              {displayUnits.map((unit) => {
+                  const isSelected = selectedUnits.includes(unit.number);
+                  return (
+                    <button
+                        key={unit.number}
+                        onClick={() => handleUnitToggle(unit.number)}
+                        className={`w-full flex items-center p-4 border rounded-lg cursor-pointer transition-all duration-200 ${
+                          isSelected 
+                            ? 'border-blue-500 shadow-md shadow-blue-100/50 bg-blue-50' 
+                            : 'border-gray-200 hover:border-blue-500 hover:shadow-md hover:shadow-blue-100/50 bg-white hover:bg-blue-50'
+                        }`}
+                    >
+                        <div className="flex-1 text-left">
+                          <span className="block text-xl font-semibold text-gray-900">
+                            <span className="text-black">Unit {unit.number}:</span>
+                            <span className="text-gray-500 ml-2">{unit.title}</span>
+                          </span>
+                        </div>
+                        <div className={`w-6 h-6 rounded-full border-2 transition-colors duration-200 ${
+                          isSelected 
+                            ? 'border-blue-500 bg-blue-500' 
+                            : 'border-gray-300 group-hover:border-blue-500'
+                        }`}>
+                          {isSelected && (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <div className="w-2 h-2 bg-white rounded-full"></div>
+                            </div>
+                          )}
+                        </div>
+                    </button>
+                  );
+              })}
+            </div>
+
+            <div className="text-center">
+              <button
+                onClick={handleStartPractice}
+                disabled={selectedUnits.length === 0}
+                className={`w-full py-2 px-6 rounded-lg font-semibold text-base transition-all duration-200 ${
+                  selectedUnits.length === 0 
+                    ? 'bg-gray-200 text-gray-500 cursor-not-allowed' 
+                    : 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg'
+                }`}
+              >
+                Start Focused Practice
+              </button>
+            </div>
+          </div>
         </div>
     );
 }
