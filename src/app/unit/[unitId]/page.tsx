@@ -3,9 +3,11 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronDown, ChevronRight, ChevronLeft, BookOpen } from "lucide-react";
+import { ChevronDown, ChevronRight, ChevronLeft, BookOpen, Download, X } from "lucide-react";
 import { videos as allVideos } from '@/data/videos';
-import { keyTerms, KeyTerm } from '@/data/allContent';
+import { keyTerms, KeyTerm, whiteboardImages, WhiteboardImage } from '@/data/allContent';
+import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
+import { Question as QuestionType } from '@/data/questionBanks/types';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { LoginModal, SignupModal, SelectPlanModal } from '@/components/AuthModals';
 
@@ -133,8 +135,19 @@ function TermCard({ term, isFirst = false }: TermCardProps) {
     }
   }, [isFirst, hasAdditionalContent]);
 
+  const handleCardClick = () => {
+    if (hasAdditionalContent) {
+      setIsExpanded(!isExpanded);
+    }
+  };
+
   return (
-    <div className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 p-4 hover:border-blue-300 hover:shadow-blue-100/50 group">
+    <div 
+      className={`bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 p-4 hover:border-blue-300 hover:shadow-blue-100/50 group cursor-pointer ${
+        hasAdditionalContent ? 'hover:bg-gray-50' : ''
+      }`}
+      onClick={handleCardClick}
+    >
       <div className="relative">
         <div className="flex items-start justify-between">
           <div className="flex-1">
@@ -149,15 +162,11 @@ function TermCard({ term, isFirst = false }: TermCardProps) {
           </div>
           <div className="flex items-center gap-2">
             {hasAdditionalContent && (
-              <button
-                onClick={() => setIsExpanded(!isExpanded)}
-                className="p-1 text-gray-400 hover:text-blue-600 transition-colors duration-200"
-                title={isExpanded ? "Collapse" : "Expand"}
-              >
+              <div className="p-1 text-gray-400 group-hover:text-blue-600 transition-colors duration-200">
                 <ChevronDown 
                   className={`w-4 h-4 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} 
                 />
-              </button>
+              </div>
             )}
           </div>
         </div>
@@ -205,6 +214,303 @@ function TermCard({ term, isFirst = false }: TermCardProps) {
   );
 }
 
+// --- Comprehension Check Components ---
+interface QuickCheckAnswerState {
+  selectedLetter: string;
+  isCorrect: boolean;
+}
+
+interface SimpleMcqDisplayProps {
+  question: QuestionType;
+  onAnswerSelect: (questionId: string | number, answerLetter: string, isCorrect: boolean) => void; 
+  currentAnswer?: QuickCheckAnswerState; 
+}
+
+function SimpleMcqDisplay({ question, onAnswerSelect, currentAnswer }: SimpleMcqDisplayProps) {
+  const isSubmitted = !!currentAnswer; 
+  const letterToIndex = (letter?: string): number | null => {
+    if (!letter || typeof letter !== 'string' || letter.length !== 1) return null;
+    const index = letter.toUpperCase().charCodeAt(0) - 65;
+    return index >= 0 && index < question.options.length ? index : null;
+  };
+  const textToIndex = (text?: string): number | null => {
+      if (!text || typeof text !== 'string') return null;
+      const index = question.options.findIndex(opt => opt === text);
+      return index !== -1 ? index : null;
+  }
+  const correctAnswerIndex = letterToIndex(question.correctAnswer) ?? textToIndex(question.correctAnswer);
+  const selectedAnswerIndex = isSubmitted ? letterToIndex(currentAnswer.selectedLetter) : null;
+
+  const handleSelect = (optIndex: number) => {
+    if (isSubmitted) return; 
+    const selectedLetter = String.fromCharCode(65 + optIndex);
+    const isCorrect = optIndex === correctAnswerIndex;
+    onAnswerSelect(question.id, selectedLetter, isCorrect);
+  };
+
+  return (
+    <div className="mb-6">
+      <div className="font-semibold text-base mb-4 text-gray-900">{question.question}</div>
+      <div className="space-y-2">
+        {question.options.map((option, optIndex) => {
+          const letter = String.fromCharCode(65 + optIndex);
+          const isCorrectOption = optIndex === correctAnswerIndex;
+          const isSelectedOption = optIndex === selectedAnswerIndex;
+          
+          return (
+            <button
+              key={letter}
+              onClick={() => handleSelect(optIndex)}
+              className={`block w-full text-left px-4 py-3 rounded-lg border transition-colors duration-150 text-base font-medium
+                ${isSubmitted ? (
+                  isCorrectOption ? 'bg-green-100 border-green-400 text-green-900' :
+                  isSelectedOption ? 'bg-red-100 border-red-400 text-red-900' :
+                  'bg-white border-gray-200'
+                ) : isSelectedOption ? (
+                  isCorrectOption ? 'bg-green-100 border-green-400 text-green-900' :
+                  'bg-red-100 border-red-400 text-red-900'
+                ) : 'bg-white border-gray-200 hover:bg-blue-50'}
+                focus:outline-none`}
+              disabled={isSubmitted}
+            >
+              <span className="mr-3 font-bold">{letter}.</span>{option}
+            </button>
+          );
+        })}
+      </div>
+      {currentAnswer && (
+        <div className="mt-4 p-4 rounded-lg text-base bg-white border border-gray-200">
+          <div className="font-bold mb-2">
+            {currentAnswer.isCorrect ? 'Correct!' : 'Incorrect'}
+          </div>
+          {question.explanation && (
+            <div className="text-base">{question.explanation}</div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+interface ComprehensionCheckProps {
+  unitId: number;
+  subject: 'ap_macroeconomics' | 'ap_microeconomics';
+}
+
+function ComprehensionCheck({ unitId, subject }: ComprehensionCheckProps) {
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [quickCheckAnswers, setQuickCheckAnswers] = useState<Record<string | number, QuickCheckAnswerState>>({});
+
+  // Get questions for this unit and subject
+  const unitQuestions = allQuestions.filter(q => 
+    q.subject === subject && q.unit === unitId
+  ).slice(0, 5); // Limit to 5 questions like in whiteboards
+
+  const handleQuickCheckAnswer = (questionId: string | number, answerLetter: string, isCorrect: boolean) => {
+    setQuickCheckAnswers(prev => ({
+      ...prev,
+      [questionId]: { selectedLetter: answerLetter, isCorrect }
+    }));
+  };
+
+  const handleNextQuestion = () => {
+    if (currentQuestionIndex < unitQuestions.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
+    }
+  };
+
+  const handlePreviousQuestion = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(prev => prev - 1);
+    }
+  };
+
+  const currentQuestion = unitQuestions[currentQuestionIndex];
+
+  if (unitQuestions.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="mt-8 border-t border-gray-200 pt-6">
+      <h4 className="text-xl font-semibold mb-4 text-gray-800">
+        Comprehension Check
+      </h4>
+      <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+        <SimpleMcqDisplay
+          question={currentQuestion}
+          onAnswerSelect={handleQuickCheckAnswer}
+          currentAnswer={quickCheckAnswers[currentQuestion.id]}
+        />
+        <div className="flex items-center justify-between mt-4">
+          <button
+            onClick={handlePreviousQuestion}
+            className={`text-sm font-medium cursor-pointer ${
+              currentQuestionIndex === 0
+                ? 'text-gray-400 pointer-events-none'
+                : 'text-blue-600 hover:text-blue-800'
+            }`}
+          >
+            ← Previous Question
+          </button>
+          <span className="text-sm text-gray-500">
+            Question {currentQuestionIndex + 1} of {unitQuestions.length}
+          </span>
+          <button
+            onClick={handleNextQuestion}
+            className={`text-sm font-medium cursor-pointer ${
+              currentQuestionIndex === unitQuestions.length - 1
+                ? 'text-gray-400 pointer-events-none'
+                : 'text-blue-600 hover:text-blue-800'
+            }`}
+          >
+            Next Question →
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+interface WhiteboardsGalleryProps {
+  unitId: number;
+  subject: 'ap_macroeconomics' | 'ap_microeconomics';
+}
+
+function WhiteboardsGallery({ unitId, subject }: WhiteboardsGalleryProps) {
+  const [expandedImage, setExpandedImage] = useState<WhiteboardImage | null>(null);
+
+  // Get whiteboards for this unit and subject
+  const unitWhiteboards = whiteboardImages.filter(wb => 
+    wb.unit === unitId && wb.subject === subject
+  );
+
+  // Since there are no Unit 1 AP macro whiteboards yet, create placeholder containers
+  const placeholderCount = 6; // Show 6 placeholder containers
+  const hasWhiteboards = unitWhiteboards.length > 0;
+
+  return (
+    <div className="mt-8 border-t border-gray-200 pt-6">
+      <h4 className="text-xl font-bold mb-4 text-gray-800">
+        Visual Aids & Whiteboards
+      </h4>
+      
+      {hasWhiteboards ? (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {unitWhiteboards.map((whiteboard) => (
+            <div
+              key={whiteboard.id}
+              className="relative cursor-pointer group shadow-md hover:shadow-lg rounded-lg overflow-hidden border border-gray-200 hover:border-blue-400 transition-all duration-200"
+              onClick={() => setExpandedImage(whiteboard)}
+            >
+              <div className="aspect-video bg-gray-100 relative">
+                <img
+                  src={whiteboard.imageUrl}
+                  alt={whiteboard.title || `Whiteboard ${whiteboard.id}`}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
+                  <div className="w-8 h-8 bg-white bg-opacity-90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <svg className="w-4 h-4 text-gray-800" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6zM14 9a1 1 0 00-1-1h-2z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              {whiteboard.title && (
+                <div className="p-3 bg-white">
+                  <p className="text-sm font-bold text-gray-900 truncate">{whiteboard.title}</p>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {Array.from({ length: placeholderCount }, (_, index) => (
+            <div
+              key={index}
+              className="relative cursor-pointer group shadow-md hover:shadow-lg rounded-lg overflow-hidden border border-gray-200 hover:border-blue-400 transition-all duration-200 bg-gray-50"
+              onClick={() => setExpandedImage({
+                id: `placeholder-${index}`,
+                imageUrl: '/images/placeholder-whiteboard.jpg',
+                title: `Visual Aid ${index + 1} - Coming Soon`,
+                unit: unitId,
+                subject: subject,
+                lessonIDs: [] // Add dummy lessonIDs property to satisfy type
+              })}
+            >
+              <div className="aspect-video bg-gray-100 relative flex items-center justify-center">
+                <div className="text-center">
+                  <svg className="w-12 h-12 text-gray-300 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6zM14 9a1 1 0 00-1-1h-2z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-sm text-gray-500">Coming Soon</p>
+                </div>
+                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
+                  <div className="w-8 h-8 bg-white bg-opacity-90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <svg className="w-4 h-4 text-gray-800" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6zM14 9a1 1 0 00-1-1h-2z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              <div className="p-3 bg-white">
+                <p className="text-sm font-medium text-gray-400">Visual Aid {index + 1}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Modal for expanded image */}
+      {expandedImage && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4" 
+          onClick={() => setExpandedImage(null)}
+        >
+          <div className="relative max-w-4xl w-full" onClick={e => e.stopPropagation()}>
+            <div className="absolute -top-12 right-0 flex items-center gap-4">
+              <button
+                onClick={() => {
+                  const link = document.createElement('a');
+                  link.href = expandedImage.imageUrl;
+                  link.download = expandedImage.title || 'whiteboard-image';
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }}
+                className="text-white hover:text-gray-300 flex items-center gap-2"
+                aria-label="Download"
+              >
+                <Download className="w-6 h-6" />
+                <span className="text-sm">Download</span>
+              </button>
+              <button
+                onClick={() => setExpandedImage(null)}
+                className="text-white hover:text-gray-300"
+                aria-label="Close"
+              >
+                <X className="w-8 h-8" />
+              </button>
+            </div>
+            <img
+              src={expandedImage.imageUrl}
+              alt={expandedImage.title || 'Expanded whiteboard view'}
+              className="w-full h-auto rounded-lg"
+            />
+            {expandedImage.title && (
+              <div className="mt-4 text-center">
+                <h3 className="text-lg font-bold text-white">{expandedImage.title}</h3>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 interface UnitPageProps {
   params: { unitId: string };
 }
@@ -221,33 +527,33 @@ export default function UnitLandingPage({ params }: UnitPageProps) {
 
   const { user } = useAuthContext();
 
-  // Filter and sort AP Macro Unit 1 videos
+  // Filter and sort AP Macro videos for current unit
   const macroUnitVideos = allVideos
-    .filter(v => v.unit === '1' && v.subjects.includes('AP Macroeconomics'))
+    .filter(v => v.unit === unitId && v.subjects.includes('AP Macroeconomics'))
     .sort((a, b) => {
       const aLesson = a.lessonIDS[0] ? parseFloat(a.lessonIDS[0]) : 0;
       const bLesson = b.lessonIDS[0] ? parseFloat(b.lessonIDS[0]) : 0;
       return aLesson - bLesson;
     });
 
-  // Filter and sort AP Micro Unit 1 videos (for future use)
+  // Filter and sort AP Micro videos for current unit (for future use)
   const microUnitVideos = allVideos
-    .filter(v => v.unit === '1' && v.subjects.includes('AP Microeconomics'))
+    .filter(v => v.unit === unitId && v.subjects.includes('AP Microeconomics'))
     .sort((a, b) => {
       const aLesson = a.lessonIDS[0] ? parseFloat(a.lessonIDS[0]) : 0;
       const bLesson = b.lessonIDS[0] ? parseFloat(b.lessonIDS[0]) : 0;
       return aLesson - bLesson;
     });
 
-  // Get Unit 1 terms from allContent.ts
-  const unit1Terms = keyTerms.filter(term => 
-    term.unit === 1 && term.subject === 'ap_macroeconomics'
+  // Get terms for current unit from allContent.ts
+  const unitTerms = keyTerms.filter(term => 
+    term.unit === unitIdNum && term.subject === 'ap_macroeconomics'
   ).sort((a, b) => {
     // Sort by first lessonID
     const aLesson = a.lessonIDs[0] ? parseFloat(a.lessonIDs[0]) : 0;
     const bLesson = b.lessonIDs[0] ? parseFloat(b.lessonIDs[0]) : 0;
     return aLesson - bLesson;
-  }).slice(0, 5); // Only show first 5 terms
+  }); // Show all terms for the unit
 
   const handlePrev = () => {
     if (unitIdNum > 1) {
@@ -323,9 +629,9 @@ export default function UnitLandingPage({ params }: UnitPageProps) {
         }}
       />
       
-      <div className="min-h-screen flex flex-col items-center justify-center py-8 px-2 relative">
+      <div className="min-h-screen bg-white">
         {/* Top Navigation */}
-        <div className="flex items-center justify-center mb-8 w-full">
+        <div className="flex items-center justify-center py-8 px-4 border-b border-gray-200">
           {/* Always show Prev Unit button, but disable for Unit 1 */}
           <button
             onClick={unitIdNum === 1 ? undefined : handlePrev}
@@ -351,51 +657,44 @@ export default function UnitLandingPage({ params }: UnitPageProps) {
         </div>
 
         {/* Main Content Grid */}
-        <div className="w-full max-w-7xl grid grid-cols-1 md:grid-cols-4 gap-8 relative items-start">
+        <div className="grid grid-cols-1 md:grid-cols-4 h-fit">
           {/* Left: Videos Column (1/4) */}
-          <div className="col-span-1 flex flex-col items-center">
-            {/* Videos Column */}
-            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 flex flex-col items-center w-full">
-              <div className="text-2xl font-bold text-blue-700 mb-4 w-full text-center">Videos</div>
+          <div className="md:col-span-1 border-r border-gray-200 bg-white flex flex-col">
+            <div className="py-5 px-6 border-b border-gray-200 bg-gray-50 flex-shrink-0">
+              <div className="flex items-center justify-between h-full">
+                <h3 className="text-xl font-bold text-gray-800">Videos</h3>
+              </div>
+            </div>
+            <div className="pt-6 pb-6 px-6 overflow-y-auto">
               <div className="w-full flex flex-col items-center">
                 {macroUnitVideos.map((video, idx) => (
-                  <React.Fragment key={video.id}>
-                    <Link href={`/videos/macro/${video.videoSlug}`} className="w-full group">
-                      <div className={`flex flex-col items-center mb-2 last:mb-0 p-4 cursor-pointer transition-all duration-300 rounded-lg ${
-                        idx === 0 ? 'bg-blue-50 hover:bg-blue-100 hover:shadow-lg hover:scale-105 border-2 border-blue-200 group-hover:bg-gray-50 group-hover:border-transparent group-hover:shadow-none group-hover:scale-100' : 'hover:bg-gray-50 border-2 border-transparent'
-                      }`}>
-                        <img
-                          src={video.thumbnail || '/images/placeholder-thumb.png'}
-                          alt={video.title}
-                          className="w-40 h-24 object-cover rounded-lg shadow border border-gray-200 mb-2"
-                        />
-                        <div className="text-base font-semibold text-gray-800 text-center">{video.title}</div>
-                      </div>
-                    </Link>
-                    {idx < macroUnitVideos.length - 1 && (
-                      <div className="w-2 h-12 bg-blue-700 mx-auto mb-2"></div>
-                    )}
-                  </React.Fragment>
+                  <Link key={video.id} href={`/videos/macro/${video.videoSlug}`} className="w-full group mb-8 last:mb-0">
+                    <div className="flex flex-col items-center p-4 cursor-pointer transition-all duration-300 rounded-lg hover:bg-gray-50">
+                      <img
+                        src={video.thumbnail || '/images/placeholder-thumb.png'}
+                        alt={video.title}
+                        className={`w-40 h-24 object-cover rounded-lg shadow mb-3 ${
+                          idx === 0 ? 'border-4 border-black' : 'border border-gray-200'
+                        }`}
+                      />
+                      <div className="text-base font-semibold text-gray-800 text-center">{video.title}</div>
+                    </div>
+                  </Link>
                 ))}
               </div>
             </div>
           </div>
           
           {/* Right: Terms Section (3/4) */}
-          <div className="col-span-1 md:col-span-3 flex flex-col justify-center">
-            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-8 flex-1 w-full">
-              <div className="flex items-center justify-between mb-6">
-                <div className="text-2xl font-bold text-gray-800">Key Terms & Definitions</div>
-                <Link 
-                  href="/whiteboards"
-                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors duration-200"
-                >
-                  Full Study Guide &rarr;
-                </Link>
+          <div className="md:col-span-3 flex flex-col">
+            <div className="py-5 px-6 border-b border-gray-200 bg-gray-50 flex-shrink-0">
+              <div className="flex items-center justify-between h-full">
+                <h3 className="text-xl font-bold text-gray-800">Key Terms & Definitions</h3>
               </div>
-              
+            </div>
+            <div className="pt-6 pb-6 px-6 overflow-y-auto">
               <div className="grid gap-4">
-                {unit1Terms.map((term, index) => (
+                {unitTerms.map((term, index) => (
                   <TermCard
                     key={term.id}
                     term={term}
@@ -403,6 +702,18 @@ export default function UnitLandingPage({ params }: UnitPageProps) {
                   />
                 ))}
               </div>
+              
+              {/* Comprehension Check Section */}
+              <ComprehensionCheck 
+                unitId={unitIdNum} 
+                subject="ap_macroeconomics" 
+              />
+              
+              {/* Whiteboards Gallery Section */}
+              <WhiteboardsGallery 
+                unitId={unitIdNum} 
+                subject="ap_macroeconomics" 
+              />
             </div>
           </div>
         </div>

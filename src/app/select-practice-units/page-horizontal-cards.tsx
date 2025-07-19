@@ -103,63 +103,102 @@ function SelectPracticeUnitsContent() {
     const displayUnits = unitsData.slice(0, 6);
 
     return (
-        <div className="flex flex-col items-center justify-center bg-gray-50 py-16 px-2 sm:px-4 lg:px-6">
-          <div className="max-w-xl w-full space-y-3 p-6 bg-white rounded-lg shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300">
-            <div className="text-center">
-              <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 mb-1">
+        <div className="min-h-screen bg-gray-50 py-16 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-extrabold tracking-tight text-gray-900 mb-4">
                 Choose Your <span className="text-blue-500">Units</span>
               </h2>
-              <p className="text-sm text-gray-600">
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
                 Select the {subject === 'micro' ? 'Microeconomics' : 'Macroeconomics'} units you want to focus on.
               </p>
             </div>
 
-            <div className="space-y-2">
+            {/* Unit Cards Grid */}
+            <div className="flex flex-row gap-4 overflow-x-auto pb-4 mb-12">
               {displayUnits.map((unit) => {
                   const isSelected = selectedUnits.includes(unit.number);
                   return (
-                    <button
+                    <div
                         key={unit.number}
                         onClick={() => handleUnitToggle(unit.number)}
-                        className={`w-full flex items-center p-4 border rounded-lg cursor-pointer transition-all duration-200 ${
+                        className={`relative cursor-pointer transition-all duration-300 transform hover:scale-105 flex-shrink-0 ${
                           isSelected 
-                            ? 'border-blue-500 shadow-md shadow-blue-100/50 bg-blue-50' 
-                            : 'border-gray-200 hover:border-blue-500 hover:shadow-md hover:shadow-blue-100/50 bg-white hover:bg-blue-50'
+                            ? 'ring-4 ring-blue-500 ring-opacity-50' 
+                            : 'hover:ring-2 hover:ring-blue-300 hover:ring-opacity-50'
                         }`}
                     >
-                        <div className="flex-1 text-left">
-                          <span className="block text-lg font-semibold text-gray-900">
-                            <span className="text-black">Unit {unit.number}:</span>
-                            <span className="text-gray-500 ml-2">{unit.title}</span>
-                          </span>
-                        </div>
-                        <div className={`w-6 h-6 rounded-full border-2 transition-colors duration-200 ${
+                        <div className={`w-48 h-80 bg-white rounded-xl shadow-lg border-2 transition-all duration-300 p-4 flex flex-col justify-between ${
                           isSelected 
-                            ? 'border-blue-500 bg-blue-500' 
-                            : 'border-gray-300 group-hover:border-blue-500'
+                            ? 'border-blue-500 bg-blue-50 shadow-blue-100' 
+                            : 'border-gray-200 hover:border-blue-300 hover:shadow-xl'
                         }`}>
-                          {isSelected && (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <div className="w-2 h-2 bg-white rounded-full"></div>
+                            {/* Unit Number Badge */}
+                            <div className="flex justify-between items-start">
+                                <div className={`px-2 py-1 rounded-full text-xs font-bold ${
+                                  isSelected 
+                                    ? 'bg-blue-500 text-white' 
+                                    : 'bg-gray-100 text-gray-700'
+                                }`}>
+                                    Unit {unit.number}
+                                </div>
+                                
+                                {/* Selection Indicator */}
+                                <div className={`w-5 h-5 rounded-full border-2 transition-colors duration-200 flex items-center justify-center ${
+                                  isSelected 
+                                    ? 'border-blue-500 bg-blue-500' 
+                                    : 'border-gray-300'
+                                }`}>
+                                  {isSelected && (
+                                    <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+                                  )}
+                                </div>
                             </div>
-                          )}
+
+                            {/* Unit Title */}
+                            <div className="flex-1 flex items-center justify-center text-center px-2">
+                                <h3 className={`text-sm font-bold leading-tight ${
+                                  isSelected 
+                                    ? 'text-blue-900' 
+                                    : 'text-gray-900'
+                                }`}>
+                                    {unit.title}
+                                </h3>
+                            </div>
+
+                            {/* Bottom Section */}
+                            <div className="text-center">
+                                <div className={`text-xs font-medium ${
+                                  isSelected 
+                                    ? 'text-blue-700' 
+                                    : 'text-gray-500'
+                                }`}>
+                                    {isSelected ? 'Selected' : 'Click to select'}
+                                </div>
+                            </div>
                         </div>
-                    </button>
+                    </div>
                   );
               })}
             </div>
 
+            {/* Start Practice Button */}
             <div className="text-center">
               <button
                 onClick={handleStartPractice}
                 disabled={selectedUnits.length === 0}
-                className={`w-full py-2 px-6 rounded-lg font-semibold text-base transition-all duration-200 ${
+                className={`px-8 py-4 rounded-xl font-bold text-lg transition-all duration-200 ${
                   selectedUnits.length === 0 
                     ? 'bg-gray-200 text-gray-500 cursor-not-allowed' 
-                    : 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg'
+                    : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105'
                 }`}
               >
                 Start Focused Practice
+                {selectedUnits.length > 0 && (
+                  <span className="ml-2 text-sm opacity-90">
+                    ({selectedUnits.length} unit{selectedUnits.length !== 1 ? 's' : ''} selected)
+                  </span>
+                )}
               </button>
             </div>
           </div>

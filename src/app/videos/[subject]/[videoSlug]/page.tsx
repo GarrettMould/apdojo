@@ -7,7 +7,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { videos as allVideos, Video as VideoType } from '@/data/videos';
 import { useAuthContext } from '@/contexts/AuthContext';
-import { LoginModal, SignupModal, SelectPlanModal } from '@/components/AuthModals';
+import { AuthGate } from '@/components/AuthGate';
 import dojoIcon from "../../../../../public/images/dojoIcon.png";
 import { use } from 'react';
 
@@ -36,10 +36,6 @@ export default function VideoPage({ params }: VideoPageProps) {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [expandedImage, setExpandedImage] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [showSignupModal, setShowSignupModal] = useState(false);
-  const [showSelectPlanModal, setShowSelectPlanModal] = useState(false);
 
   // Find the video by slug
   const video = allVideos.find(v => v.videoSlug === videoSlug);
@@ -72,28 +68,7 @@ export default function VideoPage({ params }: VideoPageProps) {
 
   // Check if user is authenticated
   if (!user) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">Authentication Required</h1>
-          <p className="text-gray-600 mb-6">Please log in or sign up to access this video.</p>
-          <div className="flex gap-4 justify-center">
-            <button 
-              onClick={() => setShowLoginModal(true)}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Login
-            </button>
-            <button 
-              onClick={() => setShowSignupModal(true)}
-              className="px-6 py-2 bg-white text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
-            >
-              Sign Up
-            </button>
-          </div>
-        </div>
-      </div>
-    );
+    return <AuthGate />;
   }
 
   const handleAnswerSelect = (questionId: string, answerIndex: number) => {
@@ -112,63 +87,15 @@ export default function VideoPage({ params }: VideoPageProps) {
     setExpandedImage(imageUrl);
   };
 
-  const handleAuthSuccess = () => {
-    setShowLoginModal(false);
-    setShowSignupModal(false);
-    setShowSelectPlanModal(false);
-  };
 
-  // Find related videos (same subject, different videos, limit to 3)
-  const getRelatedVideos = () => {
-    const currentSubject = subject === 'macro' ? 'AP Macroeconomics' : 'AP Microeconomics';
-    return allVideos
-      .filter(v => 
-        v.videoSlug !== videoSlug && 
-        v.subjects.includes(currentSubject)
-      )
-      .slice(0, 3);
-  };
-
-  const relatedVideos = getRelatedVideos();
 
   return (
     <>
-      <LoginModal 
-        isOpen={showLoginModal}
-        onClose={() => setShowLoginModal(false)}
-        switchToSignup={() => { 
-          setShowLoginModal(false); 
-          setShowSignupModal(true); 
-        }}
-        onAuthSuccess={handleAuthSuccess}
-      />
-      <SignupModal 
-        isOpen={showSignupModal}
-        onClose={() => setShowSignupModal(false)}
-        switchToLogin={() => { 
-          setShowSignupModal(false); 
-          setShowLoginModal(true); 
-        }}
-        onAuthSuccess={handleAuthSuccess}
-      />
-      <SelectPlanModal 
-        isOpen={showSelectPlanModal}
-        onClose={() => setShowSelectPlanModal(false)}
-        switchToLogin={() => { 
-          setShowSelectPlanModal(false); 
-          setShowLoginModal(true); 
-        }}
-        switchToSignup={() => { 
-          setShowSelectPlanModal(false); 
-          setShowSignupModal(true); 
-        }}
-      />
-
-      <div className="min-h-screen bg-white">
-        <div className="grid grid-cols-1 lg:grid-cols-4 h-fit">
+      <div className="h-screen bg-white overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-4 h-full">
           {/* Video Section */}
-          <div className="lg:col-span-3">
-            <div className="bg-black">
+          <div className="lg:col-span-3 flex flex-col h-full">
+            <div className="bg-black flex-shrink-0">
               <video 
                 ref={videoRef}
                 controls 
@@ -182,64 +109,17 @@ export default function VideoPage({ params }: VideoPageProps) {
             </div>
             
             {/* Video Info */}
-            <div className="mt-2 p-4 lg:p-6 border-r border-gray-200">
+            <div className="p-4 lg:p-6 border-r border-gray-200 flex-shrink-0">
               <h1 className="text-2xl font-bold text-gray-800 mb-2">{video.title}</h1>
               <p className="text-gray-600 mb-4">Unit {video.unit} - {video.subjects.join(', ')}</p>
               {video.description && (
                 <p className="text-gray-700 leading-relaxed">{video.description}</p>
               )}
             </div>
-
-            {/* Related Videos */}
-            {relatedVideos.length > 0 && (
-              <div className="p-6 lg:p-8 border-r border-gray-200 border-t border-gray-200">
-                <h2 className="text-xl font-bold text-gray-800 mb-4">Related Videos</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {relatedVideos.map((relatedVideo) => (
-                    <Link
-                      key={relatedVideo.id}
-                      href={`/videos/${subject}/${relatedVideo.videoSlug}`}
-                      className="group block bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all duration-200 overflow-hidden"
-                    >
-                      <div className="aspect-video bg-gray-100 relative overflow-hidden">
-                        {relatedVideo.thumbnail ? (
-                          <img
-                            src={relatedVideo.thumbnail}
-                            alt={relatedVideo.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-gray-200">
-                            <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
-                              <svg className="w-6 h-6 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                              </svg>
-                            </div>
-                          </div>
-                        )}
-                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
-                          <div className="w-10 h-10 bg-white bg-opacity-90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                            <svg className="w-5 h-5 text-gray-800" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                            </svg>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="p-3">
-                        <h3 className="font-semibold text-sm text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors">
-                          {relatedVideo.title}
-                        </h3>
-                        <p className="text-xs text-gray-600 mt-1">Unit {relatedVideo.unit}</p>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Questions Sidebar */}
-          <div className="lg:col-span-1 border-l border-gray-200 bg-white flex flex-col h-fit">
+          <div className="lg:col-span-1 border-l border-gray-200 bg-white flex flex-col h-full">
             <div className="pt-6 pb-4 lg:pt-8 lg:pb-6 px-4 lg:px-6 border-b border-gray-200 bg-gray-50 flex-shrink-0">
               <h3 className="text-xl font-bold text-gray-800 mb-1">Comprehension Check</h3>
               <p className="text-sm text-gray-600">
@@ -247,7 +127,7 @@ export default function VideoPage({ params }: VideoPageProps) {
               </p>
             </div>
 
-            <div className="pt-0 pb-4 lg:pb-6 px-4 lg:px-6 overflow-y-auto">
+            <div className="flex-1 pt-0 pb-4 lg:pb-6 px-4 lg:px-6 overflow-y-auto">
               {video.questions && video.questions.length > 0 ? (
                 <div className="space-y-0">
                   {video.questions.map((question, questionIndex) => (

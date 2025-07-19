@@ -105,12 +105,12 @@ export function FixedSidebar() {
 
   const userDashboardNavItems: NavItemProps[] = [
     { icon: Home, label: 'Home', baseHrefPattern: '/', isSubjectDependent: false }, 
+    { icon: BookCopy, label: 'Unit Study Guides', baseHrefPattern: '/unit/1', isSubjectDependent: false }, // Unit landing page with study guide icon
+    { icon: PlaySquare, label: 'Video Library', baseHrefPattern: '/videos/{subject}', isSubjectDependent: true }, 
     { icon: Target, label: 'Focused Practice', baseHrefPattern: '/focusedPracticePreview', isSubjectDependent: false },
     { icon: ListChecks, label: 'Unit MCQs', baseHrefPattern: '/select-practice-units?subject={subject}', isSubjectDependent: true }, 
     { icon: Bot, label: 'AI FRQ Helper', baseHrefPattern: '/aiFRQHelper', isSubjectDependent: false }, 
     { icon: FileText, label: 'Practice Exams', baseHrefPattern: '/purchase/exams', isSubjectDependent: false }, // Assuming purchase page isn't subject-specific upfront
-    { icon: PlaySquare, label: 'Video Library', baseHrefPattern: '/videos/{subject}', isSubjectDependent: true }, 
-    { icon: BookCopy, label: 'Study Guides', baseHrefPattern: '/whiteboards', isSubjectDependent: false }, // Assuming study guides/whiteboards page can list all or prompt
   ];
 
   return (
@@ -216,46 +216,6 @@ export function FixedSidebar() {
           );
         })}
       </nav>
-
-      {/* Unit Landing Page Dev Link */}
-      <Link
-        href={isOnSelectSubjectPage ? '#' : '/unit/1'}
-        className={`flex items-center rounded-md transition-colors duration-150 group ${
-          isCompactMode 
-            ? `justify-center w-12 h-12 mt-2 ${
-                isOnSelectSubjectPage 
-                  ? 'text-gray-400 cursor-not-allowed' 
-                  : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
-              }`
-            : `px-4 py-3 space-x-3 mt-2 ${
-                isOnSelectSubjectPage 
-                  ? 'text-gray-400 cursor-not-allowed' 
-                  : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'
-              }`
-        }`}
-        title={isOnSelectSubjectPage ? "Please complete subject selection first" : "Unit Landing Page"}
-        onClick={(e) => {
-          if (isOnSelectSubjectPage) {
-            e.preventDefault();
-          }
-        }}
-      >
-        <Target 
-          size={24} 
-          className={`${
-            isCompactMode 
-              ? `${
-                  isOnSelectSubjectPage 
-                    ? 'text-gray-400' 
-                    : 'text-gray-500 group-hover:text-blue-500'
-                }`
-              : `text-gray-500 group-hover:text-blue-500 flex-shrink-0`
-          }`} 
-        />
-        {!isCompactMode && (
-          <span className="text-base font-medium flex-grow whitespace-nowrap">Unit Landing Page</span>
-        )}
-      </Link>
 
       {/* Removed dividers and social links section */}
     </div>

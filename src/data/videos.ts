@@ -502,7 +502,7 @@ export const videos: Video[] = [
         lessonIDS: ["1.1"],
         tags: ["Scarcity"],
         videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.1+-+Scarcity.mp4",
-        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.1+-+Scarcity.jpg",
+        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.1+-+Scarcity+-+TN",
         accessLevel: "free",
         questions: [
           {  
@@ -550,7 +550,7 @@ export const videos: Video[] = [
         lessonIDS: ["1.4"],
         tags: ["Demand", "Law of Demand"],
         videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.4+-+Demand.mp4",
-        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.4+-+Demand.jpg",
+        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.4+-+Demand+-+TN.png",
         accessLevel: "free",
         questions: [
           {
@@ -609,7 +609,7 @@ export const videos: Video[] = [
         lessonIDS: ["2.1"],
         tags: ["Circular Flow Model", "Injections", "Leakages"],
         videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.1+-+Circular+Flow+Model.mp4",
-        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.1+-+Circular+Flow+Model.jpg",
+        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.1+-+Circular+Flow+Model+-+TN.png",
         accessLevel: "free",
         questions: [
           {
@@ -657,7 +657,7 @@ export const videos: Video[] = [
         lessonIDS: ["1.5"],
         tags: ["Supply", "Law of Supply"],
         videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.5+-+Supply.mp4",
-        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.5+-+Supply.jpg",
+        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.5+-+Supply+-+TN.png",
         accessLevel: "free",
         questions: [
           {
@@ -706,6 +706,223 @@ export const videos: Video[] = [
           },
         ],
       }, 
+      {
+        id: "18",
+        title: "2.3: Unemployment",
+        description: "Learn the three main types of unemployment, how to calculate a country's unemployment rate and labor force participation rate, and learn about the problem of discouraged workers.",
+        videoSlug: "unemployment-rate-labor-force-participation-rate",
+        subjects: ["AP Macroeconomics"],
+        unit: "2",
+        lessonIDS: ["2.3"],
+        tags: ["Unemployment", "Natural Rate of Unemployment", "Labor Force Participation Rate", "Discouraged Workers"],
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.3+-+Unemployment.mp4",
+        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.3+-+Unemployment+-+TN.png",
+        accessLevel: "free",
+        questions: [
+          
+  {
+    id: "1",
+    text: "A recent college graduate who is actively searching for their first job is experiencing which type of unemployment?",
+    options: [
+      "Structural unemployment",
+      "Cyclical unemployment",
+      "Seasonal unemployment",
+      "Frictional unemployment"
+    ],
+    correctAnswer: 3
+  },
+  {
+    id: "2",
+    text: "Which type of unemployment is caused by a downturn in the business cycle, such as a recession?",
+    options: [
+      "Frictional unemployment",
+      "Structural unemployment",
+      "Cyclical unemployment",
+      "Natural unemployment"
+    ],
+    correctAnswer: 2
+  },
+  {
+    id: "3",
+    text: "A country has a total working-age population of 200 million. The labor force is 150 million, and 7.5 million people are unemployed. What is the unemployment rate?",
+    options: [
+      "3.75%",
+      "5%",
+      "7.5%",
+      "10%"
+    ],
+    correctAnswer: 1
+  },
+  {
+      id: "4",
+    text: "In an economy with an adult population of 200 million, 120 million people are employed and 10 million are unemployed. What is the labor force participation rate?",
+    options: [
+      "55%",
+      "60%",
+      "65%",
+      "70%"
+    ],
+    correctAnswer: 2
+  }
+        ],
+      },
+      {
+        id: "19",
+        title: "1.6: Market Equilibrium, Disequilibrium, and Changes in Equilibrium",
+        description: "Learn about market equilibrium, shortages and surpluses, and how shifts in supply and demand lead to changes in equilibrium.",
+        videoSlug: "market-equilibrium-disequilibrium-changes-in-equilibrium",
+        subjects: ["AP Macroeconomics"],
+        unit: "1",
+        lessonIDS: ["1.6"],
+        tags: ["Market Equilibrium", "Disequilibrium", "Changes in Equilibrium", "Surplus", "Shortage"],
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.6+-+Equilibrium.mp4",
+        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.6+-+TN.png",
+        accessLevel: "free",
+        questions:      [
+          {
+            id: "1",
+            text: "If the current market price for a good is set above the equilibrium price, which of the following will occur?",
+            options: [
+              "A shortage, because quantity demanded exceeds quantity supplied.",
+              "A surplus, because quantity supplied exceeds quantity demanded.",
+              "An increase in demand to meet the higher price.",
+              "A decrease in supply to restore equilibrium."
+            ],
+            correctAnswer: 1
+          },
+          {
+            id: "2",
+            text: "A new technology lowers the cost of producing solar panels. What is the expected impact on the equilibrium price and quantity in the market for solar panels?",
+            options: [
+              "Price will increase, Quantity will increase.",
+              "Price will decrease, Quantity will decrease.",
+              "Price will increase, Quantity will decrease.",
+              "Price will decrease, Quantity will increase."
+            ],
+            correctAnswer: 3
+          },
+          {
+            id: "3",
+            text: "Suppose consumers' incomes increase, leading to a higher demand for new cars. At the same time, the cost of steel for manufacturing cars rises, decreasing supply. What is the effect on the equilibrium price and quantity of new cars?",
+            options: [
+              "Price will increase, and the change in quantity is indeterminate.",
+              "Price will decrease, and the change in quantity is indeterminate.",
+              "Quantity will increase, and the change in price is indeterminate.",
+              "Quantity will decrease, and the change in price is indeterminate."
+            ],
+            correctAnswer: 0
+          }
+        ]
+      },
+      {
+        id: "20",
+        title: "1.2: Opportunity Cost and the Production Possibilities Curve",
+        description: "Learn about opportunity cost, the production possibilities curve, and the concept of trade-offs.",
+        videoSlug: "opportunity-cost-production-possibilities-curve",
+        subjects: ["AP Macroeconomics"],
+        unit: "1",
+        lessonIDS: ["1.2"],
+        tags: ["Opportunity Cost", "Production Possibilities Curve", "Trade-offs"],
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.2+-+Opportunity+Cost+and+the+PPC.mp4",
+        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.2+-+TN.png",
+        accessLevel: "free",
+        questions:      [
+          {
+            id: "1",
+            text: "According to the Production Possibilities Curve (PPC) model, a point located inside the curve represents:",
+            options: [
+              "An unattainable level of production.",
+              "An efficient use of all available resources.",
+              "An inefficient use of resources or underutilization.",
+              "Economic growth from new technology."
+            ],
+            correctAnswer: 2
+          },
+          {
+            id: "2",
+            text: "A production possibilities curve that is 'bowed-out' from the origin signifies which of the following concepts?",
+            options: [
+              "Constant opportunity cost",
+              "Increasing opportunity cost",
+              "Economic recession",
+              "Allocative efficiency"
+            ],
+            correctAnswer: 1
+          },
+          {
+            id: "3",
+            text: "A company can produce either 40 phones and 30 burgers (Point A) or 30 phones and 60 burgers (Point B). What is the opportunity cost of increasing burger production from 30 to 60?",
+            options: [
+              "30 burgers",
+              "60 burgers",
+              "10 phones",
+              "30 phones"
+            ],
+            correctAnswer: 2
+          }
+        ]
+      },
+      {
+        id: "21",
+        title: "2.1: The Circular Flow Model and GDP (Part 2)",
+        description: "Learn about GDP, the expenditure approach to calculating GDP, and the income approach to calculating GDP.",
+        videoSlug: "circular-flow-model-and-gdp-part-2",
+        subjects: ["AP Macroeconomics"],
+        unit: "2",
+        lessonIDS: ["2.1"],
+        tags: ["GDP", "Expenditure Approach", "Income Approach"],
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.1+-+GDP.mp4",
+        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.1+-+(GDP)+-+TN.png",
+        accessLevel: "free",
+        questions:      [
+          {
+            id: "1",
+            text: "Which of the following would be counted as part of the current year's Gross Domestic Product (GDP) for the United States?",
+            options: [
+              "The sale of a used college textbook from one student to another.",
+              "A Social Security payment received by a retired individual.",
+              "The purchase of domestically produced steel by a bicycle manufacturer.",
+              "A haircut service provided by a stylist in New York City."
+            ],
+            correctAnswer: 3
+          },
+          {
+            id: "2",
+            text: "Within the expenditure approach to GDP, which of the following transactions is classified under Investment (I)?",
+            options: [
+              "The U.S. government purchasing a new fleet of naval ships.",
+              "A construction company buying a new crane.",
+              "A family buying a new refrigerator for their home.",
+              "An individual purchasing 100 shares of a tech company's stock."
+            ],
+            correctAnswer: 1
+          },
+          {
+            id: "3",
+            text: "When calculating GDP using the expenditure approach, what is the primary reason for subtracting the value of imports?",
+            options: [
+              "To ensure that spending on foreign-produced goods is not counted as domestic production.",
+              "Because imports are generally considered economically harmful to domestic industries.",
+              "To account for the tariff revenue the government earns from foreign goods.",
+              "Because the value of imports is already included in the income approach."
+            ],
+            correctAnswer: 0
+          },
+          {
+            id: "4",
+            text: "An economy produces the following in a year: Consumption: $500B; Investment: $150B; Value of Stocks Traded: $80B; Government Spending: $200B; Exports: $50B; Imports: $70B. What is its Gross Domestic Product (GDP)?",
+            options: [
+              "$880B",
+              "$910B",
+              "$830B",
+              "$970B"
+            ],
+            correctAnswer: 2
+          }
+        ]
+      },
+
+      
   ];
   
 const macroUnitVideos = videos
