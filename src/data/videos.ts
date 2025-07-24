@@ -921,6 +921,216 @@ export const videos: Video[] = [
           }
         ]
       },
+      {
+        id: "22",
+        title: "2.4: Price Indices and Inflation",
+        description: "Learn about price inflation, deflation, disinflation, and price indices like the Consumer Price Index (CPI).",
+        videoSlug: "price-indices-inflation-consumer-price-index",
+        subjects: ["AP Macroeconomics"],
+        unit: "2",
+        lessonIDS: ["2.4"],
+        tags: ["Price Indices", "Inflation", "Deflation", "Disinflation", "Consumer Price Index (CPI)"],
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.4+-+Price+Indices+and+Inflation.mp4",
+        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.4+-+Price+Indices+and+Inflation+TN.png",
+        accessLevel: "free",
+        questions:      [
+          {
+            id: "1",
+            text: "Suppose the inflation rate in a country was 7% in 2023, 4% in 2024, and 2% in 2025. Which economic term best describes this trend?",
+            options: [
+              "Deflation",
+              "Stagflation",
+              "Hyperinflation",
+              "Disinflation"
+            ],
+            correctAnswer: 3
+          },
+          {
+            id: "2",
+            text: "If the cost of a fixed market basket of goods was $400 in the base year and the cost of the same basket is $460 in the current year, what is the Consumer Price Index (CPI) for the current year?",
+            options: [
+              "87",
+              "115",
+              "15",
+              "146"
+            ],
+            correctAnswer: 1
+          },
+          {
+            id: "3",
+            text: "Given that the Consumer Price Index (CPI) was 180 in Year 1 and 189 in Year 2, what was the inflation rate between the two years?",
+            options: [
+              "9%",
+              "4.7%",
+              "5%",
+              "1.05%"
+            ],
+            correctAnswer: 2
+          },
+          {
+            id: "4",
+            text: "When the price of beef rises, consumers often buy more chicken as an alternative. Why does this behavior pose a challenge to the accuracy of the Consumer Price Index (CPI)?",
+            options: [
+              "The CPI does not account for changes in product quality, which is known as quality bias.",
+              "The CPI's use of a fixed market basket does not account for consumer substitution, potentially overstating the cost of living.",
+              "The CPI only tracks the prices of goods, not services like food preparation.",
+              "The CPI does not include food and energy prices, which are too volatile."
+            ],
+            correctAnswer: 1
+          },
+          {
+            id: "5",
+            text: "A new laptop model is released that costs 10% more than the previous year's model, but it also includes a significantly faster processor and double the memory. This situation highlights which potential bias in the CPI?",
+            options: [
+              "Substitution bias",
+              "Income bias",
+              "Quality bias",
+              "New product bias"
+            ],
+            correctAnswer: 2
+          }
+        ]
+      },
+      {
+        id: "23",
+        title: "2.7: Business Cycles",
+        description: "Learn about the four phases of the business cycle, the concept of a natural rate of unemployment, and the relationship between RGDP and unemployment.",
+        videoSlug: "business-cycles",
+        subjects: ["AP Macroeconomics"],
+        unit: "2",
+        lessonIDS: ["2.7"],
+        tags: ["Business Cycles", "Natural Rate of Unemployment", "Real GDP", "Unemployment"],
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.7+-+Business+Cycles.mp4",
+        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.7+-+Business+Cycles+TN.png",
+        accessLevel: "free",
+        questions:     [
+          {
+            id: "1",
+            text: "An economy is experiencing a period where real GDP is consistently falling and the unemployment rate is rising. Which phase of the business cycle is this economy in?",
+            options: [
+              "Peak",
+              "Expansion",
+              "Trough",
+              "Recession"
+            ],
+            correctAnswer: 3
+          },
+          {
+            id: "2",
+            text: "On the business cycle graph, the potential output line represents the level of real GDP that corresponds to:",
+            options: [
+              "zero unemployment.",
+              "the peak of an expansion.",
+              "the natural rate of unemployment.",
+              "a period of rapid inflation."
+            ],
+            correctAnswer: 2
+          },
+          {
+            id: "3",
+            text: "If an economy's actual rate of unemployment is higher than its natural rate of unemployment, which of the following must be true?",
+            options: [
+              "The economy is experiencing an inflationary gap.",
+              "The economy is operating at its potential output.",
+              "The economy is experiencing a recessionary gap.",
+              "The economy is at the peak of its business cycle."
+            ],
+            correctAnswer: 2
+          },
+          {
+            id: "4",
+            text: "A sudden surge in consumer confidence leads to a massive increase in spending, pushing the unemployment rate below its natural rate and causing prices to rise. This situation describes:",
+            options: [
+              "a recessionary gap.",
+              "a trough.",
+              "an inflationary gap.",
+              "a period of stagflation."
+            ],
+            correctAnswer: 2
+          },
+          {
+            id: "5",
+            text: "The point on the business cycle model where an expansion ends and a contraction begins is known as the:",
+            options: [
+              "Trough",
+              "Peak",
+              "Recessionary Gap",
+              "Inflationary Gap"
+            ],
+            correctAnswer: 1
+          }
+        ]
+      },
+      {
+        id: "24",
+        title: "2.6: Real v Nominal GDP",
+        description: "Learn about the difference between real and nominal GDP, and how to use the GDP deflator to calculate real GDP.",
+        videoSlug: "real-v-nominal-gdp",
+        subjects: ["AP Macroeconomics"],
+        unit: "2",
+        lessonIDS: ["2.6"],
+        tags: ["Real GDP", "Nominal GDP", "GDP Deflator"],
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.6+-+Real+v+Nominal+GDP.mp4",
+        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.6+-+Real+v+Nominal+GDP+TN.png",
+        accessLevel: "free",
+        questions:     [
+          {
+            id: "1",
+            text: "If a country's nominal GDP increased by 7% in a year, while its real GDP only increased by 3%, what can be concluded?",
+            options: [
+              "The country's production of goods and services decreased.",
+              "The country experienced an inflation rate of approximately 4%.",
+              "The country's unemployment rate must have increased.",
+              "The country experienced a deflation rate of approximately 4%."
+            ],
+            correctAnswer: 1
+          },
+          {
+            id: "2",
+            text: "An economy produces only two goods: books and pencils. In a given year, it produces 100 books at $20 each and 500 pencils at $1 each. What is the nominal GDP for that year?",
+            options: [
+              "$600",
+              "$2,000",
+              "$2,500",
+              "$3,000"
+            ],
+            correctAnswer: 2
+          },
+          {
+            id: "3",
+            text: "In an economy that only produces computers, the base year is 2023, when 1,000 computers were sold at $800 each. In 2024, 1,100 computers were sold at $900 each. What is the real GDP for 2024?",
+            options: [
+              "$800,000",
+              "$880,000",
+              "$900,000",
+              "$990,000"
+            ],
+            correctAnswer: 1
+          },
+          {
+            id: "4",
+            text: "If a country's nominal GDP is $1.2 trillion and its real GDP is $1.0 trillion, what is the value of the GDP deflator?",
+            options: [
+              "83",
+              "100",
+              "120",
+              "20"
+            ],
+            correctAnswer: 2
+          },
+          {
+            id: "5",
+            text: "Real GDP is a more accurate measure of an economy's output than nominal GDP because it is adjusted for changes in:",
+            options: [
+              "the unemployment rate.",
+              "income distribution.",
+              "the overall price level.",
+              "government spending."
+            ],
+            correctAnswer: 2
+          }
+        ]
+      },
 
       
   ];

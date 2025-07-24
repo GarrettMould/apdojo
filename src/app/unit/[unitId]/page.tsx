@@ -121,32 +121,11 @@ interface TermCardProps {
 }
 
 function TermCard({ term, isFirst = false }: TermCardProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
   const hasAdditionalContent = term.subNotes || term.image;
-
-  // Auto-expand first term after a delay for tutorial effect
-  useEffect(() => {
-    if (isFirst && hasAdditionalContent) {
-      const timer = setTimeout(() => {
-        setIsExpanded(true);
-      }, 1500); // 1.5 second delay
-      
-      return () => clearTimeout(timer);
-    }
-  }, [isFirst, hasAdditionalContent]);
-
-  const handleCardClick = () => {
-    if (hasAdditionalContent) {
-      setIsExpanded(!isExpanded);
-    }
-  };
 
   return (
     <div 
-      className={`bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 p-4 hover:border-blue-300 hover:shadow-blue-100/50 group cursor-pointer ${
-        hasAdditionalContent ? 'hover:bg-gray-50' : ''
-      }`}
-      onClick={handleCardClick}
+      className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 p-4 hover:border-blue-300 hover:shadow-blue-100/50 group"
     >
       <div className="relative">
         <div className="flex items-start justify-between">
@@ -160,22 +139,11 @@ function TermCard({ term, isFirst = false }: TermCardProps) {
               {term.definition}
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            {hasAdditionalContent && (
-              <div className="p-1 text-gray-400 group-hover:text-blue-600 transition-colors duration-200">
-                <ChevronDown 
-                  className={`w-4 h-4 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} 
-                />
-              </div>
-            )}
-          </div>
         </div>
 
-        {/* Expandable Content */}
+        {/* Additional Content - Always Visible */}
         {hasAdditionalContent && (
-          <div className={`overflow-hidden transition-all duration-300 ease-in-out ${
-            isExpanded ? 'max-h-[800px] opacity-100 mt-4' : 'max-h-0 opacity-0'
-          }`}>
+          <div className="mt-4">
             <div className="border-t border-gray-100 pt-4 space-y-4">
               
               {/* SubNotes */}

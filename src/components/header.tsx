@@ -126,6 +126,8 @@ export function Header() {
     router.push('/');
   };
 
+
+
   return (
     <div className="w-full bg-white border-b sticky top-0 z-[100]">
       <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8">

@@ -49,6 +49,8 @@ export interface UserData {
   mcqAnswerStatus?: { [key: string]: boolean }; 
   // Keep viewedMcqIds for now if needed elsewhere, remove later if redundant
   viewedMcqIds?: (string | number)[]; 
+  // Add purchases field for premium features
+  purchases?: string[];
 }
 
 // --- ADD LEVELING LOGIC --- 
