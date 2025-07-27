@@ -1,6 +1,7 @@
 'use client'; // Directive at the top!
 
 import React from 'react'; 
+import { usePathname } from 'next/navigation';
 import { HeaderWrapper } from '@/components/header-wrapper';
 import { Footer } from '@/components/Footer';
 import { PageContainer } from '@/components/ui/page-container';
@@ -9,6 +10,7 @@ import { LoginModal, SignupModal } from '@/components/AuthModals';
 import { Analytics } from "@vercel/analytics/react";
 
 export function LayoutClientWrapper({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
   const { 
     showLoginModal, 
     setShowLoginModal, 
@@ -33,9 +35,8 @@ export function LayoutClientWrapper({ children }: { children: React.ReactNode })
         <HeaderWrapper />
       </div>
 
-      {/* Main content area with padding ONLY for fixed header */}
-      {/* Assuming header is h-16 (4rem) */}
-      <main className="flex-1 w-full bg-white pt-16 overflow-y-auto">
+      {/* Layout without sidebar */}
+      <main className="flex-1 w-full pt-16 overflow-y-auto bg-white">
         {/* REMOVE PageContainer here to allow full width */}
         {children}
         <Analytics />

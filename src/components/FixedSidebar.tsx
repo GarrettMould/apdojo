@@ -14,6 +14,7 @@ import {
   PlusCircle,
   Smile, // For guest avatar
   MessageSquare, // For Async Tutoring
+  GraduationCap, // For AP Macro Course
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuthContext } from '@/contexts/AuthContext'; // Import useAuthContext
@@ -106,6 +107,7 @@ export function FixedSidebar() {
 
   const userDashboardNavItems: NavItemProps[] = [
     { icon: Home, label: 'Home', baseHrefPattern: '/', isSubjectDependent: false }, 
+    { icon: GraduationCap, label: 'AP Macro Course', baseHrefPattern: '/ap-macro-course', isSubjectDependent: false }, 
     { icon: BookCopy, label: 'Unit Study Guides', baseHrefPattern: '/unit/1', isSubjectDependent: false }, // Unit landing page with study guide icon
     { icon: PlaySquare, label: 'Video Library', baseHrefPattern: '/videos/{subject}', isSubjectDependent: true }, 
     { icon: Target, label: 'Focused Practice', baseHrefPattern: '/focusedPracticePreview', isSubjectDependent: false },

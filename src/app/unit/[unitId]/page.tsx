@@ -4,12 +4,13 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChevronDown, ChevronRight, ChevronLeft, BookOpen, Download, X } from "lucide-react";
-import { videos as allVideos } from '@/data/videos';
+
 import { keyTerms, KeyTerm, whiteboardImages, WhiteboardImage } from '@/data/allContent';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question as QuestionType } from '@/data/questionBanks/types';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { LoginModal, SignupModal, SelectPlanModal } from '@/components/AuthModals';
+import { CourseSidebar } from '@/components/CourseSidebar';
 
 // Helper function to sort lesson IDs like "1.1", "1.10", "2.1"
 const sortLessonIDs = (a: string, b: string): number => {
@@ -486,7 +487,6 @@ interface UnitPageProps {
 export default function UnitLandingPage({ params }: UnitPageProps) {
   const unitId = params.unitId;
   const unitIdNum = parseInt(unitId, 10);
-  const router = useRouter();
   const [isFlashcardMode, setIsFlashcardMode] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
@@ -494,24 +494,6 @@ export default function UnitLandingPage({ params }: UnitPageProps) {
   const [pendingUnit, setPendingUnit] = useState<number | null>(null);
 
   const { user } = useAuthContext();
-
-  // Filter and sort AP Macro videos for current unit
-  const macroUnitVideos = allVideos
-    .filter(v => v.unit === unitId && v.subjects.includes('AP Macroeconomics'))
-    .sort((a, b) => {
-      const aLesson = a.lessonIDS[0] ? parseFloat(a.lessonIDS[0]) : 0;
-      const bLesson = b.lessonIDS[0] ? parseFloat(b.lessonIDS[0]) : 0;
-      return aLesson - bLesson;
-    });
-
-  // Filter and sort AP Micro videos for current unit (for future use)
-  const microUnitVideos = allVideos
-    .filter(v => v.unit === unitId && v.subjects.includes('AP Microeconomics'))
-    .sort((a, b) => {
-      const aLesson = a.lessonIDS[0] ? parseFloat(a.lessonIDS[0]) : 0;
-      const bLesson = b.lessonIDS[0] ? parseFloat(b.lessonIDS[0]) : 0;
-      return aLesson - bLesson;
-    });
 
   // Get terms for current unit from allContent.ts
   const unitTerms = keyTerms.filter(term => 
@@ -523,32 +505,12 @@ export default function UnitLandingPage({ params }: UnitPageProps) {
     return aLesson - bLesson;
   }); // Show all terms for the unit
 
-  const handlePrev = () => {
-    if (unitIdNum > 1) {
-      if (unitIdNum === 2 || unitIdNum === 3 || user) {
-        router.push(`/unit/${unitIdNum - 1}`);
-      } else {
-        setPendingUnit(unitIdNum - 1);
-        setShowSelectPlanModal(true);
-      }
-    }
-  };
-
-  const handleNext = () => {
-    if (unitIdNum === 2 || unitIdNum === 3 || user) {
-      router.push(`/unit/${unitIdNum + 1}`);
-    } else {
-      setPendingUnit(unitIdNum + 1);
-      setShowSelectPlanModal(true);
-    }
-  };
-
   const handleAuthSuccess = () => {
     setShowLoginModal(false);
     setShowSignupModal(false);
     setShowSelectPlanModal(false);
     if (pendingUnit !== null) {
-      router.push(`/unit/${pendingUnit}`);
+      window.location.href = `/unit/${pendingUnit}`;
       setPendingUnit(null);
     }
   };
@@ -597,91 +559,54 @@ export default function UnitLandingPage({ params }: UnitPageProps) {
         }}
       />
       
-      <div className="min-h-screen bg-white">
-        {/* Top Navigation */}
-        <div className="flex items-center justify-center py-8 px-4 border-b border-gray-200">
-          {/* Always show Prev Unit button, but disable for Unit 1 */}
-          <button
-            onClick={unitIdNum === 1 ? undefined : handlePrev}
-            className={`px-4 py-2 rounded-lg shadow font-bold border border-gray-200 transition mr-4 ${
-              unitIdNum === 1
-                ? 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-60'
-                : 'bg-white hover:bg-blue-50 text-black'
-            }`}
-            disabled={unitIdNum === 1}
-          >
-            &larr; Prev Unit
-          </button>
-          <div className="flex flex-col items-center px-8 py-4 bg-transparent">
-            <div className="text-4xl md:text-6xl font-extrabold tracking-tight text-gray-800">UNIT {unitId}</div>
-            <div className="text-3xl font-bold text-black mt-6">Basic Economic Concepts</div>
-          </div>
-          <button
-            onClick={handleNext}
-            className="px-4 py-2 rounded-lg shadow font-bold bg-white border border-gray-200 hover:bg-blue-50 transition ml-4"
-          >
-            Next Unit &rarr;
-          </button>
-        </div>
+      <div className="min-h-screen bg-white flex">
+        {/* Course Sidebar */}
+        <CourseSidebar
+          selectedUnit={unitIdNum.toString()}
+          isFixed={true}
+        />
+        
+        {/* Main Content */}
+        <div className="flex-1 ml-80">
+          <div className="max-w-6xl mx-auto">
+            {/* Header */}
+            <div className="flex items-center justify-center py-8 px-4 border-b border-gray-200">
+              <div className="flex flex-col items-center px-8 py-4 bg-transparent">
+                <div className="text-4xl md:text-6xl font-extrabold tracking-tight text-gray-800">UNIT {unitId}</div>
+                <div className="text-3xl font-bold text-black mt-6">Basic Economic Concepts</div>
+              </div>
+            </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 h-fit">
-          {/* Left: Videos Column (1/4) */}
-          <div className="md:col-span-1 border-r border-gray-200 bg-white flex flex-col">
-            <div className="py-5 px-6 border-b border-gray-200 bg-gray-50 flex-shrink-0">
-              <div className="flex items-center justify-between h-full">
-                <h3 className="text-xl font-bold text-gray-800">Videos</h3>
+            {/* Terms Section - Full Width */}
+            <div className="flex flex-col">
+              <div className="py-5 px-6 border-b border-gray-200 bg-gray-50 flex-shrink-0">
+                <div className="flex items-center justify-between h-full">
+                  <h3 className="text-xl font-bold text-gray-800">Key Terms & Definitions</h3>
+                </div>
               </div>
-            </div>
-            <div className="pt-6 pb-6 px-6 overflow-y-auto">
-              <div className="w-full flex flex-col items-center">
-                {macroUnitVideos.map((video, idx) => (
-                  <Link key={video.id} href={`/videos/macro/${video.videoSlug}`} className="w-full group mb-8 last:mb-0">
-                    <div className="flex flex-col items-center p-4 cursor-pointer transition-all duration-300 rounded-lg hover:bg-gray-50">
-                      <img
-                        src={video.thumbnail || '/images/placeholder-thumb.png'}
-                        alt={video.title}
-                        className={`w-40 h-24 object-cover rounded-lg shadow mb-3 ${
-                          idx === 0 ? 'border-4 border-black' : 'border border-gray-200'
-                        }`}
-                      />
-                      <div className="text-base font-semibold text-gray-800 text-center">{video.title}</div>
-                    </div>
-                  </Link>
-                ))}
+              <div className="pt-6 pb-6 px-6 overflow-y-auto">
+                <div className="grid gap-4">
+                  {unitTerms.map((term, index) => (
+                    <TermCard
+                      key={term.id}
+                      term={term}
+                      isFirst={index === 0}
+                    />
+                  ))}
+                </div>
+                
+                {/* Comprehension Check Section */}
+                <ComprehensionCheck 
+                  unitId={unitIdNum} 
+                  subject="ap_macroeconomics" 
+                />
+                
+                {/* Whiteboards Gallery Section */}
+                <WhiteboardsGallery 
+                  unitId={unitIdNum} 
+                  subject="ap_macroeconomics" 
+                />
               </div>
-            </div>
-          </div>
-          
-          {/* Right: Terms Section (3/4) */}
-          <div className="md:col-span-3 flex flex-col">
-            <div className="py-5 px-6 border-b border-gray-200 bg-gray-50 flex-shrink-0">
-              <div className="flex items-center justify-between h-full">
-                <h3 className="text-xl font-bold text-gray-800">Key Terms & Definitions</h3>
-              </div>
-            </div>
-            <div className="pt-6 pb-6 px-6 overflow-y-auto">
-              <div className="grid gap-4">
-                {unitTerms.map((term, index) => (
-                  <TermCard
-                    key={term.id}
-                    term={term}
-                    isFirst={index === 0}
-                  />
-                ))}
-              </div>
-              
-              {/* Comprehension Check Section */}
-              <ComprehensionCheck 
-                unitId={unitIdNum} 
-                subject="ap_macroeconomics" 
-              />
-              
-              {/* Whiteboards Gallery Section */}
-              <WhiteboardsGallery 
-                unitId={unitIdNum} 
-                subject="ap_macroeconomics" 
-              />
             </div>
           </div>
         </div>

@@ -24,7 +24,7 @@ export type Video = {
 export const videos: Video[] = [
     {
       id: "1",
-      title: "3.8: Fiscal Policy & Long-Run Self-Adjustment",
+      title: "Fiscal Policy & Long-Run Self-Adjustment",
       description: "Learn about how an economy returns to long-run equilibrium from an output gap.",
       videoSlug: "fiscal-policy-long-run-self-adjustment",
       subjects: ["AP Macroeconomics"],
@@ -57,7 +57,7 @@ export const videos: Video[] = [
     },
     {
       id: "2",
-      title: "4.6: Open Market Operations",
+      title: "Open Market Operations",
       description: "Learn how buying and selling government bonds actually leads to changes in the money supply.",
       videoSlug: "open-market-operations",
       subjects: ["AP Macroeconomics"],
@@ -90,7 +90,7 @@ export const videos: Video[] = [
     }, 
     {
         id: "3",
-        title: "6.6: Shifters in the Foreign Exchange Market",
+        title: "Shifters in the Foreign Exchange Market",
         description: "Learn how to conceptually understand the shifts in the foreign exchange market.",
         videoSlug: "foreign-exchange-market-shifters",
         subjects: ["AP Macroeconomics"],
@@ -123,7 +123,7 @@ export const videos: Video[] = [
       }, 
       {
         id: "4",
-        title: "5.5: The Crowding Out Effect",
+        title: "The Crowding Out Effect",
         description: "Learn how government borrowing can lead to a decrease in private investment.",
         videoSlug: "crowding-out-effect",
         subjects: ["AP Macroeconomics"],
@@ -156,7 +156,7 @@ export const videos: Video[] = [
       }, 
       {
         id: "5",
-        title: "6.4: Policy Action and Currency Value",
+        title: "Policy Action and Currency Value",
         description: "Learn how fiscal and monetary policy actions can lead to changes in the value of a currency.",
         videoSlug: "policy-action-currency-value",
         subjects: ["AP Macroeconomics"],
@@ -189,7 +189,7 @@ export const videos: Video[] = [
       }, 
       {
         id: "6",
-        title: "5.2: Phillips Curve and AD-AS Graph (AD Shifts)",
+        title: "Phillips Curve and AD-AS Graph (AD Shifts)",
         description: "Learn about the connection between the Phillips Curve and the AD-AS graph",
         videoSlug: "phillips-curve-ad-as-ad-shifts",
         subjects: ["AP Macroeconomics"],
@@ -222,7 +222,7 @@ export const videos: Video[] = [
       }, 
       {
         id: "7",
-        title: "5.2:Phillips Curve and AD-AS Graph (SRAS Shifts)",
+        title: "Phillips Curve and AD-AS Graph (SRAS Shifts)",
         description: "Learn about the connection between the Phillips Curve and the AD-AS graph",
         videoSlug: "phillips-curve-ad-as-sras-shifts",
         subjects: ["AP Macroeconomics"],
@@ -255,7 +255,7 @@ export const videos: Video[] = [
       }, 
       {
         id: "8",
-        title: "2.7:It's All Connected: The Business Cycle Graph, The AD-AS Model, and the PPC",
+        title: "It's All Connected: The Business Cycle Graph, The AD-AS Model, and the PPC",
         description: "Learn about the connection between the business cycles graph, the AS-AS graph, the a country's PPC",
         videoSlug: "business-cycle-ad-as-ppc-connections",
         subjects: ["AP Macroeconomics"],
@@ -293,7 +293,7 @@ export const videos: Video[] = [
       }, 
       {
         id: "9",
-        title: "1.3: Comparative Advantage: Output Questions",
+        title: "Comparative Advantage: Output Questions",
         description: "Learn how to identify and solve output comparative advantage questions",
         videoSlug: "comparative-advantage-output-questions",
         subjects: ["AP Macroeconomics", "AP Microeconomics"],
@@ -328,7 +328,7 @@ export const videos: Video[] = [
       }, 
       {
         id: "10",
-        title: "1.3: Comparative Advantage: Input Questions",
+        title: "Comparative Advantage: Input Questions",
         description: "Learn how to identify and solve input comparative advantage questions",
         videoSlug: "comparative-advantage-input-questions",
         subjects: ["AP Macroeconomics", "AP Microeconomics"],
@@ -363,7 +363,7 @@ export const videos: Video[] = [
       }, 
       {
         id: "11",
-        title: "2.6: Nominal vs. Real GDP",
+        title: "Nominal vs. Real GDP",
         description: "Understand the key difference between nominal and real GDP",
         videoSlug: "nominal-vs-real-gdp",
         subjects: ["AP Macroeconomics"],
@@ -407,7 +407,7 @@ export const videos: Video[] = [
       }, 
       {
         id: "12",
-        title: "3.2: Marginal Costs and Average Costs",
+        title: "Marginal Costs and Average Costs",
         description: "Steph Curry helps us understand the relationship between marginal costs and average costs",
         videoSlug: "marginal-costs-average-costs",
         subjects: ["AP Microeconomics"],
@@ -450,7 +450,7 @@ export const videos: Video[] = [
       }, 
       {
         id: "13",
-        title: "3.1: Marginal Product and Marginal Costs",
+        title: "Marginal Product and Marginal Costs",
         description: "Understand the relationship between the MP curve and the MC curve",
         videoSlug: "marginal-product-marginal-costs",
         subjects: ["AP Microeconomics"],
@@ -494,7 +494,7 @@ export const videos: Video[] = [
       }, 
       {
         id: "14",
-        title: "1.1: Scarcity",
+        title: "Scarcity",
         description: "Understand the fundamental problem of economics.",
         videoSlug: "scarcity-fundamental-problem",
         subjects: ["AP Microeconomics", "AP Macroeconomics"],
@@ -542,7 +542,7 @@ export const videos: Video[] = [
       }, 
       {
         id: "15",
-        title: "1.4: Demand",
+        title: "Demand",
         description: "Learn about the law of demand, demand curves, and demand schedules.",
         videoSlug: "demand-law-curves-schedules",
         subjects: ["AP Macroeconomics"],
@@ -601,7 +601,7 @@ export const videos: Video[] = [
       }, 
       {
         id: "16",
-        title: "2.1: The Circular Flow Model",
+        title: "The Circular Flow Model",
         description: "Learn about the circular flow model, the product and factor markets, and various leakages and injections.",
         videoSlug: "circular-flow-model-markets",
         subjects: ["AP Macroeconomics"],
@@ -649,7 +649,7 @@ export const videos: Video[] = [
       }, 
       {
         id: "17",
-        title: "1.5: Supply",
+        title: "Supply",
         description: "Learn about the law of supply, supply curves, and supply schedules.",
         videoSlug: "supply-law-curves-schedules",
         subjects: ["AP Macroeconomics"],
@@ -708,7 +708,7 @@ export const videos: Video[] = [
       }, 
       {
         id: "18",
-        title: "2.3: Unemployment",
+        title: "Unemployment",
         description: "Learn the three main types of unemployment, how to calculate a country's unemployment rate and labor force participation rate, and learn about the problem of discouraged workers.",
         videoSlug: "unemployment-rate-labor-force-participation-rate",
         subjects: ["AP Macroeconomics"],
@@ -768,7 +768,7 @@ export const videos: Video[] = [
       },
       {
         id: "19",
-        title: "1.6: Market Equilibrium, Disequilibrium, and Changes in Equilibrium",
+        title: "Market Equilibrium, Disequilibrium, and Changes in Equilibrium",
         description: "Learn about market equilibrium, shortages and surpluses, and how shifts in supply and demand lead to changes in equilibrium.",
         videoSlug: "market-equilibrium-disequilibrium-changes-in-equilibrium",
         subjects: ["AP Macroeconomics"],
@@ -816,7 +816,7 @@ export const videos: Video[] = [
       },
       {
         id: "20",
-        title: "1.2: Opportunity Cost and the Production Possibilities Curve",
+        title: "Opportunity Cost and the Production Possibilities Curve",
         description: "Learn about opportunity cost, the production possibilities curve, and the concept of trade-offs.",
         videoSlug: "opportunity-cost-production-possibilities-curve",
         subjects: ["AP Macroeconomics"],
@@ -864,7 +864,7 @@ export const videos: Video[] = [
       },
       {
         id: "21",
-        title: "2.1: The Circular Flow Model and GDP (Part 2)",
+        title: "The Circular Flow Model and GDP (Part 2)",
         description: "Learn about GDP, the expenditure approach to calculating GDP, and the income approach to calculating GDP.",
         videoSlug: "circular-flow-model-and-gdp-part-2",
         subjects: ["AP Macroeconomics"],
@@ -923,7 +923,7 @@ export const videos: Video[] = [
       },
       {
         id: "22",
-        title: "2.4: Price Indices and Inflation",
+        title: "Price Indices and Inflation",
         description: "Learn about price inflation, deflation, disinflation, and price indices like the Consumer Price Index (CPI).",
         videoSlug: "price-indices-inflation-consumer-price-index",
         subjects: ["AP Macroeconomics"],
@@ -993,7 +993,7 @@ export const videos: Video[] = [
       },
       {
         id: "23",
-        title: "2.7: Business Cycles",
+        title: "Business Cycles",
         description: "Learn about the four phases of the business cycle, the concept of a natural rate of unemployment, and the relationship between RGDP and unemployment.",
         videoSlug: "business-cycles",
         subjects: ["AP Macroeconomics"],
@@ -1063,7 +1063,7 @@ export const videos: Video[] = [
       },
       {
         id: "24",
-        title: "2.6: Real v Nominal GDP",
+        title: "Real v Nominal GDP",
         description: "Learn about the difference between real and nominal GDP, and how to use the GDP deflator to calculate real GDP.",
         videoSlug: "real-v-nominal-gdp",
         subjects: ["AP Macroeconomics"],
@@ -1130,6 +1130,103 @@ export const videos: Video[] = [
             correctAnswer: 2
           }
         ]
+      },
+      {
+        id: "25",
+        title: "Limitations of GDP",
+        description: "Learn about the limitations of GDP as a measure of economic well-being.",
+        videoSlug: "limitations-of-gdp",
+        subjects: ["AP Macroeconomics"],
+        unit: "2",
+        lessonIDS: ["2.2"],
+        tags: ["GDP", "Limitations", "GDP per capita"],
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.2+-+Limitations+of+GDP.mp4",
+        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.2+-+TN.png",
+        accessLevel: "free",
+        questions:     [
+          {
+            id: "1",
+            text: "Which of the following activities is excluded from GDP because it is a non-market transaction?",
+            options: [
+              "Hiring a professional plumber to fix a leaky pipe.",
+              "A homeowner renovating their own kitchen without paid assistance.",
+              "Purchasing materials from a hardware store for a home project.",
+              "Paying a monthly subscription fee for a streaming service."
+            ],
+            correctAnswer: 1
+          },
+          {
+            id: "2",
+            text: "A large factory's air pollution leads to a rise in respiratory illnesses, resulting in increased healthcare spending. How do these events affect GDP?",
+            options: [
+              "GDP decreases to reflect the negative impact of pollution on public health.",
+              "GDP is unchanged because the healthcare spending is just correcting a problem.",
+              "GDP increases due to the rise in healthcare spending, while the negative effects of pollution are not directly measured.",
+              "GDP only changes if the factory is shut down by the government."
+            ],
+            correctAnswer: 2
+          },
+          {
+            id: "3",
+            text: "A country's real GDP per capita has grown by 15% over the past decade. From this information, what can be concluded with certainty?",
+            options: [
+              "The standard of living has improved for every citizen in the country.",
+              "The distribution of income within the country has become more equal.",
+              "The average economic output per person in the country has increased.",
+              "The country's environmental quality has improved alongside its economic growth."
+            ],
+            correctAnswer: 2
+          }
+        ]
+      },
+      {
+        id: "26",
+        title: "Costs of Inflation",
+        description: "Learn about the costs of inflation, interest rates, and how unexpected inflation impacts borrowers and lenders.",
+        videoSlug: "costs-of-inflation",
+        subjects: ["AP Macroeconomics"],
+        unit: "2",
+        lessonIDS: ["2.5 "],
+        tags: ["Inflation", "Interest Rates", "Borrowers", "Lenders"],
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.5+-+Costs+of+Inflation.mp4",
+        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.5+-+TN.jpg",
+        accessLevel: "free",
+        questions:     [
+          {
+            id: "1",
+            text: "A bank issues fixed-rate loans at a nominal interest rate of 5%, based on an expected inflation rate of 2%. If the actual inflation rate turns out to be 4%, who benefits from this unexpectedly high inflation?",
+            options: [
+              "The bank that issued the loans.",
+              "The borrowers who took out the fixed-rate loans.",
+              "Individuals who keep their savings in cash.",
+              "Both the borrowers and the bank are equally well-off."
+            ],
+            correctAnswer: 1
+          },
+          {
+            id: "2",
+            text: "If you deposit money into a savings account with a nominal interest rate of 3% and the inflation rate for the year is 2%, what is the real interest rate on your deposit?",
+            options: [
+              "5%",
+              "1%",
+              "1.5%",
+              "-1%"
+            ],
+            correctAnswer: 1
+          },
+          {
+            id: "3",
+            text: "A business must frequently reprint its product catalogs and update its website to reflect rising prices. This is an example of which cost of inflation?",
+            options: [
+              "Loss of purchasing power",
+              "Menu costs",
+              "The Fisher Effect",
+              "Unexpected inflation"
+            ],
+            correctAnswer: 1
+          }
+        ]
+          
       },
 
       

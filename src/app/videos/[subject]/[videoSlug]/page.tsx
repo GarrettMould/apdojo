@@ -2,12 +2,13 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { X, Check, ArrowLeft } from 'lucide-react';
+import { X, Check, ArrowLeft, FileText } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { videos as allVideos, Video as VideoType } from '@/data/videos';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { AuthGate } from '@/components/AuthGate';
+import { CourseSidebar } from '@/components/CourseSidebar';
 import dojoIcon from "../../../../../public/images/dojoIcon.png";
 import { use } from 'react';
 
@@ -31,26 +32,127 @@ export default function VideoPage({ params }: VideoPageProps) {
   const router = useRouter();
   const { user } = useAuthContext();
   
-  const [selectedAnswers, setSelectedAnswers] = useState<Record<string, number>>({});
-  const [submittedAnswers, setSubmittedAnswers] = useState<Record<string, number>>({});
-  const [isSubmitted, setIsSubmitted] = useState(false);
   const [expandedImage, setExpandedImage] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Disable page scrolling when component mounts
-  useEffect(() => {
-    const originalStyle = window.getComputedStyle(document.body).overflow;
-    document.body.style.overflow = 'hidden';
-    document.documentElement.style.overflow = 'hidden';
-    
-    return () => {
-      document.body.style.overflow = originalStyle;
-      document.documentElement.style.overflow = 'auto';
-    };
-  }, []);
+
 
   // Find the video by slug
   const video = allVideos.find(v => v.videoSlug === videoSlug);
+  
+  // Get navigation items (videos and comprehension checks)
+  const getNavigationItems = () => {
+    if (!video) return { previous: null, next: null };
+    
+    // Create a sequence of all videos and their comprehension checks for the current unit
+    const unitVideos = allVideos
+      .filter(v => 
+        v.subjects.includes('AP Macroeconomics') && 
+        v.unit === video.unit
+      )
+      .sort((a, b) => {
+        const aLesson = a.lessonIDS[0] ? parseFloat(a.lessonIDS[0]) : 0;
+        const bLesson = b.lessonIDS[0] ? parseFloat(b.lessonIDS[0]) : 0;
+        return aLesson - bLesson;
+      });
+    
+    // Create the sequence: video -> comp check -> video -> comp check
+    const sequence: Array<{ type: 'video' | 'comp-check'; video: any; index: number }> = [];
+    unitVideos.forEach((v, index) => {
+      sequence.push({ type: 'video', video: v, index });
+      sequence.push({ type: 'comp-check', video: v, index });
+    });
+    
+    // Find current position in sequence
+    const currentSequenceIndex = sequence.findIndex(item => 
+      item.type === 'video' && item.video.videoSlug === videoSlug
+    );
+    
+    let previous = null;
+    let next = null;
+    
+    // Find previous item
+    if (currentSequenceIndex > 0) {
+      const prevItem = sequence[currentSequenceIndex - 1];
+      if (prevItem.type === 'video') {
+        previous = {
+          type: 'video',
+          title: `${prevItem.video.lessonIDS[0]}: Video`,
+          href: `/videos/macro/${prevItem.video.videoSlug}`
+        };
+      } else {
+        previous = {
+          type: 'comp-check',
+          title: `${prevItem.video.lessonIDS[0]}: Comprehension Check`,
+          href: `/video-comprehension-checks/${prevItem.video.videoSlug}`
+        };
+      }
+    } else if (currentSequenceIndex === 0) {
+      // If this is the first item, check if there's a previous unit
+      const prevUnitVideos = allVideos
+        .filter(v => 
+          v.subjects.includes('AP Macroeconomics') && 
+          v.unit === String(parseInt(video.unit) - 1)
+        )
+        .sort((a, b) => {
+          const aLesson = a.lessonIDS[0] ? parseFloat(a.lessonIDS[0]) : 0;
+          const bLesson = b.lessonIDS[0] ? parseFloat(b.lessonIDS[0]) : 0;
+          return aLesson - bLesson;
+        });
+      
+      if (prevUnitVideos.length > 0) {
+        const lastVideo = prevUnitVideos[prevUnitVideos.length - 1];
+        previous = {
+          type: 'comp-check',
+          title: `${lastVideo.lessonIDS[0]}: Comprehension Check`,
+          href: `/video-comprehension-checks/${lastVideo.videoSlug}`
+        };
+      }
+    }
+    
+    // Find next item - should be the comprehension check for the current video
+    if (currentSequenceIndex < sequence.length - 1) {
+      const nextItem = sequence[currentSequenceIndex + 1];
+      if (nextItem.type === 'video') {
+        next = {
+          type: 'video',
+          title: `${nextItem.video.lessonIDS[0]}: Video`,
+          href: `/videos/macro/${nextItem.video.videoSlug}`
+        };
+      } else {
+        next = {
+          type: 'comp-check',
+          title: `${nextItem.video.lessonIDS[0]}: Comprehension Check`,
+          href: `/video-comprehension-checks/${nextItem.video.videoSlug}`
+        };
+      }
+    } else {
+      // If this is the last item, check if there's a next unit
+      const nextUnitVideos = allVideos
+        .filter(v => 
+          v.subjects.includes('AP Macroeconomics') && 
+          v.unit === String(parseInt(video.unit) + 1)
+        )
+        .sort((a, b) => {
+          const aLesson = a.lessonIDS[0] ? parseFloat(a.lessonIDS[0]) : 0;
+          const bLesson = b.lessonIDS[0] ? parseFloat(b.lessonIDS[0]) : 0;
+          return aLesson - bLesson;
+        });
+      
+      if (nextUnitVideos.length > 0) {
+        const firstVideo = nextUnitVideos[0];
+        next = {
+          type: 'video',
+          title: `${firstVideo.lessonIDS[0]}: Video`,
+          href: `/videos/macro/${firstVideo.videoSlug}`
+        };
+      }
+    }
+    
+    return { previous, next };
+  };
+  
+  const { previous, next } = getNavigationItems();
   
   // Debug logging
   console.log('Looking for video with slug:', videoSlug);
@@ -85,19 +187,6 @@ export default function VideoPage({ params }: VideoPageProps) {
     return <AuthGate />;
   }
 
-  const handleAnswerSelect = (questionId: string, answerIndex: number) => {
-    // Submit the answer immediately when selected
-    setSelectedAnswers(prev => ({
-      ...prev,
-      [questionId]: answerIndex
-    }));
-    setSubmittedAnswers(prev => ({
-      ...prev,
-      [questionId]: answerIndex
-    }));
-    setIsSubmitted(true);
-  };
-
   const handleImageClick = (imageUrl: string) => {
     setExpandedImage(imageUrl);
   };
@@ -105,144 +194,116 @@ export default function VideoPage({ params }: VideoPageProps) {
 
 
   return (
-    <>
-      <div className="h-screen bg-white overflow-hidden flex flex-col" style={{ height: '100vh', overflow: 'hidden', maxHeight: '100vh' }}>
-        <div className="grid grid-cols-1 lg:grid-cols-4 flex-1 min-h-0">
+    <div className="min-h-screen bg-white flex">
+      {/* Course Sidebar - Only show for macro videos */}
+      {subject === 'macro' && (
+        <CourseSidebar 
+          selectedUnit={video.unit}
+          isFixed={true}
+        />
+      )}
+      
+      {/* Main Content */}
+      <div className={`flex-1 py-8 ${subject === 'macro' ? 'ml-80' : 'max-w-6xl mx-auto'}`}>
+        <div className="max-w-6xl mx-auto">
           {/* Video Section */}
-          <div className="lg:col-span-3 flex flex-col min-h-0">
-            <div className="bg-white flex-shrink-0 p-4 pt-6 border-t border-gray-200">
-              <video 
-                ref={videoRef}
-                controls 
-                autoPlay 
-                className="w-full aspect-video rounded-lg"
-                playsInline
-              >
-                <source src={video.videoUrl} type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
-            </div>
-            
-            {/* Video Info - Fixed height to ensure it fits */}
-            <div className="p-4 lg:p-6 border-r border-gray-200 flex-shrink-0" style={{ maxHeight: '120px' }}>
-              <h1 className="text-xl font-bold text-gray-800 mb-2 truncate">{video.title}</h1>
-              <p className="text-gray-600 mb-2 text-sm">Unit {video.unit} - {video.subjects.join(', ')}</p>
-              {video.description && (
-                <p className="text-gray-700 leading-relaxed truncate text-sm">{video.description}</p>
-              )}
-            </div>
+          <div className="mb-8 px-4">
+            <video 
+              ref={videoRef}
+              controls 
+              autoPlay 
+              className="w-full aspect-video rounded-lg shadow-lg"
+              playsInline
+            >
+              <source src={video.videoUrl} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          
+          {/* Video Info */}
+          <div className="mb-8 px-4">
+            <h1 className="text-3xl font-bold text-gray-800 mb-4">{video.title}</h1>
+            <p className="text-gray-600 mb-4 text-lg">Unit {video.unit} - {video.subjects.join(', ')}</p>
+            {video.description && (
+              <p className="text-gray-700 leading-relaxed text-lg">{video.description}</p>
+            )}
           </div>
 
-          {/* Questions Sidebar */}
-          <div className="lg:col-span-1 border-l border-gray-200 bg-white flex flex-col min-h-0">
-            <div className="pt-6 pb-4 lg:pt-8 lg:pb-6 px-4 lg:px-6 border-b border-gray-200 bg-gray-50 flex-shrink-0">
-              <h3 className="text-xl font-bold text-gray-800 mb-1">Comprehension Check</h3>
-              <p className="text-sm text-gray-600">
-                Test your understanding with these questions
-              </p>
-            </div>
-
-            <div className="flex-1 overflow-y-auto min-h-0">
-              {video.questions && video.questions.length > 0 ? (
-                <div className="space-y-0">
-                  {video.questions.map((question, questionIndex) => (
-                    <div 
-                      key={question.id}
-                      className={`${questionIndex === 0 ? 'p-4 lg:p-6' : 'pt-4 pb-4 px-4 lg:px-6'} border-b border-gray-200 ${questionIndex === video.questions.length - 1 ? 'border-b-0' : ''}`}
-                    >
-                      <p className={`text-base font-semibold ${questionIndex === 0 ? 'mb-2' : 'mb-3'} text-gray-900`}>
-                        <span className="inline-flex w-6 h-6 bg-blue-100 text-blue-600 rounded-full text-sm font-bold items-center justify-center mr-3">
-                          {questionIndex + 1}
-                        </span>
-                        {question.text}
-                      </p>
-                      
-                      {question.image && (
-                        <div 
-                          onClick={() => handleImageClick(question.image!)}
-                          className="cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98] mb-4"
-                        >
-                          <img 
-                            src={question.image} 
-                            alt="Question diagram"
-                            className="w-full rounded-md border border-gray-200"
-                          />
-                        </div>
-                      )}
-
-                      <div className="space-y-2">
-                        {question.options.map((option, index) => (
-                          <button
-                            key={index}
-                            onClick={() => handleAnswerSelect(question.id, index)}
-                            disabled={submittedAnswers[question.id] !== undefined}
-                            className={`w-full text-left p-3 rounded-md text-sm font-medium transition-all duration-200 border ${
-                              submittedAnswers[question.id] !== undefined
-                                ? index === question.correctAnswer
-                                  ? 'bg-green-50 text-gray-900 shadow-sm border-green-200'
-                                  : index === submittedAnswers[question.id]
-                                    ? 'bg-red-50 text-gray-900 shadow-sm border-red-200'
-                                    : 'bg-gray-50 text-gray-900 border-transparent'
-                                : selectedAnswers[question.id] === index
-                                  ? 'bg-blue-50 text-gray-900 border-blue-200 shadow-sm'
-                                  : 'bg-white hover:bg-gray-50 hover:shadow-sm border-gray-200'
-                            }`}
-                          >
-                            <div className="flex items-center gap-3">
-                              <span className="w-6 h-6 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-600 font-medium text-sm">
-                                {String.fromCharCode(65 + index)}
-                              </span>
-                              <span className="flex-1 min-w-0 break-words pr-2">{option}</span>
-                              <div className="flex-shrink-0">
-                                {submittedAnswers[question.id] !== undefined && (
-                                  index === question.correctAnswer 
-                                    ? <Check className="w-5 h-5 text-green-500" /> 
-                                    : index === submittedAnswers[question.id] 
-                                      ? <X className="w-5 h-5 text-red-500" />
-                                      : null
-                                )}
-                              </div>
-                            </div>
-                          </button>
-                        ))}
-                      </div>
+          {/* Navigation Buttons */}
+          <div className="mt-12 px-4">
+            <div className="flex gap-4">
+              {/* Previous Button */}
+              <div className="flex-1">
+                {previous ? (
+                  <Link
+                    href={previous.href}
+                    className="block w-full h-24 p-4 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 group"
+                  >
+                    <div className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-2">
+                      Previous
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-gray-500">No comprehension questions available for this video.</p>
-                </div>
-              )}
+                    <div className="text-sm font-medium text-gray-600">
+                      {previous.title}
+                    </div>
+                  </Link>
+                ) : (
+                  <div className="w-full h-24 p-4 rounded-lg border border-gray-200 bg-gray-50">
+                    <div className="text-lg font-semibold text-gray-400 mb-2">Previous</div>
+                    <div className="text-sm font-medium text-gray-400">No previous resource</div>
+                  </div>
+                )}
+              </div>
+
+              {/* Next Button */}
+              <div className="flex-1">
+                {next ? (
+                  <Link
+                    href={next.href}
+                    className="block w-full h-24 p-4 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 group text-right"
+                  >
+                    <div className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-2">
+                      Next
+                    </div>
+                    <div className="text-sm font-medium text-gray-600">
+                      {next.title}
+                    </div>
+                  </Link>
+                ) : (
+                  <div className="w-full h-24 p-4 rounded-lg border border-gray-200 bg-gray-50 text-right">
+                    <div className="text-lg font-semibold text-gray-400 mb-2">Next</div>
+                    <div className="text-sm font-medium text-gray-400">No next resource</div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
-
-        {/* Image Expansion Modal */}
-        {expandedImage && (
-          <div 
-            className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
-            onClick={() => setExpandedImage(null)}
-          >
-            <button
-              onClick={() => setExpandedImage(null)}
-              className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors"
-            >
-              <X className="w-8 h-8" />
-            </button>
-            <div 
-              className="relative max-w-[90vw] max-h-[90vh]"
-              onClick={e => e.stopPropagation()}
-            >
-              <img
-                src={expandedImage || ''}
-                alt="Expanded diagram"
-                className="w-full h-full object-contain rounded-lg"
-              />
-            </div>
-          </div>
-        )}
       </div>
-    </>
+
+      {/* Image Expansion Modal */}
+      {expandedImage && (
+        <div 
+          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
+          onClick={() => setExpandedImage(null)}
+        >
+          <button
+            onClick={() => setExpandedImage(null)}
+            className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors"
+          >
+            <X className="w-8 h-8" />
+          </button>
+          <div 
+            className="relative max-w-[90vw] max-h-[90vh]"
+            onClick={e => e.stopPropagation()}
+          >
+            <img
+              src={expandedImage || ''}
+              alt="Expanded diagram"
+              className="w-full h-full object-contain rounded-lg"
+            />
+          </div>
+        </div>
+      )}
+    </div>
   );
 } 
