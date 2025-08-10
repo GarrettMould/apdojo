@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { ArrowLeft, FileText, Check, X, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
@@ -11,6 +11,7 @@ import { getUnitMCQTest } from '@/data/unitMCQTests';
 import { apMacroCourseInfo } from '@/data/courseInfo';
 import { videos as allVideos } from '@/data/videos';
 import { use } from 'react';
+import { saveTestProgress, loadTestProgress, saveTestResult } from '@/lib/testProgress';
 
 interface UnitMCQTestPageProps {
   params: Promise<{
@@ -29,15 +30,71 @@ export default function UnitMCQTestPage({ params }: UnitMCQTestPageProps) {
   
   const [answeredQuestions, setAnsweredQuestions] = useState<Record<string, { selectedAnswer: number; isCorrect: boolean }>>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isLoadingProgress, setIsLoadingProgress] = useState(true);
+  const [hasSavedProgress, setHasSavedProgress] = useState(false);
 
   // Get the unit test questions
   const unitNumber = parseInt(unitId);
   const questions = getUnitMCQTest(unitNumber);
+  const totalQuestions = questions.length;
   
   // Get unit info
   const unitInfo = apMacroCourseInfo.units.find(unit => 
     unit.unit.split(':')[0].split(' ')[1] === unitId.toString()
   );
+
+  // Load saved progress when component mounts
+  useEffect(() => {
+    const loadProgress = async () => {
+      if (user && unitId) {
+        try {
+          const savedProgress = await loadTestProgress(user.uid, `unit_${unitId}`);
+          if (savedProgress && !savedProgress.isSubmitted) {
+            setAnsweredQuestions(savedProgress.answeredQuestions);
+            setIsSubmitted(savedProgress.isSubmitted);
+            setHasSavedProgress(true);
+          }
+        } catch (error) {
+          console.error('Error loading progress:', error);
+        } finally {
+          setIsLoadingProgress(false);
+        }
+      } else {
+        setIsLoadingProgress(false);
+      }
+    };
+
+    loadProgress();
+  }, [user, unitId]);
+
+  // Save progress whenever answers change
+  useEffect(() => {
+    const saveProgress = async () => {
+      if (user && unitId && !isLoadingProgress) {
+        try {
+          await saveTestProgress({
+            userId: user.uid,
+            testType: 'unit_mcq',
+            testId: `unit_${unitId}`,
+            progress: {
+              answeredQuestions,
+              currentQuestionIndex: 0, // Not using this for unit tests
+              isSubmitted,
+              totalQuestions,
+              startedAt: new Date(),
+              lastUpdated: new Date()
+            }
+          });
+        } catch (error) {
+          console.error('Error saving progress:', error);
+        }
+      }
+    };
+
+    // Debounce the save to avoid too many Firebase calls
+    const timeoutId = setTimeout(saveProgress, 1000);
+    return () => clearTimeout(timeoutId);
+  }, [answeredQuestions, isSubmitted, user, unitId, totalQuestions, isLoadingProgress]);
   
   // If unit not found, show error
   if (!unitInfo || questions.length === 0) {
@@ -63,7 +120,17 @@ export default function UnitMCQTestPage({ params }: UnitMCQTestPageProps) {
     return <AuthGate />;
   }
 
-  const totalQuestions = questions.length;
+  // Show loading state while progress is being loaded
+  if (isLoadingProgress) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading your progress...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleAnswerSelect = (questionId: number, answerIndex: number) => {
     if (isSubmitted) return; // Can't change answers after submission
@@ -78,8 +145,24 @@ export default function UnitMCQTestPage({ params }: UnitMCQTestPageProps) {
     }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setIsSubmitted(true);
+    
+    // Save final test result
+    if (user && unitId) {
+      try {
+        await saveTestResult({
+          userId: user.uid,
+          testType: 'unit_mcq',
+          testId: `unit_${unitId}`,
+          score: correctAnswers,
+          totalQuestions,
+          completedAt: new Date()
+        });
+      } catch (error) {
+        console.error('Error saving test result:', error);
+      }
+    }
   };
 
   const progress = Object.keys(answeredQuestions).length;
@@ -98,7 +181,7 @@ export default function UnitMCQTestPage({ params }: UnitMCQTestPageProps) {
       <div className="flex-1 ml-80">
         {/* Unified Container */}
         <div className="flex justify-center mt-8">
-          <div className="w-full max-w-6xl bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+          <div className="w-full max-w-5xl bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
             {/* Header */}
             <div className="border-b border-gray-200">
               <div className="px-6 py-4">
@@ -114,6 +197,31 @@ export default function UnitMCQTestPage({ params }: UnitMCQTestPageProps) {
                 </div>
               </div>
             </div>
+
+            {/* Resume Test Banner - Show when there's saved progress */}
+            {hasSavedProgress && !isSubmitted && progress > 0 && (
+              <div className="border-b border-blue-200 bg-blue-50">
+                <div className="px-6 py-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
+                      <span className="text-sm font-medium text-blue-800">
+                        You have {progress} answered questions. Your progress is automatically saved.
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setAnsweredQuestions({});
+                        setHasSavedProgress(false);
+                      }}
+                      className="text-sm text-blue-600 hover:text-blue-800 underline"
+                    >
+                      Start Over
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Progress Bar - Only show during test */}
             {!isSubmitted && (
@@ -142,26 +250,29 @@ export default function UnitMCQTestPage({ params }: UnitMCQTestPageProps) {
                     const currentAnswer = answeredQuestions[question.id];
                     
                     return (
-                      <div key={question.id} className="border-b border-gray-200 pb-8 last:border-b-0">
+                      <div key={question.id} className="bg-white border border-gray-200 rounded-xl shadow-sm p-8 mb-8 last:mb-0">
                         {/* Question Header */}
-                        <div className="flex items-center gap-3 mb-4">
-                          <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                            Question {questionIndex + 1}
-                          </span>
+                        <div className="flex items-center gap-4 mb-6">
+                          <div className="flex items-center justify-center w-10 h-10 bg-slate-100 border border-slate-200 rounded-lg">
+                            <span className="text-lg font-bold text-slate-700">{questionIndex + 1}</span>
+                          </div>
+                          <div className="h-px flex-1 bg-gradient-to-r from-slate-200 to-transparent"></div>
                         </div>
 
                         {/* Question Text */}
-                        <p className="text-lg font-medium text-gray-900 mb-6 leading-relaxed">
-                          {question.question}
-                        </p>
+                        <div className="mb-8">
+                          <h3 className="text-lg font-medium text-slate-900 leading-relaxed mb-4">
+                            {question.question}
+                          </h3>
+                        </div>
 
                         {/* Question Image */}
                         {question.image && (
-                          <div className="mb-6">
+                          <div className="mb-8">
                             <img
                               src={question.image.src}
                               alt="Question diagram"
-                              className="w-full rounded-lg border border-gray-200"
+                              className="w-full rounded-lg border border-slate-200 shadow-sm"
                             />
                           </div>
                         )}
@@ -176,23 +287,29 @@ export default function UnitMCQTestPage({ params }: UnitMCQTestPageProps) {
                                 key={index}
                                 onClick={() => handleAnswerSelect(question.id, index)}
                                 disabled={isSubmitted}
-                                className={`w-full text-left p-4 rounded-lg border transition-all duration-200 flex items-center gap-3 ${
+                                className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 flex items-start gap-4 group ${
                                   isSelected 
-                                    ? 'bg-blue-50 text-gray-900 shadow-sm border-blue-200' 
-                                    : 'bg-transparent hover:bg-gray-50 border-gray-200 hover:border-gray-300 hover:shadow-sm'
+                                    ? 'bg-slate-50 text-slate-900 shadow-md border-slate-300 ring-2 ring-slate-100' 
+                                    : 'bg-white hover:bg-slate-50 border-slate-200 hover:border-slate-300 hover:shadow-md'
                                 }`}
                               >
-                                {/* Letter bubble */}
-                                <span className={`w-6 h-6 flex items-center justify-center rounded-full border text-xs font-medium flex-shrink-0 ${
+                                {/* Letter indicator */}
+                                <div className={`flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg border-2 font-semibold text-sm transition-all duration-200 ${
                                   isSelected 
-                                    ? 'bg-blue-100 border-blue-300 text-blue-700' 
-                                    : 'bg-white border-gray-300 text-gray-600'
+                                    ? 'bg-slate-700 border-slate-700 text-white' 
+                                    : 'bg-white border-slate-300 text-slate-600 group-hover:border-slate-400'
                                 }`}>
                                   {String.fromCharCode(65 + index)}
-                                </span>
+                                </div>
                                 
                                 {/* Option Text */}
-                                <span className="flex-1 text-sm">{option}</span>
+                                <div className="flex-1 pt-1">
+                                  <span className={`text-base ${
+                                    isSelected ? 'text-slate-900' : 'text-slate-700'
+                                  }`}>
+                                    {option}
+                                  </span>
+                                </div>
                               </button>
                             );
                           })}
@@ -202,11 +319,11 @@ export default function UnitMCQTestPage({ params }: UnitMCQTestPageProps) {
                   })}
 
                   {/* Submit Button */}
-                  <div className="flex justify-center pt-6">
+                  <div className="flex justify-center pt-8">
                     <button
                       onClick={handleSubmit}
                       disabled={progress < totalQuestions}
-                      className="px-8 py-3 bg-blue-600 text-white text-lg font-medium rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                      className="px-10 py-4 bg-slate-700 text-white text-lg font-semibold rounded-xl hover:bg-slate-800 disabled:bg-slate-300 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
                     >
                       Submit Test
                     </button>
@@ -230,35 +347,40 @@ export default function UnitMCQTestPage({ params }: UnitMCQTestPageProps) {
                     const isCorrect = currentAnswer?.isCorrect;
                     
                     return (
-                      <div key={question.id} className="border-b border-gray-200 pb-8 last:border-b-0">
+                      <div key={question.id} className="bg-white border border-gray-200 rounded-xl shadow-sm p-8 mb-8 last:mb-0">
                         {/* Question Header */}
-                        <div className="flex items-center gap-3 mb-4">
-                          <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                            Question {questionIndex + 1}
-                          </span>
-                          {isCorrect ? (
-                            <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
-                              Correct
-                            </span>
-                          ) : (
-                            <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
-                              Incorrect
-                            </span>
-                          )}
+                        <div className="flex items-center gap-4 mb-6">
+                          <div className="flex items-center justify-center w-10 h-10 bg-slate-100 border border-slate-200 rounded-lg">
+                            <span className="text-lg font-bold text-slate-700">{questionIndex + 1}</span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            {isCorrect ? (
+                              <div className="px-3 py-1 bg-emerald-50 border border-emerald-200 rounded-lg">
+                                <span className="text-sm font-semibold text-emerald-700">Correct</span>
+                              </div>
+                            ) : (
+                              <div className="px-3 py-1 bg-red-50 border border-red-200 rounded-lg">
+                                <span className="text-sm font-semibold text-red-700">Incorrect</span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="h-px flex-1 bg-gradient-to-r from-slate-200 to-transparent"></div>
                         </div>
 
                         {/* Question Text */}
-                        <p className="text-lg font-medium text-gray-900 mb-6 leading-relaxed">
-                          {question.question}
-                        </p>
+                        <div className="mb-8">
+                          <h3 className="text-lg font-medium text-slate-900 leading-relaxed mb-4">
+                            {question.question}
+                          </h3>
+                        </div>
 
                         {/* Question Image */}
                         {question.image && (
-                          <div className="mb-6">
+                          <div className="mb-8">
                             <img
                               src={question.image.src}
                               alt="Question diagram"
-                              className="w-full rounded-lg border border-gray-200"
+                              className="w-full rounded-lg border border-slate-200 shadow-sm"
                             />
                           </div>
                         )}
@@ -272,7 +394,7 @@ export default function UnitMCQTestPage({ params }: UnitMCQTestPageProps) {
                             return (
                               <div
                                 key={index}
-                                className={`w-full text-left p-4 rounded-lg border transition-all duration-200 flex items-center gap-3 ${
+                                className={`w-full text-left p-3 rounded-lg border transition-all duration-200 flex items-center gap-3 ${
                                   isCorrectAnswer 
                                     ? 'bg-green-50 text-gray-900 shadow-sm border-green-200' 
                                     : isSelected && !isCorrectAnswer
@@ -292,7 +414,7 @@ export default function UnitMCQTestPage({ params }: UnitMCQTestPageProps) {
                                 </span>
                                 
                                 {/* Option Text */}
-                                <span className="flex-1 text-sm">{option}</span>
+                                <span className="flex-1 text-base">{option}</span>
                                 
                                 {/* Feedback Icon */}
                                 <div className="flex-shrink-0">
@@ -307,13 +429,13 @@ export default function UnitMCQTestPage({ params }: UnitMCQTestPageProps) {
                           })}
                         </div>
 
-                                                 {/* Explanation */}
-                         <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                           <h4 className="font-semibold text-gray-900 mb-2">Explanation</h4>
-                           <p className="text-gray-700">
-                             {question.explanation}
-                           </p>
-                         </div>
+                        {/* Explanation */}
+                        <div className="p-6 bg-slate-50 rounded-xl border border-slate-200">
+                          <h4 className="font-semibold text-slate-900 mb-3 text-lg">Explanation</h4>
+                          <p className="text-slate-700 leading-relaxed">
+                            {question.explanation}
+                          </p>
+                        </div>
                       </div>
                     );
                   })}
@@ -325,7 +447,7 @@ export default function UnitMCQTestPage({ params }: UnitMCQTestPageProps) {
 
         {/* Navigation Buttons */}
         <div className="flex justify-center mt-12 mb-8">
-          <div className="w-full max-w-6xl">
+          <div className="w-full max-w-5xl">
             <div className="flex gap-4">
               {/* Previous Button */}
               <div className="flex-1">

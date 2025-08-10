@@ -3,14 +3,13 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronDown, ChevronRight, ChevronLeft, BookOpen, Download, X } from "lucide-react";
+import { ChevronDown, ChevronRight, ChevronLeft, BookOpen, Download, X, Home, ChevronRight as ChevronRightIcon } from "lucide-react";
 
 import { keyTerms, KeyTerm, whiteboardImages, WhiteboardImage } from '@/data/allContent';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question as QuestionType } from '@/data/questionBanks/types';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { LoginModal, SignupModal, SelectPlanModal } from '@/components/AuthModals';
-import { CourseSidebar } from '@/components/CourseSidebar';
 
 // Helper function to sort lesson IDs like "1.1", "1.10", "2.1"
 const sortLessonIDs = (a: string, b: string): number => {
@@ -126,17 +125,17 @@ function TermCard({ term, isFirst = false }: TermCardProps) {
 
   return (
     <div 
-      className="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 p-4 hover:border-blue-300 hover:shadow-blue-100/50 group"
+      className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 p-6 hover:border-slate-300 hover:shadow-slate-100/50 group"
     >
       <div className="relative">
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <h5 
-              className="text-lg font-bold text-gray-900 mb-2"
+              className="text-xl font-bold text-slate-900 mb-3"
             >
               {term.term}
             </h5>
-            <p className="text-gray-700 leading-relaxed text-sm">
+            <p className="text-slate-700 leading-relaxed text-base">
               {term.definition}
             </p>
           </div>
@@ -144,18 +143,18 @@ function TermCard({ term, isFirst = false }: TermCardProps) {
 
         {/* Additional Content - Always Visible */}
         {hasAdditionalContent && (
-          <div className="mt-4">
-            <div className="border-t border-gray-100 pt-4 space-y-4">
+          <div className="mt-6">
+            <div className="border-t border-slate-100 pt-6 space-y-5">
               
               {/* SubNotes */}
               {term.subNotes && term.subNotes.length > 0 && (
                 <div>
-                  <h6 className="text-sm font-semibold text-gray-800 mb-2">Key Points:</h6>
-                  <ul className="space-y-1">
+                  <h6 className="text-sm font-semibold text-slate-800 mb-3 uppercase tracking-wide">Key Points</h6>
+                  <ul className="space-y-2">
                     {term.subNotes.map((note, index) => (
-                      <li key={index} className="flex items-start gap-2 text-sm text-gray-600">
-                        <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></span>
-                        <span>{note}</span>
+                      <li key={index} className="flex items-start gap-3 text-sm text-slate-600">
+                        <span className="w-2 h-2 bg-slate-400 rounded-full mt-2 flex-shrink-0"></span>
+                        <span className="leading-relaxed">{note}</span>
                       </li>
                     ))}
                   </ul>
@@ -165,12 +164,12 @@ function TermCard({ term, isFirst = false }: TermCardProps) {
               {/* Image */}
               {term.image && (
                 <div>
-                  <h6 className="text-sm font-semibold text-gray-800 mb-2">Visual Aid:</h6>
+                  <h6 className="text-sm font-semibold text-slate-800 mb-3 uppercase tracking-wide">Visual Aid</h6>
                   <div className="relative group">
                     <img
                       src={term.image.url}
                       alt={term.image.alt}
-                      className="w-full max-w-md rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 object-contain"
+                      className="w-full max-w-md rounded-lg border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-200 object-contain"
                     />
                   </div>
                 </div>
@@ -196,7 +195,14 @@ interface SimpleMcqDisplayProps {
 }
 
 function SimpleMcqDisplay({ question, onAnswerSelect, currentAnswer }: SimpleMcqDisplayProps) {
+  // Only consider submitted if there's an answer for THIS specific question
   const isSubmitted = !!currentAnswer; 
+  
+  // Debug logging
+  console.log('SimpleMcqDisplay: Question ID:', question.id);
+  console.log('SimpleMcqDisplay: Current answer:', currentAnswer);
+  console.log('SimpleMcqDisplay: Is submitted:', isSubmitted);
+  
   const letterToIndex = (letter?: string): number | null => {
     if (!letter || typeof letter !== 'string' || letter.length !== 1) return null;
     const index = letter.toUpperCase().charCodeAt(0) - 65;
@@ -219,8 +225,8 @@ function SimpleMcqDisplay({ question, onAnswerSelect, currentAnswer }: SimpleMcq
 
   return (
     <div className="mb-6">
-      <div className="font-semibold text-base mb-4 text-gray-900">{question.question}</div>
-      <div className="space-y-2">
+      <div className="font-semibold text-lg mb-6 text-slate-900 leading-relaxed">{question.question}</div>
+      <div className="space-y-3">
         {question.options.map((option, optIndex) => {
           const letter = String.fromCharCode(65 + optIndex);
           const isCorrectOption = optIndex === correctAnswerIndex;
@@ -230,30 +236,30 @@ function SimpleMcqDisplay({ question, onAnswerSelect, currentAnswer }: SimpleMcq
             <button
               key={letter}
               onClick={() => handleSelect(optIndex)}
-              className={`block w-full text-left px-4 py-3 rounded-lg border transition-colors duration-150 text-base font-medium
+              className={`block w-full text-left px-5 py-4 rounded-xl border-2 transition-all duration-200 text-base font-medium
                 ${isSubmitted ? (
-                  isCorrectOption ? 'bg-green-100 border-green-400 text-green-900' :
-                  isSelectedOption ? 'bg-red-100 border-red-400 text-red-900' :
-                  'bg-white border-gray-200'
+                  isCorrectOption ? 'bg-emerald-50 border-emerald-300 text-emerald-900 shadow-sm' :
+                  isSelectedOption ? 'bg-red-50 border-red-300 text-red-900 shadow-sm' :
+                  'bg-white border-slate-200 text-slate-700'
                 ) : isSelectedOption ? (
-                  isCorrectOption ? 'bg-green-100 border-green-400 text-green-900' :
-                  'bg-red-100 border-red-400 text-red-900'
-                ) : 'bg-white border-gray-200 hover:bg-blue-50'}
-                focus:outline-none`}
+                  isCorrectOption ? 'bg-emerald-50 border-emerald-300 text-emerald-900 shadow-sm' :
+                  'bg-red-50 border-red-300 text-red-900 shadow-sm'
+                ) : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 hover:shadow-sm'}
+                focus:outline-none focus:ring-2 focus:ring-slate-200`}
               disabled={isSubmitted}
             >
-              <span className="mr-3 font-bold">{letter}.</span>{option}
+              <span className="mr-4 font-bold text-slate-600">{letter}.</span>{option}
             </button>
           );
         })}
       </div>
       {currentAnswer && (
-        <div className="mt-4 p-4 rounded-lg text-base bg-white border border-gray-200">
-          <div className="font-bold mb-2">
+        <div className="mt-6 p-5 rounded-xl text-base bg-slate-50 border border-slate-200">
+          <div className="font-bold mb-3 text-slate-900">
             {currentAnswer.isCorrect ? 'Correct!' : 'Incorrect'}
           </div>
           {question.explanation && (
-            <div className="text-base">{question.explanation}</div>
+            <div className="text-slate-700 leading-relaxed">{question.explanation}</div>
           )}
         </div>
       )}
@@ -275,7 +281,15 @@ function ComprehensionCheck({ unitId, subject }: ComprehensionCheckProps) {
     q.subject === subject && q.unit === unitId
   ).slice(0, 5); // Limit to 5 questions like in whiteboards
 
+  // Reset answers when unit changes or component mounts
+  useEffect(() => {
+    console.log('ComprehensionCheck: Resetting answers for unit', unitId, 'subject', subject);
+    setQuickCheckAnswers({});
+    setCurrentQuestionIndex(0);
+  }, [unitId, subject]);
+
   const handleQuickCheckAnswer = (questionId: string | number, answerLetter: string, isCorrect: boolean) => {
+    console.log('ComprehensionCheck: Answering question', questionId, 'with letter', answerLetter, 'isCorrect:', isCorrect);
     setQuickCheckAnswers(prev => ({
       ...prev,
       [questionId]: { selectedLetter: answerLetter, isCorrect }
@@ -296,45 +310,85 @@ function ComprehensionCheck({ unitId, subject }: ComprehensionCheckProps) {
 
   const currentQuestion = unitQuestions[currentQuestionIndex];
 
+  // Debug logging
+  useEffect(() => {
+    console.log('ComprehensionCheck: Current question index:', currentQuestionIndex);
+    console.log('ComprehensionCheck: Current question:', currentQuestion);
+    console.log('ComprehensionCheck: Quick check answers:', quickCheckAnswers);
+    console.log('ComprehensionCheck: Current answer for question:', quickCheckAnswers[currentQuestion?.id]);
+  }, [currentQuestionIndex, currentQuestion, quickCheckAnswers]);
+
   if (unitQuestions.length === 0) {
     return null;
   }
 
   return (
-    <div className="mt-8 border-t border-gray-200 pt-6">
-      <h4 className="text-xl font-semibold mb-4 text-gray-800">
-        Comprehension Check
-      </h4>
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-        <SimpleMcqDisplay
-          question={currentQuestion}
-          onAnswerSelect={handleQuickCheckAnswer}
-          currentAnswer={quickCheckAnswers[currentQuestion.id]}
-        />
-        <div className="flex items-center justify-between mt-4">
-          <button
-            onClick={handlePreviousQuestion}
-            className={`text-sm font-medium cursor-pointer ${
-              currentQuestionIndex === 0
-                ? 'text-gray-400 pointer-events-none'
-                : 'text-blue-600 hover:text-blue-800'
-            }`}
-          >
-            ← Previous Question
-          </button>
-          <span className="text-sm text-gray-500">
-            Question {currentQuestionIndex + 1} of {unitQuestions.length}
-          </span>
-          <button
-            onClick={handleNextQuestion}
-            className={`text-sm font-medium cursor-pointer ${
-              currentQuestionIndex === unitQuestions.length - 1
-                ? 'text-gray-400 pointer-events-none'
-                : 'text-blue-600 hover:text-blue-800'
-            }`}
-          >
-            Next Question →
-          </button>
+    <div className="mt-12 border-t border-slate-200 pt-8">
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div className="px-6 py-4 bg-slate-50 border-b border-slate-200">
+          <h4 className="text-xl font-bold text-slate-900">
+            Comprehension Check
+          </h4>
+          <p className="text-sm text-slate-600 mt-1">
+            Test your understanding with practice questions
+          </p>
+        </div>
+        <div className="p-6">
+          {/* Progress Indicator */}
+          <div className="mb-6">
+            <div className="flex items-center justify-between text-sm text-slate-600 mb-2">
+              <span>Progress</span>
+              <span>{Object.keys(quickCheckAnswers).length} of {unitQuestions.length} questions answered</span>
+            </div>
+            <div className="w-full bg-slate-200 rounded-full h-2">
+              <div 
+                className="bg-slate-600 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${(Object.keys(quickCheckAnswers).length / unitQuestions.length) * 100}%` }}
+              ></div>
+            </div>
+          </div>
+          
+          <SimpleMcqDisplay
+            question={currentQuestion}
+            onAnswerSelect={handleQuickCheckAnswer}
+            currentAnswer={quickCheckAnswers[currentQuestion.id]}
+          />
+          
+          {/* Completion Message */}
+          {Object.keys(quickCheckAnswers).length === unitQuestions.length && (
+            <div className="mt-6 p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-center">
+              <div className="text-emerald-800 font-semibold mb-1">🎉 Great job!</div>
+              <div className="text-emerald-700 text-sm">
+                You've completed all the comprehension check questions for this unit.
+              </div>
+            </div>
+          )}
+          
+          <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-100">
+            <button
+              onClick={handlePreviousQuestion}
+              className={`text-sm font-medium cursor-pointer px-4 py-2 rounded-lg transition-colors ${
+                currentQuestionIndex === 0
+                  ? 'text-slate-400 bg-slate-50 cursor-not-allowed'
+                  : 'text-slate-600 hover:text-slate-800 hover:bg-slate-50'
+              }`}
+            >
+              ← Previous Question
+            </button>
+            <span className="text-sm text-slate-500 bg-slate-50 px-3 py-1 rounded-lg">
+              Question {currentQuestionIndex + 1} of {unitQuestions.length}
+            </span>
+            <button
+              onClick={handleNextQuestion}
+              className={`text-sm font-medium cursor-pointer px-4 py-2 rounded-lg transition-colors ${
+                currentQuestionIndex === unitQuestions.length - 1
+                  ? 'text-slate-400 bg-slate-50 cursor-not-allowed'
+                  : 'text-slate-600 hover:text-slate-800 hover:bg-slate-50'
+              }`}
+            >
+              Next Question →
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -359,78 +413,86 @@ function WhiteboardsGallery({ unitId, subject }: WhiteboardsGalleryProps) {
   const hasWhiteboards = unitWhiteboards.length > 0;
 
   return (
-    <div className="mt-8 border-t border-gray-200 pt-6">
-      <h4 className="text-xl font-bold mb-4 text-gray-800">
-        Visual Aids & Whiteboards
-      </h4>
-      
-      {hasWhiteboards ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {unitWhiteboards.map((whiteboard) => (
-            <div
-              key={whiteboard.id}
-              className="relative cursor-pointer group shadow-md hover:shadow-lg rounded-lg overflow-hidden border border-gray-200 hover:border-blue-400 transition-all duration-200"
-              onClick={() => setExpandedImage(whiteboard)}
-            >
-              <div className="aspect-video bg-gray-100 relative">
-                <img
-                  src={whiteboard.imageUrl}
-                  alt={whiteboard.title || `Whiteboard ${whiteboard.id}`}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
-                  <div className="w-8 h-8 bg-white bg-opacity-90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    <svg className="w-4 h-4 text-gray-800" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6zM14 9a1 1 0 00-1-1h-2z" clipRule="evenodd" />
-                    </svg>
+    <div className="mt-12 border-t border-slate-200 pt-8">
+      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div className="px-6 py-4 bg-slate-50 border-b border-slate-200">
+          <h4 className="text-xl font-bold text-slate-900">
+            Visual Aids & Whiteboards
+          </h4>
+          <p className="text-sm text-slate-600 mt-1">
+            Interactive diagrams and visual explanations
+          </p>
+        </div>
+        <div className="p-6">
+          {hasWhiteboards ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {unitWhiteboards.map((whiteboard) => (
+                <div
+                  key={whiteboard.id}
+                  className="relative cursor-pointer group shadow-sm hover:shadow-md rounded-xl overflow-hidden border border-slate-200 hover:border-slate-300 transition-all duration-200"
+                  onClick={() => setExpandedImage(whiteboard)}
+                >
+                  <div className="aspect-video bg-slate-100 relative">
+                    <img
+                      src={whiteboard.imageUrl}
+                      alt={whiteboard.title || `Whiteboard ${whiteboard.id}`}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    />
+                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
+                      <div className="w-8 h-8 bg-white bg-opacity-90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <svg className="w-4 h-4 text-slate-800" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6zM14 9a1 1 0 00-1-1h-2z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                  {whiteboard.title && (
+                    <div className="p-3 bg-white">
+                      <p className="text-sm font-semibold text-slate-900 truncate">{whiteboard.title}</p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {Array.from({ length: placeholderCount }, (_, index) => (
+                <div
+                  key={index}
+                  className="relative cursor-pointer group shadow-sm hover:shadow-md rounded-xl overflow-hidden border border-slate-200 hover:border-slate-300 transition-all duration-200 bg-slate-50"
+                  onClick={() => setExpandedImage({
+                    id: `placeholder-${index}`,
+                    imageUrl: '/images/placeholder-whiteboard.jpg',
+                    title: `Visual Aid ${index + 1} - Coming Soon`,
+                    unit: unitId,
+                    subject: subject,
+                    lessonIDs: [] // Add dummy lessonIDs property to satisfy type
+                  })}
+                >
+                  <div className="aspect-video bg-slate-100 relative flex items-center justify-center">
+                    <div className="text-center">
+                      <svg className="w-12 h-12 text-slate-300 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6zM14 9a1 1 0 00-1-1h-2z" clipRule="evenodd" />
+                      </svg>
+                      <p className="text-sm text-slate-500">Coming Soon</p>
+                    </div>
+                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
+                      <div className="w-8 h-8 bg-white bg-opacity-90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <svg className="w-4 h-4 text-slate-800" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6zM14 9a1 1 0 00-1-1h-2z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-3 bg-white">
+                    <p className="text-sm font-medium text-slate-400">Visual Aid {index + 1}</p>
                   </div>
                 </div>
-              </div>
-              {whiteboard.title && (
-                <div className="p-3 bg-white">
-                  <p className="text-sm font-bold text-gray-900 truncate">{whiteboard.title}</p>
-                </div>
-              )}
+              ))}
             </div>
-          ))}
+          )}
         </div>
-      ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {Array.from({ length: placeholderCount }, (_, index) => (
-            <div
-              key={index}
-              className="relative cursor-pointer group shadow-md hover:shadow-lg rounded-lg overflow-hidden border border-gray-200 hover:border-blue-400 transition-all duration-200 bg-gray-50"
-              onClick={() => setExpandedImage({
-                id: `placeholder-${index}`,
-                imageUrl: '/images/placeholder-whiteboard.jpg',
-                title: `Visual Aid ${index + 1} - Coming Soon`,
-                unit: unitId,
-                subject: subject,
-                lessonIDs: [] // Add dummy lessonIDs property to satisfy type
-              })}
-            >
-              <div className="aspect-video bg-gray-100 relative flex items-center justify-center">
-                <div className="text-center">
-                  <svg className="w-12 h-12 text-gray-300 mx-auto mb-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6zM14 9a1 1 0 00-1-1h-2z" clipRule="evenodd" />
-                  </svg>
-                  <p className="text-sm text-gray-500">Coming Soon</p>
-                </div>
-                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
-                  <div className="w-8 h-8 bg-white bg-opacity-90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    <svg className="w-4 h-4 text-gray-800" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6zM14 9a1 1 0 00-1-1h-2z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-              <div className="p-3 bg-white">
-                <p className="text-sm font-medium text-gray-400">Visual Aid {index + 1}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      </div>
 
       {/* Modal for expanded image */}
       {expandedImage && (
@@ -449,7 +511,7 @@ function WhiteboardsGallery({ unitId, subject }: WhiteboardsGalleryProps) {
                   link.click();
                   document.body.removeChild(link);
                 }}
-                className="text-white hover:text-gray-300 flex items-center gap-2"
+                className="text-white hover:text-slate-300 flex items-center gap-2"
                 aria-label="Download"
               >
                 <Download className="w-6 h-6" />
@@ -457,7 +519,7 @@ function WhiteboardsGallery({ unitId, subject }: WhiteboardsGalleryProps) {
               </button>
               <button
                 onClick={() => setExpandedImage(null)}
-                className="text-white hover:text-gray-300"
+                className="text-white hover:text-slate-300"
                 aria-label="Close"
               >
                 <X className="w-8 h-8" />
@@ -559,54 +621,79 @@ export default function UnitLandingPage({ params }: UnitPageProps) {
         }}
       />
       
-      <div className="min-h-screen bg-white flex">
-        {/* Course Sidebar */}
-        <CourseSidebar
-          selectedUnit={unitIdNum.toString()}
-          isFixed={true}
-        />
+      <div className="min-h-screen bg-gray-50">
+        {/* Breadcrumb Navigation */}
+        <div className="bg-white border-b border-slate-200 shadow-sm">
+          <div className="max-w-5xl mx-auto px-8 py-4">
+            <nav className="flex items-center space-x-2 text-sm">
+              <Link 
+                href="/" 
+                className="flex items-center text-slate-600 hover:text-slate-900 transition-colors"
+              >
+                <Home className="w-4 h-4 mr-1" />
+                Home
+              </Link>
+              <ChevronRightIcon className="w-4 h-4 text-slate-400" />
+              <Link 
+                href="/unit-study-guides" 
+                className="text-slate-600 hover:text-slate-900 transition-colors"
+              >
+                AP Macroeconomics
+              </Link>
+              <ChevronRightIcon className="w-4 h-4 text-slate-400" />
+              <span className="text-slate-900 font-medium">Unit {unitId}</span>
+            </nav>
+          </div>
+        </div>
         
         {/* Main Content */}
-        <div className="flex-1 ml-80">
-          <div className="max-w-6xl mx-auto">
-            {/* Header */}
-            <div className="flex items-center justify-center py-8 px-4 border-b border-gray-200">
-              <div className="flex flex-col items-center px-8 py-4 bg-transparent">
-                <div className="text-4xl md:text-6xl font-extrabold tracking-tight text-gray-800">UNIT {unitId}</div>
-                <div className="text-3xl font-bold text-black mt-6">Basic Economic Concepts</div>
+        <div className="max-w-5xl mx-auto">
+          {/* Professional Header */}
+          <div className="bg-white border-b border-slate-200 shadow-sm mt-8">
+            <div className="px-8 py-12 text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-slate-100 border border-slate-200 rounded-xl mb-6">
+                <BookOpen className="w-8 h-8 text-slate-700" />
+              </div>
+              <h1 className="text-4xl font-bold text-slate-900 mb-4">Unit {unitId}</h1>
+              <h2 className="text-2xl font-semibold text-slate-700 mb-2">Basic Economic Concepts</h2>
+              <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+                Master the fundamental principles and key terminology essential for understanding macroeconomics
+              </p>
+            </div>
+          </div>
+
+          {/* Terms Section - Enhanced Design */}
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 mt-8 overflow-hidden">
+            <div className="px-8 py-6 border-b border-slate-200 bg-slate-50">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-bold text-slate-900">Key Terms & Definitions</h3>
+                <span className="text-sm text-slate-500 bg-white px-3 py-1 rounded-lg border border-slate-200">
+                  {unitTerms.length} terms
+                </span>
               </div>
             </div>
-
-            {/* Terms Section - Full Width */}
-            <div className="flex flex-col">
-              <div className="py-5 px-6 border-b border-gray-200 bg-gray-50 flex-shrink-0">
-                <div className="flex items-center justify-between h-full">
-                  <h3 className="text-xl font-bold text-gray-800">Key Terms & Definitions</h3>
-                </div>
+            <div className="p-8">
+              <div className="space-y-6">
+                {unitTerms.map((term, index) => (
+                  <TermCard
+                    key={term.id}
+                    term={term}
+                    isFirst={index === 0}
+                  />
+                ))}
               </div>
-              <div className="pt-6 pb-6 px-6 overflow-y-auto">
-                <div className="grid gap-4">
-                  {unitTerms.map((term, index) => (
-                    <TermCard
-                      key={term.id}
-                      term={term}
-                      isFirst={index === 0}
-                    />
-                  ))}
-                </div>
-                
-                {/* Comprehension Check Section */}
-                <ComprehensionCheck 
-                  unitId={unitIdNum} 
-                  subject="ap_macroeconomics" 
-                />
-                
-                {/* Whiteboards Gallery Section */}
-                <WhiteboardsGallery 
-                  unitId={unitIdNum} 
-                  subject="ap_macroeconomics" 
-                />
-              </div>
+              
+              {/* Enhanced Comprehension Check Section */}
+              <ComprehensionCheck 
+                unitId={unitIdNum} 
+                subject="ap_macroeconomics" 
+              />
+              
+              {/* Enhanced Whiteboards Gallery Section */}
+              <WhiteboardsGallery 
+                unitId={unitIdNum} 
+                subject="ap_macroeconomics" 
+              />
             </div>
           </div>
         </div>

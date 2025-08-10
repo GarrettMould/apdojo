@@ -4,6 +4,7 @@ export type Question = {
   options: string[];
   correctAnswer: number;
   image?: string;
+  explanation?: string;
 }
 
 export type Video = {
@@ -502,7 +503,7 @@ export const videos: Video[] = [
         lessonIDS: ["1.1"],
         tags: ["Scarcity"],
         videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.1+-+Scarcity.mp4",
-        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.1+-+Scarcity+-+TN",
+        thumbnail: "https://thumbnailslarge.s3.ap-southeast-2.amazonaws.com/1.1_TN.jpg",
         accessLevel: "free",
         questions: [
           {  
@@ -528,7 +529,7 @@ export const videos: Video[] = [
             correctAnswer: 2
           },
           {
-            id: "2",
+            id: "3",
             text: "Which of the following is the best example of an economy facing the problem of scarcity?",
             options: [
               "A company decides to produce laptops instead of phones.",
@@ -550,7 +551,7 @@ export const videos: Video[] = [
         lessonIDS: ["1.4"],
         tags: ["Demand", "Law of Demand"],
         videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.4+-+Demand.mp4",
-        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.4+-+Demand+-+TN.png",
+        thumbnail: "https://thumbnailslarge.s3.ap-southeast-2.amazonaws.com/1.4_TN.jpg",
         accessLevel: "free",
         questions: [
           {
@@ -609,7 +610,7 @@ export const videos: Video[] = [
         lessonIDS: ["2.1"],
         tags: ["Circular Flow Model", "Injections", "Leakages"],
         videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.1+-+Circular+Flow+Model.mp4",
-        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.1+-+Circular+Flow+Model+-+TN.png",
+        thumbnail: "https://thumbnailslarge.s3.ap-southeast-2.amazonaws.com/2.1_TN_Circular_Flow.jpg",
         accessLevel: "free",
         questions: [
           {
@@ -657,7 +658,7 @@ export const videos: Video[] = [
         lessonIDS: ["1.5"],
         tags: ["Supply", "Law of Supply"],
         videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.5+-+Supply.mp4",
-        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.5+-+Supply+-+TN.png",
+        thumbnail: "https://thumbnailslarge.s3.ap-southeast-2.amazonaws.com/1.5_TN.jpg",
         accessLevel: "free",
         questions: [
           {
@@ -716,7 +717,7 @@ export const videos: Video[] = [
         lessonIDS: ["2.3"],
         tags: ["Unemployment", "Natural Rate of Unemployment", "Labor Force Participation Rate", "Discouraged Workers"],
         videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.3+-+Unemployment.mp4",
-        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.3+-+Unemployment+-+TN.png",
+        thumbnail: "https://thumbnailslarge.s3.ap-southeast-2.amazonaws.com/2.3_TN.jpg",
         accessLevel: "free",
         questions: [
           
@@ -776,7 +777,7 @@ export const videos: Video[] = [
         lessonIDS: ["1.6"],
         tags: ["Market Equilibrium", "Disequilibrium", "Changes in Equilibrium", "Surplus", "Shortage"],
         videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.6+-+Equilibrium.mp4",
-        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.6+-+TN.png",
+        thumbnail: "https://thumbnailslarge.s3.ap-southeast-2.amazonaws.com/1.6_TN.jpg",
         accessLevel: "free",
         questions:      [
           {
@@ -824,7 +825,7 @@ export const videos: Video[] = [
         lessonIDS: ["1.2"],
         tags: ["Opportunity Cost", "Production Possibilities Curve", "Trade-offs"],
         videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.2+-+Opportunity+Cost+and+the+PPC.mp4",
-        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.2+-+TN.png",
+        thumbnail: "https://thumbnailslarge.s3.ap-southeast-2.amazonaws.com/1.2_TN.jpg",
         accessLevel: "free",
         questions:      [
           {
@@ -872,7 +873,7 @@ export const videos: Video[] = [
         lessonIDS: ["2.1"],
         tags: ["GDP", "Expenditure Approach", "Income Approach"],
         videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.1+-+GDP.mp4",
-        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.1+-+(GDP)+-+TN.png",
+        thumbnail: "https://thumbnailslarge.s3.ap-southeast-2.amazonaws.com/2.1_TN.jpg",
         accessLevel: "free",
         questions:      [
           {
@@ -931,7 +932,7 @@ export const videos: Video[] = [
         lessonIDS: ["2.4"],
         tags: ["Price Indices", "Inflation", "Deflation", "Disinflation", "Consumer Price Index (CPI)"],
         videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.4+-+Price+Indices+and+Inflation.mp4",
-        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.4+-+Price+Indices+and+Inflation+TN.png",
+        thumbnail: "https://thumbnailslarge.s3.ap-southeast-2.amazonaws.com/2.1_TN.jpg",
         accessLevel: "free",
         questions:      [
           {
@@ -1001,7 +1002,7 @@ export const videos: Video[] = [
         lessonIDS: ["2.7"],
         tags: ["Business Cycles", "Natural Rate of Unemployment", "Real GDP", "Unemployment"],
         videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.7+-+Business+Cycles.mp4",
-        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.7+-+Business+Cycles+TN.png",
+        thumbnail: "https://thumbnailslarge.s3.ap-southeast-2.amazonaws.com/2.7_TN.jpg",
         accessLevel: "free",
         questions:     [
           {
@@ -1071,7 +1072,7 @@ export const videos: Video[] = [
         lessonIDS: ["2.6"],
         tags: ["Real GDP", "Nominal GDP", "GDP Deflator"],
         videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.6+-+Real+v+Nominal+GDP.mp4",
-        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.6+-+Real+v+Nominal+GDP+TN.png",
+        thumbnail: "https://thumbnailslarge.s3.ap-southeast-2.amazonaws.com/2.6_TN.jpg",
         accessLevel: "free",
         questions:     [
           {
@@ -1141,7 +1142,7 @@ export const videos: Video[] = [
         lessonIDS: ["2.2"],
         tags: ["GDP", "Limitations", "GDP per capita"],
         videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.2+-+Limitations+of+GDP.mp4",
-        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.2+-+TN.png",
+        thumbnail: "https://thumbnailslarge.s3.ap-southeast-2.amazonaws.com/2.2_TN.jpg",
         accessLevel: "free",
         questions:     [
           {
@@ -1226,6 +1227,583 @@ export const videos: Video[] = [
             correctAnswer: 1
           }
         ]
+          
+      },
+    
+      {
+        id: "27",
+        title: "Aggregate Demand",
+        description: "Learn about the components of aggregate demand, the relationship between aggregate demand and the price level, and the impact of changes in aggregate demand on the economy.",
+        videoSlug: "aggregate-demand",
+        subjects: ["AP Macroeconomics"],
+        unit: "3",
+        lessonIDS: ["3.1"],
+        tags: ["Aggregate Demand", "Price Level", "Changes in Aggregate Demand"],
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/3.1+-+Aggregate+Demand.mp4",
+        thumbnail: "https://thumbnailslarge.s3.ap-southeast-2.amazonaws.com/3.1_TN.jpg",
+        accessLevel: "free",
+        questions:     [
+          {
+            id: "1",
+            text: "When the domestic price level in a country falls, its goods become cheaper for foreigners to buy. This leads to an increase in what component of aggregate demand?",
+            options: [
+              "Consumption",
+              "Investment",
+              "Government Spending",
+              "Net Exports"
+            ],
+            correctAnswer: 3,
+            explanation: "This describes the Net Export Effect. A lower domestic price level makes a country's exports more attractive to foreign buyers and makes imports less attractive to domestic consumers, thus increasing net exports (Exports - Imports)."
+          },
+          {
+            id: "2",
+            text: "Which of the following would cause a rightward shift of the Aggregate Demand (AD) curve?",
+            options: [
+              "A decrease in the overall price level.",
+              "An increase in personal income taxes.",
+              "An increase in consumer confidence leading to more household spending.",
+              "A decrease in the money supply."
+            ],
+            correctAnswer: 2,
+            explanation: "An increase in consumer confidence leads to higher household spending, which is an increase in the Consumption (C) component of aggregate demand. This non-price-level change shifts the entire AD curve to the right."
+          },
+          {
+            id: "3",
+            text: "Which of the following events would most likely cause the Aggregate Demand curve in the United States to shift to the left?",
+            options: [
+              "The U.S. government passes a bill to increase spending on infrastructure.",
+              "The price level in the United States falls relative to other countries.",
+              "Several major European nations, key trading partners of the U.S., fall into a recession.",
+              "A technological breakthrough increases productivity."
+            ],
+            correctAnswer: 2,
+            explanation: "When key trading partners fall into a recession, their citizens and businesses buy fewer goods, including those imported from the U.S. This decreases U.S. exports, which reduces Net Exports (NX) and shifts the U.S. Aggregate Demand curve to the left."
+          },
+          {
+            id: "4",
+            text: "A decrease in the overall price level causing interest rates to fall, which in turn stimulates more business spending on capital goods, is known as the:",
+            options: [
+              "Real Wealth Effect",
+              "Interest Rate Effect",
+              "Net Export Effect",
+              "Multiplier Effect"
+            ],
+            correctAnswer: 1,
+            explanation: "This is the Interest Rate Effect. A lower price level means households need less money for purchases and can save more. This increases the supply of loanable funds, lowering interest rates and encouraging more investment spending by businesses."
+          }
+        ]
+          
+      },
+      {
+        id: "28",
+        title: "Multipliers",
+        description: "Learn about the spending multiplier, the tax multiplier, and the affect of changes in government spending and taxes on the economy.",
+        videoSlug: "multipliers",
+        subjects: ["AP Macroeconomics"],
+        unit: "3",
+        lessonIDS: ["3.2"],
+        tags: ["Spending Multiplier", "Tax Multiplier", "Government Spending", "Taxes"],
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/3.2+-+Multipliers+.mp4",
+        thumbnail: "https://thumbnailslarge.s3.ap-southeast-2.amazonaws.com/3.2_TN.jpg",
+        accessLevel: "free",
+        questions:     [
+          {
+            id: "1",
+            text: "If a household receives an additional $1,000 of income and chooses to spend $700 and save $300, what is its Marginal Propensity to Save (MPS)?",
+            options: [
+              "0.3",
+              "0.7",
+              "3.33",
+              "1.42"
+            ],
+            correctAnswer: 0,
+            explanation: "The Marginal Propensity to Save (MPS) is the fraction of extra income that is saved. It is calculated as the change in savings ($300) divided by the change in income ($1,000), which equals 0.3."
+          },
+          {
+            id: "2",
+            text: "If the marginal propensity to consume (MPC) in an economy is 0.9, what is the value of the spending multiplier?",
+            options: [
+              "1.11",
+              "9",
+              "10",
+              "0.1"
+            ],
+            correctAnswer: 2,
+            explanation: "First, find the MPS: MPS = 1 - MPC = 1 - 0.9 = 0.1. The spending multiplier formula is 1 / MPS. Therefore, the multiplier is 1 / 0.1 = 10."
+          },
+          {
+            id: "3",
+            text: "Assuming an MPC of 0.8, what would be the maximum possible change in real GDP from a $20 billion increase in government spending?",
+            options: [
+              "A $16 billion increase.",
+              "A $20 billion increase.",
+              "An $80 billion increase.",
+              "A $100 billion increase."
+            ],
+            correctAnswer: 3,
+            explanation: "First, find the spending multiplier. If MPC=0.8, then MPS=0.2. The multiplier is 1/MPS = 1/0.2 = 5. The total change in GDP is the initial spending ($20B) times the multiplier (5), which equals $100 billion."
+          },
+          {
+            id: "4",
+            text: "Why is a $50 billion tax cut a less powerful policy for stimulating the economy than a $50 billion increase in government spending?",
+            options: [
+              "The tax cut is not subject to the multiplier effect.",
+              "A portion of the tax cut will be saved by households rather than spent in the first round.",
+              "Government spending is an injection, while a tax cut is a leakage from the economy.",
+              "The tax multiplier is always a positive number."
+            ],
+            correctAnswer: 1,
+            explanation: "With a government spending increase, the entire $50 billion is immediately injected into the economy as spending. With a tax cut, households receive the extra disposable income, but they will save a portion of it (determined by the MPS), so the initial round of new spending is smaller."
+          }
+        ]
+          
+      },
+      {
+        id: "29",
+        title: "Short-Run Aggregate Supply",
+        description: "Learn about the components of short-run aggregate supply, the relationship between short-run aggregate supply and the price level, and the impact of changes in short-run aggregate supply on the economy.",
+        videoSlug: "short-run-aggregate-supply",
+        subjects: ["AP Macroeconomics"],
+        unit: "3",
+        lessonIDS: ["3.3"],
+        tags: ["Short-Run Aggregate Supply", "Price Level", "Changes in Short-Run Aggregate Supply"],
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/3.3+-+Short-Run+Aggregate+Supply.mp4",
+        thumbnail: "https://thumbnailslarge.s3.ap-southeast-2.amazonaws.com/3.3_TN.jpg",
+        accessLevel: "free",
+        questions:     [
+          {
+            id: "1",
+            text: "What is the primary reason for the upward slope of the short-run aggregate supply (SRAS) curve?",
+            options: [
+              "As the price level rises, consumers have more purchasing power.",
+              "In the short run, nominal wages and other input prices are 'sticky' or slow to adjust.",
+              "Government regulations increase as the price level rises.",
+              "The interest rate effect encourages more investment at higher price levels."
+            ],
+            correctAnswer: 1,
+            explanation: "The SRAS curve slopes upward because nominal wages are 'sticky' in the short run. When the overall price level rises, firms receive higher prices for their goods, but their labor costs remain fixed. This increases profit margins, creating an incentive to produce more output."
+          },
+          {
+            id: "2",
+            text: "Which of the following would cause the short-run aggregate supply curve to shift to the left?",
+            options: [
+              "A decrease in the price of oil, a key input.",
+              "A widespread increase in labor productivity due to new technology.",
+              "An increase in government subsidies for businesses.",
+              "A nationwide increase in the negotiated wages for workers."
+            ],
+            correctAnswer: 3,
+            explanation: "A nationwide increase in wages raises the cost of production for many firms across the economy. This decrease in profitability leads firms to supply less output at any given price level, shifting the SRAS curve to the left."
+          },
+          {
+            id: "3",
+            text: "The widespread adoption of a new, more efficient internet infrastructure that boosts worker output across many industries would cause which of the following?",
+            options: [
+              "A rightward shift of the short-run aggregate supply curve.",
+              "A leftward shift of the short-run aggregate supply curve.",
+              "A movement up along the short-run aggregate supply curve.",
+              "A leftward shift of the aggregate demand curve."
+            ],
+            correctAnswer: 0,
+            explanation: "A boost in worker output is an increase in productivity. This lowers the per-unit cost of production for businesses, allowing them to supply more goods and services at every price level and shifting the SRAS curve to the right."
+          },
+          {
+            id: "4",
+            text: "If business leaders across the economy expect the general price level to be much higher in the near future, how will this affect the current short-run aggregate supply curve?",
+            options: [
+              "It will shift to the right, as businesses produce more in anticipation of higher profits.",
+              "It will shift to the left, as businesses may withhold some production to sell later at higher prices.",
+              "It will become steeper, as businesses react more quickly to price changes.",
+              "It will not change, as expectations only affect aggregate demand."
+            ],
+            correctAnswer: 1,
+            explanation: "If producers expect higher prices in the future, they have an incentive to reduce their supply in the present to sell their inventory later when it is more profitable. This collective action shifts the current SRAS curve to the left."
+          }
+        ]
+          
+      },
+      {
+        id: "30",
+        title: "Long-Run Aggregate Supply",
+        description: "Learn about the components of long-run aggregate supply, the (lack of a) relationship between long-run aggregate supply and the price level, and the causes of changes to the LRAS curve.",
+        videoSlug: "long-run-aggregate-supply",
+        subjects: ["AP Macroeconomics"],
+        unit: "3",
+        lessonIDS: ["3.4"],
+        tags: ["Long-Run Aggregate Supply", "Price Level", "Changes in Long-Run Aggregate Supply"],
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/3.4+-+Long-Run+Aggregate+Supply.mp4",
+        thumbnail: "https://thumbnailslarge.s3.ap-southeast-2.amazonaws.com/3.4_TN.jpg",
+        accessLevel: "free",
+        questions:     [
+          {
+            id: "1",
+            text: "The long-run aggregate supply (LRAS) curve is vertical because:",
+            options: [
+              "the government can always adjust its spending to maintain full employment.",
+              "in the long run, the price level is fixed by the central bank.",
+              "in the long run, wages and other input prices are flexible and fully adjust to changes in the price level.",
+              "the multiplier effect is stronger in the long run than in the short run."
+            ],
+            correctAnswer: 2,
+            explanation: "The LRAS is vertical because in the long run, an economy's ability to produce goods and services depends on its resources and technology, not the overall price level. Flexible wages and prices mean that changes in the price level do not change real profit incentives."
+          },
+          {
+            id: "2",
+            text: "Which of the following would cause a country's long-run aggregate supply (LRAS) curve to shift to the right?",
+            options: [
+              "A decrease in corporate income taxes.",
+              "A widespread increase in the population's level of education and skills.",
+              "An increase in aggregate demand.",
+              "A decrease in the price of imported natural resources."
+            ],
+            correctAnswer: 1,
+            explanation: "A more educated and skilled workforce represents an improvement in human capital. This increases the economy's overall productivity and its potential output, causing the LRAS curve to shift to the right."
+          },
+          {
+            id: "3",
+            text: "A devastating earthquake destroys a significant portion of a nation's infrastructure and factories. This event would cause:",
+            options: [
+              "the short-run aggregate supply curve to shift right.",
+              "the aggregate demand curve to shift left.",
+              "the long-run aggregate supply curve to shift left.",
+              "a movement down along the long-run aggregate supply curve."
+            ],
+            correctAnswer: 2,
+            explanation: "The destruction of infrastructure and factories represents a decrease in the nation's physical capital stock. This reduces the economy's productive capacity and potential output, causing a leftward shift of the LRAS curve."
+          },
+          {
+            id: "4",
+            text: "The level of output represented by the long-run aggregate supply curve is known as full-employment output. At this level of output, the economy is experiencing:",
+            options: [
+              "zero unemployment.",
+              "only cyclical and frictional unemployment.",
+              "the natural rate of unemployment.",
+              "only structural and cyclical unemployment."
+            ],
+            correctAnswer: 2,
+            explanation: "Full-employment output (or potential output) is the level of production an economy can sustain when unemployment is at its 'natural' rate, which includes frictional and structural unemployment but excludes cyclical unemployment."
+          }
+        ]
+          
+      },
+      {
+        id: "31",
+        title: "Equilibrium in the AD-AS Model",
+        description: "Learn about the full AD-AS model, the concept of short-run equilibrium, long-run equilibrium, and output gaps.",
+        videoSlug: "equilibrium-in-the-ad-as-model",
+        subjects: ["AP Macroeconomics"],
+        unit: "3",
+        lessonIDS: ["3.5"],
+        tags: ["AD-AS Model", "Short-Run Equilibrium", "Long-Run Equilibrium", "Recessionary Gap", "Inflationary Gap"],
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/3.5+-+Equilibrium+in+the+AD-AS+Model.mp4",
+        thumbnail: "https://thumbnailslarge.s3.ap-southeast-2.amazonaws.com/3.5_TN.jpg",
+        accessLevel: "free",
+        questions:     [
+          {
+            id: "1",
+            text: "Which of the following is true when an economy is in a state of long-run equilibrium?",
+            options: [
+              "The actual unemployment rate is equal to the natural rate of unemployment.",
+              "The aggregate demand curve is vertical.",
+              "Actual real GDP is greater than potential real GDP.",
+              "The short-run aggregate supply curve is vertical."
+            ],
+            correctAnswer: 0,
+            explanation: "Long-run equilibrium occurs when all three curves (AD, SRAS, LRAS) intersect at the same point. This means actual output equals potential output, and the actual unemployment rate is equal to the natural rate."
+          },
+          {
+            id: "2",
+            text: "If an economy's short-run equilibrium output is less than its potential output, what is the condition of the labor market?",
+            options: [
+              "The actual unemployment rate is less than the natural rate of unemployment.",
+              "The labor force participation rate must be falling.",
+              "The actual unemployment rate is higher than the natural rate of unemployment.",
+              "There is no cyclical unemployment."
+            ],
+            correctAnswer: 2,
+            explanation: "When an economy is in a recessionary gap (actual output < potential output), it is not using all of its resources efficiently. This includes labor, so the actual unemployment rate will be higher than the natural rate."
+          },
+          {
+            id: "3",
+            text: "In the AD-AS model, an inflationary gap is represented by a short-run equilibrium point where:",
+            options: [
+              "the SRAS curve has shifted to the left of the LRAS curve.",
+              "the AD and SRAS curves intersect to the right of the LRAS curve.",
+              "the AD and SRAS curves intersect to the left of the LRAS curve.",
+              "the LRAS curve has shifted to the right."
+            ],
+            correctAnswer: 1,
+            explanation: "An inflationary gap occurs when the economy is 'overheating' and producing at a level of output greater than its long-run potential. Graphically, this is shown by the intersection of AD and SRAS at a level of real GDP to the right of the vertical LRAS curve."
+          },
+          {
+            id: "4",
+            text: "The intersection of the aggregate demand curve and the short-run aggregate supply curve always determines the:",
+            options: [
+              "long-run economic growth rate and potential output.",
+              "natural rate of unemployment and the long-run price level.",
+              "current price level and current level of real GDP.",
+              "rate of inflation and the size of the labor force."
+            ],
+            correctAnswer: 2,
+            explanation: "The intersection of AD and SRAS represents the short-run equilibrium for the economy, indicating the current price level and the current amount of output (real GDP) that is being produced and purchased."
+          }
+        ]
+          
+      },
+      {
+        id: "32",
+        title: "Changes in Equilibrium in the AD-AS Model",
+        description: "Learn about how shifts of the AD curve and SRAS curve change the equilibrium in the AD-AS model.",
+        videoSlug: "changes-in-equilibrium-in-the-ad-as-model",
+        subjects: ["AP Macroeconomics"],
+        unit: "3",
+        lessonIDS: ["3.6"],
+        tags: ["AD-AS Model", "Price Level", "Changes in Equilibrium"],
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/3.6+-+Changes+in+Equilibrium+in+the+AD-AS+Model.mp4",
+        thumbnail: "https://thumbnailslarge.s3.ap-southeast-2.amazonaws.com/3.6_TN.jpg",
+        accessLevel: "free",
+        questions:     [
+          {
+            id: "1",
+            text: "A significant increase in household wealth due to a booming stock market would lead to what short-run change in the economy?",
+            options: [
+              "A decrease in the price level and a decrease in real GDP.",
+              "An increase in the price level and a decrease in real GDP.",
+              "A decrease in the price level and an increase in real GDP.",
+              "An increase in the price level and an increase in real GDP."
+            ],
+            correctAnswer: 3,
+            explanation: "Increased household wealth boosts consumer confidence and spending (C), which shifts the aggregate demand (AD) curve to the right. This leads to a higher short-run equilibrium price level and a higher level of real GDP."
+          },
+          {
+            id: "2",
+            text: "A period of high inflation combined with a recession (falling output) is known as stagflation. This is caused by:",
+            options: [
+              "a rightward shift of the aggregate demand curve.",
+              "a leftward shift of the short-run aggregate supply curve.",
+              "a leftward shift of the aggregate demand curve.",
+              "a rightward shift of the short-run aggregate supply curve."
+            ],
+            correctAnswer: 1,
+            explanation: "Stagflation (stagnant growth + inflation) is the result of a negative supply shock, which shifts the SRAS curve to the left. This leads to a higher equilibrium price level and a lower level of real GDP."
+          },
+          {
+            id: "3",
+            text: "Which of the following events would cause demand-pull inflation?",
+            options: [
+              "An increase in the price of energy resources.",
+              "A large increase in government spending on national defense.",
+              "A decrease in labor productivity.",
+              "A significant increase in business taxes."
+            ],
+            correctAnswer: 1,
+            explanation: "Demand-pull inflation is caused by a rightward shift of the aggregate demand curve. A large increase in government spending is a direct injection that shifts AD to the right, 'pulling' the price level up."
+          },
+          {
+            id: "4",
+            text: "If an economy's price level rises while its real GDP falls, this is most likely a case of:",
+            options: [
+              "cost-push inflation.",
+              "demand-pull inflation.",
+              "a positive supply shock.",
+              "an increase in consumer confidence."
+            ],
+            correctAnswer: 0,
+            explanation: "This combination of a higher price level and lower output is the signature outcome of a leftward shift in the short-run aggregate supply (SRAS) curve. This is known as cost-push inflation because rising input costs 'push' the price level higher."
+          }
+        ]
+          
+      },
+      {
+        id: "33",
+        title: "Long-Run Self-Adjustment",
+        description: "Learn about the process of long-run self-adjustment in the AD-AS model and how the economy returns to long-run equilibrium.",
+        videoSlug: "long-run-self-adjustment",
+        subjects: ["AP Macroeconomics"],
+        unit: "3",
+        lessonIDS: ["3.7"],
+        tags: ["Long-Run Self-Adjustment", "SRAS", "Sticky Wages"],
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/3.7+-+Long-Run+Self-Adjustment.mp4",
+          thumbnail: "https://thumbnailslarge.s3.ap-southeast-2.amazonaws.com/3.7_TN.jpg",
+        accessLevel: "free",
+        questions:     [
+          {
+            id: "1",
+            text: "The economy's long-run self-adjustment mechanism primarily relies on the flexibility of which of the following?",
+            options: [
+              "Government spending",
+              "Nominal wages and other resource prices",
+              "The money supply",
+              "Consumer confidence"
+            ],
+            correctAnswer: 1,
+            explanation: "Long-run self-adjustment occurs because nominal wages and other input prices eventually adjust to the overall price level, causing the SRAS curve to shift and guide the economy back to its long-run potential."
+          },
+          {
+            id: "2",
+            text: "If an economy is currently in an inflationary gap and the government takes no policy action, what will happen in the long run?",
+            options: [
+              "The aggregate demand curve will shift left as consumers spend less.",
+              "The short-run aggregate supply curve will shift left as nominal wages rise.",
+              "The long-run aggregate supply curve will shift right as potential grows.",
+              "The short-run aggregate supply curve will shift right as technology improves."
+            ],
+            correctAnswer: 1,
+            explanation: "In an inflationary gap, low unemployment leads to competition for workers, which drives up nominal wages. Higher wages are an increased cost of production, which shifts the SRAS curve to the left, returning the economy to long-run equilibrium at a higher price level."
+          },
+          {
+            id: "3",
+            text: "In the absence of government intervention, how does an economy self-correct from a recessionary gap?",
+            options: [
+              "Falling nominal wages shift the short-run aggregate supply curve to the right.",
+              "Rising prices shift the aggregate demand curve to the right.",
+              "Falling consumer confidence shifts the aggregate demand curve to the left.",
+              "Rising wages shift the short-run aggregate supply curve to the left."
+            ],
+            correctAnswer: 0,
+            explanation: "In a recessionary gap, high unemployment puts downward pressure on nominal wages. As wages fall, production becomes cheaper for firms, causing the short-run aggregate supply curve to shift to the right until the economy returns to full employment."
+          },
+          {
+            id: "4",
+            text: "After an economy experiences a negative demand shock and then self-adjusts back to long-run equilibrium, how will the new price level and output compare to the original equilibrium?",
+            options: [
+              "The price level will be higher, and output will be the same.",
+              "The price level will be lower, and output will be lower.",
+              "The price level will be lower, and output will be the same.",
+              "The price level will be the same, and output will be the same."
+            ],
+            correctAnswer: 2,
+            explanation: "A negative demand shock creates a recessionary gap. The self-adjustment process involves falling wages shifting the SRAS curve to the right. This returns the economy to its original potential output (Yf) but at a new, lower price level."
+          }
+        ]
+          
+      },
+      {
+        id: "35",
+        title: "Fiscal Policy",
+        description: "Learn about how the federal government uses spending and taxes to influence economic outcomes and help close output gaps.",
+        videoSlug: "fiscal-policy",
+        subjects: ["AP Macroeconomics"],
+        unit: "3",
+        lessonIDS: ["3.8"],
+        tags: ["Fiscal Policy", "Government Spending", "Taxes", "Output Gaps"],
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/3.8+-+Fiscal+Policy.mp4",
+        thumbnail: "https://thumbnailslarge.s3.ap-southeast-2.amazonaws.com/3.8_TN.jpg",
+        accessLevel: "free",
+        questions:     [
+          {
+            id: "1",
+            text: "If an economy is in a severe recession, which of the following represents an appropriate expansionary fiscal policy?",
+            options: [
+              "Increasing the money supply.",
+              "Increasing corporate and personal income taxes.",
+              "Decreasing government spending on infrastructure.",
+              "Decreasing taxes and increasing government spending."
+            ],
+            correctAnswer: 3,
+            explanation: "Expansionary fiscal policy is used to combat a recession by increasing aggregate demand. Both decreasing taxes (which increases consumption and investment) and increasing government spending directly shift the AD curve to the right."
+          },
+          {
+            id: "2",
+            text: "An economy is experiencing rapidly rising inflation, and the unemployment rate is well below the natural rate. Which of the following is an appropriate contractionary fiscal policy?",
+            options: [
+              "Decreasing government spending.",
+              "Decreasing the reserve requirement for banks.",
+              "Increasing the money supply.",
+              "Decreasing personal income taxes."
+            ],
+            correctAnswer: 0,
+            explanation: "Contractionary fiscal policy is used to slow down an overheating economy and fight inflation. Decreasing government spending is a direct way to reduce aggregate demand, shifting the AD curve to the left."
+          },
+          {
+            id: "3",
+            text: "If the government enacts a policy to increase taxes on both households and businesses, what will be the short-run effect on the price level, real GDP, and unemployment?",
+            options: [
+              "Price level increases, real GDP increases, unemployment decreases.",
+              "Price level decreases, real GDP decreases, unemployment increases.",
+              "Price level increases, real GDP decreases, unemployment increases.",
+              "Price level decreases, real GDP increases, unemployment decreases."
+            ],
+            correctAnswer: 1,
+            explanation: "Increasing taxes is a contractionary fiscal policy. It reduces disposable income for consumers (lowering C) and profits for businesses (lowering I), which shifts the aggregate demand curve to the left. This results in a lower price level, lower real GDP, and higher unemployment."
+          },
+          {
+            id: "4",
+            text: "Fiscal policy, enacted by the government, is a tool used to influence the economy primarily by shifting the:",
+            options: [
+              "short-run aggregate supply curve.",
+              "long-run aggregate supply curve.",
+              "production possibilities curve.",
+              "aggregate demand curve."
+            ],
+            correctAnswer: 3,
+            explanation: "The primary tools of fiscal policy—changes in government spending and taxes—are components of, or directly influence the components of, aggregate demand (C, I, G, NX). Therefore, fiscal policy's main effect is to shift the AD curve."
+          }
+        ]
+          
+      },
+      {
+        id: "34",
+        title: "Automatic Stabilizers",
+        description: "Learn about how automatic stabilizers help the economy self-correct to long-run equilibrium.",
+        videoSlug: "automatic-stabilizers",
+        subjects: ["AP Macroeconomics"],
+        unit: "3",
+        lessonIDS: ["3.9"],
+        tags: ["Automatic Stabilizers", "Taxes", "Government Spending", "Output Gaps"],
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/3.9+-+Automatic+Stabilizers.mp4",
+        thumbnail: "https://thumbnailslarge.s3.ap-southeast-2.amazonaws.com/3.9_TN.jpg",
+        accessLevel: "free",
+        questions:     [
+  {
+    id: "1",
+    text: "What is the key feature of an automatic stabilizer that distinguishes it from discretionary fiscal policy?",
+    options: [
+      "It only works to combat inflation, not recessions.",
+      "It requires a new bill to be passed by Congress to take effect.",
+      "It works to stabilize the economy without new, deliberate action from policymakers.",
+      "It only affects the short-run aggregate supply curve."
+    ],
+    correctAnswer: 2,
+    explanation: "Automatic stabilizers are built-in features of the tax and spending system that trigger automatically in response to changes in the economy, whereas discretionary policy involves lawmakers making explicit, new decisions."
+  },
+  {
+    id: "2",
+    text: "During an economic expansion when incomes are rising, how does a progressive income tax system act as an automatic stabilizer?",
+    options: [
+      "It automatically decreases tax rates, further stimulating the economy.",
+      "It automatically increases tax revenues, which helps to dampen aggregate demand.",
+      "It automatically increases government spending on social programs.",
+      "It automatically shifts the short-run aggregate supply curve to the right."
+    ],
+    correctAnswer: 1,
+    explanation: "In a progressive tax system, as people earn higher incomes during an expansion, they move into higher tax brackets. This automatically increases the amount of tax revenue collected by the government, which helps to slow down the growth of disposable income and dampen aggregate demand."
+  },
+  {
+    id: "3",
+    text: "Which of the following describes how an automatic stabilizer works during a recession?",
+    options: [
+      "Tax revenues rise as people work more hours to make up for lost income.",
+      "Government spending on unemployment benefits increases as more people lose their jobs.",
+      "The government passes a new infrastructure spending bill.",
+      "Interest rates automatically fall, encouraging more investment."
+    ],
+    correctAnswer: 1,
+    explanation: "During a recession, more people become unemployed and automatically become eligible for unemployment benefits. This increase in government transfer payments helps support household incomes and consumption, cushioning the downturn."
+  },
+  {
+    id: "4",
+    text: "Which of the following is an example of discretionary fiscal policy, NOT an automatic stabilizer?",
+    options: [
+      "A rise in unemployment insurance payments during a recession.",
+      "A decrease in government tax receipts during a recession.",
+      "A newly passed law that provides a one-time tax rebate to all citizens.",
+      "A fall in unemployment insurance payments during an expansion."
+    ],
+    correctAnswer: 2,
+    explanation: "A new law providing a one-time tax rebate is a deliberate, explicit action taken by lawmakers to influence the economy, which is the definition of discretionary fiscal policy. The other options describe changes that happen automatically based on existing laws."
+  }
+]
           
       },
 

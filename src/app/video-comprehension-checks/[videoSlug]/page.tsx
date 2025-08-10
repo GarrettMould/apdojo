@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { ArrowLeft, FileText, Check, X, Brain } from 'lucide-react';
+import { ArrowLeft, ArrowRight, FileText, Check, X, Brain } from 'lucide-react';
 import Link from 'next/link';
 import { videos as allVideos, Video as VideoType } from '@/data/videos';
 import { useAuthContext } from '@/contexts/AuthContext';
@@ -26,6 +26,28 @@ export default function VideoComprehensionChecksPage({ params }: VideoComprehens
 
   // Find the video by slug
   const video = allVideos.find(v => v.videoSlug === videoSlug);
+
+  // Reset state when video changes
+  useEffect(() => {
+    console.log('VideoComprehensionChecks: Resetting state for video:', videoSlug);
+    setAnsweredQuestions({});
+    setCurrentQuestionIndex(0);
+    setShowExplanation(false);
+  }, [videoSlug]);
+
+  // Debug logging for state changes
+  useEffect(() => {
+    if (video) {
+      const totalQuestions = video.questions.length;
+      const currentQuestion = video.questions[currentQuestionIndex];
+      const currentAnswer = answeredQuestions[currentQuestion?.id];
+      
+      console.log('VideoComprehensionChecks: Current question index:', currentQuestionIndex);
+      console.log('VideoComprehensionChecks: Current question:', currentQuestion);
+      console.log('VideoComprehensionChecks: Answered questions:', answeredQuestions);
+      console.log('VideoComprehensionChecks: Current answer for question:', currentAnswer);
+    }
+  }, [video, currentQuestionIndex, answeredQuestions]);
   
   // If video not found, show error
   if (!video) {
@@ -56,7 +78,12 @@ export default function VideoComprehensionChecksPage({ params }: VideoComprehens
   const currentAnswer = answeredQuestions[currentQuestion.id];
 
   const handleAnswerSelect = (answerIndex: number) => {
-    if (currentAnswer) return; // Already answered
+    console.log('VideoComprehensionChecks: Answering question', currentQuestion.id, 'with answer index', answerIndex, 'isCorrect:', answerIndex === currentQuestion.correctAnswer);
+    
+    if (currentAnswer) {
+      console.log('VideoComprehensionChecks: Question already answered, returning early');
+      return; // Already answered
+    }
     
     const isCorrect = answerIndex === currentQuestion.correctAnswer;
     setAnsweredQuestions(prev => ({
@@ -215,7 +242,7 @@ export default function VideoComprehensionChecksPage({ params }: VideoComprehens
         <div className="max-w-6xl mx-auto">
           {/* Unified Container */}
           <div className="flex justify-center mt-8">
-            <div className="w-full max-w-6xl bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+            <div className="w-full max-w-5xl bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
               {/* Header */}
               <div className="border-b border-gray-200">
                 <div className="px-6 py-4">
@@ -392,7 +419,7 @@ export default function VideoComprehensionChecksPage({ params }: VideoComprehens
 
           {/* Navigation Buttons */}
           <div className="flex justify-center mt-12 mb-8">
-            <div className="w-full max-w-6xl">
+            <div className="w-full max-w-5xl">
               <div className="flex gap-4">
                 {/* Previous Button */}
                 <div className="flex-1">
@@ -401,7 +428,8 @@ export default function VideoComprehensionChecksPage({ params }: VideoComprehens
                       href={previous.href}
                       className="block w-full h-24 p-4 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 group"
                     >
-                      <div className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-2">
+                      <div className="flex items-center gap-2 text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-2">
+                        <ArrowLeft className="w-6 h-6" />
                         Previous
                       </div>
                       <div className="text-sm font-medium text-gray-600">
@@ -410,7 +438,10 @@ export default function VideoComprehensionChecksPage({ params }: VideoComprehens
                     </Link>
                   ) : (
                     <div className="w-full h-24 p-4 rounded-lg border border-gray-200 bg-gray-50">
-                      <div className="text-lg font-semibold text-gray-400 mb-2">Previous</div>
+                      <div className="flex items-center gap-2 text-lg font-semibold text-gray-400 mb-2">
+                        <ArrowLeft className="w-6 h-6" />
+                        Previous
+                      </div>
                       <div className="text-sm font-medium text-gray-400">No previous resource</div>
                     </div>
                   )}
@@ -423,8 +454,9 @@ export default function VideoComprehensionChecksPage({ params }: VideoComprehens
                       href={next.href}
                       className="block w-full h-24 p-4 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 group text-right"
                     >
-                      <div className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-2">
+                      <div className="flex items-center justify-end gap-2 text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-2">
                         Next
+                        <ArrowRight className="w-6 h-6" />
                       </div>
                       <div className="text-sm font-medium text-gray-600">
                         {next.title}
@@ -432,7 +464,10 @@ export default function VideoComprehensionChecksPage({ params }: VideoComprehens
                     </Link>
                   ) : (
                     <div className="w-full h-24 p-4 rounded-lg border border-gray-200 bg-gray-50 text-right">
-                      <div className="text-lg font-semibold text-gray-400 mb-2">Next</div>
+                      <div className="flex items-center justify-end gap-2 text-lg font-semibold text-gray-400 mb-2">
+                        Next
+                        <ArrowRight className="w-6 h-6" />
+                      </div>
                       <div className="text-sm font-medium text-gray-400">No next resource</div>
                     </div>
                   )}

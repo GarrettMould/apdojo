@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { X, Check, ArrowLeft, FileText } from 'lucide-react';
+import { X, Check, ArrowLeft, ArrowRight, FileText } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { videos as allVideos, Video as VideoType } from '@/data/videos';
@@ -239,7 +239,8 @@ export default function VideoPage({ params }: VideoPageProps) {
                     href={previous.href}
                     className="block w-full h-24 p-4 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 group"
                   >
-                    <div className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-2">
+                    <div className="flex items-center gap-2 text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-2">
+                      <ArrowLeft className="w-6 h-6" />
                       Previous
                     </div>
                     <div className="text-sm font-medium text-gray-600">
@@ -248,7 +249,10 @@ export default function VideoPage({ params }: VideoPageProps) {
                   </Link>
                 ) : (
                   <div className="w-full h-24 p-4 rounded-lg border border-gray-200 bg-gray-50">
-                    <div className="text-lg font-semibold text-gray-400 mb-2">Previous</div>
+                    <div className="flex items-center gap-2 text-lg font-semibold text-gray-400 mb-2">
+                      <ArrowLeft className="w-6 h-6" />
+                      Previous
+                    </div>
                     <div className="text-sm font-medium text-gray-400">No previous resource</div>
                   </div>
                 )}
@@ -261,8 +265,9 @@ export default function VideoPage({ params }: VideoPageProps) {
                     href={next.href}
                     className="block w-full h-24 p-4 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 group text-right"
                   >
-                    <div className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-2">
+                    <div className="flex items-center justify-end gap-2 text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-2">
                       Next
+                      <ArrowRight className="w-6 h-6" />
                     </div>
                     <div className="text-sm font-medium text-gray-600">
                       {next.title}
@@ -270,7 +275,10 @@ export default function VideoPage({ params }: VideoPageProps) {
                   </Link>
                 ) : (
                   <div className="w-full h-24 p-4 rounded-lg border border-gray-200 bg-gray-50 text-right">
-                    <div className="text-lg font-semibold text-gray-400 mb-2">Next</div>
+                    <div className="flex items-center justify-end gap-2 text-lg font-semibold text-gray-400 mb-2">
+                      Next
+                      <ArrowRight className="w-6 h-6" />
+                    </div>
                     <div className="text-sm font-medium text-gray-400">No next resource</div>
                   </div>
                 )}
