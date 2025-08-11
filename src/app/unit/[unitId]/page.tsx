@@ -6,10 +6,12 @@ import { useRouter } from "next/navigation";
 import { ChevronDown, ChevronRight, ChevronLeft, BookOpen, Download, X, Home, ChevronRight as ChevronRightIcon } from "lucide-react";
 
 import { keyTerms, KeyTerm, whiteboardImages, WhiteboardImage } from '@/data/allContent';
+import { apMacroUnit2Whiteboards, apMacroUnit3Whiteboards } from '@/data/whiteboards';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question as QuestionType } from '@/data/questionBanks/types';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { LoginModal, SignupModal, SelectPlanModal } from '@/components/AuthModals';
+
 
 // Helper function to sort lesson IDs like "1.1", "1.10", "2.1"
 const sortLessonIDs = (a: string, b: string): number => {
@@ -401,15 +403,38 @@ interface WhiteboardsGalleryProps {
 }
 
 function WhiteboardsGallery({ unitId, subject }: WhiteboardsGalleryProps) {
-  const [expandedImage, setExpandedImage] = useState<WhiteboardImage | null>(null);
+  const [expandedImage, setExpandedImage] = useState<any>(null);
 
   // Get whiteboards for this unit and subject
-  const unitWhiteboards = whiteboardImages.filter(wb => 
-    wb.unit === unitId && wb.subject === subject
-  );
+  let unitWhiteboards: any[] = [];
+  
+  if (unitId === 2 && subject === 'ap_macroeconomics') {
+    // Use the existing apMacroUnit2Whiteboards data for Unit 2 macro
+    unitWhiteboards = apMacroUnit2Whiteboards.map(wb => ({
+      id: wb.lessonID + '_' + wb.topic.replace(/\s+/g, '_'),
+      imageUrl: wb.url,
+      title: wb.topic,
+      unit: wb.unit,
+      subject: 'ap_macroeconomics',
+      lessonIDs: [wb.lessonID]
+    }));
+  } else if (unitId === 3 && subject === 'ap_macroeconomics') {
+    // Use the existing apMacroUnit3Whiteboards data for Unit 3 macro
+    unitWhiteboards = apMacroUnit3Whiteboards.map(wb => ({
+      id: wb.lessonID + '_' + wb.topic.replace(/\s+/g, '_'),
+      imageUrl: wb.url,
+      title: wb.topic,
+      unit: wb.unit,
+      subject: 'ap_macroeconomics',
+      lessonIDs: [wb.lessonID]
+    }));
+  } else {
+    // Fall back to the original whiteboardImages for other units
+    unitWhiteboards = whiteboardImages.filter(wb => 
+      wb.unit === unitId && wb.subject === subject
+    );
+  }
 
-  // Since there are no Unit 1 AP macro whiteboards yet, create placeholder containers
-  const placeholderCount = 6; // Show 6 placeholder containers
   const hasWhiteboards = unitWhiteboards.length > 0;
 
   return (
@@ -441,22 +466,18 @@ function WhiteboardsGallery({ unitId, subject }: WhiteboardsGalleryProps) {
                     <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
                       <div className="w-8 h-8 bg-white bg-opacity-90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                         <svg className="w-4 h-4 text-slate-800" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6zM14 9a1 1 0 00-1-1h-2z" clipRule="evenodd" />
+                          <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6zM14 9a1 1 0 00-1-1h-2z" clipRule="evenodd" />
                         </svg>
                       </div>
                     </div>
                   </div>
-                  {whiteboard.title && (
-                    <div className="p-3 bg-white">
-                      <p className="text-sm font-semibold text-slate-900 truncate">{whiteboard.title}</p>
-                    </div>
-                  )}
+
                 </div>
               ))}
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {Array.from({ length: placeholderCount }, (_, index) => (
+              {Array.from({ length: 6 }, (_, index) => (
                 <div
                   key={index}
                   className="relative cursor-pointer group shadow-sm hover:shadow-md rounded-xl overflow-hidden border border-slate-200 hover:border-slate-300 transition-all duration-200 bg-slate-50"
@@ -530,11 +551,7 @@ function WhiteboardsGallery({ unitId, subject }: WhiteboardsGalleryProps) {
               alt={expandedImage.title || 'Expanded whiteboard view'}
               className="w-full h-auto rounded-lg"
             />
-            {expandedImage.title && (
-              <div className="mt-4 text-center">
-                <h3 className="text-lg font-bold text-white">{expandedImage.title}</h3>
-              </div>
-            )}
+
           </div>
         </div>
       )}
@@ -543,19 +560,35 @@ function WhiteboardsGallery({ unitId, subject }: WhiteboardsGalleryProps) {
 }
 
 interface UnitPageProps {
-  params: { unitId: string };
+  params: Promise<{ unitId: string }>;
 }
 
 export default function UnitLandingPage({ params }: UnitPageProps) {
-  const unitId = params.unitId;
+  const resolvedParams = React.use(params);
+  const unitId = resolvedParams.unitId;
   const unitIdNum = parseInt(unitId, 10);
   const [isFlashcardMode, setIsFlashcardMode] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
   const [showSelectPlanModal, setShowSelectPlanModal] = useState(false);
   const [pendingUnit, setPendingUnit] = useState<number | null>(null);
+  const [isUnitDropdownOpen, setIsUnitDropdownOpen] = useState(false);
 
   const { user } = useAuthContext();
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isUnitDropdownOpen) {
+        setIsUnitDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [isUnitDropdownOpen]);
 
   // Get terms for current unit from allContent.ts
   const unitTerms = keyTerms.filter(term => 
@@ -641,7 +674,58 @@ export default function UnitLandingPage({ params }: UnitPageProps) {
                 AP Macroeconomics
               </Link>
               <ChevronRightIcon className="w-4 h-4 text-slate-400" />
-              <span className="text-slate-900 font-medium">Unit {unitId}</span>
+              <div className="relative">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsUnitDropdownOpen(!isUnitDropdownOpen);
+                  }}
+                  className="flex items-center gap-1 text-slate-900 font-medium hover:text-blue-600 transition-colors cursor-pointer"
+                >
+                  Unit {unitId}
+                  <ChevronDown className={`w-4 h-4 transition-transform ${isUnitDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+                
+                {/* Unit Dropdown */}
+                {isUnitDropdownOpen && (
+                  <div 
+                    className="absolute top-full left-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-50 min-w-32"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {[1, 2, 3, 4, 5, 6].map((unitNum) => {
+                      const isUnlocked = unitNum === 2 || unitNum === 3;
+                      const isCurrentUnit = unitNum === unitIdNum;
+                      
+                      return (
+                        <Link
+                          key={unitNum}
+                          href={isUnlocked ? `/unit/${unitNum}` : '#'}
+                          className={`block px-4 py-2 text-sm transition-colors ${
+                            isCurrentUnit 
+                              ? 'bg-blue-50 text-blue-600 font-medium' 
+                              : isUnlocked
+                              ? 'text-slate-700 hover:bg-slate-50'
+                              : 'text-slate-400 cursor-not-allowed'
+                          }`}
+                          onClick={(e) => {
+                            if (!isUnlocked) {
+                              e.preventDefault();
+                              setShowSelectPlanModal(true);
+                              setPendingUnit(unitNum);
+                            }
+                            setIsUnitDropdownOpen(false);
+                          }}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span>Unit {unitNum}</span>
+                            {!isUnlocked && <span className="text-xs">🔒</span>}
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             </nav>
           </div>
         </div>
@@ -655,9 +739,21 @@ export default function UnitLandingPage({ params }: UnitPageProps) {
                 <BookOpen className="w-8 h-8 text-slate-700" />
               </div>
               <h1 className="text-4xl font-bold text-slate-900 mb-4">Unit {unitId}</h1>
-              <h2 className="text-2xl font-semibold text-slate-700 mb-2">Basic Economic Concepts</h2>
+              <h2 className="text-2xl font-semibold text-slate-700 mb-2">
+                {unitIdNum === 1 && 'Basic Economic Concepts'}
+                {unitIdNum === 2 && 'Economic Indicators and the Business Cycle'}
+                {unitIdNum === 3 && 'National Income and Price Determination'}
+                {unitIdNum === 4 && 'Financial Sector'}
+                {unitIdNum === 5 && 'Stabilization Policies'}
+                {unitIdNum === 6 && 'Open Economy—International Trade and Finance'}
+              </h2>
               <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-                Master the fundamental principles and key terminology essential for understanding macroeconomics
+                {unitIdNum === 1 && 'Master the fundamental principles and key terminology essential for understanding macroeconomics'}
+                {unitIdNum === 2 && 'Explore economic indicators, GDP, unemployment, inflation, and business cycles'}
+                {unitIdNum === 3 && 'Learn about aggregate demand, aggregate supply, equilibrium, and fiscal policy'}
+                {unitIdNum === 4 && 'Understand money, banking, and monetary policy'}
+                {unitIdNum === 5 && 'Study fiscal and monetary policy tools and their effects'}
+                {unitIdNum === 6 && 'Explore international trade, exchange rates, and balance of payments'}
               </p>
             </div>
           </div>
