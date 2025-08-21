@@ -1,35 +1,29 @@
 import { Question as QuestionType } from '@/data/questionBanks/types';
-import { allQuestions } from './unitPracticeProblems/unitPracticeProblems';
+import { getUnitTestQuestions } from './unitTestQuestions';
 
-// Function to get 15 consistent questions for each unit
-// Using a deterministic selection based on question IDs to ensure consistency
-const getUnitTestQuestions = (unitNumber: number): QuestionType[] => {
-  const unitQuestions = allQuestions.filter(q => q.unit === unitNumber);
-  
-  // Sort by ID to ensure consistent ordering
-  const sortedQuestions = unitQuestions.sort((a, b) => a.id - b.id);
-  
-  // Select first 15 questions (or all if less than 15)
-  return sortedQuestions.slice(0, 15);
+// Function to get unit test questions for each unit
+// Using dedicated unit test questions to ensure uniqueness
+const getUnitTestQuestionsForUnit = (unitNumber: number): QuestionType[] => {
+  return getUnitTestQuestions(unitNumber);
 };
 
 // Unit 1: Basic Economic Concepts
-export const unit1MCQTest: QuestionType[] = getUnitTestQuestions(1);
+export const unit1MCQTest: QuestionType[] = getUnitTestQuestionsForUnit(1);
 
 // Unit 2: Economic Indicators and the Business Cycle
-export const unit2MCQTest: QuestionType[] = getUnitTestQuestions(2);
+export const unit2MCQTest: QuestionType[] = getUnitTestQuestionsForUnit(2);
 
 // Unit 3: National Income and Price Determination
-export const unit3MCQTest: QuestionType[] = getUnitTestQuestions(3);
+export const unit3MCQTest: QuestionType[] = getUnitTestQuestionsForUnit(3);
 
 // Unit 4: Financial Sector
-export const unit4MCQTest: QuestionType[] = getUnitTestQuestions(4);
+export const unit4MCQTest: QuestionType[] = getUnitTestQuestionsForUnit(4);
 
 // Unit 5: Long-Run Consequences of Stabilization Policies
-export const unit5MCQTest: QuestionType[] = getUnitTestQuestions(5);
+export const unit5MCQTest: QuestionType[] = getUnitTestQuestionsForUnit(5);
 
 // Unit 6: Open Economy—International Trade and Finance
-export const unit6MCQTest: QuestionType[] = getUnitTestQuestions(6);
+export const unit6MCQTest: QuestionType[] = getUnitTestQuestionsForUnit(6);
 
 // Helper function to get test for any unit
 export const getUnitMCQTest = (unitNumber: number): QuestionType[] => {

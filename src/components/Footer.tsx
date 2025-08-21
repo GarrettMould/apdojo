@@ -30,6 +30,12 @@ export function Footer() {
             {/* Navigation Links */}
             <div className="flex flex-col gap-3">
               <span className="text-sm font-bold text-gray-900">Menu</span>
+              <Link 
+                href="/select-practice-units?subject=macro" 
+                className="text-sm text-gray-500 hover:text-blue-600 transition-colors"
+              >
+                MCQ Practice
+              </Link>
               {/* Comment out private tutoring link */}
               {/* <Link 
                 href="/tutoring" 
@@ -37,24 +43,19 @@ export function Footer() {
               >
                 Private Tutoring
               </Link> */}
-              <Link 
+              {/* <Link 
                 href="/interactive-tools/flashcards" 
                 className="text-sm text-gray-500 hover:text-blue-600 transition-colors"
               >
                 Flashcards
-              </Link>
+              </Link> */}
               <Link 
                 href="/cheat-sheets" 
                 className="text-sm text-gray-500 hover:text-blue-600 transition-colors"
               >
                 Cheat Sheets
               </Link>
-              <Link 
-                href="/purchase/exams" 
-                className="text-sm text-gray-500 hover:text-blue-600 transition-colors"
-              >
-                Practice Exams
-              </Link>
+
               <Link 
                 href="/feedback" 
                 className="text-sm text-gray-500 hover:text-blue-600 transition-colors"

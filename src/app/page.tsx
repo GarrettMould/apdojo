@@ -5,35 +5,9 @@ import { QuestionsGrid } from "@/components/questionsGrid"
 import { ExamsPreview } from "../components/previews/examsPreview"
 import { Hero } from "@/components/hero"
 import { ReviewsSection } from "@/components/ReviewsSection"
-import { useAuthContext } from "@/contexts/AuthContext"
 import UserHomePage from "@/app/userHomePage/page"
-import { Loader2 } from "lucide-react"
-import { UniversityLogos } from "@/components/UniversityLogos"
-import { MainFeaturesPreview } from "@/components/previews/MainFeaturesPreview"
-import { PaymentPlanPreview } from "@/components/previews/PaymentPlanPreview"
 
 export default function Home() {
-  const { user, loading } = useAuthContext();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
-      </div>
-    );
-  }
-
-  if (user) {
-    return <UserHomePage />;
-  } else {
-    return (
-      <main className="overflow-x-hidden">
-        <Hero />
-        <MainFeaturesPreview />
-        <PaymentPlanPreview />
-        <UniversityLogos />
-        <ReviewsSection />
-      </main>
-    )
-  }
+  // MVP: Always show UserHomePage regardless of authentication status
+  return <UserHomePage />;
 }

@@ -1413,10 +1413,3 @@ export const keyTerms: KeyTerm[] = [
   // Add terms for other units here...
 ];
 
-export const allContent = { 
-    macroeconomics: { 
-        
-    }
-    // You could potentially nest whiteboardImages here too, if preferred:
-    // whiteboardImages: whiteboardImages 
-}

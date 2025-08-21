@@ -21,6 +21,12 @@ const nextConfig = {
         port: '', 
         pathname: '/**', 
       },
+      {
+        protocol: 'https',
+        hostname: 'thumbnailslarge.s3.ap-southeast-2.amazonaws.com',
+        port: '', 
+        pathname: '/**', 
+      },
       // Add other domains here if needed
     ],
   },

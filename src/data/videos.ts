@@ -310,20 +310,23 @@ export const videos: Video[] = [
             text: "What is Liz's opportunity cost of producing one bracelet?",
             image: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/video9Q1.png",
             options: ["1.67 necklaces", "0.60 necklaces", "0.75 bracelets", "1.5 necklaces"],
-            correctAnswer: 1
+            correctAnswer: 1, 
+            explanation: "Liz's opportunity cost of producing one bracelet is 0.60 necklaces. This is calculated by dividing the number of necklaces she could have produced (120) by the number of bracelets she could have produced (200) in the same amount of time."
           },
           {
             id: "2",
             text: "Who has the comparative advantage in the production of necklaces?",
             image: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/video9Q1.png",
             options: ["Liz", "Sam", "Neither has a comparative advantage"],
-            correctAnswer: 0
+            correctAnswer: 0, 
+            explanation: "Liz has the comparative advantage in the production of necklaces because she has the lower opportunity cost (1.67) compared to Sam's opportunity cost (2)."
           },
           {
             id: "3",
             text: "If Liz and Sam decided to specialize and trade, who should produces each item?",
             options: ["Sam should produce both items", "Liz should produce bracelets and Sam should produce necklaces", "Sam should produce both items", "Liz should produce necklaces and Sam should produce bracelets"],
-            correctAnswer: 3
+            correctAnswer: 3, 
+            explanation: "Liz should produce necklaces and Sam should produce bracelets. This is because Liz has the comparative advantage in the production of necklaces, and Sam has the comparative advantage in the production of bracelets. If both specialize and trade, they will both benefit from the trade."
           }
         ],
       }, 
@@ -345,20 +348,23 @@ export const videos: Video[] = [
             text: "The table below should the number of labor hours it takes a farmer and a rancher to produce one bushel of wheat or one pound of beef. Who has the comparative advantage in producing beef?",
             image: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/video10Q1.png",
             options: ["The farmer", "The rancher", "Neither, because they have the same opportunity cost", "It is impossible to determine"],
-            correctAnswer: 0
+            correctAnswer: 0, 
+            explanation: "The farmer has the comparative advantage in producing beef because his opportunity cost is lower than the rancher's. To produce 1 pound of beef, the farmer gvies up 2 bushels of wheat, while the rancher gives up 3 bushels of wheat."
           },
           {
             id: "2",
             text: "Two countries, Alpha and Beta, produce cars and computers. The table below shows the number of labor hours required to produce one unit of each good. Which country has a comparative advantage in producing computers?",
             image: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/video10Q2.png",
             options: ["Beta", "Alpha", "Neither, because both are equally efficient", "It is impossible to determine"],
-            correctAnswer: 1
+            correctAnswer: 0, 
+            explanation: "Beta has the comparative advantage in producing computers because for every 1 computer Beta produces, it gvies up the opportunity to produce 0.5 of a car, whereas Alpha gives up 2 cars for every 1 computer they produce."
           },
           {
             id: "3",
             text: "If Country X has the comparative advantage in producing lumber and Country Y has the comparative advantage in producing steel, then which of the following is true?",
-            options: ["Country X must have the absolute advantage in producing lumber", "Country Y must have the absolute advantage in producing steel", "Country X gives up less steel when it produces a unit of lumber", "Country Y can produce more units of steel per hour than units of lumber per hour"],
-            correctAnswer: 2
+            options: ["Country X must have the absolute advantage in producing lumber", "Country Y must have the absolute advantage in producing steel", "Country X gives up less steel when it produces a unit of lumber, compared to Country Y", "Country Y can produce more units of steel per hour than units of lumber per hour"],
+            correctAnswer: 2,
+            explanation: "To have a comparative advantage in a good, a country must have the lowest opportunity cost in producing that good. In this case, if Country X has the comparative advantage in producing lumber, it must give up less steel when it produces a unit of lumber than Country Y does when it produces a unit of steel."
           }
         ],
       }, 
@@ -502,7 +508,7 @@ export const videos: Video[] = [
         unit: "1",
         lessonIDS: ["1.1"],
         tags: ["Scarcity"],
-        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.1+-+Scarcity.mp4",
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.1+-+Scarcity+(v2).mp4",
         thumbnail: "https://thumbnailslarge.s3.ap-southeast-2.amazonaws.com/1.1_TN.jpg",
         accessLevel: "free",
         questions: [
@@ -515,30 +521,33 @@ export const videos: Video[] = [
               "Companies must specialize in producing specific goods rather than diversifying.",
               "An individual's income is insufficient to purchase everything they desire."
             ],
-            correctAnswer: 1
+            correctAnswer: 1, 
+            explanation: "Economics is the study of how individiuals and groups deal with scarcity—the basic condition where unlimited human wants for goods and services exceed the limited resources available. This forces everyone to make choices about resource allocation."
           },
           {
-            id: "2",
-            text: "Which of the following topics is most likely to be studied in macroeconomics?",
-            options: [
-              "The production decisions of a single technology company.",
-              "How an individual student allocates their time between various activities.",
-              "The effect of a government borrowing to cover a budget deficit on the national economy.",
-              "The market forces determining the price of cellular phones."
+            "id": "2",
+            "text": "Which of the following would NOT be considered a 'factor of production' in economics?",
+            "options": [
+              "A forest used for lumber.",
+              "The effort of a factory worker.",
+              "A company's delivery truck.",
+              "The money used to hire an employee."
             ],
-            correctAnswer: 2
+            "correctAnswer": 3,
+            "explanation": "In economics, money itself isn't considered a resource or a factor of production. Instead, it is used to acquire the factors of production, such as labor (the employee), land (the forest), or capital (the truck)."
           },
           {
-            id: "3",
-            text: "Which of the following is the best example of an economy facing the problem of scarcity?",
-            options: [
-              "A company decides to produce laptops instead of phones.",
-              "A student chooses to study for an exam instead of going out with friends.",
-              "A government must decide between funding new roads or increasing military spending due to a limited budget.",
-              "A consumer chooses a less expensive brand of phone to save money."
+            "id": "3",
+            "text": "A factory building is an example of which factor of production?",
+            "options": [
+              "Land",
+              "Labor",
+              "Capital",
+              "Entrepreneurship"
             ],
-            correctAnswer: 2
-          },
+            "correctAnswer": 2,
+            "explanation": "Capital refers to all human-made resources used to produce other goods and services. Factories and machines are examples of physical capital."
+          }
         ],
       }, 
       {
@@ -550,7 +559,7 @@ export const videos: Video[] = [
         unit: "1",
         lessonIDS: ["1.4"],
         tags: ["Demand", "Law of Demand"],
-        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.4+-+Demand.mp4",
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.4+-+Demand+(v2).mp4",
         thumbnail: "https://thumbnailslarge.s3.ap-southeast-2.amazonaws.com/1.4_TN.jpg",
         accessLevel: "free",
         questions: [
@@ -563,7 +572,8 @@ export const videos: Video[] = [
               "An inverse relationship between price and quantity demanded.",
               "A direct relationship between price and demand."
             ],
-            correctAnswer: 2
+            correctAnswer: 2, 
+            explanation: "The Law of Demand states that there is an inverse, or opposite, relationship between the price of a good and the quantity demanded. This means that as price falls, quantity demanded rises, and as price rises, quantity demanded falls."
           },
           {
             id: "2",
@@ -574,7 +584,8 @@ export const videos: Video[] = [
               "An increase in the quantity demanded for the video game.",
               "A decrease in the quantity demanded for the video game."
             ],
-            correctAnswer: 2
+            correctAnswer: 2, 
+            explanation: "A change in the good's own price causes a change in the quantity demanded, which is a movement along the demand curve. It does not shift the curve. A decrease in price leads to an increase in the quantity demanded."
           },
           {
             id: "3",
@@ -585,7 +596,8 @@ export const videos: Video[] = [
               "There will be a movement up along the demand curve.",
               "The demand curve will shift to the right."
             ],
-            correctAnswer: 3
+            correctAnswer: 3, 
+            explanation: "An increase in the population leads to an increase in the number of potential buyers. The number of buyers is a non-price factor that shifts the demand curve. More buyers will increase demand at every price level, causing a rightward shift of the curve."
           },
           {
             id: "4",
@@ -596,7 +608,8 @@ export const videos: Video[] = [
               "The quantity demanded for cars will increase.",
               "Demand will not change, but quantity supplied will decrease."
             ],
-            correctAnswer: 0
+            correctAnswer: 0, 
+            explanation: "Consumer expectations about future prices are a shifter of demand. If people expect a good to be cheaper in the future, they will reduce their demand for it today and wait to buy it later. A decrease in current demand is shown as a leftward shift of the demand curve."
           },
         ],
       }, 
@@ -657,7 +670,7 @@ export const videos: Video[] = [
         unit: "1",
         lessonIDS: ["1.5"],
         tags: ["Supply", "Law of Supply"],
-        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.5+-+Supply.mp4",
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.5+-+Supply+(v2).mp4",
         thumbnail: "https://thumbnailslarge.s3.ap-southeast-2.amazonaws.com/1.5_TN.jpg",
         accessLevel: "free",
         questions: [
@@ -670,7 +683,8 @@ export const videos: Video[] = [
               "An increase in the cost of an input will increase the supply of the good.",
               "A decrease in the price of a good will cause the supply curve to shift to the left."
             ],
-            correctAnswer: 1
+            correctAnswer: 1, 
+            explanation: "The Law of Supply states that there is a direct relationship between the price of a good and the quantity producers are willing to sell. As the price increases, producing the good becomes more profitable, creating an incentive for firms to increase their quantity supplied."
           },
           {
             id: "2",
@@ -681,7 +695,8 @@ export const videos: Video[] = [
               "A movement up along the supply curve for automobiles.",
               "A movement down along the supply curve for automobiles."
             ],
-            correctAnswer: 2
+            correctAnswer: 2, 
+            explanation: "A change in the good's own price causes a change in the quantity supplied, which is shown as a movement along the supply curve. An increase in price incentivizes producers to supply more, resulting in a movement up and to the right along the curve."
           },
           {
             id: "3",
@@ -692,7 +707,8 @@ export const videos: Video[] = [
               "It will cause the demand curve for computers to shift to the right.",
               "It will cause a decrease in the quantity supplied of computers."
             ],
-            correctAnswer: 0
+            correctAnswer: 0, 
+            explanation: "Technology is a shifter of supply. Since computer chips are an input for computers, a technological innovation that lowers chip costs also lowers the production cost of computers. This makes producing computers more profitable at all price levels, causing an increase in supply, which is shown as a rightward shift of the supply curve."
           },
           {
             id: "4",
@@ -703,7 +719,8 @@ export const videos: Video[] = [
               "The supply curve for cars will shift to the left.",
               "The demand curve for cars will shift to the left."
             ],
-            correctAnswer: 2
+            correctAnswer: 2, 
+            explanation: "The price of inputs is a key shifter of supply. An increase in the cost of steel raises the overall cost of producing a car, making it less profitable at any given selling price. This will cause manufacturers to reduce their supply, which is shown as a leftward shift of the supply curve."
           },
         ],
       }, 
@@ -789,7 +806,8 @@ export const videos: Video[] = [
               "An increase in demand to meet the higher price.",
               "A decrease in supply to restore equilibrium."
             ],
-            correctAnswer: 1
+            correctAnswer: 1, 
+            explanation: "When the price is above equilibrium, producers are willing to supply more of the good than consumers are willing to buy. This situation, where quantity supplied is greater than quantity demanded, is called a surplus."
           },
           {
             id: "2",
@@ -800,7 +818,8 @@ export const videos: Video[] = [
               "Price will increase, Quantity will decrease.",
               "Price will decrease, Quantity will increase."
             ],
-            correctAnswer: 3
+            correctAnswer: 3, 
+            explanation: "A new technology that lowers production costs will increase supply, shifting the supply curve to the right. When the supply curve shifts right, the new equilibrium point occurs at a lower price and a higher quantity."
           },
           {
             id: "3",
@@ -811,7 +830,8 @@ export const videos: Video[] = [
               "Quantity will increase, and the change in price is indeterminate.",
               "Quantity will decrease, and the change in price is indeterminate."
             ],
-            correctAnswer: 0
+            correctAnswer: 0, 
+            explanation: "This is a double shift scenario. The increase in demand pushes the price up and quantity up. The decrease in supply pushes the price up and quantity down. Since both shifts cause the price to rise, the price will definitely increase. However, the effect on quantity is opposing, making the final change in quantity indeterminate."
           }
         ]
       },
@@ -837,7 +857,8 @@ export const videos: Video[] = [
               "An inefficient use of resources or underutilization.",
               "Economic growth from new technology."
             ],
-            correctAnswer: 2
+            correctAnswer: 2,
+            explanation: "The line of the PPC represents the maximum possible efficient production. Any point inside the curve indicates that the economy is producing less than its potential, meaning some resources are unemployed or used inefficiently."
           },
           {
             id: "2",
@@ -848,18 +869,20 @@ export const videos: Video[] = [
               "Economic recession",
               "Allocative efficiency"
             ],
-            correctAnswer: 1
+            correctAnswer: 1,
+            explanation: "A bowed-out shape shows that resources are not perfectly adaptable between the production of the two goods. As you produce more of one good, you must give up increasingly larger amounts of the other, resulting in an increasing opportunity cost."
           },
           {
             id: "3",
-            text: "A company can produce either 40 phones and 30 burgers (Point A) or 30 phones and 60 burgers (Point B). What is the opportunity cost of increasing burger production from 30 to 60?",
+            text: "A company can produce either 40 TVs and 30 sandwiches (Point A) or 30 TVs and 60 sandwiches (Point B). What is the opportunity cost of increasing sandwich production from 30 to 60?",
             options: [
-              "30 burgers",
-              "60 burgers",
-              "10 phones",
-              "30 phones"
+              "30 sandwiches",
+              "60 sandwiches",
+              "10 TVs",
+              "30 TVs"
             ],
-            correctAnswer: 2
+            correctAnswer: 2,
+            explanation: "Opportunity cost is what is given up to get something else. To increase sandwich production from 30 to 60, the company's TV production had to fall from 40 to 30. Therefore, the opportunity cost of those extra sandwiches is the 10 TVs that were given up."
           }
         ]
       },

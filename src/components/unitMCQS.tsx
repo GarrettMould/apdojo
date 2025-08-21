@@ -20,7 +20,7 @@ interface AnsweredQuestionState {
   isCorrect: boolean;
 }
 
-interface UnitMCQsProps {
+interface UnitMCQSProps {
   currentUnit: number;
   currentQuestionIndex: number;
   isLoggedIn: boolean;
@@ -39,7 +39,6 @@ interface UnitMCQsProps {
   questions: QuestionType[];
   subject: 'macro' | 'micro';
   practiceUnitIds: number[];
-  onGuestLimitReached: (currentIndex: number) => void;
   isParentModalOpen: boolean;
 }
 
@@ -58,7 +57,6 @@ interface QuestionCardProps {
   dojoProgress: number;
   correctStreak: number;
   highlightedIndex: number | null;
-  onGuestLimitReached: (currentIndex: number) => void;
   isParentModalOpen: boolean;
 }
 
@@ -77,7 +75,6 @@ const QuestionCard = ({
   dojoProgress,
   correctStreak,
   highlightedIndex,
-  onGuestLimitReached,
   isParentModalOpen
 }: QuestionCardProps) => {
   const letterToIndex = (letter?: string): number | null => {
@@ -177,6 +174,8 @@ const QuestionCard = ({
     );
   };
 
+
+
   const handleSignupSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSignupError(null);
@@ -240,14 +239,13 @@ const QuestionCard = ({
 
   const shouldBlurContent = !isLoggedIn && currentIndex >= 2;
 
-  // Effect to call onGuestLimitReached when limit is hit
+  // Effect to handle guest limit overlay
   useEffect(() => {
     if (!isLoggedIn && currentIndex >= 2) {
-      onGuestLimitReached(currentIndex);
       // Only show internal overlay if parent modal is also being shown or expected to be shown
       setShowInternalOverlay(isParentModalOpen);
     }
-  }, [isLoggedIn, currentIndex, onGuestLimitReached, isParentModalOpen]);
+  }, [isLoggedIn, currentIndex, isParentModalOpen]);
 
   // Effect to hide internal overlay if parent modal is closed
   useEffect(() => {
@@ -427,6 +425,8 @@ const QuestionCard = ({
                  );
                 })}
             </div>
+            
+            
           </>
         )}
       </div>
@@ -453,9 +453,8 @@ export function UnitMCQs({
   questions,
   subject,
   practiceUnitIds,
-  onGuestLimitReached,
   isParentModalOpen
-}: UnitMCQsProps) {
+}: UnitMCQSProps) {
   const { login, signup, userData, loadingUserData, user } = useAuthContext();
   const [aiExplanations, setAiExplanations] = useState<Record<number, string>>({});
   const [isLoadingExplanation, setIsLoadingExplanation] = useState(false);
@@ -465,6 +464,7 @@ export function UnitMCQs({
   const DOUBLE_XP_CHANCE = 0.15;
   const [highlightedIndex, setHighlightedIndex] = useState<number | null>(null);
   const [showAiTooltip, setShowAiTooltip] = useState(false);
+
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -477,6 +477,10 @@ export function UnitMCQs({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+
+
+
 
   const currentQuestion = questions[currentQuestionIndex];
   const currentAnswerState = currentQuestion ? answeredQuestions[currentQuestion.id] : undefined;
@@ -704,7 +708,6 @@ export function UnitMCQs({
               correctStreak={correctStreak}
               totalQuestions={totalQuestions}
               highlightedIndex={highlightedIndex}
-              onGuestLimitReached={onGuestLimitReached}
               isParentModalOpen={isParentModalOpen}
             />
           )}
@@ -719,6 +722,8 @@ export function UnitMCQs({
               <h3 className="font-extrabold tracking-tight text-gray-900 text-2xl">
                   <span className="text-blue-600">Unit MCQ</span> Practice
               </h3>
+              
+
               {/* Keep dropdown for now, might remove later if tags are sufficient */}
               {!isWeakestUnitsMode && (
                 <div className="relative" ref={dropdownRef}>
@@ -730,19 +735,26 @@ export function UnitMCQs({
                   </button>
                   {isUnitDropdownOpen && (
                     <div className="absolute left-0 mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-10">
-                      {units.map(unit => (
-                        <button
-                          key={unit.number}
-                          onClick={() => handleUnitChange(unit.number)}
-                          className={`w-full text-left px-4 py-2 text-sm transition-colors ${
-                            currentUnit === unit.number
-                              ? 'bg-blue-50 text-blue-600'
-                              : 'text-gray-700 hover:bg-gray-50'
-                          }`}
-                        >
-                          {unit.title}
-                        </button>
-                      ))}
+                      {units.map(unit => {
+                        const isLocked = unit.number === 5 || unit.number === 6;
+                        return (
+                          <button
+                            key={unit.number}
+                            onClick={() => !isLocked && handleUnitChange(unit.number)}
+                            disabled={isLocked}
+                            className={`w-full text-left px-4 py-2 text-sm transition-colors ${
+                              currentUnit === unit.number
+                                ? 'bg-blue-50 text-blue-600'
+                                : isLocked
+                                ? 'text-gray-400 bg-gray-50 cursor-not-allowed'
+                                : 'text-gray-700 hover:bg-gray-50'
+                            }`}
+                          >
+                            {unit.title}
+                            {isLocked && <span className="text-xs text-gray-400 ml-2">(Coming Soon)</span>}
+                          </button>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -753,7 +765,7 @@ export function UnitMCQs({
             {practiceUnitIds && practiceUnitIds.length > 0 && (
                 <div className="flex flex-wrap gap-1 mb-4"> {/* Container for tags */} 
                     {practiceUnitIds.map(unitId => (
-                        <span key={unitId} className="inline-block bg-gray-100 text-gray-700 text-xs font-medium px-2 py-0.5 rounded-full">
+                        <span key={unitId} className="inline-block bg-gray-100 text-gray-700 text-xs font-medium px-2 py-0.5 rounded-md">
                             Unit {unitId}
                         </span>
                     ))}
@@ -784,21 +796,40 @@ export function UnitMCQs({
              <h3 className="font-extrabold tracking-tight text-gray-900 text-lg mb-3">Study Resources</h3>
             
             {/* Study Guide Link - Reduced padding */} 
-            <a
-              href={`/study-guides/AP-macroeconomics-unit-${displayUnitId}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full p-3 rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 bg-white hover:bg-gray-50 group block"
-            >
-               <div className="flex items-center gap-3 justify-start">
-                 <div className="p-1.5 rounded-lg bg-gray-100 text-gray-600 group-hover:bg-gray-200 transition-colors"> {/* Reduced icon padding */} 
-                   <FileText className="w-5 h-5" />
-                 </div>
-                 <span className="font-semibold text-sm text-gray-900"> {/* Reduced text size */} 
-                   Unit {displayUnitId} Study Guide
-                 </span>
-               </div>
-            </a>
+            {(() => {
+              const isLocked = displayUnitId === 5 || displayUnitId === 6;
+              if (isLocked) {
+                return (
+                  <div className="w-full p-3 rounded-lg border border-gray-200 bg-gray-50 group block opacity-60">
+                    <div className="flex items-center gap-3 justify-start">
+                      <div className="p-1.5 rounded-lg bg-gray-200 text-gray-400"> {/* Reduced icon padding */} 
+                        <FileText className="w-5 h-5" />
+                      </div>
+                      <span className="font-semibold text-sm text-gray-500"> {/* Reduced text size */} 
+                        Unit {displayUnitId} Study Guide (Coming Soon)
+                      </span>
+                    </div>
+                  </div>
+                );
+              }
+              return (
+                <a
+                  href={`/unit/${displayUnitId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full p-3 rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 bg-white hover:bg-gray-50 group block"
+                >
+                   <div className="flex items-center gap-3 justify-start">
+                     <div className="p-1.5 rounded-lg bg-gray-100 text-gray-600 group-hover:bg-gray-200 transition-colors"> {/* Reduced icon padding */} 
+                       <FileText className="w-5 h-5" />
+                     </div>
+                     <span className="font-semibold text-sm text-gray-900"> {/* Reduced text size */} 
+                       Unit {displayUnitId} Study Guide
+                     </span>
+                   </div>
+                </a>
+              );
+            })()}
 
             {/* AI Explanation Button - Reduced padding */}
             <div 

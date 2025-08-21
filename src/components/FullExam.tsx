@@ -707,7 +707,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
     {
       title: `Cheat Sheet: Unit ${currentQuestion.unit} - ${currentQuestion.unitName} `,
       type: 'notes' as const,
-      link: `/study-guides/AP-${subjectFullName}-unit-${currentQuestion.unit}`,
+                      link: `/unit-study-guides`,
     }
   ];
 
@@ -954,7 +954,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
                   
                   {/* Unit Cheat Sheet Button */}
                   <a
-                    href={`/study-guides/AP-${subjectFullName}-unit-${questions[currentQuestionIndex].unit}`}
+                    href={`/unit-study-guides`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full p-3 lg:p-4 rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 bg-white hover:bg-gray-50 group block"

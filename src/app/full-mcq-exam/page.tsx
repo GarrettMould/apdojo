@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ArrowLeft, FileText, Check, X, CheckCircle } from 'lucide-react';
+import { ArrowLeft, FileText, Check, X, CheckCircle, Lock } from 'lucide-react';
 import Link from 'next/link';
-import { useAuthContext } from '@/contexts/AuthContext';
-import { AuthGate } from '@/components/AuthGate';
+// MVP: Removed authentication imports
+// import { useAuthContext } from '@/contexts/AuthContext';
+// import { AuthGate } from '@/components/AuthGate';
 import { CourseSidebar } from '@/components/CourseSidebar';
 import { macroSetOneQuestions } from '@/data/questionBanks/macro/mcqs/macroSetOne';
 import { use } from 'react';
@@ -16,7 +17,11 @@ const getCorrectAnswerIndex = (correctAnswer: string): number => {
 };
 
 export default function FullMCQExamPage() {
-  const { user } = useAuthContext();
+  // MVP: Removed authentication context
+  // const { user } = useAuthContext();
+  
+  // MVP: Full MCQ exam covers all units, so it's locked for MVP (only Unit 1 is accessible)
+  const isExamLocked = true;
   
   const [answeredQuestions, setAnsweredQuestions] = useState<Record<string, { selectedAnswer: number; isCorrect: boolean }>>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -28,71 +33,106 @@ export default function FullMCQExamPage() {
   const questions = macroSetOneQuestions.questions;
   const totalQuestions = questions.length;
 
-  // Load saved progress when component mounts
+  // MVP: Removed user-dependent progress loading for MVP
+  // useEffect(() => {
+  //   const loadProgress = async () => {
+  //     if (user) {
+  //       try {
+  //         console.log('Loading progress for user:', user.uid);
+  //         const savedProgress = await loadTestProgress(user.uid, 'full_mcq_exam');
+  //         console.log('Loaded progress:', savedProgress);
+  //         if (savedProgress && !savedProgress.isSubmitted) {
+  //           setAnsweredQuestions(savedProgress.answeredQuestions);
+  //           setIsSubmitted(savedProgress.isSubmitted);
+  //           setHasSavedProgress(true);
+  //           console.log('Restored progress:', savedProgress.answeredQuestions);
+  //         }
+  //       } catch (error) {
+  //         console.error('Error loading progress:', error);
+  //         setIsLoadingProgress(false);
+  //       }
+  //     } else {
+  //       setIsLoadingProgress(false);
+  //     }
+  //   };
+
+  //   loadProgress();
+  // }, [user]);
+
+  // MVP: Set loading to false immediately since we're not loading user progress
   useEffect(() => {
-    const loadProgress = async () => {
-      if (user) {
-        try {
-          console.log('Loading progress for user:', user.uid);
-          const savedProgress = await loadTestProgress(user.uid, 'full_mcq_exam');
-          console.log('Loaded progress:', savedProgress);
-          if (savedProgress && !savedProgress.isSubmitted) {
-            setAnsweredQuestions(savedProgress.answeredQuestions);
-            setIsSubmitted(savedProgress.isSubmitted);
-            setHasSavedProgress(true);
-            console.log('Restored progress:', savedProgress.answeredQuestions);
-          }
-        } catch (error) {
-          console.error('Error loading progress:', error);
-        } finally {
-          setIsLoadingProgress(false);
-        }
-      } else {
-        setIsLoadingProgress(false);
-      }
-    };
+    setIsLoadingProgress(false);
+  }, []);
 
-    loadProgress();
-  }, [user]);
+  // MVP: Removed user-dependent progress saving for MVP
+  // useEffect(() => {
+  //   const saveProgress = async () => {
+  //     if (user && !isLoadingProgress) {
+  //       try {
+  //         console.log('Saving progress:', {
+  //           answeredQuestions,
+  //           isSubmitted,
+  //           totalQuestions
+  //         });
+  //         await saveTestProgress({
+  //           userId: user.uid,
+  //           testType: 'full_exam',
+  //           testId: 'full_mcq_exam',
+  //           progress: {
+  //           answeredQuestions,
+  //           currentQuestionIndex: 0, // Not using this for full exam
+  //           isSubmitted,
+  //           totalQuestions,
+  //           startedAt: new Date(),
+  //           lastUpdated: new Date()
+  //         }
+  //       });
+  //         console.log('Progress saved successfully');
+  //       } catch (error) {
+  //         console.error('Error saving progress:', error);
+  //       }
+  //     }
+  //   };
 
-  // Save progress whenever answers change
-  useEffect(() => {
-    const saveProgress = async () => {
-      if (user && !isLoadingProgress) {
-        try {
-          console.log('Saving progress:', {
-            answeredQuestions,
-            isSubmitted,
-            totalQuestions
-          });
-          await saveTestProgress({
-            userId: user.uid,
-            testType: 'full_exam',
-            testId: 'full_mcq_exam',
-            progress: {
-              answeredQuestions,
-              currentQuestionIndex: 0, // Not using this for full exam
-              isSubmitted,
-              totalQuestions,
-              startedAt: new Date(),
-              lastUpdated: new Date()
-            }
-          });
-          console.log('Progress saved successfully');
-        } catch (error) {
-          console.error('Error saving progress:', error);
-        }
-      }
-    };
-
-    // Debounce the save to avoid too many Firebase calls
-    const timeoutId = setTimeout(saveProgress, 1000);
-    return () => clearTimeout(timeoutId);
-  }, [answeredQuestions, isSubmitted, user, totalQuestions, isLoadingProgress]);
+  //   // Debounce the save to avoid too many Firebase calls
+  //   const timeoutId = setTimeout(saveProgress, 1000);
+  //   return () => clearTimeout(timeoutId);
+  // }, [answeredQuestions, isSubmitted, user, totalQuestions, isLoadingProgress]);
   
-  // Check if user is authenticated
-  if (!user) {
-    return <AuthGate />;
+  // MVP: Removed authentication requirement - allow all users to access full MCQ exam
+  // if (!user) {
+  //   return <AuthGate />;
+  // }
+
+  // MVP: Check if exam is locked (only Unit 1 content is accessible for MVP)
+  if (isExamLocked) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto px-4">
+          <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Lock className="w-12 h-12 text-gray-400" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">Premium Content Locked</h1>
+          <p className="text-gray-600 mb-6">
+            The full MCQ exam covers all units and requires a subscription. 
+            Complete Unit 1 to unlock access to comprehensive exams.
+          </p>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <p className="text-sm text-blue-800">
+              <strong>What's included:</strong> Comprehensive practice exam covering all AP Macroeconomics units 
+              with detailed explanations and progress tracking.
+            </p>
+          </div>
+          <Link 
+            href="/ap-macro-course"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to AP Macro Course
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   // Show loading state while progress is being loaded
@@ -128,21 +168,22 @@ export default function FullMCQExamPage() {
   const handleSubmit = async () => {
     setIsSubmitted(true);
     
+    // MVP: Removed user-dependent result saving for MVP
     // Save final test result
-    if (user) {
-      try {
-        await saveTestResult({
-          userId: user.uid,
-          testType: 'full_exam',
-          testId: 'full_mcq_exam',
-          score: correctAnswers,
-          totalQuestions,
-          completedAt: new Date()
-        });
-      } catch (error) {
-        console.error('Error saving test result:', error);
-      }
-    }
+    // if (user) {
+    //   try {
+    //     await saveTestResult({
+    //       userId: user.uid,
+    //       testType: 'full_exam',
+    //       testId: 'full_mcq_exam',
+    //       score: correctAnswers,
+    //       totalQuestions,
+    //       completedAt: new Date()
+    //     });
+    //   } catch (error) {
+    //     console.error('Error saving test result:', error);
+    //   }
+    // }
   };
 
   const progress = Object.keys(answeredQuestions).length;

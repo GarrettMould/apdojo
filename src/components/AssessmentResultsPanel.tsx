@@ -149,7 +149,7 @@ export function AssessmentResultsPanel({
               {weakestUnits.map(unit => (
                 <a
                   key={unit.unit}
-                  href={`/study-guides/${examType}-${unit.unit}`}
+                  href={`/unit-study-guides`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50/50 transition-all"

@@ -49,7 +49,7 @@ export default function CheatSheetsPage() {
     if (type === 'view') {
       const subjectSlug = unit.subject === 'macro' ? 'macroeconomics' : 'microeconomics';
       const slug = `AP-${subjectSlug}-unit-${unit.number}`;
-      window.location.href = `/study-guides/${slug}`;
+              window.location.href = `/unit-study-guides`;
     } else {
       window.open(unit.pdfUrl, '_blank');
     }

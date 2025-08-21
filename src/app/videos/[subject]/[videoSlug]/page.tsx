@@ -2,12 +2,13 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { X, Check, ArrowLeft, ArrowRight, FileText } from 'lucide-react';
+import { X, Check, ArrowLeft, ArrowRight, FileText, Lock } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { videos as allVideos, Video as VideoType } from '@/data/videos';
-import { useAuthContext } from '@/contexts/AuthContext';
-import { AuthGate } from '@/components/AuthGate';
+// MVP: Removed authentication imports
+// import { useAuthContext } from '@/contexts/AuthContext';
+// import { AuthGate } from '@/components/AuthGate';
 import { CourseSidebar } from '@/components/CourseSidebar';
 import dojoIcon from "../../../../../public/images/dojoIcon.png";
 import { use } from 'react';
@@ -30,7 +31,8 @@ interface VideoPageProps {
 export default function VideoPage({ params }: VideoPageProps) {
   const { subject, videoSlug } = use(params);
   const router = useRouter();
-  const { user } = useAuthContext();
+  // MVP: Removed authentication context
+  // const { user } = useAuthContext();
   
   const [expandedImage, setExpandedImage] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -39,6 +41,9 @@ export default function VideoPage({ params }: VideoPageProps) {
 
   // Find the video by slug
   const video = allVideos.find(v => v.videoSlug === videoSlug);
+  
+  // MVP: Check if video is from a locked unit (only Unit 1 is accessible)
+  const isVideoLocked = video && parseInt(video.unit) > 1;
   
   // Get navigation items (videos and comprehension checks)
   const getNavigationItems = () => {
@@ -141,11 +146,15 @@ export default function VideoPage({ params }: VideoPageProps) {
       
       if (nextUnitVideos.length > 0) {
         const firstVideo = nextUnitVideos[0];
-        next = {
-          type: 'video',
-          title: `${firstVideo.lessonIDS[0]}: Video`,
-          href: `/videos/macro/${firstVideo.videoSlug}`
-        };
+        // MVP: Check if next unit is locked (only Unit 1 is accessible)
+        const isNextUnitLocked = parseInt(firstVideo.unit) > 1;
+        if (!isNextUnitLocked) {
+          next = {
+            type: 'video',
+            title: `${firstVideo.lessonIDS[0]}: Video`,
+            href: `/videos/macro/${firstVideo.videoSlug}`
+          };
+        }
       }
     }
     
@@ -182,10 +191,41 @@ export default function VideoPage({ params }: VideoPageProps) {
     );
   }
 
-  // Check if user is authenticated
-  if (!user) {
-    return <AuthGate />;
+  // MVP: Check if video is from a locked unit (only Unit 1 is accessible)
+  if (isVideoLocked) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto px-4">
+          <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Lock className="w-12 h-12 text-gray-400" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">Premium Content Locked</h1>
+          <p className="text-gray-600 mb-6">
+            This video is part of Unit {video.unit}, which requires a subscription. 
+            Complete Unit 1 to unlock access to all units.
+          </p>
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <p className="text-sm text-blue-800">
+              <strong>What's included:</strong> {video.questions.length} comprehension questions 
+              and comprehensive video content.
+            </p>
+          </div>
+          <Link 
+            href="/ap-macro-course"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to AP Macro Course
+          </Link>
+        </div>
+      </div>
+    );
   }
+
+  // MVP: Removed authentication requirement - allow all users to access videos
+  // if (!user) {
+  //   return <AuthGate />;
+  // }
 
   const handleImageClick = (imageUrl: string) => {
     setExpandedImage(imageUrl);
@@ -195,13 +235,12 @@ export default function VideoPage({ params }: VideoPageProps) {
 
   return (
     <div className="min-h-screen bg-white flex">
-      {/* Course Sidebar - Only show for macro videos */}
-      {subject === 'macro' && (
-        <CourseSidebar 
-          selectedUnit={video.unit}
-          isFixed={true}
-        />
-      )}
+      {/* Sidebar */}
+      <CourseSidebar 
+        selectedUnit={video?.unit || '1'} 
+        currentLessonId={video?.lessonIDS[0]}
+        isFixed={true}
+      />
       
       {/* Main Content */}
       <div className={`flex-1 py-8 ${subject === 'macro' ? 'ml-80' : 'max-w-6xl mx-auto'}`}>
@@ -279,7 +318,9 @@ export default function VideoPage({ params }: VideoPageProps) {
                       Next
                       <ArrowRight className="w-6 h-6" />
                     </div>
-                    <div className="text-sm font-medium text-gray-400">No next resource</div>
+                    <div className="text-sm font-medium text-gray-400">
+                      {parseInt(video.unit) === 1 ? "No next resource" : "🔒 Premium Content"}
+                    </div>
                   </div>
                 )}
               </div>

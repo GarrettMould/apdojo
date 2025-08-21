@@ -66,6 +66,17 @@ export default function FlashcardsPage() {
 
   return (
     <div className="max-w-4xl mx-auto mt-4 px-4 py-8">
+      {/* Back Button */}
+      <div className="max-w-3xl mx-auto px-4 mb-6">
+        <Link 
+          href="/interactive-tools" 
+          className="inline-flex items-center text-gray-600 hover:text-blue-600 transition-colors"
+        >
+          <ChevronLeft className="w-4 h-4 mr-2" />
+          Back to Interactive Tools
+        </Link>
+      </div>
+      
       <div className="max-w-3xl mx-auto px-4">
         <h1 className="text-4xl text-center font-extrabold tracking-tight text-gray-900 mt-12 mb-6">
           <span className="text-blue-500">AP {subjectTitle}</span> Flashcards

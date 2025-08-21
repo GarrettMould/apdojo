@@ -1,20 +1,26 @@
 'use client';
 
 import { useState } from 'react';
-import { Globe, FileText, Edit, Play, CheckCircle } from 'lucide-react';
+import { Globe, FileText, Edit, Play, CheckCircle, Lock, ChevronRight, ChevronDown, Home, BookOpen, Target, TrendingUp, ArrowRight, Brain } from 'lucide-react';
 import { apMacroCourseInfo } from '@/data/courseInfo';
+import { videos as allVideos } from '@/data/videos';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import React from 'react'; // Added for useEffect
 
 interface CourseSidebarProps {
   selectedUnit?: string;
   onUnitChange?: (unit: string) => void;
   isFixed?: boolean;
+  currentLessonId?: string; // Add prop for current lesson ID
 }
 
-export function CourseSidebar({ selectedUnit = '1', onUnitChange, isFixed = false }: CourseSidebarProps) {
+export function CourseSidebar({ selectedUnit = '1', onUnitChange, isFixed = false, currentLessonId }: CourseSidebarProps) {
   const pathname = usePathname();
   const isOnCoursePage = pathname === '/ap-macro-course';
+  const isOnLessonPage = pathname.includes('/videos/') || pathname.includes('/video-comprehension-checks/');
+  const isOnUnitTestPage = pathname.includes('/unit-mcq-test/');
+  const [expandedLessons, setExpandedLessons] = useState<Set<string>>(new Set()); // Track expanded lessons
   
   const handleUnitClick = (unitNumber: string) => {
     if (onUnitChange) {
@@ -22,145 +28,289 @@ export function CourseSidebar({ selectedUnit = '1', onUnitChange, isFixed = fals
     }
   };
 
-  const sidebarClasses = `w-80 bg-white border-r border-gray-200 flex-shrink-0 ${
+  const toggleLessonExpansion = (lessonId: string) => {
+    const newExpanded = new Set(expandedLessons);
+    if (newExpanded.has(lessonId)) {
+      // If clicking the same lesson, close it
+      newExpanded.delete(lessonId);
+    } else {
+      // If opening a new lesson, close all others and open this one
+      newExpanded.clear();
+      newExpanded.add(lessonId);
+    }
+    setExpandedLessons(newExpanded);
+  };
+
+  // Auto-expand lesson if user is on a video or comprehension check page
+  React.useEffect(() => {
+    if (isOnLessonPage || isOnUnitTestPage) {
+      const currentVideo = allVideos.find(video => 
+        (pathname.includes('/videos/') && pathname.includes(video.videoSlug)) ||
+        (pathname.includes('/video-comprehension-checks/') && pathname.includes(video.videoSlug))
+      );
+      
+      if (currentVideo && currentVideo.lessonIDS[0]) {
+        setExpandedLessons(prev => new Set([...prev, currentVideo.lessonIDS[0]]));
+      }
+    }
+  }, [pathname, isOnLessonPage, isOnUnitTestPage, allVideos]);
+
+  const sidebarClasses = `w-80 bg-white border-r border-gray-100 flex-shrink-0 ${
     isFixed ? 'fixed left-0 top-16 h-[calc(100vh-4rem)] overflow-y-auto z-40' : ''
   }`;
 
   return (
     <div className={sidebarClasses}>
-      <div className="p-6 pb-8">
+      <div className="p-6">
         {/* Course Header */}
-        <div className="mb-6">
-          <div className="flex items-center">
-            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center mr-3">
-              <Globe className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <h1 className="text-lg font-bold text-gray-900">AP Macroeconomics</h1>
-            </div>
-          </div>
-        </div>
 
-        {/* Unit Navigation */}
-        <div className="space-y-2 mb-6">
-          <h2 className="text-sm font-semibold text-gray-700 mb-3">Course Units</h2>
-          {apMacroCourseInfo.units.map((unit, index) => {
-            const unitNumber = unit.unit.split(':')[0].split(' ')[1];
-            const unitName = unit.unit.split(':')[1]?.trim() || unit.unit;
-            const isSelected = selectedUnit === unitNumber;
-            
-            return (
-              <div key={unitNumber}>
-                {isOnCoursePage ? (
+
+        {/* Course Units - Different behavior based on page type */}
+        {isOnCoursePage ? (
+          // Course Page: Units are clickable with card-based design
+          <div className="space-y-3">
+            {apMacroCourseInfo.units.map((unit, index) => {
+              const unitNumber = unit.unit.split(':')[0].split(' ')[1];
+              const unitName = unit.unit.split(':')[1]?.trim() || unit.unit;
+              const isSelected = selectedUnit === unitNumber;
+              const isLocked = parseInt(unitNumber) > 1; // MVP: Only Unit 1 is accessible
+              
+              // Get unit videos for progress calculation
+              const unitVideos = allVideos.filter(video => 
+                video.subjects.includes('AP Macroeconomics') && 
+                video.unit === unitNumber
+              );
+              
+              // Calculate progress metrics
+              const totalLessons = unitVideos.length;
+              const totalQuestions = unitVideos.reduce((sum, video) => sum + (video.questions?.length || 0), 0);
+              
+              // Override with specific counts for certain units
+              let displayLessons = totalLessons;
+              let displayQuestions = totalQuestions;
+              
+              if (unitNumber === '4' || unitNumber === '5') {
+                displayLessons = 7;
+                displayQuestions = 36;
+              } else if (unitNumber === '6') {
+                displayLessons = 6;
+                displayQuestions = 33;
+              }
+              
+              return (
+                <div key={unitNumber} className="border border-gray-200 rounded-lg overflow-hidden">
                   <button
-                    onClick={() => handleUnitClick(unitNumber)}
-                    className={`w-full text-left p-3 rounded-lg transition-colors duration-200 ${
+                    onClick={() => !isLocked && handleUnitClick(unitNumber)}
+                    disabled={isLocked}
+                    className={`w-full text-left px-4 py-4 transition-colors relative ${
                       isSelected 
-                        ? 'bg-blue-50 border border-blue-200' 
-                        : 'bg-white border border-gray-200 hover:border-blue-300 hover:bg-blue-50'
+                        ? 'bg-blue-50 text-blue-700' 
+                        : isLocked
+                        ? 'bg-gray-50 text-gray-500 cursor-not-allowed opacity-60'
+                        : 'bg-white hover:bg-gray-50 text-gray-700'
                     }`}
                   >
-                    <div className="flex items-center gap-3">
-                      <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                        isSelected ? 'bg-blue-500' : 'bg-gray-100'
-                      }`}>
-                        {isSelected ? (
-                          <CheckCircle className="w-4 h-4 text-white" />
-                        ) : (
-                          <span className="text-xs font-bold text-gray-600">{unitNumber}</span>
-                        )}
-                      </div>
+                    {isSelected && (
+                      <div className="absolute right-0 top-0 bottom-0 w-1 bg-blue-500"></div>
+                    )}
+                    <div className="flex items-center justify-between">
                       <div className="flex-1">
-                        <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
-                          Unit {unitNumber}
+                        <div className="font-semibold text-gray-900 mb-2">
+                          Unit {unitNumber}: {unitName}
                         </div>
-                        <div className={`text-sm font-medium ${
-                          isSelected ? 'text-blue-600' : 'text-gray-900'
-                        }`}>
-                          {unitName}
+                        <div className="text-sm text-gray-500">
+                          {displayLessons} lessons • {displayQuestions} questions total
                         </div>
                       </div>
+                      {isLocked && (
+                        <Lock className="w-4 h-4 text-gray-400" />
+                      )}
                     </div>
                   </button>
-                ) : (
-                  <Link
-                    href={`/ap-macro-course?unit=${unitNumber}`}
-                    className={`block w-full text-left p-3 rounded-lg transition-colors duration-200 ${
-                      isSelected 
-                        ? 'bg-blue-50 border border-blue-200' 
-                        : 'bg-white border border-gray-200 hover:border-blue-300 hover:bg-blue-50'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                        isSelected ? 'bg-blue-500' : 'bg-gray-100'
-                      }`}>
-                        {isSelected ? (
-                          <CheckCircle className="w-4 h-4 text-white" />
-                        ) : (
-                          <span className="text-xs font-bold text-gray-600">{unitNumber}</span>
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
-                          Unit {unitNumber}
+                </div>
+              );
+            })}
+          </div>
+        ) : (isOnLessonPage || isOnUnitTestPage) ? (
+          // Lesson Pages & Unit Test Pages: Clean, streamlined lesson navigation
+          <div className="space-y-4">
+            {/* Back to Course */}
+            <Link
+              href="/ap-macro-course"
+              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors group"
+            >
+              <ChevronRight className="w-4 h-4 text-gray-400 rotate-180 group-hover:text-gray-600" />
+              <span>Back to Course</span>
+            </Link>
+
+            {/* Unit Header */}
+            <div className="px-3">
+              <h2 className="text-lg font-semibold text-gray-900 mb-1">Unit 1</h2>
+              <p className="text-sm text-gray-500">Basic Economic Concepts</p>
+            </div>
+
+            {/* Lesson Navigation */}
+            <div className="space-y-1">
+              {(() => {
+                // Get Unit 1 videos and group by lesson ID
+                const unit1Videos = allVideos
+                  .filter(video => 
+                    video.subjects.includes('AP Macroeconomics') && 
+                    video.unit === '1'
+                  );
+                
+                // Group videos by lesson ID
+                const lessonGroups = new Map<string, typeof unit1Videos>();
+                unit1Videos.forEach(video => {
+                  const lessonId = video.lessonIDS[0];
+                  if (lessonId) {
+                    if (!lessonGroups.has(lessonId)) {
+                      lessonGroups.set(lessonId, []);
+                    }
+                    lessonGroups.get(lessonId)!.push(video);
+                  }
+                });
+                
+                // Sort lessons and create lesson items
+                const sortedLessons = Array.from(lessonGroups.entries())
+                  .sort(([a], [b]) => parseFloat(a) - parseFloat(b));
+                
+                return sortedLessons.map(([lessonId, videos]) => {
+                  const isCurrentLesson = currentLessonId === lessonId;
+                  const isExpanded = expandedLessons.has(lessonId);
+                  
+                  // Get lesson title from first video
+                  const lessonTitle = videos[0]?.title.split(':')[0] || lessonId;
+                  
+                  return (
+                    <div key={lessonId} className="border border-gray-200 rounded-lg overflow-hidden">
+                      {/* Lesson Header */}
+                      <button
+                        onClick={() => toggleLessonExpansion(lessonId)}
+                        className={`w-full text-left px-3 py-2.5 transition-colors h-12 flex items-center ${
+                          isCurrentLesson
+                            ? 'bg-blue-50 border-blue-200 text-blue-700' 
+                            : 'bg-white hover:bg-gray-50 text-gray-700'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between w-full">
+                          <div className="flex items-center gap-2 min-w-0 flex-1">
+                            <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                              isCurrentLesson ? 'bg-blue-500' : 'bg-gray-300'
+                            }`} />
+                            <span className="text-sm font-medium truncate">
+                              {lessonId}: {lessonTitle}
+                            </span>
+                          </div>
+                          <ChevronRight 
+                            className={`w-4 h-4 text-gray-400 transition-transform flex-shrink-0 ${
+                              isExpanded ? 'rotate-90' : ''
+                            }`} 
+                          />
                         </div>
-                        <div className={`text-sm font-medium ${
-                          isSelected ? 'text-blue-600' : 'text-gray-900'
-                        }`}>
-                          {unitName}
+                      </button>
+                      
+                      {/* Lesson Content */}
+                      {isExpanded && (
+                        <div className="bg-gray-50 border-t border-gray-200">
+                          <div className="p-2 space-y-1">
+                            {videos.map((video, index) => {
+                              const isOnVideoPage = pathname.includes('/videos/') && pathname.includes(video.videoSlug);
+                              const isOnComprehensionPage = pathname.includes('/video-comprehension-checks/') && pathname.includes(video.videoSlug);
+                              
+                              return (
+                                <div key={video.id} className="space-y-1">
+                                  {/* Video Link */}
+                                  <Link
+                                    href={`/videos/macro/${video.videoSlug}`}
+                                    className={`block px-3 py-2 text-sm rounded-md transition-colors ${
+                                      isOnVideoPage
+                                        ? 'bg-blue-100 text-blue-700 font-medium' 
+                                        : 'text-gray-600 hover:bg-white hover:text-gray-900'
+                                    }`}
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      <Play className="w-3 h-3" />
+                                      <span>Video</span>
+                                    </div>
+                                  </Link>
+                                  
+                                  {/* Comprehension Check Link */}
+                                  <Link
+                                    href={`/video-comprehension-checks/${video.videoSlug}`}
+                                    className={`block px-3 py-2 text-sm rounded-md transition-colors ${
+                                      isOnComprehensionPage
+                                        ? 'bg-blue-100 text-blue-700 font-medium' 
+                                        : 'text-gray-600 hover:bg-white hover:text-gray-900'
+                                    }`}
+                                  >
+                                    <div className="flex items-center gap-2">
+                                      <Brain className="w-3 h-3" />
+                                      <span>Quiz</span>
+                                    </div>
+                                  </Link>
+                                </div>
+                              );
+                            })}
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
-                  </Link>
+                  );
+                });
+              })()}
+            </div>
+
+            {/* MCQ Test Section */}
+            <div className="border-t border-gray-200 pt-4">
+              <div className="border border-gray-200 rounded-lg overflow-hidden">
+                <button
+                  onClick={() => toggleLessonExpansion('mcq-test')}
+                  className={`w-full text-left px-3 py-2.5 transition-colors h-12 flex items-center ${
+                    expandedLessons.has('mcq-test')
+                      ? 'bg-green-50 border-green-200 text-green-700' 
+                      : 'bg-white hover:bg-gray-50 text-gray-700'
+                  }`}
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                        expandedLessons.has('mcq-test') ? 'bg-green-500' : 'bg-gray-300'
+                      }`} />
+                      <span className="text-sm font-medium">Unit Test</span>
+                    </div>
+                    <ChevronRight 
+                      className={`w-4 h-4 text-gray-400 transition-transform flex-shrink-0 ${
+                        expandedLessons.has('mcq-test') ? 'rotate-90' : ''
+                      }`} 
+                    />
+                  </div>
+                </button>
+                
+                {/* MCQ Test Content */}
+                {expandedLessons.has('mcq-test') && (
+                  <div className="bg-gray-50 border-t border-gray-200">
+                    <div className="p-2">
+                      <Link
+                        href="/unit-mcq-test/1"
+                        className={`block px-3 py-2 text-sm rounded-md transition-colors ${
+                          pathname.includes('/unit-mcq-test/1')
+                            ? 'bg-green-100 text-green-700 font-medium' 
+                            : 'text-gray-600 hover:bg-white hover:text-gray-900'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <FileText className="w-3 h-3" />
+                          <span>MCQ Test</span>
+                        </div>
+                      </Link>
+                    </div>
+                  </div>
                 )}
               </div>
-            );
-          })}
-        </div>
-
-        {/* Full Exams */}
-        <div className="space-y-2">
-          <h2 className="text-sm font-semibold text-gray-700 mb-3">Practice Exams</h2>
-          
-          <Link
-            href="/full-mcq-exam"
-            className="block w-full text-left p-3 rounded-lg transition-colors duration-200 bg-white border border-gray-200 hover:border-blue-300 hover:bg-blue-50"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                <FileText className="w-3 h-3 text-green-600" />
-              </div>
-              <div>
-                <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
-                  Full Exam
-                </div>
-                <div className="text-sm font-medium text-gray-900">
-                  MCQ Exam
-                </div>
-              </div>
             </div>
-          </Link>
-          
-          <Link
-            href="/full-frq-exam"
-            className="block w-full text-left p-3 rounded-lg transition-colors duration-200 bg-white border border-gray-200 hover:border-blue-300 hover:bg-blue-50"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center">
-                <Edit className="w-3 h-3 text-purple-600" />
-              </div>
-              <div>
-                <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
-                  Full Exam
-                </div>
-                <div className="text-sm font-medium text-gray-900">
-                  FRQ Exam
-                </div>
-              </div>
-            </div>
-          </Link>
-        </div>
+          </div>
+        ) : null}
       </div>
     </div>
   );

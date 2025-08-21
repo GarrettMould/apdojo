@@ -6,7 +6,8 @@ import Image from 'next/image';
 import { Film, PlayCircle } from 'lucide-react';
 import { videos as allVideos, Video as VideoType } from '@/data/videos';
 import { LoginModal, SignupModal, SelectPlanModal } from '@/components/AuthModals';
-import { useAuthContext } from '@/contexts/AuthContext';
+// MVP: Removed authentication import
+// import { useAuthContext } from '@/contexts/AuthContext';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useRouter } from 'next/navigation';
 
@@ -36,7 +37,8 @@ export default function VideoLibraryPage({ params }: VideoLibraryPageProps) {
   const [showSignupModal, setShowSignupModal] = useState(false);
   const [showSelectPlanModal, setShowSelectPlanModal] = useState(false);
 
-  const { user } = useAuthContext();
+  // MVP: Removed authentication context
+  // const { user } = useAuthContext();
 
   if (subject !== 'macro' && subject !== 'micro') {
     return <div className="p-8 text-center text-red-500">Invalid subject specified.</div>;
@@ -66,12 +68,9 @@ export default function VideoLibraryPage({ params }: VideoLibraryPageProps) {
   const pageTitle = subject === 'macro' ? 'AP Macroeconomics Video Library' : 'AP Microeconomics Video Library';
 
   const handleVideoClick = (video: VideoType) => {
-    if (!user) {
-      setShowSelectPlanModal(true);
-    } else {
-      // Navigate to the individual video page
-      router.push(`/videos/${subject}/${video.videoSlug}`);
-    }
+    // MVP: Allow all users to access videos without authentication
+    // Navigate to the individual video page
+    router.push(`/videos/${subject}/${video.videoSlug}`);
   };
 
   const handleAuthSuccess = () => {

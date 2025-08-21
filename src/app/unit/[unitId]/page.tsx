@@ -6,11 +6,13 @@ import { useRouter } from "next/navigation";
 import { ChevronDown, ChevronRight, ChevronLeft, BookOpen, Download, X, Home, ChevronRight as ChevronRightIcon } from "lucide-react";
 
 import { keyTerms, KeyTerm, whiteboardImages, WhiteboardImage } from '@/data/allContent';
-import { apMacroUnit2Whiteboards, apMacroUnit3Whiteboards } from '@/data/whiteboards';
+import { apMacroUnit2Whiteboards, apMacroUnit3Whiteboards, apMacroUnit4Whiteboards } from '@/data/whiteboards';
+import { keyTerms as apMacroTerms } from '@/data/apMacroTerms';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question as QuestionType } from '@/data/questionBanks/types';
-import { useAuthContext } from '@/contexts/AuthContext';
-import { LoginModal, SignupModal, SelectPlanModal } from '@/components/AuthModals';
+// MVP: Removed authentication imports
+// import { useAuthContext } from '@/contexts/AuthContext';
+// import { LoginModal, SignupModal, SelectPlanModal } from '@/components/AuthModals';
 
 
 // Helper function to sort lesson IDs like "1.1", "1.10", "2.1"
@@ -22,6 +24,10 @@ const sortLessonIDs = (a: string, b: string): number => {
   }
   return (partsA[1] || 0) - (partsB[1] || 0); // Then sort by lesson number
 };
+
+
+
+
 
 // --- Flashcard Component ---
 interface FlashcardProps {
@@ -183,6 +189,8 @@ function TermCard({ term, isFirst = false }: TermCardProps) {
     </div>
   );
 }
+
+
 
 // --- Comprehension Check Components ---
 interface QuickCheckAnswerState {
@@ -404,6 +412,7 @@ interface WhiteboardsGalleryProps {
 
 function WhiteboardsGallery({ unitId, subject }: WhiteboardsGalleryProps) {
   const [expandedImage, setExpandedImage] = useState<any>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   // Get whiteboards for this unit and subject
   let unitWhiteboards: any[] = [];
@@ -431,8 +440,8 @@ function WhiteboardsGallery({ unitId, subject }: WhiteboardsGalleryProps) {
   } else {
     // Fall back to the original whiteboardImages for other units
     unitWhiteboards = whiteboardImages.filter(wb => 
-      wb.unit === unitId && wb.subject === subject
-    );
+    wb.unit === unitId && wb.subject === subject
+  );
   }
 
   const hasWhiteboards = unitWhiteboards.length > 0;
@@ -525,18 +534,50 @@ function WhiteboardsGallery({ unitId, subject }: WhiteboardsGalleryProps) {
             <div className="absolute -top-12 right-0 flex items-center gap-4">
               <button
                 onClick={() => {
+                  if (isDownloading) return; // Prevent multiple clicks
+                  
+                  setIsDownloading(true);
+                  
+                  // Generate a meaningful filename based on unit and lesson
+                  const unitNum = expandedImage.unit || unitId; // Use the unitId from component props
+                  const lessonId = expandedImage.lessonIDs?.[0] || 'unknown';
+                  const filename = `AP_Macro_Unit${unitNum}_Lesson${lessonId}_Whiteboard.jpg`;
+                  
+                  // Use our API endpoint to download the image
+                  const downloadUrl = `/api/download-whiteboard?url=${encodeURIComponent(expandedImage.imageUrl)}&filename=${encodeURIComponent(filename)}`;
+                  
+                  // Create a temporary link element
                   const link = document.createElement('a');
-                  link.href = expandedImage.imageUrl;
-                  link.download = expandedImage.title || 'whiteboard-image';
+                  link.href = downloadUrl;
+                  link.download = filename;
+                  
+                  // Trigger download
                   document.body.appendChild(link);
                   link.click();
                   document.body.removeChild(link);
+                  
+                  // Reset loading state after a short delay
+                  setTimeout(() => setIsDownloading(false), 2000);
                 }}
-                className="text-white hover:text-slate-300 flex items-center gap-2"
-                aria-label="Download"
+                disabled={isDownloading}
+                className={`flex items-center gap-2 transition-opacity ${
+                  isDownloading 
+                    ? 'text-slate-400 cursor-not-allowed opacity-50' 
+                    : 'text-white hover:text-slate-300'
+                }`}
+                aria-label={isDownloading ? 'Downloading...' : 'Download'}
               >
+                {isDownloading ? (
+                  <>
+                    <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span className="text-sm">Downloading...</span>
+                  </>
+                ) : (
+                  <>
                 <Download className="w-6 h-6" />
                 <span className="text-sm">Download</span>
+                  </>
+                )}
               </button>
               <button
                 onClick={() => setExpandedImage(null)}
@@ -567,14 +608,46 @@ export default function UnitLandingPage({ params }: UnitPageProps) {
   const resolvedParams = React.use(params);
   const unitId = resolvedParams.unitId;
   const unitIdNum = parseInt(unitId, 10);
-  const [isFlashcardMode, setIsFlashcardMode] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [showSignupModal, setShowSignupModal] = useState(false);
-  const [showSelectPlanModal, setShowSelectPlanModal] = useState(false);
-  const [pendingUnit, setPendingUnit] = useState<number | null>(null);
-  const [isUnitDropdownOpen, setIsUnitDropdownOpen] = useState(false);
+  const subject = 'ap_macroeconomics' as const;
+  
+  // Lock Units 5 and 6
+  if (unitIdNum === 5 || unitIdNum === 6) {
+    return (
+      <div className="min-h-screen bg-gray-50 pt-16">
+        <div className="max-w-5xl mx-auto px-6 py-12">
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 border border-gray-200 rounded-xl mb-6">
+              <BookOpen className="w-8 h-8 text-gray-600" />
+            </div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">
+              Unit {unitIdNum} Study Guide
+            </h1>
+            <p className="text-lg text-gray-600 mb-8">
+              This unit is coming soon. Check back later for comprehensive study materials.
+            </p>
+            <Link
+              href="/unit-study-guides"
+              className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Back to Study Guides
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-  const { user } = useAuthContext();
+  const [isFlashcardMode, setIsFlashcardMode] = useState(false);
+  // MVP: Removed authentication state variables
+  // const [showLoginModal, setShowLoginModal] = useState(false);
+  // const [showSignupModal, setShowSignupModal] = useState(false);
+  // const [showSelectPlanModal, setShowSelectPlanModal] = useState(false);
+  // const [pendingUnit, setPendingUnit] = useState<number | null>(null);
+  const [isUnitDropdownOpen, setIsUnitDropdownOpen] = useState(false);
+  const [expandedImage, setExpandedImage] = useState<any>(null);
+
+  // MVP: Removed authentication requirement - allow all users to access unit study guides
+  // const { user } = useAuthContext();
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -590,29 +663,42 @@ export default function UnitLandingPage({ params }: UnitPageProps) {
     };
   }, [isUnitDropdownOpen]);
 
-  // Get terms for current unit from allContent.ts
-  const unitTerms = keyTerms.filter(term => 
+  // Get terms for current unit - use apMacroTerms for Units 1, 3 & 4, allContent for others
+  const unitTerms = (() => {
+    if ((unitIdNum === 1 || unitIdNum === 3 || unitIdNum === 4) && subject === 'ap_macroeconomics') {
+      // Use the new apMacroTerms for Units 1, 3 & 4
+      return apMacroTerms.filter(term => term.unit === unitIdNum).sort((a, b) => {
+        const aLesson = a.lessonIDs[0] ? parseFloat(a.lessonIDs[0]) : 0;
+        const bLesson = b.lessonIDs[0] ? parseFloat(b.lessonIDs[0]) : 0;
+        return aLesson - bLesson;
+      });
+    } else {
+      // Use allContent for other units
+      return keyTerms.filter(term => 
     term.unit === unitIdNum && term.subject === 'ap_macroeconomics'
   ).sort((a, b) => {
-    // Sort by first lessonID
     const aLesson = a.lessonIDs[0] ? parseFloat(a.lessonIDs[0]) : 0;
     const bLesson = b.lessonIDs[0] ? parseFloat(b.lessonIDs[0]) : 0;
-    return aLesson - bLesson;
-  }); // Show all terms for the unit
-
-  const handleAuthSuccess = () => {
-    setShowLoginModal(false);
-    setShowSignupModal(false);
-    setShowSelectPlanModal(false);
-    if (pendingUnit !== null) {
-      window.location.href = `/unit/${pendingUnit}`;
-      setPendingUnit(null);
+        return aLesson - bLesson;
+      });
     }
-  };
+  })();
+
+  // MVP: Removed authentication logic
+  // const handleAuthSuccess = () => {
+  //   setShowLoginModal(false);
+  //   setShowSignupModal(false);
+  //   setShowSelectPlanModal(false);
+  //   if (pendingUnit !== null) {
+  //     window.location.href = `/unit/${pendingUnit}`;
+  //     setPendingUnit(null);
+  //   }
+  // };
 
   return (
     <>
-      <LoginModal
+      {/* MVP: Removed authentication modals */}
+      {/* <LoginModal
         isOpen={showLoginModal}
         onClose={() => {
           setShowLoginModal(false);
@@ -625,7 +711,7 @@ export default function UnitLandingPage({ params }: UnitPageProps) {
         }}
         onAuthSuccess={handleAuthSuccess}
       />
-      <SignupModal
+      {/* <SignupModal
         isOpen={showSignupModal}
         onClose={() => {
           setShowSignupModal(false);
@@ -652,7 +738,7 @@ export default function UnitLandingPage({ params }: UnitPageProps) {
           setShowSelectPlanModal(false);
           setShowSignupModal(true);
         }}
-      />
+      /> */}
       
       <div className="min-h-screen bg-gray-50">
         {/* Breadcrumb Navigation */}
@@ -693,7 +779,7 @@ export default function UnitLandingPage({ params }: UnitPageProps) {
                     onClick={(e) => e.stopPropagation()}
                   >
                     {[1, 2, 3, 4, 5, 6].map((unitNum) => {
-                      const isUnlocked = unitNum === 2 || unitNum === 3;
+                      const isUnlocked = true; // All units are accessible for study guides
                       const isCurrentUnit = unitNum === unitIdNum;
                       
                       return (
@@ -710,8 +796,9 @@ export default function UnitLandingPage({ params }: UnitPageProps) {
                           onClick={(e) => {
                             if (!isUnlocked) {
                               e.preventDefault();
-                              setShowSelectPlanModal(true);
-                              setPendingUnit(unitNum);
+                              // MVP: Removed authentication logic
+                              // setShowSelectPlanModal(true);
+                              // setPendingUnit(unitNum);
                             }
                             setIsUnitDropdownOpen(false);
                           }}
@@ -758,8 +845,189 @@ export default function UnitLandingPage({ params }: UnitPageProps) {
             </div>
           </div>
 
-          {/* Terms Section - Enhanced Design */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 mt-8 overflow-hidden">
+          {/* Lesson-by-Lesson Content */}
+          <div className="mt-8 space-y-8">
+            {(() => {
+              if ((unitIdNum === 1 || unitIdNum === 2 || unitIdNum === 3 || unitIdNum === 4) && subject === 'ap_macroeconomics') {
+                // For Units 1, 2, 3 & 4, group by lesson and show terms + whiteboards together
+                const lessonGroups = new Map<string, { terms: KeyTerm[], whiteboards: any[] }>();
+                
+                // Group terms by lesson - only for the current unit
+                let unitTerms: KeyTerm[];
+                if (unitIdNum === 1 || unitIdNum === 2 || unitIdNum === 3 || unitIdNum === 4) {
+                  // Use apMacroTerms for Units 1, 2, 3 & 4, but filter by unit
+                  unitTerms = apMacroTerms.filter(term => term.unit === unitIdNum);
+                } else {
+                  unitTerms = [];
+                }
+                
+                unitTerms.forEach(term => {
+                  term.lessonIDs.forEach(lessonId => {
+                    // Only add terms for lessons in the current unit
+                    if (lessonId.startsWith(unitIdNum.toString() + '.')) {
+                      if (!lessonGroups.has(lessonId)) {
+                        lessonGroups.set(lessonId, { terms: [], whiteboards: [] });
+                      }
+                      lessonGroups.get(lessonId)!.terms.push(term);
+                    }
+                  });
+                });
+                
+                // Group whiteboards by lesson - only for the current unit
+                let unitWhiteboards: any[];
+                if (unitIdNum === 1) {
+                  unitWhiteboards = []; // TODO: Add apMacroUnit1Whiteboards when available
+                } else if (unitIdNum === 2) {
+                  unitWhiteboards = apMacroUnit2Whiteboards;
+                } else if (unitIdNum === 3) {
+                  unitWhiteboards = apMacroUnit3Whiteboards;
+                } else if (unitIdNum === 4) {
+                  unitWhiteboards = apMacroUnit4Whiteboards;
+                } else {
+                  unitWhiteboards = [];
+                }
+                
+                unitWhiteboards.forEach(wb => {
+                  // Only add whiteboards for lessons in the current unit
+                  if (wb.lessonID.startsWith(unitIdNum.toString() + '.')) {
+                    if (!lessonGroups.has(wb.lessonID)) {
+                      lessonGroups.set(wb.lessonID, { terms: [], whiteboards: [] });
+                    }
+                    lessonGroups.get(wb.lessonID)!.whiteboards.push(wb);
+                  }
+                });
+                
+                // Convert to array and sort by lesson number
+                const sortedLessons = Array.from(lessonGroups.entries())
+                  .sort(([a], [b]) => parseFloat(a) - parseFloat(b));
+                
+                return sortedLessons.map(([lessonId, { terms, whiteboards }]) => (
+                  <div key={lessonId} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    {/* Lesson Header */}
+                    <div className="px-8 py-6 border-b border-slate-200 bg-slate-50">
+                      <h3 className="text-xl font-bold text-slate-900">
+                        {lessonId}: {
+                          lessonId === '1.1' ? 'Basic Economic Concepts' :
+                          lessonId === '1.2' ? 'Production Possibilities Curve' :
+                          lessonId === '1.3' ? 'Comparative Advantage and Trade' :
+                          lessonId === '1.4' ? 'Demand' :
+                          lessonId === '1.5' ? 'Supply' :
+                          lessonId === '1.6' ? 'Market Equilibrium' :
+                          lessonId === '2.1' ? 'Circular Flow Model' :
+                          lessonId === '2.2' ? 'GDP and Economic Indicators' :
+                          lessonId === '2.3' ? 'Unemployment' :
+                          lessonId === '2.4' ? 'Price Indices and Inflation' :
+                          lessonId === '2.5' ? 'Costs of Inflation' :
+                          lessonId === '2.6' ? 'GDP Deflator and Real vs Nominal' :
+                          lessonId === '2.7' ? 'Business Cycles' :
+                          lessonId === '3.1' ? 'Aggregate Demand' :
+                          lessonId === '3.2' ? 'Multipliers' :
+                          lessonId === '3.3' ? 'Short-Run Aggregate Supply' :
+                          lessonId === '3.4' ? 'Long-Run Aggregate Supply' :
+                          lessonId === '3.5' ? 'Equilibrium in the AD-AS Model' :
+                          lessonId === '3.6' ? 'Changes in the AD-AS Model' :
+                          lessonId === '3.7' ? 'Long-Run Self-Adjustment' :
+                          lessonId === '3.8' ? 'Fiscal Policy' :
+                          lessonId === '3.9' ? 'Automatic Stabilizers' :
+                          lessonId === '4.1' ? 'Financial Assets' :
+                          lessonId === '4.2' ? 'Interest Rates' :
+                          lessonId === '4.3' ? 'Functions of Money' :
+                          lessonId === '4.4' ? 'Banking System' :
+                          lessonId === '4.5' ? 'Money Market' :
+                          lessonId === '4.6' ? 'Monetary Policy' :
+                          lessonId === '4.7' ? 'Loanable Funds Market' : ''
+                        }
+                      </h3>
+                    </div>
+                    
+                    <div className="p-8">
+                      {/* Terms for this lesson */}
+                      {terms.length > 0 && (
+                        <div className="mb-8">
+                          <div className="space-y-6">
+                            {terms.map((term, index) => (
+                              <div key={term.id} className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 p-6 hover:border-slate-300 hover:shadow-slate-100/50 group">
+                                <div className="relative">
+                                  <div className="flex items-start justify-between">
+                                    <div className="flex-1">
+                                      <h5 className="text-xl font-bold text-slate-900 mb-3">
+                                        {term.term}
+                                      </h5>
+                                      <p className="text-slate-700 leading-relaxed text-base">
+                                        {term.definition}
+                                      </p>
+                                    </div>
+                                  </div>
+
+                                  {/* SubNotes - Only show divider if there are subpoints */}
+                                  {term.subNotes && term.subNotes.length > 0 && (
+                                    <div className="mt-6">
+                                      <div className="border-t border-slate-100 pt-6 space-y-5">
+                                        <div>
+                                          <h6 className="text-sm font-semibold text-slate-800 mb-3 uppercase tracking-wide">Key Points</h6>
+                                          <ul className="space-y-2">
+                                            {term.subNotes.map((note, noteIndex) => (
+                                              <li key={noteIndex} className="flex items-start gap-3 text-sm text-slate-600">
+                                                <span className="w-2 h-2 bg-slate-400 rounded-full mt-2 flex-shrink-0"></span>
+                                                <span className="leading-relaxed">{note}</span>
+                                              </li>
+                                            ))}
+                                          </ul>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Whiteboards for this lesson */}
+                      {whiteboards.length > 0 && (
+                        <div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {whiteboards.map((whiteboard) => (
+                              <div
+                                key={whiteboard.lessonID + '_' + whiteboard.topic.replace(/\s+/g, '_')}
+                                className="relative cursor-pointer group shadow-sm hover:shadow-md rounded-xl overflow-hidden border border-slate-200 hover:border-slate-300 transition-all duration-200"
+                                onClick={() => setExpandedImage({
+                                  id: whiteboard.lessonID + '_' + whiteboard.topic.replace(/\s+/g, '_'),
+                                  imageUrl: whiteboard.url,
+                                  title: whiteboard.topic,
+                                  unit: whiteboard.unit,
+                                  subject: 'ap_macroeconomics',
+                                  lessonIDs: [whiteboard.lessonID]
+                                })}
+                              >
+                                <div className="aspect-video bg-slate-100 relative">
+                                  <img
+                                    src={whiteboard.url}
+                                    alt={whiteboard.topic || `Whiteboard ${whiteboard.lessonID}`}
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                                  />
+                                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
+                                    <div className="w-8 h-8 bg-white bg-opacity-90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                      <svg className="w-4 h-4 text-slate-800" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 0 001-1v-6zM14 9a1 1 0 00-1-1h-2z" clipRule="evenodd" />
+                                      </svg>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ));
+              } else {
+                // For other units, use the original layout
+                return (
+                  <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    {/* Terms Section */}
             <div className="px-8 py-6 border-b border-slate-200 bg-slate-50">
               <div className="flex items-center justify-between">
                 <h3 className="text-xl font-bold text-slate-900">Key Terms & Definitions</h3>
@@ -771,13 +1039,46 @@ export default function UnitLandingPage({ params }: UnitPageProps) {
             <div className="p-8">
               <div className="space-y-6">
                 {unitTerms.map((term, index) => (
-                  <TermCard
-                    key={term.id}
-                    term={term}
-                    isFirst={index === 0}
-                  />
+                  <div key={term.id} className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all duration-200 p-6 hover:border-slate-300 hover:shadow-slate-100/50 group">
+                    <div className="relative">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h5 className="text-xl font-bold text-slate-900 mb-3">
+                            {term.term}
+                          </h5>
+                          <p className="text-slate-700 leading-relaxed text-base">
+                            {term.definition}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* SubNotes - Only show divider if there are subpoints */}
+                      {term.subNotes && term.subNotes.length > 0 && (
+                        <div className="mt-6">
+                          <div className="border-t border-slate-100 pt-6 space-y-5">
+                            <div>
+                              <h6 className="text-sm font-semibold text-slate-800 mb-3 uppercase tracking-wide">Key Points</h6>
+                              <ul className="space-y-2">
+                                {term.subNotes.map((note, noteIndex) => (
+                                  <li key={noteIndex} className="flex items-start gap-3 text-sm text-slate-600">
+                                    <span className="w-2 h-2 bg-slate-400 rounded-full mt-2 flex-shrink-0"></span>
+                                    <span className="leading-relaxed">{note}</span>
+                                  </li>
+                                ))}
+                              </ul>
+              </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 ))}
               </div>
+                    </div>
+                  </div>
+                );
+              }
+            })()}
               
               {/* Enhanced Comprehension Check Section */}
               <ComprehensionCheck 
@@ -785,15 +1086,31 @@ export default function UnitLandingPage({ params }: UnitPageProps) {
                 subject="ap_macroeconomics" 
               />
               
-              {/* Enhanced Whiteboards Gallery Section */}
-              <WhiteboardsGallery 
-                unitId={unitIdNum} 
-                subject="ap_macroeconomics" 
-              />
+              {/* Spacing before footer */}
+              <div className="h-16"></div>
             </div>
           </div>
         </div>
+
+      {/* Image Modal */}
+      {expandedImage && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+          <div className="relative max-w-4xl max-h-full">
+            <button
+              onClick={() => setExpandedImage(null)}
+              className="absolute top-4 right-4 z-10 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-100 transition-colors"
+            >
+              <X className="w-6 h-6 text-gray-600" />
+            </button>
+            <img
+              src={expandedImage.imageUrl}
+              alt={expandedImage.title || 'Whiteboard'}
+              className="w-full h-auto max-h-[80vh] object-contain rounded-lg shadow-2xl"
+            />
+
+        </div>
       </div>
+      )}
     </>
   );
 } 

@@ -46,7 +46,7 @@ export function MCQFeedbackModal({
   }, [isOpen]);
 
   const getStudyGuideLink = () => {
-    return `/study-guides/${currentSubject.toLowerCase()}-${unitNumber}`;
+    return `/unit-study-guides`;
   };
 
   const toggleSubject = () => {

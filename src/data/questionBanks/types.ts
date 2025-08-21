@@ -9,7 +9,7 @@ export interface Question {
   subject: 'ap_macroeconomics' | 'ap_microeconomics';
   unitName: string;
   question: string;
-  image: StaticImageData | null;
+  image: StaticImageData | { src: string; alt: string } | null;
   options: string[];
   correctAnswer: string;
   explanation: string;

@@ -28,11 +28,7 @@ function SelectPracticeUnitsContent() {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const originalOverflow = document.body.style.overflow;
-        document.body.style.overflow = 'hidden';
-        return () => {
-            document.body.style.overflow = originalOverflow;
-        };
+        // Removed the overflow hidden effect that was preventing scrolling
     }, []);
 
     useEffect(() => {
@@ -103,66 +99,81 @@ function SelectPracticeUnitsContent() {
     const displayUnits = unitsData.slice(0, 6);
 
     return (
-        <div className="flex flex-col items-center justify-center bg-gray-50 py-16 px-2 sm:px-4 lg:px-6">
-          <div className="max-w-xl w-full space-y-3 p-6 bg-white rounded-lg shadow-lg border border-gray-200 hover:shadow-xl transition-all duration-300">
-            <div className="text-center">
-              <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 mb-1">
-                Choose Your <span className="text-blue-500">Units</span>
-              </h2>
-              <p className="text-sm text-gray-600">
-                Select the {subject === 'micro' ? 'Microeconomics' : 'Macroeconomics'} units you want to focus on.
-              </p>
-            </div>
+        <div className="min-h-screen bg-gray-50 py-2 px-4 sm:px-6 lg:px-8 flex flex-col justify-center">
+            <div className="max-w-3xl mx-auto w-full">
+                {/* Header */}
+                <div className="text-center mb-4">
+                    <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900 mb-1">
+                        Choose Your <span className="text-blue-500">Units</span>
+                    </h2>
+                    <p className="text-sm sm:text-base text-gray-600 max-w-xl mx-auto">
+                        Select the {subject === 'micro' ? 'Microeconomics' : 'Macroeconomics'} units you want to focus on.
+                    </p>
+                </div>
 
-            <div className="space-y-2">
-              {displayUnits.map((unit) => {
-                  const isSelected = selectedUnits.includes(unit.number);
-                  return (
+                {/* Units Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-3">
+                    {displayUnits.map((unit) => {
+                        const isSelected = selectedUnits.includes(unit.number);
+                        return (
+                            <button
+                                key={unit.number}
+                                onClick={() => handleUnitToggle(unit.number)}
+                                className={`group relative aspect-square p-2 border-2 rounded-lg cursor-pointer transition-all duration-300 ${
+                                    isSelected 
+                                        ? 'border-blue-500 shadow-md shadow-blue-100/50 bg-gradient-to-br from-blue-50 to-blue-100' 
+                                        : 'border-gray-200 hover:border-blue-400 hover:shadow-md hover:shadow-blue-100/30 bg-white hover:bg-blue-50'
+                                }`}
+                            >
+                                {/* Selection indicator */}
+                                <div className={`absolute top-1 right-1 w-3 h-3 rounded-full border-2 transition-all duration-200 ${
+                                    isSelected 
+                                        ? 'border-blue-500 bg-blue-500' 
+                                        : 'border-gray-300 group-hover:border-blue-400'
+                                }`}>
+                                    {isSelected && (
+                                        <div className="w-full h-full flex items-center justify-center">
+                                            <div className="w-1 h-1 bg-white rounded-full"></div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Unit content */}
+                                <div className="h-full flex flex-col justify-center text-center">
+                                    <div className="text-xl sm:text-2xl font-bold text-blue-500 mb-1">
+                                        Unit {unit.number}
+                                    </div>
+                                    <h3 className="text-sm sm:text-base font-semibold text-gray-800 leading-tight px-1">
+                                        {unit.title}
+                                    </h3>
+                                </div>
+
+                                {/* Hover effect overlay */}
+                                <div className={`absolute inset-0 rounded-lg transition-opacity duration-200 ${
+                                    isSelected 
+                                        ? 'bg-blue-500/5' 
+                                        : 'bg-blue-500/0 group-hover:bg-blue-500/5'
+                                }`} />
+                            </button>
+                        );
+                    })}
+                </div>
+
+                {/* Action Button */}
+                <div className="w-full">
                     <button
-                        key={unit.number}
-                        onClick={() => handleUnitToggle(unit.number)}
-                        className={`w-full flex items-center p-4 border rounded-lg cursor-pointer transition-all duration-200 ${
-                          isSelected 
-                            ? 'border-blue-500 shadow-md shadow-blue-100/50 bg-blue-50' 
-                            : 'border-gray-200 hover:border-blue-500 hover:shadow-md hover:shadow-blue-100/50 bg-white hover:bg-blue-50'
+                        onClick={handleStartPractice}
+                        disabled={selectedUnits.length === 0}
+                        className={`w-full px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300 ${
+                            selectedUnits.length === 0 
+                                ? 'bg-gray-200 text-gray-500 cursor-not-allowed' 
+                                : 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg hover:shadow-blue-500/25'
                         }`}
                     >
-                        <div className="flex-1 text-left">
-                          <span className="block text-lg font-semibold text-gray-900">
-                            <span className="text-black">Unit {unit.number}:</span>
-                            <span className="text-gray-500 ml-2">{unit.title}</span>
-                          </span>
-                        </div>
-                        <div className={`w-6 h-6 rounded-full border-2 transition-colors duration-200 ${
-                          isSelected 
-                            ? 'border-blue-500 bg-blue-500' 
-                            : 'border-gray-300 group-hover:border-blue-500'
-                        }`}>
-                          {isSelected && (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <div className="w-2 h-2 bg-white rounded-full"></div>
-                            </div>
-                          )}
-                        </div>
+                        Start Practice
                     </button>
-                  );
-              })}
+                </div>
             </div>
-
-            <div className="text-center">
-              <button
-                onClick={handleStartPractice}
-                disabled={selectedUnits.length === 0}
-                className={`w-full py-2 px-6 rounded-lg font-semibold text-base transition-all duration-200 ${
-                  selectedUnits.length === 0 
-                    ? 'bg-gray-200 text-gray-500 cursor-not-allowed' 
-                    : 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg'
-                }`}
-              >
-                Start Focused Practice
-              </button>
-            </div>
-          </div>
         </div>
     );
 }

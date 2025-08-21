@@ -561,7 +561,7 @@ const macroUnit3Questions = [
     "unit": 3,
     "lessonIDS": ["3.7"],
     "unitName": "National Income and Price Determination",
-    "question": "If an economy is experiencing an inflationary gap (actual output > potential output), how will the economy typically self-adjust back to long-run equilibrium assuming no government intervention?",
+    "question": "If an economy is experiencing an inflationary gap where actual output is greater than potential output, how will the economy typically self-adjust back to long-run equilibrium assuming no government intervention?",
     "image": null,
     "options": [
       "Nominal wages will fall, shifting SRAS right.",
@@ -892,7 +892,7 @@ const macroUnit5Questions = [
     "unit": 5,
     "lessonIDS": ["5.1"],
     "unitName": "Long-Run Consequences of Stabilization Policies",
-    "question": "Suppose an economy is in a recession. Policymakers implement expansionary fiscal policy (e.g., increased government spending) while the central bank simultaneously implements contractionary monetary policy (e.g., raising administered rates). What is the most likely combined effect on real output and real interest rates in the short run?",
+    "question": "Suppose an economy is in a recession. Policymakers implement expansionary fiscal policy while the central bank simultaneously implements contractionary monetary policy. What is the most likely combined effect on real output and real interest rates in the short run?",
     "image": null,
     "options": [
       "Real output increases, Real interest rates decrease",
@@ -909,7 +909,7 @@ const macroUnit5Questions = [
     "unit": 5,
     "lessonIDS": ["5.1"],
     "unitName": "Long-Run Consequences of Stabilization Policies",
-    "question": "To combat high inflation, a country enacts contractionary fiscal policy (e.g., tax increases) and contractionary monetary policy (e.g., selling bonds/raising administered rates). What is the most likely short-run impact on real output and the price level?",
+    "question": "To combat high inflation, a country enacts contractionary fiscal policy and contractionary monetary policy. What is the most likely short-run impact on real output and the price level?",
     "image": null,
     "options": [
       "Real output increases, Price level decreases",
@@ -1011,7 +1011,7 @@ const macroUnit5Questions = [
     "unit": 5,
     "lessonIDS": ["5.2", "3.3"],
     "unitName": "Long-Run Consequences of Stabilization Policies",
-    "question": "A sudden, sharp increase in energy prices (an adverse supply shock) would likely cause which shift in the Phillips curve analysis?",
+    "question": "A sudden, sharp increase in energy prices would likely cause which shift in the Phillips curve model?",
     "image": null,
     "options": [
       "Movement down along the SRPC",
@@ -1219,7 +1219,7 @@ const macroUnit6Questions = [
     "unit": 6,
     "lessonIDS": ["6.1"],
     "unitName": "Open Economy - International Trade and Finance",
-    "question": "If a country has a current account deficit, which of the following must be true, assuming no statistical discrepancy?",
+    "question": "If a country is running a current account deficit, which of the following must also be true:",
     "image": null,
     "options": [
       "It must also have a financial account deficit.",
@@ -1304,7 +1304,7 @@ const macroUnit6Questions = [
     "unit": 6,
     "lessonIDS": ["6.3", "6.4"],
     "unitName": "Open Economy - International Trade and Finance",
-    "question": "Suppose the foreign exchange market for the Mexican Peso (MXN) experiences a simultaneous increase in demand and decrease in supply. What is the definitive impact on the value of the Peso?",
+    "question": "Suppose the foreign exchange market for the Mexican Peso (MXN) experiences a simultaneous increase in demand and decrease in supply. What is the likely impact on the value of the Peso?",
     "image": null,
     "options": [
       "The Peso will depreciate.",
@@ -3308,22 +3308,22 @@ export const allQuestions: QuestionType[] = [
     "explanation": "To combat inflation in an ample reserves system, the central bank needs to raise interest rates to dampen aggregate demand. It achieves this by increasing its administered rates. Raising the ON RRP rate sets a higher floor for the federal funds rate, making borrowing more expensive. Lowering IORB (A) or the discount rate (D) would be expansionary. OMO purchases (B) add reserves, potentially loosening conditions. RRR (E) is not the primary tool."
   },
   {
-    "id": 48,
+    "id": 48, // replace with next available ID
     "subject": "ap_macroeconomics",
     "unit": 4,
     "lessonIDS": ["4.6"],
-    "unitName": "Financial Sector",
-    "question": "In an ample reserves system, how does the central bank typically use the overnight reverse repurchase agreement (ON RRP) facility rate?",
+    "unitName": "Monetary Policy",
+    "question": "In an ample reserves system, the central bank primarily influences the federal funds rate by adjusting which of the following policy tools?",
     "image": null,
     "options": [
-      "To directly control the M2 money supply.",
-      "To set a ceiling on the federal funds rate.",
-      "To act as a floor for the federal funds rate, influencing short-term market rates.",
-      "To determine the required reserve ratio for banks.",
-      "To finance government budget deficits."
+      "The required reserve ratio.",
+      "The discount rate.",
+      "The interest rate paid on reserve balances (IORB).", // ✅ Correct
+      "The reserve requirement on excess reserves.",
+      "The currency-to-deposit ratio."
     ],
     "correctAnswer": "C",
-    "explanation": "The ON RRP rate is offered to certain non-bank financial institutions. Since they can always earn this rate from the central bank risk-free overnight, they are unlikely to lend funds in the market (like the federal funds market) for less. This helps establish a floor under the policy rate (the federal funds rate)."
+    "explanation": "In an ample reserves framework, banks hold more reserves than they need to meet requirements. The federal funds rate is anchored by the interest rate paid on reserve balances (IORB), which serves as the effective floor for short-term interest rates."
   },
   {
     "id": 49,
@@ -5039,7 +5039,7 @@ export const allQuestions: QuestionType[] = [
     "unit": 4, // Money Market and Monetary Policy are typically in Unit 4
     "lessonIDS": ["4.5", "4.6"], // Covers Money Market and Monetary Policy Tools
     "unitName": "Financial Sector",
-    "question": "Which of the following monetary policy actions by a central bank could cause the change in the money market illustrated by the shift from MS1 to MS2 in the graph above?",
+    "question": "Which of the following monetary policy actions by a central bank could cause the change in the money market illustrated by the shift from MS1 to MS2 in graph below?",
     "image": allQS143, // Reference to the image file
     "options": [
       "Increasing the required reserve ratio.",
@@ -5075,7 +5075,7 @@ export const allQuestions: QuestionType[] = [
     "unit": 3, // AD-AS model and Automatic Stabilizers are typically in Unit 3
     "lessonIDS": ["3.5", "3.9"], // Identifying Gaps and Automatic Stabilizers
     "unitName": "National Income and Price Determination",
-    "question": "The AD-AS model above depicts an economy experiencing a recessionary gap. In this situation, how would automatic stabilizers, such as the income tax system and unemployment benefits, affect the economy?",
+    "question": "The AD-AS model in the image depicts an economy experiencing a recessionary gap. In this situation, how would automatic stabilizers, such as the income tax system and unemployment benefits, affect the economy?",
     "image": allQS145, // Reference to the image file
     "options": [
       "They would automatically increase tax revenues and decrease transfer payments, worsening the recession.",
@@ -5474,24 +5474,7 @@ export const allQuestions: QuestionType[] = [
     },
   
     // --- Unit 5: Long-Run Consequences of Stabilization Policies ---
-    {
-      "id": 167,
-      "subject": "ap_macroeconomics",
-      "unit": 5,
-      "lessonIDS": ["5.2"],
-      "unitName": "Long-Run Consequences of Stabilization Policies",
-      "question": "The Non-Accelerating Inflation Rate of Unemployment is generally understood to be the same as:",
-      "image": null,
-      "options": [
-        "Zero unemployment.",
-        "The cyclical rate of unemployment.",
-        "The structural rate of unemployment.",
-        "The natural rate of unemployment.",
-        "The frictional rate of unemployment."
-      ],
-      "correctAnswer": "D",
-      "explanation": "The Non-Accelerating Inflation Rate of Unemployment, or NAIRU, represents the unemployment rate consistent with stable inflation in the long run. It is equivalent to the natural rate of unemployment, which includes frictional and structural unemployment but excludes cyclical unemployment."
-    },
+    
     {
       "id": 168,
       "subject": "ap_macroeconomics",
@@ -7336,7 +7319,7 @@ export const allQuestions: QuestionType[] = [
                 "unit": 6,
                 "lessonIDS": ["6.1"],
                 "unitName": "Open Economy - International Trade and Finance",
-                "question": "Net exports are calculated as:",
+                "question": "Net exports are calculated as which of the following?",
                 "image": null,
                 "options": [
                   "Imports minus exports.",
@@ -7372,7 +7355,7 @@ export const allQuestions: QuestionType[] = [
                 "unit": 6,
                 "lessonIDS": ["6.2"],
                 "unitName": "Open Economy - International Trade and Finance",
-                "question": "Suppose 1 Euro costs 1.10 US dollars. If a bottle of French wine costs 20 Euros in Paris, what is its cost in US dollars?",
+                "question": "Suppose the current exchange rate is 1 Euro = 1.10 US dollars. If a bottle of French wine costs 20 Euros in Paris, what is its cost in US dollars?",
                 "image": null,
                 "options": [
                   "$18.18",
@@ -7480,7 +7463,7 @@ export const allQuestions: QuestionType[] = [
                   "unit": 5,
                   "lessonIDS": ["5.1"],
                   "unitName": "Long-Run Consequences of Stabilization Policies",
-                  "question": "Which combination of fiscal and monetary policy actions would unambiguously lead to a decrease in aggregate demand in the short run?",
+                  "question": "Which combination of fiscal and monetary policy actions would definitely lead to a decrease in aggregate demand in the short run?",
                   "image": null,
                   "options": [
                     "Decreasing taxes and buying government securities.",
@@ -7552,17 +7535,17 @@ export const allQuestions: QuestionType[] = [
                   "unit": 5,
                   "lessonIDS": ["5.2"],
                   "unitName": "Long-Run Consequences of Stabilization Policies",
-                  "question": "Stagflation, a combination of high inflation and high unemployment, is typically caused by:",
+                  "question": "Why is the actual change in the money supply from a new deposit or open market operation often less than the maximum possible change predicted by the money multiplier?",
                   "image": null,
                   "options": [
                     "A decrease in aggregate demand.",
                     "An increase in aggregate demand.",
-                    "A favorable supply shock.",
-                    "An adverse supply shock.", // Correct
+                    "A positive supply shock.",
+                    "A negative supply shock.", // Correct
                     "Expansionary monetary policy."
                   ],
                   "correctAnswer": "D",
-                  "explanation": "An adverse supply shock, such as a sharp increase in oil prices, shifts the short-run aggregate supply curve leftward. This leads to a higher price level (inflation) and lower output (higher unemployment) simultaneously, a condition known as stagflation. This corresponds to a rightward shift of the SRPC."
+                  "explanation": "Stagflation is typically caused by an adverse supply shock, which decreases aggregate supply, raising prices while reducing output and employment."
                 },
                 {
                   "id": 283,
@@ -8056,7 +8039,7 @@ export const allQuestions: QuestionType[] = [
                     "unit": 4,
                     "lessonIDS": ["4.6", "5.1"],
                     "unitName": "Financial Sector",
-                    "question": "A decrease in the money supply engineered by the central bank is likely to cause which effect in the short run?",
+                    "question": "A decrease in the money supply is likely to cause which effect in the short run?",
                     "image": null,
                     "options": [
                       "Lower nominal interest rates and increased aggregate demand.",

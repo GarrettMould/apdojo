@@ -14,7 +14,7 @@ import dojoIcon from "../../../public/images/dojoIcon.png"
 import { Button } from "@/components/ui/button";
 import { videos as allVideos, Video } from '@/data/videos';
 import { macroUnits as allMacroUnitsData, microUnits as allMicroUnitsData } from '@/data/cheatSheets';
-import { LoginModal, SignupModal, SelectPlanModal } from '@/components/AuthModals';
+import { LoginModal, SignupModal } from '@/components/AuthModals';
 
 // Assuming this matches the structure in useAuth.ts and Firestore
 interface McqAnswer {
@@ -281,8 +281,7 @@ function shuffleArray<T>(array: T[]): T[] {
   return array;
 }
 
-// Define GUEST_QUESTION_LIMIT if it's not already defined globally or imported
-const GUEST_QUESTION_LIMIT = 3; // Or whatever your limit is (QuestionCard uses currentIndex >= 2, which is the 3rd question)
+
 
 function UnitMCQPracticeContent() {
   const router = useRouter();
@@ -334,8 +333,7 @@ function UnitMCQPracticeContent() {
   const [showDoubleXpModal, setShowDoubleXpModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
-  const [showSelectPlanModal, setShowSelectPlanModal] = useState(false);
-  const [lastQuestionIndexModalShownFor, setLastQuestionIndexModalShownFor] = useState<number | null>(null);
+
 
   const DOUBLE_XP_CHANCE = 0.15; // 15% chance
 
@@ -609,18 +607,11 @@ function UnitMCQPracticeContent() {
       practiceMode === 'singleUnit' ? [currentUnit] : // Include currentUnit for single mode display
       []; // Default empty
 
-  const handleGuestLimitReached = (questionIndex: number) => {
-    if (questionIndex !== lastQuestionIndexModalShownFor) {
-      setShowSelectPlanModal(true);
-    }
-    setLastQuestionIndexModalShownFor(questionIndex);
-  };
+
 
   const handleAuthSuccess = () => {
     setShowLoginModal(false);
     setShowSignupModal(false);
-    setShowSelectPlanModal(false);
-    setLastQuestionIndexModalShownFor(null); // Reset this state
     // Potentially refresh user data or trigger other actions as needed
     if (userData) {
       // ... existing code ...
@@ -634,7 +625,6 @@ function UnitMCQPracticeContent() {
         onClose={() => setShowLoginModal(false)}
         switchToSignup={() => { 
             setShowLoginModal(false); 
-            setShowSelectPlanModal(false); // Close plan modal if open
             setShowSignupModal(true); 
         }}
         onAuthSuccess={handleAuthSuccess}
@@ -644,35 +634,11 @@ function UnitMCQPracticeContent() {
         onClose={() => setShowSignupModal(false)}
         switchToLogin={() => { 
             setShowSignupModal(false); 
-            setShowSelectPlanModal(false); // Close plan modal if open
             setShowLoginModal(true); 
         }}
         onAuthSuccess={handleAuthSuccess}
       />
-      <SelectPlanModal 
-        isOpen={showSelectPlanModal}
-        onClose={() => {
-          setShowSelectPlanModal(false);
-          if (currentQuestionIndex > 0) {
-            handleQuestionSelect(currentQuestionIndex - 1);
-            setLastQuestionIndexModalShownFor(null); // Reset if navigated away
-          } else {
-            // If modal was for Q0 (index 0) and we didn't navigate,
-            // lastQuestionIndexModalShownFor remains 0 (set by handleGuestLimitReached).
-            // This prevents an immediate loop on Q0.
-          }
-        }}
-        switchToLogin={() => { 
-            setShowSelectPlanModal(false); 
-            setShowLoginModal(true); 
-        }}
-        switchToSignup={() => { 
-            setShowSelectPlanModal(false); 
-            setShowSignupModal(true); 
-        }}
-        // onAuthSuccessAfterPlan prop might be needed if SelectPlanModal handles auth directly
-        // and you need to perform actions in this parent component after that.
-      />
+
 
       <div className="bg-transparent min-h-screen pt-16 pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -705,8 +671,7 @@ function UnitMCQPracticeContent() {
               unitName={currentUnitName}
               subject={subject} 
               practiceUnitIds={relevantUnitIdsForDisplay}
-              onGuestLimitReached={handleGuestLimitReached}
-              isParentModalOpen={showSelectPlanModal}
+
             />
           )}
 
