@@ -154,31 +154,32 @@ function APMacroCoursePageContent() {
                         {video.description}
                       </p>
                       <div className="flex items-center gap-3 mb-3">
-                        <div className="flex items-center gap-1 text-sm text-gray-500">
-                          <Play className="w-4 h-4" />
-                          <span>Video Lesson</span>
-                        </div>
-                        <div className="flex items-center gap-1 text-sm text-gray-500">
-                          <FileText className="w-4 h-4" />
-                          <span>{video.questions?.length || 0} Questions</span>
-                        </div>
-                      </div>
-                      
-                      {/* Action Buttons */}
-                      <div className="flex gap-3">
-                        <Link
-                          href={`/videos/macro/${video.videoSlug}`}
-                          className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-                        >
-                          <Play className="w-4 h-4" />
-                          Watch Video
+                        {/* Lesson Tag */}
+                        <Link href={`/videos/macro/${video.videoSlug}`}>
+                          <div className="bg-white border border-gray-200 rounded-lg px-4 py-2 flex items-center gap-2 hover:border-blue-300 hover:bg-blue-50 transition-colors duration-200 cursor-pointer">
+                            <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center">
+                              <Play className="w-3 h-3 text-gray-600" />
+                            </div>
+                            <span className="text-sm font-semibold text-gray-800">
+                              Lesson {video.lessonIDS[0]}
+                            </span>
+                          </div>
                         </Link>
+                        
+                        {/* Comprehension Check Toggle */}
                         <Link
                           href={`/video-comprehension-checks/${video.videoSlug}`}
-                          className="inline-flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                          className="bg-white border border-gray-200 rounded-lg px-4 py-2 flex items-center gap-3 hover:border-blue-300 transition-colors duration-200 w-fit"
                         >
-                          <FileText className="w-4 h-4" />
-                          Take Quiz
+                          <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                            <div className="w-3 h-3 bg-blue-400 rounded-full"></div>
+                          </div>
+                          <span className="text-sm font-bold text-blue-600">
+                            Comprehension Check
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            ({video.questions?.length || 0} questions)
+                          </span>
                         </Link>
                       </div>
                     </div>
