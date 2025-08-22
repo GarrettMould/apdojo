@@ -266,9 +266,9 @@ function UserHomePageContent() {
                     <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
                     <span className="text-xs sm:text-sm font-semibold text-blue-700">Featured Course</span>
                   </div>
-                  <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold bg-gradient-to-r from-gray-900 via-blue-800 to-indigo-800 bg-clip-text text-transparent mb-3 sm:mb-4">
+                  <h2 className="text-3xl sm:text-4xl lg:text-6xl font-extrabold bg-gradient-to-r from-gray-900 via-blue-800 to-indigo-800 bg-clip-text text-transparent mb-3 sm:mb-4">
                     <span className="block sm:hidden">AP</span>
-                    <span className="block sm:hidden">Macro</span>
+                    <span className="block sm:hidden">Macroeconomics</span>
                     <span className="hidden sm:block">AP Macroeconomics</span>
                   </h2>
                   <p className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed px-4">
