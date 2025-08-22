@@ -259,55 +259,55 @@ function UserHomePageContent() {
               <div className="absolute top-0 right-0 w-64 h-64 bg-blue-400/10 rounded-full blur-3xl"></div>
               <div className="absolute bottom-0 left-0 w-48 h-48 bg-indigo-400/10 rounded-full blur-3xl"></div>
               
-              <div className="relative p-12">
+              <div className="relative p-6 sm:p-8 lg:p-12">
                 {/* Header Section with Badge */}
-                <div className="text-center mb-8">
-                  <div className="inline-flex items-center gap-2 bg-blue-100 border border-blue-200 rounded-full px-4 py-2 mb-4">
+                <div className="text-center mb-6 sm:mb-8">
+                  <div className="inline-flex items-center gap-2 bg-blue-100 border border-blue-200 rounded-full px-3 sm:px-4 py-2 mb-3 sm:mb-4">
                     <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                    <span className="text-sm font-semibold text-blue-700">Featured Course</span>
+                    <span className="text-xs sm:text-sm font-semibold text-blue-700">Featured Course</span>
                   </div>
-                  <h2 className="text-6xl font-extrabold bg-gradient-to-r from-gray-900 via-blue-800 to-indigo-800 bg-clip-text text-transparent mb-4">
-                    AP Macroeconomics
+                  <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold bg-gradient-to-r from-gray-900 via-blue-800 to-indigo-800 bg-clip-text text-transparent mb-3 sm:mb-4">
+                    <span className="block sm:hidden">AP</span>
+                    <span className="block sm:hidden">Macro</span>
+                    <span className="hidden sm:block">AP Macroeconomics</span>
                   </h2>
-                  <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+                  <p className="text-base sm:text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed px-4">
                     Master the fundamentals of economic theory with our comprehensive curriculum, interactive tools, and expert-led instruction.
                   </p>
                 </div>
 
                 {/* Main Content Grid */}
-                <div className="grid lg:grid-cols-1 gap-8 items-center">
+                <div className="grid lg:grid-cols-1 gap-6 sm:gap-8 items-center">
                   {/* Full Width CTA Button */}
                   <div className="w-full">
                     <Link href="/ap-macro-course" className="block w-full">
-                      <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white py-8 px-16 text-2xl rounded-lg transition-colors duration-200 font-semibold">
-                        <Play className="w-8 h-8 mr-4" />
-                        Start Learning
+                      <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white py-6 sm:py-8 px-8 sm:px-16 text-lg sm:text-xl lg:text-2xl rounded-lg transition-colors duration-200 font-semibold">
+                        <Play className="w-6 h-6 sm:w-8 sm:h-8 mr-3 sm:mr-4" />
+                        <span className="hidden sm:inline">Start Learning</span>
+                        <span className="sm:hidden">Start</span>
                       </Button>
                     </Link>
                   </div>
                 </div>
 
                 {/* Bottom Stats Bar */}
-                <div className="mt-8 pt-6 border-t border-gray-200/50">
-                  <div className="flex items-center justify-between text-center">
-                    <div className="flex-1">
-                      <p className="text-lg font-bold text-gray-800">50+ Videos</p>
-                      <p className="text-sm text-gray-500">Teacher Explanations</p>
+                <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200/50">
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-0 text-center">
+                    <div className="lg:flex-1">
+                      <p className="text-base sm:text-lg font-bold text-gray-800">50+ Videos</p>
+                      <p className="text-xs sm:text-sm text-gray-500">Teacher Explanations</p>
                     </div>
-                    <div className="w-px h-12 bg-gray-300"></div>
-                    <div className="flex-1">
-                      <p className="text-lg font-bold text-gray-800">Full Practice Tests</p>
-                      <p className="text-sm text-gray-500">MCQ and FRQ</p>
+                    <div className="lg:flex-1">
+                      <p className="text-base sm:text-lg font-bold text-gray-800">Full Practice Tests</p>
+                      <p className="text-xs sm:text-sm text-gray-500">MCQ and FRQ</p>
                     </div>
-                    <div className="w-px h-12 bg-gray-300"></div>
-                    <div className="flex-1">
-                      <p className="text-lg font-bold text-gray-800">Question Walkthroughs</p>
-                      <p className="text-sm text-gray-500">Teacher Led</p>
+                    <div className="lg:flex-1">
+                      <p className="text-base sm:text-lg font-bold text-gray-800">Question Walkthroughs</p>
+                      <p className="text-xs sm:text-sm text-gray-500">Teacher Led</p>
                     </div>
-                    <div className="w-px h-12 bg-gray-300"></div>
-                    <div className="flex-1">
-                      <p className="text-lg font-bold text-gray-800">150+ MCQ</p>
-                      <p className="text-sm text-gray-500">practice questions</p>
+                    <div className="lg:flex-1">
+                      <p className="text-base sm:text-lg font-bold text-gray-800">150+ MCQ</p>
+                      <p className="text-xs sm:text-sm text-gray-500">practice questions</p>
                     </div>
                   </div>
                 </div>
@@ -318,10 +318,10 @@ function UserHomePageContent() {
       </div>
       
       {/* MCQ Practice Preview - Full Viewport Width */}
-      <div className="mt-32 w-full">
+      <div className="mt-16 sm:mt-32 w-full">
         {/* Section Headline */}
-        <div className="text-center mb-12">
-          <h2 className="text-5xl font-bold text-gray-800">
+        <div className="text-center mb-8 sm:mb-12">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-800">
             <span className="text-blue-500">AP Dojo</span> MCQ Practice
           </h2>
         </div>
@@ -332,9 +332,9 @@ function UserHomePageContent() {
         </div>
         
         {/* MCQ Practice Button - Full Width */}
-        <div className="text-center mt-16 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mt-12 sm:mt-16 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <Link href="/select-practice-units?subject=macro">
-            <Button className="bg-blue-500 hover:bg-blue-600 text-white py-8 px-16 text-2xl rounded-lg transition-colors duration-200 w-full font-semibold">
+            <Button className="bg-blue-500 hover:bg-blue-600 text-white py-6 sm:py-8 px-8 sm:px-16 text-lg sm:text-xl lg:text-2xl rounded-lg transition-colors duration-200 w-full font-semibold">
               Start MCQ Practice
             </Button>
           </Link>
@@ -342,10 +342,10 @@ function UserHomePageContent() {
       </div>
 
       {/* Study Guides - Full Viewport Width */}
-      <div className="mt-16 w-full">
+      <div className="mt-12 sm:mt-16 w-full">
         {/* Section Headline */}
-        <div className="text-center mb-12">
-          <h2 className="text-5xl font-bold text-gray-800">
+        <div className="text-center mb-8 sm:mb-12">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-800">
             <span className="text-blue-500">AP Dojo</span> Cheat Sheets
           </h2>
         </div>
@@ -356,9 +356,9 @@ function UserHomePageContent() {
         </div>
         
         {/* Study Guides Button - Full Width */}
-        <div className="text-center mt-16 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mt-12 sm:mt-16 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <Link href="/unit-study-guides">
-            <Button className="bg-blue-500 hover:bg-blue-600 text-white py-8 px-16 text-2xl rounded-lg transition-colors duration-200 w-full font-semibold">
+            <Button className="bg-blue-500 hover:bg-blue-600 text-white py-6 sm:py-8 px-8 sm:px-16 text-lg sm:text-xl lg:text-2xl rounded-lg transition-colors duration-200 w-full font-semibold">
               View Cheat Sheets
             </Button>
           </Link>
