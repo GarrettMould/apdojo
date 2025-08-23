@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronDown, ChevronRight, ChevronLeft, BookOpen, Download, X, Home, ChevronRight as ChevronRightIcon } from "lucide-react";
+import { ChevronDown, ChevronRight, ChevronLeft, BookOpen, Download, X, Home, ChevronRight as ChevronRightIcon, FileText } from "lucide-react";
 
 import { keyTerms, KeyTerm, whiteboardImages, WhiteboardImage } from '@/data/allContent';
 import { unit1Whiteboards, apMacroUnit2Whiteboards, apMacroUnit3Whiteboards, apMacroUnit4Whiteboards } from '@/data/whiteboards';
@@ -1088,6 +1088,39 @@ export default function UnitLandingPage({ params }: UnitPageProps) {
                 unitId={unitIdNum} 
                 subject="ap_macroeconomics" 
               />
+              
+              {/* Unit MCQ Test Section */}
+              {unitIdNum === 1 && (
+                <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mt-8">
+                  <div className="px-8 py-6 border-b border-slate-200 bg-slate-50">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-xl font-bold text-slate-900">Unit MCQ Test</h3>
+                      <span className="text-sm text-slate-500 bg-white px-3 py-1 rounded-lg border border-slate-200">
+                        14 questions
+                      </span>
+                    </div>
+                  </div>
+                  <div className="p-8">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="text-lg font-semibold text-slate-800 mb-2">
+                          Test Your Knowledge
+                        </h4>
+                        <p className="text-slate-600 text-sm">
+                          Take the Unit 1 MCQ test to assess your understanding of Basic Economic Concepts.
+                        </p>
+                      </div>
+                      <Link
+                        href={`/unit-mcq-test/${unitIdNum}`}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors duration-200 flex items-center gap-2"
+                      >
+                        <FileText className="w-5 h-5" />
+                        Start Test
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              )}
               
               {/* Spacing before footer */}
               <div className="h-16"></div>

@@ -1,14 +1,14 @@
 import { keyTerms as apMicroTerms } from './apMicroTerms';
 
 type Flashcard = {
-  term: string;
-  definition: string;
-}
-
-type MicroFlashcards = {
-  [key: string]: Flashcard[];
-}
-
+    term: string;
+    definition: string;
+  }
+  
+  type MicroFlashcards = {
+    [key: string]: Flashcard[];
+  }
+  
 // Transform apMicroTerms into the flashcard format
 const transformApMicroTermsToFlashcards = (): MicroFlashcards => {
   const flashcards: MicroFlashcards = {};

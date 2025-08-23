@@ -32,7 +32,33 @@ function APMacroCoursePageContent() {
     .sort((a, b) => {
       const aLesson = a.lessonIDS[0] ? parseFloat(a.lessonIDS[0]) : 0;
       const bLesson = b.lessonIDS[0] ? parseFloat(b.lessonIDS[0]) : 0;
-      return aLesson - bLesson;
+      
+      // If lessons are different, sort normally (1.1, 1.2, 1.3, 1.4, 1.5, 1.6)
+      if (aLesson !== bLesson) {
+        return aLesson - bLesson;
+      }
+      
+      // If lessons are the same (e.g., both 1.3), use custom ordering
+      if (aLesson === 1.3) {
+        // For lesson 1.3, order: main lesson first, then output questions, then input questions
+        const aTitle = a.title.toLowerCase();
+        const bTitle = b.title.toLowerCase();
+        
+        // Main lesson first
+        if (aTitle.includes('comparative advantage and trade') && !bTitle.includes('comparative advantage and trade')) return -1;
+        if (bTitle.includes('comparative advantage and trade') && !aTitle.includes('comparative advantage and trade')) return 1;
+        
+        // Output questions second
+        if (aTitle.includes('output') && !bTitle.includes('output')) return -1;
+        if (bTitle.includes('output') && !aTitle.includes('output')) return 1;
+        
+        // Input questions last
+        if (aTitle.includes('input') && !bTitle.includes('input')) return -1;
+        if (bTitle.includes('input') && !aTitle.includes('input')) return 1;
+      }
+      
+      // For other lessons, sort by video ID
+      return a.id.localeCompare(b.id);
     });
 
   // Get current unit info from courseInfo
@@ -191,6 +217,48 @@ function APMacroCoursePageContent() {
                     </div>
                   </div>
                 ))}
+                
+                {/* Unit 1 MCQ Test Section - Only show for Unit 1 */}
+                {selectedUnit === '1' && (
+                  <div className="border-t border-gray-200">
+                    <div className="flex items-center p-6 hover:bg-gray-50 transition-colors duration-200">
+                      {/* Test Icon */}
+                      <div className="flex-shrink-0 mr-6">
+                        <img
+                          src="https://apdojovideos.s3.ap-southeast-2.amazonaws.com/UnitMCQIcon.jpg"
+                          alt="MCQ Practice"
+                          className="w-48 h-32 object-cover rounded-lg border border-gray-200"
+                        />
+                      </div>
+                      
+                      {/* Test Content */}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                          Unit 1 MCQ Test
+                        </h3>
+                        <p className="text-gray-600 text-sm mb-3">
+                          Test your knowledge of Basic Economic Concepts with our comprehensive MCQ test.
+                        </p>
+                        <div className="flex items-center gap-3">
+                          {/* Test Button */}
+                          <Link href="/unit-mcq-test/1">
+                            <div className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors duration-200 cursor-pointer">
+                              <FileText className="w-4 h-4" />
+                              <span className="text-sm font-semibold">
+                                Start Test
+                              </span>
+                            </div>
+                          </Link>
+                          
+                          {/* Question Count */}
+                          <div className="text-xs text-gray-500 bg-white px-3 py-1 rounded-lg border border-gray-200">
+                            15 questions
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </>
             ) : (
               <div className="text-center py-16 px-8">

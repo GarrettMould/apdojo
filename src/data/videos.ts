@@ -1863,7 +1863,7 @@ export const videos: Video[] = [
               "Country B, because its opportunity cost of wheat is lower.",
               "Neither country, since they have identical opportunity costs."
             ],
-            correctAnswer: 2,
+            correctAnswer: 3,
             explanation: "Country A gives up 2 rice per wheat (20/10), while Country B gives up 2 rice per wheat (12/6). Since the opportunity cost is the same, neither has a comparative advantage in wheat."
           },
           {
