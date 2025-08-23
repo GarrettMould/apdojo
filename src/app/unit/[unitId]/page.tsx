@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { ChevronDown, ChevronRight, ChevronLeft, BookOpen, Download, X, Home, ChevronRight as ChevronRightIcon } from "lucide-react";
 
 import { keyTerms, KeyTerm, whiteboardImages, WhiteboardImage } from '@/data/allContent';
-import { apMacroUnit2Whiteboards, apMacroUnit3Whiteboards, apMacroUnit4Whiteboards } from '@/data/whiteboards';
+import { unit1Whiteboards, apMacroUnit2Whiteboards, apMacroUnit3Whiteboards, apMacroUnit4Whiteboards } from '@/data/whiteboards';
 import { keyTerms as apMacroTerms } from '@/data/apMacroTerms';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question as QuestionType } from '@/data/questionBanks/types';
@@ -876,7 +876,7 @@ export default function UnitLandingPage({ params }: UnitPageProps) {
                 // Group whiteboards by lesson - only for the current unit
                 let unitWhiteboards: any[];
                 if (unitIdNum === 1) {
-                  unitWhiteboards = []; // TODO: Add apMacroUnit1Whiteboards when available
+                  unitWhiteboards = unit1Whiteboards;
                 } else if (unitIdNum === 2) {
                   unitWhiteboards = apMacroUnit2Whiteboards;
                 } else if (unitIdNum === 3) {
@@ -986,7 +986,10 @@ export default function UnitLandingPage({ params }: UnitPageProps) {
                       
                       {/* Whiteboards for this lesson */}
                       {whiteboards.length > 0 && (
-                        <div>
+                        <div className="mt-8">
+                          <div className="border-t border-slate-100 pt-6 mb-6">
+                            <h6 className="text-sm font-semibold text-slate-800 mb-4 uppercase tracking-wide">Whiteboards</h6>
+                          </div>
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {whiteboards.map((whiteboard) => (
                               <div

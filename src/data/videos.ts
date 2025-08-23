@@ -1829,6 +1829,70 @@ export const videos: Video[] = [
 ]
           
       },
+      {
+        id: "35",
+        title: "Comparative Advantage and Trade",
+        description: "Learn about how absolute advantage, comparative advantage, and how individuals and countries benefit from specialization and trade.",
+        videoSlug: "comparative-advantage-and-trade",
+        subjects: ["AP Macroeconomics"],
+        unit: "1",
+        lessonIDS: ["1.3"],
+        tags: ["Comparative Advantage", "Trade", "Specialization", "Absolute Advantage"],
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.3+-+Comparative+Advantage+and+Trade.mp4",
+        thumbnail: "https://thumbnailslarge.s3.ap-southeast-2.amazonaws.com/1.3_TN.jpg",
+        accessLevel: "free",
+        questions: [
+          {
+            id: "1",
+            text: "Which of the following best defines comparative advantage?",
+            options: [
+              "The ability to produce more of a good using fewer resources than another country.",
+              "The ability to produce a good at a lower opportunity cost than another producer.",
+              "The ability to trade goods without facing tariffs or quotas.",
+              "The ability to use all available resources efficiently."
+            ],
+            correctAnswer: 1,
+            explanation: "Comparative advantage exists when a producer can make a good at a lower opportunity cost than another, even if they do not have the absolute advantage."
+          },
+          {
+            id: "2",
+            text: "If Country A can produce either 10 tons of wheat or 20 tons of rice, and Country B can produce either 6 tons of wheat or 12 tons of rice, which country has the comparative advantage in wheat?",
+            options: [
+              "Country A, because it produces more wheat overall.",
+              "Country A, because its opportunity cost of wheat is lower.",
+              "Country B, because its opportunity cost of wheat is lower.",
+              "Neither country, since they have identical opportunity costs."
+            ],
+            correctAnswer: 2,
+            explanation: "Country A gives up 2 rice per wheat (20/10), while Country B gives up 2 rice per wheat (12/6). Since the opportunity cost is the same, neither has a comparative advantage in wheat."
+          },
+          {
+            id: "3",
+            text: "Which of the following outcomes is most likely when countries specialize according to comparative advantage and then trade?",
+            options: [
+              "Both countries consume at points beyond their production possibilities curves.",
+              "One country benefits while the other loses resources.",
+              "World output decreases because of specialization.",
+              "Countries only consume what they produce domestically."
+            ],
+            correctAnswer: 0,
+            explanation: "Trade based on comparative advantage allows countries to specialize and consume beyond their own PPCs, making both better off."
+          },
+          {
+            id: "4",
+            text: "Suppose an individual is more productive than others at both cooking and repairing cars. According to the principle of comparative advantage, this person should:",
+            options: [
+              "Do both tasks since they have the absolute advantage in both.",
+              "Specialize in the task where they have the lower opportunity cost.",
+              "Avoid specialization because they are already efficient at both.",
+              "Specialize only if they can trade with someone who has an absolute advantage."
+            ],
+            correctAnswer: 1,
+            explanation: "Even if one person has the absolute advantage in both tasks, comparative advantage tells us they should specialize in what they give up the least to produce."
+          }
+        ]
+          
+      },
 
       
   ];

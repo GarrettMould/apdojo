@@ -61,6 +61,9 @@ function APMacroCoursePageContent() {
               </h1>
             </div>
             
+            {/* Divider */}
+            <div className="w-full h-px bg-gray-200"></div>
+            
             {/* Unit Information */}
             {currentUnitInfo && (
               <div className="px-8 py-6">
@@ -105,6 +108,9 @@ function APMacroCoursePageContent() {
                 </div>
               </div>
             )}
+
+            {/* Divider */}
+            <div className="w-full h-px bg-gray-200"></div>
 
             {isUnitLocked ? (
               // MVP: Show locked state for non-Unit 1 content
