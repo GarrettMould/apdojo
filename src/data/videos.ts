@@ -24,6 +24,20 @@ export type Video = {
 
 export const videos: Video[] = [
     {
+      id: "mcq-explanations",
+      title: "Unit 1 MCQ Explanations",
+      description: "Comprehensive explanations for all Unit 1 MCQ questions with detailed breakdowns of key concepts.",
+      videoSlug: "mcq-explanations",
+      subjects: ["AP Macroeconomics"],
+      unit: "1",
+      lessonIDS: ["1.0"],
+      tags: ["MCQ Explanations", "Unit 1", "Practice Questions"],
+      videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/Unit_MCQ_Explanations/Unit_MCQ_Explanations_U1",
+      thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/UnitMCQIcon.jpg",
+      accessLevel: "free",
+      questions: []
+    },
+    {
       id: "1",
       title: "Fiscal Policy & Long-Run Self-Adjustment",
       description: "Learn about how an economy returns to long-run equilibrium from an output gap.",

@@ -65,17 +65,17 @@ export const unitTestQuestions: QuestionType[] = [
     "unit": 1,
     "lessonIDS": ["1.3"],
     "unitName": "Basic Economic Concepts",
-    "question": "Country Alpha can produce either 100 cars or 200 computers. Country Beta can produce either 80 cars or 160 computers. Which statement is correct?",
+    "question": "Country Alpha can produce either 150 cars or 200 computers. Country Beta can produce either 80 cars or 160 computers. Which statement is correct?",
     "image": null,
     "options": [
-      "Country Alpha has an absolute advantage in both goods.",
       "Country Beta has a comparative advantage in cars.",
       "Country Alpha has a comparative advantage in computers.",
       "Both countries should specialize in the same good.",
+      "Country Alpha has an absolute advantage in both goods.",
       "Neither country has a comparative advantage."
     ],
-    "correctAnswer": "A",
-    "explanation": "Country Alpha can produce more of both goods (100 cars vs 80 cars, 200 computers vs 160 computers), giving it an absolute advantage in both. However, to determine comparative advantage, we need to calculate opportunity costs for each good."
+    "correctAnswer": "D",
+    "explanation": "Country Alpha can produce more of both goods (150 cars vs 80 cars, 200 computers vs 160 computers), giving it an absolute advantage in both."
   },
   {
     "id": 1004,
@@ -83,16 +83,16 @@ export const unitTestQuestions: QuestionType[] = [
     "unit": 1,
     "lessonIDS": ["1.4"],
     "unitName": "Basic Economic Concepts",
-    "question": "If the price of coffee increases significantly, what would most likely happen to the demand for tea, assuming they are substitutes?",
+    "question": "If the price of coffee increases significantly, which of the following would most likely happen, assuming coffee and tea are substitutes?",
     "image": null,
     "options": [
-      "Demand for tea would decrease.",
+      "Demand for coffee would decrease.",
       "Demand for tea would increase.",
       "Demand for tea would remain unchanged.",
-      "Supply of tea would increase.",
+      "Demand for tea would increase.",
       "Supply of tea would decrease."
     ],
-    "correctAnswer": "B",
+    "correctAnswer": "D",
     "explanation": "When the price of coffee increases, consumers will likely substitute tea for coffee, causing an increase in the demand for tea. This is a classic example of the substitution effect in consumer behavior."
   },
   {
@@ -122,13 +122,13 @@ export const unitTestQuestions: QuestionType[] = [
     "question": "Which of the following best describes the effect of specialization and trade on an economy?",
     "image": null,
     "options": [
-      "Countries are able to consume at levels beyond their production possibilities curve.", // Correct
       "A nation must possess both comparative and absolute advantage in a good to benefit from trade.",
       "Specialization and trade shift a nation's production possibilities curve outward.",
+      "Countries are able to consume at levels beyond their production possibilities curve.", 
       "Gains from trade occur only when countries specialize in goods where they hold an absolute advantage.",
       "Through specialization and trade, a nation produces a combination of goods that lies outside its production possibilities curve."
     ],
-    "correctAnswer": "A",
+    "correctAnswer": "C",
     "explanation": "Specialization and trade allow countries to consume combinations of goods beyond their production possibilities curve because they can trade for goods they do not produce as efficiently. Option B is incorrect because only comparative advantage is necessary, not absolute advantage. Option C is incorrect because specialization and trade do not shift the PPC itself, they allow consumption beyond it. Option D is wrong since absolute advantage alone does not determine gains from trade. Option E misstates the effect—trade changes consumption possibilities, not production."
   }, 
   {
@@ -176,13 +176,13 @@ export const unitTestQuestions: QuestionType[] = [
     question: "Which of the following combinations of events could explain the shifts shown in the graph below?",
     image: { src: "/images/unitTestImages/Q1009.svg", alt: "Demand and supply shifts graph" },
     options: [
-      "Consumer incomes rise and the cost of raw materials increases.", // Correct
-      "A fall in input prices and a decrease in population.",
+      "Lower wages for workers and reduced consumer confidence.",// Correct
+      "A rise in input prices and a decrease in population.",
       "Technological improvements and a decline in consumer preferences.",
       "An increase in subsidies for producers and higher interest rates reducing demand.",
-      "Lower wages for workers and reduced consumer confidence."
+      "An increase in the cost of raw materials and a rise in consumer income.",
     ],
-    correctAnswer: "A",
+    correctAnswer: "E",
     explanation: "A rightward shift in demand occurs when consumer demand rises (such as from higher incomes), while a leftward shift in supply occurs when it becomes more costly to produce (such as from higher input costs)."
   }, 
   {
@@ -209,7 +209,7 @@ export const unitTestQuestions: QuestionType[] = [
     unit: 1,
     lessonIDS: ["1.3"],
     unitName: "Basic Economic Concepts",
-    question: "Based on the PPCs for Gondwana and Pangea shown above, which country has the comparative advantage in producing trinkets?",
+    question: "Based on the PPCs for Gondwana and Pangea shown below, which country has the comparative advantage in producing trinkets?",
     image: { src: "/images/unitTestImages/Q1011.svg", alt: "PPC comparison graph" },
     options: [
       "Gondwana",
@@ -267,13 +267,13 @@ export const unitTestQuestions: QuestionType[] = [
     question: "Country A can produce 10 tons of wheat using 5 workers, while Country B can produce 8 tons of wheat using 5 workers. Which of the following best describes what it means for Country A to have an absolute advantage in wheat production?",
     image: null,
     options: [
-      "Country A can produce more wheat than Country B using the same amount of resources.",
+      "Country A cannot produce as much wheat as Country B.",
       "Country A can produce wheat at a lower opportunity cost than Country B.",
       "Country A should trade wheat for goods it produces less efficiently.",
-      "Country A cannot produce as much wheat as Country B.",
+      "Country A can produce more wheat than Country B using the same amount of resources.",
       "Country A and Country B produce the same amount of wheat with equal resources."
     ],
-    correctAnswer: "A",
+    correctAnswer: "D",
     explanation: "Absolute advantage occurs when a country can produce more of a good than another country using the same quantity of resources. In this case, Country A produces 10 tons of wheat with 5 workers, more than Country B's 8 tons with the same number of workers."
   }
 ];

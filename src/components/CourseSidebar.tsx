@@ -19,7 +19,7 @@ export function CourseSidebar({ selectedUnit = '1', onUnitChange, isFixed = fals
   const pathname = usePathname();
   const isOnCoursePage = pathname === '/ap-macro-course';
   const isOnLessonPage = pathname.includes('/videos/') || pathname.includes('/video-comprehension-checks/');
-  const isOnUnitTestPage = pathname.includes('/unit-mcq-test/');
+  const isOnUnitTestPage = pathname.includes('/unit-mcq-test/') || pathname.includes('/unit-frq-test/');
   const [expandedLessons, setExpandedLessons] = useState<Set<string>>(new Set()); // Track expanded lessons
   
   const handleUnitClick = (unitNumber: string) => {
@@ -152,11 +152,12 @@ export function CourseSidebar({ selectedUnit = '1', onUnitChange, isFixed = fals
             {/* Lesson Navigation */}
             <div className="space-y-1">
               {(() => {
-                // Get Unit 1 videos and group by lesson ID
+                // Get Unit 1 videos and group by lesson ID (exclude MCQ Explanations)
                 const unit1Videos = allVideos
                   .filter(video => 
                     video.subjects.includes('AP Macroeconomics') && 
-                    video.unit === '1'
+                    video.unit === '1' &&
+                    video.videoSlug !== 'mcq-explanations'
                   );
                 
                 // Group videos by lesson ID
@@ -287,10 +288,10 @@ export function CourseSidebar({ selectedUnit = '1', onUnitChange, isFixed = fals
                   </div>
                 </button>
                 
-                {/* MCQ Test Content */}
+                {/* Unit Test Content */}
                 {expandedLessons.has('mcq-test') && (
                   <div className="bg-gray-50 border-t border-gray-200">
-                    <div className="p-2">
+                    <div className="p-2 space-y-1">
                       <Link
                         href="/unit-mcq-test/1"
                         className={`block px-3 py-2 text-sm rounded-md transition-colors ${
@@ -302,6 +303,32 @@ export function CourseSidebar({ selectedUnit = '1', onUnitChange, isFixed = fals
                         <div className="flex items-center gap-2">
                           <FileText className="w-3 h-3" />
                           <span>MCQ Test</span>
+                        </div>
+                      </Link>
+                      <Link
+                        href="/videos/macro/mcq-explanations"
+                        className={`block px-3 py-2 text-sm rounded-md transition-colors ${
+                          pathname.includes('/mcq-explanations')
+                            ? 'bg-green-100 text-green-700 font-medium' 
+                            : 'text-gray-600 hover:bg-white hover:text-gray-900'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <Play className="w-3 h-3" />
+                          <span>MCQ Explanations</span>
+                        </div>
+                      </Link>
+                      <Link
+                        href="/unit-frq-test/1"
+                        className={`block px-3 py-2 text-sm rounded-md transition-colors ${
+                          pathname.includes('/unit-frq-test/1')
+                            ? 'bg-green-100 text-green-700 font-medium' 
+                            : 'text-gray-600 hover:bg-white hover:text-gray-900'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <FileText className="w-3 h-3" />
+                          <span>FRQ Test</span>
                         </div>
                       </Link>
                     </div>

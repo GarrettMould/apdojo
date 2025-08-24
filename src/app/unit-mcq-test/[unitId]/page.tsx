@@ -596,7 +596,24 @@ export default function UnitMCQTestPage({ params }: UnitMCQTestPageProps) {
               {/* Next Button */}
               <div className="flex-1">
                 {(() => {
-                  // Find the first video of the next unit
+                  // For Unit 1, navigate to MCQ Explanations video
+                  if (unitId === '1') {
+                    return (
+                      <Link
+                        href="/videos/macro/mcq-explanations"
+                        className="block w-full h-24 p-4 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 group text-right"
+                      >
+                        <div className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-2">
+                          Next
+                        </div>
+                        <div className="text-sm font-medium text-gray-600">
+                          MCQ Explanations
+                        </div>
+                      </Link>
+                    );
+                  }
+                  
+                  // For other units, find the first video of the next unit
                   const nextUnitVideos = allVideos
                     .filter(v => 
                       v.subjects.includes('AP Macroeconomics') && 
@@ -617,7 +634,7 @@ export default function UnitMCQTestPage({ params }: UnitMCQTestPageProps) {
                     return (
                       <Link
                         href={`/videos/macro/${firstVideo.videoSlug}`}
-                        className="block w-full h-24 p-4 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 group text-right"
+                        className="block w-full h-24 p-4 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-300 transition-all duration-200 group text-right"
                       >
                         <div className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-2">
                           Next

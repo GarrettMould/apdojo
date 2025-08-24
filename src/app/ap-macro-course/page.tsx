@@ -23,11 +23,12 @@ function APMacroCoursePageContent() {
   // MVP: Only allow access to Unit 1
   const isUnitLocked = parseInt(selectedUnit) > 1;
   
-  // Filter AP Macro videos for the selected unit and sort by lesson ID
+  // Filter AP Macro videos for the selected unit and sort by lesson ID (exclude MCQ Explanations)
   const unitVideos = allVideos
     .filter(video => 
       video.subjects.includes('AP Macroeconomics') && 
-      video.unit === selectedUnit
+      video.unit === selectedUnit &&
+      video.videoSlug !== 'mcq-explanations'
     )
     .sort((a, b) => {
       const aLesson = a.lessonIDS[0] ? parseFloat(a.lessonIDS[0]) : 0;
@@ -237,7 +238,7 @@ function APMacroCoursePageContent() {
                           Unit 1 MCQ Test
                         </h3>
                         <p className="text-gray-600 text-sm mb-3">
-                          Test your knowledge of Basic Economic Concepts with our comprehensive MCQ test.
+                          Test your knowledge of Basic Economic Concepts with 15 multiple choice questions.
                         </p>
                         <div className="flex items-center gap-3">
                           {/* Test Button */}
@@ -245,7 +246,7 @@ function APMacroCoursePageContent() {
                             <div className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors duration-200 cursor-pointer">
                               <FileText className="w-4 h-4" />
                               <span className="text-sm font-semibold">
-                                Start Test
+                                Start MCQ Test
                               </span>
                             </div>
                           </Link>
@@ -259,6 +260,43 @@ function APMacroCoursePageContent() {
                     </div>
                   </div>
                 )}
+
+                {/* Unit 1 FRQ Test Section - Commented out for now
+                {selectedUnit === '1' && (
+                  <div className="border-t border-gray-200">
+                    <div className="flex items-center p-6 hover:bg-gray-50 transition-colors duration-200">
+                      <div className="flex-shrink-0 mr-6">
+                        <img
+                          src="https://apdojovideos.s3.ap-southeast-2.amazonaws.com/UnitMCQIcon.jpg"
+                          alt="FRQ Practice"
+                          className="w-48 h-32 object-cover rounded-lg border border-gray-200"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                          Unit 1 FRQ Test
+                        </h3>
+                        <p className="text-gray-600 text-sm mb-3">
+                          Practice free response questions with detailed explanations and whiteboard tools.
+                        </p>
+                        <div className="flex items-center gap-3">
+                          <Link href="/unit-frq-test/1">
+                            <div className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors duration-200 cursor-pointer">
+                              <FileText className="w-4 h-4" />
+                              <span className="text-sm font-semibold">
+                                Start FRQ Test
+                              </span>
+                            </div>
+                          </Link>
+                          <div className="text-xs text-gray-500 bg-white px-3 py-1 rounded-lg border border-gray-200">
+                            2 questions
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                */}
               </>
             ) : (
               <div className="text-center py-16 px-8">
