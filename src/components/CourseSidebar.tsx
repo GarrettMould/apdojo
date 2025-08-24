@@ -318,6 +318,7 @@ export function CourseSidebar({ selectedUnit = '1', onUnitChange, isFixed = fals
                           <span>MCQ Explanations</span>
                         </div>
                       </Link>
+                      {/* FRQ Test - Commented out for now
                       <Link
                         href="/unit-frq-test/1"
                         className={`block px-3 py-2 text-sm rounded-md transition-colors ${
@@ -331,6 +332,7 @@ export function CourseSidebar({ selectedUnit = '1', onUnitChange, isFixed = fals
                           <span>FRQ Test</span>
                         </div>
                       </Link>
+                      */}
                     </div>
                   </div>
                 )}
