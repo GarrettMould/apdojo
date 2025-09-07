@@ -143,201 +143,200 @@ export function CourseSidebar({ selectedUnit = '1', onUnitChange, isFixed = fals
               <span>Back to Course</span>
             </Link>
 
-            {/* Unit Header */}
-            <div className="px-3">
-              <h2 className="text-lg font-semibold text-gray-900 mb-1">Unit 1</h2>
-              <p className="text-sm text-gray-500">Basic Economic Concepts</p>
-            </div>
+            {(() => {
+              // Find current unit info
+              const currentUnitInfo = apMacroCourseInfo.units.find(u => u.unit.startsWith(`Unit ${selectedUnit}:`));
+              const unitName = currentUnitInfo ? currentUnitInfo.unit.split(': ')[1] : '';
 
-            {/* Lesson Navigation */}
-            <div className="space-y-1">
-              {(() => {
-                // Get Unit 1 videos and group by lesson ID (exclude MCQ Explanations)
-                const unit1Videos = allVideos
-                  .filter(video => 
-                    video.subjects.includes('AP Macroeconomics') && 
-                    video.unit === '1' &&
-                    video.videoSlug !== 'mcq-explanations'
-                  );
-                
-                // Group videos by lesson ID
-                const lessonGroups = new Map<string, typeof unit1Videos>();
-                unit1Videos.forEach(video => {
-                  const lessonId = video.lessonIDS[0];
-                  if (lessonId) {
-                    if (!lessonGroups.has(lessonId)) {
-                      lessonGroups.set(lessonId, []);
-                    }
-                    lessonGroups.get(lessonId)!.push(video);
-                  }
-                });
-                
-                // Sort lessons and create lesson items
-                const sortedLessons = Array.from(lessonGroups.entries())
-                  .sort(([a], [b]) => parseFloat(a) - parseFloat(b));
-                
-                return sortedLessons.map(([lessonId, videos]) => {
-                  const isCurrentLesson = currentLessonId === lessonId;
-                  const isExpanded = expandedLessons.has(lessonId);
-                  
-                  // Get lesson title from first video
-                  const lessonTitle = videos[0]?.title.split(':')[0] || lessonId;
-                  
-                  return (
-                    <div key={lessonId} className="border border-gray-200 rounded-lg overflow-hidden">
-                      {/* Lesson Header */}
+              return (
+                <>
+                  {/* Unit Header */}
+                  <div className="px-3">
+                    <h2 className="text-lg font-semibold text-gray-900 mb-1">Unit {selectedUnit}</h2>
+                    <p className="text-sm text-gray-500">{unitName}</p>
+                  </div>
+
+                  {/* Lesson Navigation */}
+                  <div className="space-y-1">
+                    {(() => {
+                      // Get videos for the selected unit and group by lesson ID
+                      const unitVideos = allVideos
+                        .filter(video => 
+                          video.subjects.includes('AP Macroeconomics') && 
+                          video.unit === selectedUnit &&
+                          video.videoSlug !== 'mcq-explanations'
+                        )
+                        .sort((a, b) => {
+                          const aLesson = a.lessonIDS[0] ? parseFloat(a.lessonIDS[0]) : 0;
+                          const bLesson = b.lessonIDS[0] ? parseFloat(b.lessonIDS[0]) : 0;
+                          if (aLesson !== bLesson) return aLesson - bLesson;
+                          
+                          // Secondary sort: "Practice" videos should come after main video
+                          const aIsPractice = a.title.toLowerCase().includes('practice');
+                          const bIsPractice = b.title.toLowerCase().includes('practice');
+                          if (aIsPractice && !bIsPractice) return 1;
+                          if (!aIsPractice && bIsPractice) return -1;
+                          
+                          return 0; // Or further sort by ID if needed
+                        });
+                      
+                      // Group videos by lesson ID
+                      const lessonGroups = new Map<string, typeof unitVideos>();
+                      unitVideos.forEach(video => {
+                        const lessonId = video.lessonIDS[0];
+                        if (lessonId) {
+                          const baseLessonId = lessonId.substring(0, 3); // "1.31" -> "1.3"
+                          if (!lessonGroups.has(baseLessonId)) {
+                            lessonGroups.set(baseLessonId, []);
+                          }
+                          lessonGroups.get(baseLessonId)!.push(video);
+                        }
+                      });
+                      
+                      // Sort lessons and create lesson items
+                      const sortedLessons = Array.from(lessonGroups.entries())
+                        .sort(([a], [b]) => parseFloat(a) - parseFloat(b));
+                      
+                      return sortedLessons.map(([lessonId, videos]) => {
+                        const isCurrentLesson = currentLessonId === lessonId;
+                        const isExpanded = expandedLessons.has(lessonId);
+                        
+                        // Get lesson title from first video
+                        const lessonTitle = videos[0]?.title.split(':')[0] || lessonId;
+                        
+                        return (
+                          <div key={lessonId} className="border border-gray-200 rounded-lg overflow-hidden">
+                            {/* Lesson Header */}
+                            <button
+                              onClick={() => toggleLessonExpansion(lessonId)}
+                              className={`w-full text-left px-3 py-2.5 transition-colors h-12 flex items-center ${
+                                isCurrentLesson
+                                  ? 'bg-blue-50 border-blue-200 text-blue-700' 
+                                  : 'bg-white hover:bg-gray-50 text-gray-700'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between w-full">
+                                <div className="flex items-center gap-2 min-w-0 flex-1">
+                                  <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                                    isCurrentLesson ? 'bg-blue-500' : 'bg-gray-300'
+                                  }`} />
+                                  <span className="text-sm font-medium truncate">
+                                    {lessonId}: {lessonTitle}
+                                  </span>
+                                </div>
+                                <ChevronRight 
+                                  className={`w-4 h-4 text-gray-400 transition-transform flex-shrink-0 ${
+                                    isExpanded ? 'rotate-90' : ''
+                                  }`} 
+                                />
+                              </div>
+                            </button>
+                            
+                            {/* Lesson Content */}
+                            {isExpanded && (
+                              <div className="bg-gray-50 border-t border-gray-200">
+                                <div className="p-2 space-y-1">
+                                  {videos.map((video, index) => {
+                                    const isOnVideoPage = pathname.includes('/videos/') && pathname.includes(video.videoSlug);
+                                    const isOnComprehensionPage = pathname.includes('/video-comprehension-checks/') && pathname.includes(video.videoSlug);
+                                    
+                                    return (
+                                      <div key={video.id} className="space-y-1">
+                                        {/* Video Link */}
+                                        <Link
+                                          href={`/videos/macro/${video.videoSlug}`}
+                                          className={`block px-3 py-2 text-sm rounded-md transition-colors ${
+                                            isOnVideoPage
+                                              ? 'bg-blue-100 text-blue-700 font-medium' 
+                                              : 'text-gray-600 hover:bg-white hover:text-gray-900'
+                                          }`}
+                                        >
+                                          <div className="flex items-center gap-2">
+                                            <Play className="w-3 h-3" />
+                                            <span>Video</span>
+                                          </div>
+                                        </Link>
+                                        
+                                        {/* Comprehension Check Link */}
+                                        <Link
+                                          href={`/video-comprehension-checks/${video.videoSlug}`}
+                                          className={`block px-3 py-2 text-sm rounded-md transition-colors ${
+                                            isOnComprehensionPage
+                                              ? 'bg-blue-100 text-blue-700 font-medium' 
+                                              : 'text-gray-600 hover:bg-white hover:text-gray-900'
+                                          }`}
+                                        >
+                                          <div className="flex items-center gap-2">
+                                            <Brain className="w-3 h-3" />
+                                            <span>Quiz</span>
+                                          </div>
+                                        </Link>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      });
+                    })()}
+                  </div>
+
+                  {/* MCQ Test Section */}
+                  <div className="border-t border-gray-200 pt-4">
+                    <div className="border border-gray-200 rounded-lg overflow-hidden">
                       <button
-                        onClick={() => toggleLessonExpansion(lessonId)}
-                        className={`w-full text-left px-3 py-2.5 transition-colors h-12 flex items-center ${
-                          isCurrentLesson
-                            ? 'bg-blue-50 border-blue-200 text-blue-700' 
-                            : 'bg-white hover:bg-gray-50 text-gray-700'
-                        }`}
+                        disabled={true}
+                        className="w-full text-left px-3 py-2.5 transition-colors h-12 flex items-center bg-gray-50 text-gray-500 cursor-not-allowed opacity-60"
                       >
                         <div className="flex items-center justify-between w-full">
                           <div className="flex items-center gap-2 min-w-0 flex-1">
-                            <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                              isCurrentLesson ? 'bg-blue-500' : 'bg-gray-300'
-                            }`} />
-                            <span className="text-sm font-medium truncate">
-                              {lessonId}: {lessonTitle}
-                            </span>
+                            <div className="w-2 h-2 rounded-full flex-shrink-0 bg-gray-300" />
+                            <span className="text-sm font-medium">Unit Test</span>
                           </div>
-                          <ChevronRight 
-                            className={`w-4 h-4 text-gray-400 transition-transform flex-shrink-0 ${
-                              isExpanded ? 'rotate-90' : ''
-                            }`} 
-                          />
+                          <Lock className="w-4 h-4 text-gray-400" />
                         </div>
                       </button>
                       
-                      {/* Lesson Content */}
-                      {isExpanded && (
+                      {/* Unit Test Content */}
+                      {false && expandedLessons.has('mcq-test') && (
                         <div className="bg-gray-50 border-t border-gray-200">
                           <div className="p-2 space-y-1">
-                            {videos.map((video, index) => {
-                              const isOnVideoPage = pathname.includes('/videos/') && pathname.includes(video.videoSlug);
-                              const isOnComprehensionPage = pathname.includes('/video-comprehension-checks/') && pathname.includes(video.videoSlug);
-                              
-                              return (
-                                <div key={video.id} className="space-y-1">
-                                  {/* Video Link */}
-                                  <Link
-                                    href={`/videos/macro/${video.videoSlug}`}
-                                    className={`block px-3 py-2 text-sm rounded-md transition-colors ${
-                                      isOnVideoPage
-                                        ? 'bg-blue-100 text-blue-700 font-medium' 
-                                        : 'text-gray-600 hover:bg-white hover:text-gray-900'
-                                    }`}
-                                  >
-                                    <div className="flex items-center gap-2">
-                                      <Play className="w-3 h-3" />
-                                      <span>Video</span>
-                                    </div>
-                                  </Link>
-                                  
-                                  {/* Comprehension Check Link */}
-                                  <Link
-                                    href={`/video-comprehension-checks/${video.videoSlug}`}
-                                    className={`block px-3 py-2 text-sm rounded-md transition-colors ${
-                                      isOnComprehensionPage
-                                        ? 'bg-blue-100 text-blue-700 font-medium' 
-                                        : 'text-gray-600 hover:bg-white hover:text-gray-900'
-                                    }`}
-                                  >
-                                    <div className="flex items-center gap-2">
-                                      <Brain className="w-3 h-3" />
-                                      <span>Quiz</span>
-                                    </div>
-                                  </Link>
-                                </div>
-                              );
-                            })}
+                            <Link
+                              href={`/unit-mcq-test/${selectedUnit}`}
+                              className={`block px-3 py-2 text-sm rounded-md transition-colors ${
+                                pathname.includes(`/unit-mcq-test/${selectedUnit}`)
+                                  ? 'bg-green-100 text-green-700 font-medium' 
+                                  : 'text-gray-600 hover:bg-white hover:text-gray-900'
+                              }`}
+                            >
+                              <div className="flex items-center gap-2">
+                                <FileText className="w-3 h-3" />
+                                <span>MCQ Test</span>
+                              </div>
+                            </Link>
+                            <Link
+                              href="/videos/macro/mcq-explanations"
+                              className={`block px-3 py-2 text-sm rounded-md transition-colors ${
+                                pathname.includes('/mcq-explanations')
+                                  ? 'bg-green-100 text-green-700 font-medium' 
+                                  : 'text-gray-600 hover:bg-white hover:text-gray-900'
+                              }`}
+                            >
+                              <div className="flex items-center gap-2">
+                                <Play className="w-3 h-3" />
+                                <span>MCQ Explanations</span>
+                              </div>
+                            </Link>
                           </div>
                         </div>
                       )}
                     </div>
-                  );
-                });
-              })()}
-            </div>
-
-            {/* MCQ Test Section */}
-            <div className="border-t border-gray-200 pt-4">
-              <div className="border border-gray-200 rounded-lg overflow-hidden">
-                <button
-                  onClick={() => toggleLessonExpansion('mcq-test')}
-                  className={`w-full text-left px-3 py-2.5 transition-colors h-12 flex items-center ${
-                    expandedLessons.has('mcq-test')
-                      ? 'bg-green-50 border-green-200 text-green-700' 
-                      : 'bg-white hover:bg-gray-50 text-gray-700'
-                  }`}
-                >
-                  <div className="flex items-center justify-between w-full">
-                    <div className="flex items-center gap-2 min-w-0 flex-1">
-                      <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                        expandedLessons.has('mcq-test') ? 'bg-green-500' : 'bg-gray-300'
-                      }`} />
-                      <span className="text-sm font-medium">Unit Test</span>
-                    </div>
-                    <ChevronRight 
-                      className={`w-4 h-4 text-gray-400 transition-transform flex-shrink-0 ${
-                        expandedLessons.has('mcq-test') ? 'rotate-90' : ''
-                      }`} 
-                    />
                   </div>
-                </button>
-                
-                {/* Unit Test Content */}
-                {expandedLessons.has('mcq-test') && (
-                  <div className="bg-gray-50 border-t border-gray-200">
-                    <div className="p-2 space-y-1">
-                      <Link
-                        href="/unit-mcq-test/1"
-                        className={`block px-3 py-2 text-sm rounded-md transition-colors ${
-                          pathname.includes('/unit-mcq-test/1')
-                            ? 'bg-green-100 text-green-700 font-medium' 
-                            : 'text-gray-600 hover:bg-white hover:text-gray-900'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <FileText className="w-3 h-3" />
-                          <span>MCQ Test</span>
-                        </div>
-                      </Link>
-                      <Link
-                        href="/videos/macro/mcq-explanations"
-                        className={`block px-3 py-2 text-sm rounded-md transition-colors ${
-                          pathname.includes('/mcq-explanations')
-                            ? 'bg-green-100 text-green-700 font-medium' 
-                            : 'text-gray-600 hover:bg-white hover:text-gray-900'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <Play className="w-3 h-3" />
-                          <span>MCQ Explanations</span>
-                        </div>
-                      </Link>
-                      {/* FRQ Test - Commented out for now
-                      <Link
-                        href="/unit-frq-test/1"
-                        className={`block px-3 py-2 text-sm rounded-md transition-colors ${
-                          pathname.includes('/unit-frq-test/1')
-                            ? 'bg-green-100 text-green-700 font-medium' 
-                            : 'text-gray-600 hover:bg-white hover:text-gray-900'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2">
-                          <FileText className="w-3 h-3" />
-                          <span>FRQ Test</span>
-                        </div>
-                      </Link>
-                      */}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
+                </>
+              )
+            })()}
           </div>
         ) : null}
       </div>

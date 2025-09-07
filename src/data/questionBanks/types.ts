@@ -12,7 +12,8 @@ export interface Question {
   image: StaticImageData | { src: string; alt: string } | null;
   options: string[];
   correctAnswer: string;
-  explanation: string;
+  explanation?: string;
+  explanationVideo?: string;
   lessonIDS: string[];
 }
 

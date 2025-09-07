@@ -267,14 +267,14 @@ export const videos: Video[] = [
             correctAnswer: 0
           }
         ],
-      }, 
+      },
       {
         id: "8",
         title: "It's All Connected: The Business Cycle Graph, The AD-AS Model, and the PPC",
         description: "Learn about the connection between the business cycles graph, the AS-AS graph, the a country's PPC",
         videoSlug: "business-cycle-ad-as-ppc-connections",
         subjects: ["AP Macroeconomics"],
-        unit: "2",
+        unit: "0",
         lessonIDS: ["2.7"],
         tags: ["Business Cycles", "AD-AS", "PPC"],
         videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/its+all+connected.mp4",
@@ -312,7 +312,7 @@ export const videos: Video[] = [
         description: "Learn how to identify and solve output comparative advantage questions",
         videoSlug: "comparative-advantage-output-questions",
         subjects: ["AP Macroeconomics", "AP Microeconomics"],
-        lessonIDS: ["1.3"],
+        lessonIDS: ["1.32"],
         unit: "1",
         tags: ["Comparative Advantage", "Opportunity Cost"],
         videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/comp+adv+output.mp4",
@@ -351,7 +351,7 @@ export const videos: Video[] = [
         videoSlug: "comparative-advantage-input-questions",
         subjects: ["AP Macroeconomics", "AP Microeconomics"],
         unit: "1",
-        lessonIDS: ["1.3"],
+        lessonIDS: ["1.33"],
         tags: ["Comparative Advantage", "Opportunity Cost"],
         videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/comp+adv+inpt.mp4",
         thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/comp+adv+input+thumbnail.jpg",
@@ -384,7 +384,7 @@ export const videos: Video[] = [
       }, 
       {
         id: "11",
-        title: "Nominal vs. Real GDP",
+        title: "Real v Nominal GDP - Example Problem",
         description: "Understand the key difference between nominal and real GDP",
         videoSlug: "nominal-vs-real-gdp",
         subjects: ["AP Macroeconomics"],
@@ -969,7 +969,7 @@ export const videos: Video[] = [
         lessonIDS: ["2.4"],
         tags: ["Price Indices", "Inflation", "Deflation", "Disinflation", "Consumer Price Index (CPI)"],
         videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.4+-+Price+Indices+and+Inflation.mp4",
-        thumbnail: "https://thumbnailslarge.s3.ap-southeast-2.amazonaws.com/2.1_TN.jpg",
+        thumbnail: "https://thumbnailslarge.s3.ap-southeast-2.amazonaws.com/2.4_TN.jpg",
         accessLevel: "free",
         questions:      [
           {
@@ -1227,7 +1227,7 @@ export const videos: Video[] = [
         lessonIDS: ["2.5 "],
         tags: ["Inflation", "Interest Rates", "Borrowers", "Lenders"],
         videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.5+-+Costs+of+Inflation.mp4",
-        thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/2.5+-+TN.jpg",
+        thumbnail: "https://thumbnailslarge.s3.ap-southeast-2.amazonaws.com/2.5_TN.jpg",
         accessLevel: "free",
         questions:     [
           {
@@ -1850,7 +1850,7 @@ export const videos: Video[] = [
         videoSlug: "comparative-advantage-and-trade",
         subjects: ["AP Macroeconomics"],
         unit: "1",
-        lessonIDS: ["1.3"],
+        lessonIDS: ["1.31"],
         tags: ["Comparative Advantage", "Trade", "Specialization", "Absolute Advantage"],
         videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/1.3+-+Comparative+Advantage+and+Trade.mp4",
         thumbnail: "https://thumbnailslarge.s3.ap-southeast-2.amazonaws.com/1.3_TN.jpg",
@@ -1903,6 +1903,302 @@ export const videos: Video[] = [
             ],
             correctAnswer: 1,
             explanation: "Even if one person has the absolute advantage in both tasks, comparative advantage tells us they should specialize in what they give up the least to produce."
+          }
+        ]
+          
+      },
+      {
+        id: "36",
+        title: "Financial Assets",
+        description: "Learn about different types of financial assets and how they are used to store and transfer wealth.",
+        videoSlug: "financial-assets",
+        subjects: ["AP Macroeconomics"],
+        unit: "4",
+        lessonIDS: ["4.1"],
+        tags: ["Financial Assets", "Stock", "Bond", "Liquidity"],
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/4.1+-+Financial+Assets.mp4",
+        thumbnail: "https://thumbnailslarge.s3.ap-southeast-2.amazonaws.com/1.3_TN.jpg",
+        accessLevel: "free",
+        questions: [
+          {
+            id: "1",
+            text: "A person's wealth is divided among the following: a savings account, shares of a publicly traded company (stock), and a collection of rare art. Which of the following ranks these assets from MOST liquid to LEAST liquid?",
+            options: [
+              "Art collection, company stock, savings account.",
+              "Company stock, savings account, art collection.",
+              "Savings account, company stock, art collection.",
+              "Savings account, art collection, company stock."
+            ],
+            correctAnswer: 2,
+            explanation: "Liquidity refers to how easily an asset can be converted into cash. A savings account is highly liquid. Company stock can be sold relatively quickly on the stock market but is less liquid than savings. A rare art collection is highly illiquid as finding a buyer at a fair price can take a long time."
+          },
+          {
+            id: "2",
+            text: "An individual decides to keep a large amount of their savings in a non-interest-bearing checking account for easy access. What is the primary opportunity cost of this decision?",
+            options: [
+              "The risk of the bank failing.",
+              "The fees charged by the bank for the account.",
+              "The erosion of value due to deflation.",
+              "The interest that could have been earned by holding an interest-bearing asset like a bond."
+            ],
+            correctAnswer: 3,
+            explanation: "The opportunity cost of holding wealth as cash is forgoing the potential returns from other financial assets. By keeping money in a non-interest-bearing account, the individual gives up the interest payments they could have received from an asset like a bond."
+          },
+          {
+            id: "3",
+            text: "If market interest rates for newly issued bonds fall from 5% to 3%, what will happen to the market price of a previously issued bond that has a fixed interest rate of 4%?",
+            options: [
+              "The price of the 4% bond will increase.",
+              "The price of the 4% bond will decrease.",
+              "The price of the 4% bond will not change.",
+              "The 4% bond will be recalled by the issuer."
+            ],
+            correctAnswer: 0,
+            explanation: "There is an inverse relationship between interest rates and the price of existing bonds. When new bonds are offering a lower rate (3%), an existing bond with a higher fixed rate (4%) becomes more attractive. This increased demand will drive up the market price of the older bond."
+          }
+        ]
+          
+      },
+      {
+        id: "37",
+        title: "Nominal vs. Real Interest Rates",
+        description: "Learn about the difference between nominal and real interest rates, how to calculate them, and the effects of inflation on interest rates.",
+        videoSlug: "nominal-vs-real-interest-rates",
+        subjects: ["AP Macroeconomics"],
+        unit: "4",
+        lessonIDS: ["4.2"],
+        tags: ["Nominal Interest Rate", "Real Interest Rate", "Inflation", "Fisher Effect"],
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/4.2+-+Nominal+vs.+Real+Interest+Rates.mp4",
+        thumbnail: "https://thumbnailslarge.s3.ap-southeast-2.amazonaws.com/1.3_TN.jpg",
+        accessLevel: "free",
+        questions: [
+          {
+            id: "1",
+            text: "A person deposits money in a savings account that pays a 4% nominal interest rate. If the economy experiences an inflation rate of 1.5% during that year, what is the real interest rate on the savings?",
+            options: [
+              "5.5%",
+              "4%",
+              "2.5%",
+              "1.5%"
+            ],
+            correctAnswer: 2,
+            explanation: "The real interest rate is the nominal interest rate minus the inflation rate. In this case, it is 4% (nominal rate) - 1.5% (inflation rate) = 2.5%."
+          },
+          {
+            id: "2",
+            text: "A company takes out a loan with a fixed nominal interest rate of 7%, expecting the inflation rate to be 2%. If the actual inflation rate turns out to be 5%, who is better off?",
+            options: [
+              "The company that borrowed the money.",
+              "The bank that lent the money.",
+              "Both parties are equally well off.",
+              "The government."
+            ],
+            correctAnswer: 0,
+            explanation: "Higher-than-expected inflation benefits borrowers. The company is repaying the loan with money that has less purchasing power than was anticipated, which lowers the real cost of borrowing. The bank (the lender) is worse off."
+          },
+          {
+            id: "3",
+            text: "A bank wants to earn a real return of 3% on its loans. If the bank anticipates that the inflation rate will be 2% over the next year, what is the minimum nominal interest rate it must charge?",
+            options: [
+              "1%",
+              "2%",
+              "3%",
+              "5%"
+            ],
+            correctAnswer: 3,
+            explanation: "The nominal interest rate must cover both the desired real return and the expected inflation. Using the formula: Nominal Rate = Real Rate + Expected Inflation, the bank must charge 3% + 2% = 5%."
+          }
+        ]
+          
+      },
+      {
+        id: "38",
+        title: "Definition, Measurement, and Functions of Money",
+        description: "Learn how money is defined, how it is measured, and the three key functions of money.",
+        videoSlug: "definition-measurement-and-functions-of-money",
+        subjects: ["AP Macroeconomics"],
+        unit: "4",
+        lessonIDS: ["4.3"],
+        tags: ["Medium of Exchange", "Store of Value", "Unit of Account", "M1", "M2", "Money Supply"],
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/4.3+-+Definition%2C+Measurement%2C+and+Functions+of+Money.mp4",
+        thumbnail: "https://thumbnailslarge.s3.ap-southeast-2.amazonaws.com/1.3_TN.jpg",
+        accessLevel: "free",
+        questions: [
+          {
+            id: "1",
+            text: "When a clothing store puts a price tag of $25 on a shirt, it is using money primarily as a:",
+            options: [
+              "store of value.",
+              "medium of exchange.",
+              "unit of account.",
+              "form of barter."
+            ],
+            correctAnswer: 2,
+            explanation: "A unit of account is the function of money that provides a common measure of value. By pricing the shirt in dollars, the store is using money as a standard way to communicate the item's value."
+          },
+          {
+            id: "2",
+            text: "When you purchase a movie ticket with cash, you are primarily using money as a:",
+            options: [
+              "unit of account.",
+              "store of value.",
+              "medium of exchange.",
+              "financial asset."
+            ],
+            correctAnswer: 2,
+            explanation: "A medium of exchange is an item that is widely accepted as payment for goods and services. Using cash to buy a ticket is a direct example of money facilitating this exchange."
+          },
+          {
+            id: "3",
+            text: "If an individual transfers $500 from their savings account to their checking account, what is the immediate impact on the M1 and M2 measures of the money supply?",
+            options: [
+              "M1 increases, and M2 stays the same.",
+              "M1 decreases, and M2 increases.",
+              "Both M1 and M2 increase.",
+              "M1 stays the same, and M2 increases."
+            ],
+            correctAnswer: 0,
+            explanation: "M1 includes checking accounts but not savings accounts. M2 includes everything in M1 plus savings accounts. Transferring money from savings to checking moves funds into M1, increasing its value. Since both accounts are already part of the broader M2 measure, M2 remains unchanged."
+          },
+          {
+            id: "4",
+            text: "Which of the following financial assets is NOT included in the M2 measure of the money supply?",
+            options: [
+              "Physical currency (cash).",
+              "Savings account deposits.",
+              "Shares of company stock.",
+              "Money market accounts."
+            ],
+            correctAnswer: 2,
+            explanation: "M2 includes cash, checking deposits, savings deposits, and other 'near money' assets. Financial assets like stocks and bonds are considered investments, not money, because they are not a direct medium of exchange and their value can fluctuate."
+          }
+        ]
+          
+      },
+      {
+        id: "39",
+        title: "Banking and the Expansion of the Money Supply",
+        description: "Learn about the fractional reserve banking system and how lending leads to the expansion of the money supply.",
+        videoSlug: "banking-and-the-expansion-of-the-money-supply",
+        subjects: ["AP Macroeconomics"],
+        unit: "4",
+        lessonIDS: ["4.4"],
+        tags: ["Fractional Reserve Banking System", "Money Multiplier", "Money Supply"],
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/4.4+-+Banking+and+the+Expansion+of+the+Money+Supply.mp4",
+        thumbnail: "https://thumbnailslarge.s3.ap-southeast-2.amazonaws.com/1.3_TN.jpg",
+        accessLevel: "free",
+        questions: [
+          {
+            id: "1",
+            text: "A customer deposits $2,000 into a checking account at a bank that has a required reserve ratio of 10%. How much must the bank keep as required reserves, and how much is available to be loaned out as excess reserves?",
+            options: [
+              "$2,000 required, $0 excess.",
+              "$1,800 required, $200 excess.",
+              "$1,000 required, $1,000 excess.",
+              "$200 required, $1,800 excess."
+            ],
+            correctAnswer: 3,
+            explanation: "Required reserves are the deposit amount multiplied by the required reserve ratio ($2,000 * 0.10 = $200). Excess reserves are the remaining amount that can be loaned out ($2,000 - $200 = $1,800)."
+          },
+          {
+            id: "2",
+            text: "If the required reserve ratio in a banking system is 20%, what is the maximum value of the money multiplier?",
+            options: [
+              "20",
+              "5",
+              "4",
+              "0.8"
+            ],
+            correctAnswer: 1,
+            explanation: "The money multiplier is calculated as 1 divided by the required reserve ratio. In this case, the calculation is 1 / 0.20 = 5."
+          },
+          {
+            id: "3",
+            text: "Alex deposits $100 of cash into a checking account. The required reserve ratio is 5%. What is the maximum possible change in the money supply as a result of this deposit?",
+            options: [
+              "$2,000",
+              "$100",
+              "$1,900",
+              "$95"
+            ],
+            correctAnswer: 2,
+            explanation: "First, find the initial excess reserves: $100 * (1 - 0.05) = $95. Next, find the money multiplier: 1 / 0.05 = 20. The maximum expansion is the initial excess reserves multiplied by the multiplier: $95 * 20 = $1,900."
+          },
+          {
+            id: "4",
+            text: "A person who was holding $500 in a piggy bank decides to deposit it into their checking account. What is the immediate effect on the M1 money supply?",
+            options: [
+              "M1 increases by $500.",
+              "M1 decreases by $500.",
+              "M1 remains unchanged.",
+              "M1 increases by more than $500."
+            ],
+            correctAnswer: 2,
+            explanation: "Both cash and checking account balances are part of the M1 money supply. This deposit is simply a transfer from one component of M1 (currency) to another (demand deposits). Therefore, the total value of M1 does not change at the moment of deposit."
+          }
+        ]
+          
+      },
+      {
+        id: "40",
+        title: "The Money Market",
+        description: "Learn about the money market graph, which depicts the relationship between nominal interest rates, the money supply, and the demand for money.",
+        videoSlug: "the-money-market",
+        subjects: ["AP Macroeconomics"],
+        unit: "4",
+        lessonIDS: ["4.5"],
+        tags: ["Money Market", "Nominal Interest Rate", "Money Supply", "Demand for Money"],
+        videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/4.5+-+The+Money+Market+(v2+-+higher+volume).mp4",
+        thumbnail: "https://thumbnailslarge.s3.ap-southeast-2.amazonaws.com/1.3_TN.jpg",
+        accessLevel: "free",
+        questions: [
+          {
+            id: "1",
+            text: "The demand curve for money is downward sloping because:",
+            options: [
+              "a higher nominal interest rate reduces the purchasing power of money.",
+              "the central bank increases the money supply when interest rates are high.",
+              "a lower nominal interest rate decreases the opportunity cost of holding money.",
+              "a higher price level requires people to hold more money for transactions."
+            ],
+            correctAnswer: 2,
+            explanation: "When the nominal interest rate is low, the interest you give up by holding cash instead of an interest-bearing asset (like a bond) is small. This low opportunity cost makes people more willing to hold a larger quantity of money."
+          },
+          {
+            id: "2",
+            text: "If a country experiences significant inflation, causing the overall price level to rise, what is the expected impact in the money market?",
+            options: [
+              "The demand for money will shift to the right, increasing the nominal interest rate.",
+              "The supply of money will shift to the right, decreasing the nominal interest rate.",
+              "The demand for money will shift to the left, decreasing the nominal interest rate.",
+              "The supply of money will shift to the left, increasing the nominal interest rate."
+            ],
+            correctAnswer: 0,
+            explanation: "When the price level rises, people need more money to conduct their everyday transactions. This increases the demand for money, shifting the money demand curve to the right and leading to a higher equilibrium nominal interest rate."
+          },
+          {
+            id: "3",
+            text: "Which of the following would cause a rightward shift of the money demand curve?",
+            options: [
+              "A decrease in the nominal interest rate.",
+              "An increase in the nominal interest rate.",
+              "A decrease in the aggregate price level.",
+              "An increase in real GDP."
+            ],
+            correctAnswer: 3,
+            explanation: "An increase in real GDP means national income has risen, leading to more overall spending in the economy. To facilitate these additional transactions, people need to hold more liquid money, which shifts the money demand curve to the right."
+          },
+          {
+            id: "4",
+            text: "Which of the following best explains why the money supply curve is vertical?",
+            options: [
+              "The quantity of money supplied by the central bank is fixed at a given point in time and does not change based on the interest rate.",
+              "The money supply can only be changed by an act of Congress.",
+              "The interest rate is determined by the supply of money, but the supply of money is not determined by the interest rate.",
+              "As the interest rate increases, the opportunity cost of holding money decreases, leading to a constant supply."
+            ],
+            correctAnswer: 0,
+            explanation: "The money supply is determined by the central bank's policies, not by the prevailing market interest rate. Because the quantity is set by the central bank at a specific level, it is represented as a vertical line, perfectly inelastic with respect to the nominal interest rate."
           }
         ]
           
