@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import html2canvas from 'html2canvas';
+import { videos as allVideos } from '@/data/videos';
 
 import dojoIcon from "../../public/images/dojoIcon.png";
 
@@ -460,6 +461,7 @@ export function UnitMCQs({
   const [isLoadingExplanation, setIsLoadingExplanation] = useState(false);
   const [explanationError, setExplanationError] = useState<string | null>(null);
   const [isUnitDropdownOpen, setIsUnitDropdownOpen] = useState(false);
+  const [isSwitchingUnit, setIsSwitchingUnit] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const DOUBLE_XP_CHANCE = 0.15;
   const [highlightedIndex, setHighlightedIndex] = useState<number | null>(null);
@@ -486,14 +488,7 @@ export function UnitMCQs({
   const currentAnswerState = currentQuestion ? answeredQuestions[currentQuestion.id] : undefined;
   const displayUnitId = currentQuestion?.unit ?? currentUnit;
 
-  const handleUnitChange = (unitId: number) => {
-    setAiExplanations({});
-    setExplanationError(null);
-    setIsLoadingExplanation(false);
-    onUnitChange(unitId);
-    setIsUnitDropdownOpen(false);
-    setHighlightedIndex(null);
-  };
+
 
   const handleAnswerSelection = async (questionId: number, answerLetter: string, answerText: string, lessonIDS: string[]) => {
     if (!currentQuestion) return; // Ensure currentQuestion is available
@@ -686,11 +681,41 @@ export function UnitMCQs({
   return (
     <div className="container mx-auto px-4 pt-4 pb-12 relative">
       {/* Use Flexbox for columns */}
-      {/* Adjusted column widths lg:w-3/5 and lg:w-2/5 */}
       <div className="flex flex-col lg:flex-row gap-6 lg:items-stretch">
+        
+
         
         {/* Left Column: Question Card */}
         <div className="w-full lg:w-3/5">
+          {/* Mobile Unit Selector - Only visible on mobile */}
+          <div className="lg:hidden mb-6">
+            <div className="bg-white border border-gray-200 rounded-lg shadow-md p-4">
+              <div className="flex items-center justify-between">
+                <div className="text-center">
+                  <div className="text-4xl font-bold text-blue-600 mb-1">
+                    {currentUnit}
+                  </div>
+                  <div className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                    Unit {currentUnit === 1 ? 'Basic Economic Concepts' : 'Economic Indicators'}
+                  </div>
+                </div>
+                
+                <button
+                  onClick={() => {
+                    const nextUnit = currentUnit === 1 ? 2 : 1;
+                    onUnitChange(nextUnit);
+                  }}
+                  className="p-3 bg-blue-100 hover:bg-blue-200 rounded-full transition-all duration-200 group hover:scale-110"
+                  title={`Switch to Unit ${currentUnit === 1 ? 2 : 1}`}
+                >
+                  <ChevronDown className={`w-5 h-5 text-blue-600 transition-transform duration-300 ${
+                    currentUnit === 1 ? 'rotate-0' : 'rotate-180'
+                  }`} />
+                </button>
+              </div>
+            </div>
+          </div>
+          
           {currentQuestion && (
             <QuestionCard 
               key={`${currentUnit}-${currentQuestion.id}`} 
@@ -740,7 +765,7 @@ export function UnitMCQs({
                         return (
                           <button
                             key={unit.number}
-                            onClick={() => !isLocked && handleUnitChange(unit.number)}
+                            onClick={() => !isLocked && onUnitChange(unit.number)}
                             disabled={isLocked}
                             className={`w-full text-left px-4 py-2 text-sm transition-colors ${
                               currentUnit === unit.number
@@ -795,6 +820,8 @@ export function UnitMCQs({
              {/* Reduced heading size */}
              <h3 className="font-extrabold tracking-tight text-gray-900 text-lg mb-3">Study Resources</h3>
             
+
+            
             {/* Study Guide Link - Reduced padding */} 
             {(() => {
               const isLocked = displayUnitId === 5 || displayUnitId === 6;
@@ -830,6 +857,46 @@ export function UnitMCQs({
                 </a>
               );
             })()}
+
+            {/* Video Lessons - Show based on question's lesson IDs */}
+            {currentQuestion?.lessonIDS && currentQuestion.lessonIDS.length > 0 && (
+              <div className="space-y-2">
+                {(() => {
+                  const lessonId = currentQuestion.lessonIDS[0]; // Take the first lesson ID
+                  const firstRelatedVideo = allVideos.find(video => 
+                    video.lessonIDS.includes(lessonId) && 
+                    video.subjects.includes('AP Macroeconomics')
+                  );
+
+                  if (firstRelatedVideo) {
+                    return (
+                      <div key={`${lessonId}-${firstRelatedVideo.id}`} className="space-y-2">
+                        {/* Video Link */}
+                        <Link
+                          href={`/videos/macro/${firstRelatedVideo.videoSlug}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full p-3 rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 bg-white hover:bg-gray-50 group block"
+                        >
+                          <div className="flex items-center gap-3 justify-start">
+                            <div className="p-1.5 rounded-lg bg-green-100 text-green-600 group-hover:bg-green-200 transition-colors">
+                              <Play className="w-5 h-5" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="font-semibold text-sm text-gray-900">
+                                Video: {firstRelatedVideo.title}
+                              </div>
+                            </div>
+                          </div>
+                        </Link>
+                        
+                      </div>
+                    );
+                  }
+                  return null; // Render nothing if no related video is found
+                })()}
+              </div>
+            )}
 
             {/* AI Explanation Button - Reduced padding */}
             <div 

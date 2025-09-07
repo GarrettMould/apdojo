@@ -34,8 +34,8 @@ export default function UnitFRQTestPage({ params }: UnitFRQTestPageProps) {
   const questions = frqTest?.questions || [];
   const totalQuestions = questions.length;
   
-  // MVP: Only allow access to Unit 1
-  const isUnitLocked = unitNumber > 1;
+  // MVP: Only allow access to Units 1 and 2
+  const isUnitLocked = unitNumber > 2;
   
   // Get unit info
   const unitInfo = apMacroCourseInfo.units.find(unit => 

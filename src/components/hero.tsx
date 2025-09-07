@@ -26,7 +26,7 @@ export function Hero() {
   return (
     <div className="flex flex-col items-center">
       {/* Heading Section - Wider width to match heroBG */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:pt-20 pb-8 text-center">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12 md:pt-28 pb-8 text-center">
         <h1 className="text-[2.5rem] sm:text-[3.5rem] md:text-[5rem] font-extrabold tracking-tight leading-none">
           <div className="relative inline-block">
             <span style={{ textShadow: '0 0 15px rgba(59, 130, 246, 0.8)' }} className="text-blue-500">
@@ -46,8 +46,8 @@ export function Hero() {
             size="lg"
             className="w-full shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5 py-6 sm:py-7 md:py-8 text-lg sm:text-xl font-bold text-white bg-blue-500 hover:bg-blue-600"
           >
-            <Link href="/CourseExplorer">
-              Explore AP Dojo Courses
+            <Link href="/unit-final-practice-tests">
+              Get Started
             </Link>
           </Button>
         </div>
