@@ -1,213 +1,43 @@
 'use client';
-import dojoIcon from "../../public/images/dojoIcon.png"
-import { useState, useRef, useEffect } from 'react';
-import { X, Check } from 'lucide-react';
-import Image from 'next/image';
 
-type Question = {
-  id: string;
-  text: string;
-  options: string[];
-  correctAnswer: number;
-  image?: string;
-}
+import { X } from 'lucide-react';
 
-type VideoModalProps = {
-  videoUrl: string;
-  questions: Question[];
+interface VideoModalProps {
+  isOpen: boolean;
   onClose: () => void;
+  videoSlug: string;
 }
 
-export const VideoModal = ({ videoUrl, questions, onClose }: VideoModalProps) => {
-  const [selectedAnswers, setSelectedAnswers] = useState<Record<string, number>>({});
-  const [submittedAnswers, setSubmittedAnswers] = useState<Record<string, number>>({});
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [expandedImage, setExpandedImage] = useState<string | null>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
+export function VideoModal({ isOpen, onClose, videoSlug }: VideoModalProps) {
+  if (!isOpen) return null;
 
-  // Add useEffect to handle body scroll locking
-  useEffect(() => {
-    // Lock scrolling when component mounts
-    document.body.style.overflow = 'hidden';
-    
-    // Cleanup: restore scrolling when component unmounts
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, []);
-
-  const handleAnswerSelect = (questionId: string, answerIndex: number) => {
-    setSelectedAnswers(prev => ({
-      ...prev,
-      [questionId]: answerIndex
-    }));
-  };
-
-  const handleSubmit = () => {
-    setSubmittedAnswers(selectedAnswers);
-    setIsSubmitted(true);
-  };
-
-  // Add handler for image expansion
-  const handleImageClick = (imageUrl: string) => {
-    setExpandedImage(imageUrl);
-  };
+  const videoSrc = `https://www.youtube.com/embed/${videoSlug}`;
 
   return (
     <div 
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-0 md:p-4"
+      className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
       onClick={onClose}
     >
       <div 
-        className="relative bg-black rounded-lg overflow-hidden w-full h-full md:h-[80vh] flex flex-col md:flex-row"
-        onClick={e => e.stopPropagation()}
+        className="bg-black rounded-lg shadow-2xl w-full max-w-4xl aspect-video relative"
+        onClick={(e) => e.stopPropagation()} // Prevent closing when clicking on the video player
       >
-        {/* Video Section */}
-        <div className="flex-none h-[40vh] md:h-auto md:flex-1 relative">
-          <video 
-            ref={videoRef}
-            controls 
-            autoPlay 
-            className="w-full h-full"
-            playsInline
-          >
-            <source src={videoUrl} type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-        </div>
-
-        {/* Questions Sidebar */}
-        <div className="w-full md:w-96 bg-white flex flex-col flex-1 md:flex-none h-[60vh] md:h-full">
-          {/* Fixed Header */}
-          <div className="sticky top-0 bg-white p-4 md:p-6 border-b z-10">
-            <button
-              onClick={onClose}
-              className="absolute top-4 md:top-6 right-4 md:right-6 text-gray-900 hover:text-gray-600 transition-colors"
-            >
-              <X className="w-7 h-7" />
-            </button>
-            
-            <div>
-              <div className="flex items-center gap-4 mb-1">
-                <Image 
-                  src={dojoIcon}
-                  alt="Dojo Icon"
-                  width={32}
-                  height={32}
-                  className="object-contain"
-                />
-                <h3 className="font-extrabold text-xl md:text-2xl">
-                  AP <span className="text-blue-500">Dojo</span>
-                </h3>
-              </div>
-              <h4 className="font-bold text-lg md:text-xl">
-                Comprehension Check
-              </h4>
-            </div>
-          </div>
-
-          {/* Scrollable Content */}
-          <div className="flex-1 overflow-y-auto p-4 md:p-6">
-            <div className="space-y-3 md:space-y-4">
-              {questions.map((question) => (
-                <div 
-                  key={question.id}
-                  className="p-4 md:p-5 rounded-lg border bg-white shadow-sm hover:shadow-md transition-shadow"
-                >
-                  <p className="text-base font-semibold mb-3 md:mb-4 text-gray-900">{question.text}</p>
-                  
-                  {question.image && (
-                    <div 
-                      onClick={() => handleImageClick(question.image!)}
-                      className="cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98]"
-                    >
-                      <img 
-                        src={question.image} 
-                        alt="Question diagram"
-                        className="w-full rounded-md mb-4 border border-gray-200"
-                      />
-                    </div>
-                  )}
-
-                  <div className="space-y-2 md:space-y-2.5">
-                    {question.options.map((option, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleAnswerSelect(question.id, index)}
-                        disabled={isSubmitted}
-                        className={`w-full text-left p-3.5 rounded-md text-sm font-medium transition-all duration-200 border ${
-                          isSubmitted
-                            ? index === question.correctAnswer
-                              ? 'bg-blue-50 text-gray-900 shadow-sm border-blue-200'
-                              : index === selectedAnswers[question.id]
-                                ? 'bg-gray-100 text-gray-900 shadow-sm border-gray-200'
-                                : 'bg-gray-50 text-gray-900 border-transparent'
-                            : selectedAnswers[question.id] === index
-                              ? 'bg-blue-50 text-gray-900 border-blue-200 shadow-sm'
-                              : 'bg-gray-50 hover:bg-gray-100 hover:shadow-sm border-transparent'
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className="flex-1 min-w-0 break-words pr-2">{option}</span>
-                          <div className="flex-shrink-0">
-                            {isSubmitted && (
-                              index === question.correctAnswer 
-                                ? <Check className="w-5 h-5 text-blue-500" /> 
-                                : index === selectedAnswers[question.id] 
-                                  ? <X className="w-5 h-5 text-gray-400" />
-                                  : null
-                            )}
-                          </div>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-            
-            {/* Submit Button */}
-            <button
-              onClick={handleSubmit}
-              disabled={isSubmitted || Object.keys(selectedAnswers).length !== questions.length}
-              className={`mt-4 md:mt-6 w-full py-2.5 rounded font-medium text-sm
-                ${isSubmitted
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : Object.keys(selectedAnswers).length === questions.length
-                    ? 'bg-blue-500 text-white hover:bg-blue-600'
-                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                }`}
-            >
-              {isSubmitted ? 'Submitted' : 'Submit'}
-            </button>
-          </div>
-        </div>
-
-        {/* Image Expansion Modal */}
-        {expandedImage && (
-          <div 
-            className="fixed inset-0 bg-black/80 z-[60] flex items-center justify-center p-4"
-            onClick={() => setExpandedImage(null)}
-          >
-            <button
-              onClick={() => setExpandedImage(null)}
-              className="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors"
-            >
-              <X className="w-8 h-8" />
-            </button>
-            <div 
-              className="relative max-w-[90vw] max-h-[90vh]"
-              onClick={e => e.stopPropagation()}
-            >
-              <img
-                src={expandedImage}
-                alt="Expanded diagram"
-                className="w-full h-full object-contain rounded-lg"
-              />
-            </div>
-          </div>
-        )}
+        <button
+          onClick={onClose}
+          className="absolute -top-4 -right-4 w-10 h-10 bg-white text-gray-800 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors z-10 shadow-lg"
+          aria-label="Close video player"
+        >
+          <X className="w-6 h-6" />
+        </button>
+        <iframe
+          src={videoSrc}
+          title="YouTube video player"
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          className="w-full h-full rounded-lg"
+        ></iframe>
       </div>
     </div>
   );
-}; 
+} 

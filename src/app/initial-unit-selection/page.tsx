@@ -3,27 +3,28 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthContext } from '@/contexts/AuthContext';
-// Import getDoc and updateDoc for user data, remove batch/timestamp
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { Loader2, Check } from 'lucide-react';
+import { Loader2, Check, ArrowLeft } from 'lucide-react';
 import { macroUnits, microUnits, Unit as UnitType } from '@/data/cheatSheets';
 
-// Page renamed to InitialUnitSelectionPage
 export default function InitialUnitSelectionPage() {
   const { user, loading: authLoading } = useAuthContext();
   const router = useRouter();
-  const [selectedUnits, setSelectedUnits] = useState<Set<number>>(new Set());
-  const [units, setUnits] = useState<UnitType[]>([]);
-  const [subject, setSubject] = useState<'macro' | 'micro' | null>(null);
+  
+  // State for multi-subject flow
+  const [subjects, setSubjects] = useState<('macro' | 'micro')[]>([]);
+  const [currentStep, setCurrentStep] = useState(0);
+
+  // Store selected units per subject
+  const [selectedUnits, setSelectedUnits] = useState<{ [key in 'macro' | 'micro']?: Set<number> }>({});
+  
   const [pageLoading, setPageLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const [showTooltip, setShowTooltip] = useState(false);
 
-  // Fetch user subject and check initial unit selection status
   useEffect(() => {
-    if (authLoading) return; 
+    if (authLoading) return;
 
     if (!user) {
       router.push('/login');
@@ -39,21 +40,21 @@ export default function InitialUnitSelectionPage() {
 
         if (userDocSnap.exists()) {
           const userData = userDocSnap.data();
-          // Check if initial units already selected
           if (userData.hasCompletedInitialUnitSelection) {
-            console.log('User already completed initial unit selection, redirecting home.');
             router.push('/userHomePage');
-          } else if (userData.selectedSubject) {
-            const selectedSubject = userData.selectedSubject as 'macro' | 'micro';
-            setSubject(selectedSubject);
-            const subjectUnits = selectedSubject === 'macro' ? macroUnits : microUnits;
-            setUnits(subjectUnits);
-            setSelectedUnits(new Set()); 
+          } else if (userData.selectedSubjects && userData.selectedSubjects.length > 0) {
+            const userSubjects = userData.selectedSubjects as ('macro' | 'micro')[];
+            setSubjects(userSubjects);
+
+            // Initialize state for selected units for each subject
+            const initialSelections: { [key in 'macro' | 'micro']?: Set<number> } = {};
+            userSubjects.forEach(s => {
+              initialSelections[s] = new Set();
+            });
+            setSelectedUnits(initialSelections);
             setPageLoading(false);
           } else {
-            // Should not happen if previous step worked, but handle anyway
-            console.log('Subject not selected, redirecting to subject selection.');
-            router.push('/select-subject'); 
+            router.push('/select-subject');
           }
         } else {
           console.error('User document not found.');
@@ -68,68 +69,108 @@ export default function InitialUnitSelectionPage() {
     };
 
     fetchUserData();
-
   }, [user, authLoading, router]);
 
+  const currentSubject = subjects[currentStep];
+  const unitsForCurrentSubject = currentSubject === 'macro' ? macroUnits : microUnits;
+  const selectedUnitsForCurrentSubject = selectedUnits[currentSubject] || new Set();
+
   const handleUnitToggle = (unitId: number) => {
+    if (!currentSubject) return;
     setSelectedUnits(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(unitId)) {
-        newSet.delete(unitId);
+      const newSubjectUnits = new Set(prev[currentSubject]);
+      if (newSubjectUnits.has(unitId)) {
+        newSubjectUnits.delete(unitId);
       } else {
-        newSet.add(unitId);
+        newSubjectUnits.add(unitId);
       }
-      return newSet;
+      return { ...prev, [currentSubject]: newSubjectUnits };
     });
   };
 
-  // Submit handler to save selected units to user doc
-  const handleSelectionSubmit = async () => {
-    // Require at least two units
-    if (selectedUnits.size < 2) {
-      setError('Please select at least two units to focus on initially.');
+  const handleNextStep = () => {
+    if (selectedUnitsForCurrentSubject.size < 2) {
+      setError(`Please select at least two units for ${currentSubject === 'macro' ? 'AP Macroeconomics' : 'AP Microeconomics'}.`);
       return;
     }
+    setError('');
+
+    if (currentStep < subjects.length - 1) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      handleSelectionSubmit();
+    }
+  };
+
+  const handlePreviousStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+      setError('');
+    }
+  };
+
+  const handleSelectionSubmit = async () => {
     if (!user) {
-        setError('User not found. Please log in again.');
-        return;
+      setError('User not found. Please log in again.');
+      return;
+    }
+    // Final validation
+    for (const subject of subjects) {
+        if (!selectedUnits[subject] || selectedUnits[subject]!.size < 2) {
+            setError(`Please select at least two units for each subject.`);
+            // Optionally, switch to the step with the error
+            const subjectIndex = subjects.indexOf(subject);
+            if (subjectIndex !== -1) setCurrentStep(subjectIndex);
+            return;
+        }
     }
 
     setError('');
     setIsSubmitting(true);
 
     try {
-        const userDocRef = doc(db, 'users', user.uid);
-        const initialPracticeUnitIds = Array.from(selectedUnits);
-        
-        // Update user document with selected units and completion flag
-        await updateDoc(userDocRef, {
-            initialPracticeUnitIds: initialPracticeUnitIds,
-            hasCompletedInitialUnitSelection: true
-        });
+      const userDocRef = doc(db, 'users', user.uid);
+      
+      const initialPracticeUnits: { [key: string]: number[] } = {};
+      for (const subject of subjects) {
+        initialPracticeUnits[subject] = Array.from(selectedUnits[subject]!);
+      }
 
-        console.log('Initial practice units saved:', initialPracticeUnitIds);
-        router.push('/userHomePage'); // Go to homepage
+      await updateDoc(userDocRef, {
+        initialPracticeUnits: initialPracticeUnits,
+        hasCompletedInitialUnitSelection: true
+      });
 
+      router.push('/userHomePage');
     } catch (err) {
-        console.error("Error saving initial unit selection:", err);
-        setError('Failed to save selection. Please try again.');
-        setIsSubmitting(false);
+      console.error("Error saving initial unit selection:", err);
+      setError('Failed to save selection. Please try again.');
+      setIsSubmitting(false);
     }
   };
 
-  // ... loading return ...
+  if (pageLoading || authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
+      </div>
+    );
+  }
+
+  const subjectName = currentSubject === 'macro' ? 'AP Macroeconomics' : 'AP Microeconomics';
+  const isFinalStep = currentStep === subjects.length - 1;
 
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl w-full space-y-8 p-8 bg-white rounded-lg shadow-lg border border-gray-200">
         <div>
-          {/* Title and subtitle remain the same */}
           <h2 className="text-center text-3xl font-extrabold tracking-tight text-gray-900 mb-2">
-             Select Your Skills to Sharpen
+            Select Your Skills to Sharpen
           </h2>
           <p className="text-center text-gray-600 max-w-md mx-auto">
-             We'll target your practice to help you master the areas you need most — and rack up that XP.
+            {subjects.length > 1 
+              ? `Step ${currentStep + 1} of ${subjects.length}: Select initial units for ${subjectName}.`
+              : `Select at least two units you want to focus on for ${subjectName}.`}
           </p>
         </div>
 
@@ -139,10 +180,9 @@ export default function InitialUnitSelectionPage() {
           </div>
         )}
 
-        {/* Checkbox List remains the same */}
         <div className="space-y-4">
-          {units.map(unit => {
-            const isSelected = selectedUnits.has(unit.number);
+          {unitsForCurrentSubject.map(unit => {
+            const isSelected = selectedUnitsForCurrentSubject.has(unit.number);
             return (
               <label
                 key={unit.number}
@@ -157,7 +197,7 @@ export default function InitialUnitSelectionPage() {
                   id={`unit-${unit.number}-checkbox`}
                   checked={isSelected}
                   onChange={() => handleUnitToggle(unit.number)}
-                  className="absolute opacity-0 w-0 h-0" // Hide default checkbox
+                  className="absolute opacity-0 w-0 h-0"
                 />
                 <span className="text-lg font-semibold text-gray-800">
                   Unit {unit.number}: {unit.title}
@@ -167,30 +207,25 @@ export default function InitialUnitSelectionPage() {
           })}
         </div>
 
-        {/* Wrapper div for button and tooltip */}
-        <div 
-          className="relative" 
-          onMouseEnter={() => { if (selectedUnits.size < 2) setShowTooltip(true); }}
-          onMouseLeave={() => setShowTooltip(false)}
-        >
-          <button
-            onClick={handleSelectionSubmit} // Use new handler
-            className={`w-full flex justify-center py-3 px-4 border border-transparent text-base font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${ 
-              (isSubmitting || selectedUnits.size < 2) ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
-            }`}
-            disabled={isSubmitting || selectedUnits.size < 2}
-          >
-            {isSubmitting ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Start Learning'} 
-          </button>
-
-          {/* Tooltip - Absolutely positioned */}
-          {showTooltip && (
-            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-max max-w-xs px-3 py-1.5 bg-gray-800 text-white text-xs rounded shadow-lg z-10">
-              Choose at least two units you would like to improve
-              {/* Optional: triangle pointer */}
-              <div className="absolute left-1/2 transform -translate-x-1/2 top-full w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-gray-800"></div>
-            </div>
+        <div className="flex gap-4 items-center">
+          {currentStep > 0 && (
+             <button
+                onClick={handlePreviousStep}
+                className="p-3 border rounded-md text-gray-700 hover:bg-gray-100 transition-colors"
+                aria-label="Go to previous step"
+            >
+                <ArrowLeft className="h-5 w-5" />
+            </button>
           )}
+          <button
+            onClick={handleNextStep}
+            className={`w-full flex justify-center py-3 px-4 border border-transparent text-base font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${ 
+              (isSubmitting || selectedUnitsForCurrentSubject.size < 2) ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
+            }`}
+            disabled={isSubmitting || selectedUnitsForCurrentSubject.size < 2}
+          >
+            {isSubmitting ? <Loader2 className="h-5 w-5 animate-spin" /> : (isFinalStep ? 'Finish and Start Learning' : 'Next')} 
+          </button>
         </div>
       </div>
     </div>

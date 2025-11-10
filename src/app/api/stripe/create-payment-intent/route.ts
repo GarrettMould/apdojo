@@ -1,21 +1,21 @@
-import { NextResponse } from 'next/server'
-import { stripe } from '@/lib/stripe-server'
+import { NextResponse } from 'next/server';
+import { stripe } from '@/lib/stripe-server';
+import { adminDb, auth as adminAuth } from '@/lib/firebase-admin';
 
 export async function POST(req: Request) {
   try {
-    const { amount } = await req.json();
+    const { amount, userId, unitIds, email } = await req.json();
 
-    if (!amount || amount <= 0) {
-      return NextResponse.json({ error: 'Invalid amount' }, { status: 400 });
+    if (!amount || amount <= 0 || !userId || !unitIds || !email) {
+      return NextResponse.json({ error: 'Invalid amount, userId, unitIds, or email' }, { status: 400 });
     }
 
-    // Create a PaymentIntent with the order amount and currency
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount * 100), // Amount in cents
+      amount: Math.round(amount * 100),
       currency: 'usd',
-      automatic_payment_methods: {
-        enabled: true,
-      },
+      payment_method_types: ['card'],
+      receipt_email: email, // Use the logged-in user's email for the receipt
+      metadata: { userId, unitIds: unitIds.join(',') },
     });
 
     return NextResponse.json({
@@ -27,6 +27,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
+
+
+
+
+
+
+
+
+
 
 
 

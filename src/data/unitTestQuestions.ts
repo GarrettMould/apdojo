@@ -1128,8 +1128,450 @@ options: [
     "A decrease in consumer borrowing caused by tighter credit standards"
   ],
   correctAnswer: "B"
-}
-	
+},
+{
+    id: 1063,
+    subject: "ap_macroeconomics",
+    unit: 5,
+    lessonIDS: ["5.1"],
+    unitName: "Long-Run Consequences of Stabilization Policies",
+    question: "Which of the following combinations of fiscal and monetary policy will have an indeterminate effect on interest rates and cause a decrease in unemployment? ",
+    image: null,
+    options: [
+      "contractionary fiscal policy and contractionary monetary policy",
+      "contractionary fiscal policy and expansionary monetary policy",
+      "expansionary fiscal policy and contractionary monetary policy",
+      "expansionary fiscal policy and expansionary monetary policy",
+      "expansionary fiscal policy and an absence of monetary policy"
+    ],
+    correctAnswer: "D"
+  },
+  {
+    id: 1064,
+    subject: "ap_macroeconomics",
+    unit: 5,
+    lessonIDS: ["5.1"],
+    unitName: "National Income and Price Determination",
+    question: "With a central bank acting within a limited reserves banking system, which combination of fiscal and monetary policy actions will lead to an increase in RGDP in the short-run?",
+    image: null,
+    options: [
+      "Decreasing the discount rate and increasing government deficit spending",
+      "Increasing the required reserve ratio and decreasing income taxes",
+      "Buying government securities in the open market and increasing income taxes",
+      "Selling government securities in the open market and increasing government spending",
+      "Increasing the discount rate and increasing income taxes"
+    ],
+    correctAnswer: "A"
+  },
+  {
+    id: 1065,
+    subject: "ap_macroeconomics",
+    unit: 5,
+    lessonIDS: ["5.1"],
+    unitName: "National Income and Price Determination",
+    question: "If a country uses a combination of contractionary monetary policy and expansionary fiscal policy, nominal interest rates and unemployment would most likely be affected in which of the following ways in the short-run?",
+    image: null,
+    options: [
+      "Nominal interest rates increase, unemployment increases",
+      "Nominal interest rates increase, indeterminate change in unemployment",
+      "Indeterminate change in nominal interest rates, unemployment decreases",
+      "Indeterminate change in nominal interest rates, unemployment increases",
+      "Nominal interest rates decrease, unemployment increases"
+    ],
+    correctAnswer: "B"
+  },
+  {
+    id: 1066,
+    subject: "ap_macroeconomics",
+    unit: 5,
+    lessonIDS: ["5.2"],
+    unitName: "National Income and Price Determination",
+    question: "Which of the following is true about the Phillips Curve?",
+    image: null,
+    options: [
+      "It shows the direct relationship between inflation and unemployment in both the short-run and the long-run",
+      "It shows the direct relationship between inflation and unemployment in the short-run, and the lack of a relationship between inflation and unemployment in the long-run",
+      "An upward movement along the short-run Phillips Curve indicates higher levels of inflation and lower levels of unemployment",
+      "A shift of the aggregate demand curve in the AD-AS graph corresponds to a shift of short-run Phillips Curve",
+      "The short-run Phillips curve represents a country's natural rate of unemployment"
+    ],
+    correctAnswer: "C"
+  },
+{
+    id: 1067,
+    subject: "ap_macroeconomics",
+    unit: 5,
+    lessonIDS: ["5.2"],
+    unitName: "National Income and Price Determination",
+    question: "If a country experiences an increase in labor costs due to demographic changes and net emigration, how will the short-run Phillips curve be affected?",
+    image: null,
+    options: [
+      "A leftward shift of the short-run Phillips curve",
+      "A rightward shift of the short-run Phillips curve",
+      "A downward movement along the short-run Phillips curve",
+      "An upward movement along the short-run Phillips curve",
+      "A leftward shift of the long-run Phillips curve"
+    ],
+    correctAnswer: "B"
+  },
+{
+    id: 1068,
+    subject: "ap_macroeconomics",
+    unit: 5,
+    lessonIDS: ["5.3"],
+    unitName: "National Income and Price Determination",
+    question: "If real output is $5,000, the price level is 4, and the velocity of money is 5, then the money supply is",
+    image: null,
+    options: [
+      "$250",
+      "$1,000",
+      "$2,500",
+      "$4,000",
+      "$20,000"
+    ],
+    correctAnswer: "D"
+  },
+{
+    id: 1069,
+    subject: "ap_macroeconomics",
+    unit: 5,
+    lessonIDS: ["5.3"],
+    unitName: "National Income and Price Determination",
+    question: "In the long run, a decrease in the money supply will cause aggregate demand to shift in which direction, and what will be the resulting effect on the price level and real output?",
+    image: null,
+    options: [
+      "Leftward; lower price level and lower real output",
+      "Leftward; lower price level and unchanged real output",
+      "Leftward; unchanged price level and lower real output",
+      "Rightward; higher price level and higher real output",
+      "Rightward; unchanged price level and higher real output"
+    ],
+    correctAnswer: "B"
+  },
+
+{
+    id: 1070,
+    subject: "ap_macroeconomics",
+    unit: 5,
+    lessonIDS: ["5.3"],
+    unitName: "National Income and Price Determination",
+    question: "Which of the following best describes the long-run effect of an increase in the growth rate of the money supply?",
+    image: null,
+    options: [
+      "It increases potential real output",
+      "It decrease the natural rate of unemployment",
+      "It increases the price level and increases real output",
+      "It increases the price level and does not affect real output",
+      "It increases the price level and decrease real output"
+    ],
+    correctAnswer: "D"
+  },
+{
+    id: 1071,
+    subject: "ap_macroeconomics",
+    unit: 5,
+    lessonIDS: ["5.4"],
+    unitName: "National Income and Price Determination",
+    question: "If a government that initially has a balanced budget increases government spending and reduces taxes at the same time, which of the following will occur?",
+    image: null,
+    options: [
+      "The government will continue to have a balanced budget, and aggregate demand will not change.",
+      "The government will run a budget deficit, and aggregate demand will increase.",
+      "The government will run a budget surplus, and aggregate demand will increase.",
+      "The government will run a budget deficit, but aggregate demand will decrease.",
+      "The government will continue to have a balanced budget, and aggregate demand will decrease."
+    ],
+    correctAnswer: "B"
+  },
+{
+    id: 1072,
+    subject: "ap_macroeconomics",
+    unit: 5,
+    lessonIDS: ["5.4"],
+    unitName: "National Income and Price Determination",
+    question: "Which of the following is true regarding a country’s national debt?",
+    image: null,
+    options: [
+      "The national debt decreases whenever the government runs a budget deficit.",
+      "If the government runs a budget surplus in a given year, the national debt will be eliminated.",
+      "The national debt is accumulation of past budget deficits.",
+      "The national debt is the same as the trade deficit since both measure imbalances in the economy.",
+      "The national debt does not increase during periods of inflation."
+    ],
+    correctAnswer: "C"
+  },
+{
+    id: 1073,
+    subject: "ap_macroeconomics",
+    unit: 5,
+    lessonIDS: ["5.6"],
+    unitName: "National Income and Price Determination",
+    question: "Economic growth is shown by which of the following?",
+    image: null,
+    options: [
+      "A rightward shift of the aggregate demand curve.",
+      "A leftward shift of the aggregate supply curve.",
+      "A movement from a within the PPC to a point along the PPC.",
+      "An upward movement along the long-run aggregate supply curve.",
+      "A rightward shift of the long-run aggregate supply curve."
+    ],
+    correctAnswer: "E"
+  },
+{
+    id: 1074,
+    subject: "ap_macroeconomics",
+    unit: 5,
+    lessonIDS: ["5.6"],
+    unitName: "National Income and Price Determination",
+    question: "Which of the following will most likely lead to long-run economic growth?",
+    image: null,
+    options: [
+      "High levels of emigration.",
+      "High levels of investment in science and technology research.",
+      "High levels of consumption spending.",
+      "Low levels of unemployment.",
+      "Low level of foreign direct investment (FDI)."
+    ],
+    correctAnswer: "B"
+  },
+{
+    id: 1075,
+    subject: "ap_macroeconomics",
+    unit: 5,
+    lessonIDS: ["5.7"],
+    unitName: "National Income and Price Determination",
+    question: "To encourage economic growth over the long-run, the government can do which of the following EXCEPT:",
+    image: null,
+    options: [
+      "Invest in education and worker development programs",
+      "Implement an investment tax credit",
+      "Enact policies that protect intellectual property.",
+      "Increase transfer payments such as unemployment benefits.",
+      "Invest in infrastructure such as roads, ports, and communication systems."
+    ],
+    correctAnswer: "D"
+  },
+{
+    id: 1076,
+    subject: "ap_macroeconomics",
+    unit: 5,
+    lessonIDS: ["5.7"],
+    unitName: "National Income and Price Determination",
+    question: "Supply-side economic policies, such as a reduction in business taxes and regulations, will have which of the following effects in the short run?",
+  image: null,
+  options: [
+    "Shift the short-run aggregate supply curve to the left, decreasing the price level and decreasing real GDP.",
+    "Shift the short-run aggregate supply curve to the right, decreasing the price level and increasing real GDP.",
+    "Shift the short-run aggregate supply curve to the right, increasing both the price level and real GDP.",
+    "Shift the short-run aggregate supply curve to the left, increasing the price level and decreasing real GDP.",
+    "Leave the short-run aggregate supply curve unchanged, but shift the aggregate demand curve to the right."
+  ],
+  correctAnswer: "B"
+  },
+  {
+    id: 1077,
+    subject: "ap_macroeconomics",
+    unit: 6,
+    lessonIDS: ["6.1"],
+    unitName: "Open Economy",
+    question: "Suppose an economy has a current account surplus of +130 million USD. Which of the following must be true?",
+    image: null,
+    options: [
+      "It must show a surplus in the capital account.",
+      "The trade balance must be negative.",
+      "The capital account must show a deficit.",
+      "Exports of goods and services must be less than imports.",
+      "Financial inflows exceed outflows in the capital account."
+    ],
+    correctAnswer: "C"
+  },
+  {
+    id: 1078,
+    subject: "ap_macroeconomics",
+    unit: 6,
+    lessonIDS: ["6.1"],
+    unitName: "Open Economy",
+    question: "The country of Bosnia recorded exports of $50 million in 2007 and imports of $70 million. Which of the following is true about Bosnia's balance of payments account?",
+    image: null,
+    options: [
+      "Bosnia’s trade balance is in deficit since imports exceed exports.",
+      "Bosnia’s current account must show a surplus.",
+      "The current account balance is negative because the country imports more than it exports.",
+      "The capital and financial account must be in surplus to offset the current account deficit.",
+      "The capital and financial account must also be in deficit when the trade balance is negative."
+    ],
+    correctAnswer: "A"
+  },
+  {
+    id: 1079,
+    subject: "ap_macroeconomics",
+    unit: 6,
+    lessonIDS: ["6.2"],
+    unitName: "Open Economy",
+    question: "The current exchange rate is 4.5 Swedish kronor per Japanese yen. If a product costs 12 Japanese yen, what is the cost of the product in Swedish kronor?",
+    image: null,
+    options: [
+      "48 kronor",
+      "50 kronor",
+      "54 kronor",
+      "56 kronor",
+      "60 kronor"
+    ],
+    correctAnswer: "C"
+  },
+  {
+    id: 1080,
+    subject: "ap_macroeconomics",
+    unit: 6,
+    lessonIDS: ["6.2"],
+    unitName: "Open Economy",
+    question: "In 2005, the exchange rate was 40 Thai baht per 1 U.S. dollar. By 2010, the exchange rate was 32 Thai baht per 1 U.S. dollar. Based on these exchange rates, which of the following statements is correct?",
+    image: null,
+    options: [
+      "Both the Thai baht and the U.S. dollar appreciated.",
+      "Both the Thai baht and the U.S. dollar depreciated.",
+      "The Thai baht depreciated, and the U.S. dollar appreciated.",
+      "The Thai baht appreciated, and the U.S. dollar depreciated.",
+      "Neither currency experienced appreciation or depreciation."
+    ],
+    correctAnswer: "D"
+  },
+  {
+    id: 1081,
+    subject: "ap_macroeconomics",
+    unit: 6,
+    lessonIDS: ["6.3"],
+    unitName: "Open Economy",
+    question: "Suppose the equilibrium exchange rate is 100 Japanese yen per 1 U.S. dollar. If the current exchange rate in the market is 90 yen per dollar, what will be the likely outcome in the foreign exchange market?",
+    image: null,
+    options: [
+      "There will be a surplus of dollars, causing the dollar to depreciate toward equilibrium.",
+      "There will be a shortage of dollars, causing the dollar to appreciate toward equilibrium.",
+      "There will be a shortage of yen, causing the yen to depreciate further.",
+      "There will be a surplus of yen, causing the yen to appreciate further.",
+      "Neither currency will adjust because exchange rates are fixed in the short run."
+    ],
+    correctAnswer: "B"
+  },
+  {
+    id: 1082,
+    subject: "ap_macroeconomics",
+    unit: 6,
+    lessonIDS: ["6.3"],
+    unitName: "Open Economy",
+    question: "In the foreign exchange market for euros against U.S. dollars, if the supply of euros decreases, which of the following will occur?",
+    image: null,
+    options: [
+      "The euro will appreciate relative to the dollar, and more euros will be exchanged.",
+      "The euro will depreciate relative to the dollar, and fewer euros will be exchanged.",
+      "The euro will depreciate relative to the dollar, and more euros will be exchanged.",
+      "The euro will depreciate relative to the dollar, and more euros will be exchanged.",
+      "The euro will appreciate relative to the dollar, and fewer euros will be exchanged."
+    ],
+    correctAnswer: "E"
+  },
+  {
+    id: 1083,
+    subject: "ap_macroeconomics",
+    unit: 6,
+    lessonIDS: ["6.4"],
+    unitName: "Open Economy",
+    question: "The central bank of Japan buys government bonds on the open market. In the short run, how will this most likely affect international financial capital flows and the value of the Japanese yen?",
+    image: null,
+    options: [
+      "Financial capital inflows to Japan will increase, and the yen will appreciate.",
+      "Financial capital outflows from Japan will increase, and the yen will depreciate.",
+      "Financial capital inflows to Japan will decrease, and the yen will depreciate.",
+      "Financial capital outflows from Japan will decrease, and the yen will appreciate.",
+      "Financial capital inflows to Japan will increase, and the yen will depreciate."
+    ],
+    correctAnswer: "B"
+  },
+  {
+    id: 1084,
+    subject: "ap_macroeconomics",
+    unit: 6,
+    lessonIDS: ["6.4"],
+    unitName: "Open Economy",
+    question: "The government of Brazil increases spending on infrastructure projects as part of an expansionary fiscal policy. In the short run, how will this most likely affect international financial capital flows and the value of the Brazilian real?",
+    image: null,
+    options: [
+      "Financial capital inflows to Brazil will fall, and the real will depreciate.",
+      "Financial capital outflows from Brazil will rise, but the real will appreciate.",
+      "Financial capital inflows to Brazil will rise, but the real will depreciate.",
+      "Financial capital outflows from Brazil will rise, and the real will depreciate.",
+      "Financial capital inflows to Brazil will rise, and the real will appreciate.",
+    ],
+    correctAnswer: "E"
+  },
+  {
+    id: 1085,
+    subject: "ap_macroeconomics",
+    unit: 6,
+    lessonIDS: ["6.4"],
+    unitName: "Open Economy",
+    question: "Which of the following is most likely to cause a decrease in the international value of the British pound?",
+    image: null,
+    options: [
+      "Reduced government spending in the United Kingdom",
+      "Lower real interest rates abroad",
+      "Contractionary monetary policy in the United Kingdom",
+      "Lower real interest rates in the United Kingdom",
+      "Falling inflation rates in the United Kingdom"
+    ],
+    correctAnswer: "D"
+  },
+  {
+    id: 1086,
+    subject: "ap_macroeconomics",
+    unit: 6,
+    lessonIDS: ["6.5"],
+    unitName: "Open Economy",
+    question: "Suppose the Japanese yen depreciates relative to the Canadian dollar. Holding everything else constant, what will most likely happen to Japan’s net      exports?",
+    image: null,
+    options: [
+      "Japan’s exports will decrease, and imports will increase, reducing net exports.",
+      "Japan’s exports will increase, and imports will decrease, increasing net exports.",
+      "Japan’s exports will decrease, but imports will remain unchanged, reducing net exports.",
+      "Japan’s exports will increase, but imports will remain unchanged, leaving net exports unchanged.",
+      "Japan’s exports and imports will both remain unchanged, leaving net exports unchanged."
+    ],
+    correctAnswer: "B"
+  },
+  {
+    id: 1087,
+    subject: "ap_macroeconomics",
+    unit: 6,
+    lessonIDS: ["6.5"],
+    unitName: "Open Economy",
+    question: "If the value of the Mexican peso decreases relative to the United States dollar, which of the following groups will most likely benefit?",
+    image: null,
+    options: [
+      "Mexican exporters",
+      "United States exporters",
+      "Mexican consumers of imported goods",
+      "Foreign investors holding peso-denominated assets",
+      "United States tourists in Mexico"
+    ],
+    correctAnswer: "A"
+  },
+  {
+    id: 1088,
+    subject: "ap_macroeconomics",
+    unit: 6,
+    lessonIDS: ["6.6"],
+    unitName: "Open Economy",
+    question: "If real interest rates increase in Japan relative to real interest rates in South Korea, which of the following will most likely occur?",
+    image: null,
+    options: [
+      "Financial capital will flow from Japan to South Korea, appreciating the won relative to the yen.",
+      "Financial capital will flow into both Japan and South Korea, leaving exchange rates unchanged.",
+      "Financial capital will flow from South Korea to Japan, appreciating the yen relative to the won.",
+      "Financial capital will flow from South Korea to Japan, depreciating the yen relative to the won.",
+      "Financial capital will flow into South Korea, appreciating the yen relative to the won."
+    ],
+    correctAnswer: "C"
+  }
 ];
 
 // Helper function to get unit test questions for a specific unit

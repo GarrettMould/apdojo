@@ -1,9 +1,13 @@
 import './globals.css'
 import type { Metadata } from 'next'
+import { Inter } from 'next/font/google';
+import { Header } from '@/components/header';
+import { Footer } from '@/components/Footer';
 import { AuthProvider } from '@/contexts/AuthContext'
 import { LayoutClientWrapper } from '@/components/LayoutClientWrapper'
 import { LayoutWrapper } from '@/components/LayoutWrapper'
 
+const inter = Inter({ subsets: ['latin'] });
 
 // generateMetadata remains active in this Server Component
 export async function generateMetadata({ params }: { params: { type: string } }) {
@@ -24,14 +28,18 @@ function LayoutClientContent({ children }: { children: React.ReactNode }) {
 */
 
 // RootLayout remains a Server Component
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
-      <body className="min-h-screen flex flex-col bg-gray-50">
+      <body className={inter.className}>
         <AuthProvider>
-          <LayoutWrapper>
-            <LayoutClientWrapper>{children}</LayoutClientWrapper>
-          </LayoutWrapper>
+          <Header />
+          {children}
+          <Footer />
         </AuthProvider>
       </body>
     </html>

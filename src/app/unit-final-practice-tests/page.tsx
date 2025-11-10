@@ -1,114 +1,81 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
+import { ArrowRight, PlayCircle } from 'lucide-react';
+import { macroUnits as allMacroUnitsData } from '@/data/cheatSheets';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, FileText, Play, Brain, Check } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import Image from 'next/image';
+import { useAuthContext } from '@/contexts/AuthContext'; // Import auth context
 
-export default function MCQPracticePage() {
-  const router = useRouter();
-
-  const units = [
-    { id: '1', name: 'Unit 1: Basic Economic Concepts', price: 10 },
-    { id: '2', name: 'Unit 2: Economic Indicators and the Business Cycle', price: 10 },
-    { id: '3', name: 'Unit 3: National Income and Price Determination', price: 10 },
-    { id: '4', name: 'Unit 4: Financial Sector', price: 10 },
-    { id: '5', name: 'Unit 5: Long-Run Consequences of Stabilization Policies', price: 10 },
-    { id: '6', name: 'Unit 6: Open Economy—International Trade and Finance', price: 10 },
-  ];
-
-  const bundlePrice = 49;
-
-  const handlePurchase = (item: { type: 'unit' | 'bundle', id?: string, price: number }) => {
-    const params = new URLSearchParams();
-    params.set('total', item.price.toString());
-    
-    if (item.type === 'bundle') {
-      params.set('bundle', 'true');
-    } else {
-      params.set('units', item.id!);
-    }
-    
-    router.push(`/purchase/mcq-practice?${params.toString()}`);
-  };
+export default function UnitFinalPracticeTestsPage() {
+  const units = allMacroUnitsData;
+  const { user, userData } = useAuthContext(); // Get user and userData
+  const purchasedTests = userData?.purchasedTests || []; // Get purchased tests, default to empty array
 
   return (
-    <div className="min-h-screen pt-20 pb-16 bg-gray-50">
+    <div className="min-h-screen bg-gray-50 py-16 sm:py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8">
-          {/* Page Header */}
-          <div className="text-center mb-12">
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-              AP Dojo Practice Tests
-            </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              AP-aligned practice tests with teacher-led video explanation
-            </p>
-          </div>
+        {/* Page Header */}
+        <div className="text-center mb-16">
+          <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight">
+            Unit Practice Tests
+          </h1>
+          <p className="mt-4 text-xl text-gray-600 max-w-2xl mx-auto">
+            Test your knowledge with a full-length practice test for each unit.
+          </p>
+        </div>
 
-          {/* Reordered Layout: Paid Content First, then Free */}
-          <div className="space-y-16">
-            
-            {/* Top Section: Unit Tests with Video Explanations (Paid) */}
-            <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
-                Unit Tests + Detailed Video Explanations
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                
-                {/* Bundle Option */}
-                <div className="bg-white rounded-lg overflow-hidden shadow-lg flex flex-col">
-                  <div className="relative">
-                    <Image src="/images/MasterMCQs.PNG" alt="MCQ Explanations Thumbnail" width={500} height={300} className="w-full object-cover" />
-                  </div>
-                  <div className="p-4 flex flex-col flex-grow">
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="text-lg font-bold text-gray-900">All 6 Units Bundle</h3>
-                      <p className="text-lg font-semibold text-green-600">$49</p>
-                    </div>
-                    <ul className="text-gray-600 text-sm mt-2 list-disc list-inside space-y-1 flex-grow">
-                      <li>Includes all 6 units exams</li>
-                      <li>$11 discount</li>
-                    </ul>
-                    <Button 
-                      onClick={() => handlePurchase({ type: 'bundle', price: bundlePrice })}
-                      className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-md text-sm mt-4"
-                    >
-                      Purchase
-                    </Button>
-                  </div>
+        {/* Units Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {units.map((unit) => {
+            const hasPurchased = user && purchasedTests.includes(unit.number.toString());
+
+            return (
+              <div 
+                key={unit.number}
+                className="group bg-white rounded-xl shadow-lg border border-gray-200 p-8 flex flex-col h-full"
+              >
+                <div className="flex-grow">
+                  <span className="text-lg font-bold text-blue-500 bg-gray-100 py-1 px-3 rounded-lg">
+                    Unit {unit.number}
+                  </span>
+                  <h2 className="text-2xl font-bold text-gray-900 mt-4">
+                    {unit.title}
+                  </h2>
+                  <p className="text-gray-600 mt-2 h-24">
+                    {unit.description}
+                  </p>
                 </div>
-                
-                {/* Individual Unit Options */}
-                {units.map((unit) => (
-                  <div key={unit.id} className="bg-white rounded-lg overflow-hidden shadow-lg flex flex-col">
-                    <div className="relative">
-                      <Image src="/images/MasterMCQs.PNG" alt="MCQ Explanations Thumbnail" width={500} height={300} className="w-full object-cover" />
-                    </div>
-                    <div className="p-4 flex flex-col flex-grow">
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className="text-lg font-bold text-gray-900">{`Unit ${unit.id} Test`}</h3>
-                        <p className="text-lg font-semibold text-gray-800">${unit.price}</p>
-                      </div>
-                      <ul className="text-gray-600 text-sm mt-2 list-disc list-inside space-y-1 flex-grow">
-                        <li>15 MCQs</li>
-                        <li>2 FRQs</li>
-                        <li>Detailed Video Explanations</li>
-                      </ul>
-                      <Button 
-                        onClick={() => handlePurchase({ type: 'unit', id: unit.id, price: unit.price })}
-                        className="w-full bg-gray-800 hover:bg-gray-900 text-white font-semibold py-2 px-4 rounded-md text-sm mt-4"
-                      >
-                        Purchase
+                <div className="mt-8 flex items-center justify-between">
+                  {!hasPurchased && (
+                    <span className="text-2xl font-bold text-gray-900">${unit.price.toFixed(2)}</span>
+                  )}
+                  {hasPurchased ? (
+                    <Link 
+                      href={`/unit-mcq-test/${unit.number}`}
+                      passHref
+                      className="w-full"
+                    >
+                      <Button className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold">
+                        Start Test
+                        <PlayCircle className="w-5 h-5 ml-2" />
                       </Button>
-                    </div>
-                  </div>
-                ))}
+                    </Link>
+                  ) : (
+                    <Link 
+                      href={`/purchase/mcq-practice?units=${unit.number}&total=${unit.price.toFixed(2)}&bundle=false`}
+                      passHref
+                    >
+                      <Button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold">
+                        Purchase Test
+                        <ArrowRight className="w-5 h-5 ml-2" />
+                      </Button>
+                    </Link>
+                  )}
+                </div>
               </div>
-            </div>
-          </div>
+            );
+          })}
         </div>
       </div>
     </div>

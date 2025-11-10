@@ -3,17 +3,18 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { X, Loader2 } from 'lucide-react';
+import { X, Loader2, Lock } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { UnitMCQs } from '@/components/unitMCQS';
-import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
+import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems'; // Reverted import
 import { Question as QuestionType } from '@/data/questionBanks/types';
 import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp, doc, updateDoc, increment } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, doc, updateDoc, increment, getDoc } from 'firebase/firestore';
 import dojoIcon from "../../../public/images/dojoIcon.png"
 import { Button } from "@/components/ui/button";
 import { videos as allVideos, Video } from '@/data/videos';
 import { macroUnits as allMacroUnitsData, microUnits as allMicroUnitsData } from '@/data/cheatSheets';
+import { macroLessons, microLessons } from '@/data/lessons'; // Import lessons
 import { LoginModal, SignupModal } from '@/components/AuthModals';
 
 // Assuming this matches the structure in useAuth.ts and Firestore
@@ -281,6 +282,30 @@ function shuffleArray<T>(array: T[]): T[] {
   return array;
 }
 
+function AccessDenied({ unitId, subject }: { unitId: string, subject: string }) {
+  const unitData = (subject === 'macro' ? allMacroUnitsData : allMicroUnitsData).find(u => u.number === parseInt(unitId));
+  const price = unitData?.price || 4.99;
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 pt-16 pb-12">
+      <div className="bg-white p-8 rounded-lg shadow-md border border-gray-200 max-w-md w-full text-center">
+        <Lock className="w-12 h-12 mx-auto text-yellow-500 mb-4" />
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">Purchase Required</h2>
+        <p className="text-gray-600 mb-6">
+          You need to purchase this test to access the full set of practice questions.
+        </p>
+        <Link 
+          href={`/purchase/mcq-practice?units=${unitId}&total=${price}&subject=${subject}`}
+          className="inline-block"
+        >
+          <Button size="lg" className="w-full bg-blue-500 hover:bg-blue-600">
+            Purchase Unit {unitId} Test
+          </Button>
+        </Link>
+      </div>
+    </div>
+  );
+}
 
 
 function UnitMCQPracticeContent() {
@@ -288,35 +313,95 @@ function UnitMCQPracticeContent() {
   const searchParams = useSearchParams();
   const { 
     user, 
+    userData,
     mcqAnswersData, 
     loadingMcqData, 
     correctStreak,
     setCorrectStreak,
     isNextQuestionDoubleXp,
     setIsNextQuestionDoubleXp,
-    userData
   } = useAuthContext();
   
-  // Determine Subject from params or default
-  const subjectParam = searchParams.get('subject');
-  const subject = (subjectParam === 'micro' || subjectParam === 'macro') ? subjectParam : 'macro';
-  const unitsData = subject === 'micro' ? microUnitsData : macroUnitsData;
-  const initialUnit = unitsData[0]?.number ?? (subject === 'micro' ? 2 : 1);
+  // --- Access Control State ---
+  const [hasAccess, setHasAccess] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(true);
 
-  // Determine Mode and specific unit IDs if custom/initial
+  // Determine Subject and Mode from params
+  const subjectParam = searchParams.get('subject');
+  const subject = (subjectParam === 'macro' || subjectParam === 'micro') ? subjectParam : 'macro';
+  const unitsParam = searchParams.get('units');
+  const lessonIdParam = searchParams.get('lessonId');
   const modeParam = searchParams.get('mode');
-  const unitsParam = searchParams.get('units'); // Get units for custom/initial mode
+  const unitsData = subject === 'micro' ? microUnitsData : macroUnitsData;
+
   const initialCustomUnitIds = unitsParam 
       ? unitsParam.split(',').map(id => parseInt(id.trim(), 10)).filter(id => !isNaN(id))
       : [];
 
   // Set practice mode based on params
-  type PracticeMode = 'singleUnit' | 'weakest' | 'custom'; // Added 'custom' mode
+  type PracticeMode = 'singleUnit' | 'weakest' | 'custom' | 'topic';
   const initialPracticeMode: PracticeMode = 
       modeParam === 'weakest' ? 'weakest' :
       modeParam === 'custom' && initialCustomUnitIds.length > 0 ? 'custom' :
-      'singleUnit'; // Default to single unit
+      modeParam === 'topic' && lessonIdParam ? 'topic' :
+      'singleUnit';
 
+  const initialUnit = (initialPracticeMode === 'singleUnit' && initialCustomUnitIds.length > 0)
+    ? initialCustomUnitIds[0]
+    : (unitsData[0]?.number ?? (subject === 'micro' ? 2 : 1));
+
+  // --- Effect to Verify Purchase ---
+  useEffect(() => {
+    // Topic-based practice from the homepage does not require a purchase check
+    if (modeParam === 'topic') {
+      setHasAccess(true);
+      setIsVerifying(false);
+      return;
+    }
+    
+    // For unit tests, user must be logged in
+    if (!user) {
+      setHasAccess(false);
+      setIsVerifying(false);
+      return;
+    }
+
+    const verifyAccess = async () => {
+      if (user && unitsParam) {
+        try {
+          const userRef = doc(db, 'users', user.uid);
+          const userDoc = await getDoc(userRef);
+          
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            const purchasedTests = userData.purchasedTests || [];
+            const requiredUnit = unitsParam.split(',')[0]; // Check the first unit in the list
+
+            if (purchasedTests.includes(requiredUnit)) {
+              setHasAccess(true);
+            } else {
+              setHasAccess(false);
+            }
+          } else {
+            setHasAccess(false);
+          }
+        } catch (error) {
+          console.error("Error verifying purchase:", error);
+          setHasAccess(false);
+        }
+      } else {
+        // If there's no user or no unit specified, default to no access
+        setHasAccess(false);
+      }
+      setIsVerifying(false);
+    };
+
+    setIsVerifying(true);
+    verifyAccess();
+  }, [user, unitsParam, modeParam]);
+
+
+  // --- State for the practice component ---
   const [currentUnit, setCurrentUnit] = useState<number>(initialUnit);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [answeredQuestions, setAnsweredQuestions] = useState<Record<number, AnsweredQuestionState>>({});
@@ -348,34 +433,42 @@ function UnitMCQPracticeContent() {
     }
   }, [practiceMode, mcqAnswersData, user, loadingMcqData]);
 
-  // --- Effect to Prepare Question Set based on Mode (Refactored) --- 
+  // --- Effect to Prepare Question Set (Reverted) --- 
   useEffect(() => {
+    if (!hasAccess) return;
+
     console.log(`[Practice Page Effect] Preparing question set. Mode: ${practiceMode}, Subject: ${subject}`);
     setIsLoadingQuestionSet(true);
-    setCorrectStreak(0); // Reset streak when mode/units change
+    setCorrectStreak(0);
     
-    let relevantUnitIds: number[] = [];
-
-    // Determine relevant unit IDs based on mode
-    if (practiceMode === 'weakest') {
-        relevantUnitIds = weakestUnitIds.length > 0 ? weakestUnitIds : [];
-    } else if (practiceMode === 'custom') {
-        relevantUnitIds = customUnitIds.length > 0 ? customUnitIds : [];
-    } else { // singleUnit mode
-        relevantUnitIds = [currentUnit];
-    }
-
-    // Filter the single allQuestions array based on subject and relevant units
     let baseFilteredQuestions: QuestionType[] = [];
-    if (relevantUnitIds.length > 0) {
-        const subjectInDataFormat = subject === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics';
-        baseFilteredQuestions = allQuestions.filter(q =>
-            q.subject === subjectInDataFormat && 
-            relevantUnitIds.includes(q.unit) 
+    const subjectInDataFormat = subject === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics';
+    
+    if (practiceMode === 'topic' && lessonIdParam) {
+        baseFilteredQuestions = allQuestions.filter(q => // Reverted to allQuestions
+            q.subject === subjectInDataFormat &&
+            q.lessonIDS.includes(lessonIdParam)
         );
-        console.log(`[Practice Page Effect] Filtered ${baseFilteredQuestions.length} base questions for subject ${subject} and units [${relevantUnitIds.join(',')}]`);
+        console.log(`[Practice Page Effect] Filtered ${baseFilteredQuestions.length} questions for topic (lessonId: ${lessonIdParam})`);
     } else {
-        console.log(`[Practice Page Effect] No relevant units determined for mode: ${practiceMode}.`);
+        let relevantUnitIds: number[] = [];
+        if (practiceMode === 'weakest') {
+            relevantUnitIds = weakestUnitIds.length > 0 ? weakestUnitIds : [];
+        } else if (practiceMode === 'custom') {
+            relevantUnitIds = customUnitIds.length > 0 ? customUnitIds : [];
+        } else { // singleUnit mode
+            relevantUnitIds = initialCustomUnitIds.length > 0 ? initialCustomUnitIds : [currentUnit];
+        }
+
+        if (relevantUnitIds.length > 0) {
+            baseFilteredQuestions = allQuestions.filter(q => // Reverted to allQuestions
+                q.subject === subjectInDataFormat && 
+                relevantUnitIds.includes(q.unit) 
+            );
+            console.log(`[Practice Page Effect] Filtered ${baseFilteredQuestions.length} base questions for subject ${subject} and units [${relevantUnitIds.join(',')}]`);
+        } else {
+            console.log(`[Practice Page Effect] No relevant units determined for mode: ${practiceMode}.`);
+        }
     }
 
     // --- Filter based on mcqAnswerStatus --- 
@@ -406,13 +499,7 @@ function UnitMCQPracticeContent() {
     setIsLoadingQuestionSet(false);
     console.log("[Practice Page Effect] Question set preparation complete.");
 
-  }, [
-    practiceMode, 
-    subject, 
-    weakestUnitIds.join(','), 
-    customUnitIds.join(','), 
-    currentUnit 
-  ]); 
+  }, [hasAccess, practiceMode, subject, weakestUnitIds.join(','), customUnitIds.join(','), currentUnit, lessonIdParam]); // Reverted dependencies
 
   // --- Effect to Reset Streak on Unmount ---
   useEffect(() => {
@@ -424,10 +511,16 @@ function UnitMCQPracticeContent() {
   }, [setCorrectStreak]); // Dependency ensures correct setter is used
 
   // Determine Current Unit Name for Display (Using unitsData from metadata)
-  const currentUnitName = 
-      practiceMode === 'weakest' ? `Weakest Units (${weakestUnitIds.join(', ') || 'Finding...'})` :
-      practiceMode === 'custom' ? `Custom Practice (${customUnitIds.join(', ') || 'None'})` :
-      unitsData.find(unit => unit.number === currentUnit)?.title || `Unit ${currentUnit}`; // Use .number instead of .id
+  const currentUnitName = (() => {
+    if (practiceMode === 'topic') {
+      const lessons = subject === 'macro' ? macroLessons : microLessons;
+      const lesson = lessons.find(l => l.lessonNumber === lessonIdParam);
+      return lesson ? lesson.lessonName : `Topic ${lessonIdParam}`;
+    }
+    if (practiceMode === 'weakest') return `Weakest Units (${weakestUnitIds.join(', ') || 'Finding...'})`;
+    if (practiceMode === 'custom') return `Custom Practice (${customUnitIds.join(', ') || 'None'})`;
+    return unitsData.find(unit => unit.number === currentUnit)?.title || `Unit ${currentUnit}`; // Use .number instead of .id
+  })();
 
   const totalQuestionsInSet = questionsForPractice.length;
 
@@ -617,6 +710,14 @@ function UnitMCQPracticeContent() {
       // ... existing code ...
     }
   };
+
+  if (isVerifying) {
+    return <PageLoadingFallback />;
+  }
+
+  if (!hasAccess) {
+    return <AccessDenied unitId={currentUnitForAccessCheck} subject={subject} />;
+  }
 
   return (
     <>

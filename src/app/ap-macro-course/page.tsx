@@ -3,8 +3,8 @@
 import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { Play, FileText, Lock, ChevronDown, ChevronRight, Brain } from 'lucide-react';
-import { videos as allVideos, Video as VideoType } from '@/data/videos';
+import { Play, FileText, Lock, Brain } from 'lucide-react';
+import { videos as allVideos } from '@/data/videos';
 import { apMacroCourseInfo } from '@/data/courseInfo';
 import Image from 'next/image';
 import {
@@ -71,7 +71,7 @@ function APMacroCoursePageContent() {
 
         {/* Units Accordion */}
         <Accordion type="single" collapsible value={activeUnit} onValueChange={setActiveUnit} className="w-full">
-          {apMacroCourseInfo.units.map((unit, index) => {
+          {apMacroCourseInfo.units.map((unit) => {
             const unitNumber = unit.unit.split(':')[0].split(' ')[1];
             const isLocked = parseInt(unitNumber, 10) >= 3;
 
@@ -102,7 +102,10 @@ function APMacroCoursePageContent() {
                 <AccordionContent>
                   <div className="border-t border-gray-200">
                     {unitVideos.map((video) => (
-                      <div key={video.id} className="flex items-center gap-6 p-4 border-b border-gray-200">
+                      <div 
+                        key={video.id} 
+                        className="flex items-center gap-6 p-4 border-b border-gray-200"
+                      >
                         {/* Thumbnail */}
                         <div className="flex-shrink-0">
                           <Image

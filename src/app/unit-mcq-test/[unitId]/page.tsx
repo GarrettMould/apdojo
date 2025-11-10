@@ -5,14 +5,14 @@ import { useParams } from 'next/navigation';
 import { ArrowLeft, ArrowRight, FileText, Check, X, CheckCircle, Lock, Strikethrough, Bookmark, Expand, Play } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image'; // Import the Next.js Image component
-// MVP: Removed authentication imports
-// import { useAuthContext } from '@/contexts/AuthContext';
-// import { AuthGate } from '@/components/AuthGate';
+import { useAuthContext } from '@/contexts/AuthContext'; // Re-enabled authentication
+import { AuthGate } from '@/components/AuthGate';
 import { getUnitMCQTest } from '@/data/unitMCQTests';
 import { apMacroCourseInfo } from '@/data/courseInfo';
 import { videos as allVideos } from '@/data/videos';
 import { saveTestProgress, loadTestProgress, saveTestResult } from '@/lib/testProgress';
 import { Question as QuestionType } from '@/data/questionBanks/types';
+import { Button } from '@/components/ui/button';
 
 interface UnitMCQTestPageProps {
   params: Promise<{
@@ -25,20 +25,44 @@ const getCorrectAnswerIndex = (correctAnswer: string): number => {
   return correctAnswer.charCodeAt(0) - 65; // Convert A=0, B=1, C=2, etc.
 };
 
-export default function UnitMCQTestPage({ params }: UnitMCQTestPageProps) {
-  const { unitId } = use(params);
-  const unitNumber = parseInt(unitId);
+function AccessDenied({ unitId }: { unitId: string }) {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 pt-16 pb-12">
+      <div className="bg-white p-8 rounded-lg shadow-md border border-gray-200 max-w-md w-full text-center">
+        <Lock className="w-12 h-12 mx-auto text-yellow-500 mb-4" />
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">Purchase Required</h2>
+        <p className="text-gray-600 mb-6">
+          You need to purchase this test to access the full set of practice questions.
+        </p>
+        <Link 
+          href={`/purchase/mcq-practice?units=${unitId}&total=4.99&subject=macro`}
+          className="inline-block"
+        >
+          <Button size="lg" className="w-full bg-blue-500 hover:bg-blue-600">
+            Purchase Unit {unitId} Test
+          </Button>
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+export default function UnitMCQTestPage() {
+  // --- ALL HOOKS MOVED TO TOP ---
+  const { unitId } = useParams();
+  const { user, userData, loading } = useAuthContext();
+  
+  const unitNumber = parseInt(unitId as string);
   const questions = getUnitMCQTest(unitNumber);
   const totalQuestions = questions.length;
   const unitInfo = apMacroCourseInfo.units.find(unit => 
-    unit.unit.split(':')[0].split(' ')[1] === unitId.toString()
+    unit.unit.split(':')[0].split(' ')[1] === (unitId as string)
   );
 
-  // MVP: Removed authentication context
-  // const { user } = useAuthContext();
+  const [hasAccess, setHasAccess] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(true);
   
-  // Get the unit test questions first
-  
+  // State from the original component
   const [answeredQuestions, setAnsweredQuestions] = useState<Record<string, { selectedAnswer: number; isCorrect: boolean }>>({});
   const [strikethroughState, setStrikethroughState] = useState<Record<number, number[]>>({});
   const [bookmarkedQuestions, setBookmarkedQuestions] = useState<number[]>([]);
@@ -50,36 +74,26 @@ export default function UnitMCQTestPage({ params }: UnitMCQTestPageProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeQuestion, setActiveQuestion] = useState<number | null>(questions.length > 0 ? questions[0].id : null);
 
-  // Get unit info
-  
-  // MVP: Only allow access to Units 1, 2 and 3
-  const isUnitLocked = false;
-
+  // --- ACCESS VERIFICATION LOGIC ---
   useEffect(() => {
-    if (!isSubmitted) return;
+    if (loading) {
+      return; // Wait until auth state is loaded
+    }
+    if (!user) {
+      setHasAccess(false);
+      setIsVerifying(false);
+      return;
+    }
+    
+    const purchasedTests = userData?.purchasedTests || [];
+    if (purchasedTests.includes(unitId as string)) {
+      setHasAccess(true);
+    } else {
+      setHasAccess(false);
+    }
+    setIsVerifying(false);
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const questionId = parseInt(entry.target.id.split('-')[1]);
-            setActiveQuestion(questionId);
-          }
-        });
-      },
-      {
-        rootMargin: '-50% 0px -50% 0px', // Trigger when the question is in the middle of the viewport
-        threshold: 0,
-      }
-    );
-
-    const questionElements = questions.map(q => document.getElementById(`question-${q.id}`)).filter(el => el);
-    questionElements.forEach(el => el && observer.observe(el));
-
-    return () => {
-      questionElements.forEach(el => el && observer.unobserve(el));
-    };
-  }, [isSubmitted, questions]);
+  }, [user, userData, loading, unitId]);
 
   // MVP: Removed user-dependent progress loading for MVP
   // useEffect(() => {
@@ -159,6 +173,7 @@ export default function UnitMCQTestPage({ params }: UnitMCQTestPageProps) {
   }
 
   // MVP: Check if unit is locked (only Unit 1 is accessible)
+  const isUnitLocked = false;
   if (isUnitLocked) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">

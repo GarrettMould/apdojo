@@ -5,6 +5,7 @@ import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { SubscriptionOfferPrompt } from './SubscriptionOfferPrompt';
+import { useRouter } from 'next/navigation';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -113,6 +114,7 @@ export function SignupModal({ isOpen, onClose, switchToLogin, onAuthSuccess }: A
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const { signup } = useAuthContext();
+  const router = useRouter();
 
   // Updated password validation - removed special character requirement
   const hasMinLength = password.length >= 8;
@@ -156,6 +158,7 @@ export function SignupModal({ isOpen, onClose, switchToLogin, onAuthSuccess }: A
       await signup(email, password);
       onClose();
       onAuthSuccess?.();
+      router.push('/'); // Redirect to the main homepage
     } catch (error: any) {
       switch (error.code) {
         case 'auth/invalid-email':

@@ -24,8 +24,8 @@ function LoginPageContent() {
     // 3. There is NO 'redirect' query parameter present
     const redirectParam = searchParams.get('redirect');
     if (!authLoading && user && !redirectParam) {
-      console.log('[Login Page Effect] User logged in and NO redirect param, pushing to /userHomePage');
-      router.push('/userHomePage');
+      console.log('[Login Page Effect] User logged in and NO redirect param, pushing to /');
+      router.push('/'); // CHANGED
     } else if (!authLoading && user && redirectParam) {
         console.log('[Login Page Effect] User logged in WITH redirect param, letting handleSubmit handle navigation.');
         // Do nothing here - handleSubmit already called router.replace()
@@ -44,8 +44,8 @@ function LoginPageContent() {
         console.log('Login page redirecting to:', redirectPath)
         router.replace(redirectPath)
       } else {
-        console.log('Login page redirecting to default /userHomePage')
-        router.push('/userHomePage')
+        console.log('Login page redirecting to default /');
+        router.push('/'); // CHANGED
       }
     } catch (error) {
       setError('Failed to sign in. Please check your credentials.')

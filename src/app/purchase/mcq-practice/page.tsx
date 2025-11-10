@@ -1,162 +1,75 @@
 'use client';
 
-import React, { Suspense } from 'react';
+import React, { Suspense, useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { AlertCircle, CheckCircle, Info, Lock } from 'lucide-react';
+import { Check, Lock, Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import { Elements, PaymentElement, useElements, useStripe, ExpressCheckoutElement } from '@stripe/react-stripe-js';
+import Image from 'next/image';
+import { Elements, PaymentElement, useElements, useStripe, LinkAuthenticationElement } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
+import { useAuthContext } from '@/contexts/AuthContext';
+import { LoginModal, SignupModal } from '@/components/AuthModals'; // Import both modals
+import dojoIcon from '../../../../public/images/dojoIcon.png';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
-function CheckoutForm() {
+function PurchaseCardHeader() {
   const searchParams = useSearchParams();
-  const [clientSecret, setClientSecret] = React.useState('');
-
+  const units = searchParams.get('units')?.split(',') || [];
   const isBundle = searchParams.get('bundle') === 'true';
-  const unitIds = searchParams.get('units')?.split(',') || [];
-  const total = searchParams.get('total') || '0';
-
-  const productName = isBundle ? "Complete Bundle (All 6 Units)" : `Unit Tests for Unit(s): ${unitIds.join(', ')}`;
+  const total = searchParams.get('total') || (isBundle ? '14.99' : '4.99');
   const price = parseFloat(total);
 
-  React.useEffect(() => {
-    // Create PaymentIntent as soon as the page loads
-    if (price > 0) {
-      fetch("/api/stripe/create-payment-intent", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: price }),
-      })
-      .then((res) => res.json())
-      .then((data) => setClientSecret(data.clientSecret));
+  const getProductName = () => {
+    if (isBundle) return "All Unit Test Banks";
+    if (units.length > 1) return "Multiple Unit Test Banks";
+    if (units.length === 1) {
+      const unitName = units[0] === '1' ? 'Unit 1' : `Unit ${units[0]}`;
+      return `${unitName} MCQ Test`;
     }
-  }, [price]);
-
-  const appearance = {
-    theme: 'stripe',
+    return "MCQ Practice Test";
   };
-  const options = {
-    clientSecret,
-    appearance,
-  };
+  
+  const productName = getProductName();
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-6xl mx-auto lg:grid lg:grid-cols-2 lg:gap-12">
-        
-        {/* Left Side: Checkout Form */}
-        <div className="bg-white p-8 rounded-xl shadow-md">
-          {/* Success Message */}
-          <div className="bg-green-50 border border-green-200 text-green-700 text-sm rounded-lg p-4 flex items-center gap-3 mb-6">
-            <CheckCircle className="w-5 h-5" />
-            <span>"{productName}" has been added to your cart.</span>
-          </div>
-          
-          <div className="text-sm mb-6">
-            Returning customer? <Link href="/login" className="text-blue-600 hover:underline">Click here to login</Link>
-          </div>
-
-          {clientSecret ? (
-            <Elements options={options} stripe={stripePromise}>
-              {/* Express Checkout */}
-              <div className="mb-6">
-                <div className="text-xs text-gray-500 mb-2 text-center">Express Checkout</div>
-                <ExpressCheckoutElement />
-              </div>
-
-              <div className="flex items-center text-gray-400 text-xs my-6">
-                <div className="flex-grow border-t border-gray-200"></div>
-                <span className="px-4">OR</span>
-                <div className="flex-grow border-t border-gray-200"></div>
-              </div>
-
-              {/* Student Information & Payment */}
-              <div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-6">Student Information</h2>
-                <PaymentForm />
-              </div>
-            </Elements>
-          ) : (
-            <div className="text-center py-8">
-              <p>Loading payment options...</p>
-            </div>
-          )}
+    <>
+      <div className="flex justify-between items-start text-left mb-6">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-800">{productName}</h2>
+          <p className="text-sm text-gray-500 mt-1">One-time purchase</p>
         </div>
-
-        {/* Right Side: Order Summary and Support */}
-        <div className="space-y-8">
-          {/* Order Summary */}
-          <div className="bg-white border border-gray-200 rounded-xl shadow-sm">
-            <div className="p-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-6">Order summary</h2>
-              
-              <div className="space-y-4">
-                <div className="flex justify-between items-center pb-4 border-b border-gray-200">
-                  <div className="text-gray-600">{productName} x 1</div>
-                  <div className="font-semibold text-gray-800">${price.toFixed(2)}</div>
-                </div>
-                <div className="flex justify-between items-center text-gray-600 pt-2">
-                  <div>Subtotal</div>
-                  <div>${price.toFixed(2)}</div>
-                </div>
-                <div className="flex justify-between items-center text-xl font-bold text-gray-900 pt-4">
-                  <div>Total</div>
-                  <div>${price.toFixed(2)}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Support Sections */}
-          <div className="bg-white border border-gray-200 p-8 rounded-xl shadow-sm space-y-6">
-            <div className="flex gap-4">
-              <Lock className="w-8 h-8 text-blue-500 flex-shrink-0 mt-1" />
-              <div>
-                <h3 className="font-bold text-lg text-gray-800">Our AP Dojo Guarantee</h3>
-                <p className="text-gray-600 text-sm mt-1">
-                  14-day, 100% money-back guarantee with no hassle. Simply send us a contact message. <a href="#" className="text-blue-600 underline">For more info, click here.</a>
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-4">
-              <Info className="w-8 h-8 text-blue-500 flex-shrink-0 mt-1" />
-              <div>
-                <h3 className="font-bold text-lg text-gray-800">Customer Support</h3>
-                <p className="text-gray-600 text-sm mt-1">
-                  Got a question before purchase? <a href="#" className="text-blue-600 underline">Send us a message</a> and we'll respond within 24 hours.
-                </p>
-              </div>
-            </div>
-          </div>
+        <div className="text-right">
+          <p className="text-3xl font-extrabold text-gray-900">${price.toFixed(2)}</p>
         </div>
       </div>
-    </div>
+      <div className="space-y-3 text-sm text-gray-600 mb-6">
+        <p className="flex items-center"><Check className="w-4 h-4 mr-2 text-green-500" /> <strong>Lifetime Access </strong> to purchased materials.</p>
+        <p className="flex items-center"><Check className="w-4 h-4 mr-2 text-green-500" /> Detailed, expert-written explanations.</p>
+        <p className="flex items-center"><Lock className="w-4 h-4 mr-2 text-gray-400" /> Secure payment processing with Stripe.</p>
+      </div>
+    </>
   );
 }
 
-function PaymentForm() {
+
+function PaymentForm({ unitIds }: { unitIds: string[] }) {
   const stripe = useStripe();
   const elements = useElements();
-  const [message, setMessage] = React.useState<string | null>(null);
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!stripe || !elements) {
-      return;
-    }
+    if (!stripe || !elements) return;
 
     setIsLoading(true);
 
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: `${window.location.origin}/success`,
+        return_url: `${window.location.origin}/purchase/success?units=${unitIds.join(',')}`,
       },
     });
 
@@ -170,22 +83,122 @@ function PaymentForm() {
   };
 
   return (
-    <form id="payment-form" onSubmit={handleSubmit} className="space-y-6">
+    <form id="payment-form" onSubmit={handleSubmit}>
       <PaymentElement id="payment-element" options={{ layout: "tabs" }} />
-      <Button disabled={isLoading || !stripe || !elements} id="submit" className="w-full py-4 text-lg">
+      <Button disabled={isLoading || !stripe || !elements} id="submit" className="w-full mt-6">
         <span id="button-text">
-          {isLoading ? <div className="spinner" id="spinner"></div> : "Pay now"}
+          {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Pay now"}
         </span>
       </Button>
-      {message && <div id="payment-message" className="text-red-500 text-sm mt-2">{message}</div>}
+      {message && <div id="payment-message" className="text-red-500 text-sm mt-2 text-center">{message}</div>}
     </form>
   );
 }
 
-export default function MCQCheckoutPage() {
+function LoginGate({ onAuthSuccess }: { onAuthSuccess: () => void }) {
+  const [modalToShow, setModalToShow] = useState<'none' | 'login' | 'signup'>('none');
+  
+  const handleAuthSuccess = () => {
+    setModalToShow('none');
+    onAuthSuccess();
+  };
+
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <CheckoutForm />
-    </Suspense>
+    <>
+      <LoginModal 
+        isOpen={modalToShow === 'login'}
+        onClose={() => setModalToShow('none')}
+        onAuthSuccess={handleAuthSuccess}
+        switchToSignup={() => setModalToShow('signup')} 
+      />
+      <SignupModal 
+        isOpen={modalToShow === 'signup'}
+        onClose={() => setModalToShow('none')}
+        onAuthSuccess={handleAuthSuccess}
+        switchToLogin={() => setModalToShow('login')} 
+      />
+      <div className="text-center">
+        <div className="flex flex-col items-center mb-6">
+          <Image src={dojoIcon} alt="AP Dojo" width={48} height={48} />
+          <h3 className="text-xl font-semibold text-gray-800 mt-4">Please sign in to continue</h3>
+          <p className="text-md text-gray-600 mt-1">An account is required to purchase and access your test materials.</p>
+        </div>
+        <Button onClick={() => setModalToShow('login')} size="lg" className="w-full">
+          Login or Create Account
+        </Button>
+      </div>
+    </>
+  );
+}
+
+
+function MCQPracticePurchaseContent() {
+  const { user } = useAuthContext();
+  const [clientSecret, setClientSecret] = useState('');
+  const [isReadyForPayment, setIsReadyForPayment] = useState(!!user);
+  
+  const searchParams = useSearchParams();
+  const units = searchParams.get('units')?.split(',') || [];
+  const isBundle = searchParams.get('bundle') === 'true';
+  const total = searchParams.get('total') || (isBundle ? '14.99' : '4.99');
+  const price = parseFloat(total);
+
+  useEffect(() => {
+    if (isReadyForPayment && user) {
+      fetch("/api/stripe/create-payment-intent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: price, userId: user.uid, unitIds: units, email: user.email }),
+      })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.clientSecret) {
+          setClientSecret(data.clientSecret);
+        } else {
+          console.error("Failed to get client secret from server");
+        }
+      });
+    }
+  }, [isReadyForPayment, user, price, units]);
+
+  const onLoginSuccess = () => {
+    setIsReadyForPayment(true);
+  };
+  
+  const appearance = { theme: 'stripe' as const };
+  const options = { clientSecret, appearance };
+
+  return (
+    <div className="bg-white p-8 rounded-2xl shadow-2xl border border-gray-100 max-w-lg w-full">
+      <PurchaseCardHeader />
+      
+      <div className="border-t border-gray-200 mt-8 pt-8">
+        {isReadyForPayment ? (
+          clientSecret ? (
+            <Elements options={options} stripe={stripePromise}>
+              <PaymentForm unitIds={units} />
+            </Elements>
+          ) : (
+            <div className="text-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin text-gray-500 mx-auto" />
+              <p className="mt-2 text-sm text-gray-600">Preparing secure payment...</p>
+            </div>
+          )
+        ) : (
+          <LoginGate onAuthSuccess={onLoginSuccess} />
+        )}
+      </div>
+    </div>
+  );
+}
+
+
+export default function MCQPracticePurchasePage() {
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center py-12 px-4">
+      <Suspense fallback={<div className="flex items-center justify-center p-12"><Loader2 className="h-12 w-12 animate-spin text-blue-500" /></div>}>
+        <MCQPracticePurchaseContent />
+      </Suspense>
+    </div>
   );
 }

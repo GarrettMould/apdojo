@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Question as QuestionType } from '@/data/questionBanks/types';
 import { Unit } from '@/data/cheatSheets';
-import { Check, X, Brain, FileText, ChevronDown, Triangle, Loader2, Play, RefreshCw, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Clipboard } from 'lucide-react';
+import { Check, X, Brain, FileText, ChevronDown, Triangle, Loader2, Play, RefreshCw, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Clipboard, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
 import Image from 'next/image';
@@ -41,6 +41,7 @@ interface UnitMCQSProps {
   subject: 'macro' | 'micro';
   practiceUnitIds: number[];
   isParentModalOpen: boolean;
+  isSidebar?: boolean; // New optional prop
 }
 
 interface QuestionCardProps {
@@ -454,7 +455,8 @@ export function UnitMCQs({
   questions,
   subject,
   practiceUnitIds,
-  isParentModalOpen
+  isParentModalOpen,
+  isSidebar = false // Default to false
 }: UnitMCQSProps) {
   const { login, signup, userData, loadingUserData, user } = useAuthContext();
   const [aiExplanations, setAiExplanations] = useState<Record<number, string>>({});
@@ -678,6 +680,67 @@ export function UnitMCQs({
     // --- END COMMENT OUT - Scroll Lock --- */
   }, []); // Empty dependency array runs only on mount and unmount
 
+  // --- >>> NEW: Sidebar Rendering Logic <<< ---
+  if (isSidebar) {
+    return (
+      <div className="space-y-4">
+        {questions.map((question) => {
+          const answerState = answeredQuestions[question.id];
+          const correctAnswerIndex = question.options.findIndex((opt, index) => String.fromCharCode(65 + index) === question.correctAnswer);
+
+          return (
+            <div key={question.id} className="p-4 border-b border-gray-200 last:border-b-0">
+              <p className="text-sm font-medium text-gray-800 mb-3">{question.question}</p>
+              <div className="space-y-2">
+                {question.options.map((option, optIndex) => {
+                  const letter = String.fromCharCode(65 + optIndex);
+                  const isSelected = answerState?.selectedLetter === letter;
+                  const isCorrect = optIndex === correctAnswerIndex;
+
+                  let buttonClass = 'w-full text-left p-2 rounded-md text-xs border flex items-center gap-2 transition-colors ';
+                  if (answerState) {
+                    // Answered
+                    if (isCorrect) {
+                      buttonClass += 'bg-green-50 border-green-200 text-gray-900 cursor-default';
+                    } else if (isSelected) {
+                      buttonClass += 'bg-red-50 border-red-200 text-gray-900 cursor-default';
+                    } else {
+                      buttonClass += 'bg-gray-50 border-gray-100 text-gray-500 cursor-default';
+                    }
+                  } else {
+                    // Not answered
+                    buttonClass += 'bg-white hover:bg-gray-50 border-gray-200 text-gray-700';
+                  }
+
+                  return (
+                    <button
+                      key={optIndex}
+                      disabled={!!answerState}
+                      onClick={() => onAnswer(question.id, letter, isCorrect, question.lessonIDS)}
+                      className={buttonClass}
+                    >
+                      <span className={`w-5 h-5 flex items-center justify-center rounded-full border text-xs font-semibold flex-shrink-0 
+                        ${answerState && isCorrect ? 'bg-green-100 border-green-300 text-green-700' : ''}
+                        ${answerState && isSelected && !isCorrect ? 'bg-red-100 border-red-300 text-red-700' : ''}
+                        ${!answerState ? 'bg-white border-gray-300 text-gray-600' : ''}
+                      `}>
+                        {letter}
+                      </span>
+                      <span className="flex-1">{option}</span>
+                      {answerState && isCorrect && <Check className="w-4 h-4 text-green-500" />}
+                      {answerState && isSelected && !isCorrect && <X className="w-4 h-4 text-red-500" />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+  // --- >>> END: Sidebar Rendering Logic <<< ---
+
   return (
     <div className="container mx-auto px-4 pt-4 pb-12 relative">
       {/* Use Flexbox for columns */}
@@ -767,7 +830,7 @@ export function UnitMCQs({
                             key={unit.number}
                             onClick={() => !isLocked && onUnitChange(unit.number)}
                             disabled={isLocked}
-                            className={`w-full text-left px-4 py-2 text-sm transition-colors ${
+                            className={`w-full text-left px-4 py-2 text-sm transition-colors flex items-center justify-between ${
                               currentUnit === unit.number
                                 ? 'bg-blue-50 text-blue-600'
                                 : isLocked
@@ -775,8 +838,8 @@ export function UnitMCQs({
                                 : 'text-gray-700 hover:bg-gray-50'
                             }`}
                           >
-                            {unit.title}
-                            {isLocked && <span className="text-xs text-gray-400 ml-2">(Coming Soon)</span>}
+                            <span>{unit.title}</span>
+                            {isLocked && <Lock className="w-4 h-4 text-gray-400" />}
                           </button>
                         );
                       })}

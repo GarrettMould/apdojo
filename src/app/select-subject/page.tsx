@@ -3,29 +3,40 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthContext } from '@/contexts/AuthContext';
-import { doc, updateDoc, writeBatch, serverTimestamp } from 'firebase/firestore';
+import { doc, writeBatch, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { Loader2 } from 'lucide-react';
-import { macroUnits, microUnits, Unit as UnitType } from '@/data/cheatSheets';
+import { Loader2, Check } from 'lucide-react';
+import { macroUnits, microUnits } from '@/data/cheatSheets';
 
 export default function SelectSubjectPage() {
   const { user, loading: authLoading } = useAuthContext();
   const router = useRouter();
-  const [selectedSubject, setSelectedSubject] = useState<'macro' | 'micro' | ''>('');
+  const [selectedSubjects, setSelectedSubjects] = useState<Set<'macro' | 'micro'>>(new Set());
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
   // Redirect if not logged in or auth is still loading
   useEffect(() => {
     if (!authLoading && !user) {
-      router.push('/login'); // Or wherever you want to redirect logged-out users
+      router.push('/login');
     }
-    // We might add a check here later to redirect if subject is already selected
   }, [user, authLoading, router]);
 
+  const handleSubjectToggle = (subject: 'macro' | 'micro') => {
+    setSelectedSubjects(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(subject)) {
+        newSet.delete(subject);
+      } else {
+        newSet.add(subject);
+      }
+      return newSet;
+    });
+  };
+
   const handleSubjectSelect = async () => {
-    if (!selectedSubject) {
-      setError('Please select a subject to continue.');
+    if (selectedSubjects.size === 0) {
+      setError('Please select at least one subject to continue.');
       return;
     }
     if (!user) {
@@ -39,31 +50,37 @@ export default function SelectSubjectPage() {
     try {
       const batch = writeBatch(db);
       const userDocRef = doc(db, 'users', user.uid);
+      const subjects = Array.from(selectedSubjects);
 
-      // 1. Update the main user document with the selected subject
+      // 1. Update the main user document with the selected subjects
       batch.update(userDocRef, {
-        selectedSubject: selectedSubject,
+        selectedSubjects: subjects,
         hasCompletedSubjectSelection: true
       });
 
-      // 2. Create initial XP docs for all units of the selected subject
-      const unitsToInitialize = selectedSubject === 'macro' ? macroUnits : microUnits;
+      // 2. Create initial XP docs for all units of the selected subjects
       const initialBaseXP = 25; // Start everyone at 25 XP
 
-      unitsToInitialize.forEach(unit => {
-        const unitIdStr = unit.number.toString();
-        const unitXPRef = doc(db, 'users', user.uid, 'unitXP', unitIdStr);
-        batch.set(unitXPRef, {
-          subject: selectedSubject,
-          totalXP: initialBaseXP,
-          lastUpdated: serverTimestamp()
+      subjects.forEach(subject => {
+        const unitsToInitialize = subject === 'macro' ? macroUnits : microUnits;
+        unitsToInitialize.forEach(unit => {
+          const unitIdStr = unit.number.toString();
+          // The path now needs to be unique for each subject's unit
+          const unitXPRef = doc(db, 'users', user.uid, 'unitXP', `${subject}_${unitIdStr}`);
+          batch.set(unitXPRef, {
+            subject: subject,
+            unit: unit.number,
+            totalXP: initialBaseXP,
+            lastUpdated: serverTimestamp()
+          });
         });
       });
 
       // 3. Commit the batch write
       await batch.commit();
 
-      console.log(`User ${user.uid} updated with subject ${selectedSubject} and initial XP docs created.`);
+      console.log(`User ${user.uid} updated with subjects: ${subjects.join(', ')} and initial XP docs created.`);
+      
       // 4. Redirect to the NEXT step (initial unit selection)
       router.push('/initial-unit-selection');
 
@@ -75,7 +92,6 @@ export default function SelectSubjectPage() {
   };
 
   if (authLoading || (!user && !authLoading)) {
-    // Show loading spinner while auth check happens or if redirecting
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
@@ -91,7 +107,7 @@ export default function SelectSubjectPage() {
             Choose Your Focus
           </h2>
           <p className="text-center text-gray-600">
-            Select the primary AP subject you'll be studying with AP Dojo.
+            Select the AP subject(s) you'll be studying. You can choose both!
           </p>
         </div>
 
@@ -102,30 +118,42 @@ export default function SelectSubjectPage() {
         )}
 
         <div className="space-y-4">
-          <label className={`flex items-center p-4 border rounded-md cursor-pointer transition-colors ${selectedSubject === 'macro' ? 'border-blue-500 ring-2 ring-blue-200 bg-blue-50' : 'border-gray-300 hover:border-gray-400'}`}>
+          <label 
+            htmlFor="macro-checkbox"
+            className={`flex items-center p-4 border rounded-md cursor-pointer transition-colors ${selectedSubjects.has('macro') ? 'border-blue-500 ring-2 ring-blue-200 bg-blue-50' : 'border-gray-300 hover:border-gray-400'}`}
+          >
+            <div className={`w-6 h-6 flex-shrink-0 border-2 rounded flex items-center justify-center mr-4 ${selectedSubjects.has('macro') ? 'bg-blue-500 border-blue-500' : 'border-gray-400 bg-white'}`}>
+              {selectedSubjects.has('macro') && <Check className="w-4 h-4 text-white stroke-[3]" />}
+            </div>
             <input
-              type="radio"
+              type="checkbox"
+              id="macro-checkbox"
               name="subject"
               value="macro"
-              checked={selectedSubject === 'macro'}
-              onChange={() => setSelectedSubject('macro')}
-              className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300"
-              required
+              checked={selectedSubjects.has('macro')}
+              onChange={() => handleSubjectToggle('macro')}
+              className="absolute opacity-0 w-0 h-0"
             />
             <div className="ml-3">
               <span className="block text-base font-semibold text-gray-900">AP Macroeconomics</span>
               <span className="block text-sm text-gray-500">Study of the economy as a whole.</span>
             </div>
           </label>
-          <label className={`flex items-center p-4 border rounded-md cursor-pointer transition-colors ${selectedSubject === 'micro' ? 'border-blue-500 ring-2 ring-blue-200 bg-blue-50' : 'border-gray-300 hover:border-gray-400'}`}>
+          <label 
+            htmlFor="micro-checkbox"
+            className={`flex items-center p-4 border rounded-md cursor-pointer transition-colors ${selectedSubjects.has('micro') ? 'border-blue-500 ring-2 ring-blue-200 bg-blue-50' : 'border-gray-300 hover:border-gray-400'}`}
+          >
+            <div className={`w-6 h-6 flex-shrink-0 border-2 rounded flex items-center justify-center mr-4 ${selectedSubjects.has('micro') ? 'bg-blue-500 border-blue-500' : 'border-gray-400 bg-white'}`}>
+              {selectedSubjects.has('micro') && <Check className="w-4 h-4 text-white stroke-[3]" />}
+            </div>
             <input
-              type="radio"
+              type="checkbox"
+              id="micro-checkbox"
               name="subject"
               value="micro"
-              checked={selectedSubject === 'micro'}
-              onChange={() => setSelectedSubject('micro')}
-              className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300"
-              required
+              checked={selectedSubjects.has('micro')}
+              onChange={() => handleSubjectToggle('micro')}
+              className="absolute opacity-0 w-0 h-0"
             />
             <div className="ml-3">
               <span className="block text-base font-semibold text-gray-900">AP Microeconomics</span>
@@ -138,9 +166,9 @@ export default function SelectSubjectPage() {
           <button
             onClick={handleSubjectSelect}
             className={`w-full flex justify-center py-3 px-4 border border-transparent text-base font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-              (!selectedSubject || isLoading) ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+              (selectedSubjects.size === 0 || isLoading) ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
             }`}
-            disabled={!selectedSubject || isLoading}
+            disabled={selectedSubjects.size === 0 || isLoading}
           >
             {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Continue to Unit Selection'}
           </button>
