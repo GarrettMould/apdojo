@@ -773,6 +773,7 @@ function UnitMCQPracticeContent() {
               unitName={currentUnitName}
               subject={subject} 
               practiceUnitIds={relevantUnitIdsForDisplay}
+              isParentModalOpen={showLoginModal || showSignupModal}
 
             />
           )}

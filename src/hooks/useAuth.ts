@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { 
   User,
   UserCredential,
@@ -51,6 +51,7 @@ export interface UserData {
   viewedMcqIds?: (string | number)[]; 
   // Add purchases field for premium features
   purchases?: string[];
+  lastSelectedPracticeUnits?: LastSelectedUnits; // Add this field
 }
 
 // --- ADD LEVELING LOGIC --- 
@@ -124,7 +125,7 @@ export interface AuthContextValue {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<AuthContextValue>;
-  signup: (email: string, password: string) => Promise<AuthContextValue>;
+  signup: (email: string, password: string, isSubscribed: boolean) => Promise<AuthContextValue>;
   logout: () => Promise<void>;
   mcqAnswersData: McqAnswer[] | null;
   loadingMcqData: boolean;
@@ -386,31 +387,27 @@ export function useAuth() {
     }
   }, []) // Empty dependency array ensures this runs only once on mount
 
-  const signup = async (email: string, password: string): Promise<AuthContextValue> => {
+  const signup = async (email: string, password: string, isSubscribed: boolean): Promise<AuthContextValue> => {
     setLoading(true);
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const newUser = userCredential.user;
-      if (newUser) {
-        const userDocRef = doc(db, 'users', newUser.uid);
-        await setDoc(userDocRef, {
-          uid: newUser.uid,
-          email: newUser.email,
-          displayName: newUser.displayName || email.split('@')[0],
-          createdAt: serverTimestamp(),
-          hasCompletedSubjectSelection: false,
-          hasCompletedInitialUnitSelection: false,
-          initialPracticeUnitIds: [],
-          hasCompletedQuizTutorial: false,
-          mcqAnswerStatus: {}, // Initialize the map field
-          viewedMcqIds: [],   // Initialize the array field
-          totalXP: 150 // <-- Initialize totalXP to 150
-        });
-        setUser(newUser);
-        console.log("[useAuth] New user document created with initial totalXP 150."); // Updated log message
-      } else {
-         throw new Error("User creation failed in Firebase Auth.");
-      }
+      
+      // Also create a user document in Firestore
+      await setDoc(doc(db, "users", newUser.uid), {
+        email: newUser.email,
+        uid: newUser.uid,
+        createdAt: serverTimestamp(),
+        selectedSubjects: [],
+        initialPracticeUnits: {},
+        isSubscribedToMarketing: isSubscribed,
+        totalXP: 0,
+        mcqAnswerStatus: {}
+      });
+
+      // After setting the doc, we can assume the onSnapshot listener will pick it up.
+      // The state will be updated automatically.
+      
       setLoading(false);
       // Return the full context object to satisfy the type
       return { 

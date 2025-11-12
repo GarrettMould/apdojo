@@ -4,18 +4,17 @@ import { useAuth } from '@/hooks/useAuth'
 import type { AuthContextValue, UserData, UnitXPData } from '@/hooks/useAuth'
 import { User, GoogleAuthProvider, signInWithPopup } from 'firebase/auth'
 import { auth } from "@/lib/firebase" // Make sure auth is exported from your firebase config
+import { db } from '@/lib/firebase';
+import { doc, setDoc } from 'firebase/firestore';
+import { useState } from 'react';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 
 const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const auth = useAuth()
-  
-  return (
-    <AuthContext.Provider value={auth}>
-      {children}
-    </AuthContext.Provider>
-  )
-}
+  return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
+};
 
 export function useAuthContext(): AuthContextValue {
   const context = useContext(AuthContext)
@@ -42,6 +41,10 @@ export function useAuthContext(): AuthContextValue {
       setIsNextQuestionDoubleXp: (isDouble: boolean | ((prev: boolean) => boolean)) => { console.warn('AuthProvider not found, cannot set is next question double XP'); },
       unitPerformanceStats: null,
       loadingUnitPerformance: true,
+      showLoginModal: false,
+      setShowLoginModal: () => { console.warn('AuthProvider not found'); },
+      showSignupModal: false,
+      setShowSignupModal: () => { console.warn('AuthProvider not found'); },
     }
   }
   return context

@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { SubscriptionOfferPrompt } from './SubscriptionOfferPrompt';
 import { useRouter } from 'next/navigation';
+import { Checkbox } from "@/components/ui/checkbox" // Import the checkbox component
+import { Label } from "@/components/ui/label"     // Import the label component
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -112,6 +114,7 @@ export function SignupModal({ isOpen, onClose, switchToLogin, onAuthSuccess }: A
   const [emailError, setEmailError] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [isSubscribed, setIsSubscribed] = useState(true); // State for the checkbox, default to true
   const [error, setError] = useState('');
   const { signup } = useAuthContext();
   const router = useRouter();
@@ -155,7 +158,7 @@ export function SignupModal({ isOpen, onClose, switchToLogin, onAuthSuccess }: A
     if (!isValidPassword || !validateEmail(email)) return;
     
     try {
-      await signup(email, password);
+      await signup(email, password, isSubscribed); // Pass the isSubscribed state to the signup function
       onClose();
       onAuthSuccess?.();
       router.push('/'); // Redirect to the main homepage
@@ -252,6 +255,19 @@ export function SignupModal({ isOpen, onClose, switchToLogin, onAuthSuccess }: A
                 </li>
               </ul>
             </div>
+            
+            {/* --- NEW CHECKBOX --- */}
+            <div className="flex items-center space-x-2 pt-2">
+              <Checkbox 
+                id="subscribe" 
+                checked={isSubscribed} 
+                onCheckedChange={(checked) => setIsSubscribed(checked as boolean)}
+              />
+              <Label htmlFor="subscribe" className="text-sm font-medium leading-none text-gray-600 cursor-pointer">
+                Send me helpful tips, course updates, and special offers.
+              </Label>
+            </div>
+            {/* --- END NEW CHECKBOX --- */}
 
             <Button 
               type="submit" 
