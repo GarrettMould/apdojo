@@ -716,6 +716,7 @@ function UnitMCQPracticeContent() {
   }
 
   if (!hasAccess) {
+    const currentUnitForAccessCheck = unitsParam ? unitsParam.split(',')[0] : "";
     return <AccessDenied unitId={currentUnitForAccessCheck} subject={subject} />;
   }
 
