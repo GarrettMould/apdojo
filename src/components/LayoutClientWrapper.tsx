@@ -2,8 +2,9 @@
 
 import React from 'react'; 
 import { usePathname } from 'next/navigation';
-import { HeaderWrapper } from '@/components/header-wrapper';
-import { Footer } from '@/components/Footer';
+// Remove HeaderWrapper and Footer imports as they are now in LayoutWrapper
+// import { HeaderWrapper } from '@/components/header-wrapper';
+// import { Footer } from '@/components/Footer';
 import { PageContainer } from '@/components/ui/page-container';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { LoginModal, SignupModal } from '@/components/AuthModals';
@@ -30,20 +31,12 @@ export function LayoutClientWrapper({ children }: { children: React.ReactNode })
 
   return (
     <>
-      {/* Fixed Header */}
-      <div className="fixed top-0 left-0 right-0 z-50">
-        <HeaderWrapper />
-      </div>
-
       {/* Layout without sidebar */}
-      <main className="flex-1 w-full pt-16 overflow-y-auto bg-white">
+      <main className="flex-1 w-full overflow-y-auto bg-white">
         {/* REMOVE PageContainer here to allow full width */}
         {children}
         <Analytics />
       </main>
-
-      {/* Footer (Not Fixed) */}
-      <Footer />
 
       {/* Render Modals Conditionally */}
       <LoginModal 

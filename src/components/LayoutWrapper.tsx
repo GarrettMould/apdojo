@@ -1,6 +1,8 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import { Header } from './header';
+import { Footer } from './Footer';
 
 interface LayoutWrapperProps {
   children: React.ReactNode;
@@ -8,8 +10,12 @@ interface LayoutWrapperProps {
 
 export function LayoutWrapper({ children }: LayoutWrapperProps) {
   return (
-    <div className="flex-1 bg-gray-50 min-h-screen">
-      {children}
+    <div className="flex flex-col min-h-screen">
+      <Header />
+      <main className="flex-1">
+        {children}
+      </main>
+      <Footer />
     </div>
   );
 } 

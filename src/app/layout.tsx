@@ -37,9 +37,11 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <AuthProvider>
-          <Header />
-          {children}
-          <Footer />
+          <LayoutWrapper>
+            <LayoutClientWrapper>
+              {children}
+            </LayoutClientWrapper>
+          </LayoutWrapper>
         </AuthProvider>
       </body>
     </html>
