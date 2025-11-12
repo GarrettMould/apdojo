@@ -330,6 +330,7 @@ function UnitMCQPracticeContent() {
   const subjectParam = searchParams.get('subject');
   const subject = (subjectParam === 'macro' || subjectParam === 'micro') ? subjectParam : 'macro';
   const unitsParam = searchParams.get('units');
+  const currentUnitForAccessCheck = unitsParam ? unitsParam.split(',')[0] : '1';
   const lessonIdParam = searchParams.get('lessonId');
   const modeParam = searchParams.get('mode');
   const unitsData = subject === 'micro' ? microUnitsData : macroUnitsData;
@@ -352,52 +353,9 @@ function UnitMCQPracticeContent() {
 
   // --- Effect to Verify Purchase ---
   useEffect(() => {
-    // Topic-based practice from the homepage does not require a purchase check
-    if (modeParam === 'topic') {
-      setHasAccess(true);
-      setIsVerifying(false);
-      return;
-    }
-    
-    // For unit tests, user must be logged in
-    if (!user) {
-      setHasAccess(false);
-      setIsVerifying(false);
-      return;
-    }
-
-    const verifyAccess = async () => {
-      if (user && unitsParam) {
-        try {
-          const userRef = doc(db, 'users', user.uid);
-          const userDoc = await getDoc(userRef);
-          
-          if (userDoc.exists()) {
-            const userData = userDoc.data();
-            const purchasedTests = userData.purchasedTests || [];
-            const requiredUnit = unitsParam.split(',')[0]; // Check the first unit in the list
-
-            if (purchasedTests.includes(requiredUnit)) {
-              setHasAccess(true);
-            } else {
-              setHasAccess(false);
-            }
-          } else {
-            setHasAccess(false);
-          }
-        } catch (error) {
-          console.error("Error verifying purchase:", error);
-          setHasAccess(false);
-        }
-      } else {
-        // If there's no user or no unit specified, default to no access
-        setHasAccess(false);
-      }
-      setIsVerifying(false);
-    };
-
-    setIsVerifying(true);
-    verifyAccess();
+    // All practice is free for now, so we can grant access
+    setHasAccess(true);
+    setIsVerifying(false);
   }, [user, unitsParam, modeParam]);
 
 
@@ -716,7 +674,6 @@ function UnitMCQPracticeContent() {
   }
 
   if (!hasAccess) {
-    const currentUnitForAccessCheck = unitsParam ? unitsParam.split(',')[0] : "";
     return <AccessDenied unitId={currentUnitForAccessCheck} subject={subject} />;
   }
 

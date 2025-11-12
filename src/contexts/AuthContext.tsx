@@ -1,20 +1,15 @@
 'use client'
 import React, { createContext, useContext, ReactNode } from 'react'
 import { useAuth } from '@/hooks/useAuth'
-import type { AuthContextValue, UserData, UnitXPData } from '@/hooks/useAuth'
-import { User, GoogleAuthProvider, signInWithPopup } from 'firebase/auth'
-import { auth } from "@/lib/firebase" // Make sure auth is exported from your firebase config
-import { db } from '@/lib/firebase';
-import { doc, setDoc } from 'firebase/firestore';
-import { useState } from 'react';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import type { AuthContextValue } from '@/hooks/useAuth'
+import { User } from 'firebase/auth'
 
 const AuthContext = createContext<AuthContextValue | null>(null)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const auth = useAuth()
-  return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
-};
+  return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>
+}
 
 export function useAuthContext(): AuthContextValue {
   const context = useContext(AuthContext)
@@ -23,7 +18,7 @@ export function useAuthContext(): AuthContextValue {
     return {
       user: null,
       loading: true,
-      signup: async () => { throw new Error('AuthProvider not found'); },
+      signup: async (email, password, isSubscribed) => { throw new Error('AuthProvider not found'); },
       login: async () => { throw new Error('AuthProvider not found'); },
       logout: async () => { throw new Error('AuthProvider not found'); },
       mcqAnswersData: null,
@@ -42,23 +37,10 @@ export function useAuthContext(): AuthContextValue {
       unitPerformanceStats: null,
       loadingUnitPerformance: true,
       showLoginModal: false,
-      setShowLoginModal: () => { console.warn('AuthProvider not found'); },
+      setShowLoginModal: () => {},
       showSignupModal: false,
-      setShowSignupModal: () => { console.warn('AuthProvider not found'); },
+      setShowSignupModal: () => {},
     }
   }
   return context
-} 
-
-export interface AuthContextType {
-  user: User | null;
-  userData: UserData | null;
-  // ... other existing properties ...
-  loadingUnitXPData: boolean;
-  unitXPData: UnitXPData[] | null;
-  // Add new state for streak and double XP
-  correctStreak: number;
-  setCorrectStreak: (streak: number | ((prev: number) => number)) => void;
-  isNextQuestionDoubleXp: boolean;
-  setIsNextQuestionDoubleXp: (isDouble: boolean | ((prev: boolean) => boolean)) => void;
 } 
