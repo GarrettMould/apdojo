@@ -1,0 +1,19 @@
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <!-- Main circle background -->
+  <circle cx="60" cy="60" r="50" fill="#3B82F6" />
+  
+  <!-- Inner circle for depth -->
+  <circle cx="60" cy="60" r="45" fill="#60A5FA" />
+  
+  <!-- Bottom shadow -->
+  <path d="M60 110c-27.614 0-50-22.386-50-50 0 0 20 8 50 8s50-8 50-8c0 27.614-22.386 50-50 50z" fill="#2563EB" />
+  
+  <!-- Star icon -->
+  <path d="M60 27l8.5 17.3 19 2.8-13.8 13.4 3.3 19-17-8.9-17 8.9 3.3-19-13.8-13.4 19-2.8z" fill="#FFC800" stroke="#E5B400" stroke-width="2" />
+  
+  <!-- White outline around the badge -->
+  <circle cx="60" cy="60" r="50" fill="none" stroke="white" stroke-width="4" />
+  
+  <!-- Shine effect -->
+  <ellipse cx="40" cy="40" rx="15" ry="10" fill="#FFFFFF" fill-opacity="0.3" transform="rotate(-25 40 40)" />
+</svg>

@@ -1,0 +1,23 @@
+import { StaticImageData } from 'next/image';
+
+export type { StaticImageData };
+
+export interface Question {
+  id: number;
+  questionNumber?: number;
+  unit: number;
+  subject: 'ap_macroeconomics' | 'ap_microeconomics';
+  unitName: string;
+  question: string;
+  image: StaticImageData | { src: string; alt: string } | null;
+  options: string[];
+  correctAnswer: string;
+  explanation?: string;
+  explanationVideo?: string;
+  lessonIDS: string[];
+}
+
+export interface QuestionBank {
+  name: string;
+  questions: Question[];
+} 
