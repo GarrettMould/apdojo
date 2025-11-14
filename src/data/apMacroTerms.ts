@@ -1696,9 +1696,9 @@ export const keyTerms: KeyTerm[] = [
           unit: 5,
           lessonIDs: ['5.1'],
           subNotes: [
-            'The impact on the real interest rate (RIR) depends on the mix.',
-            'Ex: Expansionary Fiscal (G↑) + Contractionary Monetary (MS↓) → RIR ↑ significantly.',
-            'Ex: Expansionary Fiscal (G↑) + Expansionary Monetary (MS↑) → RIR effect is indeterminate.'
+            'The impact on the real interest rate (RIR) depends on the mix of policies.',
+            'Expansionary Fiscal (G↑) + Contractionary Monetary (MS↓) → RIR ↑ significantly.',
+            'Expansionary Fiscal (G↑) + Expansionary Monetary (MS↑) → RIR effect is indeterminate (policies work in opposite directions on interest rates).'
           ]
         },
     
@@ -1752,27 +1752,26 @@ export const keyTerms: KeyTerm[] = [
         {
           id: 'movements-along-srpc',
           term: 'Movements Along the SRPC',
-          definition: 'A change in the combination of inflation and unemployment on a stable SRPC.',
+          definition: 'A change in the combination of inflation and unemployment along a stable Short-Run Phillips Curve, caused by shifts in Aggregate Demand.',
           subject: 'ap_macroeconomics',
           unit: 5,
           lessonIDs: ['5.2'],
           subNotes: [
-            'Caused by a shift in Aggregate Demand (AD).',
-            'AD Right → Move up/left (lower UE, higher inflation).',
-            'AD Left → Move down/right (higher UE, lower inflation).'
+            'AD Right → Move up/left along SRPC (lower unemployment, higher inflation).',
+            'AD Left → Move down/right along SRPC (higher unemployment, lower inflation).'
           ]
         },
         {
           id: 'shifts-of-srpc',
           term: 'Shifts of the SRPC',
-          definition: 'A change in the short-run trade-off, moving the entire curve.',
+          definition: 'A change in the short-run trade-off between inflation and unemployment, moving the entire Short-Run Phillips Curve.',
           subject: 'ap_macroeconomics',
           unit: 5,
           lessonIDs: ['5.2'],
           subNotes: [
             'Caused by changes in inflationary expectations or supply shocks (SRAS shifts).',
-            'Negative supply shock (Stagflation) → SRPC shifts right.',
-            'Positive supply shock → SRPC shifts left.',
+            'Negative supply shock (Stagflation) → SRPC shifts right (worse inflation and unemployment at any point).',
+            'Positive supply shock → SRPC shifts left (improved trade-off).',
             'Increase in inflationary expectations → SRPC shifts right.'
           ]
         },
@@ -1878,12 +1877,13 @@ export const keyTerms: KeyTerm[] = [
         {
           id: 'financing-a-deficit',
           term: 'Financing a Budget Deficit',
-          definition: 'The method the government uses to pay for its deficit.',
+          definition: 'The method the government uses to pay for its deficit, primarily through borrowing money by selling government bonds (securities) to investors.',
           subject: 'ap_macroeconomics',
           unit: 5,
           lessonIDs: ['5.4'],
           subNotes: [
-            'Primarily done by borrowing money through the sale of government bonds (securities).'
+            'Government sells bonds to both domestic and foreign investors.',
+            'The government borrows from bondholders, promising to pay them back with interest in the future.'
           ]
         },
         {
@@ -1910,13 +1910,13 @@ export const keyTerms: KeyTerm[] = [
         {
           id: 'crowding-out',
           term: 'Crowding Out',
-          definition: 'The effect of government deficit spending where borrowing increases real interest rates, causing a decrease in private investment.',
+          definition: 'An economic effect where government deficit spending increases real interest rates, causing a decrease in private investment.',
           subject: 'ap_macroeconomics',
           unit: 5,
           lessonIDs: ['5.4', '5.5'],
           subNotes: [
             'Government deficit → Demand for loanable funds ↑ → Real Interest Rate ↑ → Private Investment (I) ↓',
-            'This dampens the full effect of expansionary fiscal policy.'
+            'This dampens the full effect of expansionary fiscal policy, as the increase in government spending is partially offset by the decrease in private investment.'
           ]
         }, 
         {
@@ -1933,12 +1933,14 @@ export const keyTerms: KeyTerm[] = [
         {
           id: 'crowding-out-long-run-growth',
           term: 'Crowding Out and Long-Run Economic Growth',
-          definition: 'The long-run negative effect of persistent government deficits, where higher real interest rates reduce private investment and capital accumulation (capital formation).',
+          definition: 'The long-run negative effect of persistent government deficits, where higher real interest rates reduce private investment and capital accumulation, slowing economic growth.',
           subject: 'ap_macroeconomics',
           unit: 5,
           lessonIDs: ['5.5', '5.6'],
           subNotes: [
-            'Less investment in physical capital results in a slower rate of economic growth and a smaller rightward shift of the LRAS and PPC.'
+            'Government borrowing increases real interest rates, reducing private investment and capital formation.',
+            'Less investment in physical capital (machinery, factories, infrastructure) results in slower economic growth.',
+            'Reflected in smaller rightward shifts of the LRAS curve and PPC, meaning potential output grows more slowly than it otherwise would.'
           ]
         },
     
@@ -1966,23 +1968,25 @@ export const keyTerms: KeyTerm[] = [
         {
           id: 'economic-growth-ppc',
           term: 'Economic Growth (on the PPC)',
-          definition: 'How economic growth is illustrated on the Production Possibilities Curve model.',
+          definition: 'How economic growth is illustrated on the Production Possibilities Curve model as an outward shift of the entire curve.',
           subject: 'ap_macroeconomics',
           unit: 5,
           lessonIDs: ['5.6'],
           subNotes: [
-            'Shown as an outward shift of the entire PPC curve.'
+            'Represents an increase in the economy\'s productive capacity, meaning it can now produce more of both goods than before.',
+            'Occurs when there is an increase in resources, improvements in technology, or growth in the factors of production.'
           ]
         },
         {
           id: 'economic-growth-adas',
           term: 'Economic Growth (on the AD-AS Model)',
-          definition: 'How economic growth is illustrated on the Aggregate Demand-Aggregate Supply model.',
+          definition: 'How economic growth is illustrated on the Aggregate Demand-Aggregate Supply model as a rightward shift of the Long-Run Aggregate Supply (LRAS) curve.',
           subject: 'ap_macroeconomics',
           unit: 5,
           lessonIDs: ['5.6'],
           subNotes: [
-            'Shown as a rightward shift of the Long-Run Aggregate Supply (LRAS) curve.'
+            'Represents an increase in the economy\'s potential output, or full-employment output (Yf).',
+            'Indicates the economy can now produce more goods and services at full employment, reflecting an increase in productive capacity due to growth in resources, technology, or factors of production.'
           ]
         },
         {
@@ -1993,10 +1997,11 @@ export const keyTerms: KeyTerm[] = [
           unit: 5,
           lessonIDs: ['5.6', '5.7'],
           subNotes: [
-            'Increase in Physical Capital (K) (e.g., more machines, factories)',
-            'Increase in Human Capital (H) (e.g., education, skills)',
+            'Increase in Physical Capital (K): more machines, factories',
+            'Increase in Human Capital (H): better education, skills',
             'Advancements in Technology (A)',
-            'Increase in quantity/quality of Natural Resources or Labor (L)'
+            'Increase in quantity/quality of Natural Resources or Labor (L)',
+            'These factors work together to expand an economy\'s productive capacity over time.'
           ]
         },
         {
@@ -2015,35 +2020,40 @@ export const keyTerms: KeyTerm[] = [
         {
           id: 'supply-side-economics',
           term: 'Supply-Side Economics',
-          definition: 'The school of thought that government policies should focus on increasing aggregate supply (LRAS) to achieve long-run growth.',
+          definition: 'A school of thought that advocates for government policies focused on increasing aggregate supply (LRAS) to achieve long-run growth, rather than focusing primarily on aggregate demand.',
           subject: 'ap_macroeconomics',
           unit: 5,
           lessonIDs: ['5.7'],
           subNotes: [
             'Also known as "trickle-down" economics.',
-            'Examples: Tax cuts for businesses, deregulation, and other policies to increase incentives to work, save, and invest.'
+            'Emphasizes policies that increase incentives to work, save, and invest.',
+            'Examples: Tax cuts for businesses, deregulation, and other policies designed to encourage production and investment.',
+            'Based on the belief that benefits will eventually "trickle down" to all members of society.'
           ]
         },
         {
           id: 'promoting-physical-capital',
           term: 'Promoting Physical Capital Development',
-          definition: 'Government policies aimed at increasing the amount of tools, machinery, and infrastructure (capital formation).',
+          definition: 'Government policies aimed at increasing the amount of tools, machinery, and infrastructure (capital formation) to promote long-run economic growth.',
           subject: 'ap_macroeconomics',
           unit: 5,
           lessonIDs: ['5.7'],
           subNotes: [
-            'Examples: Investment tax credits, lower corporate income taxes, spending on public infrastructure (roads, bridges, internet).'
+            'These policies encourage both private and public investment in physical capital.',
+            'Examples: Investment tax credits (reduce cost of business investment), lower corporate income taxes (leave more money for capital spending), direct government spending on public infrastructure (roads, bridges, internet networks).',
+            'By increasing physical capital, these policies shift the LRAS curve to the right and expand the economy\'s productive capacity.'
           ]
         },
         {
           id: 'promoting-human-capital',
           term: 'Promoting Human Capital Development',
-          definition: 'Government policies aimed at increasing the knowledge, skills, and health of the workforce.',
+          definition: 'Government policies aimed at increasing the knowledge, skills, and health of the workforce to promote long-run economic growth.',
           subject: 'ap_macroeconomics',
           unit: 5,
           lessonIDs: ['5.7'],
           subNotes: [
-            'Examples: Government spending on public education, job training programs, subsidies for healthcare, student loans/grants.'
+            'Examples: Government spending on public education, job training programs, subsidies for healthcare, student loans or grants.',
+            'By improving human capital, workers become more productive, which increases potential output and shifts the LRAS curve to the right.'
           ]
         }, 
         {
@@ -2124,12 +2134,13 @@ export const keyTerms: KeyTerm[] = [
         {
           id: 'bop-relationship',
           term: 'Current & Financial Account Relationship',
-          definition: 'The Current Account and the Financial Account must sum to zero (or balance). A deficit in one account must be offset by a surplus in the other.',
+          definition: 'The Current Account and the Financial Account must sum to zero (or balance), meaning a deficit in one account must be offset by a surplus in the other.',
           subject: 'ap_macroeconomics',
           unit: 6,
           lessonIDs: ['6.1'],
           subNotes: [
-            'If the US has a current account deficit with China, it must have a financial account surplus (capital inflow) from China.'
+            'Example: If the US has a current account deficit with China (imports more than exports), it must have a corresponding financial account surplus (capital inflow) from China, as Chinese investors purchase US assets to balance the accounts.',
+            'This relationship reflects the fact that every dollar that flows out of one account must flow into the other.'
           ]
         },
     
@@ -2220,7 +2231,7 @@ export const keyTerms: KeyTerm[] = [
         {
           id: 'exp-fiscal-exchange-rate',
           term: 'Expansionary Fiscal Policy & Exchange Rate',
-          definition: 'How expansionary fiscal policy (deficit spending) affects the exchange rate.',
+          definition: 'How expansionary fiscal policy (deficit spending) affects the exchange rate through changes in real interest rates and capital flows.',
           subject: 'ap_macroeconomics',
           unit: 6,
           lessonIDs: ['6.4'],
@@ -2232,7 +2243,7 @@ export const keyTerms: KeyTerm[] = [
         {
           id: 'con-fiscal-exchange-rate',
           term: 'Contractionary Fiscal Policy & Exchange Rate',
-          definition: 'How contractionary fiscal policy (surplus) affects the exchange rate.',
+          definition: 'How contractionary fiscal policy (surplus) affects the exchange rate through changes in real interest rates and capital flows.',
           subject: 'ap_macroeconomics',
           unit: 6,
           lessonIDs: ['6.4'],
@@ -2244,7 +2255,7 @@ export const keyTerms: KeyTerm[] = [
         {
           id: 'exp-monetary-exchange-rate',
           term: 'Expansionary Monetary Policy & Exchange Rate',
-          definition: 'How expansionary monetary policy affects the exchange rate.',
+          definition: 'How expansionary monetary policy affects the exchange rate through changes in interest rates and capital flows.',
           subject: 'ap_macroeconomics',
           unit: 6,
           lessonIDs: ['6.4'],
@@ -2256,7 +2267,7 @@ export const keyTerms: KeyTerm[] = [
         {
           id: 'con-monetary-exchange-rate',
           term: 'Contractionary Monetary Policy & Exchange Rate',
-          definition: 'How contractionary monetary policy affects the exchange rate.',
+          definition: 'How contractionary monetary policy affects the exchange rate through changes in interest rates and capital flows.',
           subject: 'ap_macroeconomics',
           unit: 6,
           lessonIDs: ['6.4'],
@@ -2275,8 +2286,8 @@ export const keyTerms: KeyTerm[] = [
           unit: 6,
           lessonIDs: ['6.5'],
           subNotes: [
-            'Exports decrease (↓).',
-            'Imports increase (↑).',
+            'Exports decrease (↓) because they\'re more expensive for foreigners.',
+            'Imports increase (↑) because they\'re cheaper for domestic citizens.',
             'Net Exports (Xn) decrease, shifting AD to the left.'
           ]
         },
@@ -2288,8 +2299,8 @@ export const keyTerms: KeyTerm[] = [
           unit: 6,
           lessonIDs: ['6.5'],
           subNotes: [
-            'Exports increase (↑).',
-            'Imports decrease (↓).',
+            'Exports increase (↑) because they\'re cheaper for foreigners.',
+            'Imports decrease (↓) because they\'re more expensive for domestic citizens.',
             'Net Exports (Xn) increase, shifting AD to the right.'
           ]
         },
@@ -2314,7 +2325,7 @@ export const keyTerms: KeyTerm[] = [
           unit: 6,
           lessonIDs: ['6.6', '6.4'],
           subNotes: [
-            'If RIR in Country A > RIR in Country B → Capital flows to Country A.',
+            'If RIR in Country A > RIR in Country B → Capital flows to Country A (investors seek best returns).',
             'To invest, foreigners must buy Country A\'s currency.',
             'Demand for Country A\'s currency increases → Country A\'s currency appreciates.'
           ]
