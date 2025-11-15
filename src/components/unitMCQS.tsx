@@ -54,7 +54,7 @@ interface QuestionCardProps {
   aiExplanation?: string;
   isLoadingAI: boolean;
   isLoggedIn: boolean;
-  signup: (email: string, password: string) => Promise<any>;
+  signup: (email: string, password: string, isSubscribed: boolean) => Promise<any>;
   login: (email: string, password: string) => Promise<any>;
   dojoProgress: number;
   correctStreak: number;
@@ -119,9 +119,11 @@ const QuestionCard = ({
 
   // Effect to sync internal state and reset forms/validation/mode
   useEffect(() => {
+    console.log(`[QuestionCard] useEffect triggered for question ${question.id}, isAnswered: ${isAnswered}, initialSelectedLetter: ${initialSelectedLetter}`);
     const currentSelectedIndex = letterToIndex(initialSelectedLetter);
     setSelectedAnswerIndex(currentSelectedIndex);
-    setIsSubmitted(isAnswered);
+    // Ensure isSubmitted matches isAnswered state - if not answered, definitely not submitted
+    setIsSubmitted(isAnswered && !!initialSelectedLetter);
     setShowInternalOverlay(false);
     
     // Reset common overlay state
@@ -164,16 +166,26 @@ const QuestionCard = ({
   const correctAnswerIndex = letterToIndex(question.correctAnswer);
 
   const handleAnswerSelect = (index: number) => {
-    if (!isLoggedIn && currentIndex >= 2) return;
-    if (isSubmitted) return;
+    if (isSubmitted) {
+      console.warn(`[QuestionCard] Blocked answer selection: question ${question.id} already submitted (isSubmitted: ${isSubmitted}, isAnswered: ${isAnswered})`);
+      return;
+    }
+    console.log(`[QuestionCard] Answer selected for question ${question.id}, index ${index}, isLoggedIn: ${isLoggedIn}, currentIndex: ${currentIndex}`);
     setSelectedAnswerIndex(index);
     setIsSubmitted(true);
-    onAnswerSelect(
-      question.id,
-      String.fromCharCode(65 + index),
-      question.options[index],
-      question.lessonIDS
-    );
+    try {
+      onAnswerSelect(
+        question.id,
+        String.fromCharCode(65 + index),
+        question.options[index],
+        question.lessonIDS
+      );
+    } catch (error) {
+      console.error(`[QuestionCard] Error in onAnswerSelect for question ${question.id}:`, error);
+      // Reset state on error so user can try again
+      setIsSubmitted(false);
+      setSelectedAnswerIndex(null);
+    }
   };
 
 
@@ -187,7 +199,7 @@ const QuestionCard = ({
     }
     setSignupLoading(true);
     try {
-      await signup(signupEmail, signupPassword);
+      await signup(signupEmail, signupPassword, false);
       // Success will trigger auth context update and re-render
     } catch (err: any) {
       console.error("Signup failed:", err);
@@ -238,16 +250,6 @@ const QuestionCard = ({
       setLoginLoading(false);
     }
   };
-
-  const shouldBlurContent = !isLoggedIn && currentIndex >= 2;
-
-  // Effect to handle guest limit overlay
-  useEffect(() => {
-    if (!isLoggedIn && currentIndex >= 2) {
-      // Only show internal overlay if parent modal is also being shown or expected to be shown
-      setShowInternalOverlay(isParentModalOpen);
-    }
-  }, [isLoggedIn, currentIndex, isParentModalOpen]);
 
   // Effect to hide internal overlay if parent modal is closed
   useEffect(() => {
@@ -342,8 +344,8 @@ const QuestionCard = ({
         </div>
       )}
 
-      {/* Main Question Content - will be blurred by CSS if showInternalOverlay is true and CSS is set up for it */}
-      <div className={`space-y-6 ${showInternalOverlay ? 'blur-sm' : ''}`}> 
+      {/* Main Question Content */}
+      <div className="space-y-6"> 
         {/* Question Text */}
         <p className="text-base md:text-lg font-medium font-serif leading-relaxed text-gray-800">
           {question.question}
@@ -393,7 +395,7 @@ const QuestionCard = ({
                     <button
                       key={optIndex}
                       onClick={() => handleAnswerSelect(optIndex)}
-                      disabled={isSubmitted || showInternalOverlay}
+                      disabled={isSubmitted}
                       className={`w-full text-left p-3 rounded-lg text-sm font-medium transition-all duration-150 border flex items-center gap-3
                         ${isSubmitted ? 
                           (optIndex === correctAnswerIndex ? 'bg-green-50 text-gray-900 shadow-sm border-green-200 cursor-default' : 
@@ -403,8 +405,7 @@ const QuestionCard = ({
                           'bg-gray-100 border-gray-400 shadow-sm' // Highlight style
                         : 
                           'bg-transparent hover:bg-gray-50 border-gray-200 hover:border-gray-300 hover:shadow-sm' // Default non-submitted style
-                        }
-                        ${showInternalOverlay ? 'cursor-not-allowed' : ''}`}
+                        }`}
                     >
                        {/* Letter bubble */}
                       <span className={`w-6 h-6 flex items-center justify-center rounded-full border text-xs font-medium flex-shrink-0 ${isSubmitted ? (optIndex === correctAnswerIndex ? 'bg-green-100 border-green-300 text-green-700' : optIndex === selectedAnswerIndex ? 'bg-red-100 border-red-300 text-red-700' : 'bg-white border-gray-300 text-gray-500') : isHighlighted ? 'bg-white border-gray-400 text-gray-700' : 'bg-white border-gray-300 text-gray-600'}`}> 
@@ -493,10 +494,15 @@ export function UnitMCQs({
 
 
   const handleAnswerSelection = async (questionId: number, answerLetter: string, answerText: string, lessonIDS: string[]) => {
-    if (!currentQuestion) return; // Ensure currentQuestion is available
+    if (!currentQuestion) {
+      console.error(`[handleAnswerSelection] No current question available for questionId ${questionId}`);
+      return;
+    }
 
     const isCorrect = answerLetter === currentQuestion.correctAnswer;
     const unitId = currentQuestion.unit; // Get unitId from the question data
+
+    console.log(`[handleAnswerSelection] Processing answer for question ${questionId}, answer: ${answerLetter}, correct: ${isCorrect}, user: ${user?.uid || 'not logged in'}`);
 
     // Update local state for immediate UI feedback
     onAnswer(questionId, answerLetter, isCorrect, lessonIDS);
@@ -507,7 +513,8 @@ export function UnitMCQs({
         
         // 1. Update mcqAnswerStatus Map (via API)
         try {
-            fetch('/api/update-mcq-status', {
+            console.log(`[handleAnswerSelection] Updating MCQ status for question ${questionId}`);
+            const statusResponse = await fetch('/api/update-mcq-status', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -515,19 +522,16 @@ export function UnitMCQs({
                     questionId: questionId,
                     isCorrect: isCorrect
                 }),
-            })
-            .then(response => { 
-                if (!response.ok) {
-                    response.json().then(err => console.error(`Failed to update MCQ status for ${questionId}: ${response.status}`, err));
-                } else {
-                    console.log(`MCQ status update request sent for ${questionId}`);
-                }
-            })
-            .catch(error => {
-                console.error('Error calling /api/update-mcq-status:', error);
             });
+            
+            if (!statusResponse.ok) {
+                const errorData = await statusResponse.json().catch(() => ({}));
+                console.error(`[handleAnswerSelection] Failed to update MCQ status for ${questionId}: ${statusResponse.status}`, errorData);
+            } else {
+                console.log(`[handleAnswerSelection] Successfully updated MCQ status for question ${questionId}`);
+            }
         } catch (error) {
-            console.error('Sync Error trying to call /api/update-mcq-status:', error);
+            console.error(`[handleAnswerSelection] Error calling /api/update-mcq-status for question ${questionId}:`, error);
         }
 
         // 2. Update Total XP (via API)
@@ -536,7 +540,7 @@ export function UnitMCQs({
 
         // 3. --- >>> Write Detailed Answer to mcqAnswers Subcollection <<< ---
         try {
-            console.log(`Attempting to write detailed answer log for user ${user.uid}, question ${questionId}`);
+            console.log(`[handleAnswerSelection] Writing detailed answer log for user ${user.uid}, question ${questionId}`);
             const userAnswersColRef = collection(db, 'users', user.uid, 'mcqAnswers');
             const answerData = {
                 questionId: questionId,      // Use the actual number ID
@@ -546,14 +550,15 @@ export function UnitMCQs({
                 timestamp: serverTimestamp() // Use Firestore server timestamp
             };
             await addDoc(userAnswersColRef, answerData);
-            console.log(`Successfully wrote detailed answer log for question ${questionId}`);
+            console.log(`[handleAnswerSelection] Successfully wrote detailed answer log for question ${questionId}`);
         } catch (error) {
-            console.error('Error writing detailed answer log to Firestore:', error);
+            console.error(`[handleAnswerSelection] Error writing detailed answer log to Firestore for question ${questionId}:`, error);
+            // Don't throw - allow the UI to continue even if logging fails
         }
         // --- >>> End Subcollection Write <<< ---
 
     } else {
-        console.warn("User not logged in. Skipping backend updates.");
+        console.warn(`[handleAnswerSelection] User not logged in. Skipping backend updates for question ${questionId}.`);
     }
   };
 
