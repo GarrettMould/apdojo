@@ -66,25 +66,25 @@ export async function POST(req: Request) {
       break;
     
     case 'checkout.session.completed':
-      const session = event.data.object as Stripe.Checkout.Session;
-      console.log(`✅ Checkout session completed: ${session.id}`);
+      const checkoutSession = event.data.object as Stripe.Checkout.Session;
+      console.log(`✅ Checkout session completed: ${checkoutSession.id}`);
       
-      const { examId, userId: sessionUserId } = session.metadata || {};
+      const { examId: checkoutExamId, userId: checkoutUserId } = checkoutSession.metadata || {};
       
-      if (!examId || !sessionUserId) {
-        console.error(`Webhook Error: Missing metadata for checkout session ${session.id}`);
+      if (!checkoutExamId || !checkoutUserId) {
+        console.error(`Webhook Error: Missing metadata for checkout session ${checkoutSession.id}`);
         return NextResponse.json({ error: 'Missing metadata' }, { status: 400 });
       }
 
       try {
-        const userRef = adminDb.collection('users').doc(sessionUserId);
+        const userRef = adminDb.collection('users').doc(checkoutUserId);
         await userRef.set({
-          purchases: FieldValue.arrayUnion(examId),
+          purchases: FieldValue.arrayUnion(checkoutExamId),
         }, { merge: true });
         
-        console.log(`✅ Added exam ${examId} to user ${sessionUserId} purchases`);
+        console.log(`✅ Added exam ${checkoutExamId} to user ${checkoutUserId} purchases`);
       } catch (error: any) {
-        console.error(`Error updating user ${sessionUserId} in Firestore for checkout ${session.id}: ${error.message}`);
+        console.error(`Error updating user ${checkoutUserId} in Firestore for checkout ${checkoutSession.id}: ${error.message}`);
         return NextResponse.json({ error: 'Firestore update failed.' }, { status: 500 });
       }
 
