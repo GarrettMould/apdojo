@@ -1,21 +1,33 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { redirectToCheckout } from '@/lib/stripe'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { LoginModal, SignupModal, SelectPlanModal } from '@/components/AuthModals'
 import { Lock, Loader2 } from 'lucide-react'
 
-export default function PurchaseExams() {
+function PurchaseExamsContent() {
+  const searchParams = useSearchParams();
   const { user, userData, loadingUserData } = useAuthContext();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
   const [showSelectPlanModal, setShowSelectPlanModal] = useState(false);
+  
+  // Get exam params from URL if provided
+  const urlExamType = searchParams.get('examType') as 'macro' | 'micro' | null;
+  const urlQuestionType = searchParams.get('questionType') as 'mcq' | 'frq' | null;
+  const urlExamNumber = searchParams.get('examNumber');
+  
   const [pendingExam, setPendingExam] = useState<{
     examType: 'macro' | 'micro';
     questionType: 'mcq' | 'frq';
     examNumber: string;
-  } | null>(null);
+  } | null>(urlExamType && urlQuestionType && urlExamNumber ? {
+    examType: urlExamType,
+    questionType: urlQuestionType,
+    examNumber: urlExamNumber
+  } : null);
   const [guestSubject, setGuestSubject] = useState<string | null>(null);
   const [isClient, setIsClient] = useState(false);
 
@@ -25,6 +37,31 @@ export default function PurchaseExams() {
       setGuestSubject(localStorage.getItem('guestAPSubject'));
     }
   }, []);
+
+  // Auto-start exam if user has purchased and URL params are provided
+  useEffect(() => {
+    if (pendingExam && user && userData && !loadingUserData && isClient) {
+      const examId = `${pendingExam.examType}-${pendingExam.questionType}-${pendingExam.examNumber}`;
+      const hasPurchase = userData.purchases?.includes(examId);
+      
+      if (hasPurchase) {
+        // User has purchased, redirect to exam immediately
+        window.location.href = `/preview/${pendingExam.examType}/${pendingExam.questionType}/${pendingExam.examNumber}`;
+      } else if (!showSelectPlanModal && !showLoginModal && !showSignupModal) {
+        // User doesn't have purchase, show purchase modal after a brief delay
+        const timer = setTimeout(() => {
+          setShowSelectPlanModal(true);
+        }, 100);
+        return () => clearTimeout(timer);
+      }
+    } else if (pendingExam && !user && isClient && !showSelectPlanModal && !showLoginModal && !showSignupModal) {
+      // Not logged in, show login modal
+      const timer = setTimeout(() => {
+        setShowSelectPlanModal(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [pendingExam, user, userData, loadingUserData, isClient, showSelectPlanModal, showLoginModal, showSignupModal]);
 
   let effectiveSubject: string | null = null;
   if (userData?.selectedSubject) {
@@ -59,7 +96,7 @@ export default function PurchaseExams() {
 
   const pageTitleSubject = effectiveSubject === 'macro' ? 'Macroeconomics' : 'Microeconomics';
 
-  const handleExamStart = (e: React.MouseEvent, examType: 'macro' | 'micro', questionType: 'mcq' | 'frq', examNumber: string) => {
+  const handleExamStart = async (e: React.MouseEvent, examType: 'macro' | 'micro', questionType: 'mcq' | 'frq', examNumber: string) => {
     e.preventDefault();
     
     if (!user) {
@@ -68,7 +105,22 @@ export default function PurchaseExams() {
       return;
     }
 
-    window.location.href = `/preview/${examType}/${questionType}/${examNumber}`;
+    // Check if user has purchased this exam
+    const examId = `${examType}-${questionType}-${examNumber}`;
+    const hasPurchase = userData?.purchases?.includes(examId);
+    
+    if (hasPurchase) {
+      // User has purchased, go to exam
+      window.location.href = `/preview/${examType}/${questionType}/${examNumber}`;
+    } else {
+      // User hasn't purchased, redirect to checkout
+      try {
+        const { redirectToCheckout } = await import('@/lib/stripe');
+        await redirectToCheckout(examType, questionType, examNumber, user.uid);
+      } catch (error) {
+        console.error('Error redirecting to checkout:', error);
+      }
+    }
   };
 
   const handleAuthSuccess = () => {
@@ -447,4 +499,16 @@ export default function PurchaseExams() {
       </div>
     </>
   )
+}
+
+export default function PurchaseExams() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+      </div>
+    }>
+      <PurchaseExamsContent />
+    </Suspense>
+  );
 } 

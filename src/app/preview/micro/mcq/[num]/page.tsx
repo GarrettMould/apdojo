@@ -1,9 +1,11 @@
+import { use } from 'react';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 
-export default function MicroMCQPreview({ params }: { params: { num: string } }) {
+export default function MicroMCQPreview({ params }: { params: Promise<{ num: string }> }) {
+  const { num } = use(params);
   // Only show exam 1 for now
-  if (params.num !== '1') {
+  if (num !== '1') {
     notFound();
   }
 
@@ -12,7 +14,7 @@ export default function MicroMCQPreview({ params }: { params: { num: string } })
       <div className="max-w-4xl mx-auto px-4">
       <div className="mb-6">
         <h1 className="text-4xl font-extrabold mt-4">
-          AP Microeconomics MCQ {params.num}
+          AP Microeconomics MCQ {num}
         </h1>
         <p className="text-gray-600 mt-2">
           Complete all questions to submit and view your score. Explanations are available after you submit.

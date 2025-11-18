@@ -5,12 +5,12 @@ import Link from 'next/link';
 import { ArrowRight, PlayCircle } from 'lucide-react';
 import { macroUnits as allMacroUnitsData } from '@/data/cheatSheets';
 import { Button } from '@/components/ui/button';
-import { useAuthContext } from '@/contexts/AuthContext'; // Import auth context
+import { useAuthContext } from '@/contexts/AuthContext';
 
 export default function UnitFinalPracticeTestsPage() {
   const units = allMacroUnitsData;
-  const { user, userData } = useAuthContext(); // Get user and userData
-  const purchasedTests = userData?.purchasedTests || []; // Get purchased tests, default to empty array
+  const { user, userData } = useAuthContext();
+  const purchasedTests = userData?.purchasedTests || [];
 
   // Add structured data for SEO
   useEffect(() => {
@@ -53,64 +53,173 @@ export default function UnitFinalPracticeTestsPage() {
         {/* Page Header */}
         <div className="text-center mb-16">
           <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight">
-            Unit Practice <span className="text-blue-500">Tests</span>
+            Full AP Macroeconomics <span className="text-blue-500">Practice Tests</span>
           </h1>
           <p className="mt-4 text-xl text-gray-600 max-w-2xl mx-auto">
-            Test your knowledge with a full-length practice test for each unit.
+            Test your knowledge with full-length practice exams and unit tests.
           </p>
         </div>
 
-        {/* Units Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {units.map((unit) => {
-            const hasPurchased = user && purchasedTests.includes(unit.number.toString());
-
-            return (
-              <div 
-                key={unit.number}
-                className="group bg-white rounded-xl shadow-lg border border-gray-200 p-8 flex flex-col h-full"
-              >
-                <div className="flex-grow">
-                  <span className="text-lg font-bold text-blue-500 bg-gray-100 py-1 px-3 rounded-lg">
-                    Unit {unit.number}
-                  </span>
-                  <h2 className="text-2xl font-bold text-gray-900 mt-4">
-                    {unit.title}
-                  </h2>
-                  <p className="text-gray-600 mt-2 h-24">
-                    {unit.description}
-                  </p>
-                </div>
-                <div className="mt-8 flex items-center justify-between">
-                  {!hasPurchased && (
-                    <span className="text-2xl font-bold text-gray-900">${unit.price.toFixed(2)}</span>
-                  )}
-                  {hasPurchased ? (
-                    <Link 
-                      href={`/unit-mcq-test/${unit.number}`}
-                      passHref
-                      className="w-full"
-                    >
-                      <Button className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold">
-                        Start Test
-                        <PlayCircle className="w-5 h-5 ml-2" />
-                      </Button>
-                    </Link>
-                  ) : (
-                    <Link 
-                      href={`/purchase/mcq-practice?units=${unit.number}&total=${unit.price.toFixed(2)}&bundle=false`}
-                      passHref
-                    >
-                      <Button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold">
-                        Purchase Test
-                        <ArrowRight className="w-5 h-5 ml-2" />
-                      </Button>
-                    </Link>
-                  )}
-                </div>
+        {/* Full Exams Section */}
+        <div className="mb-16">
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-8">
+            Full Practice <span className="text-blue-500">Exams</span>
+          </h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Full MCQ Exam 1 Card */}
+            <div className="group bg-white rounded-xl shadow-lg border border-gray-200 p-8 flex flex-row items-center gap-6">
+              <div className="flex-grow">
+                <span className="text-lg font-bold text-blue-500 bg-gray-100 py-1 px-3 rounded-lg inline-block">
+                  MCQ Exam
+                </span>
+                <h2 className="text-2xl font-bold text-gray-900 mt-4">
+                  AP Macroeconomics Full MCQ Exam 1
+                </h2>
+                <p className="text-gray-600 mt-2">
+                  Comprehensive practice exam covering all units of AP Macroeconomics with detailed explanations and progress tracking.
+                </p>
               </div>
-            );
-          })}
+              <div className="flex flex-col items-end gap-4 min-w-[200px]">
+                {(() => {
+                  const hasPurchased = user && userData?.purchases?.includes('macro-mcq-1');
+                  return (
+                    <>
+                      {!hasPurchased && (
+                        <span className="text-2xl font-bold text-gray-900">$30.00</span>
+                      )}
+                      {hasPurchased ? (
+                        <Link 
+                          href="/preview/macro/mcq/1"
+                          passHref
+                        >
+                          <Button className="bg-green-500 hover:bg-green-600 text-white font-semibold">
+                            Start Test
+                            <PlayCircle className="w-5 h-5 ml-2" />
+                          </Button>
+                        </Link>
+                      ) : (
+                        <Link 
+                          href="/purchase/full-exam?examType=macro&questionType=mcq&examNumber=1&total=30.00"
+                          passHref
+                        >
+                          <Button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold">
+                            Purchase Test
+                            <ArrowRight className="w-5 h-5 ml-2" />
+                          </Button>
+                        </Link>
+                      )}
+                    </>
+                  );
+                })()}
+              </div>
+            </div>
+
+            {/* Full FRQ Exam 1 Card */}
+            <div className="group bg-white rounded-xl shadow-lg border border-gray-200 p-8 flex flex-row items-center gap-6">
+              <div className="flex-grow">
+                <span className="text-lg font-bold text-blue-500 bg-gray-100 py-1 px-3 rounded-lg inline-block">
+                  FRQ Exam
+                </span>
+                <h2 className="text-2xl font-bold text-gray-900 mt-4">
+                  AP Macroeconomics Full FRQ Exam 1
+                </h2>
+                <p className="text-gray-600 mt-2">
+                  Full-length free response question exam covering key units of AP Macroeconomics with detailed explanations.
+                </p>
+              </div>
+              <div className="flex flex-col items-end gap-4 min-w-[200px]">
+                {(() => {
+                  const hasPurchased = user && userData?.purchases?.includes('macro-frq-1');
+                  return (
+                    <>
+                      {!hasPurchased && (
+                        <span className="text-2xl font-bold text-gray-900">$20.00</span>
+                      )}
+                      {hasPurchased ? (
+                        <Link 
+                          href="/preview/macro/frq/1"
+                          passHref
+                        >
+                          <Button className="bg-green-500 hover:bg-green-600 text-white font-semibold">
+                            Start Test
+                            <PlayCircle className="w-5 h-5 ml-2" />
+                          </Button>
+                        </Link>
+                      ) : (
+                        <Link 
+                          href="/purchase/full-exam?examType=macro&questionType=frq&examNumber=1&total=20.00"
+                          passHref
+                        >
+                          <Button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold">
+                            Purchase Test
+                            <ArrowRight className="w-5 h-5 ml-2" />
+                          </Button>
+                        </Link>
+                      )}
+                    </>
+                  );
+                })()}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Unit Tests Section */}
+        <div>
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-8">
+            Unit Practice <span className="text-blue-500">Tests</span>
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {units.map((unit) => {
+              const hasPurchased = user && purchasedTests.includes(unit.number.toString());
+
+              return (
+                <div 
+                  key={unit.number}
+                  className="group bg-white rounded-xl shadow-lg border border-gray-200 p-8 flex flex-col h-full"
+                >
+                  <div className="flex-grow">
+                    <span className="text-lg font-bold text-blue-500 bg-gray-100 py-1 px-3 rounded-lg">
+                      Unit {unit.number}
+                    </span>
+                    <h2 className="text-2xl font-bold text-gray-900 mt-4">
+                      {unit.title}
+                    </h2>
+                    <p className="text-gray-600 mt-2 h-24">
+                      {unit.description}
+                    </p>
+                  </div>
+                  <div className="mt-8 flex items-center justify-between">
+                    {!hasPurchased && (
+                      <span className="text-2xl font-bold text-gray-900">${unit.price.toFixed(2)}</span>
+                    )}
+                    {hasPurchased ? (
+                      <Link 
+                        href={`/unit-mcq-test/${unit.number}`}
+                        passHref
+                        className="w-full"
+                      >
+                        <Button className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold">
+                          Start Test
+                          <PlayCircle className="w-5 h-5 ml-2" />
+                        </Button>
+                      </Link>
+                    ) : (
+                      <Link 
+                        href={`/purchase/mcq-practice?units=${unit.number}&total=${unit.price.toFixed(2)}&bundle=false`}
+                        passHref
+                      >
+                        <Button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold">
+                          Purchase Test
+                          <ArrowRight className="w-5 h-5 ml-2" />
+                        </Button>
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>

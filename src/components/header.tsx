@@ -60,7 +60,7 @@ export function Header() {
                 href="/unit-final-practice-tests"
                 className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
               >
-                Practice Tests
+                Full Practice Tests
               </Link>
               
               <Link
@@ -119,7 +119,7 @@ export function Header() {
                 onClick={closeMobileMenu}
                 className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
               >
-                Practice Tests
+                Full Practice Tests
               </Link>
               <Link
                 href="/select-practice-units?subject=macro"

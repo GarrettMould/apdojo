@@ -106,8 +106,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
   // Add to state variables
   const [penColor, setPenColor] = useState('#000000');
 
-  // Add current question index state
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  // Add current question index state (for pagination)
+  const [currentPage, setCurrentPage] = useState(0);
+  const questionsPerPage = 10;
 
   // Add completed questions tracking
   const [completedQuestions, setCompletedQuestions] = useState<Set<number>>(new Set());
@@ -626,69 +627,15 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
 
     console.log('User is logged in, proceeding to checkout');
     try {
-      await redirectToCheckout(examType, questionType, examNumber);
+      await redirectToCheckout(examType, questionType, examNumber, user.uid);
     } catch (error) {
       console.error('Error during checkout:', error);
     }
   };
 
-  const handleAITutorClick = async () => {
-    try {
-      setIsAILoading(true); // Set loading state when starting
-      const currentQuestion = questions[currentQuestionIndex];
-      
-      const response = await fetch('/api/check-answer', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          type: 'ai_tutor',
-          questionType: questionType,
-          question: currentQuestion.question,
-          options: currentQuestion.options,
-          correctAnswer: currentQuestion.correctAnswer,
-          explanation: currentQuestion.explanation,
-          unit: currentQuestion.unit,
-          unitName: currentQuestion.unitName,
-          userAnswer: answers[currentQuestion.id] || '',
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      
-      let status: 'incorrect' | 'partial' | 'correct';
-      const feedbackLower = data.feedback.toLowerCase();
-
-      if (feedbackLower.includes('incorrect') || feedbackLower.includes('error')) {
-        status = 'incorrect';
-      } else if (feedbackLower.includes('partially correct') || 
-                 feedbackLower.includes('could be improved') || 
-                 (feedbackLower.includes('correct') && feedbackLower.includes('but'))) {
-        status = 'partial';
-      } else {
-        status = 'correct';
-      }
-
-      setFeedbackData({
-        status,
-        message: data.feedback
-      });
-      setShowFeedbackModal(true);
-    } catch (error) {
-      console.error('Error connecting to AI:', error);
-      setFeedbackData({
-        status: 'incorrect',
-        message: 'Sorry, there was an error getting feedback. Please try again.'
-      });
-      setShowFeedbackModal(true);
-    } finally {
-      setIsAILoading(false); // Reset loading state when done
-    }
+  // AI Tutor function removed - can be re-added per-question if needed
+  const handleAITutorClick = async (questionId: number) => {
+    // TODO: Implement per-question AI tutor if needed
   };
 
   const getRelatedVideos = (lessonIds: string[], examType: 'macro' | 'micro') => {
@@ -698,21 +645,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
     );
   };
 
-  const currentQuestion = questions[currentQuestionIndex];
-  const relatedVideos = getRelatedVideos(currentQuestion.lessonIDS, examType);
-
-  const subjectFullName = examType === 'macro' ? 'macroeconomics' : 'microeconomics';
-
-  const studyResources = [
-    {
-      title: `Cheat Sheet: Unit ${currentQuestion.unit} - ${currentQuestion.unitName} `,
-      type: 'notes' as const,
-                      link: `/unit-study-guides`,
-    }
-  ];
-
-  const startIndex = currentTrackPage * questionsPerTrack;
-  const totalPages = Math.ceil(questions.length / questionsPerTrack);
+  // Removed currentQuestionIndex references since we show all questions at once
 
   return (
     <>
@@ -761,7 +694,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
       )}
 
       {/* Video Modal */}
-      {showVideoModal && relatedVideos.length > 0 && (
+      {showVideoModal && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
           onClick={() => setShowVideoModal(false)}
@@ -789,269 +722,211 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
                 setIsVideoLoading(false); // Stop loading spinner
               }}
             >
-              <source src={relatedVideos[0].videoUrl} type="video/mp4" />
+              <source src="" type="video/mp4" />
               Your browser does not support the video tag.
             </video>
           </div>
         </div>
       )}
 
-      {/* Replace the existing feedback modal with the new component */}
-              <MCQFeedbackModal 
-          isOpen={showFeedbackModal}
-          onClose={() => setShowFeedbackModal(false)}
-          question={questions[currentQuestionIndex]?.question}
-          selectedAnswer={answers[questions[currentQuestionIndex]?.id] ? 
-            `${answers[questions[currentQuestionIndex].id]}) ${
-              questions[currentQuestionIndex].options[
-                answers[questions[currentQuestionIndex].id].charCodeAt(0) - 65
-              ]
-            }` : undefined
-          }
-          correctAnswer={questions[currentQuestionIndex]?.correctAnswer ? 
-            `${questions[currentQuestionIndex].correctAnswer}) ${
-              questions[currentQuestionIndex].options[
-                questions[currentQuestionIndex].correctAnswer.charCodeAt(0) - 65
-              ]
-            }` : undefined
-          }
-          feedback={feedbackData || { status: 'incorrect', message: '' }}
-          studyResources={studyResources}
-          subject={examType}
-          unitNumber={questions[currentQuestionIndex]?.unit || 1}
-        />
+      {/* Feedback modal removed - can be re-added per-question if needed */}
 
-      <div className="container mx-auto px-4 py-12 max-w-[2800px]">
+      <div className="w-full">
         {!showResults ? (
           <>
-            {/* Question grid */}
-            <div className="mb-8 bg-white rounded-lg shadow-md border border-gray-200 p-8">
-              <div className="flex items-center gap-4">
-                      <button
-                  onClick={() => {
-                    if (currentTrackPage > 0) {
-                      setCurrentTrackPage(currentTrackPage - 1);
+            {/* Progress Bar */}
+            <div className="border-b border-gray-200 mb-6">
+              <div className="p-6">
+                <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
+                  <span className="font-bold">Progress Bar</span>
+                  <span>{completedQuestions.size} of {questions.length} answered</span>
+                </div>
+                <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(20, minmax(0, 1fr))' }}>
+                  {questions.map((q, index) => {
+                    const isAnswered = answers[q.id] !== undefined;
+                    const isBookmarked = bookmarkedQuestions.has(q.id);
+                    const questionPage = Math.floor(index / questionsPerPage);
+                    let buttonClasses = 'w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs transition-colors';
+                    let textClasses = '';
+                    if (isBookmarked) {
+                      buttonClasses += ' bg-yellow-200';
+                      textClasses += ' text-yellow-800';
+                    } else if (isAnswered) {
+                      buttonClasses += ' bg-blue-300';
+                      textClasses += ' text-blue-800';
+                    } else {
+                      buttonClasses += ' bg-gray-200';
+                      textClasses += ' text-gray-600';
                     }
-                  }}
-                  className={`
-                    flex min-w-[32px] h-[32px] items-center justify-center rounded-lg
-                    transition-all duration-200 ease-in-out text-sm font-medium
-                    ${currentTrackPage === 0
-                      ? 'border-2 border-gray-200 text-gray-400 cursor-not-allowed'
-                      : 'bg-blue-500 text-white hover:bg-blue-600 cursor-pointer hover:scale-105'
-                    }
-                  `}
-                >
-                  <Triangle className="w-4 h-4 -rotate-90" />
-                      </button>
-                      
-                <div className="flex-1 flex justify-between gap-2">
-                  {Array.from({ length: questionsPerTrack }, (_, i) => {
-                    const questionIndex = startIndex + i;
-                    if (questionIndex >= questions.length) return null;
-                    const question = questions[questionIndex];
-                    const isBookmarked = question && bookmarkedQuestions.has(question.id);
-                    
                     return (
-                      <div
-                        key={questionIndex}
-                        className={`
-                          min-w-[32px] h-[32px] flex items-center justify-center rounded-lg 
-                          transition-all duration-200 ease-in-out text-sm font-medium
-                          ${questionIndex === currentQuestionIndex 
-                            ? 'border-2 border-blue-500 bg-blue-50 text-blue-900 shadow-sm scale-105' 
-                            : completedQuestions.has(questions[questionIndex]?.id)
-                              ? 'border-2 border-blue-400 text-blue-900'
-                              : 'border-2 border-gray-200 text-gray-700 hover:bg-gray-50'}
-                          ${isBookmarked ? 'border-2 border-yellow-300/70' : ''}
-                          hover:scale-105 cursor-pointer
-                        `}
-                        onClick={() => setCurrentQuestionIndexWithTrack(questionIndex)}
+                      <button
+                        key={q.id}
+                        onClick={() => {
+                          setCurrentPage(questionPage);
+                          // Small delay to ensure page change happens first
+                          setTimeout(() => {
+                            const element = document.getElementById(`question-${q.id}`);
+                            element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                          }, 100);
+                        }}
+                        className={buttonClasses}
+                        title={`Question ${index + 1}`}
                       >
-                        {questionIndex + 1}
-                          </div>
+                        <span className={textClasses}>{index + 1}</span>
+                      </button>
                     );
                   })}
-                        </div>
-
-                    <button
-                  onClick={() => {
-                    if (currentTrackPage < totalPages - 1) {
-                      setCurrentTrackPage(currentTrackPage + 1);
-                    }
-                  }}
-                  className={`
-                    flex min-w-[32px] h-[32px] items-center justify-center rounded-lg
-                    transition-all duration-200 ease-in-out text-sm font-medium
-                    ${currentTrackPage >= totalPages - 1
-                      ? 'border-2 border-gray-200 text-gray-400 cursor-not-allowed'
-                      : 'bg-blue-500 text-white hover:bg-blue-600 cursor-pointer hover:scale-105'
-                    }
-                  `}
-                >
-                  <Triangle className="w-4 h-4 rotate-90" />
-                    </button>
-                  </div>
                 </div>
-                  
-            {/* Main exam container */}
-            <div className="flex flex-col lg:flex-row gap-6">
-              {/* Question container (75% width) */}
-              <div className="w-full lg:w-3/4">
-                <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-4 lg:p-8">
-                {/* Question content */}
-                  <div className="space-y-6 px-8">
-                  <p className="text-lg font-medium font-serif leading-relaxed text-gray-800">
-                    {questions[currentQuestionIndex].question}
-                  </p>
-                    
-                    {questions[currentQuestionIndex].image && (
-                      <div className="my-4">
-                        <img 
-                          src={questions[currentQuestionIndex].image.src}
-                          alt="Question"
-                        className="max-h-[225px] object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
+              </div>
+            </div>
+
+            {/* Paginated Questions */}
+            <div className="space-y-8">
+              {(() => {
+                const startIndex = currentPage * questionsPerPage;
+                const endIndex = Math.min(startIndex + questionsPerPage, questions.length);
+                const currentPageQuestions = questions.slice(startIndex, endIndex);
+                const totalPages = Math.ceil(questions.length / questionsPerPage);
+                
+                return (
+                  <>
+                    {/* Page Info at Top */}
+                    <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
+                      <span className="text-sm text-gray-600">
+                        Page {currentPage + 1} of {totalPages}
+                      </span>
+                      <div className="text-sm text-gray-600">
+                        Questions {startIndex + 1}-{endIndex} of {questions.length}
+                      </div>
+                    </div>
+
+                    {/* Current Page Questions */}
+                    {currentPageQuestions.map((question, relativeIndex) => {
+                      const questionIndex = startIndex + relativeIndex;
+                const selectedAnswer = answers[question.id];
+                const selectedIndex = selectedAnswer ? selectedAnswer.charCodeAt(0) - 65 : null;
+                
+                return (
+                  <div key={question.id} id={`question-${question.id}`} className="bg-white border border-gray-200 rounded-xl shadow-sm p-8">
+                    {/* Question Header */}
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 bg-slate-100 border border-slate-200 rounded-lg">
+                        <span className="text-lg font-bold text-slate-700">{questionIndex + 1}</span>
+                      </div>
+                      <div className="h-px flex-1 bg-slate-200"></div>
+                      <button
+                        onClick={() => {
+                          const newBookmarks = new Set(bookmarkedQuestions);
+                          if (newBookmarks.has(question.id)) {
+                            newBookmarks.delete(question.id);
+                          } else {
+                            newBookmarks.add(question.id);
+                          }
+                          setBookmarkedQuestions(newBookmarks);
+                        }}
+                        className={`flex-shrink-0 p-2 rounded-lg transition-colors ${
+                          bookmarkedQuestions.has(question.id)
+                            ? 'bg-yellow-100 text-yellow-500'
+                            : 'bg-slate-100 hover:bg-slate-200 text-slate-500'
+                        }`}
+                        aria-label={bookmarkedQuestions.has(question.id) ? "Remove bookmark" : "Bookmark question"}
+                      >
+                        <Bookmark className="w-5 h-5" />
+                      </button>
+                    </div>
+
+                    {/* Question Text */}
+                    <div className="mb-8">
+                      <h3 className="text-lg font-medium text-slate-900 leading-relaxed">{question.question}</h3>
+                    </div>
+
+                    {/* Question Image */}
+                    {question.image && (
+                      <div className="mb-8 flex justify-center">
+                        <img
+                          src={question.image.src}
+                          alt={'alt' in question.image && question.image.alt ? question.image.alt : "Question diagram"}
+                          className="max-w-xl w-full h-auto rounded-lg border border-slate-200 shadow-sm cursor-pointer hover:opacity-90 transition-opacity"
                           onClick={() => {
-                            setSelectedImage(questions[currentQuestionIndex].image);
+                            setSelectedImage(question.image);
                             setShowImageModal(true);
                           }}
                         />
                       </div>
                     )}
-                    
+
                     {/* Answer Options */}
                     <div className="space-y-4">
-                    {questions[currentQuestionIndex].options.map((option, optIndex) => (
+                      {question.options.map((option, index) => {
+                        const isSelected = selectedIndex === index;
+                        return (
+                          <div
+                            key={index}
+                            onClick={() => handleAnswer(question.id, index)}
+                            className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 flex items-center gap-4 cursor-pointer ${
+                              isSelected 
+                                ? 'bg-slate-50 text-slate-900 shadow-md border-slate-300 ring-2 ring-slate-100' 
+                                : 'bg-white hover:bg-slate-50 border-slate-200 hover:border-slate-300 hover:shadow-md'
+                            }`}
+                          >
+                            <div className={`flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg border-2 font-semibold text-sm transition-all duration-200 ${
+                              isSelected ? 'bg-slate-700 border-slate-700 text-white' : 'bg-white border-slate-300 text-slate-600'
+                            }`}>
+                              {String.fromCharCode(65 + index)}
+                            </div>
+                            <div className="flex-1">
+                              <span className={`text-sm ${isSelected ? 'text-slate-900' : 'text-slate-700'}`}>
+                                {option}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+                    })}
+
+                    {/* Page Navigation at Bottom */}
+                    <div className="flex items-center justify-between pt-8 mt-8 border-t border-gray-200">
                       <button
-                        key={optIndex}
-                        onClick={() => handleAnswer(questions[currentQuestionIndex].id, optIndex)}
-                        className={`w-full text-left p-4 rounded-lg text-sm font-medium transition-all duration-200 border ${
-                            answers[questions[currentQuestionIndex].id]
-                              ? optIndex === (answers[questions[currentQuestionIndex].id]?.charCodeAt(0) - 65)
-                                ? 'bg-blue-50 text-gray-900 shadow-sm border-blue-200'
-                                : 'bg-transparent text-gray-900 border-gray-200'
-                              : 'bg-transparent hover:bg-gray-50 border-gray-200 hover:border-gray-300 hover:shadow-sm'
+                        onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
+                        disabled={currentPage === 0}
+                        className={`px-8 py-4 text-lg rounded-lg font-semibold transition-colors ${
+                          currentPage === 0
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                            : 'bg-blue-500 text-white hover:bg-blue-600'
                         }`}
                       >
-                        <div className="flex items-center gap-3">
-                          <span className="w-6 h-6 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-600 font-medium">
-                              {String.fromCharCode(65 + optIndex)}
-                          </span>
-                          <span className="flex-1">{option}</span>
-                        </div>
+                        Previous
                       </button>
-                    ))}
-                    </div>
-                  </div>
-                    </div>
-                  </div>
-
-              {/* Sidebar (25% width) */}
-              <div className="w-full lg:w-1/4 bg-white rounded-lg shadow-md border border-gray-200 p-4 lg:p-6 h-fit">
-                {/* Study Resources section */}
-                <div className="space-y-4">
-                  <h3 className="font-extrabold tracking-tight text-gray-900 text-sm">Study Resources</h3>
-                  
-                  {/* Unit Cheat Sheet Button */}
-                  <a
-                    href={`/unit-study-guides`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full p-3 lg:p-4 rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 bg-white hover:bg-gray-50 group block"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-lg bg-gray-100 text-gray-600 group-hover:bg-gray-200 transition-colors">
-                        <FileText className="w-5 h-5" />
-                      </div>
-                      <span className="font-medium text-gray-900">
-                        Unit {questions[currentQuestionIndex].unit} Study Guide
-                      </span>
-                    </div>
-                  </a>
-
-                  {/* AI Dojo Button */}
-                  <button
-                    onClick={handleAITutorClick}
-                    disabled={isAILoading || !answers[questions[currentQuestionIndex].id]}
-                    className={`w-full p-3 lg:p-4 rounded-lg border transition-all duration-200 bg-white group relative
-                      ${error 
-                        ? 'border-red-200 hover:border-red-300' 
-                        : answers[questions[currentQuestionIndex].id]
-                          ? 'border-gray-200 hover:border-gray-300'
-                          : 'border-gray-200 opacity-70 cursor-not-allowed hover:opacity-100'} 
-                      hover:bg-gray-50`}
-                  >
-                    <div className="flex items-center gap-3 justify-start">
-                      <div className={`p-2 rounded-lg text-white transition-colors
-                        ${error 
-                          ? 'bg-red-500 group-hover:bg-red-600' 
-                          : answers[questions[currentQuestionIndex].id]
-                            ? 'bg-blue-500 group-hover:bg-blue-600'
-                            : 'bg-blue-500 opacity-70 group-hover:opacity-100'}`}
+                      <button
+                        onClick={() => setCurrentPage(prev => Math.min(totalPages - 1, prev + 1))}
+                        disabled={currentPage >= totalPages - 1}
+                        className={`px-8 py-4 text-lg rounded-lg font-semibold transition-colors ${
+                          currentPage >= totalPages - 1
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                            : 'bg-blue-500 text-white hover:bg-blue-600'
+                        }`}
                       >
-                        {isAILoading ? (
-                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        ) : (
-                          <Brain className="w-5 h-5" />
-                        )}
-                      </div>
-                      <span className={`font-medium text-left ${error ? 'text-red-600' : answers[questions[currentQuestionIndex].id] ? 'text-gray-900' : 'text-gray-900 opacity-70 group-hover:opacity-100'}`}>
-                        {isAILoading 
-                          ? 'Getting Explanation...' 
-                          : error 
-                            ? 'Try Again' 
-                            : 'Explain with AI Dojo'}
-                      </span>
+                        Next
+                      </button>
                     </div>
-                  </button>
-                </div>
 
-                {/* Navigation and Submit Buttons */}
-                <div className="mt-6 lg:mt-8 space-y-4">
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => {
-                        if (currentQuestionIndex > 0) {
-                          setCurrentQuestionIndex(currentQuestionIndex - 1);
-                        }
-                      }}
-                      disabled={currentQuestionIndex === 0}
-                      className={`
-                        flex-1 p-2.5 lg:p-3 rounded-lg border-2 text-sm font-medium transition-all duration-200
-                        ${currentQuestionIndex === 0
-                          ? 'border-gray-200 text-gray-400 cursor-not-allowed'
-                          : 'border-gray-300 text-gray-700 hover:bg-gray-50 cursor-pointer'
-                        }
-                      `}
-                    >
-                      Previous
-                    </button>
-                    <button
-                      onClick={() => {
-                        if (currentQuestionIndex < questions.length - 1) {
-                          setCurrentQuestionIndex(currentQuestionIndex + 1);
-                        }
-                      }}
-                      disabled={currentQuestionIndex === questions.length - 1}
-                      className={`
-                        flex-1 p-2.5 lg:p-3 rounded-lg border-2 text-sm font-medium transition-all duration-200
-                        ${currentQuestionIndex === questions.length - 1
-                          ? 'border-gray-200 text-gray-400 cursor-not-allowed'
-                          : 'border-gray-300 text-gray-700 hover:bg-gray-50 cursor-pointer'
-                        }
-                      `}
-                    >
-                      Next
-                    </button>
-                  </div>
-                  <button
-                      onClick={() => setShowResults(true)}
-                    className="w-full p-3 rounded-lg border-2 text-sm font-medium transition-all duration-200 border-blue-500 text-blue-600 hover:bg-blue-50 cursor-pointer"
-                  >
-                    Submit Exam
-                  </button>
-                </div>
-              </div>
+                    {/* Submit Button - Only show on last page */}
+                    {currentPage === Math.ceil(questions.length / questionsPerPage) - 1 && (
+                      <div className="pt-8 mt-4">
+                        <button
+                          onClick={() => setShowResults(true)}
+                          className="w-full py-4 bg-blue-500 hover:bg-blue-600 text-white text-lg font-semibold rounded-xl disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
+                        >
+                          Submit Exam
+                        </button>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
             </div>
           </>
         ) : (

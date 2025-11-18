@@ -18,37 +18,38 @@ export async function POST(req: Request) {
     const url = new URL(req.url);
     const baseUrl = `${url.protocol}//${url.host}`;
     
-    const { subject, productType, examType, cancelUrl } = await req.json() as { 
+    const { subject, productType, examType, cancelUrl, userId } = await req.json() as { 
       subject: Subject; 
       productType: ProductType; 
       examType: ExamType;
       cancelUrl: string;
+      userId?: string;
     };
     
     // Define product configurations
     const products = {
       macro: {
         mcq: {
-          1: { name: 'AP Macroeconomics MCQ Exam 1', price: 1999 },
-          2: { name: 'AP Macroeconomics MCQ Exam 2', price: 1999 },
-          3: { name: 'AP Macroeconomics MCQ Exam 3', price: 1999 },
+          1: { name: 'AP Macroeconomics MCQ Exam 1', price: 3000 },
+          2: { name: 'AP Macroeconomics MCQ Exam 2', price: 3000 },
+          3: { name: 'AP Macroeconomics MCQ Exam 3', price: 3000 },
         },
         frq: {
-          1: { name: 'AP Macroeconomics FRQ Exam 1', price: 999 },
-          2: { name: 'AP Macroeconomics FRQ Exam 2', price: 999 },
-          3: { name: 'AP Macroeconomics FRQ Exam 3', price: 999 },
+          1: { name: 'AP Macroeconomics FRQ Exam 1', price: 3000 },
+          2: { name: 'AP Macroeconomics FRQ Exam 2', price: 3000 },
+          3: { name: 'AP Macroeconomics FRQ Exam 3', price: 3000 },
         }
       },
       micro: {
         mcq: {
-          1: { name: 'AP Microeconomics MCQ Exam 1', price: 1999 },
-          2: { name: 'AP Microeconomics MCQ Exam 2', price: 1999 },
-          3: { name: 'AP Microeconomics MCQ Exam 3', price: 1999 },
+          1: { name: 'AP Microeconomics MCQ Exam 1', price: 3000 },
+          2: { name: 'AP Microeconomics MCQ Exam 2', price: 3000 },
+          3: { name: 'AP Microeconomics MCQ Exam 3', price: 3000 },
         },
         frq: {
-          1: { name: 'AP Microeconomics FRQ Exam 1', price: 999 },
-          2: { name: 'AP Microeconomics FRQ Exam 2', price: 999 },
-          3: { name: 'AP Microeconomics FRQ Exam 3', price: 999 },
+          1: { name: 'AP Microeconomics FRQ Exam 1', price: 3000 },
+          2: { name: 'AP Microeconomics FRQ Exam 2', price: 3000 },
+          3: { name: 'AP Microeconomics FRQ Exam 3', price: 3000 },
         }
       }
     };
@@ -59,6 +60,9 @@ export async function POST(req: Request) {
       throw new Error('Invalid subject, product type, or exam type');
     }
 
+    // Create exam ID for metadata
+    const examId = `${subject}-${productType}-${examType}`;
+    
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -83,8 +87,15 @@ export async function POST(req: Request) {
         },
       ],
       mode: 'payment',
-      success_url: `${baseUrl}/success`,
-      cancel_url: `${baseUrl}/purchase/${subject}-exams`,
+      metadata: {
+        examId: examId,
+        userId: userId || '',
+        subject: subject,
+        productType: productType,
+        examType: examType,
+      },
+      success_url: `${baseUrl}/success?examId=${examId}`,
+      cancel_url: cancelUrl || `${baseUrl}/purchase/exams`,
     });
 
     return NextResponse.json({ sessionId: session.id });

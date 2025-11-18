@@ -51,6 +51,10 @@ At minimum, you need the Firebase variables to run the app:
 
 Other services are only needed if you're using those features:
 - **Stripe**: For payment processing
+  - `STRIPE_SECRET_KEY` - Your Stripe secret key (starts with `sk_`)
+  - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` - Your Stripe publishable key (starts with `pk_`)
+  - `STRIPE_WEBHOOK_SECRET` - Webhook signing secret (starts with `whsec_`) - **Required for exam purchases**
+    - See `STRIPE_WEBHOOK_SETUP.md` for detailed setup instructions
 - **Sanity**: For CMS content
 - **OpenAI/Together AI**: For AI features
 - **Resend**: For email sending

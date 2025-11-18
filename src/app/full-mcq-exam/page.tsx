@@ -20,8 +20,8 @@ export default function FullMCQExamPage() {
   // MVP: Removed authentication context
   // const { user } = useAuthContext();
   
-  // MVP: Full MCQ exam covers all units, so it's locked for MVP (only Unit 1 is accessible)
-  const isExamLocked = true;
+  // Exam is now unlocked - purchase verification happens in preview pages
+  const isExamLocked = false;
   
   const [answeredQuestions, setAnsweredQuestions] = useState<Record<string, { selectedAnswer: number; isCorrect: boolean }>>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
