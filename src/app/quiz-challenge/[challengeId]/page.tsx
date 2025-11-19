@@ -553,7 +553,7 @@ export default function QuizChallengePage() {
            {`Oops! This is not an AP ${userData?.selectedSubject ? (userData.selectedSubject.charAt(0).toUpperCase() + userData.selectedSubject.slice(1)) : 'Unknown Subject'} quiz.`}
         </h2>
         <Button 
-          onClick={() => router.push('/userHomePage')}
+          onClick={() => router.push('/')}
           size="lg"
           className="bg-blue-500 hover:bg-blue-600 text-white"
         >

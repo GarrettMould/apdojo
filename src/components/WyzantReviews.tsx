@@ -4,11 +4,11 @@ import WyzantReviews from '../../public/images/WyzantReviews.png'
 
 export function WyzantReviewsSection() {
   return (
-    <div className="mt-32 max-w-6xl mx-auto">
+    <div className="max-w-6xl mx-auto">
       <h3 className="text-4xl font-extrabold text-gray-900 text-center mb-16">
         Hundreds of hours of experience helping students achieve their AP goals
       </h3>
-      <div className="flex items-center justify-center gap-12">
+      <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12">
         <div className="relative w-48 h-48 rounded-full overflow-hidden flex-shrink-0 border-4 border-blue-100">
           <div className="absolute inset-0 translate-y-4">
             <Image

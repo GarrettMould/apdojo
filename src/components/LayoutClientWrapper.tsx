@@ -8,6 +8,7 @@ import { usePathname } from 'next/navigation';
 import { PageContainer } from '@/components/ui/page-container';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { LoginModal, SignupModal } from '@/components/AuthModals';
+import { EmailVerificationBanner } from '@/components/EmailVerificationBanner';
 import { Analytics } from "@vercel/analytics/react";
 
 export function LayoutClientWrapper({ children }: { children: React.ReactNode }) {
@@ -34,6 +35,7 @@ export function LayoutClientWrapper({ children }: { children: React.ReactNode })
       {/* Layout without sidebar */}
       <main className="flex-1 w-full overflow-y-auto bg-white">
         {/* REMOVE PageContainer here to allow full width */}
+        <EmailVerificationBanner />
         {children}
         <Analytics />
       </main>

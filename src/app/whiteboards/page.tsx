@@ -719,7 +719,7 @@ export default function WhiteboardsPage() {
           <p className="text-gray-600 mb-6">
             Please select your primary subject on the homepage to view your personalized study guide.
           </p>
-          <a href="/userHomePage" className="text-blue-600 hover:underline">
+          <a href="/" className="text-blue-600 hover:underline">
             Go to Homepage
           </a>
         </div>

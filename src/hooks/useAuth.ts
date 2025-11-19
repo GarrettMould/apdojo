@@ -6,7 +6,8 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
-  onAuthStateChanged
+  onAuthStateChanged,
+  sendEmailVerification
 } from 'firebase/auth'
 import { auth, db } from '@/lib/firebase'
 import { doc, setDoc, serverTimestamp, collection, query, getDocs, onSnapshot, getDoc, where } from 'firebase/firestore'
@@ -126,6 +127,7 @@ export interface AuthContextValue {
   login: (email: string, password: string) => Promise<AuthContextValue>;
   signup: (email: string, password: string, isSubscribed: boolean) => Promise<AuthContextValue>;
   logout: () => Promise<void>;
+  resendVerificationEmail: () => Promise<void>;
   mcqAnswersData: McqAnswer[] | null;
   loadingMcqData: boolean;
   userData: UserData | null;
@@ -425,6 +427,15 @@ export function useAuth() {
           }
         }
         
+        // Send email verification
+        try {
+          await sendEmailVerification(newUser);
+          console.log("[useAuth] Verification email sent to:", newUser.email);
+        } catch (verificationError) {
+          // Log error but don't fail signup if verification email fails
+          console.error("[useAuth] Failed to send verification email:", verificationError);
+        }
+        
         setUser(newUser);
         console.log("[useAuth] New user document created with initial totalXP 150."); // Updated log message
       } else {
@@ -438,6 +449,7 @@ export function useAuth() {
         login, 
         signup, 
         logout, 
+        resendVerificationEmail,
         mcqAnswersData: mcqAnswersData, 
         loadingMcqData: loadingMcqData, 
         userData: userData, 
@@ -480,6 +492,7 @@ export function useAuth() {
           login, 
           signup, 
           logout, 
+          resendVerificationEmail,
           mcqAnswersData: mcqAnswersData, 
           loadingMcqData: loadingMcqData, 
           userData: userData, 
@@ -514,12 +527,29 @@ export function useAuth() {
     return signOut(auth)
   }
 
+  const resendVerificationEmail = async (): Promise<void> => {
+    if (!user || !user.email) {
+      throw new Error("No user logged in");
+    }
+    
+    // Reload user to get latest emailVerified status
+    await user.reload();
+    
+    if (user.emailVerified) {
+      throw new Error("Email is already verified");
+    }
+    
+    await sendEmailVerification(user);
+    console.log("[useAuth] Verification email resent to:", user.email);
+  }
+
   const value: AuthContextValue = {
     user,
     loading,
     login,
     signup,
     logout,
+    resendVerificationEmail,
     mcqAnswersData,
     loadingMcqData,
     userData,

@@ -29,8 +29,8 @@ export default function VideoComprehensionChecksPage({ params }: VideoComprehens
   // Find the video by slug
   const video = allVideos.find(v => v.videoSlug === videoSlug);
   
-  // MVP: Check if video is from a locked unit (only Unit 1 is accessible)
-  const isVideoLocked = video && parseInt(video.unit) > 2;
+  // MVP: Check if video is from a locked unit (all units are now accessible)
+  const isVideoLocked = false;
   
   // Get navigation items (videos and comprehension checks)
   const getNavigationItems = () => {
@@ -134,7 +134,7 @@ export default function VideoComprehensionChecksPage({ params }: VideoComprehens
       if (nextUnitVideos.length > 0) {
         const firstVideo = nextUnitVideos[0];
         // MVP: Check if next unit is locked (only Unit 1 is accessible)
-        const isNextUnitLocked = parseInt(firstVideo.unit) > 2;
+        const isNextUnitLocked = false;
         if (!isNextUnitLocked) {
           next = {
             type: 'video',

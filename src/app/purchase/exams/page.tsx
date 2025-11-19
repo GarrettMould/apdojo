@@ -86,7 +86,7 @@ function PurchaseExamsContent() {
              <p className="text-gray-600 mb-6">
                Please select your primary subject on the homepage to see available practice exams.
              </p>
-             <Link href="/userHomePage" className="text-blue-600 hover:underline">
+             <Link href="/" className="text-blue-600 hover:underline">
                Go to Homepage
              </Link>
            </div>

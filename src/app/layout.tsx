@@ -13,10 +13,10 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   metadataBase: new URL('https://apdojo.com'),
   title: {
-    default: 'AP Dojo | AP Macroeconomics and AP Microeconomics Study Resources',
+    default: 'AP Dojo | Free Economics Study Resources',
     template: '%s | AP Dojo',
   },
-  description: 'Unlock top AP scores with AP Dojo. Free AP Macroeconomics and AP Microeconomics study guides, cheat sheets, practice tests, and practice questions. Comprehensive exam prep resources.',
+  description: 'Free AP Macroeconomics and Microeconomics study guides, practice tests, and questions. Achieve top scores with comprehensive exam prep resources.',
   keywords: [
     'AP Macroeconomics',
     'AP Microeconomics',
@@ -37,13 +37,13 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://apdojo.com',
     siteName: 'AP Dojo',
-    title: 'AP Dojo | AP Macroeconomics and AP Microeconomics Study Resources',
-    description: 'Unlock top AP scores with AP Dojo. Free AP Macroeconomics and AP Microeconomics study guides, cheat sheets, practice tests, and practice questions.',
+    title: 'AP Dojo | Free Economics Study Resources',
+    description: 'Free AP Macroeconomics and Microeconomics study guides, practice tests, and questions. Achieve top scores with comprehensive exam prep resources.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AP Dojo | AP Macroeconomics and AP Microeconomics Study Resources',
-    description: 'Unlock top AP scores with AP Dojo. Free AP Macroeconomics and AP Microeconomics study guides, cheat sheets, practice tests, and practice questions.',
+    title: 'AP Dojo | Free Economics Study Resources',
+    description: 'Free AP Macroeconomics and Microeconomics study guides, practice tests, and questions. Achieve top scores with comprehensive exam prep resources.',
   },
   robots: {
     index: true,

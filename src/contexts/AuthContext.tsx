@@ -21,6 +21,7 @@ export function useAuthContext(): AuthContextValue {
       signup: async (email, password, isSubscribed) => { throw new Error('AuthProvider not found'); },
       login: async () => { throw new Error('AuthProvider not found'); },
       logout: async () => { throw new Error('AuthProvider not found'); },
+      resendVerificationEmail: async () => { throw new Error('AuthProvider not found'); },
       mcqAnswersData: null,
       loadingMcqData: true,
       userData: null,

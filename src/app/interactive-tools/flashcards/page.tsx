@@ -56,7 +56,7 @@ export default function FlashcardsPage() {
         <div>
           <h2 className="text-xl font-semibold mb-4">Subject Not Selected</h2>
           <p className="text-gray-600 mb-6">Please select your primary subject on the homepage to view flashcards.</p>
-          <Link href="/userHomePage" className="text-blue-600 hover:underline">
+          <Link href="/" className="text-blue-600 hover:underline">
             Go to Homepage
           </Link>
         </div>

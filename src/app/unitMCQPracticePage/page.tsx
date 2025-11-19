@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { X, Loader2, Lock } from 'lucide-react';
+import { X, Loader2, Lock, ArrowRight } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { UnitMCQs } from '@/components/unitMCQS';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems'; // Reverted import
@@ -192,6 +192,7 @@ function UnitMCQPracticeContent() {
   const [showSignupModal, setShowSignupModal] = useState(false);
   const [totalQuestionsInSet, setTotalQuestionsInSet] = useState(0);
   const [currentUnitName, setCurrentUnitName] = useState('');
+  const [showPracticeTestBanner, setShowPracticeTestBanner] = useState(false);
 
   // Calculate weakest units from MCQ answers
   useEffect(() => {
@@ -285,6 +286,14 @@ function UnitMCQPracticeContent() {
     }
     setIsVerifying(false);
   }, [user, userData, currentUnitForAccessCheck, practiceMode]);
+
+  // Show banner after 3 questions answered
+  useEffect(() => {
+    const answeredCount = Object.keys(answeredQuestions).length;
+    if (answeredCount >= 3) {
+      setShowPracticeTestBanner(true);
+    }
+  }, [answeredQuestions]);
 
   const handleAnswer = async (questionId: number, answerLetter: string, isCorrect: boolean, lessonIDS: string[]) => {
     setAnsweredQuestions(prev => ({
@@ -385,6 +394,32 @@ function UnitMCQPracticeContent() {
         onAuthSuccess={handleAuthSuccess}
       />
       <div className="min-h-screen bg-gray-50">
+        {/* Sticky Practice Test Banner */}
+        <div 
+          className={`sticky top-0 z-50 bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg transition-all duration-500 ease-out ${
+            showPracticeTestBanner 
+              ? 'translate-y-0 opacity-100' 
+              : '-translate-y-full opacity-0 pointer-events-none'
+          }`}
+        >
+          <div className="max-w-7xl mx-auto px-4 py-2">
+            <div className="flex items-center justify-center gap-4">
+              <p className="text-xs md:text-sm font-medium">
+                Ready for a full-length exam? Test your knowledge with our practice tests! <span className="text-base md:text-lg">🎯</span>
+              </p>
+              <Link href="/unit-final-practice-tests">
+                <Button 
+                  size="sm" 
+                  variant="outline"
+                  className="bg-white/10 border-white/30 text-white hover:bg-white/20 font-medium whitespace-nowrap backdrop-blur-sm"
+                >
+                  View Practice Tests
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
         <div className="max-w-7xl mx-auto px-4 py-8">
           {isLoadingQuestionSet ? (
             <div className="flex items-center justify-center min-h-[400px]">

@@ -41,7 +41,7 @@ export default function InitialUnitSelectionPage() {
         if (userDocSnap.exists()) {
           const userData = userDocSnap.data();
           if (userData.hasCompletedInitialUnitSelection) {
-            router.push('/userHomePage');
+            router.push('/');
           } else if (userData.selectedSubjects && userData.selectedSubjects.length > 0) {
             const userSubjects = userData.selectedSubjects as ('macro' | 'micro')[];
             setSubjects(userSubjects);
@@ -141,7 +141,7 @@ export default function InitialUnitSelectionPage() {
         hasCompletedInitialUnitSelection: true
       });
 
-      router.push('/userHomePage');
+      router.push('/');
     } catch (err) {
       console.error("Error saving initial unit selection:", err);
       setError('Failed to save selection. Please try again.');

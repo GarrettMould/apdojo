@@ -39,7 +39,7 @@ export function FixedSidebar() {
   const isOnSelectSubjectPage = pathname === '/select-subject';
   
   // Check if we're on the home page (for extended mode)
-  const isOnHomePage = pathname === '/' || pathname === '/userHomePage';
+  const isOnHomePage = pathname === '/';
   
   // Determine if we should show compact mode
   // Use compact mode for all pages except home page

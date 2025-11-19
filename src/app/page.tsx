@@ -6,7 +6,6 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Loader2, Play } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
-import UserHomePage from './userHomePage/page';
 import { topicBundles, TopicBundle } from '@/data/topicBundles';
 import { useRouter } from 'next/navigation';
 
@@ -63,11 +62,11 @@ function LoggedOutHomePage() {
       <div className="py-16 sm:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-5xl sm:text-6xl font-extrabold text-gray-900">
+            <h1 className="text-5xl sm:text-6xl font-extrabold text-gray-900 mb-6">
               <span className="text-blue-500">Pick a Topic.</span> Any Topic.
-            </h2>
-            <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
-              Struggling with a specific concept? Try these focused question bundles to master the key ideas.
+            </h1>
+            <p className="text-xl text-gray-700 max-w-3xl mx-auto">
+              Master <strong>AP Macroeconomics</strong> and <strong>AP Microeconomics</strong> with study resources designed to help you achieve top scores on your AP exams.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -96,7 +95,5 @@ export default function Home() {
     return <HomePageLoadingFallback />;
   }
   
-  // Temporarily defaulting to LoggedOutHomePage to allow for design review
   return <LoggedOutHomePage />;
-  // return user ? <UserHomePage /> : <LoggedOutHomePage />;
 }
