@@ -9,7 +9,7 @@ import { macroUnits as allMacroUnits, microUnits as allMicroUnits } from '@/data
 import { useAuthContext } from '@/contexts/AuthContext';
 import Link from 'next/link';
 import { keyTerms as apMacroTerms } from '@/data/apMacroTerms';
-import { unit1Whiteboards, apMacroUnit2Whiteboards, apMacroUnit3Whiteboards, apMacroUnit4Whiteboards, Whiteboard } from '@/data/whiteboards';
+import { unit1Whiteboards, apMacroUnit2Whiteboards, apMacroUnit3Whiteboards, apMacroUnit4Whiteboards, apMacroUnit5Whiteboards, Whiteboard } from '@/data/whiteboards';
 import { X, ArrowRight, Lock, ArrowLeft } from 'lucide-react';
 import { UnitMCQs } from '@/components/unitMCQS';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
@@ -31,6 +31,9 @@ const getUnitWhiteboards = (unitNumber: number): WhiteboardImage[] => {
       break;
     case 4:
       rawWhiteboards = apMacroUnit4Whiteboards;
+      break;
+    case 5:
+      rawWhiteboards = apMacroUnit5Whiteboards;
       break;
     default:
       return allContentWhiteboards.filter(wb => wb.subject === 'ap_macroeconomics' && wb.unit === unitNumber);
