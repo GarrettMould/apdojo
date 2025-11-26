@@ -8518,14 +8518,13 @@ export const allQuestions: QuestionType[] = [
                       ],
                       "correctAnswer": "B",
                       "explanation": "Technological improvements increase productivity, lowering production costs in the short run (shifting SRAS right) and increasing the economy's overall potential output in the long run (shifting LRAS right)."
-                    }
-                ]
-              
-            
-          
-        
-      
-    
-    
+                    },
   
+  // Add micro unit questions to allQuestions
+  ...microUnit2Questions.map(q => ({ ...q, subject: "ap_microeconomics" as const })),
+  ...microUnit3Questions.map(q => ({ ...q, subject: "ap_microeconomics" as const })),
+  ...microUnit4Questions.map(q => ({ ...q, subject: "ap_microeconomics" as const })),
+  ...microUnit5Questions.map(q => ({ ...q, subject: "ap_microeconomics" as const })),
+  ...microUnit6Questions.map(q => ({ ...q, subject: "ap_microeconomics" as const }))
+];
   
