@@ -1578,6 +1578,228 @@ export const keyTerms: KeyTerm[] = [
         'Formula: (MUx / Px) = (MUy / Py)',
         'If (MUx / Px) > (MUy / Py), the consumer should buy more X and less Y.'
       ]
+    }, 
+    {
+      id: 'imperfect-competition',
+      term: 'Imperfect Competition',
+      definition: 'A market structure that fails to meet the conditions of perfect competition, where firms have some control over the price.',
+      subject: 'ap_microeconomics',
+      unit: 4,
+      lessonIDs: ['4.1'],
+      subNotes: [
+        'Includes Monopoly, Oligopoly, and Monopolistic Competition.',
+        'Firms are "Price Makers" rather than "Price Takers".',
+        'The Demand curve for the firm is downward sloping.'
+      ]
+    },
+  
+    // Lesson 4.2: Monopoly
+    {
+      id: 'monopoly',
+      term: 'Monopoly',
+      definition: 'A market structure where there is only one large firm (the firm is the market) producing a unique product.',
+      subject: 'ap_microeconomics',
+      unit: 4,
+      lessonIDs: ['4.2'],
+      subNotes: [
+        'Characteristics: High barriers to entry, "price makers".',
+        'Marginal Revenue (MR) is less than Demand (Price).',
+        'There are no close substitutes for the good.'
+      ]
+    },
+    {
+      id: 'monopoly-graph-mr',
+      term: 'Marginal Revenue in Monopoly',
+      definition: 'The additional revenue from selling one more unit. In a monopoly, the MR curve lies below the Demand curve.',
+      subject: 'ap_microeconomics',
+      unit: 4,
+      lessonIDs: ['4.2'],
+      subNotes: [
+        'To sell more units, the firm must lower the price on ALL units sold, not just the last one.',
+        'MR < Price at every quantity after the first unit.'
+      ]
+    },
+    {
+      id: 'elasticity-monopoly',
+      term: 'Elasticity and Total Revenue (Monopoly)',
+      definition: 'A monopoly will only produce in the elastic range of the demand curve.',
+      subject: 'ap_microeconomics',
+      unit: 4,
+      lessonIDs: ['4.2'],
+      subNotes: [
+        'Elastic Range: MR > 0. Total Revenue increases as Price decreases.',
+        'Inelastic Range: MR < 0. Total Revenue decreases as Price decreases.',
+        'Total Revenue is maximized where MR = 0 (Unit Elastic).'
+      ]
+    },
+    {
+      id: 'monopoly-inefficiency',
+      term: 'Inefficiency of Monopoly',
+      definition: 'Monopolies are inefficient because they charge a higher price and produce a lower quantity than perfectly competitive markets.',
+      subject: 'ap_microeconomics',
+      unit: 4,
+      lessonIDs: ['4.2'],
+      subNotes: [
+        'Allocatively Inefficient: Price > Marginal Cost (P > MC).',
+        'Productive Inefficient: Price > Minimum ATC.',
+        'Creates Deadweight Loss (DWL).'
+      ]
+    },
+    {
+      id: 'natural-monopoly',
+      term: 'Natural Monopoly',
+      definition: 'A distinct type of monopoly where one firm can produce the socially optimal quantity at the lowest cost due to economies of scale.',
+      subject: 'ap_microeconomics',
+      unit: 4,
+      lessonIDs: ['4.2'],
+      subNotes: [
+        'The ATC curve falls over the relevant range of production.',
+        'It is better to have one firm because two firms would have higher average costs.'
+      ]
+    },
+    {
+      id: 'regulating-monopoly',
+      term: 'Regulating Monopolies',
+      definition: 'Government price controls used to reduce the inefficiency of natural monopolies.',
+      subject: 'ap_microeconomics',
+      unit: 4,
+      lessonIDs: ['4.2'],
+      subNotes: [
+        'Socially Optimal Price: Set P = MC (Allocative Efficiency). May cause a loss for the firm.',
+        'Fair Return Price: Set P = ATC (Normal Profit). Firm breaks even.'
+      ]
+    },
+  
+    // Lesson 4.3: Price Discrimination
+    {
+      id: 'price-discrimination',
+      term: 'Price Discrimination',
+      definition: 'The practice of selling the same product to different buyers at different prices based on their willingness to pay.',
+      subject: 'ap_microeconomics',
+      unit: 4,
+      lessonIDs: ['4.3'],
+      subNotes: [
+        'Conditions: Firm must have market power, be able to segregate the market, and prevent resale.',
+        'Result: Converts Consumer Surplus into Profit.',
+        'Perfect Price Discrimination: MR = Demand. No Deadweight Loss. Allocatively Efficient.'
+      ]
+    },
+  
+    // Lesson 4.4: Monopolistic Competition
+    {
+      id: 'monopolistic-competition',
+      term: 'Monopolistic Competition',
+      definition: 'A market structure with many sellers offering differentiated products.',
+      subject: 'ap_microeconomics',
+      unit: 4,
+      lessonIDs: ['4.4'],
+      subNotes: [
+        'Characteristics: Relatively large number of sellers, easy entry and exit, non-price competition (advertising).',
+        'Products are substitutes but not identical (e.g., fast food, furniture).'
+      ]
+    },
+    {
+      id: 'differentiation',
+      term: 'Product Differentiation',
+      definition: 'Strategies used by firms to distinguish their products from competitors, such as branding, quality, or features.',
+      subject: 'ap_microeconomics',
+      unit: 4,
+      lessonIDs: ['4.4'],
+      subNotes: [
+        'Gives the firm some control over price (Demand is downward sloping but highly elastic).'
+      ]
+    },
+    {
+      id: 'long-run-monopolistic-competition',
+      term: 'Long-Run Equilibrium (Monopolistic Competition)',
+      definition: 'In the long run, firms enter or exit until economic profit is zero.',
+      subject: 'ap_microeconomics',
+      unit: 4,
+      lessonIDs: ['4.4'],
+      subNotes: [
+        'Entry/Exit shifts the Demand curve.',
+        'Equilibrium: Price = ATC (Normal Profit), but Price > MC (Inefficient).',
+        'Demand is tangent to the ATC curve.'
+      ]
+    },
+    {
+      id: 'excess-capacity',
+      term: 'Excess Capacity',
+      definition: 'The gap between the minimum ATC output and the profit-maximizing output.',
+      subject: 'ap_microeconomics',
+      unit: 4,
+      lessonIDs: ['4.4'],
+      subNotes: [
+        'The firm could produce at a lower cost but holds back production to maximize profit.'
+      ]
+    },
+  
+    // Lesson 4.5: Oligopoly and Game Theory
+    {
+      id: 'oligopoly',
+      term: 'Oligopoly',
+      definition: 'A market structure dominated by a few large producers.',
+      subject: 'ap_microeconomics',
+      unit: 4,
+      lessonIDs: ['4.5'],
+      subNotes: [
+        'Characteristics: High barriers to entry, identical or differentiated products.',
+        'Key Feature: Mutual Interdependence (decisions depend on competitors).'
+      ]
+    },
+    {
+      id: 'game-theory',
+      term: 'Game Theory',
+      definition: 'The study of how people/firms behave in strategic situations.',
+      subject: 'ap_microeconomics',
+      unit: 4,
+      lessonIDs: ['4.5'],
+      subNotes: [
+        'Used to analyze the pricing and output decisions of oligopolies.'
+      ]
+    },
+    {
+      id: 'dominant-strategy',
+      term: 'Dominant Strategy',
+      definition: 'The best move to make regardless of what your opponent does.',
+      subject: 'ap_microeconomics',
+      unit: 4,
+      lessonIDs: ['4.5'],
+      subNotes: [
+        'Not all games have a dominant strategy.',
+        'How to identify:',
+        'For Player 1: Check each row - if one row has higher payoffs than another in every column, that row is dominant.',
+        'For Player 2: Check each column - if one column has higher payoffs than another in every row, that column is dominant.',
+        'A strategy is dominant if it yields a better payoff than all other strategies, regardless of opponent\'s choice.'
+      ]
+    },
+    {
+      id: 'nash-equilibrium',
+      term: 'Nash Equilibrium',
+      definition: 'The outcome that occurs when both firms make decisions simultaneously and have no incentive to change.',
+      subject: 'ap_microeconomics',
+      unit: 4,
+      lessonIDs: ['4.5'],
+      subNotes: [
+        'The "optimal" outcome given the rival\'s choice.',
+        'How to identify:',
+        'Step 1: For each cell, check if Player 1\'s payoff is the highest in that column (best response to Player 2\'s strategy).',
+        'Step 2: For the same cell, check if Player 2\'s payoff is the highest in that row (best response to Player 1\'s strategy).',
+        'If both conditions are true, that cell is a Nash equilibrium.',
+        'A Nash equilibrium can exist even if neither player has a dominant strategy.'
+      ]
+    },
+    {
+      id: 'collusion-cartel',
+      term: 'Collusion / Cartel',
+      definition: 'A group of producers that create an agreement to fix prices high, effectively acting as a monopoly.',
+      subject: 'ap_microeconomics',
+      unit: 4,
+      lessonIDs: ['4.5'],
+      subNotes: [
+        'They restrict output to maximize collective profit.',
+        'Cartels are unstable because firms have an incentive to cheat (lower price) to gain market share.'
+      ]
     }
     // Add terms for other units here...
   ];

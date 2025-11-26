@@ -1439,6 +1439,118 @@ const macroUnit6Questions = [
 
 
 
+// Microeconomics Unit 1 Practice Problems
+const microUnit1Questions = [
+  // Lesson 1.1: Scarcity (copied from macro 1.1)
+  {
+    "id": 200,
+    "unit": 1,
+    "lessonIDS": ["1.1"], 
+    "unitName": "Basic Economic Concepts",
+    "question": "The fundamental problem of economics that arises from limited resources and unlimited wants is known as:",
+    "image": null,
+    "options": [
+      "Opportunity cost.",
+      "Comparative advantage.",
+      "Scarcity.",
+      "Equilibrium.",
+      "Efficiency."
+    ],
+    "correctAnswer": "C",
+    "explanation": "Scarcity is the core economic problem referring to the conflict between society's unlimited wants and its limited resources, necessitating choices about resource allocation."
+  },
+  // Lesson 1.2: (left empty)
+  // Lesson 1.3: Opportunity Cost and PPC (copied from macro 1.2)
+  {
+    "id": 201,
+    "unit": 1,
+    "lessonIDS": ["1.3"], 
+    "unitName": "Basic Economic Concepts",
+    "question": "The value of the best alternative forgone when a choice is made is called:",
+    "image": null,
+    "options": [
+      "Explicit cost.",
+      "Marginal cost.",
+      "Scarcity.",
+      "Opportunity cost.",
+      "Comparative cost."
+    ],
+    "correctAnswer": "D",
+    "explanation": "Opportunity cost is the value of the next best alternative that must be sacrificed when making a decision. It highlights the trade-offs inherent in every choice."
+  },
+  {
+    "id": 202,
+    "unit": 1,
+    "lessonIDS": ["1.3"], 
+    "unitName": "Basic Economic Concepts",
+    "question": "A point located inside the Production Possibilities Curve (PPC) indicates that:",
+    "image": null,
+    "options": [
+      "The economy is operating at full employment.",
+      "Resources are being used inefficiently or are unemployed.",
+      "The economy has experienced economic growth.",
+      "The combination of goods is unattainable with current resources.",
+      "The economy is producing beyond its capacity."
+    ],
+    "correctAnswer": "B",
+    "explanation": "Points inside the PPC represent attainable production levels but signify inefficiency, meaning resources (like labor or capital) are either unemployed or not being used to their full potential."
+  },
+  {
+    "id": 203,
+    "unit": 1,
+    "lessonIDS": ["1.3"], 
+    "unitName": "Basic Economic Concepts",
+    "question": "Which of the following would cause an outward shift of a nation's Production Possibilities Curve (PPC)?",
+    "image": null,
+    "options": [
+      "A decrease in unemployment.",
+      "An increase in the general price level.",
+      "A natural disaster destroying resources.",
+      "An improvement in technology applicable to production.",
+      "A shift in consumer preferences."
+    ],
+    "correctAnswer": "D",
+    "explanation": "An outward shift of the PPC signifies economic growth. This can result from increases in resource availability (land, labor, capital) or improvements in technology that allow more output to be produced with the same resources."
+  },
+  // Lesson 1.4: Comparative Advantage (copied from macro 1.3)
+  {
+    "id": 204,
+    "unit": 1,
+    "lessonIDS": ["1.4"], 
+    "unitName": "Basic Economic Concepts",
+    "question": "Country A can produce 10 cars or 20 computers. Country B can produce 8 cars or 12 computers. Which country has the comparative advantage in producing cars?",
+    "image": null,
+    "options": [
+      "Country A.",
+      "Country B.",
+      "Neither country.",
+      "Both countries.",
+      "Cannot be determined from the information given."
+    ],
+    "correctAnswer": "B",
+    "explanation": "To find comparative advantage, calculate opportunity costs. Country A's opportunity cost of 1 car is 2 computers (20/10). Country B's opportunity cost of 1 car is 1.5 computers (12/8). Since Country B has the lower opportunity cost for cars, it has the comparative advantage."
+  },
+  {
+    "id": 205,
+    "unit": 1,
+    "lessonIDS": ["1.4"], 
+    "unitName": "Basic Economic Concepts",
+    "question": "Specialization and trade based on comparative advantage lead to:",
+    "image": null,
+    "options": [
+      "Increased scarcity.",
+      "A decrease in total world production.",
+      "Higher opportunity costs for all nations.",
+      "An increase in total world production and consumption possibilities.",
+      "A shift inward of the Production Possibilities Curve for trading nations."
+    ],
+    "correctAnswer": "D",
+    "explanation": "When countries specialize in goods where they have a lower opportunity cost (comparative advantage) and trade, global efficiency increases. This results in higher total world output and allows countries to consume beyond their individual production possibilities."
+  }
+  // Lesson 1.5: (left empty)
+  // Lesson 1.6: (left empty)
+]
+
 // Microeconomics Unit 2 Practice Problems
 const microUnit2Questions = [
   {
@@ -8521,6 +8633,7 @@ export const allQuestions: QuestionType[] = [
                     },
   
   // Add micro unit questions to allQuestions
+  ...microUnit1Questions.map(q => ({ ...q, subject: "ap_microeconomics" as const })),
   ...microUnit2Questions.map(q => ({ ...q, subject: "ap_microeconomics" as const })),
   ...microUnit3Questions.map(q => ({ ...q, subject: "ap_microeconomics" as const })),
   ...microUnit4Questions.map(q => ({ ...q, subject: "ap_microeconomics" as const })),

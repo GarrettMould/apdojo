@@ -141,6 +141,439 @@ export const whiteboardImages: WhiteboardImage[] = [
     title: 'Total Surplus'
   },
 
+  // AP Microeconomics Unit 1 Whiteboards (from Macro Unit 1)
+  // Lesson 1.1: Scarcity
+  {
+    id: '16',
+    subject: 'ap_microeconomics',
+    unit: 1,
+    lessonIDs: ['1.1'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.1_scarcity 10.jpg',
+    title: 'Scarcity 10'
+  },
+  {
+    id: '17',
+    subject: 'ap_microeconomics',
+    unit: 1,
+    lessonIDs: ['1.1'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.1_scarcity 13.jpg',
+    title: 'Scarcity 13'
+  },
+  {
+    id: '18',
+    subject: 'ap_microeconomics',
+    unit: 1,
+    lessonIDs: ['1.1'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.1_scarcity 15.jpg',
+    title: 'Scarcity 15'
+  },
+  {
+    id: '19',
+    subject: 'ap_microeconomics',
+    unit: 1,
+    lessonIDs: ['1.1'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.1_scarcity 16.jpg',
+    title: 'Scarcity 16'
+  },
+  {
+    id: '20',
+    subject: 'ap_microeconomics',
+    unit: 1,
+    lessonIDs: ['1.1'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.1_scarcity 17.jpg',
+    title: 'Scarcity 17'
+  },
+  {
+    id: '21',
+    subject: 'ap_microeconomics',
+    unit: 1,
+    lessonIDs: ['1.1'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.1_scarcity 18.jpg',
+    title: 'Scarcity 18'
+  },
+  {
+    id: '22',
+    subject: 'ap_microeconomics',
+    unit: 1,
+    lessonIDs: ['1.1'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.1_scarcity 19.jpg',
+    title: 'Scarcity 19'
+  },
+  {
+    id: '23',
+    subject: 'ap_microeconomics',
+    unit: 1,
+    lessonIDs: ['1.1'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.1_scarcity 7.jpg',
+    title: 'Scarcity 7'
+  },
+  // Lesson 1.3: Comparative Advantage
+  {
+    id: '24',
+    subject: 'ap_microeconomics',
+    unit: 1,
+    lessonIDs: ['1.3'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.3_ComparativeA 15.jpg',
+    title: 'Comparative Advantage 15'
+  },
+  {
+    id: '25',
+    subject: 'ap_microeconomics',
+    unit: 1,
+    lessonIDs: ['1.3'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.3_ComparativeA 20.jpg',
+    title: 'Comparative Advantage 20'
+  },
+  {
+    id: '26',
+    subject: 'ap_microeconomics',
+    unit: 1,
+    lessonIDs: ['1.3'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.3_ComparativeA 24.jpg',
+    title: 'Comparative Advantage 24'
+  },
+  {
+    id: '27',
+    subject: 'ap_microeconomics',
+    unit: 1,
+    lessonIDs: ['1.3'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.3_ComparativeA 25.jpg',
+    title: 'Comparative Advantage 25'
+  },
+  {
+    id: '28',
+    subject: 'ap_microeconomics',
+    unit: 1,
+    lessonIDs: ['1.3'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.3_ComparativeA 31.jpg',
+    title: 'Comparative Advantage 31'
+  },
+  {
+    id: '29',
+    subject: 'ap_microeconomics',
+    unit: 1,
+    lessonIDs: ['1.3'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.3_ComparativeA 38.jpg',
+    title: 'Comparative Advantage 38'
+  },
+  {
+    id: '30',
+    subject: 'ap_microeconomics',
+    unit: 1,
+    lessonIDs: ['1.3'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.3_ComparativeA 6.jpg',
+    title: 'Comparative Advantage 6'
+  },
+
+  // AP Microeconomics Unit 2 Whiteboards (from Macro Unit 1)
+  // Lesson 2.1: Demand (from Macro 1.4)
+  {
+    id: '31',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.1'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.4_Demand 10.jpg',
+    title: 'Demand 10'
+  },
+  {
+    id: '32',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.1'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.4_Demand 12.jpg',
+    title: 'Demand 12'
+  },
+  {
+    id: '33',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.1'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.4_Demand 13.jpg',
+    title: 'Demand 13'
+  },
+  {
+    id: '34',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.1'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.4_Demand 15.jpg',
+    title: 'Demand 15'
+  },
+  {
+    id: '35',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.1'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.4_Demand 18.jpg',
+    title: 'Demand 18'
+  },
+  {
+    id: '36',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.1'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.4_Demand 22.jpg',
+    title: 'Demand 22'
+  },
+  {
+    id: '37',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.1'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.4_Demand 27.jpg',
+    title: 'Demand 27'
+  },
+  {
+    id: '38',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.1'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.4_Demand 30.jpg',
+    title: 'Demand 30'
+  },
+  {
+    id: '39',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.1'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.4_Demand 33.jpg',
+    title: 'Demand 33'
+  },
+  {
+    id: '40',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.1'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.4_Demand 6.jpg',
+    title: 'Demand 6'
+  },
+  {
+    id: '41',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.1'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.4_Demand 8.jpg',
+    title: 'Demand 8'
+  },
+  {
+    id: '42',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.1'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.4_Demand 9.jpg',
+    title: 'Demand 9'
+  },
+  {
+    id: '43',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.1'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.4_Demand.jpg',
+    title: 'Demand'
+  },
+  {
+    id: '44',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.1'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.4_shifts1.jpg',
+    title: 'Demand Shifts'
+  },
+  // Lesson 2.2: Supply (from Macro 1.5)
+  {
+    id: '45',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.2'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.5_supply 10.jpg',
+    title: 'Supply 10'
+  },
+  {
+    id: '46',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.2'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.5_supply 13.jpg',
+    title: 'Supply 13'
+  },
+  {
+    id: '47',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.2'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.5_supply 15.jpg',
+    title: 'Supply 15'
+  },
+  {
+    id: '48',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.2'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.5_supply 17.jpg',
+    title: 'Supply 17'
+  },
+  {
+    id: '49',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.2'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.5_supply 19.jpg',
+    title: 'Supply 19'
+  },
+  {
+    id: '50',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.2'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.5_supply 21.jpg',
+    title: 'Supply 21'
+  },
+  {
+    id: '51',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.2'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.5_supply 24.jpg',
+    title: 'Supply 24'
+  },
+  {
+    id: '52',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.2'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.5_supply 27.jpg',
+    title: 'Supply 27'
+  },
+  {
+    id: '53',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.2'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.5_supply 30.jpg',
+    title: 'Supply 30'
+  },
+  {
+    id: '54',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.2'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.5_supply 33.jpg',
+    title: 'Supply 33'
+  },
+  {
+    id: '55',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.2'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.5_supply 36.jpg',
+    title: 'Supply 36'
+  },
+  {
+    id: '56',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.2'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.5_supply 4.jpg',
+    title: 'Supply 4'
+  },
+  {
+    id: '57',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.2'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.5_supply 5.jpg',
+    title: 'Supply 5'
+  },
+  // Lesson 2.6 & 2.7: Market Equilibrium (from Macro 1.6)
+  {
+    id: '58',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.6', '2.7'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.6_Equilibrium, Disequilibrium, and Changes in Equilibrium 1 copy 10.jpg',
+    title: 'Equilibrium 10'
+  },
+  {
+    id: '59',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.6', '2.7'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.6_Equilibrium, Disequilibrium, and Changes in Equilibrium 1 copy 11.jpg',
+    title: 'Equilibrium 11'
+  },
+  {
+    id: '60',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.6', '2.7'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.6_Equilibrium, Disequilibrium, and Changes in Equilibrium 1 copy 12.jpg',
+    title: 'Equilibrium 12'
+  },
+  {
+    id: '61',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.6', '2.7'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.6_Equilibrium, Disequilibrium, and Changes in Equilibrium 1 copy 13.jpg',
+    title: 'Equilibrium 13'
+  },
+  {
+    id: '62',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.6', '2.7'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.6_Equilibrium, Disequilibrium, and Changes in Equilibrium 1 copy 15.jpg',
+    title: 'Equilibrium 15'
+  },
+  {
+    id: '63',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.6', '2.7'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.6_Equilibrium, Disequilibrium, and Changes in Equilibrium 1 copy 16.jpg',
+    title: 'Equilibrium 16'
+  },
+  {
+    id: '64',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.6', '2.7'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.6_Equilibrium, Disequilibrium, and Changes in Equilibrium 1 copy 18.jpg',
+    title: 'Equilibrium 18'
+  },
+  {
+    id: '65',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.6', '2.7'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.6_Equilibrium, Disequilibrium, and Changes in Equilibrium 1 copy 20.jpg',
+    title: 'Equilibrium 20'
+  },
+  {
+    id: '66',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.6', '2.7'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.6_Equilibrium, Disequilibrium, and Changes in Equilibrium 1 copy 23.jpg',
+    title: 'Equilibrium 23'
+  },
+  {
+    id: '67',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.6', '2.7'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.6_Equilibrium, Disequilibrium, and Changes in Equilibrium 1 copy 7.jpg',
+    title: 'Equilibrium 7'
+  },
+  {
+    id: '68',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIDs: ['2.6', '2.7'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.6_Equilibrium, Disequilibrium, and Changes in Equilibrium 1 copy 9.jpg',
+    title: 'Equilibrium 9'
+  },
+
   // ... more whiteboard objects can be added here
 ];
 
