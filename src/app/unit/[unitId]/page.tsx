@@ -9,6 +9,7 @@ import { macroUnits as allMacroUnits, microUnits as allMicroUnits } from '@/data
 import { useAuthContext } from '@/contexts/AuthContext';
 import Link from 'next/link';
 import { keyTerms as apMacroTerms } from '@/data/apMacroTerms';
+import { keyTerms as apMicroTerms } from '@/data/apMicroTerms';
 import { unit1Whiteboards, apMacroUnit2Whiteboards, apMacroUnit3Whiteboards, apMacroUnit4Whiteboards, apMacroUnit5Whiteboards, Whiteboard } from '@/data/whiteboards';
 import { X, ArrowRight, Lock, ArrowLeft } from 'lucide-react';
 import { UnitMCQs } from '@/components/unitMCQS';
@@ -58,7 +59,7 @@ interface LessonContent {
 export default function UnitPage() {
   const params = useParams();
   const router = useRouter(); // Initialize useRouter
-  const { user, userData } = useAuthContext(); // Correctly destructure userData
+  const { user, userData, selectedSubject } = useAuthContext(); // Correctly destructure userData and selectedSubject
   
   const [activeUnit, setActiveUnit] = useState((params.unitId as string) || '1');
   const [selectedWhiteboard, setSelectedWhiteboard] = useState<WhiteboardImage | null>(null);
@@ -69,7 +70,6 @@ export default function UnitPage() {
   const [answeredQuestions, setAnsweredQuestions] = useState<Record<number, any>>({});
   
   const activeUnitNum = parseInt(activeUnit as string);
-  const selectedSubject = (user && userData?.selectedSubject) ? userData.selectedSubject : 'macro';
   const subjectFilter = selectedSubject === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics';
 
   useEffect(() => {
@@ -118,7 +118,7 @@ export default function UnitPage() {
   // --- Data Grouping Logic ---
   let unitKeyTerms: KeyTerm[] = selectedSubject === 'macro' 
     ? apMacroTerms.filter(term => term.unit === activeUnitNum)
-    : allContentKeyTerms.filter(term => term.subject === subjectFilter && term.unit === activeUnitNum);
+    : apMicroTerms.filter(term => term.unit === activeUnitNum);
   
   let unitWhiteboards: WhiteboardImage[] = selectedSubject === 'macro'
     ? getUnitWhiteboards(activeUnitNum)
@@ -221,6 +221,7 @@ export default function UnitPage() {
         {(() => {
           const currentUnit = unitsToDisplay.find(u => u.number === activeUnitNum);
           const unitPrice = currentUnit?.price || 4.99;
+          const isMicro = selectedSubject === 'micro';
           
           return (
             <div className={`mb-8 rounded-xl p-6 shadow-md border ${
@@ -237,17 +238,26 @@ export default function UnitPage() {
                     Test your knowledge with a full-length practice test.
                   </p>
                 </div>
-                <Link 
-                  href={`/purchase/mcq-practice?units=${activeUnitNum}&total=${unitPrice.toFixed(2)}&bundle=false`}
-                  className={`inline-flex items-center gap-2 px-6 py-3 text-white font-semibold rounded-lg transition-colors shadow-md hover:shadow-lg ${
-                    themeColor === 'blue'
-                      ? 'bg-blue-600 hover:bg-blue-700'
-                      : 'bg-green-600 hover:bg-green-700'
-                  }`}
-                >
-                  Take the Unit {activeUnitNum} Practice Test now
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
+                {isMicro ? (
+                  <button
+                    disabled
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-gray-400 text-white font-semibold rounded-lg cursor-not-allowed"
+                  >
+                    Coming Soon
+                  </button>
+                ) : (
+                  <Link 
+                    href={`/purchase/mcq-practice?units=${activeUnitNum}&total=${unitPrice.toFixed(2)}&bundle=false`}
+                    className={`inline-flex items-center gap-2 px-6 py-3 text-white font-semibold rounded-lg transition-colors shadow-md hover:shadow-lg ${
+                      themeColor === 'blue'
+                        ? 'bg-blue-600 hover:bg-blue-700'
+                        : 'bg-green-600 hover:bg-green-700'
+                    }`}
+                  >
+                    Take the Unit {activeUnitNum} Practice Test now
+                    <ArrowRight className="w-5 h-5" />
+                  </Link>
+                )}
               </div>
             </div>
           );

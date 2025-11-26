@@ -152,6 +152,11 @@ export interface AuthContextValue {
   showSignupModal: boolean;
   setShowSignupModal: React.Dispatch<React.SetStateAction<boolean>>;
   // --- END: Modal State and Setters ---
+  // --- ADD: Subject State and Setters ---
+  selectedSubject: 'macro' | 'micro';
+  setSelectedSubject: (subject: 'macro' | 'micro') => void;
+  toggleSubject: () => void;
+  // --- END: Subject State and Setters ---
 }
 
 // --- ADD: Helper Function to Calculate Unit Performance ---
@@ -228,6 +233,47 @@ export function useAuth() {
   const [unitPerformanceStats, setUnitPerformanceStats] = useState<UnitPerformanceStat[] | null>(null);
   const [loadingUnitPerformance, setLoadingUnitPerformance] = useState(true);
   // --- END State ---
+
+  // --- ADD State for Selected Subject (works for both logged-in and guests) ---
+  const [selectedSubject, setSelectedSubjectState] = useState<'macro' | 'micro'>('macro');
+  
+  // Initialize subject from userData or localStorage
+  useEffect(() => {
+    if (user && userData?.selectedSubject) {
+      setSelectedSubjectState(userData.selectedSubject);
+    } else if (!user && typeof window !== 'undefined') {
+      const storedSubject = localStorage.getItem('guestAPSubject') as 'macro' | 'micro' | null;
+      if (storedSubject) {
+        setSelectedSubjectState(storedSubject);
+      }
+    }
+  }, [user, userData?.selectedSubject]);
+
+  // Function to set selected subject (updates both state and storage)
+  const setSelectedSubject = async (subject: 'macro' | 'micro') => {
+    setSelectedSubjectState(subject);
+    if (user) {
+      // Update in Firestore for logged-in users
+      try {
+        const userDocRef = doc(db, 'users', user.uid);
+        await setDoc(userDocRef, { selectedSubject: subject }, { merge: true });
+      } catch (error) {
+        console.error('[useAuth] Error updating selected subject:', error);
+      }
+    } else {
+      // Store in localStorage for guests
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('guestAPSubject', subject);
+      }
+    }
+  };
+
+  // Function to toggle between macro and micro
+  const toggleSubject = () => {
+    const newSubject = selectedSubject === 'macro' ? 'micro' : 'macro';
+    setSelectedSubject(newSubject);
+  };
+  // --- END Subject State ---
 
   // --- Refs for unsubscribers ---
   const unsubscribeAnswersRef = useRef<(() => void) | null>(null);
@@ -443,7 +489,7 @@ export function useAuth() {
       }
       setLoading(false);
       // Return the full context object to satisfy the type
-      return { 
+        return { 
         user: newUser, 
         loading: false, 
         login, 
@@ -468,7 +514,10 @@ export function useAuth() {
         showLoginModal,
         setShowLoginModal,
         showSignupModal,
-        setShowSignupModal
+        setShowSignupModal,
+        selectedSubject,
+        setSelectedSubject,
+        toggleSubject
       };
     } catch (error) {
       console.error("Signup failed:", error);
@@ -511,7 +560,10 @@ export function useAuth() {
           showLoginModal,
           setShowLoginModal,
           showSignupModal,
-          setShowSignupModal
+          setShowSignupModal,
+          selectedSubject,
+          setSelectedSubject,
+          toggleSubject
         };
     } catch (error) {
         console.error("Login failed:", error);
@@ -568,7 +620,10 @@ export function useAuth() {
     showLoginModal,
     setShowLoginModal,
     showSignupModal,
-    setShowSignupModal
+    setShowSignupModal,
+    selectedSubject,
+    setSelectedSubject,
+    toggleSubject
   };
 
   return value;

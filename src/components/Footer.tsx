@@ -31,7 +31,7 @@ export function Footer() {
             <div className="flex flex-col gap-3">
               <span className="text-sm font-bold text-gray-900">Menu</span>
               <Link 
-                href="/select-practice-units?subject=macro" 
+                href="/select-practice-units" 
                 className="text-sm text-gray-500 hover:text-blue-600 transition-colors"
               >
                 MCQ Practice

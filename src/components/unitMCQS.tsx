@@ -337,7 +337,7 @@ const QuestionCard = ({
       {showInternalOverlay && (
         <div className="absolute inset-0 bg-white bg-opacity-80 backdrop-blur-sm z-10 flex items-center justify-center p-4 rounded-lg">
           <div className="text-center">
-            <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-4" />
+            <Loader2 className={`h-8 w-8 animate-spin mx-auto mb-4 ${subject === 'macro' ? 'text-blue-600' : 'text-green-600'}`} />
             <p className="text-lg font-semibold text-gray-700">Loading options...</p>
             {/* Or a message like: "Please complete your selection via the plan modal." */}
           </div>
@@ -379,7 +379,7 @@ const QuestionCard = ({
               </div>
             </div>
             {/* Explanation Box */}
-            <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <div className="p-4 bg-green-50 rounded-lg border border-green-200">
               <h4 className="font-semibold text-gray-900 mb-2 text-sm">Explanation</h4>
               <p className="text-gray-900">{aiExplanation}</p>
             </div>
@@ -760,7 +760,7 @@ export function UnitMCQs({
             <div className="bg-white border border-gray-200 rounded-lg shadow-md p-4">
               <div className="flex items-center justify-between">
                 <div className="text-center">
-                  <div className="text-4xl font-bold text-blue-600 mb-1">
+                  <div className={`text-4xl font-bold mb-1 ${subject === 'macro' ? 'text-blue-600' : 'text-green-600'}`}>
                     {currentUnit}
                   </div>
                   <div className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
@@ -773,10 +773,10 @@ export function UnitMCQs({
                     const nextUnit = currentUnit === 1 ? 2 : 1;
                     onUnitChange(nextUnit);
                   }}
-                  className="p-3 bg-blue-100 hover:bg-blue-200 rounded-full transition-all duration-200 group hover:scale-110"
+                  className={`p-3 rounded-full transition-all duration-200 group hover:scale-110 ${subject === 'macro' ? 'bg-blue-100 hover:bg-blue-200' : 'bg-green-100 hover:bg-green-200'}`}
                   title={`Switch to Unit ${currentUnit === 1 ? 2 : 1}`}
                 >
-                  <ChevronDown className={`w-5 h-5 text-blue-600 transition-transform duration-300 ${
+                  <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${subject === 'macro' ? 'text-blue-600' : 'text-green-600'} ${
                     currentUnit === 1 ? 'rotate-0' : 'rotate-180'
                   }`} />
                 </button>
@@ -811,10 +811,16 @@ export function UnitMCQs({
         <div className="w-full lg:w-2/5 bg-white rounded-lg shadow-md border border-gray-200 p-4 lg:p-6 flex flex-col h-full">
           {/* Top Section: Headline, Tags, Navigation */}
           <div className="mb-6"> {/* Reduced bottom margin */} 
-            <div className="flex items-center gap-4 mb-3"> {/* Added bottom margin */}
+            <div className="flex items-center gap-4 mb-3"> {/* Added bottom margin */} 
               <h3 className="font-extrabold tracking-tight text-gray-900 text-2xl">
-                  <span className="text-blue-600">Unit MCQ</span> Practice
+                  <span className={subject === 'macro' ? 'text-blue-600' : 'text-green-600'}>Unit MCQ</span> Practice
               </h3>
+              {/* Subject Pill */}
+              <span className={`px-3 py-1 rounded-md text-sm font-medium bg-gray-100 ${
+                subject === 'macro' ? 'text-blue-600' : 'text-green-600'
+              }`}>
+                AP {subject === 'macro' ? 'Macro' : 'Micro'}
+              </span>
               
 
               {/* Keep dropdown for now, might remove later if tags are sufficient */}
@@ -822,7 +828,7 @@ export function UnitMCQs({
                 <div className="relative" ref={dropdownRef}>
                   <button
                     onClick={() => setIsUnitDropdownOpen(!isUnitDropdownOpen)}
-                    className="p-1.5 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition-colors"
+                    className={`p-1.5 rounded-full text-white transition-colors ${subject === 'macro' ? 'bg-blue-500 hover:bg-blue-600' : 'bg-green-500 hover:bg-green-600'}`}
                   >
                     <Triangle className="w-2 h-2 rotate-180 fill-current" />
                   </button>
@@ -837,7 +843,7 @@ export function UnitMCQs({
                             disabled={isLocked}
                             className={`w-full text-left px-4 py-2 text-sm transition-colors flex items-center justify-between ${
                               currentUnit === unit.number
-                                ? 'bg-blue-50 text-blue-600'
+                                ? subject === 'macro' ? 'bg-blue-50 text-blue-600' : 'bg-green-50 text-green-600'
                                 : isLocked
                                 ? 'text-gray-400 bg-gray-50 cursor-not-allowed'
                                 : 'text-gray-700 hover:bg-gray-50'
@@ -869,14 +875,14 @@ export function UnitMCQs({
               <button
                 onClick={handlePreviousQuestion}
                 disabled={currentQuestionIndex === 0}
-                className={`flex-1 p-2 rounded-md font-semibold text-sm transition-colors bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed`}
+                className={`flex-1 p-2 rounded-md font-semibold text-sm transition-colors text-white disabled:bg-gray-300 disabled:cursor-not-allowed ${subject === 'macro' ? 'bg-blue-500 hover:bg-blue-600' : 'bg-green-500 hover:bg-green-600'}`}
               >
                 Previous
               </button>
               <button
                 onClick={handleNextQuestion}
                 disabled={currentQuestionIndex === totalQuestions - 1 || totalQuestions === 0}
-                className={`flex-1 p-2 rounded-md font-semibold text-sm transition-colors bg-blue-500 text-white hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed`}
+                className={`flex-1 p-2 rounded-md font-semibold text-sm transition-colors text-white disabled:bg-gray-300 disabled:cursor-not-allowed ${subject === 'macro' ? 'bg-blue-500 hover:bg-blue-600' : 'bg-green-500 hover:bg-green-600'}`}
               >
                 Next
               </button>
@@ -926,8 +932,8 @@ export function UnitMCQs({
               );
             })()}
 
-            {/* Video Lessons - Show based on question's lesson IDs */}
-            {currentQuestion?.lessonIDS && currentQuestion.lessonIDS.length > 0 && (
+            {/* Video Lessons - Show based on question's lesson IDs (only for Macro) */}
+            {subject !== 'micro' && currentQuestion?.lessonIDS && currentQuestion.lessonIDS.length > 0 && (
               <div className="space-y-2">
                 {(() => {
                   const lessonId = currentQuestion.lessonIDS[0]; // Take the first lesson ID
@@ -947,7 +953,7 @@ export function UnitMCQs({
                           className="w-full p-3 rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 bg-white hover:bg-gray-50 group block"
                         >
                           <div className="flex items-center gap-3 justify-start">
-                            <div className="p-1.5 rounded-lg bg-green-100 text-green-600 group-hover:bg-green-200 transition-colors">
+                            <div className={`p-1.5 rounded-lg group-hover:transition-colors ${subject === 'macro' ? 'bg-blue-100 text-blue-600 group-hover:bg-blue-200' : 'bg-green-100 text-green-600 group-hover:bg-green-200'}`}>
                               <Play className="w-5 h-5" />
                             </div>
                             <div className="flex-1 min-w-0">
@@ -981,7 +987,7 @@ export function UnitMCQs({
                   disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white`}
               >
                 <div className="flex items-center gap-3 justify-start">
-                  <div className={`p-1.5 rounded-lg text-white transition-colors ${explanationError ? 'bg-red-500 group-hover:bg-red-600' : 'bg-blue-500 group-hover:bg-blue-600'} group-disabled:bg-gray-400`}>
+                  <div className={`p-1.5 rounded-lg text-white transition-colors ${explanationError ? 'bg-red-500 group-hover:bg-red-600' : subject === 'macro' ? 'bg-blue-500 group-hover:bg-blue-600' : 'bg-green-500 group-hover:bg-green-600'} group-disabled:bg-gray-400`}>
                     {isLoadingExplanation ? (
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     ) : (
@@ -1021,7 +1027,7 @@ export function UnitMCQs({
                  href={`/select-practice-units?subject=${subject}`}
                  className="inline-flex items-center justify-center w-full text-base text-gray-900 hover:underline" /* Increased size */ 
              >
-                 <RefreshCw className="w-5 h-5 mr-2 text-blue-600" /> {/* Kept icon blue, increased size */} 
+                 <RefreshCw className={`w-5 h-5 mr-2 ${subject === 'macro' ? 'text-blue-600' : 'text-green-600'}`} /> 
                  Change Units
              </Link>
           </div>

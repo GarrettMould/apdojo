@@ -129,7 +129,7 @@ function AccessDenied({ unitId, subject }: { unitId: string, subject: string }) 
           href={`/purchase/mcq-practice?units=${unitId}&total=${price}&subject=${subject}`}
           className="inline-block"
         >
-          <Button size="lg" className="w-full bg-blue-500 hover:bg-blue-600">
+          <Button size="lg" className={`w-full ${subject === 'macro' ? 'bg-blue-500 hover:bg-blue-600' : 'bg-green-500 hover:bg-green-600'}`}>
             Purchase Unit {unitId} Test
           </Button>
         </Link>
@@ -364,7 +364,7 @@ function UnitMCQPracticeContent() {
   if (isVerifying) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
+        <Loader2 className={`h-12 w-12 animate-spin ${subject === 'macro' ? 'text-blue-500' : 'text-green-500'}`} />
       </div>
     );
   }
@@ -396,7 +396,7 @@ function UnitMCQPracticeContent() {
       <div className="min-h-screen bg-gray-50">
         {/* Sticky Practice Test Banner */}
         <div 
-          className={`sticky top-0 z-50 bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg transition-all duration-500 ease-out ${
+          className={`sticky top-0 z-50 ${subject === 'macro' ? 'bg-gradient-to-r from-blue-600 to-blue-700' : 'bg-gradient-to-r from-green-600 to-green-700'} text-white shadow-lg transition-all duration-500 ease-out ${
             showPracticeTestBanner 
               ? 'translate-y-0 opacity-100' 
               : '-translate-y-full opacity-0 pointer-events-none'
@@ -423,7 +423,7 @@ function UnitMCQPracticeContent() {
         <div className="max-w-7xl mx-auto px-4 py-8">
           {isLoadingQuestionSet ? (
             <div className="flex items-center justify-center min-h-[400px]">
-              <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
+              <Loader2 className={`h-12 w-12 animate-spin ${subject === 'macro' ? 'text-blue-500' : 'text-green-500'}`} />
             </div>
           ) : questionsForPractice.length === 0 ? (
             <div className="text-center py-12">

@@ -41,6 +41,9 @@ export function useAuthContext(): AuthContextValue {
       setShowLoginModal: () => {},
       showSignupModal: false,
       setShowSignupModal: () => {},
+      selectedSubject: 'macro',
+      setSelectedSubject: () => {},
+      toggleSubject: () => {},
     }
   }
   return context

@@ -11,17 +11,10 @@ import { useAuthContext } from '@/contexts/AuthContext';
 function SelectPracticeUnitsContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { lastSelectedPracticeUnits, setLastSelectedPracticeUnits } = useAuthContext();
+    const { lastSelectedPracticeUnits, setLastSelectedPracticeUnits, selectedSubject } = useAuthContext();
     const { user } = useAuthContext();
     
-    // Get subject from URL params (only for logged-in users)
-    const getEffectiveSubject = () => {
-        const urlSubject = searchParams.get('subject');
-        if (urlSubject) return urlSubject;
-        return null;
-    };
-
-    const subject = getEffectiveSubject();
+    const subject = selectedSubject;
 
     const [selectedUnits, setSelectedUnits] = useState<number[]>([]);
     const [unitsData, setUnitsData] = useState<UnitDetailsType[]>([]);
@@ -32,8 +25,6 @@ function SelectPracticeUnitsContent() {
     }, []);
 
     useEffect(() => {
-        if (!subject) return; // Early return if no subject
-        
         setIsLoading(true);
         const data = (subject === 'micro' ? allMicroCheatSheets : allMacroCheatSheets).slice(0, 6);
         setUnitsData(data);
@@ -79,24 +70,18 @@ function SelectPracticeUnitsContent() {
         }
     };
 
-    // Show loading if no subject available
-    if (!subject) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-blue-500"/>
-            </div>
-        );
-    }
 
     if (isLoading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <Loader2 className="h-8 w-8 animate-spin text-blue-500"/>
+                <Loader2 className={`h-8 w-8 animate-spin ${subject === 'macro' ? 'text-blue-500' : 'text-green-500'}`}/>
             </div>
         );
     }
 
     const displayUnits = unitsData.slice(0, 6);
+    const isMicro = subject === 'micro';
+    const themeColor = isMicro ? 'green' : 'blue';
 
     return (
         <div className="min-h-screen bg-gray-50 py-2 px-4 sm:px-6 lg:px-8 flex flex-col justify-center">
@@ -104,7 +89,7 @@ function SelectPracticeUnitsContent() {
                 {/* Header */}
                 <div className="text-center mb-4">
                     <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight">
-                        Choose Your <span className="text-blue-500">Units</span>
+                        Choose Your <span className={isMicro ? 'text-green-500' : 'text-blue-500'}>Units</span>
                     </h1>
                     <p className="mt-4 text-xl text-gray-600 max-w-2xl mx-auto">
                         Select the {subject === 'micro' ? 'Microeconomics' : 'Macroeconomics'} units you want to focus on.
@@ -121,15 +106,23 @@ function SelectPracticeUnitsContent() {
                                 onClick={() => handleUnitToggle(unit.number)}
                                 className={`group relative aspect-square p-2 border-2 rounded-lg cursor-pointer transition-all duration-300 ${
                                     isSelected 
-                                        ? 'border-blue-500 shadow-md shadow-blue-100/50 bg-gradient-to-br from-blue-50 to-blue-100' 
-                                        : 'border-gray-200 hover:border-blue-400 hover:shadow-md hover:shadow-blue-100/30 bg-white hover:bg-blue-50'
+                                        ? isMicro
+                                            ? 'border-green-500 shadow-md shadow-green-100/50 bg-gradient-to-br from-green-50 to-green-100'
+                                            : 'border-blue-500 shadow-md shadow-blue-100/50 bg-gradient-to-br from-blue-50 to-blue-100'
+                                        : isMicro
+                                            ? 'border-gray-200 hover:border-green-400 hover:shadow-md hover:shadow-green-100/30 bg-white hover:bg-green-50'
+                                            : 'border-gray-200 hover:border-blue-400 hover:shadow-md hover:shadow-blue-100/30 bg-white hover:bg-blue-50'
                                 }`}
                             >
                                 {/* Selection indicator */}
                                 <div className={`absolute top-1 right-1 w-3 h-3 rounded-full border-2 transition-all duration-200 ${
                                     isSelected 
-                                        ? 'border-blue-500 bg-blue-500' 
-                                        : 'border-gray-300 group-hover:border-blue-400'
+                                        ? isMicro
+                                            ? 'border-green-500 bg-green-500'
+                                            : 'border-blue-500 bg-blue-500'
+                                        : isMicro
+                                            ? 'border-gray-300 group-hover:border-green-400'
+                                            : 'border-gray-300 group-hover:border-blue-400'
                                 }`}>
                                     {isSelected && (
                                         <div className="w-full h-full flex items-center justify-center">
@@ -140,7 +133,7 @@ function SelectPracticeUnitsContent() {
 
                                 {/* Unit content */}
                                 <div className="h-full flex flex-col justify-center text-center">
-                                    <div className="text-xl sm:text-2xl font-bold text-blue-500 mb-1">
+                                    <div className={`text-xl sm:text-2xl font-bold mb-1 ${isMicro ? 'text-green-500' : 'text-blue-500'}`}>
                                         Unit {unit.number}
                                     </div>
                                     <h3 className="text-sm sm:text-base font-semibold text-gray-800 leading-tight px-1">
@@ -151,8 +144,8 @@ function SelectPracticeUnitsContent() {
                                 {/* Hover effect overlay */}
                                 <div className={`absolute inset-0 rounded-lg transition-opacity duration-200 ${
                                     isSelected 
-                                        ? 'bg-blue-500/5' 
-                                        : 'bg-blue-500/0 group-hover:bg-blue-500/5'
+                                        ? isMicro ? 'bg-green-500/5' : 'bg-blue-500/5'
+                                        : isMicro ? 'bg-green-500/0 group-hover:bg-green-500/5' : 'bg-blue-500/0 group-hover:bg-blue-500/5'
                                 }`} />
                             </button>
                         );
@@ -167,7 +160,9 @@ function SelectPracticeUnitsContent() {
                         className={`w-full px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300 ${
                             selectedUnits.length === 0 
                                 ? 'bg-gray-200 text-gray-500 cursor-not-allowed' 
-                                : 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg hover:shadow-blue-500/25'
+                                : isMicro
+                                    ? 'bg-green-600 hover:bg-green-700 text-white shadow-md hover:shadow-lg hover:shadow-green-500/25'
+                                    : 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg hover:shadow-blue-500/25'
                         }`}
                     >
                         Start Practice

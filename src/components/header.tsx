@@ -10,7 +10,7 @@ import { Button } from './ui/button';
 import { useRouter } from 'next/navigation';
 
 export function Header() {
-  const { user, logout } = useAuthContext();
+  const { user, logout, selectedSubject, setSelectedSubject } = useAuthContext();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCoursesDropdownOpen, setIsCoursesDropdownOpen] = useState(false);
   const router = useRouter();
@@ -64,7 +64,7 @@ export function Header() {
               </Link>
               
               <Link
-                href="/select-practice-units?subject=macro"
+                href="/select-practice-units"
                 className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
               >
                 MCQ Practice
@@ -78,8 +78,32 @@ export function Header() {
               </Link>
             </nav>
 
-            {/* User Icon & Auth Buttons */}
-            <div className="flex items-center gap-2">
+            {/* Subject Segmented Control & User Icon & Auth Buttons */}
+            <div className="flex items-center gap-3">
+              {/* Subject Segmented Control */}
+              <div className="inline-flex items-center bg-gray-100 rounded-lg p-1 border border-gray-200">
+                <button
+                  onClick={() => setSelectedSubject('macro')}
+                  className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-200 ${
+                    selectedSubject === 'macro'
+                      ? 'bg-white text-blue-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  Macro
+                </button>
+                <button
+                  onClick={() => setSelectedSubject('micro')}
+                  className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-200 ${
+                    selectedSubject === 'micro'
+                      ? 'bg-white text-green-600 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  Micro
+                </button>
+              </div>
+              
               {user ? (
                 <>
                   <Button onClick={handleLogout} variant="outline" size="sm">Logout</Button>
@@ -122,7 +146,7 @@ export function Header() {
                 Full Practice Tests
               </Link>
               <Link
-                href="/select-practice-units?subject=macro"
+                href="/select-practice-units"
                 onClick={closeMobileMenu}
                 className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
               >
@@ -138,6 +162,38 @@ export function Header() {
                 </Link>
 
                 <div className="border-t border-gray-200 mt-4 pt-4">
+                  {/* Subject Segmented Control (Mobile) */}
+                  <div className="px-4 py-2">
+                    <div className="inline-flex items-center w-full bg-gray-100 rounded-lg p-1 border border-gray-200">
+                      <button
+                        onClick={() => {
+                          setSelectedSubject('macro');
+                          closeMobileMenu();
+                        }}
+                        className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
+                          selectedSubject === 'macro'
+                            ? 'bg-white text-blue-600 shadow-sm'
+                            : 'text-gray-600 hover:text-gray-900'
+                        }`}
+                      >
+                        Macro
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSelectedSubject('micro');
+                          closeMobileMenu();
+                        }}
+                        className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
+                          selectedSubject === 'micro'
+                            ? 'bg-white text-green-600 shadow-sm'
+                            : 'text-gray-600 hover:text-gray-900'
+                        }`}
+                      >
+                        Micro
+                      </button>
+                    </div>
+                  </div>
+                  
                   {user ? (
                     <>
                       <div className="px-4 py-2">
