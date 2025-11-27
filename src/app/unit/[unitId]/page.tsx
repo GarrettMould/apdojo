@@ -11,10 +11,9 @@ import Link from 'next/link';
 import { keyTerms as apMacroTerms } from '@/data/apMacroTerms';
 import { keyTerms as apMicroTerms } from '@/data/apMicroTerms';
 import { unit1Whiteboards, apMacroUnit2Whiteboards, apMacroUnit3Whiteboards, apMacroUnit4Whiteboards, apMacroUnit5Whiteboards, Whiteboard } from '@/data/whiteboards';
-import { X, ArrowRight, Lock, ArrowLeft } from 'lucide-react';
-import { UnitMCQs } from '@/components/unitMCQS';
-import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
-import { Question as QuestionType } from '@/data/questionBanks/types';
+import { getCheckpointForLesson } from '@/data/checkpoints';
+import { microLessons, macroLessons } from '@/data/lessons';
+import { X, ArrowRight, Lock, ArrowLeft, CheckCircle2, XCircle } from 'lucide-react';
 
 // Helper to combine and structure whiteboard data
 const getUnitWhiteboards = (unitNumber: number): WhiteboardImage[] => {
@@ -56,6 +55,132 @@ interface LessonContent {
   keyTerms: KeyTerm[];
 }
 
+// Checkpoint component for section quizzes
+interface CheckpointProps {
+  lessonId: string;
+  question: string;
+  options: string[];
+  correctAnswer: string;
+  explanation?: string;
+  subject: 'macro' | 'micro';
+}
+
+function Checkpoint({ lessonId, question, options, correctAnswer, explanation, subject }: CheckpointProps) {
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [showResult, setShowResult] = useState(false);
+
+  const handleAnswer = (option: string) => {
+    if (showResult) return; // Prevent changing answer after submission
+    setSelectedAnswer(option);
+    setShowResult(true);
+  };
+
+  const isCorrect = selectedAnswer === correctAnswer;
+  const practiceUrl = `/unitMCQPracticePage?subject=${subject}&mode=topic&lessonId=${lessonId}`;
+
+  return (
+    <div className="mt-12 mb-8 p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border-2 border-gray-200 shadow-lg relative">
+      <div className="mb-4">
+        <div className="flex items-start justify-between">
+          <div>
+            <h3 className="text-lg font-bold text-gray-700 mb-1">Checkpoint</h3>
+            <p className="text-xs text-gray-500">Test your understanding of {lessonId}</p>
+          </div>
+          {showResult && (
+            <Link 
+              href={practiceUrl}
+              className="px-4 py-2 text-sm font-semibold text-blue-600 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 hover:border-blue-300 transition-colors whitespace-nowrap inline-block"
+            >
+              Want to practice AP MCQs on this topic?
+            </Link>
+          )}
+        </div>
+      </div>
+      
+      <p className="text-xl md:text-2xl font-bold text-gray-900 mb-6 leading-tight">
+        {question}
+      </p>
+
+      <div className="space-y-3">
+        {options.map((option, index) => {
+          const optionLetter = String.fromCharCode(65 + index); // A, B, C, D
+          const isSelected = selectedAnswer === optionLetter;
+          const isCorrectOption = optionLetter === correctAnswer;
+          const showCorrect = showResult && isCorrectOption;
+          const showIncorrect = showResult && isSelected && !isCorrectOption;
+
+          let buttonClass = "w-full text-left p-5 text-lg font-semibold rounded-lg transition-all duration-200 border-2 ";
+          
+          if (showResult) {
+            if (showCorrect) {
+              buttonClass += "bg-green-100 border-green-400 text-green-800 shadow-md";
+            } else if (showIncorrect) {
+              buttonClass += "bg-red-100 border-red-400 text-red-800 shadow-md";
+            } else {
+              buttonClass += "bg-gray-100 border-gray-300 text-gray-600";
+            }
+          } else {
+            buttonClass += "bg-blue-100 border-blue-300 text-gray-900 hover:bg-blue-200 hover:border-blue-400 hover:shadow-lg cursor-pointer active:scale-95";
+          }
+
+          return (
+            <button
+              key={index}
+              onClick={() => handleAnswer(optionLetter)}
+              disabled={showResult}
+              className={buttonClass}
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-xl font-bold min-w-[1.5rem]">{optionLetter}.</span>
+                <span className="flex-1">{option}</span>
+                {showResult && showCorrect && (
+                  <CheckCircle2 className="w-6 h-6 text-green-600 flex-shrink-0" />
+                )}
+                {showResult && showIncorrect && (
+                  <XCircle className="w-6 h-6 text-red-600 flex-shrink-0" />
+                )}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      {showResult && explanation && (
+        <div className={`mt-4 p-3 rounded-lg ${isCorrect ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+          <p className={`text-sm font-semibold ${isCorrect ? 'text-green-800' : 'text-red-800'}`}>
+            {isCorrect ? '✓ Correct!' : '✗ Incorrect'}
+          </p>
+          <p className={`mt-1 text-xs ${isCorrect ? 'text-green-700' : 'text-red-700'}`}>
+            {explanation}
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Helper function to format subnotes with bold text before colons
+function formatSubNote(note: string): React.ReactNode {
+  // Find the first colon in the note
+  const colonIndex = note.indexOf(':');
+  
+  // If there's a colon, bold everything from the start up to and including the colon
+  if (colonIndex !== -1) {
+    const beforeColon = note.substring(0, colonIndex + 1);
+    const afterColon = note.substring(colonIndex + 1);
+    
+    return (
+      <>
+        <strong>{beforeColon}</strong>
+        <span>{afterColon}</span>
+      </>
+    );
+  }
+  
+  // If no colon, return the note as-is
+  return <span>{note}</span>;
+}
+
 export default function UnitPage() {
   const params = useParams();
   const router = useRouter(); // Initialize useRouter
@@ -65,21 +190,8 @@ export default function UnitPage() {
   const [selectedWhiteboard, setSelectedWhiteboard] = useState<WhiteboardImage | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // --- State for Sidebar MCQs ---
-  const [sidebarQuestions, setSidebarQuestions] = useState<QuestionType[]>([]);
-  const [answeredQuestions, setAnsweredQuestions] = useState<Record<number, any>>({});
-  
   const activeUnitNum = parseInt(activeUnit as string);
   const subjectFilter = selectedSubject === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics';
-
-  useEffect(() => {
-    // This is now the SINGLE source of truth for sidebar questions.
-    // It runs whenever the active unit or subject changes.
-    const unitQuestions = allQuestions.filter(q => q.subject === subjectFilter && q.unit === activeUnitNum);
-    const shuffled = [...unitQuestions].sort(() => 0.5 - Math.random());
-    setSidebarQuestions(shuffled.slice(0, 5));
-    setAnsweredQuestions({}); // Reset answers when questions change
-  }, [activeUnitNum, subjectFilter]);
 
   // --- Modal Logic ---
   const openModal = (whiteboard: WhiteboardImage) => {
@@ -91,13 +203,6 @@ export default function UnitPage() {
     setSelectedWhiteboard(null);
   };
   
-  // --- Handle MCQ Answer ---
-  const handleAnswer = (questionId: number, answerLetter: string, isCorrect: boolean) => {
-    setAnsweredQuestions(prev => ({
-      ...prev,
-      [questionId]: { selectedLetter: answerLetter, isCorrect }
-    }));
-  };
 
   const handleUnitChange = (unitNumber: string) => {
     setActiveUnit(unitNumber);
@@ -107,6 +212,13 @@ export default function UnitPage() {
   const unitsToDisplay = selectedSubject === 'macro' ? allMacroUnits : allMicroUnits;
   const pageTitleSubject = selectedSubject === 'macro' ? 'Macroeconomics' : 'Microeconomics';
   const themeColor = selectedSubject === 'macro' ? 'blue' : 'green';
+  
+  // Get lesson names
+  const lessons = selectedSubject === 'macro' ? macroLessons : microLessons;
+  const getLessonName = (lessonId: string): string => {
+    const lesson = lessons.find(l => l.lessonNumber === lessonId);
+    return lesson ? lesson.lessonName : '';
+  };
 
   // Determine if the unit is locked
   const unitNumber = parseInt(params.unitId as string, 10);
@@ -264,96 +376,90 @@ export default function UnitPage() {
         })()}
 
         {/* Main Content Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
-          {/* Left Column: Terms and Whiteboards */}
-          <div className="lg:col-span-2 space-y-12">
-            {sortedLessons.map(({ lessonId, whiteboards, keyTerms }) => (
-              <div key={lessonId}>
-                {keyTerms.length > 0 && (
-                  <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-gray-800 mb-6 pb-2 border-b border-gray-200">{lessonId} - Key Terms & Definitions</h2>
-                    <div className="space-y-4 pt-4">
-                      {keyTerms.map(term => (
-                        <div key={term.id} className="p-4 bg-white border border-gray-200 rounded-lg">
-                          <h3 className="font-bold text-gray-800">{term.term}</h3>
-                          <p className="mt-1 text-gray-600">{term.definition}</p>
-                          {term.subNotes && term.subNotes.length > 0 && (
-                            <div className="mt-3 pt-3 border-t border-gray-100">
-                              <ul className="space-y-1.5 pl-0 list-none">
-                                {term.subNotes.map((note, index) => (
-                                  <li key={index} className="text-sm text-gray-700 flex items-start gap-2">
-                                    <span className="text-blue-500 flex-shrink-0 mt-0.5">•</span>
-                                    <span className="leading-relaxed flex-1">{note}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {whiteboards.length > 0 && (
-                  <div>
-                    <h2 className="text-2xl font-bold text-gray-800 mb-6 pb-2 border-b border-gray-200">{lessonId} - Whiteboards</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 pt-4">
-                      {whiteboards.map((image, index) => (
-                        <div key={`${image.id}-${index}`} className="border rounded-lg shadow-sm overflow-hidden cursor-pointer transform hover:scale-105 transition-transform duration-200" onClick={() => openModal(image)}>
-                          <Image src={image.imageUrl} alt={image.title || `Whiteboard for Lesson ${lessonId}`} width={400} height={300} className="w-full h-auto object-cover" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* Right Column: MCQ Sidebar */}
-          <aside className="lg:col-span-1">
-            <div className="sticky top-24 flex flex-col h-[calc(100vh-7rem)] bg-gray-50/50 p-6 rounded-lg border border-gray-200 shadow-sm">
-              <h2 className={`text-2xl font-bold text-gray-900 pb-4 border-b border-gray-200 shrink-0`}>Practice Questions</h2>
+        <div className="space-y-12">
+          {sortedLessons.map(({ lessonId, whiteboards, keyTerms }) => {
+            const lessonName = getLessonName(lessonId);
+            return (
+            <div key={lessonId} className="space-y-8">
+              {/* Lesson Header */}
+              <h2 className="text-2xl font-bold text-gray-800 pb-2 border-b border-gray-200">
+                {lessonId}{lessonName ? ` - ${lessonName}` : ''}
+              </h2>
               
-              <div className="flex-grow overflow-y-auto my-4 pr-2 -mr-2">
-                {sidebarQuestions.length > 0 ? (
-                  <UnitMCQs
-                    currentUnit={activeUnitNum}
-                    currentQuestionIndex={0} // Simplified for sidebar
-                    isLoggedIn={!!user}
-                    onAnswer={handleAnswer}
-                    onNextQuestion={() => {}} // Not needed for sidebar
-                    onPreviousQuestion={() => {}} // Not needed
-                    onQuestionSelect={() => {}} // Not needed
-                    onUnitChange={() => {}} // Not needed
-                    answeredQuestions={answeredQuestions}
-                    units={unitsToDisplay}
-                    dojoProgress={0}
-                    correctStreak={0}
-                    isWeakestUnitsMode={false}
-                    totalQuestions={sidebarQuestions.length}
-                    unitName={`Unit ${activeUnitNum} Practice`}
-                    questions={sidebarQuestions}
-                    subject={selectedSubject}
-                    practiceUnitIds={[activeUnitNum]}
-                    isParentModalOpen={false}
-                    isSidebar={true} 
-                  />
-                ) : (
-                  <p className="text-gray-600">No practice questions available for this unit yet.</p>
-                )}
-              </div>
+              {/* Key Terms Section */}
+              {keyTerms.length > 0 && (
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-700 mb-4">Key Terms & Definitions</h3>
+                  <div className="space-y-4">
+                    {keyTerms.map(term => (
+                      <div key={term.id} className="p-4 bg-white border border-gray-200 rounded-lg">
+                        <h3 className="font-bold text-gray-800">{term.term}</h3>
+                        <p className="mt-1 text-gray-600">{term.definition}</p>
+                        {term.subNotes && term.subNotes.length > 0 && (
+                          <div className="mt-3 pt-3 border-t border-gray-100">
+                            <ul className="space-y-1.5 pl-0 list-none">
+                              {term.subNotes.map((note, index) => (
+                                <li key={index} className="text-sm text-gray-700 flex items-start gap-2">
+                                  <span className="text-blue-500 flex-shrink-0 mt-0.5">•</span>
+                                  <span className="leading-relaxed flex-1">{formatSubNote(note)}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
-              <div className="shrink-0 pt-4 border-t border-gray-200">
-                <Link href={`/select-practice-units?subject=${selectedSubject}`} passHref>
-                  <button className={`w-full flex items-center justify-center gap-2 bg-${themeColor}-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-${themeColor}-700 transition-colors shadow-md`}>
-                    More MCQ Practice
-                    <ArrowRight className="w-5 h-5" />
-                  </button>
-                </Link>
-              </div>
+              {/* Whiteboards Section */}
+              {whiteboards.length > 0 && (
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-700 mb-4">Whiteboards</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                    {whiteboards.map((image, index) => (
+                      <div 
+                        key={`${image.id}-${index}`} 
+                        className="border rounded-lg shadow-sm overflow-hidden cursor-pointer transform hover:scale-105 transition-transform duration-200 bg-white"
+                        onClick={() => openModal(image)}
+                      >
+                        <div className="relative aspect-video">
+                          <Image 
+                            src={image.imageUrl} 
+                            alt={image.title || `Whiteboard for Lesson ${lessonId}`} 
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {/* Checkpoint for this section */}
+              {(() => {
+                const checkpoint = getCheckpointForLesson(
+                  lessonId,
+                  subjectFilter,
+                  activeUnitNum
+                );
+                return checkpoint ? (
+                  <Checkpoint
+                    lessonId={checkpoint.lessonId}
+                    question={checkpoint.question}
+                    options={checkpoint.options}
+                    correctAnswer={checkpoint.correctAnswer}
+                    explanation={checkpoint.explanation}
+                    subject={selectedSubject}
+                  />
+                ) : null;
+              })()}
             </div>
-          </aside>
+          );
+          })}
         </div>
       </div>
       

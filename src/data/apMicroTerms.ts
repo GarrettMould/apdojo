@@ -118,6 +118,30 @@ export const keyTerms: KeyTerm[] = [
       ]
     },
     {
+      id: 'input-problem',
+      term: 'Input Problem',
+      definition: 'A type of opportunity cost problem where you are given the amount of resources (inputs) needed to produce each good.',
+      subject: 'ap_microeconomics',
+      unit: 1,
+      lessonIDs: ['1.3'],
+      subNotes: [
+        'How to find opportunity cost: Itself / Other',
+        'Example: If it takes 2 hours to produce Good A and 4 hours to produce Good B, the opportunity cost of 1 Good A is 2/4 = 0.5 Good B. The opportunity cost of 1 Good B is 4/2 = 2 Good A.'
+      ]
+    },
+    {
+      id: 'output-problem',
+      term: 'Output Problem',
+      definition: 'A type of opportunity cost problem where you are given the amount of output that can be produced with the same resources.',
+      subject: 'ap_microeconomics',
+      unit: 1,
+      lessonIDs: ['1.3'],
+      subNotes: [
+        'How to find opportunity cost: Other / Itself',
+        'Example: If a country can produce 10 units of Good A or 5 units of Good B with the same resources, the opportunity cost of 1 Good A is 5/10 = 0.5 Good B. The opportunity cost of 1 Good B is 10/5 = 2 Good A.'
+      ]
+    },
+    {
       id: 'economic-systems',
       term: 'Economic Systems',
       definition: 'The method used by a society to produce and distribute goods and services.',
@@ -171,12 +195,11 @@ export const keyTerms: KeyTerm[] = [
     {
       id: 'demand',
       term: 'Demand',
-      definition: 'The relationship between the price of a good or service and the quantity consumers are willing and able to purchase at various prices during a specific time period, ceteris paribus.',
+      definition: 'The relationship between the price of a good or service and the quantity consumers are willing and able to purchase at various prices during a specific time period.',
       subject: 'ap_microeconomics',
       unit: 2,
       lessonIDs: ['2.1'],
       subNotes: [
-        'Demand is a schedule showing quantities at various prices',
         'Demand represents willingness AND ability to pay',
         'Demand is always downward sloping (Law of Demand)',
         'Demand can shift due to non-price factors'
@@ -185,34 +208,56 @@ export const keyTerms: KeyTerm[] = [
     {
       id: 'law-of-demand',
       term: 'Law of Demand',
-      definition: 'The principle that, ceteris paribus, as the price of a good or service increases, the quantity demanded will decrease, and vice versa, resulting in a downward-sloping demand curve.',
+      definition: 'The principle that, as the price of a good or service increases, the quantity demanded will decrease, and vice versa.',
       subject: 'ap_microeconomics',
       unit: 2,
       lessonIDs: ['2.1'],
       subNotes: [
         'Price and quantity demanded have an inverse relationship',
         'The demand curve always slopes downward from left to right',
-        'This relationship holds true for most goods and services',
-        'Exceptions include Giffen goods and Veblen goods'
+        'Two main reasons for the law of demand: substitution effect and income effect',
       ],
       image: {
         url: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/apmicro_unit2_lawofdemand.jpg',
         alt: 'Demand curve showing inverse relationship between price and quantity'
       }
     },
-     {
-      id: 'determinants-of-demand',
-      term: 'Determinants of Demand',
-      definition: 'Factors other than price that shift the demand curve. These include: Tastes/Preferences, Income, Prices of Related Goods (Substitutes & Complements), Number of Buyers, and Expectations (TIPSE).',
+    {
+      id: 'substitution-effect',
+      term: 'Substitution Effect',
+      definition: 'When the price of a good increases, consumers substitute away from it and purchase relatively cheaper goods instead, decreasing the quantity demanded.',
       subject: 'ap_microeconomics',
       unit: 2,
       lessonIDs: ['2.1'],
       subNotes: [
-        'Tastes/Preferences: Changes in consumer preferences can shift demand',
-        'Income: Higher income typically increases demand for normal goods',
-        'Prices of Related Goods: Substitutes and complements affect demand',
-        'Number of Buyers: More buyers in the market increases demand',
-        'Expectations: Future price expectations can affect current demand'
+        'Example: If the price of chicken increases, consumers buy less chicken and more beef (substitute)',
+        'Works in reverse as well: if the price of a good decreases, consumers buy more of it and less of relatively more expensive goods'
+      ]
+    },
+    {
+      id: 'income-effect',
+      term: 'Income Effect',
+      definition: 'When the price of a good decreases, consumers\' real purchasing power increases, allowing them to buy more of the good (and other goods) with the same nominal income.',
+      subject: 'ap_microeconomics',
+      unit: 2,
+      lessonIDs: ['2.1'],
+      subNotes: [
+        'Example: If I have $5 to spend on cookies everyday, and the price of cookies decreases, I can buy more cookies with the same $5.'
+      ]
+    },
+     {
+      id: 'determinants-of-demand',
+      term: 'Determinants of Demand',
+      definition: 'Factors other than price that shift the demand curve.',
+      subject: 'ap_microeconomics',
+      unit: 2,
+      lessonIDs: ['2.1'],
+      subNotes: [
+        'Tastes and Preferences: Fidget spinners are no longer cool, so demand for them decreases.',
+        'Income: As a country becomes more wealthy, demand for luxury goods increases.',
+        'Prices of Related Goods: If Apple Music increases their price, demand for Spotify increases.',
+        'Number of Buyers: If more people move to Miami, demand for apartments in Miami increases.',
+        'Expectations: If people expect the price of gasoline to increase next week, they will buy more gasoline this week.'
       ]
     },
     {
@@ -286,21 +331,20 @@ export const keyTerms: KeyTerm[] = [
     {
       id: 'law-of-supply',
       term: 'Law of Supply',
-      definition: 'The principle that, ceteris paribus, as the price of a good or service increases, the quantity supplied will increase, and vice versa, resulting in an upward-sloping supply curve.',
+      definition: 'The principle that, as the price of a good or service increases, the quantity supplied will increase, and vice versa.',
       subject: 'ap_microeconomics',
       unit: 2,
       lessonIDs: ['2.2'],
       subNotes: [
         'Price and quantity supplied have a direct relationship',
-        'The supply curve always slopes upward from left to right',
-        'Higher prices provide incentive for producers to supply more',
-        'This relationship holds true for most goods and services'
+        'The supply curve always slopes upward',
+        'Two main reasons for the law of supply: profit motive and opportunity cost',
       ]
     },
     {
       id: 'determinants-of-supply',
       term: 'Determinants of Supply',
-      definition: 'Factors other than price that shift the supply curve. These include: Resource/Input Prices, Technology, Prices of Other Goods (in production), Number of Sellers, Expectations, and Government Actions (Taxes/Subsidies).',
+      definition: 'Factors other than price that shift the supply curve.',
       subject: 'ap_microeconomics',
       unit: 2,
       lessonIDs: ['2.2'],
@@ -321,8 +365,7 @@ export const keyTerms: KeyTerm[] = [
       subNotes: [
         'Higher input costs shift supply curve left (decrease supply)',
         'Lower input costs shift supply curve right (increase supply)',
-        'Examples: wages, raw materials, energy costs, rent',
-        'Directly affects production costs and profitability'
+        'Examples: If I produce wooden tables, and the price of wood increases, I can produce fewer tables with the same amount of money.',
       ]
     },
     {
@@ -335,8 +378,8 @@ export const keyTerms: KeyTerm[] = [
       subNotes: [
         'Better technology shifts supply curve right (increase supply)',
         'Increases productivity and reduces production costs',
-        'Examples: automation, new machinery, improved processes',
-        'Allows more output with same or fewer inputs'
+        'Examples: New improved fertilizer allows farmers to produce more crops with the same amount of land and labor.',
+        
       ]
     },
     {
@@ -350,7 +393,7 @@ export const keyTerms: KeyTerm[] = [
         'Higher prices of alternatives shift supply left (decrease supply)',
         'Lower prices of alternatives shift supply right (increase supply)',
         'Producers switch to more profitable alternatives',
-        'Examples: corn vs. soybeans, beef vs. chicken'
+        'Examples: If the price of durian increase, farmers will produce more durian and less other fruits.'
       ]
     },
     {
@@ -378,7 +421,7 @@ export const keyTerms: KeyTerm[] = [
         'Expected higher future prices shift supply left (decrease current supply)',
         'Expected lower future prices shift supply right (increase current supply)',
         'Producers may hold inventory or rush to sell',
-        'Examples: seasonal expectations, economic forecasts'
+        'Examples: If sellers of gold expect the price of gold to increase, they will sell less today and wait to sell more at the higher future price.'
       ]
     },
     {
@@ -396,17 +439,29 @@ export const keyTerms: KeyTerm[] = [
       ]
     },
     {
+      id: 'subsidy',
+      term: 'Subsidy',
+      definition: 'A government payment to producers (or consumers) that reduces production costs, encouraging increased supply.',
+      subject: 'ap_microeconomics',
+      unit: 2,
+      lessonIDs: ['2.2'],
+      subNotes: [
+        'Shifts the supply curve to the right (increases supply)',
+        'Lowers production costs for firms',
+        'Example: Government gives subsidy to electric car company, allowing them to produce more electric cars at each price level'
+      ]
+    },
+    {
       id: 'market-equilibrium',
       term: 'Market Equilibrium',
-      definition: 'The state where the quantity demanded equals the quantity supplied at a specific price (the equilibrium price). The market clears, and there is no tendency for the price to change.',
+      definition: 'The state where the quantity demanded equals the quantity supplied at a specific price.',
       subject: 'ap_microeconomics',
       unit: 2,
       lessonIDs: ['2.6', '2.7'],
       subNotes: [
         'Occurs where demand and supply curves intersect',
         'No shortage or surplus at equilibrium',
-        'Market automatically moves toward equilibrium',
-        'Efficient allocation of resources occurs here'
+        'Market automatically moves toward equilibrium'
       ]
     },
     {
@@ -417,10 +472,7 @@ export const keyTerms: KeyTerm[] = [
       unit: 2,
       lessonIDs: ['2.6', '2.7'],
       subNotes: [
-        'Also called market-clearing price',
-        'Eliminates both shortage and surplus',
-        'Determined by intersection of D and S curves',
-        'Can change when curves shift'
+        'Occurs where demand and supply curves intersect'
       ]
     },
     {
@@ -431,10 +483,7 @@ export const keyTerms: KeyTerm[] = [
       unit: 2,
       lessonIDs: ['2.6', '2.7'],
       subNotes: [
-        'Also called market-clearing quantity',
-        'Maximizes total surplus in the market',
-        'All willing buyers and sellers are satisfied',
-        'No excess demand or supply exists'
+        'Occurs where demand and supply curves intersect'
       ]
     },
     {
@@ -472,6 +521,9 @@ export const keyTerms: KeyTerm[] = [
       subject: 'ap_microeconomics',
       unit: 2,
       lessonIDs: ['2.3'],
+      subNotes: [
+        'The law of demand tell us that when price increases, people buy less. Price elasticity of demand tells us how much less they buy.'
+      ],
       image: {
         url: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/apmicro_unit2_demandelasticity.jpg',
         alt: 'Demand elasticity diagram showing different elasticity ranges'
@@ -516,7 +568,6 @@ export const keyTerms: KeyTerm[] = [
         '|PED| = 1 (absolute value equals 1)',
         'Percentage change in Qd equals percentage change in P',
         'Total revenue remains constant when price changes',
-        'Rare in practice but important theoretical concept'
       ]
     },
     {
@@ -584,7 +635,6 @@ export const keyTerms: KeyTerm[] = [
       lessonIDs: ['2.4'],
       subNotes: [
         'PES > 1 (greater than 1)',
-        'Producers are very responsive to price changes',
         'Examples: goods with flexible production, long time periods',
         'Price increase leads to larger increase in quantity supplied'
       ]
@@ -598,7 +648,6 @@ export const keyTerms: KeyTerm[] = [
       lessonIDs: ['2.4'],
       subNotes: [
         'PES < 1 (less than 1)',
-        'Producers are not very responsive to price changes',
         'Examples: goods with fixed production, short time periods',
         'Price increase leads to smaller increase in quantity supplied'
       ]
@@ -767,7 +816,6 @@ export const keyTerms: KeyTerm[] = [
       unit: 2,
       lessonIDs: ['2.8'],
       subNotes: [
-        'Loss of total surplus due to market inefficiency',
         'Triangle area between supply and demand curves',
         'Created by taxes, price controls, quotas, externalities',
         'Represents value of mutually beneficial trades that don\'t occur'
@@ -775,16 +823,46 @@ export const keyTerms: KeyTerm[] = [
     },
      {
       id: 'quantity-control',
-      term: 'Quantity Control (Quota)',
+      term: 'Quota (Quantity Control)',
       definition: 'An upper limit set by the government on the quantity of a good that can be bought or sold. Leads to inefficiencies such as deadweight loss and incentives for illegal activities.',
       subject: 'ap_microeconomics',
       unit: 2,
-      lessonIDs: ['2.8'],
+      lessonIDs: ['2.9'],
       subNotes: [
         'Government limit on quantity bought/sold',
         'Creates artificial scarcity and higher prices',
         'Examples: fishing quotas, import quotas',
         'Leads to deadweight loss and black market activity'
+      ]
+    },
+    {
+      id: 'tariff',
+      term: 'Tariff',
+      definition: 'A tax imposed by the government on imported goods, raising the price of imports and reducing the quantity imported.',
+      subject: 'ap_microeconomics',
+      unit: 2,
+      lessonIDs: ['2.9'],
+      subNotes: [
+        'Increases the price of imported goods',
+        'Reduces quantity imported',
+        'Shifts the supply curve for imports left (decreases supply)',
+        'Creates deadweight loss and reduces total surplus',
+        'Example: Government imposes tariff on imported steel, making foreign steel more expensive'
+      ]
+    },
+    {
+      id: 'quantity-imported',
+      term: 'Quantity Imported',
+      definition: 'The amount of a good that a country purchases from foreign producers. On a graph, it is the difference between domestic quantity demanded and domestic quantity supplied at the world price.',
+      subject: 'ap_microeconomics',
+      unit: 2,
+      lessonIDs: ['2.9'],
+      subNotes: [
+        'How to find on a graph: At the world price, find where the price line intersects the domestic demand curve (Qd) and where it intersects the domestic supply curve (Qs)',
+        'Quantity Imported = Qd - Qs (at the world price)',
+        'If Qd > Qs at world price, the country imports the difference',
+        'If Qd < Qs at world price, the country exports instead (negative imports)',
+        'Example: If domestic demand is 100 units and domestic supply is 60 units at world price, quantity imported = 40 units'
       ]
     }, 
     {
@@ -819,21 +897,49 @@ export const keyTerms: KeyTerm[] = [
       unit: 3,
       lessonIDs: ['3.1'],
       subNotes: [
+        'Example: If you keep adding chefs to a kitchen with a fixed number of ovens, the marginal product of the chefs will eventually decline as they start to get in each other\'s way.',
         'This explains why the Marginal Cost (MC) curve eventually slopes upward.',
-        'Occurs only in the short run because of fixed resources.'
       ]
     },
   
     // Lesson 3.2: Short-Run Production Costs
     {
-      id: 'fixed-vs-variable-costs',
-      term: 'Fixed vs. Variable Costs',
-      definition: 'Fixed costs do not change with output (e.g., rent), while variable costs increase as output increases (e.g., wages, raw materials).',
+      id: 'fixed-costs',
+      term: 'Fixed Costs',
+      definition: 'Costs that do not change with the level of output produced.',
       subject: 'ap_microeconomics',
       unit: 3,
       lessonIDs: ['3.2'],
       subNotes: [
-        'Total Cost (TC) = Total Fixed Cost (TFC) + Total Variable Cost (TVC)'
+        'Remain constant regardless of production level',
+        'Example: Monthly rent for a factory, insurance premiums, or loan payments',
+        'Must be paid even if output is zero'
+      ]
+    },
+    {
+      id: 'variable-costs',
+      term: 'Variable Costs',
+      definition: 'Costs that change with the level of output produced.',
+      subject: 'ap_microeconomics',
+      unit: 3,
+      lessonIDs: ['3.2'],
+      subNotes: [
+        'Increase as output increases, decrease as output decreases',
+        'Example: Wages for hourly workers, raw materials, electricity used in production',
+        'Zero when output is zero'
+      ]
+    },
+    {
+      id: 'total-costs',
+      term: 'Total Costs',
+      definition: 'The sum of all fixed costs and all variable costs at a given level of output.',
+      subject: 'ap_microeconomics',
+      unit: 3,
+      lessonIDs: ['3.2'],
+      subNotes: [
+        'Formula: Total Cost (TC) = Total Fixed Cost (TFC) + Total Variable Cost (TVC)',
+        'Example: If a factory has $10,000 in fixed costs (rent) and $5,000 in variable costs (materials and labor) for producing 100 units, total cost is $15,000',
+        'Increases as output increases due to variable costs'
       ]
     },
     {
@@ -845,7 +951,7 @@ export const keyTerms: KeyTerm[] = [
       lessonIDs: ['3.2'],
       subNotes: [
         'Formula: Change in Total Cost / Change in Quantity',
-        'The MC curve looks like a Nike swoosh (checks mark).',
+        'The MC curve looks like a Nike swoosh.',
         'MC crosses ATC and AVC at their minimum points.'
       ]
     },
@@ -884,7 +990,8 @@ export const keyTerms: KeyTerm[] = [
       lessonIDs: ['3.3'],
       subNotes: [
         'Occurs due to specialization and bulk purchasing.',
-        'Represented by the downward-sloping portion of the LRATC curve.'
+        'Represented by the downward-sloping portion of the LRATC curve.', 
+        'Explains why large companies are often more efficient than small companies.'
       ]
     },
     {
@@ -896,20 +1003,57 @@ export const keyTerms: KeyTerm[] = [
       lessonIDs: ['3.3'],
       subNotes: [
         'Occurs due to coordination problems and bureaucracy in very large firms.',
-        'Represented by the upward-sloping portion of the LRATC curve.'
+        'Represented by the upward-sloping portion of the LRATC curve.', 
+        'In other words, a company has become too big for its own good.'
       ]
     },
   
     // Lesson 3.4: Types of Profit
     {
-      id: 'accounting-vs-economic-profit',
-      term: 'Accounting vs. Economic Profit',
-      definition: 'Accounting profit considers only explicit costs (out-of-pocket). Economic profit considers both explicit and implicit costs (opportunity costs).',
+      id: 'explicit-costs-unit3',
+      term: 'Explicit Costs',
+      definition: 'Direct, out-of-pocket payments for inputs.',
       subject: 'ap_microeconomics',
       unit: 3,
       lessonIDs: ['3.4'],
       subNotes: [
-        'Economic Profit = Total Revenue - (Explicit Costs + Implicit Costs)',
+        'These are clearly seen on a receipt.',
+        'Example: Wages for hourly workers, rent for a factory, materials for a product.'
+      ]
+    },
+    {
+      id: 'implicit-costs-unit3',
+      term: 'Implicit Costs',
+      definition: 'The opportunity costs of using resources that the firm or individual already owns.',
+      subject: 'ap_microeconomics',
+      unit: 3,
+      lessonIDs: ['3.4'],
+      subNotes: [
+        'These are not recorded in accounting books but are crucial for economic decisions.', 
+        'Example: Salary that a business owner could have earned working for someone else.'
+      ]
+    },
+    {
+      id: 'accounting-profit',
+      term: 'Accounting Profit',
+      definition: 'Profit calculated by subtracting only explicit costs from total revenue. Does not consider implicit costs (opportunity costs).',
+      subject: 'ap_microeconomics',
+      unit: 3,
+      lessonIDs: ['3.4'],
+      subNotes: [
+        'Formula: Accounting Profit = Total Revenue - Explicit Costs',
+        'A firm can have positive accounting profit but zero economic profit.'
+      ]
+    },
+    {
+      id: 'economic-profit',
+      term: 'Economic Profit',
+      definition: 'Profit calculated by subtracting both explicit costs and implicit costs (opportunity costs) from total revenue.',
+      subject: 'ap_microeconomics',
+      unit: 3,
+      lessonIDs: ['3.4'],
+      subNotes: [
+        'Formula: Economic Profit = Total Revenue - (Explicit Costs + Implicit Costs)',
         'A firm can have positive accounting profit but zero economic profit.'
       ]
     },
@@ -927,6 +1071,32 @@ export const keyTerms: KeyTerm[] = [
   
     // Lesson 3.5: Profit Maximization
     {
+      id: 'marginal-cost-unit3-5',
+      term: 'Marginal Cost (MC)',
+      definition: 'The additional cost incurred by producing one more unit of output.',
+      subject: 'ap_microeconomics',
+      unit: 3,
+      lessonIDs: ['3.5'],
+      subNotes: [
+        'Formula: Change in Total Cost / Change in Quantity',
+        'The MC curve looks like a Nike swoosh.',
+        'MC crosses ATC and AVC at their minimum points.'
+      ]
+    },
+    {
+      id: 'marginal-revenue',
+      term: 'Marginal Revenue (MR)',
+      definition: 'The additional revenue generated from selling one more unit of output.',
+      subject: 'ap_microeconomics',
+      unit: 3,
+      lessonIDs: ['3.5'],
+      subNotes: [
+        'Formula: Change in Total Revenue / Change in Quantity',
+        'Represents the revenue gained from producing and selling one additional unit',
+        'Used in the profit maximization decision: compare MR to MC to determine optimal output level'
+      ]
+    },
+    {
       id: 'profit-maximization-rule',
       term: 'Profit Maximization Rule',
       definition: 'To maximize profit (or minimize loss), a firm should produce the quantity where Marginal Revenue equals Marginal Cost.',
@@ -935,8 +1105,9 @@ export const keyTerms: KeyTerm[] = [
       lessonIDs: ['3.5'],
       subNotes: [
         'Rule: Produce where MR = MC',
-        'If MR > MC, produce more.',
-        'If MC > MR, produce less.'
+        'When MR > MC, the firm earns additional profit (MR - MC > 0) for each additional unit produced, so it should continue producing more units.',
+        'When MR < MC, the firm loses profit by producing an additional unit, so it should reduce production.',
+        'Profit is maximized at MR = MC because the firm has produced all units where MR > MC (gaining profit) but has not produced any units where MR < MC (which would reduce profit).'
       ]
     },
   
@@ -1063,6 +1234,32 @@ export const keyTerms: KeyTerm[] = [
         'Resource demand is NOT independent.'
       ]
     },
+    {
+      id: 'labor-supply',
+      term: 'Labor Supply',
+      definition: 'The relationship between the wage rate and the quantity of labor that households are willing and able to provide.',
+      subject: 'ap_microeconomics',
+      unit: 5,
+      lessonIDs: ['5.1'],
+      subNotes: [
+        'Households are responsible for labor supply.',
+        'There is a direct relationship between the wage rate and the quantity of labor supplied.',
+        'A change in the wage rate leads to a change in the quantity of labor supplied (Qs).'
+      ]
+    },
+    {
+      id: 'labor-demand',
+      term: 'Labor Demand',
+      definition: 'The relationship between the wage rate and the quantity of labor that firms are willing and able to hire.',
+      subject: 'ap_microeconomics',
+      unit: 5,
+      lessonIDs: ['5.1'],
+      subNotes: [
+        'Firms are responsible for labor demand.',
+        'There is an inverse relationship between the wage rate and the quantity of labor demanded.',
+        'A change in the wage rate leads to a change in the quantity of labor demanded (Qd).'
+      ]
+    },
   
     // Lesson 5.2: Changes in Factor Demand and Factor Supply
     {
@@ -1073,7 +1270,7 @@ export const keyTerms: KeyTerm[] = [
       unit: 5,
       lessonIDs: ['5.2', '5.3'],
       subNotes: [
-        'Formula: Marginal Product (MP) x Price of the Good (P).',
+        'Formula: Marginal Product (MP) x Marginal Revenue (MR).',
         'Represents the Factor Demand Curve for the firm.'
       ]
     },
@@ -1177,6 +1374,8 @@ export const keyTerms: KeyTerm[] = [
       unit: 5,
       lessonIDs: ['5.4'],
       subNotes: [
+        'The MFC curve lies above the Supply curve because in a monopsony, to hire one more worker, the firm must raise the wage for ALL workers, not just the new one.',
+        'Example: If a firm currently pays $10/hour to 10 workers and wants to hire an 11th worker, it must raise the wage to $11/hour for all 11 workers. The MFC of the 11th worker is $11 (the new wage) + $10 (the additional $1/hour for each of the 10 existing workers) = $21, which is above the $11 supply price.',
         'Quantity hired is determined where MRP = MFC.',
         'Wage paid is determined by the Supply curve at that quantity (Wage < MRP).',
         'Result: Monopsonies hire fewer workers and pay lower wages than competitive markets.'
@@ -1295,7 +1494,7 @@ export const keyTerms: KeyTerm[] = [
     },
     {
       id: 'shared-consumption',
-      term: 'Shared Consumption (Non-Rival)',
+      term: 'Non-Rival (Shared Consumption)',
       definition: 'A characteristic of a good where one person\'s use of the good does not reduce its usefulness to others.',
       subject: 'ap_microeconomics',
       unit: 6,

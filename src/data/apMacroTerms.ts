@@ -4,12 +4,27 @@ export const keyTerms: KeyTerm[] = [
     {
         id: 'resources',
         term: 'Resources',
-        definition: 'Inputs used to create goods and services, including time, money, natural resources, workers, and machines.',
+        definition: 'Inputs used to create goods and services',
         subject: 'ap_macroeconomics',
         unit: 1,
         lessonIDs: ['1.1'],
-        subNotes: []
+        subNotes: [
+          'Also known as the factors of production',
+        ]
       },
+       {
+         id: 'scarcity',
+         term: 'Scarcity',
+         definition: 'The fundamental problem of economics where there are not enough resources to fulfill all wants and needs.',
+         subject: 'ap_macroeconomics',
+         unit: 1,
+         lessonIDs: ['1.1'],
+         subNotes: [
+           'Example (Individuals): A student has limited time and must choose between studying for an exam or going to a party.',
+           'Example (Businesses): A company has a limited budget and must choose between hiring more employees or investing in new equipment.',
+           'Example (Countries): A nation has limited oil reserves and must decide how to allocate them between domestic use and exports.'
+         ]
+       },
       {
         id: 'ap_macroeconomics',
         term: 'Macroeconomics',
@@ -17,7 +32,9 @@ export const keyTerms: KeyTerm[] = [
         subject: 'ap_macroeconomics',
         unit: 1,
         lessonIDs: ['1.1'],
-        subNotes: []
+        subNotes: [
+          'Example: Might study how an increase in taxes impacts consumer spending.'
+        ]
       },
       {
         id: 'ap_microeconomics',
@@ -26,17 +43,11 @@ export const keyTerms: KeyTerm[] = [
         subject: 'ap_macroeconomics',
         unit: 1,
         lessonIDs: ['1.1'],
-        subNotes: []
+        subNotes: [
+          'Example: Might study how a company decides how many workers to hire, or how much to produce.'
+        ]
       },
-      {
-        id: 'scarcity',
-        term: 'Scarcity',
-        definition: 'The fundamental problem of economics where there are not enough resources to fulfill all wants and needs.',
-        subject: 'ap_macroeconomics',
-        unit: 1,
-        lessonIDs: ['1.1'],
-        subNotes: []
-      },
+  
       {
         id: 'factors_of_production',
         term: 'Factors of Production',
@@ -71,7 +82,9 @@ export const keyTerms: KeyTerm[] = [
         subject: 'ap_macroeconomics',
         unit: 1,
         lessonIDs: ['1.1'],
-        subNotes: []
+        subNotes: [
+          'Example: A factory building used to manufacture cars, or a computer used to design software.'
+        ]
       },
       {
         id: 'physical_capital',
@@ -80,7 +93,9 @@ export const keyTerms: KeyTerm[] = [
         subject: 'ap_macroeconomics',
         unit: 1,
         lessonIDs: ['1.1'],
-        subNotes: []
+        subNotes: [
+          'Example: A tractor used on a farm, a delivery truck for a shipping company, or a factory building.'
+        ]
       },
       {
         id: 'human_capital',
@@ -89,7 +104,9 @@ export const keyTerms: KeyTerm[] = [
         subject: 'ap_macroeconomics',
         unit: 1,
         lessonIDs: ['1.1'],
-        subNotes: []
+        subNotes: [
+          'Example: A doctor\'s medical training, a programmer\'s coding skills, or a chef\'s culinary expertise.'
+        ]
       },
       {
         id: 'entrepreneurship',
@@ -98,7 +115,9 @@ export const keyTerms: KeyTerm[] = [
         subject: 'ap_macroeconomics',
         unit: 1,
         lessonIDs: ['1.1'],
-        subNotes: []
+        subNotes: [
+          'Example: A business owner who starts a new restaurant, combining land (location), labor (chefs and servers), and capital (kitchen equipment) to create a dining experience.'
+        ]
       },
       {
         id: 'trade_off',
@@ -116,16 +135,10 @@ export const keyTerms: KeyTerm[] = [
         subject: 'ap_macroeconomics',
         unit: 1,
         lessonIDs: ['1.2'],
-        subNotes: []
-      },
-      {
-        id: 'increasing_opportunity_cost',
-        term: 'Increasing Opportunity Cost',
-        definition: 'When the opportunity cost of making a good increases the more of it you produce, shown by a bowed-out PPC.',
-        subject: 'ap_macroeconomics',
-        unit: 1,
-        lessonIDs: ['1.2'],
-        subNotes: []
+        subNotes: [
+          'Example: If a country can produce 10 units of Good A or 5 units of Good B with the same resources, the opportunity cost of producing 1 unit of Good A is 0.5 units of Good B (5 ÷ 10 = 0.5).',
+          'Example: If I can finish two math assignments in an hour and one English assignment in an hour, then my opportunity cost of doing the English assignment is 2 math assignments.'
+        ]
       },
       {
         id: 'ppc',
@@ -144,6 +157,51 @@ export const keyTerms: KeyTerm[] = [
         unit: 1,
         lessonIDs: ['1.2'],
         subNotes: []
+      },
+      {
+        id: 'increasing_opportunity_cost',
+        term: 'Increasing Opportunity Cost',
+        definition: 'When the opportunity cost of making a good increases the more of it you produce, shown by a bowed-out PPC.',
+        subject: 'ap_macroeconomics',
+        unit: 1,
+        lessonIDs: ['1.2'],
+        subNotes: []
+      },
+      {
+        id: 'underutilization',
+        term: 'Underutilization',
+        definition: 'A situation where an economy is not using all of its resources efficiently, producing less than its maximum potential output.',
+        subject: 'ap_macroeconomics',
+        unit: 1,
+        lessonIDs: ['1.2'],
+        subNotes: [
+          'Where to find on a graph: Points located inside the PPC curve represent underutilization.',
+          'Example: If a country has high unemployment, it is operating at a point inside its PPC, not using all available labor resources.'
+        ]
+      },
+      {
+        id: 'allocative-efficiency',
+        term: 'Allocative Efficiency',
+        definition: 'A situation where resources are allocated to produce the combination of goods and services that society most values.',
+        subject: 'ap_macroeconomics',
+        unit: 1,
+        lessonIDs: ['1.2'],
+        subNotes: [
+          'Where to find on a graph: The specific point on the PPC curve that represents the optimal combination of goods based on society\'s preferences.',
+          'Note: While all points on the PPC are productively efficient, only one point represents allocative efficiency (the point that matches what society wants most).'
+        ]
+      },
+      {
+        id: 'unattainable-point',
+        term: 'Unattainable Point',
+        definition: 'A combination of goods that cannot be produced with the current resources and technology available to an economy.',
+        subject: 'ap_macroeconomics',
+        unit: 1,
+        lessonIDs: ['1.2'],
+        subNotes: [
+          'Where to find on a graph: Points located outside (to the right of) the PPC curve represent unattainable combinations.',
+          'Example: If a country wants to produce more of both goods than its PPC allows, that combination is unattainable with current resources.'
+        ]
       },
       {
         id: 'ppc_shift_out',
@@ -181,10 +239,35 @@ export const keyTerms: KeyTerm[] = [
         lessonIDs: ['1.3'],
         subNotes: []
       },
+      
+      {
+        id: 'input-problem',
+        term: 'Input Problem',
+        definition: 'A type of opportunity cost problem where you are given the amount of resources (inputs) needed to produce each good.',
+        subject: 'ap_macroeconomics',
+        unit: 1,
+        lessonIDs: ['1.3'],
+        subNotes: [
+          'How to find opportunity cost: Itself / Other',
+          'Example: If it takes 2 hours to produce Good A and 4 hours to produce Good B, the opportunity cost of 1 Good A is 2/4 = 0.5 Good B. The opportunity cost of 1 Good B is 4/2 = 2 Good A.'
+        ]
+      },
+      {
+        id: 'output-problem',
+        term: 'Output Problem',
+        definition: 'A type of opportunity cost problem where you are given the amount of output that can be produced with the same resources.',
+        subject: 'ap_macroeconomics',
+        unit: 1,
+        lessonIDs: ['1.3'],
+        subNotes: [
+          'How to find opportunity cost: Other / Itself',
+          'Example: If a country can produce 10 units of Good A or 5 units of Good B with the same resources, the opportunity cost of 1 Good A is 5/10 = 0.5 Good B. The opportunity cost of 1 Good B is 10/5 = 2 Good A.'
+        ]
+      },
       {
         id: 'terms_of_trade',
         term: 'Terms of Trade',
-        definition: 'The rate at which one good can be exchanged for another in trade; must lie between both parties’ opportunity costs to be mutually beneficial.',
+        definition: 'The rate at which one good can be exchanged for another in trade; must lie between both parties\' opportunity costs to be mutually beneficial.',
         subject: 'ap_macroeconomics',
         unit: 1,
         lessonIDs: ['1.3'],
@@ -193,20 +276,99 @@ export const keyTerms: KeyTerm[] = [
       {
         id: 'demand',
         term: 'Demand',
-        definition: 'A consumer’s ability and willingness to pay for a good or service.',
+        definition: 'The relationship between the price of a good or service and the quantity consumers are willing and able to purchase at various prices during a specific time period.',
         subject: 'ap_macroeconomics',
         unit: 1,
         lessonIDs: ['1.4'],
-        subNotes: []
+        subNotes: [
+          'Demand represents willingness AND ability to pay',
+          'Demand is always downward sloping (Law of Demand)',
+          'Demand can shift due to non-price factors'
+        ]
       },
       {
         id: 'law_of_demand',
         term: 'Law of Demand',
-        definition: 'There is an inverse relationship between the price of a good and the quantity demanded.',
+        definition: 'The principle that, as the price of a good or service increases, the quantity demanded will decrease, and vice versa.',
         subject: 'ap_macroeconomics',
         unit: 1,
         lessonIDs: ['1.4'],
-        subNotes: []
+        subNotes: [
+          'Price and quantity demanded have an inverse relationship',
+          'The demand curve always slopes downward from left to right',
+          'Two main reasons for the law of demand: substitution effect and income effect',
+        ]
+      },
+      {
+        id: 'determinants-of-demand',
+        term: 'Determinants of Demand',
+        definition: 'Factors other than price that shift the demand curve.',
+        subject: 'ap_macroeconomics',
+        unit: 1,
+        lessonIDs: ['1.4'],
+        subNotes: [
+          'Tastes and Preferences: Fidget spinners are no longer cool, so demand for them decreases.',
+          'Income: As a country becomes more wealthy, demand for luxury goods increases.',
+          'Prices of Related Goods: If Apple Music increases their price, demand for Spotify increases.',
+          'Number of Buyers: If more people move to Miami, demand for apartments in Miami increases.',
+          'Expectations: If people expect the price of gasoline to increase next week, they will buy more gasoline this week.'
+        ]
+      },
+      {
+        id: 'normal-good',
+        term: 'Normal Good',
+        definition: 'A good for which demand increases as consumer income rises, and demand decreases as consumer income falls (positive income elasticity).',
+        subject: 'ap_macroeconomics',
+        unit: 1,
+        lessonIDs: ['1.4'],
+        subNotes: [
+          'Examples include most goods: cars, electronics, clothing',
+          'Has positive income elasticity of demand',
+          'Demand curve shifts right when income increases',
+          'Demand curve shifts left when income decreases'
+        ]
+      },
+      {
+        id: 'inferior-good',
+        term: 'Inferior Good',
+        definition: 'A good for which demand decreases as consumer income rises, and demand increases as consumer income falls (negative income elasticity).',
+        subject: 'ap_macroeconomics',
+        unit: 1,
+        lessonIDs: ['1.4'],
+        subNotes: [
+          'Examples include ramen noodles, used cars, public transportation',
+          'Has negative income elasticity of demand',
+          'Demand curve shifts left when income increases',
+          'Demand curve shifts right when income decreases'
+        ]
+      },
+      {
+        id: 'substitutes',
+        term: 'Substitutes',
+        definition: 'Two goods for which an increase in the price of one leads to an increase in the demand for the other (positive cross-price elasticity).',
+        subject: 'ap_macroeconomics',
+        unit: 1,
+        lessonIDs: ['1.4'],
+        subNotes: [
+          'Examples: Coke and Pepsi, butter and margarine',
+          'Have positive cross-price elasticity of demand',
+          'Price increase of one shifts demand for the other right',
+          'Consumers can easily switch between them'
+        ]
+      },
+      {
+        id: 'complements',
+        term: 'Complements',
+        definition: 'Two goods for which an increase in the price of one leads to a decrease in the demand for the other (negative cross-price elasticity). Goods often consumed together.',
+        subject: 'ap_macroeconomics',
+        unit: 1,
+        lessonIDs: ['1.4'],
+        subNotes: [
+          'Examples: peanut butter and jelly, cars and gasoline',
+          'Have negative cross-price elasticity of demand',
+          'Price increase of one shifts demand for the other left',
+          'Goods are consumed together as a bundle'
+        ]
       },
       {
         id: 'demand_curve',
@@ -227,18 +389,9 @@ export const keyTerms: KeyTerm[] = [
         subNotes: []
       },
       {
-        id: 'shifters_of_demand',
-        term: 'Shifters of Demand',
-        definition: 'The five non-price factors that shift the entire demand curve.',
-        subject: 'ap_macroeconomics',
-        unit: 1,
-        lessonIDs: ['1.4'],
-        subNotes: ['Tastes/preferences', 'Price of related goods', 'Income', 'Number of buyers', 'Expectations']
-      },
-      {
         id: 'supply',
         term: 'Supply',
-        definition: 'A producer’s ability and willingness to sell a good or service.',
+        definition: 'The relationship between the price of a good or service and the quantity producers are willing and able to sell at various prices during a specific time period, ceteris paribus.',
         subject: 'ap_macroeconomics',
         unit: 1,
         lessonIDs: ['1.5'],
@@ -247,11 +400,124 @@ export const keyTerms: KeyTerm[] = [
       {
         id: 'law_of_supply',
         term: 'Law of Supply',
-        definition: 'There is a direct relationship between the price of a good and the quantity supplied.',
+        definition: 'The principle that, as the price of a good or service increases, the quantity supplied will increase, and vice versa.',
         subject: 'ap_macroeconomics',
         unit: 1,
         lessonIDs: ['1.5'],
-        subNotes: []
+        subNotes: [
+          'Price and quantity supplied have a direct relationship',
+          'The supply curve always slopes upward',
+          'Two main reasons for the law of supply: profit motive and opportunity cost',
+        ]
+      },
+      {
+        id: 'determinants-of-supply',
+        term: 'Determinants of Supply',
+        definition: 'Factors other than price that shift the supply curve.',
+        subject: 'ap_macroeconomics',
+        unit: 1,
+        lessonIDs: ['1.5'],
+        subNotes: [
+          'Resource Prices: Higher input costs shift supply left',
+          'Technology: Better technology shifts supply right',
+          'Number of Sellers: More sellers shifts supply right',
+          'Government Actions: Taxes shift supply left, subsidies shift right'
+        ]
+      },
+      {
+        id: 'resource-input-prices',
+        term: 'Resource/Input Prices',
+        definition: 'The cost of factors of production (land, labor, capital, entrepreneurship) used to produce goods and services. Changes in these costs shift the supply curve.',
+        subject: 'ap_macroeconomics',
+        unit: 1,
+        lessonIDs: ['1.5'],
+        subNotes: [
+          'Higher input costs shift supply curve left (decrease supply)',
+          'Lower input costs shift supply curve right (increase supply)',
+          'Examples: If I produce wooden tables, and the price of wood increases, I can produce fewer tables with the same amount of money.',
+        ]
+      },
+      {
+        id: 'technology',
+        term: 'Technology',
+        definition: 'The methods, processes, and techniques used to produce goods and services. Improvements in technology can increase productivity and shift the supply curve.',
+        subject: 'ap_macroeconomics',
+        unit: 1,
+        lessonIDs: ['1.5'],
+        subNotes: [
+          'Better technology shifts supply curve right (increase supply)',
+          'Increases productivity and reduces production costs',
+          'Examples: New improved fertilizer allows farmers to produce more crops with the same amount of land and labor.',
+        ]
+      },
+      {
+        id: 'prices-of-other-goods',
+        term: 'Prices of Other Goods',
+        definition: 'The prices of alternative goods that producers could produce instead. Changes in these prices can affect the supply of the current good.',
+        subject: 'ap_macroeconomics',
+        unit: 1,
+        lessonIDs: ['1.5'],
+        subNotes: [
+          'Higher prices of alternatives shift supply left (decrease supply)',
+          'Lower prices of alternatives shift supply right (increase supply)',
+          'Producers switch to more profitable alternatives',
+          'Examples: If the price of durian increase, farmers will produce more durian and less other fruits.'
+        ]
+      },
+      {
+        id: 'number-of-sellers',
+        term: 'Number of Sellers',
+        definition: 'The quantity of firms or producers in a market. Changes in the number of sellers directly affect the total supply in the market.',
+        subject: 'ap_macroeconomics',
+        unit: 1,
+        lessonIDs: ['1.5'],
+        subNotes: [
+          'More sellers shift supply curve right (increase supply)',
+          'Fewer sellers shift supply curve left (decrease supply)',
+          'Each seller contributes to total market supply',
+          'Examples: new firms entering, existing firms exiting'
+        ]
+      },
+      {
+        id: 'expectations',
+        term: 'Expectations',
+        definition: 'Producers\' beliefs about future market conditions, including prices, costs, and demand. These expectations can influence current supply decisions.',
+        subject: 'ap_macroeconomics',
+        unit: 1,
+        lessonIDs: ['1.5'],
+        subNotes: [
+          'Expected higher future prices shift supply left (decrease current supply)',
+          'Expected lower future prices shift supply right (increase current supply)',
+          'Producers may hold inventory or rush to sell',
+          'Examples: If sellers of gold expect the price of gold to increase, they will sell less today and wait to sell more at the higher future price.'
+        ]
+      },
+      {
+        id: 'government-actions',
+        term: 'Government Actions',
+        definition: 'Policies and regulations implemented by government that affect production costs or incentives, including taxes, subsidies, regulations, and trade policies.',
+        subject: 'ap_macroeconomics',
+        unit: 1,
+        lessonIDs: ['1.5'],
+        subNotes: [
+          'Taxes shift supply curve left (decrease supply)',
+          'Subsidies shift supply curve right (increase supply)',
+          'Regulations can increase costs and decrease supply',
+          'Examples: excise taxes, production subsidies, environmental regulations'
+        ]
+      },
+      {
+        id: 'subsidy',
+        term: 'Subsidy',
+        definition: 'A government payment to producers (or consumers) that reduces production costs, encouraging increased supply.',
+        subject: 'ap_macroeconomics',
+        unit: 1,
+        lessonIDs: ['1.5'],
+        subNotes: [
+          'Shifts the supply curve to the right (increases supply)',
+          'Lowers production costs for firms',
+          'Example: Government gives subsidy to electric car company, allowing them to produce more electric cars at each price level'
+        ]
       },
       {
         id: 'supply_curve',
@@ -272,22 +538,39 @@ export const keyTerms: KeyTerm[] = [
         subNotes: []
       },
       {
-        id: 'shifters_of_supply',
-        term: 'Shifters of Supply',
-        definition: 'The five non-price factors that shift the entire supply curve.',
-        subject: 'ap_macroeconomics',
-        unit: 1,
-        lessonIDs: ['1.5'],
-        subNotes: ['Cost of inputs', 'Number of sellers', 'Sellers’ expectations', 'Price of related goods', 'Government action']
-      },
-      {
-        id: 'equilibrium',
-        term: 'Equilibrium',
-        definition: 'When quantity supplied equals quantity demanded; the intersection of supply and demand curves.',
+        id: 'market-equilibrium',
+        term: 'Market Equilibrium',
+        definition: 'The state where the quantity demanded equals the quantity supplied at a specific price.',
         subject: 'ap_macroeconomics',
         unit: 1,
         lessonIDs: ['1.6'],
-        subNotes: []
+        subNotes: [
+          'Occurs where demand and supply curves intersect',
+          'No shortage or surplus at equilibrium',
+          'Market automatically moves toward equilibrium'
+        ]
+      },
+      {
+        id: 'equilibrium-price',
+        term: 'Equilibrium Price',
+        definition: 'The price at which quantity demanded equals quantity supplied in a market. Also known as the market-clearing price (P* or Pe).',
+        subject: 'ap_macroeconomics',
+        unit: 1,
+        lessonIDs: ['1.6'],
+        subNotes: [
+          'Occurs where demand and supply curves intersect'
+        ]
+      },
+      {
+        id: 'equilibrium-quantity',
+        term: 'Equilibrium Quantity',
+        definition: 'The quantity of a good or service bought and sold at the equilibrium price (Q* or Qe).',
+        subject: 'ap_macroeconomics',
+        unit: 1,
+        lessonIDs: ['1.6'],
+        subNotes: [
+          'Occurs where demand and supply curves intersect'
+        ]
       },
       {
         id: 'disequilibrium',
@@ -301,20 +584,30 @@ export const keyTerms: KeyTerm[] = [
       {
         id: 'surplus',
         term: 'Surplus',
-        definition: 'When quantity supplied exceeds quantity demanded; occurs when price is above equilibrium.',
+        definition: 'A situation where the quantity supplied (Qs) exceeds the quantity demanded (Qd) at the current price (Qs > Qd). Occurs when the price is above equilibrium.',
         subject: 'ap_macroeconomics',
         unit: 1,
         lessonIDs: ['1.6'],
-        subNotes: []
+        subNotes: [
+          'Also called excess supply',
+          'Creates downward pressure on price',
+          'Some producers cannot sell their goods',
+          'Market will adjust toward equilibrium'
+        ]
       },
       {
         id: 'shortage',
         term: 'Shortage',
-        definition: 'When quantity demanded exceeds quantity supplied; occurs when price is below equilibrium.',
+        definition: 'A situation where the quantity demanded (Qd) exceeds the quantity supplied (Qs) at the current price (Qd > Qs). Occurs when the price is below equilibrium.',
         subject: 'ap_macroeconomics',
         unit: 1,
         lessonIDs: ['1.6'],
-        subNotes: []
+        subNotes: [
+          'Also called excess demand',
+          'Creates upward pressure on price',
+          'Some consumers cannot buy the good',
+          'Market will adjust toward equilibrium'
+        ]
       },
       {
         id: 'indeterminate_change',
@@ -334,7 +627,12 @@ export const keyTerms: KeyTerm[] = [
     subject: 'ap_macroeconomics',
     unit: 2,
     lessonIDs: ['2.1'],
-    subNotes: []
+    subNotes: [
+      'GDP',
+      'GDP per capita',
+      'Unemployment',
+      'Inflation'
+    ]
   },
   {
     id: 'circular-flow-model',
@@ -343,7 +641,9 @@ export const keyTerms: KeyTerm[] = [
     subject: 'ap_macroeconomics',
     unit: 2,
     lessonIDs: ['2.1'],
-    subNotes: []
+    subNotes: [
+      'Depicts money and goods and services moving between households, firms, government, external sector, and financial sector.'
+    ]
   },
   {
     id: 'households',
@@ -447,16 +747,19 @@ export const keyTerms: KeyTerm[] = [
     subject: 'ap_macroeconomics',
     unit: 2,
     lessonIDs: ['2.1'],
-    subNotes: []
+    subNotes: [
+      'Includes durable goods (cars, appliances), non-durable goods (food, clothing), and services (healthcare, education)', 
+      'Some large consumer purchases (cars, houses) are interest-senssitive, meaning when interest rates decrease, consumption increases'
+    ]
   },
   {
     id: 'investment-i',
     term: 'Investment (I)',
-    definition: 'Business spending on capital goods like machines, not stock purchases.',
+    definition: 'Business spending on capital goods like machines',
     subject: 'ap_macroeconomics',
     unit: 2,
     lessonIDs: ['2.1'],
-    subNotes: []
+    subNotes: ['Investment is interest-sensitive, meaning when interest rates decrease, investment increases', 'Careful: Investment is NOT stock purchases']
   },
   {
     id: 'government-spending-g',
@@ -470,15 +773,6 @@ export const keyTerms: KeyTerm[] = [
     ]
   },
   {
-    id: 'net-exports-nx',
-    term: 'Net Exports (NX)',
-    definition: 'Exports minus imports; imports are subtracted to avoid counting foreign production in GDP.',
-    subject: 'ap_macroeconomics',
-    unit: 2,
-    lessonIDs: ['2.1'],
-    subNotes: []
-  },
-  {
     id: 'gov-transfer-payments',
     term: 'Government Transfer Payments',
     definition: 'Money the government gives without receiving a good or service in return, not counted in GDP.',
@@ -489,6 +783,18 @@ export const keyTerms: KeyTerm[] = [
       'Example: Unemployment benefits'
     ]
   },
+  {
+    id: 'net-exports-nx',
+    term: 'Net Exports (NX)',
+    definition: 'Exports minus imports.',
+    subject: 'ap_macroeconomics',
+    unit: 2,
+    lessonIDs: ['2.1'],
+    subNotes: [
+      'Imports are subtracted to avoid counting foreign production in GDP.'
+    ]
+  },
+  
   {
     id: 'income-approach',
     term: 'Income Approach',
@@ -507,7 +813,9 @@ export const keyTerms: KeyTerm[] = [
     subject: 'ap_macroeconomics',
     unit: 2,
     lessonIDs: ['2.1'],
-    subNotes: []
+    subNotes: [
+      'Example: When you buy a $10 pizza (expenditure approach: C = $10), that $10 becomes income for the pizza shop owner (income approach: wages, rent, profit = $10). Both approaches count the same $10 transaction.'
+    ]
   },
 
   // Lesson 2.2: Limitations of GDP
@@ -523,14 +831,91 @@ export const keyTerms: KeyTerm[] = [
     ]
   },
   {
-    id: 'non-market-transactions',
-    term: 'Non-Market Transactions',
-    definition: 'Productive work where no money changes hands, not counted in GDP.',
+    id: 'limitations-of-gdp',
+    term: 'Limitations of GDP',
+    definition: 'Shortcomings of GDP as a measure of economic well-being and quality of life.',
     subject: 'ap_macroeconomics',
     unit: 2,
     lessonIDs: ['2.2'],
     subNotes: [
-      'Examples: Washing your own car, caring for your kids'
+      'Population: GDP doesn\'t account for population size (Luxembourg has a much smaller GDP than India due to its size, but a much higher standard of living)',
+      'Inequality: GDP doesn\'t show how income and wealth are distributed among the population',
+      'Environment: GDP doesn\'t account for environmental degradation or depletion of natural resources',
+      'Shadow Economy: GDP doesn\'t include illegal activities and unreported income from the underground economy'
+    ]
+  },
+  {
+    id: 'gdp-excludes-non-market-underground',
+    term: 'GDP Excludes Non-Market and Underground Activities',
+    definition: 'GDP only counts goods and services that are bought and sold in official markets, overlooking unpaid work and illegal transactions.',
+    subject: 'ap_macroeconomics',
+    unit: 2,
+    lessonIDs: ['2.2'],
+    subNotes: [
+      'GDP overlooks unpaid work like household chores, caregiving, and volunteerism',
+      'GDP does not include "off-the-books" or illegal transactions that occur in the underground economy',
+      'Example: A parent caring for their child at home is not counted in GDP, but hiring a nanny would be counted'
+    ]
+  },
+  {
+    id: 'gdp-ignores-negative-externalities',
+    term: 'GDP Ignores Negative Externalities',
+    definition: 'GDP does not subtract the costs of negative consequences like pollution or environmental degradation from its calculation.',
+    subject: 'ap_macroeconomics',
+    unit: 2,
+    lessonIDs: ['2.2'],
+    subNotes: [
+      'Economic growth measured by GDP can include costs that harm society and the environment',
+      'Examples: Pollution from factories, depletion of natural resources, environmental damage from production'
+    ]
+  },
+  {
+    id: 'gdp-fails-to-account-for-inequality',
+    term: 'GDP Fails to Account for Income Inequality',
+    definition: 'GDP doesn\'t show how wealth is distributed within a country, potentially masking significant income inequality.',
+    subject: 'ap_macroeconomics',
+    unit: 2,
+    lessonIDs: ['2.2'],
+    subNotes: [
+      'A high GDP can mask significant income inequality, where a small portion of the population holds most of the wealth',
+      'Example: A country with high GDP but where most people live in poverty still appears economically successful'
+    ]
+  },
+  {
+    id: 'gdp-doesnt-measure-quality-of-life',
+    term: 'GDP Doesn\'t Measure Quality of Life or Well-Being',
+    definition: 'GDP is a poor indicator of a nation\'s overall well-being because it doesn\'t measure important non-economic factors.',
+    subject: 'ap_macroeconomics',
+    unit: 2,
+    lessonIDs: ['2.2'],
+    subNotes: [
+      'GDP doesn\'t measure factors like health, education, life expectancy, leisure time, or social and political freedom',
+      'Example: A country with high GDP but poor healthcare and education systems may have lower overall well-being'
+    ]
+  },
+  {
+    id: 'gdp-includes-unproductive-expenditures',
+    term: 'GDP Includes Unproductive Expenditures',
+    definition: 'GDP counts spending on negative events as a positive economic gain, treating them as if they are wealth-creating activities.',
+    subject: 'ap_macroeconomics',
+    unit: 2,
+    lessonIDs: ['2.2'],
+    subNotes: [
+      'Spending on disaster recovery, crime prevention, or even the costs of war are included in GDP',
+      'Example: Rebuilding after a hurricane increases GDP, even though the destruction itself was harmful to society'
+    ]
+  },
+  {
+    id: 'gdp-misrepresents-technology-depreciation',
+    term: 'GDP Misrepresents Progress Due to Technology and Depreciation',
+    definition: 'GDP doesn\'t always accurately account for improvements in product quality or efficiency, and treats replacement of depreciated capital the same as new capital creation.',
+    subject: 'ap_macroeconomics',
+    unit: 2,
+    lessonIDs: ['2.2'],
+    subNotes: [
+      'GDP doesn\'t account for improvements in product quality or efficiency driven by technology',
+      'GDP counts the replacement of depreciated capital (e.g., a worn-out machine) the same as the creation of new capital, failing to reflect net investment',
+      'Example: Replacing a broken computer with an identical model counts the same as upgrading to a much better computer'
     ]
   },
 
@@ -542,7 +927,9 @@ export const keyTerms: KeyTerm[] = [
     subject: 'ap_macroeconomics',
     unit: 2,
     lessonIDs: ['2.3'],
-    subNotes: []
+    subNotes: [
+      'Careful: Just because you don\'t have a job doesn\'t mean you are unemployed (discouraged workers, retired people, children).'
+    ]
   },
   {
     id: 'frictional-unemployment',
@@ -552,7 +939,7 @@ export const keyTerms: KeyTerm[] = [
     unit: 2,
     lessonIDs: ['2.3'],
     subNotes: [
-      'Examples: Career change, recent graduates'
+      'Examples: A recent college graduate searching for their first job, a worker who quit their job to find a better one, someone moving to a new city and looking for work'
     ]
   },
   {
@@ -562,7 +949,9 @@ export const keyTerms: KeyTerm[] = [
     subject: 'ap_macroeconomics',
     unit: 2,
     lessonIDs: ['2.3'],
-    subNotes: []
+    subNotes: [
+      'Examples: A coal miner whose job was eliminated due to the shift to renewable energy, a factory worker whose job was replaced by automation, a typewriter repair person after computers became widespread'
+    ]
   },
   {
     id: 'cyclical-unemployment',
@@ -571,7 +960,9 @@ export const keyTerms: KeyTerm[] = [
     subject: 'ap_macroeconomics',
     unit: 2,
     lessonIDs: ['2.3'],
-    subNotes: []
+    subNotes: [
+      'Examples: A construction worker laid off during an economic downturn, a retail employee whose store closed due to reduced consumer spending, a factory worker who lost their job when the company reduced production during a recession'
+    ]
   },
   {
     id: 'natural-rate-unemployment',
@@ -589,7 +980,9 @@ export const keyTerms: KeyTerm[] = [
     subject: 'ap_macroeconomics',
     unit: 2,
     lessonIDs: ['2.3'],
-    subNotes: []
+    subNotes: [
+      'Formula: Labor Force = Employed + Unemployed'
+    ]
   },
   {
     id: 'unemployment-rate',
@@ -599,7 +992,8 @@ export const keyTerms: KeyTerm[] = [
     unit: 2,
     lessonIDs: ['2.3'],
     subNotes: [
-      'Formula: (Number of Unemployed / Labor Force) × 100'
+      'Formula: (Number of Unemployed / Labor Force) × 100',
+      'Shortcoming: An increase in discouraged workers causes a decrease in the unemployment rate, which is a shortcoming of the unemployment rate as an economic indicator.'
     ]
   },
   {
@@ -620,7 +1014,9 @@ export const keyTerms: KeyTerm[] = [
     subject: 'ap_macroeconomics',
     unit: 2,
     lessonIDs: ['2.3'],
-    subNotes: []
+    subNotes: [
+      'An increase in discouraged workers causes a decrease in the unemployment rate (because they are no longer counted as unemployed or in the labor force).'
+    ]
   },
 
   // Lesson 2.4: Price Indices and Inflation
@@ -721,22 +1117,15 @@ export const keyTerms: KeyTerm[] = [
 
   // Lesson 2.5: Costs of Inflation
   {
-    id: 'purchasing-power',
-    term: 'Purchasing Power',
-    definition: 'The quantity of goods and services money can buy; reduced by unexpected inflation.',
-    subject: 'ap_macroeconomics',
-    unit: 2,
-    lessonIDs: ['2.5'],
-    subNotes: []
-  },
-  {
     id: 'nominal-variable',
     term: 'Nominal Variable',
     definition: 'A value measured in current dollars, not adjusted for inflation.',
     subject: 'ap_macroeconomics',
     unit: 2,
     lessonIDs: ['2.5'],
-    subNotes: []
+    subNotes: [
+      'Example: Nominal wage, nominal GDP, nominal interest rate'
+    ]
   },
   {
     id: 'real-variable',
@@ -745,17 +1134,8 @@ export const keyTerms: KeyTerm[] = [
     subject: 'ap_macroeconomics',
     unit: 2,
     lessonIDs: ['2.5'],
-    subNotes: []
-  },
-  {
-    id: 'menu-costs',
-    term: 'Menu Costs',
-    definition: 'Costs to businesses from changing prices during inflation.',
-    subject: 'ap_macroeconomics',
-    unit: 2,
-    lessonIDs: ['2.5'],
     subNotes: [
-      'Example: Printing new menus'
+      'Example: Real wage, real GDP, real interest rate'
     ]
   },
   {
@@ -776,6 +1156,39 @@ export const keyTerms: KeyTerm[] = [
     lessonIDs: ['2.5'],
     subNotes: [
       'Formula: Real Interest Rate = Nominal Interest Rate – Inflation Rate'
+    ]
+  },
+  {
+    id: 'purchasing-power',
+    term: 'Purchasing Power',
+    definition: 'The quantity of goods and services money can buy; reduced by unexpected inflation.',
+    subject: 'ap_macroeconomics',
+    unit: 2,
+    lessonIDs: ['2.5'],
+    subNotes: []
+  },
+  
+  {
+    id: 'menu-costs',
+    term: 'Menu Costs',
+    definition: 'Costs to businesses from changing prices during inflation.',
+    subject: 'ap_macroeconomics',
+    unit: 2,
+    lessonIDs: ['2.5'],
+    subNotes: [
+      'Example: Printing new menus'
+    ]
+  },
+  {
+    id: 'substitution-bias',
+    term: 'Substitution Bias',
+    definition: 'A limitation of the Consumer Price Index (CPI) that occurs because consumers substitute away from goods that become relatively more expensive.',
+    subject: 'ap_macroeconomics',
+    unit: 2,
+    lessonIDs: ['2.5'],
+    subNotes: [
+      'CPI uses a fixed basket of goods, but consumers actually change their spending patterns when prices change',
+      'Example: If the price of beef increases, consumers may buy more chicken instead, but CPI still weights beef the same as before'
     ]
   },
 
@@ -799,7 +1212,8 @@ export const keyTerms: KeyTerm[] = [
     unit: 2,
     lessonIDs: ['2.6'],
     subNotes: [
-      'Formula: Real GDP = (Nominal GDP / GDP Deflator) × 100'
+      'Formula: Real GDP = (Nominal GDP / GDP Deflator) × 100', 
+      'When calculating real GDP using a table of goods and services, you can multiply the quantity of each good by the price of the good in the base year to get the real GDP.'
     ]
   },
   {
@@ -810,7 +1224,8 @@ export const keyTerms: KeyTerm[] = [
     unit: 2,
     lessonIDs: ['2.6'],
     subNotes: [
-      'Formula: GDP Deflator = (Nominal GDP / Real GDP) × 100'
+      'Formula: GDP Deflator = (Nominal GDP / Real GDP) × 100',
+      'A broader measure than CPI because it includes all goods and services in the economy, not just a fixed basket of consumer goods.'
     ]
   },
 
@@ -894,7 +1309,10 @@ export const keyTerms: KeyTerm[] = [
     subject: 'ap_macroeconomics',
     unit: 2,
     lessonIDs: ['2.7'],
-    subNotes: []
+    subNotes: [
+      'Actual output is below potential output',
+      'Actual unemployment rate is higher than the natural rate.'
+    ]
   },
   {
     id: 'inflationary_gap',
@@ -903,7 +1321,10 @@ export const keyTerms: KeyTerm[] = [
     subject: 'ap_macroeconomics',
     unit: 2,
     lessonIDs: ['2.7'],
-    subNotes: []
+    subNotes: [
+      'Actual output is above potential output',
+      'Actual unemployment rate is lower than the natural rate.'
+    ]
   },
     // Lesson 3.1: Aggregate Demand
     {
@@ -941,9 +1362,40 @@ export const keyTerms: KeyTerm[] = [
       unit: 3,
       lessonIDs: ['3.1'],
       subNotes: [
-        'The Real Wealth Effect: When the price level falls, the money you have is more valuable, making you feel wealthier and causing you to spend more.',
-        'The Interest Rate Effect: When the price level falls, people save more, which drives down interest rates and makes it cheaper for businesses to borrow and invest.',
-        'The Net Export Effect: When a country’s price level falls, its goods become cheaper compared to foreign goods, which causes its net exports to go up.'
+        'This inverse relationship is explained by three effects: the Real Wealth Effect, the Interest Rate Effect, and the Net Export Effect'
+      ]
+    },
+    {
+      id: 'real-wealth-effect',
+      term: 'Real Wealth Effect',
+      definition: 'When the price level falls, the money you have is more valuable, making you feel wealthier and causing you to spend more.',
+      subject: 'ap_macroeconomics',
+      unit: 3,
+      lessonIDs: ['3.1'],
+      subNotes: [
+        'Example: If you have $1000 in savings and the price level falls by 10%, your $1000 can now buy more goods and services, making you feel wealthier. This increased purchasing power encourages you to spend more, increasing aggregate demand.'
+      ]
+    },
+    {
+      id: 'interest-rate-effect',
+      term: 'Interest Rate Effect',
+      definition: 'When the price level falls, people save more, which drives down interest rates and makes it cheaper for businesses to borrow and invest.',
+      subject: 'ap_macroeconomics',
+      unit: 3,
+      lessonIDs: ['3.1'],
+      subNotes: [
+        'Example: When prices fall, people need less money for transactions, so they save more. This increased supply of loanable funds lowers interest rates. Lower interest rates make it cheaper for businesses to borrow money for investment projects, increasing aggregate demand.'
+      ]
+    },
+    {
+      id: 'net-export-effect',
+      term: 'Net Export Effect',
+      definition: 'When a country\'s price level falls, its goods become cheaper compared to foreign goods, which causes its net exports to go up.',
+      subject: 'ap_macroeconomics',
+      unit: 3,
+      lessonIDs: ['3.1'],
+      subNotes: [
+        'Example: If the U.S. price level falls while prices in other countries stay the same, American goods become relatively cheaper. Foreign consumers will buy more American products, and American consumers will buy fewer foreign products, increasing U.S. net exports and aggregate demand.'
       ]
     },
     {
@@ -969,7 +1421,7 @@ export const keyTerms: KeyTerm[] = [
       subject: 'ap_macroeconomics',
       unit: 3,
       lessonIDs: ['3.2'],
-      subNotes: []
+      subNotes: ['The size of the multiplier is determined by the marginal propensity to consume (MPC) and the marginal propensity to save (MPS)']
     },
     {
       id: 'mpc',
@@ -1007,12 +1459,14 @@ export const keyTerms: KeyTerm[] = [
     {
       id: 'tax-multiplier',
       term: 'Tax Multiplier',
-      definition: 'The multiplier that applies to a change in taxes; it is always one less than the spending multiplier because the initial change in spending is smaller.',
+      definition: 'The multiplier that applies to a change in taxes.',
       subject: 'ap_macroeconomics',
       unit: 3,
       lessonIDs: ['3.2'],
       subNotes: [
-        'Formula: -MPC / MPS'
+        'Formula: -MPC / MPS', 
+        'Note: The negative sign indicates that a decrease in taxes will increase GDP, and an increase in taxes will decrease GDP.',
+        'Easy trick: tax multiplier is always one less than the spending multiplier'
       ]
     },
     {
@@ -1032,11 +1486,11 @@ export const keyTerms: KeyTerm[] = [
     {
       id: 'sras',
       term: 'Short-Run Aggregate Supply (SRAS)',
-      definition: 'Shows the direct relationship between the overall price level and the quantity of output that firms produce in the short run. It is upward-sloping.',
+      definition: 'Shows the direct relationship between the overall price level and the quantity of output that firms produce in the short run.',
       subject: 'ap_macroeconomics',
       unit: 3,
       lessonIDs: ['3.3'],
-      subNotes: []
+      subNotes: ['It is upward-sloping due to sticky wages']
     },
     {
       id: 'sticky-wages',
@@ -1046,7 +1500,7 @@ export const keyTerms: KeyTerm[] = [
       unit: 3,
       lessonIDs: ['3.3'],
       subNotes: [
-        'If the price of goods rises while wages remain "stuck," company profits go up, creating an incentive to produce more.'
+        'If I produce and sell wooden tables and the price of my tables rises while my workers wages remain "stuck," my profits go up, creating an incentive to produce more.'
       ]
     },
     {
@@ -1068,11 +1522,14 @@ export const keyTerms: KeyTerm[] = [
     {
       id: 'lras',
       term: 'Long-Run Aggregate Supply (LRAS)',
-      definition: 'Shows the total amount of production possible for an economy when it’s using all of its resources efficiently. It is a vertical line at the economy’s full-employment output level (Yf).',
+      definition: 'Shows the total amount of production possible for an economy when it’s using all of its resources efficiently.',
       subject: 'ap_macroeconomics',
       unit: 3,
       lessonIDs: ['3.4'],
-      subNotes: []
+      subNotes: [
+        'It is a vertical line at the economy’s full-employment output level (Yf).',
+        'This means there is no relationship between the price level and the quantity of output that firms produce in the long run.'
+      ]
     },
     {
       id: 'full-employment-output',
@@ -1085,7 +1542,7 @@ export const keyTerms: KeyTerm[] = [
     },
     {
       id: 'factors-of-production-macro',
-      term: 'Factors of Production (Macro)',
+      term: 'Factors of Production',
       definition: 'The resources that determine a country’s potential output and the position of the LRAS curve.',
       subject: 'ap_macroeconomics',
       unit: 3,
@@ -1160,7 +1617,9 @@ export const keyTerms: KeyTerm[] = [
       subject: 'ap_macroeconomics',
       unit: 3,
       lessonIDs: ['3.6'],
-      subNotes: []
+      subNotes: [
+        'Results in a decrease in output, an increase in the price level, and an increase in unemployment'
+      ]
     },
     {
       id: 'positive-supply-shock',
@@ -1169,7 +1628,7 @@ export const keyTerms: KeyTerm[] = [
       subject: 'ap_macroeconomics',
       unit: 3,
       lessonIDs: ['3.6'],
-      subNotes: []
+      subNotes: ['Results in an increase in output, a decrease in the price level, and a decrease in unemployment' ]
     },
     {
       id: 'stagflation',
@@ -1423,9 +1882,40 @@ export const keyTerms: KeyTerm[] = [
         unit: 4,
         lessonIDs: ['4.3'],
         subNotes: [
-          'Medium of Exchange: Used to buy goods/services, avoiding barter.',
-          'Store of Value: Holds wealth over time without expiring.',
-          'Unit of Account: Standard measure for pricing goods and services.'
+          'Money must fulfill all three functions: Medium of Exchange, Store of Value, and Unit of Account'
+        ]
+      },
+      {
+        id: 'medium-of-exchange',
+        term: 'Medium of Exchange',
+        definition: 'A function of money where it is used to buy goods and services, avoiding the need for barter.',
+        subject: 'ap_macroeconomics',
+        unit: 4,
+        lessonIDs: ['4.3'],
+        subNotes: [
+          'Example: Instead of trading 5 chickens for a pair of shoes (barter), you can use money (dollars) to buy the shoes directly. This makes transactions much easier and more efficient.'
+        ]
+      },
+      {
+        id: 'store-of-value',
+        term: 'Store of Value',
+        definition: 'A function of money where it holds wealth over time without expiring or losing its value.',
+        subject: 'ap_macroeconomics',
+        unit: 4,
+        lessonIDs: ['4.3'],
+        subNotes: [
+          'Example: You can save $100 today and use it to buy goods and services in the future. Unlike perishable goods like food, money doesn\'t spoil or expire, allowing you to preserve your purchasing power over time.'
+        ]
+      },
+      {
+        id: 'unit-of-account',
+        term: 'Unit of Account',
+        definition: 'A function of money where it serves as a standard measure for pricing goods and services.',
+        subject: 'ap_macroeconomics',
+        unit: 4,
+        lessonIDs: ['4.3'],
+        subNotes: [
+          'Example: Prices are expressed in dollars (e.g., a pizza costs $12, a movie ticket costs $15). This allows easy comparison of values - you can quickly see that the movie ticket is more expensive than the pizza, without needing to know how many pizzas equal one movie ticket.'
         ]
       },
       {
@@ -1458,6 +1948,28 @@ export const keyTerms: KeyTerm[] = [
         unit: 4,
         lessonIDs: ['4.4'],
         subNotes: []
+      },
+      {
+        id: 'asset-banking',
+        term: 'Asset (Banking)',
+        definition: 'Something a bank is owed or owns; money that will come to the bank.',
+        subject: 'ap_macroeconomics',
+        unit: 4,
+        lessonIDs: ['4.4'],
+        subNotes: [
+          'Examples: Loans made to customers (the bank is owed repayment), reserves held at the bank, securities owned by the bank'
+        ]
+      },
+      {
+        id: 'liability-banking',
+        term: 'Liability (Banking)',
+        definition: 'Something a bank owes to others; money the bank must pay out.',
+        subject: 'ap_macroeconomics',
+        unit: 4,
+        lessonIDs: ['4.4'],
+        subNotes: [
+          'Examples: Customer deposits (the bank owes customers their money back when they withdraw), money the bank has borrowed'
+        ]
       },
       {
         id: 'required_reserve_ratio',

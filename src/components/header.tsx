@@ -13,6 +13,7 @@ export function Header() {
   const { user, logout, selectedSubject, setSelectedSubject } = useAuthContext();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCoursesDropdownOpen, setIsCoursesDropdownOpen] = useState(false);
+  const [isTutoringDropdownOpen, setIsTutoringDropdownOpen] = useState(false);
   const router = useRouter();
 
   const toggleMobileMenu = () => {
@@ -76,6 +77,48 @@ export function Header() {
               >
                 Unit Cheat Sheets
               </Link>
+
+              {/* Tutoring Dropdown */}
+              <div 
+                className="relative"
+                onMouseEnter={() => setIsTutoringDropdownOpen(true)}
+                onMouseLeave={() => setIsTutoringDropdownOpen(false)}
+              >
+                <button className="flex items-center gap-1 text-gray-700 hover:text-blue-600 transition-colors font-semibold">
+                  Tutoring
+                  <ChevronDown className={`w-4 h-4 transition-transform ${isTutoringDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+                
+                {isTutoringDropdownOpen && (
+                  <div className="absolute top-full left-0 pt-2 w-56 z-50">
+                    <div className="bg-white rounded-lg shadow-lg border border-gray-200 py-2">
+                      <Link
+                        href="/tutoring"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                        onClick={() => setIsTutoringDropdownOpen(false)}
+                      >
+                        Book a Lesson
+                      </Link>
+                      <Link
+                        href="/async-tutoring"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                        onClick={() => setIsTutoringDropdownOpen(false)}
+                      >
+                        Ask a Question
+                      </Link>
+                      <Link
+                        href="https://www.youtube.com/@apdojo"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                        onClick={() => setIsTutoringDropdownOpen(false)}
+                      >
+                        Join a YouTube Live Session
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </div>
             </nav>
 
             {/* Subject Segmented Control & User Icon & Auth Buttons */}
@@ -160,6 +203,44 @@ export function Header() {
                 >
                   Unit Cheat Sheets
                 </Link>
+
+                {/* Tutoring Dropdown (Mobile) */}
+                <div className="px-4 py-2">
+                  <button
+                    onClick={() => setIsTutoringDropdownOpen(!isTutoringDropdownOpen)}
+                    className="flex items-center justify-between w-full text-gray-700 hover:text-blue-600 transition-colors font-semibold"
+                  >
+                    Tutoring
+                    <ChevronDown className={`w-4 h-4 transition-transform ${isTutoringDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                  {isTutoringDropdownOpen && (
+                    <div className="mt-2 ml-4 space-y-1">
+                      <Link
+                        href="/tutoring"
+                        onClick={closeMobileMenu}
+                        className="block px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition-colors rounded-md"
+                      >
+                        Book a Lesson
+                      </Link>
+                      <Link
+                        href="/async-tutoring"
+                        onClick={closeMobileMenu}
+                        className="block px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition-colors rounded-md"
+                      >
+                        Ask a Question
+                      </Link>
+                      <Link
+                        href="https://www.youtube.com/@apdojo"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={closeMobileMenu}
+                        className="block px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition-colors rounded-md"
+                      >
+                        Join a YouTube Live Session
+                      </Link>
+                    </div>
+                  )}
+                </div>
 
                 <div className="border-t border-gray-200 mt-4 pt-4">
                   {/* Subject Segmented Control (Mobile) */}

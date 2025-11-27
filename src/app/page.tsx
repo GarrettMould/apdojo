@@ -4,10 +4,12 @@ import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Loader2, Play } from 'lucide-react';
+import { Loader2, Play, X, ArrowRight } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { topicBundles, TopicBundle } from '@/data/topicBundles';
 import { useRouter } from 'next/navigation';
+import { ReviewsSection } from '@/components/ReviewsSection';
+import { UniversityLogos } from '@/components/UniversityLogos';
 
 // Reverted TopicCard to original design, with only the link href corrected
 function TopicCard({ bundle }: { bundle: TopicBundle }) {
@@ -56,8 +58,58 @@ function TopicCard({ bundle }: { bundle: TopicBundle }) {
 
 // Homepage for logged-out users - NOW CLEANED UP
 function LoggedOutHomePage() {
+  const [showMicroBanner, setShowMicroBanner] = useState(false);
+  const router = useRouter();
+  const { setSelectedSubject } = useAuthContext();
+
+  // Check localStorage on mount to see if banner was dismissed
+  useEffect(() => {
+    const dismissed = localStorage.getItem('microBannerDismissed');
+    if (!dismissed) {
+      setShowMicroBanner(true);
+    }
+  }, []);
+
+  const handleDismissBanner = () => {
+    setShowMicroBanner(false);
+    localStorage.setItem('microBannerDismissed', 'true');
+  };
+
+  const handleBannerClick = () => {
+    setSelectedSubject('micro');
+    router.push('/unit/1');
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 overflow-x-hidden">
+      {/* AP Micro Banner */}
+      {showMicroBanner && (
+        <div 
+          className="sticky top-0 z-50 bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg transition-all duration-500 ease-out"
+        >
+        <div className="max-w-7xl mx-auto px-4 py-2">
+          <div className="flex items-center justify-center gap-4">
+            <p className="text-xs md:text-sm font-medium">
+              AP Micro unit cheat sheets and MCQ practice problems now available! <span className="text-base md:text-lg">🎯</span>
+            </p>
+            <button
+              onClick={handleBannerClick}
+              className="px-3 py-1.5 text-sm font-medium text-white bg-white/10 border border-white/30 rounded-md hover:bg-white/20 whitespace-nowrap backdrop-blur-sm transition-colors flex items-center gap-2"
+            >
+              View Cheat Sheets
+              <ArrowRight className="w-4 h-4" />
+            </button>
+            <button
+              onClick={handleDismissBanner}
+              className="ml-2 p-1 hover:bg-white/20 rounded-full transition-colors"
+              aria-label="Dismiss banner"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+      )}
       {/* Topic Bundles Section */}
       <div className="py-16 sm:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -76,6 +128,12 @@ function LoggedOutHomePage() {
           </div>
         </div>
       </div>
+
+      {/* Reviews Section */}
+      <ReviewsSection />
+
+      {/* University Logos Section */}
+      <UniversityLogos />
     </div>
   );
 }

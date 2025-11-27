@@ -1,18 +1,15 @@
 'use client'
 
-import { Check } from 'lucide-react'
+import { Check, Star, Quote, GraduationCap } from 'lucide-react'
 import { Card } from "@/components/ui/card"
 import { reviews } from '@/data/reviews'
 import { Button } from "@/components/ui/button"
-import { ReviewsSection } from '@/components/ReviewsSection'
 import { useAuthContext } from '@/contexts/AuthContext'
 import { useState } from 'react'
 import { LoginModal, SignupModal } from '@/components/AuthModals'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js'
-import CalendlyWidget from '@/components/CalendlyWidget'
-
-
+import Link from 'next/link'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
@@ -63,6 +60,7 @@ export default function TutoringPage() {
   const [setupIntent, setSetupIntent] = useState<{ clientSecret: string } | null>(null)
   const [loading, setLoading] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [selectedReview, setSelectedReview] = useState<typeof reviews[0] | null>(null)
 
   const handleBookSession = () => {
     if (!user) {
@@ -77,9 +75,7 @@ export default function TutoringPage() {
     setLoading(true)
     setSubmitStatus('idle')
     
-    // Store the form reference
     const form = e.currentTarget
-    
     const formData = new FormData(form)
     const data = {
       name: formData.get('name'),
@@ -98,17 +94,15 @@ export default function TutoringPage() {
         body: JSON.stringify(data),
       })
 
-      // First check if response is ok before trying to parse JSON
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // Try to parse JSON response
       try {
         const result = await response.json();
         if (result.success) {
           setSubmitStatus('success')
-          form.reset() // Use the stored form reference
+          form.reset()
         } else {
           throw new Error(result.error || 'Unknown error occurred')
         }
@@ -123,6 +117,9 @@ export default function TutoringPage() {
       setLoading(false)
     }
   }
+
+  // Display first 3 reviews
+  const displayedReviews = reviews.slice(0, 3)
 
   return (
     <>
@@ -177,7 +174,7 @@ export default function TutoringPage() {
           Get personalized instruction from an experienced AP Economics teacher and tutor who has helped hundreds of students achieve their desired score.
         </p>
 
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-3xl mx-auto mb-20">
           <Card className="hover:shadow-lg transition-all duration-200 flex flex-col border border-gray-200">
             <div className="grid md:grid-cols-2 divide-x">
               {/* Tutoring Card */}
@@ -255,131 +252,257 @@ export default function TutoringPage() {
           </Card>
         </div>
 
-        {/* Contact Form Section */}
-        <div className="mt-32">
-          <h3 className="text-4xl font-extrabold text-gray-900 text-center mb-12">Request a Tutoring Session</h3>
-          <div className="max-w-2xl mx-auto">
-            <form 
-              onSubmit={handleSubmit}
-              className="space-y-6 bg-white p-8 rounded-lg border border-gray-200"
-            >
-              <div>
-                <label htmlFor="name" className="block text-md font-extrabold text-blue-700 mb-1">
-                  Name <span className="text-gray-400">(∗)</span>
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="email" className="block text-md font-extrabold text-blue-700 mb-1">
-                  Email <span className="text-gray-400">(∗)</span>
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="subject" className="block text-md font-extrabold text-blue-700 mb-1">Subject</label>
-                <div className="relative">
-                  <select
-                    id="subject"
-                    name="subject"
-                    required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 focus:outline-none bg-white appearance-none cursor-pointer pr-10"
-                  >
-                    <option value="AP Macroeconomics">AP Macroeconomics</option>
-                    <option value="AP Microeconomics">AP Microeconomics</option>
-                  </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                      <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="dates" className="block text-md font-extrabold text-blue-700 mb-1">Preferred Dates & Times</label>
-                <textarea
-                  id="dates"
-                  name="dates"
-                  rows={3}
-                  placeholder="Please list your preferred dates and times for tutoring"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="message" className="block text-md font-extrabold text-blue-700 mb-1">Additional Notes</label>
-                <textarea
-                  id="message"
-                  name="message"
-                  rows={4}
-                  placeholder="Any specific topics you'd like to cover or questions you have"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 focus:outline-none"
-                />
-              </div>
-
-              <p className="text-sm text-gray-400 italic">
-                <span className="text-gray-400">(∗)</span> indicates a required field
-              </p>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full px-6 py-3 bg-blue-600 text-white font-extrabold rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
+        {/* Two Column Layout: Form and Reviews */}
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 mb-12">
+          {/* Left Column: Contact Form */}
+          <div>
+            <h3 className="text-3xl font-extrabold text-gray-900 mb-6">Request a Tutoring Session</h3>
+            <Card className="p-6 lg:p-8 border border-gray-200">
+              <form 
+                onSubmit={handleSubmit}
+                className="space-y-5"
               >
-                {loading ? 'Sending...' : 'Send Request'}
-              </button>
+                <div>
+                  <label htmlFor="name" className="block text-sm font-bold text-gray-900 mb-1.5">
+                    Name <span className="text-gray-400 font-normal">(required)</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    required
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all"
+                  />
+                </div>
 
-              {submitStatus === 'success' && (
-                <div className="bg-blue-50 border border-blue-200 p-6 rounded-lg shadow-sm">
-                  <div className="flex flex-col items-center gap-2">
-                    <svg 
-                      className="w-12 h-12 text-blue-600" 
-                      fill="none" 
-                      stroke="currentColor" 
-                      viewBox="0 0 24 24"
+                <div>
+                  <label htmlFor="email" className="block text-sm font-bold text-gray-900 mb-1.5">
+                    Email <span className="text-gray-400 font-normal">(required)</span>
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    required
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="subject" className="block text-sm font-bold text-gray-900 mb-1.5">Subject</label>
+                  <div className="relative">
+                    <select
+                      id="subject"
+                      name="subject"
+                      required
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none bg-white appearance-none cursor-pointer pr-10"
                     >
-                      <path 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round" 
-                        strokeWidth={2} 
-                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" 
-                      />
-                    </svg>
-                    <h4 className="text-xl font-extrabold text-blue-700">
-                      Request Sent Successfully!
-                    </h4>
-                    <p className=" text-center">
-                      Thank you for your interest. We'll get back to you shortly.
-                    </p>
+                      <option value="AP Macroeconomics">AP Macroeconomics</option>
+                      <option value="AP Microeconomics">AP Microeconomics</option>
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-700">
+                      <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                        <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                      </svg>
+                    </div>
                   </div>
                 </div>
-              )}
-              
-              {submitStatus === 'error' && (
-                <p className="text-red-600 text-center font-medium mt-4">
-                  Sorry, there was an error sending your request. Please try again.
-                </p>
-              )}
-            </form>
+
+                <div>
+                  <label htmlFor="dates" className="block text-sm font-bold text-gray-900 mb-1.5">Preferred Dates & Times</label>
+                  <textarea
+                    id="dates"
+                    name="dates"
+                    rows={3}
+                    placeholder="Please list your preferred dates and times for tutoring"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all resize-none"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="message" className="block text-sm font-bold text-gray-900 mb-1.5">Additional Notes</label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    rows={4}
+                    placeholder="Any specific topics you'd like to cover or questions you have"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition-all resize-none"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
+                >
+                  {loading ? 'Sending...' : 'Send Request'}
+                </button>
+
+                {submitStatus === 'success' && (
+                  <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <svg 
+                        className="w-6 h-6 text-green-600 flex-shrink-0" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                          strokeWidth={2} 
+                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" 
+                        />
+                      </svg>
+                      <div>
+                        <p className="font-semibold text-green-800">Request sent successfully!</p>
+                        <p className="text-sm text-green-700">We'll get back to you shortly.</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {submitStatus === 'error' && (
+                  <div className="bg-red-50 border border-red-200 p-4 rounded-lg">
+                    <p className="text-red-700 font-medium">Sorry, there was an error. Please try again.</p>
+                  </div>
+                )}
+              </form>
+            </Card>
+          </div>
+
+          {/* Right Column: Reviews */}
+          <div>
+            <h3 className="text-3xl font-extrabold text-gray-900 mb-6">
+              <span className="text-blue-500">Success Stories</span> from Students
+            </h3>
+            <div className="space-y-4">
+              {displayedReviews.map((review, index) => (
+                <Card 
+                  key={index} 
+                  className="group relative overflow-hidden bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-300"
+                >
+                  <div className="relative p-5">
+                    <div className="flex gap-1 mb-3">
+                      {[...Array(5)].map((_, i) => (
+                        <Star 
+                          key={i} 
+                          className="w-4 h-4 fill-yellow-400 text-yellow-400"
+                        />
+                      ))}
+                    </div>
+
+                    {review.title && (
+                      <h4 className="text-base font-bold text-gray-900 mb-2 line-clamp-1">
+                        {review.title}
+                      </h4>
+                    )}
+                    
+                    <p className="text-sm text-gray-700 leading-relaxed line-clamp-4 mb-3">
+                      "{review.text}"
+                    </p>
+
+                    {review.text.length > 200 && (
+                      <button 
+                        onClick={() => setSelectedReview(review)}
+                        className="text-sm font-semibold text-blue-600 hover:text-blue-700 hover:underline transition-colors"
+                      >
+                        Read full review →
+                      </button>
+                    )}
+
+                    <div className="pt-3 border-t border-gray-100 mt-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-xs">
+                            {review.author.charAt(0).toUpperCase()}
+                          </div>
+                          <span className="font-semibold text-gray-900 text-sm">{review.author}</span>
+                        </div>
+                        <div className="flex items-center gap-1 text-xs text-gray-500">
+                          <GraduationCap className="w-3.5 h-3.5" />
+                          <span className="font-medium">{review.lessonCount} lessons</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+            
+            <div className="mt-6 text-center">
+              <Link href="/">
+                <Button variant="outline" className="w-full">
+                  See All Reviews
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
 
-      <ReviewsSection />
+      {/* Review Dialog */}
+      {selectedReview && (
+        <div 
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+          onClick={() => setSelectedReview(null)}
+        >
+          <div 
+            className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-2xl font-bold flex items-center gap-2">
+                  <Quote className="w-6 h-6 text-blue-500" />
+                  {selectedReview.title || 'Student Review'}
+                </h3>
+                <button
+                  onClick={() => setSelectedReview(null)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="flex gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <Star 
+                      key={i} 
+                      className="w-5 h-5 fill-yellow-400 text-yellow-400"
+                    />
+                  ))}
+                </div>
+                
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <p className="text-gray-700 leading-relaxed italic">
+                    "{selectedReview.text}"
+                  </p>
+                </div>
+                
+                <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold">
+                      {selectedReview.author.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900">{selectedReview.author}</p>
+                      <p className="text-sm text-gray-500">Student</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-600 bg-blue-50 px-4 py-2 rounded-full">
+                    <GraduationCap className="w-4 h-4 text-blue-600" />
+                    <span className="font-semibold">{selectedReview.lessonCount} lessons</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
-} 
+}

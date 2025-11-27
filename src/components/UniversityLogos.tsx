@@ -40,8 +40,8 @@ export const UniversityLogos: React.FC = () => {
                   <Image 
                     src={logo.src} 
                     alt={logo.alt} 
-                    layout="fill"
-                    objectFit="contain"
+                    fill
+                    style={{ objectFit: 'contain' }}
                     unoptimized={true} // Good for SVGs or if optimization causes issues, can test without
                   />
                 </div>
