@@ -44,6 +44,9 @@ export function useAuthContext(): AuthContextValue {
       selectedSubject: 'macro',
       setSelectedSubject: () => {},
       toggleSubject: () => {},
+      guestXp: 0,
+      awardXp: async () => { throw new Error('AuthProvider not found'); },
+      xpToast: null,
     }
   }
   return context

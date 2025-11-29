@@ -12,6 +12,7 @@ import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import html2canvas from 'html2canvas';
 import { videos as allVideos } from '@/data/videos';
+import { QuestionWithKeyTerms } from './QuestionWithKeyTerms';
 
 import dojoIcon from "../../public/images/dojoIcon.png";
 
@@ -42,6 +43,8 @@ interface UnitMCQSProps {
   practiceUnitIds: number[];
   isParentModalOpen: boolean;
   isSidebar?: boolean; // New optional prop
+  hasTestModeAccess: boolean;
+  onEnterTestMode: () => void;
 }
 
 interface QuestionCardProps {
@@ -348,7 +351,11 @@ const QuestionCard = ({
       <div className="space-y-6"> 
         {/* Question Text */}
         <p className="text-base md:text-lg font-medium font-serif leading-relaxed text-gray-800">
-          {question.question}
+          <QuestionWithKeyTerms 
+            questionText={question.question} 
+            unit={question.unit} 
+            subject={question.subject}
+          />
         </p>
 
         {/* --- ADDED: Question Image Display --- */}
@@ -457,9 +464,11 @@ export function UnitMCQs({
   subject,
   practiceUnitIds,
   isParentModalOpen,
-  isSidebar = false // Default to false
+  isSidebar = false, // Default to false
+  hasTestModeAccess,
+  onEnterTestMode,
 }: UnitMCQSProps) {
-  const { login, signup, userData, loadingUserData, user } = useAuthContext();
+  const { login, signup, userData, loadingUserData, user, awardXp } = useAuthContext();
   const [aiExplanations, setAiExplanations] = useState<Record<number, string>>({});
   const [isLoadingExplanation, setIsLoadingExplanation] = useState(false);
   const [explanationError, setExplanationError] = useState<string | null>(null);
@@ -503,6 +512,19 @@ export function UnitMCQs({
     const unitId = currentQuestion.unit; // Get unitId from the question data
 
     console.log(`[handleAnswerSelection] Processing answer for question ${questionId}, answer: ${answerLetter}, correct: ${isCorrect}, user: ${user?.uid || 'not logged in'}`);
+
+    // Award XP for correct answers (100 XP per correct question)
+    if (isCorrect && awardXp) {
+      console.log(`[handleAnswerSelection] Answer is correct! Awarding 100 XP...`);
+      try {
+        await awardXp(100);
+        console.log(`[handleAnswerSelection] Successfully awarded 100 XP`);
+      } catch (error) {
+        console.error(`[handleAnswerSelection] Error awarding XP:`, error);
+      }
+    } else if (isCorrect && !awardXp) {
+      console.warn(`[handleAnswerSelection] Answer is correct but awardXp function is not available`);
+    }
 
     // Update local state for immediate UI feedback
     onAnswer(questionId, answerLetter, isCorrect, lessonIDS);
@@ -695,7 +717,13 @@ export function UnitMCQs({
 
           return (
             <div key={question.id} className="p-4 border-b border-gray-200 last:border-b-0">
-              <p className="text-sm font-medium text-gray-800 mb-3">{question.question}</p>
+              <p className="text-sm font-medium text-gray-800 mb-3">
+                <QuestionWithKeyTerms 
+                  questionText={question.question} 
+                  unit={question.unit} 
+                  subject={question.subject}
+                />
+              </p>
               <div className="space-y-2">
                 {question.options.map((option, optIndex) => {
                   const letter = String.fromCharCode(65 + optIndex);
@@ -755,35 +783,6 @@ export function UnitMCQs({
         
         {/* Left Column: Question Card */}
         <div className="w-full lg:w-3/5">
-          {/* Mobile Unit Selector - Only visible on mobile */}
-          <div className="lg:hidden mb-6">
-            <div className="bg-white border border-gray-200 rounded-lg shadow-md p-4">
-              <div className="flex items-center justify-between">
-                <div className="text-center">
-                  <div className={`text-4xl font-bold mb-1 ${subject === 'macro' ? 'text-blue-600' : 'text-green-600'}`}>
-                    {currentUnit}
-                  </div>
-                  <div className="text-sm font-semibold text-gray-600 uppercase tracking-wide">
-                    Unit {currentUnit === 1 ? 'Basic Economic Concepts' : 'Economic Indicators'}
-                  </div>
-                </div>
-                
-                <button
-                  onClick={() => {
-                    const nextUnit = currentUnit === 1 ? 2 : 1;
-                    onUnitChange(nextUnit);
-                  }}
-                  className={`p-3 rounded-full transition-all duration-200 group hover:scale-110 ${subject === 'macro' ? 'bg-blue-100 hover:bg-blue-200' : 'bg-green-100 hover:bg-green-200'}`}
-                  title={`Switch to Unit ${currentUnit === 1 ? 2 : 1}`}
-                >
-                  <ChevronDown className={`w-5 h-5 transition-transform duration-300 ${subject === 'macro' ? 'text-blue-600' : 'text-green-600'} ${
-                    currentUnit === 1 ? 'rotate-0' : 'rotate-180'
-                  }`} />
-                </button>
-              </div>
-            </div>
-          </div>
-          
           {currentQuestion && (
             <QuestionCard 
               key={`${currentUnit}-${currentQuestion.id}`} 
@@ -931,6 +930,35 @@ export function UnitMCQs({
                 </a>
               );
             })()}
+
+            {/* Test Mode CTA */}
+            {currentUnit > 0 && (
+              <div className="w-full p-3 rounded-lg border border-gray-200 bg-white flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm font-semibold text-gray-900">Test Mode</p>
+                  <p className="text-xs text-gray-600">
+                    Timed, exam-style practice for Unit {displayUnitId}.
+                  </p>
+                </div>
+                <button
+                  onClick={onEnterTestMode}
+                  className={`inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-md border transition-colors ${
+                    hasTestModeAccess
+                      ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700'
+                      : 'bg-gray-100 text-gray-500 border-gray-200 cursor-pointer hover:bg-gray-100'
+                  }`}
+                >
+                  {hasTestModeAccess ? (
+                    <>Enter Test</>
+                  ) : (
+                    <>
+                      <Lock className="w-3 h-3" />
+                      <span>Locked</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
 
             {/* Video Lessons - Show based on question's lesson IDs (only for Macro) */}
             {subject !== 'micro' && currentQuestion?.lessonIDS && currentQuestion.lessonIDS.length > 0 && (

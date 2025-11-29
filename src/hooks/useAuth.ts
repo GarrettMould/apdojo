@@ -10,7 +10,7 @@ import {
   sendEmailVerification
 } from 'firebase/auth'
 import { auth, db } from '@/lib/firebase'
-import { doc, setDoc, serverTimestamp, collection, query, getDocs, onSnapshot, getDoc, where } from 'firebase/firestore'
+import { doc, setDoc, serverTimestamp, collection, query, getDocs, onSnapshot, getDoc, where, increment } from 'firebase/firestore'
 import { UnitDetails } from '@/components/UnitPerformanceDisplay'
 
 // Define the structure of your MCQ answer data
@@ -157,6 +157,12 @@ export interface AuthContextValue {
   setSelectedSubject: (subject: 'macro' | 'micro') => void;
   toggleSubject: () => void;
   // --- END: Subject State and Setters ---
+
+  // --- ADD: XP Helper + Guest XP + Toast ---
+  guestXp: number;
+  awardXp: (amount: number) => Promise<void>;
+  xpToast: { amount: number; total: number } | null;
+  // --- END: XP Helper + Guest XP + Toast ---
 }
 
 // --- ADD: Helper Function to Calculate Unit Performance ---
@@ -229,6 +235,10 @@ export function useAuth() {
   const [correctStreak, setCorrectStreak] = useState<number>(0);
   const [isNextQuestionDoubleXp, setIsNextQuestionDoubleXp] = useState<boolean>(false);
 
+   // --- ADD State for guest XP and XP toast ---
+   const [guestXp, setGuestXp] = useState<number>(0);
+   const [xpToast, setXpToast] = useState<{ amount: number; total: number } | null>(null);
+
   // --- ADD State for Unit Performance ---
   const [unitPerformanceStats, setUnitPerformanceStats] = useState<UnitPerformanceStat[] | null>(null);
   const [loadingUnitPerformance, setLoadingUnitPerformance] = useState(true);
@@ -248,6 +258,31 @@ export function useAuth() {
       }
     }
   }, [user, userData?.selectedSubject]);
+
+  // Initialize guest XP from localStorage for logged-out users
+  useEffect(() => {
+    if (!user && typeof window !== 'undefined') {
+      const raw = localStorage.getItem('guestXp');
+      const parsed = raw ? parseInt(raw, 10) : 0;
+      console.log('[XP] Initializing guest XP from localStorage:', { raw, parsed, isValid: !Number.isNaN(parsed) });
+      if (!Number.isNaN(parsed)) {
+        setGuestXp(parsed);
+        console.log('[XP] Guest XP initialized to:', parsed);
+      }
+    } else if (user) {
+      console.log('[XP] User is logged in, clearing guest XP state');
+      setGuestXp(0);
+    }
+  }, [user]);
+
+  // Auto-hide XP toast after a short delay
+  useEffect(() => {
+    if (!xpToast) return;
+    const timer = setTimeout(() => {
+      setXpToast(null);
+    }, 2500);
+    return () => clearTimeout(timer);
+  }, [xpToast]);
 
   // Function to set selected subject (updates both state and storage)
   const setSelectedSubject = async (subject: 'macro' | 'micro') => {
@@ -312,6 +347,30 @@ export function useAuth() {
         setLoadingMcqData(true);
         setLoadingUserData(true);
         setLoadingUnitPerformance(true); // Reset unit performance loading
+
+        // --- Merge any guest XP into this user once on login --- 
+        (async () => {
+          try {
+            if (typeof window !== 'undefined') {
+              const rawGuestXp = localStorage.getItem('guestXp');
+              const pendingGuestXp = rawGuestXp ? parseInt(rawGuestXp, 10) : 0;
+              if (pendingGuestXp > 0) {
+                const userDocRef = doc(db, 'users', firebaseUser.uid);
+                await setDoc(
+                  userDocRef,
+                  { totalXP: increment(pendingGuestXp) },
+                  { merge: true }
+                );
+                // Fallback: if increment isn't available via window, we'll rely on snapshot overwrite
+                localStorage.removeItem('guestXp');
+                setGuestXp(0);
+                console.log(`[useAuth] Merged ${pendingGuestXp} guest XP into user ${firebaseUser.uid}.`);
+              }
+            }
+          } catch (err) {
+            console.error('[useAuth] Error merging guest XP into user:', err);
+          }
+        })();
 
         // --- Fetch User Document Data (now includes totalXP calculation) --- 
         const userDocRef = doc(db, 'users', firebaseUser.uid);
@@ -434,6 +493,39 @@ export function useAuth() {
     }
   }, []) // Empty dependency array ensures this runs only once on mount
 
+  // --- ADD: awardXp helper ---
+  const awardXp = async (amount: number): Promise<void> => {
+    console.log('[XP] ===== awardXp FUNCTION CALLED =====', { amount, hasUser: !!user, userId: user?.uid });
+    try {
+      console.log('[XP] Awarding XP:', { amount, hasUser: !!user });
+      if (user) {
+        // Logged-in: increment totalXP in Firestore; let the user doc listener update local totalXP/level
+        const userDocRef = doc(db, 'users', user.uid);
+        await setDoc(userDocRef, { totalXP: increment(amount) }, { merge: true });
+
+        // Optimistic toast using current totalXP + amount, without mutating totalXP state here
+        const optimisticTotal = (totalXP ?? 0) + amount;
+        setXpToast({ amount, total: optimisticTotal });
+      } else {
+        // Guest: track XP locally
+        console.log('[XP] Guest user - updating guestXp state and localStorage');
+        setGuestXp(prev => {
+          const next = prev + amount;
+          console.log('[XP] Guest XP state update:', { previous: prev, amount, next });
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('guestXp', String(next));
+            console.log('[XP] Saved to localStorage:', next);
+          }
+          console.log('[XP] New guestXp total:', next);
+          setXpToast({ amount, total: next });
+          return next;
+        });
+      }
+    } catch (err) {
+      console.error('[useAuth] Error awarding XP:', err);
+    }
+  };
+
   const signup = async (email: string, password: string, isSubscribed: boolean): Promise<AuthContextValue> => {
     setLoading(true);
     try {
@@ -517,7 +609,10 @@ export function useAuth() {
         setShowSignupModal,
         selectedSubject,
         setSelectedSubject,
-        toggleSubject
+        toggleSubject,
+        guestXp,
+        awardXp,
+        xpToast
       };
     } catch (error) {
       console.error("Signup failed:", error);
@@ -563,7 +658,10 @@ export function useAuth() {
           setShowSignupModal,
           selectedSubject,
           setSelectedSubject,
-          toggleSubject
+          toggleSubject,
+          guestXp,
+          awardXp,
+          xpToast
         };
     } catch (error) {
         console.error("Login failed:", error);
@@ -623,7 +721,10 @@ export function useAuth() {
     setShowSignupModal,
     selectedSubject,
     setSelectedSubject,
-    toggleSubject
+    toggleSubject,
+    guestXp,
+    awardXp,
+    xpToast
   };
 
   return value;

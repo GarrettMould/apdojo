@@ -17,7 +17,8 @@ export function LayoutClientWrapper({ children }: { children: React.ReactNode })
     showLoginModal, 
     setShowLoginModal, 
     showSignupModal, 
-    setShowSignupModal 
+    setShowSignupModal,
+    xpToast
   } = useAuthContext();
 
   const handleSwitchToSignup = () => {
@@ -34,8 +35,8 @@ export function LayoutClientWrapper({ children }: { children: React.ReactNode })
     <>
       {/* Layout without sidebar */}
       <main className="flex-1 w-full overflow-y-auto bg-white">
-        {/* REMOVE PageContainer here to allow full width */}
-        <EmailVerificationBanner />
+        {/* Email verification banner disabled for now */}
+        {/* <EmailVerificationBanner /> */}
         {children}
         <Analytics />
       </main>

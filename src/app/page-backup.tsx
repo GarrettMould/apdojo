@@ -67,14 +67,6 @@ function LoggedOutHomePage() {
     const dismissed = localStorage.getItem('microBannerDismissed');
     if (!dismissed) {
       setShowMicroBanner(true);
-      
-      // Auto-dismiss after 30 seconds
-      const timer = setTimeout(() => {
-        setShowMicroBanner(false);
-        localStorage.setItem('microBannerDismissed', 'true');
-      }, 30000);
-      
-      return () => clearTimeout(timer);
     }
   }, []);
 
@@ -93,10 +85,7 @@ function LoggedOutHomePage() {
       {/* AP Micro Banner */}
       {showMicroBanner && (
         <div 
-          className="fixed top-16 left-0 right-0 z-40 shadow-lg transition-all duration-500 ease-out"
-          style={{
-            background: 'linear-gradient(to right, rgba(34, 197, 94, 0.3), rgba(22, 163, 74, 0.3))'
-          }}
+          className="fixed top-16 left-0 right-0 z-40 bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg transition-all duration-500 ease-out"
         >
         <div className="max-w-7xl mx-auto px-4 py-2">
           <div className="flex items-center justify-center gap-4">
@@ -105,7 +94,7 @@ function LoggedOutHomePage() {
             </p>
             <button
               onClick={handleBannerClick}
-              className="px-3 py-1.5 text-sm font-medium text-gray-800 bg-white/20 border border-white/30 rounded-md hover:bg-white/30 whitespace-nowrap transition-colors flex items-center gap-2"
+              className="px-3 py-1.5 text-sm font-medium text-white bg-white/10 border border-white/30 rounded-md hover:bg-white/20 whitespace-nowrap backdrop-blur-sm transition-colors flex items-center gap-2"
             >
               View Cheat Sheets
               <ArrowRight className="w-4 h-4" />
@@ -166,3 +155,4 @@ export default function Home() {
   
   return <LoggedOutHomePage />;
 }
+

@@ -6,6 +6,11 @@ export interface KeyTerm {
     subject: 'ap_microeconomics' | 'ap_macroeconomics';
     unit: number;
     lessonIDs: string[];
+    /**
+     * Optional list of alternative phrasings / synonyms that should also trigger this term's tooltip.
+     * These are matched in question text the same way as the main `term`.
+     */
+    aliases?: string[];
     subNotes?: string[]; // Optional array of bullet point notes
     image?: {
       url: string;
@@ -1241,6 +1246,10 @@ export const keyTerms: KeyTerm[] = [
       subject: 'ap_microeconomics',
       unit: 5,
       lessonIDs: ['5.1'],
+      aliases: [
+        'supply of labor',
+        'labor supplied'
+      ],
       subNotes: [
         'Households are responsible for labor supply.',
         'There is a direct relationship between the wage rate and the quantity of labor supplied.',
@@ -1254,6 +1263,10 @@ export const keyTerms: KeyTerm[] = [
       subject: 'ap_microeconomics',
       unit: 5,
       lessonIDs: ['5.1'],
+      aliases: [
+        'demand for labor',
+        'labor demanded'
+      ],
       subNotes: [
         'Firms are responsible for labor demand.',
         'There is an inverse relationship between the wage rate and the quantity of labor demanded.',
@@ -1269,6 +1282,11 @@ export const keyTerms: KeyTerm[] = [
       subject: 'ap_microeconomics',
       unit: 5,
       lessonIDs: ['5.2', '5.3'],
+      aliases: [
+        'marginal revenue product of labor',
+        'MRP of labor',
+        'marginal revenue product'
+      ],
       subNotes: [
         'Formula: Marginal Product (MP) x Marginal Revenue (MR).',
         'Represents the Factor Demand Curve for the firm.'
@@ -1281,6 +1299,12 @@ export const keyTerms: KeyTerm[] = [
       subject: 'ap_microeconomics',
       unit: 5,
       lessonIDs: ['5.2', '5.3'],
+      aliases: [
+        'marginal factor cost of labor',
+        'MFC of labor',
+        'marginal resource cost',
+        'MRC'
+      ],
       subNotes: [
         'Also known as Marginal Resource Cost (MRC).',
         'Formula: Change in Total Resource Cost / Change in Quantity of Resource.',
@@ -1335,6 +1359,10 @@ export const keyTerms: KeyTerm[] = [
       subject: 'ap_microeconomics',
       unit: 5,
       lessonIDs: ['5.3'],
+      aliases: [
+        'perfectly competitive factor market',
+        'competitive labor market'
+      ],
       subNotes: [
         'Firms are "Wage Takers".',
         'The firm\'s supply of labor is perfectly elastic (horizontal) at the market wage.'
@@ -1347,6 +1375,12 @@ export const keyTerms: KeyTerm[] = [
       subject: 'ap_microeconomics',
       unit: 5,
       lessonIDs: ['5.3'],
+      aliases: [
+        'least cost combination rule',
+        'least-cost combination rule',
+        'cost minimization rule',
+        'least cost rule'
+      ],
       subNotes: [
         'Formula: (MP of Labor / Price of Labor) = (MP of Capital / Price of Capital).',
         'Basically, get the same "bang for your buck" from the last dollar spent on each resource.'
@@ -1361,6 +1395,10 @@ export const keyTerms: KeyTerm[] = [
       subject: 'ap_microeconomics',
       unit: 5,
       lessonIDs: ['5.4'],
+      aliases: [
+        'monopsonist',
+        'monopsonistic labor market'
+      ],
       subNotes: [
         'The firm is a "Wage Maker".',
         'To hire more workers, the firm must raise the wage for ALL workers, not just the new one.'

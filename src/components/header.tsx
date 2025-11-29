@@ -10,7 +10,7 @@ import { Button } from './ui/button';
 import { useRouter } from 'next/navigation';
 
 export function Header() {
-  const { user, logout, selectedSubject, setSelectedSubject } = useAuthContext();
+  const { user, logout, selectedSubject, setSelectedSubject, totalXP, guestXp } = useAuthContext();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCoursesDropdownOpen, setIsCoursesDropdownOpen] = useState(false);
   const [isTutoringDropdownOpen, setIsTutoringDropdownOpen] = useState(false);
@@ -54,7 +54,7 @@ export function Header() {
             </Link>
           </div>
 
-          {/* Desktop Navigation, User Icon, and Auth Buttons */}
+          {/* Desktop Navigation, XP, and Auth Buttons */}
           <div className="hidden md:flex items-center gap-x-8">
             <nav className="flex items-center space-x-8">
               <Link
@@ -78,8 +78,8 @@ export function Header() {
                 Unit Cheat Sheets
               </Link>
 
-              {/* Tutoring Dropdown */}
-              <div 
+              {/* Tutoring Dropdown - HIDDEN */}
+              {/* <div 
                 className="relative"
                 onMouseEnter={() => setIsTutoringDropdownOpen(true)}
                 onMouseLeave={() => setIsTutoringDropdownOpen(false)}
@@ -118,18 +118,18 @@ export function Header() {
                     </div>
                   </div>
                 )}
-              </div>
+              </div> */}
             </nav>
 
             {/* Subject Segmented Control & User Icon & Auth Buttons */}
             <div className="flex items-center gap-3">
               {/* Subject Segmented Control */}
-              <div className="inline-flex items-center bg-gray-100 rounded-lg p-1 border border-gray-200">
+              <div className="inline-flex items-center bg-gray-100 rounded p-0.5 border border-gray-200">
                 <button
                   onClick={() => setSelectedSubject('macro')}
-                  className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-200 ${
+                  className={`px-2.5 py-1.5 text-xs font-medium rounded transition-all duration-200 ${
                     selectedSubject === 'macro'
-                      ? 'bg-white text-blue-600 shadow-sm'
+                      ? 'bg-blue-600 text-white shadow-sm'
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
@@ -137,9 +137,9 @@ export function Header() {
                 </button>
                 <button
                   onClick={() => setSelectedSubject('micro')}
-                  className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-200 ${
+                  className={`px-2.5 py-1.5 text-xs font-medium rounded transition-all duration-200 ${
                     selectedSubject === 'micro'
-                      ? 'bg-white text-green-600 shadow-sm'
+                      ? 'bg-green-600 text-white shadow-sm'
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
                 >
@@ -147,14 +147,50 @@ export function Header() {
                 </button>
               </div>
               
+              {/* XP bar with subtle red glow */}
+              <div className="flex items-center">
+                {(() => {
+                  const xp = user ? (totalXP ?? 0) : (guestXp ?? 0);
+                  const clamped = Math.max(0, Math.min(xp, 2000));
+                  const ratio = clamped / 2000; // 0 to 1
+                  // Very light opaque red glow that intensifies slightly with XP
+                  const baseAlpha = 0.08;
+                  const maxAlpha = 0.24;
+                  const alpha = baseAlpha + (maxAlpha - baseAlpha) * ratio;
+                  const background = `rgba(248, 113, 113, ${alpha})`; // red-400 with low opacity
+                  return (
+                    <div
+                      className="flex items-center gap-2 px-4 py-1.5 rounded-md border border-red-100 text-sm font-semibold text-gray-800 transition-colors duration-300"
+                      style={{ background }}
+                    >
+                      <span className="uppercase tracking-tight text-[11px] text-gray-600">XP</span>
+                      <span>{xp}</span>
+                      <span className="inline-flex items-center">
+                        <Image
+                          src="/images/flame100.png"
+                          alt="XP Flame"
+                          width={20}
+                          height={20}
+                          className="w-5 h-5"
+                        />
+                      </span>
+                    </div>
+                  );
+                })()}
+              </div>
+
               {user ? (
-                <>
-                  <Button onClick={handleLogout} variant="outline" size="sm">Logout</Button>
-                </>
+                <div className="flex items-center gap-2">
+                  <Button onClick={handleLogout} variant="outline" size="sm">
+                    Logout
+                  </Button>
+                </div>
               ) : (
                 <div className="flex items-center gap-2">
                   <Link href="/login" passHref>
-                    <Button variant="outline" size="sm">Login</Button>
+                    <Button variant="outline" size="sm">
+                      Login
+                    </Button>
                   </Link>
                 </div>
               )}
@@ -204,8 +240,8 @@ export function Header() {
                   Unit Cheat Sheets
                 </Link>
 
-                {/* Tutoring Dropdown (Mobile) */}
-                <div className="px-4 py-2">
+                {/* Tutoring Dropdown (Mobile) - HIDDEN */}
+                {/* <div className="px-4 py-2">
                   <button
                     onClick={() => setIsTutoringDropdownOpen(!isTutoringDropdownOpen)}
                     className="flex items-center justify-between w-full text-gray-700 hover:text-blue-600 transition-colors font-semibold"
@@ -240,20 +276,20 @@ export function Header() {
                       </Link>
                     </div>
                   )}
-                </div>
+                </div> */}
 
                 <div className="border-t border-gray-200 mt-4 pt-4">
                   {/* Subject Segmented Control (Mobile) */}
                   <div className="px-4 py-2">
-                    <div className="inline-flex items-center w-full bg-gray-100 rounded-lg p-1 border border-gray-200">
+                    <div className="inline-flex items-center w-full bg-gray-100 rounded p-0.5 border border-gray-200">
                       <button
                         onClick={() => {
                           setSelectedSubject('macro');
                           closeMobileMenu();
                         }}
-                        className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
+                        className={`flex-1 px-2.5 py-2 text-xs font-medium rounded transition-all duration-200 ${
                           selectedSubject === 'macro'
-                            ? 'bg-white text-blue-600 shadow-sm'
+                            ? 'bg-blue-600 text-white shadow-sm'
                             : 'text-gray-600 hover:text-gray-900'
                         }`}
                       >
@@ -264,9 +300,9 @@ export function Header() {
                           setSelectedSubject('micro');
                           closeMobileMenu();
                         }}
-                        className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 ${
+                        className={`flex-1 px-2.5 py-2 text-xs font-medium rounded transition-all duration-200 ${
                           selectedSubject === 'micro'
-                            ? 'bg-white text-green-600 shadow-sm'
+                            ? 'bg-green-600 text-white shadow-sm'
                             : 'text-gray-600 hover:text-gray-900'
                         }`}
                       >

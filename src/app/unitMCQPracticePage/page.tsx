@@ -152,6 +152,7 @@ function UnitMCQPracticeContent() {
     setCorrectStreak,
     isNextQuestionDoubleXp,
     setIsNextQuestionDoubleXp,
+    awardXp,
   } = useAuthContext();
   
   // --- Access Control State ---
@@ -193,6 +194,15 @@ function UnitMCQPracticeContent() {
   const [totalQuestionsInSet, setTotalQuestionsInSet] = useState(0);
   const [currentUnitName, setCurrentUnitName] = useState('');
   const [showPracticeTestBanner, setShowPracticeTestBanner] = useState(false);
+  const [practiceBannerDismissed, setPracticeBannerDismissed] = useState(false);
+  const [questionsAnsweredSinceBannerShown, setQuestionsAnsweredSinceBannerShown] = useState(0);
+  const purchasedTests = (userData?.purchasedTests || []) as string[];
+
+  const hasTestModeAccess =
+    !!user &&
+    practiceMode === 'singleUnit' &&
+    currentUnit > 0 &&
+    purchasedTests.includes(String(currentUnit));
 
   // Calculate weakest units from MCQ answers
   useEffect(() => {
@@ -287,15 +297,63 @@ function UnitMCQPracticeContent() {
     setIsVerifying(false);
   }, [user, userData, currentUnitForAccessCheck, practiceMode]);
 
-  // Show banner after 3 questions answered
+  // Show banner after 3 questions answered (unless dismissed)
   useEffect(() => {
     const answeredCount = Object.keys(answeredQuestions).length;
-    if (answeredCount >= 3) {
+    if (answeredCount >= 3 && !practiceBannerDismissed && !showPracticeTestBanner) {
       setShowPracticeTestBanner(true);
+      setQuestionsAnsweredSinceBannerShown(0);
     }
-  }, [answeredQuestions]);
+  }, [answeredQuestions, practiceBannerDismissed, showPracticeTestBanner]);
+
+  // Auto-close banner after 2 more questions answered (without clicking it)
+  useEffect(() => {
+    if (showPracticeTestBanner && !practiceBannerDismissed) {
+      const answeredCount = Object.keys(answeredQuestions).length;
+      // Count questions answered since banner appeared (banner shows at 3, so count from 3)
+      const questionsSinceBanner = answeredCount >= 3 ? answeredCount - 3 : 0;
+      
+      if (questionsSinceBanner >= 2) {
+        setShowPracticeTestBanner(false);
+        setPracticeBannerDismissed(true);
+      }
+    }
+  }, [answeredQuestions, showPracticeTestBanner, practiceBannerDismissed]);
+
+  const handleClosePracticeTestBanner = () => {
+    setShowPracticeTestBanner(false);
+    setPracticeBannerDismissed(true);
+  };
+
+  const handleEnterTestMode = () => {
+    // Only Macro has unit MCQ tests wired up currently
+    if (subject !== 'macro') {
+      return;
+    }
+
+    if (!user) {
+      setShowLoginModal(true);
+      return;
+    }
+
+    const price =
+      unitsData.find(u => u.number === currentUnit)?.price || 4.99;
+
+    if (!purchasedTests.includes(String(currentUnit))) {
+      // Redirect to purchase page for this unit test
+      router.push(
+        `/purchase/mcq-practice?units=${currentUnit}&total=${price}&subject=${subject}`
+      );
+      return;
+    }
+
+    // User has access → go to test page
+    router.push(`/unit-mcq-test/${currentUnit}`);
+  };
 
   const handleAnswer = async (questionId: number, answerLetter: string, isCorrect: boolean, lessonIDS: string[]) => {
+    console.log('[UnitMCQ] handleAnswer called:', { questionId, answerLetter, isCorrect, hasAwardXp: !!awardXp });
+    
     setAnsweredQuestions(prev => ({
       ...prev,
       [questionId]: { selectedLetter: answerLetter, isCorrect }
@@ -327,6 +385,9 @@ function UnitMCQPracticeContent() {
         console.error('Error saving answer:', error);
       }
     }
+
+    // Note: XP is awarded in unitMCQS.tsx handleAnswerSelection, not here
+    // to avoid double-awarding
   };
 
   const handleNextQuestion = () => {
@@ -394,33 +455,43 @@ function UnitMCQPracticeContent() {
         onAuthSuccess={handleAuthSuccess}
       />
       <div className="min-h-screen bg-gray-50">
-        {/* Sticky Practice Test Banner */}
+        {/* Sticky Practice Test Banner - Fixed to bottom of header */}
         <div 
-          className={`sticky top-0 z-50 ${subject === 'macro' ? 'bg-gradient-to-r from-blue-600 to-blue-700' : 'bg-gradient-to-r from-green-600 to-green-700'} text-white shadow-lg transition-all duration-500 ease-out ${
+          className={`fixed top-16 left-0 right-0 z-40 ${subject === 'macro' ? 'bg-gradient-to-r from-blue-600 to-blue-700' : 'bg-gradient-to-r from-green-600 to-green-700'} text-white shadow-lg transition-all duration-500 ease-out ${
             showPracticeTestBanner 
               ? 'translate-y-0 opacity-100' 
               : '-translate-y-full opacity-0 pointer-events-none'
           }`}
         >
           <div className="max-w-7xl mx-auto px-4 py-2">
-            <div className="flex items-center justify-center gap-4">
-              <p className="text-xs md:text-sm font-medium">
-                Ready for a full-length exam? Test your knowledge with our practice tests! <span className="text-base md:text-lg">🎯</span>
-              </p>
-              <Link href="/unit-final-practice-tests">
-                <Button 
-                  size="sm" 
-                  variant="outline"
-                  className="bg-white/10 border-white/30 text-white hover:bg-white/20 font-medium whitespace-nowrap backdrop-blur-sm"
-                >
-                  View Practice Tests
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </Link>
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-4">
+                <p className="text-xs md:text-sm font-medium">
+                  Ready for a full-length exam? Test your knowledge with our practice tests! <span className="text-base md:text-lg">🎯</span>
+                </p>
+                <Link href="/unit-final-practice-tests">
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    className="bg-white/10 border-white/30 text-white hover:bg-white/20 font-medium whitespace-nowrap backdrop-blur-sm"
+                  >
+                    View Practice Tests
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </Link>
+              </div>
+              <button
+                onClick={handleClosePracticeTestBanner}
+                className="p-1 rounded-full hover:bg-white/20 transition-colors"
+                aria-label="Dismiss practice test banner"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
           </div>
         </div>
-        <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Add padding-top to account for fixed banner below header */}
+        <div className={`max-w-7xl mx-auto px-4 py-8 ${showPracticeTestBanner ? 'pt-20' : 'pt-8'}`}>
           {isLoadingQuestionSet ? (
             <div className="flex items-center justify-center min-h-[400px]">
               <Loader2 className={`h-12 w-12 animate-spin ${subject === 'macro' ? 'text-blue-500' : 'text-green-500'}`} />
@@ -450,6 +521,8 @@ function UnitMCQPracticeContent() {
               subject={subject} 
               practiceUnitIds={relevantUnitIdsForDisplay}
               isParentModalOpen={showLoginModal || showSignupModal}
+              hasTestModeAccess={hasTestModeAccess}
+              onEnterTestMode={handleEnterTestMode}
             />
           )}
         </div>
