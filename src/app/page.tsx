@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Loader2, Play, X, ArrowRight, FileText } from 'lucide-react';
+import { Loader2, Play, X, ArrowRight, FileText, Pencil, Sparkles, PlayCircle, Star } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { topicBundles, TopicBundle } from '@/data/topicBundles';
 import { useRouter } from 'next/navigation';
@@ -60,7 +60,15 @@ function TopicCard({ bundle }: { bundle: TopicBundle }) {
 function LoggedOutHomePage() {
   const [showMicroBanner, setShowMicroBanner] = useState(false);
   const router = useRouter();
-  const { setSelectedSubject } = useAuthContext();
+  const { user, setShowLoginModal, setSelectedSubject } = useAuthContext();
+
+  const handlePracticeFrqClick = () => {
+    if (user) {
+      router.push('/unitFRQpracticePage');
+    } else {
+      setShowLoginModal(true);
+    }
+  };
 
   // Check localStorage on mount to see if banner was dismissed
   useEffect(() => {
@@ -123,38 +131,77 @@ function LoggedOutHomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h1 className="text-5xl sm:text-6xl font-extrabold text-gray-900 mb-6">
-              <span className="text-blue-500">Pick a Topic.</span> Any Topic.
+              Become an FRQ Expert in the <span className="text-blue-500">FRQ Dojo</span>
             </h1>
             <p className="text-xl text-gray-700 max-w-3xl mx-auto">
-              Master <strong>AP Macroeconomics</strong> and <strong>AP Microeconomics</strong> with study resources designed to help you achieve top scores on your AP exams.
+              Practice smarter with real AP-style questions, step-by-step feedback, and targeted skill-building.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* FRQ Practice Card - First in grid */}
-            {/* <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 text-center flex flex-col transition-shadow hover:shadow-2xl h-full">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">FRQ Practice</h3>
-              
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+            {/* Left Column: FRQ Dojo Card */}
+            <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 text-center flex flex-col transition-shadow hover:shadow-2xl h-full">
               <div className="relative mb-6 cursor-pointer group rounded-lg overflow-hidden shadow-inner bg-gray-50 aspect-video flex items-center justify-center">
-                <div className="text-center p-6">
-                  <FileText className="w-16 h-16 text-gray-400 mx-auto mb-3" />
-                  <p className="text-sm text-gray-600 font-medium">Free Response Questions</p>
-                </div>
+                <Image
+                  src="/images/unit4MacroFRQCover.jpg"
+                  alt="FRQ Practice Placeholder"
+                  layout="fill"
+                  objectFit="cover"
+                  className="transform group-hover:scale-105 transition-transform duration-300"
+                />
               </div>
 
               <div className="flex flex-col gap-3 mt-auto">
-                <Link href="/unitFRQpracticePage" passHref>
-                  <Button 
-                    className="w-full font-semibold py-3 text-base rounded-lg text-white bg-blue-600 hover:bg-blue-700"
-                  >
-                    Practice FRQ
-                  </Button>
-                </Link>
+                <Button 
+                  onClick={handlePracticeFrqClick}
+                  className="w-full font-semibold py-6 text-lg rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                >
+                  Practice FRQ
+                </Button>
               </div>
-            </div> */}
-            
-            {topicBundles.map((bundle) => (
-              <TopicCard key={bundle.lessonId} bundle={bundle} />
-            ))}
+            </div>
+
+            {/* Right Column: Features & Review Card */}
+            <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-100 h-full flex flex-col justify-center">
+              <div className="space-y-8">
+                <h3 className="text-3xl font-extrabold text-gray-900">
+                  With <span className="text-blue-500">FRQ Dojo</span> you can...
+                </h3>
+                
+                {/* Features List */}
+                <ul className="space-y-6">
+                  <li className="flex items-center text-xl font-semibold text-gray-800">
+                    <Pencil className="w-7 h-7 text-blue-500 mr-4 flex-shrink-0" />
+                    <span>Draw Graphs</span>
+                  </li>
+                  <li className="flex items-center text-xl font-semibold text-gray-800">
+                    <Sparkles className="w-7 h-7 text-blue-500 mr-4 flex-shrink-0" />
+                    <span>Get Instant Feedback</span>
+                  </li>
+                  <li className="flex items-center text-xl font-semibold text-gray-800">
+                    <PlayCircle className="w-7 h-7 text-blue-500 mr-4 flex-shrink-0" />
+                    <span>Watch Video Walkthroughs</span>
+                  </li>
+                </ul>
+
+                {/* Divider */}
+                <div className="border-t border-gray-200" />
+
+                {/* Student Review */}
+                <div>
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="flex gap-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                      ))}
+                    </div>
+                    <p className="font-semibold text-gray-900 text-sm">- Alex P.</p>
+                  </div>
+                  <p className="text-gray-700 italic">
+                    "FRQ Dojo helped me learn the FRQs that I struggled with, with short videos and detailed feedback for my graphs."
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
