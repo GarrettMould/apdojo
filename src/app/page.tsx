@@ -4,12 +4,12 @@ import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Loader2, Play, X, ArrowRight } from 'lucide-react';
+import { Loader2, Play, X, ArrowRight, FileText } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { topicBundles, TopicBundle } from '@/data/topicBundles';
 import { useRouter } from 'next/navigation';
-import { ReviewsSection } from '@/components/ReviewsSection';
-import { UniversityLogos } from '@/components/UniversityLogos';
+// import { ReviewsSection } from '@/components/ReviewsSection';
+// import { UniversityLogos } from '@/components/UniversityLogos';
 
 // Reverted TopicCard to original design, with only the link href corrected
 function TopicCard({ bundle }: { bundle: TopicBundle }) {
@@ -93,19 +93,16 @@ function LoggedOutHomePage() {
       {/* AP Micro Banner */}
       {showMicroBanner && (
         <div 
-          className="fixed top-16 left-0 right-0 z-40 shadow-lg transition-all duration-500 ease-out"
-          style={{
-            background: 'linear-gradient(to right, rgba(34, 197, 94, 0.3), rgba(22, 163, 74, 0.3))'
-          }}
+          className="fixed top-16 left-0 right-0 z-40 shadow-lg transition-all duration-500 ease-out bg-gradient-to-r from-green-500 to-green-600"
         >
         <div className="max-w-7xl mx-auto px-4 py-2">
           <div className="flex items-center justify-center gap-4">
-            <p className="text-xs md:text-sm font-medium">
+            <p className="text-xs md:text-sm font-medium text-white">
               AP Micro unit cheat sheets and MCQ practice problems now available! <span className="text-base md:text-lg">🎯</span>
             </p>
             <button
               onClick={handleBannerClick}
-              className="px-3 py-1.5 text-sm font-medium text-gray-800 bg-white/20 border border-white/30 rounded-md hover:bg-white/30 whitespace-nowrap transition-colors flex items-center gap-2"
+              className="px-3 py-1.5 text-sm font-medium text-white bg-white/10 border border-white/30 rounded-md hover:bg-white/20 whitespace-nowrap transition-colors flex items-center gap-2"
             >
               View Cheat Sheets
               <ArrowRight className="w-4 h-4" />
@@ -115,7 +112,7 @@ function LoggedOutHomePage() {
               className="ml-2 p-1 hover:bg-white/20 rounded-full transition-colors"
               aria-label="Dismiss banner"
             >
-              <X className="w-4 h-4" />
+              <X className="w-4 h-4 text-white" />
             </button>
           </div>
         </div>
@@ -133,6 +130,28 @@ function LoggedOutHomePage() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* FRQ Practice Card - First in grid */}
+            {/* <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 text-center flex flex-col transition-shadow hover:shadow-2xl h-full">
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">FRQ Practice</h3>
+              
+              <div className="relative mb-6 cursor-pointer group rounded-lg overflow-hidden shadow-inner bg-gray-50 aspect-video flex items-center justify-center">
+                <div className="text-center p-6">
+                  <FileText className="w-16 h-16 text-gray-400 mx-auto mb-3" />
+                  <p className="text-sm text-gray-600 font-medium">Free Response Questions</p>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-3 mt-auto">
+                <Link href="/unitFRQpracticePage" passHref>
+                  <Button 
+                    className="w-full font-semibold py-3 text-base rounded-lg text-white bg-blue-600 hover:bg-blue-700"
+                  >
+                    Practice FRQ
+                  </Button>
+                </Link>
+              </div>
+            </div> */}
+            
             {topicBundles.map((bundle) => (
               <TopicCard key={bundle.lessonId} bundle={bundle} />
             ))}
@@ -141,10 +160,10 @@ function LoggedOutHomePage() {
       </div>
 
       {/* Reviews Section */}
-      <ReviewsSection />
+      {/* <ReviewsSection /> */}
 
       {/* University Logos Section */}
-      <UniversityLogos />
+      {/* <UniversityLogos /> */}
     </div>
   );
 }
