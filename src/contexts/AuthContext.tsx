@@ -47,6 +47,8 @@ export function useAuthContext(): AuthContextValue {
       guestXp: 0,
       awardXp: async () => { throw new Error('AuthProvider not found'); },
       xpToast: null,
+      redirectOnLogin: null,
+      setRedirectOnLogin: () => {},
     }
   }
   return context
