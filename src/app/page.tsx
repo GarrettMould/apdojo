@@ -60,13 +60,12 @@ function TopicCard({ bundle }: { bundle: TopicBundle }) {
 function LoggedOutHomePage() {
   const [showMicroBanner, setShowMicroBanner] = useState(false);
   const router = useRouter();
-  const { user, setShowLoginModal, setSelectedSubject, setRedirectOnLogin } = useAuthContext();
+  const { user, setShowLoginModal, setSelectedSubject } = useAuthContext();
 
   const handlePracticeFrqClick = () => {
     if (user) {
       router.push('/unitFRQpracticePage');
     } else {
-      setRedirectOnLogin('/unitFRQpracticePage');
       setShowLoginModal(true);
     }
   };
@@ -156,7 +155,7 @@ function LoggedOutHomePage() {
                   onClick={handlePracticeFrqClick}
                   className="w-full font-semibold py-6 text-lg rounded-md text-white bg-blue-600 hover:bg-blue-700"
                 >
-                  Try Now for Free
+                  Practice FRQ
                 </Button>
               </div>
             </div>
@@ -203,23 +202,6 @@ function LoggedOutHomePage() {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Other Topics Section */}
-      <div className="py-16 sm:py-24 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-5xl font-extrabold text-gray-900">Explore Other Topics</h2>
-            <p className="mt-4 text-lg text-gray-600">
-              Practice MCQs and review cheat sheets for a variety of AP Macro topics.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {topicBundles.map((bundle) => (
-              <TopicCard key={bundle.lessonId} bundle={bundle} />
-            ))}
           </div>
         </div>
       </div>

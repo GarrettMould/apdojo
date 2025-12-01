@@ -163,10 +163,6 @@ export interface AuthContextValue {
   awardXp: (amount: number) => Promise<void>;
   xpToast: { amount: number; total: number } | null;
   // --- END: XP Helper + Guest XP + Toast ---
-
-  // --- ADD: Redirect on Login ---
-  redirectOnLogin: string | null;
-  setRedirectOnLogin: (path: string | null) => void;
 }
 
 // --- ADD: Helper Function to Calculate Unit Performance ---
@@ -238,13 +234,10 @@ export function useAuth() {
   // --- ADD State for streak and double XP
   const [correctStreak, setCorrectStreak] = useState<number>(0);
   const [isNextQuestionDoubleXp, setIsNextQuestionDoubleXp] = useState<boolean>(false);
-  
+
    // --- ADD State for guest XP and XP toast ---
    const [guestXp, setGuestXp] = useState<number>(0);
    const [xpToast, setXpToast] = useState<{ amount: number; total: number } | null>(null);
-
-   // --- ADD State for redirect on login ---
-  const [redirectOnLogin, setRedirectOnLogin] = useState<string | null>(null);
 
   // --- ADD State for Unit Performance ---
   const [unitPerformanceStats, setUnitPerformanceStats] = useState<UnitPerformanceStat[] | null>(null);
@@ -588,7 +581,7 @@ export function useAuth() {
       }
       setLoading(false);
       // Return the full context object to satisfy the type
-      return { 
+        return { 
         user: newUser, 
         loading: false, 
         login, 
@@ -619,9 +612,7 @@ export function useAuth() {
         toggleSubject,
         guestXp,
         awardXp,
-        xpToast,
-        redirectOnLogin,
-        setRedirectOnLogin
+        xpToast
       };
     } catch (error) {
       console.error("Signup failed:", error);
@@ -637,14 +628,6 @@ export function useAuth() {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         console.log("[useAuth] Login successful trigger for:", userCredential.user?.email);
         setLoading(false);
-
-        // --- ADD: Handle redirect ---
-        if (redirectOnLogin) {
-          window.location.href = redirectOnLogin;
-          setRedirectOnLogin(null);
-        }
-        // --- END: Handle redirect ---
-
         // Return the current context state 
         // The onAuthStateChanged listener will update the user state globally
         return { 
@@ -678,9 +661,7 @@ export function useAuth() {
           toggleSubject,
           guestXp,
           awardXp,
-          xpToast,
-          redirectOnLogin,
-          setRedirectOnLogin
+          xpToast
         };
     } catch (error) {
         console.error("Login failed:", error);
@@ -743,9 +724,7 @@ export function useAuth() {
     toggleSubject,
     guestXp,
     awardXp,
-    xpToast,
-    redirectOnLogin,
-    setRedirectOnLogin
+    xpToast
   };
 
   return value;
