@@ -106,6 +106,10 @@ export async function POST(request: NextRequest) {
         throw new Error(`Could not initialize any Gemini model. Please check your API key. Error: ${listError.message}`);
       }
     }
+
+    if (!model) {
+      throw new Error("Failed to initialize a Gemini model. The API key may be invalid or no models are available.");
+    }
     
     // Use the explicit grading criteria from the question, or fallback to generic criteria
     const criteriaToUse = gradingCriteria || `

@@ -8,6 +8,7 @@ import { Loader2, Play, X, ArrowRight, FileText, Pencil, Sparkles, PlayCircle, S
 import { useAuthContext } from '@/contexts/AuthContext';
 import { topicBundles, TopicBundle } from '@/data/topicBundles';
 import { useRouter } from 'next/navigation';
+import { frqExams } from '@/data/frqQuestions';
 // import { ReviewsSection } from '@/components/ReviewsSection';
 // import { UniversityLogos } from '@/components/UniversityLogos';
 
@@ -60,7 +61,12 @@ function TopicCard({ bundle }: { bundle: TopicBundle }) {
 function LoggedOutHomePage() {
   const [showMicroBanner, setShowMicroBanner] = useState(false);
   const router = useRouter();
-  const { user, setShowLoginModal, setSelectedSubject, setRedirectOnLogin } = useAuthContext();
+  const { user, setShowLoginModal, setSelectedSubject, setRedirectOnLogin, selectedSubject } = useAuthContext();
+
+  const frqExam = frqExams.find(exam => 
+    (selectedSubject === 'macro' && exam.examTitle.includes('Macroeconomics')) ||
+    (selectedSubject === 'micro' && exam.examTitle.includes('Microeconomics'))
+  ) || frqExams[0];
 
   const handlePracticeFrqClick = () => {
     if (user) {
@@ -132,7 +138,7 @@ function LoggedOutHomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h1 className="text-5xl sm:text-6xl font-extrabold text-gray-900 mb-6">
-              Become an FRQ Expert in the <span className="text-blue-500">FRQ Dojo</span>
+              Become an FRQ Expert in the <span className={selectedSubject === 'micro' ? 'text-green-500' : 'text-blue-500'}>FRQ Dojo</span>
             </h1>
             <p className="text-xl text-gray-700 max-w-3xl mx-auto">
               Practice smarter with real AP-style questions, step-by-step feedback, and targeted skill-building.
@@ -143,7 +149,7 @@ function LoggedOutHomePage() {
             <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 text-center flex flex-col transition-shadow hover:shadow-2xl h-full">
               <div className="relative mb-6 cursor-pointer group rounded-lg overflow-hidden shadow-inner bg-gray-50 aspect-video flex items-center justify-center">
                 <Image
-                  src="/images/unit4MacroFRQCover.jpg"
+                  src={frqExam.thumbnailUrl}
                   alt="FRQ Practice Placeholder"
                   layout="fill"
                   objectFit="cover"
@@ -154,7 +160,7 @@ function LoggedOutHomePage() {
               <div className="flex flex-col gap-3 mt-auto">
                 <Button 
                   onClick={handlePracticeFrqClick}
-                  className="w-full font-semibold py-6 text-lg rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                  className={`w-full font-semibold py-6 text-lg rounded-md text-white ${selectedSubject === 'micro' ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'}`}
                 >
                   Try Now for Free
                 </Button>
@@ -165,21 +171,21 @@ function LoggedOutHomePage() {
             <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-100 h-full flex flex-col justify-center">
               <div className="space-y-8">
                 <h3 className="text-3xl font-extrabold text-gray-900">
-                  With <span className="text-blue-500">FRQ Dojo</span> you can...
+                  With <span className={selectedSubject === 'micro' ? 'text-green-500' : 'text-blue-500'}>FRQ Dojo</span> you can...
                 </h3>
                 
                 {/* Features List */}
                 <ul className="space-y-6">
                   <li className="flex items-center text-xl font-semibold text-gray-800">
-                    <Pencil className="w-7 h-7 text-blue-500 mr-4 flex-shrink-0" />
+                    <Pencil className={`w-7 h-7 ${selectedSubject === 'micro' ? 'text-green-500' : 'text-blue-500'} mr-4 flex-shrink-0`} />
                     <span>Draw Graphs</span>
                   </li>
                   <li className="flex items-center text-xl font-semibold text-gray-800">
-                    <Sparkles className="w-7 h-7 text-blue-500 mr-4 flex-shrink-0" />
+                    <Sparkles className={`w-7 h-7 ${selectedSubject === 'micro' ? 'text-green-500' : 'text-blue-500'} mr-4 flex-shrink-0`} />
                     <span>Get Instant Feedback</span>
                   </li>
                   <li className="flex items-center text-xl font-semibold text-gray-800">
-                    <PlayCircle className="w-7 h-7 text-blue-500 mr-4 flex-shrink-0" />
+                    <PlayCircle className={`w-7 h-7 ${selectedSubject === 'micro' ? 'text-green-500' : 'text-blue-500'} mr-4 flex-shrink-0`} />
                     <span>Watch Video Walkthroughs</span>
                   </li>
                 </ul>
