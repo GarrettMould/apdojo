@@ -148,11 +148,13 @@ Part Instructions: ${partText}
 Student Answer: ${textAnswer}
 
 IMPORTANT GRADING RULES:
-- Score 2 (Full Credit): Award 2 points if the answer meets ALL requirements stated in the "2 points" criteria. Do NOT deduct points for minor issues if all key criteria are satisfied.
-- Score 1 (Partial Credit): Award 1 point only if the answer demonstrates some understanding but is clearly missing one or more key elements from the "2 points" criteria.
-- Score 0 (No Credit): Award 0 points only if the answer does not meet the criteria or is completely incorrect.
+- Score 2 (Full Credit): The answer meets ALL requirements and is fully correct.
+- Score 1 (Partial Credit): The answer is partially correct or demonstrates some understanding, but is incomplete. For example, if a question requires a specific answer AND an explanation, providing only the correct answer without the explanation earns 1 point.
+- Score 0 (No Credit): The answer is incorrect, irrelevant, or does not meet the minimum criteria for partial credit.
 
-Be generous with full credit - if the answer addresses what is asked for in the "2 points" criteria, it should receive 2 points, not 1.
+The final score must be an integer: 0, 1, or 2. Do not use fractional scores.
+
+Be generous with full credit - if the answer addresses what is asked for in the criteria, it should receive 2 points.
 
 Output: Return ONLY a valid JSON object with this exact structure:
 {
@@ -199,7 +201,7 @@ The feedback should be concise and directly state why the score was given. Do no
     try {
       const feedback = JSON.parse(jsonText);
       // Ensure score is 0, 1, or 2
-      if (typeof feedback.score !== 'number' || feedback.score < 0 || feedback.score > 2) {
+      if (typeof feedback.score !== 'number' || !Number.isInteger(feedback.score) || feedback.score < 0 || feedback.score > 2) {
         feedback.score = Math.max(0, Math.min(2, Math.round(feedback.score || 0)));
       }
       return new Response(JSON.stringify(feedback), {
