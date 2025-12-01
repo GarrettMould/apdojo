@@ -70,6 +70,12 @@ export function Header() {
               >
                 MCQ Practice
               </Link>
+              <Link
+                href={`/unitFRQpracticePage?subject=${selectedSubject}`}
+                className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
+              >
+                FRQ Practice
+              </Link>
               
               <Link
                 href="/unit/1"
@@ -231,6 +237,13 @@ export function Header() {
               >
                 MCQ Practice
               </Link>
+              <Link
+                  href={`/unitFRQpracticePage?subject=${selectedSubject}`}
+                  onClick={closeMobileMenu}
+                  className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
+                >
+                  FRQ Practice
+                </Link>
                 
                 <Link
                   href="/unit/1"

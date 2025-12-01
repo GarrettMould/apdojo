@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Head from 'next/head';
 import { macroUnits, microUnits } from '@/data/cheatSheets';
 import { useParams, useRouter } from 'next/navigation'; // Import useRouter
 import Image from 'next/image';
@@ -190,6 +191,38 @@ export default function UnitPage() {
   const [selectedWhiteboard, setSelectedWhiteboard] = useState<WhiteboardImage | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // --- FAQ Schema Data ---
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: 'What is the main topic of this unit?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'This is a placeholder answer. This unit covers the fundamental economic concepts that form the foundation of both microeconomics and macroeconomics.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'What are the key graphs I need to know for this unit?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'This is a placeholder answer. The most important graphs for this unit include the Production Possibilities Curve (PPC), the Circular Flow Diagram, and the basic Supply and Demand model.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: 'How is this unit tested on the AP Exam?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: 'This is a placeholder answer. Concepts from this unit appear in both the multiple-choice and free-response sections of the AP exam. It is crucial to have a strong understanding of these basics.',
+        },
+      },
+    ],
+  };
+
   const activeUnitNum = parseInt(activeUnit as string);
   const subjectFilter = selectedSubject === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics';
 
@@ -299,6 +332,12 @@ export default function UnitPage() {
 
   return (
     <>
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        />
+      </Head>
       <div className="max-w-7xl mx-auto px-4 py-12 mt-12">
         {/* Page Header */}
         <div className="text-center mb-12">

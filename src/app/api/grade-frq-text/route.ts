@@ -1,17 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
+export const maxDuration = 30; // Set a 30-second timeout
+
 const apiKey = process.env.GEMINI_API_KEY;
 if (!apiKey) {
-  throw new Error('GEMINI_API_KEY environment variable is not set.');
+  // Throws an error if the API key is not found in environment variables
+  throw new Error("GEMINI_API_KEY not found in environment variables.");
 }
-const genAI = new GoogleGenerativeAI(apiKey);
 
-export async function POST(request: NextRequest) {
+export async function POST(req: Request) {
+  const apiKey = process.env.GEMINI_API_KEY;
+
+  if (!apiKey) {
+    console.error("GEMINI_API_KEY not found in environment variables.");
+    return new Response(JSON.stringify({ message: "Server configuration error: Missing API key." }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   try {
     console.log('Grade FRQ text API called');
-    const body = await request.json();
-    const { textAnswer, partLabel, questionPrompt, partText, gradingCriteria } = body;
+    const { textAnswer, partLabel, questionPrompt, partText, gradingCriteria } = await req.json();
+    const genAI = new GoogleGenerativeAI(apiKey);
 
     console.log('Received data:', {
       hasTextAnswer: !!textAnswer,
@@ -108,7 +120,10 @@ export async function POST(request: NextRequest) {
     }
 
     if (!model) {
-      throw new Error("Failed to initialize a Gemini model. The API key may be invalid or no models are available.");
+      return new Response(JSON.stringify({ message: "Could not initialize AI model." }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
     
     // Use the explicit grading criteria from the question, or fallback to generic criteria
@@ -118,7 +133,8 @@ Verify that the explanation is clear and accurate
 Ensure all required elements from the question are present
 `;
 
-    const prompt = `You are an expert AP Economics Grader grading according to College Board AP exam standards.
+    const prompt = `
+      You are an AP Macroeconomics grader. Analyze the student's text-based answer for a Free Response Question (FRQ).
 
 Input: A text answer submitted by a student.
 
@@ -186,7 +202,10 @@ The feedback should be concise and directly state why the score was given. Do no
       if (typeof feedback.score !== 'number' || feedback.score < 0 || feedback.score > 2) {
         feedback.score = Math.max(0, Math.min(2, Math.round(feedback.score || 0)));
       }
-      return NextResponse.json(feedback);
+      return new Response(JSON.stringify(feedback), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
     } catch (parseError) {
       // If JSON parsing fails, return a structured response
       return NextResponse.json({
@@ -196,21 +215,18 @@ The feedback should be concise and directly state why the score was given. Do no
       });
     }
   } catch (error: any) {
-    console.error('Error grading FRQ text:', error);
-    console.error('Error details:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name,
-      cause: error.cause
+    // Log the detailed error on the server for debugging
+    console.error("Detailed Gemini API Error:", error);
+    
+    // Return a more user-friendly error to the client
+    const userMessage = error.message.includes("API key not valid") 
+      ? "Could not initialize any Gemini model. Please check your API key."
+      : "An error occurred while grading the answer. Please check the server logs for details.";
+      
+    return new Response(JSON.stringify({ message: userMessage }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
     });
-    return NextResponse.json(
-      { 
-        error: 'Failed to grade answer',
-        message: error.message || 'Unknown error occurred',
-        details: process.env.NODE_ENV === 'development' ? error.stack : undefined
-      },
-      { status: 500 }
-    );
   }
 }
 

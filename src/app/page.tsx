@@ -63,11 +63,6 @@ function LoggedOutHomePage() {
   const router = useRouter();
   const { user, setShowLoginModal, setSelectedSubject, setRedirectOnLogin, selectedSubject } = useAuthContext();
 
-  const frqExam = frqExams.find(exam => 
-    (selectedSubject === 'macro' && exam.examTitle.includes('Macroeconomics')) ||
-    (selectedSubject === 'micro' && exam.examTitle.includes('Microeconomics'))
-  ) || frqExams[0];
-
   const handlePracticeFrqClick = () => {
     if (user) {
       router.push('/unitFRQpracticePage');
@@ -76,6 +71,10 @@ function LoggedOutHomePage() {
       setShowLoginModal(true);
     }
   };
+
+  const thumbnailUrl = selectedSubject === 'micro' 
+    ? '/images/U5FRQMicro.jpg' 
+    : '/images/unit4MacroFRQCover.jpg';
 
   // Check localStorage on mount to see if banner was dismissed
   useEffect(() => {
@@ -149,7 +148,7 @@ function LoggedOutHomePage() {
             <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 text-center flex flex-col transition-shadow hover:shadow-2xl h-full">
               <div className="relative mb-6 cursor-pointer group rounded-lg overflow-hidden shadow-inner bg-gray-50 aspect-video flex items-center justify-center">
                 <Image
-                  src={frqExam.thumbnailUrl}
+                  src={thumbnailUrl}
                   alt="FRQ Practice Placeholder"
                   layout="fill"
                   objectFit="cover"
