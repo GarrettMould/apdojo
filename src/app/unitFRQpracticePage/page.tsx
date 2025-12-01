@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ArrowLeft, ChevronDown, ChevronUp, Eye, EyeOff, Sparkles, Loader2, PlayCircle } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ChevronUp, Sparkles, Loader2, PlayCircle, Upload, X, Pencil, Image as ImageIcon } from 'lucide-react';
 import Link from 'next/link';
 import { DrawingPad } from '@/components/DrawingPad';
 import { ProgressBars } from '@/components/ProgressBars';
@@ -12,6 +12,7 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import { VideoModal } from '@/components/VideoModal';
 import { frqExams, FRQPart, FRQSubPart } from '@/data/frqQuestions';
 import { FeedbackBlock } from '@/components/FeedbackBlock';
+import { DrawingInput } from '@/components/DrawingInput';
 
 export default function UnitFRQPracticePage() {
   const { selectedSubject, awardXp } = useAuthContext();
@@ -309,7 +310,23 @@ export default function UnitFRQPracticePage() {
                 {/* Part Answer */}
                 {expandedParts[part.label] && (
                   <div className="p-4 bg-white border-t border-gray-200 space-y-4">
-                    
+
+                    {/* Show Instructional Subparts (if they exist) */}
+                    {part.subparts && part.subparts.some(sp => !sp.answerType) && (
+                      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                        <p className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+                          Include the Following in Your Answer:
+                        </p>
+                        <ul className="space-y-2">
+                          {part.subparts.filter(sp => !sp.answerType).map((subpart) => (
+                            <li key={subpart.label} className="text-sm text-gray-800">
+                              <span className="font-semibold">{part.label}{subpart.label}.</span> {subpart.text}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
                     {/* RENDER SIMPLE ANSWER (if part has its own answerType) */}
                     {part.answerType && (
                     <div>
@@ -318,21 +335,15 @@ export default function UnitFRQPracticePage() {
                       </label>
                       {part.answerType === 'draw' ? (
                         <div className="space-y-3">
-                          <div className={`border-2 border-gray-200 rounded-lg p-4 bg-white relative ${gradingFeedback[`part-${part.label}`] ? 'pointer-events-none opacity-75' : ''}`}>
-                            {gradingFeedback[`part-${part.label}`] && (
-                              <div className="absolute inset-0 bg-gray-100 bg-opacity-50 rounded-lg z-10 flex items-center justify-center">
-                                <span className="text-sm font-medium text-gray-600">Answer submitted</span>
-                              </div>
-                            )}
-                            <DrawingPad
-                              isLarge={true}
-                              onSave={(data) => handleDrawingAnswer(`part-${part.label}`, data)}
-                              initialData={drawingAnswers[`part-${part.label}`]}
-                            />
-                          </div>
-                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                          <DrawingInput
+                            drawingKey={`part-${part.label}`}
+                            drawingData={drawingAnswers[`part-${part.label}`]}
+                            onSave={handleDrawingAnswer}
+                            isGraded={!!gradingFeedback[`part-${part.label}`]}
+                          />
+                          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                           <Button
-                            onClick={() => handleGradeDrawing(part.label, part.text)}
+                              onClick={() => handleGradeDrawing(`part-${part.label}`, part.text)}
                             disabled={isGrading[`part-${part.label}`] || !drawingAnswers[`part-${part.label}`] || !!gradingFeedback[`part-${part.label}`]}
                             className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
                           >
@@ -344,21 +355,21 @@ export default function UnitFRQPracticePage() {
                             ) : (
                               <>
                                 <Sparkles className="w-4 h-4 mr-2" />
-                                Grade My Drawing
+                                  Grade My Answer
                               </>
                             )}
                           </Button>
-                              {gradingFeedback[`part-${part.label}`] && part.videoUrl && (
-                                <Button
-                                  variant="outline"
-                                  onClick={() => setVideoModalUrl(part.videoUrl!)}
-                                  className="w-full sm:w-auto bg-sky-100 text-sky-800 border-sky-300 hover:bg-sky-200 hover:text-sky-900"
-                                >
-                                  <PlayCircle className="w-4 h-4 mr-2" />
-                                  Video Walkthrough
-                                </Button>
-                              )}
-                            </div>
+                            {gradingFeedback[`part-${part.label}`] && part.videoUrl && (
+                              <Button
+                                variant="outline"
+                                onClick={() => setVideoModalUrl(part.videoUrl!)}
+                                className="w-full sm:w-auto bg-sky-100 text-sky-800 border-sky-300 hover:bg-sky-200 hover:text-sky-900"
+                              >
+                                <PlayCircle className="w-4 h-4 mr-2" />
+                                Video Walkthrough
+                              </Button>
+                            )}
+                          </div>
                           {gradingFeedback[`part-${part.label}`] && (
                             <FeedbackBlock
                               feedback={gradingFeedback[`part-${part.label}`]}
@@ -381,7 +392,7 @@ export default function UnitFRQPracticePage() {
                           />
                             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                           <Button
-                            onClick={() => handleGradeTextAnswer(part.label, part.text, part.gradingCriteria || '')}
+                            onClick={() => handleGradeTextAnswer(`part-${part.label}`, part.text, part.gradingCriteria || '')}
                             disabled={isGrading[`part-${part.label}`] || !textAnswers[`part-${part.label}`] || !!gradingFeedback[`part-${part.label}`]}
                             className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
                           >
@@ -422,112 +433,107 @@ export default function UnitFRQPracticePage() {
                     </div>
                     )}
 
-                    {/* RENDER SUBPARTS (if they exist) */}
-                    {part.subparts && (
+                    {/* RENDER ANSWERABLE SUBPARTS (if they exist) */}
+                    {part.subparts && part.subparts.some(sp => sp.answerType) && (
                       <div className="space-y-6">
-                        {part.subparts.map((subpart) => {
+                        {part.subparts.filter(sp => sp.answerType).map((subpart) => {
                           const subpartKey = `subpart-${part.label}-${subpart.label}`;
+                          // If subpart is answerable, render the full input component
                           return (
                             <div key={subpartKey} className="pl-4 border-l-2 border-gray-200">
                               <p className="text-gray-800 mb-3">
                                 <span className="font-bold text-lg text-gray-900">{part.label}{subpart.label}.</span> {subpart.text}
                               </p>
-                              <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                  Your Answer:
-                                </label>
-                                {subpart.answerType === 'draw' ? (
-                                  <div className="space-y-3">
-                                    <div className={`border-2 border-gray-200 rounded-lg p-4 bg-white relative ${gradingFeedback[subpartKey] ? 'pointer-events-none opacity-75' : ''}`}>
+                                <div>
+                                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                    Your Answer:
+                                  </label>
+                                  {subpart.answerType === 'draw' ? (
+                                    <div className="space-y-3">
+                                      <DrawingInput
+                                        drawingKey={subpartKey}
+                                        drawingData={drawingAnswers[subpartKey]}
+                                        onSave={handleDrawingAnswer}
+                                        isGraded={!!gradingFeedback[subpartKey]}
+                                      />
+                                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                                        <Button
+                                          onClick={() => handleGradeDrawing(subpartKey, subpart.text)}
+                                          disabled={isGrading[subpartKey] || !drawingAnswers[subpartKey] || !!gradingFeedback[subpartKey]}
+                                          className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                          {isGrading[subpartKey] ? (
+                                            <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Grading...</>
+                                          ) : (
+                                            <><Sparkles className="w-4 h-4 mr-2" />Grade My Answer</>
+                                          )}
+                                        </Button>
+                                        {gradingFeedback[subpartKey] && subpart.videoUrl && (
+                                          <Button
+                                            variant="outline"
+                                            onClick={() => setVideoModalUrl(subpart.videoUrl!)}
+                                            className="w-full sm:w-auto bg-sky-100 text-sky-800 border-sky-300 hover:bg-sky-200 hover:text-sky-900"
+                                          >
+                                            <PlayCircle className="w-4 h-4 mr-2" />
+                                            Video Walkthrough
+                                          </Button>
+                                        )}
+                                  </div>
                                       {gradingFeedback[subpartKey] && (
-                                        <div className="absolute inset-0 bg-gray-100 bg-opacity-50 rounded-lg z-10 flex items-center justify-center">
-                                          <span className="text-sm font-medium text-gray-600">Answer submitted</span>
-                                        </div>
-                                      )}
-                                      <DrawingPad
-                                        isLarge={true}
-                                        onSave={(data) => handleDrawingAnswer(subpartKey, data)}
-                                        initialData={drawingAnswers[subpartKey]}
-                                      />
-                                    </div>
-                                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                                      <Button
-                                        onClick={() => handleGradeDrawing(subpartKey, subpart.text)}
-                                        disabled={isGrading[subpartKey] || !drawingAnswers[subpartKey] || !!gradingFeedback[subpartKey]}
-                                        className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                                      >
-                                        {isGrading[subpartKey] ? (
-                                          <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Grading...</>
-                                        ) : (
-                                          <><Sparkles className="w-4 h-4 mr-2" />Grade My Drawing</>
-                                        )}
-                                      </Button>
-                                      {gradingFeedback[subpartKey] && subpart.videoUrl && (
-                                        <Button
-                                          variant="outline"
-                                          onClick={() => setVideoModalUrl(subpart.videoUrl!)}
-                                          className="w-full sm:w-auto bg-sky-100 text-sky-800 border-sky-300 hover:bg-sky-200 hover:text-sky-900"
-                                        >
-                                          <PlayCircle className="w-4 h-4 mr-2" />
-                                          Video Walkthrough
-                                        </Button>
-                                      )}
-                                    </div>
-                                    {gradingFeedback[subpartKey] && (
-                                      <FeedbackBlock
-                                        feedback={gradingFeedback[subpartKey]}
-                                        part={subpart}
-                                        answerKey={subpartKey}
-                                        showAnswers={showAnswers}
-                                        toggleAnswer={toggleAnswer}
-                                      />
-                                    )}
-                                  </div>
-                                ) : (
-                                  <div className="space-y-3">
-                                    <Input
-                                      value={textAnswers[subpartKey] || ''}
-                                      onChange={(e) => handleTextAnswer(subpartKey, e.target.value)}
-                                      placeholder="Type your answer here..."
-                                      className="w-full"
-                                      disabled={!!gradingFeedback[subpartKey]}
-                                      readOnly={!!gradingFeedback[subpartKey]}
-                                    />
-                                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                                      <Button
-                                        onClick={() => handleGradeTextAnswer(subpartKey, subpart.text, subpart.gradingCriteria || '')}
-                                        disabled={isGrading[subpartKey] || !textAnswers[subpartKey] || !!gradingFeedback[subpartKey]}
-                                        className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                                      >
-                                        {isGrading[subpartKey] ? (
-                                          <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Grading...</>
-                                        ) : (
-                                          <><Sparkles className="w-4 h-4 mr-2" />Submit Answer</>
-                                        )}
-                                      </Button>
-                                      {gradingFeedback[subpartKey] && subpart.videoUrl && (
-                                        <Button
-                                          variant="outline"
-                                          onClick={() => setVideoModalUrl(subpart.videoUrl!)}
-                                          className="w-full sm:w-auto bg-sky-100 text-sky-800 border-sky-300 hover:bg-sky-200 hover:text-sky-900"
-                                        >
-                                          <PlayCircle className="w-4 h-4 mr-2" />
-                                          Video Walkthrough
-                                        </Button>
-                                      )}
-                                    </div>
-                                    {gradingFeedback[subpartKey] && (
-                                      <FeedbackBlock
-                                        feedback={gradingFeedback[subpartKey]}
-                                        part={subpart}
-                                        answerKey={subpartKey}
-                                        showAnswers={showAnswers}
-                                        toggleAnswer={toggleAnswer}
-                                      />
-                                    )}
-                                  </div>
+                                        <FeedbackBlock
+                                          feedback={gradingFeedback[subpartKey]}
+                                          part={subpart}
+                                          answerKey={subpartKey}
+                                          showAnswers={showAnswers}
+                                          toggleAnswer={toggleAnswer}
+                                        />
                                 )}
                               </div>
+                                  ) : (
+                                    <div className="space-y-3">
+                                      <Input
+                                        value={textAnswers[subpartKey] || ''}
+                                        onChange={(e) => handleTextAnswer(subpartKey, e.target.value)}
+                                        placeholder="Type your answer here..."
+                                        className="w-full"
+                                        disabled={!!gradingFeedback[subpartKey]}
+                                        readOnly={!!gradingFeedback[subpartKey]}
+                                      />
+                                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                                        <Button
+                                          onClick={() => handleGradeTextAnswer(subpartKey, subpart.text, subpart.gradingCriteria || '')}
+                                          disabled={isGrading[subpartKey] || !textAnswers[subpartKey] || !!gradingFeedback[subpartKey]}
+                                          className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                          {isGrading[subpartKey] ? (
+                                            <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Grading...</>
+                                          ) : (
+                                            <><Sparkles className="w-4 h-4 mr-2" />Submit Answer</>
+                                          )}
+                                        </Button>
+                                        {gradingFeedback[subpartKey] && subpart.videoUrl && (
+                                          <Button
+                                            variant="outline"
+                                            onClick={() => setVideoModalUrl(subpart.videoUrl!)}
+                                            className="w-full sm:w-auto bg-sky-100 text-sky-800 border-sky-300 hover:bg-sky-200 hover:text-sky-900"
+                                          >
+                                            <PlayCircle className="w-4 h-4 mr-2" />
+                                            Video Walkthrough
+                                          </Button>
+                                        )}
+                                      </div>
+                                      {gradingFeedback[subpartKey] && (
+                                        <FeedbackBlock
+                                          feedback={gradingFeedback[subpartKey]}
+                                          part={subpart}
+                                          answerKey={subpartKey}
+                                          showAnswers={showAnswers}
+                                          toggleAnswer={toggleAnswer}
+                                        />
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
                             </div>
                           );
                         })}

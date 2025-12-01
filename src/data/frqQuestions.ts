@@ -1,7 +1,7 @@
 export interface FRQSubPart {
   label: string;
   text: string;
-  answerType: 'draw' | 'text';
+  answerType?: 'draw' | 'text'; // Made optional
   answer?: string | any;
   gradingCriteria?: string;
   videoUrl?: string;
@@ -157,8 +157,6 @@ export const frqExams: FRQExam[] = [
               {
                  label: "i",
                  text: "Ensure the firm's graph clearly labels the demand for labor (MRP) and the supply of labor (MRC).",
-                 answerType: "text" as const,
-                 answer: "The firm's graph should show a downward-sloping MRP curve and a horizontal MRC curve (perfectly elastic supply of labor) at the market wage We."
               }
             ]
           },
