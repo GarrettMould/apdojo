@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -40,7 +40,8 @@ const lockedQuestions = mockTopics.map((topic, i) => ({
   isLocked: true,
 }));
 
-export default function UnitFRQPracticePage() {
+
+function UnitFRQPracticePageComponent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { selectedSubject, awardXp } = useAuthContext();
@@ -671,6 +672,14 @@ export default function UnitFRQPracticePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function UnitFRQPracticePage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <UnitFRQPracticePageComponent />
+    </Suspense>
   );
 }
 

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { adminDb } from '@/lib/firebase-admin';
+import { db } from '@/lib/firebase-admin';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 
 export async function POST() {
@@ -19,7 +19,7 @@ export async function POST() {
       updatedAt: new Date().toISOString(),
     };
 
-    await adminDb.collection('dailyQuestions').doc('current').set(dailyQuestions);
+    await db.collection('dailyQuestions').doc('current').set(dailyQuestions);
 
     return NextResponse.json({ success: true, questions: dailyQuestions });
   } catch (error) {
