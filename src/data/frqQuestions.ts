@@ -37,6 +37,8 @@ export interface FRQQuestion {
   tableData?: FRQTableData;
   parts: FRQPart[];
   difficulty?: 'easy' | 'medium' | 'hard' | 'extreme';
+  expertTip?: string;
+  isLocked?: boolean;
 }
 
 export interface FRQExam {
@@ -64,6 +66,7 @@ export const ampleReservesExam: FRQExam = {
       questionNumber: 4,
       difficulty: 'medium',
       prompt: "Assume the economy of Northland is currently operating below full employment and the banking system has ample reserves.",
+      expertTip: "Many monetary policy tools designed for a limited reserves system, like changing the required reserve ratio, are ineffective in an ample reserves system. The Fed's primary tools in an ample reserves system are administered interest rates.",
       image: null,
       parts: [
         {
@@ -134,6 +137,7 @@ export const factorMarketsExam: FRQExam = {
       title: 'Unit 5 FRQ - Factor Markets',
       questionNumber: 1,
       prompt: "The table below shows the daily production data for a firm operating in a perfectly competitive product market and a perfectly competitive labor market. The firm sells its product for $10 per unit, and the market wage rate for workers is $150 per day.",
+      expertTip: "The profit-maximizing rule for hiring is MRP = MRC. A common mistake is stopping at the last worker where MRP is greater than MRC, instead of the one where they are equal. If MRP is still greater, you should hire the next worker!",
       image: null,
       tableData: {
         headers: ["Number of Workers", "Total Product"],
@@ -213,15 +217,16 @@ export const factorMarketsExam: FRQExam = {
 };
 
 export const microGameTheoryExam: FRQExam = {
-  examTitle: "AP Microeconomics Unit 2 FRQ: Game Theory",
+  examTitle: "AP Microeconomics Unit 4 FRQ: Game Theory",
   thumbnailUrl: '/images/microGameTheoryMatrix.png',
   questions: [
     {
       id: 3,
       subject: 'micro',
-      title: 'Unit 2 FRQ - Game Theory',
+      title: 'Unit 4 FRQ - Game Theory',
       questionNumber: 1,
       prompt: "Two rival coffee shops, 'Stacey's Coffee' and 'Daily Grind,' are the only two coffee providers in a small town. They are considering whether to launch a new advertising campaign or not. The payoff matrix below shows the daily profits for each firm based on their decision. The first entry in each cell represents the profit for Stacey's Coffee, and the second entry represents the profit for Daily Grind.",
+      expertTip: "When identifying a dominant strategy, you must check one player's choices against ALL of the other player's possible actions. Don't just assume a strategy is dominant after checking one scenario.",
       image: undefined, 
       tableData: {
         headers: ["", "Advertise", "Do Not Advertise"],
@@ -265,6 +270,138 @@ export const microGameTheoryExam: FRQExam = {
   ]
 };
 
+export const macroBankingExam = {
+  examTitle: "AP Macroeconomics Unit 4 FRQ: The Banking System",
+  thumbnailUrl: "/images/unit4MacroFRQCover.jpg",
+  questions: [
+    {
+      id: 5,
+      subject: 'macro',
+      title: 'Unit 4 FRQ - Banking & Money Creation',
+      questionNumber: 1,
+      prompt: "The central bank purchases $10,000 worth of government bonds from Sarah, who deposits the entire proceeds into her checking account at 'Regional Bank.' The banking system has limited reserves, and the required reserve ratio is 20%.",
+      expertTip: "When calculating the 'Maximum Change in Money Supply', remember to determine if the injection is 'new money' (like a Fed purchase) or existing currency deposited. A Fed purchase adds entirely new reserves to the system, triggering the full multiplier effect.",
+      image: undefined,
+      tableData: undefined,
+      parts: [
+        {
+          label: "A",
+          text: "What is the amount by which Regional Bank's liabilities have changed as a result of Sarah's deposit? Explain.",
+          answerType: "text",
+          answer: "Liabilities increased by $10,000. Explanation: When Sarah deposits the money, the bank now owes that money back to her on demand. Therefore, the demand deposit (a liability to the bank) increases by the full amount of the deposit.",
+        },
+        {
+          label: "B",
+          text: "Calculate the change in excess reserves for Regional Bank immediately after the deposit. Show your work.",
+          answerType: "text",
+          answer: "$8,000. Explanation: The required reserves are 20% of $10,000, which equals $2,000. Excess reserves = Total Reserves - Required Reserves. $10,000 - $2,000 = $8,000.",
+        },
+        {
+          label: "C",
+          text: "What is the dollar value of the maximum amount of new loans Regional Bank can initially make as a result of this deposit? Explain.",
+          answerType: "text",
+          answer: "$8,000. Explanation: A single bank can only lend out its excess reserves. Since Regional Bank has $8,000 in excess reserves calculated in part (b), this is the maximum amount they can initially lend.",
+        },
+        {
+          label: "D",
+          text: "Based on the central bank's open-market purchase of bonds, calculate the maximum amount by which the money supply can change throughout the entire banking system. Show your work.",
+          answerType: "text",
+          answer: "$50,000. Explanation: The money multiplier is 1 / Reserve Ratio (1 / 0.20 = 5). Since the Central Bank purchase injected $10,000 of new monetary base into the system, the total maximum change is the Initial Injection x Money Multiplier ($10,000 x 5 = $50,000).",
+        },
+        {
+          label: "E",
+          text: "How will the central bank's purchase of bonds described in the prompt affect the nominal interest rate in the short run? Explain.",
+          answerType: "text",
+          answer: "The nominal interest rate will decrease. Explanation: The central bank's purchase of bonds increases the money supply. An increase in the money supply shifts the vertical money supply curve to the right, lowering the equilibrium nominal interest rate.",
+        }
+      ]
+    }
+  ]
+};
+
+export const macroUnit2DataExam: FRQExam = {
+  examTitle: "AP Macroeconomics Unit 2 FRQ: Economic Indicators",
+  thumbnailUrl: "/images/unit4MacroFRQCover.jpg",
+  questions: [
+    {
+      id: 6,
+      subject: 'macro',
+      title: 'Unit 2 FRQ - GDP & Inflation Data',
+      questionNumber: 1,
+      prompt: "The countries of Highland and Lowland experienced the economic conditions described in the tables below.",
+      expertTip: "Remember the order of operations for per capita calculations: First, 'deflate' the Nominal GDP to get Real GDP. Only THEN divide by the population.",
+      image: undefined,
+      tableData: {
+        headers: ["Country", "Year", "GDP Deflator", "Nominal GDP", "Population"],
+        rows: [
+          ["Highland", "1", "100", "$500", "50"],
+          ["Highland", "2", "120", "$720", "60"],
+          ["Lowland", "1", "100", "$200", "20"],
+          ["Lowland", "2", "125", "$500", "25"]
+        ],
+        // Note: You may need to adjust how your frontend renders this based on the split-table style in the image, 
+        // or just render two separate small tables.
+      },
+      parts: [
+        {
+          label: "A",
+          text: "Calculate each of the following for Year 2. Show your work.",
+          subparts: [
+            {
+              label: "i",
+              text: "Real GDP per capita for Highland",
+              answerType: "text",
+              answer: "$10. Explanation: First, calculate Real GDP: ($720 / 120) * 100 = $600. Then, divide by population: $600 / 60 = $10."
+            },
+            {
+              label: "ii",
+              text: "Real GDP per capita for Lowland",
+              answerType: "text",
+              answer: "$16. Explanation: First, calculate Real GDP: ($500 / 125) * 100 = $400. Then, divide by population: $400 / 25 = $16."
+            }
+          ]
+        },
+        {
+          label: "B",
+          text: "If Highland and Lowland have the same velocity of money in Year 2, which country must have the higher money supply in Year 2? Explain.",
+          answerType: "text",
+          answer: "Highland. Explanation: According to the equation of exchange (MV = PY), if Velocity (V) is constant, the Money Supply (M) is determined by Nominal GDP (PY). Since Highland has a higher Nominal GDP in Year 2 ($720) compared to Lowland ($500), Highland must have the higher money supply."
+        },
+        {
+          label: "C",
+          text: "Calculate each of the following in Year 2. Show your work.",
+          subparts: [
+            {
+              label: "i",
+              text: "The inflation rate in Highland",
+              answerType: "text",
+              answer: "20%. Explanation: ((120 - 100) / 100) * 100 = 20%."
+            },
+            {
+              label: "ii",
+              text: "The inflation rate in Lowland",
+              answerType: "text",
+              answer: "25%. Explanation: ((125 - 100) / 100) * 100 = 25%."
+            }
+          ]
+        },
+        {
+          label: "D",
+          text: "Based on your answer to part (c), if the nominal interest rate is the same for both nations in Year 2, which nation experiences the higher real interest rate in Year 2? Explain.",
+          answerType: "text",
+          answer: "Highland. Explanation: Real Interest Rate = Nominal Interest Rate - Inflation Rate. Since Highland has a lower inflation rate (20%) than Lowland (25%), subtracting a smaller number from the same nominal rate results in a higher real interest rate for Highland."
+        },
+        {
+          label: "E",
+          text: "Based on your answer to part (c)(ii), if the expected inflation rate in Lowland in Year 2 was 10%, what would be the effect on real GDP as the economy adjusts to its long-run equilibrium? Explain.",
+          answerType: "text",
+          answer: "Real GDP will decrease. Explanation: Since the actual inflation rate (25%) was higher than expected (10%), the economy is operating in an inflationary gap (output is above full employment). In the long run, nominal wages and input costs will increase to match the higher price levels, shifting the Short-Run Aggregate Supply (SRAS) curve to the left, returning Real GDP to the lower full-employment level."
+        }
+      ]
+    }
+  ]
+};
+
 export const foreignExchangeFRQExam: FRQExam = {
   examTitle: "AP Macroeconomics FRQ: Foreign Exchange",
   thumbnailUrl: "/images/logo.png",
@@ -275,7 +412,9 @@ export const foreignExchangeFRQExam: FRQExam = {
       title: 'Unit 6 FRQ - Foreign Exchange Market',
       questionNumber: 5,
       difficulty: 'hard',
+      isLocked: true,
       prompt: "Canada and Mexico are major trading partners and the exchange rate between the Canadian dollar and the Mexican peso is determined in a flexible foreign exchange market.",
+      expertTip: "Remember the 'mirror effect' in Forex markets. An action that increases the demand for one currency must cause an increase in the supply of the other currency. You can't just shift one graph!",
       image: null,
       parts: [
         {
@@ -347,6 +486,7 @@ export const foreignExchangeFRQExam: FRQExam = {
 
 export const frqExams: FRQExam[] = [
   ampleReservesExam,
+  macroUnit2DataExam,
   factorMarketsExam,
   microGameTheoryExam,
   foreignExchangeFRQExam

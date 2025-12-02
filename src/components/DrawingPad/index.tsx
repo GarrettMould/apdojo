@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useState, useEffect } from 'react';
-import { Pen, Eraser, Trash2, Type } from 'lucide-react';
+import { Pen, Eraser, Trash2, Type, CheckCircle } from 'lucide-react';
 
 interface DrawingPadProps {
   isLarge?: boolean;
@@ -223,7 +223,14 @@ export function DrawingPad({ isLarge = false, className = '', initialData, onSav
     }
 
     setIsDrawing(false);
-    onSave(canvas.toDataURL());
+    // onSave(canvas.toDataURL()); // REMOVED: This was causing the premature finalization
+  };
+
+  const handleSave = () => {
+    const canvas = canvasRef.current;
+    if (canvas) {
+      onSave(canvas.toDataURL());
+    }
   };
 
   const getPenCursor = () => {
@@ -323,6 +330,15 @@ export function DrawingPad({ isLarge = false, className = '', initialData, onSav
           className="p-1 rounded hover:bg-gray-100"
         >
           <Trash2 className="w-4 h-4" />
+        </button>
+      </div>
+      <div className="absolute top-2 right-2 z-10">
+        <button
+          onClick={handleSave}
+          className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors"
+        >
+          <CheckCircle className="w-4 h-4" />
+          Done
         </button>
       </div>
       <canvas

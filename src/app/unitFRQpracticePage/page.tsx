@@ -4,7 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ArrowLeft, ChevronDown, ChevronUp, Sparkles, Loader2, PlayCircle, Upload, X, Pencil, Image as ImageIcon, Lock, Share2, Check } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ChevronUp, Sparkles, Loader2, PlayCircle, Upload, X, Pencil, Image as ImageIcon, Lock, Share2, Check, Lightbulb } from 'lucide-react';
 import Link from 'next/link';
 import { DrawingPad } from '@/components/DrawingPad';
 import { ProgressBars } from '@/components/ProgressBars';
@@ -17,29 +17,41 @@ import { ShareFRQButton } from '@/components/ShareFRQButton';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 // Mock data for locked questions
-const mockTopics = [
-  'Production Possibilities Curve',
+const mockMacroTopics = [
   'Fiscal Policy',
   'Monetary Policy',
-  'Perfect Competition',
-  'Monopoly',
-  'Externalities',
-  'Cost of Production',
-  'International Trade & Tariffs',
   'GDP and CPI',
   'The Phillips Curve',
   'Economic Growth',
   'Bank Balance Sheets',
-  'Interest Rates & Investment Demand',
-  'Market Failure',
-  'Consumer Choice Theory'
+  'International Trade & Tariffs',
+  'Money Market',
+  'Loanable Funds Market',
+  'Aggregate Demand & Supply',
+  'Balance of Payments',
+  'Foreign Exchange Markets',
+  'Cost-Push Inflation',
+  'The Multiplier Effect',
+  'Real vs. Nominal GDP'
 ];
 
-const lockedQuestions = mockTopics.map((topic, i) => ({
-  id: `locked-${i}`,
-  title: `Unit ${Math.floor(Math.random() * 6) + 1} FRQ - ${topic}`,
-  isLocked: true,
-}));
+const mockMicroTopics = [
+  'Production Possibilities Curve',
+  'Perfect Competition',
+  'Monopoly',
+  'Externalities',
+  'Cost of Production',
+  'Price Ceilings & Floors',
+  'Elasticity',
+  'Consumer Surplus',
+  'Game Theory',
+  'Factor Markets',
+  'Market Structures',
+  'Public Goods',
+  'Marginal Analysis',
+  'Tariffs and Quotas',
+  'Supply and Demand'
+];
 
 
 function UnitFRQPracticePageComponent() {
@@ -47,16 +59,28 @@ function UnitFRQPracticePageComponent() {
   const searchParams = useSearchParams();
   const { selectedSubject, awardXp } = useAuthContext();
 
-  const relevantExams = frqExams.filter(exam => 
+  // Memoize the calculation of locked questions to prevent re-rendering
+  const lockedQuestions = React.useMemo(() => {
+    const mockTopics = selectedSubject === 'macro' ? mockMacroTopics : mockMicroTopics;
+    return mockTopics.map((topic, i) => ({
+      id: `locked-${i}`,
+      title: `Unit ${Math.floor(Math.random() * 6) + 1} FRQ - ${topic}`,
+      isLocked: true,
+    }));
+  }, [selectedSubject]);
+
+  // Memoize the filtering of relevant exams
+  const relevantExams = React.useMemo(() => frqExams.filter(exam => 
     (selectedSubject === 'macro' && exam.examTitle.includes('Macroeconomics')) ||
     (selectedSubject === 'micro' && exam.examTitle.includes('Microeconomics'))
-  );
+  ), [selectedSubject]);
 
-  const allQuestions = relevantExams.flatMap(exam => {
+  // Memoize the flattening of all questions
+  const allQuestions = React.useMemo(() => relevantExams.flatMap(exam => {
     const unitMatch = exam.examTitle.match(/Unit (\d+)/);
     const unit = unitMatch ? parseInt(unitMatch[1]) : null;
     return exam.questions.map(q => ({ ...q, unit, examTitle: exam.examTitle }));
-  });
+  }), [relevantExams]);
 
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0);
 
@@ -80,6 +104,7 @@ function UnitFRQPracticePageComponent() {
 
   // Fallback to the first question if no match is found
   const frqQuestion = allDisplayQuestions[selectedQuestionIndex] || allDisplayQuestions[0];
+  const isSelectedQuestionLocked = 'isLocked' in frqQuestion && frqQuestion.isLocked;
 
   const [expandedParts, setExpandedParts] = useState<Record<string, boolean>>({});
   const [expandedSubparts, setExpandedSubparts] = useState<Record<string, boolean>>({});
@@ -89,6 +114,18 @@ function UnitFRQPracticePageComponent() {
   const [gradingFeedback, setGradingFeedback] = useState<Record<string, any>>({});
   const [isGrading, setIsGrading] = useState<Record<string, boolean>>({});
   const [videoModalState, setVideoModalState] = useState<{ url: string; aspectRatio?: 'vertical' | 'horizontal' } | null>(null);
+  const [isExpertTipVisible, setIsExpertTipVisible] = useState(false);
+
+  // Effect to expand all question parts by default when a new question is loaded
+  useEffect(() => {
+    if (frqQuestion && frqQuestion.parts) {
+      const allPartsExpanded = frqQuestion.parts.reduce((acc, part) => {
+        acc[part.label] = true;
+        return acc;
+      }, {} as Record<string, boolean>);
+      setExpandedParts(allPartsExpanded);
+    }
+  }, [frqQuestion]);
 
   // Calculate total points and current points from feedback
   const totalPoints = frqQuestion.parts.reduce((acc, part) => {
@@ -163,6 +200,7 @@ function UnitFRQPracticePageComponent() {
     setDrawingAnswers({});
     setGradingFeedback({});
     setIsGrading({});
+    setIsExpertTipVisible(false);
   };
 
   const handleGradeTextAnswer = async (answerKey: string, partText: string, gradingCriteria: string) => {
@@ -331,13 +369,25 @@ function UnitFRQPracticePageComponent() {
 
         {/* Right Column: Main Content */}
         <div className="lg:w-3/4">
+        {isSelectedQuestionLocked ? (
+          <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 h-full flex flex-col items-center justify-center text-center">
+            <Lock className="w-16 h-16 text-gray-300 mb-4" />
+            <h2 className="text-2xl font-bold text-gray-800">Content Locked</h2>
+            <p className="text-gray-600 max-w-sm mt-2">
+              This FRQ is part of a premium course. Upgrade your account to unlock this and many other practice questions.
+            </p>
+            <Button className="mt-6">Upgrade to Unlock</Button>
+          </div>
+        ) : (
           <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
             {/* Header with points and timer */}
-            <div className="flex justify-between items-center mb-6 pb-4 border-b">
+            <div className="flex justify-between items-start mb-6 pb-4 border-b">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">Unit FRQ Practice</h1>
-                <p className="text-lg text-gray-700">
+                <h1 className="text-3xl font-bold text-gray-900 mb-1">
                   {'title' in frqQuestion ? frqQuestion.title : `Question ${frqQuestion.questionNumber}`}
+                </h1>
+                <p className="text-md text-gray-600">
+                  From: {frqQuestion.examTitle}
                 </p>
               </div>
               <ProgressBars
@@ -351,41 +401,43 @@ function UnitFRQPracticePageComponent() {
             {/* Question Card */}
             <div className="mb-6">
               <div className="mb-4">
-                {/* Difficulty and Share Section */}
+                {/* Tip and Share Section */}
                 <div className="flex items-center justify-between mb-4">
-                  {/* Difficulty Bars */}
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-gray-700 mr-2">Difficulty:</span>
-                    <div className="flex gap-1">
-                      {[1, 2, 3, 4].map((bar) => {
-                        const difficulty = 'difficulty' in frqQuestion ? frqQuestion.difficulty : 'medium';
-                        const filledBars = 
-                          difficulty === 'easy' ? 1 :
-                          difficulty === 'medium' ? 2 :
-                          difficulty === 'hard' ? 3 : 4;
-                        const isFilled = bar <= filledBars;
-                        const colorClass = 
-                          difficulty === 'easy' ? 'bg-green-500' :
-                          difficulty === 'medium' ? 'bg-yellow-500' :
-                          difficulty === 'hard' ? 'bg-orange-500' : 'bg-red-500';
-                        
-                        return (
-                          <div
-                            key={bar}
-                            className={`w-8 h-2 rounded-full ${isFilled ? colorClass : 'bg-gray-200'}`}
-                          />
-                        );
-                      })}
-                    </div>
-                  </div>
-                  
-                  {/* Share Button */}
+                  {frqQuestion.expertTip ? (
+                    <button
+                      onClick={() => setIsExpertTipVisible(!isExpertTipVisible)}
+                      className={`flex items-center gap-2 text-sm font-semibold transition-colors px-3 py-1.5 rounded-md border ${
+                        isExpertTipVisible 
+                          ? 'bg-blue-100 border-blue-300 text-blue-800' 
+                          : 'bg-gray-100 border-gray-200 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      <Lightbulb className="w-4 h-4" />
+                      <span>{isExpertTipVisible ? 'Hide Tip' : 'Expert Tip'}</span>
+                    </button>
+                  ) : (
+                    <div /> // Empty div to maintain space
+                  )}
                   <ShareFRQButton questionId={frqQuestion.id} />
                 </div>
                 
+                {/* Revealed Expert Tip */}
+                {frqQuestion.expertTip && isExpertTipVisible && (
+                  <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg animate-in fade-in-50 duration-300">
+                    <div className="flex items-start">
+                      <Lightbulb className="w-5 h-5 mr-3 mt-1 flex-shrink-0 text-blue-500" />
+                      <div>
+                        <h4 className="font-bold text-blue-900">Expert Tip</h4>
+                        <p className="mt-1 text-blue-800">{frqQuestion.expertTip}</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <p className="text-lg text-gray-800 leading-relaxed">
                   {frqQuestion.prompt}
                 </p>
+
                 {frqQuestion.tableData && (
                   <div className="my-8 flex justify-center">
                     <div className="flex items-center gap-4">
@@ -440,280 +492,281 @@ function UnitFRQPracticePageComponent() {
                 )}
               </div>
 
-              {/* Parts */}
-              <div className="space-y-4">
-                {frqQuestion.parts.map((part) => (
-                  <div key={part.label} className="border border-gray-200 rounded-lg overflow-hidden">
-                    {/* Part Header */}
-                    <button
-                      onClick={() => togglePart(part.label)}
-                      className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors text-left"
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="font-bold text-lg text-gray-900">{part.label}.</span>
-                        <span className="text-gray-800">{part.text}</span>
-                      </div>
-                      {expandedParts[part.label] ? (
-                        <ChevronUp className="w-5 h-5 text-gray-500 flex-shrink-0" />
-                      ) : (
-                        <ChevronDown className="w-5 h-5 text-gray-500 flex-shrink-0" />
-                      )}
-                    </button>
+          {/* Parts */}
+          <div className="space-y-4">
+            {frqQuestion.parts.map((part) => (
+              <div key={part.label} className="border border-gray-200 rounded-lg overflow-hidden">
+                {/* Part Header */}
+                <button
+                  onClick={() => togglePart(part.label)}
+                  className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors text-left"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="font-bold text-lg text-gray-900">{part.label}.</span>
+                    <span className="text-gray-800">{part.text}</span>
+                  </div>
+                  {expandedParts[part.label] ? (
+                    <ChevronUp className="w-5 h-5 text-gray-500 flex-shrink-0" />
+                  ) : (
+                    <ChevronDown className="w-5 h-5 text-gray-500 flex-shrink-0" />
+                  )}
+                </button>
 
-                    {/* Part Answer */}
-                    {expandedParts[part.label] && (
-                      <div className="p-4 bg-white border-t border-gray-200 space-y-4">
+                {/* Part Answer */}
+                {expandedParts[part.label] && (
+                  <div className="p-4 bg-white border-t border-gray-200 space-y-4">
 
-                        {/* Show Instructional Subparts (if they exist) */}
-                        {part.subparts && part.subparts.some(sp => !sp.answerType) && (
-                          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                            <p className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
-                              Include the Following in Your Answer:
-                            </p>
-                            <ul className="space-y-2">
-                              {part.subparts.filter(sp => !sp.answerType).map((subpart) => (
-                                <li key={subpart.label} className="text-sm text-gray-800">
-                                  <span className="font-semibold">{part.label}{subpart.label}.</span> {subpart.text}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-
-                        {/* RENDER SIMPLE ANSWER (if part has its own answerType) */}
-                        {part.answerType && (
-                        <div>
-                          <label className="block text-sm font-semibold text-gray-700 mb-2">
-                            Your Answer:
-                          </label>
-                          {part.answerType === 'draw' ? (
-                            <div className="space-y-3">
-                              <DrawingInput
-                                drawingKey={`part-${part.label}`}
-                                drawingData={drawingAnswers[`part-${part.label}`]}
-                                onSave={handleDrawingAnswer}
-                                isGraded={!!gradingFeedback[`part-${part.label}`]}
-                              />
-                              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                              <Button
-                                  onClick={() => handleGradeDrawing(`part-${part.label}`, part.text)}
-                                disabled={isGrading[`part-${part.label}`] || !drawingAnswers[`part-${part.label}`] || !!gradingFeedback[`part-${part.label}`]}
-                                className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                              >
-                                {isGrading[`part-${part.label}`] ? (
-                                  <>
-                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                    Grading...
-                                  </>
-                                ) : (
-                                  <>
-                                    <Sparkles className="w-4 h-4 mr-2" />
-                                      Grade My Answer
-                                  </>
-                                )}
-                              </Button>
-                                {gradingFeedback[`part-${part.label}`] && part.videoUrl && (
-                                  <Button
-                                    variant="outline"
-                                    onClick={() => setVideoModalState({ url: part.videoUrl!, aspectRatio: part.videoAspectRatio })}
-                                    className="w-full sm:w-auto bg-sky-100 text-sky-800 border-sky-300 hover:bg-sky-200 hover:text-sky-900"
-                                  >
-                                    <PlayCircle className="w-4 h-4 mr-2" />
-                                    Video Walkthrough
-                                  </Button>
-                                )}
-                              </div>
-                              {gradingFeedback[`part-${part.label}`] && (
-                                <FeedbackBlock
-                                  feedback={gradingFeedback[`part-${part.label}`]}
-                                  part={part}
-                                  answerKey={`part-${part.label}`}
-                                  showAnswers={showAnswers}
-                                  toggleAnswer={toggleAnswer}
-                                />
-                              )}
-                            </div>
-                          ) : (
-                            <div className="space-y-3">
-                              <Input
-                                value={textAnswers[`part-${part.label}`] || ''}
-                                onChange={(e) => handleTextAnswer(`part-${part.label}`, e.target.value)}
-                                placeholder="Type your answer here..."
-                                className="w-full"
-                                disabled={!!gradingFeedback[`part-${part.label}`]}
-                                readOnly={!!gradingFeedback[`part-${part.label}`]}
-                              />
-                                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                              <Button
-                                onClick={() => handleGradeTextAnswer(`part-${part.label}`, part.text, part.gradingCriteria || '')}
-                                disabled={isGrading[`part-${part.label}`] || !textAnswers[`part-${part.label}`] || !!gradingFeedback[`part-${part.label}`]}
-                                className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                              >
-                                {isGrading[`part-${part.label}`] ? (
-                                  <>
-                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                    Grading...
-                                  </>
-                                ) : (
-                                  <>
-                                    <Sparkles className="w-4 h-4 mr-2" />
-                                    Submit Answer
-                                  </>
-                                )}
-                              </Button>
-                                  {gradingFeedback[`part-${part.label}`] && part.videoUrl && (
-                                    <Button
-                                      variant="outline"
-                                      onClick={() => setVideoModalState({ url: part.videoUrl!, aspectRatio: part.videoAspectRatio })}
-                                      className="w-full sm:w-auto bg-sky-100 text-sky-800 border-sky-300 hover:bg-sky-200 hover:text-sky-900"
-                                    >
-                                      <PlayCircle className="w-4 h-4 mr-2" />
-                                      Video Walkthrough
-                                    </Button>
-                                  )}
-                                </div>
-                              {gradingFeedback[`part-${part.label}`] && (
-                                <FeedbackBlock
-                                  feedback={gradingFeedback[`part-${part.label}`]}
-                                  part={part}
-                                  answerKey={`part-${part.label}`}
-                                  showAnswers={showAnswers}
-                                  toggleAnswer={toggleAnswer}
-                                />
-                              )}
-                            </div>
-                          )}
-                        </div>
-                        )}
-
-                        {/* RENDER ANSWERABLE SUBPARTS (if they exist) */}
-                        {part.subparts && part.subparts.some(sp => sp.answerType) && (
-                          <div className="space-y-6">
-                            {part.subparts.filter(sp => sp.answerType).map((subpart) => {
-                              const subpartKey = `subpart-${part.label}-${subpart.label}`;
-                              // If subpart is answerable, render the full input component
-                              return (
-                                <div key={subpartKey} className="pl-4 border-l-2 border-gray-200">
-                                  <p className="text-gray-800 mb-3">
-                                    <span className="font-bold text-lg text-gray-900">{part.label}{subpart.label}.</span> {subpart.text}
-                                  </p>
-                                    <div>
-                                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                        Your Answer:
-                                      </label>
-                                      {subpart.answerType === 'draw' ? (
-                                        <div className="space-y-3">
-                                          <DrawingInput
-                                            drawingKey={subpartKey}
-                                            drawingData={drawingAnswers[subpartKey]}
-                                            onSave={handleDrawingAnswer}
-                                            isGraded={!!gradingFeedback[subpartKey]}
-                                          />
-                                          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                                            <Button
-                                              onClick={() => handleGradeDrawing(subpartKey, subpart.text)}
-                                              disabled={isGrading[subpartKey] || !drawingAnswers[subpartKey] || !!gradingFeedback[subpartKey]}
-                                              className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                                            >
-                                              {isGrading[subpartKey] ? (
-                                                <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Grading...</>
-                                              ) : (
-                                                <><Sparkles className="w-4 h-4 mr-2" />Grade My Answer</>
-                                              )}
-                                            </Button>
-                                            {gradingFeedback[subpartKey] && subpart.videoUrl && (
-                                              <Button
-                                                variant="outline"
-                                                onClick={() => setVideoModalState({ url: subpart.videoUrl!, aspectRatio: subpart.videoAspectRatio })}
-                                                className="w-full sm:w-auto bg-sky-100 text-sky-800 border-sky-300 hover:bg-sky-200 hover:text-sky-900"
-                                              >
-                                                <PlayCircle className="w-4 h-4 mr-2" />
-                                                Video Walkthrough
-                                              </Button>
-                                            )}
-                                      </div>
-                                          {gradingFeedback[subpartKey] && (
-                                            <FeedbackBlock
-                                              feedback={gradingFeedback[subpartKey]}
-                                              part={subpart}
-                                              answerKey={subpartKey}
-                                              showAnswers={showAnswers}
-                                              toggleAnswer={toggleAnswer}
-                                            />
-                                    )}
-                                  </div>
-                                      ) : (
-                                        <div className="space-y-3">
-                                          <Input
-                                            value={textAnswers[subpartKey] || ''}
-                                            onChange={(e) => handleTextAnswer(subpartKey, e.target.value)}
-                                            placeholder="Type your answer here..."
-                                            className="w-full"
-                                            disabled={!!gradingFeedback[subpartKey]}
-                                            readOnly={!!gradingFeedback[subpartKey]}
-                                          />
-                                          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                                            <Button
-                                              onClick={() => handleGradeTextAnswer(subpartKey, subpart.text, subpart.gradingCriteria || '')}
-                                              disabled={isGrading[subpartKey] || !textAnswers[subpartKey] || !!gradingFeedback[subpartKey]}
-                                              className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                                            >
-                                              {isGrading[subpartKey] ? (
-                                                <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Grading...</>
-                                              ) : (
-                                                <><Sparkles className="w-4 h-4 mr-2" />Submit Answer</>
-                                              )}
-                                            </Button>
-                                            {gradingFeedback[subpartKey] && subpart.videoUrl && (
-                                              <Button
-                                                variant="outline"
-                                                onClick={() => setVideoModalState({ url: subpart.videoUrl!, aspectRatio: subpart.videoAspectRatio })}
-                                                className="w-full sm:w-auto bg-sky-100 text-sky-800 border-sky-300 hover:bg-sky-200 hover:text-sky-900"
-                                              >
-                                                <PlayCircle className="w-4 h-4 mr-2" />
-                                                Video Walkthrough
-                                              </Button>
-                                            )}
-                                          </div>
-                                          {gradingFeedback[subpartKey] && (
-                                            <FeedbackBlock
-                                              feedback={gradingFeedback[subpartKey]}
-                                              part={subpart}
-                                              answerKey={subpartKey}
-                                              showAnswers={showAnswers}
-                                              toggleAnswer={toggleAnswer}
-                                            />
-                                          )}
-                                        </div>
-                                      )}
-                                    </div>
-                                </div>
-                              );
-                            })}
-                            </div>
-                          )}
+                    {/* Show Instructional Subparts (if they exist) */}
+                    {part.subparts && part.subparts.some(sp => !sp.answerType) && (
+                      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                        <p className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+                          Include the Following in Your Answer:
+                        </p>
+                        <ul className="space-y-2">
+                          {part.subparts.filter(sp => !sp.answerType).map((subpart) => (
+                            <li key={subpart.label} className="text-sm text-gray-800">
+                              <span className="font-semibold">{part.label}{subpart.label}.</span> {subpart.text}
+                            </li>
+                          ))}
+                        </ul>
                       </div>
                     )}
+
+                    {/* RENDER SIMPLE ANSWER (if part has its own answerType) */}
+                    {part.answerType && (
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Your Answer:
+                      </label>
+                      {part.answerType === 'draw' ? (
+                        <div className="space-y-3">
+                          <DrawingInput
+                            drawingKey={`part-${part.label}`}
+                            drawingData={drawingAnswers[`part-${part.label}`]}
+                            onSave={handleDrawingAnswer}
+                            isGraded={!!gradingFeedback[`part-${part.label}`]}
+                          />
+                          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                          <Button
+                              onClick={() => handleGradeDrawing(`part-${part.label}`, part.text)}
+                            disabled={isGrading[`part-${part.label}`] || !drawingAnswers[`part-${part.label}`] || !!gradingFeedback[`part-${part.label}`]}
+                            className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {isGrading[`part-${part.label}`] ? (
+                              <>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                Grading...
+                              </>
+                            ) : (
+                              <>
+                                <Sparkles className="w-4 h-4 mr-2" />
+                                  Grade My Answer
+                              </>
+                            )}
+                          </Button>
+                            {gradingFeedback[`part-${part.label}`] && part.videoUrl && (
+                              <Button
+                                variant="outline"
+                                    onClick={() => setVideoModalState({ url: part.videoUrl!, aspectRatio: part.videoAspectRatio })}
+                                className="w-full sm:w-auto bg-sky-100 text-sky-800 border-sky-300 hover:bg-sky-200 hover:text-sky-900"
+                              >
+                                <PlayCircle className="w-4 h-4 mr-2" />
+                                Video Walkthrough
+                              </Button>
+                            )}
+                          </div>
+                          {gradingFeedback[`part-${part.label}`] && (
+                            <FeedbackBlock
+                              feedback={gradingFeedback[`part-${part.label}`]}
+                              part={part}
+                              answerKey={`part-${part.label}`}
+                              showAnswers={showAnswers}
+                              toggleAnswer={toggleAnswer}
+                            />
+                          )}
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          <Input
+                            value={textAnswers[`part-${part.label}`] || ''}
+                            onChange={(e) => handleTextAnswer(`part-${part.label}`, e.target.value)}
+                            placeholder="Type your answer here..."
+                            className="w-full"
+                            disabled={!!gradingFeedback[`part-${part.label}`]}
+                            readOnly={!!gradingFeedback[`part-${part.label}`]}
+                          />
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                          <Button
+                            onClick={() => handleGradeTextAnswer(`part-${part.label}`, part.text, part.gradingCriteria || '')}
+                            disabled={isGrading[`part-${part.label}`] || !textAnswers[`part-${part.label}`] || !!gradingFeedback[`part-${part.label}`]}
+                            className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {isGrading[`part-${part.label}`] ? (
+                              <>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                Grading...
+                              </>
+                            ) : (
+                              <>
+                                <Sparkles className="w-4 h-4 mr-2" />
+                                Submit Answer
+                              </>
+                            )}
+                          </Button>
+                              {gradingFeedback[`part-${part.label}`] && part.videoUrl && (
+                                <Button
+                                  variant="outline"
+                                      onClick={() => setVideoModalState({ url: part.videoUrl!, aspectRatio: part.videoAspectRatio })}
+                                  className="w-full sm:w-auto bg-sky-100 text-sky-800 border-sky-300 hover:bg-sky-200 hover:text-sky-900"
+                                >
+                                  <PlayCircle className="w-4 h-4 mr-2" />
+                                  Video Walkthrough
+                                </Button>
+                              )}
+                            </div>
+                          {gradingFeedback[`part-${part.label}`] && (
+                            <FeedbackBlock
+                              feedback={gradingFeedback[`part-${part.label}`]}
+                              part={part}
+                              answerKey={`part-${part.label}`}
+                              showAnswers={showAnswers}
+                              toggleAnswer={toggleAnswer}
+                            />
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    )}
+
+                    {/* RENDER ANSWERABLE SUBPARTS (if they exist) */}
+                    {part.subparts && part.subparts.some(sp => sp.answerType) && (
+                      <div className="space-y-6">
+                        {part.subparts.filter(sp => sp.answerType).map((subpart) => {
+                          const subpartKey = `subpart-${part.label}-${subpart.label}`;
+                          // If subpart is answerable, render the full input component
+                          return (
+                            <div key={subpartKey} className="pl-4 border-l-2 border-gray-200">
+                              <p className="text-gray-800 mb-3">
+                                <span className="font-bold text-lg text-gray-900">{part.label}{subpart.label}.</span> {subpart.text}
+                              </p>
+                                <div>
+                                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                    Your Answer:
+                                  </label>
+                                  {subpart.answerType === 'draw' ? (
+                                    <div className="space-y-3">
+                                      <DrawingInput
+                                        drawingKey={subpartKey}
+                                        drawingData={drawingAnswers[subpartKey]}
+                                        onSave={handleDrawingAnswer}
+                                        isGraded={!!gradingFeedback[subpartKey]}
+                                      />
+                                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                                        <Button
+                                          onClick={() => handleGradeDrawing(subpartKey, subpart.text)}
+                                          disabled={isGrading[subpartKey] || !drawingAnswers[subpartKey] || !!gradingFeedback[subpartKey]}
+                                          className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                          {isGrading[subpartKey] ? (
+                                            <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Grading...</>
+                                          ) : (
+                                            <><Sparkles className="w-4 h-4 mr-2" />Grade My Answer</>
+                                          )}
+                                        </Button>
+                                        {gradingFeedback[subpartKey] && subpart.videoUrl && (
+                                          <Button
+                                            variant="outline"
+                                                onClick={() => setVideoModalState({ url: subpart.videoUrl!, aspectRatio: subpart.videoAspectRatio })}
+                                            className="w-full sm:w-auto bg-sky-100 text-sky-800 border-sky-300 hover:bg-sky-200 hover:text-sky-900"
+                                          >
+                                            <PlayCircle className="w-4 h-4 mr-2" />
+                                            Video Walkthrough
+                                          </Button>
+                                        )}
+                                  </div>
+                                      {gradingFeedback[subpartKey] && (
+                                        <FeedbackBlock
+                                          feedback={gradingFeedback[subpartKey]}
+                                          part={subpart}
+                                          answerKey={subpartKey}
+                                          showAnswers={showAnswers}
+                                          toggleAnswer={toggleAnswer}
+                                        />
+                                )}
+                              </div>
+                                  ) : (
+                                    <div className="space-y-3">
+                                      <Input
+                                        value={textAnswers[subpartKey] || ''}
+                                        onChange={(e) => handleTextAnswer(subpartKey, e.target.value)}
+                                        placeholder="Type your answer here..."
+                                        className="w-full"
+                                        disabled={!!gradingFeedback[subpartKey]}
+                                        readOnly={!!gradingFeedback[subpartKey]}
+                                      />
+                                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                                        <Button
+                                          onClick={() => handleGradeTextAnswer(subpartKey, subpart.text, subpart.gradingCriteria || '')}
+                                          disabled={isGrading[subpartKey] || !textAnswers[subpartKey] || !!gradingFeedback[subpartKey]}
+                                          className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                          {isGrading[subpartKey] ? (
+                                            <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Grading...</>
+                                          ) : (
+                                            <><Sparkles className="w-4 h-4 mr-2" />Submit Answer</>
+                                          )}
+                                        </Button>
+                                        {gradingFeedback[subpartKey] && subpart.videoUrl && (
+                                          <Button
+                                            variant="outline"
+                                                onClick={() => setVideoModalState({ url: subpart.videoUrl!, aspectRatio: subpart.videoAspectRatio })}
+                                            className="w-full sm:w-auto bg-sky-100 text-sky-800 border-sky-300 hover:bg-sky-200 hover:text-sky-900"
+                                          >
+                                            <PlayCircle className="w-4 h-4 mr-2" />
+                                            Video Walkthrough
+                                          </Button>
+                                        )}
+                                      </div>
+                                      {gradingFeedback[subpartKey] && (
+                                        <FeedbackBlock
+                                          feedback={gradingFeedback[subpartKey]}
+                                          part={subpart}
+                                          answerKey={subpartKey}
+                                          showAnswers={showAnswers}
+                                          toggleAnswer={toggleAnswer}
+                                        />
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                            </div>
+                          );
+                        })}
+                        </div>
+                      )}
                   </div>
-                ))}
+                )}
+              </div>
+            ))}
               </div>
             </div>
 
             {/* Call to Action Section */}
-            <div className="mt-12 text-center bg-white rounded-lg shadow-md border border-gray-200 p-8">
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">🚀 Ready to Master the MCQs?</h3>
-              <p className="text-gray-700 mb-6 max-w-2xl mx-auto">
+            <div className="mt-12 text-center bg-blue-50 border-2 border-blue-200 rounded-lg shadow-sm p-8 transition-shadow hover:shadow-md">
+              <h3 className="text-3xl font-extrabold text-blue-900 mb-2">🚀 Ready to Master the MCQs?</h3>
+              <p className="text-blue-800 mb-6 max-w-2xl mx-auto">
                 FRQs are only half the battle. Test your knowledge with AP-style multiple-choice questions to make sure you're ready for everything the exam can throw at you.
               </p>
-              <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-6 px-8 text-lg rounded-md">
+              <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-6 px-8 text-lg rounded-md shadow-lg transform hover:scale-105 transition-transform duration-200">
                 <Link href={`/unitMCQPracticePage?subject=${selectedSubject}&mode=custom&units=${frqQuestion.unit || 1}`}>
                   Practice Unit {frqQuestion.unit || 1} MCQs
                 </Link>
               </Button>
-              <p className="text-xs text-gray-500 mt-4">The best way to prepare for your next test.</p>
+              <p className="text-xs text-blue-600 mt-4 font-semibold">The best way to prepare for your next test.</p>
             </div>
 
           </div>
+        )}
         </div>
       </div>
     </div>

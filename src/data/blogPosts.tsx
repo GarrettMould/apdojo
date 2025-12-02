@@ -7,6 +7,9 @@ export type BlogPost = {
   slug: string;
   title: string;
   description: string;
+  subject: string;
+  unit: number;
+  thumbnailUrl: string;
   keyTakeaway?: string;
   content: ReactNode;
   linkedFRQ?: number; // ID of the related FRQ question to link to
@@ -17,6 +20,9 @@ export const blogPosts: Record<string, BlogPost> = {
     slug: 'monetary-policy-and-aggregate-demand',
     title: 'Monetary Policy: Connecting the Money Market to AD-AS',
     description: 'How Central Banks use interest rates to fix a recession.',
+    subject: 'Macro',
+    unit: 4,
+    thumbnailUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/image0.jpg',
     keyTakeaway: 'Buy Bonds → MS ↑ → Interest Rate ↓ → Investment ↑ → AD ↑ → GDP ↑. The chain reaction connects money supply changes to aggregate demand through interest rates.',
     content: (
       <>
@@ -120,6 +126,9 @@ export const blogPosts: Record<string, BlogPost> = {
     slug: 'foreign-exchange-cookies',
     title: 'The Foreign Exchange Market: Why Money is Just Like Cookies',
     description: 'Mastering the hardest graph in AP Macro by treating currency like a normal good.',
+    subject: 'Macro',
+    unit: 6,
+    thumbnailUrl: '/images/placeholder.png', // Using the local placeholder for this one
     keyTakeaway: 'A change in demand for one currency causes an opposite change in the supply of the other. If one appreciates, the other must depreciate.',
     linkedFRQ: 4, // Links to Unit 6 FRQ - Foreign Exchange Market
     content: (

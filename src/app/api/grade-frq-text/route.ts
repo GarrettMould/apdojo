@@ -134,35 +134,60 @@ Ensure all required elements from the question are present
 `;
 
     const prompt = `
-      You are an AP Macroeconomics grader. Analyze the student's text-based answer for a Free Response Question (FRQ).
+You are an AP Economics Exam Reader. Your job is to grade student responses against a specific Rubric. 
 
-Input: A text answer submitted by a student.
+### CORE GRADING PHILOSOPHY
+- **Precision:** Do not award points for "close enough" numbers.
+- **Fairness:** You must award partial credit if the rubric allows it. 
 
-Task: Grade this answer for Part ${partLabel} using the explicit criteria below.
+### SCORING ALGORITHM (Follow strictly in order):
 
-Grading Criteria:
+1. **STEP 1: ANALYZE POINT ALLOCATION**
+   - Look at the total points available for this question part (e.g., 1 point or 2 points).
+   - **If 1 Point Total:** The grading is usually "All or Nothing." If the prompt asks to "Explain," the student MUST have the explanation to get the single point.
+   - **If 2+ Points Total:** The points are likely split. Usually, 1 point is for the Assertion (the "What") and 1 point is for the Explanation (the "Why"). Treat them as separate check-boxes.
+
+2. **STEP 2: GRADE THE ASSERTION (The "What")**
+   - Locate the student's final answer (e.g., "Increase," "Decrease," "$10,000").
+   - Compare strictly to the Rubric's correct answer.
+   - **If INCORRECT:** They usually lose the Assertion point AND the Explanation point (unless the rubric explicitly allows "consistency points"). 
+   - **If CORRECT:** Award the point for the Assertion (if the question is worth 2+ points).
+
+3. **STEP 3: GRADE THE EXPLANATION (The "Why")**
+   - Check if the student provides the reasoning required by the Rubric.
+   - **Missing Explanation:** If the student got the Assertion right but provides NO explanation:
+     - If Question is 1 Point Total: Score 0/1.
+     - If Question is 2 Points Total: Score 1/2.
+   - **Incorrect Explanation:** If the reasoning contradicts economic principles, do not award the explanation point.
+
+### SPECIFIC SCORING EXAMPLES:
+**Scenario:** Question asks "What happens to Price? Explain." (Total Value: 2 Points).
+**Rubric:** 1 point for "Decrease". 1 point for explanation of shift.
+- **Student:** "Decrease." (No explanation).
+  - **Score:** 1/2.
+  - **Reasoning:** Assertion is correct. Explanation is missing. Award partial credit.
+- **Student:** "Increase because demand shifts left."
+  - **Score:** 0/2.
+  - **Reasoning:** Assertion is wrong.
+- **Student:** "Decrease because supply shifts left." (Wrong curve).
+  - **Score:** 1/2.
+  - **Reasoning:** Assertion is correct (+1). Explanation is incorrect (0).
+
+### YOUR CURRENT TASK:
+Grade the following response for Part ${partLabel}. Look closely at the total point value (assume 2 points unless criteria suggest otherwise). If it is a 2-point question and they have the right answer but no explanation, give them 1 point. 
+
+**Question Context:** ${questionPrompt}
+**Part Instructions:** ${partText}
+**Rubric / Grading Criteria:** 
 ${criteriaToUse}
+**Student's Answer:** "${textAnswer}"
 
-Question Context: ${questionPrompt}
-Part Instructions: ${partText}
-Student Answer: ${textAnswer}
-
-IMPORTANT GRADING RULES:
-- Score 2 (Full Credit): The answer meets ALL requirements and is fully correct.
-- Score 1 (Partial Credit): The answer is partially correct or demonstrates some understanding, but is incomplete. For example, if a question requires a specific answer AND an explanation, providing only the correct answer without the explanation earns 1 point.
-- Score 0 (No Credit): The answer is incorrect, irrelevant, or does not meet the minimum criteria for partial credit.
-
-The final score must be an integer: 0, 1, or 2. Do not use fractional scores.
-
-Be generous with full credit - if the answer addresses what is asked for in the criteria, it should receive 2 points.
-
-Output: Return ONLY a valid JSON object with this exact structure:
+**Output:**
+Return ONLY a valid JSON object with this exact structure:
 {
-  "score": 0 or 1 or 2,
-  "feedback": "A single, concise sentence (2-3 sentences max) explaining why this specific score (0, 1, or 2) was awarded, directly referencing which criteria were met or not met. Be clear and specific but brief."
-}
-
-The feedback should be concise and directly state why the score was given. Do not provide long lists or extensive bullet points.`;
+  "score": 0, 1, or 2,
+  "feedback": "A single, concise sentence (2-3 sentences max) explaining your reasoning based on the SCORING ALGORITHM. Be clear and specific."
+}`;
 
     console.log('Calling Gemini API...');
     
