@@ -4,7 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ArrowLeft, ChevronDown, ChevronUp, Sparkles, Loader2, PlayCircle, Upload, X, Pencil, Image as ImageIcon, Lock } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ChevronUp, Sparkles, Loader2, PlayCircle, Upload, X, Pencil, Image as ImageIcon, Lock, Share2, Check } from 'lucide-react';
 import Link from 'next/link';
 import { DrawingPad } from '@/components/DrawingPad';
 import { ProgressBars } from '@/components/ProgressBars';
@@ -13,6 +13,7 @@ import { VideoModal } from '@/components/VideoModal';
 import { frqExams, FRQPart, FRQSubPart } from '@/data/frqQuestions';
 import { FeedbackBlock } from '@/components/FeedbackBlock';
 import { DrawingInput } from '@/components/DrawingInput';
+import { ShareFRQButton } from '@/components/ShareFRQButton';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 // Mock data for locked questions
@@ -58,6 +59,21 @@ function UnitFRQPracticePageComponent() {
   });
 
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0);
+
+  // Check for frqId query parameter to auto-select a specific question
+  useEffect(() => {
+    const frqIdParam = searchParams.get('frqId');
+    if (frqIdParam) {
+      const frqId = parseInt(frqIdParam, 10);
+      if (!isNaN(frqId)) {
+        // Find the question with matching ID
+        const questionIndex = allQuestions.findIndex(q => q.id === frqId);
+        if (questionIndex !== -1) {
+          setSelectedQuestionIndex(questionIndex);
+        }
+      }
+    }
+  }, [searchParams, allQuestions]);
 
   // Combine real questions with mock locked questions for display
   const allDisplayQuestions = [...allQuestions, ...lockedQuestions];
@@ -321,7 +337,7 @@ function UnitFRQPracticePageComponent() {
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">Unit FRQ Practice</h1>
                 <p className="text-lg text-gray-700">
-                  Question {frqQuestion.questionNumber}
+                  {'title' in frqQuestion ? frqQuestion.title : `Question ${frqQuestion.questionNumber}`}
                 </p>
               </div>
               <ProgressBars
@@ -335,9 +351,38 @@ function UnitFRQPracticePageComponent() {
             {/* Question Card */}
             <div className="mb-6">
               <div className="mb-4">
-                <span className="inline-block bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full mb-3">
-                  Question {frqQuestion.questionNumber}
-                </span>
+                {/* Difficulty and Share Section */}
+                <div className="flex items-center justify-between mb-4">
+                  {/* Difficulty Bars */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-gray-700 mr-2">Difficulty:</span>
+                    <div className="flex gap-1">
+                      {[1, 2, 3, 4].map((bar) => {
+                        const difficulty = 'difficulty' in frqQuestion ? frqQuestion.difficulty : 'medium';
+                        const filledBars = 
+                          difficulty === 'easy' ? 1 :
+                          difficulty === 'medium' ? 2 :
+                          difficulty === 'hard' ? 3 : 4;
+                        const isFilled = bar <= filledBars;
+                        const colorClass = 
+                          difficulty === 'easy' ? 'bg-green-500' :
+                          difficulty === 'medium' ? 'bg-yellow-500' :
+                          difficulty === 'hard' ? 'bg-orange-500' : 'bg-red-500';
+                        
+                        return (
+                          <div
+                            key={bar}
+                            className={`w-8 h-2 rounded-full ${isFilled ? colorClass : 'bg-gray-200'}`}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+                  
+                  {/* Share Button */}
+                  <ShareFRQButton questionId={frqQuestion.id} />
+                </div>
+                
                 <p className="text-lg text-gray-800 leading-relaxed">
                   {frqQuestion.prompt}
                 </p>

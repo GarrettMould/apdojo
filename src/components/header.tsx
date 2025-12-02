@@ -84,6 +84,13 @@ export function Header() {
                 Unit Cheat Sheets
               </Link>
 
+              <Link
+                href="/ap-blog-home"
+                className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
+              >
+                Blog
+              </Link>
+
               {/* Tutoring Dropdown - HIDDEN */}
               {/* <div 
                 className="relative"
@@ -251,6 +258,14 @@ export function Header() {
                   className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
                 >
                   Unit Cheat Sheets
+                </Link>
+
+                <Link
+                  href="/ap-blog-home"
+                  onClick={closeMobileMenu}
+                  className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
+                >
+                  Blog
                 </Link>
 
                 {/* Tutoring Dropdown (Mobile) - HIDDEN */}

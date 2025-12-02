@@ -36,6 +36,7 @@ export interface FRQQuestion {
   image?: string | any;
   tableData?: FRQTableData;
   parts: FRQPart[];
+  difficulty?: 'easy' | 'medium' | 'hard' | 'extreme';
 }
 
 export interface FRQExam {
@@ -61,6 +62,7 @@ export const ampleReservesExam: FRQExam = {
       subject: 'macro',
       title: 'Unit 4 FRQ - Ample Reserves',
       questionNumber: 4,
+      difficulty: 'medium',
       prompt: "Assume the economy of Northland is currently operating below full employment and the banking system has ample reserves.",
       image: null,
       parts: [
@@ -75,14 +77,14 @@ export const ampleReservesExam: FRQExam = {
             {
               label: "i",
               text: "Current equilibrium real output and price level, labeled Y1 and PL1, respectively.",
-              answerType: "text" as const,
+              // No answerType - this is informational only, provides context for the drawing
               answer: "The graph should show the intersection of AD and SRAS (Y1 and PL1) to the left of the LRAS curve.",
               gradingCriteria: "2 points: Correctly identifies and labels the current equilibrium point (Y1, PL1) at the intersection of AD and SRAS, positioned to the left of LRAS. 1 point: Identifies the equilibrium but labels are missing or incorrectly positioned. 0 points: Does not correctly identify or label the equilibrium.",
             },
             {
               label: "ii",
               text: "Full-employment output, labeled Yf.",
-              answerType: "text" as const,
+              // No answerType - this is informational only, provides context for the drawing
               answer: "Yf should be labeled at the vertical LRAS curve, to the right of Y1.",
               gradingCriteria: "2 points: Correctly labels Yf at the vertical LRAS curve, positioned to the right of Y1. 1 point: Labels Yf but position is incorrect relative to Y1 or LRAS. 0 points: Does not correctly label Yf.",
             }
@@ -272,6 +274,7 @@ export const foreignExchangeFRQExam: FRQExam = {
       subject: 'macro',
       title: 'Unit 6 FRQ - Foreign Exchange Market',
       questionNumber: 5,
+      difficulty: 'hard',
       prompt: "Canada and Mexico are major trading partners and the exchange rate between the Canadian dollar and the Mexican peso is determined in a flexible foreign exchange market.",
       image: null,
       parts: [
