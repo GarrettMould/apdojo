@@ -70,17 +70,18 @@ function UnitFRQPracticePageComponent() {
   }, [selectedSubject]);
 
   // Memoize the filtering of relevant exams
-  const relevantExams = React.useMemo(() => frqExams.filter(exam => 
-    (selectedSubject === 'macro' && exam.examTitle.includes('Macroeconomics')) ||
-    (selectedSubject === 'micro' && exam.examTitle.includes('Microeconomics'))
+  const relevantExams = React.useMemo(() => frqExams.filter(exam =>
+    exam.questions.some(q =>
+      Array.isArray(q.subject)
+        ? q.subject.includes(selectedSubject)
+        : q.subject === selectedSubject
+    )
   ), [selectedSubject]);
 
-  // Memoize the flattening of all questions
-  const allQuestions = React.useMemo(() => relevantExams.flatMap(exam => {
-    const unitMatch = exam.examTitle.match(/Unit (\d+)/);
-    const unit = unitMatch ? parseInt(unitMatch[1]) : null;
-    return exam.questions.map(q => ({ ...q, unit, examTitle: exam.examTitle }));
-  }), [relevantExams]);
+  // Memoize the flattening and sorting of all questions
+  const allQuestions = React.useMemo(() => relevantExams.flatMap(exam => 
+    exam.questions.map(q => ({ ...q, unit: exam.unit, examTitle: exam.examTitle }))
+  ).sort((a, b) => (a.unit || 99) - (b.unit || 99) || a.title.localeCompare(b.title)), [relevantExams]);
 
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0);
 
@@ -128,10 +129,26 @@ function UnitFRQPracticePageComponent() {
   }, [frqQuestion]);
 
   // Calculate total points and current points from feedback
-  const totalPoints = frqQuestion.parts.reduce((acc, part) => {
-    // Each part is worth 2 points, assuming a 0-2 scale
-    return acc + 2;
-  }, 0);
+  const totalPoints = React.useMemo(() => {
+    if (!frqQuestion || !frqQuestion.parts) return 0;
+    return frqQuestion.parts.reduce((acc, part) => {
+      // Add points for the main part if it's answerable
+      if (part.answerType) {
+        return acc + (part.pointValue || 0);
+      }
+      // Add points for answerable subparts
+      if (part.subparts) {
+        const subpartPoints = part.subparts.reduce((subAcc, subpart) => {
+          if (subpart.answerType) {
+            return subAcc + (subpart.pointValue || 0);
+          }
+          return subAcc;
+        }, 0);
+        return acc + subpartPoints;
+      }
+      return acc;
+    }, 0);
+  }, [frqQuestion]);
 
   const currentPoints = Object.values(gradingFeedback).reduce((acc, feedback) => {
     return acc + (feedback.score || 0);
@@ -203,7 +220,7 @@ function UnitFRQPracticePageComponent() {
     setIsExpertTipVisible(false);
   };
 
-  const handleGradeTextAnswer = async (answerKey: string, partText: string, gradingCriteria: string) => {
+  const handleGradeTextAnswer = async (answerKey: string, partText: string, gradingCriteria: string, pointValue?: number) => {
     const textAnswer = textAnswers[answerKey];
 
     if (!textAnswer || textAnswer.trim() === '') {
@@ -230,6 +247,7 @@ function UnitFRQPracticePageComponent() {
           questionPrompt: frqQuestion.prompt,
           partText,
           gradingCriteria,
+          pointValue,
         }),
       });
 
@@ -438,6 +456,19 @@ function UnitFRQPracticePageComponent() {
                   {frqQuestion.prompt}
                 </p>
 
+                {frqQuestion.image && typeof frqQuestion.image === 'string' && (
+                  <div className="my-6 flex justify-center">
+                    <Image
+                      src={frqQuestion.image}
+                      alt="FRQ Question Diagram"
+                      width={600}
+                      height={400}
+                      className="rounded-lg border bg-white"
+                      style={{ objectFit: 'contain' }}
+                    />
+                  </div>
+                )}
+
                 {frqQuestion.tableData && (
                   <div className="my-8 flex justify-center">
                     <div className="flex items-center gap-4">
@@ -597,7 +628,7 @@ function UnitFRQPracticePageComponent() {
                           />
                             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                           <Button
-                            onClick={() => handleGradeTextAnswer(`part-${part.label}`, part.text, part.gradingCriteria || '')}
+                            onClick={() => handleGradeTextAnswer(`part-${part.label}`, part.text, part.gradingCriteria || '', part.pointValue)}
                             disabled={isGrading[`part-${part.label}`] || !textAnswers[`part-${part.label}`] || !!gradingFeedback[`part-${part.label}`]}
                             className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
                           >
@@ -706,7 +737,7 @@ function UnitFRQPracticePageComponent() {
                                       />
                                       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                                         <Button
-                                          onClick={() => handleGradeTextAnswer(subpartKey, subpart.text, subpart.gradingCriteria || '')}
+                                          onClick={() => handleGradeTextAnswer(subpartKey, subpart.text, subpart.gradingCriteria || '', subpart.pointValue)}
                                           disabled={isGrading[subpartKey] || !textAnswers[subpartKey] || !!gradingFeedback[subpartKey]}
                                           className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
                                         >

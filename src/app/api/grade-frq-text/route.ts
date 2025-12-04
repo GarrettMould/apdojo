@@ -22,7 +22,7 @@ export async function POST(req: Request) {
 
   try {
     console.log('Grade FRQ text API called');
-    const { textAnswer, partLabel, questionPrompt, partText, gradingCriteria } = await req.json();
+    const { textAnswer, partLabel, questionPrompt, partText, gradingCriteria, pointValue } = await req.json();
     const genAI = new GoogleGenerativeAI(apiKey);
 
     console.log('Received data:', {
@@ -31,7 +31,8 @@ export async function POST(req: Request) {
       partLabel,
       hasPrompt: !!questionPrompt,
       hasPartText: !!partText,
-      hasCriteria: !!gradingCriteria
+      hasCriteria: !!gradingCriteria,
+      pointValue,
     });
 
     if (!textAnswer || textAnswer.trim() === '') {
@@ -174,7 +175,11 @@ You are an AP Economics Exam Reader. Your job is to grade student responses agai
   - **Reasoning:** Assertion is correct (+1). Explanation is incorrect (0).
 
 ### YOUR CURRENT TASK:
-Grade the following response for Part ${partLabel}. Look closely at the total point value (assume 2 points unless criteria suggest otherwise). If it is a 2-point question and they have the right answer but no explanation, give them 1 point. 
+You are to act as an automated grader. Your ONLY job is to compare the "Student's Answer" to the "Rubric / Grading Criteria" provided below. The maximum score for this part is ${pointValue || 2} points.
+
+1.  **Check for a Correct Assertion:** Does the student's answer contain the correct assertion (e.g., "Increase," "Yes," the correct number) as specified in the rubric?
+2.  **Check for a Correct Explanation:** If the rubric requires an explanation, does the student provide one that matches the rubric's requirements?
+3.  **Assign Score:** Based on the rubric's point allocation for assertion and explanation, assign a final score. If the assertion is correct but the explanation is missing, award partial credit ONLY if the rubric allows for it (e.g., "1 point for correct assertion").
 
 **Question Context:** ${questionPrompt}
 **Part Instructions:** ${partText}
@@ -185,8 +190,8 @@ ${criteriaToUse}
 **Output:**
 Return ONLY a valid JSON object with this exact structure:
 {
-  "score": 0, 1, or 2,
-  "feedback": "A single, concise sentence (2-3 sentences max) explaining your reasoning based on the SCORING ALGORITHM. Be clear and specific."
+  "score": an integer between 0 and ${pointValue || 2},
+  "feedback": "A single, concise sentence justifying your score by directly comparing the student's answer to the rubric."
 }`;
 
     console.log('Calling Gemini API...');
@@ -225,9 +230,10 @@ Return ONLY a valid JSON object with this exact structure:
 
     try {
       const feedback = JSON.parse(jsonText);
-      // Ensure score is 0, 1, or 2
-      if (typeof feedback.score !== 'number' || !Number.isInteger(feedback.score) || feedback.score < 0 || feedback.score > 2) {
-        feedback.score = Math.max(0, Math.min(2, Math.round(feedback.score || 0)));
+      const maxScore = pointValue !== undefined ? pointValue : 2;
+      // Ensure score is an integer between 0 and maxScore
+      if (typeof feedback.score !== 'number' || !Number.isInteger(feedback.score) || feedback.score < 0 || feedback.score > maxScore) {
+        feedback.score = Math.max(0, Math.min(maxScore, Math.round(feedback.score || 0)));
       }
       return new Response(JSON.stringify(feedback), {
         status: 200,

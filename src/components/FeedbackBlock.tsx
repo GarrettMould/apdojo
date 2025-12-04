@@ -8,6 +8,7 @@ interface AnswerablePart {
   label: string;
   answer?: string | any;
   gradingCriteria?: string;
+  pointValue?: number;
 }
 
 // Define the shape of the feedback object
@@ -41,6 +42,8 @@ const formatAnswerText = (text: string) => {
 
 export const FeedbackBlock: React.FC<FeedbackBlockProps> = ({ feedback, part, answerKey, showAnswers, toggleAnswer }) => {
   const criteriaKey = `criteria-${answerKey}`;
+  const maxScore = part.pointValue !== undefined ? part.pointValue : 2; // Default to 2 if not provided
+  const scoreOptions = Array.from({ length: maxScore + 1 }, (_, i) => i); // Creates [0, 1] or [0, 1, 2]
 
   return (
     <div className="mt-3 space-y-4">
@@ -51,7 +54,7 @@ export const FeedbackBlock: React.FC<FeedbackBlockProps> = ({ feedback, part, an
             AP Exam Score
           </p>
           <div className="flex gap-2">
-            {[0, 1, 2].map((score) => {
+            {scoreOptions.map((score) => {
               const isSelected = feedback.score === score;
               return (
                 <button
@@ -73,7 +76,8 @@ export const FeedbackBlock: React.FC<FeedbackBlockProps> = ({ feedback, part, an
           </div>
           <p className="text-xs text-gray-600 mt-2 text-center">
             {feedback.score === 0 && 'No credit - Does not meet criteria'}
-            {feedback.score === 1 && 'Partial credit - Some understanding shown'}
+            {feedback.score === 1 && maxScore === 1 && 'Full credit - Meets all criteria'}
+            {feedback.score === 1 && maxScore > 1 && 'Partial credit - Some understanding shown'}
             {feedback.score === 2 && 'Full credit - Meets all criteria'}
           </p>
         </div>
