@@ -36,3 +36,4 @@ export default function cloudinaryLoader({ src, width, quality }: { src: string;
   // CONSTRUCT FINAL URL
   return `https://res.cloudinary.com/${cloudName}/image/upload/${params.join(',')}/${mappingFolder}/${cleanSrc}`;
 }
+

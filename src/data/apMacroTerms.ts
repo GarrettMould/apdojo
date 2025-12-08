@@ -1294,6 +1294,20 @@ export const keyTerms: KeyTerm[] = [
     subNotes: []
   },
   {
+    id: 'business-inventories',
+    term: 'Business Inventories',
+    definition: 'The stock of goods that businesses hold in anticipation of future sales. Rising inventories are a sign of economic recession, as businesses produce more than consumers are buying.',
+    subject: 'ap_macroeconomics',
+    unit: 2,
+    lessonIDs: ['2.7'],
+    subNotes: [
+      'Rising inventories indicate that businesses are producing more goods than consumers are purchasing',
+      'This is a leading indicator of economic recession, as it suggests weakening consumer demand',
+      'During a recession, businesses accumulate inventory because sales decline faster than production can be adjusted',
+      'High inventory levels often lead businesses to reduce production and lay off workers, further deepening the recession'
+    ]
+  },
+  {
     id: 'output_gap',
     term: 'Output Gap',
     definition: 'The space between the potential output line and the actual output line, which tells us a lot about the health of the economy.',

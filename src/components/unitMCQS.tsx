@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Question as QuestionType } from '@/data/questionBanks/types';
 import { Unit } from '@/data/cheatSheets';
-import { Check, X, Brain, FileText, ChevronDown, Triangle, Loader2, Play, RefreshCw, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Clipboard, Lock } from 'lucide-react';
+import { Check, X, Brain, FileText, ChevronDown, Triangle, Loader2, RefreshCw, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Clipboard, Lock, Play } from 'lucide-react';
 import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
 import Image from 'next/image';
@@ -11,8 +11,11 @@ import { Button } from '@/components/ui/button';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import html2canvas from 'html2canvas';
-import { videos as allVideos } from '@/data/videos';
+import { videos as allVideos, Video } from '@/data/videos';
 import { QuestionWithKeyTerms } from './QuestionWithKeyTerms';
+import { keyTerms as apMacroTerms } from '@/data/apMacroTerms';
+import { keyTerms as apMicroTerms } from '@/data/apMicroTerms';
+import { KeyTerm } from '@/data/allContent';
 
 import dojoIcon from "../../public/images/dojoIcon.png";
 
@@ -333,30 +336,170 @@ const QuestionCard = ({
   };
 
   const [showInternalOverlay, setShowInternalOverlay] = useState(false);
+  const [showDojoDrill, setShowDojoDrill] = useState(false);
+  const [dojoDrillVideo, setDojoDrillVideo] = useState<Video | null>(null);
+
+  // Find matching video for the lesson
+  const findVideoForLesson = (lessonIds: string[]): Video | null => {
+    if (!lessonIds || lessonIds.length === 0) return null;
+    const subjectFilter = question.subject === 'ap_macroeconomics' ? 'AP Macroeconomics' : 'AP Microeconomics';
+    for (const lessonId of lessonIds) {
+      const video = allVideos.find(v => 
+        v.subjects.includes(subjectFilter) &&
+        v.lessonIDS.includes(lessonId)
+      );
+      if (video) return video;
+    }
+    return null;
+  };
+
+  const handleTeachMe = () => {
+    const video = findVideoForLesson(question.lessonIDS);
+    if (video) {
+      setDojoDrillVideo(video);
+      setShowDojoDrill(true);
+    }
+  };
+
+  const matchingVideo = findVideoForLesson(question.lessonIDS);
+
+  // Find best matching key term for the question
+  const findBestMatchingTerm = (): KeyTerm | null => {
+    const allTerms = question.subject === 'ap_macroeconomics' ? apMacroTerms : apMicroTerms;
+    
+    // Filter terms by subject and unit (prioritize same unit, but also check adjacent units)
+    const sameUnitTerms = allTerms.filter(
+      term => term.subject === question.subject && term.unit === question.unit
+    );
+    
+    // Also check adjacent units (unit ± 1) for broader matching
+    const adjacentUnitTerms = allTerms.filter(
+      term => term.subject === question.subject && 
+      (term.unit === question.unit - 1 || term.unit === question.unit + 1)
+    );
+
+    const relevantTerms = [...sameUnitTerms, ...adjacentUnitTerms];
+
+    if (relevantTerms.length === 0) return null;
+
+    // Combine question text and options for matching
+    const searchText = `${question.question} ${question.options.join(' ')}`.toLowerCase();
+
+    // Score each term based on relevance
+    const scoredTerms = relevantTerms.map(term => {
+      let score = 0;
+      const termLower = term.term.toLowerCase();
+      const definitionLower = term.definition.toLowerCase();
+
+      // Unit match bonus (same unit gets higher priority)
+      if (term.unit === question.unit) {
+        score += 10;
+      }
+
+      // Exact term match in question (highest priority)
+      if (searchText.includes(termLower)) {
+        score += 100;
+      }
+
+      // Term appears as whole word in question
+      const termWordRegex = new RegExp(`\\b${termLower.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+      if (termWordRegex.test(searchText)) {
+        score += 80; // Whole word match is better than substring
+      }
+
+      // Term appears in question (case-insensitive partial match)
+      const termWords = termLower.split(/\s+/).filter(w => w.length > 2);
+      const matchingWords = termWords.filter(word => 
+        searchText.includes(word)
+      );
+      score += matchingWords.length * 15;
+
+      // Check aliases if they exist
+      if ((term as any).aliases) {
+        (term as any).aliases.forEach((alias: string) => {
+          const aliasLower = alias.toLowerCase();
+          if (searchText.includes(aliasLower)) {
+            score += 60;
+          }
+          // Whole word alias match
+          const aliasRegex = new RegExp(`\\b${aliasLower.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+          if (aliasRegex.test(searchText)) {
+            score += 40;
+          }
+        });
+      }
+
+      // Lesson ID match (bonus for same lesson)
+      if (question.lessonIDS.some(lessonId => term.lessonIDs.includes(lessonId))) {
+        score += 40;
+      }
+
+      // Definition keywords in question (lower priority)
+      const definitionWords = definitionLower.split(/\s+/).filter(word => word.length > 4);
+      const matchingDefWords = definitionWords.filter(word => searchText.includes(word));
+      score += matchingDefWords.length * 3;
+
+      return { term, score };
+    });
+
+    // Sort by score and return the best match
+    scoredTerms.sort((a, b) => b.score - a.score);
+    const bestMatch = scoredTerms[0];
+    
+    // Only return if score is above threshold (at least some relevance)
+    return bestMatch && bestMatch.score >= 25 ? bestMatch.term : null;
+  };
+
+  const matchingTerm = findBestMatchingTerm();
 
   return (
-    <div ref={cardRef} className="bg-white rounded-lg shadow-md border border-gray-200 p-6 md:p-8 relative">
-      {/* Overlay: Simplified or removed if parent modal is sufficient */} 
-      {showInternalOverlay && (
-        <div className="absolute inset-0 bg-white bg-opacity-80 backdrop-blur-sm z-10 flex items-center justify-center p-4 rounded-lg">
-          <div className="text-center">
-            <Loader2 className={`h-8 w-8 animate-spin mx-auto mb-4 ${subject === 'macro' ? 'text-blue-600' : 'text-green-600'}`} />
-            <p className="text-lg font-semibold text-gray-700">Loading options...</p>
-            {/* Or a message like: "Please complete your selection via the plan modal." */}
+    <>
+      <div ref={cardRef} className="bg-white rounded-lg shadow-md border border-gray-200 p-6 md:p-8 relative">
+        {/* Overlay: Simplified or removed if parent modal is sufficient */} 
+        {showInternalOverlay && (
+          <div className="absolute inset-0 bg-white bg-opacity-80 backdrop-blur-sm z-10 flex items-center justify-center p-4 rounded-lg">
+            <div className="text-center">
+              <Loader2 className={`h-8 w-8 animate-spin mx-auto mb-4 ${question.subject === 'ap_macroeconomics' ? 'text-blue-600' : 'text-green-600'}`} />
+              <p className="text-lg font-semibold text-gray-700">Loading options...</p>
+              {/* Or a message like: "Please complete your selection via the plan modal." */}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Main Question Content */}
-      <div className="space-y-6"> 
-        {/* Question Text */}
-        <p className="text-base md:text-lg font-medium font-serif leading-relaxed text-gray-800">
-          <QuestionWithKeyTerms 
-            questionText={question.question} 
-            unit={question.unit} 
-            subject={question.subject}
-          />
-        </p>
+        {/* Main Question Content */}
+        <div className="space-y-6"> 
+          {/* Action Buttons - Side by Side */}
+          {(matchingVideo || matchingTerm) && (
+            <div className="flex items-center gap-2 mb-2">
+              {matchingVideo && (
+                <button
+                  onClick={handleTeachMe}
+                  className="flex items-center justify-center w-10 h-10 rounded-lg border-2 border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400 transition-colors shadow-sm"
+                  title="Teach Me"
+                >
+                  <Play className="w-6 h-6 text-gray-700" />
+                </button>
+              )}
+              {matchingTerm && (
+                <Link
+                  href={`/unit/${question.unit}?subject=${question.subject === 'ap_macroeconomics' ? 'macro' : 'micro'}#term-${matchingTerm.id}`}
+                  className="flex items-center justify-center w-10 h-10 rounded-lg border-2 border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400 transition-colors shadow-sm"
+                  title={`Review: ${matchingTerm.term}`}
+                >
+                  <FileText className="w-6 h-6 text-gray-700" />
+                </Link>
+              )}
+            </div>
+          )}
+
+          {/* Question Text */}
+          <p className="text-base md:text-lg font-medium font-serif leading-relaxed text-gray-800">
+            <QuestionWithKeyTerms 
+              questionText={question.question} 
+              unit={question.unit} 
+              subject={question.subject}
+            />
+          </p>
 
         {/* --- ADDED: Question Image Display --- */}
         {question.image && (
@@ -440,7 +583,95 @@ const QuestionCard = ({
           </>
         )}
       </div>
+
+      {/* Dojo Drill Modal */}
+      {showDojoDrill && dojoDrillVideo && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4 overflow-y-auto"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowDojoDrill(false);
+            }
+          }}
+        >
+          <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto relative my-8">
+            <button
+              onClick={() => setShowDojoDrill(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-900 transition-colors z-10 bg-white rounded-full p-2 shadow-md"
+              aria-label="Close Dojo Drill"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            
+            <div className="p-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Dojo Drill: {dojoDrillVideo.title}</h2>
+              
+              {/* Video Section */}
+              <div className="mb-6">
+                <video
+                  src={dojoDrillVideo.videoUrl}
+                  controls
+                  autoPlay
+                  className="w-full aspect-video rounded-lg shadow-lg"
+                  playsInline
+                >
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+
+              {/* Questions Section */}
+              {dojoDrillVideo.questions && dojoDrillVideo.questions.length > 0 && (
+                <div className="mt-8">
+                  <h3 className="text-xl font-bold text-gray-800 mb-4">Practice Questions</h3>
+                  <div className="space-y-4">
+                    {dojoDrillVideo.questions.map((q, index) => (
+                      <div key={q.id} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                        <p className="font-semibold text-gray-900 mb-3">
+                          {index + 1}. {q.text}
+                        </p>
+                        <div className="space-y-2">
+                          {q.options.map((option, optIndex) => (
+                            <div
+                              key={optIndex}
+                              className={`p-3 rounded-lg border-2 ${
+                                optIndex === q.correctAnswer
+                                  ? 'bg-green-100 border-green-400 text-green-800'
+                                  : 'bg-white border-gray-300 text-gray-700'
+                              }`}
+                            >
+                              <span className="font-medium">
+                                {String.fromCharCode(65 + optIndex)}. {option}
+                              </span>
+                              {optIndex === q.correctAnswer && (
+                                <Check className="w-5 h-5 text-green-600 inline-block ml-2" />
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                        {q.explanation && (
+                          <p className="mt-3 text-sm text-gray-600 italic">{q.explanation}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Done Button */}
+              <div className="mt-8 text-center">
+                <button
+                  onClick={() => setShowDojoDrill(false)}
+                  className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-md"
+                >
+                  Done
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+    </>
   );
 };
 
@@ -960,45 +1191,7 @@ export function UnitMCQs({
               </div>
             )}
 
-            {/* Video Lessons - Show based on question's lesson IDs (only for Macro) */}
-            {subject !== 'micro' && currentQuestion?.lessonIDS && currentQuestion.lessonIDS.length > 0 && (
-              <div className="space-y-2">
-                {(() => {
-                  const lessonId = currentQuestion.lessonIDS[0]; // Take the first lesson ID
-                  const firstRelatedVideo = allVideos.find(video => 
-                    video.lessonIDS.includes(lessonId) && 
-                    video.subjects.includes('AP Macroeconomics')
-                  );
-
-                  if (firstRelatedVideo) {
-                    return (
-                      <div key={`${lessonId}-${firstRelatedVideo.id}`} className="space-y-2">
-                        {/* Video Link */}
-                        <Link
-                          href={`/videos/macro/${firstRelatedVideo.videoSlug}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="w-full p-3 rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 bg-white hover:bg-gray-50 group block"
-                        >
-                          <div className="flex items-center gap-3 justify-start">
-                            <div className={`p-1.5 rounded-lg group-hover:transition-colors ${subject === 'macro' ? 'bg-blue-100 text-blue-600 group-hover:bg-blue-200' : 'bg-green-100 text-green-600 group-hover:bg-green-200'}`}>
-                              <Play className="w-5 h-5" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="font-semibold text-sm text-gray-900">
-                                Video: {firstRelatedVideo.title}
-                              </div>
-                            </div>
-                          </div>
-                        </Link>
-                        
-                      </div>
-                    );
-                  }
-                  return null; // Render nothing if no related video is found
-                })()}
-              </div>
-            )}
+            {/* Video Lessons - Removed: Now using "Teach Me..." button on question card */}
 
             {/* AI Explanation Button - Reduced padding */}
             <div 

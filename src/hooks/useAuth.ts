@@ -167,6 +167,11 @@ export interface AuthContextValue {
   // --- ADD: Redirect on Login ---
   redirectOnLogin: string | null;
   setRedirectOnLogin: (path: string | null) => void;
+
+  // --- ADD: Character Closet State ---
+  isCharacterClosetOpen: boolean;
+  setIsCharacterClosetOpen: (isOpen: boolean | ((prev: boolean) => boolean)) => void;
+  // --- END: Character Closet State ---
 }
 
 // --- ADD: Helper Function to Calculate Unit Performance ---
@@ -245,6 +250,10 @@ export function useAuth() {
 
    // --- ADD State for redirect on login ---
   const [redirectOnLogin, setRedirectOnLogin] = useState<string | null>(null);
+
+  // --- ADD State for Character Closet ---
+  const [isCharacterClosetOpen, setIsCharacterClosetOpen] = useState<boolean>(false);
+  // --- END: Character Closet State ---
 
   // --- ADD State for Unit Performance ---
   const [unitPerformanceStats, setUnitPerformanceStats] = useState<UnitPerformanceStat[] | null>(null);
@@ -745,7 +754,9 @@ export function useAuth() {
     awardXp,
     xpToast,
     redirectOnLogin,
-    setRedirectOnLogin
+    setRedirectOnLogin,
+    isCharacterClosetOpen,
+    setIsCharacterClosetOpen,
   };
 
   return value;

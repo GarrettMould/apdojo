@@ -166,6 +166,7 @@ function UnitMCQPracticeContent() {
   const currentUnitForAccessCheck = unitsParam ? unitsParam.split(',')[0] : '1';
   const lessonIdParam = searchParams.get('lessonId');
   const modeParam = searchParams.get('mode');
+  const testMode = searchParams.get('test') === 'true'; // Enable test questions when ?test=true
   const unitsData = subject === 'micro' ? allMicroUnitsData : allMacroUnitsData;
 
   const initialCustomUnitIds = unitsParam 
@@ -226,25 +227,29 @@ function UnitMCQPracticeContent() {
       questions = allQuestions.filter(q => 
         q.subject === subjectFilter && 
         q.lessonIDS && 
-        q.lessonIDS.includes(lessonIdParam)
+        q.lessonIDS.includes(lessonIdParam) &&
+        (testMode || !q.isTest) // Exclude test questions unless test mode is enabled
       );
     } else if (practiceMode === 'singleUnit') {
       // Single unit mode
       questions = allQuestions.filter(q => 
         q.subject === subjectFilter && 
-        q.unit === currentUnit
+        q.unit === currentUnit &&
+        (testMode || !q.isTest) // Exclude test questions unless test mode is enabled
       );
     } else if (practiceMode === 'custom' && customUnitIds.length > 0) {
       // Custom units mode
       questions = allQuestions.filter(q => 
         q.subject === subjectFilter && 
-        customUnitIds.includes(q.unit)
+        customUnitIds.includes(q.unit) &&
+        (testMode || !q.isTest) // Exclude test questions unless test mode is enabled
       );
     } else if (practiceMode === 'weakest' && weakestUnitIds.length > 0) {
       // Weakest units mode
       questions = allQuestions.filter(q => 
         q.subject === subjectFilter && 
-        weakestUnitIds.includes(q.unit)
+        weakestUnitIds.includes(q.unit) &&
+        (testMode || !q.isTest) // Exclude test questions unless test mode is enabled
       );
     }
 

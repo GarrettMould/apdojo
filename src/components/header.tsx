@@ -10,7 +10,7 @@ import { Button } from './ui/button';
 import { useRouter } from 'next/navigation';
 
 export function Header() {
-  const { user, logout, selectedSubject, setSelectedSubject, totalXP, guestXp } = useAuthContext();
+  const { user, logout, selectedSubject, setSelectedSubject, totalXP, guestXp, isCharacterClosetOpen, setIsCharacterClosetOpen } = useAuthContext();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isCoursesDropdownOpen, setIsCoursesDropdownOpen] = useState(false);
   const [isTutoringDropdownOpen, setIsTutoringDropdownOpen] = useState(false);
@@ -153,7 +153,7 @@ export function Header() {
                 </button>
               </div>
               
-              {/* XP bar with subtle red glow */}
+              {/* XP bar with subtle red glow - Clickable to open character closet */}
               <div className="flex items-center">
                 {(() => {
                   const xp = user ? (totalXP ?? 0) : (guestXp ?? 0);
@@ -165,9 +165,15 @@ export function Header() {
                   const alpha = baseAlpha + (maxAlpha - baseAlpha) * ratio;
                   const background = `rgba(248, 113, 113, ${alpha})`; // red-400 with low opacity
                   return (
-                    <div
-                      className="flex items-center gap-2 px-4 py-1.5 rounded-md border border-red-100 text-sm font-semibold text-gray-800 transition-colors duration-300"
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        setIsCharacterClosetOpen(prev => !prev);
+                      }}
+                      className="flex items-center gap-2 px-4 py-1.5 rounded-md border border-red-100 text-sm font-semibold text-gray-800 transition-colors duration-300 cursor-pointer hover:opacity-80"
                       style={{ background }}
+                      data-xp-button="true"
                     >
                       <span className="uppercase tracking-tight text-[11px] text-gray-600">XP</span>
                       <span>{xp}</span>
@@ -180,7 +186,7 @@ export function Header() {
                           className="w-5 h-5"
                         />
                       </span>
-                    </div>
+                    </button>
                   );
                 })()}
               </div>

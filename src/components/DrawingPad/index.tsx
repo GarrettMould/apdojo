@@ -3,14 +3,39 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Pen, Eraser, Trash2, Type, CheckCircle } from 'lucide-react';
 
+interface Line {
+  id: string;
+  startX: number;
+  startY: number;
+  endX: number;
+  endY: number;
+  type: 'vertical' | 'horizontal' | 'sloping';
+}
+
+interface Sticker {
+  id: string;
+  label: string;
+  x: number;
+  y: number;
+}
+
 interface DrawingPadProps {
   isLarge?: boolean;
   className?: string;
   initialData?: string;
   onSave: (data: string) => void;
+  enableStickers?: boolean; // New prop to enable sticker mode
+  stickerLabels?: string[]; // Labels available for stickers
 }
 
-export function DrawingPad({ isLarge = false, className = '', initialData, onSave }: DrawingPadProps) {
+export function DrawingPad({ 
+  isLarge = false, 
+  className = '', 
+  initialData, 
+  onSave,
+  enableStickers = false,
+  stickerLabels = ['LRAS', 'SRAS', 'AD', 'Price Level', 'Real GDP']
+}: DrawingPadProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [isEraser, setIsEraser] = useState(false);
@@ -23,6 +48,13 @@ export function DrawingPad({ isLarge = false, className = '', initialData, onSav
   const [editingTextId, setEditingTextId] = useState<string | null>(null);
   const [cursorPos, setCursorPos] = useState<{ x: number; y: number } | null>(null);
   const textInputRef = useRef<HTMLInputElement>(null);
+  const isCreatingNewText = useRef<boolean>(false);
+  
+  // Sticker system state
+  const [stickers, setStickers] = useState<Sticker[]>([]);
+  const [lines, setLines] = useState<Line[]>([]);
+  const [draggedSticker, setDraggedSticker] = useState<string | null>(null);
+  const [dragOffset, setDragOffset] = useState<{ x: number; y: number } | null>(null);
 
   const clearCanvas = () => {
     const canvas = canvasRef.current;
@@ -33,6 +65,8 @@ export function DrawingPad({ isLarge = false, className = '', initialData, onSav
 
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    setStickers([]);
+    setLines([]);
     onSave('');
   };
 
@@ -57,19 +91,52 @@ export function DrawingPad({ isLarge = false, className = '', initialData, onSav
       };
       img.src = initialData;
     }
-  }, [initialData, isLarge]); // Removed textElements and onSave to prevent loops
+  }, [initialData, isLarge]);
 
-  // Effect to save canvas when text changes (but don't redraw canvas)
-  useEffect(() => {
-    if (textElements.length > 0 && !editingTextId) {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      onSave(canvas.toDataURL());
+  const isVertical = (line: Line): boolean => {
+    const dx = Math.abs(line.endX - line.startX);
+    const dy = Math.abs(line.endY - line.startY);
+    return dx < 10 && dy > 20; // Vertical if x difference is small and y difference is large
+  };
+
+  const isHorizontal = (line: Line): boolean => {
+    const dx = Math.abs(line.endX - line.startX);
+    const dy = Math.abs(line.endY - line.startY);
+    return dy < 10 && dx > 20; // Horizontal if y difference is small and x difference is large
+  };
+
+  const getDistance = (point: { x: number; y: number }, line: Line): number => {
+    // Calculate distance from point to line segment
+    const A = point.x - line.startX;
+    const B = point.y - line.startY;
+    const C = line.endX - line.startX;
+    const D = line.endY - line.startY;
+
+    const dot = A * C + B * D;
+    const lenSq = C * C + D * D;
+    let param = -1;
+    if (lenSq !== 0) param = dot / lenSq;
+
+    let xx, yy;
+
+    if (param < 0) {
+      xx = line.startX;
+      yy = line.startY;
+    } else if (param > 1) {
+      xx = line.endX;
+      yy = line.endY;
+    } else {
+      xx = line.startX + param * C;
+      yy = line.startY + param * D;
     }
-  }, [textElements, editingTextId, onSave]);
+
+    const dx = point.x - xx;
+    const dy = point.y - yy;
+    return Math.sqrt(dx * dx + dy * dy);
+  };
 
   const startDrawing = (e: React.MouseEvent | React.TouchEvent) => {
-    e.preventDefault(); // Prevent scrolling
+    e.preventDefault();
     const canvas = canvasRef.current;
     if (!canvas) return;
     
@@ -82,10 +149,13 @@ export function DrawingPad({ isLarge = false, className = '', initialData, onSav
       : (e as React.MouseEvent).clientY - rect.top;
     
     if (tool === 'text') {
-      // Create a new text element
+      isCreatingNewText.current = true;
       const newId = `text-${Date.now()}`;
       setTextElements(prev => [...prev, { id: newId, x, y, text: '' }]);
       setEditingTextId(newId);
+      setTimeout(() => {
+        isCreatingNewText.current = false;
+      }, 100);
       return;
     }
     
@@ -105,25 +175,10 @@ export function DrawingPad({ isLarge = false, className = '', initialData, onSav
   };
 
   const handleTextBlur = () => {
-    const canvas = canvasRef.current;
-    if (!canvas || !editingTextId) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const textEl = textElements.find(el => el.id === editingTextId);
-
-    if (textEl && textEl.text.trim() !== '') {
-      ctx.fillStyle = penColor;
-      ctx.font = '16px Arial';
-      ctx.fillText(textEl.text, textEl.x, textEl.y);
+    if (isCreatingNewText.current) {
+      return;
     }
-    
     setEditingTextId(null);
-    // Remove the text element from state after drawing it
-    setTextElements(prev => prev.filter(el => el.id !== editingTextId)); 
-    
-    onSave(canvas.toDataURL());
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -138,7 +193,7 @@ export function DrawingPad({ isLarge = false, className = '', initialData, onSav
   };
 
   const draw = (e: React.MouseEvent | React.TouchEvent) => {
-    e.preventDefault(); // Prevent scrolling
+    e.preventDefault();
     const canvas = canvasRef.current;
     if (!canvas || !isDrawing || !lastPos.current) return;
     
@@ -218,18 +273,123 @@ export function DrawingPad({ isLarge = false, className = '', initialData, onSav
       ctx.lineWidth = 3.5;
       ctx.stroke();
 
+      // Store line data for grading
+      const newLine: Line = {
+        id: `line-${Date.now()}`,
+        startX: lineStart.x,
+        startY: lineStart.y,
+        endX: x,
+        endY: y,
+        type: isVertical({ startX: lineStart.x, startY: lineStart.y, endX: x, endY: y, id: '', type: 'sloping' }) 
+          ? 'vertical' 
+          : isHorizontal({ startX: lineStart.x, startY: lineStart.y, endX: x, endY: y, id: '', type: 'sloping' })
+          ? 'horizontal'
+          : 'sloping'
+      };
+      setLines(prev => [...prev, newLine]);
+
       setLineStart(null);
       lastPos.current = null;
     }
 
     setIsDrawing(false);
-    // onSave(canvas.toDataURL()); // REMOVED: This was causing the premature finalization
+  };
+
+  const handleStickerDragStart = (e: React.MouseEvent, stickerId: string) => {
+    e.stopPropagation();
+    const sticker = stickers.find(s => s.id === stickerId);
+    if (!sticker) return;
+    
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    setDraggedSticker(stickerId);
+    setDragOffset({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    });
+  };
+
+  const handleStickerDrag = (e: React.MouseEvent) => {
+    if (!draggedSticker || !dragOffset) return;
+    
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left - dragOffset.x;
+    const y = e.clientY - rect.top - dragOffset.y;
+    
+    setStickers(prev => prev.map(s => 
+      s.id === draggedSticker ? { ...s, x, y } : s
+    ));
+  };
+
+  const handleStickerDragEnd = () => {
+    setDraggedSticker(null);
+    setDragOffset(null);
+  };
+
+  const addSticker = (label: string) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const newSticker: Sticker = {
+      id: `sticker-${Date.now()}`,
+      label,
+      x: canvas.width / 2,
+      y: canvas.height / 2
+    };
+    setStickers(prev => [...prev, newSticker]);
   };
 
   const handleSave = () => {
     const canvas = canvasRef.current;
-    if (canvas) {
-      onSave(canvas.toDataURL());
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Before saving, commit any text that's currently being edited
+    if (editingTextId) {
+      const textEl = textElements.find(el => el.id === editingTextId);
+      if (textEl && textEl.text.trim() !== '') {
+        ctx.fillStyle = penColor;
+        ctx.font = '16px Arial';
+        ctx.fillText(textEl.text, textEl.x, textEl.y);
+      }
+      setEditingTextId(null);
+      setTextElements(prev => prev.filter(el => el.id !== editingTextId));
+    }
+
+    // Commit remaining text elements
+    textElements.forEach(textEl => {
+      if (textEl.text.trim() !== '') {
+        ctx.fillStyle = penColor;
+        ctx.font = '16px Arial';
+        ctx.fillText(textEl.text, textEl.x, textEl.y);
+      }
+    });
+    setTextElements([]);
+
+    // Draw stickers on canvas
+    stickers.forEach(sticker => {
+      ctx.fillStyle = '#000000';
+      ctx.font = 'bold 14px Arial';
+      ctx.fillText(sticker.label, sticker.x, sticker.y);
+    });
+
+    // Save canvas image
+    const imageData = canvas.toDataURL();
+    
+    // If stickers are enabled, also save structured data
+    if (enableStickers) {
+      const structuredData = {
+        image: imageData,
+        stickers: stickers,
+        lines: lines
+      };
+      onSave(JSON.stringify(structuredData));
+    } else {
+      onSave(imageData);
     }
   };
 
@@ -266,6 +426,24 @@ export function DrawingPad({ isLarge = false, className = '', initialData, onSav
 
   return (
     <div className={`relative ${className}`}>
+      {/* Sticker Toolbar */}
+      {enableStickers && (
+        <div className="mb-2 p-2 bg-gray-50 border-b border-gray-200 rounded-t-lg">
+          <p className="text-xs text-gray-600 mb-2 font-medium">Drag labels onto your graph:</p>
+          <div className="flex flex-wrap gap-2">
+            {stickerLabels.map(label => (
+              <button
+                key={label}
+                onClick={() => addSticker(label)}
+                className="px-3 py-1.5 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors shadow-sm"
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="absolute top-2 left-2 flex gap-2 z-10">
         <div className="relative group">
           <button
@@ -307,15 +485,17 @@ export function DrawingPad({ isLarge = false, className = '', initialData, onSav
             <line x1="2" y1="14" x2="14" y2="2" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
           </svg>
         </button>
-        <button
-          onClick={() => {
-            setTool('text');
-            setIsEraser(false);
-          }}
-          className={`p-1 rounded ${tool === 'text' ? 'bg-blue-100' : 'hover:bg-gray-100'}`}
-        >
-          <Type className="w-4 h-4" />
-        </button>
+        {!enableStickers && (
+          <button
+            onClick={() => {
+              setTool('text');
+              setIsEraser(false);
+            }}
+            className={`p-1 rounded ${tool === 'text' ? 'bg-blue-100' : 'hover:bg-gray-100'}`}
+          >
+            <Type className="w-4 h-4" />
+          </button>
+        )}
         <button
           onClick={() => {
             setTool('eraser');
@@ -358,16 +538,36 @@ export function DrawingPad({ isLarge = false, className = '', initialData, onSav
         onMouseMove={(e) => {
           handleMouseMove(e);
           draw(e);
+          handleStickerDrag(e);
         }}
-        onMouseUp={stopDrawing}
+        onMouseUp={(e) => {
+          stopDrawing(e);
+          handleStickerDragEnd();
+        }}
         onMouseLeave={(e) => {
           setCursorPos(null);
           stopDrawing(e);
+          handleStickerDragEnd();
         }}
         onTouchStart={startDrawing}
         onTouchMove={draw}
         onTouchEnd={stopDrawing}
       />
+      {/* Sticker overlays */}
+      {enableStickers && stickers.map(sticker => (
+        <div
+          key={sticker.id}
+          draggable
+          onMouseDown={(e) => handleStickerDragStart(e, sticker.id)}
+          className="absolute px-2 py-1 bg-blue-100 border-2 border-blue-400 rounded text-sm font-semibold text-blue-800 cursor-move z-30 select-none"
+          style={{
+            left: `${sticker.x}px`,
+            top: `${sticker.y - 20}px`,
+          }}
+        >
+          {sticker.label}
+        </div>
+      ))}
       {/* Visible cursor indicator */}
       {cursorPos && (
         <div
@@ -385,9 +585,10 @@ export function DrawingPad({ isLarge = false, className = '', initialData, onSav
           }`} />
         </div>
       )}
-      {/* Text input overlays */}
-      {textElements.map(textEl => (
-        editingTextId === textEl.id && (
+      {/* Text input overlays (only if stickers not enabled) */}
+      {!enableStickers && textElements.map(textEl => {
+        const isEditing = editingTextId === textEl.id;
+        return isEditing ? (
           <input
             key={textEl.id}
             ref={textInputRef}
@@ -395,6 +596,8 @@ export function DrawingPad({ isLarge = false, className = '', initialData, onSav
             value={textEl.text}
             onChange={(e) => handleTextChange(textEl.id, e.target.value)}
             onBlur={handleTextBlur}
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
             className="absolute border-2 border-blue-500 bg-white px-2 py-1 rounded text-sm z-30"
             style={{
               left: `${textEl.x}px`,
@@ -402,8 +605,24 @@ export function DrawingPad({ isLarge = false, className = '', initialData, onSav
             }}
             autoFocus
           />
-        )
-      ))}
+        ) : (
+          <div
+            key={textEl.id}
+            onClick={(e) => {
+              e.stopPropagation();
+              setEditingTextId(textEl.id);
+            }}
+            className="absolute px-2 py-1 rounded text-sm z-30 cursor-pointer hover:bg-blue-50 border border-transparent hover:border-blue-300"
+            style={{
+              left: `${textEl.x}px`,
+              top: `${textEl.y - 20}px`,
+              color: penColor,
+            }}
+          >
+            {textEl.text || ' '}
+          </div>
+        );
+      })}
     </div>
   );
-} 
+}

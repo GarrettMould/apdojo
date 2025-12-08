@@ -3,10 +3,12 @@ export interface FRQSubPart {
   text: string;
   answerType?: 'draw' | 'text';
   answer?: string | any;
-  gradingCriteria?: string;
+  gradingCriteria?: string; // Detailed instructions for AI grader (not shown to students)
+  studentExplanation?: string; // Student-friendly explanation shown in UI
   videoUrl?: string;
   videoAspectRatio?: 'vertical' | 'horizontal';
   pointValue?: number;
+  referenceImageUrl?: string; // Reference image for drawing comparison (answer key)
 }
 
 export interface FRQPart {
@@ -15,10 +17,12 @@ export interface FRQPart {
   answerType?: 'draw' | 'text'; // Made optional
   answer?: string | any;
   subparts?: FRQSubPart[];
-  gradingCriteria?: string;
+  gradingCriteria?: string; // Detailed instructions for AI grader (not shown to students)
+  studentExplanation?: string; // Student-friendly explanation shown in UI
   videoUrl?: string;
   videoAspectRatio?: 'vertical' | 'horizontal';
   pointValue?: number;
+  referenceImageUrl?: string; // Reference image for drawing comparison (answer key)
 }
 
 // Interface for the table data within an FRQ
@@ -51,18 +55,18 @@ export interface FRQExam {
 }
 
 // Define image paths - some are placeholders for now
-const OUTPUTLOW = '/images/OUTPUTLOW.svg';
-const PRDOWN = '/images/PRDOWN.svg';
-const microUnit5FRQA1D = '/images/ID2QD.svg';
-const microUnit5FRQA1E = '/images/ID2QE.svg';
-const macroSetOneFRQA5APlaceholder = '/images/logo.png';
-const macroSetOneFRQA5CPlaceholder = '/images/logo.png';
-const macroMoneyMarketBuy = '/images/macroMoneyMarketBuy.png';
-const macroLoanableFundsFiscal = '/images/macroLoanableFundsFiscal.png';
+const OUTPUTLOW = '/images/frqPracticePage/OUTPUTLOW.svg';
+const PRDOWN = '/images/frqPracticePage/PRDOWN.svg';
+const microUnit5FRQA1D = '/images/frqPracticePage/ID2QD.svg';
+const microUnit5FRQA1E = '/images/frqPracticePage/ID2QE.svg';
+const macroSetOneFRQA5APlaceholder = '/images/frqPracticePage/logo.png';
+const macroSetOneFRQA5CPlaceholder = '/images/frqPracticePage/logo.png';
+const macroMoneyMarketBuy = '/images/frqPracticePage/macroMoneyMarketBuy.png';
+const macroLoanableFundsFiscal = '/images/frqPracticePage/macroLoanableFundsFiscal.png';
 
-export const ampleReservesExam: FRQExam = {
+export const macroUnit4Set1: FRQExam = {
   examTitle: "AP Macroeconomics Unit 4 FRQ: Ample Reserves",
-  thumbnailUrl: "/images/unit4MacroFRQCover.jpg",
+  thumbnailUrl: "/images/frqPracticePage/unit4MacroFRQCover.jpg",
   unit: 4,
   questions: [
     {
@@ -138,9 +142,9 @@ export const ampleReservesExam: FRQExam = {
   ]
 };
 
-export const factorMarketsExam: FRQExam = {
+export const microUnit5Set1: FRQExam = {
   examTitle: "AP Microeconomics Unit 5 FRQ: Factor Markets",
-  thumbnailUrl: "/images/U5FRQMicro.jpg",
+  thumbnailUrl: "/images/frqPracticePage/U5FRQMicro.jpg",
   unit: 5,
   questions: [
     {
@@ -235,9 +239,9 @@ export const factorMarketsExam: FRQExam = {
   ]
 };
 
-export const microGameTheoryExam: FRQExam = {
+export const microUnit4Set2: FRQExam = {
   examTitle: "AP Microeconomics Unit 4 FRQ: Game Theory",
-  thumbnailUrl: '/images/microGameTheoryMatrix.png',
+  thumbnailUrl: '/images/frqPracticePage/microGameTheoryMatrix.png',
   unit: 4,
   questions: [
     {
@@ -294,13 +298,13 @@ export const microGameTheoryExam: FRQExam = {
   ]
 };
 
-export const macroBankingExam: FRQExam = {
+export const macroUnit4Set3: FRQExam = {
   examTitle: "AP Macroeconomics Unit 4 FRQ: The Banking System",
-  thumbnailUrl: "/images/unit4MacroFRQCover.jpg",
+  thumbnailUrl: "/images/frqPracticePage/unit4MacroFRQCover.jpg",
   unit: 4,
   questions: [
     {
-      id: 5,
+      id: 4,
       subject: 'macro',
       title: 'Unit 4 FRQ - Banking & Money Creation',
       questionNumber: 1,
@@ -349,13 +353,13 @@ export const macroBankingExam: FRQExam = {
   ]
 };
 
-export const macroUnit2DataExam: FRQExam = {
+export const macroUnit2Set1: FRQExam = {
   examTitle: "AP Macroeconomics Unit 2 FRQ: Economic Indicators",
-  thumbnailUrl: "/images/unit4MacroFRQCover.jpg",
+  thumbnailUrl: "/images/frqPracticePage/unit4MacroFRQCover.jpg",
   unit: 2,
   questions: [
     {
-      id: 6,
+      id: 5,
       subject: 'macro',
       title: 'Unit 2 FRQ - GDP & Inflation Data',
       questionNumber: 1,
@@ -442,13 +446,13 @@ export const macroUnit2DataExam: FRQExam = {
   ]
 };
 
-export const macroUnit3Exam: FRQExam = {
+export const macroUnit3Set1: FRQExam = {
   examTitle: "AP Macroeconomics Unit 3 FRQ: National Income & Price Determination",
-  thumbnailUrl: "/images/unit4MacroFRQCover.jpg", // Using a relevant placeholder
+  thumbnailUrl: "/images/frqPracticePage/unit4MacroFRQCover.jpg", // Using a relevant placeholder
   unit: 3,
   questions: [
     {
-      id: 7,
+      id: 6,
       subject: 'macro',
       title: 'Unit 3 FRQ - Inflationary Gap & Multipliers',
       questionNumber: 1,
@@ -506,11 +510,11 @@ export const macroUnit3Exam: FRQExam = {
 
 export const macroUnit5Set1: FRQExam = {
   examTitle: "AP Macroeconomics Unit 5 FRQ: The Phillips Curve",
-  thumbnailUrl: "/images/unit4MacroFRQCover.jpg",
+  thumbnailUrl: "/images/frqPracticePage/unit4MacroFRQCover.jpg",
   unit: 5,
   questions: [
     {
-      id: 8,
+      id: 7,
       subject: 'macro',
       title: 'Unit 5 FRQ - Phillips Curve and Interest Rates',
       questionNumber: 1,
@@ -561,11 +565,11 @@ export const macroUnit5Set1: FRQExam = {
 
 export const macroUnit5Set2: FRQExam = {
   examTitle: "AP Macroeconomics Unit 5 FRQ: Short-Run & Long-Run Phillips Curves",
-  thumbnailUrl: "/images/unit4MacroFRQCover.jpg", // You can link a screenshot of a table here if you have one
+  thumbnailUrl: "/images/frqPracticePage/unit4MacroFRQCover.jpg", // You can link a screenshot of a table here if you have one
   unit: 5,
   questions: [
     {
-      id: 9,
+      id: 8,
       subject: 'macro',
       title: 'Unit 5 FRQ - SRPC and Long-Run Adjustments',
       questionNumber: 1,
@@ -616,18 +620,18 @@ export const macroUnit5Set2: FRQExam = {
 
 export const macroUnit1Set2: FRQExam = {
   examTitle: "AP Macroeconomics Unit 1 FRQ: Comparative Advantage & Trade",
-  thumbnailUrl: "/images/unit4MacroFRQCover.jpg", 
+  thumbnailUrl: "/images/frqPracticePage/unit4MacroFRQCover.jpg", 
   unit: 1,
   questions: [
     {
-      id: 10, 
+      id: 9, 
       subject: ['macro', 'micro'],
       title: 'Unit 1 FRQ - Comparative Advantage & PPC',
       questionNumber: 1,
       prompt: "The graph below shows the production possibilities curves for two countries, Novus and Vetus. Novus can produce 80 units of Cotton or 40 units of Wool. Vetus can produce 40 units of Cotton or 120 units of Wool. Assume constant opportunity costs for both nations.",
       expertTip: "To find the Opportunity Cost, always put the 'Other' good On Top (OOO). For example, to find the cost of 1 unit of Cotton, divide the maximum Wool by the maximum Cotton.",
       // You can insert the SVG component code provided below into your image renderer here
-      image: '/images/macroUnit1Set2.svg', 
+      image: '/images/frqPracticePage/macroUnit1Set2.svg', 
       parts: [
         {
           label: "A",
@@ -664,11 +668,11 @@ export const macroUnit1Set2: FRQExam = {
 
 export const macroUnit4Set2: FRQExam = {
   examTitle: "AP Macroeconomics Unit 4 FRQ: Monetary vs. Fiscal Policy",
-  thumbnailUrl: "/images/unit4MacroFRQCover.jpg",
+  thumbnailUrl: "/images/frqPracticePage/unit4MacroFRQCover.jpg",
   unit: 4,
   questions: [
     {
-      id: 11,
+      id: 10,
       subject: 'macro',
       title: 'Unit 4 FRQ - Policy Mix & Interest Rates',
       questionNumber: 1,
@@ -735,11 +739,11 @@ export const macroUnit4Set2: FRQExam = {
 
 export const macroUnit6Set2: FRQExam = {
   examTitle: "AP Macroeconomics Unit 6 FRQ: Capital Flight & Exchange Rate Intervention",
-  thumbnailUrl: "/images/unit4MacroFRQCover.jpg",
+  thumbnailUrl: "/images/frqPracticePage/unit4MacroFRQCover.jpg",
   unit: 6,
   questions: [
     {
-      id: 12,
+      id: 11,
       subject: 'macro',
       title: 'Unit 6 FRQ - Political Instability & Stabilization',
       questionNumber: 1,
@@ -797,11 +801,11 @@ export const macroUnit6Set2: FRQExam = {
 
 export const macroUnit2Set2: FRQExam = {
   examTitle: "AP Macroeconomics Unit 2 FRQ: CPI and Inflation",
-  thumbnailUrl: "/images/unit4MacroFRQCover.jpg",
+  thumbnailUrl: "/images/frqPracticePage/unit4MacroFRQCover.jpg",
   unit: 2,
   questions: [
     {
-      id: 13,
+      id: 12,
       subject: 'macro',
       title: 'Unit 2 FRQ - Price Indices & Real Income',
       questionNumber: 1,
@@ -858,11 +862,11 @@ export const macroUnit2Set2: FRQExam = {
 };
 export const macroUnit3Set4: FRQExam = {
   examTitle: "AP Macroeconomics Unit 3 FRQ: Inflationary Gaps & Long-Run Growth",
-  thumbnailUrl: "/images/unit4MacroFRQCover.jpg",
+  thumbnailUrl: "/images/frqPracticePage/unit4MacroFRQCover.jpg",
   unit: 3,
   questions: [
     {
-      id: 15,
+      id: 13,
       subject: 'macro',
       title: 'Unit 3 FRQ - Inflationary Gap & Crowding In',
       questionNumber: 1,
@@ -875,42 +879,98 @@ export const macroUnit3Set4: FRQExam = {
           pointValue: 2,
           text: "Draw a correctly labeled graph of the long-run aggregate supply, short-run aggregate supply, and aggregate demand curves. Label the current short-run equilibrium real output as Y1 and the current price level as PL1. Label the full-employment output as Yf.",
           answerType: "draw",
-          answer: "The graph should show a vertical LRAS curve at Yf. The downward-sloping AD and upward-sloping SRAS curves should intersect to the RIGHT of the LRAS curve. The intersection is labeled Y1 and PL1.",
+          referenceImageUrl: "/images/frqPracticePage/macroUnit3Set4key.png",
+          answer: `
+**POINTS:** 2 Points Total.
+**GRAPH REQUIREMENTS:**
+1. Vertical LRAS curve labeled Yf.
+2. Downward-sloping AD and Upward-sloping SRAS.
+**CRITICAL CHECK:** The intersection of AD and SRAS (labeled Y1/PL1) MUST be to the RIGHT of the LRAS curve (Inflationary Gap).
+**SCORING:** 1 point for correct curves/labels. 1 point for showing the correct gap (Y1 > Yf).
+
+### SPECIAL INSTRUCTIONS FOR GRAPH GRADING (VISION ANALYSIS)
+
+When analyzing a hand-drawn graph, you must perform a strict GEOMETRIC CHECK before awarding points.
+
+1. **Identify the Vertical Line:**
+   - Locate the vertical line.
+   - CHECK LABEL: Is it labeled "LRAS" (Long Run Aggregate Supply)?
+   - If it is labeled "SRAS" or "AD", the graph is WRONG. Score 0.
+
+2. **Identify the Intersection (Equilibrium):**
+   - Locate where the downward sloping line (AD) crosses the upward sloping line (SRAS).
+   - CHECK POSITION: Is this intersection to the LEFT or RIGHT of the vertical line?
+   - **Right** = Inflationary Gap.
+   - **Left** = Recessionary Gap.
+   - **On the Line** = Full Employment.
+
+3. **Hallucination Check:**
+   - Do not assume the student drew it correctly.
+   - If the labels are messy/swapped (e.g., vertical line is SRAS), mark it INCORRECT immediately.
+   - Explicitly output in your thought process: "I see a vertical line labeled [Read Label]. I see an intersection at [Position]."
+          `,
         },
         {
           label: "B",
           pointValue: 1,
           text: "Assume that the government budget is currently balanced. In the absence of any discretionary policy action, will the government budget move into surplus, deficit, or remain in balance as a result of the economic conditions identified in part (a)? Explain.",
           answerType: "text",
-          answer: "Move into surplus. Explanation: Because the economy is operating above full employment (high income/low unemployment), automatic stabilizers will kick in. Tax revenues (income taxes) will increase, and transfer payments (unemployment benefits) will decrease, naturally creating a budget surplus.",
+          answer: `
+**ASSERTION:** Move into SURPLUS.
+**REQUIRED LOGIC:** Student must explain AUTOMATIC STABILIZERS.
+- Logic A: High income/output leads to INCREASED tax revenues (income taxes).
+- Logic B: Low unemployment leads to DECREASED transfer payments (unemployment benefits).
+**FORBIDDEN LOGIC:** Do NOT accept "Government cuts spending" or "Government raises taxes." The prompt says "absence of discretionary action." The change must be automatic.
+          `,
         },
         {
           label: "C",
           pointValue: 2,
           text: "On your graph in part (a), show how the economy will adjust in the long run in the absence of any discretionary policy action.",
           answerType: "draw",
-          answer: "The Short-Run Aggregate Supply (SRAS) curve shifts to the left. Explanation: Over time, nominal wages and input costs will rise due to the high demand for labor and resources. This increases the cost of production, shifting SRAS left until it intersects AD at the long-run aggregate supply curve (Yf).",
+          answer: `
+**POINTS:** 2 Points Total.
+**GRAPH CHECK:** Short-Run Aggregate Supply (SRAS) must shift to the LEFT until it intersects AD at the LRAS line.
+**EXPLANATION CHECK:** Student must explain that NOMINAL WAGES (or input costs) will INCREASE due to the high demand for labor/resources (or expectations of higher inflation).
+**SCORING:** 1 point for the graph shift. 1 point for the correct reasoning (wages rising).
+          `,
         },
         {
           label: "D",
           pointValue: 1,
           text: "Now assume instead the government decides to increase taxes to close the inflationary gap. What effect will this policy have on the national debt?",
           answerType: "text",
-          answer: "The national debt will decrease (or grow at a slower rate). Explanation: Increasing taxes increases government revenue, moving the budget toward a surplus, which allows the government to pay down existing debt.",
+          answer: `
+**ASSERTION:** The National Debt will DECREASE (or stop growing).
+**REQUIRED LOGIC:** Higher taxes increase government revenue. If the budget was balanced, this creates a SURPLUS. A surplus allows the government to pay down existing debt.
+          `,
         },
         {
           label: "E",
           pointValue: 2,
           text: "Draw a correctly labeled graph of the loanable funds market and show the effect of the change in the national debt identified in part (d) on the equilibrium real interest rate.",
           answerType: "draw",
-          answer: "The graph should show the Demand for Loanable Funds shifting to the LEFT (or Supply shifting to the RIGHT). Explanation: As the government borrows less (or saves more/pays down debt), the demand for loanable funds decreases. This results in a lower equilibrium real interest rate.",
+          answer: `
+**POINTS:** 2 Points Total.
+**ASSERTION:** Real Interest Rate DECREASES.
+**GRAPH CHECK:**
+- Option A (Demand Shift): Demand for Loanable Funds (DLF) shifts LEFT (Government borrows less).
+- Option B (Supply Shift): Supply of Loanable Funds (SLF) shifts RIGHT (Government saves more/National Savings increase).
+**SCORING:** 1 point for correct curve shift. 1 point for showing lower equilibrium Real Interest Rate.
+          `,
         },
         {
           label: "F",
           pointValue: 2,
           text: "Based on the change in the equilibrium real interest rate identified in part (e), what will happen to the rate of economic growth in the country in the long run? Explain.",
           answerType: "text",
-          answer: "Economic growth will increase. Explanation: A lower real interest rate reduces the cost of borrowing for firms, which incentivizes Investment spending (I) on physical capital. An increase in the capital stock leads to an increase in the long-run productive capacity (LRAS shifts right) of the economy.",
+          answer: `
+**POINTS:** 2 Points Total.
+**ASSERTION:** Economic growth will INCREASE.
+**REQUIRED LOGIC:** The student must link the LOWER Real Interest Rate to INCREASED INVESTMENT SPENDING (I).
+**KEYWORD CHECK:** They MUST mention that this leads to an increase in "Capital Stock," "Physical Capital," or "Productive Capacity."
+**FORBIDDEN LOGIC:** Do NOT award the explanation point if they say growth is caused by "Consumer Spending" or "Aggregate Demand" shifting right. Long-run growth is about Capital Accumulation (LRAS), not spending.
+          `,
         }
       ]
     }
@@ -919,11 +979,11 @@ export const macroUnit3Set4: FRQExam = {
 
 export const macroUnit2Set4: FRQExam = {
   examTitle: "AP Macroeconomics Unit 2 FRQ: Labor Calculations & Economic Growth",
-  thumbnailUrl: "/images/unit4MacroFRQCover.jpg", 
+  thumbnailUrl: "/images/frqPracticePage/unit4MacroFRQCover.jpg", 
   unit: 2,
   questions: [
     {
-      id: 16,
+      id: 14,
       subject: 'macro',
       title: 'Unit 2 FRQ - LFPR and Human Capital',
       questionNumber: 1,
@@ -976,11 +1036,11 @@ export const macroUnit2Set4: FRQExam = {
 
 export const macroUnit3Set3: FRQExam = {
   examTitle: "AP Macroeconomics Unit 3 FRQ: Self-Adjustment & Automatic Stabilizers",
-  thumbnailUrl: "/images/unit4MacroFRQCover.jpg",
+  thumbnailUrl: "/images/frqPracticePage/unit4MacroFRQCover.jpg",
   unit: 3,
   questions: [
     {
-      id: 14,
+      id: 15,
       subject: 'macro',
       title: 'Unit 3 FRQ - Long-Run Adjustment',
       questionNumber: 1,
@@ -994,6 +1054,7 @@ export const macroUnit3Set3: FRQExam = {
           text: "Draw a correctly labeled graph of the long-run aggregate supply, short-run aggregate supply, and aggregate demand curves. Label the current equilibrium real output as Y1 and the current price level as PL1. Label the full-employment output as Yf.",
           answerType: "draw",
           answer: "The graph should show the downward-sloping AD curve intersecting the upward-sloping SRAS curve to the RIGHT of the vertical LRAS curve. The intersection point is labeled Y1 and PL1. The vertical LRAS line is labeled Yf, and Y1 > Yf.",
+          referenceImageUrl: "/images/frqPracticePage/macroUnit3Set3 1.jpg",
         },
         {
           label: "B",
@@ -1001,6 +1062,7 @@ export const macroUnit3Set3: FRQExam = {
           text: "Assume that the policymakers in Prosperia take no fiscal or monetary policy actions to close the output gap. Explain how the economy will adjust to full employment in the long run.",
           answerType: "text",
           answer: "The Short-Run Aggregate Supply (SRAS) curve will shift to the left. Explanation: Because the economy is operating beyond full employment, the unemployment rate is extremely low. This causes nominal wages (and other input costs) to increase. As production costs rise, firms decrease supply, shifting the SRAS curve to the left until real output returns to Yf.",
+          referenceImageUrl: "/images/frqPracticePage/macroUnit3Set3 2.jpg",
         },
         {
           label: "C",
@@ -1030,11 +1092,11 @@ export const macroUnit3Set3: FRQExam = {
 
 export const macroUnit5Set3: FRQExam = {
   examTitle: "AP Macroeconomics Unit 5 FRQ: Monetary Neutrality & Quantity Theory",
-  thumbnailUrl: "/images/unit4MacroFRQCover.jpg",
+  thumbnailUrl: "/images/frqPracticePage/unit4MacroFRQCover.jpg",
   unit: 5,
   questions: [
     {
-      id: 17,
+      id: 16,
       subject: 'macro',
       title: 'Unit 5 FRQ - Quantity Theory of Money',
       questionNumber: 1,
@@ -1084,11 +1146,11 @@ export const macroUnit5Set3: FRQExam = {
 
 export const macroUnit6Set3: FRQExam = {
   examTitle: "AP Macroeconomics Unit 6 FRQ: Balance of Payments",
-  thumbnailUrl: "/images/unit4MacroFRQCover.jpg",
+  thumbnailUrl: "/images/frqPracticePage/unit4MacroFRQCover.jpg",
   unit: 6,
   questions: [
     {
-      id: 18,
+      id: 17,
       subject: 'macro',
       title: 'Unit 6 FRQ - Balance of Payments Accounts',
       questionNumber: 1,
@@ -1147,13 +1209,13 @@ export const macroUnit6Set3: FRQExam = {
   ]
 };
 
-export const foreignExchangeFRQExam: FRQExam = {
+export const macroUnit6Set1: FRQExam = {
   examTitle: "AP Macroeconomics FRQ: Foreign Exchange",
-  thumbnailUrl: "/images/logo.png",
+  thumbnailUrl: "/images/frqPracticePage/logo.png",
   unit: 6,
   questions: [
     {
-      id: 4,
+      id: 18,
       subject: 'macro',
       title: 'Unit 6 FRQ - Foreign Exchange Market',
       questionNumber: 5,
@@ -1239,11 +1301,960 @@ export const foreignExchangeFRQExam: FRQExam = {
   ]
 };
 
+
+
+
+export const microUnit2Set5: FRQExam = {
+  examTitle: "AP Microeconomics Unit 2 FRQ: Tax Calculation and Allocative Efficiency",
+  thumbnailUrl: "/images/frqPracticePage/U2FRQMicroCover.jpg",
+  unit: 2,
+  questions: [
+    {
+      id: 19,
+      subject: 'micro',
+      title: 'Unit 2 FRQ - Tax Wedge and Deadweight Loss',
+      questionNumber: 1,
+      prompt: "The graph below shows the market for Boutique Backpacks, both before and after a per unit tax is imposed.",
+      expertTip: "Total Economic Surplus is the sum of CS and PS. The most efficient outcome maximizes this area. Any tax creates a wedge, shrinks the surplus, and results in Deadweight Loss.",
+      image: '/images/frqPracticePage/microUnit2Set5.svg', 
+      parts: [
+        {
+          label: "A",
+          pointValue: 1,
+          text: "Calculate the Consumer Surplus (CS) before the tax is imposed. Show your work.",
+          answerType: "text" as const,
+          answer: "$600. Explanation: CS = 0.5 x Base x Height. CS = 0.5 x ($80 - $50) x 40 = $600.",
+        },
+        {
+          label: "B",
+          text: "Now assume a $20 per unit tax is imposed, resulting in a new price consumers pay of $60 and a new quantity of 30 units.",
+          subparts: [
+            {
+              label: "i",
+              pointValue: 2,
+              text: "Calculate the Deadweight Loss (DWL) as a result of the tax. Show your work.",
+              answerType: "text" as const,
+              answer: "$100. Explanation: DWL = 0.5 x (40 - 30) x $20 = $100.",
+            },
+            {
+              label: "ii",
+              pointValue: 1,
+              text: "Calculate total Tax Revenue (TR) generated by the tax.",
+              answerType: "text" as const,
+              answer: "$600. Explanation: TR = $20 x 30 = $600.",
+            },
+            {
+              label: "iii",
+              pointValue: 2,
+              text: "Calculate Producer Surplus (PS) after the tax is imposed. Show your work.",
+              answerType: "text" as const,
+              answer: "$300. Explanation: The price producers receive is $60 - $20 = $40. PS = 0.5 x 30 x ($40 - $20) = $300.",
+            }
+          ]
+        },
+        {
+          label: "C",
+          pointValue: 1,
+          text: "What is the new price that consumers pay?",
+          answerType: "text" as const,
+          answer: "$60. Explanation: The price consumers pay is given in the prompt as the price corresponding to the new equilibrium quantity of 30 units.",
+        },
+        {
+          label: "D",
+          pointValue: 2,
+          text: "Assuming no externalities, how does the tax affect allocative efficiency? Explain.",
+          answerType: "text" as const,
+          answer: "Allocative efficiency decreases. Explanation: Allocative efficiency occurs when Marginal Benefit equals Marginal Cost ($Q=40$). The tax causes underproduction at $Q=30$, leading to a Deadweight Loss ($\$100$) and a loss of efficiency.",
+        }
+      ]
+    }
+  ]
+};
+
+export const microUnit1Set1: FRQExam = {
+  examTitle: "AP Microeconomics Unit 1 FRQ: Production Possibilities & Opportunity Cost",
+  thumbnailUrl: "/images/frqPracticePage/unit1MicroFRQCover.jpg", // Placeholder
+  unit: 1,
+  questions: [
+    {
+      id: 20,
+      subject: 'micro',
+      title: 'Unit 1 FRQ - PPC Construction & Efficiency',
+      questionNumber: 1,
+      prompt: "The data provided in the table below describe a bakery's daily production possibilities for croissants and bagels.",
+      expertTip: "Pay close attention to the numbers to determine the shape of the curve. If the Opportunity Cost is constant (1-for-1 trade-off), the line is straight. If you have to give up increasing amounts of one good to get the other, the curve is bowed out (concave).",
+      image: undefined,
+      tableData: {
+        headers: ["Croissants", "0", "20", "40", "60", "80"],
+        rows: [
+          ["Bagels", "100", "90", "70", "40", "0"]
+        ]
+      },
+      parts: [
+        {
+          label: "A",
+          pointValue: 2,
+          text: "Draw a correctly labeled graph of the bakery's production possibilities curve (PPC) with croissants on the horizontal axis and bagels on the vertical axis. Plot the specific points from the table on your graph.",
+          answerType: "draw",
+          answer: "The graph should have 'Bagels' on the Y-axis and 'Croissants' on the X-axis. The curve connecting the points (0,100), (20,90), (40,70), (60,40), and (80,0) should be concave (bowed out) from the origin.",
+        },
+        {
+          label: "B",
+          pointValue: 2,
+          text: "Is the opportunity cost of producing croissants increasing, decreasing, or constant? Explain using numbers from the table.",
+          answerType: "text",
+          answer: "Increasing. Explanation: As the bakery produces more croissants, they must give up increasing amounts of bagels. The first 20 croissants cost 10 bagels (100-90). The next 20 croissants cost 20 bagels (90-70). The final 20 croissants cost 40 bagels (40-0). Since the amount given up is rising, opportunity cost is increasing.",
+        },
+        {
+          label: "C",
+          pointValue: 1,
+          text: "The bakery is currently producing 40 croissants and 70 bagels. Calculate the opportunity cost of increasing croissant production to 60 croissants. Show your work.",
+          answerType: "text",
+          answer: "30 Bagels. Explanation: At 40 croissants, the bakery produces 70 bagels. At 60 croissants, the bakery produces 40 bagels. The opportunity cost is the difference: 70 - 40 = 30 bagels.",
+        },
+        {
+          label: "D",
+          pointValue: 1,
+          text: "Would it be efficient for the bakery to produce 40 croissants and 40 bagels? Explain using numbers in the table.",
+          answerType: "text",
+          answer: "No (Inefficient). Explanation: According to the table, if the bakery produces 40 croissants, it is capable of producing 70 bagels. Producing only 40 bagels means resources are being underutilized (or unemployment exists), placing the point inside the PPC.",
+        },
+        {
+          label: "E",
+          pointValue: 1,
+          text: "Assume that the demand for bagels increases significantly in the town where the bakery operates. How will this change be represented on your graph in part (a)? Explain.",
+          answerType: "text",
+          answer: "It will not shift the curve. Explanation: A change in demand does not change the productive capacity (resources or technology) of the bakery. It would be represented by a movement along the curve to a point with a higher quantity of bagels and fewer croissants, but the PPC itself remains stationary.",
+        }
+      ]
+    }
+  ]
+};
+
+
+
+
+export const microUnit2Set2: FRQExam = {
+  examTitle: "AP Microeconomics Unit 2 FRQ: International Trade and Tariffs",
+  thumbnailUrl: "/images/frqPracticePage/U2FRQMicroCover.jpg",
+  unit: 2,
+  questions: [
+    {
+      id: 25,
+      subject: 'micro',
+      title: 'Unit 2 FRQ - Import Tariffs',
+      questionNumber: 1,
+      prompt: "The diagram below shows the domestic supply and demand for Good Z in the country of Novadia. ",
+      expertTip: "To calculate Tariff Revenue, you first need to find the new quantity of imports. Imports = Quantity Demanded - Quantity Supplied at the tariff price (Pt). Then multiply by the tariff amount (Pt - Pw).",
+      image: '/images/frqPracticePage/microUnit2Set2.svg',
+      parts: [
+        {
+          label: "A",
+          pointValue: 2,
+          text: "At the world price of Pw = $40, does Novadia export or import Good Z? Indicate the quantity.",
+          answerType: "text" as const,
+          answer: "Novadia Imports 120 units. Explanation: At Pw ($40), the domestic quantity demanded (Point W) is 150 units, and the domestic quantity supplied (Point S) is 30 units. Imports = 150 - 30 = 120.",
+        },
+        {
+          label: "B",
+          pointValue: 2,
+          text: "After the tariff is imposed, the price rises to Pt = $60. Indicate the change in each of the following in Novadia:",
+          subparts: [
+            {
+              label: "i",
+              pointValue: 1,
+              text: "Consumer surplus (Change in area)",
+              answerType: "text" as const,
+              answer: "Consumer Surplus decreases. Explanation: Consumers lose the area of the trapezoid bounded by points Pt, V, W, Pw. This represents the surplus lost due to the higher price and lower consumption.",
+            },
+            {
+              label: "ii",
+              pointValue: 1,
+              text: "Producer surplus (Change in area)",
+              answerType: "text" as const,
+              answer: "Producer Surplus increases. Explanation: Producers gain the area of the trapezoid bounded by points Pt, T, S, Pw. This represents the surplus gained due to the higher price and increased production.",
+            },
+          ]
+        },
+        {
+          label: "C",
+          pointValue: 1,
+          text: "Indicate how employment in the domestic industry that produces Good Z is affected by the tariff. Explain.",
+          answerType: "text" as const,
+          answer: "Employment increases. Explanation: At the higher tariff price (Pt), domestic production increases from 30 units (Point S) to 60 units (Point T). Domestic firms hire more workers to increase output.",
+        },
+        {
+          label: "D",
+          pointValue: 2,
+          text: "Calculate the total Tariff Revenue collected by the Novadian government. Show your work.",
+          answerType: "text" as const,
+          answer: "$1,200. Explanation: The new quantity of imports at Pt is 120 (Point V) - 60 (Point T) = 60 units. The tariff per unit is $60 - $40 = $20. Revenue = 60 units * $20/unit = $1,200.",
+        },
+        {
+          label: "E",
+          pointValue: 1,
+          text: "Based on the change in domestic production caused by the tariff, explain one potential long-run consequence of this policy on the efficiency of Novadia's economy.",
+          answerType: "text" as const,
+          answer: "Decreased long-run efficiency. Explanation: The tariff causes Novadia to shift resources toward producing Good Z, even though it has a comparative disadvantage (indicated by the high domestic cost). This inefficient allocation of resources creates a Deadweight Loss and reduces total economic surplus.",
+        },
+      ],
+    },
+  ],
+};
+
+export const microUnit2Set6: FRQExam = {
+  examTitle: "AP Microeconomics Unit 2 FRQ: Utility Maximization",
+  thumbnailUrl: "/images/frqPracticePage/U2FRQMicroCover.jpg",
+  unit: 2,
+  questions: [
+    {
+      id: 26,
+      subject: 'micro',
+      title: 'Unit 2 FRQ - Consumer Choice Theory',
+      questionNumber: 1,
+      prompt: "Janice is a consumer who spends her income on hamburgers and sodas. The table below shows the marginal benefit she receives from consuming each additional unit of hamburgers and sodas.",
+      expertTip: "Utility maximization occurs when the marginal benefit per dollar (MB/P) is equal for the last unit of each good consumed. If MBx/Px > MBy/Py, the consumer should switch spending to Good X.",
+      image: undefined,
+      tableData: {
+        headers: ["Quantity", "Marginal Benefit of Hamburgers", "Marginal Benefit of Sodas"],
+        rows: [
+          ["1", "$24", "$12"],
+          ["2", "$18", "$9"],
+          ["3", "$12", "$6"],
+          ["4", "$6", "$3"],
+          ["5", "$2", "$1"]
+        ]
+      },
+      parts: [
+        {
+          label: "A",
+          pointValue: 1,
+          text: "Calculate the total benefit Janice receives from consuming a combination of 2 hamburgers and 2 sodas.",
+          answerType: "text" as const,
+          answer: "$63. Explanation: Sum the marginal benefits of the first 2 units of each good. Hamburgers: $24 + $18 = $42. Sodas: $12 + $9 = $21. Total Benefit = $42 + $21 = $63.",
+        },
+        {
+          label: "B", 
+          pointValue: 2,
+          text: "Now assume the price of a soda is $3. Calculate Janice's total consumer surplus if she chooses to consume 3 sodas. Show your work.",
+          answerType: "text" as const,
+          answer: "$18. Explanation: Consumer Surplus is the difference between marginal benefit and Price for each unit consumed. 1st Soda: $12 - $3 = $9 2nd Soda: $9 - $3 = $6 3rd Soda: $6 - $3 = $3 Total CS = $9 + $6 + $3 = $18.",
+        },
+        {
+          label: "C",
+          text: "Now assume the price of a hamburger is $6 and the price of a soda is $3. Janice has a specific budget of $18.",
+          subparts: [
+            {
+              label: "i",
+              pointValue: 2,
+              text: "Janice spends her entire budget of $18 buying 1 hamburger and 4 sodas. Explain why this combination does not maximize her utility. Use marginal analysis to explain your answer.",
+              answerType: "text" as const,
+              answer: "This is not optimal because the marginal benefit per dollar is higher for hamburgers than for sodas. MB/P for the 1st Hamburger = $24 / $6 = 4. MB/P for the 4th Soda = $3 / $3 = 1. Since 4 > 1, Janice gains more utility per dollar from hamburgers. To maximize utility, she should consume more hamburgers and fewer sodas.",
+            },
+            {
+              label: "ii",
+              pointValue: 2,
+              text: "What is the utility-maximizing combination of hamburgers and sodas Janice should purchase with her $18 budget?",
+              answerType: "text" as const,
+              answer: "2 Hamburgers and 2 Sodas. Explanation: Cost: (2 * $6) + (2 * $3) = $12 + $6 = $18. Marginal analysis check: MB/P of 2nd Hamburger = $18 / $6 = 3. MB/P of 2nd Soda = $9 / $3 = 3. Since MB/P is equal (3 = 3) and the budget is fully spent, this is the optimal combination.",
+            }
+          ]
+        }
+      ]
+    }
+  ]
+};
+
+export const microUnit3Set2: FRQExam = {
+  examTitle: "AP Microeconomics Unit 3 FRQ: Perfect Competition and Government Intervention",
+  thumbnailUrl: "/images/frqPracticePage/U3FRQMicroCover.jpg",
+  unit: 3,
+  questions: [
+    {
+      id: 27,
+      subject: 'micro',
+      title: 'Unit 3 FRQ - Perfect Competition Shocks',
+      questionNumber: 1,
+      prompt: "Copper is a metal used extensively in electronics and wiring. Assume the market for copper is perfectly competitive and is currently operating in long-run equilibrium.",
+      expertTip: "Remember: A lump-sum tax acts like a Fixed Cost. It shifts the ATC curve upward but does NOT change the Marginal Cost (MC) curve. Since the profit-maximizing quantity is determined where MR = MC, a lump-sum tax does NOT change the quantity produced in the short run.",
+      image: undefined, // Placeholder
+      parts: [
+        {
+          label: "A",
+          pointValue: 2,
+          text: "Draw correctly labeled side-by-side graphs for the copper market and a representative copper firm. On your graphs show each of the following.",
+          answerType: "draw",
+          subparts: [
+            {
+              label: "i",
+              text: "The equilibrium price and quantity in the copper market, labeled PM and QM, respectively.",
+              answer: "Market graph should show downward sloping D and upward sloping S intersecting at PM and QM."
+            },
+            {
+              label: "ii",
+              text: "The profit-maximizing quantity produced by the representative firm earning zero economic profit, labeled QF.",
+              answer: "Firm graph should show a horizontal Demand/MR curve at PM. The MC curve intersects MR at QF. The minimum of the ATC curve must tangent the Demand curve at QF (Zero Economic Profit)."
+            }
+          ]
+        },
+        {
+          label: "B",
+          pointValue: 2,
+          text: "Assume there is a severe global recession that reduces consumer income, and copper is a normal good. On your graphs in part (a), show what will happen to each of the following in the short run.",
+          answerType: "draw",
+          subparts: [
+            {
+              label: "i",
+              text: "The market price and quantity of copper, labeled P2 and Q2.",
+              answer: "The Market Demand curve shifts to the left. The new intersection establishes a lower price P2 and lower quantity Q2."
+            },
+            {
+              label: "ii",
+              text: "The area of the profit or loss earned by the representative copper firm, shaded completely.",
+              answer: "On the Firm graph, the MR curve shifts down to P2. The new quantity is where P2 = MC. The shaded area is the rectangle between the new Price (P2) and the ATC curve at that quantity (Loss)."
+            }
+          ]
+        },
+        {
+          label: "C",
+          pointValue: 2,
+          text: "Instead of the recession, assume the government sets a binding price floor in the copper market. Draw a new correctly labeled graph for the copper market and show each of the following.",
+          answerType: "draw",
+          subparts: [
+            {
+              label: "i",
+              text: "The binding price floor, labeled PF.",
+              answer: "The graph should show a horizontal line labeled PF drawn above the equilibrium price."
+            },
+            {
+              label: "ii",
+              text: "The quantity of copper purchased by consumers, labeled QD, and the quantity supplied by producers, labeled QS.",
+              answer: "QD is the point where PF intersects the Demand curve. QS is the point where PF intersects the Supply curve. (QS > QD, indicating a surplus)."
+            }
+          ]
+        },
+        {
+          label: "D",
+          pointValue: 1,
+          text: "Gold is a substitute in production for copper (mines can easily switch between extracting copper or gold). If the price of gold increases significantly, what will happen to the supply of copper? Explain.",
+          answerType: "text",
+          answer: "The supply of copper will decrease. Explanation: Since gold is now more profitable to extract, mining firms will reallocate resources from copper mines to gold mines, shifting the copper supply curve to the left."
+        },
+        {
+          label: "E",
+          pointValue: 1,
+          text: "Assume the government imposes a lump-sum tax on all copper producers to pay for environmental cleanup. Identify the effect of this tax on the firm's profit-maximizing quantity in the short run. Explain.",
+          answerType: "text",
+          answer: "The quantity will remain the same. Explanation: A lump-sum tax increases Fixed Costs, which shifts the Average Total Cost (ATC) curve upward, but does NOT affect Marginal Cost (MC). Since the profit-maximizing rule is MR = MC, and neither MR nor MC has changed, the optimal quantity (QF) remains unchanged."
+        }
+      ]
+    }
+  ]
+};
+
+
+export const microUnit3Set3: FRQExam = {
+  examTitle: "AP Microeconomics Unit 3 FRQ: Perfect Competition and Cost Curves",
+  thumbnailUrl: "/images/frqPracticePage/U3FRQMicroCover.jpg",
+  unit: 3,
+  questions: [
+    {
+      id: 28,
+      subject: 'micro',
+      title: 'Unit 3 FRQ - Perfect Competition and Costs',
+      questionNumber: 1,
+      prompt: "The market for Avocados is perfectly competitive and is currently operating in long-run equilibrium.",
+      expertTip: "Distinguish between Lump-Sum and Per-Unit. A Lump-Sum tax/subsidy changes Fixed Costs (moves ATC only). A Per-Unit tax/subsidy changes Variable Costs (moves MC and ATC). Only changes to MC affect the profit-maximizing quantity.",
+      image: null,
+      parts: [
+        {
+          label: "A",
+          pointValue: 2,
+          text: "Draw correctly labeled side-by-side graphs for the avocado market and a representative avocado farmer. On your graphs show each of the following.",
+          answerType: "draw",
+          referenceImageUrl: "/images/frqPracticePage/microUnit3Set3A.jpg",
+          subparts: [
+            {
+              label: "i",
+              text: "The equilibrium price and quantity in the market, labeled Pm and Qm.",
+              answer: "The market graph shows a downward sloping Demand curve and upward sloping Supply curve intersecting. The equilibrium price is labeled Pm and quantity is labeled Qm."
+            },
+            {
+              label: "ii",
+              text: "The profit-maximizing price and quantity for the representative farmer, labeled Pf and Qf.",
+              answer: "The firm graph shows a horizontal Demand/MR curve at the price Pm (so Pf equals Pm). The Marginal Cost (MC) curve intersects the MR curve at quantity Qf. The minimum of the Average Total Cost (ATC) curve touches the Demand curve at Qf, indicating zero economic profit."
+            }
+          ]
+        },
+        {
+          label: "B",
+          pointValue: 2,
+          text: "A new medical study is published showing that eating avocados significantly improves memory. On your graphs in part (a), show the effect of this study on the market and the firm in the short run.",
+          answerType: "draw",
+          referenceImageUrl: "/images/frqPracticePage/microUnit3Set3B.jpg",
+          subparts: [
+            {
+              label: "ii",
+              text: "Shade the area of economic profit or loss for the representative farmer.",
+              answerType: "draw",
+              answer: "On the firm graph, the MR curve shifts upward to the new price P2. The firm produces where P2 equals MC. The shaded area is the rectangle defined by the new quantity, the new price P2 (top), and the ATC curve value at that quantity (bottom). This represents an economic profit.",
+              referenceImageUrl: "/images/frqPracticePage/microUnit3Set3BII.jpg"
+            }
+          ]
+        },
+        {
+          label: "C",
+          pointValue: 1,
+          text: "The government decides to provide a lump-sum subsidy to all avocado farmers to support agriculture. What happens to the profit-maximizing quantity produced by the representative farmer in the short run? Explain.",
+          answerType: "text",
+          answer: "The quantity remains the same. Explanation: A lump-sum subsidy reduces Fixed Costs, which shifts the Average Total Cost (ATC) curve downward. However, it does not change Marginal Cost (MC). Since the firm maximizes profit where MR equals MC, and neither curve has shifted, the quantity Qf does not change."
+        },
+        {
+          label: "D",
+          pointValue: 1,
+          text: "Instead of the subsidy, assume the price of water (a variable input for growing avocados) increases. What happens to the profit-maximizing quantity produced by the representative farmer in the short run? Explain.",
+          answerType: "text",
+          answer: "The quantity decreases. Explanation: An increase in the price of a variable input increases Marginal Cost (MC). The MC curve shifts upward (and to the left). The new intersection of MR and MC occurs at a lower quantity."
+        },
+        {
+          label: "E",
+          pointValue: 1,
+          text: "Following the increase in the price of water from part (D), what will happen to the market supply curve for avocados? Explain.",
+          answerType: "text",
+          answer: "The market supply curve will shift to the left. Explanation: The market supply curve is the horizontal summation of all individual firms' Marginal Cost curves (above AVC). Since the MC curve for every firm shifted up/left due to the higher variable cost, the entire market supply decreases."
+        }
+      ]
+    }
+  ]
+};
+
+
+export const microUnit3Set4: FRQExam = {
+  examTitle: "AP Microeconomics Unit 3 FRQ: Short-Run Cost Curves",
+  thumbnailUrl: "/images/frqPracticePage/U3FRQMicroCover.jpg",
+  unit: 3,
+  questions: [
+    {
+      id: 29,
+      subject: 'micro',
+      title: 'Unit 3 FRQ - Cost Curves and Shutdown Point',
+      questionNumber: 1,
+      prompt: "The graph below shows the short-run cost structure of a firm in a perfectly competitive industry.",
+      expertTip: "Remember the 'Nike Swoosh' shapes. Marginal Cost (MC) cuts through the minimum points of both Average Total Cost (ATC) and Average Variable Cost (AVC). The vertical distance between ATC and AVC represents Average Fixed Cost (AFC), which gets smaller as output increases.",
+      image: '/images/frqPracticePage/microUnit3Set4.svg',
+      parts: [
+        {
+          label: "A",
+          pointValue: 3,
+          text: "Identify the cost curves that are denoted by each of the following labels.",
+          subparts: [
+            {
+              label: "i",
+              text: "Curve 1",
+              answerType: "text",
+              answer: "Marginal Cost (MC). Explanation: It intersects the minimum points of both the ATC and AVC curves."
+            },
+            {
+              label: "ii",
+              text: "Curve 2",
+              answerType: "text",
+              answer: "Average Total Cost (ATC). Explanation: It is U-shaped and lies above the AVC curve."
+            },
+            {
+              label: "iii",
+              text: "Curve 3",
+              answerType: "text",
+              answer: "Average Variable Cost (AVC). Explanation: It is U-shaped and lies below the ATC curve, getting closer to ATC as output increases."
+            }
+          ]
+        },
+        {
+          label: "B",
+          pointValue: 2,
+          text: "Explain why Curve 1 does each of the following as output increases.",
+          subparts: [
+            {
+              label: "i",
+              text: "Initially decreases",
+              answerType: "text",
+              answer: "Specialization (or Increasing Marginal Returns). Explanation: As the first few units of variable input are added to fixed inputs, workers can specialize, causing marginal product to rise and marginal cost to fall."
+            },
+            {
+              label: "ii",
+              text: "Finally increases",
+              answerType: "text",
+              answer: "Diminishing Marginal Returns. Explanation: As more units of variable input are added to a fixed amount of capital/land, the marginal product of the variable input eventually falls, causing the marginal cost of producing additional units to rise."
+            }
+          ]
+        },
+        {
+          label: "C",
+          pointValue: 1,
+          text: "What measure of cost is represented by the vertical distance between Curve 2 and Curve 3?",
+          answerType: "text",
+          answer: "Average Fixed Cost (AFC). Explanation: ATC = AVC + AFC. Therefore, the difference between ATC and AVC is AFC."
+        },
+        {
+          label: "D",
+          pointValue: 1,
+          text: "Explain why the vertical distance between Curve 2 and Curve 3 decreases as output increases.",
+          answerType: "text",
+          answer: "Spreading of Fixed Costs. Explanation: Total Fixed Cost is constant. As output (Q) increases, Average Fixed Cost (TFC / Q) becomes smaller and smaller, causing the gap between ATC and AVC to narrow."
+        },
+        {
+          label: "E",
+          pointValue: 1,
+          text: "Identify the price point at which the firm will shut down in the short run. Explain why.",
+          answerType: "text",
+          answer: "Price P2 (where MC intersects AVC). Explanation: This is the Shutdown Point. If the price falls below minimum Average Variable Cost (AVC), the firm cannot cover its variable costs of operation. It loses less money by shutting down (loss = Fixed Costs) than by operating (loss = Fixed Costs + portion of Variable Costs). Note: Based on standard diagrams, the shutdown price is the minimum of Curve 3 (AVC)."
+        }
+      ]
+    }
+  ]
+};
+
+
+export const microUnit4Set1: FRQExam = {
+  examTitle: "AP Microeconomics Unit 4 FRQ: Monopoly and Price Discrimination",
+  thumbnailUrl: "/images/U4FRQMicroCover.jpg",
+  unit: 4,
+  questions: [
+    {
+      id: 30,
+      subject: 'micro',
+      title: 'Unit 4 FRQ - Monopoly Behavior',
+      questionNumber: 1,
+      prompt: "Solaris Tech holds a patent for a revolutionary solar battery, giving it monopoly power in the market. Solaris Tech currently charges a single price to all consumers and earns positive economic profits.",
+      expertTip: "A single-price monopolist produces where MR = MC and charges a price from the Demand curve. However, a Perfect Price Discriminator has a Marginal Revenue curve that is identical to the Demand curve. They produce until P = MC, eliminating Deadweight Loss but also eliminating Consumer Surplus.",
+      parts: [
+        {
+          label: "A",
+          pointValue: 1,
+          text: "Explain why the demand curve lies above the marginal revenue curve for Solaris Tech.",
+          answerType: "text",
+          answer: "To sell an additional unit of output, the monopolist must lower the price on all units sold, not just the last one. Therefore, the additional revenue generated (Marginal Revenue) is always less than the price charged for that unit (Demand)."
+        },
+        {
+          label: "B",
+          pointValue: 2,
+          text: "Using a correctly labeled graph for Solaris Tech, show each of the following.",
+          subparts: [
+            {
+              label: "i",
+              text: "The profit-maximizing level of output, labeled Q*",
+              answerType: "draw",
+              answer: "The graph should show the intersection of the downward sloping Marginal Revenue (MR) curve and the Marginal Cost (MC) curve. The quantity corresponding to this intersection on the X-axis is Q*."
+            },
+            {
+              label: "ii",
+              text: "The profit-maximizing price, labeled P*",
+              answerType: "draw",
+              answer: "Go up from Q* to the Demand curve, then across to the Y-axis to label P*."
+            },
+            {
+              label: "iii",
+              text: "Economic profits, as a shaded area",
+              answerType: "draw",
+              answer: "The shaded rectangle is bounded by the quantity Q*, the price P* on the top, and the Average Total Cost (ATC) curve on the bottom."
+            }
+          ]
+        },
+        {
+          label: "C",
+          pointValue: 2,
+          text: "If Solaris Tech wants to maximize its total revenues instead of profits, using the graph from part (b) show the following.",
+          subparts: [
+            {
+              label: "i",
+              text: "Revenue-maximizing level of output, labeled Qr",
+              answerType: "draw",
+              answer: "Qr is located where the Marginal Revenue (MR) curve crosses the horizontal axis (where MR = 0)."
+            },
+            {
+              label: "ii",
+              text: "Revenue-maximizing price, labeled Pr",
+              answerType: "draw",
+              answer: "Go up from Qr to the Demand curve, then across to the Y-axis to label Pr."
+            }
+          ]
+        },
+        {
+          label: "D",
+          pointValue: 1,
+          text: "Given your answer in part (b), indicate whether Solaris Tech is producing the allocatively efficient level of output. Explain.",
+          answerType: "text",
+          answer: "No. Explanation: Allocative efficiency occurs where Price equals Marginal Cost (P = MC). At the profit-maximizing quantity Q*, the price charged (from the Demand curve) is greater than the Marginal Cost. Therefore, resources are underallocated to the production of solar batteries."
+        },
+        {
+          label: "E",
+          pointValue: 2,
+          text: "Suppose that Solaris Tech develops the ability to perfectly price discriminate (also known as first-degree price discrimination).",
+          subparts: [
+            {
+              label: "i",
+              text: "What happens to the number of units sold compared to the single-price equilibrium? Explain.",
+              answerType: "text",
+              answer: "The number of units sold increases. Explanation: A perfectly price discriminating monopolist continues to sell units as long as the price a consumer is willing to pay is greater than or equal to the marginal cost. They will produce up to the quantity where Demand intersects Marginal Cost."
+            },
+            {
+              label: "ii",
+              text: "What happens to consumer surplus? Explain.",
+              answerType: "text",
+              answer: "Consumer surplus decreases to zero. Explanation: Since the firm charges every individual consumer exactly their maximum willingness to pay, there is no difference between the price paid and the consumer's value. The entire surplus is captured by the monopolist as profit."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+};
+
+
+export const microUnit4Set3: FRQExam = {
+  examTitle: "AP Microeconomics Unit 4 FRQ: Monopolistic Competition",
+  thumbnailUrl: "/images/U4FRQMicroCover.jpg",
+  unit: 4,
+  questions: [
+    {
+      id: 31,
+      subject: 'micro',
+      title: 'Unit 4 FRQ - Monopolistic Competition',
+      questionNumber: 1,
+      prompt: "Luna Lighting operates in a monopolistically competitive market producing designer lamps. The graph above shows the cost and revenue curves for the firm.",
+      expertTip: "In monopolistic competition, 'Short-Run Profit' attracts new firms. This entry increases the number of substitutes, causing the Demand curve for the existing firm to shift to the LEFT until it is tangent to the ATC curve (Zero Profit).",
+      image: '/images/frqPracticePage/microUnit4Set3.svg',
+      parts: [
+        {
+          label: "A",
+          pointValue: 2,
+          text: "Is Luna Lighting currently in long-run equilibrium? Explain.",
+          answerType: "text",
+          answer: "No. Explanation: The firm is currently earning positive economic profits because the price (on the Demand curve) is greater than the Average Total Cost (ATC) at the profit-maximizing quantity. In long-run equilibrium for monopolistic competition, the firm would earn zero economic profit (Price equals ATC)."
+        },
+        {
+          label: "B",
+          pointValue: 2,
+          text: "Using the graph above, identify each of the following.",
+          subparts: [
+            {
+              label: "i",
+              text: "The profit-maximizing price",
+              answerType: "text",
+              answer: "$25. Explanation: The profit-maximizing price is found by locating the quantity where MR = MC, then going up to the Demand curve. The price value read from the vertical axis at that point is $25."
+            },
+            {
+              label: "ii",
+              text: "The profit-maximizing quantity",
+              answerType: "text",
+              answer: "30 units. Explanation: The profit-maximizing quantity is where the Marginal Revenue (MR) curve intersects the Marginal Cost (MC) curve. This quantity value read from the horizontal axis is 30 units."
+            },
+            {
+              label: "iii",
+              text: "Calculate the total consumer surplus at the profit-maximizing level of output. Show your work.",
+              answerType: "text",
+              answer: "225. Explanation: Consumer Surplus = (1/2) × (Maximum Willingness to Pay - Price) × Quantity. At the profit-maximizing output of 30 units and price of $25, with a maximum willingness to pay of $40 (vertical intercept of Demand curve), Consumer Surplus = (1/2) × ($40 - $25) × 30 = (1/2) × $15 × 30 = 0.5 × 450 = 225."
+            }
+          ]
+        },
+        {
+          label: "C",
+          pointValue: 2,
+          text: "If Luna Lighting wants to maximize its total revenues instead of profits, using the graph from part (b) show the following.",
+          answerType: "draw",
+          subparts: [
+            {
+              label: "i",
+              text: "Revenue-maximizing level of output, labeled Qr",
+              answer: "Qr is located where the Marginal Revenue (MR) curve crosses the horizontal axis (where MR = 0). This quantity is greater than Q*."
+            },
+            {
+              label: "ii",
+              text: "Revenue-maximizing price, labeled Pr",
+              answer: "Go vertical from Qr up to the Demand curve, then horizontal to the vertical axis. Label this price Pr. This price is lower than P*."
+            }
+          ]
+        },
+        {
+          label: "D",
+          pointValue: 1,
+          text: "Given your answer in part (b), indicate whether Luna Lighting is producing the allocatively efficient level of output. Explain.",
+          answerType: "text",
+          answer: "No. Explanation: Allocative efficiency occurs where Price equals Marginal Cost (P = MC). At the profit-maximizing level of output Q*, the price charged is greater than the Marginal Cost. This means the firm is underproducing relative to the social optimum, creating deadweight loss."
+        },
+        {
+          label: "E",
+          pointValue: 1,
+          text: "What will happen to the demand curve for Luna Lighting's lamps as the market adjusts to the long-run equilibrium? Explain.",
+          answerType: "text",
+          answer: "The demand curve will shift to the left. Explanation: Because Luna Lighting is earning short-run economic profits, new firms will enter the market producing close substitutes. This increases competition, reducing the market share for Luna Lighting and lowering the demand for its specific product until profits fall to zero."
+        }
+      ]
+    }
+  ]
+};
+
+
+export const microUnit5Set2: FRQExam = {
+  examTitle: "AP Microeconomics Unit 5 FRQ: Monopsony and Minimum Wage",
+  thumbnailUrl: "/images/U5FRQMicroCover.jpg",
+  unit: 5,
+  questions: [
+    {
+      id: 32,
+      subject: 'micro',
+      title: 'Unit 5 FRQ - Monopsony Labor Market',
+      questionNumber: 1,
+      prompt: "The graph above shows the Marginal Revenue Product, Marginal Resource Cost, and Supply of Labor curves for a firm that is the sole employer in a small town.",
+      expertTip: "A monopsony creates a 'wage gap' because it pays workers less than their Marginal Revenue Product. Minimum wage laws can theoretically increase employment in a monopsony by fixing the marginal cost of labor, making the firm a wage-taker up to a certain point.",
+      image: '/images/frqPracticePage/microUnit5Set2.svg',
+      parts: [
+        {
+          label: "A",
+          pointValue: 2,
+          text: "Identify the profit-maximizing quantity of labor and the wage rate the monopsony will pay. Show how you determined your answer.",
+          answerType: "text",
+          answer: "Quantity: 75 workers. Wage: $10. Explanation: The firm maximizes profit where the Marginal Resource Cost (MRC) equals the Marginal Revenue Product (Demand). This intersection occurs at 75 workers. The firm then pays the wage indicated by the Supply curve at that quantity, which is $10."
+        },
+        {
+          label: "B",
+          pointValue: 2,
+          text: "Explain why the Marginal Resource Cost (MRC) curve lies above the Supply of Labor curve for this firm.",
+          answerType: "text",
+          answer: "Because the firm must raise wages to hire additional workers. Explanation: To attract an additional worker, the monopsony must offer a higher wage than the previous rate. However, it must also pay this higher wage to all existing workers. This means the marginal cost of the new worker includes their wage plus the raises given to all other employees, making MRC higher than the wage rate shown on the supply curve."
+        },
+        {
+          label: "C",
+          pointValue: 2,
+          text: "Suppose this firm operated in a perfectly competitive labor market instead. Identify the profit-maximizing quantity of labor and the equilibrium wage rate.",
+          answerType: "text",
+          answer: "Quantity: 125 workers. Wage: $20. Explanation: In a perfectly competitive market, equilibrium is determined where the Market Supply of Labor equals the Market Demand for Labor. The curves intersect at 125 workers and a wage of $20."
+        },
+        {
+          label: "D",
+          pointValue: 2,
+          text: "Assume the government imposes a binding minimum wage of $20. Will the number of workers hired by the firm increase, decrease, or stay the same? Identify the new quantity of workers hired.",
+          answerType: "text",
+          answer: "Increase to 125 workers. Explanation: The minimum wage makes the firm a wage-taker at $20. The firm's new Marginal Resource Cost curve becomes horizontal at $20 up to the point where it hits the supply curve (at 125 workers). Since the firm maximizes profit where the new MRC ($20) equals MRP (Demand), and MRP is $20 at 125 workers, the firm will hire 125 workers."
+        }
+      ]
+    }
+  ]
+};
+
+
+export const microUnit5Set3: FRQExam = {
+  examTitle: "AP Microeconomics Unit 5 FRQ: Perfectly Competitive Labor Markets",
+  thumbnailUrl: "/images/U5FRQMicroCover.jpg",
+  unit: 5,
+  questions: [
+    {
+      id: 33,
+      subject: 'micro',
+      title: 'Unit 5 FRQ - Labor Market Shocks',
+      questionNumber: 1,
+      prompt: "Construction workers in the city of Buildburg operate in a perfectly competitive labor market. Klien's Construction is one of many firms that hire construction workers in this market.",
+      expertTip: "In a perfectly competitive labor market, the firm is a wage taker. This means the Market determines the wage, and the Firm's Supply of Labor curve is perfectly elastic (horizontal) at that wage rate. Also remember that the Firm's Demand for Labor is its MRP curve.",
+      image: undefined,
+      parts: [
+        {
+          label: "A",
+          pointValue: 2,
+          text: "Draw correctly labeled side-by-side graphs for the labor market for construction workers and Klien's Construction.",
+          answerType: "draw",
+          answer: "The market graph shows a downward-sloping Demand curve and an upward-sloping Supply curve intersecting at We and Qe. The firm graph shows a downward-sloping Marginal Revenue Product (MRP) curve and a horizontal Marginal Resource Cost (MRC) curve (Supply of Labor) at the level of We. The firm's wage Wf is equal to We. The firm hires quantity qf where MRP intersects MRC.",
+          referenceImageUrl: "/images/frqPracticePage/microUnit5Set3A.jpg",
+          subparts: [
+            {
+              label: "i",
+              text: "Show the market equilibrium wage, labeled We, and quantity, labeled Qe."
+            },
+            {
+              label: "ii",
+              text: "On the graph for the firm, show the wage paid by the firm, labeled Wf, and the quantity of workers hired, labeled Qf."
+            }
+          ]
+        },
+        {
+          label: "B",
+          pointValue: 1,
+          text: "Is the equilibrium wage paid by Klien's Construction greater than, less than, or equal to the marginal resource cost of the last worker hired?",
+          answerType: "text",
+          answer: "Equal to. Explanation: In a perfectly competitive labor market, the firm is a wage taker, meaning the additional cost of hiring one more worker (MRC) is constant and equal to the market wage rate."
+        },
+        {
+          label: "C",
+          pointValue: 1,
+          text: "Explain why the marginal revenue product curve for Klien's Construction is shaped the way it is.",
+          answerType: "text",
+          answer: "The curve is downward sloping because of the Law of Diminishing Marginal Returns. As the firm hires more workers, the marginal product of each additional worker eventually decreases. Since MRP equals Marginal Product times Price, and the price of the output is constant in perfect competition, the falling Marginal Product causes MRP to decrease as quantity increases."
+        },
+        {
+          label: "D",
+          pointValue: 3,
+          text: "Assume that an unbearably hot summer causes a large portion of construction workers to seek alternative work in indoor industries. Show the impact of this change on your graphs in part (A) and answer the following.",
+          answerType: "draw",
+          referenceImageUrl: "/images/frqPracticePage/microUnit5Set3D.jpg",
+          subparts: [
+            {
+              label: "i",
+              text: "Show the shift on the labor market graph and label the new equilibrium wage W2."
+            },
+            {
+              label: "ii",
+              text: "As a result of the change in the market, what happens to the number of workers hired by Klien's Construction? Explain.",
+              answerType: "text",
+              answer: "The number of workers decreases. Explanation: The firm takes the new, higher market wage W2 as its new Marginal Resource Cost. This shifts the horizontal MRC curve upward. The new MRC intersects the downward-sloping MRP curve at a lower quantity of labor."
+            },
+            {
+              label: "iii",
+              text: "Is the marginal revenue product of the last worker hired greater than, less than, or equal to the marginal revenue product of the last worker hired prior to the hot summer? Explain.",
+              answerType: "text",
+              answer: "Greater than. Explanation: The firm maximizes profit by hiring where MRP equals the Wage (MRC). Since the new market wage W2 is higher than the original wage We, the firm stops hiring at a point where the MRP is equal to that higher wage. Additionally, hiring fewer workers means the marginal product of the last worker is higher due to diminishing returns."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+};
+
+
+
+export const microUnit6Set1: FRQExam = {
+  examTitle: "AP Microeconomics Unit 6 FRQ: Market Failure and Externalities",
+  thumbnailUrl: "/images/U6FRQMicroCover.jpg",
+  unit: 6,
+  questions: [
+    {
+      id: 34,
+      subject: 'micro',
+      title: 'Unit 6 FRQ - Externality Graph',
+      questionNumber: 1,
+      prompt: "The graph below illustrates the market for Good Z, and shows the Marginal Private Benefit (MPB), Marginal Private Cost (MPC), Marginal Social Benefit (MSB), and Marginal Social Cost (MSC).",
+      expertTip: "Always identify the type of externality by looking at the divergence. If MSB is above MPB, it is a Positive Consumption Externality (spillover benefit). The vertical distance between the two curves represents the Marginal External Benefit (MEB).",
+      image: '/images/frqPracticePage/microUnit6Set1.svg',
+      parts: [
+        {
+          label: "A",
+          pointValue: 2,
+          text: "Identify the market equilibrium price and quantity, and the socially optimal price and quantity.",
+          subparts: [
+            {
+              label: "i",
+              text: "Market Equilibrium price and quantity",
+              answerType: "text",
+              answer: "Price: $10. Quantity: Q1. Explanation: The private market ignores external benefits and operates where Marginal Private Benefit (MPB) equals Marginal Private Cost (MPC)."
+            },
+            {
+              label: "ii",
+              text: "Socially Optimal price and quantity",
+              answerType: "text",
+              answer: "Price: $12. Quantity: Q2. Explanation: The social optimum occurs where Marginal Social Benefit (MSB) equals Marginal Social Cost (MSC). This includes the spillover benefits to society."
+            }
+          ]
+        },
+        {
+          label: "B",
+          pointValue: 1,
+          text: "Calculate the Marginal External Benefit (MEB) at the market equilibrium quantity. Show your work.",
+          answerType: "text",
+          answer: "$3. Explanation: The Marginal External Benefit is the vertical difference between the MSB curve and the MPB curve. At Q1, the MSB is $13 and the MPB is $10. MEB = $13 - $10 = $3."
+        },
+        {
+          label: "C",
+          pointValue: 2,
+          text: "Identify a specific government policy that could correct this externality and achieve the socially optimal quantity. Be precise with the amount.",
+          answerType: "text",
+          answer: "A per-unit subsidy of $3. Explanation: To internalize a positive externality, the government should provide a subsidy equal to the Marginal External Benefit ($3). This lowers the effective price for consumers or increases the benefit, shifting the MPB curve upward (or MPC downward) until the market outcome aligns with Q2."
+        },
+        {
+          label: "D",
+          pointValue: 1,
+          text: "If the government takes no action and leaves the market unregulated, does deadweight loss exist? Explain using the values from the graph.",
+          answerType: "text",
+          answer: "Yes. Explanation: At the market quantity Q1, the Marginal Social Benefit ($13) is greater than the Marginal Social Cost ($10). This means society values the next unit more than it costs to produce. By stopping at Q1 instead of Q2, society misses out on net benefits (welfare), creating deadweight loss represented by the area of the triangle between Q1 and Q2."
+        }
+      ]
+    }
+  ]
+};
+
+export const microUnit6Set2: FRQExam = {
+  examTitle: "AP Microeconomics Unit 6 FRQ: Social Benefit and Cost Analysis",
+  thumbnailUrl: "/images/U6FRQMicroCover.jpg",
+  unit: 6,
+  questions: [
+    {
+      id: 35,
+      subject: 'micro',
+      title: 'Unit 6 FRQ - Optimal Provision of Public Goods',
+      questionNumber: 1,
+      prompt: "The town of Lakewood is deciding how many free public Wi-Fi hotspots to install. The table below shows the Total Social Benefit (TSB) and Total Social Cost (TSC) associated with various numbers of hotspots.",
+      expertTip: "To find the optimal quantity, you must calculate the Marginal Social Benefit (MSB) and Marginal Social Cost (MSC) for each unit. The optimal quantity is where MSB equals MSC. If they are never exactly equal, stop at the last unit where MSB is greater than MSC.",
+      image: undefined,
+      tableData: {
+        headers: ["Number of Hotspots", "Total Social Benefit ($)", "Total Social Cost ($)"],
+        rows: [
+          ["0", "0", "0"],
+          ["1", "100", "20"],
+          ["2", "190", "50"],
+          ["3", "270", "90"],
+          ["4", "340", "140"],
+          ["5", "400", "200"],
+          ["6", "450", "270"]
+        ]
+      },
+      parts: [
+        {
+          label: "A",
+          pointValue: 1,
+          text: "Calculate the Marginal Social Benefit (MSB) of the 3rd hotspot. Show your work.",
+          answerType: "text",
+          answer: "$80. Explanation: Marginal Social Benefit is the change in Total Social Benefit resulting from one additional unit. MSB = TSB of 3 units - TSB of 2 units = 270 - 190 = 80."
+        },
+        {
+          label: "B",
+          pointValue: 2,
+          text: "Identify the socially optimal number of hotspots to install. Explain using marginal analysis.",
+          answerType: "text",
+          answer: "5 hotspots. Explanation: The socially optimal quantity occurs where the Marginal Social Benefit equals the Marginal Social Cost. For the 5th unit, the MSB is $60 (400 - 340) and the MSC is $60 (200 - 140). Since MSB = MSC at 5 units, this is the optimal quantity."
+        },
+        {
+          label: "C",
+          pointValue: 3,
+          text: "Assume the state government imposes a regulatory fee of $20 for every hotspot installed up to and including the 5th unit. This fee must be paid by the town, increasing the social cost of installation.",
+          subparts: [
+            {
+              label: "i",
+              text: "Calculate the new Marginal Social Cost (MSC) of the 4th hotspot.",
+              answerType: "text",
+              answer: "$70. Explanation: The original MSC of the 4th unit was $50 (140 - 90). The new fee adds $20 to the marginal cost of that unit. New MSC = 50 + 20 = 70."
+            },
+            {
+              label: "ii",
+              text: "What is the new socially optimal quantity of hotspots? Explain.",
+              answerType: "text",
+              answer: "4 hotspots. Explanation: With the fee, the MSC of the 4th unit becomes $70, which equals the MSB of the 4th unit ($70). The MSC of the 5th unit becomes $80 (Original 60 + 20), which is greater than the MSB of the 5th unit ($60). Therefore, the town should stop at 4 units."
+            }
+          ]
+        },
+        {
+          label: "D",
+          pointValue: 1,
+          text: "If the town installs the 6th hotspot, would the Total Social Surplus increase, decrease, or stay the same compared to the 5th hotspot (assuming no government fees)? Explain.",
+          answerType: "text",
+          answer: "Decrease. Explanation: For the 6th hotspot, the Marginal Social Benefit is $50 (450 - 400) and the Marginal Social Cost is $70 (270 - 200). Since the cost of the 6th unit ($70) is greater than the benefit it provides ($50), installing it reduces the total net benefit to society."
+        }
+      ]
+    }
+  ]
+};
+
 export const frqExams: FRQExam[] = [
-  ampleReservesExam,
-  macroBankingExam,
-  macroUnit2DataExam,
-  macroUnit3Exam,
+  macroUnit4Set1,
+  macroUnit4Set3,
+  macroUnit2Set1,
+  macroUnit3Set1,
   macroUnit5Set1,
   macroUnit5Set2,
   macroUnit1Set2,
@@ -1255,7 +2266,19 @@ export const frqExams: FRQExam[] = [
   macroUnit2Set4,
   macroUnit5Set3,
   macroUnit6Set3,
-  factorMarketsExam,
-  microGameTheoryExam,
-  foreignExchangeFRQExam
+  microUnit5Set1,
+  microUnit4Set2,
+  macroUnit6Set1,
+  microUnit2Set5,
+  microUnit2Set2,
+  microUnit2Set6,
+  microUnit3Set2,
+  microUnit3Set3, 
+  microUnit3Set4,
+  microUnit4Set1,
+  microUnit4Set3, 
+  microUnit5Set2,  
+  microUnit5Set3,
+  microUnit6Set1, 
+  microUnit6Set2
 ];

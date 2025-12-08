@@ -15,6 +15,7 @@ export interface Question {
   explanation?: string;
   explanationVideo?: string;
   lessonIDS: string[];
+  isTest?: boolean; // Flag for test-only questions
 }
 
 export interface QuestionBank {

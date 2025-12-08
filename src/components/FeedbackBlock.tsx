@@ -2,12 +2,15 @@
 
 import React from 'react';
 import { Star, ChevronDown, ChevronUp } from 'lucide-react';
+import { InlineMath } from 'react-katex';
+import 'katex/dist/katex.min.css';
 
 // Define the shape of the part/subpart object
 interface AnswerablePart {
   label: string;
   answer?: string | any;
-  gradingCriteria?: string;
+  gradingCriteria?: string; // Used for AI grading (not shown to students)
+  studentExplanation?: string; // Student-friendly explanation (shown in UI)
   pointValue?: number;
 }
 
@@ -25,19 +28,39 @@ interface FeedbackBlockProps {
   toggleAnswer: (key: string) => void;
 }
 
+const renderWithMath = (text: string) => {
+  if (typeof text !== 'string') return text;
+
+  // This regex splits the string by expressions enclosed in $, capturing the content inside.
+  const parts = text.split(/\$(.*?)\$/g);
+
+  return (
+    <>
+      {parts.map((part, index) => {
+        // Odd-indexed parts are the captured math expressions.
+        if (index % 2 === 1) {
+          return <InlineMath key={index} math={part} />;
+        }
+        // Even-indexed parts are the surrounding text.
+        return <span key={index}>{part}</span>;
+      })}
+    </>
+  );
+};
+
 const formatAnswerText = (text: string) => {
   const parts = text.split(/Explanation: ?/i);
   if (parts.length === 2) {
     return (
       <>
-        {parts[0].trim()}
+        {renderWithMath(parts[0].trim())}
         <br />
         <br />
-        <span className="font-bold">Explanation:</span> {parts[1].trim()}
+        <span className="font-bold">Explanation:</span> {renderWithMath(parts[1].trim())}
       </>
     );
   }
-  return text;
+  return renderWithMath(text);
 };
 
 export const FeedbackBlock: React.FC<FeedbackBlockProps> = ({ feedback, part, answerKey, showAnswers, toggleAnswer }) => {
@@ -56,18 +79,28 @@ export const FeedbackBlock: React.FC<FeedbackBlockProps> = ({ feedback, part, an
           <div className="flex gap-2">
             {scoreOptions.map((score) => {
               const isSelected = feedback.score === score;
+              // Color logic: For 0/1 point questions, 1 is green. For 0/1/2 point questions, 1 is yellow, 2 is green.
+              let colorClass = '';
+              if (isSelected) {
+                if (score === 0) {
+                  colorClass = 'bg-red-100 border-red-500 text-red-700';
+                } else if (score === 1) {
+                  // If maxScore is 1, then score 1 is full credit (green). Otherwise, it's partial (yellow).
+                  colorClass = maxScore === 1 
+                    ? 'bg-green-100 border-green-500 text-green-700'
+                    : 'bg-yellow-100 border-yellow-500 text-yellow-700';
+                } else {
+                  // score === 2, always green (full credit)
+                  colorClass = 'bg-green-100 border-green-500 text-green-700';
+                }
+              } else {
+                colorClass = 'bg-white border-gray-300 text-gray-500 hover:border-gray-400';
+              }
+              
               return (
                 <button
                   key={score}
-                  className={`flex-1 py-3 px-4 rounded-lg border-2 font-semibold text-lg transition-all ${
-                    isSelected
-                      ? score === 0
-                        ? 'bg-red-100 border-red-500 text-red-700'
-                        : score === 1
-                        ? 'bg-yellow-100 border-yellow-500 text-yellow-700'
-                        : 'bg-green-100 border-green-500 text-green-700'
-                      : 'bg-white border-gray-300 text-gray-500 hover:border-gray-400'
-                  }`}
+                  className={`flex-1 py-3 px-4 rounded-lg border-2 font-semibold text-lg transition-all ${colorClass}`}
                 >
                   {score}
                 </button>
@@ -105,13 +138,13 @@ export const FeedbackBlock: React.FC<FeedbackBlockProps> = ({ feedback, part, an
               />
             </div>
           ) : (
-            <p className="text-gray-800 whitespace-pre-wrap">{formatAnswerText(part.answer)}</p>
+            <div className="text-gray-800 whitespace-pre-wrap">{formatAnswerText(part.answer)}</div>
           )}
         </div>
       )}
 
-      {/* Grading Criteria (Expandable) */}
-      {part.gradingCriteria && (
+      {/* Student Explanation (Expandable) - Shows student-friendly explanation, not detailed grading criteria */}
+      {(part.studentExplanation || part.gradingCriteria) && (
         <div className="border border-gray-200 rounded-lg overflow-hidden">
           <button
             onClick={() => toggleAnswer(criteriaKey)}
@@ -130,21 +163,27 @@ export const FeedbackBlock: React.FC<FeedbackBlockProps> = ({ feedback, part, an
                 Grading Criteria
               </p>
               <div className="text-sm text-gray-800 leading-relaxed space-y-3">
-                {part.gradingCriteria.split(/(?=\d+ points?:)/).map((section, idx) => {
-                  if (!section.trim()) return null;
-                  const match = section.match(/^(\d+ points?:)\s*(.+)$/);
-                  if (match) {
-                    const [, scoreLabel, description] = match;
-                    return (
-                      <div key={idx} className={idx > 0 ? 'pt-3 border-t border-gray-200' : ''}>
-                        <p className="text-gray-800">
-                          <span className="font-bold text-gray-900">{scoreLabel}</span> {description.trim()}
-                        </p>
-                      </div>
-                    );
-                  }
-                  return <p key={idx}>{section.trim()}</p>;
-                })}
+                {/* Show studentExplanation if available, otherwise fall back to gradingCriteria */}
+                {part.studentExplanation ? (
+                  <p className="text-gray-800 whitespace-pre-wrap">{part.studentExplanation}</p>
+                ) : (
+                  // Fallback: try to parse gradingCriteria if no studentExplanation exists
+                  part.gradingCriteria?.split(/(?=\d+ points?:)/).map((section, idx) => {
+                    if (!section.trim()) return null;
+                    const match = section.match(/^(\d+ points?:)\s*(.+)$/);
+                    if (match) {
+                      const [, scoreLabel, description] = match;
+                      return (
+                        <div key={idx} className={idx > 0 ? 'pt-3 border-t border-gray-200' : ''}>
+                          <p className="text-gray-800">
+                            <span className="font-bold text-gray-900">{scoreLabel}</span> {description.trim()}
+                          </p>
+                        </div>
+                      );
+                    }
+                    return <p key={idx}>{section.trim()}</p>;
+                  })
+                )}
               </div>
             </div>
           )}

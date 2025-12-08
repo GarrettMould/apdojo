@@ -49,6 +49,8 @@ export function useAuthContext(): AuthContextValue {
       xpToast: null,
       redirectOnLogin: null,
       setRedirectOnLogin: () => {},
+      isCharacterClosetOpen: false,
+      setIsCharacterClosetOpen: () => {},
     }
   }
   return context

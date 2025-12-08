@@ -10,9 +10,18 @@ interface DrawingInputProps {
   drawingData: string | undefined;
   onSave: (key: string, data: string) => void;
   isGraded: boolean;
+  enableStickers?: boolean;
+  stickerLabels?: string[];
 }
 
-export const DrawingInput: React.FC<DrawingInputProps> = ({ drawingKey, drawingData, onSave, isGraded }) => {
+export const DrawingInput: React.FC<DrawingInputProps> = ({ 
+  drawingKey, 
+  drawingData, 
+  onSave, 
+  isGraded,
+  enableStickers = false,
+  stickerLabels = ['LRAS', 'SRAS', 'AD', 'Price Level', 'Real GDP']
+}) => {
   const [inputMethod, setInputMethod] = useState<'draw' | 'upload'>('draw');
 
   const handleImageUpload = (file: File | null) => {
@@ -64,49 +73,85 @@ export const DrawingInput: React.FC<DrawingInputProps> = ({ drawingKey, drawingD
           </div>
         )}
 
-        {/* Show either the drawing pad or upload UI, but only if there's no data yet */}
-        {!drawingData && (
-          <>
-            {inputMethod === 'draw' && (
-              <DrawingPad
-                isLarge={true}
-                onSave={(data) => onSave(drawingKey, data)}
-                initialData={drawingData}
-              />
-            )}
-            
-            {inputMethod === 'upload' && (
-              <div className="text-center p-8">
-                <input
-                  type="file"
-                  id={`file-input-${drawingKey}`}
-                  onChange={(e) => handleImageUpload(e.target.files ? e.target.files[0] : null)}
-                  className="hidden"
-                  accept="image/*"
-                />
-                <label htmlFor={`file-input-${drawingKey}`} className="cursor-pointer">
-                  <div className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-                    <Upload className="w-4 h-4 mr-2" />
-                    Choose Image
-                  </div>
-                </label>
-                <p className="text-xs text-gray-500 mt-2">Upload a PNG, JPG, or GIF.</p>
-              </div>
-            )}
-          </>
-        )}
+        {/* Show either the drawing pad or upload UI */}
+        {(() => {
+          // Check if data is structured (JSON) - if so, always show pad for editing
+          let isStructured = false;
+          let imageData = drawingData;
+          try {
+            if (drawingData) {
+              const parsed = JSON.parse(drawingData);
+              if (parsed.image) {
+                isStructured = true;
+                imageData = parsed.image;
+              }
+            }
+          } catch (e) {
+            // Not JSON
+          }
 
-        {/* If there IS data (from drawing or upload), show the preview */}
-        {drawingData && (
-           <div className="relative p-4">
-             <img src={drawingData} alt="Drawing preview" className="w-full h-auto max-w-md mx-auto rounded-md border" />
-             {!isGraded && (
+          return !drawingData || isStructured ? (
+            <>
+              {inputMethod === 'draw' && (
+                <DrawingPad
+                  isLarge={true}
+                  onSave={(data) => onSave(drawingKey, data)}
+                  initialData={imageData}
+                  enableStickers={enableStickers}
+                  stickerLabels={stickerLabels}
+                />
+              )}
+            
+              {inputMethod === 'upload' && (
+                <div className="text-center p-8">
+                  <input
+                    type="file"
+                    id={`file-input-${drawingKey}`}
+                    onChange={(e) => handleImageUpload(e.target.files ? e.target.files[0] : null)}
+                    className="hidden"
+                    accept="image/*"
+                  />
+                  <label htmlFor={`file-input-${drawingKey}`} className="cursor-pointer">
+                    <div className="inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                      <Upload className="w-4 h-4 mr-2" />
+                      Choose Image
+                    </div>
+                  </label>
+                  <p className="text-xs text-gray-500 mt-2">Upload a PNG, JPG, or GIF.</p>
+                </div>
+              )}
+            </>
+          ) : null;
+        })()}
+
+        {/* If there IS data (from drawing or upload) and it's NOT structured, show the preview */}
+        {drawingData && (() => {
+          // Check if it's structured data (JSON) - if so, don't show preview (pad is shown above)
+          let isStructured = false;
+          try {
+            if (drawingData) {
+              const parsed = JSON.parse(drawingData);
+              if (parsed.image) {
+                isStructured = true;
+              }
+            }
+          } catch (e) {
+            // Not JSON
+          }
+
+          if (isStructured) return null; // Structured data shows pad above
+          
+          return (
+            <div className="relative p-4">
+              <img src={drawingData} alt="Drawing preview" className="w-full h-auto max-w-md mx-auto rounded-md border" />
+              {!isGraded && (
                 <Button variant="destructive" size="icon" onClick={() => onSave(drawingKey, '')} className="absolute top-2 right-2 h-8 w-8">
                   <X className="w-4 h-4" />
                 </Button>
-             )}
-           </div>
-        )}
+              )}
+            </div>
+          );
+        })()}
       </div>
     </div>
   );
