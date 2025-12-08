@@ -71,11 +71,4 @@ export const topicBundles: TopicBundle[] = [
     unit: 1,
     questionIds: [23, 24, 25, 26]
   }),
-  {
-    title: 'Factor Markets FRQ',
-    lessonId: '5.1', // Placeholder lesson ID
-    unit: 5,
-    thumbnailUrl: '/images/U5FRQMicro.jpg',
-    questions: [], // No MCQs for this bundle, it's for the FRQ
-  }
 ];
