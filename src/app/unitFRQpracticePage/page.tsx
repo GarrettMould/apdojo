@@ -29,11 +29,8 @@ const DrawingSelfReview = ({
   
   // Debug: Log referenceImageUrl
   useEffect(() => {
-    if (referenceImageUrl) {
-      console.log('DrawingSelfReview received referenceImageUrl:', referenceImageUrl);
-    } else {
-      console.log('DrawingSelfReview: No referenceImageUrl provided');
-    }
+    console.log('DrawingSelfReview - referenceImageUrl:', referenceImageUrl);
+    console.log('DrawingSelfReview - will encode to:', referenceImageUrl ? referenceImageUrl.replace(/ /g, '%20') : 'undefined');
   }, [referenceImageUrl]);
 
   const checklistItems = [
@@ -414,6 +411,17 @@ function UnitFRQPracticePageComponent() {
       ? answerKey.split('-').slice(1).join('') // "E-i" -> "Ei"
       : answerKey.split('-')[1]; // "part-A" -> "A"
 
+    const requestBody = {
+      textAnswer,
+      partLabel: partLabelForApi,
+      questionPrompt: frqQuestion?.prompt || 'No prompt provided',
+      partText,
+      gradingCriteria: gradingCriteria || '',
+      pointValue: pointValue || 2,
+    };
+
+    console.log("Sending to API:", requestBody);
+
     try {
       // Validate that frqQuestion exists and has required properties
       if (!frqQuestion || !frqQuestion.prompt) {
@@ -425,14 +433,7 @@ function UnitFRQPracticePageComponent() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          textAnswer,
-          partLabel: partLabelForApi,
-          questionPrompt: frqQuestion.prompt,
-          partText,
-          gradingCriteria: gradingCriteria || '',
-          pointValue: pointValue || 2,
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
@@ -787,6 +788,7 @@ function UnitFRQPracticePageComponent() {
                             drawingData={drawingAnswers[`part-${part.label}`]}
                             onSave={handleDrawingAnswer}
                             isGraded={false}
+                            templateImageUrl={part.templateImageUrl}
                           />
                           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                           <Button
@@ -814,9 +816,10 @@ function UnitFRQPracticePageComponent() {
                                 </div>
                               )}
                               <DrawingSelfReview 
-                                referenceImageUrl={part.referenceImageUrl}
+                                referenceImageUrl={(part as FRQPart).referenceImageUrl}
                                 studentDrawing={drawingAnswers[`part-${part.label}`]}
                               />
+                              {console.log(`Part ${part.label} referenceImageUrl:`, (part as FRQPart).referenceImageUrl)}
                             </>
                           )}
                         </div>
@@ -896,7 +899,8 @@ function UnitFRQPracticePageComponent() {
                                         drawingKey={subpartKey}
                                         drawingData={drawingAnswers[subpartKey]}
                                         onSave={handleDrawingAnswer}
-                                            isGraded={false}
+                                        isGraded={false}
+                                        templateImageUrl={(subpart as any).templateImageUrl}
                                       />
                                       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                                         <Button
@@ -906,7 +910,7 @@ function UnitFRQPracticePageComponent() {
                                         >
                                               <Sparkles className="w-4 h-4 mr-2" />
                                               Submit My Drawing
-                                            </Button>
+                                        </Button>
                                           </div>
                                         </>
                                       ) : (

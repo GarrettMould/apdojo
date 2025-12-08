@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Head from 'next/head';
 import { macroUnits, microUnits } from '@/data/cheatSheets';
 import { useParams, useRouter } from 'next/navigation'; // Import useRouter
@@ -17,7 +17,8 @@ import { microLessons, macroLessons } from '@/data/lessons';
 import { videos, Video } from '@/data/videos';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question as QuestionType } from '@/data/questionBanks/types';
-import { X, ArrowRight, Lock, ArrowLeft, CheckCircle2, XCircle } from 'lucide-react';
+import { X, ArrowRight, Lock, ArrowLeft, CheckCircle2, XCircle, Download, Bookmark, Play, Check, Brain } from 'lucide-react';
+import { dojoIcon } from '@/data/imagePaths';
 
 // Helper to combine and structure whiteboard data
 const getUnitWhiteboards = (unitNumber: number): WhiteboardImage[] => {
@@ -154,8 +155,8 @@ function Checkpoint({ lessonId, question, options, correctAnswer, explanation, s
                   : 'opacity-0 translate-x-full'
               }`}
             >
-              {/* Teach Me Button - Upper Border */}
-              {isActive && findVideoForLesson(q.lessonId) && (
+              {/* Teach Me Button - Upper Border - HIDDEN FOR NOW */}
+              {/* {isActive && findVideoForLesson(q.lessonId) && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
                   <button
                     onClick={() => handleTeachMe(q.lessonId)}
@@ -164,7 +165,7 @@ function Checkpoint({ lessonId, question, options, correctAnswer, explanation, s
                     Teach Me...
                   </button>
                 </div>
-              )}
+              )} */}
 
       <div className="mb-4">
         <div className="flex items-start justify-between">
@@ -382,6 +383,7 @@ export default function UnitPage() {
   
   const [activeUnit, setActiveUnit] = useState((params.unitId as string) || '1');
   const [selectedWhiteboard, setSelectedWhiteboard] = useState<WhiteboardImage | null>(null);
+  const [selectedWhiteboards, setSelectedWhiteboards] = useState<Set<string>>(new Set());
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [visibleWhiteboardsCount, setVisibleWhiteboardsCount] = useState<Record<string, number>>({});
   const [selectedTerms, setSelectedTerms] = useState<Set<string>>(new Set());
@@ -390,6 +392,7 @@ export default function UnitPage() {
   const [availableQuizQuestions, setAvailableQuizQuestions] = useState<QuestionType[]>([]);
   const [answeredQuizQuestions, setAnsweredQuizQuestions] = useState<Set<number>>(new Set());
   const [selectedQuizAnswer, setSelectedQuizAnswer] = useState<string | null>(null);
+  const [isAnimatingOut, setIsAnimatingOut] = useState(false);
 
   // --- FAQ Schema Data ---
   const faqSchema = {
@@ -424,7 +427,16 @@ export default function UnitPage() {
   };
 
   const activeUnitNum = parseInt(activeUnit as string);
-  const subjectFilter = selectedSubject === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics';
+  
+  const subjectFilter = useMemo(() => selectedSubject === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics', [selectedSubject]);
+
+  const unitKeyTerms: KeyTerm[] = useMemo(() => selectedSubject === 'macro' 
+    ? apMacroTerms.filter(term => term.unit === activeUnitNum)
+    : apMicroTerms.filter(term => term.unit === activeUnitNum), [selectedSubject, activeUnitNum]);
+  
+  const unitWhiteboards: WhiteboardImage[] = useMemo(() => selectedSubject === 'macro'
+    ? getUnitWhiteboards(activeUnitNum)
+    : allContentWhiteboards.filter(img => img.subject === subjectFilter && img.unit === activeUnitNum), [selectedSubject, activeUnitNum, subjectFilter]);
 
   // --- Modal Logic ---
   const openModal = (whiteboard: WhiteboardImage) => {
@@ -434,6 +446,18 @@ export default function UnitPage() {
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedWhiteboard(null);
+  };
+  
+  const handleWhiteboardClick = (whiteboard: WhiteboardImage) => {
+    setSelectedWhiteboards(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(whiteboard.id)) {
+        newSet.delete(whiteboard.id);
+      } else {
+        newSet.add(whiteboard.id);
+      }
+      return newSet;
+    });
   };
   
 
@@ -522,7 +546,7 @@ export default function UnitPage() {
 
   // Update available quiz questions when terms are selected/unselected
   useEffect(() => {
-    if (selectedTerms.size === 0) {
+    if (selectedTerms.size === 0 && selectedWhiteboards.size === 0) {
       setAvailableQuizQuestions([]);
       return;
     }
@@ -580,14 +604,98 @@ export default function UnitPage() {
       }
     });
 
-    // Remove duplicates and filter out answered questions
+    // Find questions for each selected whiteboard
+    selectedWhiteboards.forEach(whiteboardId => {
+      const whiteboard = unitWhiteboards.find(wb => wb.id === whiteboardId);
+      if (whiteboard) {
+        const relevantQuestions = allQuestions.filter(q => 
+          q.subject === subjectFilter && 
+          q.unit === activeUnitNum &&
+          !q.isTest &&
+          !answeredQuizQuestions.has(q.id)
+        );
+
+        if (relevantQuestions.length > 0) {
+          const scoredQuestions = relevantQuestions.map(question => {
+            let score = 0;
+            const questionText = `${question.question} ${question.options.join(' ')}`.toLowerCase();
+            const titleLower = whiteboard.title?.toLowerCase() || '';
+
+            if (titleLower && questionText.includes(titleLower)) {
+              score += 100;
+            }
+            
+            const titleWords = titleLower.split(/\s+/).filter(w => w.length > 3);
+            titleWords.forEach(word => {
+              if (questionText.includes(word)) {
+                score += 20;
+              }
+            });
+
+            if (question.lessonIDS && whiteboard.lessonIDs) {
+              if (question.lessonIDS.some(lid => whiteboard.lessonIDs.includes(lid))) {
+                score += 50;
+              }
+            }
+            
+            return { question, score };
+          });
+
+          const relevant = scoredQuestions
+            .filter(item => item.score > 0)
+            .map(item => item.question);
+          
+          allRelevantQuestions.push(...relevant);
+        }
+      }
+    });
+
+    // Remove duplicates
     const uniqueQuestions = allRelevantQuestions.filter((q, index, self) => 
-      index === self.findIndex(q2 => q2.id === q.id) &&
-      !answeredQuizQuestions.has(q.id)
+      index === self.findIndex(q2 => q2.id === q.id)
     );
 
-    setAvailableQuizQuestions(uniqueQuestions);
-  }, [selectedTerms, answeredQuizQuestions, activeUnitNum, selectedSubject, subjectFilter]);
+    // Score all unique questions against all selected items to find the most relevant
+    const selectedTermObjects = Array.from(selectedTerms)
+      .map(termId => allTerms.find(t => t.id === termId))
+      .filter(Boolean) as KeyTerm[];
+      
+    const selectedWhiteboardObjects = Array.from(selectedWhiteboards)
+      .map(wbId => unitWhiteboards.find(wb => wb.id === wbId))
+      .filter(Boolean) as WhiteboardImage[];
+
+    const scoredQuestions = uniqueQuestions.map(question => {
+      let score = 0;
+      const questionText = `${question.question} ${question.options.join(' ')}`.toLowerCase();
+
+      selectedTermObjects.forEach(term => {
+        const termLower = term.term.toLowerCase();
+        if (questionText.includes(termLower)) score += 100;
+        const termWordRegex = new RegExp(`\\b${termLower.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+        if (termWordRegex.test(questionText)) score += 80;
+        if (question.lessonIDS && term.lessonIDs && question.lessonIDS.some(lid => term.lessonIDs.includes(lid))) score += 50;
+      });
+
+      selectedWhiteboardObjects.forEach(whiteboard => {
+        const titleLower = whiteboard.title?.toLowerCase() || '';
+        if (titleLower && questionText.includes(titleLower)) score += 100;
+        const titleWords = titleLower.split(/\s+/).filter(w => w.length > 3);
+        titleWords.forEach(word => { if (questionText.includes(word)) score += 20; });
+        if (question.lessonIDS && whiteboard.lessonIDs && question.lessonIDS.some(lid => whiteboard.lessonIDs.includes(lid))) score += 50;
+      });
+
+      return { question, score };
+    });
+
+    // Sort by score and take the top 5
+    scoredQuestions.sort((a, b) => b.score - a.score);
+    const topQuestions = scoredQuestions.slice(0, 5).map(item => item.question);
+
+    // Filter out already answered questions from the top list
+    const finalQuestions = topQuestions.filter(q => !answeredQuizQuestions.has(q.id));
+
+    setAvailableQuizQuestions(finalQuestions);
+  }, [selectedTerms, selectedWhiteboards, answeredQuizQuestions, activeUnitNum, selectedSubject, subjectFilter, unitWhiteboards]);
 
   // Find most relevant question from available questions
   const findMostRelevantQuestion = (): QuestionType | null => {
@@ -599,7 +707,12 @@ export default function UnitPage() {
       .map(termId => allTerms.find(t => t.id === termId))
       .filter(Boolean) as KeyTerm[];
 
-    if (selectedTermObjects.length === 0) return availableQuizQuestions[0];
+    // Get selected whiteboard objects
+    const selectedWhiteboardObjects = Array.from(selectedWhiteboards)
+      .map(wbId => unitWhiteboards.find(wb => wb.id === wbId))
+      .filter(Boolean) as WhiteboardImage[];
+
+    if (selectedTermObjects.length === 0 && selectedWhiteboardObjects.length === 0) return availableQuizQuestions[0];
 
     // Score each available question
     const scoredQuestions = availableQuizQuestions.map(question => {
@@ -629,6 +742,29 @@ export default function UnitPage() {
         }
       });
 
+      // Score against selected whiteboards
+      selectedWhiteboardObjects.forEach(whiteboard => {
+        const titleLower = whiteboard.title?.toLowerCase() || '';
+        
+        if (titleLower && questionText.includes(titleLower)) {
+          score += 100;
+        }
+
+        const titleWords = titleLower.split(/\s+/).filter(w => w.length > 3);
+        titleWords.forEach(word => {
+          if (questionText.includes(word)) {
+            score += 20;
+          }
+        });
+
+        if (question.lessonIDS && whiteboard.lessonIDs) {
+          const hasMatchingLesson = question.lessonIDS.some(lid => whiteboard.lessonIDs.includes(lid));
+          if (hasMatchingLesson) {
+            score += 50;
+          }
+        }
+      });
+
       return { question, score };
     });
 
@@ -644,12 +780,15 @@ export default function UnitPage() {
     if (question) {
       setQuizQuestion(question);
       setSelectedQuizAnswer(null);
+      setIsAnimatingOut(false);
       setShowQuizModal(true);
     }
   };
 
   const handleQuizAnswerSelect = (answerLetter: string) => {
+    if (selectedQuizAnswer) return;
     setSelectedQuizAnswer(answerLetter);
+    setIsAnimatingOut(true);
   };
 
   const handleQuizSubmit = () => {
@@ -666,19 +805,35 @@ export default function UnitPage() {
         if (nextQuestion && nextQuestion.id !== quizQuestion.id) {
           setQuizQuestion(nextQuestion);
           setSelectedQuizAnswer(null);
+          setIsAnimatingOut(false);
         } else {
           // Fallback to first remaining question
           setQuizQuestion(remainingQuestions[0]);
           setSelectedQuizAnswer(null);
+          setIsAnimatingOut(false);
         }
       } else {
         // No more questions, close modal
         setShowQuizModal(false);
         setQuizQuestion(null);
         setSelectedQuizAnswer(null);
+        setIsAnimatingOut(false);
       }
     }
   };
+
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (showQuizModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [showQuizModal]);
 
   const unitsToDisplay = selectedSubject === 'macro' ? allMacroUnits : allMicroUnits;
   const pageTitleSubject = selectedSubject === 'macro' ? 'Macroeconomics' : 'Microeconomics';
@@ -699,14 +854,6 @@ export default function UnitPage() {
   // The lock will be handled visually on the component that links here.
 
   // --- Data Grouping Logic ---
-  let unitKeyTerms: KeyTerm[] = selectedSubject === 'macro' 
-    ? apMacroTerms.filter(term => term.unit === activeUnitNum)
-    : apMicroTerms.filter(term => term.unit === activeUnitNum);
-  
-  let unitWhiteboards: WhiteboardImage[] = selectedSubject === 'macro'
-    ? getUnitWhiteboards(activeUnitNum)
-    : allContentWhiteboards.filter(img => img.subject === subjectFilter && img.unit === activeUnitNum);
-
   const lessonGroups = new Map<string, { whiteboards: WhiteboardImage[], keyTerms: KeyTerm[] }>();
   unitWhiteboards.forEach(wb => {
     wb.lessonIDs.forEach(lessonId => {
@@ -947,14 +1094,14 @@ export default function UnitPage() {
                           }}
                           className={`p-4 bg-white border rounded-lg scroll-mt-20 cursor-pointer transition-all duration-200 relative ${
                             isSelected 
-                              ? 'border-blue-500 border-2 shadow-md transform scale-[0.98] bg-blue-50' 
+                              ? 'border-blue-400 border-4 shadow-inner transform scale-[0.98] bg-blue-50' 
                               : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
                           }`}
                         >
                           {/* Selection Indicator */}
                           {isSelected && (
-                            <div className="absolute top-3 right-3 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                              <CheckCircle2 className="w-4 h-4 text-white" />
+                            <div className="absolute top-3 right-3 w-6 h-6 bg-white rounded-full flex items-center justify-center border-2 border-gray-300">
+                              <Check className="w-4 h-4 text-gray-500" />
                             </div>
                           )}
                           <h3 className="font-bold text-gray-800 pr-8">{term.term}</h3>
@@ -990,23 +1137,36 @@ export default function UnitPage() {
                   <h3 className="text-xl font-semibold text-gray-700 mb-4">Whiteboards</h3>
                               <div className="border border-gray-300 rounded-lg p-6 bg-white">
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                                  {whiteboardsToShow.map((image, index) => (
+                                  {whiteboardsToShow.map((image, index) => {
+                                    const isSelected = selectedWhiteboards.has(image.id);
+                                    return (
                       <div 
                         key={`${image.id}-${index}`} 
-                        className="border rounded-lg shadow-sm overflow-hidden cursor-pointer transform hover:scale-105 transition-transform duration-200 bg-white"
-                        onClick={() => openModal(image)}
-                      >
-                        <div className="relative aspect-video">
+                                        className={`relative p-2 border rounded-lg cursor-pointer transition-all duration-200 ${
+                                          isSelected
+                                            ? 'border-blue-400 border-4 shadow-inner transform scale-[0.98] bg-blue-50'
+                                            : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
+                                        }`}
+                                        onClick={() => handleWhiteboardClick(image)}
+                                      >
+                                        <div className="relative aspect-video rounded-md overflow-hidden">
                           <Image 
                             src={image.imageUrl} 
-                            alt={image.title || `Whiteboard for Lesson ${lessonId}`} 
+                                            alt={`Whiteboard for Lesson ${lessonId}`}
                             fill
                             className="object-cover"
                             sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
                           />
                         </div>
+
+                                        {isSelected && (
+                                          <div className="absolute top-3 right-3 w-6 h-6 bg-white rounded-full flex items-center justify-center border-2 border-gray-300 pointer-events-none">
+                                            <Check className="w-4 h-4 text-gray-500" />
                       </div>
-                    ))}
+                                        )}
+                  </div>
+                                    );
+                                  })}
                   </div>
                                 {hasMore && (
                                   <div 
@@ -1087,51 +1247,110 @@ export default function UnitPage() {
         </div>
       )}
 
-      {/* Make a Quiz Sidebar */}
-      <div 
-        className={`fixed right-4 top-20 bg-white border border-gray-200 rounded-lg shadow-lg z-40 transform transition-all duration-300 ease-in-out cursor-pointer ${
-          selectedTerms.size >= 3 
-            ? 'w-40 p-4 opacity-100 translate-x-0 hover:bg-gray-50' 
-            : 'w-0 p-0 opacity-0 translate-x-full overflow-hidden'
-        }`}
-        onClick={handleMakeQuiz}
-      >
-        <h2 className="text-base font-bold text-gray-900 whitespace-nowrap">Make a Quiz</h2>
-      </div>
+      {/* Floating Action Dock */}
+      {(() => {
+        const isAnythingSelected = selectedTerms.size > 0 || selectedWhiteboards.size > 0;
+        const showDownload = selectedWhiteboards.size > 0;
+
+        const handleDownload = () => {
+          selectedWhiteboards.forEach(id => {
+            const whiteboard = unitWhiteboards.find(wb => wb.id === id);
+            if (whiteboard) {
+              const link = document.createElement('a');
+              link.href = whiteboard.imageUrl;
+              link.download = whiteboard.title || `whiteboard-${whiteboard.id}`;
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            }
+          });
+        };
+
+        return (
+          <div className={`fixed top-1/2 -translate-y-1/2 left-8 z-50 transition-all duration-300 ease-in-out ${
+            isAnythingSelected ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          }`}>
+            <div className="flex flex-col items-center gap-2 bg-white text-gray-800 rounded-lg shadow-lg p-2 border-2 border-blue-500">
+              <button 
+                onClick={handleMakeQuiz}
+                className="flex flex-col items-center justify-center p-2 rounded-md hover:bg-gray-100 transition-colors w-20 h-16"
+                title="Make a Quiz"
+              >
+                <Play className="w-6 h-6 text-blue-500" />
+                <span className="text-xs font-semibold mt-1">Drill</span>
+              </button>
+              
+              <div className="w-px h-6 bg-gray-300" />
+
+              <button 
+                onClick={(e) => e.preventDefault()}
+                className="flex flex-col items-center justify-center p-2 rounded-md w-20 h-16 cursor-not-allowed"
+                title="Save to Board (Coming Soon)"
+              >
+                <Bookmark className="w-6 h-6 text-gray-400" />
+                <span className="text-xs font-semibold mt-1 text-gray-400">Save</span>
+              </button>
+              
+              {showDownload && (
+                <>
+                  <div className="h-px w-full bg-gray-300" />
+                  <button 
+                    onClick={handleDownload}
+                    className="flex flex-col items-center justify-center p-2 rounded-md hover:bg-gray-100 transition-colors w-20 h-16"
+                    title="Download Selected Images"
+                  >
+                    <Download className="w-6 h-6 text-blue-500" />
+                    <span className="text-xs font-semibold mt-1">Download</span>
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Quiz Modal */}
       {showQuizModal && quizQuestion && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50 p-4"
           onClick={(e) => {
             if (e.target === e.currentTarget) {
               setShowQuizModal(false);
+              setIsAnimatingOut(false);
             }
           }}
         >
-          <div className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative">
+          <div className={`bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border-2 border-gray-200 shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto relative`}>
             <button
-              onClick={() => setShowQuizModal(false)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-900 transition-colors z-10 bg-white rounded-full p-2 shadow-md"
+              onClick={() => {
+                setShowQuizModal(false);
+                setIsAnimatingOut(false);
+              }}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors z-10 bg-white rounded-full p-2 shadow"
               aria-label="Close Quiz"
             >
               <X className="w-5 h-5" />
             </button>
             
-            <div className="p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Quiz Question</h2>
+            <div className="p-8">
+              <div className="text-center mb-8">
+                <h2 className="text-4xl font-extrabold tracking-tight text-gray-900">
+                  <span className="text-blue-500">Dojo</span> Drill
+                </h2>
+                <p className="text-gray-500 mt-1">A quick question to test your knowledge.</p>
+              </div>
               
-              <div className="space-y-4">
-                <p className="text-lg font-medium text-gray-800 leading-relaxed">
+              <div className="space-y-6">
+                <p className="text-2xl font-bold text-gray-800 leading-snug">
                   {quizQuestion.question}
                 </p>
 
                 {quizQuestion.image && (
-                  <div className="my-4 rounded-lg overflow-hidden border border-gray-200">
+                  <div className="my-4 rounded-lg overflow-hidden border-2 border-gray-200 bg-white">
                     <img
                       src={typeof quizQuestion.image === 'string' ? quizQuestion.image : (quizQuestion.image as any).src} 
                       alt="Question related image" 
-                      className="max-h-60 w-auto mx-auto object-contain"
+                      className="max-h-72 w-auto mx-auto object-contain p-2"
                     />
                   </div>
                 )}
@@ -1142,26 +1361,33 @@ export default function UnitPage() {
                     const isCorrect = optionLetter === quizQuestion.correctAnswer;
                     const isSelected = selectedQuizAnswer === optionLetter;
                     const showResult = selectedQuizAnswer !== null;
-                    
+                    const shouldDisappear = isAnimatingOut && !isCorrect && !isSelected;
+
+                    if (shouldDisappear) {
+                      return null;
+                    }
+
                     return (
-                      <button
+                      <div 
                         key={index}
-                        onClick={() => !showResult && handleQuizAnswerSelect(optionLetter)}
-                        disabled={showResult}
-                        className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
-                          showResult
+                      >
+                        <button
+                          onClick={() => !showResult && handleQuizAnswerSelect(optionLetter)}
+                          disabled={showResult}
+                          className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-200 group ${
+                            showResult
                             ? isCorrect
-                              ? 'bg-green-50 border-green-400 text-green-800'
+                              ? 'bg-green-50 border-green-400 text-green-800 shadow-sm'
                               : isSelected && !isCorrect
-                              ? 'bg-red-50 border-red-400 text-red-800'
-                              : 'bg-gray-50 border-gray-200 text-gray-700'
+                              ? 'bg-red-50 border-red-400 text-red-800 shadow-sm'
+                              : 'bg-gray-50 border-gray-200 text-gray-600'
                             : isSelected
-                            ? 'bg-blue-50 border-blue-400 text-blue-800 hover:bg-blue-100'
-                            : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300'
+                            ? 'bg-blue-50 border-blue-400 text-blue-800'
+                            : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 hover:shadow-sm'
                         }`}
                       >
-                        <div className="flex items-center gap-3">
-                          <span className={`w-8 h-8 flex items-center justify-center rounded-full border-2 font-semibold ${
+                        <div className="flex items-center gap-4">
+                          <span className={`w-8 h-8 flex items-center justify-center rounded-lg border-2 font-bold text-lg ${
                             showResult
                               ? isCorrect
                                 ? 'bg-green-100 border-green-400 text-green-700'
@@ -1170,43 +1396,62 @@ export default function UnitPage() {
                                 : 'bg-white border-gray-300 text-gray-500'
                               : isSelected
                               ? 'bg-blue-100 border-blue-400 text-blue-700'
-                              : 'bg-white border-gray-300 text-gray-600'
+                              : 'bg-white border-gray-300 text-gray-600 group-hover:border-gray-400'
                           }`}>
                             {optionLetter}
                           </span>
-                          <span className="flex-1">{option}</span>
+                          <span className="flex-1 font-medium">{option}</span>
                           {showResult && isCorrect && (
-                            <CheckCircle2 className="w-5 h-5 text-green-600" />
+                            <CheckCircle2 className="w-6 h-6 text-green-600" />
                           )}
                           {showResult && isSelected && !isCorrect && (
-                            <XCircle className="w-5 h-5 text-red-600" />
+                            <XCircle className="w-6 h-6 text-red-600" />
                           )}
                         </div>
                       </button>
+                      </div>
                     );
                   })}
                 </div>
 
                 {selectedQuizAnswer && quizQuestion.explanation && (
-                  <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                    <h3 className="font-semibold text-gray-900 mb-2">Explanation</h3>
-                    <p className="text-gray-700">{quizQuestion.explanation}</p>
+                  <div className={`mt-6 p-5 rounded-lg border-2 ${themeColor === 'blue' ? 'bg-blue-50 border-blue-200' : 'bg-green-50 border-green-200'}`}>
+                    <h3 className="font-bold text-gray-900 mb-2 text-lg">Explanation</h3>
+                    <p className="text-gray-700 leading-relaxed">{quizQuestion.explanation}</p>
                   </div>
                 )}
 
                 {/* Submit/Next Button */}
                 {selectedQuizAnswer && (
-                  <div className="mt-6 flex justify-end">
+                  <div className="mt-6">
                     <button
                       onClick={handleQuizSubmit}
-                      className={`px-6 py-3 rounded-lg font-semibold transition-colors shadow-md ${
+                      className={`w-full inline-flex items-center justify-center gap-2 px-8 py-3 rounded-lg font-semibold transition-colors shadow-lg transform hover:scale-105 ${
                         themeColor === 'blue'
                           ? 'bg-blue-600 hover:bg-blue-700 text-white'
                           : 'bg-green-600 hover:bg-green-700 text-white'
                       }`}
                     >
-                      {availableQuizQuestions.length > 1 ? 'Next Question' : 'Done'}
+                      <span>{availableQuizQuestions.length > 1 ? 'Next Question' : 'Done'}</span>
+                      <ArrowRight className="w-5 h-5" />
                     </button>
+                  </div>
+                )}
+
+                {/* Progress Dots */}
+                {availableQuizQuestions.length > 1 && (
+                  <div className="flex justify-center gap-2 mt-8 pt-4 border-t border-gray-200">
+                    {Array.from({ length: availableQuizQuestions.length }).map((_, index) => {
+                      const currentQuizIndex = availableQuizQuestions.findIndex(q => q.id === quizQuestion.id);
+                      return (
+                        <div 
+                          key={index}
+                          className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                            index === currentQuizIndex ? 'bg-blue-500 scale-110' : 'bg-gray-300'
+                          }`}
+                        />
+                      );
+                    })}
                   </div>
                 )}
               </div>

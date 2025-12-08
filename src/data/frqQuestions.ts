@@ -23,6 +23,7 @@ export interface FRQPart {
   videoAspectRatio?: 'vertical' | 'horizontal';
   pointValue?: number;
   referenceImageUrl?: string; // Reference image for drawing comparison (answer key)
+  templateImageUrl?: string; // Template image to show as background in drawing pad
 }
 
 // Interface for the table data within an FRQ
@@ -120,6 +121,7 @@ export const macroUnit4Set1: FRQExam = {
           answer: PRDOWN,
           gradingCriteria: "2 points: Graph correctly shows the reserve market with properly labeled axes (Reserves/Quantity of Reserves on X-axis, Interest Rate/Policy Rate on Y-axis). Demand for reserves curve and supply of reserves curve are shown. The effect of decreasing IOR is correctly illustrated (supply curve shifts down or demand shifts appropriately), resulting in a decrease in the policy rate. 1 point: Graph shows most elements correctly but is missing one key component (e.g., missing axis labels, incorrect curve representation, or missing policy effect). 0 points: Graph does not meet the criteria or is completely incorrect.",
           videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/frqExplanations/U4V3.mp4",
+          referenceImageUrl: "/images/frqPracticePage/macroUnit4Set1C.jpg",
         },
         {
           label: "D",
@@ -471,6 +473,7 @@ export const macroUnit3Set1: FRQExam = {
           text: "Draw a correctly labeled graph of the long-run aggregate supply, short-run aggregate supply, and aggregate demand curves.",
           answerType: "draw",
           answer: "The graph should show the AD and SRAS curves intersecting to the RIGHT of the vertical LRAS curve. The intersection point is labeled Y1 ($600B) and PL1. The vertical LRAS line is labeled Yf ($500B).",
+          referenceImageUrl: "/images/frqPracticePage/macroUnit3Set1A.jpg",
           subparts: [
             {
               label: "i",
@@ -513,9 +516,10 @@ export const macroUnit3Set1: FRQExam = {
         {
           label: "F",
           pointValue: 1,
-          text: "Assume instead that the government decides to change government spending to close the gap. Calculate the minimum change in government spending required to close the gap completely.",
-          answerType: "text",
-          answer: "Decrease spending by $20 billion. Explanation: The Spending Multiplier is 1/MPS = 1/0.2 = 5. To reduce GDP by $100 billion: Change in GDP = Spending Change * Spending Multiplier -> -$100 = Spending Change * 5 -> Spending Change = -$20 billion.",
+          text: "Suppose that the government of Veridia took no action at all and the economy self-adjusted in the long run. Show that change on your graph from part A.",
+          answerType: "draw",
+          answer: "The Short-Run Aggregate Supply (SRAS) curve shifts to the left. Explanation: Because the economy is operating beyond full employment, the unemployment rate is extremely low. This causes nominal wages (and other input costs) to increase. As production costs rise, firms decrease supply, shifting the SRAS curve to the left until real output returns to Yf at full employment. The new equilibrium occurs where the shifted SRAS curve intersects AD at the vertical LRAS line (Yf).",
+          referenceImageUrl: "/images/frqPracticePage/macroUnit3Set1F.jpg",
         }
       ]
     }
@@ -532,7 +536,7 @@ export const macroUnit5Set1: FRQExam = {
       subject: 'macro',
       title: 'Unit 5 FRQ - Phillips Curve and Interest Rates',
       questionNumber: 1,
-      prompt: "Inflation and unemployment are two critical economic indicators that policymakers closely monitor. The relationship between them is often analyzed using the Phillips curve framework. Assume the economy of 'Agraria' is currently operating at its full-employment level of output.",
+      prompt: "Agraria is a country currently operating at full employment. Below is a short run Phillips curve that represents Agraria's current economic situation.",
       expertTip: "Remember that the Short-Run Phillips Curve (SRPC) shifts in the opposite direction of the Short-Run Aggregate Supply (SRAS) curve. An adverse supply shock shifts SRAS to the left, which corresponds to a rightward shift of the SRPC.",
       image: undefined,
       tableData: undefined,
@@ -543,6 +547,7 @@ export const macroUnit5Set1: FRQExam = {
           text: "Draw a correctly labeled graph of a short-run Phillips curve (SRPC).",
           answerType: "draw",
           answer: "The graph should have the 'Inflation Rate' on the vertical axis and the 'Unemployment Rate' on the horizontal axis. A downward-sloping curve should be labeled 'SRPC'. The long-run Phillips curve (LRPC) should be drawn as a vertical line at the natural rate of unemployment. Point 'X' should be located at the intersection of the SRPC and LRPC, representing the current state of the economy at full employment.",
+          templateImageUrl: "/images/frqPracticePage/macroUnit5Set1TEMPLATE.jpg",
           subparts: [
             {
               label: "i",
@@ -710,6 +715,7 @@ export const macroUnit4Set2: FRQExam = {
           text: "Draw a correctly labeled graph of the money market and show the impact of the monetary policy action identified in part (A) on the equilibrium nominal interest rate.",
           answerType: "draw",
           answer: macroMoneyMarketBuy, // Image shows Vertical MS shifting Right. Nominal IR decreases.
+          referenceImageUrl: "/images/frqPracticePage/macroUnit4Set2B.jpg",
           subparts: [
             
           ]
@@ -745,6 +751,7 @@ export const macroUnit4Set2: FRQExam = {
           text: "Now assume that instead of the central bank action, the government of Bellaterra decides to increase government spending and decrease taxes to close the recessionary gap. Draw a correctly labeled graph of the loanable funds market and show the impact of this fiscal policy action on the real interest rate.",
           answerType: "draw",
           answer: macroLoanableFundsFiscal, // Image shows Demand for LF shifting Right OR Supply of LF shifting Left. RIR Increases.
+          referenceImageUrl: "/images/frqPracticePage/macroUnit4Set2D.jpg",
           subparts: [
            
           ]

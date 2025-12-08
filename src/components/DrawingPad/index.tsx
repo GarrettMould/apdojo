@@ -26,6 +26,7 @@ interface DrawingPadProps {
   onSave: (data: string) => void;
   enableStickers?: boolean; // New prop to enable sticker mode
   stickerLabels?: string[]; // Labels available for stickers
+  templateImageUrl?: string; // Template image to show as background
 }
 
 export function DrawingPad({ 
@@ -34,7 +35,8 @@ export function DrawingPad({
   initialData, 
   onSave,
   enableStickers = false,
-  stickerLabels = ['LRAS', 'SRAS', 'AD', 'Price Level', 'Real GDP']
+  stickerLabels = ['LRAS', 'SRAS', 'AD', 'Price Level', 'Real GDP'],
+  templateImageUrl
 }: DrawingPadProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -70,7 +72,7 @@ export function DrawingPad({
     onSave('');
   };
 
-  // Effect to handle initialData changes
+  // Effect to handle initialData and templateImageUrl changes
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -82,8 +84,40 @@ export function DrawingPad({
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // If there's initialData, draw it
-    if (initialData) {
+    // Load template image first as background (if provided)
+    if (templateImageUrl) {
+      const templateImg = new Image();
+      templateImg.crossOrigin = 'anonymous';
+      templateImg.onload = () => {
+        // Draw template as background
+        ctx.drawImage(templateImg, 0, 0, canvas.width, canvas.height);
+        // Then draw initialData on top if it exists
+        if (initialData) {
+          const img = new Image();
+          img.onload = () => {
+            ctx.drawImage(img, 0, 0);
+            onSave(canvas.toDataURL());
+          };
+          img.src = initialData;
+        } else {
+          onSave(canvas.toDataURL());
+        }
+      };
+      templateImg.onerror = () => {
+        console.error('Failed to load template image:', templateImageUrl);
+        // If template fails, still try to load initialData
+        if (initialData) {
+          const img = new Image();
+          img.onload = () => {
+            ctx.drawImage(img, 0, 0);
+            onSave(canvas.toDataURL());
+          };
+          img.src = initialData;
+        }
+      };
+      templateImg.src = templateImageUrl;
+    } else if (initialData) {
+      // If there's no template but there's initialData, draw it
       const img = new Image();
       img.onload = () => {
         ctx.drawImage(img, 0, 0);
@@ -91,7 +125,7 @@ export function DrawingPad({
       };
       img.src = initialData;
     }
-  }, [initialData, isLarge]);
+  }, [initialData, templateImageUrl, isLarge]);
 
   const isVertical = (line: Line): boolean => {
     const dx = Math.abs(line.endX - line.startX);

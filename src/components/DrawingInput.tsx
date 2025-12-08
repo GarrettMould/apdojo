@@ -12,6 +12,7 @@ interface DrawingInputProps {
   isGraded: boolean;
   enableStickers?: boolean;
   stickerLabels?: string[];
+  templateImageUrl?: string;
 }
 
 export const DrawingInput: React.FC<DrawingInputProps> = ({ 
@@ -20,7 +21,8 @@ export const DrawingInput: React.FC<DrawingInputProps> = ({
   onSave, 
   isGraded,
   enableStickers = false,
-  stickerLabels = ['LRAS', 'SRAS', 'AD', 'Price Level', 'Real GDP']
+  stickerLabels = ['LRAS', 'SRAS', 'AD', 'Price Level', 'Real GDP'],
+  templateImageUrl
 }) => {
   const [inputMethod, setInputMethod] = useState<'draw' | 'upload'>('draw');
 
@@ -92,15 +94,16 @@ export const DrawingInput: React.FC<DrawingInputProps> = ({
 
           return !drawingData || isStructured ? (
             <>
-              {inputMethod === 'draw' && (
-                <DrawingPad
-                  isLarge={true}
-                  onSave={(data) => onSave(drawingKey, data)}
-                  initialData={imageData}
-                  enableStickers={enableStickers}
-                  stickerLabels={stickerLabels}
-                />
-              )}
+                {inputMethod === 'draw' && (
+                  <DrawingPad
+                    isLarge={true}
+                    onSave={(data) => onSave(drawingKey, data)}
+                    initialData={imageData}
+                    enableStickers={enableStickers}
+                    stickerLabels={stickerLabels}
+                    templateImageUrl={templateImageUrl}
+                  />
+                )}
             
               {inputMethod === 'upload' && (
                 <div className="text-center p-8">
