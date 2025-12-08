@@ -73,8 +73,8 @@ function LoggedOutHomePage() {
   };
 
   const thumbnailUrl = selectedSubject === 'micro' 
-    ? '/images/U5FRQMicro.jpg' 
-    : '/images/unit4MacroFRQCover.jpg';
+    ? '/images/frqPracticePage/U5FRQMicro.jpg' 
+    : '/images/frqPracticePage/unit4MacroFRQCover.jpg';
 
   // Check localStorage on mount to see if banner was dismissed
   useEffect(() => {
