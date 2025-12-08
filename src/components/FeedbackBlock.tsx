@@ -2,8 +2,6 @@
 
 import React from 'react';
 import { Star, ChevronDown, ChevronUp } from 'lucide-react';
-import { InlineMath } from 'react-katex';
-import 'katex/dist/katex.min.css';
 
 // Define the shape of the part/subpart object
 interface AnswerablePart {
@@ -28,39 +26,19 @@ interface FeedbackBlockProps {
   toggleAnswer: (key: string) => void;
 }
 
-const renderWithMath = (text: string) => {
-  if (typeof text !== 'string') return text;
-
-  // This regex splits the string by expressions enclosed in $, capturing the content inside.
-  const parts = text.split(/\$(.*?)\$/g);
-
-  return (
-    <>
-      {parts.map((part, index) => {
-        // Odd-indexed parts are the captured math expressions.
-        if (index % 2 === 1) {
-          return <InlineMath key={index} math={part} />;
-        }
-        // Even-indexed parts are the surrounding text.
-        return <span key={index}>{part}</span>;
-      })}
-    </>
-  );
-};
-
 const formatAnswerText = (text: string) => {
   const parts = text.split(/Explanation: ?/i);
   if (parts.length === 2) {
     return (
       <>
-        {renderWithMath(parts[0].trim())}
+        {parts[0].trim()}
         <br />
         <br />
-        <span className="font-bold">Explanation:</span> {renderWithMath(parts[1].trim())}
+        <span className="font-bold">Explanation:</span> {parts[1].trim()}
       </>
     );
   }
-  return renderWithMath(text);
+  return text;
 };
 
 export const FeedbackBlock: React.FC<FeedbackBlockProps> = ({ feedback, part, answerKey, showAnswers, toggleAnswer }) => {

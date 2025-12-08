@@ -4,12 +4,6 @@ import { generateGradingPrompt } from '@/lib/grading-logic';
 
 export const maxDuration = 30; // Set a 30-second timeout
 
-const apiKey = process.env.GEMINI_API_KEY;
-if (!apiKey) {
-  // Throws an error if the API key is not found in environment variables
-  throw new Error("GEMINI_API_KEY not found in environment variables.");
-}
-
 export async function POST(req: Request) {
   const apiKey = process.env.GEMINI_API_KEY;
 
@@ -45,9 +39,31 @@ export async function POST(req: Request) {
 
     console.log('Initializing Gemini model...');
     
-    // Use gemini-1.5-pro for FRQ grading
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-002" });
-    console.log('Using model: gemini-1.5-pro-002');
+    // Try standard model names first (avoids extra API call to list models)
+    // This reduces quota usage by skipping the models list API call
+    const fallbackModels = ['gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-pro', 'gemini-1.0-pro'];
+    let model;
+    let found = false;
+    
+    for (const modelName of fallbackModels) {
+      try {
+        model = genAI.getGenerativeModel({ model: modelName });
+        console.log(`Using model: ${modelName}`);
+        found = true;
+        break;
+      } catch (e: any) {
+        // If it's a 404, try next model. If it's a quota error, throw it.
+        if (e.message?.includes('429') || e.message?.includes('quota') || e.message?.includes('rate limit')) {
+          throw new Error('API quota exceeded. Please wait a moment and try again, or check your Google AI Studio quota limits.');
+        }
+        // For 404 or other errors, try next model
+        continue;
+      }
+    }
+    
+    if (!found) {
+      throw new Error('Could not initialize any Gemini model. Please check your API key and model availability.');
+    }
     
     // Use the explicit grading criteria from the question, or fallback to generic criteria
     const criteriaToUse = gradingCriteria || `
@@ -81,8 +97,18 @@ Ensure all required elements from the question are present
         response: apiError.response
       });
       
-      // Check if it's a quota/rate limit error
-      if (apiError.message?.includes('429') || apiError.message?.includes('quota') || apiError.message?.includes('rate limit')) {
+      // Check if it's a quota/rate limit error (429 status code or error message)
+      const errorMessage = apiError.message || '';
+      const statusCode = apiError.status || apiError.statusCode || '';
+      
+      if (
+        statusCode === 429 || 
+        errorMessage.includes('429') || 
+        errorMessage.includes('quota') || 
+        errorMessage.includes('rate limit') ||
+        errorMessage.includes('RESOURCE_EXHAUSTED') ||
+        errorMessage.includes('Quota exceeded')
+      ) {
         throw new Error('API quota exceeded. Please wait a moment and try again, or check your Google AI Studio quota limits.');
       }
       
@@ -127,11 +153,18 @@ Ensure all required elements from the question are present
     
     // Return a more user-friendly error to the client
     let userMessage = "An error occurred while grading the answer. Please try again.";
+    const errorMsg = error.message || '';
     
-    if (error.message?.includes("API key not valid") || error.message?.includes("API_KEY")) {
+    if (errorMsg.includes("API key not valid") || errorMsg.includes("API_KEY") || errorMsg.includes("API key")) {
       userMessage = "API configuration error. Please contact support.";
-    } else if (error.message?.includes("quota") || error.message?.includes("429") || error.message?.includes("rate limit")) {
-      userMessage = "API quota exceeded. Please wait a moment and try again.";
+    } else if (
+      errorMsg.includes("quota") || 
+      errorMsg.includes("429") || 
+      errorMsg.includes("rate limit") ||
+      errorMsg.includes("RESOURCE_EXHAUSTED") ||
+      errorMsg.includes("Quota exceeded")
+    ) {
+      userMessage = "API quota exceeded. Please wait a moment and try again, or check your Google AI Studio quota limits.";
     } else if (error.message) {
       userMessage = error.message;
     }

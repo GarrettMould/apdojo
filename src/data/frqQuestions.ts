@@ -198,7 +198,7 @@ export const microUnit5Set1: FRQExam = {
         {
           label: "D",
           pointValue: 2,
-          text: "Draw a correctly labeled graph of the labor market and the firm side-by-side. Show the equilibrium wage (We) and quantity (Qe) in the market, and the wage (We) and quantity (Qf) for the firm.",
+          text: "Draw a correctly labeled graph of the labor market and the firm side-by-side.",
           answerType: "draw" as const,
           answer: microUnit5FRQA1D,
           videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/frqExplanations/ID2QD.mp4",
@@ -206,6 +206,10 @@ export const microUnit5Set1: FRQExam = {
           subparts: [
             {
                label: "i",
+               text: "Show the equilibrium wage (We) and quantity (Qe) in the market, and the wage (We) and quantity (Qf) for the firm.",
+            },
+            {
+               label: "ii",
                text: "Ensure the firm's graph clearly labels the demand for labor (MRP) and the supply of labor (MRC).",
             }
           ]
@@ -213,7 +217,7 @@ export const microUnit5Set1: FRQExam = {
         {
           label: "E",
           pointValue: 2,
-          text: "Assume the government implements a new regulation that limits the number of workers certified to work in this specific industry. Show the impact of this change on your graphs in part (D).",
+          text: "Assume the government implements a new regulation that limits the number of workers certified to work in this specific industry.",
           // answerType and answer removed from parent
           subparts: [
             {
@@ -308,7 +312,7 @@ export const macroUnit4Set3: FRQExam = {
       subject: 'macro',
       title: 'Unit 4 FRQ - Banking & Money Creation',
       questionNumber: 1,
-      prompt: "The central bank purchases $10,000 worth of government bonds from Sarah, who deposits the entire proceeds into her checking account at 'Regional Bank.' The banking system has limited reserves, and the required reserve ratio is 20%.",
+      prompt: "The central bank purchases $10,000 worth of government bonds from Sarah, who deposits the entire proceeds into her checking account at 'First City Bank.' The banking system has limited reserves, and the required reserve ratio is 20%.",
       expertTip: "When calculating the 'Maximum Change in Money Supply', remember to determine if the injection is 'new money' (like a Fed purchase) or existing currency deposited. A Fed purchase adds entirely new reserves to the system, triggering the full multiplier effect.",
       image: undefined,
       tableData: undefined,
@@ -316,23 +320,23 @@ export const macroUnit4Set3: FRQExam = {
         {
           label: "A",
           pointValue: 2,
-          text: "What is the amount by which Regional Bank's liabilities have changed as a result of Sarah's deposit? Explain.",
+          text: "What is the amount by which First City Bank's liabilities have changed as a result of Sarah's deposit? Explain.",
           answerType: "text",
           answer: "Liabilities increased by $10,000. Explanation: When Sarah deposits the money, the bank now owes that money back to her on demand. Therefore, the demand deposit (a liability to the bank) increases by the full amount of the deposit.",
         },
         {
           label: "B",
           pointValue: 1,
-          text: "Calculate the change in excess reserves for Regional Bank immediately after the deposit. Show your work.",
+          text: "Calculate the change in excess reserves for First City Bank immediately after the deposit. Show your work.",
           answerType: "text",
           answer: "$8,000. Explanation: The required reserves are 20% of $10,000, which equals $2,000. Excess reserves = Total Reserves - Required Reserves. $10,000 - $2,000 = $8,000.",
         },
         {
           label: "C",
           pointValue: 1,
-          text: "What is the dollar value of the maximum amount of new loans Regional Bank can initially make as a result of this deposit?",
+          text: "What is the dollar value of the maximum amount of new loans First City Bank can initially make as a result of this deposit?",
           answerType: "text",
-          answer: "$8,000. Explanation: A single bank can only lend out its excess reserves. Since Regional Bank has $8,000 in excess reserves calculated in part (b), this is the maximum amount they can initially lend.",
+          answer: "$8,000. Explanation: A single bank can only lend out its excess reserves. Since First City Bank has $8,000 in excess reserves calculated in part (b), this is the maximum amount they can initially lend.",
         },
         {
           label: "D",
@@ -464,9 +468,19 @@ export const macroUnit3Set1: FRQExam = {
         {
           label: "A",
           pointValue: 2,
-          text: "Draw a correctly labeled graph of the long-run aggregate supply, short-run aggregate supply, and aggregate demand curves. Label the current equilibrium output as Y1 and the full-employment output as Yf.",
+          text: "Draw a correctly labeled graph of the long-run aggregate supply, short-run aggregate supply, and aggregate demand curves.",
           answerType: "draw",
           answer: "The graph should show the AD and SRAS curves intersecting to the RIGHT of the vertical LRAS curve. The intersection point is labeled Y1 ($600B) and PL1. The vertical LRAS line is labeled Yf ($500B).",
+          subparts: [
+            {
+              label: "i",
+              text: "Label the current equilibrium output as Y1.",
+            },
+            {
+              label: "ii",
+              text: "Label the full-employment output as Yf.",
+            }
+          ]
         },
         {
           label: "B",
@@ -526,23 +540,26 @@ export const macroUnit5Set1: FRQExam = {
         {
           label: "A",
           pointValue: 2,
-          text: "Draw a correctly labeled graph of a short-run Phillips curve (SRPC). On your graph, label a point 'A' that represents the current state of the economy at full employment.",
+          text: "Draw a correctly labeled graph of a short-run Phillips curve (SRPC).",
           answerType: "draw",
-          answer: "The graph should have the 'Inflation Rate' on the vertical axis and the 'Unemployment Rate' on the horizontal axis. A downward-sloping curve should be labeled 'SRPC'. Point 'A' should be located on the SRPC at a point that corresponds to the natural rate of unemployment (LRPC intersection, if drawn).",
+          answer: "The graph should have the 'Inflation Rate' on the vertical axis and the 'Unemployment Rate' on the horizontal axis. A downward-sloping curve should be labeled 'SRPC'. The long-run Phillips curve (LRPC) should be drawn as a vertical line at the natural rate of unemployment. Point 'X' should be located at the intersection of the SRPC and LRPC, representing the current state of the economy at full employment.",
+          subparts: [
+            {
+              label: "i",
+              text: "On your graph, label a point 'X' that represents the current state of the economy at full employment.",
+            },
+            {
+              label: "ii",
+              text: "Your graph should include both the short-run Phillips curve (SRPC) and the long-run Phillips curve (LRPC).",
+            }
+          ]
         },
         {
           label: "B",
           pointValue: 2,
-          text: "Assume that Agraria experiences a severe drought that significantly reduces crop yields, creating an adverse supply shock. On your graph from part (a), show the effect of this shock on the short-run Phillips curve.",
+          text: "Assume that Agraria experiences a severe drought that significantly reduces crop yields, creating an adverse supply shock. On your graph from part (a), show the effect of this shock on the Phillips Curve graph.",
           answerType: "draw",
-          answer: "The adverse supply shock leads to stagflation (higher inflation and higher unemployment). This is represented by a rightward (or upward) shift of the entire SRPC curve. The new curve should be labeled 'SRPC2'.",
-        },
-        {
-          label: "C",
-          pointValue: 2,
-          text: "On your graph from part (a), draw the long-run Phillips curve (LRPC). Explain what the LRPC represents.",
-          answerType: "draw",
-          answer: "The LRPC should be drawn as a vertical line at the natural rate of unemployment. Explanation: The vertical LRPC indicates that in the long run, there is no trade-off between inflation and unemployment. The economy gravitates toward its natural rate of unemployment regardless of the inflation rate, as expectations adjust.",
+          answer: "The adverse supply shock leads to stagflation (higher inflation and higher unemployment). This is represented by a rightward (or upward) shift of the entire SRPC curve. The new curve should be labeled 'SRPC2'. The LRPC remains unchanged as it represents the natural rate of unemployment.",
         },
         {
           label: "D",
@@ -588,9 +605,9 @@ export const macroUnit5Set2: FRQExam = {
         {
           label: "A",
           pointValue: 2,
-          text: "Draw a correctly labeled graph of a short-run Phillips curve for Zephyria. Plot the data points for Year 1 and Year 2, labeling them as Point 1 and Point 2, respectively.",
+          text: "Draw a correctly labeled graph of a short-run Phillips curve for Zephyria. Plot the data points for Year 1 and Year 2, labeling them as Point X and Point Y, respectively.",
           answerType: "draw",
-          answer: "The graph should show a downward-sloping SRPC. Point 1 should be lower on the curve (High Unemp: 6%, Low Inf: 2%). Point 2 should be higher on the curve (Low Unemp: 3%, High Inf: 7%). This illustrates a movement up and to the left along the curve.",
+          answer: "The graph should show a downward-sloping SRPC. Point X should be lower on the curve (High Unemp: 6%, Low Inf: 2%). Point Y should be higher on the curve (Low Unemp: 3%, High Inf: 7%). This illustrates a movement up and to the left along the curve.",
         },
         {
           label: "B",
@@ -604,12 +621,12 @@ export const macroUnit5Set2: FRQExam = {
           pointValue: 1,
           text: "Assume that the natural rate of unemployment in Zephyria is 6 percent. On your graph from part (a), draw the long-run Phillips curve and label it as LRPC.",
           answerType: "draw",
-          answer: "The LRPC should be drawn as a vertical line at the 6% unemployment mark on the horizontal axis. It should pass through Point 1 (from part A) if that point represented the natural rate conditions.",
+          answer: "The LRPC should be drawn as a vertical line at the 6% unemployment mark on the horizontal axis. It should pass through Point X (from part A) if that point represented the natural rate conditions.",
         },
         {
           label: "D",
           pointValue: 1,
-          text: "Identify one specific fiscal policy action that the government could have taken in Year 2 to return the unemployment rate to the natural rate immediately, rather than waiting for the long-run adjustment.",
+          text: "Identify one specific fiscal policy action that the government could have taken in Year 2 to help reduce the inflation rate.",
           answerType: "text",
           answer: "Decrease Government Spending OR Increase Taxes. (Contractionary fiscal policy reduces Aggregate Demand, moving the economy down the SRPC back towards the natural rate).",
         }
@@ -643,14 +660,14 @@ export const macroUnit1Set2: FRQExam = {
         {
           label: "B",
           pointValue: 2,
-          text: "Calculate the opportunity cost of producing one unit of Cotton for each country. Based on these calculations, which country has the comparative advantage in Cotton?",
+          text: "Which country has the comparative advantage in Cotton?",
           answerType: "text",
           answer: "Novus has the comparative advantage. Explanation: For Novus, 1 unit of Cotton costs 0.5 units of Wool (40/80). For Vetus, 1 unit of Cotton costs 3 units of Wool (120/40). Since 0.5 < 3, Novus gives up less to produce Cotton.",
         },
         {
           label: "C",
           pointValue: 1,
-          text: "Identify a specific numerical value for the terms of trade (exchange rate) of Cotton for Wool that would be beneficial for both countries to accept.",
+          text: "Identify a specific numerical value for the terms of trade that would be beneficial for both countries to accept.",
           answerType: "text",
           answer: "1 unit of Cotton for 1 unit of Wool (or any number between 0.5 and 3). Explanation: Novus will only sell Cotton if they get more than 0.5 units of Wool. Vetus will only buy Cotton if they pay less than 3 units of Wool.",
         },
@@ -761,9 +778,9 @@ export const macroUnit6Set2: FRQExam = {
         {
           label: "B",
           pointValue: 2,
-          text: "Draw a correctly labeled graph of the foreign exchange market for the Caldon. Show the effect of the political instability on the equilibrium exchange rate.",
+          text: "Draw correctly labeled side-by-side graphs of the foreign exchange market for the Caldon and the foreign exchange market for the Euro. Show the effect of the political instability on the equilibrium exchange rates.",
           answerType: "draw",
-          answer: "The graph should have the 'Exchange Rate (Euros/Caldon)' on the vertical axis and 'Quantity of Caldons' on the horizontal axis. It should show a downward-sloping Demand curve and an upward-sloping Supply curve. The Demand curve must shift to the LEFT (labeled D1 to D2), representing foreign investors exiting the market. The new equilibrium point shows a LOWER exchange rate (depreciation) and a lower quantity of Caldons traded.",
+          answer: "The graph for the Caldon should have the 'Exchange Rate (Euros/Caldon)' on the vertical axis and 'Quantity of Caldons' on the horizontal axis. It should show a downward-sloping Demand curve and an upward-sloping Supply curve. The Demand curve must shift to the LEFT (labeled D1 to D2), representing foreign investors exiting the market. The new equilibrium point shows a LOWER exchange rate (depreciation) and a lower quantity of Caldons traded. The graph for the Euro should have the 'Exchange Rate (Caldons/Euro)' on the vertical axis and 'Quantity of Euros' on the horizontal axis. It should show a downward-sloping Demand curve and an upward-sloping Supply curve. The Demand curve must shift to the RIGHT (labeled D1 to D2), representing increased demand for Euros as investors flee Caldonian assets. The new equilibrium point shows a HIGHER exchange rate (appreciation of the Euro) and a higher quantity of Euros traded.",
           subparts: [
             {
                label: "i",
@@ -790,7 +807,7 @@ export const macroUnit6Set2: FRQExam = {
         {
           label: "E",
           pointValue: 1,
-          text: "Assume the Central Bank of Caldonia wants to return the exchange rate to its pre-crisis level. To achieve this, should the Central Bank buy or sell its reserves of the Euro? Explain.",
+          text: "Assume the Central Bank of Caldonia wants to return the exchange rate to its pre-crisis level. To achieve this, should the Central Bank buy Euros or sell Euros? Explain.",
           answerType: "text",
           answer: "Sell Euros. Explanation: To increase the value of the Caldon (appreciate it), the Central Bank needs to increase the demand for the Caldon. They do this by entering the market, selling their foreign reserves (Euros) and using the proceeds to buy Caldons.",
         }
@@ -877,9 +894,19 @@ export const macroUnit3Set4: FRQExam = {
         {
           label: "A",
           pointValue: 2,
-          text: "Draw a correctly labeled graph of the long-run aggregate supply, short-run aggregate supply, and aggregate demand curves. Label the current short-run equilibrium real output as Y1 and the current price level as PL1. Label the full-employment output as Yf.",
+          text: "Draw a correctly labeled graph of the long-run aggregate supply, short-run aggregate supply, and aggregate demand curves.",
           answerType: "draw",
           referenceImageUrl: "/images/frqPracticePage/macroUnit3Set4key.png",
+          subparts: [
+            {
+              label: "i",
+              text: "Label the current short-run equilibrium real output as Y1 and the current price level as PL1.",
+            },
+            {
+              label: "ii",
+              text: "Label the full-employment output as Yf.",
+            }
+          ],
           answer: `
 **POINTS:** 2 Points Total.
 **GRAPH REQUIREMENTS:**
@@ -1051,10 +1078,20 @@ export const macroUnit3Set3: FRQExam = {
         {
           label: "A",
           pointValue: 2,
-          text: "Draw a correctly labeled graph of the long-run aggregate supply, short-run aggregate supply, and aggregate demand curves. Label the current equilibrium real output as Y1 and the current price level as PL1. Label the full-employment output as Yf.",
+          text: "Draw a correctly labeled graph of the long-run aggregate supply, short-run aggregate supply, and aggregate demand curves.",
           answerType: "draw",
           answer: "The graph should show the downward-sloping AD curve intersecting the upward-sloping SRAS curve to the RIGHT of the vertical LRAS curve. The intersection point is labeled Y1 and PL1. The vertical LRAS line is labeled Yf, and Y1 > Yf.",
           referenceImageUrl: "/images/frqPracticePage/macroUnit3Set3 1.jpg",
+          subparts: [
+            {
+              label: "i",
+              text: "Label the current equilibrium real output as Y1 and the current price level as PL1.",
+            },
+            {
+              label: "ii",
+              text: "Label the full-employment output as Yf.",
+            }
+          ]
         },
         {
           label: "B",
@@ -1154,7 +1191,7 @@ export const macroUnit6Set3: FRQExam = {
       subject: 'macro',
       title: 'Unit 6 FRQ - Balance of Payments Accounts',
       questionNumber: 1,
-      prompt: "The table below shows the international transactions for the country of 'Tradevia' for a specific year. Amounts are in billions of dollars.",
+      prompt: "The table below shows the international transactions for the country of 'Atlas' for a specific year. Amounts are in billions of dollars.",
       expertTip: "The Balance of Payments must always sum to zero. Therefore, Current Account + Financial/Capital Account = 0. If the Current Account is in deficit, the Financial Account must be in surplus (and vice versa).",
       image: undefined,
       tableData: {
@@ -1164,45 +1201,45 @@ export const macroUnit6Set3: FRQExam = {
           ["Imports of Goods and Services", "-$500"],
           ["Net Investment Income", "+$50"],
           ["Net Unilateral Transfers", "-$20"],
-          ["Purchase of Foreign Assets by Tradevians", "-$100"],
-          ["Purchase of Tradevian Assets by Foreigners", "+$170"]
+          ["Purchase of Foreign Assets by Atlas Residents", "-$100"],
+          ["Purchase of Atlas Assets by Foreigners", "+$170"]
         ]
       },
       parts: [
         {
           label: "A",
           pointValue: 2,
-          text: "Calculate the balance on the Current Account for Tradevia. Show your work.",
+          text: "Calculate the balance on the Current Account for Atlas. Show your work.",
           answerType: "text",
           answer: "-$70 Billion (Deficit). Explanation: Current Account = (Exports - Imports) + Net Investment Income + Net Unilateral Transfers. ($400 - $500) + $50 + (-$20) = -100 + 50 - 20 = -$70 Billion.",
         },
         {
           label: "B",
           pointValue: 2,
-          text: "Calculate the balance on the Financial Account (Capital Account) for Tradevia. Show your work.",
+          text: "Calculate the balance on the Financial Account (Capital Account) for Atlas. Show your work.",
           answerType: "text",
-          answer: "+$70 Billion (Surplus). Explanation: Financial Account = Inflow of Foreign Capital - Outflow of Domestic Capital. (Purchase of Tradevian Assets by Foreigners) - (Purchase of Foreign Assets by Tradevians) = $170 - $100 = +$70 Billion.",
+          answer: "+$70 Billion (Surplus). Explanation: Financial Account = Inflow of Foreign Capital - Outflow of Domestic Capital. (Purchase of Atlas Assets by Foreigners) - (Purchase of Foreign Assets by Atlas Residents) = $170 - $100 = +$70 Billion.",
         },
         {
           label: "C",
           pointValue: 1,
-          text: "Based on your calculations in parts (A) and (B), is the Balance of Payments for Tradevia balanced? Explain.",
+          text: "Based on your calculations in parts (A) and (B), is the Balance of Payments for Atlas balanced? Explain.",
           answerType: "text",
           answer: "Yes. Explanation: The sum of the Current Account (-$70) and the Financial Account (+$70) is zero, indicating the balance of payments accounts are balanced.",
         },
         {
           label: "D",
           pointValue: 1,
-          text: "Now assume that national income in Tradevia increases significantly relative to the rest of the world. How will this affect the Trade Balance component of the Current Account? Explain.",
+          text: "Now assume that national income in Atlas increases significantly relative to the rest of the world. How will this affect the Trade Balance component of the Current Account? Explain.",
           answerType: "text",
-          answer: "The Trade Balance will decrease (move toward deficit). Explanation: As national income rises, Tradevian consumers have more disposable income and will purchase more goods, including imports. An increase in imports, holding exports constant, decreases the trade balance (Exports - Imports).",
+          answer: "The Trade Balance will decrease (move toward deficit). Explanation: As national income rises, Atlas consumers have more disposable income and will purchase more goods, including imports. An increase in imports, holding exports constant, decreases the trade balance (Exports - Imports).",
         },
         {
           label: "E",
           pointValue: 2,
-          text: "Draw a correctly labeled graph of the foreign exchange market for Tradevia's currency, the 'Trad', and show the effect of the increase in national income identified in part (D) on the value of the Trad.",
+          text: "Draw a correctly labeled graph of the foreign exchange market for Atlas's currency, the 'Atlas Dollar', and show the effect of the increase in national income identified in part (D) on the value of the Atlas Dollar.",
           answerType: "draw",
-          answer: "The graph should show the Supply of Trads shifting to the Right. (Alternatively, Demand for Trads could shift left if analyzing relative price levels, but income usually targets Supply of domestic currency). Explanation: To buy more imports, Tradevians must supply more Trads to the forex market to exchange for foreign currency. The increase in Supply causes the equilibrium exchange rate (Value of the Trad) to depreciate.",
+          answer: "The graph should show the Supply of Atlas Dollars shifting to the Right. (Alternatively, Demand for Atlas Dollars could shift left if analyzing relative price levels, but income usually targets Supply of domestic currency). Explanation: To buy more imports, Atlas residents must supply more Atlas Dollars to the forex market to exchange for foreign currency. The increase in Supply causes the equilibrium exchange rate (Value of the Atlas Dollar) to depreciate.",
         }
       ]
     }
@@ -1271,7 +1308,7 @@ export const macroUnit6Set1: FRQExam = {
         {
           label: "C",
           pointValue: 2,
-          text: "Assume instead that the Mexican government increases deficit spending to fund infrastructure projects. Draw a correctly labeled graph of the loanable funds market in Mexico, and show the effect of the increase in deficit spending on the equilibrium real interest rate.",
+          text: "The Mexican government increases deficit spending to fund infrastructure projects. Draw a correctly labeled graph of the loanable funds market in Mexico, and show the effect of the increase in deficit spending on the equilibrium real interest rate.",
           answerType: "draw",
           answer: macroSetOneFRQA5CPlaceholder, 
         },
@@ -1327,7 +1364,7 @@ export const microUnit2Set5: FRQExam = {
         },
         {
           label: "B",
-          text: "Now assume a $20 per unit tax is imposed, resulting in a new price consumers pay of $60 and a new quantity of 30 units.",
+          text: "Now assume a $20 per unit tax is imposed on the market for Boutique Backpacks.",
           subparts: [
             {
               label: "i",
@@ -1357,14 +1394,14 @@ export const microUnit2Set5: FRQExam = {
           pointValue: 1,
           text: "What is the new price that consumers pay?",
           answerType: "text" as const,
-          answer: "$60. Explanation: The price consumers pay is given in the prompt as the price corresponding to the new equilibrium quantity of 30 units.",
+          answer: "$60. Explanation: The tax incidence is shared between consumers and producers. Consumers pay $60 and producers receive $40.",
         },
         {
           label: "D",
           pointValue: 2,
           text: "Assuming no externalities, how does the tax affect allocative efficiency? Explain.",
           answerType: "text" as const,
-          answer: "Allocative efficiency decreases. Explanation: Allocative efficiency occurs when Marginal Benefit equals Marginal Cost ($Q=40$). The tax causes underproduction at $Q=30$, leading to a Deadweight Loss ($\$100$) and a loss of efficiency.",
+          answer: "Allocative efficiency decreases. Explanation: Allocative efficiency falls because the tax causes the market to produce less than the efficient output where QS = QD. The lost trades generate deadweight loss, which means the market is no longer fully efficient.",
         }
       ]
     }
@@ -1451,28 +1488,28 @@ export const microUnit2Set2: FRQExam = {
         {
           label: "A",
           pointValue: 2,
-          text: "At the world price of Pw = $40, does Novadia export or import Good Z? Indicate the quantity.",
+          text: "At the world price of Pw = $40, does Novadia export or import Good Z? Indicate the quantity of imports or exports.",
           answerType: "text" as const,
           answer: "Novadia Imports 120 units. Explanation: At Pw ($40), the domestic quantity demanded (Point W) is 150 units, and the domestic quantity supplied (Point S) is 30 units. Imports = 150 - 30 = 120.",
         },
         {
           label: "B",
           pointValue: 2,
-          text: "After the tariff is imposed, the price rises to Pt = $60. Indicate the change in each of the following in Novadia:",
+          text: "After the tariff is imposed, the price rises to Pt = $60. Calculate the value of each of the following in Novadia:",
           subparts: [
             {
               label: "i",
               pointValue: 1,
-              text: "Consumer surplus (Change in area)",
+              text: "Consumer surplus",
               answerType: "text" as const,
-              answer: "Consumer Surplus decreases. Explanation: Consumers lose the area of the trapezoid bounded by points Pt, V, W, Pw. This represents the surplus lost due to the higher price and lower consumption.",
+              answer: "$5,400. Explanation: Consumer surplus is the area of the triangle above the price that consumers pay and below the demand curve. The base of the triangle is 120 units. The height of the triangle is $150 - 60 = $90. The area of the triangle is 0.5 * base * height = 0.5 *120 * 90 = $5,400.",
             },
             {
               label: "ii",
               pointValue: 1,
-              text: "Producer surplus (Change in area)",
+              text: "Producer surplus",
               answerType: "text" as const,
-              answer: "Producer Surplus increases. Explanation: Producers gain the area of the trapezoid bounded by points Pt, T, S, Pw. This represents the surplus gained due to the higher price and increased production.",
+              answer: "$900. Explanation: Producer surplus is the area of the triangle below the price that producers receive and above the supply curve. The base of the triangle is 60 units. The height of the triangle is $60 - 30 = $30. The area of the triangle is 0.5 * base * height = 0.5 *60 * 30 = $900.",
             },
           ]
         },
@@ -1512,7 +1549,7 @@ export const microUnit2Set6: FRQExam = {
       subject: 'micro',
       title: 'Unit 2 FRQ - Consumer Choice Theory',
       questionNumber: 1,
-      prompt: "Janice is a consumer who spends her income on hamburgers and sodas. The table below shows the marginal benefit she receives from consuming each additional unit of hamburgers and sodas.",
+      prompt: "Janice is a consumer who spends her income on hamburgers and sodas. The table below shows the marginal benefit she receives from consuming each additional unit of hamburgers and sodas. Each hamburger costs $6 and each soda costs $3.",
       expertTip: "Utility maximization occurs when the marginal benefit per dollar (MB/P) is equal for the last unit of each good consumed. If MBx/Px > MBy/Py, the consumer should switch spending to Good X.",
       image: undefined,
       tableData: {
@@ -1536,13 +1573,13 @@ export const microUnit2Set6: FRQExam = {
         {
           label: "B", 
           pointValue: 2,
-          text: "Now assume the price of a soda is $3. Calculate Janice's total consumer surplus if she chooses to consume 3 sodas. Show your work.",
+          text: "Calculate Janice's total consumer surplus if she chooses to consume 3 sodas. Show your work.",
           answerType: "text" as const,
           answer: "$18. Explanation: Consumer Surplus is the difference between marginal benefit and Price for each unit consumed. 1st Soda: $12 - $3 = $9 2nd Soda: $9 - $3 = $6 3rd Soda: $6 - $3 = $3 Total CS = $9 + $6 + $3 = $18.",
         },
         {
           label: "C",
-          text: "Now assume the price of a hamburger is $6 and the price of a soda is $3. Janice has a specific budget of $18.",
+          text: "Now assume that Janice has a budget of $18 to spend on hamburgers and sodas.",
           subparts: [
             {
               label: "i",
@@ -1670,7 +1707,7 @@ export const microUnit3Set3: FRQExam = {
         {
           label: "A",
           pointValue: 2,
-          text: "Draw correctly labeled side-by-side graphs for the avocado market and a representative avocado farmer. On your graphs show each of the following.",
+          text: "Draw correctly labeled side-by-side graphs for the avocado market and a firm that produces avocados. On your graphs show each of the following.",
           answerType: "draw",
           referenceImageUrl: "/images/frqPracticePage/microUnit3Set3A.jpg",
           subparts: [
@@ -1681,7 +1718,7 @@ export const microUnit3Set3: FRQExam = {
             },
             {
               label: "ii",
-              text: "The profit-maximizing price and quantity for the representative farmer, labeled Pf and Qf.",
+              text: "The profit-maximizing price and quantity for the firm, labeled Pf and Qf.",
               answer: "The firm graph shows a horizontal Demand/MR curve at the price Pm (so Pf equals Pm). The Marginal Cost (MC) curve intersects the MR curve at quantity Qf. The minimum of the Average Total Cost (ATC) curve touches the Demand curve at Qf, indicating zero economic profit."
             }
           ]
@@ -1695,7 +1732,7 @@ export const microUnit3Set3: FRQExam = {
           subparts: [
             {
               label: "ii",
-              text: "Shade the area of economic profit or loss for the representative farmer.",
+              text: "Shade the area of economic profit or loss for the avacado firm.",
               answerType: "draw",
               answer: "On the firm graph, the MR curve shifts upward to the new price P2. The firm produces where P2 equals MC. The shaded area is the rectangle defined by the new quantity, the new price P2 (top), and the ATC curve value at that quantity (bottom). This represents an economic profit.",
               referenceImageUrl: "/images/frqPracticePage/microUnit3Set3BII.jpg"
@@ -1705,14 +1742,14 @@ export const microUnit3Set3: FRQExam = {
         {
           label: "C",
           pointValue: 1,
-          text: "The government decides to provide a lump-sum subsidy to all avocado farmers to support agriculture. What happens to the profit-maximizing quantity produced by the representative farmer in the short run? Explain.",
+          text: "The government decides to provide a lump-sum subsidy to all avocado producers to support agriculture. What happens to the profit-maximizing quantity produced by the avacado firm in the short run? Explain.",
           answerType: "text",
           answer: "The quantity remains the same. Explanation: A lump-sum subsidy reduces Fixed Costs, which shifts the Average Total Cost (ATC) curve downward. However, it does not change Marginal Cost (MC). Since the firm maximizes profit where MR equals MC, and neither curve has shifted, the quantity Qf does not change."
         },
         {
           label: "D",
           pointValue: 1,
-          text: "Instead of the subsidy, assume the price of water (a variable input for growing avocados) increases. What happens to the profit-maximizing quantity produced by the representative farmer in the short run? Explain.",
+          text: "Instead of the subsidy, assume the price of water, a variable input for growing avocados, increases. What happens to the profit-maximizing quantity produced by the representative farmer in the short run? Explain.",
           answerType: "text",
           answer: "The quantity decreases. Explanation: An increase in the price of a variable input increases Marginal Cost (MC). The MC curve shifts upward (and to the left). The new intersection of MR and MC occurs at a lower quantity."
         },
@@ -1838,23 +1875,22 @@ export const microUnit4Set1: FRQExam = {
           label: "B",
           pointValue: 2,
           text: "Using a correctly labeled graph for Solaris Tech, show each of the following.",
+          answerType: "draw",
+          answer: "The graph should show: (i) The intersection of the downward sloping Marginal Revenue (MR) curve and the Marginal Cost (MC) curve, with the quantity corresponding to this intersection on the X-axis labeled Q*. (ii) Go up from Q* to the Demand curve, then across to the Y-axis to label P*. (iii) The shaded rectangle for economic profits is bounded by the quantity Q*, the price P* on the top, and the Average Total Cost (ATC) curve on the bottom.",
           subparts: [
             {
               label: "i",
               text: "The profit-maximizing level of output, labeled Q*",
-              answerType: "draw",
-              answer: "The graph should show the intersection of the downward sloping Marginal Revenue (MR) curve and the Marginal Cost (MC) curve. The quantity corresponding to this intersection on the X-axis is Q*."
+              answer: "The intersection of the downward sloping Marginal Revenue (MR) curve and the Marginal Cost (MC) curve. The quantity corresponding to this intersection on the X-axis is Q*."
             },
             {
               label: "ii",
               text: "The profit-maximizing price, labeled P*",
-              answerType: "draw",
               answer: "Go up from Q* to the Demand curve, then across to the Y-axis to label P*."
             },
             {
               label: "iii",
               text: "Economic profits, as a shaded area",
-              answerType: "draw",
               answer: "The shaded rectangle is bounded by the quantity Q*, the price P* on the top, and the Average Total Cost (ATC) curve on the bottom."
             }
           ]
@@ -1888,7 +1924,7 @@ export const microUnit4Set1: FRQExam = {
         {
           label: "E",
           pointValue: 2,
-          text: "Suppose that Solaris Tech develops the ability to perfectly price discriminate (also known as first-degree price discrimination).",
+          text: "Suppose that Solaris Tech develops the ability to perfectly price discriminate.",
           subparts: [
             {
               label: "i",
@@ -1959,20 +1995,9 @@ export const microUnit4Set3: FRQExam = {
         {
           label: "C",
           pointValue: 2,
-          text: "If Luna Lighting wants to maximize its total revenues instead of profits, using the graph from part (b) show the following.",
-          answerType: "draw",
-          subparts: [
-            {
-              label: "i",
-              text: "Revenue-maximizing level of output, labeled Qr",
-              answer: "Qr is located where the Marginal Revenue (MR) curve crosses the horizontal axis (where MR = 0). This quantity is greater than Q*."
-            },
-            {
-              label: "ii",
-              text: "Revenue-maximizing price, labeled Pr",
-              answer: "Go vertical from Qr up to the Demand curve, then horizontal to the vertical axis. Label this price Pr. This price is lower than P*."
-            }
-          ]
+          text: "If Luna Lighting wants to maximize its total revenues instead of profits, identify the revenue-maximizing quantity and price.",
+          answerType: "text",
+          answer: "Revenue-maximizing quantity: Qr (where MR = 0). Revenue-maximizing price: Pr (found by going up from Qr to the Demand curve). Explanation: Total revenue is maximized where Marginal Revenue equals zero. This occurs where the MR curve intersects the horizontal axis. The corresponding price is found by going vertically from this quantity up to the Demand curve, then horizontally to the price axis. The revenue-maximizing quantity is greater than the profit-maximizing quantity (Q*), and the revenue-maximizing price is lower than the profit-maximizing price (P*).",
         },
         {
           label: "D",
@@ -2011,7 +2036,7 @@ export const microUnit5Set2: FRQExam = {
         {
           label: "A",
           pointValue: 2,
-          text: "Identify the profit-maximizing quantity of labor and the wage rate the monopsony will pay. Show how you determined your answer.",
+          text: "Identify the profit-maximizing quantity of labor and the wage rate the monopsony will pay. Explain how you determined your answer.",
           answerType: "text",
           answer: "Quantity: 75 workers. Wage: $10. Explanation: The firm maximizes profit where the Marginal Resource Cost (MRC) equals the Marginal Revenue Product (Demand). This intersection occurs at 75 workers. The firm then pays the wage indicated by the Supply curve at that quantity, which is $10."
         },
@@ -2163,7 +2188,7 @@ export const microUnit6Set1: FRQExam = {
         {
           label: "C",
           pointValue: 2,
-          text: "Identify a specific government policy that could correct this externality and achieve the socially optimal quantity. Be precise with the amount.",
+          text: "Identify a policy the government could use to correct the externality and achieve the socially efficient quantity. Include the specific tax or subsidy amount needed.",
           answerType: "text",
           answer: "A per-unit subsidy of $3. Explanation: To internalize a positive externality, the government should provide a subsidy equal to the Marginal External Benefit ($3). This lowers the effective price for consumers or increases the benefit, shifting the MPB curve upward (or MPC downward) until the market outcome aligns with Q2."
         },
@@ -2222,7 +2247,7 @@ export const microUnit6Set2: FRQExam = {
         {
           label: "C",
           pointValue: 3,
-          text: "Assume the state government imposes a regulatory fee of $20 for every hotspot installed up to and including the 5th unit. This fee must be paid by the town, increasing the social cost of installation.",
+          text: "Assume the state government imposes a $20 regulatory fee for each hotspot installed, up to the fifth unit. The fee is paid by the town, increasing the marginal social cost of installing hotspots.",
           subparts: [
             {
               label: "i",
@@ -2241,7 +2266,7 @@ export const microUnit6Set2: FRQExam = {
         {
           label: "D",
           pointValue: 1,
-          text: "If the town installs the 6th hotspot, would the Total Social Surplus increase, decrease, or stay the same compared to the 5th hotspot (assuming no government fees)? Explain.",
+          text: "If the town installs the 6th hotspot, would the net benefit to society increase, decrease, or stay the same compared to the 5th hotspot (assuming no government fees)? Explain.",
           answerType: "text",
           answer: "Decrease. Explanation: For the 6th hotspot, the Marginal Social Benefit is $50 (450 - 400) and the Marginal Social Cost is $70 (270 - 200). Since the cost of the 6th unit ($70) is greater than the benefit it provides ($50), installing it reduces the total net benefit to society."
         }

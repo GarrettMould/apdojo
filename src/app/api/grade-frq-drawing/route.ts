@@ -2,12 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { VISION_COMPARISON_PROTOCOL } from '@/lib/grading-logic';
 
-const apiKey = process.env.GEMINI_API_KEY;
-if (!apiKey) {
-  throw new Error('GEMINI_API_KEY environment variable is not set.');
-}
-const genAI = new GoogleGenerativeAI(apiKey);
-
 // Coordinate-based grading function for sticker system
 function gradeWithStickers(structuredData: any, expectedGap: string | undefined, partLabel: string) {
   const { stickers, lines } = structuredData;
@@ -139,6 +133,16 @@ function gradeWithStickers(structuredData: any, expectedGap: string | undefined,
 
 export async function POST(request: NextRequest) {
   try {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      console.error('GEMINI_API_KEY environment variable is not set.');
+      return NextResponse.json(
+        { error: 'Server configuration error: Missing API key.' },
+        { status: 500 }
+      );
+    }
+    const genAI = new GoogleGenerativeAI(apiKey);
+
     console.log('Grade FRQ drawing API called');
     const body = await request.json();
     const { imageBase64, partLabel, questionPrompt, partText, gradingCriteria, expectedGap, questionId, referenceImageUrl } = body;
@@ -191,81 +195,32 @@ export async function POST(request: NextRequest) {
 
     console.log('Initializing Gemini model...');
     
-    // First, try to get available models from the API
+    // Try standard model names first (avoids extra API call to list models)
+    // This reduces quota usage by skipping the models list API call
+    const fallbackModels = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro', 'gemini-1.0-pro'];
     let model;
-    try {
-      // Try to fetch available models
-      const modelsResponse = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`
-      );
-      
-      if (modelsResponse.ok) {
-        const modelsData = await modelsResponse.json();
-        const availableModels = modelsData.models || [];
-        
-        // Filter for models that support generateContent and prioritize free-tier models
-        const generateContentModels = availableModels
-          .filter((m: any) => m.supportedGenerationMethods?.includes('generateContent'))
-          .map((m: any) => ({
-            name: m.name.replace('models/', ''),
-            displayName: m.displayName,
-            // Free tier models typically include: gemini-pro, gemini-1.5-flash, gemini-1.5-pro
-            isFreeTier: !m.name.includes('2.5') && !m.name.includes('exp') && !m.name.includes('preview')
-          }));
-        
-        console.log('Available models for generateContent:', generateContentModels.map((m: any) => m.name));
-        
-        // Prioritize free-tier models first
-        const freeTierModels = generateContentModels.filter((m: any) => m.isFreeTier);
-        const modelsToTry = freeTierModels.length > 0 ? freeTierModels : generateContentModels;
-        
-        // Prefer models in this order: gemini-1.5-flash, gemini-1.5-pro, gemini-pro
-        const preferredOrder = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro'];
-        let modelToUse: string | null = null;
-        
-        for (const preferred of preferredOrder) {
-          const found = modelsToTry.find((m: any) => m.name === preferred);
-          if (found) {
-            modelToUse = found.name;
-            break;
-          }
+    let found = false;
+    
+    for (const modelName of fallbackModels) {
+      try {
+        model = genAI.getGenerativeModel({ model: modelName });
+        console.log(`Using model: ${modelName}`);
+        found = true;
+        break;
+      } catch (e: any) {
+        // If it's a 404, try next model. If it's a quota error, throw it.
+        if (e.message?.includes('429') || e.message?.includes('quota') || e.message?.includes('rate limit')) {
+          throw new Error('API quota exceeded. Please wait a moment and try again, or check your Google AI Studio quota limits.');
         }
-        
-        // If no preferred model found, use the first available
-        if (!modelToUse && modelsToTry.length > 0) {
-          modelToUse = modelsToTry[0].name;
-        }
-        
-        if (modelToUse) {
-          model = genAI.getGenerativeModel({ model: modelToUse });
-          console.log(`Using model: ${modelToUse} (free-tier: ${modelsToTry.find((m: any) => m.name === modelToUse)?.isFreeTier || false})`);
-        } else {
-          throw new Error('No models available that support generateContent');
-        }
-      } else {
-        throw new Error('Could not fetch available models');
-      }
-    } catch (listError: any) {
-      console.error('Error fetching available models, trying fallback:', listError);
-      // Fallback: try free-tier model names first
-      const fallbackModels = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro', 'gemini-1.0-pro'];
-      let found = false;
-      
-      for (const modelName of fallbackModels) {
-        try {
-          model = genAI.getGenerativeModel({ model: modelName });
-          console.log(`Using fallback model: ${modelName}`);
-          found = true;
-          break;
-        } catch (e) {
-          continue;
-        }
-      }
-      
-      if (!found || !model) {
-        throw new Error(`Could not initialize any Gemini model. Please check your API key. Error: ${listError.message}`);
+        // For 404 or other errors, try next model
+        continue;
       }
     }
+    
+    if (!found || !model) {
+      throw new Error('Could not initialize any Gemini model. Please check your API key and model availability.');
+    }
+    
     
     if (!model) {
       throw new Error('Model initialization failed - no model available');
@@ -441,8 +396,18 @@ For the vision_map:
         response: apiError.response
       });
       
-      // Check if it's a quota/rate limit error
-      if (apiError.message?.includes('429') || apiError.message?.includes('quota') || apiError.message?.includes('rate limit')) {
+      // Check if it's a quota/rate limit error (429 status code or error message)
+      const errorMessage = apiError.message || '';
+      const statusCode = apiError.status || apiError.statusCode || '';
+      
+      if (
+        statusCode === 429 || 
+        errorMessage.includes('429') || 
+        errorMessage.includes('quota') || 
+        errorMessage.includes('rate limit') ||
+        errorMessage.includes('RESOURCE_EXHAUSTED') ||
+        errorMessage.includes('Quota exceeded')
+      ) {
         throw new Error('API quota exceeded. Please wait a moment and try again, or check your Google AI Studio quota limits.');
       }
       
@@ -511,10 +476,29 @@ For the vision_map:
       name: error.name,
       cause: error.cause
     });
+    
+    // Return a more user-friendly error to the client
+    let userMessage = 'Failed to grade drawing. Please try again.';
+    const errorMsg = error.message || '';
+    
+    if (errorMsg.includes('API key not valid') || errorMsg.includes('API_KEY') || errorMsg.includes('API key')) {
+      userMessage = 'API configuration error. Please contact support.';
+    } else if (
+      errorMsg.includes('quota') || 
+      errorMsg.includes('429') || 
+      errorMsg.includes('rate limit') ||
+      errorMsg.includes('RESOURCE_EXHAUSTED') ||
+      errorMsg.includes('Quota exceeded')
+    ) {
+      userMessage = 'API quota exceeded. Please wait a moment and try again, or check your Google AI Studio quota limits.';
+    } else if (error.message) {
+      userMessage = error.message;
+    }
+    
     return NextResponse.json(
       { 
-        error: 'Failed to grade drawing',
-        message: error.message || 'Unknown error occurred',
+        error: userMessage,
+        message: userMessage,
         details: process.env.NODE_ENV === 'development' ? error.stack : undefined
       },
       { status: 500 }
