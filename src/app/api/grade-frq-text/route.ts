@@ -4,34 +4,24 @@ import { generateGradingPrompt } from '@/lib/grading-logic';
 
 export const maxDuration = 30; // Set a 30-second timeout
 
-// 1. Read API Key at the top level
-const apiKey = process.env.GEMINI_API_KEY;
-let genAI: GoogleGenerativeAI | null = null;
-let model: any = null;
-
-// 2. Initialize the Gemini client once
-if (apiKey) {
-  try {
-    console.log("Initializing GoogleGenerativeAI client...");
-    genAI = new GoogleGenerativeAI(apiKey);
-   // Use Flash for text grading (it's fast and handles this logic easily)
-// Update line 17
-model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-    console.log("GoogleGenerativeAI client initialized successfully with gemini-pro.");
-  } catch (error) {
-    console.error("Failed to initialize GoogleGenerativeAI client:", error);
-  }
-} else {
-  console.error("CRITICAL: GEMINI_API_KEY environment variable is not set.");
-}
-
 export async function POST(req: NextRequest) {
-  // 3. Check for initialization errors at the start of the request
-  if (!genAI || !model) {
-    console.error("Aborting request because Gemini client is not initialized.");
-    return NextResponse.json({ message: "Server configuration error: AI service is not available." }, { status: 500 });
+  // 1. Check for API key
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    console.error("CRITICAL: GEMINI_API_KEY environment variable is not set.");
+    return NextResponse.json({ message: "Server configuration error: Missing API key." }, { status: 500 });
   }
+
+  // 2. Initialize Gemini client
+  const genAI = new GoogleGenerativeAI(apiKey);
+  
+  // 3. Initialize model - start with gemini-pro (most stable)
+  // Note: getGenerativeModel doesn't throw errors until you use it, so we'll handle errors during API calls
+  console.log('Initializing Gemini model...');
+  // Updated to use the model confirmed to exist in your account
+// 'gemini-flash-latest' automatically points to the most stable, high-quota version
+let model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
+  console.log('Using model: gemini-2.0-flash');
 
   let body;
   try {
@@ -74,9 +64,43 @@ export async function POST(req: NextRequest) {
 
     console.log('Calling Gemini API with generated prompt...');
     
-    const result = await model.generateContent(prompt);
-    const responseText = result.response.text();
-    console.log('Response received from Gemini, length:', responseText.length);
+
+const modelNames = ['gemini-flash-latest', 'gemini-2.0-flash-lite-preview-02-05', 'gemini-2.0-flash-exp'];
+    let result;
+    let responseText;
+    let success = false;
+    
+    for (const modelName of modelNames) {
+      try {
+        const currentModel = genAI.getGenerativeModel({ model: modelName });
+        console.log(`Trying model: ${modelName}`);
+        result = await currentModel.generateContent(prompt);
+        responseText = result.response.text();
+        console.log(`Success with model ${modelName}, response length:`, responseText.length);
+        success = true;
+        break;
+      } catch (modelError: any) {
+        const errorMsg = modelError.message || '';
+        console.log(`Model ${modelName} failed:`, errorMsg.substring(0, 200));
+        
+        // If it's a quota error, throw it immediately
+        if (errorMsg.includes('429') || errorMsg.includes('quota') || errorMsg.includes('rate limit') || errorMsg.includes('RESOURCE_EXHAUSTED')) {
+          throw new Error('API quota exceeded. Please wait a moment and try again, or check your Google AI Studio quota limits.');
+        }
+        
+        // If it's the last model, throw the error
+        if (modelName === modelNames[modelNames.length - 1]) {
+          throw modelError;
+        }
+        
+        // Otherwise, try next model
+        continue;
+      }
+    }
+    
+    if (!success || !responseText) {
+      throw new Error('All Gemini models failed. Please check your API key and model availability.');
+    }
 
     let jsonText = responseText.trim();
     if (jsonText.startsWith('```json')) {
@@ -85,13 +109,54 @@ export async function POST(req: NextRequest) {
       jsonText = jsonText.replace(/```\n?/g, '');
     }
 
-    const feedback = JSON.parse(jsonText);
+    let feedback;
+    try {
+      feedback = JSON.parse(jsonText);
+    } catch (parseError: any) {
+      console.error("Error parsing JSON response:", parseError);
+      console.error("Raw response text:", jsonText);
+      // Return a structured response even if JSON parsing fails
+      return NextResponse.json({
+        score: 0,
+        feedback: 'Unable to parse AI response. Please try submitting again for detailed feedback.',
+        raw_response: jsonText.substring(0, 500) // Include first 500 chars for debugging
+      });
+    }
     
     return NextResponse.json(feedback);
 
   } catch (error: any) {
     console.error("Error during FRQ grading process:", error);
-    return NextResponse.json({ message: "An error occurred while grading the answer.", error: error.message }, { status: 500 });
+    console.error("Error details:", {
+      message: error.message,
+      stack: error.stack,
+      name: error.name,
+      cause: error.cause
+    });
+    
+    // Return a more user-friendly error to the client
+    let userMessage = 'Failed to grade answer. Please try again.';
+    const errorMsg = error.message || '';
+    
+    if (errorMsg.includes('API key not valid') || errorMsg.includes('API_KEY') || errorMsg.includes('API key')) {
+      userMessage = 'API configuration error. Please contact support.';
+    } else if (
+      errorMsg.includes('quota') || 
+      errorMsg.includes('429') || 
+      errorMsg.includes('rate limit') ||
+      errorMsg.includes('RESOURCE_EXHAUSTED') ||
+      errorMsg.includes('Quota exceeded')
+    ) {
+      userMessage = 'API quota exceeded. Please wait a moment and try again, or check your Google AI Studio quota limits.';
+    } else if (error.message) {
+      userMessage = error.message;
+    }
+    
+    return NextResponse.json({ 
+      message: userMessage, 
+      error: userMessage,
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    }, { status: 500 });
   }
 }
 

@@ -16,6 +16,7 @@ import { DrawingInput } from '@/components/DrawingInput';
 import { ShareFRQButton } from '@/components/ShareFRQButton';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CheckCircle2 } from 'lucide-react';
+import { LoginModal, SignupModal } from '@/components/AuthModals';
 
 // Self-Review Component for Drawings
 const DrawingSelfReview = ({ 
@@ -158,86 +159,12 @@ const DrawingSelfReview = ({
   );
 };
 
-// Difficulty Rating Component
-const DifficultyRating = ({ difficulty }: { difficulty?: 'easy' | 'medium' | 'hard' | 'extreme' }) => {
-  if (!difficulty) return null;
-
-  const difficultyConfig = {
-    easy: { bars: 1, color: 'bg-green-500' },
-    medium: { bars: 2, color: 'bg-yellow-500' },
-    hard: { bars: 3, color: 'bg-red-500' },
-    extreme: { bars: 3, color: 'bg-purple-700' },
-  };
-
-  const level = difficultyConfig[difficulty];
-
-  return (
-    <div className="flex items-center gap-2 mt-1">
-      <span className="text-xs text-gray-500 font-normal">Difficulty:</span>
-      <div className="flex items-center gap-1">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <div
-            key={i}
-            className={`w-2 h-3 rounded-sm ${i < level.bars ? level.color : 'bg-gray-200'}`}
-          />
-        ))}
-      </div>
-    </div>
-  );
-};
-
-// Mock data for locked questions
-const mockMacroTopics = [
-  'Fiscal Policy',
-  'Monetary Policy',
-  'GDP and CPI',
-  'The Phillips Curve',
-  'Economic Growth',
-  'Bank Balance Sheets',
-  'International Trade & Tariffs',
-  'Money Market',
-  'Loanable Funds Market',
-  'Aggregate Demand & Supply',
-  'Balance of Payments',
-  'Foreign Exchange Markets',
-  'Cost-Push Inflation',
-  'The Multiplier Effect',
-  'Real vs. Nominal GDP'
-];
-
-const mockMicroTopics = [
-  'Production Possibilities Curve',
-  'Perfect Competition',
-  'Monopoly',
-  'Externalities',
-  'Cost of Production',
-  'Price Ceilings & Floors',
-  'Elasticity',
-  'Consumer Surplus',
-  'Game Theory',
-  'Factor Markets',
-  'Market Structures',
-  'Public Goods',
-  'Marginal Analysis',
-  'Tariffs and Quotas',
-  'Supply and Demand'
-];
-
-
 function UnitFRQPracticePageComponent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { selectedSubject, awardXp } = useAuthContext();
-
-  // Memoize the calculation of locked questions to prevent re-rendering
-  const lockedQuestions = React.useMemo(() => {
-    const mockTopics = selectedSubject === 'macro' ? mockMacroTopics : mockMicroTopics;
-    return mockTopics.map((topic, i) => ({
-      id: `locked-${i}`,
-      title: `Unit ${Math.floor(Math.random() * 6) + 1} FRQ - ${topic}`,
-      isLocked: true,
-    }));
-  }, [selectedSubject]);
+  const { selectedSubject, awardXp, user } = useAuthContext();
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showSignupModal, setShowSignupModal] = useState(false);
 
   // Memoize the filtering of relevant exams
   const relevantExams = React.useMemo(() => frqExams.filter(exam =>
@@ -253,6 +180,13 @@ function UnitFRQPracticePageComponent() {
     exam.questions.map(q => ({ ...q, unit: exam.unit, examTitle: exam.examTitle }))
   ).sort((a, b) => (a.unit || 99) - (b.unit || 99) || a.title.localeCompare(b.title)), [relevantExams]);
 
+  // Helper function to check if a question is locked
+  // Only questions with id 1 (macro) and id 2 (micro) are unlocked
+  const isQuestionLocked = (questionId: number | undefined): boolean => {
+    if (questionId === undefined) return true;
+    return questionId !== 1 && questionId !== 2;
+  };
+
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0);
 
   // Check for frqId query parameter to auto-select a specific question
@@ -264,18 +198,26 @@ function UnitFRQPracticePageComponent() {
         // Find the question with matching ID
         const questionIndex = allQuestions.findIndex(q => q.id === frqId);
         if (questionIndex !== -1) {
-          setSelectedQuestionIndex(questionIndex);
+          // Only auto-select if the question is not locked
+          if (!isQuestionLocked(frqId)) {
+            setSelectedQuestionIndex(questionIndex);
+          }
+          // If locked, the locked message will be shown
         }
       }
     }
   }, [searchParams, allQuestions]);
 
-  // Combine real questions with mock locked questions for display
-  const allDisplayQuestions = [...allQuestions, ...lockedQuestions];
+  // Use only real questions from frqQuestions.ts
+  const allDisplayQuestions = allQuestions;
 
-  // Fallback to the first question if no match is found
-  const frqQuestion = allDisplayQuestions[selectedQuestionIndex] || allDisplayQuestions[0];
-  const isSelectedQuestionLocked = 'isLocked' in frqQuestion && frqQuestion.isLocked;
+  // Get the selected question, or fallback to first question if index is invalid
+  const selectedQuestion = allDisplayQuestions[selectedQuestionIndex] || allDisplayQuestions[0];
+  const isCurrentQuestionLocked = isQuestionLocked(selectedQuestion?.id);
+  
+  // If the selected question is locked, we'll show a locked message
+  // Otherwise, use the selected question
+  const frqQuestion = selectedQuestion;
 
   const [expandedParts, setExpandedParts] = useState<Record<string, boolean>>({});
   const [expandedSubparts, setExpandedSubparts] = useState<Record<string, boolean>>({});
@@ -384,6 +326,11 @@ function UnitFRQPracticePageComponent() {
   };
 
   const handleSelectQuestion = (index: number) => {
+    const question = allDisplayQuestions[index];
+    // Prevent selecting locked questions
+    if (question && isQuestionLocked(question.id)) {
+      return;
+    }
     setSelectedQuestionIndex(index);
     // Reset all answer and feedback states
     setExpandedParts({});
@@ -397,6 +344,12 @@ function UnitFRQPracticePageComponent() {
   };
 
   const handleGradeTextAnswer = async (answerKey: string, partText: string, gradingCriteria: string, pointValue?: number) => {
+    // Check if user is logged in
+    if (!user) {
+      setShowLoginModal(true);
+      return;
+    }
+
     const textAnswer = textAnswers[answerKey];
 
     if (!textAnswer || textAnswer.trim() === '') {
@@ -485,6 +438,12 @@ function UnitFRQPracticePageComponent() {
   };
 
   const handleSubmitDrawing = (drawingKey: string) => {
+    // Check if user is logged in
+    if (!user) {
+      setShowLoginModal(true);
+      return;
+    }
+
     const drawingData = drawingAnswers[drawingKey];
 
     if (!drawingData) {
@@ -498,6 +457,28 @@ function UnitFRQPracticePageComponent() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        switchToSignup={() => {
+          setShowLoginModal(false);
+          setShowSignupModal(true);
+        }}
+        onAuthSuccess={() => {
+          setShowLoginModal(false);
+        }}
+      />
+      <SignupModal
+        isOpen={showSignupModal}
+        onClose={() => setShowSignupModal(false)}
+        switchToLogin={() => {
+          setShowSignupModal(false);
+          setShowLoginModal(true);
+        }}
+        onAuthSuccess={() => {
+          setShowSignupModal(false);
+        }}
+      />
       <VideoModal
         isOpen={!!videoModalState}
         onClose={() => setVideoModalState(null)}
@@ -509,14 +490,10 @@ function UnitFRQPracticePageComponent() {
       {!isSidebarOpen && (
         <button
           onClick={() => setIsSidebarOpen(true)}
-          className="fixed top-1/2 -translate-y-1/2 left-0 z-40 print:hidden cursor-pointer"
+          className="fixed top-1/2 -translate-y-1/2 left-0 z-40 print:hidden cursor-pointer bg-white border-r-2 border-t-2 border-b-2 border-gray-300 rounded-r-lg shadow-md hover:bg-gray-50 transition-colors px-3 py-8 flex items-center justify-center group"
+          aria-label="Open FRQ Library"
         >
-          <Image
-            src="/images/frqPracticePage/morefrqs.jpg"
-            alt="More FRQs"
-            width={160}
-            height={160}
-          />
+          <ChevronsRight className="w-6 h-6 text-gray-600 group-hover:text-gray-900 transition-colors" />
         </button>
       )}
 
@@ -547,7 +524,7 @@ function UnitFRQPracticePageComponent() {
           <div className="space-y-2 overflow-y-auto flex-1">
             {allDisplayQuestions.map((question, index) => {
               const isSelected = 'id' in question && question.id === frqQuestion.id;
-              const isLocked = 'isLocked' in question && question.isLocked;
+              const isLocked = isQuestionLocked(question.id);
 
               return (
                 <button
@@ -560,18 +537,17 @@ function UnitFRQPracticePageComponent() {
                   }}
                   disabled={isLocked}
                   className={`w-full text-left p-2.5 rounded-md transition-all duration-200 flex items-center justify-between ${
-                    isSelected
+                    isLocked
+                      ? 'bg-gray-50 text-gray-400 cursor-not-allowed opacity-60'
+                      : isSelected
                       ? 'bg-blue-600 text-white shadow-md'
                       : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                  } ${
-                    isLocked ? 'cursor-not-allowed bg-gray-50 text-gray-400' : ''
                   }`}
                 >
-                  <div>
+                  <div className="flex items-center gap-2 flex-1">
                     <span className="font-medium text-sm">{question.title}</span>
-                    <DifficultyRating difficulty={'difficulty' in question ? question.difficulty as any : undefined} />
+                    {isLocked && <Lock className="w-4 h-4 flex-shrink-0" />}
                   </div>
-                  {isLocked && <Lock className="w-4 h-4 text-gray-400" />}
                 </button>
               );
             })}
@@ -582,16 +558,6 @@ function UnitFRQPracticePageComponent() {
       <div className="max-w-screen-2xl mx-auto px-4 py-8 print:px-0 print:py-0">
         {/* Main Content Area */}
         <div className="lg:w-3/4 mx-auto print:w-full print:mx-0">
-        {isSelectedQuestionLocked ? (
-          <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 h-full flex flex-col items-center justify-center text-center print:hidden">
-            <Lock className="w-16 h-16 text-gray-300 mb-4" />
-            <h2 className="text-2xl font-bold text-gray-800">Content Locked</h2>
-            <p className="text-gray-600 max-w-sm mt-2">
-              This FRQ is part of a premium course. Upgrade your account to unlock this and many other practice questions.
-            </p>
-            <Button className="mt-6">Upgrade to Unlock</Button>
-          </div>
-        ) : (
           <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 print:shadow-none print:border-none">
             {/* Header with points and timer */}
             <div className="flex justify-between items-start mb-6 pb-4 border-b print:border-b-2 print:border-black">
@@ -613,7 +579,51 @@ function UnitFRQPracticePageComponent() {
               </div>
           </div>
 
+            {/* Locked Question Message */}
+            {isCurrentQuestionLocked && (
+              <div className="text-center py-16 mb-6">
+                <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Lock className="w-12 h-12 text-gray-400" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                  This FRQ is Locked
+                </h3>
+                <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                  This FRQ is currently locked. Only the featured FRQs are available at this time.
+                </p>
+                <div className="flex gap-4 justify-center">
+                  {allDisplayQuestions.find(q => q.id === 1) && (
+                    <button
+                      onClick={() => {
+                        const macroIndex = allDisplayQuestions.findIndex(q => q.id === 1);
+                        if (macroIndex !== -1) {
+                          handleSelectQuestion(macroIndex);
+                        }
+                      }}
+                      className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      Try Ample Reserves FRQ
+                    </button>
+                  )}
+                  {allDisplayQuestions.find(q => q.id === 2) && (
+                    <button
+                      onClick={() => {
+                        const microIndex = allDisplayQuestions.findIndex(q => q.id === 2);
+                        if (microIndex !== -1) {
+                          handleSelectQuestion(microIndex);
+                        }
+                      }}
+                      className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      Try Factor Markets FRQ
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Question Card */}
+            {!isCurrentQuestionLocked && (
             <div className="mb-6">
           <div className="mb-4">
                 {/* Tip and Share Section */}
@@ -990,8 +1000,10 @@ function UnitFRQPracticePageComponent() {
             ))}
           </div>
             </div>
+            )}
 
             {/* Call to Action Section */}
+            {!isCurrentQuestionLocked && (
             <div className="mt-12 text-center bg-blue-50 border-2 border-blue-200 rounded-lg shadow-sm p-8 transition-shadow hover:shadow-md print:hidden">
               <h3 className="text-3xl font-extrabold text-blue-900 mb-2">🚀 Ready to Master the MCQs?</h3>
               <p className="text-blue-800 mb-6 max-w-2xl mx-auto">
@@ -1004,9 +1016,9 @@ function UnitFRQPracticePageComponent() {
               </Button>
               <p className="text-xs text-blue-600 mt-4 font-semibold">The best way to prepare for your next test.</p>
             </div>
+            )}
 
           </div>
-        )}
         </div>
       </div>
     </div>

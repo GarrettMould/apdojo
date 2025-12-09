@@ -78,16 +78,15 @@ interface CheckpointProps {
 }
 
 function Checkpoint({ lessonId, question, options, correctAnswer, explanation, subject, allCheckpoints = [] }: CheckpointProps) {
-  // Combine first question with all additional checkpoints
+  // Combine first question with all additional checkpoints, but limit to only 2 questions
   const allQuestions = [
     { lessonId, question, options, correctAnswer, explanation },
     ...allCheckpoints
-  ];
+  ].slice(0, 2); // Only show 2 questions maximum
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, string | null>>({});
   const [showResults, setShowResults] = useState<Record<number, boolean>>({});
-  const [showCTA, setShowCTA] = useState(false);
   const [showDojoDrill, setShowDojoDrill] = useState(false);
   const [dojoDrillVideo, setDojoDrillVideo] = useState<Video | null>(null);
 
@@ -123,12 +122,8 @@ function Checkpoint({ lessonId, question, options, correctAnswer, explanation, s
       setTimeout(() => {
         setCurrentQuestionIndex(prev => prev + 1);
       }, 1500);
-    } else {
-      // If this is the last question, show CTA after 1.5 seconds
-      setTimeout(() => {
-        setShowCTA(true);
-      }, 1500);
     }
+    // After the second question, just maintain the answered state (no transition to Dojo Gym)
   };
 
   const practiceUrl = `/unitMCQPracticePage?subject=${subject}&mode=topic&lessonId=${lessonId}`;
@@ -139,7 +134,7 @@ function Checkpoint({ lessonId, question, options, correctAnswer, explanation, s
       <div className="relative min-h-[500px] overflow-hidden">
         {/* Render all question cards */}
         {allQuestions.map((q, questionIndex) => {
-          const isActive = currentQuestionIndex === questionIndex && !showCTA;
+          const isActive = currentQuestionIndex === questionIndex;
           const qSelectedAnswer = selectedAnswers[questionIndex] || null;
           const qShowResult = showResults[questionIndex] || false;
           const qIsCorrect = qSelectedAnswer === q.correctAnswer;
@@ -173,7 +168,7 @@ function Checkpoint({ lessonId, question, options, correctAnswer, explanation, s
             <h3 className="text-lg font-bold text-gray-700 mb-1">Checkpoint</h3>
                     <p className="text-xs text-gray-500">Test your understanding of {q.lessonId}</p>
           </div>
-                  {qShowResult && questionIndex === 0 && (
+                  {qShowResult && questionIndex === 1 && (
             <Link 
               href={practiceUrl}
               className="px-4 py-2 text-sm font-semibold text-blue-600 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 hover:border-blue-300 transition-colors whitespace-nowrap inline-block"
@@ -239,27 +234,19 @@ function Checkpoint({ lessonId, question, options, correctAnswer, explanation, s
           );
         })}
 
-        {/* CTA Card */}
-        {allQuestions.length > 0 && (
-          <div 
-            className={`absolute inset-0 p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border-2 border-gray-200 shadow-lg transition-all duration-500 ease-in-out ${
-              showCTA
-                ? 'opacity-100 translate-x-0'
-                : 'opacity-0 translate-x-full'
-            }`}
-          >
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-8 text-center text-white shadow-lg h-full flex flex-col items-center justify-center">
-              <h3 className="text-2xl font-bold mb-3">Ready to Level Up?</h3>
-              <p className="text-lg mb-6 opacity-90">
-                Join Dojo Gym and unlock unlimited practice questions, detailed explanations, and personalized study plans.
-              </p>
-              <Link
-                href="/membership"
-                className="inline-block px-8 py-4 bg-white text-blue-600 font-bold rounded-lg hover:bg-gray-100 transition-colors shadow-md"
-              >
-                Join Dojo Gym Now
-              </Link>
-            </div>
+        {/* Navigation Dots */}
+        {allQuestions.length > 1 && (
+          <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-2 z-10">
+            {allQuestions.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentQuestionIndex(index)}
+                className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                  index === currentQuestionIndex ? 'bg-blue-500 scale-110' : 'bg-gray-300 hover:bg-gray-400'
+                }`}
+                aria-label={`Go to question ${index + 1}`}
+              />
+            ))}
           </div>
         )}
       </div>

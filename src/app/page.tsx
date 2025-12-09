@@ -64,10 +64,15 @@ function LoggedOutHomePage() {
   const { user, setShowLoginModal, setSelectedSubject, setRedirectOnLogin, selectedSubject } = useAuthContext();
 
   const handlePracticeFrqClick = () => {
+    // For macro: Ample Reserves FRQ (id: 1)
+    // For micro: Factor Markets FRQ (id: 2) - has video explanations
+    const frqId = selectedSubject === 'macro' ? 1 : 2;
+    const frqUrl = `/unitFRQpracticePage?frqId=${frqId}`;
+    
     if (user) {
-      router.push('/unitFRQpracticePage');
+      router.push(frqUrl);
     } else {
-      setRedirectOnLogin('/unitFRQpracticePage');
+      setRedirectOnLogin(frqUrl);
       setShowLoginModal(true);
     }
   };
