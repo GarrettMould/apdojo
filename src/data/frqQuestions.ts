@@ -58,8 +58,8 @@ export interface FRQExam {
 // Define image paths - some are placeholders for now
 const OUTPUTLOW = '/images/frqPracticePage/OUTPUTLOW.svg';
 const PRDOWN = '/images/frqPracticePage/PRDOWN.svg';
-const microUnit5FRQA1D = '/images/frqPracticePage/ID2QD.svg';
-const microUnit5FRQA1E = '/images/frqPracticePage/ID2QE.svg';
+const microUnit5FRQA1D = '/images/frqPracticePage/microUnit5Set1D.jpg';
+const microUnit5FRQA1E = '/images/frqPracticePage/microUnit5Set1E.jpg';
 const macroSetOneFRQA5APlaceholder = '/images/frqPracticePage/logo.png';
 const macroSetOneFRQA5CPlaceholder = '/images/frqPracticePage/logo.png';
 const macroMoneyMarketBuy = '/images/frqPracticePage/macroMoneyMarketBuy.png';
@@ -203,6 +203,7 @@ export const microUnit5Set1: FRQExam = {
           text: "Draw a correctly labeled graph of the labor market and the firm side-by-side.",
           answerType: "draw" as const,
           answer: microUnit5FRQA1D,
+          referenceImageUrl: microUnit5FRQA1D,
           videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/frqExplanations/ID2QD.mp4",
           videoAspectRatio: 'vertical',
           subparts: [
@@ -228,6 +229,7 @@ export const microUnit5Set1: FRQExam = {
               text: "Show the impact of this change on your graphs in part (D).",
               answerType: "draw" as const,
               answer: microUnit5FRQA1E,
+              referenceImageUrl: microUnit5FRQA1E,
               videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/frqExplanations/ID2QE.mp4",
               videoAspectRatio: 'vertical',
             },
