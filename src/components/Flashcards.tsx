@@ -1,0 +1,136 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react'
+
+interface FlashcardsProps {
+  flashcards: {
+    [unit: string]: Array<{
+      term: string;
+      definition: string;
+    }>;
+  };
+}
+
+export default function Flashcards({ flashcards }: FlashcardsProps) {
+  const [selectedUnit, setSelectedUnit] = useState<string>(Object.keys(flashcards)[0])
+  const [currentCardIndex, setCurrentCardIndex] = useState(0)
+
+  // Rest of your component logic using flashcards[selectedUnit] instead of directly accessing the data
+  const units = Object.keys(flashcards)
+  const currentCards = flashcards[selectedUnit] || []
+
+  // Get random unit and card index
+  const getRandomUnit = () => {
+    const units = Object.keys(flashcards)
+    const randomIndex = Math.floor(Math.random() * units.length)
+    return units[randomIndex]
+  }
+
+  const getRandomCardIndex = (unitName: string) => {
+    const cards = flashcards[unitName]
+    return Math.floor(Math.random() * cards.length)
+  }
+
+  // Initialize with random values
+  const initialUnit = getRandomUnit()
+  const [isFlipped, setIsFlipped] = useState(false)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+
+  const nextCard = () => {
+    setIsFlipped(false)
+    setCurrentCardIndex((prev) => 
+      prev === currentCards.length - 1 ? 0 : prev + 1
+    )
+  }
+
+  const previousCard = () => {
+    setIsFlipped(false)
+    setCurrentCardIndex((prev) => 
+      prev === 0 ? currentCards.length - 1 : prev - 1
+    )
+  }
+
+  return (
+    <div className="max-w-4xl mx-auto px-4 py-12">
+      <div className="relative mb-8 max-w-2xl mx-auto">
+        <button
+          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+          className="w-full bg-white px-4 py-3 rounded-lg shadow-sm border border-gray-200 flex items-center justify-between"
+        >
+          <span className="text-lg font-semibold">
+            {selectedUnit || 'Select a Unit'}
+          </span>
+          <ChevronDown className={`w-5 h-5 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+        </button>
+
+        {isDropdownOpen && (
+          <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+            {units.map((unit) => (
+              <button
+                key={unit}
+                onClick={() => {
+                  setSelectedUnit(unit)
+                  setIsDropdownOpen(false)
+                  setCurrentCardIndex(0)
+                  setIsFlipped(false)
+                }}
+                className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors first:rounded-t-lg last:rounded-b-lg"
+              >
+                {unit}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {selectedUnit && (
+        <div className="flex items-center justify-center gap-2 md:gap-6">
+          <button
+            onClick={previousCard}
+            className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+
+          <div className="relative w-full max-w-2xl md:aspect-[3/2] aspect-[4/5]">
+            <div
+              onClick={() => setIsFlipped(!isFlipped)}
+              className={`w-full h-full cursor-pointer transition-all duration-500 [transform-style:preserve-3d] ${
+                isFlipped ? '[transform:rotateY(180deg)]' : ''
+              }`}
+            >
+              {/* Front of card */}
+              <div className="absolute inset-0 backface-hidden bg-white rounded-xl shadow-lg border border-gray-200 p-4 md:p-8 flex items-center justify-center">
+                <h3 className="text-lg md:text-2xl font-bold text-center break-words max-w-full overflow-auto">
+                  {currentCards[currentCardIndex]?.term}
+                </h3>
+              </div>
+
+              {/* Back of card */}
+              <div className="absolute inset-0 backface-hidden [transform:rotateY(180deg)] bg-white rounded-xl shadow-lg border border-gray-200 p-4 md:p-8 flex items-center justify-center">
+                <p className="text-base md:text-lg text-center break-words max-w-full overflow-auto max-h-full">
+                  {currentCards[currentCardIndex]?.definition}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <button
+            onClick={nextCard}
+            className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+          >
+            <ChevronRight className="w-6 h-6" />
+          </button>
+        </div>
+      )}
+
+      {selectedUnit && (
+        <div className="mt-6 text-center text-gray-600">
+          {currentCardIndex + 1} of {currentCards.length}
+        </div>
+      )}
+    </div>
+  )
+} 

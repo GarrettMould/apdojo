@@ -1,0 +1,107 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Rule for the users collection
+    match /users/{userId} {
+      // Allow users to read/update their own main document
+      allow read, update: if request.auth.uid == userId;
+      
+      // Allow creating user doc during signup
+      allow create: if request.auth.uid != null && request.resource.data.uid == request.auth.uid;
+
+      // --- RULES FOR mcqAnswers SUBCOLLECTION ---
+      // Allow users to read/write their own mcqAnswers subcollection
+      match /mcqAnswers/{answerId} {
+        // Allow reading and writing (which includes create, update, delete)
+        // only if the requester is the owner of the user document.
+        allow read, write: if request.auth.uid == userId;
+      }
+      // --- End mcqAnswers Subcollection Rules ---
+
+      // --- RULES FOR unitXP SUBCOLLECTION ---
+      match /unitXP/{unitId} {
+        // Allow users to read AND WRITE documents in their OWN unitXP subcollection
+        allow read, write: if request.auth.uid == userId;
+      }
+      // --- End unitXP Subcollection Rules ---
+
+      // (Add similar blocks for other subcollections if needed)
+
+    } // Closing brace for match /users/{userId}
+
+    // --- RULES FOR quizChallenges COLLECTION ---
+    // --- Start of REPLACEMENT --- // (Keeping your existing complex challenge rules)
+    match /quizChallenges/{challengeId} {
+      // Allow anyone to read the challenge data (needed for shared links)
+      allow read: if true;
+
+      // Allow authenticated users to update based on specific conditions
+      allow update: if request.auth.uid != null && (
+        // Scenario 1: Originator submitting their score for the first time
+        ( request.auth.uid == resource.data.generatedByUserId &&
+          resource.data.originatorScore == null &&
+          request.resource.data.originatorScore != resource.data.originatorScore && // Ensure score is actually changing
+          request.resource.data.originatorTime != resource.data.originatorTime // Ensure time is actually changing
+          // Add other fields originator sets initially if needed (e.g., status: 'originator_submitted')
+        ) ||
+        // Scenario 2: Opponent claiming the slot and submitting their score for the first time
+        ( request.auth.uid != resource.data.generatedByUserId &&
+          resource.data.opponentUserId == null && // Slot must be open
+          request.resource.data.opponentUserId == request.auth.uid && // Must set their own ID
+          resource.data.opponentScore == null &&
+          request.resource.data.opponentScore != resource.data.opponentScore && // Ensure score is actually changing
+          request.resource.data.opponentTime != resource.data.opponentTime // Ensure time is actually changing
+          // Add other fields opponent sets initially if needed (e.g., status: 'opponent_submitted')
+        ) ||
+        // Scenario 3: Either participant finalizing the challenge (setting status/winner/xp)
+        ( (request.auth.uid == resource.data.generatedByUserId || request.auth.uid == resource.data.opponentUserId) &&
+          resource.data.originatorScore != null && // Both scores must be present in existing doc
+          resource.data.opponentScore != null &&
+          // Only allow updating the specific fields needed for completion
+          ( request.resource.data.keys().hasAll(['status', 'winnerUserId']) || // Base case: status + winner
+            request.resource.data.keys().hasAll(['status', 'winnerUserId', 'xpAwarded']) // Case including xpAwarded
+          ) &&
+          request.resource.data.status == 'completed' && // Ensure status is correctly set to 'completed'
+          // Optional: Prevent changing scores/times in this final step
+          request.resource.data.originatorScore == resource.data.originatorScore &&
+          request.resource.data.originatorTime == resource.data.originatorTime &&
+          request.resource.data.opponentScore == resource.data.opponentScore &&
+          request.resource.data.opponentTime == resource.data.opponentTime
+        )
+      );
+
+      // Creation is handled by the backend (Admin SDK) - No explicit 'create' rule needed here for clients
+
+    }
+    // --- End of REPLACEMENT ---
+    // --- End quizChallenges Collection Rules ---
+
+    // --- RULES FOR userTestProgress COLLECTION ---
+    match /userTestProgress/{userId} {
+      // Allow users to read/write their own test progress documents
+      allow read, write: if request.auth.uid == userId;
+      
+      // Allow access to subcollections
+      match /tests/{testId} {
+        allow read, write: if request.auth.uid == userId;
+      }
+    }
+    // --- End userTestProgress Collection Rules ---
+
+    // --- RULES FOR userTestResults COLLECTION ---
+    match /userTestResults/{userId} {
+      // Allow users to read/write their own test result documents
+      allow read, write: if request.auth.uid == userId;
+      
+      // Allow access to subcollections
+      match /results/{testId} {
+        allow read, write: if request.auth.uid == userId;
+      }
+    }
+    // --- End userTestResults Collection Rules ---
+
+    // (Add rules for any other top-level collections)
+
+  } // Closing brace for match /databases/{database}/documents
+} // Closing brace for service cloud.firestore 
