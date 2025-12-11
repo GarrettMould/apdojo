@@ -205,5 +205,65 @@ export const blogPosts: Record<string, BlogPost> = {
       </>
     ),
   },
+  'monopoly-marginal-revenue': {
+    slug: 'monopoly-marginal-revenue',
+    title: 'Why Marginal Revenue Falls Faster Than Demand',
+    description: 'Understanding why monopolists must lower prices on all previous units to sell one more—and why that makes MR fall faster than demand.',
+    subject: 'Micro',
+    unit: 4,
+    thumbnailUrl: '/images/placeholder.png', // Update with actual thumbnail URL
+    keyTakeaway: 'Marginal Revenue falls faster than Demand because the monopolist has to lower the price on all previous units just to sell one more.',
+    content: (
+      <>
+        <h2 className="mt-12 mb-4 text-4xl font-bold text-gray-800">The Setup: Different People, Different Values</h2>
+        <p className="mb-6 text-lg">Meet people. Different people have different values and needs, so they are willing to pay different prices for a good. One person is willing to pay <strong>$50</strong> while the other one is only willing to pay <strong>$45</strong>.</p>
+        
+        <h2 className="mt-12 mb-4 text-4xl font-bold text-gray-800">The Monopoly's Dilemma</h2>
+        <p className="mb-6 text-lg">Monopolies are the only firm in town. They can choose the price they set, but the law of demand still applies. Whatever price they choose will have an impact on the number of people willing to buy their product.</p>
+        
+        <h3 className="mt-10 mb-4 text-3xl font-bold text-gray-800">Option 1: Price at $50</h3>
+        <p className="mb-6 text-lg">If they sell at <strong>$50</strong>, they will make more money per product but only sell one. They make <strong>$50 in total revenue</strong>.</p>
+        
+        <h3 className="mt-10 mb-4 text-3xl font-bold text-gray-800">Option 2: Price at $45</h3>
+        <p className="mb-6 text-lg">But what if they want to sell more? This person is willing to pay $45. If they choose a price of <strong>$45</strong> they can sell to her too. If they drop the price to $45, they sell to both. Two units at $45 each is <strong>$90 in Total Revenue.</strong></p>
+        
+        <div className="my-8 pl-4 border-l-2 border-gray-200">
+          <p className="mb-3 text-lg text-gray-700"><em>But here is the catch:</em></p>
+          <p className="mb-2 text-lg text-gray-700">They don't just charge the <em>new</em> person $45. They have to lower the price for the <em>first</em> person too.</p>
+          <p className="mb-2 text-lg text-gray-700">They lost $5 on the first guy to gain $45 from the second guy.</p>
+          <p className="text-lg text-gray-800">That is why the Marginal Revenue is only <strong>$40</strong>.</p>
+        </div>
+        
+        <h2 className="mt-12 mb-4 text-4xl font-bold text-gray-800">The Rule</h2>
+        <div className="my-8 pl-4 border-l-2 border-gray-200">
+          <p className="text-lg text-gray-800 italic">Marginal Revenue falls faster than Demand because the monopolist has to lower the price on <em>all previous units</em> just to sell one more.</p>
+        </div>
+        
+        <p className="mb-6 text-lg">This is why the MR curve is steeper than the Demand curve. Every time the monopolist wants to sell one more unit, they must:</p>
+        <ul className="mb-6 list-disc list-inside space-y-2 text-lg">
+          <li>Lower the price for <strong>everyone</strong>, not just the new customer</li>
+          <li>Lose revenue on all previous units sold at the higher price</li>
+          <li>Only gain revenue from the one new unit at the lower price</li>
+        </ul>
+        
+        <p className="mb-6 text-lg">The net effect: Marginal Revenue = New Revenue - Lost Revenue from Previous Units</p>
+        <p className="mb-6 text-lg">In our example: MR = $45 (new sale) - $5 (lost on first customer) = <strong>$40</strong></p>
+        
+        <hr className="my-12"/>
+
+        <div className="text-center bg-gray-100 p-8 rounded-lg">
+          <h3 className="text-2xl font-bold text-gray-900 mb-2">📊 Master Monopoly Pricing</h3>
+          <p className="text-gray-700 mb-6">
+            Understanding why MR falls faster than Demand is crucial for drawing accurate monopoly graphs on the AP Exam.
+          </p>
+          <Button asChild className="bg-green-600 hover:bg-green-700 text-white font-semibold py-6 px-8 text-lg rounded-md">
+            <Link href="/unitMCQPracticePage?subject=micro&units=4">
+              Practice Unit 4 Micro MCQs
+            </Link>
+          </Button>
+        </div>
+      </>
+    ),
+  },
 };
 

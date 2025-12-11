@@ -182,10 +182,10 @@ function UnitFRQPracticePageComponent() {
   // Helper function to check if a question is locked
   // All questions are now unlocked
   const isQuestionLocked = (questionId: number | undefined): boolean => {
-    // Unlock FRQ id 1 (macro - Ample Reserves), id 2 (micro - Factor Markets), and id 33 (micro - Labor Market Shocks)
-    // These are the ones linked from the home page "Try For Free" containers plus Labor Market Shocks
+    // Unlock FRQ id 1 (macro - Ample Reserves), id 2 (micro - Factor Markets), id 5 (macro - GDP & Inflation Data), and id 33 (micro - Labor Market Shocks)
+    // These are the ones linked from the home page "Try For Free" containers plus Labor Market Shocks and GDP & Inflation Data
     if (questionId === undefined) return true;
-    return questionId !== 1 && questionId !== 2 && questionId !== 33;
+    return questionId !== 1 && questionId !== 2 && questionId !== 5 && questionId !== 33;
   };
 
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0);

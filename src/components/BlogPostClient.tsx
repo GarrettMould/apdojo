@@ -19,7 +19,7 @@ export function BlogPostClient({
   practiceUrl = '/unitFRQpracticePage'
 }: BlogPostClientProps) {
   return (
-    <div className="prose prose-lg max-w-none prose-blue">
+    <div className="prose prose-xl max-w-none prose-blue text-lg">
       <BlogContentWithKeyTerms subject={subject}>
         {content}
       </BlogContentWithKeyTerms>

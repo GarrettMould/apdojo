@@ -7,7 +7,7 @@ import { Menu, X, ChevronDown } from 'lucide-react';
 import dojoIcon from "../../public/images/dojoIcon.png";
 import { useAuthContext } from '@/contexts/AuthContext';
 import { Button } from './ui/button';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 
 export function Header() {
   const { user, logout, selectedSubject, setSelectedSubject, totalXP, guestXp, isCharacterClosetOpen, setIsCharacterClosetOpen } = useAuthContext();
@@ -15,6 +15,15 @@ export function Header() {
   const [isCoursesDropdownOpen, setIsCoursesDropdownOpen] = useState(false);
   const [isTutoringDropdownOpen, setIsTutoringDropdownOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // If on unit MCQ practice page, use subject from URL, otherwise use context
+  const displaySubject = pathname === '/unitMCQPracticePage' 
+    ? (searchParams.get('subject') === 'macro' || searchParams.get('subject') === 'micro' 
+        ? searchParams.get('subject') as 'macro' | 'micro'
+        : selectedSubject)
+    : selectedSubject;
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -31,6 +40,28 @@ export function Header() {
     } catch (error) {
       console.error('Failed to log out:', error);
       // Optionally, show an error message to the user
+    }
+  };
+
+  const handleSubjectChange = (newSubject: 'macro' | 'micro') => {
+    // If we're on the unit MCQ practice page, preserve the unit and reload with new subject
+    if (pathname === '/unitMCQPracticePage') {
+      const unitsParam = searchParams.get('units');
+      const modeParam = searchParams.get('mode');
+      const lessonIdParam = searchParams.get('lessonId');
+      const testMode = searchParams.get('test');
+      
+      const params = new URLSearchParams();
+      params.set('subject', newSubject);
+      if (unitsParam) params.set('units', unitsParam);
+      if (modeParam) params.set('mode', modeParam);
+      if (lessonIdParam) params.set('lessonId', lessonIdParam);
+      if (testMode) params.set('test', testMode);
+      
+      router.push(`/unitMCQPracticePage?${params.toString()}`);
+    } else {
+      // For other pages, just update the subject
+      setSelectedSubject(newSubject);
     }
   };
 
@@ -84,6 +115,13 @@ export function Header() {
                 Unit Cheat Sheets
               </Link>
 
+              <Link
+                href="/ap-blog-home"
+                className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
+              >
+                Blog
+              </Link>
+
               {/* Tutoring Dropdown - HIDDEN */}
               {/* <div 
                 className="relative"
@@ -132,9 +170,9 @@ export function Header() {
               {/* Subject Segmented Control */}
               <div className="inline-flex items-center bg-gray-100 rounded p-0.5 border border-gray-200">
                 <button
-                  onClick={() => setSelectedSubject('macro')}
+                  onClick={() => handleSubjectChange('macro')}
                   className={`px-2.5 py-1.5 text-xs font-medium rounded transition-all duration-200 ${
-                    selectedSubject === 'macro'
+                    displaySubject === 'macro'
                       ? 'bg-blue-600 text-white shadow-sm'
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
@@ -142,9 +180,9 @@ export function Header() {
                   Macro
                 </button>
                 <button
-                  onClick={() => setSelectedSubject('micro')}
+                  onClick={() => handleSubjectChange('micro')}
                   className={`px-2.5 py-1.5 text-xs font-medium rounded transition-all duration-200 ${
-                    selectedSubject === 'micro'
+                    displaySubject === 'micro'
                       ? 'bg-green-600 text-white shadow-sm'
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
@@ -259,6 +297,14 @@ export function Header() {
                   Unit Cheat Sheets
                 </Link>
 
+                <Link
+                  href="/ap-blog-home"
+                  onClick={closeMobileMenu}
+                  className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
+                >
+                  Blog
+                </Link>
+
                 {/* Tutoring Dropdown (Mobile) - HIDDEN */}
                 {/* <div className="px-4 py-2">
                   <button
@@ -303,11 +349,11 @@ export function Header() {
                     <div className="inline-flex items-center w-full bg-gray-100 rounded p-0.5 border border-gray-200">
                       <button
                         onClick={() => {
-                          setSelectedSubject('macro');
+                          handleSubjectChange('macro');
                           closeMobileMenu();
                         }}
                         className={`flex-1 px-2.5 py-2 text-xs font-medium rounded transition-all duration-200 ${
-                          selectedSubject === 'macro'
+                          displaySubject === 'macro'
                             ? 'bg-blue-600 text-white shadow-sm'
                             : 'text-gray-600 hover:text-gray-900'
                         }`}
@@ -316,11 +362,11 @@ export function Header() {
                       </button>
                       <button
                         onClick={() => {
-                          setSelectedSubject('micro');
+                          handleSubjectChange('micro');
                           closeMobileMenu();
                         }}
                         className={`flex-1 px-2.5 py-2 text-xs font-medium rounded transition-all duration-200 ${
-                          selectedSubject === 'micro'
+                          displaySubject === 'micro'
                             ? 'bg-green-600 text-white shadow-sm'
                             : 'text-gray-600 hover:text-gray-900'
                         }`}

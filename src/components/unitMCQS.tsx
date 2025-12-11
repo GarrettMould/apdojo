@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Question as QuestionType } from '@/data/questionBanks/types';
 import { Unit } from '@/data/cheatSheets';
-import { Check, X, Brain, FileText, ChevronDown, Triangle, Loader2, RefreshCw, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Clipboard, Lock, Play, Minus } from 'lucide-react';
+import { Check, X, Brain, FileText, ChevronDown, Triangle, Loader2, RefreshCw, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Clipboard, Lock, Play, Minus, Menu } from 'lucide-react';
 import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
 import Image from 'next/image';
@@ -66,6 +66,8 @@ interface QuestionCardProps {
   correctStreak: number;
   highlightedIndex: number | null;
   isParentModalOpen: boolean;
+  enableUnderlining?: boolean;
+  enableStrikethrough?: boolean;
 }
 
 const QuestionCard = ({ 
@@ -83,7 +85,9 @@ const QuestionCard = ({
   dojoProgress,
   correctStreak,
   highlightedIndex,
-  isParentModalOpen
+  isParentModalOpen,
+  enableUnderlining = true,
+  enableStrikethrough = true
 }: QuestionCardProps) => {
   const letterToIndex = (letter?: string): number | null => {
     if (!letter) return null;
@@ -483,11 +487,15 @@ const QuestionCard = ({
         <div className="space-y-6"> 
           {/* Question Text */}
           <p className="text-base md:text-lg font-medium font-serif leading-relaxed text-gray-800">
-            <QuestionWithKeyTerms 
-              questionText={question.question} 
-              unit={question.unit} 
-              subject={question.subject}
-            />
+            {enableUnderlining ? (
+              <QuestionWithKeyTerms 
+                questionText={question.question} 
+                unit={question.unit} 
+                subject={question.subject}
+              />
+            ) : (
+              question.question
+            )}
           </p>
 
         {/* --- ADDED: Question Image Display --- */}
@@ -567,8 +575,8 @@ const QuestionCard = ({
                       </span>
                        {/* Option Text - Reduced Size */}
                       <span className={`flex-1 text-sm ${isStruckThrough ? 'line-through text-gray-400' : ''} ${isSubmitted ? 'text-gray-800' : isHighlighted ? 'text-gray-900' : 'text-gray-900'}`}>{option}</span>
-                      {/* Strikethrough Button - Only show when not submitted */}
-                      {!isSubmitted && (
+                      {/* Strikethrough Button - Only show when enabled and not submitted */}
+                      {!isSubmitted && enableStrikethrough && (
                         <button
                           onClick={handleStrikethroughToggle}
                           className="flex-shrink-0 p-1.5 rounded hover:bg-gray-200 transition-colors flex items-center justify-center"
@@ -728,6 +736,31 @@ export function UnitMCQs({
   const DOUBLE_XP_CHANCE = 0.15;
   const [highlightedIndex, setHighlightedIndex] = useState<number | null>(null);
   const [showAiTooltip, setShowAiTooltip] = useState(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  const [enableUnderlining, setEnableUnderlining] = useState(true); // Default ON
+  const [enableStrikethrough, setEnableStrikethrough] = useState(true); // Default ON
+  const [enableZenMode, setEnableZenMode] = useState(false);
+  const settingsButtonRef = useRef<HTMLButtonElement>(null);
+  
+  // Store previous state before zen mode
+  const prevUnderliningRef = useRef<boolean>(true);
+  const prevStrikethroughRef = useRef<boolean>(true);
+
+  // Handle zen mode toggle - disable underlining and strikethrough in zen mode
+  useEffect(() => {
+    if (enableZenMode) {
+      // Save current state before disabling
+      prevUnderliningRef.current = enableUnderlining;
+      prevStrikethroughRef.current = enableStrikethrough;
+      // Disable both features in zen mode
+      setEnableUnderlining(false);
+      setEnableStrikethrough(false);
+    } else {
+      // Restore to default ON when exiting zen mode
+      setEnableUnderlining(true);
+      setEnableStrikethrough(true);
+    }
+  }, [enableZenMode]);
 
 
   useEffect(() => {
@@ -889,46 +922,62 @@ export function UnitMCQs({
     proceedToActualNextQuestion(); 
   };
 
-  // --- Updated useEffect for Keyboard Navigation --- 
+  // --- Keyboard Navigation for Zen Mode Only --- 
   useEffect(() => {
-    /* // --- START COMMENT OUT - Keyboard Navigation --- 
+    // Only enable keyboard navigation in zen mode
+    if (!enableZenMode) {
+      return;
+    }
+
     const handleKeyDown = (event: KeyboardEvent) => {
-      // Ignore if focused on input/button or if an overlay/offer is active
+      // ESC key to exit zen mode
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setEnableZenMode(false);
+        return;
+      }
+
+      // Ignore if focused on input/textarea/button or if modal is open
       const target = event.target as HTMLElement;
-      if (displayDoubleXpOffer || target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON') {
+      if (isParentModalOpen || isSettingsModalOpen || target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON') {
         return;
       }
 
       const numOptions = currentQuestion?.options?.length ?? 0;
-      if (numOptions === 0) return; // No options to navigate
+      if (numOptions === 0) return;
 
+      // Left/Right arrows for navigation between questions
       if (event.key === 'ArrowLeft') {
+        event.preventDefault();
         handlePreviousQuestion();
       } else if (event.key === 'ArrowRight') {
+        event.preventDefault();
         handleNextQuestion();
-      } else if (event.key === 'ArrowUp') {
+      } 
+      // Up/Down arrows for navigating answer options
+      else if (event.key === 'ArrowUp') {
         event.preventDefault();
         setHighlightedIndex(prevIndex => {
-          if (prevIndex === null) return numOptions - 1; // Highlight D first
-          if (prevIndex === 0) return numOptions - 1;    // Wrap from A to D
-          return prevIndex - 1;                   // Go up
+          if (prevIndex === null) return numOptions - 1; // Start from last option
+          if (prevIndex === 0) return numOptions - 1; // Wrap from first to last
+          return prevIndex - 1; // Move up
         });
       } else if (event.key === 'ArrowDown') {
         event.preventDefault();
         setHighlightedIndex(prevIndex => {
-          if (prevIndex === null) return 0; // Highlight A first
-          if (prevIndex === numOptions - 1) return 0; // Wrap from D to A
-          return prevIndex + 1;                   // Go down
+          if (prevIndex === null) return 0; // Start from first option
+          if (prevIndex === numOptions - 1) return 0; // Wrap from last to first
+          return prevIndex + 1; // Move down
         });
-      } else if (event.key === 'Enter') {
-        if (highlightedIndex !== null && !currentAnswerState) { // Only submit if highlighted and not already answered
-           event.preventDefault();
-           console.log("Enter pressed, submitting option:", highlightedIndex); // Debug
-           // Find the actual answer details for the highlighted index
-           const letter = String.fromCharCode(65 + highlightedIndex);
-           const text = currentQuestion.options[highlightedIndex];
-           const lessonIds = currentQuestion.lessonIDS;
-           handleAnswerSelection(currentQuestion.id, letter, text, lessonIds);
+      } 
+      // Enter key to submit selected answer
+      else if (event.key === 'Enter') {
+        if (highlightedIndex !== null && !currentAnswerState && currentQuestion) {
+          event.preventDefault();
+          const letter = String.fromCharCode(65 + highlightedIndex);
+          const text = currentQuestion.options[highlightedIndex];
+          const lessonIds = currentQuestion.lessonIDS;
+          handleAnswerSelection(currentQuestion.id, letter, text, lessonIds);
         }
       }
     };
@@ -937,25 +986,46 @@ export function UnitMCQs({
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-    // --- END COMMENT OUT - Keyboard Navigation --- */ 
-  }, [handlePreviousQuestion, handleNextQuestion, currentQuestion, highlightedIndex, currentAnswerState, handleAnswerSelection]); // Added dependencies
+  }, [enableZenMode, handlePreviousQuestion, handleNextQuestion, isParentModalOpen, isSettingsModalOpen, currentQuestion, highlightedIndex, currentAnswerState, handleAnswerSelection]);
 
-  // --- NEW useEffect to Disable Body Scroll --- 
+  // --- Hide Header when Zen Mode is Active ---
   useEffect(() => {
-    /* // --- START COMMENT OUT - Scroll Lock --- 
-    // Store original overflow style
-    const originalOverflow = document.body.style.overflow;
-    // Disable scrolling
-    document.body.style.overflow = 'hidden';
-    console.log("Body scroll disabled"); // Debug
+    if (enableZenMode) {
+      // Add class to body to hide header
+      document.body.classList.add('zen-mode-active');
+      // Also hide header directly
+      const header = document.querySelector('header');
+      if (header) {
+        (header as HTMLElement).style.display = 'none';
+      }
+      // Hide any banners below header
+      const banners = document.querySelectorAll('[class*="top-16"], [class*="top-20"]');
+      banners.forEach(banner => {
+        (banner as HTMLElement).style.display = 'none';
+      });
+    } else {
+      // Remove class and restore header
+      document.body.classList.remove('zen-mode-active');
+      const header = document.querySelector('header');
+      if (header) {
+        (header as HTMLElement).style.display = '';
+      }
+      // Restore banners
+      const banners = document.querySelectorAll('[class*="top-16"], [class*="top-20"]');
+      banners.forEach(banner => {
+        (banner as HTMLElement).style.display = '';
+      });
+    }
 
-    // Cleanup function to restore scroll
     return () => {
-      document.body.style.overflow = originalOverflow;
-      console.log("Body scroll enabled"); // Debug
+      // Cleanup on unmount
+      document.body.classList.remove('zen-mode-active');
+      const header = document.querySelector('header');
+      if (header) {
+        (header as HTMLElement).style.display = '';
+      }
     };
-    // --- END COMMENT OUT - Scroll Lock --- */
-  }, []); // Empty dependency array runs only on mount and unmount
+  }, [enableZenMode]);
 
   // --- >>> NEW: Sidebar Rendering Logic <<< ---
   if (isSidebar) {
@@ -968,11 +1038,15 @@ export function UnitMCQs({
           return (
             <div key={question.id} className="p-4 border-b border-gray-200 last:border-b-0">
               <p className="text-sm font-medium text-gray-800 mb-3">
-                <QuestionWithKeyTerms 
-                  questionText={question.question} 
-                  unit={question.unit} 
-                  subject={question.subject}
-                />
+                {enableUnderlining ? (
+                  <QuestionWithKeyTerms 
+                    questionText={question.question} 
+                    unit={question.unit} 
+                    subject={question.subject}
+                  />
+                ) : (
+                  question.question
+                )}
               </p>
               <div className="space-y-2">
                 {question.options.map((option, optIndex) => {
@@ -1025,88 +1099,291 @@ export function UnitMCQs({
   // --- >>> END: Sidebar Rendering Logic <<< ---
 
   return (
-    <div className="container mx-auto px-4 pt-4 pb-12 relative">
-      {/* Use Flexbox for columns */}
-      <div className="flex flex-col lg:flex-row gap-6 lg:items-stretch">
-        
+    <div className={`${enableZenMode ? 'fixed inset-0 flex items-center justify-center bg-gray-50' : 'container mx-auto px-4 pt-4 pb-12 relative'}`}>
+      {/* Zen Mode Settings Button - Top Right of Main Content */}
+      {enableZenMode && (
+        <div className="fixed top-4 right-4 z-40">
+          <div className="relative">
+            <button
+              ref={settingsButtonRef}
+              onClick={() => setIsSettingsModalOpen(true)}
+              className="p-3 rounded-lg transition-all hover:scale-110 hover:opacity-80"
+              aria-label="Open settings"
+            >
+              <Image 
+                src={subject === 'macro' ? "/images/sliderBlue.svg" : "/images/sliderGreen.svg"} 
+                alt="Settings" 
+                width={28} 
+                height={28}
+                className="w-7 h-7"
+                style={{
+                  transform: 'scale(1.4)',
+                  filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.15))'
+                }}
+              />
+            </button>
+            
+            {/* Settings Modal - Positioned under button */}
+            {isSettingsModalOpen && (
+              <>
+                {/* Backdrop */}
+                <div 
+                  className="fixed inset-0 bg-black bg-opacity-50 z-40"
+                  onClick={() => setIsSettingsModalOpen(false)}
+                />
+                {/* Modal */}
+                <div 
+                  className="absolute top-full right-0 mt-2 bg-white rounded-lg shadow-xl w-80 p-6 z-50"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <button
+                    onClick={() => setIsSettingsModalOpen(false)}
+                    className="absolute top-4 right-4 text-gray-500 hover:text-gray-900 transition-colors"
+                    aria-label="Close settings"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                  
+                  <h2 className="text-xl font-bold text-gray-900 mb-6">Customize your Dojo Experience</h2>
+                  
+                  <div className="space-y-3">
+                    {/* Underline Key Terms - Item 1 */}
+                    <label className="flex items-center justify-between p-4 rounded-lg border-2 border-gray-300 hover:bg-gray-50 cursor-pointer transition-colors">
+                      <span className="text-gray-900 font-bold text-base">Underline Key Terms</span>
+                      <input
+                        type="checkbox"
+                        checked={enableUnderlining}
+                        onChange={(e) => setEnableUnderlining(e.target.checked)}
+                        className={`w-5 h-5 rounded focus:ring-2 ${
+                          subject === 'macro' 
+                            ? 'text-blue-600 focus:ring-blue-500' 
+                            : 'text-green-600 focus:ring-green-500'
+                        }`}
+                        style={{
+                          accentColor: subject === 'macro' ? '#2563eb' : '#22c55e'
+                        }}
+                      />
+                    </label>
 
-        
-        {/* Left Column: Question Card */}
-        <div className="w-full lg:w-3/5">
+                    {/* Strikethrough - Item 2 */}
+                    <label className="flex items-center justify-between p-4 rounded-lg border-2 border-gray-300 hover:bg-gray-50 cursor-pointer transition-colors">
+                      <span className="text-gray-900 font-bold text-base">Strikethrough</span>
+                      <input
+                        type="checkbox"
+                        checked={enableStrikethrough}
+                        onChange={(e) => setEnableStrikethrough(e.target.checked)}
+                        className={`w-5 h-5 rounded focus:ring-2 ${
+                          subject === 'macro' 
+                            ? 'text-blue-600 focus:ring-blue-500' 
+                            : 'text-green-600 focus:ring-green-500'
+                        }`}
+                        style={{
+                          accentColor: subject === 'macro' ? '#2563eb' : '#22c55e'
+                        }}
+                      />
+                    </label>
+
+                    {/* Zen Mode / Standard Mode - Link */}
+                    <div className="p-4 rounded-lg border-2 border-gray-300">
+                      <button
+                        onClick={() => {
+                          setEnableZenMode(!enableZenMode);
+                          setIsSettingsModalOpen(false);
+                        }}
+                        className={`w-full text-left font-bold text-base ${
+                          subject === 'macro' ? 'text-blue-500' : 'text-green-500'
+                        } hover:opacity-80 transition-opacity`}
+                      >
+                        {enableZenMode ? 'Standard Mode' : 'Zen Mode'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Use Flexbox for columns */}
+      {enableZenMode ? (
+        /* Zen Mode: Centered Question Card Only */
+        <div className="w-full max-w-4xl mx-auto px-4 z-10">
           {currentQuestion && (
-            <QuestionCard 
-              key={`${currentUnit}-${currentQuestion.id}`} 
-              question={currentQuestion} 
-              currentIndex={currentQuestionIndex}
-              onAnswerSelect={handleAnswerSelection}
-              initialSelectedLetter={currentAnswerState?.selectedLetter}
-              isAnswered={!!currentAnswerState} 
-              aiExplanation={aiExplanations[currentQuestion.id]}
-              isLoadingAI={isLoadingExplanation} 
-              isLoggedIn={isLoggedIn}
-              signup={signup}
-              login={login}
-              dojoProgress={dojoProgress}
-              correctStreak={correctStreak}
-              totalQuestions={totalQuestions}
-              highlightedIndex={highlightedIndex}
-              isParentModalOpen={isParentModalOpen}
-            />
+            <div className="transform scale-110">
+              <div className="bg-white rounded-lg border-2 border-gray-300 shadow-2xl p-1">
+                <div className="bg-white rounded-lg">
+                  <QuestionCard 
+                    key={`${currentUnit}-${currentQuestion.id}`} 
+                    question={currentQuestion} 
+                    currentIndex={currentQuestionIndex}
+                    onAnswerSelect={handleAnswerSelection}
+                    initialSelectedLetter={currentAnswerState?.selectedLetter}
+                    isAnswered={!!currentAnswerState} 
+                    aiExplanation={aiExplanations[currentQuestion.id]}
+                    isLoadingAI={isLoadingExplanation} 
+                    isLoggedIn={isLoggedIn}
+                    signup={signup}
+                    login={login}
+                    dojoProgress={dojoProgress}
+                    correctStreak={correctStreak}
+                    totalQuestions={totalQuestions}
+                    highlightedIndex={highlightedIndex}
+                    isParentModalOpen={isParentModalOpen}
+                    enableUnderlining={enableUnderlining}
+                    enableStrikethrough={enableStrikethrough}
+                  />
+                </div>
+              </div>
+            </div>
           )}
         </div>
+      ) : (
+        /* Normal Mode: Sidebar Layout */
+        <div className="flex flex-col lg:flex-row gap-6 lg:items-stretch">
+          {/* Left Column: Question Card */}
+          <div className="w-full lg:w-3/5">
+            {currentQuestion && (
+              <QuestionCard 
+                key={`${currentUnit}-${currentQuestion.id}`} 
+                question={currentQuestion} 
+                currentIndex={currentQuestionIndex}
+                onAnswerSelect={handleAnswerSelection}
+                initialSelectedLetter={currentAnswerState?.selectedLetter}
+                isAnswered={!!currentAnswerState} 
+                aiExplanation={aiExplanations[currentQuestion.id]}
+                isLoadingAI={isLoadingExplanation} 
+                isLoggedIn={isLoggedIn}
+                signup={signup}
+                login={login}
+                dojoProgress={dojoProgress}
+                correctStreak={correctStreak}
+                totalQuestions={totalQuestions}
+                highlightedIndex={highlightedIndex}
+                isParentModalOpen={isParentModalOpen}
+                enableUnderlining={enableUnderlining}
+                enableStrikethrough={enableStrikethrough}
+              />
+            )}
+          </div>
 
-        {/* Right Column: Controls and Resources */}
-        {/* Adjusted column width lg:w-2/5 */}
-        <div className="w-full lg:w-2/5 bg-white rounded-lg shadow-md border border-gray-200 p-4 lg:p-6 flex flex-col h-full">
+          {/* Right Column: Controls and Resources */}
+          <div className="w-full lg:w-2/5 bg-white rounded-lg shadow-md border border-gray-200 p-4 lg:p-6 flex flex-col h-full">
           {/* Top Section: Headline, Tags, Navigation */}
           <div className="mb-6"> {/* Reduced bottom margin */} 
-            <div className="flex items-center gap-4 mb-3"> {/* Added bottom margin */} 
-              <h3 className="font-extrabold tracking-tight text-gray-900 text-2xl">
-                  <span className={subject === 'macro' ? 'text-blue-600' : 'text-green-600'}>Unit MCQ</span> Practice
-              </h3>
-              {/* Subject Pill */}
-              <span className={`px-3 py-1 rounded-md text-sm font-medium bg-gray-100 ${
-                subject === 'macro' ? 'text-blue-600' : 'text-green-600'
-              }`}>
-                AP {subject === 'macro' ? 'Macro' : 'Micro'}
-              </span>
+            <div className="flex items-center justify-between gap-4 mb-3"> {/* Added justify-between and bottom margin */} 
+              <div className="flex items-center gap-4">
+                <h3 className="font-extrabold tracking-tight text-gray-900 text-2xl">
+                    <span className={subject === 'macro' ? 'text-blue-600' : 'text-green-600'}>Unit MCQ</span> Practice
+                </h3>
+                {/* Subject Pill */}
+                <span className={`px-3 py-1 rounded-md text-sm font-medium bg-gray-100 ${
+                  subject === 'macro' ? 'text-blue-600' : 'text-green-600'
+                }`}>
+                  AP {subject === 'macro' ? 'Macro' : 'Micro'}
+                </span>
+              </div>
               
-
-              {/* Keep dropdown for now, might remove later if tags are sufficient */}
-              {!isWeakestUnitsMode && (
-                <div className="relative" ref={dropdownRef}>
-                  <button
-                    onClick={() => setIsUnitDropdownOpen(!isUnitDropdownOpen)}
-                    className={`p-1.5 rounded-full text-white transition-colors ${subject === 'macro' ? 'bg-blue-500 hover:bg-blue-600' : 'bg-green-500 hover:bg-green-600'}`}
-                  >
-                    <Triangle className="w-2 h-2 rotate-180 fill-current" />
-                  </button>
-                  {isUnitDropdownOpen && (
-                    <div className="absolute left-0 mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-10">
-                      {units.map(unit => {
-                        const isLocked = false;
-                        return (
-                          <button
-                            key={unit.number}
-                            onClick={() => !isLocked && onUnitChange(unit.number)}
-                            disabled={isLocked}
-                            className={`w-full text-left px-4 py-2 text-sm transition-colors flex items-center justify-between ${
-                              currentUnit === unit.number
-                                ? subject === 'macro' ? 'bg-blue-50 text-blue-600' : 'bg-green-50 text-green-600'
-                                : isLocked
-                                ? 'text-gray-400 bg-gray-50 cursor-not-allowed'
-                                : 'text-gray-700 hover:bg-gray-50'
+              {/* Settings Button */}
+              <div className="relative">
+                <button
+                  ref={settingsButtonRef}
+                  onClick={() => setIsSettingsModalOpen(true)}
+                  className="p-3 rounded-lg transition-all hover:scale-110 hover:opacity-80"
+                  aria-label="Open settings"
+                >
+                  <Image 
+                    src={subject === 'macro' ? "/images/sliderBlue.svg" : "/images/sliderGreen.svg"} 
+                    alt="Settings" 
+                    width={28} 
+                    height={28}
+                    className="w-7 h-7"
+                    style={{
+                      transform: 'scale(1.4)',
+                      filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.15))'
+                    }}
+                  />
+                </button>
+                
+                {/* Settings Modal - Positioned under button */}
+                {isSettingsModalOpen && (
+                  <>
+                    {/* Backdrop */}
+                    <div 
+                      className="fixed inset-0 bg-black bg-opacity-50 z-40"
+                      onClick={() => setIsSettingsModalOpen(false)}
+                    />
+                    {/* Modal */}
+                    <div 
+                      className="absolute top-full right-0 mt-2 bg-white rounded-lg shadow-xl w-80 p-6 z-50"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <button
+                        onClick={() => setIsSettingsModalOpen(false)}
+                        className="absolute top-4 right-4 text-gray-500 hover:text-gray-900 transition-colors"
+                        aria-label="Close settings"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                      
+                      <h2 className="text-xl font-bold text-gray-900 mb-6">Customize your Dojo Experience</h2>
+                      
+                      <div className="space-y-3">
+                        {/* Underline Key Terms - Item 1 */}
+                        <label className="flex items-center justify-between p-4 rounded-lg border-2 border-gray-300 hover:bg-gray-50 cursor-pointer transition-colors">
+                          <span className="text-gray-900 font-bold text-base">Underline Key Terms</span>
+                          <input
+                            type="checkbox"
+                            checked={enableUnderlining}
+                            onChange={(e) => setEnableUnderlining(e.target.checked)}
+                            className={`w-5 h-5 rounded focus:ring-2 ${
+                              subject === 'macro' 
+                                ? 'text-blue-600 focus:ring-blue-500' 
+                                : 'text-green-600 focus:ring-green-500'
                             }`}
+                            style={{
+                              accentColor: subject === 'macro' ? '#2563eb' : '#22c55e'
+                            }}
+                          />
+                        </label>
+
+                        {/* Strikethrough - Item 2 */}
+                        <label className="flex items-center justify-between p-4 rounded-lg border-2 border-gray-300 hover:bg-gray-50 cursor-pointer transition-colors">
+                          <span className="text-gray-900 font-bold text-base">Strikethrough</span>
+                          <input
+                            type="checkbox"
+                            checked={enableStrikethrough}
+                            onChange={(e) => setEnableStrikethrough(e.target.checked)}
+                            className={`w-5 h-5 rounded focus:ring-2 ${
+                              subject === 'macro' 
+                                ? 'text-blue-600 focus:ring-blue-500' 
+                                : 'text-green-600 focus:ring-green-500'
+                            }`}
+                            style={{
+                              accentColor: subject === 'macro' ? '#2563eb' : '#22c55e'
+                            }}
+                          />
+                        </label>
+
+                        {/* Zen Mode / Standard Mode - Link */}
+                        <div className="p-4 rounded-lg border-2 border-gray-300">
+                          <button
+                            onClick={() => {
+                              setEnableZenMode(!enableZenMode);
+                              setIsSettingsModalOpen(false);
+                            }}
+                            className={`w-full text-left font-bold text-base ${
+                              subject === 'macro' ? 'text-blue-500' : 'text-green-500'
+                            } hover:opacity-80 transition-opacity`}
                           >
-                            <span>{unit.title}</span>
-                            {isLocked && <Lock className="w-4 h-4 text-gray-400" />}
+                            {enableZenMode ? 'Standard Mode' : 'Zen Mode'}
                           </button>
-                        );
-                      })}
+                        </div>
+                      </div>
                     </div>
-                  )}
-                </div>
-              )}
+                  </>
+                )}
+              </div>
             </div>
 
             {/* --- Unit Tags --- */}
@@ -1271,8 +1548,10 @@ export function UnitMCQs({
                  Change Units
              </Link>
           </div>
+          </div>
         </div>
-      </div>
+      )}
+
     </div>
   );
 }

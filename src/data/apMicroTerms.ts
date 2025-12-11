@@ -889,6 +889,7 @@ export const keyTerms: KeyTerm[] = [
       subject: 'ap_microeconomics',
       unit: 3,
       lessonIDs: ['3.1'],
+      aliases: ['marginal product'],
       subNotes: [
         'Formula: Change in Total Product / Change in Inputs',
         'MP intersects Average Product (AP) at the maximum point of AP.'
@@ -954,6 +955,7 @@ export const keyTerms: KeyTerm[] = [
       subject: 'ap_microeconomics',
       unit: 3,
       lessonIDs: ['3.2'],
+      aliases: ['marginal cost'],
       subNotes: [
         'Formula: Change in Total Cost / Change in Quantity',
         'The MC curve looks like a Nike swoosh.',
@@ -967,6 +969,7 @@ export const keyTerms: KeyTerm[] = [
       subject: 'ap_microeconomics',
       unit: 3,
       lessonIDs: ['3.2'],
+      aliases: ['average total cost'],
       subNotes: [
         'Formula: TC / Q  or  AFC + AVC',
         'The curve is U-shaped due to economies of scale and diminishing returns.'
@@ -979,6 +982,7 @@ export const keyTerms: KeyTerm[] = [
       subject: 'ap_microeconomics',
       unit: 3,
       lessonIDs: ['3.2'],
+      aliases: ['average variable cost'],
       subNotes: [
         'Formula: TVC / Q',
         'Gets closer to ATC as output increases because Average Fixed Cost (AFC) declines.'
@@ -986,6 +990,20 @@ export const keyTerms: KeyTerm[] = [
     },
   
     // Lesson 3.3: Long-Run Production Costs
+    {
+      id: 'the-long-run',
+      term: 'The Long Run',
+      definition: 'A time period in which all factors of production are variable; there are no fixed costs.',
+      subject: 'ap_microeconomics',
+      unit: 3,
+      lessonIDs: ['3.3'],
+      aliases: ['the long run', 'long run'],
+      subNotes: [
+        'Firms can adjust all inputs, including plant size and capital.',
+        'All costs are variable in the long run.',
+        'Firms can enter or exit the industry in the long run.'
+      ]
+    },
     {
       id: 'economies-of-scale',
       term: 'Economies of Scale',
@@ -1095,10 +1113,25 @@ export const keyTerms: KeyTerm[] = [
       subject: 'ap_microeconomics',
       unit: 3,
       lessonIDs: ['3.5'],
+      aliases: ['marginal revenue'],
       subNotes: [
         'Formula: Change in Total Revenue / Change in Quantity',
         'Represents the revenue gained from producing and selling one additional unit',
         'Used in the profit maximization decision: compare MR to MC to determine optimal output level'
+      ]
+    },
+    {
+      id: 'total-revenue',
+      term: 'Total Revenue',
+      definition: 'The total amount of money a firm receives from selling its output.',
+      subject: 'ap_microeconomics',
+      unit: 3,
+      lessonIDs: ['3.5'],
+      aliases: ['total revenue'],
+      subNotes: [
+        'Formula: Price × Quantity (TR = P × Q)',
+        'For perfectly competitive firms, TR increases linearly with quantity since price is constant.',
+        'Used in calculating marginal revenue and economic profit.'
       ]
     },
     {
@@ -1130,6 +1163,20 @@ export const keyTerms: KeyTerm[] = [
       ]
     },
     {
+      id: 'short-run-supply-curve',
+      term: 'Short-Run Supply Curve',
+      definition: 'For a perfectly competitive firm, the portion of the marginal cost curve that lies above the minimum average variable cost.',
+      subject: 'ap_microeconomics',
+      unit: 3,
+      lessonIDs: ['3.6'],
+      aliases: ['short-run supply curve'],
+      subNotes: [
+        'The firm will produce where P = MC, but only if P ≥ min AVC.',
+        'If P < min AVC, the firm shuts down and supplies zero output.',
+        'The market supply curve is the horizontal sum of all individual firm supply curves.'
+      ]
+    },
+    {
       id: 'barriers-to-entry',
       term: 'Barriers to Entry',
       definition: 'Obstacles that prevent new firms from entering a market, such as patents, high start-up costs, or control of resources.',
@@ -1152,6 +1199,34 @@ export const keyTerms: KeyTerm[] = [
       subNotes: [
         'Firms are "Price Takers" (they cannot set their own price).',
         'Demand for the individual firm is perfectly elastic (horizontal).'
+      ]
+    },
+    {
+      id: 'perfectly-competitive-industry',
+      term: 'Perfectly Competitive Industry',
+      definition: 'An industry characterized by many firms, identical products, free entry and exit, and perfect information.',
+      subject: 'ap_microeconomics',
+      unit: 3,
+      lessonIDs: ['3.7'],
+      aliases: ['perfectly competitive industry'],
+      subNotes: [
+        'In the long run, firms enter when there are positive economic profits and exit when there are losses.',
+        'Entry and exit drive economic profit to zero in long-run equilibrium.',
+        'Examples include agricultural markets and stock exchanges.'
+      ]
+    },
+    {
+      id: 'positive-economic-profits',
+      term: 'Positive Economic Profits',
+      definition: 'When total revenue exceeds total cost (including both explicit and implicit opportunity costs).',
+      subject: 'ap_microeconomics',
+      unit: 3,
+      lessonIDs: ['3.7'],
+      aliases: ['positive economic profits', 'positive economic profit'],
+      subNotes: [
+        'In perfect competition, positive economic profits attract new firms to enter the industry.',
+        'Entry increases supply, lowers price, and reduces profits until they reach zero.',
+        'Economic profit = Total Revenue - (Explicit Costs + Implicit Costs).'
       ]
     },
     {
@@ -1208,6 +1283,7 @@ export const keyTerms: KeyTerm[] = [
       subject: 'ap_microeconomics',
       unit: 5,
       lessonIDs: ['5.1'],
+      aliases: ['factor of production'],
       subNotes: [
         'Labor: Human effort used in production (wages).',
         'Land: Natural resources (rent).',
@@ -1930,6 +2006,7 @@ export const keyTerms: KeyTerm[] = [
       subject: 'ap_microeconomics',
       unit: 4,
       lessonIDs: ['4.4'],
+      aliases: ['monopolistically competitive'],
       subNotes: [
         'Characteristics: Relatively large number of sellers, easy entry and exit, non-price competition (advertising).',
         'Products are substitutes but not identical (e.g., fast food, furniture).'

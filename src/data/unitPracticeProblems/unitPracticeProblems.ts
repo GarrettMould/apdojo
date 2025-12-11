@@ -1729,175 +1729,481 @@ const microUnit2Questions = [
 // Microeconomics Unit 3 Practice Problems
 const microUnit3Questions = [
   {
-    "id": 93,
+    "id": 2034,
     "unit": 3,
     "lessonIDS": ["3.1"],
     "unitName": "Production, Cost, and the Perfect Competition Model",
-    "question": "The law of diminishing marginal product states that:",
-    "image": null,
+    "question": "Suppose the marginal product of labor initially increases, hits a peak, and then decreases. If the average product of labor is currently declining, which of the following statements must be true?",
+    "image": { "src": "./images/allQS2034.svg", "alt": "Marginal and average product of labor graph" },
     "options": [
-      "Total output decreases as more input is added",
-      "Average product eventually decreases as more input is added",
-      "Marginal product eventually decreases as more variable input is added to a fixed input",
-      "Total cost eventually increases as output increases",
-      "Marginal cost eventually decreases as output increases"
+    "The total product of labor is decreasing.",
+    "The marginal product of labor is negative.",
+    "The marginal product of labor is less than the average product.",
+    "The average product of labor exceeds the total product of labor.",
+    "The firm is experiencing increasing marginal returns."
     ],
     "correctAnswer": "C",
-    "explanation": "Diminishing marginal product occurs in the short run when adding successive units of a variable input (like labor) to a fixed input (like capital) results in smaller and smaller increases in total output. The marginal product of the variable input eventually declines."
-  },
-  {
-    "id": 94,
+    "explanation": "Mathematically, the average product (AP) curve only slopes downward when the marginal product (MP) curve is below it. If MP were above AP, it would pull the average up."
+    },
+    {
+    "id": 2035,
     "unit": 3,
     "lessonIDS": ["3.2"],
     "unitName": "Production, Cost, and the Perfect Competition Model",
-    "question": "Which statement accurately describes the relationship between marginal cost (MC) and average total cost (ATC)?",
+    "question": "When a manufacturing plant expands its output levels in the short run, it inevitably faces rising marginal costs. This phenomenon is primarily driven by:",
     "image": null,
     "options": [
-      "If MC > ATC, then ATC must be falling",
-      "If MC < ATC, then ATC must be rising",
-      "MC equals ATC when ATC is at its maximum",
-      "MC intersects ATC at the minimum point of ATC",
-      "ATC is always greater than MC"
+    "managerial inefficiencies in the long run",
+    "economies of scale",
+    "diminishing marginal returns",
+    "an increase in the price of fixed inputs",
+    "a decrease in consumer demand"
     ],
-    "correctAnswer": "D",
-    "explanation": "The marginal cost curve intersects the average total cost curve at the lowest point of the ATC curve. When MC is below ATC, it pulls ATC down; when MC is above ATC, it pulls ATC up."
-  },
-  {
-    "id": 95,
-    "unit": 3,
-    "lessonIDS": ["3.2"],
-    "unitName": "Production, Cost, and the Perfect Competition Model",
-    "question": "Marginal cost is defined as the change in:",
-    "image": null,
-    "options": [
-      "Total revenue resulting from selling one more unit",
-      "Total cost resulting from producing one more unit",
-      "Average total cost resulting from producing one more unit",
-      "Average variable cost resulting from producing one more unit",
-      "Fixed cost resulting from producing one more unit"
-    ],
-    "correctAnswer": "B",
-    "explanation": "Marginal cost (MC) is the additional cost incurred from producing one more unit of output. It is calculated as the change in total cost divided by the change in quantity (ΔTC / ΔQ)."
-  },
-  {
-    "id": 96,
+    "correctAnswer": "C",
+    "explanation": "In the short run, fixed inputs (like factory size) constrain production. As more variable inputs (labor) are added, their marginal productivity eventually falls (law of diminishing marginal returns), causing the cost of each additional unit (marginal cost) to rise."
+    },
+    {
+    "id": 2036,
     "unit": 3,
     "lessonIDS": ["3.3"],
     "unitName": "Production, Cost, and the Perfect Competition Model",
-    "question": "A firm experiences economies of scale when:",
+    "question": "Which of the following best characterizes the 'long run' in microeconomic production theory?",
     "image": null,
     "options": [
-      "Its long-run average total cost decreases as output increases",
-      "Its short-run average total cost decreases as output increases",
-      "Its marginal cost is increasing",
-      "Its total fixed costs are decreasing",
-      "It doubles inputs and more than doubles output"
+    "A period where firms cannot exit the industry.",
+    "A timeframe where all factors of production are variable.",
+    "A situation where at least one input cost is sunk.",
+    "A duration of exactly one fiscal year.",
+    "A period where only labor inputs can be adjusted."
+    ],
+    "correctAnswer": "B",
+    "explanation": "The long run is defined not by a specific time but by the ability of the firm to adjust all inputs, meaning there are no fixed costs or fixed factors."
+    },
+    {
+    "id": 2037,
+    "unit": 3,
+    "lessonIDS": ["3.1"],
+    "unitName": "Production, Cost, and the Perfect Competition Model",
+    "question": "The graph below shows the total product curve for a firm. At Point B, which marks the peak of the total output curve, which of the following statements is true? ",
+    "image": null,
+    "options": [
+    "The marginal product of labor is zero.",
+    "The average product of labor is negative.",
+    "The firm is experiencing increasing marginal returns.",
+    "Total product is increasing at an increasing rate.",
+    "The marginal product of labor is at its maximum."
     ],
     "correctAnswer": "A",
-    "explanation": "Economies of scale occur when a firm's long-run average total cost (LRATC) falls as it increases its scale of production. This is represented by the downward-sloping portion of the LRATC curve."
-  },
-  {
-    "id": 97,
+    "explanation": "The slope of the total product curve represents the marginal product. At the peak of the curve (Point B), the slope is zero, meaning the additional output from the last unit of labor is zero ($MP = 0$)."
+    },
+    {
+    "id": 2038,
     "unit": 3,
-    "lessonIDS": ["3.4"],
+    "lessonIDS": ["3.2"],
     "unitName": "Production, Cost, and the Perfect Competition Model",
-    "question": "Economic profit differs from accounting profit because economic profit accounts for:",
+    "question": "Which of the following formulas correctly defines the Average Total Cost (ATC) in the short run?",
     "image": null,
     "options": [
-      "Only explicit costs",
-      "Only implicit costs",
-      "Both explicit and implicit costs",
-      "Total revenue minus variable costs",
-      "Fixed costs only"
+    "Total cost multiplied by quantity",
+    "Marginal cost plus average fixed cost",
+    "Total variable cost divided by quantity",
+    "Average fixed cost plus average variable cost",
+    "The slope of the total cost curve"
+    ],
+    "correctAnswer": "D",
+    "explanation": "Average total cost is the sum of average fixed cost and average variable cost ($ATC = AFC + AVC$)."
+    },
+    {
+    "id": 2039,
+    "unit": 3,
+    "lessonIDS": ["3.2"],
+    "unitName": "Production, Cost, and the Perfect Competition Model",
+    "question": "Consider a production process where total fixed costs are $100. At an output level of 20 units, the average product of labor is 4. Assuming labor is the sole variable input and costs $20 per unit, calculate the average total cost for these 20 units.",
+    "image": null,
+    "options": [
+    "$5",
+    "$10",
+    "$15",
+    "$20",
+    "$25"
+    ],
+    "correctAnswer": "B",
+    "explanation": "1. Find Labor: $L = Output / AP = 20 / 4 = 5$ workers. 2. Find TVC: $5 workers * $20 wage = $100$. 3. Find TC: $TFC ($100) + TVC ($100) = $200$. 4. Find ATC: $TC / Output = 200 / 20 = $10$."
+    },
+    {
+    "id": 2040,
+    "unit": 3,
+    "lessonIDS": ["3.2"],
+    "unitName": "Production, Cost, and the Perfect Competition Model",
+    "question": "Use the table below to answer the question:\n\n| Output (Quantity) | Total Cost |\n| :---: | :---: |\n| 0 | $50 |\n| 10 | $90 |\n\nBased on the cost schedule above, what is the average variable cost (AVC) when producing 10 units?",
+    "image": null,
+    "options": [
+    "$4",
+    "$5",
+    "$9",
+    "$40",
+    "$50"
+    ],
+    "correctAnswer": "A",
+    "explanation": "Total cost at 0 output represents fixed costs ($50). At 10 units, total cost is $90, so variable cost is $90 - $50 = $40. AVC is $40 / 10 units = $4."
+    },
+    {
+    "id": 2041,
+    "unit": 3,
+    "lessonIDS": ["3.2"],
+    "unitName": "Production, Cost, and the Perfect Competition Model",
+    "question": "A company produces 50 widgets with a total cost of $600. If the average variable cost is $8 per widget, what is the firm's total fixed cost?",
+    "image": null,
+    "options": [
+    "$50",
+    "$100",
+    "$200",
+    "$400",
+    "$800"
     ],
     "correctAnswer": "C",
-    "explanation": "Accounting profit subtracts only explicit (out-of-pocket) costs from total revenue. Economic profit subtracts both explicit costs and implicit costs (the opportunity costs of resources used) from total revenue."
-  },
-  {
-    "id": 98,
+    "explanation": "Total variable cost = $AVC * Quantity = $8 * 50 = $400$. Total fixed cost = $Total cost - Total variable cost = $600 - $400 = $200$."
+    },
+    {
+    "id": 2042,
+    "unit": 3,
+    "lessonIDS": ["3.2"],
+    "unitName": "Production, Cost, and the Perfect Competition Model",
+    "question": "If a firm is operating in the region of diminishing marginal product, which of the following must be true about its short-run marginal cost (MC) curve?",
+    "image": null,
+    "options": [
+    "The MC curve is sloping upward.",
+    "The MC curve is vertical.",
+    "The MC curve intersects the average fixed cost curve at its minimum.",
+    "The MC curve is horizontal.",
+    "The MC curve is sloping downward."
+    ],
+    "correctAnswer": "A",
+    "explanation": "Marginal cost is the inverse of marginal product (assuming constant input prices). If marginal product is falling (diminishing), the cost of producing the next unit must be rising."
+    },
+    {
+    "id": 2043,
+    "unit": 3,
+    "lessonIDS": ["3.3"],
+    "unitName": "Production, Cost, and the Perfect Competition Model",
+    "question": "If a corporation notices that its Long-Run Average Total Cost (LRATC) curve slopes downward as output increases, this trend signifies:",
+    "image": null,
+    "options": [
+    "Allocative inefficiency",
+    "Economies of scale",
+    "Decreasing returns to scale",
+    "Diminishing marginal returns",
+    "Constant returns to scale"
+    ],
+    "correctAnswer": "B",
+    "explanation": "Economies of scale exist when increasing the scale of production leads to a lower average cost per unit, represented by a downward sloping LRATC."
+    },
+    {
+        "id": 2044,
+        "unit": 3,
+        "lessonIDS": ["3.3"],
+        "unitName": "Production, Cost, and the Perfect Competition Model",
+        "question": "The table below shows the long-run relationship between a firm's inputs and its total output:\n\n| Units of Input | Total Output |\n| :---: | :---: |\n| 100 | 500 |\n| 200 | 1,200 |\n\nBased on the data in the table, which of the following describes the firm's production?",
+        "image": null,
+        "options": [
+          "Increasing returns to scale",
+          "Constant returns to scale",
+          "Decreasing returns to scale",
+          "Diminishing marginal returns",
+          "Negative returns to scale"
+        ],
+        "correctAnswer": "A",
+        "explanation": "When inputs are doubled (increased by 100%), output more than doubles (increases by 140%). This disproportionate rise in output relative to inputs is the definition of Increasing Returns to Scale (which causes Economies of Scale)."
+      },
+    {
+    "id": 2045,
+    "unit": 3,
+    "lessonIDS": ["3.3"],
+    "unitName": "Production, Cost, and the Perfect Competition Model",
+    "question": "Orion Tech produces microchips using labor and capital. When Orion triples its input of both labor and capital, its total output of microchips also exactly triples. This production function exhibits:",
+    "image": null,
+    "options": [
+    "Diminishing marginal utility",
+    "Diseconomies of scale",
+    "Increasing returns to scale",
+    "Constant returns to scale",
+    "Decreasing returns to scale"
+    ],
+    "correctAnswer": "D",
+    "explanation": "Constant returns to scale occur when output increases by the same proportion as the increase in inputs (e.g., inputs x3 -> output x3)."
+    },
+    {
+    "id": 2046,
     "unit": 3,
     "lessonIDS": ["3.5"],
     "unitName": "Production, Cost, and the Perfect Competition Model",
-    "question": "A profit-maximizing firm in any market structure will produce the quantity of output where:",
+    "question": "The table below displays the cost and profit data for a perfectly competitive firm:\n\n| Output | Marginal Cost (MC) | Marginal Revenue (MR) | Total Economic Profit |\n| :---: | :---: | :---: | :---: |\n| 100 | - | - | $500 |\n| 101 | $40 | $30 | ? |\n\nBased on the table, what will be the new total economic profit if the firm increases production to 101 units?",
     "image": null,
     "options": [
-      "Marginal revenue equals average total cost",
-      "Price equals marginal cost",
-      "Marginal revenue equals marginal cost",
-      "Total revenue is maximized",
-      "Average total cost is minimized"
+    "$490",
+    "$500",
+    "$510",
+    "$530",
+    "$540"
     ],
-    "correctAnswer": "C",
-    "explanation": "The fundamental rule for profit maximization is to produce up to the point where the revenue generated by the last unit sold (marginal revenue, MR) is equal to the cost of producing that last unit (marginal cost, MC)."
-  },
-  {
-    "id": 99,
+    "correctAnswer": "A",
+    "explanation": "The firm loses $10 on the 101st unit ($MR $30 - MC $40 = -$10$). This loss reduces the total profit from $500 to $490."
+    },
+    {
+    "id": 2047,
+    "unit": 3,
+    "lessonIDS": ["3.4"],
+    "unitName": "Production, Cost, and the Perfect Competition Model",
+    "question": "After resigning from a position that paid $200 daily, an entrepreneur launches a food truck. Day one operations yield $250 in revenue with zero variable costs. While the accounting profit is clearly $250, what is the economic profit?",
+    "image": null,
+    "options": [
+    "$50",
+    "$200",
+    "$250",
+    "- $50",
+    "- $200"
+    ],
+    "correctAnswer": "A",
+    "explanation": "Economic Profit subtracts both explicit costs ($0 in this simple case) and implicit costs (the opportunity cost of his lost wages, $200). $250 revenue - $200 opportunity cost = $50 economic profit."
+    },
+    {
+    "id": 2048,
     "unit": 3,
     "lessonIDS": ["3.6"],
     "unitName": "Production, Cost, and the Perfect Competition Model",
-    "question": "In the short run, a perfectly competitive firm should shut down and produce zero output if:",
+    "question": "A perfectly competitive firm produces 100 units where the price is $10, average total cost (ATC) is $20, and average variable cost (AVC) is $12. By shutting down instead of operating, how much would the firm save in losses?",
     "image": null,
     "options": [
-      "Price is less than average total cost",
-      "Price is less than average variable cost",
-      "Marginal revenue is less than marginal cost",
-      "Economic profit is zero",
-      "Accounting profit is negative"
+    "$200",
+    "$400",
+    "$800",
+    "$1,000",
+    "$1,200"
     ],
-    "correctAnswer": "B",
-    "explanation": "The short-run shutdown rule states that a firm should cease production if the market price falls below its minimum average variable cost (P < min AVC). At such a price, the firm cannot even cover its variable costs per unit."
-  },
-  {
-    "id": 100,
+    "correctAnswer": "A",
+    "explanation": "Operating loss: $(ATC - P) * Q = ($20 - $10) * 100 = $1,000$. Shutdown loss (fixed costs): $(ATC - AVC) * Q = ($20 - $12) * 100 = $800$. The firm reduces its loss from $1,000 to $800 by shutting down, a difference of $200."
+    },
+    {
+    "id": 2049,
     "unit": 3,
-    "lessonIDS": ["3.7"],
+    "lessonIDS": ["3.4"],
     "unitName": "Production, Cost, and the Perfect Competition Model",
-    "question": "Which of the following is NOT a characteristic of a perfectly competitive market?",
+    "question": "Which of the following financial metrics accounts for revenue and explicit costs but ignores implicit (opportunity) costs?",
     "image": null,
     "options": [
-      "A large number of buyers and sellers",
-      "Firms sell differentiated products",
-      "Free entry and exit for firms",
-      "Firms are price takers",
-      "Perfect information for buyers and sellers"
-    ],
-    "correctAnswer": "B",
-    "explanation": "Perfectly competitive markets are characterized by firms selling identical (homogeneous) products. Product differentiation is a feature of monopolistic competition."
-  },
-  {
-    "id": 101,
-    "unit": 3,
-    "lessonIDS": ["3.7"],
-    "unitName": "Production, Cost, and the Perfect Competition Model",
-    "question": "In long-run equilibrium, a perfectly competitive firm produces at the output level where:",
-    "image": null,
-    "options": [
-      "Price > Average Total Cost",
-      "Price < Average Variable Cost",
-      "Marginal Revenue > Marginal Cost",
-      "Price = Marginal Cost = Minimum Average Total Cost",
-      "Economic Profit > 0"
+    "Economic profit",
+    "Marginal profit",
+    "Normal profit",
+    "Accounting profit",
+    "Deadweight loss"
     ],
     "correctAnswer": "D",
-    "explanation": "In the long run, free entry and exit drive economic profits to zero in perfect competition. This occurs where firms produce at the minimum point of their average total cost curve, and price equals both marginal cost and minimum average total cost (P = MC = min ATC)."
-  },
-  {
-    "id": 102,
+    "explanation": "Accounting profit is calculated as Revenue minus Explicit Expenses. It does not deduct the value of the next best alternative (implicit cost)."
+    },
+    {
+    "id": 2050,
     "unit": 3,
-    "lessonIDS": ["3.6", "3.7"],
+    "lessonIDS": ["3.5"],
     "unitName": "Production, Cost, and the Perfect Competition Model",
-    "question": "If a perfectly competitive firm is earning positive economic profit in the short run, then:",
+    "question": "For a firm in a perfectly competitive market where price exceeds average variable cost, profit maximization occurs at the quantity where:",
     "image": null,
     "options": [
-      "Price must be less than average total cost",
-      "Price must be equal to average total cost",
-      "Price must be greater than average total cost",
-      "The firm should exit the market",
-      "New firms will exit the market"
+    "Marginal revenue equals marginal cost",
+    "Total revenue is maximized",
+    "Average total cost is minimized",
+    "Price equals average fixed cost",
+    "Marginal revenue exceeds average variable cost"
+    ],
+    "correctAnswer": "A",
+    "explanation": "The universal rule for profit maximization is to produce up to the point where the additional revenue from selling one more unit (MR) equals the additional cost of producing it (MC)."
+    },
+    {
+    "id": 2051,
+    "unit": 3,
+    "lessonIDS": ["3.5"],
+    "unitName": "Production, Cost, and the Perfect Competition Model",
+    "question": "A firm analyzes its data and realizes it could increase its total profit by producing more units than it currently is. Which of the following inequalities must be true at the current level of output?",
+    "image": null,
+    "options": [
+    "Marginal revenue < marginal cost",
+    "Price < average variable cost",
+    "Marginal revenue > marginal cost",
+    "Marginal revenue = marginal cost",
+    "Average total cost > price"
     ],
     "correctAnswer": "C",
-    "explanation": "Positive economic profit means total revenue exceeds total cost (explicit + implicit). For a perfectly competitive firm (where P = MR), this occurs when the market price is greater than the average total cost at the profit-maximizing quantity (where P = MC)."
-  }
+    "explanation": "If producing more adds to total profit, the revenue generated by the next unit (MR) must be greater than the cost to produce it (MC)."
+    },
+    {
+    "id": 2052,
+    "unit": 3,
+    "lessonIDS": ["3.5"],
+    "unitName": "Production, Cost, and the Perfect Competition Model",
+    "question": "If a firm's total revenue is rising as it sells more units, which of the following must be true about its marginal revenue?",
+    "image": null,
+    "options": [
+    "It is equal to zero.",
+    "It is negative.",
+    "It is greater than zero.",
+    "It is less than Average Revenue.",
+    "It is undefined."
+    ],
+    "correctAnswer": "C",
+    "explanation": "Marginal revenue is the slope of the total revenue curve. If total revenue is increasing (positive slope), marginal revenue must be positive ($>0$)."
+    },
+    {
+    "id": 2053,
+    "unit": 3,
+    "lessonIDS": ["3.7"],
+    "unitName": "Production, Cost, and the Perfect Competition Model",
+    "question": "Use the table below which shows the short-run total variable cost for a firm. The market price for the product is $75.\n\n| Quantity | Total Variable Cost |\n| :---: | :---: |\n| 0 | $0 |\n| 1 | $50 |\n| 2 | $110 |\n| 3 | $180 |\n| 4 | $260 |\n\nHow many units will the firm produce to maximize profit?",
+    "image": null,
+    "options": [
+    "1 unit",
+    "2 units",
+    "3 units",
+    "4 units",
+    "0 units"
+    ],
+    "correctAnswer": "C",
+    "explanation": "Calculate Marginal Cost ($Change in TVC / Change in Q$). MC of Unit 1: $50. Unit 2: $60 ($110-50). Unit 3: $70 ($180-110). Unit 4: $80 ($260-180). With a Price of $75, the firm produces Unit 3 (MC $70 < P $75) but stops before Unit 4 (MC $80 > P $75)."
+    },
+    {
+    "id": 2054,
+    "unit": 3,
+    "lessonIDS": ["3.6"],
+    "unitName": "Production, Cost, and the Perfect Competition Model",
+    "question": "A fitness center is locked into an annual lease of $50,000 (a fixed cost). Next year's projections show total revenue at $300,000 and total variable costs (salaries, utilities) at $280,000. Economically, the optimal decision is to:",
+    "image": null,
+    "options": [
+    "Operate, because it minimizes losses to $30,000.",
+    "Shut down, because it is making an economic loss.",
+    "Shut down, to limit losses to $0.",
+    "Operate, because it is making a profit of $20,000.",
+    "Operate, but reduce prices to increase volume."
+    ],
+    "correctAnswer": "A",
+    "explanation": "Operating Profit = $Revenue - TVC - TFC = 300k - 280k - 50k = -$30,000$. Shutting Down Profit = $-TFC = -$50,000$. Operating results in a smaller loss ($30k vs $50k) because the revenue covers all variable costs and contributes $20k toward the fixed lease."
+    },
+    {
+    "id": 2055,
+    "unit": 3,
+    "lessonIDS": ["3.6"],
+    "unitName": "Production, Cost, and the Perfect Competition Model",
+    "question": "Graphically, the short-run supply curve for a perfectly competitive firm corresponds to:",
+    "image": null,
+    "options": [
+    "The entire marginal cost curve.",
+    "The average total cost curve above the break-even point.",
+    "The marginal cost curve above the minimum average variable cost.",
+    "The average variable cost curve below the marginal cost curve.",
+    "The vertical axis where quantity equals zero."
+    ],
+    "correctAnswer": "C",
+    "explanation": "A firm supplies based on its marginal cost, but will produce zero (shut down) if the price falls below the minimum average variable cost. Thus, the supply curve is the MC segment above min AVC."
+    },
+    {
+    "id": 2056,
+    "unit": 3,
+    "lessonIDS": ["3.7"],
+    "unitName": "Production, Cost, and the Perfect Competition Model",
+    "question": "Suppose the prevailing market price in a perfectly competitive industry is higher than the minimum of the average total cost curve. How will the market adjust in the long run?",
+    "image": null,
+    "options": [
+    "Firms will exit, pushing prices down.",
+    "New firms will enter, increasing supply and lowering the price.",
+    "Existing firms will increase prices to maximize profit.",
+    "Demand will decrease due to the high price.",
+    "Government intervention will set a price ceiling."
+    ],
+    "correctAnswer": "B",
+    "explanation": "Price > ATC implies economic profits. In perfect competition, these profits attract new entrants. Entry shifts the market supply right, driving the price down until zero economic profit is restored."
+    },
+    {
+    "id": 2057,
+    "unit": 3,
+    "lessonIDS": ["3.6"],
+    "unitName": "Production, Cost, and the Perfect Competition Model",
+    "question": "A competitive firm faces a price that is lower than its average total cost but higher than its average variable cost. In the short run, this firm should:",
+    "image": null,
+    "options": [
+    "Produce at the quantity where price equals marginal cost.",
+    "Shut down immediately to stop losing money.",
+    "Produce at the quantity where average total cost is minimized.",
+    "Raise its price to cover the total costs.",
+    "Decrease production to zero."
+    ],
+    "correctAnswer": "A",
+    "explanation": "Since price > AVC, the firm covers all variable costs and some fixed costs. It minimizes losses by operating where $P = MC$ rather than shutting down."
+    },
+    {
+    "id": 2058,
+    "unit": 3,
+    "lessonIDS": ["3.7"],
+    "unitName": "Production, Cost, and the Perfect Competition Model",
+    "question": "Which structural feature of perfect competition ensures that economic profits are eliminated in the long run?",
+    "image": null,
+    "options": [
+    "Product differentiation",
+    "High barriers to entry",
+    "Free entry and exit",
+    "Information asymmetry",
+    "Government regulation"
+    ],
+    "correctAnswer": "C",
+    "explanation": "The absence of barriers allows firms to freely enter (eroding profits) or exit (eroding losses), ensuring the market settles at zero economic profit."
+    },
+    {
+    "id": 2059,
+    "unit": 3,
+    "lessonIDS": ["3.6"],
+    "unitName": "Production, Cost, and the Perfect Competition Model",
+    "question": "On the cost curve diagram below, the points P, Q, R, and S lie on the marginal cost curve. Point Q is at the minimum of the average variable cost curve, and Point R is at the minimum of the average total cost curve. Which segment identifies the firm's supply curve? ",
+    "image": { "src": "./images/allQS2059.svg", "alt": "Cost curve diagram showing Marginal Cost, Average Variable Cost, and Average Total Cost curves" },
+    "options": [
+    "Segment QRS (points at or above AVC)",
+    "Segment PQR (points below ATC)",
+    "Segment RS only (points at or above ATC)",
+    "The entire curve PQRS",
+    "Segment PQ only"
+    ],
+    "correctAnswer": "A",
+    "explanation": "The supply curve begins at the shutdown point (minimum AVC, which is point Q) and follows the marginal cost curve upward as prices rise (Segment QRS)."
+    },
+    {
+    "id": 2060,
+    "unit": 3,
+    "lessonIDS": ["3.2"],
+    "unitName": "Production, Cost, and the Perfect Competition Model",
+    "question": "A profit-maximizing firm is currently producing at a quantity where the marginal cost is $50 and the average total cost is $55. The current market price for the product is $80. If the firm produces additional units, which of the following must be true regarding the average total cost? ",
+    "image": null,
+    "options": [
+    "It will increase.",
+    "It will decrease.",
+    "It is currently at its minimum.",
+    "It is equal to average variable cost.",
+    "It will remain constant."
+    ],
+    "correctAnswer": "B",
+    "explanation": "Cost theory dictates that whenever marginal cost is less than average total cost ($MC < ATC$), the marginal unit pulls the average down. The price of $80 determines profit but does not change the mathematical relationship between the cost curves."
+    },
+    {
+    "id": 2061,
+    "unit": 3,
+    "lessonIDS": ["3.2"],
+    "unitName": "Production, Cost, and the Perfect Competition Model",
+    "question": "Refer to the graph below, which shows the short run product cost curves for a profit maximizing firm. The marginal cost curve has shifted upward from MC1 to MC2. Which of the following changes could have caused this shift? ",
+    "image": { "src": "./images/allQS2061.svg", "alt": "Short run product cost curves showing Marginal Cost curve shift" },
+    "options": [
+    "An increase in the monthly rent for the factory",
+    "An increase in the hourly wage paid to workers",
+    "Adoption of a more efficient production technology",
+    "A decrease in the market price of the good",
+    "An increase in the firm's property taxes"
+    ],
+    "correctAnswer": "B",
+    "explanation": "The Marginal Cost curve shifts only when the price of a variable input changes. Wages are a variable cost. Rent and property taxes are fixed costs (which shift ATC but not MC), and technology improvements usually shift MC down, not up."
+    }
 ]
 
 
@@ -2293,7 +2599,7 @@ const microUnit5Questions = [
       "Price of the output times the quantity of labor"
     ],
     "correctAnswer": "B",
-    "explanation": "MRP represents the additional revenue a firm earns from hiring one more unit of labor. It is the Marginal Product of Labor (MPL) multiplied by the Marginal Revenue (MR) from selling the additional output. In perfectly competitive output markets, MR equals Price (P), so MRP = MPL x P."
+    "explanation": "MRP represents the additional revenue a firm earns from hiring one more unit of labor. It is the marginal product of labor (MPL) multiplied by the marginal revenue (MR) from selling the additional output. In perfectly competitive output markets, MR equals price (P), so MRP = MPL x P."
   },
   {
     "id": 115,
@@ -2310,7 +2616,7 @@ const microUnit5Questions = [
       "Marginal cost equals the wage rate"
     ],
     "correctAnswer": "B",
-    "explanation": "Firms maximize profit by hiring factors up to the point where the additional revenue from the factor (MRP) equals the additional cost of the factor (Marginal Factor Cost, MFC). In a perfectly competitive labor market, MFC equals the market wage rate (W). Thus, the firm hires until MRP = W."
+    "explanation": "Firms maximize profit by hiring factors up to the point where the additional revenue from the factor (MRP) equals the additional cost of the factor (marginal factor cost, MFC). In a perfectly competitive labor market, MFC equals the market wage rate (W). Thus, the firm hires until MRP = W."
   },
   {
     "id": 116,
@@ -2447,7 +2753,7 @@ const microUnit5Questions = [
       "decrease its demand for labor"
     ],
     "correctAnswer": "A",
-    "explanation": "Factor demand is a 'derived demand.' Even in monopolistic competition, if demand for the product increases, both the Price and Marginal Revenue (MR) for the product rise. This increases the Marginal Revenue Product (MRP = MP * MR) of the inputs, leading the firm to increase its demand for capital and labor."
+    "explanation": "Factor demand is a 'derived demand.' Even in monopolistic competition, if demand for the product increases, both the price and marginal revenue (MR) for the product rise. This increases the marginal revenue product (MRP = MP * MR) of the inputs, leading the firm to increase its demand for capital and labor."
   },
   {
     "id": 2012,
@@ -2465,7 +2771,7 @@ const microUnit5Questions = [
       "more than the profit-maximizing level of output"
     ],
     "correctAnswer": "B",
-    "explanation": "The law of diminishing marginal returns applies regardless of market structure. If MP is falling, MC is rising. A profit-maximizing monopolist produces where MR = MC, which must occur in the region where MC is rising (and MP is falling)."
+    "explanation": "The law of diminishing marginal returns applies regardless of market structure. If MP is falling, MC is rising. A profit-maximizing monopolist produces where MR = MC, which must occur in the region where marginal cost is rising (and marginal product is falling)."
   },
   {
     "id": 2013,
@@ -2483,7 +2789,7 @@ const microUnit5Questions = [
       "An increase in the demand for advertising services by large corporations"
     ],
     "correctAnswer": "E",
-    "explanation": "Labor demand is derived from product demand. If large corporations demand more advertising services (the product), the advertising firms' Marginal Revenue (MR) increases. This raises the MRP of graphic designers, shifting the labor demand curve right and increasing the wage."
+    "explanation": "Labor demand is derived from product demand. If large corporations demand more advertising services (the product), the advertising firms' marginal revenue (MR) increases. This raises the MRP of graphic designers, shifting the labor demand curve right and increasing the wage."
   },
   {
     "id": 2014,
@@ -2519,7 +2825,7 @@ const microUnit5Questions = [
       "The demand curve for labor will shift to the right."
     ],
     "correctAnswer": "A",
-    "explanation": "MRP = MP * MR. If MR decreases due to falling product demand, the MRP decreases. Since the labor demand curve is the MRP curve, the firm's demand for labor decreases."
+    "explanation": "MRP = MP * MR. If marginal revenue decreases due to falling product demand, the MRP decreases. Since the labor demand curve is the MRP curve, the firm's demand for labor decreases."
   },
   {
     "id": 2016,
@@ -2537,7 +2843,7 @@ const microUnit5Questions = [
       "P = $40 and MR = $40"
     ],
     "correctAnswer": "B",
-    "explanation": "The firm hires where Wage = MRP. So, $40 = MRP. Since MRP = MP * MR, we have $40 = 8 * MR, which means MR = $5. For a firm with market power (downward sloping demand), Price (P) is always greater than Marginal Revenue (MR). Therefore, P > $5."
+    "explanation": "The firm hires where wage = MRP. So, $40 = MRP. Since MRP = MP * MR, we have $40 = 8 * MR, which means MR = $5. For a firm with market power (downward sloping demand), price (P) is always greater than marginal revenue (MR). Therefore, P > $5."
   },
   {
     "id": 2017,
@@ -2555,7 +2861,7 @@ const microUnit5Questions = [
       "Wage: $25, Rental Rate: $120"
     ],
     "correctAnswer": "B",
-    "explanation": "Regardless of the product market structure, the profit-maximizing rule for hiring inputs is MRP = MFC (Factor Price). Thus, Wage must equal $50 and the Rental Rate must equal $120."
+    "explanation": "Regardless of the product market structure, the profit-maximizing rule for hiring inputs is MRP = MFC (factor price). Thus, wage must equal $50 and the rental rate must equal $120."
   },
   {
     "id": 2018,
@@ -2609,7 +2915,7 @@ const microUnit5Questions = [
       "Marginal Product (MP) × Marginal Revenue (MR)"
     ],
     "correctAnswer": "E",
-    "explanation": "This is a key distinction. For a perfect competitor, P=MR, so MRP=MP*P. But for a firm with market power, P > MR, so the strictly correct definition is MRP = MP * MR."
+    "explanation": "This is a key distinction. For a perfect competitor, P=MR, so MRP=MP*P. But for a firm with market power, price > marginal revenue, so the strictly correct definition is MRP = MP * MR."
   },
   {
     "id": 2021,
@@ -2627,7 +2933,7 @@ const microUnit5Questions = [
       "Keep employment levels unchanged"
     ],
     "correctAnswer": "D",
-    "explanation": "We must calculate MRP using MR, not Price. MRP = MP * MR = 5 * $8 = $40. The Wage (MFC) is $50. Since MRP ($40) < MFC ($50), the firm is losing money on the last worker and should employ fewer workers."
+    "explanation": "We must calculate MRP using MR, not price. MRP = MP * MR = 5 * $8 = $40. The wage (MFC) is $50. Since MRP ($40) < MFC ($50), the firm is losing money on the last worker and should employ fewer workers."
   },
   {
     "id": 2022,
@@ -2663,7 +2969,7 @@ const microUnit5Questions = [
       "It is downward sloping due to lack of competition."
     ],
     "correctAnswer": "D",
-    "explanation": "A monopsonist faces the market supply curve, which is upward sloping. Because they must raise wages to hire more workers, the Marginal Factor Cost (MFC) curve lies *above* the supply curve."
+    "explanation": "A monopsonist faces the market supply curve, which is upward sloping. Because they must raise wages to hire more workers, the marginal factor cost (MFC) curve lies *above* the supply curve."
   },
   {
     "id": 2024,
@@ -2699,7 +3005,7 @@ const microUnit5Questions = [
       "Price of the output times the quantity of labor"
     ],
     "correctAnswer": "B",
-    "explanation": "MRP represents the additional revenue a firm earns from hiring one more unit of labor. It is the Marginal Product of Labor (MPL) multiplied by the Marginal Revenue (MR) from selling the additional output. In perfectly competitive output markets, MR equals Price (P), so MRP = MPL x P."
+    "explanation": "MRP represents the additional revenue a firm earns from hiring one more unit of labor. It is the marginal product of labor (MPL) multiplied by the marginal revenue (MR) from selling the additional output. In perfectly competitive output markets, MR equals price (P), so MRP = MPL x P."
   },
   {
     "id": 2026,
@@ -2717,7 +3023,7 @@ const microUnit5Questions = [
       "Marginal cost equals the wage rate"
     ],
     "correctAnswer": "B",
-    "explanation": "Firms maximize profit by hiring factors up to the point where the additional revenue from the factor (MRP) equals the additional cost of the factor (Marginal Factor Cost, MFC). In a perfectly competitive labor market, MFC equals the market wage rate (W). Thus, the firm hires until MRP = W."
+    "explanation": "Firms maximize profit by hiring factors up to the point where the additional revenue from the factor (MRP) equals the additional cost of the factor (marginal factor cost, MFC). In a perfectly competitive labor market, MFC equals the market wage rate (W). Thus, the firm hires until MRP = W."
   },
   {
     "id": 2027,
@@ -5236,7 +5542,7 @@ export const allQuestions: QuestionType[] = [
       "Price of the output times the quantity of labor"
     ],
     "correctAnswer": "B",
-    "explanation": "MRP represents the additional revenue a firm earns from hiring one more unit of labor. It is the Marginal Product of Labor (MPL) multiplied by the Marginal Revenue (MR) from selling the additional output. In perfectly competitive output markets, MR equals Price (P), so MRP = MPL x P."
+    "explanation": "MRP represents the additional revenue a firm earns from hiring one more unit of labor. It is the marginal product of labor (MPL) multiplied by the marginal revenue (MR) from selling the additional output. In perfectly competitive output markets, MR equals price (P), so MRP = MPL x P."
   },
   {
     "id": 115,
@@ -5254,7 +5560,7 @@ export const allQuestions: QuestionType[] = [
       "Marginal cost equals the wage rate"
     ],
     "correctAnswer": "B",
-    "explanation": "Firms maximize profit by hiring factors up to the point where the additional revenue from the factor (MRP) equals the additional cost of the factor (Marginal Factor Cost, MFC). In a perfectly competitive labor market, MFC equals the market wage rate (W). Thus, the firm hires until MRP = W."
+    "explanation": "Firms maximize profit by hiring factors up to the point where the additional revenue from the factor (MRP) equals the additional cost of the factor (marginal factor cost, MFC). In a perfectly competitive labor market, MFC equals the market wage rate (W). Thus, the firm hires until MRP = W."
   },
   {
     "id": 116,
@@ -5993,7 +6299,7 @@ export const allQuestions: QuestionType[] = [
         "Peak",
         "Expansion",
         "Trough",
-        "Contraction or Recession",
+        "Contraction",
         "Recovery"
       ],
       "correctAnswer": "D",
