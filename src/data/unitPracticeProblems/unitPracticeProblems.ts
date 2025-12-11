@@ -2309,11 +2309,11 @@ const microUnit4Questions = [
       "Consumer surplus is maximized",
       "Deadweight loss is maximized",
       "Total output decreases compared to a single-price monopoly",
-      "The monopolist captures all consumer surplus as profit",
+      "The monopolist captures all consumer surplus as additional revenue",
       "The demand curve becomes the marginal revenue curve"
     ],
     "correctAnswer": "D",
-    "explanation": "Under perfect price discrimination, the firm charges each consumer their maximum willingness to pay. This eliminates consumer surplus entirely and transfers it to the producer as economic profit. Output expands to the allocatively efficient level (where P=MC for the last unit), eliminating deadweight loss."
+    "explanation": "Under perfect price discrimination, the firm charges each consumer their maximum willingness to pay. This eliminates consumer surplus entirely and transfers it to the producer additional revenue. Output expands to the allocatively efficient level (where P=MC for the last unit), eliminating deadweight loss."
   },
   {
     "id": 109,
