@@ -64,6 +64,8 @@ const macroSetOneFRQA5APlaceholder = '/images/frqPracticePage/logo.png';
 const macroSetOneFRQA5CPlaceholder = '/images/frqPracticePage/logo.png';
 const macroMoneyMarketBuy = '/images/frqPracticePage/macroMoneyMarketBuy.png';
 const macroLoanableFundsFiscal = '/images/frqPracticePage/macroLoanableFundsFiscal.png';
+const macroUnit4Set1A = '/images/frqPracticePage/macroUnit4Set1A.jpg';
+const macroUnit4Set1C = '/images/frqPracticePage/macroUnit4Set1C.jpg';
 
 export const macroUnit4Set1: FRQExam = {
   examTitle: "AP Macroeconomics Unit 4 FRQ: Ample Reserves",
@@ -85,7 +87,8 @@ export const macroUnit4Set1: FRQExam = {
           pointValue: 2,
           text: "Draw a correctly labeled graph of the long-run aggregate supply, short-run aggregate supply, and aggregate demand curves, and show each of the following.",
           answerType: "draw" as const,
-          answer: OUTPUTLOW,
+          answer: macroUnit4Set1A,
+          referenceImageUrl: "/images/frqPracticePage/macroUnit4Set1A.jpg",
           gradingCriteria: "2 points: Graph correctly shows LRAS (vertical), SRAS (upward sloping), and AD (downward sloping) curves with properly labeled axes (Real GDP/Output on X-axis, Price Level on Y-axis). Current equilibrium (Y1, PL1) is shown at the intersection of AD and SRAS, positioned to the left of LRAS. Full-employment output (Yf) is labeled on the LRAS curve. 1 point: Graph shows most elements correctly but is missing one key component (e.g., missing axis labels, incorrect curve slopes, or missing equilibrium labels). 0 points: Graph does not meet the criteria or is completely incorrect.",
           videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/frqExplanations/U4V1.mp4",
           subparts: [
@@ -118,7 +121,7 @@ export const macroUnit4Set1: FRQExam = {
           pointValue: 2,
           text: "Draw a correctly labeled graph of the reserve market and show the effect of the monetary policy action identified in part (B) on the policy rate.",
           answerType: "draw" as const,
-          answer: PRDOWN,
+          answer: macroUnit4Set1C,
           gradingCriteria: "2 points: Graph correctly shows the reserve market with properly labeled axes (Reserves/Quantity of Reserves on X-axis, Interest Rate/Policy Rate on Y-axis). Demand for reserves curve and supply of reserves curve are shown. The effect of decreasing IOR is correctly illustrated (supply curve shifts down or demand shifts appropriately), resulting in a decrease in the policy rate. 1 point: Graph shows most elements correctly but is missing one key component (e.g., missing axis labels, incorrect curve representation, or missing policy effect). 0 points: Graph does not meet the criteria or is completely incorrect.",
           videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/frqExplanations/U4V3.mp4",
           referenceImageUrl: "/images/frqPracticePage/macroUnit4Set1C.jpg",

@@ -1830,23 +1830,24 @@ const microUnit3Questions = [
     "correctAnswer": "B",
     "explanation": "1. Find Labor: $L = Output / AP = 20 / 4 = 5$ workers. 2. Find TVC: $5 workers * $20 wage = $100$. 3. Find TC: $TFC ($100) + TVC ($100) = $200$. 4. Find ATC: $TC / Output = 200 / 20 = $10$."
     },
-    {
-    "id": 2040,
-    "unit": 3,
-    "lessonIDS": ["3.2"],
-    "unitName": "Production, Cost, and the Perfect Competition Model",
-    "question": "Use the table below to answer the question:\n\n| Output (Quantity) | Total Cost |\n| :---: | :---: |\n| 0 | $50 |\n| 10 | $90 |\n\nBased on the cost schedule above, what is the average variable cost (AVC) when producing 10 units?",
-    "image": null,
-    "options": [
-    "$4",
-    "$5",
-    "$9",
-    "$40",
-    "$50"
-    ],
-    "correctAnswer": "A",
-    "explanation": "Total cost at 0 output represents fixed costs ($50). At 10 units, total cost is $90, so variable cost is $90 - $50 = $40. AVC is $40 / 10 units = $4."
-    },
+    // COMMENTED OUT: Table not working properly
+    // {
+    // "id": 2040,
+    // "unit": 3,
+    // "lessonIDS": ["3.2"],
+    // "unitName": "Production, Cost, and the Perfect Competition Model",
+    // "question": "Use the table below to answer the question:\n\n| Output (Quantity) | Total Cost |\n| :---: | :---: |\n| 0 | $50 |\n| 10 | $90 |\n\nBased on the cost schedule above, what is the average variable cost (AVC) when producing 10 units?",
+    // "image": null,
+    // "options": [
+    // "$4",
+    // "$5",
+    // "$9",
+    // "$40",
+    // "$50"
+    // ],
+    // "correctAnswer": "A",
+    // "explanation": "Total cost at 0 output represents fixed costs ($50). At 10 units, total cost is $90, so variable cost is $90 - $50 = $40. AVC is $40 / 10 units = $4."
+    // },
     {
     "id": 2041,
     "unit": 3,
@@ -1898,23 +1899,24 @@ const microUnit3Questions = [
     "correctAnswer": "B",
     "explanation": "Economies of scale exist when increasing the scale of production leads to a lower average cost per unit, represented by a downward sloping LRATC."
     },
-    {
-        "id": 2044,
-        "unit": 3,
-        "lessonIDS": ["3.3"],
-        "unitName": "Production, Cost, and the Perfect Competition Model",
-        "question": "The table below shows the long-run relationship between a firm's inputs and its total output:\n\n| Units of Input | Total Output |\n| :---: | :---: |\n| 100 | 500 |\n| 200 | 1,200 |\n\nBased on the data in the table, which of the following describes the firm's production?",
-        "image": null,
-        "options": [
-          "Increasing returns to scale",
-          "Constant returns to scale",
-          "Decreasing returns to scale",
-          "Diminishing marginal returns",
-          "Negative returns to scale"
-        ],
-        "correctAnswer": "A",
-        "explanation": "When inputs are doubled (increased by 100%), output more than doubles (increases by 140%). This disproportionate rise in output relative to inputs is the definition of Increasing Returns to Scale (which causes Economies of Scale)."
-      },
+    // COMMENTED OUT: Table not working properly
+    // {
+    //     "id": 2044,
+    //     "unit": 3,
+    //     "lessonIDS": ["3.3"],
+    //     "unitName": "Production, Cost, and the Perfect Competition Model",
+    //     "question": "The table below shows the long-run relationship between a firm's inputs and its total output:\n\n| Units of Input | Total Output |\n| :---: | :---: |\n| 100 | 500 |\n| 200 | 1,200 |\n\nBased on the data in the table, which of the following describes the firm's production?",
+    //     "image": null,
+    //     "options": [
+    //       "Increasing returns to scale",
+    //       "Constant returns to scale",
+    //       "Decreasing returns to scale",
+    //       "Diminishing marginal returns",
+    //       "Negative returns to scale"
+    //     ],
+    //     "correctAnswer": "A",
+    //     "explanation": "When inputs are doubled (increased by 100%), output more than doubles (increases by 140%). This disproportionate rise in output relative to inputs is the definition of Increasing Returns to Scale (which causes Economies of Scale)."
+    //   },
     {
     "id": 2045,
     "unit": 3,
@@ -1932,23 +1934,24 @@ const microUnit3Questions = [
     "correctAnswer": "D",
     "explanation": "Constant returns to scale occur when output increases by the same proportion as the increase in inputs (e.g., inputs x3 -> output x3)."
     },
-    {
-    "id": 2046,
-    "unit": 3,
-    "lessonIDS": ["3.5"],
-    "unitName": "Production, Cost, and the Perfect Competition Model",
-    "question": "The table below displays the cost and profit data for a perfectly competitive firm:\n\n| Output | Marginal Cost (MC) | Marginal Revenue (MR) | Total Economic Profit |\n| :---: | :---: | :---: | :---: |\n| 100 | - | - | $500 |\n| 101 | $40 | $30 | ? |\n\nBased on the table, what will be the new total economic profit if the firm increases production to 101 units?",
-    "image": null,
-    "options": [
-    "$490",
-    "$500",
-    "$510",
-    "$530",
-    "$540"
-    ],
-    "correctAnswer": "A",
-    "explanation": "The firm loses $10 on the 101st unit ($MR $30 - MC $40 = -$10$). This loss reduces the total profit from $500 to $490."
-    },
+    // COMMENTED OUT: Table not working properly
+    // {
+    // "id": 2046,
+    // "unit": 3,
+    // "lessonIDS": ["3.5"],
+    // "unitName": "Production, Cost, and the Perfect Competition Model",
+    // "question": "The table below displays the cost and profit data for a perfectly competitive firm:\n\n| Output | Marginal Cost (MC) | Marginal Revenue (MR) | Total Economic Profit |\n| :---: | :---: | :---: | :---: |\n| 100 | - | - | $500 |\n| 101 | $40 | $30 | ? |\n\nBased on the table, what will be the new total economic profit if the firm increases production to 101 units?",
+    // "image": null,
+    // "options": [
+    // "$490",
+    // "$500",
+    // "$510",
+    // "$530",
+    // "$540"
+    // ],
+    // "correctAnswer": "A",
+    // "explanation": "The firm loses $10 on the 101st unit ($MR $30 - MC $40 = -$10$). This loss reduces the total profit from $500 to $490."
+    // },
     {
     "id": 2047,
     "unit": 3,
@@ -2051,23 +2054,24 @@ const microUnit3Questions = [
     "correctAnswer": "C",
     "explanation": "Marginal revenue is the slope of the total revenue curve. If total revenue is increasing (positive slope), marginal revenue must be positive ($>0$)."
     },
-    {
-    "id": 2053,
-    "unit": 3,
-    "lessonIDS": ["3.7"],
-    "unitName": "Production, Cost, and the Perfect Competition Model",
-    "question": "Use the table below which shows the short-run total variable cost for a firm. The market price for the product is $75.\n\n| Quantity | Total Variable Cost |\n| :---: | :---: |\n| 0 | $0 |\n| 1 | $50 |\n| 2 | $110 |\n| 3 | $180 |\n| 4 | $260 |\n\nHow many units will the firm produce to maximize profit?",
-    "image": null,
-    "options": [
-    "1 unit",
-    "2 units",
-    "3 units",
-    "4 units",
-    "0 units"
-    ],
-    "correctAnswer": "C",
-    "explanation": "Calculate Marginal Cost ($Change in TVC / Change in Q$). MC of Unit 1: $50. Unit 2: $60 ($110-50). Unit 3: $70 ($180-110). Unit 4: $80 ($260-180). With a Price of $75, the firm produces Unit 3 (MC $70 < P $75) but stops before Unit 4 (MC $80 > P $75)."
-    },
+    // COMMENTED OUT: Table not working properly
+    // {
+    // "id": 2053,
+    // "unit": 3,
+    // "lessonIDS": ["3.7"],
+    // "unitName": "Production, Cost, and the Perfect Competition Model",
+    // "question": "Use the table below which shows the short-run total variable cost for a firm. The market price for the product is $75.\n\n| Quantity | Total Variable Cost |\n| :---: | :---: |\n| 0 | $0 |\n| 1 | $50 |\n| 2 | $110 |\n| 3 | $180 |\n| 4 | $260 |\n\nHow many units will the firm produce to maximize profit?",
+    // "image": null,
+    // "options": [
+    // "1 unit",
+    // "2 units",
+    // "3 units",
+    // "4 units",
+    // "0 units"
+    // ],
+    // "correctAnswer": "C",
+    // "explanation": "Calculate Marginal Cost ($Change in TVC / Change in Q$). MC of Unit 1: $50. Unit 2: $60 ($110-50). Unit 3: $70 ($180-110). Unit 4: $80 ($260-180). With a Price of $75, the firm produces Unit 3 (MC $70 < P $75) but stops before Unit 4 (MC $80 > P $75)."
+    // },
     {
     "id": 2054,
     "unit": 3,
