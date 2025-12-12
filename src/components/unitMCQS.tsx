@@ -16,6 +16,7 @@ import { QuestionWithKeyTerms } from './QuestionWithKeyTerms';
 import { keyTerms as apMacroTerms } from '@/data/apMacroTerms';
 import { keyTerms as apMicroTerms } from '@/data/apMicroTerms';
 import { KeyTerm } from '@/data/allContent';
+import { logger } from '@/utils/logger';
 
 import dojoIcon from "../../public/images/dojoIcon.png";
 
@@ -130,7 +131,7 @@ const QuestionCard = ({
 
   // Effect to sync internal state and reset forms/validation/mode
   useEffect(() => {
-    console.log(`[QuestionCard] useEffect triggered for question ${question.id}, isAnswered: ${isAnswered}, initialSelectedLetter: ${initialSelectedLetter}`);
+    logger.debug(`[QuestionCard] useEffect triggered for question ${question.id}, isAnswered: ${isAnswered}, initialSelectedLetter: ${initialSelectedLetter}`);
     const currentSelectedIndex = letterToIndex(initialSelectedLetter);
     setSelectedAnswerIndex(currentSelectedIndex);
     // Ensure isSubmitted matches isAnswered state - if not answered, definitely not submitted
@@ -179,7 +180,7 @@ const QuestionCard = ({
 
   const handleAnswerSelect = (index: number) => {
     if (isSubmitted) {
-      console.warn(`[QuestionCard] Blocked answer selection: question ${question.id} already submitted (isSubmitted: ${isSubmitted}, isAnswered: ${isAnswered})`);
+      logger.warn(`[QuestionCard] Blocked answer selection: question ${question.id} already submitted (isSubmitted: ${isSubmitted}, isAnswered: ${isAnswered})`);
       return;
     }
     
@@ -193,7 +194,7 @@ const QuestionCard = ({
       return;
     }
     
-    console.log(`[QuestionCard] Answer selected for question ${question.id}, index ${index}, isLoggedIn: ${isLoggedIn}, currentIndex: ${currentIndex}`);
+    logger.debug(`[QuestionCard] Answer selected for question ${question.id}, index ${index}, isLoggedIn: ${isLoggedIn}, currentIndex: ${currentIndex}`);
     setSelectedAnswerIndex(index);
     setIsSubmitted(true);
     try {
@@ -297,10 +298,10 @@ const QuestionCard = ({
         // Optional: Set background color if transparency is an issue
         // backgroundColor: '#ffffff', 
       });
-      console.log("Canvas generated.");
+      logger.debug("Canvas generated.");
 
       const imageDataUrl = canvas.toDataURL('image/png');
-      console.log("Captured Image Data URL (first 100 chars):", imageDataUrl.substring(0, 100) + "...");
+      logger.debug("Captured Image Data URL (first 100 chars):", imageDataUrl.substring(0, 100) + "...");
 
       // --- TEMPORARY FRONTEND ACTION --- 
       // alert(`Question Card Captured! ...`); // Optional: Remove or keep the alert
@@ -313,7 +314,7 @@ const QuestionCard = ({
          
          // Ensure it's an array (handle potential data corruption)
          if (!Array.isArray(boardBlocks)) {
-             console.warn('localStorage tempBoardBlocks was not an array, resetting.');
+             logger.warn('localStorage tempBoardBlocks was not an array, resetting.');
              boardBlocks = [];
          }
 
@@ -338,7 +339,7 @@ const QuestionCard = ({
 
          // Save back to localStorage
          localStorage.setItem('tempBoardBlocks', JSON.stringify(boardBlocks));
-         console.log(`Saved image block ${newImageBlock.id} to localStorage (temporary)`);
+         logger.debug(`Saved image block ${newImageBlock.id} to localStorage (temporary)`);
          alert('Question Card image saved to temporary local board!'); // Give feedback
 
       } catch (e) {
@@ -740,6 +741,7 @@ export function UnitMCQs({
   const [enableUnderlining, setEnableUnderlining] = useState(true); // Default ON
   const [enableStrikethrough, setEnableStrikethrough] = useState(true); // Default ON
   const [enableZenMode, setEnableZenMode] = useState(false);
+  const [showZenModeHelp, setShowZenModeHelp] = useState(false);
   const settingsButtonRef = useRef<HTMLButtonElement>(null);
   
   // Store previous state before zen mode
@@ -755,10 +757,14 @@ export function UnitMCQs({
       // Disable both features in zen mode
       setEnableUnderlining(false);
       setEnableStrikethrough(false);
+      // Show help text when first entering Zen Mode
+      setShowZenModeHelp(true);
     } else {
       // Restore to default ON when exiting zen mode
       setEnableUnderlining(true);
       setEnableStrikethrough(true);
+      // Hide help text when exiting Zen Mode
+      setShowZenModeHelp(false);
     }
   }, [enableZenMode]);
 
@@ -794,19 +800,19 @@ export function UnitMCQs({
     const isCorrect = answerLetter === currentQuestion.correctAnswer;
     const unitId = currentQuestion.unit; // Get unitId from the question data
 
-    console.log(`[handleAnswerSelection] Processing answer for question ${questionId}, answer: ${answerLetter}, correct: ${isCorrect}, user: ${user?.uid || 'not logged in'}`);
+    logger.debug(`[handleAnswerSelection] Processing answer for question ${questionId}, answer: ${answerLetter}, correct: ${isCorrect}, user: ${user?.uid || 'not logged in'}`);
 
     // Award XP for correct answers (100 XP per correct question)
     if (isCorrect && awardXp) {
-      console.log(`[handleAnswerSelection] Answer is correct! Awarding 100 XP...`);
+      logger.debug(`[handleAnswerSelection] Answer is correct! Awarding 100 XP...`);
       try {
         await awardXp(100);
-        console.log(`[handleAnswerSelection] Successfully awarded 100 XP`);
+        logger.debug(`[handleAnswerSelection] Successfully awarded 100 XP`);
       } catch (error) {
         console.error(`[handleAnswerSelection] Error awarding XP:`, error);
       }
     } else if (isCorrect && !awardXp) {
-      console.warn(`[handleAnswerSelection] Answer is correct but awardXp function is not available`);
+      logger.warn(`[handleAnswerSelection] Answer is correct but awardXp function is not available`);
     }
 
     // Update local state for immediate UI feedback
@@ -818,7 +824,7 @@ export function UnitMCQs({
         
         // 1. Update mcqAnswerStatus Map (via API)
         try {
-            console.log(`[handleAnswerSelection] Updating MCQ status for question ${questionId}`);
+            logger.debug(`[handleAnswerSelection] Updating MCQ status for question ${questionId}`);
             const statusResponse = await fetch('/api/update-mcq-status', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -833,7 +839,7 @@ export function UnitMCQs({
                 const errorData = await statusResponse.json().catch(() => ({}));
                 console.error(`[handleAnswerSelection] Failed to update MCQ status for ${questionId}: ${statusResponse.status}`, errorData);
             } else {
-                console.log(`[handleAnswerSelection] Successfully updated MCQ status for question ${questionId}`);
+                logger.debug(`[handleAnswerSelection] Successfully updated MCQ status for question ${questionId}`);
             }
         } catch (error) {
             console.error(`[handleAnswerSelection] Error calling /api/update-mcq-status for question ${questionId}:`, error);
@@ -845,7 +851,7 @@ export function UnitMCQs({
 
         // 3. --- >>> Write Detailed Answer to mcqAnswers Subcollection <<< ---
         try {
-            console.log(`[handleAnswerSelection] Writing detailed answer log for user ${user.uid}, question ${questionId}`);
+            logger.debug(`[handleAnswerSelection] Writing detailed answer log for user ${user.uid}, question ${questionId}`);
             const userAnswersColRef = collection(db, 'users', user.uid, 'mcqAnswers');
             const answerData = {
                 questionId: questionId,      // Use the actual number ID
@@ -855,7 +861,7 @@ export function UnitMCQs({
                 timestamp: serverTimestamp() // Use Firestore server timestamp
             };
             await addDoc(userAnswersColRef, answerData);
-            console.log(`[handleAnswerSelection] Successfully wrote detailed answer log for question ${questionId}`);
+            logger.debug(`[handleAnswerSelection] Successfully wrote detailed answer log for question ${questionId}`);
         } catch (error) {
             console.error(`[handleAnswerSelection] Error writing detailed answer log to Firestore for question ${questionId}:`, error);
             // Don't throw - allow the UI to continue even if logging fails
@@ -863,7 +869,7 @@ export function UnitMCQs({
         // --- >>> End Subcollection Write <<< ---
 
     } else {
-        console.warn(`[handleAnswerSelection] User not logged in. Skipping backend updates for question ${questionId}.`);
+        logger.warn(`[handleAnswerSelection] User not logged in. Skipping backend updates for question ${questionId}.`);
     }
   };
 
@@ -872,7 +878,7 @@ export function UnitMCQs({
         onQuestionSelect(index);
         setHighlightedIndex(null);
     } else {
-        console.warn("Attempted to select invalid question index:", index);
+        logger.warn("Attempted to select invalid question index:", index);
     }
   };
 
@@ -913,12 +919,12 @@ export function UnitMCQs({
   };
 
   const handlePreviousQuestion = () => {
-    console.log("Handling Previous Question Request");
+    logger.debug("Handling Previous Question Request");
     onPreviousQuestion();
   };
 
   const handleNextQuestion = () => {
-    console.log("Handling Next Question Request");
+    logger.debug("Handling Next Question Request");
     proceedToActualNextQuestion(); 
   };
 
@@ -930,6 +936,11 @@ export function UnitMCQs({
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
+      // Hide help text when any relevant key is pressed
+      if (showZenModeHelp && (event.key === 'Escape' || event.key === 'ArrowLeft' || event.key === 'ArrowRight' || event.key === 'ArrowUp' || event.key === 'ArrowDown' || event.key === 'Enter')) {
+        setShowZenModeHelp(false);
+      }
+
       // ESC key to exit zen mode
       if (event.key === 'Escape') {
         event.preventDefault();
@@ -986,7 +997,7 @@ export function UnitMCQs({
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [enableZenMode, handlePreviousQuestion, handleNextQuestion, isParentModalOpen, isSettingsModalOpen, currentQuestion, highlightedIndex, currentAnswerState, handleAnswerSelection]);
+  }, [enableZenMode, showZenModeHelp, handlePreviousQuestion, handleNextQuestion, isParentModalOpen, isSettingsModalOpen, currentQuestion, highlightedIndex, currentAnswerState, handleAnswerSelection]);
 
   // --- Hide Header when Zen Mode is Active ---
   useEffect(() => {
@@ -1100,6 +1111,16 @@ export function UnitMCQs({
 
   return (
     <div className={`${enableZenMode ? 'fixed inset-0 flex items-center justify-center bg-gray-50' : 'container mx-auto px-4 pt-4 pb-12 relative'}`}>
+      {/* Zen Mode Help Text - Top Left */}
+      {enableZenMode && showZenModeHelp && (
+        <div className="fixed top-4 left-4 z-50 text-sm text-gray-400 font-medium space-y-1 pointer-events-none">
+          <div>ESC to exit</div>
+          <div>← → to change question</div>
+          <div>↑ ↓ to change answer</div>
+          <div>ENTER to submit</div>
+        </div>
+      )}
+      
       {/* Zen Mode Settings Button - Top Right of Main Content */}
       {enableZenMode && (
         <div className="fixed top-4 right-4 z-40">

@@ -16,6 +16,7 @@ import { videos as allVideos, Video } from '@/data/videos';
 import { macroUnits as allMacroUnitsData, microUnits as allMicroUnitsData } from '@/data/cheatSheets';
 import { macroLessons, microLessons } from '@/data/lessons'; // Import lessons
 import { LoginModal, SignupModal } from '@/components/AuthModals';
+import { logger } from '@/utils/logger';
 
 // Assuming this matches the structure in useAuth.ts and Firestore
 interface McqAnswer {
@@ -43,7 +44,7 @@ interface UnitStats {
 
 // Function to calculate weakest units (Using correct field 'unitId')
 function calculateWeakestUnits(answers: McqAnswer[]): WeakUnitInfo[] {
-  console.log("[Calc] Starting calculation with", answers?.length, "answers.");
+  logger.debug("[Calc] Starting calculation with", answers?.length, "answers.");
   if (!answers || answers.length === 0) return [];
 
   const unitStats: { [key: number]: UnitStats } = {};
@@ -53,7 +54,7 @@ function calculateWeakestUnits(answers: McqAnswer[]): WeakUnitInfo[] {
   answers.forEach((answer, index) => {
     // Debug log uses answer.unitId now
     if (index < 5) {
-       console.log(`[Calc] Answer ${index} unitId value:`, answer.unitId, typeof answer.unitId);
+       logger.debug(`[Calc] Answer ${index} unitId value:`, answer.unitId, typeof answer.unitId);
     }
 
     // Check answer.unitId instead of answer.unit
@@ -70,13 +71,13 @@ function calculateWeakestUnits(answers: McqAnswer[]): WeakUnitInfo[] {
     } else {
         // Debug log uses answer.unitId now
         if (index < 10) {
-             console.warn(`[Calc] Answer ${index} has invalid unitId:`, answer.unitId);
+             logger.warn(`[Calc] Answer ${index} has invalid unitId:`, answer.unitId);
         }
     }
   });
 
-  console.log("[Calc] Aggregated unitStats:", unitStats);
-  console.log(`[Calc] Processed ${processedCount} answers with valid numeric unit IDs.`);
+  logger.debug("[Calc] Aggregated unitStats:", unitStats);
+  logger.debug(`[Calc] Processed ${processedCount} answers with valid numeric unit IDs.`);
 
   // 2. Calculate percentage (no change needed here)
   const unitsWithStats = Object.entries(unitStats)
@@ -94,7 +95,7 @@ function calculateWeakestUnits(answers: McqAnswer[]): WeakUnitInfo[] {
   // 3. Sort by Unit ID instead of performance
   unitsWithStats.sort((a, b) => a.unitId - b.unitId);
 
-  console.log("[Calc] Final unitsWithStats (sorted by Unit ID):", unitsWithStats);
+  logger.debug("[Calc] Final unitsWithStats (sorted by Unit ID):", unitsWithStats);
 
   // 4. Return
   return unitsWithStats;
@@ -212,7 +213,7 @@ function UnitMCQPracticeContent() {
       const sortedByWeakest = [...weakest].sort((a, b) => a.percentage - b.percentage);
       const weakestIds = sortedByWeakest.slice(0, 3).map(u => u.unitId);
       setWeakestUnitIds(weakestIds);
-      console.log('[UnitMCQPractice] Weakest units calculated:', weakestIds);
+      logger.debug('[UnitMCQPractice] Weakest units calculated:', weakestIds);
     }
   }, [mcqAnswersData, loadingMcqData, practiceMode]);
 
@@ -357,7 +358,7 @@ function UnitMCQPracticeContent() {
   };
 
   const handleAnswer = async (questionId: number, answerLetter: string, isCorrect: boolean, lessonIDS: string[]) => {
-    console.log('[UnitMCQ] handleAnswer called:', { questionId, answerLetter, isCorrect, hasAwardXp: !!awardXp });
+    logger.debug('[UnitMCQ] handleAnswer called:', { questionId, answerLetter, isCorrect, hasAwardXp: !!awardXp });
     
     setAnsweredQuestions(prev => ({
       ...prev,

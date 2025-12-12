@@ -11,7 +11,7 @@ function BlogCard({ post }: { post: BlogPost }) {
   return (
     <Link href={`/blog/${post.slug}`} className="block group">
       <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden h-full flex flex-col transition-shadow hover:shadow-xl">
-        <div className="relative w-full h-48 bg-white">
+        <div className="relative w-full h-48 bg-white py-4">
           <Image
             src={post.thumbnailUrl}
             alt={post.title}

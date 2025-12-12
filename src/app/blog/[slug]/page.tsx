@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowLeft, Clock } from 'lucide-react';
 import { blogPosts } from '@/data/blogPosts';
 import { BlogPostClient } from '@/components/BlogPostClient';
+import { BlogImagePlacer } from '@/components/BlogImagePlacer';
 import { calculateReadingTime } from '@/utils/readingTime';
 
 interface BlogPostPageProps {
@@ -62,8 +63,12 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             content={post.content}
             subject={post.subject === 'Macro' ? 'ap_macroeconomics' : 'ap_microeconomics'}
             practiceUrl="/unitFRQpracticePage"
+            images={post.images || []}
           />
         </article>
+        
+        {/* Development Image Placer Tool */}
+        <BlogImagePlacer images={post.images || []} />
       </div>
     </div>
   );

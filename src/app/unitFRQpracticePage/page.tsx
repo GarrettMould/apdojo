@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input';
 import { ArrowLeft, ChevronDown, ChevronUp, Sparkles, Loader2, PlayCircle, Upload, X, Pencil, Image as ImageIcon, Lock, Share2, Check, Lightbulb, ChevronsRight, ChevronsLeft, Printer } from 'lucide-react';
 import Link from 'next/link';
 import { DrawingPad } from '@/components/DrawingPad';
-import { ProgressBars } from '@/components/ProgressBars';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { VideoModal } from '@/components/VideoModal';
 import { frqExams, FRQPart, FRQSubPart } from '@/data/frqQuestions';
@@ -21,17 +20,21 @@ import { LoginModal, SignupModal } from '@/components/AuthModals';
 // Self-Review Component for Drawings
 const DrawingSelfReview = ({ 
   referenceImageUrl, 
-  studentDrawing 
+  studentDrawing,
+  onChecklistChange
 }: { 
   referenceImageUrl?: string;
   studentDrawing?: string;
+  onChecklistChange?: (checkedCount: number, totalCount: number) => void;
 }) => {
   const [checkedItems, setCheckedItems] = useState<Record<number, boolean>>({});
   
-  // Debug: Log referenceImageUrl
+  // Debug: Log referenceImageUrl (only in development)
   useEffect(() => {
-    console.log('DrawingSelfReview - referenceImageUrl:', referenceImageUrl);
-    console.log('DrawingSelfReview - will encode to:', referenceImageUrl ? referenceImageUrl.replace(/ /g, '%20') : 'undefined');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('DrawingSelfReview - referenceImageUrl:', referenceImageUrl);
+      console.log('DrawingSelfReview - will encode to:', referenceImageUrl ? referenceImageUrl.replace(/ /g, '%20') : 'undefined');
+    }
   }, [referenceImageUrl]);
 
   const checklistItems = [
@@ -40,6 +43,14 @@ const DrawingSelfReview = ({
     'Curves are drawn in the correct positions',
     'Equilibrium point is clearly marked'
   ];
+
+  // Calculate points and notify parent when checklist changes
+  useEffect(() => {
+    if (onChecklistChange) {
+      const checkedCount = Object.values(checkedItems).filter(Boolean).length;
+      onChecklistChange(checkedCount, checklistItems.length);
+    }
+  }, [checkedItems, onChecklistChange, checklistItems.length]);
 
   const toggleCheck = (index: number) => {
     setCheckedItems(prev => ({
@@ -109,7 +120,9 @@ const DrawingSelfReview = ({
                   }
                 }}
                 onLoad={() => {
-                  console.log('Successfully loaded reference image:', encodedReferenceUrl);
+                  if (process.env.NODE_ENV === 'development') {
+                    console.log('Successfully loaded reference image:', encodedReferenceUrl);
+                  }
                 }}
               />
             ) : null}
@@ -228,6 +241,7 @@ function UnitFRQPracticePageComponent() {
   const [videoModalState, setVideoModalState] = useState<{ url: string; aspectRatio?: 'vertical' | 'horizontal' } | null>(null);
   const [isExpertTipVisible, setIsExpertTipVisible] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [checklistPoints, setChecklistPoints] = useState<Record<string, number>>({});
 
   const handlePrint = () => {
     window.print();
@@ -266,9 +280,14 @@ function UnitFRQPracticePageComponent() {
   }, 0);
   }, [frqQuestion]);
 
-  const currentPoints = Object.values(gradingFeedback).reduce((acc, feedback) => {
-    return acc + (feedback.score || 0);
-  }, 0);
+  // Calculate points from grading feedback and checklist
+  const currentPoints = React.useMemo(() => {
+    const feedbackPoints = Object.values(gradingFeedback).reduce((acc, feedback) => {
+      return acc + (feedback.score || 0);
+    }, 0);
+    const checklistPointsTotal = Object.values(checklistPoints).reduce((acc, points) => acc + points, 0);
+    return feedbackPoints + checklistPointsTotal;
+  }, [gradingFeedback, checklistPoints]);
 
   const togglePart = (partLabel: string) => {
     setExpandedParts(prev => ({
@@ -338,6 +357,7 @@ function UnitFRQPracticePageComponent() {
     setDrawingAnswers({});
     setGradingFeedback({});
     setIsGrading({});
+    setChecklistPoints({});
     setIsExpertTipVisible(false);
   };
 
@@ -371,7 +391,9 @@ function UnitFRQPracticePageComponent() {
       pointValue: pointValue || 2,
     };
 
-    console.log("Sending to API:", requestBody);
+    if (process.env.NODE_ENV === 'development') {
+      console.log("Sending to API:", requestBody);
+    }
 
     try {
       // Validate that frqQuestion exists and has required properties
@@ -561,12 +583,25 @@ function UnitFRQPracticePageComponent() {
             <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 print:shadow-none print:border-none">
               {/* Header */}
               <div className="mb-6 pb-4 border-b print:border-b-2 print:border-black">
-                <h1 className="text-3xl font-bold text-gray-900 mb-1">
-                  {'title' in frqQuestion ? frqQuestion.title : `Question ${frqQuestion.questionNumber}`}
-                </h1>
-                <p className="text-md text-gray-600">
-                  From: {frqQuestion.examTitle}
-                </p>
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <h1 className="text-3xl font-bold text-gray-900 mb-1">
+                      {'title' in frqQuestion ? frqQuestion.title : `Question ${frqQuestion.questionNumber}`}
+                    </h1>
+                    <p className="text-md text-gray-600">
+                      From: {frqQuestion.examTitle}
+                    </p>
+                  </div>
+                  {/* Points Display */}
+                  <div className="print:hidden flex-shrink-0">
+                    <div className="bg-gray-100 border-2 border-gray-300 rounded-lg p-4 text-center min-w-[100px]">
+                      <div className="text-sm font-semibold text-gray-600 mb-1">Points</div>
+                      <div className="text-2xl font-bold text-gray-900">
+                        {currentPoints}/{totalPoints}
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Locked Question Message */}
@@ -732,16 +767,6 @@ function UnitFRQPracticePageComponent() {
           {/* Right Column: Scrollable Parts and Answers */}
           <div className="lg:overflow-y-auto lg:overflow-x-hidden lg:h-screen print:static print:h-auto lg:max-w-full lg:min-w-0">
             <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 print:shadow-none print:border-none lg:max-w-full lg:overflow-x-hidden">
-              {/* Progress Bars - Only on Desktop Right Column */}
-              <div className="mb-6 pb-4 border-b print:hidden lg:block hidden">
-                <ProgressBars
-                  currentXp={currentPoints * 100}
-                  xpForNextLevel={totalPoints * 100}
-                  currentPoints={currentPoints}
-                  totalPoints={totalPoints}
-                />
-              </div>
-
               {/* Parts */}
               {!isCurrentQuestionLocked && (
               <div className="space-y-4">
@@ -835,8 +860,28 @@ function UnitFRQPracticePageComponent() {
                               <DrawingSelfReview 
                                 referenceImageUrl={(part as FRQPart).referenceImageUrl}
                                 studentDrawing={drawingAnswers[`part-${part.label}`]}
+                                onChecklistChange={(checkedCount, totalCount) => {
+                                  const partKey = `part-${part.label}`;
+                                  let points = 0;
+                                  if (checkedCount === totalCount && checkedCount > 0) {
+                                    points = 2; // All checked
+                                  } else if (checkedCount > 0 && checkedCount < totalCount) {
+                                    points = 1; // Some checked
+                                  } else {
+                                    points = 0; // None checked
+                                  }
+                                  
+                                  // Update checklist points
+                                  setChecklistPoints(prev => {
+                                    const oldPoints = prev[partKey] || 0;
+                                    // Only update if points changed
+                                    if (oldPoints !== points) {
+                                      return { ...prev, [partKey]: points };
+                                    }
+                                    return prev;
+                                  });
+                                }}
                               />
-                              {console.log(`Part ${part.label} referenceImageUrl:`, (part as FRQPart).referenceImageUrl)}
                             </>
                           )}
                         </div>
@@ -947,6 +992,26 @@ function UnitFRQPracticePageComponent() {
                                           <DrawingSelfReview 
                                             referenceImageUrl={(subpart as any).referenceImageUrl}
                                             studentDrawing={drawingAnswers[subpartKey]}
+                                            onChecklistChange={(checkedCount, totalCount) => {
+                                              let points = 0;
+                                              if (checkedCount === totalCount && checkedCount > 0) {
+                                                points = 2; // All checked
+                                              } else if (checkedCount > 0 && checkedCount < totalCount) {
+                                                points = 1; // Some checked
+                                              } else {
+                                                points = 0; // None checked
+                                              }
+                                              
+                                              // Update checklist points
+                                              setChecklistPoints(prev => {
+                                                const oldPoints = prev[subpartKey] || 0;
+                                                // Only update if points changed
+                                                if (oldPoints !== points) {
+                                                  return { ...prev, [subpartKey]: points };
+                                                }
+                                                return prev;
+                                              });
+                                            }}
                                           />
                                         </>
                                 )}

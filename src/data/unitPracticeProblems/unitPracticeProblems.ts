@@ -2382,6 +2382,23 @@ const microUnit4Questions = [
     ],
     "correctAnswer": "C",
     "explanation": "A Nash equilibrium is a set of strategies, one for each player, such that no player has an incentive to unilaterally change their strategy, given the strategies chosen by the other players. It represents a stable outcome in a strategic interaction."
+  },
+  {
+    "id": 150,
+    "unit": 4,
+    "lessonIDS": ["4.2"],
+    "unitName": "Imperfect Competition",
+    "question": "For a monopolist marginal revenue falls faster than price because",
+    "image": null,
+    "options": [
+      "the cost of producing extra units of output increases as production is increased.",
+      "to sell additional units the price must be lowered on all units sold.",
+      "marginal revenue is larger than price.",
+      "profits are maximized when marginal cost equals marginal revenue.",
+      "the firm has no supply curve."
+    ],
+    "correctAnswer": "B",
+    "explanation": "For a monopolist, marginal revenue falls faster than price because to sell an additional unit, the monopolist must lower the price on all units sold, not just the new unit. This means the revenue gained from the new unit is offset by the revenue lost from lowering the price on all previous units."
   }
 ]
 

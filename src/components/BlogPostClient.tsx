@@ -2,11 +2,13 @@
 
 import { BlogContentWithKeyTerms } from './BlogContentWithKeyTerms';
 import { SidebarScrollTriggeredBox } from './SidebarScrollTriggeredBox';
+import { processBlogContent } from '@/utils/processBlogContent';
 
 interface BlogPostClientProps {
   content: React.ReactNode;
   subject?: 'ap_microeconomics' | 'ap_macroeconomics';
   practiceUrl?: string;
+  images?: string[];
 }
 
 /**
@@ -16,12 +18,16 @@ interface BlogPostClientProps {
 export function BlogPostClient({
   content,
   subject = 'ap_macroeconomics',
-  practiceUrl = '/unitFRQpracticePage'
+  practiceUrl = '/unitFRQpracticePage',
+  images = []
 }: BlogPostClientProps) {
+  // Process content to replace [IMAGE:N] placeholders with actual images
+  const processedContent = processBlogContent(content, images);
+
   return (
-    <div className="prose prose-xl max-w-none prose-blue text-lg">
+    <div className="prose prose-xl max-w-none prose-blue text-lg [&_p]:leading-relaxed [&_p]:mb-6 [&_li]:leading-relaxed [&_h2]:mb-6 [&_h3]:mb-4">
       <BlogContentWithKeyTerms subject={subject}>
-        {content}
+        {processedContent}
       </BlogContentWithKeyTerms>
       {/* Trigger that makes practice box appear in sidebar at this scroll position */}
       <SidebarScrollTriggeredBox practiceUrl={practiceUrl} />

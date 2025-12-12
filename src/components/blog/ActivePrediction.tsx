@@ -182,50 +182,21 @@ export function ActivePrediction({
 
       <button
         onClick={handleCheckAnswers}
-        disabled={hasChecked && isCorrect}
+        disabled={hasChecked}
         className={`w-full py-3 px-6 rounded-md font-semibold transition-all duration-200 ${
-          hasChecked && isCorrect
-            ? 'bg-green-600 text-white cursor-not-allowed'
+          hasChecked
+            ? 'bg-gray-400 text-white cursor-not-allowed'
             : 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg'
         }`}
       >
-        {hasChecked && isCorrect ? '✓ All Correct!' : 'Check Answers'}
+        {hasChecked ? 'Submitted' : 'Check Answers'}
       </button>
 
-      <AnimatePresence>
-        {hasChecked && !isCorrect && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg"
-          >
-            <p className="text-red-800 font-medium">
-              Not quite right. Review the options and try again!
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {showExplanation && !showAsText && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-            className="mt-6 p-5 bg-green-50 border border-green-200 rounded-lg"
-          >
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
-            >
-              {explanation}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {showExplanation && !showAsText && (
+        <div className="mt-6 p-5 bg-green-50 border border-green-200 rounded-lg">
+          {explanation}
+        </div>
+      )}
     </div>
   );
 }
