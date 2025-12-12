@@ -1,4 +1,5 @@
 @import 'react-notion-x/src/styles.css'; 
+@import 'katex/dist/katex.min.css';
 
 @tailwind base;
 @tailwind components;
@@ -7,9 +8,7 @@
 /* --- IMPORT NOTION STYLES HERE --- */
 
 /* Optional: for code blocks */
-/* @import 'prismjs/themes/prism-tomorrow.css'; */ 
-/* Optional: for math equations */
-/* @import 'katex/dist/katex.min.css'; */
+/* @import 'prismjs/themes/prism-tomorrow.css'; */
 
 /* Your custom overrides */
 body {

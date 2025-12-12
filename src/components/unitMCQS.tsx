@@ -999,28 +999,19 @@ export function UnitMCQs({
     };
   }, [enableZenMode, showZenModeHelp, handlePreviousQuestion, handleNextQuestion, isParentModalOpen, isSettingsModalOpen, currentQuestion, highlightedIndex, currentAnswerState, handleAnswerSelection]);
 
-  // --- Hide Header when Zen Mode is Active ---
+  // --- Hide Banners when Zen Mode is Active (but keep header visible) ---
   useEffect(() => {
     if (enableZenMode) {
-      // Add class to body to hide header
+      // Add class to body for zen mode styling
       document.body.classList.add('zen-mode-active');
-      // Also hide header directly
-      const header = document.querySelector('header');
-      if (header) {
-        (header as HTMLElement).style.display = 'none';
-      }
       // Hide any banners below header
       const banners = document.querySelectorAll('[class*="top-16"], [class*="top-20"]');
       banners.forEach(banner => {
         (banner as HTMLElement).style.display = 'none';
       });
     } else {
-      // Remove class and restore header
+      // Remove class
       document.body.classList.remove('zen-mode-active');
-      const header = document.querySelector('header');
-      if (header) {
-        (header as HTMLElement).style.display = '';
-      }
       // Restore banners
       const banners = document.querySelectorAll('[class*="top-16"], [class*="top-20"]');
       banners.forEach(banner => {
@@ -1031,10 +1022,10 @@ export function UnitMCQs({
     return () => {
       // Cleanup on unmount
       document.body.classList.remove('zen-mode-active');
-      const header = document.querySelector('header');
-      if (header) {
-        (header as HTMLElement).style.display = '';
-      }
+      const banners = document.querySelectorAll('[class*="top-16"], [class*="top-20"]');
+      banners.forEach(banner => {
+        (banner as HTMLElement).style.display = '';
+      });
     };
   }, [enableZenMode]);
 

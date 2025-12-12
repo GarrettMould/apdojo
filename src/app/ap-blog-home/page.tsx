@@ -22,7 +22,11 @@ function BlogCard({ post }: { post: BlogPost }) {
         </div>
         <div className="p-6 flex flex-col flex-grow">
           <div className="mb-3">
-            <span className="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-1 rounded-md">
+            <span className={`inline-block text-xs font-semibold px-2.5 py-1 rounded-md ${
+              post.subject === 'Macro' 
+                ? 'bg-blue-100 text-blue-800' 
+                : 'bg-green-100 text-green-800'
+            }`}>
               {post.subject} - Unit {post.unit}
             </span>
           </div>

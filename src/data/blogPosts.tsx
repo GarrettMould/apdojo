@@ -276,5 +276,153 @@ export const blogPosts: Record<string, BlogPost> = {
       </>
     ),
   },
+  'nominal-vs-real-gdp-explained': {
+    slug: 'nominal-vs-real-gdp-explained',
+    title: 'Nominal vs Real GDP Explained',
+    description: 'Understanding the difference between real growth and inflation using the gradeflation analogy.',
+    subject: 'Macro',
+    unit: 2,
+    thumbnailUrl: '/images/placeholder.png',
+    keyTakeaway: 'Nominal GDP includes price changes, while Real GDP holds prices constant to measure actual production growth. Just like GPA can rise from easier grading (nominal) vs. actual improvement (real).',
+    images: [],
+    practiceQuestionId: 17,
+    content: (
+      <>
+        <h1 className="mt-12 mb-6 text-4xl font-bold text-gray-900">Gradeflation & GDP: Why Your "A" Might Be Worth Less Than You Think</h1>
+        
+        <p className="mb-6 text-lg leading-relaxed">Over the last 30 years, the grades of US college students have steadily increased. Does that mean college students in America are getting smarter?</p>
+        
+        <p className="mb-6 text-lg leading-relaxed"><strong>Not so fast.</strong></p>
+        
+        <p className="mb-6 text-lg leading-relaxed">This trend, known as grade inflation, or "Gradeflation", raises an interesting economic question: <strong>How do we separate real growth from an illusion?</strong> The same way we analyze grades, we analyze the economy—by comparing <strong>Nominal vs. Real GDP</strong>. Let's break it down.</p>
+        
+        <hr className="my-12"/>
+        
+        <h2 className="mt-12 mb-4 text-3xl font-bold text-gray-800">Part 1: The Gradeflation Trap (Nominal GPA)</h2>
+        
+        <p className="mb-6 text-lg leading-relaxed">Grades have been going up, but why? Let's explore two potential variables:</p>
+        
+        <ol className="mb-6 list-decimal list-inside space-y-2 text-lg leading-relaxed">
+          <li><strong>Student Performance:</strong> Maybe students are actually smarter, working harder, or using better study tools.</li>
+          <li><strong>Grading Standards:</strong> Maybe universities and teachers have "softened" their criteria, making it easier to get an A.</li>
+        </ol>
+        
+        <p className="mb-6 text-lg leading-relaxed">We can combine these into a simple formula. In economics, we call this the <strong>Nominal Formula</strong>.</p>
+        
+        <div className="my-8 p-6 bg-gray-50 rounded-lg border-l-4 border-blue-500">
+          <p className="text-xl font-mono text-center">{`$$\\text{Nominal GPA} = \\text{Student Performance} \\times \\text{Grading Standard}$$`}</p>
+        </div>
+        
+        <h3 className="mt-10 mb-4 text-2xl font-bold text-gray-800">The Illusion of Progress</h3>
+        
+        <p className="mb-6 text-lg leading-relaxed">Imagine student performance <em>doesn't change at all</em> (gasp!).</p>
+        
+        <p className="mb-6 text-lg leading-relaxed">If performance is flat, what causes the GPA to rise? It must be the <strong>Grading Standard</strong>. Maybe that grammar mistake that used to cost a full point now only costs half a point. Maybe there is more extra credit.</p>
+        
+        <p className="mb-6 text-lg leading-relaxed">If the standard gets easier, the Nominal GPA goes up, even if the student didn't get any smarter.</p>
+        
+        <hr className="my-12"/>
+        
+        <h2 className="mt-12 mb-4 text-3xl font-bold text-gray-800">Part 2: Enter Professor Sternmark (Real GPA)</h2>
+        
+        <p className="mb-6 text-lg leading-relaxed">Since we know average GPAs have increased, we need a way to strip out the "fluff" (easier grading) to see if students are <em>actually</em> improving.</p>
+        
+        <p className="mb-6 text-lg leading-relaxed">To do this, we need to hold one variable constant. We need to grade today's students using the <strong>same exact standards</strong> from 30 years ago.</p>
+        
+        <p className="mb-6 text-lg leading-relaxed"><strong>Let's welcome in Professor Sternmark.</strong></p>
+        
+        <div className="my-8 p-4 border rounded-lg bg-gray-50">
+          <p className="text-center text-gray-500 italic">[Image of stern professor grading papers]</p>
+        </div>
+        
+        <p className="mb-6 text-lg leading-relaxed">Now, our formula changes. We aren't using <em>today's</em> easy standards. We are using <em>Professor Sternmark's</em> rigid standards from 1990 (the Base Year).</p>
+        
+        <div className="my-8 p-6 bg-gray-50 rounded-lg border-l-4 border-blue-500">
+          <p className="text-xl font-mono text-center">{`$$\\text{Real GPA} = \\text{Current Student Performance} \\times \\text{FIXED Grading Standard (Base Year)}$$`}</p>
+        </div>
+        
+        <p className="mb-6 text-lg leading-relaxed">Now, the essay you write today is graded against the strict 1990 rubric.</p>
+        
+        <ul className="mb-6 list-disc list-inside space-y-2 text-lg leading-relaxed">
+          <li>If your GPA is <em>still</em> higher, then you actually got smarter (<strong>Real Growth</strong>).</li>
+          <li>If your GPA drops back down to the 1990 average, then the increase was just an illusion caused by easy grading.</li>
+        </ul>
+        
+        <hr className="my-12"/>
+        
+        <h2 className="mt-12 mb-4 text-3xl font-bold text-gray-800">Part 3: Nominal vs. Real GDP</h2>
+        
+        <p className="mb-6 text-lg leading-relaxed">Okay, cool. But why does this matter for Economics?</p>
+        
+        <p className="mb-6 text-lg leading-relaxed">Because <strong>GDP (Gross Domestic Product)</strong> works exactly the same way. We use GDP to track the size of an economy, but just like grades, it can be misleading.</p>
+        
+        <div className="my-8 p-6 bg-gray-50 rounded-lg border-l-4 border-blue-500">
+          <p className="text-xl font-mono text-center">{`$$\\text{Nominal GDP} = \\text{Output (Production)} \\times \\text{Current Prices}$$`}</p>
+        </div>
+        
+        <p className="mb-6 text-lg leading-relaxed">If Nominal GDP goes up, it could be because:</p>
+        
+        <ol className="mb-6 list-decimal list-inside space-y-2 text-lg leading-relaxed">
+          <li><strong>Output Increased:</strong> We actually produced more cars, computers, and coffee (Good!).</li>
+          <li><strong>Prices Increased:</strong> We produced the exact same amount, but inflation made everything more expensive (Bad!).</li>
+        </ol>
+        
+        <p className="mb-6 text-lg leading-relaxed">Economists don't care about higher prices; they care about <strong>actual production</strong>. To find that, we use <strong>Real GDP</strong>. Just like Professor Sternmark held the grading standard constant, Real GDP holds the <strong>Price Level</strong> constant.</p>
+        
+        <h3 className="mt-10 mb-4 text-2xl font-bold text-gray-800">The Tale of "Coffee Land" ☕️</h3>
+        
+        <p className="mb-6 text-lg leading-relaxed">Let's imagine a country called <strong>Coffee Land</strong> that produces nothing but cups of coffee.</p>
+        
+        <div className="my-8 p-4 border rounded-lg bg-gray-50">
+          <p className="text-center text-gray-500 italic">[Image of coffee cup production line]</p>
+        </div>
+        
+        <h4 className="mt-8 mb-4 text-xl font-bold text-gray-800">Year 1 (2023) - The Base Year</h4>
+        
+        <ul className="mb-6 list-disc list-inside space-y-2 text-lg leading-relaxed">
+          <li><strong>Production:</strong> 100 cups</li>
+          <li><strong>Price:</strong> $1.00 per cup</li>
+          <li><strong>Nominal GDP:</strong> $100</li>
+        </ul>
+        
+        <h4 className="mt-8 mb-4 text-xl font-bold text-gray-800">Year 2 (2024) - The Inflation Year</h4>
+        
+        <p className="mb-6 text-lg leading-relaxed">Now imagine in 2024, production stays the same, but the price doubles.</p>
+        
+        <ul className="mb-6 list-disc list-inside space-y-2 text-lg leading-relaxed">
+          <li><strong>Production:</strong> 100 cups</li>
+          <li><strong>Price:</strong> $2.00 per cup</li>
+          <li><strong>Nominal GDP:</strong> $200</li>
+        </ul>
+        
+        <p className="mb-6 text-lg leading-relaxed"><strong>Wow!</strong> Coffee Land's economy doubled from $100 to $200! incredible growth, right?</p>
+        
+        <p className="mb-6 text-lg leading-relaxed"><strong>Wrong.</strong></p>
+        
+        <p className="mb-6 text-lg leading-relaxed">If we calculate <strong>Real GDP</strong> by holding the price constant at the 2023 level ($1.00):</p>
+        
+        <div className="my-8 p-6 bg-gray-50 rounded-lg border-l-4 border-blue-500">
+          <p className="text-xl font-mono text-center">{`$$\\text{Real GDP} = 100 \\text{ cups} \\times \\$1.00 \\text{ (Base Price)} = \\$100$$`}</p>
+        </div>
+        
+        <p className="mb-6 text-lg leading-relaxed"><strong>The Verdict:</strong> Coffee Land's economy didn't grow at all. Real GDP stayed flat at $100. The "growth" was just an illusion caused by higher prices.</p>
+        
+        <h3 className="mt-10 mb-4 text-2xl font-bold text-gray-800">Summary</h3>
+        
+        <p className="mb-6 text-lg leading-relaxed">We learn the difference between Nominal and Real GDP not to torture students with math, but to ensure we don't mistakenly celebrate an economy that is just getting more expensive, rather than more productive.</p>
+        
+        <hr className="my-12"/>
+
+        {(() => {
+          const practiceQuestion = allQuestions.find(q => q.id === 17);
+          if (!practiceQuestion) return null;
+          
+          return (
+            <BlogComprehensionCheck question={practiceQuestion} />
+          );
+        })()}
+      </>
+    ),
+  },
 };
 
