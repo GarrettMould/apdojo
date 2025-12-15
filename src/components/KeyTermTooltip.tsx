@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { KeyTerm } from '@/data/apMicroTerms';
+import { keyTerms as allMacroTerms } from '@/data/apMacroTerms';
+import { keyTerms as allMicroTerms } from '@/data/apMicroTerms';
 
 interface KeyTermTooltipProps {
   term: KeyTerm;
@@ -41,6 +43,23 @@ export function KeyTermTooltip({ term, children }: KeyTermTooltipProps) {
 
   const palette = isScaffold ? scaffoldPalette : mainPalette;
   const color = palette[hash % palette.length];
+
+  // Find related topics based on lessonIDs - get other terms that share lessons
+  const relatedTopics = useMemo(() => {
+    const allTerms = term.subject === 'ap_macroeconomics' ? allMacroTerms : allMicroTerms;
+    const termLessonIds = new Set(term.lessonIDs);
+    const relatedTerms = new Set<string>();
+    
+    // Find other terms that share at least one lesson with this term
+    allTerms.forEach(t => {
+      if (t.id !== term.id && t.lessonIDs.some(lid => termLessonIds.has(lid))) {
+        relatedTerms.add(t.term);
+      }
+    });
+    
+    // Return unique related terms, limited to 6 for display
+    return Array.from(relatedTerms).slice(0, 6);
+  }, [term]);
 
   const calculatePosition = () => {
     if (!triggerRef.current) return;
@@ -173,10 +192,30 @@ export function KeyTermTooltip({ term, children }: KeyTermTooltipProps) {
             ×
           </button>
           <div className="text-sm pr-6">
-            <h4 className="font-bold text-gray-900 mb-2">{term.term}</h4>
-            <p className="text-gray-700 mb-2">{term.definition}</p>
+            <h4 className="font-bold text-gray-900 mb-3 text-base">{term.term}</h4>
+            <div className="mb-4">
+              <p className="text-gray-700 leading-relaxed">{term.definition}</p>
+            </div>
+            
+            {/* Related Topics */}
+            {relatedTopics.length > 0 && (
+              <div className="mt-4 pt-3 border-t border-gray-200">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Related Topics</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {relatedTopics.map((topic) => (
+                    <span
+                      key={topic}
+                      className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200"
+                    >
+                      {topic}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            
             {term.subNotes && term.subNotes.length > 0 && (
-              <div className="mt-1">
+              <div className="mt-4 pt-3 border-t border-gray-200">
                 {!showDetails && (
                   <button
                     type="button"

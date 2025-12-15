@@ -68,6 +68,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             subject={post.subject === 'Macro' ? 'ap_macroeconomics' : 'ap_microeconomics'}
             practiceUrl="/unitFRQpracticePage"
             images={post.images || []}
+            videoUrl={post.videoUrl || null}
           />
         </article>
         

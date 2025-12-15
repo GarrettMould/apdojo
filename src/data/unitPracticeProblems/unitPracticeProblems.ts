@@ -36,7 +36,8 @@ const macroUnit1Questions = [
       "Efficiency."
     ],
     "correctAnswer": "C",
-    "explanation": "Scarcity is the core economic problem referring to the conflict between society's unlimited wants and its limited resources, necessitating choices about resource allocation."
+    "explanation": "Scarcity is the core economic problem referring to the conflict between society's unlimited wants and its limited resources, necessitating choices about resource allocation.",
+    "videoExplanation": null
   },
   {
     "id": 2,
@@ -53,7 +54,8 @@ const macroUnit1Questions = [
       "Comparative cost."
     ],
     "correctAnswer": "D",
-    "explanation": "Opportunity cost is the value of the next best alternative that must be sacrificed when making a decision. It highlights the trade-offs inherent in every choice."
+    "explanation": "Opportunity cost is the value of the next best alternative that must be sacrificed when making a decision. It highlights the trade-offs inherent in every choice.",
+    "videoExplanation": null
   },
   {
     "id": 3,
@@ -70,7 +72,8 @@ const macroUnit1Questions = [
       "The economy is producing beyond its capacity."
     ],
     "correctAnswer": "B",
-    "explanation": "Points inside the PPC represent attainable production levels but signify inefficiency, meaning resources (like labor or capital) are either unemployed or not being used to their full potential."
+    "explanation": "Points inside the PPC represent attainable production levels but signify inefficiency, meaning resources (like labor or capital) are either unemployed or not being used to their full potential.",
+    "videoExplanation": null
   },
   {
     "id": 4,
@@ -87,7 +90,8 @@ const macroUnit1Questions = [
       "A shift in consumer preferences."
     ],
     "correctAnswer": "D",
-    "explanation": "An outward shift of the PPC signifies economic growth. This can result from increases in resource availability (land, labor, capital) or improvements in technology that allow more output to be produced with the same resources."
+    "explanation": "An outward shift of the PPC signifies economic growth. This can result from increases in resource availability (land, labor, capital) or improvements in technology that allow more output to be produced with the same resources.",
+    "videoExplanation": null
   },
   {
     "id": 5,
@@ -104,7 +108,8 @@ const macroUnit1Questions = [
       "Cannot be determined from the information given."
     ],
     "correctAnswer": "B",
-    "explanation": "To find comparative advantage, calculate opportunity costs. Country A's opportunity cost of 1 car is 2 computers (20/10). Country B's opportunity cost of 1 car is 1.5 computers (12/8). Since Country B has the lower opportunity cost for cars, it has the comparative advantage."
+    "explanation": "To find comparative advantage, calculate opportunity costs. Country A's opportunity cost of 1 car is 2 computers (20/10). Country B's opportunity cost of 1 car is 1.5 computers (12/8). Since Country B has the lower opportunity cost for cars, it has the comparative advantage.",
+    "videoExplanation": null
   },
   {
     "id": 6,
@@ -121,7 +126,8 @@ const macroUnit1Questions = [
       "A shift inward of the Production Possibilities Curve for trading nations."
     ],
     "correctAnswer": "D",
-    "explanation": "When countries specialize in goods where they have a lower opportunity cost (comparative advantage) and trade, global efficiency increases. This results in higher total world output and allows countries to consume beyond their individual production possibilities."
+    "explanation": "When countries specialize in goods where they have a lower opportunity cost (comparative advantage) and trade, global efficiency increases. This results in higher total world output and allows countries to consume beyond their individual production possibilities.",
+    "videoExplanation": null
   },
   {
     "id": 7,
@@ -138,7 +144,8 @@ const macroUnit1Questions = [
       "No change in quantity demanded."
     ],
     "correctAnswer": "C",
-    "explanation": "The law of demand describes the inverse relationship between price and quantity demanded, holding other factors constant. When the price of a good rises, consumers typically buy less of it."
+    "explanation": "The law of demand describes the inverse relationship between price and quantity demanded, holding other factors constant. When the price of a good rises, consumers typically buy less of it.",
+    "videoExplanation": null
   },
   {
     "id": 8,
@@ -155,7 +162,8 @@ const macroUnit1Questions = [
       "An increase in taxes on smartphone producers."
     ],
     "correctAnswer": "C",
-    "explanation": "A rightward shift in supply indicates an increase in supply. Technological improvements often lower production costs, enabling firms to supply more at each price level."
+    "explanation": "A rightward shift in supply indicates an increase in supply. Technological improvements often lower production costs, enabling firms to supply more at each price level.",
+    "videoExplanation": null
   },
   {
     "id": 9,
@@ -172,7 +180,8 @@ const macroUnit1Questions = [
       "Demand equals supply."
     ],
     "correctAnswer": "D",
-    "explanation": "Market equilibrium occurs at the price where the amount producers are willing to sell (quantity supplied) is exactly equal to the amount consumers are willing to buy (quantity demanded). There is no tendency for the price to change at this point."
+    "explanation": "Market equilibrium occurs at the price where the amount producers are willing to sell (quantity supplied) is exactly equal to the amount consumers are willing to buy (quantity demanded). There is no tendency for the price to change at this point.",
+    "videoExplanation": null
   },
   {
     "id": 10,
@@ -189,7 +198,8 @@ const macroUnit1Questions = [
       "Equilibrium price will increase, and equilibrium quantity will remain unchanged."
     ],
     "correctAnswer": "D",
-    "explanation": "For a normal good, higher consumer incomes lead to an increase in demand (a rightward shift of the demand curve). This increase in demand causes both the equilibrium price and the equilibrium quantity to rise."
+    "explanation": "For a normal good, higher consumer incomes lead to an increase in demand (a rightward shift of the demand curve). This increase in demand causes both the equilibrium price and the equilibrium quantity to rise.",
+    "videoExplanation": null
   }
 ]
 
@@ -210,7 +220,8 @@ const macroUnit2Questions = [
       "5.0%"
     ],
     "correctAnswer": "B",
-    "explanation": "The formula for the inflation rate is: Inflation Rate = [(CPI Year 2 - CPI Year 1) / CPI Year 1] x 100. So, Inflation Rate = [(165 - 150) / 150] x 100 = (15 / 150) x 100 = 0.1 x 100 = 10.0%."
+    "explanation": "The formula for the inflation rate is: Inflation Rate = [(CPI Year 2 - CPI Year 1) / CPI Year 1] x 100. So, Inflation Rate = [(165 - 150) / 150] x 100 = (15 / 150) x 100 = 0.1 x 100 = 10.0%.",
+    "videoExplanation": null
   },
   {
     "id": 12,
@@ -227,7 +238,8 @@ const macroUnit2Questions = [
       "6.25%"
     ],
     "correctAnswer": "C",
-    "explanation": "First, find the labor force: Labor Force = Employed + Unemployed = 150 million + 10 million = 160 million. Then, calculate the Labor Force Participation Rate: LFPR = (Labor Force / Adult Population) x 100 = (160 million / 250 million) x 100 = 0.64 x 100 = 64.0%."
+    "explanation": "First, find the labor force: Labor Force = Employed + Unemployed = 150 million + 10 million = 160 million. Then, calculate the Labor Force Participation Rate: LFPR = (Labor Force / Adult Population) x 100 = (160 million / 250 million) x 100 = 0.64 x 100 = 64.0%.",
+    "videoExplanation": null
   },
   {
     "id": 13,
@@ -244,7 +256,8 @@ const macroUnit2Questions = [
       "150"
     ],
     "correctAnswer": "D",
-    "explanation": "The formula for the GDP Deflator is: GDP Deflator = (Nominal GDP / Real GDP) x 100. So, GDP Deflator = ($15 trillion / $12 trillion) x 100 = 1.25 x 100 = 125."
+    "explanation": "The formula for the GDP Deflator is: GDP Deflator = (Nominal GDP / Real GDP) x 100. So, GDP Deflator = ($15 trillion / $12 trillion) x 100 = 1.25 x 100 = 125.",
+    "videoExplanation": null
   },
   {
     "id": 14,
@@ -261,7 +274,8 @@ const macroUnit2Questions = [
       "Natural unemployment"
     ],
     "correctAnswer": "C",
-    "explanation": "Cyclical unemployment is directly related to the health of the economy. It rises during recessions (downturns) when firms lay off workers due to decreased demand and falls during economic expansions."
+    "explanation": "Cyclical unemployment is directly related to the health of the economy. It rises during recessions (downturns) when firms lay off workers due to decreased demand and falls during economic expansions.",
+    "videoExplanation": null
   },
   {
     "id": 15,
@@ -278,7 +292,8 @@ const macroUnit2Questions = [
       "250"
     ],
     "correctAnswer": "D",
-    "explanation": "The formula for CPI is: CPI = (Cost of Basket in Current Year / Cost of Basket in Base Year) x 100. So, CPI = ($250 / $200) x 100 = 1.25 x 100 = 125."
+    "explanation": "The formula for CPI is: CPI = (Cost of Basket in Current Year / Cost of Basket in Base Year) x 100. So, CPI = ($250 / $200) x 100 = 1.25 x 100 = 125.",
+    "videoExplanation": null
   },
   {
     "id": 16,
@@ -295,7 +310,8 @@ const macroUnit2Questions = [
       "It adjusts for changes in the price level."
     ],
     "correctAnswer": "B",
-    "explanation": "GDP is an aggregate measure and does not reveal how income is distributed. A high GDP could mask significant income inequality, which affects overall societal well-being. Other limitations include ignoring leisure time, environmental quality, and non-market activities."
+    "explanation": "GDP is an aggregate measure and does not reveal how income is distributed. A high GDP could mask significant income inequality, which affects overall societal well-being. Other limitations include ignoring leisure time, environmental quality, and non-market activities.",
+    "videoExplanation": null
   },
   {
     "id": 17,
@@ -312,7 +328,8 @@ const macroUnit2Questions = [
       "$7.5 trillion"
     ],
     "correctAnswer": "A",
-    "explanation": "The formula relating these is: Real GDP = (Nominal GDP / GDP Deflator) x 100. So, Real GDP = ($10 trillion / 125) x 100 = $0.08 trillion x 100 = $8 trillion."
+    "explanation": "The formula relating these is: Real GDP = (Nominal GDP / GDP Deflator) x 100. So, Real GDP = ($10 trillion / 125) x 100 = $0.08 trillion x 100 = $8 trillion.",
+    "videoExplanation": null
   },
   {
     "id": 18,
@@ -329,7 +346,8 @@ const macroUnit2Questions = [
       "4.76%"
     ],
     "correctAnswer": "A",
-    "explanation": "First, find the labor force: Labor Force = Employed + Unemployed = 190 million + 10 million = 200 million. Then, calculate the Unemployment Rate: UR = (# Unemployed / Labor Force) x 100 = (10 million / 200 million) x 100 = 0.05 x 100 = 5.0%."
+    "explanation": "First, find the labor force: Labor Force = Employed + Unemployed = 190 million + 10 million = 200 million. Then, calculate the Unemployment Rate: UR = (# Unemployed / Labor Force) x 100 = (10 million / 200 million) x 100 = 0.05 x 100 = 5.0%.",
+    "videoExplanation": null
   },
   {
     "id": 19,
@@ -346,7 +364,8 @@ const macroUnit2Questions = [
       "Net exports."
     ],
     "correctAnswer": "B",
-    "explanation": "GDP measures the market value of final goods and services produced. It excludes non-market transactions like unpaid household work, volunteer work, and illegal activities, which can be substantial."
+    "explanation": "GDP measures the market value of final goods and services produced. It excludes non-market transactions like unpaid household work, volunteer work, and illegal activities, which can be substantial.",
+    "videoExplanation": null
   },
   {
     "id": 20,
@@ -363,7 +382,8 @@ const macroUnit2Questions = [
       "Fails to account for changes in nominal wages."
     ],
     "correctAnswer": "B",
-    "explanation": "The CPI uses a fixed basket of goods and services. When prices change, consumers often substitute away from more expensive items towards cheaper ones. The CPI's fixed basket doesn't capture this substitution effect, leading to an overestimation of the cost of living increase (substitution bias)."
+    "explanation": "The CPI uses a fixed basket of goods and services. When prices change, consumers often substitute away from more expensive items towards cheaper ones. The CPI's fixed basket doesn't capture this substitution effect, leading to an overestimation of the cost of living increase (substitution bias).",
+    "videoExplanation": null
   },
   {
     "id": 21,
@@ -380,7 +400,8 @@ const macroUnit2Questions = [
       "-5.0%"
     ],
     "correctAnswer": "B",
-    "explanation": "The economic growth rate is the percentage change in Real GDP. Growth Rate = [(Real GDP Year 2 - Real GDP Year 1) / Real GDP Year 1] x 100 = [($10.5T - $10T) / $10T] x 100 = ($0.5T / $10T) x 100 = 0.05 x 100 = 5.0%."
+    "explanation": "The economic growth rate is the percentage change in Real GDP. Growth Rate = [(Real GDP Year 2 - Real GDP Year 1) / Real GDP Year 1] x 100 = [($10.5T - $10T) / $10T] x 100 = ($0.5T / $10T) x 100 = 0.05 x 100 = 5.0%.",
+    "videoExplanation": null
   },
   {
     "id": 22,
@@ -397,7 +418,8 @@ const macroUnit2Questions = [
       "$50"
     ],
     "correctAnswer": "C",
-    "explanation": "Nominal GDP is the market value of all final goods and services produced. Calculate the value of each good and sum them: Nominal GDP = (Price_Apples x Quantity_Apples) + (Price_Bananas x Quantity_Bananas) = ($1 x 100) + ($2 x 50) = $100 + $100 = $200."
+    "explanation": "Nominal GDP is the market value of all final goods and services produced. Calculate the value of each good and sum them: Nominal GDP = (Price_Apples x Quantity_Apples) + (Price_Bananas x Quantity_Bananas) = ($1 x 100) + ($2 x 50) = $100 + $100 = $200.",
+    "videoExplanation": null
   },
   {
     "id": 23,
@@ -414,7 +436,8 @@ const macroUnit2Questions = [
       "The inflation rate."
     ],
     "correctAnswer": "D",
-    "explanation": "Price indices are benchmarked to a base year. In the base year, the index compares the cost of the basket (or overall prices) to itself, resulting in a value of (Cost / Cost) x 100 = 100."
+    "explanation": "Price indices are benchmarked to a base year. In the base year, the index compares the cost of the basket (or overall prices) to itself, resulting in a value of (Cost / Cost) x 100 = 100.",
+    "videoExplanation": null
   },
   {
     "id": 24,
@@ -431,7 +454,8 @@ const macroUnit2Questions = [
       "A person who was laid off last week and is actively seeking a new job."
     ],
     "correctAnswer": "E",
-    "explanation": "The official definition of unemployed requires a person to be jobless, available for work, and actively seeking work within the past four weeks. Discouraged workers (B) are not actively seeking. Part-time workers (A) are considered employed. Students (C) and retirees (D) not seeking work are not in the labor force."
+    "explanation": "The official definition of unemployed requires a person to be jobless, available for work, and actively seeking work within the past four weeks. Discouraged workers (B) are not actively seeking. Part-time workers (A) are considered employed. Students (C) and retirees (D) not seeking work are not in the labor force.",
+    "videoExplanation": null
   },
   {
     "id": 25,
@@ -448,7 +472,8 @@ const macroUnit2Questions = [
       "Owners of real estate."
     ],
     "correctAnswer": "D",
-    "explanation": "Unanticipated inflation reduces the purchasing power of money repaid in the future. Lenders receiving fixed interest payments find that the real value of those payments is lower than expected, hurting their returns. Borrowers with fixed rates benefit by repaying loans with less valuable dollars."
+    "explanation": "Unanticipated inflation reduces the purchasing power of money repaid in the future. Lenders receiving fixed interest payments find that the real value of those payments is lower than expected, hurting their returns. Borrowers with fixed rates benefit by repaying loans with less valuable dollars.",
+    "videoExplanation": null
   }
 ]
 
@@ -469,7 +494,8 @@ const macroUnit3Questions = [
       "An appreciation of the domestic currency"
     ],
     "correctAnswer": "C",
-    "explanation": "If households expect higher inflation in the future, they are incentivized to increase current consumption spending now, shifting AD to the right. Other options decrease AD (A, B, D) or decrease net exports, thus decreasing AD (E)."
+    "explanation": "If households expect higher inflation in the future, they are incentivized to increase current consumption spending now, shifting AD to the right. Other options decrease AD (A, B, D) or decrease net exports, thus decreasing AD (E).",
+    "videoExplanation": null
   },
   {
     "id": 27,
@@ -486,7 +512,8 @@ const macroUnit3Questions = [
       "Increase by $500 billion"
     ],
     "correctAnswer": "E",
-    "explanation": "The spending multiplier is 1 / MPS = 1 / 0.2 = 5. The maximum change in GDP is the multiplier times the initial change in spending: 5 * $100 billion = $500 billion increase."
+    "explanation": "The spending multiplier is 1 / MPS = 1 / 0.2 = 5. The maximum change in GDP is the multiplier times the initial change in spending: 5 * $100 billion = $500 billion increase.",
+    "videoExplanation": null
   },
   {
     "id": 28,
@@ -503,7 +530,8 @@ const macroUnit3Questions = [
       "No change in SRAS, Price level increases"
     ],
     "correctAnswer": "B",
-    "explanation": "An increase in the price of a key input like energy increases production costs for firms. This leads to a decrease (leftward shift) in the SRAS curve, resulting in a higher price level and lower output in the short run."
+    "explanation": "An increase in the price of a key input like energy increases production costs for firms. This leads to a decrease (leftward shift) in the SRAS curve, resulting in a higher price level and lower output in the short run.",
+    "videoExplanation": null
   },
   {
     "id": 29,
@@ -520,7 +548,8 @@ const macroUnit3Questions = [
       "The relationship between the output gap and unemployment cannot be determined."
     ],
     "correctAnswer": "C",
-    "explanation": "When actual output ($500b) is below potential output ($550b), the economy is in a recessionary gap, indicating cyclical unemployment exists. Therefore, the actual unemployment rate is above the natural rate of unemployment (which corresponds to full employment/potential output)."
+    "explanation": "When actual output ($500b) is below potential output ($550b), the economy is in a recessionary gap, indicating cyclical unemployment exists. Therefore, the actual unemployment rate is above the natural rate of unemployment (which corresponds to full employment/potential output).",
+    "videoExplanation": null
   },
   {
     "id": 30,
@@ -537,7 +566,8 @@ const macroUnit3Questions = [
       "No change in price level, Real GDP increases"
     ],
     "correctAnswer": "D",
-    "explanation": "Increased government spending is expansionary fiscal policy, shifting the Aggregate Demand (AD) curve to the right. Moving along the upward-sloping Short-Run Aggregate Supply (SRAS) curve, this leads to a higher price level and higher real GDP in the short run."
+    "explanation": "Increased government spending is expansionary fiscal policy, shifting the Aggregate Demand (AD) curve to the right. Moving along the upward-sloping Short-Run Aggregate Supply (SRAS) curve, this leads to a higher price level and higher real GDP in the short run.",
+    "videoExplanation": null
   },
   {
     "id": 31,
@@ -554,7 +584,8 @@ const macroUnit3Questions = [
        "A decrease in net exports"
     ],
     "correctAnswer": "B",
-    "explanation": "A widespread technological advancement increases productivity, shifting the Short-Run Aggregate Supply (SRAS) curve to the right. This leads to higher real GDP and a lower price level."
+    "explanation": "A widespread technological advancement increases productivity, shifting the Short-Run Aggregate Supply (SRAS) curve to the right. This leads to higher real GDP and a lower price level.",
+    "videoExplanation": null
   },
   {
     "id": 32,
@@ -571,7 +602,8 @@ const macroUnit3Questions = [
       "Interest rates will fall, shifting AD right."
     ],
     "correctAnswer": "B",
-    "explanation": "In an inflationary gap, high demand for resources leads to rising input costs, particularly nominal wages. As nominal wages increase, the SRAS curve shifts to the left, eventually restoring the economy to long-run equilibrium at potential output but with a higher price level."
+    "explanation": "In an inflationary gap, high demand for resources leads to rising input costs, particularly nominal wages. As nominal wages increase, the SRAS curve shifts to the left, eventually restoring the economy to long-run equilibrium at potential output but with a higher price level.",
+    "videoExplanation": null
   },
   {
     "id": 33,
@@ -588,7 +620,8 @@ const macroUnit3Questions = [
       "Increasing the required reserve ratio for banks"
     ],
     "correctAnswer": "C",
-    "explanation": "Expansionary fiscal policy aims to increase aggregate demand during a recession. Increasing transfer payments puts more disposable income in the hands of households, boosting consumption and shifting AD to the right. Options A and B are contractionary fiscal policy. Options D and E relate to monetary policy."
+    "explanation": "Expansionary fiscal policy aims to increase aggregate demand during a recession. Increasing transfer payments puts more disposable income in the hands of households, boosting consumption and shifting AD to the right. Options A and B are contractionary fiscal policy. Options D and E relate to monetary policy.",
+    "videoExplanation": null
   },
   {
     "id": 34,
@@ -605,7 +638,8 @@ const macroUnit3Questions = [
       "The money multiplier effect"
     ],
     "correctAnswer": "C",
-    "explanation": "Automatic stabilizers work without specific legislative action. In a progressive tax system, as incomes rise during an expansion, people move into higher tax brackets, and tax revenues increase automatically. This withdraws spending power from the economy, slightly dampening the expansion, acting as a stabilizer."
+    "explanation": "Automatic stabilizers work without specific legislative action. In a progressive tax system, as incomes rise during an expansion, people move into higher tax brackets, and tax revenues increase automatically. This withdraws spending power from the economy, slightly dampening the expansion, acting as a stabilizer.",
+    "videoExplanation": null
   },
   {
     "id": 35,
@@ -622,7 +656,8 @@ const macroUnit3Questions = [
       "A decrease in the effectiveness of automatic stabilizers."
     ],
     "correctAnswer": "C",
-    "explanation": "Sticky nominal wages mean that wages do not fall easily even when aggregate demand decreases (reducing the demand for labor). Firms facing lower demand and unable to cut nominal wages may instead reduce employment significantly, leading to higher and potentially more persistent cyclical unemployment (actual unemployment above the natural rate) than if wages were flexible downwards."
+    "explanation": "Sticky nominal wages mean that wages do not fall easily even when aggregate demand decreases (reducing the demand for labor). Firms facing lower demand and unable to cut nominal wages may instead reduce employment significantly, leading to higher and potentially more persistent cyclical unemployment (actual unemployment above the natural rate) than if wages were flexible downwards.",
+    "videoExplanation": null
   }
 ]
 
@@ -643,7 +678,8 @@ const macroUnit4Questions = [
       "Selling bonds increases a company's equity, while issuing stock increases its liabilities."
     ],
     "correctAnswer": "D",
-    "explanation": "A bond is essentially an IOU, representing debt that must be repaid with interest. A stock represents equity or ownership in a corporation, giving the holder a claim on profits (dividends)."
+    "explanation": "A bond is essentially an IOU, representing debt that must be repaid with interest. A stock represents equity or ownership in a corporation, giving the holder a claim on profits (dividends).",
+    "videoExplanation": null
   },
   {
     "id": 37,
@@ -660,7 +696,8 @@ const macroUnit4Questions = [
       "8%"
     ],
     "correctAnswer": "B",
-    "explanation": "The approximate real interest rate is calculated as the nominal interest rate minus the inflation rate: Real Interest Rate ≈ Nominal Interest Rate - Inflation Rate = 5% - 3% = 2%."
+    "explanation": "The approximate real interest rate is calculated as the nominal interest rate minus the inflation rate: Real Interest Rate ≈ Nominal Interest Rate - Inflation Rate = 5% - 3% = 2%.",
+    "videoExplanation": null
   },
   {
     "id": 38,
@@ -677,7 +714,8 @@ const macroUnit4Questions = [
       "Lend only to the government."
     ],
     "correctAnswer": "B",
-    "explanation": "The Fisher effect suggests that nominal interest rates adjust to incorporate expected inflation. To maintain their desired real return, lenders will demand higher nominal interest rates when they anticipate higher inflation."
+    "explanation": "The Fisher effect suggests that nominal interest rates adjust to incorporate expected inflation. To maintain their desired real return, lenders will demand higher nominal interest rates when they anticipate higher inflation.",
+    "videoExplanation": null
   },
   {
     "id": 39,
@@ -694,7 +732,8 @@ const macroUnit4Questions = [
       "Financial asset"
     ],
     "correctAnswer": "C",
-    "explanation": "Using money to directly purchase goods and services demonstrates its role as a medium of exchange – an intermediary instrument used to facilitate transactions, avoiding the need for barter."
+    "explanation": "Using money to directly purchase goods and services demonstrates its role as a medium of exchange – an intermediary instrument used to facilitate transactions, avoiding the need for barter.",
+    "videoExplanation": null
   },
   {
     "id": 40, 
@@ -711,7 +750,8 @@ const macroUnit4Questions = [
       "M1 includes small-denomination time deposits (CDs)."
     ],
     "correctAnswer": "C",
-    "explanation": "M1 consists of the most liquid forms of money used for transactions (currency, demand deposits, traveler's checks). M2 includes all of M1 plus less liquid assets ('near monies') like savings deposits, small CDs, and money market mutual funds, which serve more as a store of value but can be easily converted."
+    "explanation": "M1 consists of the most liquid forms of money used for transactions (currency, demand deposits, traveler's checks). M2 includes all of M1 plus less liquid assets ('near monies') like savings deposits, small CDs, and money market mutual funds, which serve more as a store of value but can be easily converted.",
+    "videoExplanation": null
   },
   {
     "id": 41,
@@ -728,7 +768,8 @@ const macroUnit4Questions = [
       "$10,000"
     ],
     "correctAnswer": "D",
-    "explanation": "When cash held by the public ($1000) is deposited, it becomes reserves. The bank must hold 10% ($100) but can lend out 90% ($900). This $900 initiates the money multiplier process. The simple money multiplier is 1 / RRR = 1 / 0.10 = 10. The maximum potential *increase* in checkable deposits is Initial Excess Reserves * Multiplier = $900 * 10 = $9,000. Since the initial $1000 cash was already part of M1 (currency), depositing it doesn't change M1 initially, but the subsequent lending *does*. The $9,000 represents the new checkable deposits created through lending."
+    "explanation": "When cash held by the public ($1000) is deposited, it becomes reserves. The bank must hold 10% ($100) but can lend out 90% ($900). This $900 initiates the money multiplier process. The simple money multiplier is 1 / RRR = 1 / 0.10 = 10. The maximum potential *increase* in checkable deposits is Initial Excess Reserves * Multiplier = $900 * 10 = $9,000. Since the initial $1000 cash was already part of M1 (currency), depositing it doesn't change M1 initially, but the subsequent lending *does*. The $9,000 represents the new checkable deposits created through lending.",
+    "videoExplanation": null
   },
   {
     "id": 42,
@@ -745,7 +786,8 @@ const macroUnit4Questions = [
       "Decrease by $50 million"
     ],
     "correctAnswer": "D",
-    "explanation": "When the central bank buys bonds from the public, the payment injects new reserves into the banking system. The money multiplier is 1 / RRR = 1 / 0.20 = 5. The maximum potential change in the money supply (specifically checkable deposits) is the change in reserves times the multiplier: $50 million * 5 = $250 million increase."
+    "explanation": "When the central bank buys bonds from the public, the payment injects new reserves into the banking system. The money multiplier is 1 / RRR = 1 / 0.20 = 5. The maximum potential change in the money supply (specifically checkable deposits) is the change in reserves times the multiplier: $50 million * 5 = $250 million increase.",
+    "videoExplanation": null
   },
   {
     "id": 43,
@@ -762,7 +804,8 @@ const macroUnit4Questions = [
       "The government increases taxes."
     ],
     "correctAnswer": "B",
-    "explanation": "The simple money multiplier assumes banks lend out all excess reserves and that all loaned money is redeposited into the banking system. In reality, banks may hold excess reserves (not lend everything out) and individuals/firms may hold onto some cash (currency drain), both reducing the actual multiplier effect."
+    "explanation": "The simple money multiplier assumes banks lend out all excess reserves and that all loaned money is redeposited into the banking system. In reality, banks may hold excess reserves (not lend everything out) and individuals/firms may hold onto some cash (currency drain), both reducing the actual multiplier effect.",
+    "videoExplanation": null
   },
   {
     "id": 44,
@@ -779,7 +822,8 @@ const macroUnit4Questions = [
       "Money supply shifts right, nominal interest rate decreases."
     ],
     "correctAnswer": "B",
-    "explanation": "A higher price level increases the amount of money needed for transactions (transactions demand for money). This shifts the money demand curve to the right. Assuming the money supply is held constant by the central bank, this increase in demand leads to a higher equilibrium nominal interest rate."
+    "explanation": "A higher price level increases the amount of money needed for transactions (transactions demand for money). This shifts the money demand curve to the right. Assuming the money supply is held constant by the central bank, this increase in demand leads to a higher equilibrium nominal interest rate.",
+    "videoExplanation": null
   },
   {
     "id": 45,
@@ -796,7 +840,8 @@ const macroUnit4Questions = [
       "No change in money supply, nominal interest rate increases."
     ],
     "correctAnswer": "B",
-    "explanation": "Selling bonds removes reserves from the banking system as banks/public pay the central bank. This leads to a decrease in the money supply (shifts MS left in the traditional model). With less money available relative to demand, the price of holding money (the nominal interest rate) increases."
+    "explanation": "Selling bonds removes reserves from the banking system as banks/public pay the central bank. This leads to a decrease in the money supply (shifts MS left in the traditional model). With less money available relative to demand, the price of holding money (the nominal interest rate) increases.",
+    "videoExplanation": null
   },
   {
     "id": 46,
@@ -813,7 +858,8 @@ const macroUnit4Questions = [
       "Increasing income taxes."
     ],
     "correctAnswer": "D",
-    "explanation": "In an ample reserves system, the central bank influences the federal funds rate (and other short-term rates) primarily by adjusting administered rates. To stimulate the economy (address a recession), the central bank would lower these rates (like IORB, discount rate, ON RRP rate) to encourage borrowing and spending, shifting AD right. Selling securities (B) or increasing IORB (C) are contractionary. Increasing RRR (A) is largely irrelevant in ample reserves. Increasing taxes (E) is contractionary fiscal policy."
+    "explanation": "In an ample reserves system, the central bank influences the federal funds rate (and other short-term rates) primarily by adjusting administered rates. To stimulate the economy (address a recession), the central bank would lower these rates (like IORB, discount rate, ON RRP rate) to encourage borrowing and spending, shifting AD right. Selling securities (B) or increasing IORB (C) are contractionary. Increasing RRR (A) is largely irrelevant in ample reserves. Increasing taxes (E) is contractionary fiscal policy.",
+    "videoExplanation": null
   },
   {
     "id": 47,
@@ -830,7 +876,8 @@ const macroUnit4Questions = [
       "Decreasing the required reserve ratio."
     ],
     "correctAnswer": "C",
-    "explanation": "To combat inflation in an ample reserves system, the central bank needs to raise interest rates to dampen aggregate demand. It achieves this by increasing its administered rates. Raising the ON RRP rate sets a higher floor for the federal funds rate, making borrowing more expensive. Lowering IORB (A) or the discount rate (D) would be expansionary. OMO purchases (B) add reserves, potentially loosening conditions. RRR (E) is not the primary tool."
+    "explanation": "To combat inflation in an ample reserves system, the central bank needs to raise interest rates to dampen aggregate demand. It achieves this by increasing its administered rates. Raising the ON RRP rate sets a higher floor for the federal funds rate, making borrowing more expensive. Lowering IORB (A) or the discount rate (D) would be expansionary. OMO purchases (B) add reserves, potentially loosening conditions. RRR (E) is not the primary tool.",
+    "videoExplanation": null
   },
   {
     "id": 48,
@@ -847,7 +894,8 @@ const macroUnit4Questions = [
       "To finance government budget deficits."
     ],
     "correctAnswer": "C",
-    "explanation": "The ON RRP rate is offered to certain non-bank financial institutions. Since they can always earn this rate from the central bank risk-free overnight, they are unlikely to lend funds in the market (like the federal funds market) for less. This helps establish a floor under the policy rate (the federal funds rate)."
+    "explanation": "The ON RRP rate is offered to certain non-bank financial institutions. Since they can always earn this rate from the central bank risk-free overnight, they are unlikely to lend funds in the market (like the federal funds market) for less. This helps establish a floor under the policy rate (the federal funds rate).",
+    "videoExplanation": null
   },
   {
     "id": 49,
@@ -864,7 +912,8 @@ const macroUnit4Questions = [
       "Demand and supply of loanable funds both increase, real interest rate remains unchanged."
     ],
     "correctAnswer": "C",
-    "explanation": "Government borrowing adds to the overall demand for loanable funds. This shifts the demand curve for loanable funds to the right. Assuming the supply curve remains unchanged or shifts less, the equilibrium real interest rate will increase. This can lead to crowding out of private investment."
+    "explanation": "Government borrowing adds to the overall demand for loanable funds. This shifts the demand curve for loanable funds to the right. Assuming the supply curve remains unchanged or shifts less, the equilibrium real interest rate will increase. This can lead to crowding out of private investment.",
+    "videoExplanation": null
   },
   {
     "id": 50,
@@ -881,7 +930,8 @@ const macroUnit4Questions = [
       "Increase the supply and decrease the demand for loanable funds."
     ],
     "correctAnswer": "B",
-    "explanation": "Increased business optimism about future profits makes firms more willing to undertake investment projects. To finance these projects, they increase their borrowing, which shifts the demand curve for loanable funds to the right. This leads to a higher equilibrium real interest rate, ceteris paribus."
+    "explanation": "Increased business optimism about future profits makes firms more willing to undertake investment projects. To finance these projects, they increase their borrowing, which shifts the demand curve for loanable funds to the right. This leads to a higher equilibrium real interest rate, ceteris paribus.",
+    "videoExplanation": null
   }
 ]
 
@@ -902,7 +952,8 @@ const macroUnit5Questions = [
       "Real output decreases, Real interest rate effect is indeterminate"
     ],
     "correctAnswer": "C",
-    "explanation": "Expansionary fiscal policy increases AD, pushing output up. Contractionary monetary policy decreases AD (or slows its growth), pushing output down. The net effect on output is indeterminate. Both policies tend to increase real interest rates: fiscal policy increases demand for loanable funds, and monetary policy increases the cost of borrowing."
+    "explanation": "Expansionary fiscal policy increases AD, pushing output up. Contractionary monetary policy decreases AD (or slows its growth), pushing output down. The net effect on output is indeterminate. Both policies tend to increase real interest rates: fiscal policy increases demand for loanable funds, and monetary policy increases the cost of borrowing.",
+    "videoExplanation": null
   },
   {
     "id": 52,
@@ -919,7 +970,8 @@ const macroUnit5Questions = [
       "Real output increases, Price level effect is indeterminate"
     ],
     "correctAnswer": "D",
-    "explanation": "Both contractionary fiscal and monetary policies aim to decrease aggregate demand (AD). A decrease in AD leads to lower real output and a lower price level in the short run."
+    "explanation": "Both contractionary fiscal and monetary policies aim to decrease aggregate demand (AD). A decrease in AD leads to lower real output and a lower price level in the short run.",
+    "videoExplanation": null
   },
   {
     "id": 53,
@@ -936,7 +988,8 @@ const macroUnit5Questions = [
       "No change in real interest rates or private investment"
     ],
     "correctAnswer": "B",
-    "explanation": "Expansionary fiscal policy (increased borrowing) increases the demand for loanable funds, raising the real interest rate. A higher real interest rate makes borrowing more expensive for firms, leading to a decrease in private investment spending (crowding out)."
+    "explanation": "Expansionary fiscal policy (increased borrowing) increases the demand for loanable funds, raising the real interest rate. A higher real interest rate makes borrowing more expensive for firms, leading to a decrease in private investment spending (crowding out).",
+    "videoExplanation": null
   },
   {
     "id": 54,
@@ -953,7 +1006,8 @@ const macroUnit5Questions = [
       "Real output decreases, Real interest rate effect is indeterminate"
     ],
     "correctAnswer": "D",
-    "explanation": "Both expansionary policies increase aggregate demand, leading to an increase in real output. However, expansionary fiscal policy tends to increase real interest rates (more government borrowing), while expansionary monetary policy tends to decrease interest rates (easier credit). The net effect on real interest rates is indeterminate."
+    "explanation": "Both expansionary policies increase aggregate demand, leading to an increase in real output. However, expansionary fiscal policy tends to increase real interest rates (more government borrowing), while expansionary monetary policy tends to decrease interest rates (easier credit). The net effect on real interest rates is indeterminate.",
+    "videoExplanation": null
   },
   {
     "id": 55,
@@ -970,7 +1024,8 @@ const macroUnit5Questions = [
       "A rightward shift of the long-run Phillips curve (LRPC)"
     ],
     "correctAnswer": "A",
-    "explanation": "The SRPC shows an inverse relationship between inflation and unemployment. An increase in AD leads to higher output (lower unemployment) and a higher price level (higher inflation). This corresponds to a movement up and to the left along a stable SRPC."
+    "explanation": "The SRPC shows an inverse relationship between inflation and unemployment. An increase in AD leads to higher output (lower unemployment) and a higher price level (higher inflation). This corresponds to a movement up and to the left along a stable SRPC.",
+    "videoExplanation": null
   },
   {
     "id": 56,
@@ -987,7 +1042,8 @@ const macroUnit5Questions = [
       "The LRPC will shift leftwards"
     ],
     "correctAnswer": "C",
-    "explanation": "Higher expected inflation gets built into wage negotiations and price setting. This means that for any given unemployment rate, the actual inflation rate will be higher. This is represented by an upward (or rightward) shift of the SRPC."
+    "explanation": "Higher expected inflation gets built into wage negotiations and price setting. This means that for any given unemployment rate, the actual inflation rate will be higher. This is represented by an upward (or rightward) shift of the SRPC.",
+    "videoExplanation": null
   },
   {
     "id": 57,
@@ -1004,7 +1060,8 @@ const macroUnit5Questions = [
       "Potential GDP always grows faster than inflation."
     ],
     "correctAnswer": "B",
-    "explanation": "In the long run, the economy operates at its potential output, corresponding to the natural rate of unemployment, regardless of the rate of inflation. Expected inflation fully adjusts to actual inflation, meaning any attempt to hold unemployment below the natural rate through demand stimulus will only lead to accelerating inflation, not permanently lower unemployment."
+    "explanation": "In the long run, the economy operates at its potential output, corresponding to the natural rate of unemployment, regardless of the rate of inflation. Expected inflation fully adjusts to actual inflation, meaning any attempt to hold unemployment below the natural rate through demand stimulus will only lead to accelerating inflation, not permanently lower unemployment.",
+    "videoExplanation": null
   },
   {
     "id": 58,
@@ -1021,7 +1078,8 @@ const macroUnit5Questions = [
       "Shift the LRPC leftward"
     ],
     "correctAnswer": "B",
-    "explanation": "An adverse supply shock (like rising oil prices) shifts the Short-Run Aggregate Supply (SRAS) curve leftward. This leads to stagflation: higher inflation and higher unemployment simultaneously. On the Phillips curve diagram, this is represented by an upward/rightward shift of the SRPC, indicating a worse trade-off (or combination) of inflation and unemployment."
+    "explanation": "An adverse supply shock (like rising oil prices) shifts the Short-Run Aggregate Supply (SRAS) curve leftward. This leads to stagflation: higher inflation and higher unemployment simultaneously. On the Phillips curve diagram, this is represented by an upward/rightward shift of the SRPC, indicating a worse trade-off (or combination) of inflation and unemployment.",
+    "videoExplanation": null
   },
   {
     "id": 59,
@@ -1038,7 +1096,8 @@ const macroUnit5Questions = [
       "8.0"
     ],
     "correctAnswer": "C",
-    "explanation": "The quantity theory equation is M * V = P * Y. Plugging in the values: $2,000 * 4 = P * $4,000. This simplifies to $8,000 = P * $4,000. Solving for P: P = $8,000 / $4,000 = 2.0."
+    "explanation": "The quantity theory equation is M * V = P * Y. Plugging in the values: $2,000 * 4 = P * $4,000. This simplifies to $8,000 = P * $4,000. Solving for P: P = $8,000 / $4,000 = 2.0.",
+    "videoExplanation": null
   },
   {
     "id": 60,
@@ -1055,7 +1114,8 @@ const macroUnit5Questions = [
       "A 10% decrease in the velocity of money."
     ],
     "correctAnswer": "C",
-    "explanation": "The equation is M * V = P * Y. If V and Y are constant, then any percentage change in M must be matched by an equal percentage change in P to keep the equation balanced. Therefore, a 10% increase in M leads to a 10% increase in P (inflation)."
+    "explanation": "The equation is M * V = P * Y. If V and Y are constant, then any percentage change in M must be matched by an equal percentage change in P to keep the equation balanced. Therefore, a 10% increase in M leads to a 10% increase in P (inflation).",
+    "videoExplanation": null
   },
   {
     "id": 61,
@@ -1072,7 +1132,8 @@ const macroUnit5Questions = [
       "The sensitivity of investment spending to interest rates."
     ],
     "correctAnswer": "B",
-    "explanation": "Velocity (V) measures how quickly money circulates through the economy in the purchase of final goods and services (nominal GDP, P*Y). A higher velocity means each dollar is used more frequently in transactions during a given period."
+    "explanation": "Velocity (V) measures how quickly money circulates through the economy in the purchase of final goods and services (nominal GDP, P*Y). A higher velocity means each dollar is used more frequently in transactions during a given period.",
+    "videoExplanation": null
   },
   {
     "id": 62,
@@ -1089,7 +1150,8 @@ const macroUnit5Questions = [
       "The debt causes inflation, while the deficit causes unemployment."
     ],
     "correctAnswer": "C",
-    "explanation": "The budget deficit is a flow variable, representing the shortfall between government outlays and revenues over a specific period (usually a fiscal year). The national debt is a stock variable, representing the total accumulated amount of money the government owes from all past borrowing (deficits minus any surpluses)."
+    "explanation": "The budget deficit is a flow variable, representing the shortfall between government outlays and revenues over a specific period (usually a fiscal year). The national debt is a stock variable, representing the total accumulated amount of money the government owes from all past borrowing (deficits minus any surpluses).",
+    "videoExplanation": null
   },
   {
     "id": 63,
@@ -1106,7 +1168,8 @@ const macroUnit5Questions = [
       "A decrease in the demand for loanable funds."
     ],
     "correctAnswer": "C",
-    "explanation": "Persistent large deficits require significant government borrowing, increasing the demand for loanable funds. This drives up real interest rates, making it more expensive for private firms to borrow and invest, potentially slowing down capital accumulation and long-run economic growth (crowding out)."
+    "explanation": "Persistent large deficits require significant government borrowing, increasing the demand for loanable funds. This drives up real interest rates, making it more expensive for private firms to borrow and invest, potentially slowing down capital accumulation and long-run economic growth (crowding out).",
+    "videoExplanation": null
   },
   {
     "id": 64,
@@ -1123,7 +1186,8 @@ const macroUnit5Questions = [
       "Imports on domestic production."
     ],
     "correctAnswer": "C",
-    "explanation": "Crowding out describes the situation where increased government borrowing (to finance deficits) drives up real interest rates, which in turn reduces (crowds out) private investment spending that would have otherwise occurred."
+    "explanation": "Crowding out describes the situation where increased government borrowing (to finance deficits) drives up real interest rates, which in turn reduces (crowds out) private investment spending that would have otherwise occurred.",
+    "videoExplanation": null
   },
   {
     "id": 65,
@@ -1140,7 +1204,8 @@ const macroUnit5Questions = [
       "It decreases long-run growth by increasing the money supply."
     ],
     "correctAnswer": "B",
-    "explanation": "Long-run economic growth depends heavily on factors like capital accumulation, technological progress, and human capital. By reducing private investment (capital formation), crowding out can lead to a smaller capital stock in the future, thereby hindering the economy's long-run growth potential (slowing the outward shift of LRAS/PPC)."
+    "explanation": "Long-run economic growth depends heavily on factors like capital accumulation, technological progress, and human capital. By reducing private investment (capital formation), crowding out can lead to a smaller capital stock in the future, thereby hindering the economy's long-run growth potential (slowing the outward shift of LRAS/PPC).",
+    "videoExplanation": null
   },
   {
     "id": 66,
@@ -1157,7 +1222,8 @@ const macroUnit5Questions = [
       "A decrease in the national saving rate."
     ],
     "correctAnswer": "D",
-    "explanation": "Long-run economic growth is represented by an outward shift of the LRAS curve and the Production Possibilities Curve. This is driven by increases in the quantity or quality of resources (labor, capital, natural resources) or improvements in technology, which enhance labor productivity."
+    "explanation": "Long-run economic growth is represented by an outward shift of the LRAS curve and the Production Possibilities Curve. This is driven by increases in the quantity or quality of resources (labor, capital, natural resources) or improvements in technology, which enhance labor productivity.",
+    "videoExplanation": null
   },
   {
     "id": 67,
@@ -1174,7 +1240,8 @@ const macroUnit5Questions = [
       "Stabilize the short-run Phillips curve."
     ],
     "correctAnswer": "C",
-    "explanation": "While potentially having short-run demand effects, the main goal of supply-side fiscal policies is to encourage investment, innovation, and productivity improvements. These actions aim to increase the economy's productive capacity, shifting the long-run aggregate supply (LRAS) curve to the right and fostering long-term economic growth."
+    "explanation": "While potentially having short-run demand effects, the main goal of supply-side fiscal policies is to encourage investment, innovation, and productivity improvements. These actions aim to increase the economy's productive capacity, shifting the long-run aggregate supply (LRAS) curve to the right and fostering long-term economic growth.",
+    "videoExplanation": null
   }
 ]
 
@@ -1195,7 +1262,8 @@ const macroUnit6Questions = [
       "The U.S. government sends foreign aid to another country."
     ],
     "correctAnswer": "C",
-    "explanation": "The Current Account records trade in goods and services, investment income, and net transfers. Spending by foreign tourists in the U.S. represents an export of services for the U.S., which is a credit (inflow of funds) in the Current Account. A is an import (debit), B is investment income paid out (debit), D is a financial account outflow (debit), E is a transfer payment out (debit)."
+    "explanation": "The Current Account records trade in goods and services, investment income, and net transfers. Spending by foreign tourists in the U.S. represents an export of services for the U.S., which is a credit (inflow of funds) in the Current Account. A is an import (debit), B is investment income paid out (debit), D is a financial account outflow (debit), E is a transfer payment out (debit).",
+    "videoExplanation": null
   },
   {
     "id": 69,
@@ -1212,7 +1280,8 @@ const macroUnit6Questions = [
       "Credit (+) in the Capital Account (transfer)"
     ],
     "correctAnswer": "D",
-    "explanation": "The Financial Account records transactions involving the purchase or sale of assets (like factories, stocks, bonds). When a U.S. company invests abroad (acquires a foreign asset - the factory), it represents an outflow of capital from the U.S., recorded as a debit (-) in the U.S. Financial Account (specifically under direct investment)."
+    "explanation": "The Financial Account records transactions involving the purchase or sale of assets (like factories, stocks, bonds). When a U.S. company invests abroad (acquires a foreign asset - the factory), it represents an outflow of capital from the U.S., recorded as a debit (-) in the U.S. Financial Account (specifically under direct investment).",
+    "videoExplanation": null
   },
   {
     "id": 70,
@@ -1229,7 +1298,8 @@ const macroUnit6Questions = [
       "Its net investment income must be positive."
     ],
     "correctAnswer": "B",
-    "explanation": "The balance of payments must sum to zero (Current Account + Financial Account + Capital Account = 0). Ignoring the typically small Capital Account, this means Current Account + Financial Account ≈ 0. Therefore, if the Current Account is in deficit (negative), the Financial Account must be in surplus (positive), indicating a net inflow of capital/funds from abroad."
+    "explanation": "The balance of payments must sum to zero (Current Account + Financial Account + Capital Account = 0). Ignoring the typically small Capital Account, this means Current Account + Financial Account ≈ 0. Therefore, if the Current Account is in deficit (negative), the Financial Account must be in surplus (positive), indicating a net inflow of capital/funds from abroad.",
+    "videoExplanation": null
   },
   {
     "id": 71,
@@ -1246,7 +1316,8 @@ const macroUnit6Questions = [
       "$24,500"
     ],
     "correctAnswer": "B",
-    "explanation": "To find the cost in USD, divide the price in THB by the exchange rate (THB per USD): Cost in USD = Cost in THB / (THB/USD) = 700 THB / (35 THB/$1) = $20."
+    "explanation": "To find the cost in USD, divide the price in THB by the exchange rate (THB per USD): Cost in USD = Cost in THB / (THB/USD) = 700 THB / (35 THB/$1) = $20.",
+    "videoExplanation": null
   },
   {
     "id": 72,
@@ -1263,7 +1334,8 @@ const macroUnit6Questions = [
       "The exchange rate has become fixed."
     ],
     "correctAnswer": "C",
-    "explanation": "Since one Euro (€) can now buy more U.S. Dollars ($1.20 compared to $1.10), the Euro has become stronger or appreciated relative to the Dollar. Conversely, the Dollar has depreciated relative to the Euro (it now takes more dollars to buy one euro)."
+    "explanation": "Since one Euro (€) can now buy more U.S. Dollars ($1.20 compared to $1.10), the Euro has become stronger or appreciated relative to the Dollar. Conversely, the Dollar has depreciated relative to the Euro (it now takes more dollars to buy one euro).",
+    "videoExplanation": null
   },
   {
     "id": 73,
@@ -1280,7 +1352,8 @@ const macroUnit6Questions = [
       "Both demand and supply of pounds will decrease."
     ],
     "correctAnswer": "C",
-    "explanation": "U.S. consumers wanting more British goods need pounds to buy them. This increases the demand for pounds in the foreign exchange market. An increase in demand, ceteris paribus, leads to an increase in the price of the pound (appreciation)."
+    "explanation": "U.S. consumers wanting more British goods need pounds to buy them. This increases the demand for pounds in the foreign exchange market. An increase in demand, ceteris paribus, leads to an increase in the price of the pound (appreciation).",
+    "videoExplanation": null
   },
   {
     "id": 74,
@@ -1297,7 +1370,8 @@ const macroUnit6Questions = [
       "Demand for dollars increases; Dollar appreciates"
     ],
     "correctAnswer": "B",
-    "explanation": "Higher real income in the U.S. leads to increased demand for all goods, including imports from Japan. To buy Japanese goods, U.S. residents need to supply dollars to the foreign exchange market to obtain yen. This increases the supply of dollars, which, ceteris paribus, causes the dollar to depreciate relative to the yen."
+    "explanation": "Higher real income in the U.S. leads to increased demand for all goods, including imports from Japan. To buy Japanese goods, U.S. residents need to supply dollars to the foreign exchange market to obtain yen. This increases the supply of dollars, which, ceteris paribus, causes the dollar to depreciate relative to the yen.",
+    "videoExplanation": null
   },
   {
     "id": 75,
@@ -1314,7 +1388,8 @@ const macroUnit6Questions = [
       "The quantity traded will decrease."
     ],
     "correctAnswer": "B",
-    "explanation": "An increase in demand for the Peso pushes its value up. A decrease in the supply of the Peso also pushes its value up (makes it scarcer). Since both shifts exert upward pressure on the price (value) of the Peso, the Peso will definitively appreciate. The effect on the equilibrium quantity traded is indeterminate."
+    "explanation": "An increase in demand for the Peso pushes its value up. A decrease in the supply of the Peso also pushes its value up (makes it scarcer). Since both shifts exert upward pressure on the price (value) of the Peso, the Peso will definitively appreciate. The effect on the equilibrium quantity traded is indeterminate.",
+    "videoExplanation": null
   },
   {
     "id": 76,
@@ -1331,7 +1406,8 @@ const macroUnit6Questions = [
       "No significant impact on capital flows or the dollar"
     ],
     "correctAnswer": "B",
-    "explanation": "Lower real interest rates in the U.S. make U.S. assets less attractive to foreign investors (decreasing capital inflows) and make foreign assets more attractive to U.S. investors (increasing capital outflows). The net effect is increased capital outflow. This increases the supply of dollars (as U.S. investors sell dollars to buy foreign currency) and decreases the demand for dollars (as foreign investors demand fewer dollars), causing the dollar to depreciate."
+    "explanation": "Lower real interest rates in the U.S. make U.S. assets less attractive to foreign investors (decreasing capital inflows) and make foreign assets more attractive to U.S. investors (increasing capital outflows). The net effect is increased capital outflow. This increases the supply of dollars (as U.S. investors sell dollars to buy foreign currency) and decreases the demand for dollars (as foreign investors demand fewer dollars), causing the dollar to depreciate.",
+    "videoExplanation": null
   },
   {
     "id": 77,
@@ -1348,7 +1424,8 @@ const macroUnit6Questions = [
       "Indeterminate effect on capital flows and CAD value"
     ],
     "correctAnswer": "B",
-    "explanation": "Contractionary fiscal policy (less government borrowing) tends to lower real interest rates, making Canadian assets less attractive (net capital outflow). Slower economic growth might also reduce investment opportunities, further encouraging outflow. Increased capital outflow leads to an increased supply of CAD and decreased demand for CAD, causing the Canadian Dollar to depreciate."
+    "explanation": "Contractionary fiscal policy (less government borrowing) tends to lower real interest rates, making Canadian assets less attractive (net capital outflow). Slower economic growth might also reduce investment opportunities, further encouraging outflow. Increased capital outflow leads to an increased supply of CAD and decreased demand for CAD, causing the Canadian Dollar to depreciate.",
+    "videoExplanation": null
   },
   {
     "id": 78,
@@ -1365,7 +1442,8 @@ const macroUnit6Questions = [
       "Both currencies will appreciate against gold."
     ],
     "correctAnswer": "C",
-    "explanation": "Higher inflation in Country A means its goods are becoming relatively more expensive. This reduces foreign demand for Country A's goods (reducing demand for its currency) and increases Country A's demand for relatively cheaper goods from Country B (increasing supply of its currency). Both effects cause Country A's currency to depreciate relative to Country B's currency."
+    "explanation": "Higher inflation in Country A means its goods are becoming relatively more expensive. This reduces foreign demand for Country A's goods (reducing demand for its currency) and increases Country A's demand for relatively cheaper goods from Country B (increasing supply of its currency). Both effects cause Country A's currency to depreciate relative to Country B's currency.",
+    "videoExplanation": null
   },
   {
     "id": 79,
@@ -1382,7 +1460,8 @@ const macroUnit6Questions = [
       "Both U.S. exports and imports will increase."
     ],
     "correctAnswer": "B",
-    "explanation": "An appreciation of the dollar makes U.S. goods more expensive for Europeans (decreasing U.S. exports) and makes European goods cheaper for Americans (increasing U.S. imports). Since Net Exports = Exports - Imports, the decrease in exports and increase in imports leads to a decrease in U.S. net exports."
+    "explanation": "An appreciation of the dollar makes U.S. goods more expensive for Europeans (decreasing U.S. exports) and makes European goods cheaper for Americans (increasing U.S. imports). Since Net Exports = Exports - Imports, the decrease in exports and increase in imports leads to a decrease in U.S. net exports.",
+    "videoExplanation": null
   },
   {
     "id": 80,
@@ -1399,7 +1478,8 @@ const macroUnit6Questions = [
       "No change in exports or imports"
     ],
     "correctAnswer": "B",
-    "explanation": "A depreciation of the Yen makes Japanese goods cheaper for foreigners, leading to an increase in Japan's exports. It also makes foreign goods more expensive for Japanese residents, leading to a decrease in Japan's imports. This combination tends to increase Japan's net exports."
+    "explanation": "A depreciation of the Yen makes Japanese goods cheaper for foreigners, leading to an increase in Japan's exports. It also makes foreign goods more expensive for Japanese residents, leading to a decrease in Japan's imports. This combination tends to increase Japan's net exports.",
+    "videoExplanation": null
   },
   {
     "id": 81,
@@ -1416,7 +1496,8 @@ const macroUnit6Questions = [
       "A decrease in the U.S. financial account surplus."
     ],
     "correctAnswer": "C",
-    "explanation": "Higher real returns on U.S. financial assets make them more attractive to both foreign and domestic investors. This encourages foreigners to invest more in the U.S. (increased capital inflow) and discourages U.S. residents from investing abroad (decreased capital outflow). The net result is an increase in net capital inflow (a larger financial account surplus or smaller deficit)."
+    "explanation": "Higher real returns on U.S. financial assets make them more attractive to both foreign and domestic investors. This encourages foreigners to invest more in the U.S. (increased capital inflow) and discourages U.S. residents from investing abroad (decreased capital outflow). The net result is an increase in net capital inflow (a larger financial account surplus or smaller deficit).",
+    "videoExplanation": null
   },
   {
     "id": 82,
@@ -1433,7 +1514,8 @@ const macroUnit6Questions = [
       "An increase in net exports."
     ],
     "correctAnswer": "C",
-    "explanation": "Net capital inflow means that foreigners are purchasing more of the country's assets than residents are purchasing of foreign assets. This inflow of funds is recorded as a credit (+) balance, or a surplus, in the financial account."
+    "explanation": "Net capital inflow means that foreigners are purchasing more of the country's assets than residents are purchasing of foreign assets. This inflow of funds is recorded as a credit (+) balance, or a surplus, in the financial account.",
+    "videoExplanation": null
   }
 ]
 
@@ -1457,7 +1539,8 @@ const microUnit1Questions = [
       "Efficiency."
     ],
     "correctAnswer": "C",
-    "explanation": "Scarcity is the core economic problem referring to the conflict between society's unlimited wants and its limited resources, necessitating choices about resource allocation."
+    "explanation": "Scarcity is the core economic problem referring to the conflict between society's unlimited wants and its limited resources, necessitating choices about resource allocation.",
+    "videoExplanation": null
   },
   // Lesson 1.2: (left empty)
   // Lesson 1.3: Opportunity Cost and PPC (copied from macro 1.2)
@@ -1476,7 +1559,8 @@ const microUnit1Questions = [
       "Comparative cost."
     ],
     "correctAnswer": "D",
-    "explanation": "Opportunity cost is the value of the next best alternative that must be sacrificed when making a decision. It highlights the trade-offs inherent in every choice."
+    "explanation": "Opportunity cost is the value of the next best alternative that must be sacrificed when making a decision. It highlights the trade-offs inherent in every choice.",
+    "videoExplanation": null
   },
   {
     "id": 202,
@@ -1493,7 +1577,8 @@ const microUnit1Questions = [
       "The economy is producing beyond its capacity."
     ],
     "correctAnswer": "B",
-    "explanation": "Points inside the PPC represent attainable production levels but signify inefficiency, meaning resources (like labor or capital) are either unemployed or not being used to their full potential."
+    "explanation": "Points inside the PPC represent attainable production levels but signify inefficiency, meaning resources (like labor or capital) are either unemployed or not being used to their full potential.",
+    "videoExplanation": "/images/mcqVideoExplanations/q202VideoExplanation.mp4"
   },
   {
     "id": 203,
@@ -1510,7 +1595,8 @@ const microUnit1Questions = [
       "A shift in consumer preferences."
     ],
     "correctAnswer": "D",
-    "explanation": "An outward shift of the PPC signifies economic growth. This can result from increases in resource availability (land, labor, capital) or improvements in technology that allow more output to be produced with the same resources."
+    "explanation": "An outward shift of the PPC signifies economic growth. This can result from increases in resource availability (land, labor, capital) or improvements in technology that allow more output to be produced with the same resources.",
+    "videoExplanation": null
   },
   // Lesson 1.4: Comparative Advantage (copied from macro 1.3)
   {
@@ -1528,7 +1614,8 @@ const microUnit1Questions = [
       "Cannot be determined from the information given."
     ],
     "correctAnswer": "B",
-    "explanation": "To find comparative advantage, calculate opportunity costs. Country A's opportunity cost of 1 car is 2 computers (20/10). Country B's opportunity cost of 1 car is 1.5 computers (12/8). Since Country B has the lower opportunity cost for cars, it has the comparative advantage."
+    "explanation": "To find comparative advantage, calculate opportunity costs. Country A's opportunity cost of 1 car is 2 computers (20/10). Country B's opportunity cost of 1 car is 1.5 computers (12/8). Since Country B has the lower opportunity cost for cars, it has the comparative advantage.",
+    "videoExplanation": null
   },
   {
     "id": 205,
@@ -1545,7 +1632,8 @@ const microUnit1Questions = [
       "A shift inward of the Production Possibilities Curve for trading nations."
     ],
     "correctAnswer": "D",
-    "explanation": "When countries specialize in goods where they have a lower opportunity cost (comparative advantage) and trade, global efficiency increases. This results in higher total world output and allows countries to consume beyond their individual production possibilities."
+    "explanation": "When countries specialize in goods where they have a lower opportunity cost (comparative advantage) and trade, global efficiency increases. This results in higher total world output and allows countries to consume beyond their individual production possibilities.",
+    "videoExplanation": null
   }
   // Lesson 1.5: (left empty)
   // Lesson 1.6: (left empty)
@@ -1568,7 +1656,8 @@ const microUnit2Questions = [
       "An increase in the tax on gasoline"
     ],
     "correctAnswer": "C",
-    "explanation": "An improvement in technology lowers production costs, making sellers willing to supply more at each price, thus increasing supply (shifting the supply curve right)."
+    "explanation": "An improvement in technology lowers production costs, making sellers willing to supply more at each price, thus increasing supply (shifting the supply curve right).",
+    "videoExplanation": null
   },
   {
     "id": 84,
@@ -1585,7 +1674,8 @@ const microUnit2Questions = [
       "perfectly inelastic"
     ],
     "correctAnswer": "A",
-    "explanation": "When demand is elastic (PED > 1), a decrease in price leads to a proportionally larger increase in quantity demanded, causing total revenue (P x Q) to increase."
+    "explanation": "When demand is elastic (PED > 1), a decrease in price leads to a proportionally larger increase in quantity demanded, causing total revenue (P x Q) to increase.",
+    "videoExplanation": null
   },
   {
     "id": 85,
@@ -1602,7 +1692,8 @@ const microUnit2Questions = [
       "It will lead to a decrease in quantity demanded"
     ],
     "correctAnswer": "B",
-    "explanation": "A price ceiling set below the equilibrium price is binding. At this lower price, quantity demanded exceeds quantity supplied, resulting in a shortage."
+    "explanation": "A price ceiling set below the equilibrium price is binding. At this lower price, quantity demanded exceeds quantity supplied, resulting in a shortage.",
+    "videoExplanation": null
   },
   {
     "id": 86,
@@ -1619,7 +1710,8 @@ const microUnit2Questions = [
       "unrelated goods"
     ],
     "correctAnswer": "B",
-    "explanation": "A negative cross-price elasticity of demand means that as the price of one good increases, the quantity demanded of the other good decreases. This relationship defines complementary goods."
+    "explanation": "A negative cross-price elasticity of demand means that as the price of one good increases, the quantity demanded of the other good decreases. This relationship defines complementary goods.",
+    "videoExplanation": "/images/mcqVideoExplanations/q86VideoExplanation.mp4"
   },
   {
     "id": 87,
@@ -1636,7 +1728,8 @@ const microUnit2Questions = [
       "area above the supply curve and below the market price"
     ],
     "correctAnswer": "C",
-    "explanation": "Consumer surplus represents the net benefit to buyers, calculated as the difference between their willingness to pay for a good and the price they actually pay."
+    "explanation": "Consumer surplus represents the net benefit to buyers, calculated as the difference between their willingness to pay for a good and the price they actually pay.",
+    "videoExplanation": "/images/mcqVideoExplanations/q87VideoExplanation.mp4"
   },
   {
     "id": 88,
@@ -1653,7 +1746,8 @@ const microUnit2Questions = [
       "equilibrium price to decrease"
     ],
     "correctAnswer": "C",
-    "explanation": "A tax imposed on sellers increases their costs of production, leading to a decrease in supply, which is represented by a leftward shift of the supply curve."
+    "explanation": "A tax imposed on sellers increases their costs of production, leading to a decrease in supply, which is represented by a leftward shift of the supply curve.",
+    "videoExplanation": null
   },
   {
     "id": 89,
@@ -1670,7 +1764,8 @@ const microUnit2Questions = [
       "An increase in the population"
     ],
     "correctAnswer": "D",
-    "explanation": "If consumers expect the price of coffee to fall in the future, they will likely reduce their current demand, waiting to buy at the lower expected price."
+    "explanation": "If consumers expect the price of coffee to fall in the future, they will likely reduce their current demand, waiting to buy at the lower expected price.",
+    "videoExplanation": null
   },
   {
     "id": 90,
@@ -1687,7 +1782,8 @@ const microUnit2Questions = [
       "the income of consumers changes in response to a change in price"
     ],
     "correctAnswer": "B",
-    "explanation": "Price elasticity of supply measures the responsiveness of the quantity supplied of a good or service to a change in its price."
+    "explanation": "Price elasticity of supply measures the responsiveness of the quantity supplied of a good or service to a change in its price.",
+    "videoExplanation": null
   },
   {
     "id": 91,
@@ -1704,7 +1800,8 @@ const microUnit2Questions = [
       "Quantity demanded is greater than quantity supplied"
     ],
     "correctAnswer": "C",
-    "explanation": "Market equilibrium occurs at the price where the quantity consumers are willing and able to buy is exactly equal to the quantity producers are willing and able to sell."
+    "explanation": "Market equilibrium occurs at the price where the quantity consumers are willing and able to buy is exactly equal to the quantity producers are willing and able to sell.",
+    "videoExplanation": null
   },
   {
     "id": 92,
@@ -1721,7 +1818,8 @@ const microUnit2Questions = [
       "Market equilibrium"
     ],
     "correctAnswer": "B",
-    "explanation": "A binding price floor is set above the equilibrium price. At this higher price, quantity supplied exceeds quantity demanded, resulting in a surplus."
+    "explanation": "A binding price floor is set above the equilibrium price. At this higher price, quantity supplied exceeds quantity demanded, resulting in a surplus.",
+    "videoExplanation": null
   }
 ]
 
@@ -1743,7 +1841,8 @@ const microUnit3Questions = [
     "The firm is experiencing increasing marginal returns."
     ],
     "correctAnswer": "C",
-    "explanation": "Mathematically, the average product (AP) curve only slopes downward when the marginal product (MP) curve is below it. If MP were above AP, it would pull the average up."
+    "explanation": "Mathematically, the average product (AP) curve only slopes downward when the marginal product (MP) curve is below it. If MP were above AP, it would pull the average up.",
+    "videoExplanation": null
     },
     {
     "id": 2035,
@@ -1760,7 +1859,8 @@ const microUnit3Questions = [
     "a decrease in consumer demand"
     ],
     "correctAnswer": "C",
-    "explanation": "In the short run, fixed inputs (like factory size) constrain production. As more variable inputs (labor) are added, their marginal productivity eventually falls (law of diminishing marginal returns), causing the cost of each additional unit (marginal cost) to rise."
+    "explanation": "In the short run, fixed inputs (like factory size) constrain production. As more variable inputs (labor) are added, their marginal productivity eventually falls (law of diminishing marginal returns), causing the cost of each additional unit (marginal cost) to rise.",
+    "videoExplanation": null
     },
     {
     "id": 2036,
@@ -1777,7 +1877,8 @@ const microUnit3Questions = [
     "A period where only labor inputs can be adjusted."
     ],
     "correctAnswer": "B",
-    "explanation": "The long run is defined not by a specific time but by the ability of the firm to adjust all inputs, meaning there are no fixed costs or fixed factors."
+    "explanation": "The long run is defined not by a specific time but by the ability of the firm to adjust all inputs, meaning there are no fixed costs or fixed factors.",
+    "videoExplanation": null
     },
     {
     "id": 2037,
@@ -1794,7 +1895,8 @@ const microUnit3Questions = [
     "The marginal product of labor is at its maximum."
     ],
     "correctAnswer": "A",
-    "explanation": "The slope of the total product curve represents the marginal product. At the peak of the curve (Point B), the slope is zero, meaning the additional output from the last unit of labor is zero ($MP = 0$)."
+    "explanation": "The slope of the total product curve represents the marginal product. At the peak of the curve (Point B), the slope is zero, meaning the additional output from the last unit of labor is zero ($MP = 0$).",
+    "videoExplanation": null
     },
     {
     "id": 2038,
@@ -1811,7 +1913,8 @@ const microUnit3Questions = [
     "The slope of the total cost curve"
     ],
     "correctAnswer": "D",
-    "explanation": "Average total cost is the sum of average fixed cost and average variable cost ($ATC = AFC + AVC$)."
+    "explanation": "Average total cost is the sum of average fixed cost and average variable cost ($ATC = AFC + AVC$).",
+    "videoExplanation": null
     },
     {
     "id": 2039,
@@ -1828,7 +1931,8 @@ const microUnit3Questions = [
     "$25"
     ],
     "correctAnswer": "B",
-    "explanation": "1. Find Labor: $L = Output / AP = 20 / 4 = 5$ workers. 2. Find TVC: $5 workers * $20 wage = $100$. 3. Find TC: $TFC ($100) + TVC ($100) = $200$. 4. Find ATC: $TC / Output = 200 / 20 = $10$."
+    "explanation": "1. Find Labor: $L = Output / AP = 20 / 4 = 5$ workers. 2. Find TVC: $5 workers * $20 wage = $100$. 3. Find TC: $TFC ($100) + TVC ($100) = $200$. 4. Find ATC: $TC / Output = 200 / 20 = $10$.",
+    "videoExplanation": null
     },
     // COMMENTED OUT: Table not working properly
     // {
@@ -1863,7 +1967,8 @@ const microUnit3Questions = [
     "$800"
     ],
     "correctAnswer": "C",
-    "explanation": "Total variable cost = $AVC * Quantity = $8 * 50 = $400$. Total fixed cost = $Total cost - Total variable cost = $600 - $400 = $200$."
+    "explanation": "Total variable cost = $AVC * Quantity = $8 * 50 = $400$. Total fixed cost = $Total cost - Total variable cost = $600 - $400 = $200$.",
+    "videoExplanation": null
     },
     {
     "id": 2042,
@@ -1880,7 +1985,8 @@ const microUnit3Questions = [
     "The MC curve is sloping downward."
     ],
     "correctAnswer": "A",
-    "explanation": "Marginal cost is the inverse of marginal product (assuming constant input prices). If marginal product is falling (diminishing), the cost of producing the next unit must be rising."
+    "explanation": "Marginal cost is the inverse of marginal product (assuming constant input prices). If marginal product is falling (diminishing), the cost of producing the next unit must be rising.",
+    "videoExplanation": null
     },
     {
     "id": 2043,
@@ -1897,7 +2003,8 @@ const microUnit3Questions = [
     "Constant returns to scale"
     ],
     "correctAnswer": "B",
-    "explanation": "Economies of scale exist when increasing the scale of production leads to a lower average cost per unit, represented by a downward sloping LRATC."
+    "explanation": "Economies of scale exist when increasing the scale of production leads to a lower average cost per unit, represented by a downward sloping LRATC.",
+    "videoExplanation": null
     },
     // COMMENTED OUT: Table not working properly
     // {
@@ -1932,7 +2039,8 @@ const microUnit3Questions = [
     "Decreasing returns to scale"
     ],
     "correctAnswer": "D",
-    "explanation": "Constant returns to scale occur when output increases by the same proportion as the increase in inputs (e.g., inputs x3 -> output x3)."
+    "explanation": "Constant returns to scale occur when output increases by the same proportion as the increase in inputs (e.g., inputs x3 -> output x3).",
+    "videoExplanation": null
     },
     // COMMENTED OUT: Table not working properly
     // {
@@ -1967,7 +2075,8 @@ const microUnit3Questions = [
     "- $200"
     ],
     "correctAnswer": "A",
-    "explanation": "Economic Profit subtracts both explicit costs ($0 in this simple case) and implicit costs (the opportunity cost of his lost wages, $200). $250 revenue - $200 opportunity cost = $50 economic profit."
+    "explanation": "Economic Profit subtracts both explicit costs ($0 in this simple case) and implicit costs (the opportunity cost of his lost wages, $200). $250 revenue - $200 opportunity cost = $50 economic profit.",
+    "videoExplanation": null
     },
     {
     "id": 2048,
@@ -1984,7 +2093,8 @@ const microUnit3Questions = [
     "$1,200"
     ],
     "correctAnswer": "A",
-    "explanation": "Operating loss: $(ATC - P) * Q = ($20 - $10) * 100 = $1,000$. Shutdown loss (fixed costs): $(ATC - AVC) * Q = ($20 - $12) * 100 = $800$. The firm reduces its loss from $1,000 to $800 by shutting down, a difference of $200."
+    "explanation": "Operating loss: $(ATC - P) * Q = ($20 - $10) * 100 = $1,000$. Shutdown loss (fixed costs): $(ATC - AVC) * Q = ($20 - $12) * 100 = $800$. The firm reduces its loss from $1,000 to $800 by shutting down, a difference of $200.",
+    "videoExplanation": null
     },
     {
     "id": 2049,
@@ -2001,7 +2111,8 @@ const microUnit3Questions = [
     "Deadweight loss"
     ],
     "correctAnswer": "D",
-    "explanation": "Accounting profit is calculated as Revenue minus Explicit Expenses. It does not deduct the value of the next best alternative (implicit cost)."
+    "explanation": "Accounting profit is calculated as Revenue minus Explicit Expenses. It does not deduct the value of the next best alternative (implicit cost).",
+    "videoExplanation": null
     },
     {
     "id": 2050,
@@ -2018,7 +2129,8 @@ const microUnit3Questions = [
     "Marginal revenue exceeds average variable cost"
     ],
     "correctAnswer": "A",
-    "explanation": "The universal rule for profit maximization is to produce up to the point where the additional revenue from selling one more unit (MR) equals the additional cost of producing it (MC)."
+    "explanation": "The universal rule for profit maximization is to produce up to the point where the additional revenue from selling one more unit (MR) equals the additional cost of producing it (MC).",
+    "videoExplanation": null
     },
     {
     "id": 2051,
@@ -2035,7 +2147,8 @@ const microUnit3Questions = [
     "Average total cost > price"
     ],
     "correctAnswer": "C",
-    "explanation": "If producing more adds to total profit, the revenue generated by the next unit (MR) must be greater than the cost to produce it (MC)."
+    "explanation": "If producing more adds to total profit, the revenue generated by the next unit (MR) must be greater than the cost to produce it (MC).",
+    "videoExplanation": null
     },
     {
     "id": 2052,
@@ -2052,7 +2165,8 @@ const microUnit3Questions = [
     "It is undefined."
     ],
     "correctAnswer": "C",
-    "explanation": "Marginal revenue is the slope of the total revenue curve. If total revenue is increasing (positive slope), marginal revenue must be positive ($>0$)."
+    "explanation": "Marginal revenue is the slope of the total revenue curve. If total revenue is increasing (positive slope), marginal revenue must be positive ($>0$).",
+    "videoExplanation": null
     },
     // COMMENTED OUT: Table not working properly
     // {
@@ -2087,7 +2201,8 @@ const microUnit3Questions = [
     "Operate, but reduce prices to increase volume."
     ],
     "correctAnswer": "A",
-    "explanation": "Operating Profit = $Revenue - TVC - TFC = 300k - 280k - 50k = -$30,000$. Shutting Down Profit = $-TFC = -$50,000$. Operating results in a smaller loss ($30k vs $50k) because the revenue covers all variable costs and contributes $20k toward the fixed lease."
+    "explanation": "Operating Profit = $Revenue - TVC - TFC = 300k - 280k - 50k = -$30,000$. Shutting Down Profit = $-TFC = -$50,000$. Operating results in a smaller loss ($30k vs $50k) because the revenue covers all variable costs and contributes $20k toward the fixed lease.",
+    "videoExplanation": null
     },
     {
     "id": 2055,
@@ -2104,7 +2219,8 @@ const microUnit3Questions = [
     "The vertical axis where quantity equals zero."
     ],
     "correctAnswer": "C",
-    "explanation": "A firm supplies based on its marginal cost, but will produce zero (shut down) if the price falls below the minimum average variable cost. Thus, the supply curve is the MC segment above min AVC."
+    "explanation": "A firm supplies based on its marginal cost, but will produce zero (shut down) if the price falls below the minimum average variable cost. Thus, the supply curve is the MC segment above min AVC.",
+    "videoExplanation": null
     },
     {
     "id": 2056,
@@ -2121,7 +2237,8 @@ const microUnit3Questions = [
     "Government intervention will set a price ceiling."
     ],
     "correctAnswer": "B",
-    "explanation": "Price > ATC implies economic profits. In perfect competition, these profits attract new entrants. Entry shifts the market supply right, driving the price down until zero economic profit is restored."
+    "explanation": "Price > ATC implies economic profits. In perfect competition, these profits attract new entrants. Entry shifts the market supply right, driving the price down until zero economic profit is restored.",
+    "videoExplanation": null
     },
     {
     "id": 2057,
@@ -2138,7 +2255,8 @@ const microUnit3Questions = [
     "Decrease production to zero."
     ],
     "correctAnswer": "A",
-    "explanation": "Since price > AVC, the firm covers all variable costs and some fixed costs. It minimizes losses by operating where $P = MC$ rather than shutting down."
+    "explanation": "Since price > AVC, the firm covers all variable costs and some fixed costs. It minimizes losses by operating where $P = MC$ rather than shutting down.",
+    "videoExplanation": null
     },
     {
     "id": 2058,
@@ -2155,7 +2273,8 @@ const microUnit3Questions = [
     "Government regulation"
     ],
     "correctAnswer": "C",
-    "explanation": "The absence of barriers allows firms to freely enter (eroding profits) or exit (eroding losses), ensuring the market settles at zero economic profit."
+    "explanation": "The absence of barriers allows firms to freely enter (eroding profits) or exit (eroding losses), ensuring the market settles at zero economic profit.",
+    "videoExplanation": null
     },
     {
     "id": 2059,
@@ -2172,7 +2291,8 @@ const microUnit3Questions = [
     "Segment PQ only"
     ],
     "correctAnswer": "A",
-    "explanation": "The supply curve begins at the shutdown point (minimum AVC, which is point Q) and follows the marginal cost curve upward as prices rise (Segment QRS)."
+    "explanation": "The supply curve begins at the shutdown point (minimum AVC, which is point Q) and follows the marginal cost curve upward as prices rise (Segment QRS).",
+    "videoExplanation": null
     },
     {
     "id": 2060,
@@ -2189,7 +2309,8 @@ const microUnit3Questions = [
     "It will remain constant."
     ],
     "correctAnswer": "B",
-    "explanation": "Cost theory dictates that whenever marginal cost is less than average total cost ($MC < ATC$), the marginal unit pulls the average down. The price of $80 determines profit but does not change the mathematical relationship between the cost curves."
+    "explanation": "Cost theory dictates that whenever marginal cost is less than average total cost ($MC < ATC$), the marginal unit pulls the average down. The price of $80 determines profit but does not change the mathematical relationship between the cost curves.",
+    "videoExplanation": null
     },
     {
     "id": 2061,
@@ -2206,7 +2327,8 @@ const microUnit3Questions = [
     "An increase in the firm's property taxes"
     ],
     "correctAnswer": "B",
-    "explanation": "The Marginal Cost curve shifts only when the price of a variable input changes. Wages are a variable cost. Rent and property taxes are fixed costs (which shift ATC but not MC), and technology improvements usually shift MC down, not up."
+    "explanation": "The Marginal Cost curve shifts only when the price of a variable input changes. Wages are a variable cost. Rent and property taxes are fixed costs (which shift ATC but not MC), and technology improvements usually shift MC down, not up.",
+    "videoExplanation": null
     }
 ]
 
@@ -2228,7 +2350,8 @@ const microUnit4Questions = [
       "Has no market power"
     ],
     "correctAnswer": "A",
-    "explanation": "Significant barriers to entry in a monopoly prevent new firms from entering the market, allowing the monopolist to potentially earn positive economic profits even in the long run. Perfectly competitive firms earn zero economic profit in the long run due to free entry."
+    "explanation": "Significant barriers to entry in a monopoly prevent new firms from entering the market, allowing the monopolist to potentially earn positive economic profits even in the long run. Perfectly competitive firms earn zero economic profit in the long run due to free entry.",
+    "videoExplanation": null
   },
   {
     "id": 104,
@@ -2245,7 +2368,8 @@ const microUnit4Questions = [
       "Total revenue is maximized (MR = 0)"
     ],
     "correctAnswer": "B",
-    "explanation": "The universal profit-maximization rule for all firms, including monopolies, is to produce the quantity where marginal revenue (MR) equals marginal cost (MC). The price is then determined by the demand curve at that quantity."
+    "explanation": "The universal profit-maximization rule for all firms, including monopolies, is to produce the quantity where marginal revenue (MR) equals marginal cost (MC). The price is then determined by the demand curve at that quantity.",
+    "videoExplanation": null
   },
   {
     "id": 105,
@@ -2262,7 +2386,8 @@ const microUnit4Questions = [
       "Total revenue increases as price decreases"
     ],
     "correctAnswer": "B",
-    "explanation": "A monopolist faces the market demand curve, which is downward sloping. To sell more output, it must lower the price for every unit it sells, not just the last one. This 'price effect' on all previous units makes MR less than the price."
+    "explanation": "A monopolist faces the market demand curve, which is downward sloping. To sell more output, it must lower the price for every unit it sells, not just the last one. This 'price effect' on all previous units makes MR less than the price.",
+    "videoExplanation": null
   },
   {
     "id": 106,
@@ -2279,7 +2404,8 @@ const microUnit4Questions = [
       "An allocatively efficient quantity"
     ],
     "correctAnswer": "B",
-    "explanation": "Monopolies maximize profit by producing less output (where MR=MC, and P > MC) and charging a higher price than would occur in perfect competition (where P=MC). This leads to allocative inefficiency and deadweight loss."
+    "explanation": "Monopolies maximize profit by producing less output (where MR=MC, and P > MC) and charging a higher price than would occur in perfect competition (where P=MC). This leads to allocative inefficiency and deadweight loss.",
+    "videoExplanation": null
   },
   {
     "id": 107,
@@ -2296,7 +2422,8 @@ const microUnit4Questions = [
       "The firm must have identical demand curves across customer groups"
     ],
     "correctAnswer": "B",
-    "explanation": "Successful price discrimination requires market power, the ability to segment customers based on differing price elasticities of demand, and the ability to prevent arbitrage (low-price buyers reselling to high-price buyers)."
+    "explanation": "Successful price discrimination requires market power, the ability to segment customers based on differing price elasticities of demand, and the ability to prevent arbitrage (low-price buyers reselling to high-price buyers).",
+    "videoExplanation": null
   },
   {
     "id": 108,
@@ -2313,7 +2440,8 @@ const microUnit4Questions = [
       "The demand curve becomes the marginal revenue curve"
     ],
     "correctAnswer": "D",
-    "explanation": "Under perfect price discrimination, the firm charges each consumer their maximum willingness to pay. This eliminates consumer surplus entirely and transfers it to the producer additional revenue. Output expands to the allocatively efficient level (where P=MC for the last unit), eliminating deadweight loss."
+    "explanation": "Under perfect price discrimination, the firm charges each consumer their maximum willingness to pay. This eliminates consumer surplus entirely and transfers it to the producer additional revenue. Output expands to the allocatively efficient level (where P=MC for the last unit), eliminating deadweight loss.",
+    "videoExplanation": null
   },
   {
     "id": 109,
@@ -2330,7 +2458,8 @@ const microUnit4Questions = [
       "Monopsony"
     ],
     "correctAnswer": "D",
-    "explanation": "Monopolistic competition features a large number of firms, similar to perfect competition, but with differentiated products (giving firms some market power) and free entry/exit."
+    "explanation": "Monopolistic competition features a large number of firms, similar to perfect competition, but with differentiated products (giving firms some market power) and free entry/exit.",
+    "videoExplanation": null
   },
   {
     "id": 110,
@@ -2347,7 +2476,8 @@ const microUnit4Questions = [
       "Price equals minimum average variable cost"
     ],
     "correctAnswer": "C",
-    "explanation": "Free entry ensures monopolistically competitive firms earn zero economic profit in the long run (P = ATC). However, because they face a downward-sloping demand curve due to product differentiation, their profit-maximizing output (where MR=MC) occurs where P > MC, indicating allocative inefficiency. They also typically operate with excess capacity (not at min ATC)."
+    "explanation": "Free entry ensures monopolistically competitive firms earn zero economic profit in the long run (P = ATC). However, because they face a downward-sloping demand curve due to product differentiation, their profit-maximizing output (where MR=MC) occurs where P > MC, indicating allocative inefficiency. They also typically operate with excess capacity (not at min ATC).",
+    "videoExplanation": null
   },
   {
     "id": 111,
@@ -2364,7 +2494,8 @@ const microUnit4Questions = [
       "Firms are price takers"
     ],
     "correctAnswer": "D",
-    "explanation": "Oligopoly is characterized by a few dominant firms where the actions of one firm (regarding price, output, advertising, etc.) significantly impact the others, leading to strategic interdependence."
+    "explanation": "Oligopoly is characterized by a few dominant firms where the actions of one firm (regarding price, output, advertising, etc.) significantly impact the others, leading to strategic interdependence.",
+    "videoExplanation": null
   },
   {
     "id": 112,
@@ -2381,7 +2512,8 @@ const microUnit4Questions = [
       "One player forces the other into a suboptimal outcome"
     ],
     "correctAnswer": "C",
-    "explanation": "A Nash equilibrium is a set of strategies, one for each player, such that no player has an incentive to unilaterally change their strategy, given the strategies chosen by the other players. It represents a stable outcome in a strategic interaction."
+    "explanation": "A Nash equilibrium is a set of strategies, one for each player, such that no player has an incentive to unilaterally change their strategy, given the strategies chosen by the other players. It represents a stable outcome in a strategic interaction.",
+    "videoExplanation": null
   },
   {
     "id": 150,
@@ -2398,7 +2530,8 @@ const microUnit4Questions = [
       "the firm has no supply curve."
     ],
     "correctAnswer": "B",
-    "explanation": "For a monopolist, marginal revenue falls faster than price because to sell an additional unit, the monopolist must lower the price on all units sold, not just the new unit. This means the revenue gained from the new unit is offset by the revenue lost from lowering the price on all previous units."
+    "explanation": "For a monopolist, marginal revenue falls faster than price because to sell an additional unit, the monopolist must lower the price on all units sold, not just the new unit. This means the revenue gained from the new unit is offset by the revenue lost from lowering the price on all previous units.",
+    "videoExplanation": null
   }
 ]
 
@@ -2603,7 +2736,8 @@ const microUnit5Questions = [
       "Government regulations"
     ],
     "correctAnswer": "C",
-    "explanation": "The demand for factors of production, like labor, is derived from the demand for the goods and services they are used to create. If demand for the final product increases, the demand for the labor needed to make it also increases."
+    "explanation": "The demand for factors of production, like labor, is derived from the demand for the goods and services they are used to create. If demand for the final product increases, the demand for the labor needed to make it also increases.",
+    "videoExplanation": null
   },
   {
     "id": 114,
@@ -2620,7 +2754,8 @@ const microUnit5Questions = [
       "Price of the output times the quantity of labor"
     ],
     "correctAnswer": "B",
-    "explanation": "MRP represents the additional revenue a firm earns from hiring one more unit of labor. It is the marginal product of labor (MPL) multiplied by the marginal revenue (MR) from selling the additional output. In perfectly competitive output markets, MR equals price (P), so MRP = MPL x P."
+    "explanation": "MRP represents the additional revenue a firm earns from hiring one more unit of labor. It is the marginal product of labor (MPL) multiplied by the marginal revenue (MR) from selling the additional output. In perfectly competitive output markets, MR equals price (P), so MRP = MPL x P.",
+    "videoExplanation": null
   },
   {
     "id": 115,
@@ -2637,7 +2772,8 @@ const microUnit5Questions = [
       "Marginal cost equals the wage rate"
     ],
     "correctAnswer": "B",
-    "explanation": "Firms maximize profit by hiring factors up to the point where the additional revenue from the factor (MRP) equals the additional cost of the factor (marginal factor cost, MFC). In a perfectly competitive labor market, MFC equals the market wage rate (W). Thus, the firm hires until MRP = W."
+    "explanation": "Firms maximize profit by hiring factors up to the point where the additional revenue from the factor (MRP) equals the additional cost of the factor (marginal factor cost, MFC). In a perfectly competitive labor market, MFC equals the market wage rate (W). Thus, the firm hires until MRP = W.",
+    "videoExplanation": "/images/mcqVideoExplanations/q115VideoExplanation.mp4"
   },
   {
     "id": 116,
@@ -2654,7 +2790,8 @@ const microUnit5Questions = [
       "An increase in the supply of autoworkers"
     ],
     "correctAnswer": "C",
-    "explanation": "Since the demand for labor is derived from the demand for the product, an increase in the demand for cars (the product) will increase the demand for autoworkers (the labor), shifting the labor demand curve to the right."
+    "explanation": "Since the demand for labor is derived from the demand for the product, an increase in the demand for cars (the product) will increase the demand for autoworkers (the labor), shifting the labor demand curve to the right.",
+    "videoExplanation": null
   },
   {
     "id": 117,
@@ -2671,7 +2808,8 @@ const microUnit5Questions = [
       "An increase in the price of capital (a substitute factor)"
     ],
     "correctAnswer": "C",
-    "explanation": "Factors that increase the number of available workers at any given wage rate, such as increased immigration, population growth, or changes in preferences towards work, will shift the labor supply curve to the right (increase supply)."
+    "explanation": "Factors that increase the number of available workers at any given wage rate, such as increased immigration, population growth, or changes in preferences towards work, will shift the labor supply curve to the right (increase supply).",
+    "videoExplanation": null
   },
   {
     "id": 118,
@@ -2688,7 +2826,8 @@ const microUnit5Questions = [
       "Price of each factor is equal"
     ],
     "correctAnswer": "A",
-    "explanation": "The least-cost combination rule states that cost is minimized when the last dollar spent on each factor yields the same amount of marginal product. Mathematically, this is MPL / PL = MPK / PK, where L is labor and K is capital."
+    "explanation": "The least-cost combination rule states that cost is minimized when the last dollar spent on each factor yields the same amount of marginal product. Mathematically, this is MPL / PL = MPK / PK, where L is labor and K is capital.",
+    "videoExplanation": null
   },
   {
     "id": 119,
@@ -2705,7 +2844,8 @@ const microUnit5Questions = [
       "Monopsony"
     ],
     "correctAnswer": "E",
-    "explanation": "Monopsony is the factor market equivalent of a monopoly (single seller) in the product market. It refers to a market with a single buyer of an input, such as a dominant employer in a small town."
+    "explanation": "Monopsony is the factor market equivalent of a monopoly (single seller) in the product market. It refers to a market with a single buyer of an input, such as a dominant employer in a small town.",
+    "videoExplanation": null
   },
   {
     "id": 120,
@@ -2722,7 +2862,8 @@ const microUnit5Questions = [
       "The supply curve of labor is downward sloping"
     ],
     "correctAnswer": "A",
-    "explanation": "A monopsonist faces the entire upward-sloping market labor supply curve. To hire one more worker, it must raise the wage not only for that worker but for all existing workers as well. This makes the marginal factor cost (the cost of hiring one more worker) exceed the wage rate."
+    "explanation": "A monopsonist faces the entire upward-sloping market labor supply curve. To hire one more worker, it must raise the wage not only for that worker but for all existing workers as well. This makes the marginal factor cost (the cost of hiring one more worker) exceed the wage rate.",
+    "videoExplanation": null
   },
   {
     "id": 121,
@@ -2739,7 +2880,8 @@ const microUnit5Questions = [
       "Marginal product equals marginal factor cost (MP = MFC)"
     ],
     "correctAnswer": "B",
-    "explanation": "The profit-maximizing rule for hiring inputs is always MRP = MFC. For a monopsonist, the MFC is greater than the wage rate (W), so they hire where MRP = MFC, and then determine the wage to pay based on the labor supply curve at that quantity."
+    "explanation": "The profit-maximizing rule for hiring inputs is always MRP = MFC. For a monopsonist, the MFC is greater than the wage rate (W), so they hire where MRP = MFC, and then determine the wage to pay based on the labor supply curve at that quantity.",
+    "videoExplanation": null
   },
   {
     "id": 122,
@@ -2756,7 +2898,8 @@ const microUnit5Questions = [
       "The same number of workers at a lower wage"
     ],
     "correctAnswer": "D",
-    "explanation": "Because the monopsonist equates MRP with the higher MFC curve (which lies above the supply curve), it chooses a quantity of labor that is lower than the competitive quantity. The wage paid is determined by the supply curve at this lower quantity, resulting in a lower wage than in a competitive market."
+    "explanation": "Because the monopsonist equates MRP with the higher MFC curve (which lies above the supply curve), it chooses a quantity of labor that is lower than the competitive quantity. The wage paid is determined by the supply curve at this lower quantity, resulting in a lower wage than in a competitive market.",
+    "videoExplanation": null
   }, 
   {
     "id": 2011,
@@ -2774,7 +2917,8 @@ const microUnit5Questions = [
       "decrease its demand for labor"
     ],
     "correctAnswer": "A",
-    "explanation": "Factor demand is a 'derived demand.' Even in monopolistic competition, if demand for the product increases, both the price and marginal revenue (MR) for the product rise. This increases the marginal revenue product (MRP = MP * MR) of the inputs, leading the firm to increase its demand for capital and labor."
+    "explanation": "Factor demand is a 'derived demand.' Even in monopolistic competition, if demand for the product increases, both the price and marginal revenue (MR) for the product rise. This increases the marginal revenue product (MRP = MP * MR) of the inputs, leading the firm to increase its demand for capital and labor.",
+    "videoExplanation": null
   },
   {
     "id": 2012,
@@ -2792,7 +2936,8 @@ const microUnit5Questions = [
       "more than the profit-maximizing level of output"
     ],
     "correctAnswer": "B",
-    "explanation": "The law of diminishing marginal returns applies regardless of market structure. If MP is falling, MC is rising. A profit-maximizing monopolist produces where MR = MC, which must occur in the region where marginal cost is rising (and marginal product is falling)."
+    "explanation": "The law of diminishing marginal returns applies regardless of market structure. If MP is falling, MC is rising. A profit-maximizing monopolist produces where MR = MC, which must occur in the region where marginal cost is rising (and marginal product is falling).",
+    "videoExplanation": null
   },
   {
     "id": 2013,
@@ -2810,7 +2955,8 @@ const microUnit5Questions = [
       "An increase in the demand for advertising services by large corporations"
     ],
     "correctAnswer": "E",
-    "explanation": "Labor demand is derived from product demand. If large corporations demand more advertising services (the product), the advertising firms' marginal revenue (MR) increases. This raises the MRP of graphic designers, shifting the labor demand curve right and increasing the wage."
+    "explanation": "Labor demand is derived from product demand. If large corporations demand more advertising services (the product), the advertising firms' marginal revenue (MR) increases. This raises the MRP of graphic designers, shifting the labor demand curve right and increasing the wage.",
+    "videoExplanation": null
   },
   {
     "id": 2014,
@@ -2828,7 +2974,8 @@ const microUnit5Questions = [
       "Supply of sous-chefs: Constant; Supply of head chefs: Decrease"
     ],
     "correctAnswer": "A",
-    "explanation": "Wages are inversely related to labor supply. A rise in the sous-chef wage suggests a decrease in their supply (left shift). A fall in the head chef wage suggests an increase in their supply (right shift)."
+    "explanation": "Wages are inversely related to labor supply. A rise in the sous-chef wage suggests a decrease in their supply (left shift). A fall in the head chef wage suggests an increase in their supply (right shift).",
+    "videoExplanation": null
   },
   {
     "id": 2015,
@@ -2846,7 +2993,8 @@ const microUnit5Questions = [
       "The demand curve for labor will shift to the right."
     ],
     "correctAnswer": "A",
-    "explanation": "MRP = MP * MR. If marginal revenue decreases due to falling product demand, the MRP decreases. Since the labor demand curve is the MRP curve, the firm's demand for labor decreases."
+    "explanation": "MRP = MP * MR. If marginal revenue decreases due to falling product demand, the MRP decreases. Since the labor demand curve is the MRP curve, the firm's demand for labor decreases.",
+    "videoExplanation": null
   },
   {
     "id": 2016,
@@ -2864,7 +3012,8 @@ const microUnit5Questions = [
       "P = $40 and MR = $40"
     ],
     "correctAnswer": "B",
-    "explanation": "The firm hires where wage = MRP. So, $40 = MRP. Since MRP = MP * MR, we have $40 = 8 * MR, which means MR = $5. For a firm with market power (downward sloping demand), price (P) is always greater than marginal revenue (MR). Therefore, P > $5."
+    "explanation": "The firm hires where wage = MRP. So, $40 = MRP. Since MRP = MP * MR, we have $40 = 8 * MR, which means MR = $5. For a firm with market power (downward sloping demand), price (P) is always greater than marginal revenue (MR). Therefore, P > $5.",
+    "videoExplanation": null
   },
   {
     "id": 2017,
@@ -2882,7 +3031,8 @@ const microUnit5Questions = [
       "Wage: $25, Rental Rate: $120"
     ],
     "correctAnswer": "B",
-    "explanation": "Regardless of the product market structure, the profit-maximizing rule for hiring inputs is MRP = MFC (factor price). Thus, wage must equal $50 and the rental rate must equal $120."
+    "explanation": "Regardless of the product market structure, the profit-maximizing rule for hiring inputs is MRP = MFC (factor price). Thus, wage must equal $50 and the rental rate must equal $120.",
+    "videoExplanation": null
   },
   {
     "id": 2018,
@@ -2900,7 +3050,8 @@ const microUnit5Questions = [
       "$20,000"
     ],
     "correctAnswer": "C",
-    "explanation": "The cost minimization rule (MP_L / P_L = MP_K / P_K) applies to all firms. 50 / 25,000 = 0.002. Then 20 / P_Robot = 0.002. Solving for P_Robot: 20 / 0.002 = $10,000."
+    "explanation": "The cost minimization rule (MP_L / P_L = MP_K / P_K) applies to all firms. 50 / 25,000 = 0.002. Then 20 / P_Robot = 0.002. Solving for P_Robot: 20 / 0.002 = $10,000.",
+    "videoExplanation": null
   },
   {
     "id": 2019,
@@ -2918,7 +3069,8 @@ const microUnit5Questions = [
       "The firm should lower the price of the product to sell more output."
     ],
     "correctAnswer": "A",
-    "explanation": "Check MP per dollar. Labor: 100/$20 = 5. Machinery: 200/$50 = 4. Since labor provides a higher return per dollar (5 > 4), the firm should use more labor and less machinery."
+    "explanation": "Check MP per dollar. Labor: 100/$20 = 5. Machinery: 200/$50 = 4. Since labor provides a higher return per dollar (5 > 4), the firm should use more labor and less machinery.",
+    "videoExplanation": null
   },
   {
     "id": 2020,
@@ -2936,7 +3088,8 @@ const microUnit5Questions = [
       "Marginal Product (MP) × Marginal Revenue (MR)"
     ],
     "correctAnswer": "E",
-    "explanation": "This is a key distinction. For a perfect competitor, P=MR, so MRP=MP*P. But for a firm with market power, price > marginal revenue, so the strictly correct definition is MRP = MP * MR."
+    "explanation": "This is a key distinction. For a perfect competitor, P=MR, so MRP=MP*P. But for a firm with market power, price > marginal revenue, so the strictly correct definition is MRP = MP * MR.",
+    "videoExplanation": "/images/mcqVideoExplanations/q2020VideoExplanation.mp4"
   },
   {
     "id": 2021,
@@ -2954,7 +3107,8 @@ const microUnit5Questions = [
       "Keep employment levels unchanged"
     ],
     "correctAnswer": "D",
-    "explanation": "We must calculate MRP using MR, not price. MRP = MP * MR = 5 * $8 = $40. The wage (MFC) is $50. Since MRP ($40) < MFC ($50), the firm is losing money on the last worker and should employ fewer workers."
+    "explanation": "We must calculate MRP using MR, not price. MRP = MP * MR = 5 * $8 = $40. The wage (MFC) is $50. Since MRP ($40) < MFC ($50), the firm is losing money on the last worker and should employ fewer workers.",
+    "videoExplanation": null
   },
   {
     "id": 2022,
@@ -2972,7 +3126,8 @@ const microUnit5Questions = [
       "Marginal Revenue = Marginal Cost of Output"
     ],
     "correctAnswer": "C",
-    "explanation": "MRP = MFC is the universal condition for profit maximization in factor markets, applicable to all market structures."
+    "explanation": "MRP = MFC is the universal condition for profit maximization in factor markets, applicable to all market structures.",
+    "videoExplanation": null
   },
   {
     "id": 2023,
@@ -2990,7 +3145,8 @@ const microUnit5Questions = [
       "It is downward sloping due to lack of competition."
     ],
     "correctAnswer": "D",
-    "explanation": "A monopsonist faces the market supply curve, which is upward sloping. Because they must raise wages to hire more workers, the marginal factor cost (MFC) curve lies *above* the supply curve."
+    "explanation": "A monopsonist faces the market supply curve, which is upward sloping. Because they must raise wages to hire more workers, the marginal factor cost (MFC) curve lies *above* the supply curve.",
+    "videoExplanation": null
   },
   {
     "id": 2024,
@@ -3008,7 +3164,8 @@ const microUnit5Questions = [
       "Government regulations"
     ],
     "correctAnswer": "C",
-    "explanation": "The demand for factors of production, like labor, is derived from the demand for the goods and services they are used to create. If demand for the final product increases, the demand for the labor needed to make it also increases."
+    "explanation": "The demand for factors of production, like labor, is derived from the demand for the goods and services they are used to create. If demand for the final product increases, the demand for the labor needed to make it also increases.",
+    "videoExplanation": "/images/mcqVideoExplanations/q2024VideoExplanation.mp4"
   },
   {
     "id": 2025,
@@ -3026,7 +3183,8 @@ const microUnit5Questions = [
       "Price of the output times the quantity of labor"
     ],
     "correctAnswer": "B",
-    "explanation": "MRP represents the additional revenue a firm earns from hiring one more unit of labor. It is the marginal product of labor (MPL) multiplied by the marginal revenue (MR) from selling the additional output. In perfectly competitive output markets, MR equals price (P), so MRP = MPL x P."
+    "explanation": "MRP represents the additional revenue a firm earns from hiring one more unit of labor. It is the marginal product of labor (MPL) multiplied by the marginal revenue (MR) from selling the additional output. In perfectly competitive output markets, MR equals price (P), so MRP = MPL x P.",
+    "videoExplanation": null
   },
   {
     "id": 2026,
@@ -3044,7 +3202,8 @@ const microUnit5Questions = [
       "Marginal cost equals the wage rate"
     ],
     "correctAnswer": "B",
-    "explanation": "Firms maximize profit by hiring factors up to the point where the additional revenue from the factor (MRP) equals the additional cost of the factor (marginal factor cost, MFC). In a perfectly competitive labor market, MFC equals the market wage rate (W). Thus, the firm hires until MRP = W."
+    "explanation": "Firms maximize profit by hiring factors up to the point where the additional revenue from the factor (MRP) equals the additional cost of the factor (marginal factor cost, MFC). In a perfectly competitive labor market, MFC equals the market wage rate (W). Thus, the firm hires until MRP = W.",
+    "videoExplanation": null
   },
   {
     "id": 2027,
@@ -3062,7 +3221,8 @@ const microUnit5Questions = [
       "An increase in the supply of autoworkers"
     ],
     "correctAnswer": "C",
-    "explanation": "Since the demand for labor is derived from the demand for the product, an increase in the demand for cars (the product) will increase the demand for autoworkers (the labor), shifting the labor demand curve to the right."
+    "explanation": "Since the demand for labor is derived from the demand for the product, an increase in the demand for cars (the product) will increase the demand for autoworkers (the labor), shifting the labor demand curve to the right.",
+    "videoExplanation": null
   },
   {
     "id": 2028,
@@ -3080,7 +3240,8 @@ const microUnit5Questions = [
       "An increase in the price of capital (a substitute factor)"
     ],
     "correctAnswer": "C",
-    "explanation": "Factors that increase the number of available workers at any given wage rate, such as increased immigration, population growth, or changes in preferences towards work, will shift the labor supply curve to the right (increase supply)."
+    "explanation": "Factors that increase the number of available workers at any given wage rate, such as increased immigration, population growth, or changes in preferences towards work, will shift the labor supply curve to the right (increase supply).",
+    "videoExplanation": null
   },
   {
     "id": 2029,
@@ -3098,7 +3259,8 @@ const microUnit5Questions = [
       "Price of each factor is equal"
     ],
     "correctAnswer": "A",
-    "explanation": "The least-cost combination rule states that cost is minimized when the last dollar spent on each factor yields the same amount of marginal product. Mathematically, this is MPL / PL = MPK / PK, where L is labor and K is capital."
+    "explanation": "The least-cost combination rule states that cost is minimized when the last dollar spent on each factor yields the same amount of marginal product. Mathematically, this is MPL / PL = MPK / PK, where L is labor and K is capital.",
+    "videoExplanation": null
   },
   {
     "id": 2030,
@@ -3116,7 +3278,8 @@ const microUnit5Questions = [
       "Monopsony"
     ],
     "correctAnswer": "E",
-    "explanation": "Monopsony is the factor market equivalent of a monopoly (single seller) in the product market. It refers to a market with a single buyer of an input, such as a dominant employer in a small town."
+    "explanation": "Monopsony is the factor market equivalent of a monopoly (single seller) in the product market. It refers to a market with a single buyer of an input, such as a dominant employer in a small town.",
+    "videoExplanation": null
   },
   {
     "id": 2031,
@@ -3134,7 +3297,8 @@ const microUnit5Questions = [
       "The supply curve of labor is downward sloping"
     ],
     "correctAnswer": "A",
-    "explanation": "A monopsonist faces the entire upward-sloping market labor supply curve. To hire one more worker, it must raise the wage not only for that worker but for all existing workers as well. This makes the marginal factor cost (the cost of hiring one more worker) exceed the wage rate."
+    "explanation": "A monopsonist faces the entire upward-sloping market labor supply curve. To hire one more worker, it must raise the wage not only for that worker but for all existing workers as well. This makes the marginal factor cost (the cost of hiring one more worker) exceed the wage rate.",
+    "videoExplanation": null
   },
   {
     "id": 2032,
@@ -3152,7 +3316,8 @@ const microUnit5Questions = [
       "Marginal product equals marginal factor cost (MP = MFC)"
     ],
     "correctAnswer": "B",
-    "explanation": "The profit-maximizing rule for hiring inputs is always MRP = MFC. For a monopsonist, the MFC is greater than the wage rate (W), so they hire where MRP = MFC, and then determine the wage to pay based on the labor supply curve at that quantity."
+    "explanation": "The profit-maximizing rule for hiring inputs is always MRP = MFC. For a monopsonist, the MFC is greater than the wage rate (W), so they hire where MRP = MFC, and then determine the wage to pay based on the labor supply curve at that quantity.",
+    "videoExplanation": null
   },
   {
     "id": 2033,
@@ -3170,7 +3335,8 @@ const microUnit5Questions = [
       "The same number of workers at a lower wage"
     ],
     "correctAnswer": "D",
-    "explanation": "Because the monopsonist equates MRP with the higher MFC curve (which lies above the supply curve), it chooses a quantity of labor that is lower than the competitive quantity. The wage paid is determined by the supply curve at this lower quantity, resulting in a lower wage than in a competitive market."
+    "explanation": "Because the monopsonist equates MRP with the higher MFC curve (which lies above the supply curve), it chooses a quantity of labor that is lower than the competitive quantity. The wage paid is determined by the supply curve at this lower quantity, resulting in a lower wage than in a competitive market.",
+    "videoExplanation": null
   }
 
 ]
@@ -3193,7 +3359,8 @@ const microUnit6Questions = [
       "Total revenue is maximized"
     ],
     "correctAnswer": "C",
-    "explanation": "Allocative efficiency means resources are distributed to produce the mix of goods and services most desired by society. This occurs when the marginal social benefit (MSB) of the last unit produced equals its marginal social cost (MSC)."
+    "explanation": "Allocative efficiency means resources are distributed to produce the mix of goods and services most desired by society. This occurs when the marginal social benefit (MSB) of the last unit produced equals its marginal social cost (MSC).",
+    "videoExplanation": null
   },
   {
     "id": 124,
@@ -3210,7 +3377,8 @@ const microUnit6Questions = [
       "There is no deadweight loss"
     ],
     "correctAnswer": "D",
-    "explanation": "When a negative externality exists (e.g., pollution), the social cost (MSC) of production exceeds the private cost (MPC). The unregulated market produces where MPB = MPC, resulting in an output level greater than the socially optimal level (where MSB = MSC), leading to overproduction and deadweight loss."
+    "explanation": "When a negative externality exists (e.g., pollution), the social cost (MSC) of production exceeds the private cost (MPC). The unregulated market produces where MPB = MPC, resulting in an output level greater than the socially optimal level (where MSB = MSC), leading to overproduction and deadweight loss.",
+    "videoExplanation": null
   },
   {
     "id": 125,
@@ -3227,7 +3395,8 @@ const microUnit6Questions = [
       "Banning the consumption of the good"
     ],
     "correctAnswer": "C",
-    "explanation": "A positive externality in consumption (e.g., vaccinations) means the social benefit (MSB) exceeds the private benefit (MPB). A per-unit subsidy to consumers effectively increases their private benefit, shifting the demand curve rightward towards the socially optimal quantity where MSB = MSC."
+    "explanation": "A positive externality in consumption (e.g., vaccinations) means the social benefit (MSB) exceeds the private benefit (MPB). A per-unit subsidy to consumers effectively increases their private benefit, shifting the demand curve rightward towards the socially optimal quantity where MSB = MSC.",
+    "videoExplanation": null
   },
   {
     "id": 126,
@@ -3244,7 +3413,8 @@ const microUnit6Questions = [
       "Producer surplus equals consumer surplus"
     ],
     "correctAnswer": "B",
-    "explanation": "The socially optimal, or allocatively efficient, quantity occurs where the marginal benefit to society (MSB) from consuming the last unit is exactly equal to the marginal cost to society (MSC) of producing that last unit. This point maximizes total social surplus."
+    "explanation": "The socially optimal, or allocatively efficient, quantity occurs where the marginal benefit to society (MSB) from consuming the last unit is exactly equal to the marginal cost to society (MSC) of producing that last unit. This point maximizes total social surplus.",
+    "videoExplanation": null
   },
   {
     "id": 127,
@@ -3261,7 +3431,8 @@ const microUnit6Questions = [
       "Produced only by the government"
     ],
     "correctAnswer": "D",
-    "explanation": "Public goods possess two key characteristics: non-rivalry (one person's use does not prevent others from using it) and non-excludability (it is impractical or impossible to prevent non-payers from benefiting)."
+    "explanation": "Public goods possess two key characteristics: non-rivalry (one person's use does not prevent others from using it) and non-excludability (it is impractical or impossible to prevent non-payers from benefiting).",
+    "videoExplanation": null
   },
   {
     "id": 128,
@@ -3278,7 +3449,8 @@ const microUnit6Questions = [
       "The good is rivalrous in consumption"
     ],
     "correctAnswer": "B",
-    "explanation": "Since people cannot be easily excluded from consuming a public good, they have an incentive to let others pay for it while still enjoying the benefits. This free-riding leads to under-provision by private markets, often necessitating government provision."
+    "explanation": "Since people cannot be easily excluded from consuming a public good, they have an incentive to let others pay for it while still enjoying the benefits. This free-riding leads to under-provision by private markets, often necessitating government provision.",
+    "videoExplanation": null
   },
   {
     "id": 129,
@@ -3295,7 +3467,8 @@ const microUnit6Questions = [
       "No change in price or output"
     ],
     "correctAnswer": "D",
-    "explanation": "A per-unit tax acts like an increase in marginal cost (MC) for the monopolist. The MC curve shifts upward/leftward. The monopolist will find the new profit-maximizing quantity where MR intersects the new, higher MC curve. This results in a lower quantity and, moving up the demand curve, a higher price."
+    "explanation": "A per-unit tax acts like an increase in marginal cost (MC) for the monopolist. The MC curve shifts upward/leftward. The monopolist will find the new profit-maximizing quantity where MR intersects the new, higher MC curve. This results in a lower quantity and, moving up the demand curve, a higher price.",
+    "videoExplanation": null
   },
   {
     "id": 130,
@@ -3312,7 +3485,8 @@ const microUnit6Questions = [
       "Output decreases, price remains unchanged"
     ],
     "correctAnswer": "C",
-    "explanation": "A lump-sum tax affects only fixed costs, not marginal costs (MC) or marginal revenue (MR). Since the profit-maximizing output level is determined where MR = MC, and neither of these curves shifts, the monopolist's output and price will not change in the short run. The tax will, however, reduce the monopolist's total profit."
+    "explanation": "A lump-sum tax affects only fixed costs, not marginal costs (MC) or marginal revenue (MR). Since the profit-maximizing output level is determined where MR = MC, and neither of these curves shifts, the monopolist's output and price will not change in the short run. The tax will, however, reduce the monopolist's total profit.",
+    "videoExplanation": null
   },
   {
     "id": 131,
@@ -3329,7 +3503,8 @@ const microUnit6Questions = [
       "The deadweight loss from taxation"
     ],
     "correctAnswer": "B",
-    "explanation": "The Lorenz curve plots the cumulative percentage of total income received against the cumulative percentage of households/individuals, starting from the lowest income. The further the curve bows away from the line of perfect equality, the greater the income inequality."
+    "explanation": "The Lorenz curve plots the cumulative percentage of total income received against the cumulative percentage of households/individuals, starting from the lowest income. The further the curve bows away from the line of perfect equality, the greater the income inequality.",
+    "videoExplanation": null
   },
   {
     "id": 132,
@@ -3346,7 +3521,8 @@ const microUnit6Questions = [
       "A negative externality"
     ],
     "correctAnswer": "B",
-    "explanation": "The Gini coefficient is a numerical measure of income inequality derived from the Lorenz curve, ranging from 0 (perfect equality, where everyone has the same income) to 1 (perfect inequality, where one person has all the income)."
+    "explanation": "The Gini coefficient is a numerical measure of income inequality derived from the Lorenz curve, ranging from 0 (perfect equality, where everyone has the same income) to 1 (perfect inequality, where one person has all the income).",
+    "videoExplanation": null
   },
   {
     "id": 133,
@@ -3449,7 +3625,8 @@ const microUnit6Questions = [
       "A price floor set at P1."
     ],
     "correctAnswer": "C",
-    "explanation": "The graph shows a negative production externality because the marginal social cost (MSC) is greater than the marginal private cost (MPC). The market equilibrium quantity (where MPB=MPC) is greater than the socially optimal quantity (where MSB=MSC). To correct this overproduction, the government can impose a per-unit tax equal to the marginal external cost at the optimal quantity. This cost is represented by the vertical distance between MSC and MPC at the optimal quantity, which is equal to P1 - P3."
+    "explanation": "The graph shows a negative production externality because the marginal social cost (MSC) is greater than the marginal private cost (MPC). The market equilibrium quantity (where MPB=MPC) is greater than the socially optimal quantity (where MSB=MSC). To correct this overproduction, the government can impose a per-unit tax equal to the marginal external cost at the optimal quantity. This cost is represented by the vertical distance between MSC and MPC at the optimal quantity, which is equal to P1 - P3.",
+    "videoExplanation": null
   }, 
   {
     "id": 140,
@@ -3467,7 +3644,8 @@ const microUnit6Questions = [
       "An individual playing loud music late at night that disturbs neighbors."
     ],
     "correctAnswer": "A",
-    "explanation": "The graph shows that the marginal social cost (MSC) is greater than the marginal private cost (MPC), while marginal social benefit (MSB) equals marginal private benefit (MPB). This indicates a negative externality in production. Option A, factory pollution, is a classic example where the production process imposes external costs on society (pollution) that are not reflected in the firm's private costs."
+    "explanation": "The graph shows that the marginal social cost (MSC) is greater than the marginal private cost (MPC), while marginal social benefit (MSB) equals marginal private benefit (MPB). This indicates a negative externality in production. Option A, factory pollution, is a classic example where the production process imposes external costs on society (pollution) that are not reflected in the firm's private costs.",
+    "videoExplanation": null
   }, 
   {
     "id": 141,
@@ -3485,7 +3663,8 @@ const microUnit6Questions = [
       "Taxing the external benefits generated."
     ],
     "correctAnswer": "B",
-    "explanation": "The graph shows that the marginal social benefit (MSB) is greater than the marginal private benefit (MPB), indicating a positive externality in consumption. The market equilibrium (where MPB intersects MPC) results in a quantity below the socially optimal level (where MSB intersects MSC/MPC). To correct this under-consumption, the government can provide a per-unit subsidy to consumers, effectively increasing the marginal private benefit and shifting the demand curve towards the MSB curve, thus encouraging consumption towards the optimal quantity."
+    "explanation": "The graph shows that the marginal social benefit (MSB) is greater than the marginal private benefit (MPB), indicating a positive externality in consumption. The market equilibrium (where MPB intersects MPC) results in a quantity below the socially optimal level (where MSB intersects MSC/MPC). To correct this under-consumption, the government can provide a per-unit subsidy to consumers, effectively increasing the marginal private benefit and shifting the demand curve towards the MSB curve, thus encouraging consumption towards the optimal quantity.",
+    "videoExplanation": null
   }
 ];
 
@@ -3509,7 +3688,8 @@ export const allQuestions: QuestionType[] = [
       "Efficiency."
     ],
     "correctAnswer": "C",
-    "explanation": "Scarcity is the core economic problem referring to the conflict between society's unlimited wants and its limited resources, necessitating choices about resource allocation."
+    "explanation": "Scarcity is the core economic problem referring to the conflict between society's unlimited wants and its limited resources, necessitating choices about resource allocation.",
+    "videoExplanation": null
   },
   {
     "id": 2,
@@ -3527,7 +3707,8 @@ export const allQuestions: QuestionType[] = [
       "Comparative cost."
     ],
     "correctAnswer": "D",
-    "explanation": "Opportunity cost is the value of the next best alternative that must be sacrificed when making a decision. It highlights the trade-offs inherent in every choice."
+    "explanation": "Opportunity cost is the value of the next best alternative that must be sacrificed when making a decision. It highlights the trade-offs inherent in every choice.",
+    "videoExplanation": null
   },
   {
     "id": 3,
@@ -3545,7 +3726,8 @@ export const allQuestions: QuestionType[] = [
       "The economy is producing beyond its capacity."
     ],
     "correctAnswer": "B",
-    "explanation": "Points inside the PPC represent attainable production levels but signify inefficiency, meaning resources (like labor or capital) are either unemployed or not being used to their full potential."
+    "explanation": "Points inside the PPC represent attainable production levels but signify inefficiency, meaning resources (like labor or capital) are either unemployed or not being used to their full potential.",
+    "videoExplanation": null
   },
   {
     "id": 4,
@@ -3563,7 +3745,8 @@ export const allQuestions: QuestionType[] = [
       "A shift in consumer preferences."
     ],
     "correctAnswer": "D",
-    "explanation": "An outward shift of the PPC signifies economic growth. This can result from increases in resource availability (land, labor, capital) or improvements in technology that allow more output to be produced with the same resources."
+    "explanation": "An outward shift of the PPC signifies economic growth. This can result from increases in resource availability (land, labor, capital) or improvements in technology that allow more output to be produced with the same resources.",
+    "videoExplanation": null
   },
   {
     "id": 5,
@@ -3581,7 +3764,8 @@ export const allQuestions: QuestionType[] = [
       "Cannot be determined from the information given."
     ],
     "correctAnswer": "B",
-    "explanation": "To find comparative advantage, calculate opportunity costs. Country A's opportunity cost of 1 car is 2 computers (20/10). Country B's opportunity cost of 1 car is 1.5 computers (12/8). Since Country B has the lower opportunity cost for cars, it has the comparative advantage."
+    "explanation": "To find comparative advantage, calculate opportunity costs. Country A's opportunity cost of 1 car is 2 computers (20/10). Country B's opportunity cost of 1 car is 1.5 computers (12/8). Since Country B has the lower opportunity cost for cars, it has the comparative advantage.",
+    "videoExplanation": null
   },
   {
     "id": 6,
@@ -3599,7 +3783,8 @@ export const allQuestions: QuestionType[] = [
       "A shift inward of the Production Possibilities Curve for trading nations."
     ],
     "correctAnswer": "D",
-    "explanation": "When countries specialize in goods where they have a lower opportunity cost (comparative advantage) and trade, global efficiency increases. This results in higher total world output and allows countries to consume beyond their individual production possibilities."
+    "explanation": "When countries specialize in goods where they have a lower opportunity cost (comparative advantage) and trade, global efficiency increases. This results in higher total world output and allows countries to consume beyond their individual production possibilities.",
+    "videoExplanation": null
   },
   {
     "id": 7,
@@ -3617,7 +3802,8 @@ export const allQuestions: QuestionType[] = [
       "No change in quantity demanded."
     ],
     "correctAnswer": "C",
-    "explanation": "The law of demand describes the inverse relationship between price and quantity demanded, holding other factors constant. When the price of a good rises, consumers typically buy less of it."
+    "explanation": "The law of demand describes the inverse relationship between price and quantity demanded, holding other factors constant. When the price of a good rises, consumers typically buy less of it.",
+    "videoExplanation": null
   },
   {
     "id": 8,
@@ -3635,7 +3821,8 @@ export const allQuestions: QuestionType[] = [
       "An increase in taxes on smartphone producers."
     ],
     "correctAnswer": "C",
-    "explanation": "A rightward shift in supply indicates an increase in supply. Technological improvements often lower production costs, enabling firms to supply more at each price level."
+    "explanation": "A rightward shift in supply indicates an increase in supply. Technological improvements often lower production costs, enabling firms to supply more at each price level.",
+    "videoExplanation": null
   },
   {
     "id": 9,
@@ -3653,7 +3840,8 @@ export const allQuestions: QuestionType[] = [
       "Demand equals supply."
     ],
     "correctAnswer": "D",
-    "explanation": "Market equilibrium occurs at the price where the amount producers are willing to sell (quantity supplied) is exactly equal to the amount consumers are willing to buy (quantity demanded). There is no tendency for the price to change at this point."
+    "explanation": "Market equilibrium occurs at the price where the amount producers are willing to sell (quantity supplied) is exactly equal to the amount consumers are willing to buy (quantity demanded). There is no tendency for the price to change at this point.",
+    "videoExplanation": null
   },
   {
     "id": 10,
@@ -3671,7 +3859,8 @@ export const allQuestions: QuestionType[] = [
       "Equilibrium price will increase, and equilibrium quantity will remain unchanged."
     ],
     "correctAnswer": "D",
-    "explanation": "For a normal good, higher consumer incomes lead to an increase in demand (a rightward shift of the demand curve). This increase in demand causes both the equilibrium price and the equilibrium quantity to rise."
+    "explanation": "For a normal good, higher consumer incomes lead to an increase in demand (a rightward shift of the demand curve). This increase in demand causes both the equilibrium price and the equilibrium quantity to rise.",
+    "videoExplanation": null
   },
 
   // Unit 2: Economic Indicators and the Business Cycle
@@ -3691,7 +3880,8 @@ export const allQuestions: QuestionType[] = [
       "5.0%"
     ],
     "correctAnswer": "B",
-    "explanation": "The formula for the inflation rate is: Inflation Rate = [(CPI Year 2 - CPI Year 1) / CPI Year 1] x 100. So, Inflation Rate = [(165 - 150) / 150] x 100 = (15 / 150) x 100 = 0.1 x 100 = 10.0%."
+    "explanation": "The formula for the inflation rate is: Inflation Rate = [(CPI Year 2 - CPI Year 1) / CPI Year 1] x 100. So, Inflation Rate = [(165 - 150) / 150] x 100 = (15 / 150) x 100 = 0.1 x 100 = 10.0%.",
+    "videoExplanation": null
   },
   {
     "id": 12,
@@ -3709,7 +3899,8 @@ export const allQuestions: QuestionType[] = [
       "6.25%"
     ],
     "correctAnswer": "C",
-    "explanation": "First, find the labor force: Labor Force = Employed + Unemployed = 150 million + 10 million = 160 million. Then, calculate the Labor Force Participation Rate: LFPR = (Labor Force / Adult Population) x 100 = (160 million / 250 million) x 100 = 0.64 x 100 = 64.0%."
+    "explanation": "First, find the labor force: Labor Force = Employed + Unemployed = 150 million + 10 million = 160 million. Then, calculate the Labor Force Participation Rate: LFPR = (Labor Force / Adult Population) x 100 = (160 million / 250 million) x 100 = 0.64 x 100 = 64.0%.",
+    "videoExplanation": null
   },
   {
     "id": 13,
@@ -3727,7 +3918,8 @@ export const allQuestions: QuestionType[] = [
       "150"
     ],
     "correctAnswer": "D",
-    "explanation": "The formula for the GDP Deflator is: GDP Deflator = (Nominal GDP / Real GDP) x 100. So, GDP Deflator = ($15 trillion / $12 trillion) x 100 = 1.25 x 100 = 125."
+    "explanation": "The formula for the GDP Deflator is: GDP Deflator = (Nominal GDP / Real GDP) x 100. So, GDP Deflator = ($15 trillion / $12 trillion) x 100 = 1.25 x 100 = 125.",
+    "videoExplanation": null
   },
   {
     "id": 14,
@@ -3745,7 +3937,8 @@ export const allQuestions: QuestionType[] = [
       "Natural unemployment"
     ],
     "correctAnswer": "C",
-    "explanation": "Cyclical unemployment is directly related to the health of the economy. It rises during recessions (downturns) when firms lay off workers due to decreased demand and falls during economic expansions."
+    "explanation": "Cyclical unemployment is directly related to the health of the economy. It rises during recessions (downturns) when firms lay off workers due to decreased demand and falls during economic expansions.",
+    "videoExplanation": null
   },
   {
     "id": 15,
@@ -3763,7 +3956,8 @@ export const allQuestions: QuestionType[] = [
       "250"
     ],
     "correctAnswer": "D",
-    "explanation": "The formula for CPI is: CPI = (Cost of Basket in Current Year / Cost of Basket in Base Year) x 100. So, CPI = ($250 / $200) x 100 = 1.25 x 100 = 125."
+    "explanation": "The formula for CPI is: CPI = (Cost of Basket in Current Year / Cost of Basket in Base Year) x 100. So, CPI = ($250 / $200) x 100 = 1.25 x 100 = 125.",
+    "videoExplanation": null
   },
   {
     "id": 16,
@@ -3781,7 +3975,8 @@ export const allQuestions: QuestionType[] = [
       "It adjusts for changes in the price level."
     ],
     "correctAnswer": "B",
-    "explanation": "GDP is an aggregate measure and does not reveal how income is distributed. A high GDP could mask significant income inequality, which affects overall societal well-being. Other limitations include ignoring leisure time, environmental quality, and non-market activities."
+    "explanation": "GDP is an aggregate measure and does not reveal how income is distributed. A high GDP could mask significant income inequality, which affects overall societal well-being. Other limitations include ignoring leisure time, environmental quality, and non-market activities.",
+    "videoExplanation": null
   },
   {
     "id": 17,
@@ -3799,7 +3994,8 @@ export const allQuestions: QuestionType[] = [
       "$7.5 trillion"
     ],
     "correctAnswer": "A",
-    "explanation": "The formula relating these is: Real GDP = (Nominal GDP / GDP Deflator) x 100. So, Real GDP = ($10 trillion / 125) x 100 = $0.08 trillion x 100 = $8 trillion."
+    "explanation": "The formula relating these is: Real GDP = (Nominal GDP / GDP Deflator) x 100. So, Real GDP = ($10 trillion / 125) x 100 = $0.08 trillion x 100 = $8 trillion.",
+    "videoExplanation": null
   },
   {
     "id": 18,
@@ -3817,7 +4013,8 @@ export const allQuestions: QuestionType[] = [
       "4.76%"
     ],
     "correctAnswer": "A",
-    "explanation": "First, find the labor force: Labor Force = Employed + Unemployed = 190 million + 10 million = 200 million. Then, calculate the Unemployment Rate: UR = (# Unemployed / Labor Force) x 100 = (10 million / 200 million) x 100 = 0.05 x 100 = 5.0%."
+    "explanation": "First, find the labor force: Labor Force = Employed + Unemployed = 190 million + 10 million = 200 million. Then, calculate the Unemployment Rate: UR = (# Unemployed / Labor Force) x 100 = (10 million / 200 million) x 100 = 0.05 x 100 = 5.0%.",
+    "videoExplanation": null
   },
   {
     "id": 19,
@@ -3835,7 +4032,8 @@ export const allQuestions: QuestionType[] = [
       "Net exports."
     ],
     "correctAnswer": "B",
-    "explanation": "GDP measures the market value of final goods and services produced. It excludes non-market transactions like unpaid household work, volunteer work, and illegal activities, which can be substantial."
+    "explanation": "GDP measures the market value of final goods and services produced. It excludes non-market transactions like unpaid household work, volunteer work, and illegal activities, which can be substantial.",
+    "videoExplanation": null
   },
   {
     "id": 20,
@@ -3853,7 +4051,8 @@ export const allQuestions: QuestionType[] = [
       "Fails to account for changes in nominal wages."
     ],
     "correctAnswer": "B",
-    "explanation": "The CPI uses a fixed basket of goods and services. When prices change, consumers often substitute away from more expensive items towards cheaper ones. The CPI's fixed basket doesn't capture this substitution effect, leading to an overestimation of the cost of living increase (substitution bias)."
+    "explanation": "The CPI uses a fixed basket of goods and services. When prices change, consumers often substitute away from more expensive items towards cheaper ones. The CPI's fixed basket doesn't capture this substitution effect, leading to an overestimation of the cost of living increase (substitution bias).",
+    "videoExplanation": null
   },
   {
     "id": 21,
@@ -3871,7 +4070,8 @@ export const allQuestions: QuestionType[] = [
       "-5.0%"
     ],
     "correctAnswer": "B",
-    "explanation": "The economic growth rate is the percentage change in Real GDP. Growth Rate = [(Real GDP Year 2 - Real GDP Year 1) / Real GDP Year 1] x 100 = [($10.5T - $10T) / $10T] x 100 = ($0.5T / $10T) x 100 = 0.05 x 100 = 5.0%."
+    "explanation": "The economic growth rate is the percentage change in Real GDP. Growth Rate = [(Real GDP Year 2 - Real GDP Year 1) / Real GDP Year 1] x 100 = [($10.5T - $10T) / $10T] x 100 = ($0.5T / $10T) x 100 = 0.05 x 100 = 5.0%.",
+    "videoExplanation": null
   },
   {
     "id": 22,
@@ -3889,7 +4089,8 @@ export const allQuestions: QuestionType[] = [
       "$50"
     ],
     "correctAnswer": "C",
-    "explanation": "Nominal GDP is the market value of all final goods and services produced. Calculate the value of each good and sum them: Nominal GDP = (Price_Apples x Quantity_Apples) + (Price_Bananas x Quantity_Bananas) = ($1 x 100) + ($2 x 50) = $100 + $100 = $200."
+    "explanation": "Nominal GDP is the market value of all final goods and services produced. Calculate the value of each good and sum them: Nominal GDP = (Price_Apples x Quantity_Apples) + (Price_Bananas x Quantity_Bananas) = ($1 x 100) + ($2 x 50) = $100 + $100 = $200.",
+    "videoExplanation": null
   },
   {
     "id": 23,
@@ -3907,7 +4108,8 @@ export const allQuestions: QuestionType[] = [
       "The inflation rate."
     ],
     "correctAnswer": "D",
-    "explanation": "Price indices are benchmarked to a base year. In the base year, the index compares the cost of the basket (or overall prices) to itself, resulting in a value of (Cost / Cost) x 100 = 100."
+    "explanation": "Price indices are benchmarked to a base year. In the base year, the index compares the cost of the basket (or overall prices) to itself, resulting in a value of (Cost / Cost) x 100 = 100.",
+    "videoExplanation": null
   },
   {
     "id": 24,
@@ -3925,7 +4127,8 @@ export const allQuestions: QuestionType[] = [
       "A person who was laid off last week and is actively seeking a new job."
     ],
     "correctAnswer": "E",
-    "explanation": "The official definition of unemployed requires a person to be jobless, available for work, and actively seeking work within the past four weeks. Discouraged workers (B) are not actively seeking. Part-time workers (A) are considered employed. Students (C) and retirees (D) not seeking work are not in the labor force."
+    "explanation": "The official definition of unemployed requires a person to be jobless, available for work, and actively seeking work within the past four weeks. Discouraged workers (B) are not actively seeking. Part-time workers (A) are considered employed. Students (C) and retirees (D) not seeking work are not in the labor force.",
+    "videoExplanation": null
   },
   {
     "id": 25,
@@ -3943,7 +4146,8 @@ export const allQuestions: QuestionType[] = [
       "Owners of real estate."
     ],
     "correctAnswer": "D",
-    "explanation": "Unanticipated inflation reduces the purchasing power of money repaid in the future. Lenders receiving fixed interest payments find that the real value of those payments is lower than expected, hurting their returns. Borrowers with fixed rates benefit by repaying loans with less valuable dollars."
+    "explanation": "Unanticipated inflation reduces the purchasing power of money repaid in the future. Lenders receiving fixed interest payments find that the real value of those payments is lower than expected, hurting their returns. Borrowers with fixed rates benefit by repaying loans with less valuable dollars.",
+    "videoExplanation": null
   },
 
   // Unit 3: National Income and Price Determination
@@ -3963,7 +4167,8 @@ export const allQuestions: QuestionType[] = [
       "An appreciation of the domestic currency"
     ],
     "correctAnswer": "C",
-    "explanation": "If households expect higher inflation in the future, they are incentivized to increase current consumption spending now, shifting AD to the right. Other options decrease AD (A, B, D) or decrease net exports, thus decreasing AD (E)."
+    "explanation": "If households expect higher inflation in the future, they are incentivized to increase current consumption spending now, shifting AD to the right. Other options decrease AD (A, B, D) or decrease net exports, thus decreasing AD (E).",
+    "videoExplanation": null
   },
   {
     "id": 27,
@@ -3981,7 +4186,8 @@ export const allQuestions: QuestionType[] = [
       "Increase by $500 billion"
     ],
     "correctAnswer": "E",
-    "explanation": "The spending multiplier is 1 / MPS = 1 / 0.2 = 5. The maximum change in GDP is the multiplier times the initial change in spending: 5 * $100 billion = $500 billion increase."
+    "explanation": "The spending multiplier is 1 / MPS = 1 / 0.2 = 5. The maximum change in GDP is the multiplier times the initial change in spending: 5 * $100 billion = $500 billion increase.",
+    "videoExplanation": null
   },
   {
     "id": 28,
@@ -3999,7 +4205,8 @@ export const allQuestions: QuestionType[] = [
       "No change in SRAS, Price level increases"
     ],
     "correctAnswer": "B",
-    "explanation": "An increase in the price of a key input like energy increases production costs for firms. This leads to a decrease (leftward shift) in the SRAS curve, resulting in a higher price level and lower output in the short run."
+    "explanation": "An increase in the price of a key input like energy increases production costs for firms. This leads to a decrease (leftward shift) in the SRAS curve, resulting in a higher price level and lower output in the short run.",
+    "videoExplanation": null
   },
   {
     "id": 29,
@@ -4017,7 +4224,8 @@ export const allQuestions: QuestionType[] = [
       "The relationship between the output gap and unemployment cannot be determined."
     ],
     "correctAnswer": "C",
-    "explanation": "When actual output ($500b) is below potential output ($550b), the economy is in a recessionary gap, indicating cyclical unemployment exists. Therefore, the actual unemployment rate is above the natural rate of unemployment (which corresponds to full employment/potential output)."
+    "explanation": "When actual output ($500b) is below potential output ($550b), the economy is in a recessionary gap, indicating cyclical unemployment exists. Therefore, the actual unemployment rate is above the natural rate of unemployment (which corresponds to full employment/potential output).",
+    "videoExplanation": null
   },
   {
     "id": 30,
@@ -4035,7 +4243,8 @@ export const allQuestions: QuestionType[] = [
       "No change in price level, Real GDP increases"
     ],
     "correctAnswer": "D",
-    "explanation": "Increased government spending is expansionary fiscal policy, shifting the Aggregate Demand (AD) curve to the right. Moving along the upward-sloping Short-Run Aggregate Supply (SRAS) curve, this leads to a higher price level and higher real GDP in the short run."
+    "explanation": "Increased government spending is expansionary fiscal policy, shifting the Aggregate Demand (AD) curve to the right. Moving along the upward-sloping Short-Run Aggregate Supply (SRAS) curve, this leads to a higher price level and higher real GDP in the short run.",
+    "videoExplanation": null
   },
   {
     "id": 31,
@@ -4053,7 +4262,8 @@ export const allQuestions: QuestionType[] = [
        "A decrease in net exports"
     ],
     "correctAnswer": "B",
-    "explanation": "A widespread technological advancement increases productivity, shifting the Short-Run Aggregate Supply (SRAS) curve to the right. This leads to higher real GDP and a lower price level."
+    "explanation": "A widespread technological advancement increases productivity, shifting the Short-Run Aggregate Supply (SRAS) curve to the right. This leads to higher real GDP and a lower price level.",
+    "videoExplanation": null
   },
   {
     "id": 32,
@@ -4071,7 +4281,8 @@ export const allQuestions: QuestionType[] = [
       "Interest rates will fall, shifting AD right."
     ],
     "correctAnswer": "B",
-    "explanation": "In an inflationary gap, high demand for resources leads to rising input costs, particularly nominal wages. As nominal wages increase, the SRAS curve shifts to the left, eventually restoring the economy to long-run equilibrium at potential output but with a higher price level."
+    "explanation": "In an inflationary gap, high demand for resources leads to rising input costs, particularly nominal wages. As nominal wages increase, the SRAS curve shifts to the left, eventually restoring the economy to long-run equilibrium at potential output but with a higher price level.",
+    "videoExplanation": null
   },
   {
     "id": 33,
@@ -4089,7 +4300,8 @@ export const allQuestions: QuestionType[] = [
       "Increasing the required reserve ratio for banks"
     ],
     "correctAnswer": "C",
-    "explanation": "Expansionary fiscal policy aims to increase aggregate demand during a recession. Increasing transfer payments puts more disposable income in the hands of households, boosting consumption and shifting AD to the right. Options A and B are contractionary fiscal policy. Options D and E relate to monetary policy."
+    "explanation": "Expansionary fiscal policy aims to increase aggregate demand during a recession. Increasing transfer payments puts more disposable income in the hands of households, boosting consumption and shifting AD to the right. Options A and B are contractionary fiscal policy. Options D and E relate to monetary policy.",
+    "videoExplanation": null
   },
   {
     "id": 34,
@@ -4107,7 +4319,8 @@ export const allQuestions: QuestionType[] = [
       "The money multiplier effect"
     ],
     "correctAnswer": "C",
-    "explanation": "Automatic stabilizers work without specific legislative action. In a progressive tax system, as incomes rise during an expansion, people move into higher tax brackets, and tax revenues increase automatically. This withdraws spending power from the economy, slightly dampening the expansion, acting as a stabilizer."
+    "explanation": "Automatic stabilizers work without specific legislative action. In a progressive tax system, as incomes rise during an expansion, people move into higher tax brackets, and tax revenues increase automatically. This withdraws spending power from the economy, slightly dampening the expansion, acting as a stabilizer.",
+    "videoExplanation": null
   },
   {
     "id": 35,
@@ -4125,7 +4338,8 @@ export const allQuestions: QuestionType[] = [
       "A decrease in the effectiveness of automatic stabilizers."
     ],
     "correctAnswer": "C",
-    "explanation": "Sticky nominal wages mean that wages do not fall easily even when aggregate demand decreases (reducing the demand for labor). Firms facing lower demand and unable to cut nominal wages may instead reduce employment significantly, leading to higher and potentially more persistent cyclical unemployment (actual unemployment above the natural rate) than if wages were flexible downwards."
+    "explanation": "Sticky nominal wages mean that wages do not fall easily even when aggregate demand decreases (reducing the demand for labor). Firms facing lower demand and unable to cut nominal wages may instead reduce employment significantly, leading to higher and potentially more persistent cyclical unemployment (actual unemployment above the natural rate) than if wages were flexible downwards.",
+    "videoExplanation": null
   },
 
   // Unit 4: Financial Sector
@@ -4145,7 +4359,8 @@ export const allQuestions: QuestionType[] = [
       "Selling bonds increases a company's equity, while issuing stock increases its liabilities."
     ],
     "correctAnswer": "D",
-    "explanation": "A bond is essentially an IOU, representing debt that must be repaid with interest. A stock represents equity or ownership in a corporation, giving the holder a claim on profits (dividends)."
+    "explanation": "A bond is essentially an IOU, representing debt that must be repaid with interest. A stock represents equity or ownership in a corporation, giving the holder a claim on profits (dividends).",
+    "videoExplanation": null
   },
   {
     "id": 37,
@@ -4163,7 +4378,8 @@ export const allQuestions: QuestionType[] = [
       "8%"
     ],
     "correctAnswer": "B",
-    "explanation": "The approximate real interest rate is calculated as the nominal interest rate minus the inflation rate: Real Interest Rate ≈ Nominal Interest Rate - Inflation Rate = 5% - 3% = 2%."
+    "explanation": "The approximate real interest rate is calculated as the nominal interest rate minus the inflation rate: Real Interest Rate ≈ Nominal Interest Rate - Inflation Rate = 5% - 3% = 2%.",
+    "videoExplanation": null
   },
   {
     "id": 38,
@@ -4181,7 +4397,8 @@ export const allQuestions: QuestionType[] = [
       "Lend only to the government."
     ],
     "correctAnswer": "B",
-    "explanation": "The Fisher effect suggests that nominal interest rates adjust to incorporate expected inflation. To maintain their desired real return, lenders will demand higher nominal interest rates when they anticipate higher inflation."
+    "explanation": "The Fisher effect suggests that nominal interest rates adjust to incorporate expected inflation. To maintain their desired real return, lenders will demand higher nominal interest rates when they anticipate higher inflation.",
+    "videoExplanation": null
   },
   {
     "id": 39,
@@ -4199,7 +4416,8 @@ export const allQuestions: QuestionType[] = [
       "Financial asset"
     ],
     "correctAnswer": "C",
-    "explanation": "Using money to directly purchase goods and services demonstrates its role as a medium of exchange – an intermediary instrument used to facilitate transactions, avoiding the need for barter."
+    "explanation": "Using money to directly purchase goods and services demonstrates its role as a medium of exchange – an intermediary instrument used to facilitate transactions, avoiding the need for barter.",
+    "videoExplanation": null
   },
   {
     "id": 40,
@@ -4217,7 +4435,8 @@ export const allQuestions: QuestionType[] = [
       "M1 includes small-denomination time deposits (CDs)."
     ],
     "correctAnswer": "C",
-    "explanation": "M1 consists of the most liquid forms of money used for transactions (currency, demand deposits, traveler's checks). M2 includes all of M1 plus less liquid assets ('near monies') like savings deposits, small CDs, and money market mutual funds, which serve more as a store of value but can be easily converted."
+    "explanation": "M1 consists of the most liquid forms of money used for transactions (currency, demand deposits, traveler's checks). M2 includes all of M1 plus less liquid assets ('near monies') like savings deposits, small CDs, and money market mutual funds, which serve more as a store of value but can be easily converted.",
+    "videoExplanation": null
   },
   {
     "id": 41,
@@ -4235,7 +4454,8 @@ export const allQuestions: QuestionType[] = [
       "$10,000"
     ],
     "correctAnswer": "D",
-    "explanation": "When cash held by the public ($1000) is deposited, it becomes reserves. The bank must hold 10% ($100) but can lend out 90% ($900). This $900 initiates the money multiplier process. The simple money multiplier is 1 / RRR = 1 / 0.10 = 10. The maximum potential *increase* in checkable deposits is Initial Excess Reserves * Multiplier = $900 * 10 = $9,000. Since the initial $1000 cash was already part of M1 (currency), depositing it doesn't change M1 initially, but the subsequent lending *does*. The $9,000 represents the new checkable deposits created through lending."
+    "explanation": "When cash held by the public ($1000) is deposited, it becomes reserves. The bank must hold 10% ($100) but can lend out 90% ($900). This $900 initiates the money multiplier process. The simple money multiplier is 1 / RRR = 1 / 0.10 = 10. The maximum potential *increase* in checkable deposits is Initial Excess Reserves * Multiplier = $900 * 10 = $9,000. Since the initial $1000 cash was already part of M1 (currency), depositing it doesn't change M1 initially, but the subsequent lending *does*. The $9,000 represents the new checkable deposits created through lending.",
+    "videoExplanation": null
   },
   {
     "id": 42,
@@ -4253,7 +4473,8 @@ export const allQuestions: QuestionType[] = [
       "Decrease by $50 million"
     ],
     "correctAnswer": "D",
-    "explanation": "When the central bank buys bonds from the public, the payment injects new reserves into the banking system. The money multiplier is 1 / RRR = 1 / 0.20 = 5. The maximum potential change in the money supply (specifically checkable deposits) is the change in reserves times the multiplier: $50 million * 5 = $250 million increase."
+    "explanation": "When the central bank buys bonds from the public, the payment injects new reserves into the banking system. The money multiplier is 1 / RRR = 1 / 0.20 = 5. The maximum potential change in the money supply (specifically checkable deposits) is the change in reserves times the multiplier: $50 million * 5 = $250 million increase.",
+    "videoExplanation": null
   },
   {
     "id": 43,
@@ -4271,7 +4492,8 @@ export const allQuestions: QuestionType[] = [
       "The government increases taxes."
     ],
     "correctAnswer": "B",
-    "explanation": "The simple money multiplier assumes banks lend out all excess reserves and that all loaned money is redeposited into the banking system. In reality, banks may hold excess reserves (not lend everything out) and individuals/firms may hold onto some cash (currency drain), both reducing the actual multiplier effect."
+    "explanation": "The simple money multiplier assumes banks lend out all excess reserves and that all loaned money is redeposited into the banking system. In reality, banks may hold excess reserves (not lend everything out) and individuals/firms may hold onto some cash (currency drain), both reducing the actual multiplier effect.",
+    "videoExplanation": null
   },
   {
     "id": 44,
@@ -4289,7 +4511,8 @@ export const allQuestions: QuestionType[] = [
       "Money supply shifts right, nominal interest rate decreases."
     ],
     "correctAnswer": "B",
-    "explanation": "A higher price level increases the amount of money needed for transactions (transactions demand for money). This shifts the money demand curve to the right. Assuming the money supply is held constant by the central bank, this increase in demand leads to a higher equilibrium nominal interest rate."
+    "explanation": "A higher price level increases the amount of money needed for transactions (transactions demand for money). This shifts the money demand curve to the right. Assuming the money supply is held constant by the central bank, this increase in demand leads to a higher equilibrium nominal interest rate.",
+    "videoExplanation": null
   },
   {
     "id": 45,
@@ -4307,7 +4530,8 @@ export const allQuestions: QuestionType[] = [
       "No change in money supply, nominal interest rate increases."
     ],
     "correctAnswer": "B",
-    "explanation": "Selling bonds removes reserves from the banking system as banks/public pay the central bank. This leads to a decrease in the money supply (shifts MS left in the traditional model). With less money available relative to demand, the price of holding money (the nominal interest rate) increases."
+    "explanation": "Selling bonds removes reserves from the banking system as banks/public pay the central bank. This leads to a decrease in the money supply (shifts MS left in the traditional model). With less money available relative to demand, the price of holding money (the nominal interest rate) increases.",
+    "videoExplanation": null
   },
   {
     "id": 46,
@@ -4325,7 +4549,8 @@ export const allQuestions: QuestionType[] = [
       "Increasing income taxes."
     ],
     "correctAnswer": "D",
-    "explanation": "In an ample reserves system, the central bank influences the federal funds rate (and other short-term rates) primarily by adjusting administered rates. To stimulate the economy (address a recession), the central bank would lower these rates (like IORB, discount rate, ON RRP rate) to encourage borrowing and spending, shifting AD right. Selling securities (B) or increasing IORB (C) are contractionary. Increasing RRR (A) is largely irrelevant in ample reserves. Increasing taxes (E) is contractionary fiscal policy."
+    "explanation": "In an ample reserves system, the central bank influences the federal funds rate (and other short-term rates) primarily by adjusting administered rates. To stimulate the economy (address a recession), the central bank would lower these rates (like IORB, discount rate, ON RRP rate) to encourage borrowing and spending, shifting AD right. Selling securities (B) or increasing IORB (C) are contractionary. Increasing RRR (A) is largely irrelevant in ample reserves. Increasing taxes (E) is contractionary fiscal policy.",
+    "videoExplanation": null
   },
   {
     "id": 47,
@@ -4343,7 +4568,8 @@ export const allQuestions: QuestionType[] = [
       "Decreasing the required reserve ratio."
     ],
     "correctAnswer": "C",
-    "explanation": "To combat inflation in an ample reserves system, the central bank needs to raise interest rates to dampen aggregate demand. It achieves this by increasing its administered rates. Raising the ON RRP rate sets a higher floor for the federal funds rate, making borrowing more expensive. Lowering IORB (A) or the discount rate (D) would be expansionary. OMO purchases (B) add reserves, potentially loosening conditions. RRR (E) is not the primary tool."
+    "explanation": "To combat inflation in an ample reserves system, the central bank needs to raise interest rates to dampen aggregate demand. It achieves this by increasing its administered rates. Raising the ON RRP rate sets a higher floor for the federal funds rate, making borrowing more expensive. Lowering IORB (A) or the discount rate (D) would be expansionary. OMO purchases (B) add reserves, potentially loosening conditions. RRR (E) is not the primary tool.",
+    "videoExplanation": null
   },
   {
     "id": 48, // replace with next available ID
@@ -4361,7 +4587,8 @@ export const allQuestions: QuestionType[] = [
       "The currency-to-deposit ratio."
     ],
     "correctAnswer": "C",
-    "explanation": "In an ample reserves framework, banks hold more reserves than they need to meet requirements. The federal funds rate is anchored by the interest rate paid on reserve balances (IORB), which serves as the effective floor for short-term interest rates."
+    "explanation": "In an ample reserves framework, banks hold more reserves than they need to meet requirements. The federal funds rate is anchored by the interest rate paid on reserve balances (IORB), which serves as the effective floor for short-term interest rates.",
+    "videoExplanation": null
   },
   {
     "id": 49,
@@ -4379,7 +4606,8 @@ export const allQuestions: QuestionType[] = [
       "Demand and supply of loanable funds both increase, real interest rate remains unchanged."
     ],
     "correctAnswer": "C",
-    "explanation": "Government borrowing adds to the overall demand for loanable funds. This shifts the demand curve for loanable funds to the right. Assuming the supply curve remains unchanged or shifts less, the equilibrium real interest rate will increase. This can lead to crowding out of private investment."
+    "explanation": "Government borrowing adds to the overall demand for loanable funds. This shifts the demand curve for loanable funds to the right. Assuming the supply curve remains unchanged or shifts less, the equilibrium real interest rate will increase. This can lead to crowding out of private investment.",
+    "videoExplanation": null
   },
   {
     "id": 50,
@@ -4397,7 +4625,8 @@ export const allQuestions: QuestionType[] = [
       "Increase the supply and decrease the demand for loanable funds."
     ],
     "correctAnswer": "B",
-    "explanation": "Increased business optimism about future profits makes firms more willing to undertake investment projects. To finance these projects, they increase their borrowing, which shifts the demand curve for loanable funds to the right. This leads to a higher equilibrium real interest rate, ceteris paribus."
+    "explanation": "Increased business optimism about future profits makes firms more willing to undertake investment projects. To finance these projects, they increase their borrowing, which shifts the demand curve for loanable funds to the right. This leads to a higher equilibrium real interest rate, ceteris paribus.",
+    "videoExplanation": null
   },
 
   // Unit 5: Long-Run Consequences of Stabilization Policies
@@ -4417,7 +4646,8 @@ export const allQuestions: QuestionType[] = [
       "Real output decreases, Real interest rate effect is indeterminate"
     ],
     "correctAnswer": "C",
-    "explanation": "Expansionary fiscal policy increases AD, pushing output up. Contractionary monetary policy decreases AD (or slows its growth), pushing output down. The net effect on output is indeterminate. Both policies tend to increase real interest rates: fiscal policy increases demand for loanable funds, and monetary policy increases the cost of borrowing."
+    "explanation": "Expansionary fiscal policy increases AD, pushing output up. Contractionary monetary policy decreases AD (or slows its growth), pushing output down. The net effect on output is indeterminate. Both policies tend to increase real interest rates: fiscal policy increases demand for loanable funds, and monetary policy increases the cost of borrowing.",
+    "videoExplanation": null
   },
   {
     "id": 52,
@@ -4435,7 +4665,8 @@ export const allQuestions: QuestionType[] = [
       "Real output increases, Price level effect is indeterminate"
     ],
     "correctAnswer": "D",
-    "explanation": "Both contractionary fiscal and monetary policies aim to decrease aggregate demand (AD). A decrease in AD leads to lower real output and a lower price level in the short run."
+    "explanation": "Both contractionary fiscal and monetary policies aim to decrease aggregate demand (AD). A decrease in AD leads to lower real output and a lower price level in the short run.",
+    "videoExplanation": null
   },
   {
     "id": 53,
@@ -4453,7 +4684,8 @@ export const allQuestions: QuestionType[] = [
       "No change in real interest rates or private investment"
     ],
     "correctAnswer": "B",
-    "explanation": "Expansionary fiscal policy (increased borrowing) increases the demand for loanable funds, raising the real interest rate. A higher real interest rate makes borrowing more expensive for firms, leading to a decrease in private investment spending (crowding out)."
+    "explanation": "Expansionary fiscal policy (increased borrowing) increases the demand for loanable funds, raising the real interest rate. A higher real interest rate makes borrowing more expensive for firms, leading to a decrease in private investment spending (crowding out).",
+    "videoExplanation": null
   },
   {
     "id": 54,
@@ -4471,7 +4703,8 @@ export const allQuestions: QuestionType[] = [
       "Real output decreases, Real interest rate effect is indeterminate"
     ],
     "correctAnswer": "D",
-    "explanation": "Both expansionary policies increase aggregate demand, leading to an increase in real output. However, expansionary fiscal policy tends to increase real interest rates (more government borrowing), while expansionary monetary policy tends to decrease interest rates (easier credit). The net effect on real interest rates is indeterminate."
+    "explanation": "Both expansionary policies increase aggregate demand, leading to an increase in real output. However, expansionary fiscal policy tends to increase real interest rates (more government borrowing), while expansionary monetary policy tends to decrease interest rates (easier credit). The net effect on real interest rates is indeterminate.",
+    "videoExplanation": null
   },
   {
     "id": 55,
@@ -4489,7 +4722,8 @@ export const allQuestions: QuestionType[] = [
       "A rightward shift of the long-run Phillips curve (LRPC)"
     ],
     "correctAnswer": "A",
-    "explanation": "The SRPC shows an inverse relationship between inflation and unemployment. An increase in AD leads to higher output (lower unemployment) and a higher price level (higher inflation). This corresponds to a movement up and to the left along a stable SRPC."
+    "explanation": "The SRPC shows an inverse relationship between inflation and unemployment. An increase in AD leads to higher output (lower unemployment) and a higher price level (higher inflation). This corresponds to a movement up and to the left along a stable SRPC.",
+    "videoExplanation": null
   },
   {
     "id": 56,
@@ -4507,7 +4741,8 @@ export const allQuestions: QuestionType[] = [
       "The LRPC will shift leftwards"
     ],
     "correctAnswer": "C",
-    "explanation": "Higher expected inflation gets built into wage negotiations and price setting. This means that for any given unemployment rate, the actual inflation rate will be higher. This is represented by an upward (or rightward) shift of the SRPC."
+    "explanation": "Higher expected inflation gets built into wage negotiations and price setting. This means that for any given unemployment rate, the actual inflation rate will be higher. This is represented by an upward (or rightward) shift of the SRPC.",
+    "videoExplanation": null
   },
   {
     "id": 57,
@@ -4525,7 +4760,8 @@ export const allQuestions: QuestionType[] = [
       "Potential GDP always grows faster than inflation."
     ],
     "correctAnswer": "B",
-    "explanation": "In the long run, the economy operates at its potential output, corresponding to the natural rate of unemployment, regardless of the rate of inflation. Expected inflation fully adjusts to actual inflation, meaning any attempt to hold unemployment below the natural rate through demand stimulus will only lead to accelerating inflation, not permanently lower unemployment."
+    "explanation": "In the long run, the economy operates at its potential output, corresponding to the natural rate of unemployment, regardless of the rate of inflation. Expected inflation fully adjusts to actual inflation, meaning any attempt to hold unemployment below the natural rate through demand stimulus will only lead to accelerating inflation, not permanently lower unemployment.",
+    "videoExplanation": null
   },
   {
     "id": 58,
@@ -4543,7 +4779,8 @@ export const allQuestions: QuestionType[] = [
       "Shift the LRPC leftward"
     ],
     "correctAnswer": "B",
-    "explanation": "An adverse supply shock (like rising oil prices) shifts the Short-Run Aggregate Supply (SRAS) curve leftward. This leads to stagflation: higher inflation and higher unemployment simultaneously. On the Phillips curve diagram, this is represented by an upward/rightward shift of the SRPC, indicating a worse trade-off (or combination) of inflation and unemployment."
+    "explanation": "An adverse supply shock (like rising oil prices) shifts the Short-Run Aggregate Supply (SRAS) curve leftward. This leads to stagflation: higher inflation and higher unemployment simultaneously. On the Phillips curve diagram, this is represented by an upward/rightward shift of the SRPC, indicating a worse trade-off (or combination) of inflation and unemployment.",
+    "videoExplanation": null
   },
   {
     "id": 59,
@@ -4561,7 +4798,8 @@ export const allQuestions: QuestionType[] = [
       "8.0"
     ],
     "correctAnswer": "C",
-    "explanation": "The quantity theory equation is M * V = P * Y. Plugging in the values: $2,000 * 4 = P * $4,000. This simplifies to $8,000 = P * $4,000. Solving for P: P = $8,000 / $4,000 = 2.0."
+    "explanation": "The quantity theory equation is M * V = P * Y. Plugging in the values: $2,000 * 4 = P * $4,000. This simplifies to $8,000 = P * $4,000. Solving for P: P = $8,000 / $4,000 = 2.0.",
+    "videoExplanation": null
   },
   {
     "id": 60,
@@ -4579,7 +4817,8 @@ export const allQuestions: QuestionType[] = [
       "A 10% decrease in the velocity of money."
     ],
     "correctAnswer": "C",
-    "explanation": "The equation is M * V = P * Y. If V and Y are constant, then any percentage change in M must be matched by an equal percentage change in P to keep the equation balanced. Therefore, a 10% increase in M leads to a 10% increase in P (inflation)."
+    "explanation": "The equation is M * V = P * Y. If V and Y are constant, then any percentage change in M must be matched by an equal percentage change in P to keep the equation balanced. Therefore, a 10% increase in M leads to a 10% increase in P (inflation).",
+    "videoExplanation": null
   },
   {
     "id": 61,
@@ -4597,7 +4836,8 @@ export const allQuestions: QuestionType[] = [
       "The sensitivity of investment spending to interest rates."
     ],
     "correctAnswer": "B",
-    "explanation": "Velocity (V) measures how quickly money circulates through the economy in the purchase of final goods and services (nominal GDP, P*Y). A higher velocity means each dollar is used more frequently in transactions during a given period."
+    "explanation": "Velocity (V) measures how quickly money circulates through the economy in the purchase of final goods and services (nominal GDP, P*Y). A higher velocity means each dollar is used more frequently in transactions during a given period.",
+    "videoExplanation": null
   },
   {
     "id": 62,
@@ -4615,7 +4855,8 @@ export const allQuestions: QuestionType[] = [
       "The debt causes inflation, while the deficit causes unemployment."
     ],
     "correctAnswer": "C",
-    "explanation": "The budget deficit is a flow variable, representing the shortfall between government outlays and revenues over a specific period (usually a fiscal year). The national debt is a stock variable, representing the total accumulated amount of money the government owes from all past borrowing (deficits minus any surpluses)."
+    "explanation": "The budget deficit is a flow variable, representing the shortfall between government outlays and revenues over a specific period (usually a fiscal year). The national debt is a stock variable, representing the total accumulated amount of money the government owes from all past borrowing (deficits minus any surpluses).",
+    "videoExplanation": null
   },
   {
     "id": 63,
@@ -4633,7 +4874,8 @@ export const allQuestions: QuestionType[] = [
       "A decrease in the demand for loanable funds."
     ],
     "correctAnswer": "C",
-    "explanation": "Persistent large deficits require significant government borrowing, increasing the demand for loanable funds. This drives up real interest rates, making it more expensive for private firms to borrow and invest, potentially slowing down capital accumulation and long-run economic growth (crowding out)."
+    "explanation": "Persistent large deficits require significant government borrowing, increasing the demand for loanable funds. This drives up real interest rates, making it more expensive for private firms to borrow and invest, potentially slowing down capital accumulation and long-run economic growth (crowding out).",
+    "videoExplanation": null
   },
   {
     "id": 64,
@@ -4651,7 +4893,8 @@ export const allQuestions: QuestionType[] = [
       "Imports on domestic production."
     ],
     "correctAnswer": "C",
-    "explanation": "Crowding out describes the situation where increased government borrowing (to finance deficits) drives up real interest rates, which in turn reduces (crowds out) private investment spending that would have otherwise occurred."
+    "explanation": "Crowding out describes the situation where increased government borrowing (to finance deficits) drives up real interest rates, which in turn reduces (crowds out) private investment spending that would have otherwise occurred.",
+    "videoExplanation": null
   },
   {
     "id": 65,
@@ -4669,7 +4912,8 @@ export const allQuestions: QuestionType[] = [
       "It decreases long-run growth by increasing the money supply."
     ],
     "correctAnswer": "B",
-    "explanation": "Long-run economic growth depends heavily on factors like capital accumulation, technological progress, and human capital. By reducing private investment (capital formation), crowding out can lead to a smaller capital stock in the future, thereby hindering the economy's long-run growth potential (slowing the outward shift of LRAS/PPC)."
+    "explanation": "Long-run economic growth depends heavily on factors like capital accumulation, technological progress, and human capital. By reducing private investment (capital formation), crowding out can lead to a smaller capital stock in the future, thereby hindering the economy's long-run growth potential (slowing the outward shift of LRAS/PPC).",
+    "videoExplanation": null
   },
   {
     "id": 66,
@@ -4687,7 +4931,8 @@ export const allQuestions: QuestionType[] = [
       "A decrease in the national saving rate."
     ],
     "correctAnswer": "D",
-    "explanation": "Long-run economic growth is represented by an outward shift of the LRAS curve and the Production Possibilities Curve. This is driven by increases in the quantity or quality of resources (labor, capital, natural resources) or improvements in technology, which enhance labor productivity."
+    "explanation": "Long-run economic growth is represented by an outward shift of the LRAS curve and the Production Possibilities Curve. This is driven by increases in the quantity or quality of resources (labor, capital, natural resources) or improvements in technology, which enhance labor productivity.",
+    "videoExplanation": null
   },
   {
     "id": 67,
@@ -4705,7 +4950,8 @@ export const allQuestions: QuestionType[] = [
       "Stabilize the short-run Phillips curve."
     ],
     "correctAnswer": "C",
-    "explanation": "While potentially having short-run demand effects, the main goal of supply-side fiscal policies is to encourage investment, innovation, and productivity improvements. These actions aim to increase the economy's productive capacity, shifting the long-run aggregate supply (LRAS) curve to the right and fostering long-term economic growth."
+    "explanation": "While potentially having short-run demand effects, the main goal of supply-side fiscal policies is to encourage investment, innovation, and productivity improvements. These actions aim to increase the economy's productive capacity, shifting the long-run aggregate supply (LRAS) curve to the right and fostering long-term economic growth.",
+    "videoExplanation": null
   },
 
   // Unit 6: Open Economy - International Trade and Finance
@@ -4725,7 +4971,8 @@ export const allQuestions: QuestionType[] = [
       "The U.S. government sends foreign aid to another country."
     ],
     "correctAnswer": "C",
-    "explanation": "The Current Account records trade in goods and services, investment income, and net transfers. Spending by foreign tourists in the U.S. represents an export of services for the U.S., which is a credit (inflow of funds) in the Current Account. A is an import (debit), B is investment income paid out (debit), D is a financial account outflow (debit), E is a transfer payment out (debit)."
+    "explanation": "The Current Account records trade in goods and services, investment income, and net transfers. Spending by foreign tourists in the U.S. represents an export of services for the U.S., which is a credit (inflow of funds) in the Current Account. A is an import (debit), B is investment income paid out (debit), D is a financial account outflow (debit), E is a transfer payment out (debit).",
+    "videoExplanation": null
   },
   {
     "id": 69,
@@ -4743,7 +4990,8 @@ export const allQuestions: QuestionType[] = [
       "Credit (+) in the Capital Account (transfer)"
     ],
     "correctAnswer": "D",
-    "explanation": "The Financial Account records transactions involving the purchase or sale of assets (like factories, stocks, bonds). When a U.S. company invests abroad (acquires a foreign asset - the factory), it represents an outflow of capital from the U.S., recorded as a debit (-) in the U.S. Financial Account (specifically under direct investment)."
+    "explanation": "The Financial Account records transactions involving the purchase or sale of assets (like factories, stocks, bonds). When a U.S. company invests abroad (acquires a foreign asset - the factory), it represents an outflow of capital from the U.S., recorded as a debit (-) in the U.S. Financial Account (specifically under direct investment).",
+    "videoExplanation": null
   },
   {
     "id": 70,
@@ -4761,7 +5009,8 @@ export const allQuestions: QuestionType[] = [
       "Its net investment income must be positive."
     ],
     "correctAnswer": "B",
-    "explanation": "The balance of payments must sum to zero (Current Account + Financial Account + Capital Account = 0). Ignoring the typically small Capital Account, this means Current Account + Financial Account ≈ 0. Therefore, if the Current Account is in deficit (negative), the Financial Account must be in surplus (positive), indicating a net inflow of capital/funds from abroad."
+    "explanation": "The balance of payments must sum to zero (Current Account + Financial Account + Capital Account = 0). Ignoring the typically small Capital Account, this means Current Account + Financial Account ≈ 0. Therefore, if the Current Account is in deficit (negative), the Financial Account must be in surplus (positive), indicating a net inflow of capital/funds from abroad.",
+    "videoExplanation": null
   },
   {
     "id": 71,
@@ -4779,7 +5028,8 @@ export const allQuestions: QuestionType[] = [
       "$24,500"
     ],
     "correctAnswer": "B",
-    "explanation": "To find the cost in USD, divide the price in THB by the exchange rate (THB per USD): Cost in USD = Cost in THB / (THB/USD) = 700 THB / (35 THB/$1) = $20."
+    "explanation": "To find the cost in USD, divide the price in THB by the exchange rate (THB per USD): Cost in USD = Cost in THB / (THB/USD) = 700 THB / (35 THB/$1) = $20.",
+    "videoExplanation": null
   },
   {
     "id": 72,
@@ -4797,7 +5047,8 @@ export const allQuestions: QuestionType[] = [
       "The exchange rate has become fixed."
     ],
     "correctAnswer": "C",
-    "explanation": "Since one Euro (€) can now buy more U.S. Dollars ($1.20 compared to $1.10), the Euro has become stronger or appreciated relative to the Dollar. Conversely, the Dollar has depreciated relative to the Euro (it now takes more dollars to buy one euro)."
+    "explanation": "Since one Euro (€) can now buy more U.S. Dollars ($1.20 compared to $1.10), the Euro has become stronger or appreciated relative to the Dollar. Conversely, the Dollar has depreciated relative to the Euro (it now takes more dollars to buy one euro).",
+    "videoExplanation": null
   },
   {
     "id": 73,
@@ -4815,7 +5066,8 @@ export const allQuestions: QuestionType[] = [
       "Both demand and supply of pounds will decrease."
     ],
     "correctAnswer": "C",
-    "explanation": "U.S. consumers wanting more British goods need pounds to buy them. This increases the demand for pounds in the foreign exchange market. An increase in demand, ceteris paribus, leads to an increase in the price of the pound (appreciation)."
+    "explanation": "U.S. consumers wanting more British goods need pounds to buy them. This increases the demand for pounds in the foreign exchange market. An increase in demand, ceteris paribus, leads to an increase in the price of the pound (appreciation).",
+    "videoExplanation": null
   },
   {
     "id": 74,
@@ -4833,7 +5085,8 @@ export const allQuestions: QuestionType[] = [
       "Demand for dollars increases; Dollar appreciates"
     ],
     "correctAnswer": "B",
-    "explanation": "Higher real income in the U.S. leads to increased demand for all goods, including imports from Japan. To buy Japanese goods, U.S. residents need to supply dollars to the foreign exchange market to obtain yen. This increases the supply of dollars, which, ceteris paribus, causes the dollar to depreciate relative to the yen."
+    "explanation": "Higher real income in the U.S. leads to increased demand for all goods, including imports from Japan. To buy Japanese goods, U.S. residents need to supply dollars to the foreign exchange market to obtain yen. This increases the supply of dollars, which, ceteris paribus, causes the dollar to depreciate relative to the yen.",
+    "videoExplanation": null
   },
   {
     "id": 75,
@@ -4851,7 +5104,8 @@ export const allQuestions: QuestionType[] = [
       "The quantity traded will decrease."
     ],
     "correctAnswer": "B",
-    "explanation": "An increase in demand for the Peso pushes its value up. A decrease in the supply of the Peso also pushes its value up (makes it scarcer). Since both shifts exert upward pressure on the price (value) of the Peso, the Peso will definitively appreciate. The effect on the equilibrium quantity traded is indeterminate."
+    "explanation": "An increase in demand for the Peso pushes its value up. A decrease in the supply of the Peso also pushes its value up (makes it scarcer). Since both shifts exert upward pressure on the price (value) of the Peso, the Peso will definitively appreciate. The effect on the equilibrium quantity traded is indeterminate.",
+    "videoExplanation": null
   },
   {
     "id": 76,
@@ -4869,7 +5123,8 @@ export const allQuestions: QuestionType[] = [
       "No significant impact on capital flows or the dollar"
     ],
     "correctAnswer": "B",
-    "explanation": "Lower real interest rates in the U.S. make U.S. assets less attractive to foreign investors (decreasing capital inflows) and make foreign assets more attractive to U.S. investors (increasing capital outflows). The net effect is increased capital outflow. This increases the supply of dollars (as U.S. investors sell dollars to buy foreign currency) and decreases the demand for dollars (as foreign investors demand fewer dollars), causing the dollar to depreciate."
+    "explanation": "Lower real interest rates in the U.S. make U.S. assets less attractive to foreign investors (decreasing capital inflows) and make foreign assets more attractive to U.S. investors (increasing capital outflows). The net effect is increased capital outflow. This increases the supply of dollars (as U.S. investors sell dollars to buy foreign currency) and decreases the demand for dollars (as foreign investors demand fewer dollars), causing the dollar to depreciate.",
+    "videoExplanation": null
   },
   {
     "id": 77,
@@ -4887,7 +5142,8 @@ export const allQuestions: QuestionType[] = [
       "Indeterminate effect on capital flows and CAD value"
     ],
     "correctAnswer": "B",
-    "explanation": "Contractionary fiscal policy (less government borrowing) tends to lower real interest rates, making Canadian assets less attractive (net capital outflow). Slower economic growth might also reduce investment opportunities, further encouraging outflow. Increased capital outflow leads to an increased supply of CAD and decreased demand for CAD, causing the Canadian Dollar to depreciate."
+    "explanation": "Contractionary fiscal policy (less government borrowing) tends to lower real interest rates, making Canadian assets less attractive (net capital outflow). Slower economic growth might also reduce investment opportunities, further encouraging outflow. Increased capital outflow leads to an increased supply of CAD and decreased demand for CAD, causing the Canadian Dollar to depreciate.",
+    "videoExplanation": null
   },
   {
     "id": 78,
@@ -4905,7 +5161,8 @@ export const allQuestions: QuestionType[] = [
       "Both currencies will appreciate against gold."
     ],
     "correctAnswer": "C",
-    "explanation": "Higher inflation in Country A means its goods are becoming relatively more expensive. This reduces foreign demand for Country A's goods (reducing demand for its currency) and increases Country A's demand for relatively cheaper goods from Country B (increasing supply of its currency). Both effects cause Country A's currency to depreciate relative to Country B's currency."
+    "explanation": "Higher inflation in Country A means its goods are becoming relatively more expensive. This reduces foreign demand for Country A's goods (reducing demand for its currency) and increases Country A's demand for relatively cheaper goods from Country B (increasing supply of its currency). Both effects cause Country A's currency to depreciate relative to Country B's currency.",
+    "videoExplanation": null
   },
   {
     "id": 79,
@@ -4923,7 +5180,8 @@ export const allQuestions: QuestionType[] = [
       "Both U.S. exports and imports will increase."
     ],
     "correctAnswer": "B",
-    "explanation": "An appreciation of the dollar makes U.S. goods more expensive for Europeans (decreasing U.S. exports) and makes European goods cheaper for Americans (increasing U.S. imports). Since Net Exports = Exports - Imports, the decrease in exports and increase in imports leads to a decrease in U.S. net exports."
+    "explanation": "An appreciation of the dollar makes U.S. goods more expensive for Europeans (decreasing U.S. exports) and makes European goods cheaper for Americans (increasing U.S. imports). Since Net Exports = Exports - Imports, the decrease in exports and increase in imports leads to a decrease in U.S. net exports.",
+    "videoExplanation": null
   },
   {
     "id": 80,
@@ -4941,7 +5199,8 @@ export const allQuestions: QuestionType[] = [
       "No change in exports or imports"
     ],
     "correctAnswer": "B",
-    "explanation": "A depreciation of the Yen makes Japanese goods cheaper for foreigners, leading to an increase in Japan's exports. It also makes foreign goods more expensive for Japanese residents, leading to a decrease in Japan's imports. This combination tends to increase Japan's net exports."
+    "explanation": "A depreciation of the Yen makes Japanese goods cheaper for foreigners, leading to an increase in Japan's exports. It also makes foreign goods more expensive for Japanese residents, leading to a decrease in Japan's imports. This combination tends to increase Japan's net exports.",
+    "videoExplanation": null
   },
   {
     "id": 81,
@@ -4959,7 +5218,8 @@ export const allQuestions: QuestionType[] = [
       "A decrease in the U.S. financial account surplus."
     ],
     "correctAnswer": "C",
-    "explanation": "Higher real returns on U.S. financial assets make them more attractive to both foreign and domestic investors. This encourages foreigners to invest more in the U.S. (increased capital inflow) and discourages U.S. residents from investing abroad (decreased capital outflow). The net result is an increase in net capital inflow (a larger financial account surplus or smaller deficit)."
+    "explanation": "Higher real returns on U.S. financial assets make them more attractive to both foreign and domestic investors. This encourages foreigners to invest more in the U.S. (increased capital inflow) and discourages U.S. residents from investing abroad (decreased capital outflow). The net result is an increase in net capital inflow (a larger financial account surplus or smaller deficit).",
+    "videoExplanation": null
   },
   {
     "id": 82,
@@ -4977,7 +5237,8 @@ export const allQuestions: QuestionType[] = [
       "An increase in net exports."
     ],
     "correctAnswer": "C",
-    "explanation": "Net capital inflow means that foreigners are purchasing more of the country's assets than residents are purchasing of foreign assets. This inflow of funds is recorded as a credit (+) balance, or a surplus, in the financial account."
+    "explanation": "Net capital inflow means that foreigners are purchasing more of the country's assets than residents are purchasing of foreign assets. This inflow of funds is recorded as a credit (+) balance, or a surplus, in the financial account.",
+    "videoExplanation": null
   },
 
   // --- AP Microeconomics Questions ---
@@ -4999,7 +5260,8 @@ export const allQuestions: QuestionType[] = [
       "An increase in the tax on gasoline"
     ],
     "correctAnswer": "C",
-    "explanation": "An improvement in technology lowers production costs, making sellers willing to supply more at each price, thus increasing supply (shifting the supply curve right)."
+    "explanation": "An improvement in technology lowers production costs, making sellers willing to supply more at each price, thus increasing supply (shifting the supply curve right).",
+    "videoExplanation": null
   },
   {
     "id": 84,
@@ -5017,7 +5279,8 @@ export const allQuestions: QuestionType[] = [
       "perfectly inelastic"
     ],
     "correctAnswer": "A",
-    "explanation": "When demand is elastic (PED > 1), a decrease in price leads to a proportionally larger increase in quantity demanded, causing total revenue (P x Q) to increase."
+    "explanation": "When demand is elastic (PED > 1), a decrease in price leads to a proportionally larger increase in quantity demanded, causing total revenue (P x Q) to increase.",
+    "videoExplanation": null
   },
   {
     "id": 85,
@@ -5035,7 +5298,8 @@ export const allQuestions: QuestionType[] = [
       "It will lead to a decrease in quantity demanded"
     ],
     "correctAnswer": "B",
-    "explanation": "A price ceiling set below the equilibrium price is binding. At this lower price, quantity demanded exceeds quantity supplied, resulting in a shortage."
+    "explanation": "A price ceiling set below the equilibrium price is binding. At this lower price, quantity demanded exceeds quantity supplied, resulting in a shortage.",
+    "videoExplanation": null
   },
   {
     "id": 86,
@@ -5053,7 +5317,8 @@ export const allQuestions: QuestionType[] = [
       "unrelated goods"
     ],
     "correctAnswer": "B",
-    "explanation": "A negative cross-price elasticity of demand means that as the price of one good increases, the quantity demanded of the other good decreases. This relationship defines complementary goods."
+    "explanation": "A negative cross-price elasticity of demand means that as the price of one good increases, the quantity demanded of the other good decreases. This relationship defines complementary goods.",
+    "videoExplanation": null
   },
   {
     "id": 87,
@@ -5071,7 +5336,8 @@ export const allQuestions: QuestionType[] = [
       "area above the supply curve and below the market price"
     ],
     "correctAnswer": "C",
-    "explanation": "Consumer surplus represents the net benefit to buyers, calculated as the difference between their willingness to pay for a good and the price they actually pay."
+    "explanation": "Consumer surplus represents the net benefit to buyers, calculated as the difference between their willingness to pay for a good and the price they actually pay.",
+    "videoExplanation": null
   },
   {
     "id": 88,
@@ -5089,7 +5355,8 @@ export const allQuestions: QuestionType[] = [
       "equilibrium price to decrease"
     ],
     "correctAnswer": "C",
-    "explanation": "A tax imposed on sellers increases their costs of production, leading to a decrease in supply, which is represented by a leftward shift of the supply curve."
+    "explanation": "A tax imposed on sellers increases their costs of production, leading to a decrease in supply, which is represented by a leftward shift of the supply curve.",
+    "videoExplanation": null
   },
   {
     "id": 89,
@@ -5107,7 +5374,8 @@ export const allQuestions: QuestionType[] = [
       "An increase in the population"
     ],
     "correctAnswer": "D",
-    "explanation": "If consumers expect the price of coffee to fall in the future, they will likely reduce their current demand, waiting to buy at the lower expected price."
+    "explanation": "If consumers expect the price of coffee to fall in the future, they will likely reduce their current demand, waiting to buy at the lower expected price.",
+    "videoExplanation": null
   },
   {
     "id": 90,
@@ -5125,7 +5393,8 @@ export const allQuestions: QuestionType[] = [
       "the income of consumers changes in response to a change in price"
     ],
     "correctAnswer": "B",
-    "explanation": "Price elasticity of supply measures the responsiveness of the quantity supplied of a good or service to a change in its price."
+    "explanation": "Price elasticity of supply measures the responsiveness of the quantity supplied of a good or service to a change in its price.",
+    "videoExplanation": null
   },
   {
     "id": 91,
@@ -5143,7 +5412,8 @@ export const allQuestions: QuestionType[] = [
       "Quantity demanded is greater than quantity supplied"
     ],
     "correctAnswer": "C",
-    "explanation": "Market equilibrium occurs at the price where the quantity consumers are willing and able to buy is exactly equal to the quantity producers are willing and able to sell."
+    "explanation": "Market equilibrium occurs at the price where the quantity consumers are willing and able to buy is exactly equal to the quantity producers are willing and able to sell.",
+    "videoExplanation": null
   },
   {
     "id": 92,
@@ -5161,7 +5431,8 @@ export const allQuestions: QuestionType[] = [
       "Market equilibrium"
     ],
     "correctAnswer": "B",
-    "explanation": "A binding price floor is set above the equilibrium price. At this higher price, quantity supplied exceeds quantity demanded, resulting in a surplus."
+    "explanation": "A binding price floor is set above the equilibrium price. At this higher price, quantity supplied exceeds quantity demanded, resulting in a surplus.",
+    "videoExplanation": null
   },
 
   // Unit 3: Production, Cost, and the Perfect Competition Model
@@ -5181,7 +5452,8 @@ export const allQuestions: QuestionType[] = [
       "Marginal cost eventually decreases as output increases"
     ],
     "correctAnswer": "C",
-    "explanation": "Diminishing marginal product occurs in the short run when adding successive units of a variable input (like labor) to a fixed input (like capital) results in smaller and smaller increases in total output. The marginal product of the variable input eventually declines."
+    "explanation": "Diminishing marginal product occurs in the short run when adding successive units of a variable input (like labor) to a fixed input (like capital) results in smaller and smaller increases in total output. The marginal product of the variable input eventually declines.",
+    "videoExplanation": null
   },
   {
     "id": 94,
@@ -5199,7 +5471,8 @@ export const allQuestions: QuestionType[] = [
       "ATC is always greater than MC"
     ],
     "correctAnswer": "D",
-    "explanation": "The marginal cost curve intersects the average total cost curve at the lowest point of the ATC curve. When MC is below ATC, it pulls ATC down; when MC is above ATC, it pulls ATC up."
+    "explanation": "The marginal cost curve intersects the average total cost curve at the lowest point of the ATC curve. When MC is below ATC, it pulls ATC down; when MC is above ATC, it pulls ATC up.",
+    "videoExplanation": null
   },
   {
     "id": 95,
@@ -5217,7 +5490,8 @@ export const allQuestions: QuestionType[] = [
       "Fixed cost resulting from producing one more unit"
     ],
     "correctAnswer": "B",
-    "explanation": "Marginal cost (MC) is the additional cost incurred from producing one more unit of output. It is calculated as the change in total cost divided by the change in quantity (ΔTC / ΔQ)."
+    "explanation": "Marginal cost (MC) is the additional cost incurred from producing one more unit of output. It is calculated as the change in total cost divided by the change in quantity (ΔTC / ΔQ).",
+    "videoExplanation": null
   },
   {
     "id": 96,
@@ -5235,7 +5509,8 @@ export const allQuestions: QuestionType[] = [
       "It doubles inputs and more than doubles output"
     ],
     "correctAnswer": "A",
-    "explanation": "Economies of scale occur when a firm's long-run average total cost (LRATC) falls as it increases its scale of production. This is represented by the downward-sloping portion of the LRATC curve."
+    "explanation": "Economies of scale occur when a firm's long-run average total cost (LRATC) falls as it increases its scale of production. This is represented by the downward-sloping portion of the LRATC curve.",
+    "videoExplanation": null
   },
   {
     "id": 97,
@@ -5253,7 +5528,8 @@ export const allQuestions: QuestionType[] = [
       "Fixed costs only"
     ],
     "correctAnswer": "C",
-    "explanation": "Accounting profit subtracts only explicit (out-of-pocket) costs from total revenue. Economic profit subtracts both explicit costs and implicit costs (the opportunity costs of resources used) from total revenue."
+    "explanation": "Accounting profit subtracts only explicit (out-of-pocket) costs from total revenue. Economic profit subtracts both explicit costs and implicit costs (the opportunity costs of resources used) from total revenue.",
+    "videoExplanation": null
   },
   {
     "id": 98,
@@ -5271,7 +5547,8 @@ export const allQuestions: QuestionType[] = [
       "Average total cost is minimized"
     ],
     "correctAnswer": "C",
-    "explanation": "The fundamental rule for profit maximization is to produce up to the point where the revenue generated by the last unit sold (marginal revenue, MR) is equal to the cost of producing that last unit (marginal cost, MC)."
+    "explanation": "The fundamental rule for profit maximization is to produce up to the point where the revenue generated by the last unit sold (marginal revenue, MR) is equal to the cost of producing that last unit (marginal cost, MC).",
+    "videoExplanation": null
   },
   {
     "id": 99,
@@ -5289,7 +5566,8 @@ export const allQuestions: QuestionType[] = [
       "Accounting profit is negative"
     ],
     "correctAnswer": "B",
-    "explanation": "The short-run shutdown rule states that a firm should cease production if the market price falls below its minimum average variable cost (P < min AVC). At such a price, the firm cannot even cover its variable costs per unit."
+    "explanation": "The short-run shutdown rule states that a firm should cease production if the market price falls below its minimum average variable cost (P < min AVC). At such a price, the firm cannot even cover its variable costs per unit.",
+    "videoExplanation": null
   },
   {
     "id": 100,
@@ -5307,7 +5585,8 @@ export const allQuestions: QuestionType[] = [
       "Perfect information for buyers and sellers"
     ],
     "correctAnswer": "B",
-    "explanation": "Perfectly competitive markets are characterized by firms selling identical (homogeneous) products. Product differentiation is a feature of monopolistic competition."
+    "explanation": "Perfectly competitive markets are characterized by firms selling identical (homogeneous) products. Product differentiation is a feature of monopolistic competition.",
+    "videoExplanation": null
   },
   {
     "id": 101,
@@ -5325,7 +5604,8 @@ export const allQuestions: QuestionType[] = [
       "Economic Profit > 0"
     ],
     "correctAnswer": "D",
-    "explanation": "In the long run, free entry and exit drive economic profits to zero in perfect competition. This occurs where firms produce at the minimum point of their average total cost curve, and price equals both marginal cost and minimum average total cost (P = MC = min ATC)."
+    "explanation": "In the long run, free entry and exit drive economic profits to zero in perfect competition. This occurs where firms produce at the minimum point of their average total cost curve, and price equals both marginal cost and minimum average total cost (P = MC = min ATC).",
+    "videoExplanation": null
   },
   {
     "id": 102,
@@ -5343,7 +5623,8 @@ export const allQuestions: QuestionType[] = [
       "New firms will exit the market"
     ],
     "correctAnswer": "C",
-    "explanation": "Positive economic profit means total revenue exceeds total cost (explicit + implicit). For a perfectly competitive firm (where P = MR), this occurs when the market price is greater than the average total cost at the profit-maximizing quantity (where P = MC)."
+    "explanation": "Positive economic profit means total revenue exceeds total cost (explicit + implicit). For a perfectly competitive firm (where P = MR), this occurs when the market price is greater than the average total cost at the profit-maximizing quantity (where P = MC).",
+    "videoExplanation": null
   },
 
   // Unit 4: Imperfect Competition
@@ -5363,7 +5644,8 @@ export const allQuestions: QuestionType[] = [
       "Has no market power"
     ],
     "correctAnswer": "A",
-    "explanation": "Significant barriers to entry in a monopoly prevent new firms from entering the market, allowing the monopolist to potentially earn positive economic profits even in the long run. Perfectly competitive firms earn zero economic profit in the long run due to free entry."
+    "explanation": "Significant barriers to entry in a monopoly prevent new firms from entering the market, allowing the monopolist to potentially earn positive economic profits even in the long run. Perfectly competitive firms earn zero economic profit in the long run due to free entry.",
+    "videoExplanation": null
   },
   {
     "id": 104,
@@ -5381,7 +5663,8 @@ export const allQuestions: QuestionType[] = [
       "Total revenue is maximized (MR = 0)"
     ],
     "correctAnswer": "B",
-    "explanation": "The universal profit-maximization rule for all firms, including monopolies, is to produce the quantity where marginal revenue (MR) equals marginal cost (MC). The price is then determined by the demand curve at that quantity."
+    "explanation": "The universal profit-maximization rule for all firms, including monopolies, is to produce the quantity where marginal revenue (MR) equals marginal cost (MC). The price is then determined by the demand curve at that quantity.",
+    "videoExplanation": null
   },
   {
     "id": 105,
@@ -5399,7 +5682,8 @@ export const allQuestions: QuestionType[] = [
       "Total revenue increases as price decreases"
     ],
     "correctAnswer": "B",
-    "explanation": "A monopolist faces the market demand curve, which is downward sloping. To sell more output, it must lower the price for every unit it sells, not just the last one. This 'price effect' on all previous units makes MR less than the price."
+    "explanation": "A monopolist faces the market demand curve, which is downward sloping. To sell more output, it must lower the price for every unit it sells, not just the last one. This 'price effect' on all previous units makes MR less than the price.",
+    "videoExplanation": null
   },
   {
     "id": 106,
@@ -5417,7 +5701,8 @@ export const allQuestions: QuestionType[] = [
       "An allocatively efficient quantity"
     ],
     "correctAnswer": "B",
-    "explanation": "Monopolies maximize profit by producing less output (where MR=MC, and P > MC) and charging a higher price than would occur in perfect competition (where P=MC). This leads to allocative inefficiency and deadweight loss."
+    "explanation": "Monopolies maximize profit by producing less output (where MR=MC, and P > MC) and charging a higher price than would occur in perfect competition (where P=MC). This leads to allocative inefficiency and deadweight loss.",
+    "videoExplanation": null
   },
   {
     "id": 107,
@@ -5435,7 +5720,8 @@ export const allQuestions: QuestionType[] = [
       "The firm must have identical demand curves across customer groups"
     ],
     "correctAnswer": "B",
-    "explanation": "Successful price discrimination requires market power, the ability to segment customers based on differing price elasticities of demand, and the ability to prevent arbitrage (low-price buyers reselling to high-price buyers)."
+    "explanation": "Successful price discrimination requires market power, the ability to segment customers based on differing price elasticities of demand, and the ability to prevent arbitrage (low-price buyers reselling to high-price buyers).",
+    "videoExplanation": null
   },
   {
     "id": 108,
@@ -5453,7 +5739,8 @@ export const allQuestions: QuestionType[] = [
       "The demand curve becomes the marginal revenue curve"
     ],
     "correctAnswer": "D",
-    "explanation": "Under perfect price discrimination, the firm charges each consumer their maximum willingness to pay. This eliminates consumer surplus entirely and transfers it to the producer as economic profit. Output expands to the allocatively efficient level (where P=MC for the last unit), eliminating deadweight loss."
+    "explanation": "Under perfect price discrimination, the firm charges each consumer their maximum willingness to pay. This eliminates consumer surplus entirely and transfers it to the producer as economic profit. Output expands to the allocatively efficient level (where P=MC for the last unit), eliminating deadweight loss.",
+    "videoExplanation": null
   },
   {
     "id": 109,
@@ -5471,7 +5758,8 @@ export const allQuestions: QuestionType[] = [
       "Monopsony"
     ],
     "correctAnswer": "D",
-    "explanation": "Monopolistic competition features a large number of firms, similar to perfect competition, but with differentiated products (giving firms some market power) and free entry/exit."
+    "explanation": "Monopolistic competition features a large number of firms, similar to perfect competition, but with differentiated products (giving firms some market power) and free entry/exit.",
+    "videoExplanation": null
   },
   {
     "id": 110,
@@ -5489,7 +5777,8 @@ export const allQuestions: QuestionType[] = [
       "Price equals minimum average variable cost"
     ],
     "correctAnswer": "C",
-    "explanation": "Free entry ensures monopolistically competitive firms earn zero economic profit in the long run (P = ATC). However, because they face a downward-sloping demand curve due to product differentiation, their profit-maximizing output (where MR=MC) occurs where P > MC, indicating allocative inefficiency. They also typically operate with excess capacity (not at min ATC)."
+    "explanation": "Free entry ensures monopolistically competitive firms earn zero economic profit in the long run (P = ATC). However, because they face a downward-sloping demand curve due to product differentiation, their profit-maximizing output (where MR=MC) occurs where P > MC, indicating allocative inefficiency. They also typically operate with excess capacity (not at min ATC).",
+    "videoExplanation": null
   },
   {
     "id": 111,
@@ -5507,7 +5796,8 @@ export const allQuestions: QuestionType[] = [
       "Firms are price takers"
     ],
     "correctAnswer": "D",
-    "explanation": "Oligopoly is characterized by a few dominant firms where the actions of one firm (regarding price, output, advertising, etc.) significantly impact the others, leading to strategic interdependence."
+    "explanation": "Oligopoly is characterized by a few dominant firms where the actions of one firm (regarding price, output, advertising, etc.) significantly impact the others, leading to strategic interdependence.",
+    "videoExplanation": null
   },
   {
     "id": 112,
@@ -5525,7 +5815,8 @@ export const allQuestions: QuestionType[] = [
       "One player forces the other into a suboptimal outcome"
     ],
     "correctAnswer": "C",
-    "explanation": "A Nash equilibrium is a set of strategies, one for each player, such that no player has an incentive to unilaterally change their strategy, given the strategies chosen by the other players. It represents a stable outcome in a strategic interaction."
+    "explanation": "A Nash equilibrium is a set of strategies, one for each player, such that no player has an incentive to unilaterally change their strategy, given the strategies chosen by the other players. It represents a stable outcome in a strategic interaction.",
+    "videoExplanation": null
   },
 
   // Unit 5: Factor Markets
@@ -5545,7 +5836,8 @@ export const allQuestions: QuestionType[] = [
       "Government regulations"
     ],
     "correctAnswer": "C",
-    "explanation": "The demand for factors of production, like labor, is derived from the demand for the goods and services they are used to create. If demand for the final product increases, the demand for the labor needed to make it also increases."
+    "explanation": "The demand for factors of production, like labor, is derived from the demand for the goods and services they are used to create. If demand for the final product increases, the demand for the labor needed to make it also increases.",
+    "videoExplanation": null
   },
   {
     "id": 114,
@@ -5563,7 +5855,8 @@ export const allQuestions: QuestionType[] = [
       "Price of the output times the quantity of labor"
     ],
     "correctAnswer": "B",
-    "explanation": "MRP represents the additional revenue a firm earns from hiring one more unit of labor. It is the marginal product of labor (MPL) multiplied by the marginal revenue (MR) from selling the additional output. In perfectly competitive output markets, MR equals price (P), so MRP = MPL x P."
+    "explanation": "MRP represents the additional revenue a firm earns from hiring one more unit of labor. It is the marginal product of labor (MPL) multiplied by the marginal revenue (MR) from selling the additional output. In perfectly competitive output markets, MR equals price (P), so MRP = MPL x P.",
+    "videoExplanation": null
   },
   {
     "id": 115,
@@ -5581,7 +5874,8 @@ export const allQuestions: QuestionType[] = [
       "Marginal cost equals the wage rate"
     ],
     "correctAnswer": "B",
-    "explanation": "Firms maximize profit by hiring factors up to the point where the additional revenue from the factor (MRP) equals the additional cost of the factor (marginal factor cost, MFC). In a perfectly competitive labor market, MFC equals the market wage rate (W). Thus, the firm hires until MRP = W."
+    "explanation": "Firms maximize profit by hiring factors up to the point where the additional revenue from the factor (MRP) equals the additional cost of the factor (marginal factor cost, MFC). In a perfectly competitive labor market, MFC equals the market wage rate (W). Thus, the firm hires until MRP = W.",
+    "videoExplanation": null
   },
   {
     "id": 116,
@@ -5599,7 +5893,8 @@ export const allQuestions: QuestionType[] = [
       "An increase in the supply of autoworkers"
     ],
     "correctAnswer": "C",
-    "explanation": "Since the demand for labor is derived from the demand for the product, an increase in the demand for cars (the product) will increase the demand for autoworkers (the labor), shifting the labor demand curve to the right."
+    "explanation": "Since the demand for labor is derived from the demand for the product, an increase in the demand for cars (the product) will increase the demand for autoworkers (the labor), shifting the labor demand curve to the right.",
+    "videoExplanation": null
   },
   {
     "id": 117,
@@ -5617,7 +5912,8 @@ export const allQuestions: QuestionType[] = [
       "An increase in the price of capital (a substitute factor)"
     ],
     "correctAnswer": "C",
-    "explanation": "Factors that increase the number of available workers at any given wage rate, such as increased immigration, population growth, or changes in preferences towards work, will shift the labor supply curve to the right (increase supply)."
+    "explanation": "Factors that increase the number of available workers at any given wage rate, such as increased immigration, population growth, or changes in preferences towards work, will shift the labor supply curve to the right (increase supply).",
+    "videoExplanation": null
   },
   {
     "id": 118,
@@ -5635,7 +5931,8 @@ export const allQuestions: QuestionType[] = [
       "Price of each factor is equal"
     ],
     "correctAnswer": "A",
-    "explanation": "The least-cost combination rule states that cost is minimized when the last dollar spent on each factor yields the same amount of marginal product. Mathematically, this is MPL / PL = MPK / PK, where L is labor and K is capital."
+    "explanation": "The least-cost combination rule states that cost is minimized when the last dollar spent on each factor yields the same amount of marginal product. Mathematically, this is MPL / PL = MPK / PK, where L is labor and K is capital.",
+    "videoExplanation": null
   },
   {
     "id": 119,
@@ -5653,7 +5950,8 @@ export const allQuestions: QuestionType[] = [
       "Monopsony"
     ],
     "correctAnswer": "E",
-    "explanation": "Monopsony is the factor market equivalent of a monopoly (single seller) in the product market. It refers to a market with a single buyer of an input, such as a dominant employer in a small town."
+    "explanation": "Monopsony is the factor market equivalent of a monopoly (single seller) in the product market. It refers to a market with a single buyer of an input, such as a dominant employer in a small town.",
+    "videoExplanation": null
   },
   {
     "id": 120,
@@ -5671,7 +5969,8 @@ export const allQuestions: QuestionType[] = [
       "The supply curve of labor is downward sloping"
     ],
     "correctAnswer": "A",
-    "explanation": "A monopsonist faces the entire upward-sloping market labor supply curve. To hire one more worker, it must raise the wage not only for that worker but for all existing workers as well. This makes the marginal factor cost (the cost of hiring one more worker) exceed the wage rate."
+    "explanation": "A monopsonist faces the entire upward-sloping market labor supply curve. To hire one more worker, it must raise the wage not only for that worker but for all existing workers as well. This makes the marginal factor cost (the cost of hiring one more worker) exceed the wage rate.",
+    "videoExplanation": null
   },
   {
     "id": 121,
@@ -5689,7 +5988,8 @@ export const allQuestions: QuestionType[] = [
       "Marginal product equals marginal factor cost (MP = MFC)"
     ],
     "correctAnswer": "B",
-    "explanation": "The profit-maximizing rule for hiring inputs is always MRP = MFC. For a monopsonist, the MFC is greater than the wage rate (W), so they hire where MRP = MFC, and then determine the wage to pay based on the labor supply curve at that quantity."
+    "explanation": "The profit-maximizing rule for hiring inputs is always MRP = MFC. For a monopsonist, the MFC is greater than the wage rate (W), so they hire where MRP = MFC, and then determine the wage to pay based on the labor supply curve at that quantity.",
+    "videoExplanation": null
   },
   {
     "id": 122,
@@ -5707,7 +6007,8 @@ export const allQuestions: QuestionType[] = [
       "The same number of workers at a lower wage"
     ],
     "correctAnswer": "D",
-    "explanation": "Because the monopsonist equates MRP with the higher MFC curve (which lies above the supply curve), it chooses a quantity of labor that is lower than the competitive quantity. The wage paid is determined by the supply curve at this lower quantity, resulting in a lower wage than in a competitive market."
+    "explanation": "Because the monopsonist equates MRP with the higher MFC curve (which lies above the supply curve), it chooses a quantity of labor that is lower than the competitive quantity. The wage paid is determined by the supply curve at this lower quantity, resulting in a lower wage than in a competitive market.",
+    "videoExplanation": null
   },
 
   // Unit 6: Market Failure and the Role of Government
@@ -5727,7 +6028,8 @@ export const allQuestions: QuestionType[] = [
       "Total revenue is maximized"
     ],
     "correctAnswer": "C",
-    "explanation": "Allocative efficiency means resources are distributed to produce the mix of goods and services most desired by society. This occurs when the marginal social benefit (MSB) of the last unit produced equals its marginal social cost (MSC)."
+    "explanation": "Allocative efficiency means resources are distributed to produce the mix of goods and services most desired by society. This occurs when the marginal social benefit (MSB) of the last unit produced equals its marginal social cost (MSC).",
+    "videoExplanation": null
   },
   {
     "id": 124,
@@ -5745,7 +6047,8 @@ export const allQuestions: QuestionType[] = [
       "There is no deadweight loss"
     ],
     "correctAnswer": "D",
-    "explanation": "When a negative externality exists (e.g., pollution), the social cost (MSC) of production exceeds the private cost (MPC). The unregulated market produces where MPB = MPC, resulting in an output level greater than the socially optimal level (where MSB = MSC), leading to overproduction and deadweight loss."
+    "explanation": "When a negative externality exists (e.g., pollution), the social cost (MSC) of production exceeds the private cost (MPC). The unregulated market produces where MPB = MPC, resulting in an output level greater than the socially optimal level (where MSB = MSC), leading to overproduction and deadweight loss.",
+    "videoExplanation": null
   },
   {
     "id": 125,
@@ -5763,7 +6066,8 @@ export const allQuestions: QuestionType[] = [
       "Banning the consumption of the good"
     ],
     "correctAnswer": "C",
-    "explanation": "A positive externality in consumption (e.g., vaccinations) means the social benefit (MSB) exceeds the private benefit (MPB). A per-unit subsidy to consumers effectively increases their private benefit, shifting the demand curve rightward towards the socially optimal quantity where MSB = MSC."
+    "explanation": "A positive externality in consumption (e.g., vaccinations) means the social benefit (MSB) exceeds the private benefit (MPB). A per-unit subsidy to consumers effectively increases their private benefit, shifting the demand curve rightward towards the socially optimal quantity where MSB = MSC.",
+    "videoExplanation": null
   },
   {
     "id": 126,
@@ -5781,7 +6085,8 @@ export const allQuestions: QuestionType[] = [
       "Producer surplus equals consumer surplus"
     ],
     "correctAnswer": "B",
-    "explanation": "The socially optimal, or allocatively efficient, quantity occurs where the marginal benefit to society (MSB) from consuming the last unit is exactly equal to the marginal cost to society (MSC) of producing that last unit. This point maximizes total social surplus."
+    "explanation": "The socially optimal, or allocatively efficient, quantity occurs where the marginal benefit to society (MSB) from consuming the last unit is exactly equal to the marginal cost to society (MSC) of producing that last unit. This point maximizes total social surplus.",
+    "videoExplanation": null
   },
   {
     "id": 127,
@@ -5799,7 +6104,8 @@ export const allQuestions: QuestionType[] = [
       "Produced only by the government"
     ],
     "correctAnswer": "D",
-    "explanation": "Public goods possess two key characteristics: non-rivalry (one person's use does not prevent others from using it) and non-excludability (it is impractical or impossible to prevent non-payers from benefiting)."
+    "explanation": "Public goods possess two key characteristics: non-rivalry (one person's use does not prevent others from using it) and non-excludability (it is impractical or impossible to prevent non-payers from benefiting).",
+    "videoExplanation": null
   },
   {
     "id": 128,
@@ -5817,7 +6123,8 @@ export const allQuestions: QuestionType[] = [
       "The good is rivalrous in consumption"
     ],
     "correctAnswer": "B",
-    "explanation": "Since people cannot be easily excluded from consuming a public good, they have an incentive to let others pay for it while still enjoying the benefits. This free-riding leads to under-provision by private markets, often necessitating government provision."
+    "explanation": "Since people cannot be easily excluded from consuming a public good, they have an incentive to let others pay for it while still enjoying the benefits. This free-riding leads to under-provision by private markets, often necessitating government provision.",
+    "videoExplanation": null
   },
   {
     "id": 129,
@@ -5835,7 +6142,8 @@ export const allQuestions: QuestionType[] = [
       "No change in price or output"
     ],
     "correctAnswer": "D",
-    "explanation": "A per-unit tax acts like an increase in marginal cost (MC) for the monopolist. The MC curve shifts upward/leftward. The monopolist will find the new profit-maximizing quantity where MR intersects the new, higher MC curve. This results in a lower quantity and, moving up the demand curve, a higher price."
+    "explanation": "A per-unit tax acts like an increase in marginal cost (MC) for the monopolist. The MC curve shifts upward/leftward. The monopolist will find the new profit-maximizing quantity where MR intersects the new, higher MC curve. This results in a lower quantity and, moving up the demand curve, a higher price.",
+    "videoExplanation": null
   },
   {
     "id": 130,
@@ -5853,7 +6161,8 @@ export const allQuestions: QuestionType[] = [
       "Output decreases, price remains unchanged"
     ],
     "correctAnswer": "C",
-    "explanation": "A lump-sum tax affects only fixed costs, not marginal costs (MC) or marginal revenue (MR). Since the profit-maximizing output level is determined where MR = MC, and neither of these curves shifts, the monopolist's output and price will not change in the short run. The tax will, however, reduce the monopolist's total profit."
+    "explanation": "A lump-sum tax affects only fixed costs, not marginal costs (MC) or marginal revenue (MR). Since the profit-maximizing output level is determined where MR = MC, and neither of these curves shifts, the monopolist's output and price will not change in the short run. The tax will, however, reduce the monopolist's total profit.",
+    "videoExplanation": null
   },
   {
     "id": 131,
@@ -5871,7 +6180,8 @@ export const allQuestions: QuestionType[] = [
       "The deadweight loss from taxation"
     ],
     "correctAnswer": "B",
-    "explanation": "The Lorenz curve plots the cumulative percentage of total income received against the cumulative percentage of households/individuals, starting from the lowest income. The further the curve bows away from the line of perfect equality, the greater the income inequality."
+    "explanation": "The Lorenz curve plots the cumulative percentage of total income received against the cumulative percentage of households/individuals, starting from the lowest income. The further the curve bows away from the line of perfect equality, the greater the income inequality.",
+    "videoExplanation": null
   },
   {
     "id": 132,
@@ -5889,7 +6199,8 @@ export const allQuestions: QuestionType[] = [
       "A negative externality"
     ],
     "correctAnswer": "B",
-    "explanation": "The Gini coefficient is a numerical measure of income inequality derived from the Lorenz curve, ranging from 0 (perfect equality, where everyone has the same income) to 1 (perfect inequality, where one person has all the income)."
+    "explanation": "The Gini coefficient is a numerical measure of income inequality derived from the Lorenz curve, ranging from 0 (perfect equality, where everyone has the same income) to 1 (perfect inequality, where one person has all the income).",
+    "videoExplanation": null
   }, 
   {
     "id": 133,
@@ -6015,7 +6326,8 @@ export const allQuestions: QuestionType[] = [
       "A price floor set at P1."
     ],
     "correctAnswer": "C",
-    "explanation": "The graph shows a negative production externality because the marginal social cost (MSC) is greater than the marginal private cost (MPC). The market equilibrium quantity (where MPB=MPC) is greater than the socially optimal quantity (where MSB=MSC). To correct this overproduction, the government can impose a per-unit tax equal to the marginal external cost at the optimal quantity. This cost is represented by the vertical distance between MSC and MPC at the optimal quantity, which is equal to P1 - P3."
+    "explanation": "The graph shows a negative production externality because the marginal social cost (MSC) is greater than the marginal private cost (MPC). The market equilibrium quantity (where MPB=MPC) is greater than the socially optimal quantity (where MSB=MSC). To correct this overproduction, the government can impose a per-unit tax equal to the marginal external cost at the optimal quantity. This cost is represented by the vertical distance between MSC and MPC at the optimal quantity, which is equal to P1 - P3.",
+    "videoExplanation": null
   }, 
   {
     "id": 140,
@@ -6033,7 +6345,8 @@ export const allQuestions: QuestionType[] = [
       "An individual playing loud music late at night that disturbs neighbors."
     ],
     "correctAnswer": "A",
-    "explanation": "The graph shows that the marginal social cost (MSC) is greater than the marginal private cost (MPC), while marginal social benefit (MSB) equals marginal private benefit (MPB). This indicates a negative externality in production. Option A, factory pollution, is a classic example where the production process imposes external costs on society (pollution) that are not reflected in the firm's private costs."
+    "explanation": "The graph shows that the marginal social cost (MSC) is greater than the marginal private cost (MPC), while marginal social benefit (MSB) equals marginal private benefit (MPB). This indicates a negative externality in production. Option A, factory pollution, is a classic example where the production process imposes external costs on society (pollution) that are not reflected in the firm's private costs.",
+    "videoExplanation": null
   }, 
   {
     "id": 141,
@@ -6051,7 +6364,8 @@ export const allQuestions: QuestionType[] = [
       "Taxing the external benefits generated."
     ],
     "correctAnswer": "B",
-    "explanation": "The graph shows that the marginal social benefit (MSB) is greater than the marginal private benefit (MPB), indicating a positive externality in consumption. The market equilibrium (where MPB intersects MPC) results in a quantity below the socially optimal level (where MSB intersects MSC/MPC). To correct this under-consumption, the government can provide a per-unit subsidy to consumers, effectively increasing the marginal private benefit and shifting the demand curve towards the MSB curve, thus encouraging consumption towards the optimal quantity."
+    "explanation": "The graph shows that the marginal social benefit (MSB) is greater than the marginal private benefit (MPB), indicating a positive externality in consumption. The market equilibrium (where MPB intersects MPC) results in a quantity below the socially optimal level (where MSB intersects MSC/MPC). To correct this under-consumption, the government can provide a per-unit subsidy to consumers, effectively increasing the marginal private benefit and shifting the demand curve towards the MSB curve, thus encouraging consumption towards the optimal quantity.",
+    "videoExplanation": null
   }, 
   {
     "id": 142,
@@ -6069,7 +6383,8 @@ export const allQuestions: QuestionType[] = [
       "Nominal wages are rising rapidly due to high aggregate demand."
     ],
     "correctAnswer": "C",
-    "explanation": "The Long-Run Phillips Curve (LRPC) is vertical at the natural rate of unemployment (NRU). Point A represents long-run equilibrium where the economy is at the NRU. Point B lies on the Short-Run Phillips Curve (SRPC) to the right of the LRPC, indicating that the actual unemployment rate at point B is greater than the natural rate of unemployment. This situation corresponds to a recessionary gap."
+    "explanation": "The Long-Run Phillips Curve (LRPC) is vertical at the natural rate of unemployment (NRU). Point A represents long-run equilibrium where the economy is at the NRU. Point B lies on the Short-Run Phillips Curve (SRPC) to the right of the LRPC, indicating that the actual unemployment rate at point B is greater than the natural rate of unemployment. This situation corresponds to a recessionary gap.",
+    "videoExplanation": null
   }, 
   {
     "id": 143,
@@ -6087,7 +6402,8 @@ export const allQuestions: QuestionType[] = [
       "Increasing the interest rate paid on reserves."
     ],
     "correctAnswer": "D",
-    "explanation": "The graph shows an increase in the money supply, represented by the rightward shift from MS1 to MS2. This leads to a lower nominal interest rate. Buying government securities (bonds) on the open market is an expansionary monetary policy action. When the central bank buys bonds, it pays for them by crediting the reserves of commercial banks, increasing the monetary base and enabling banks to increase lending, which expands the money supply."
+    "explanation": "The graph shows an increase in the money supply, represented by the rightward shift from MS1 to MS2. This leads to a lower nominal interest rate. Buying government securities (bonds) on the open market is an expansionary monetary policy action. When the central bank buys bonds, it pays for them by crediting the reserves of commercial banks, increasing the monetary base and enabling banks to increase lending, which expands the money supply.",
+    "videoExplanation": null
   }, 
   {
     "id": 144,
@@ -6105,7 +6421,8 @@ export const allQuestions: QuestionType[] = [
       "$200,000"
     ],
     "correctAnswer": "B",
-    "explanation": "First, calculate the required reserves: 10% of Demand Deposits ($200,000) = 0.10 * $200,000 = $20,000. Next, find the excess reserves by subtracting required reserves from actual reserves: Excess Reserves = Actual Reserves - Required Reserves = $60,000 - $20,000 = $40,000. A bank can lend out its excess reserves, so the maximum amount of additional loans is $40,000."
+    "explanation": "First, calculate the required reserves: 10% of Demand Deposits ($200,000) = 0.10 * $200,000 = $20,000. Next, find the excess reserves by subtracting required reserves from actual reserves: Excess Reserves = Actual Reserves - Required Reserves = $60,000 - $20,000 = $40,000. A bank can lend out its excess reserves, so the maximum amount of additional loans is $40,000.",
+    "videoExplanation": null
   }, 
   {
     "id": 145,
@@ -6123,7 +6440,8 @@ export const allQuestions: QuestionType[] = [
       "They would likely have no significant impact during a recessionary gap."
     ],
     "correctAnswer": "B",
-    "explanation": "The graph shows a recessionary gap because the short-run equilibrium (intersection of AD and SRAS) is at a Real GDP level below the Long-Run Aggregate Supply (LRAS). Automatic stabilizers work counter-cyclically without new legislative action. During a recession, incomes fall, leading to lower income tax collections. Simultaneously, unemployment rises, leading to increased government spending on unemployment benefits (a transfer payment). Both lower taxes and higher transfers help support disposable income and consumption, thus cushioning the fall in aggregate demand and lessening the severity of the recession."
+    "explanation": "The graph shows a recessionary gap because the short-run equilibrium (intersection of AD and SRAS) is at a Real GDP level below the Long-Run Aggregate Supply (LRAS). Automatic stabilizers work counter-cyclically without new legislative action. During a recession, incomes fall, leading to lower income tax collections. Simultaneously, unemployment rises, leading to increased government spending on unemployment benefits (a transfer payment). Both lower taxes and higher transfers help support disposable income and consumption, thus cushioning the fall in aggregate demand and lessening the severity of the recession.",
+    "videoExplanation": null
   }, 
   {
     "id": 146,
@@ -6141,7 +6459,8 @@ export const allQuestions: QuestionType[] = [
       "$690 billion"
     ],
     "correctAnswer": "A",
-    "explanation": "The expenditure approach calculates GDP using the formula: GDP = Consumption (C) + Private Investment (I) + Government Spending (G) + Net Exports (NX). Net Exports (NX) = Exports (X) - Imports (M). Using the data: NX = $25 - $40 = -$15 billion. Therefore, GDP = $450 + $75 + $80 + (-$15) = $590 billion. Taxes are not directly included in the expenditure calculation of GDP."
+    "explanation": "The expenditure approach calculates GDP using the formula: GDP = Consumption (C) + Private Investment (I) + Government Spending (G) + Net Exports (NX). Net Exports (NX) = Exports (X) - Imports (M). Using the data: NX = $25 - $40 = -$15 billion. Therefore, GDP = $450 + $75 + $80 + (-$15) = $590 billion. Taxes are not directly included in the expenditure calculation of GDP.",
+    "videoExplanation": null
   }, 
       // --- Unit 1: Basic Economic Concepts ---
     {
@@ -6160,7 +6479,8 @@ export const allQuestions: QuestionType[] = [
         "Naturally occurring mineral deposits."
       ],
       "correctAnswer": "C",
-      "explanation": "In economics, capital refers to manufactured goods used to produce other goods and services. Machinery, tools, equipment, and factory buildings are examples of physical capital. Money and stocks are financial assets, labor is human effort, and mineral deposits are natural resources or land."
+      "explanation": "In economics, capital refers to manufactured goods used to produce other goods and services. Machinery, tools, equipment, and factory buildings are examples of physical capital. Money and stocks are financial assets, labor is human effort, and mineral deposits are natural resources or land.",
+    "videoExplanation": null
     },
     {
       "id": 148,
@@ -6178,7 +6498,8 @@ export const allQuestions: QuestionType[] = [
         "International trade organizations."
       ],
       "correctAnswer": "C",
-      "explanation": "A key characteristic of a market economy is decentralized decision-making. Prices and quantities are determined by the forces of supply and demand, reflecting the voluntary choices of individual consumers and producers responding to price signals."
+      "explanation": "A key characteristic of a market economy is decentralized decision-making. Prices and quantities are determined by the forces of supply and demand, reflecting the voluntary choices of individual consumers and producers responding to price signals.",
+    "videoExplanation": null
     },
     {
       "id": 149,
@@ -6196,7 +6517,8 @@ export const allQuestions: QuestionType[] = [
         "Cannot be determined"
       ],
       "correctAnswer": "B",
-      "explanation": "Absolute advantage refers to the ability to produce more of a good or service using the same amount of resources or the same amount using fewer resources. Country Y can produce 60 units of wheat, while Country X can produce only 50. Therefore, Country Y has the absolute advantage in wheat production."
+      "explanation": "Absolute advantage refers to the ability to produce more of a good or service using the same amount of resources or the same amount using fewer resources. Country Y can produce 60 units of wheat, while Country X can produce only 50. Therefore, Country Y has the absolute advantage in wheat production.",
+    "videoExplanation": null
     },
     {
       "id": 150,
@@ -6214,7 +6536,8 @@ export const allQuestions: QuestionType[] = [
         "One country will benefit significantly, while the other will likely be worse off."
       ],
       "correctAnswer": "C",
-      "explanation": "Trade allows countries to consume beyond their own production capabilities. By specializing in goods where they have a lower opportunity cost, meaning comparative advantage, and trading for other goods, both countries can achieve higher levels of consumption than would be possible in isolation."
+      "explanation": "Trade allows countries to consume beyond their own production capabilities. By specializing in goods where they have a lower opportunity cost, meaning comparative advantage, and trading for other goods, both countries can achieve higher levels of consumption than would be possible in isolation.",
+    "videoExplanation": null
     },
     {
       "id": 151,
@@ -6232,7 +6555,8 @@ export const allQuestions: QuestionType[] = [
         "Savings"
       ],
       "correctAnswer": "B",
-      "explanation": "In the circular flow model, households own the factors of production. They supply these factors like their labor, land they own, capital they provide, or entrepreneurial skills to firms through the factor market in exchange for income like wages, rent, interest, or profit."
+      "explanation": "In the circular flow model, households own the factors of production. They supply these factors like their labor, land they own, capital they provide, or entrepreneurial skills to firms through the factor market in exchange for income like wages, rent, interest, or profit.",
+    "videoExplanation": null
     },
   
     // --- Unit 2: Economic Indicators and the Business Cycle ---
@@ -6252,7 +6576,8 @@ export const allQuestions: QuestionType[] = [
         "Value of intermediate goods"
       ],
       "correctAnswer": "C",
-      "explanation": "The income approach calculates GDP by summing all the incomes earned from producing goods and services within a country. This includes wages and salaries which are compensation of employees, rent, interest, and profits. Consumption, investment, and government purchases are part of the expenditure approach. Transfer payments and intermediate goods are excluded from GDP calculations."
+      "explanation": "The income approach calculates GDP by summing all the incomes earned from producing goods and services within a country. This includes wages and salaries which are compensation of employees, rent, interest, and profits. Consumption, investment, and government purchases are part of the expenditure approach. Transfer payments and intermediate goods are excluded from GDP calculations.",
+    "videoExplanation": null
     },
     {
       "id": 153,
@@ -6270,7 +6595,8 @@ export const allQuestions: QuestionType[] = [
         "Both rates remain unchanged."
       ],
       "correctAnswer": "B",
-      "explanation": "Individuals who are not actively seeking work are classified as not in the labor force, even if they want a job; these are sometimes called discouraged workers. When they stop looking, they are no longer counted as unemployed, causing the unemployment rate which is Unemployed divided by Labor Force to decrease. Since they also leave the labor force, the labor force participation rate which is Labor Force divided by Adult Population also decreases."
+      "explanation": "Individuals who are not actively seeking work are classified as not in the labor force, even if they want a job; these are sometimes called discouraged workers. When they stop looking, they are no longer counted as unemployed, causing the unemployment rate which is Unemployed divided by Labor Force to decrease. Since they also leave the labor force, the labor force participation rate which is Labor Force divided by Adult Population also decreases.",
+    "videoExplanation": null
     },
     {
       "id": 154,
@@ -6288,7 +6614,8 @@ export const allQuestions: QuestionType[] = [
         "Wealth redistribution costs"
       ],
       "correctAnswer": "B",
-      "explanation": "Menu costs refer to the real costs incurred by firms when they have to update price lists, menus, catalogs, and other postings due to inflation. Shoe-leather costs relate to the time and effort people spend trying to counteract inflation's effect on holding money."
+      "explanation": "Menu costs refer to the real costs incurred by firms when they have to update price lists, menus, catalogs, and other postings due to inflation. Shoe-leather costs relate to the time and effort people spend trying to counteract inflation's effect on holding money.",
+    "videoExplanation": null
     },
     {
       "id": 155,
@@ -6306,7 +6633,8 @@ export const allQuestions: QuestionType[] = [
         "Remained unchanged"
       ],
       "correctAnswer": "A",
-      "explanation": "The real wage reflects the purchasing power of the nominal wage. It is calculated approximately as the percentage change in the nominal wage minus the percentage change in the price level or inflation rate. Real Wage Change is approximately the percentage change in Nominal Wage minus the percentage change in Price Level equals 5% minus 3% equals 2% increase."
+      "explanation": "The real wage reflects the purchasing power of the nominal wage. It is calculated approximately as the percentage change in the nominal wage minus the percentage change in the price level or inflation rate. Real Wage Change is approximately the percentage change in Nominal Wage minus the percentage change in Price Level equals 5% minus 3% equals 2% increase.",
+    "videoExplanation": null
     },
     {
       "id": 156,
@@ -6324,7 +6652,8 @@ export const allQuestions: QuestionType[] = [
         "Recovery"
       ],
       "correctAnswer": "D",
-      "explanation": "A contraction, or recession, is the phase of the business cycle where economic activity declines. This is typically marked by falling real GDP, increasing unemployment rates as firms lay off workers, and reduced profits due to lower sales."
+      "explanation": "A contraction, or recession, is the phase of the business cycle where economic activity declines. This is typically marked by falling real GDP, increasing unemployment rates as firms lay off workers, and reduced profits due to lower sales.",
+    "videoExplanation": null
     },
   
     // --- Unit 3: National Income and Price Determination ---
@@ -6344,7 +6673,8 @@ export const allQuestions: QuestionType[] = [
         "The multiplier effect"
       ],
       "correctAnswer": "C",
-      "explanation": "The downward slope of the AD curve is explained by the wealth effect, the interest-rate effect, and the exchange-rate effect. The interest-rate effect suggests that a lower price level reduces the demand for money, lowering the interest rate, which stimulates investment spending and thus increases the quantity of goods and services demanded."
+      "explanation": "The downward slope of the AD curve is explained by the wealth effect, the interest-rate effect, and the exchange-rate effect. The interest-rate effect suggests that a lower price level reduces the demand for money, lowering the interest rate, which stimulates investment spending and thus increases the quantity of goods and services demanded.",
+    "videoExplanation": null
     },
     {
       "id": 158,
@@ -6362,7 +6692,8 @@ export const allQuestions: QuestionType[] = [
         "1.33"
       ],
       "correctAnswer": "D",
-      "explanation": "The simple tax multiplier measures the change in aggregate demand resulting from a change in lump-sum taxes. Its formula is negative MPC divided by MPS, where MPS is 1 minus MPC. Given MPC = 0.75, MPS = 1 minus 0.75 = 0.25. Tax Multiplier = negative 0.75 divided by 0.25 = negative 3."
+      "explanation": "The simple tax multiplier measures the change in aggregate demand resulting from a change in lump-sum taxes. Its formula is negative MPC divided by MPS, where MPS is 1 minus MPC. Given MPC = 0.75, MPS = 1 minus 0.75 = 0.25. Tax Multiplier = negative 0.75 divided by 0.25 = negative 3.",
+    "videoExplanation": null
     },
     {
       "id": 159,
@@ -6380,7 +6711,8 @@ export const allQuestions: QuestionType[] = [
         "Aggregate demand will decrease by more than $50 billion."
       ],
       "correctAnswer": "B",
-      "explanation": "The balanced-budget multiplier states that an equal increase or decrease in government spending and net taxes leads to an increase or decrease in aggregate demand equal to the size of the change in spending or taxes. The multiplier value is 1 because the spending multiplier is larger in absolute value than the tax multiplier by exactly one."
+      "explanation": "The balanced-budget multiplier states that an equal increase or decrease in government spending and net taxes leads to an increase or decrease in aggregate demand equal to the size of the change in spending or taxes. The multiplier value is 1 because the spending multiplier is larger in absolute value than the tax multiplier by exactly one.",
+    "videoExplanation": null
     },
     {
       "id": 160,
@@ -6398,7 +6730,8 @@ export const allQuestions: QuestionType[] = [
         "A decrease in consumer confidence."
       ],
       "correctAnswer": "D",
-      "explanation": "The LRAS curve represents the economy's potential output, which depends on the availability and productivity of its resources like land, labor, capital, and technology. An increase in the stock of physical capital, such as machinery or infrastructure, enhances productive capacity, shifting the LRAS curve to the right."
+      "explanation": "The LRAS curve represents the economy's potential output, which depends on the availability and productivity of its resources like land, labor, capital, and technology. An increase in the stock of physical capital, such as machinery or infrastructure, enhances productive capacity, shifting the LRAS curve to the right.",
+    "videoExplanation": null
     },
     {
       "id": 161,
@@ -6416,7 +6749,8 @@ export const allQuestions: QuestionType[] = [
         "The central bank will decrease the money supply."
       ],
       "correctAnswer": "C",
-      "explanation": "In a recessionary gap, high unemployment puts downward pressure on nominal wages. As wages fall, production costs decrease, causing the Short-Run Aggregate Supply curve to shift to the right, eventually restoring the economy to long-run equilibrium at potential output, possibly at a lower price level."
+      "explanation": "In a recessionary gap, high unemployment puts downward pressure on nominal wages. As wages fall, production costs decrease, causing the Short-Run Aggregate Supply curve to shift to the right, eventually restoring the economy to long-run equilibrium at potential output, possibly at a lower price level.",
+    "videoExplanation": null
     },
   
     // --- Unit 4: Financial Sector ---
@@ -6436,7 +6770,8 @@ export const allQuestions: QuestionType[] = [
         "None of the above; M1 is a subset of M2."
       ],
       "correctAnswer": "E",
-      "explanation": "M1 includes the most liquid forms of money: currency in circulation, demand deposits, traveler's checks, and other checkable deposits. M2 includes all of M1 PLUS less liquid assets like savings deposits, small-time deposits, and money market mutual funds for individuals. Therefore, everything in M1 is also in M2."
+      "explanation": "M1 includes the most liquid forms of money: currency in circulation, demand deposits, traveler's checks, and other checkable deposits. M2 includes all of M1 PLUS less liquid assets like savings deposits, small-time deposits, and money market mutual funds for individuals. Therefore, everything in M1 is also in M2.",
+    "videoExplanation": null
     },
     { // REPLACEMENT for original 163 (Deposit Insurance)
       "id": 163,
@@ -6454,7 +6789,8 @@ export const allQuestions: QuestionType[] = [
         "Excess reserves remain unchanged."
       ],
       "correctAnswer": "B",
-      "explanation": "Initially, required reserves are 10% of $100,000 = $10,000. Initial excess reserves are $15,000 - $10,000 = $5,000. After the $1,000 cash withdrawal, demand deposits fall to $99,000 and actual reserves fall to $14,000. New required reserves are 10% of $99,000 = $9,900. New excess reserves are $14,000 - $9,900 = $4,100. The change in excess reserves is $4,100 - $5,000 = -$900."
+      "explanation": "Initially, required reserves are 10% of $100,000 = $10,000. Initial excess reserves are $15,000 - $10,000 = $5,000. After the $1,000 cash withdrawal, demand deposits fall to $99,000 and actual reserves fall to $14,000. New required reserves are 10% of $99,000 = $9,900. New excess reserves are $14,000 - $9,900 = $4,100. The change in excess reserves is $4,100 - $5,000 = -$900.",
+    "videoExplanation": null
     },
     { // REPLACEMENT for original 164 (CB Independence)
       "id": 164,
@@ -6472,7 +6808,8 @@ export const allQuestions: QuestionType[] = [
         "Having no effect on the loanable funds market."
       ],
       "correctAnswer": "A",
-      "explanation": "Capital flight represents a decrease in capital inflows or an increase in capital outflows. This reduces the funds available for lending within the country, decreasing the supply of loanable funds. A leftward shift in the supply of loanable funds leads to a higher equilibrium real interest rate and a lower equilibrium quantity of funds loaned."
+      "explanation": "Capital flight represents a decrease in capital inflows or an increase in capital outflows. This reduces the funds available for lending within the country, decreasing the supply of loanable funds. A leftward shift in the supply of loanable funds leads to a higher equilibrium real interest rate and a lower equilibrium quantity of funds loaned.",
+    "videoExplanation": null
     },
     {
       "id": 165,
@@ -6490,7 +6827,8 @@ export const allQuestions: QuestionType[] = [
         "A decrease in capital inflows from abroad."
       ],
       "correctAnswer": "C",
-      "explanation": "The supply of loanable funds primarily comes from saving, both private and public. An increase in the private saving rate means households are saving more at any given real interest rate, shifting the supply curve for loanable funds to the right."
+      "explanation": "The supply of loanable funds primarily comes from saving, both private and public. An increase in the private saving rate means households are saving more at any given real interest rate, shifting the supply curve for loanable funds to the right.",
+    "videoExplanation": null
     },
     {
       "id": 166,
@@ -6508,7 +6846,8 @@ export const allQuestions: QuestionType[] = [
         "8%"
       ],
       "correctAnswer": "C",
-      "explanation": "The equation of exchange in growth rates states that the percentage change in Money Supply plus the percentage change in Velocity equals the percentage change in Price Level plus the percentage change in Real GDP. If velocity is constant, its percentage change is 0. So, percentage change in Money Supply equals percentage change in Price Level plus percentage change in Real GDP. Plugging in the values: 6% = percentage change in Price Level + 2%. Solving for the inflation rate gives 4%."
+      "explanation": "The equation of exchange in growth rates states that the percentage change in Money Supply plus the percentage change in Velocity equals the percentage change in Price Level plus the percentage change in Real GDP. If velocity is constant, its percentage change is 0. So, percentage change in Money Supply equals percentage change in Price Level plus percentage change in Real GDP. Plugging in the values: 6% = percentage change in Price Level + 2%. Solving for the inflation rate gives 4%.",
+    "videoExplanation": null
     },
   
     // --- Unit 5: Long-Run Consequences of Stabilization Policies ---
@@ -6529,7 +6868,8 @@ export const allQuestions: QuestionType[] = [
         "There has been a favorable supply shock."
       ],
       "correctAnswer": "C",
-      "explanation": "The long-run Phillips curve is vertical at the natural rate of unemployment. Operating to the left of this curve means the current unemployment rate is lower than the natural rate, which corresponds to an inflationary gap where output is above potential."
+      "explanation": "The long-run Phillips curve is vertical at the natural rate of unemployment. Operating to the left of this curve means the current unemployment rate is lower than the natural rate, which corresponds to an inflationary gap where output is above potential.",
+    "videoExplanation": null
     },
     { // REPLACEMENT for original 169 (Debt-to-GDP)
       "id": 169,
@@ -6547,7 +6887,8 @@ export const allQuestions: QuestionType[] = [
         "An adverse supply shock, such as rising oil prices."
       ],
       "correctAnswer": "D",
-      "explanation": "A downward or leftward shift of the short-run Phillips curve indicates that for any given unemployment rate, the inflation rate is lower, or for any given inflation rate, the unemployment rate is lower. This is primarily caused by a decrease in expected inflation or a positive supply shock."
+      "explanation": "A downward or leftward shift of the short-run Phillips curve indicates that for any given unemployment rate, the inflation rate is lower, or for any given inflation rate, the unemployment rate is lower. This is primarily caused by a decrease in expected inflation or a positive supply shock.",
+    "videoExplanation": null
     },
     { // REPLACEMENT for original 170 (Laffer Curve)
       "id": 170,
@@ -6565,7 +6906,8 @@ export const allQuestions: QuestionType[] = [
         "An appreciation of the domestic currency and increased net exports."
       ],
       "correctAnswer": "B",
-      "explanation": "Crowding out occurs when increased government borrowing to finance deficits increases the demand for loanable funds. This drives up the real interest rate, making it more costly for private firms to borrow and invest, thus potentially reducing private investment spending."
+      "explanation": "Crowding out occurs when increased government borrowing to finance deficits increases the demand for loanable funds. This drives up the real interest rate, making it more costly for private firms to borrow and invest, thus potentially reducing private investment spending.",
+    "videoExplanation": null
     },
     { // REPLACEMENT for original 171 (Ricardian Equivalence)
       "id": 171,
@@ -6583,7 +6925,8 @@ export const allQuestions: QuestionType[] = [
         "Nominal wages."
       ],
       "correctAnswer": "C",
-      "explanation": "Long-run economic growth is driven by increases in labor productivity. Providing workers with more and better physical capital such as tools, machinery, and infrastructure directly increases the amount of output they can produce per hour worked, thus boosting productivity and potential GDP."
+      "explanation": "Long-run economic growth is driven by increases in labor productivity. Providing workers with more and better physical capital such as tools, machinery, and infrastructure directly increases the amount of output they can produce per hour worked, thus boosting productivity and potential GDP.",
+    "videoExplanation": null
     },
   
     // --- Unit 6: Open Economy - International Trade and Finance ---
@@ -6603,7 +6946,8 @@ export const allQuestions: QuestionType[] = [
         "Import of merchandise goods."
       ],
       "correctAnswer": "D",
-      "explanation": "The Capital Account, typically very small for most countries, primarily records non-produced, non-financial asset transfers and capital transfers like debt forgiveness or migrants' financial transfers. Exports and imports of goods and services and income payments like dividends are in the Current Account. Purchases of financial assets like stocks or bonds are in the Financial Account."
+      "explanation": "The Capital Account, typically very small for most countries, primarily records non-produced, non-financial asset transfers and capital transfers like debt forgiveness or migrants' financial transfers. Exports and imports of goods and services and income payments like dividends are in the Current Account. Purchases of financial assets like stocks or bonds are in the Financial Account.",
+    "videoExplanation": null
     },
     {
       "id": 173,
@@ -6621,7 +6965,8 @@ export const allQuestions: QuestionType[] = [
         "The level of gold reserves held by the country."
       ],
       "correctAnswer": "B",
-      "explanation": "In a floating exchange rate system, the exchange rate adjusts continuously based on the market forces of supply and demand for the currency relative to other currencies, without direct intervention by the central bank to maintain a specific rate."
+      "explanation": "In a floating exchange rate system, the exchange rate adjusts continuously based on the market forces of supply and demand for the currency relative to other currencies, without direct intervention by the central bank to maintain a specific rate.",
+    "videoExplanation": null
     },
     {
       "id": 174,
@@ -6639,7 +6984,8 @@ export const allQuestions: QuestionType[] = [
         "Decrease government spending."
       ],
       "correctAnswer": "B",
-      "explanation": "To prevent its currency from appreciating or getting stronger, the central bank needs to increase the supply of its currency in the foreign exchange market. Selling its own currency increases its supply, putting downward pressure on its value, while simultaneously buying foreign currency."
+      "explanation": "To prevent its currency from appreciating or getting stronger, the central bank needs to increase the supply of its currency in the foreign exchange market. Selling its own currency increases its supply, putting downward pressure on its value, while simultaneously buying foreign currency.",
+    "videoExplanation": null
     },
     {
       "id": 175,
@@ -6657,7 +7003,8 @@ export const allQuestions: QuestionType[] = [
         "High domestic inflation rates relative to other countries."
       ],
       "correctAnswer": "D",
-      "explanation": "Foreign investors are attracted to countries where they expect high returns and relatively low risk. Strong prospects for economic growth and corporate profitability make a country's assets like stocks and direct investments more attractive, leading to increased capital inflows."
+      "explanation": "Foreign investors are attracted to countries where they expect high returns and relatively low risk. Strong prospects for economic growth and corporate profitability make a country's assets like stocks and direct investments more attractive, leading to increased capital inflows.",
+    "videoExplanation": null
     },
     {
       "id": 176,
@@ -6675,7 +7022,8 @@ export const allQuestions: QuestionType[] = [
         "An appreciation of the country's currency."
       ],
       "correctAnswer": "D",
-      "explanation": "A tariff is a tax on imported goods. This tax increases the cost of importing the good, leading to a higher price paid by domestic consumers for the imported item. It also tends to decrease the quantity of imports and increase domestic production of substitute goods."
+      "explanation": "A tariff is a tax on imported goods. This tax increases the cost of importing the good, leading to a higher price paid by domestic consumers for the imported item. It also tends to decrease the quantity of imports and increase domestic production of substitute goods.",
+    "videoExplanation": null
     }, 
       {
         "id": 177,
@@ -6693,7 +7041,8 @@ export const allQuestions: QuestionType[] = [
           "Decreasing marginal cost"
         ],
         "correctAnswer": "C",
-        "explanation": "The law of diminishing marginal product states that as more units of a variable input are added to fixed inputs, the additional output produced from each new unit of the variable input will eventually decline."
+        "explanation": "The law of diminishing marginal product states that as more units of a variable input are added to fixed inputs, the additional output produced from each new unit of the variable input will eventually decline.",
+      "videoExplanation": null
       },
       {
         "id": 178,
@@ -6711,7 +7060,8 @@ export const allQuestions: QuestionType[] = [
           "Total variable cost for all units"
         ],
         "correctAnswer": "D",
-        "explanation": "Marginal cost (MC) is the additional cost incurred from producing one more unit of output. It is calculated as the change in total cost divided by the change in quantity (output)."
+        "explanation": "Marginal cost (MC) is the additional cost incurred from producing one more unit of output. It is calculated as the change in total cost divided by the change in quantity (output).",
+      "videoExplanation": null
       },
       {
         "id": 179,
@@ -6747,7 +7097,8 @@ export const allQuestions: QuestionType[] = [
           "Increase initially, then decrease as capacity is reached"
         ],
         "correctAnswer": "C",
-        "explanation": "Average fixed cost (AFC) is calculated as Total Fixed Cost (TFC) divided by Quantity (Q). Since TFC is constant in the short run, AFC must decrease as Q increases because the constant fixed cost is spread over more units of output."
+        "explanation": "Average fixed cost (AFC) is calculated as Total Fixed Cost (TFC) divided by Quantity (Q). Since TFC is constant in the short run, AFC must decrease as Q increases because the constant fixed cost is spread over more units of output.",
+      "videoExplanation": null
       },
       {
         "id": 181,
@@ -6783,7 +7134,8 @@ export const allQuestions: QuestionType[] = [
           "Decreases due to management inefficiency." // Lengthened plausible distractor
         ],
         "correctAnswer": "C",
-        "explanation": "Diseconomies of scale exist when increasing all inputs by a certain percentage leads to a smaller percentage increase in output. This results in rising long-run average total costs, often due to coordination problems in large organizations."
+        "explanation": "Diseconomies of scale exist when increasing all inputs by a certain percentage leads to a smaller percentage increase in output. This results in rising long-run average total costs, often due to coordination problems in large organizations.",
+      "videoExplanation": null
       },
       {
         "id": 183,
@@ -6801,7 +7153,8 @@ export const allQuestions: QuestionType[] = [
           "A period sufficiently short that fixed costs are irrelevant."
         ],
         "correctAnswer": "D",
-        "explanation": "The long run is defined as a time horizon long enough for a firm to vary all of its inputs, including its scale of operations (plant size, capital stock). There are no fixed inputs in the long run."
+        "explanation": "The long run is defined as a time horizon long enough for a firm to vary all of its inputs, including its scale of operations (plant size, capital stock). There are no fixed inputs in the long run.",
+      "videoExplanation": null
       },
       {
         "id": 184,
@@ -6837,7 +7190,8 @@ export const allQuestions: QuestionType[] = [
           "Variable costs incurred during production"
         ],
         "correctAnswer": "B",
-        "explanation": "Accounting profit considers only the explicit, out-of-pocket costs incurred by a firm (like wages, rent, materials). It does not subtract implicit costs, which are the opportunity costs of using owner-supplied resources."
+        "explanation": "Accounting profit considers only the explicit, out-of-pocket costs incurred by a firm (like wages, rent, materials). It does not subtract implicit costs, which are the opportunity costs of using owner-supplied resources.",
+      "videoExplanation": null
       },
       {
         "id": 186,
@@ -6855,7 +7209,8 @@ export const allQuestions: QuestionType[] = [
           "Total revenue generated is maximized."
         ],
         "correctAnswer": "B",
-        "explanation": "The universal rule for profit maximization is to produce up to the point where the additional revenue from selling one more unit (Marginal Revenue, MR) equals the additional cost of producing that unit (Marginal Cost, MC)."
+        "explanation": "The universal rule for profit maximization is to produce up to the point where the additional revenue from selling one more unit (Marginal Revenue, MR) equals the additional cost of producing that unit (Marginal Cost, MC).",
+      "videoExplanation": null
       },
       {
         "id": 187,
@@ -6891,7 +7246,8 @@ export const allQuestions: QuestionType[] = [
           "Upward sloping, reflecting increasing costs"
         ],
         "correctAnswer": "C",
-        "explanation": "A perfectly competitive firm is a price taker, meaning it can sell all it wants at the prevailing market price but nothing at a higher price. This translates to a perfectly elastic (horizontal) demand curve at the market price."
+        "explanation": "A perfectly competitive firm is a price taker, meaning it can sell all it wants at the prevailing market price but nothing at a higher price. This translates to a perfectly elastic (horizontal) demand curve at the market price.",
+      "videoExplanation": null
       },
       {
         "id": 189,
@@ -6909,7 +7265,8 @@ export const allQuestions: QuestionType[] = [
           "Total revenue equals total variable cost."
         ],
         "correctAnswer": "C",
-        "explanation": "The general profit maximization rule is MR = MC. For a perfectly competitive firm, price equals marginal revenue (P = MR) because the firm is a price taker. Therefore, the profit-maximizing condition for a perfectly competitive firm is P = MC."
+        "explanation": "The general profit maximization rule is MR = MC. For a perfectly competitive firm, price equals marginal revenue (P = MR) because the firm is a price taker. Therefore, the profit-maximizing condition for a perfectly competitive firm is P = MC.",
+      "videoExplanation": null
       },
       {
         "id": 190,
@@ -6927,7 +7284,8 @@ export const allQuestions: QuestionType[] = [
           "Total cost at the potential shutdown point."
         ],
         "correctAnswer": "D",
-        "explanation": "The shutdown rule states that a firm should cease production in the short run if the price falls below the minimum average variable cost (AVC). At prices below minimum AVC, the firm cannot even cover its variable costs per unit, and its losses would be smaller if it shut down (losing only its fixed costs)."
+        "explanation": "The shutdown rule states that a firm should cease production in the short run if the price falls below the minimum average variable cost (AVC). At prices below minimum AVC, the firm cannot even cover its variable costs per unit, and its losses would be smaller if it shut down (losing only its fixed costs).",
+      "videoExplanation": null
       },
       {
         "id": 191,
@@ -6963,7 +7321,8 @@ export const allQuestions: QuestionType[] = [
           "Firms are operating with considerable excess capacity."
         ],
         "correctAnswer": "A",
-        "explanation": "Due to free entry and exit, economic profits are driven to zero in the long run for perfectly competitive firms. This occurs at the output level where price equals marginal cost equals the minimum point of the average total cost curve (P = MC = min ATC). This point also represents productive efficiency."
+        "explanation": "Due to free entry and exit, economic profits are driven to zero in the long run for perfectly competitive firms. This occurs at the output level where price equals marginal cost equals the minimum point of the average total cost curve (P = MC = min ATC). This point also represents productive efficiency.",
+      "videoExplanation": null
       },
       {
         "id": 193,
@@ -6999,7 +7358,8 @@ export const allQuestions: QuestionType[] = [
           "Average fixed cost curve as output increases."
         ],
         "correctAnswer": "C",
-        "explanation": "A perfectly competitive firm produces where P = MC, as long as P is greater than or equal to its minimum AVC (the shutdown point). Therefore, the firm's short-run supply curve is its marginal cost curve above the minimum point of the average variable cost curve."
+        "explanation": "A perfectly competitive firm produces where P = MC, as long as P is greater than or equal to its minimum AVC (the shutdown point). Therefore, the firm's short-run supply curve is its marginal cost curve above the minimum point of the average variable cost curve.",
+      "videoExplanation": null
       },
       {
         "id": 195,
@@ -7035,7 +7395,8 @@ export const allQuestions: QuestionType[] = [
           "Number of firms decreases; Price decreases permanently below the original level." // Lengthened distractor
         ],
         "correctAnswer": "B",
-        "explanation": "A decrease in demand lowers the market price, causing short-run losses for firms. In the long run, firms will exit the industry due to these losses. Exit decreases market supply, causing the price to rise back up towards the original minimum average total cost level, restoring zero economic profit for the remaining firms."
+        "explanation": "A decrease in demand lowers the market price, causing short-run losses for firms. In the long run, firms will exit the industry due to these losses. Exit decreases market supply, causing the price to rise back up towards the original minimum average total cost level, restoring zero economic profit for the remaining firms.",
+      "videoExplanation": null
       },
         {
           "id": 197,
@@ -7053,7 +7414,8 @@ export const allQuestions: QuestionType[] = [
             "Both demand and supply will decrease significantly." // Longer distractor
           ],
           "correctAnswer": "B",
-          "explanation": "An inferior good is one for which demand increases as consumer income decreases. Therefore, a decrease in consumer incomes will cause the demand curve for good Z to shift to the right."
+          "explanation": "An inferior good is one for which demand increases as consumer income decreases. Therefore, a decrease in consumer incomes will cause the demand curve for good Z to shift to the right.",
+          "videoExplanation": "/images/mcqVideoExplanations/q197VideoExplanation.mp4"
         },
         {
           "id": 198,
@@ -7071,7 +7433,8 @@ export const allQuestions: QuestionType[] = [
             "No impact on smartphone demand occurs."
           ],
           "correctAnswer": "B",
-          "explanation": "Complementary goods are consumed together. If the price of a complement (wireless earbuds) increases, the overall cost of using the related good (smartphones with earbuds) rises, leading to a decrease in demand for smartphones (a leftward shift of the demand curve)."
+          "explanation": "Complementary goods are consumed together. If the price of a complement (wireless earbuds) increases, the overall cost of using the related good (smartphones with earbuds) rises, leading to a decrease in demand for smartphones (a leftward shift of the demand curve).",
+        "videoExplanation": null
         },
         {
           "id": 199,
@@ -7089,7 +7452,8 @@ export const allQuestions: QuestionType[] = [
             "The expectation of much higher cotton prices next year." // Longer distractor
           ],
           "correctAnswer": "B",
-          "explanation": "A decrease in the price of an input (like fertilizer) lowers production costs. This makes producers willing to supply more cotton at every price, shifting the supply curve to the right."
+          "explanation": "A decrease in the price of an input (like fertilizer) lowers production costs. This makes producers willing to supply more cotton at every price, shifting the supply curve to the right.",
+        "videoExplanation": null
         },
         {
           "id": 200,
@@ -7107,7 +7471,8 @@ export const allQuestions: QuestionType[] = [
             "A surplus exists, and the price will tend to rise."
           ],
           "correctAnswer": "B",
-          "explanation": "When the market price is above equilibrium, the quantity supplied exceeds the quantity demanded, resulting in a surplus. Market forces (sellers competing to sell excess inventory) will push the price down toward the equilibrium level."
+          "explanation": "When the market price is above equilibrium, the quantity supplied exceeds the quantity demanded, resulting in a surplus. Market forces (sellers competing to sell excess inventory) will push the price down toward the equilibrium level.",
+        "videoExplanation": null
         },
         {
           "id": 201,
@@ -7125,7 +7490,8 @@ export const allQuestions: QuestionType[] = [
             "Increase by 2%"
           ],
           "correctAnswer": "B",
-          "explanation": "Price elasticity of demand (PED) = % Change in Quantity Demanded / % Change in Price. Rearranging, % Change in Quantity Demanded = PED * % Change in Price. So, % Change in Qd = 0.2 * 10% = 2%. Since price increased, quantity demanded decreases."
+          "explanation": "Price elasticity of demand (PED) = % Change in Quantity Demanded / % Change in Price. Rearranging, % Change in Quantity Demanded = PED * % Change in Price. So, % Change in Qd = 0.2 * 10% = 2%. Since price increased, quantity demanded decreases.",
+        "videoExplanation": null
         },
         {
           "id": 202,
@@ -7143,7 +7509,8 @@ export const allQuestions: QuestionType[] = [
             "Derived demand"
           ],
           "correctAnswer": "B",
-          "explanation": "According to the total revenue test, if price decreases and total revenue increases, demand must be price elastic (PED > 1). The percentage increase in quantity demanded is larger than the percentage decrease in price."
+          "explanation": "According to the total revenue test, if price decreases and total revenue increases, demand must be price elastic (PED > 1). The percentage increase in quantity demanded is larger than the percentage decrease in price.",
+        "videoExplanation": null
         },
         {
           "id": 203,
@@ -7161,7 +7528,8 @@ export const allQuestions: QuestionType[] = [
             "A specific type of breakfast cereal with many competitors" // Longer distractor
           ],
           "correctAnswer": "C",
-          "explanation": "Demand tends to be more inelastic for goods that are necessities and have few close substitutes. Insulin is a necessity for diabetics with very few, if any, substitutes, making its demand highly price inelastic."
+          "explanation": "Demand tends to be more inelastic for goods that are necessities and have few close substitutes. Insulin is a necessity for diabetics with very few, if any, substitutes, making its demand highly price inelastic.",
+        "videoExplanation": null
         },
         {
           "id": 204,
@@ -7179,7 +7547,8 @@ export const allQuestions: QuestionType[] = [
             "Decrease by 16%"
           ],
           "correctAnswer": "B",
-          "explanation": "Price elasticity of supply (PES) = % Change in Quantity Supplied / % Change in Price. Rearranging, % Change in Quantity Supplied = PES * % Change in Price. So, % Change in Qs = 0.8 * 20% = 16%. Since price increased, quantity supplied increases."
+          "explanation": "Price elasticity of supply (PES) = % Change in Quantity Supplied / % Change in Price. Rearranging, % Change in Quantity Supplied = PES * % Change in Price. So, % Change in Qs = 0.8 * 20% = 16%. Since price increased, quantity supplied increases.",
+        "videoExplanation": null
         },
         {
           "id": 205,
@@ -7197,7 +7566,8 @@ export const allQuestions: QuestionType[] = [
             "Negative, because one is an inferior good."
           ],
           "correctAnswer": "B",
-          "explanation": "Peanut butter and jelly are typically consumed together, making them complements. An increase in the price of one (e.g., peanut butter) would lead to a decrease in the quantity demanded of the other (jelly). Complements have a negative cross-price elasticity."
+          "explanation": "Peanut butter and jelly are typically consumed together, making them complements. An increase in the price of one (e.g., peanut butter) would lead to a decrease in the quantity demanded of the other (jelly). Complements have a negative cross-price elasticity.",
+        "videoExplanation": null
         },
         {
           "id": 206,
@@ -7215,7 +7585,8 @@ export const allQuestions: QuestionType[] = [
             "Income elasticity is -2; it is a substitute good."
           ],
           "correctAnswer": "D",
-          "explanation": "Income Elasticity of Demand = % Change in Quantity Demanded / % Change in Income = -10% / +5% = -2. Since the income elasticity is negative, canned soup is an inferior good (demand decreases as income increases)."
+          "explanation": "Income Elasticity of Demand = % Change in Quantity Demanded / % Change in Income = -10% / +5% = -2. Since the income elasticity is negative, canned soup is an inferior good (demand decreases as income increases).",
+        "videoExplanation": null
         },
         {
           "id": 207,
@@ -7233,7 +7604,8 @@ export const allQuestions: QuestionType[] = [
             "Between the supply and demand curves, to the right of equilibrium."
           ],
           "correctAnswer": "D",
-          "explanation": "Consumer surplus measures the benefit buyers receive from participating in a market. It is the difference between what they are willing to pay (represented by the height of the demand curve) and what they actually pay (the market price), summed over all units purchased. Graphically, this is the area below the demand curve and above the market price."
+          "explanation": "Consumer surplus measures the benefit buyers receive from participating in a market. It is the difference between what they are willing to pay (represented by the height of the demand curve) and what they actually pay (the market price), summed over all units purchased. Graphically, this is the area below the demand curve and above the market price.",
+        "videoExplanation": null
         },
         {
           "id": 208,
@@ -7251,7 +7623,8 @@ export const allQuestions: QuestionType[] = [
             "$0"
           ],
           "correctAnswer": "A",
-          "explanation": "Consumer surplus for an individual is the difference between their willingness to pay and the actual price paid. In this case, $80 (willingness to pay) - $50 (price) = $30."
+          "explanation": "Consumer surplus for an individual is the difference between their willingness to pay and the actual price paid. In this case, $80 (willingness to pay) - $50 (price) = $30.",
+        "videoExplanation": null
         },
         {
           "id": 209,
@@ -7269,7 +7642,8 @@ export const allQuestions: QuestionType[] = [
             "The market reaching equilibrium efficiently." // Longer distractor
           ],
           "correctAnswer": "B",
-          "explanation": "An effective price ceiling is set below the equilibrium price. At this artificially low price, the quantity demanded exceeds the quantity supplied, creating a market shortage."
+          "explanation": "An effective price ceiling is set below the equilibrium price. At this artificially low price, the quantity demanded exceeds the quantity supplied, creating a market shortage.",
+        "videoExplanation": null
         },
         {
           "id": 210,
@@ -7287,7 +7661,8 @@ export const allQuestions: QuestionType[] = [
             "Price remains constant; Quantity decreases."
           ],
           "correctAnswer": "C",
-          "explanation": "A per-unit tax on producers effectively increases their cost of production, shifting the supply curve to the left (or upward). This leads to a higher equilibrium price paid by consumers and a lower equilibrium quantity traded in the market."
+          "explanation": "A per-unit tax on producers effectively increases their cost of production, shifting the supply curve to the left (or upward). This leads to a higher equilibrium price paid by consumers and a lower equilibrium quantity traded in the market.",
+        "videoExplanation": null
         },
         {
           "id": 211,
@@ -7305,7 +7680,8 @@ export const allQuestions: QuestionType[] = [
             "The government of the exporting country."
           ],
           "correctAnswer": "C",
-          "explanation": "A tariff on imported sugar raises the domestic price of sugar. This benefits domestic sugar producers because they can now sell their sugar at a higher price and face less competition from imports, leading to an increase in their producer surplus."
+          "explanation": "A tariff on imported sugar raises the domestic price of sugar. This benefits domestic sugar producers because they can now sell their sugar at a higher price and face less competition from imports, leading to an increase in their producer surplus.",
+          "videoExplanation": "/images/mcqVideoExplanations/q211VideoExplanation.mp4"
         },
         {
           "id": 212,
@@ -7323,7 +7699,8 @@ export const allQuestions: QuestionType[] = [
             "No change in domestic price but lower imports."
           ],
           "correctAnswer": "C",
-          "explanation": "A binding import quota restricts the quantity of a good that can be imported. This reduction in supply raises the domestic price of the good. While domestic producers benefit, the loss in consumer surplus typically outweighs the gain in producer surplus (and any quota rent), resulting in a decrease in total economic surplus and a deadweight loss."
+          "explanation": "A binding import quota restricts the quantity of a good that can be imported. This reduction in supply raises the domestic price of the good. While domestic producers benefit, the loss in consumer surplus typically outweighs the gain in producer surplus (and any quota rent), resulting in a decrease in total economic surplus and a deadweight loss.",
+        "videoExplanation": null
         },
         {
           "id": 213,
@@ -7341,7 +7718,8 @@ export const allQuestions: QuestionType[] = [
             "The burden cannot be determined."
           ],
           "correctAnswer": "B",
-          "explanation": "Perfectly inelastic demand means consumers will buy the same quantity regardless of the price. When a tax is imposed on sellers, they can pass the full amount of the tax onto consumers in the form of a higher price without losing any sales quantity. Therefore, buyers bear the entire tax burden."
+          "explanation": "Perfectly inelastic demand means consumers will buy the same quantity regardless of the price. When a tax is imposed on sellers, they can pass the full amount of the tax onto consumers in the form of a higher price without losing any sales quantity. Therefore, buyers bear the entire tax burden.",
+        "videoExplanation": null
         },
         {
           "id": 214,
@@ -7359,7 +7737,8 @@ export const allQuestions: QuestionType[] = [
             "An elimination of deadweight loss in the market."
           ],
           "correctAnswer": "B",
-          "explanation": "An effective price floor is set above the equilibrium price, causing quantity supplied to exceed quantity demanded (a surplus). Sellers who can sell at the higher price benefit (increased producer surplus for them), but overall market efficiency decreases (deadweight loss), and consumer surplus decreases."
+          "explanation": "An effective price floor is set above the equilibrium price, causing quantity supplied to exceed quantity demanded (a surplus). Sellers who can sell at the higher price benefit (increased producer surplus for them), but overall market efficiency decreases (deadweight loss), and consumer surplus decreases.",
+        "videoExplanation": null
         },
         {
           "id": 215,
@@ -7377,7 +7756,8 @@ export const allQuestions: QuestionType[] = [
             "Price will decrease; Quantity effect is indeterminate."
           ],
           "correctAnswer": "C",
-          "explanation": "The buyer subsidy increases demand (shifts right), putting upward pressure on price and quantity. The decrease in battery costs increases supply (shifts right), putting downward pressure on price and upward pressure on quantity. Both effects increase equilibrium quantity. However, the effect on equilibrium price is indeterminate because the demand shift pushes price up while the supply shift pushes price down."
+          "explanation": "The buyer subsidy increases demand (shifts right), putting upward pressure on price and quantity. The decrease in battery costs increases supply (shifts right), putting downward pressure on price and upward pressure on quantity. Both effects increase equilibrium quantity. However, the effect on equilibrium price is indeterminate because the demand shift pushes price up while the supply shift pushes price down.",
+        "videoExplanation": null
         },
         {
           "id": 216,
@@ -7395,7 +7775,8 @@ export const allQuestions: QuestionType[] = [
             "The price elasticity of demand equals the price elasticity of supply."
           ],
           "correctAnswer": "C",
-          "explanation": "Total economic surplus, the sum of consumer surplus and producer surplus, represents the total net benefit to society from market activity. This surplus is maximized at the competitive equilibrium quantity where the marginal benefit to consumers equals the marginal cost to producers, indicating allocative efficiency."
+          "explanation": "Total economic surplus, the sum of consumer surplus and producer surplus, represents the total net benefit to society from market activity. This surplus is maximized at the competitive equilibrium quantity where the marginal benefit to consumers equals the marginal cost to producers, indicating allocative efficiency.",
+        "videoExplanation": null
         }, 
           {
             "id": 217,
@@ -7413,7 +7794,8 @@ export const allQuestions: QuestionType[] = [
               "Wage rate paid to experienced accountants."
             ],
             "correctAnswer": "C",
-            "explanation": "Derived demand means the demand for a factor of production (like accountants' labor) is derived from the demand for the good or service that factor produces (accounting services)."
+            "explanation": "Derived demand means the demand for a factor of production (like accountants' labor) is derived from the demand for the good or service that factor produces (accounting services).",
+          "videoExplanation": null
           },
           {
             "id": 218,
@@ -7431,7 +7813,8 @@ export const allQuestions: QuestionType[] = [
               "Marginal factor cost"
             ],
             "correctAnswer": "C",
-            "explanation": "Marginal product (specifically, marginal product of labor in this case) measures the change in total output resulting from hiring one additional unit of labor."
+            "explanation": "Marginal product (specifically, marginal product of labor in this case) measures the change in total output resulting from hiring one additional unit of labor.",
+          "videoExplanation": null
           },
           {
             "id": 219,
@@ -7449,7 +7832,8 @@ export const allQuestions: QuestionType[] = [
               "Marginal cost of the product"
             ],
             "correctAnswer": "D",
-            "explanation": "Marginal Revenue Product (MRP) is the change in total revenue from employing one more unit of an input. MRP = Marginal Product (MP) x Marginal Revenue (MR). In a perfectly competitive product market, MR equals the product's price (P). Therefore, MRP = MP x P."
+            "explanation": "Marginal Revenue Product (MRP) is the change in total revenue from employing one more unit of an input. MRP = Marginal Product (MP) x Marginal Revenue (MR). In a perfectly competitive product market, MR equals the product's price (P). Therefore, MRP = MP x P.",
+          "videoExplanation": null
           },
           {
             "id": 220,
@@ -7461,13 +7845,14 @@ export const allQuestions: QuestionType[] = [
             "image": null,
             "options": [
               "Marginal product equals its price.",
-              "Marginal revenue product equals its price (marginal factor cost).", // Correct
+              "Marginal revenue product equals the wage rate.", // Correct
               "Average product equals its price.",
               "Marginal product equals marginal revenue product.",
               "Price equals the firm's marginal revenue."
             ],
             "correctAnswer": "B",
-            "explanation": "The profit-maximization rule for hiring inputs is to employ units until the Marginal Revenue Product (MRP) of the input equals its Marginal Factor Cost (MFC). In a perfectly competitive factor market, the MFC is simply the market price (e.g., wage rate) of the input."
+            "explanation": "The profit-maximization rule for hiring inputs is to employ units until the Marginal Revenue Product (MRP) of the input equals its Marginal Factor Cost (MFC). In a perfectly competitive factor market, the MFC is simply the market price (e.g., wage rate) of the input.",
+          "videoExplanation": null
           },
           {
             "id": 221,
@@ -7485,7 +7870,8 @@ export const allQuestions: QuestionType[] = [
               "A decrease in both demand and supply of labor."
             ],
             "correctAnswer": "D",
-            "explanation": "Increased labor productivity means each worker produces more output (higher Marginal Product). This increases the Marginal Revenue Product (MRP = MP x P) of labor, causing the demand curve for labor (which is the MRP curve) to shift to the right."
+            "explanation": "Increased labor productivity means each worker produces more output (higher Marginal Product). This increases the Marginal Revenue Product (MRP = MP x P) of labor, causing the demand curve for labor (which is the MRP curve) to shift to the right.",
+          "videoExplanation": null
           },
           {
             "id": 222,
@@ -7503,7 +7889,8 @@ export const allQuestions: QuestionType[] = [
               "An increase in the productivity of coal miners."
             ],
             "correctAnswer": "D",
-            "explanation": "A decrease in the demand for the final product (coal) leads to a decrease in the derived demand for the labor used to produce it (coal miners). This leftward shift in the labor demand curve results in a lower equilibrium wage rate and lower employment."
+            "explanation": "A decrease in the demand for the final product (coal) leads to a decrease in the derived demand for the labor used to produce it (coal miners). This leftward shift in the labor demand curve results in a lower equilibrium wage rate and lower employment.",
+          "videoExplanation": null
           },
           {
             "id": 223,
@@ -7521,7 +7908,8 @@ export const allQuestions: QuestionType[] = [
               "100 units" // Correct
             ],
             "correctAnswer": "E",
-            "explanation": "The least-cost combination rule states that MP_L / P_L = MP_K / P_K. Plugging in the values: 40 / $20 = MP_K / $50. This simplifies to 2 = MP_K / $50. Solving for MP_K gives MP_K = 2 * $50 = 100 units."
+            "explanation": "The least-cost combination rule states that MP_L / P_L = MP_K / P_K. Plugging in the values: 40 / $20 = MP_K / $50. This simplifies to 2 = MP_K / $50. Solving for MP_K gives MP_K = 2 * $50 = 100 units.",
+          "videoExplanation": null
           },
           {
             "id": 224,
@@ -7539,7 +7927,8 @@ export const allQuestions: QuestionType[] = [
               "Make no change to input usage." // Short distractor
             ],
             "correctAnswer": "A",
-            "explanation": "The least-cost rule requires the marginal product per dollar spent to be equal across all inputs (MP_L/P_L = MP_K/P_K). Since the MP per dollar for labor (5) is greater than for capital (3), the firm gets more 'bang for its buck' from labor. It should substitute towards labor and away from capital until the ratios are equal."
+            "explanation": "The least-cost rule requires the marginal product per dollar spent to be equal across all inputs (MP_L/P_L = MP_K/P_K). Since the MP per dollar for labor (5) is greater than for capital (3), the firm gets more 'bang for its buck' from labor. It should substitute towards labor and away from capital until the ratios are equal.",
+          "videoExplanation": null
           },
           {
             "id": 225,
@@ -7557,7 +7946,8 @@ export const allQuestions: QuestionType[] = [
               "Monopsony" // Correct
             ],
             "correctAnswer": "E",
-            "explanation": "A monopsony is a market structure where there is only one buyer for a particular input (factor of production). This gives the buyer significant market power over the price paid for the input."
+            "explanation": "A monopsony is a market structure where there is only one buyer for a particular input (factor of production). This gives the buyer significant market power over the price paid for the input.",
+          "videoExplanation": null
           },
           {
             "id": 226,
@@ -7575,7 +7965,8 @@ export const allQuestions: QuestionType[] = [
               "Perfectly elastic."
             ],
             "correctAnswer": "C",
-            "explanation": "Because a monopsonist faces an upward-sloping labor supply curve, it must offer a higher wage to attract additional workers. Crucially, it must pay this higher wage to all existing workers as well, not just the new one. This makes the cost of hiring one more worker (MFC) greater than the wage paid to that worker."
+            "explanation": "Because a monopsonist faces an upward-sloping labor supply curve, it must offer a higher wage to attract additional workers. Crucially, it must pay this higher wage to all existing workers as well, not just the new one. This makes the cost of hiring one more worker (MFC) greater than the wage paid to that worker.",
+          "videoExplanation": null
           },
           {
             "id": 227,
@@ -7593,7 +7984,8 @@ export const allQuestions: QuestionType[] = [
               "The same number of workers but pay a lower wage."
             ],
             "correctAnswer": "D",
-            "explanation": "A monopsonist maximizes profit by hiring where MRP = MFC. Since MFC is above the labor supply curve, this intersection occurs at a lower quantity of labor compared to the competitive outcome (where MRP = Supply = Wage). The monopsonist then pays the lower wage indicated by the supply curve at that reduced quantity."
+            "explanation": "A monopsonist maximizes profit by hiring where MRP = MFC. Since MFC is above the labor supply curve, this intersection occurs at a lower quantity of labor compared to the competitive outcome (where MRP = Supply = Wage). The monopsonist then pays the lower wage indicated by the supply curve at that reduced quantity.",
+          "videoExplanation": null
           },
           {
             "id": 228,
@@ -7611,7 +8003,8 @@ export const allQuestions: QuestionType[] = [
               "$3.33 per hour"
             ],
             "correctAnswer": "D",
-            "explanation": "Marginal Revenue Product (MRP) = Marginal Product (MP) x Price (P). MRP = 10 widgets/hour * $3/widget = $30 per hour."
+            "explanation": "Marginal Revenue Product (MRP) = Marginal Product (MP) x Price (P). MRP = 10 widgets/hour * $3/widget = $30 per hour.",
+          "videoExplanation": null
           },
           {
             "id": 229,
@@ -7629,7 +8022,8 @@ export const allQuestions: QuestionType[] = [
               "Decrease the wage rate it pays."
             ],
             "correctAnswer": "B",
-            "explanation": "A firm maximizes profit by hiring labor until MRP = Wage (MFC). Here, MRP ($20) < Wage ($25). The cost of the last worker ($25) is greater than the revenue they generate ($20). The firm should reduce employment until MRP equals the wage."
+            "explanation": "A firm maximizes profit by hiring labor until MRP = Wage (MFC). Here, MRP ($20) < Wage ($25). The cost of the last worker ($25) is greater than the revenue they generate ($20). The firm should reduce employment until MRP equals the wage.",
+          "videoExplanation": null
           },
           {
             "id": 230,
@@ -7647,7 +8041,8 @@ export const allQuestions: QuestionType[] = [
               "A decrease in the number of substitute inputs available." // Longer distractor
             ],
             "correctAnswer": "D",
-            "explanation": "The demand for labor is generally more elastic in the long run than in the short run. Over longer periods, firms have more time to adjust production processes and substitute between inputs (like capital and labor) in response to wage changes."
+            "explanation": "The demand for labor is generally more elastic in the long run than in the short run. Over longer periods, firms have more time to adjust production processes and substitute between inputs (like capital and labor) in response to wage changes.",
+          "videoExplanation": null
           },
           {
             "id": 231,
@@ -7665,7 +8060,8 @@ export const allQuestions: QuestionType[] = [
               "Demand and Supply remain unchanged, Wage decreases."
             ],
             "correctAnswer": "B",
-            "explanation": "Increased productivity shifts the labor demand curve right (higher MRP). The training might increase the desirability/qualification (shifting supply left) or attract more workers (shifting supply right). However, the strong increase in demand due to higher productivity generally leads to an increase in the equilibrium wage, regardless of the exact supply shift."
+            "explanation": "Increased productivity shifts the labor demand curve right (higher MRP). The training might increase the desirability/qualification (shifting supply left) or attract more workers (shifting supply right). However, the strong increase in demand due to higher productivity generally leads to an increase in the equilibrium wage, regardless of the exact supply shift.",
+          "videoExplanation": null
           },
           {
             "id": 232,
@@ -7683,7 +8079,8 @@ export const allQuestions: QuestionType[] = [
               "The current combination, as it is already optimal."
             ],
             "correctAnswer": "C",
-            "explanation": "The condition MPk/Pk > MPl/Pl means the firm gets more marginal product per dollar spent on capital than on labor. To minimize cost for a given output, the firm should substitute towards the relatively more productive input (per dollar) and away from the relatively less productive input. Thus, it should use more capital and less labor."
+            "explanation": "The condition MPk/Pk > MPl/Pl means the firm gets more marginal product per dollar spent on capital than on labor. To minimize cost for a given output, the firm should substitute towards the relatively more productive input (per dollar) and away from the relatively less productive input. Thus, it should use more capital and less labor.",
+          "videoExplanation": null
           },
           {
             "id": 233,
@@ -7701,7 +8098,8 @@ export const allQuestions: QuestionType[] = [
               "A need to pay workers their marginal revenue product."
             ],
             "correctAnswer": "C",
-            "explanation": "A perfectly competitive firm faces a perfectly elastic (horizontal) labor supply at the market wage. A monopsonist, being the sole buyer, faces the entire upward-sloping market labor supply curve, meaning it must raise wages to attract more workers."
+            "explanation": "A perfectly competitive firm faces a perfectly elastic (horizontal) labor supply at the market wage. A monopsonist, being the sole buyer, faces the entire upward-sloping market labor supply curve, meaning it must raise wages to attract more workers.",
+          "videoExplanation": null
           },
           {
             "id": 234,
@@ -7719,7 +8117,8 @@ export const allQuestions: QuestionType[] = [
               "The effect is indeterminate without knowing the output effect's strength." // Longer, plausible distractor
             ],
             "correctAnswer": "B",
-            "explanation": "When the price of a substitute input (capital) falls, firms have an incentive to substitute away from the relatively more expensive input (labor) towards the cheaper input (capital). This substitution effect causes the demand for labor to decrease (shift left)."
+            "explanation": "When the price of a substitute input (capital) falls, firms have an incentive to substitute away from the relatively more expensive input (labor) towards the cheaper input (capital). This substitution effect causes the demand for labor to decrease (shift left).",
+          "videoExplanation": null
           },
           {
             "id": 235,
@@ -7737,7 +8136,8 @@ export const allQuestions: QuestionType[] = [
               "Operating in a monopsony market."
             ],
             "correctAnswer": "B",
-            "explanation": "The firm's Marginal Revenue Product (MRP) = MP x P = 5 x $10 = $50. The Marginal Factor Cost (MFC) is the wage rate, $60. Since MRP ($50) < MFC ($60), the cost of the last worker exceeds the revenue generated. The firm should hire fewer workers."
+            "explanation": "The firm's Marginal Revenue Product (MRP) = MP x P = 5 x $10 = $50. The Marginal Factor Cost (MFC) is the wage rate, $60. Since MRP ($50) < MFC ($60), the cost of the last worker exceeds the revenue generated. The firm should hire fewer workers.",
+          "videoExplanation": null
           },
           {
             "id": 236,
@@ -7755,7 +8155,8 @@ export const allQuestions: QuestionType[] = [
               "Increasing both labor demand and labor supply, making the wage effect indeterminate." // Longer distractor
             ],
             "correctAnswer": "C",
-            "explanation": "Immigration increases the number of available workers at any given wage rate, shifting the labor supply curve to the right. Assuming labor demand remains unchanged, this leads to a lower equilibrium wage rate and higher equilibrium employment."
+            "explanation": "Immigration increases the number of available workers at any given wage rate, shifting the labor supply curve to the right. Assuming labor demand remains unchanged, this leads to a lower equilibrium wage rate and higher equilibrium employment.",
+          "videoExplanation": null
           }, 
             {
               "id": 237,
@@ -7773,7 +8174,8 @@ export const allQuestions: QuestionType[] = [
                 "The presence of variable inputs in production."
               ],
               "correctAnswer": "C",
-              "explanation": "Perfectly competitive firms are price takers, meaning they accept the market price. Imperfectly competitive firms (monopoly, oligopoly, monopolistic competition) have some degree of market power, allowing them to influence price."
+              "explanation": "Perfectly competitive firms are price takers, meaning they accept the market price. Imperfectly competitive firms (monopoly, oligopoly, monopolistic competition) have some degree of market power, allowing them to influence price.",
+            "videoExplanation": null
             },
             {
               "id": 238,
@@ -7791,7 +8193,8 @@ export const allQuestions: QuestionType[] = [
                 "Monopolistic competition and oligopoly."
               ],
               "correctAnswer": "D",
-              "explanation": "Barriers to entry, which prevent or discourage new firms from entering a market, are defining features of both oligopoly (significant barriers) and monopoly (high or complete barriers). Perfect and monopolistic competition feature low or no significant barriers to entry."
+              "explanation": "Barriers to entry, which prevent or discourage new firms from entering a market, are defining features of both oligopoly (significant barriers) and monopoly (high or complete barriers). Perfect and monopolistic competition feature low or no significant barriers to entry.",
+            "videoExplanation": null
             },
             {
               "id": 239,
@@ -7809,7 +8212,8 @@ export const allQuestions: QuestionType[] = [
                 "Because average total cost is decreasing due to economies of scale." // Longer distractor
               ],
               "correctAnswer": "D",
-              "explanation": "A monopolist faces the downward-sloping market demand curve. To sell one more unit, it must lower the price not only for that unit but for all preceding units as well (price effect). This means the additional revenue gained (marginal revenue) is less than the price of the last unit sold."
+              "explanation": "A monopolist faces the downward-sloping market demand curve. To sell one more unit, it must lower the price not only for that unit but for all preceding units as well (price effect). This means the additional revenue gained (marginal revenue) is less than the price of the last unit sold.",
+            "videoExplanation": null
             },
             {
               "id": 240,
@@ -7827,7 +8231,8 @@ export const allQuestions: QuestionType[] = [
                 "Price equals minimum average total cost."
               ],
               "correctAnswer": "B",
-              "explanation": "Like all profit-maximizing firms, a monopolist produces the quantity where marginal revenue (MR) equals marginal cost (MC). The price is then determined by finding the point on the demand curve corresponding to that quantity."
+              "explanation": "Like all profit-maximizing firms, a monopolist produces the quantity where marginal revenue (MR) equals marginal cost (MC). The price is then determined by finding the point on the demand curve corresponding to that quantity.",
+            "videoExplanation": null
             },
             {
               "id": 241,
@@ -7845,7 +8250,8 @@ export const allQuestions: QuestionType[] = [
                 "More output and charges a higher price."
               ],
               "correctAnswer": "B",
-              "explanation": "Allocative efficiency occurs where Price (reflecting marginal benefit) equals Marginal Cost. A single-price monopolist maximizes profit where MR = MC, which occurs at a lower quantity than where P = MC. The monopolist then charges a price higher than MC, leading to underproduction relative to the social optimum and deadweight loss."
+              "explanation": "Allocative efficiency occurs where Price (reflecting marginal benefit) equals Marginal Cost. A single-price monopolist maximizes profit where MR = MC, which occurs at a lower quantity than where P = MC. The monopolist then charges a price higher than MC, leading to underproduction relative to the social optimum and deadweight loss.",
+            "videoExplanation": null
             },
             {
               "id": 242,
@@ -7863,7 +8269,8 @@ export const allQuestions: QuestionType[] = [
                 "Barriers to entry are created by government patents."
               ],
               "correctAnswer": "B",
-              "explanation": "A natural monopoly arises when economies of scale are so significant that one firm can supply the entire market at a lower average total cost than two or more firms could. This implies the long-run average total cost curve is downward sloping over the entire range of market demand."
+              "explanation": "A natural monopoly arises when economies of scale are so significant that one firm can supply the entire market at a lower average total cost than two or more firms could. This implies the long-run average total cost curve is downward sloping over the entire range of market demand.",
+            "videoExplanation": null
             },
             {
               "id": 243,
@@ -7881,7 +8288,8 @@ export const allQuestions: QuestionType[] = [
                 "The firm must produce where marginal revenue equals zero."
               ],
               "correctAnswer": "C",
-              "explanation": "To successfully price discriminate, a firm needs market power, the ability to segment its customers based on willingness to pay (different elasticities), and crucially, the ability to prevent low-price buyers from reselling the product to high-price buyers (arbitrage)."
+              "explanation": "To successfully price discriminate, a firm needs market power, the ability to segment its customers based on willingness to pay (different elasticities), and crucially, the ability to prevent low-price buyers from reselling the product to high-price buyers (arbitrage).",
+            "videoExplanation": null
             },
             {
               "id": 244,
@@ -7899,7 +8307,8 @@ export const allQuestions: QuestionType[] = [
                 "A price based on the elasticity of supply."
               ],
               "correctAnswer": "D",
-              "explanation": "Perfect price discrimination involves charging every single customer the highest price they are willing to pay for each unit consumed. This allows the firm to capture all consumer surplus as profit and produce the allocatively efficient quantity."
+              "explanation": "Perfect price discrimination involves charging every single customer the highest price they are willing to pay for each unit consumed. This allows the firm to capture all consumer surplus as profit and produce the allocatively efficient quantity.",
+            "videoExplanation": null
             },
             {
               "id": 245,
@@ -7917,7 +8326,8 @@ export const allQuestions: QuestionType[] = [
                 "Monopsony"
               ],
               "correctAnswer": "D",
-              "explanation": "Monopolistic competition features a large number of firms, low barriers to entry and exit (similar to perfect competition), but crucially, firms sell products that are differentiated through branding, features, or location, giving them some degree of market power."
+              "explanation": "Monopolistic competition features a large number of firms, low barriers to entry and exit (similar to perfect competition), but crucially, firms sell products that are differentiated through branding, features, or location, giving them some degree of market power.",
+            "videoExplanation": null
             },
             {
               "id": 246,
@@ -7935,7 +8345,8 @@ export const allQuestions: QuestionType[] = [
                 "Price equals minimum average variable cost and profits are maximized."
               ],
               "correctAnswer": "C",
-              "explanation": "Due to easy entry, monopolistically competitive firms earn zero economic profit in the long run, meaning price equals average total cost (P = ATC). However, because they face a downward-sloping demand curve due to product differentiation, they maximize profit where MR = MC, which occurs at an output where P > MC. They also typically operate with excess capacity (not at minimum ATC)."
+              "explanation": "Due to easy entry, monopolistically competitive firms earn zero economic profit in the long run, meaning price equals average total cost (P = ATC). However, because they face a downward-sloping demand curve due to product differentiation, they maximize profit where MR = MC, which occurs at an output where P > MC. They also typically operate with excess capacity (not at minimum ATC).",
+            "videoExplanation": null
             },
             {
               "id": 247,
@@ -7953,7 +8364,8 @@ export const allQuestions: QuestionType[] = [
                 "Oligopoly and monopoly."
               ],
               "correctAnswer": "C",
-              "explanation": "Product differentiation, where firms distinguish their products from competitors' through branding, quality, features, or service, is central to monopolistic competition. It can also exist in oligopolies, although some oligopolies may feature homogeneous products."
+              "explanation": "Product differentiation, where firms distinguish their products from competitors' through branding, quality, features, or service, is central to monopolistic competition. It can also exist in oligopolies, although some oligopolies may feature homogeneous products.",
+            "videoExplanation": null
             },
             {
               "id": 248,
@@ -7971,7 +8383,8 @@ export const allQuestions: QuestionType[] = [
                 "An output level where price equals marginal cost exactly."
               ],
               "correctAnswer": "B",
-              "explanation": "In long-run equilibrium, a monopolistically competitive firm operates where P = ATC on the downward-sloping portion of its ATC curve, not at the minimum point of ATC. This means it produces less output than the quantity that would achieve productive efficiency (minimum ATC), resulting in excess capacity."
+              "explanation": "In long-run equilibrium, a monopolistically competitive firm operates where P = ATC on the downward-sloping portion of its ATC curve, not at the minimum point of ATC. This means it produces less output than the quantity that would achieve productive efficiency (minimum ATC), resulting in excess capacity.",
+            "videoExplanation": null
             },
             {
               "id": 249,
@@ -7989,7 +8402,8 @@ export const allQuestions: QuestionType[] = [
                 "Demand being perfectly elastic for each individual firm."
               ],
               "correctAnswer": "D",
-              "explanation": "Oligopoly is defined by a few dominant firms where each firm's actions (regarding price, output, advertising) significantly affect its rivals, and each firm considers these rivals' potential reactions when making decisions. This is known as strategic interdependence."
+              "explanation": "Oligopoly is defined by a few dominant firms where each firm's actions (regarding price, output, advertising) significantly affect its rivals, and each firm considers these rivals' potential reactions when making decisions. This is known as strategic interdependence.",
+            "videoExplanation": null
             },
             {
               "id": 250,
@@ -8007,7 +8421,8 @@ export const allQuestions: QuestionType[] = [
                 "A perfectly competitive alliance"
               ],
               "correctAnswer": "C",
-              "explanation": "A cartel is an explicit agreement among competing firms, typically in an oligopoly, to fix prices, limit output, or divide markets, effectively attempting to act collectively as a monopoly to maximize joint profits. Such agreements are often illegal."
+              "explanation": "A cartel is an explicit agreement among competing firms, typically in an oligopoly, to fix prices, limit output, or divide markets, effectively attempting to act collectively as a monopoly to maximize joint profits. Such agreements are often illegal.",
+            "videoExplanation": null
             },
             {
               "id": 251,
@@ -8025,7 +8440,8 @@ export const allQuestions: QuestionType[] = [
                 "Changes depending on the rival player's anticipated move." // Longer distractor
               ],
               "correctAnswer": "B",
-              "explanation": "A dominant strategy exists for a player if that strategy yields a better payoff than any other strategy they could choose, no matter what strategy the opposing player selects."
+              "explanation": "A dominant strategy exists for a player if that strategy yields a better payoff than any other strategy they could choose, no matter what strategy the opposing player selects.",
+            "videoExplanation": null
             },
             {
               "id": 252,
@@ -8043,7 +8459,8 @@ export const allQuestions: QuestionType[] = [
                 "Both players agree to cooperate before making their choices."
               ],
               "correctAnswer": "C",
-              "explanation": "A Nash equilibrium represents a stable outcome where each player is doing the best they can (maximizing their own payoff) given the actions of all other players. No player has an incentive to deviate from their chosen strategy alone."
+              "explanation": "A Nash equilibrium represents a stable outcome where each player is doing the best they can (maximizing their own payoff) given the actions of all other players. No player has an incentive to deviate from their chosen strategy alone.",
+            "videoExplanation": null
             },
             {
               "id": 253,
@@ -8061,7 +8478,8 @@ export const allQuestions: QuestionType[] = [
                 "Significant barriers to entry prevent competition completely." // Longer distractor
               ],
               "correctAnswer": "C",
-              "explanation": "Allocative efficiency occurs when resources are allocated such that Price (representing marginal social benefit) equals Marginal Cost. Imperfectly competitive firms maximize profit where MR = MC, but because their demand curve is downward sloping (P > MR), they produce where P > MC, meaning the value society places on the last unit exceeds the cost of producing it."
+              "explanation": "Allocative efficiency occurs when resources are allocated such that Price (representing marginal social benefit) equals Marginal Cost. Imperfectly competitive firms maximize profit where MR = MC, but because their demand curve is downward sloping (P > MR), they produce where P > MC, meaning the value society places on the last unit exceeds the cost of producing it.",
+            "videoExplanation": null
             },
             {
               "id": 254,
@@ -8079,7 +8497,8 @@ export const allQuestions: QuestionType[] = [
                 "Demand is unit elastic." // Closely related, but MR=0 is the direct rule
               ],
               "correctAnswer": "B",
-              "explanation": "Total revenue is maximized when producing one more unit adds zero additional revenue, which means marginal revenue (MR) is equal to zero. This typically occurs at the midpoint of a linear demand curve, where demand is unit elastic."
+              "explanation": "Total revenue is maximized when producing one more unit adds zero additional revenue, which means marginal revenue (MR) is equal to zero. This typically occurs at the midpoint of a linear demand curve, where demand is unit elastic.",
+            "videoExplanation": null
             },
             {
               "id": 255,
@@ -8097,7 +8516,8 @@ export const allQuestions: QuestionType[] = [
                 "A lower price and produce less output."
               ],
               "correctAnswer": "C",
-              "explanation": "Both firms earn zero economic profit in the long run (P=ATC). However, the monopolistically competitive firm faces a downward-sloping demand curve and operates with excess capacity (not at min ATC), resulting in P > MC and typically a lower quantity and higher price compared to the perfectly competitive outcome where P = MC = min ATC."
+              "explanation": "Both firms earn zero economic profit in the long run (P=ATC). However, the monopolistically competitive firm faces a downward-sloping demand curve and operates with excess capacity (not at min ATC), resulting in P > MC and typically a lower quantity and higher price compared to the perfectly competitive outcome where P = MC = min ATC.",
+            "videoExplanation": null
             },
             {
               "id": 256,
@@ -8115,7 +8535,8 @@ export const allQuestions: QuestionType[] = [
                 "Natural monopoly"
               ],
               "correctAnswer": "C",
-              "explanation": "Strategic interdependence, where firms must consider the actions and reactions of their few competitors when making decisions about price, output, or advertising, is the hallmark of an oligopoly."
+              "explanation": "Strategic interdependence, where firms must consider the actions and reactions of their few competitors when making decisions about price, output, or advertising, is the hallmark of an oligopoly.",
+            "videoExplanation": null
             }, 
               {
                 "id": 257,
@@ -8133,7 +8554,8 @@ export const allQuestions: QuestionType[] = [
                   "A U.S. resident receives a dividend payment from a foreign company."
                 ],
                 "correctAnswer": "A",
-                "explanation": "The current account records flows of goods, services, income, and transfers. Spending by U.S. residents on foreign goods or services (like tourism abroad) represents an import of services and is recorded as a debit (outflow of funds) in the U.S. current account."
+                "explanation": "The current account records flows of goods, services, income, and transfers. Spending by U.S. residents on foreign goods or services (like tourism abroad) represents an import of services and is recorded as a debit (outflow of funds) in the U.S. current account.",
+              "videoExplanation": null
               },
               {
                 "id": 258,
@@ -8151,7 +8573,8 @@ export const allQuestions: QuestionType[] = [
                   "Net unilateral transfers."
                 ],
                 "correctAnswer": "D",
-                "explanation": "The financial account records transactions involving the purchase and sale of financial and real assets, such as stocks, bonds, and direct investments. A surplus occurs when foreign purchases of domestic assets exceed domestic purchases of foreign assets (a net capital inflow)."
+                "explanation": "The financial account records transactions involving the purchase and sale of financial and real assets, such as stocks, bonds, and direct investments. A surplus occurs when foreign purchases of domestic assets exceed domestic purchases of foreign assets (a net capital inflow).",
+              "videoExplanation": null
               },
               {
                 "id": 259,
@@ -8169,7 +8592,8 @@ export const allQuestions: QuestionType[] = [
                   "Its net investment income from abroad is positive."
                 ],
                 "correctAnswer": "C",
-                "explanation": "A financial account surplus means that the inflow of funds from foreigners buying the country's assets is greater than the outflow of funds from residents buying foreign assets. This represents a net inflow of financial capital."
+                "explanation": "A financial account surplus means that the inflow of funds from foreigners buying the country's assets is greater than the outflow of funds from residents buying foreign assets. This represents a net inflow of financial capital.",
+              "videoExplanation": null
               },
               {
                 "id": 260,
@@ -8187,7 +8611,8 @@ export const allQuestions: QuestionType[] = [
                   "Relative price levels must have changed." // Longer distractor
                 ],
                 "correctAnswer": "C",
-                "explanation": "Previously, $1 could buy 110 yen. Now, $1 can only buy 100 yen. This means the dollar has weakened, or depreciated, relative to the yen. Conversely, the yen has appreciated relative to the dollar."
+                "explanation": "Previously, $1 could buy 110 yen. Now, $1 can only buy 100 yen. This means the dollar has weakened, or depreciated, relative to the yen. Conversely, the yen has appreciated relative to the dollar.",
+              "videoExplanation": null
               },
               {
                 "id": 261,
@@ -8205,7 +8630,8 @@ export const allQuestions: QuestionType[] = [
                   "Causing no change in either market initially." // Short distractor
                 ],
                 "correctAnswer": "C",
-                "explanation": "To buy more Mexican goods, US consumers need pesos. They supply US dollars to the foreign exchange market to buy pesos. This increases the supply of dollars and simultaneously increases the demand for pesos."
+                "explanation": "To buy more Mexican goods, US consumers need pesos. They supply US dollars to the foreign exchange market to buy pesos. This increases the supply of dollars and simultaneously increases the demand for pesos.",
+              "videoExplanation": null
               },
               {
                 "id": 262,
@@ -8223,7 +8649,8 @@ export const allQuestions: QuestionType[] = [
                   "A decrease in the European price level relative to the US."
                 ],
                 "correctAnswer": "B",
-                "explanation": "A decrease in incomes in the United States would lead US consumers to buy fewer goods overall, including fewer imports from the Eurozone. This reduced demand for European goods translates into a decreased demand for Euros needed to purchase them, shifting the demand curve for Euros left."
+                "explanation": "A decrease in incomes in the United States would lead US consumers to buy fewer goods overall, including fewer imports from the Eurozone. This reduced demand for European goods translates into a decreased demand for Euros needed to purchase them, shifting the demand curve for Euros left.",
+              "videoExplanation": null
               },
               {
                 "id": 263,
@@ -8241,7 +8668,8 @@ export const allQuestions: QuestionType[] = [
                   "Both currencies will depreciate against a third currency." // Longer distractor
                 ],
                 "correctAnswer": "C",
-                "explanation": "Higher inflation in Country A makes its goods relatively more expensive. This reduces foreign demand for A's goods (decreasing demand for A's currency) and increases A's residents' demand for relatively cheaper foreign goods (increasing supply of A's currency). Both effects cause Country A's currency to depreciate."
+                "explanation": "Higher inflation in Country A makes its goods relatively more expensive. This reduces foreign demand for A's goods (decreasing demand for A's currency) and increases A's residents' demand for relatively cheaper foreign goods (increasing supply of A's currency). Both effects cause Country A's currency to depreciate.",
+              "videoExplanation": null
               },
               {
                 "id": 264,
@@ -8259,7 +8687,8 @@ export const allQuestions: QuestionType[] = [
                   "Interest rates unchanged; Dollar depreciates."
                 ],
                 "correctAnswer": "B",
-                "explanation": "Expansionary monetary policy lowers nominal and real interest rates in the short run. Lower real interest rates reduce the demand for U.S. assets by foreign investors (decreasing demand for dollars) and increase U.S. investors' demand for foreign assets (increasing supply of dollars), causing the dollar to depreciate."
+                "explanation": "Expansionary monetary policy lowers nominal and real interest rates in the short run. Lower real interest rates reduce the demand for U.S. assets by foreign investors (decreasing demand for dollars) and increase U.S. investors' demand for foreign assets (increasing supply of dollars), causing the dollar to depreciate.",
+              "videoExplanation": null
               },
               {
                 "id": 265,
@@ -8277,7 +8706,8 @@ export const allQuestions: QuestionType[] = [
                   "No change in real interest rates, but currency depreciation."
                 ],
                 "correctAnswer": "D",
-                "explanation": "Increased government borrowing increases the demand for loanable funds, raising real interest rates. Higher real interest rates attract foreign financial capital (inflow), increasing the demand for the domestic currency and causing it to appreciate."
+                "explanation": "Increased government borrowing increases the demand for loanable funds, raising real interest rates. Higher real interest rates attract foreign financial capital (inflow), increasing the demand for the domestic currency and causing it to appreciate.",
+              "videoExplanation": null
               },
               {
                 "id": 266,
@@ -8295,7 +8725,8 @@ export const allQuestions: QuestionType[] = [
                   "The U.S. sends foreign aid to Egypt."
                 ],
                 "correctAnswer": "C",
-                "explanation": "A financial capital inflow occurs when foreign entities purchase domestic assets. A Japanese bank buying U.S. Treasury bonds represents foreigners acquiring U.S. financial assets, resulting in an inflow of funds to the U.S. financial account."
+                "explanation": "A financial capital inflow occurs when foreign entities purchase domestic assets. A Japanese bank buying U.S. Treasury bonds represents foreigners acquiring U.S. financial assets, resulting in an inflow of funds to the U.S. financial account.",
+              "videoExplanation": null
               },
               {
                 "id": 267,
@@ -8313,7 +8744,8 @@ export const allQuestions: QuestionType[] = [
                   "Aggregate demand will decrease due to resulting higher interest rates." // Longer distractor
                 ],
                 "correctAnswer": "B",
-                "explanation": "An appreciating dollar makes U.S. exports more expensive for foreigners (decreasing exports) and makes imports cheaper for U.S. residents (increasing imports). The resulting decrease in net exports (X-M) reduces aggregate demand."
+                "explanation": "An appreciating dollar makes U.S. exports more expensive for foreigners (decreasing exports) and makes imports cheaper for U.S. residents (increasing imports). The resulting decrease in net exports (X-M) reduces aggregate demand.",
+              "videoExplanation": null
               },
               {
                 "id": 268,
@@ -8331,7 +8763,8 @@ export const allQuestions: QuestionType[] = [
                   "Increase the price level only if the central bank intervenes."
                 ],
                 "correctAnswer": "B",
-                "explanation": "Currency depreciation makes exports cheaper and imports more expensive, leading to an increase in net exports. This rise in net exports boosts aggregate demand, putting upward pressure on the domestic price level in the short run."
+                "explanation": "Currency depreciation makes exports cheaper and imports more expensive, leading to an increase in net exports. This rise in net exports boosts aggregate demand, putting upward pressure on the domestic price level in the short run.",
+              "videoExplanation": null
               },
               {
                 "id": 269,
@@ -8349,7 +8782,8 @@ export const allQuestions: QuestionType[] = [
                   "Depreciation of the U.S. dollar."
                 ],
                 "correctAnswer": "D",
-                "explanation": "Higher real returns make U.S. financial assets (like bonds) more attractive to foreign investors compared to assets elsewhere. This increased attractiveness leads to greater demand for these U.S. assets, resulting in financial capital inflows."
+                "explanation": "Higher real returns make U.S. financial assets (like bonds) more attractive to foreign investors compared to assets elsewhere. This increased attractiveness leads to greater demand for these U.S. assets, resulting in financial capital inflows.",
+              "videoExplanation": null
               },
               {
                 "id": 270,
@@ -8367,7 +8801,8 @@ export const allQuestions: QuestionType[] = [
                   "Current account balance minus financial account balance."
                 ],
                 "correctAnswer": "B",
-                "explanation": "Net exports (NX), a component of both the current account and the calculation of GDP via the expenditures approach, is defined as the value of a country's total exports minus the value of its total imports."
+                "explanation": "Net exports (NX), a component of both the current account and the calculation of GDP via the expenditures approach, is defined as the value of a country's total exports minus the value of its total imports.",
+              "videoExplanation": null
               },
               {
                 "id": 271,
@@ -8385,7 +8820,8 @@ export const allQuestions: QuestionType[] = [
                   "Lead to an increase in British exports automatically." // Longer distractor
                 ],
                 "correctAnswer": "B",
-                "explanation": "A decrease in demand for a currency, holding supply constant, means fewer entities want to buy that currency at any given exchange rate. This reduced demand leads to a fall in the equilibrium price (exchange rate) of the currency, meaning it depreciates."
+                "explanation": "A decrease in demand for a currency, holding supply constant, means fewer entities want to buy that currency at any given exchange rate. This reduced demand leads to a fall in the equilibrium price (exchange rate) of the currency, meaning it depreciates.",
+              "videoExplanation": null
               },
               {
                 "id": 272,
@@ -8403,7 +8839,8 @@ export const allQuestions: QuestionType[] = [
                   "$31.00"
                 ],
                 "correctAnswer": "D",
-                "explanation": "To find the dollar cost, multiply the price in Euros by the dollar cost per Euro: Cost in USD = Price in Euros * (USD/Euro) = 20 Euros * ($1.10 / 1 Euro) = $22.00."
+                "explanation": "To find the dollar cost, multiply the price in Euros by the dollar cost per Euro: Cost in USD = Price in Euros * (USD/Euro) = 20 Euros * ($1.10 / 1 Euro) = $22.00.",
+              "videoExplanation": null
               },
               {
                 "id": 273,
@@ -8421,7 +8858,8 @@ export const allQuestions: QuestionType[] = [
                   "The effect is indeterminate as growth affects both imports and capital flows." // Highly plausible distractor
                 ],
                 "correctAnswer": "B",
-                "explanation": "Faster economic growth increases incomes in Country Z. Higher incomes typically lead to increased demand for all goods, including imports. To buy more imports, residents supply more of their own currency, causing it to depreciate (this income effect often outweighs effects from exports or capital flows in basic models)."
+                "explanation": "Faster economic growth increases incomes in Country Z. Higher incomes typically lead to increased demand for all goods, including imports. To buy more imports, residents supply more of their own currency, causing it to depreciate (this income effect often outweighs effects from exports or capital flows in basic models).",
+              "videoExplanation": null
               },
               {
                 "id": 274,
@@ -8439,7 +8877,8 @@ export const allQuestions: QuestionType[] = [
                   "US firms exporting goods to Japan."
                 ],
                 "correctAnswer": "A",
-                "explanation": "When the yen depreciates, it takes fewer dollars to buy a yen. This makes Japanese goods cheaper for US consumers, increasing their purchasing power for those goods."
+                "explanation": "When the yen depreciates, it takes fewer dollars to buy a yen. This makes Japanese goods cheaper for US consumers, increasing their purchasing power for those goods.",
+              "videoExplanation": null
               },
               {
                 "id": 275,
@@ -8457,7 +8896,8 @@ export const allQuestions: QuestionType[] = [
                   "The U.S. government provides aid to Egypt."
                 ],
                 "correctAnswer": "C",
-                "explanation": "The financial account records purchases/sales of assets. When a foreign entity (Mexican company) buys a U.S. asset (manufacturing plant - a form of foreign direct investment), it represents a financial capital inflow to the U.S. and is recorded as a credit in the U.S. financial account."
+                "explanation": "The financial account records purchases/sales of assets. When a foreign entity (Mexican company) buys a U.S. asset (manufacturing plant - a form of foreign direct investment), it represents a financial capital inflow to the U.S. and is recorded as a credit in the U.S. financial account.",
+              "videoExplanation": null
               },
               {
                 "id": 276,
@@ -8475,7 +8915,8 @@ export const allQuestions: QuestionType[] = [
                   "No change until the depreciation actually occurs."
                 ],
                 "correctAnswer": "B",
-                "explanation": "If investors expect the pound to depreciate (lose value), those holding pounds will try to sell them before the value drops, increasing the supply of pounds. Simultaneously, those considering buying pounds will wait, decreasing the demand. Both effects put downward pressure on the pound's current exchange rate, leading to immediate depreciation."
+                "explanation": "If investors expect the pound to depreciate (lose value), those holding pounds will try to sell them before the value drops, increasing the supply of pounds. Simultaneously, those considering buying pounds will wait, decreasing the demand. Both effects put downward pressure on the pound's current exchange rate, leading to immediate depreciation.",
+              "videoExplanation": null
               }, 
                 {
                   "id": 277,
@@ -8493,7 +8934,8 @@ export const allQuestions: QuestionType[] = [
                     "Real interest rates indeterminate; Real GDP decreases." // Longer distractor
                   ],
                   "correctAnswer": "B",
-                  "explanation": "Expansionary fiscal policy (increased spending/lower taxes) tends to increase real interest rates (via loanable funds market) and increase real GDP (via AD). Contractionary monetary policy (selling bonds/raising administered rates) increases real interest rates and decreases real GDP (via AD). Both policies raise interest rates. The effect on real GDP is indeterminate as the policies push it in opposite directions."
+                  "explanation": "Expansionary fiscal policy (increased spending/lower taxes) tends to increase real interest rates (via loanable funds market) and increase real GDP (via AD). Contractionary monetary policy (selling bonds/raising administered rates) increases real interest rates and decreases real GDP (via AD). Both policies raise interest rates. The effect on real GDP is indeterminate as the policies push it in opposite directions.",
+                "videoExplanation": null
                 },
                 {
                   "id": 278,
@@ -8511,7 +8953,8 @@ export const allQuestions: QuestionType[] = [
                     "Increasing taxes and buying government securities."
                   ],
                   "correctAnswer": "C",
-                  "explanation": "Decreasing government spending is contractionary fiscal policy, reducing aggregate demand. Selling government securities (open market sale) is contractionary monetary policy, increasing interest rates and reducing investment/consumption, thus reducing aggregate demand. Both actions reduce aggregate demand."
+                  "explanation": "Decreasing government spending is contractionary fiscal policy, reducing aggregate demand. Selling government securities (open market sale) is contractionary monetary policy, increasing interest rates and reducing investment/consumption, thus reducing aggregate demand. Both actions reduce aggregate demand.",
+                "videoExplanation": null
                 },
                 {
                   "id": 279,
@@ -8529,7 +8972,8 @@ export const allQuestions: QuestionType[] = [
                     "An increase in expected inflation."
                   ],
                   "correctAnswer": "B",
-                  "explanation": "The short-run Phillips curve shows an inverse relationship between inflation and unemployment. A decrease in aggregate demand leads to lower inflation and higher unemployment, corresponding to a movement downward and to the right along the SRPC."
+                  "explanation": "The short-run Phillips curve shows an inverse relationship between inflation and unemployment. A decrease in aggregate demand leads to lower inflation and higher unemployment, corresponding to a movement downward and to the right along the SRPC.",
+                "videoExplanation": null
                 },
                 {
                   "id": 280,
@@ -8547,7 +8991,8 @@ export const allQuestions: QuestionType[] = [
                     "A favorable supply shock like falling oil prices." // Longer distractor
                   ],
                   "correctAnswer": "C",
-                  "explanation": "A rightward shift of the SRPC means a higher inflation rate is associated with any given unemployment rate, or higher unemployment for any given inflation rate. This can be caused by an increase in expected inflation or an adverse supply shock. An increase in the natural rate of unemployment would also shift the LRPC right, implying the SRPC must also shift right to intersect it."
+                  "explanation": "A rightward shift of the SRPC means a higher inflation rate is associated with any given unemployment rate, or higher unemployment for any given inflation rate. This can be caused by an increase in expected inflation or an adverse supply shock. An increase in the natural rate of unemployment would also shift the LRPC right, implying the SRPC must also shift right to intersect it.",
+                "videoExplanation": null
                 },
                 {
                   "id": 281,
@@ -8565,7 +9010,8 @@ export const allQuestions: QuestionType[] = [
                     "The natural rate of unemployment decreases as inflation increases."
                   ],
                   "correctAnswer": "C",
-                  "explanation": "The vertical LRPC at the natural rate of unemployment indicates that in the long run, when expected inflation adjusts to actual inflation, there is no trade-off between inflation and unemployment. Expansionary policies may temporarily reduce unemployment below the natural rate but only at the cost of accelerating inflation."
+                  "explanation": "The vertical LRPC at the natural rate of unemployment indicates that in the long run, when expected inflation adjusts to actual inflation, there is no trade-off between inflation and unemployment. Expansionary policies may temporarily reduce unemployment below the natural rate but only at the cost of accelerating inflation.",
+                "videoExplanation": null
                 },
                 {
                   "id": 282,
@@ -8583,7 +9029,8 @@ export const allQuestions: QuestionType[] = [
                     "Expansionary monetary policy."
                   ],
                   "correctAnswer": "D",
-                  "explanation": "Stagflation is typically caused by an adverse supply shock, which decreases aggregate supply, raising prices while reducing output and employment."
+                  "explanation": "Stagflation is typically caused by an adverse supply shock, which decreases aggregate supply, raising prices while reducing output and employment.",
+                "videoExplanation": null
                 },
                 {
                   "id": 283,
@@ -8601,7 +9048,8 @@ export const allQuestions: QuestionType[] = [
                     "-2%"
                   ],
                   "correctAnswer": "A",
-                  "explanation": "Using the equation of exchange in growth rates (%ΔM + %ΔV = %ΔP + %ΔY), with %ΔV = 0, we have %ΔM = %ΔP + %ΔY. Plugging in the values: 5% = %ΔP + 3%. Therefore, the inflation rate (%ΔP) is 5% - 3% = 2%."
+                  "explanation": "Using the equation of exchange in growth rates (%ΔM + %ΔV = %ΔP + %ΔY), with %ΔV = 0, we have %ΔM = %ΔP + %ΔY. Plugging in the values: 5% = %ΔP + 3%. Therefore, the inflation rate (%ΔP) is 5% - 3% = 2%.",
+                "videoExplanation": null
                 },
                 {
                   "id": 284,
@@ -8619,7 +9067,8 @@ export const allQuestions: QuestionType[] = [
                     "80"
                   ],
                   "correctAnswer": "C",
-                  "explanation": "The equation of exchange is MV = PY, where PY is nominal GDP. Rearranging, Velocity (V) = Nominal GDP / Money Supply (M). V = $20 trillion / $4 trillion = 5."
+                  "explanation": "The equation of exchange is MV = PY, where PY is nominal GDP. Rearranging, Velocity (V) = Nominal GDP / Money Supply (M). V = $20 trillion / $4 trillion = 5.",
+                "videoExplanation": null
                 },
                 {
                   "id": 285,
@@ -8637,7 +9086,8 @@ export const allQuestions: QuestionType[] = [
                     "The current account equals the financial account."
                   ],
                   "correctAnswer": "B",
-                  "explanation": "A balanced budget occurs in a given fiscal year when the government's total spending (purchases plus transfer payments) is exactly equal to its total tax revenues."
+                  "explanation": "A balanced budget occurs in a given fiscal year when the government's total spending (purchases plus transfer payments) is exactly equal to its total tax revenues.",
+                "videoExplanation": null
                 },
                 {
                   "id": 286,
@@ -8655,7 +9105,8 @@ export const allQuestions: QuestionType[] = [
                     "-$50 billion"
                   ],
                   "correctAnswer": "B",
-                  "explanation": "The national debt is the accumulation of past deficits minus surpluses. Starting at $0, adding a $100 billion deficit brings the debt to $100 billion. Then, a $50 billion surplus reduces the debt by that amount. Debt at end of Year 2 = $100 billion - $50 billion = $50 billion."
+                  "explanation": "The national debt is the accumulation of past deficits minus surpluses. Starting at $0, adding a $100 billion deficit brings the debt to $100 billion. Then, a $50 billion surplus reduces the debt by that amount. Debt at end of Year 2 = $100 billion - $50 billion = $50 billion.",
+                "videoExplanation": null
                 },
                 {
                   "id": 287,
@@ -8673,7 +9124,8 @@ export const allQuestions: QuestionType[] = [
                     "Shifting the short-run Phillips curve outwards."
                   ],
                   "correctAnswer": "B",
-                  "explanation": "Government borrowing adds to the demand for loanable funds. This increased demand shifts the demand curve rightward, leading to higher equilibrium real interest rates. These higher rates discourage, or 'crowd out,' private investment spending."
+                  "explanation": "Government borrowing adds to the demand for loanable funds. This increased demand shifts the demand curve rightward, leading to higher equilibrium real interest rates. These higher rates discourage, or 'crowd out,' private investment spending.",
+                "videoExplanation": null
                 },
                 {
                   "id": 288,
@@ -8691,7 +9143,8 @@ export const allQuestions: QuestionType[] = [
                     "Transfer payments"
                   ],
                   "correctAnswer": "B",
-                  "explanation": "The crowding-out effect operates through higher real interest rates caused by government borrowing. Higher interest rates make it more expensive for businesses to borrow for capital projects, thus primarily reducing gross private domestic investment spending."
+                  "explanation": "The crowding-out effect operates through higher real interest rates caused by government borrowing. Higher interest rates make it more expensive for businesses to borrow for capital projects, thus primarily reducing gross private domestic investment spending.",
+                "videoExplanation": null
                 },
                 {
                   "id": 289,
@@ -8709,7 +9162,8 @@ export const allQuestions: QuestionType[] = [
                     "An increase in government transfer payments." // Longer distractor
                   ],
                   "correctAnswer": "C",
-                  "explanation": "Labor productivity (output per worker) increases when workers have more or better tools, machinery, and infrastructure (physical capital) to work with. Increases in physical capital per worker are a key driver of long-run economic growth."
+                  "explanation": "Labor productivity (output per worker) increases when workers have more or better tools, machinery, and infrastructure (physical capital) to work with. Increases in physical capital per worker are a key driver of long-run economic growth.",
+                "videoExplanation": null
                 },
                 {
                   "id": 290,
@@ -8727,7 +9181,8 @@ export const allQuestions: QuestionType[] = [
                     "Downward shift of the production possibilities curve."
                   ],
                   "correctAnswer": "C",
-                  "explanation": "Long-run economic growth signifies an increase in the economy's potential output. This is shown as a rightward shift in the vertical long-run aggregate supply (LRAS) curve and an outward shift of the production possibilities curve."
+                  "explanation": "Long-run economic growth signifies an increase in the economy's potential output. This is shown as a rightward shift in the vertical long-run aggregate supply (LRAS) curve and an outward shift of the production possibilities curve.",
+                "videoExplanation": null
                 },
                 {
                   "id": 291,
@@ -8745,7 +9200,8 @@ export const allQuestions: QuestionType[] = [
                     "Shifting the short-run Phillips curve downwards." // Shorter distractor
                   ],
                   "correctAnswer": "C",
-                  "explanation": "These are examples of supply-side fiscal policies. By reducing the cost or increasing the after-tax return on investment, they aim to incentivize firms to acquire more physical capital and adopt new technologies, thereby increasing potential output and fostering long-run growth (shifting LRAS right)."
+                  "explanation": "These are examples of supply-side fiscal policies. By reducing the cost or increasing the after-tax return on investment, they aim to incentivize firms to acquire more physical capital and adopt new technologies, thereby increasing potential output and fostering long-run growth (shifting LRAS right).",
+                "videoExplanation": null
                 },
                 {
                   "id": 292,
@@ -8763,7 +9219,8 @@ export const allQuestions: QuestionType[] = [
                     "Nominal GDP increases but real GDP decreases."
                   ],
                   "correctAnswer": "D",
-                  "explanation": "Expansionary fiscal policy shifts aggregate demand right, increasing real GDP. Contractionary monetary policy shifts aggregate demand left, decreasing real GDP. Since the two policies push real GDP in opposite directions, the net effect is uncertain without knowing the relative magnitudes of the policies."
+                  "explanation": "Expansionary fiscal policy shifts aggregate demand right, increasing real GDP. Contractionary monetary policy shifts aggregate demand left, decreasing real GDP. Since the two policies push real GDP in opposite directions, the net effect is uncertain without knowing the relative magnitudes of the policies.",
+                "videoExplanation": null
                 },
                 {
                   "id": 293,
@@ -8781,7 +9238,8 @@ export const allQuestions: QuestionType[] = [
                     "Deflation and stable unemployment rates." // Longer distractor
                   ],
                   "correctAnswer": "C",
-                  "explanation": "While expansionary AD policy can temporarily push unemployment below the NRU, this leads to rising inflation expectations. To keep unemployment low, policymakers must continually increase AD faster, leading to ever-higher (accelerating) inflation in the long run, with unemployment eventually returning to the NRU."
+                  "explanation": "While expansionary AD policy can temporarily push unemployment below the NRU, this leads to rising inflation expectations. To keep unemployment low, policymakers must continually increase AD faster, leading to ever-higher (accelerating) inflation in the long run, with unemployment eventually returning to the NRU.",
+                "videoExplanation": null
                 },
                 {
                   "id": 294,
@@ -8799,7 +9257,8 @@ export const allQuestions: QuestionType[] = [
                     "The national debt only includes borrowing from foreign countries."
                   ],
                   "correctAnswer": "C",
-                  "explanation": "The national debt represents the total amount owed by the government from all past borrowing (accumulated deficits minus any accumulated surpluses). A budget surplus (tax revenues exceed outlays) in a given year allows the government to pay down some of its existing debt, thus reducing the national debt."
+                  "explanation": "The national debt represents the total amount owed by the government from all past borrowing (accumulated deficits minus any accumulated surpluses). A budget surplus (tax revenues exceed outlays) in a given year allows the government to pay down some of its existing debt, thus reducing the national debt.",
+                "videoExplanation": null
                 },
                 {
                   "id": 295,
@@ -8817,7 +9276,8 @@ export const allQuestions: QuestionType[] = [
                     "Reducing the length of patents for new inventions."
                   ],
                   "correctAnswer": "B",
-                  "explanation": "Long-run economic growth depends on factors like human capital accumulation and technological progress. Subsidies for education enhance human capital (skills), while subsidies for research and development encourage technological advancements, both contributing to a higher potential output (shifting LRAS right)."
+                  "explanation": "Long-run economic growth depends on factors like human capital accumulation and technological progress. Subsidies for education enhance human capital (skills), while subsidies for research and development encourage technological advancements, both contributing to a higher potential output (shifting LRAS right).",
+                "videoExplanation": null
                 },
                 {
                   "id": 296,
@@ -8835,7 +9295,8 @@ export const allQuestions: QuestionType[] = [
                     "The speed at which inflation erodes purchasing power." // Longer distractor
                   ],
                   "correctAnswer": "B",
-                  "explanation": "Velocity measures how quickly money circulates within the economy to facilitate transactions included in nominal GDP. A higher velocity implies each dollar is used more frequently during a given period."
+                  "explanation": "Velocity measures how quickly money circulates within the economy to facilitate transactions included in nominal GDP. A higher velocity implies each dollar is used more frequently during a given period.",
+                "videoExplanation": null
                 }, 
                   {
                     "id": 297,
@@ -8853,7 +9314,8 @@ export const allQuestions: QuestionType[] = [
                       "Bonds offer higher potential returns but greater risk than stocks."
                     ],
                     "correctAnswer": "C",
-                    "explanation": "A stock represents partial ownership (equity) in a corporation, giving the holder potential voting rights and a claim on profits (dividends). A bond represents a loan made by an investor to a borrower (corporation or government), which obligates the borrower to repay the principal plus periodic interest payments."
+                    "explanation": "A stock represents partial ownership (equity) in a corporation, giving the holder potential voting rights and a claim on profits (dividends). A bond represents a loan made by an investor to a borrower (corporation or government), which obligates the borrower to repay the principal plus periodic interest payments.",
+                  "videoExplanation": null
                   },
                   {
                     "id": 298,
@@ -8871,7 +9333,8 @@ export const allQuestions: QuestionType[] = [
                       "Interest rate paid by the asset."
                     ],
                     "correctAnswer": "C",
-                    "explanation": "Liquidity measures how quickly and easily an asset can be converted into cash (the most common medium of exchange) with minimal loss of its purchasing power or value."
+                    "explanation": "Liquidity measures how quickly and easily an asset can be converted into cash (the most common medium of exchange) with minimal loss of its purchasing power or value.",
+                  "videoExplanation": null
                   },
                   {
                     "id": 299,
@@ -8889,7 +9352,8 @@ export const allQuestions: QuestionType[] = [
                       "-5%"
                     ],
                     "correctAnswer": "B",
-                    "explanation": "The expected real interest rate is approximately equal to the nominal interest rate minus the expected inflation rate. Real Interest Rate ≈ Nominal Interest Rate - Expected Inflation Rate = 8% - 3% = 5%."
+                    "explanation": "The expected real interest rate is approximately equal to the nominal interest rate minus the expected inflation rate. Real Interest Rate ≈ Nominal Interest Rate - Expected Inflation Rate = 8% - 3% = 5%.",
+                  "videoExplanation": null
                   },
                   {
                     "id": 300,
@@ -8907,7 +9371,8 @@ export const allQuestions: QuestionType[] = [
                       "The government benefits through higher taxes."
                     ],
                     "correctAnswer": "A",
-                    "explanation": "Higher-than-expected inflation means the borrower repays the loan with dollars that have less purchasing power than anticipated. This reduces the real value of the loan repayment, benefiting the borrower at the expense of the lender, who receives back less valuable dollars."
+                    "explanation": "Higher-than-expected inflation means the borrower repays the loan with dollars that have less purchasing power than anticipated. This reduces the real value of the loan repayment, benefiting the borrower at the expense of the lender, who receives back less valuable dollars.",
+                  "videoExplanation": null
                   },
                   {
                     "id": 301,
@@ -8925,7 +9390,8 @@ export const allQuestions: QuestionType[] = [
                       "Measure of liquidity"
                     ],
                     "correctAnswer": "C",
-                    "explanation": "The unit of account function of money allows us to measure and compare the values of diverse goods and services using a common denominator (e.g., dollars, euros), simplifying economic calculations and comparisons."
+                    "explanation": "The unit of account function of money allows us to measure and compare the values of diverse goods and services using a common denominator (e.g., dollars, euros), simplifying economic calculations and comparisons.",
+                  "videoExplanation": null
                   },
                   {
                     "id": 302,
@@ -8943,7 +9409,8 @@ export const allQuestions: QuestionType[] = [
                       "Corporate bonds held by commercial banks." // Longer distractor
                     ],
                     "correctAnswer": "D",
-                    "explanation": "M1 is the narrowest measure of money supply, including the most liquid assets used for transactions: currency in circulation, checkable deposits (demand deposits), and traveler's checks."
+                    "explanation": "M1 is the narrowest measure of money supply, including the most liquid assets used for transactions: currency in circulation, checkable deposits (demand deposits), and traveler's checks.",
+                  "videoExplanation": null
                   },
                   {
                     "id": 303,
@@ -8961,7 +9428,8 @@ export const allQuestions: QuestionType[] = [
                       "Owner's equity"
                     ],
                     "correctAnswer": "A",
-                    "explanation": "Reserves (both required and excess), whether held as vault cash or deposits at the central bank, are assets for a commercial bank because they represent funds the bank owns or has claim to."
+                    "explanation": "Reserves (both required and excess), whether held as vault cash or deposits at the central bank, are assets for a commercial bank because they represent funds the bank owns or has claim to.",
+                  "videoExplanation": null
                   },
                   {
                     "id": 304,
@@ -8979,7 +9447,8 @@ export const allQuestions: QuestionType[] = [
                       "$130,000"
                     ],
                     "correctAnswer": "A",
-                    "explanation": "Required Reserves = Required Reserve Ratio * Demand Deposits = 0.20 * $100,000 = $20,000. Excess Reserves = Total Reserves - Required Reserves = $30,000 - $20,000 = $10,000."
+                    "explanation": "Required Reserves = Required Reserve Ratio * Demand Deposits = 0.20 * $100,000 = $20,000. Excess Reserves = Total Reserves - Required Reserves = $30,000 - $20,000 = $10,000.",
+                  "videoExplanation": null
                   },
                   {
                     "id": 305,
@@ -9015,7 +9484,8 @@ export const allQuestions: QuestionType[] = [
                       "Consumer confidence declines sharply." // Longer distractor
                     ],
                     "correctAnswer": "B",
-                    "explanation": "The opportunity cost of holding money (which typically earns no interest) is the interest income forgone by not holding interest-bearing assets (like bonds). When nominal interest rates rise, the potential interest income given up increases, thus raising the opportunity cost of holding cash."
+                    "explanation": "The opportunity cost of holding money (which typically earns no interest) is the interest income forgone by not holding interest-bearing assets (like bonds). When nominal interest rates rise, the potential interest income given up increases, thus raising the opportunity cost of holding cash.",
+                  "videoExplanation": null
                   },
                   {
                     "id": 307,
@@ -9033,7 +9503,8 @@ export const allQuestions: QuestionType[] = [
                       "No change in money demand but a higher nominal interest rate."
                     ],
                     "correctAnswer": "C",
-                    "explanation": "A higher price level increases the amount of money needed for transactions. This increases the demand for money (shifts the MD curve right). Holding the money supply constant, this leads to a higher equilibrium nominal interest rate."
+                    "explanation": "A higher price level increases the amount of money needed for transactions. This increases the demand for money (shifts the MD curve right). Holding the money supply constant, this leads to a higher equilibrium nominal interest rate.",
+                  "videoExplanation": null
                   },
                   {
                     "id": 308,
@@ -9051,7 +9522,8 @@ export const allQuestions: QuestionType[] = [
                       "Lowering administered interest rates like the interest on reserves." // Longer distractor
                     ],
                     "correctAnswer": "D",
-                    "explanation": "Contractionary monetary policy aims to decrease the money supply and raise interest rates to curb inflation. Selling government securities (bonds) removes reserves from the banking system, reducing banks' ability to lend and thus contracting the money supply."
+                    "explanation": "Contractionary monetary policy aims to decrease the money supply and raise interest rates to curb inflation. Selling government securities (bonds) removes reserves from the banking system, reducing banks' ability to lend and thus contracting the money supply.",
+                  "videoExplanation": null
                   },
                   {
                     "id": 309,
@@ -9069,7 +9541,8 @@ export const allQuestions: QuestionType[] = [
                       "Setting foreign exchange rate targets."
                     ],
                     "correctAnswer": "C",
-                    "explanation": "In an ample reserves system, traditional open market operations are less effective for fine-tuning the policy rate. Instead, central banks primarily manage the policy rate by adjusting administered rates like the interest paid on reserve balances (IORB) or the rate offered on overnight reverse repurchase agreements (ON RRP), which influence banks' incentives to lend or hold reserves."
+                    "explanation": "In an ample reserves system, traditional open market operations are less effective for fine-tuning the policy rate. Instead, central banks primarily manage the policy rate by adjusting administered rates like the interest paid on reserve balances (IORB) or the rate offered on overnight reverse repurchase agreements (ON RRP), which influence banks' incentives to lend or hold reserves.",
+                  "videoExplanation": null
                   },
                   {
                     "id": 310,
@@ -9087,7 +9560,8 @@ export const allQuestions: QuestionType[] = [
                       "No change in interest rates but decreased aggregate supply."
                     ],
                     "correctAnswer": "B",
-                    "explanation": "A decrease in the money supply (MS shifts left) leads to higher nominal interest rates in the money market. Higher interest rates discourage investment and interest-sensitive consumption, causing aggregate demand to decrease (shift left)."
+                    "explanation": "A decrease in the money supply (MS shifts left) leads to higher nominal interest rates in the money market. Higher interest rates discourage investment and interest-sensitive consumption, causing aggregate demand to decrease (shift left).",
+                  "videoExplanation": null
                   },
                   {
                     "id": 311,
@@ -9105,7 +9579,8 @@ export const allQuestions: QuestionType[] = [
                       "Foreign capital inflows decrease significantly." // Longer distractor
                     ],
                     "correctAnswer": "D",
-                    "explanation": "The real interest rate represents the cost of borrowing for firms undertaking investment projects. As the real interest rate falls, more projects that previously had an expected rate of return below the interest rate now become profitable, increasing the quantity of loanable funds demanded for investment."
+                    "explanation": "The real interest rate represents the cost of borrowing for firms undertaking investment projects. As the real interest rate falls, more projects that previously had an expected rate of return below the interest rate now become profitable, increasing the quantity of loanable funds demanded for investment.",
+                  "videoExplanation": null
                   },
                   {
                     "id": 312,
@@ -9123,7 +9598,8 @@ export const allQuestions: QuestionType[] = [
                       "Increasing both supply and demand, leaving the real interest rate unchanged."
                     ],
                     "correctAnswer": "C",
-                    "explanation": "Household saving is a primary source of the supply of loanable funds. An increase in saving shifts the supply curve for loanable funds to the right, leading to a lower equilibrium real interest rate and a higher equilibrium quantity of funds loaned."
+                    "explanation": "Household saving is a primary source of the supply of loanable funds. An increase in saving shifts the supply curve for loanable funds to the right, leading to a lower equilibrium real interest rate and a higher equilibrium quantity of funds loaned.",
+                  "videoExplanation": null
                   },
                   {
                     "id": 313,
@@ -9141,7 +9617,8 @@ export const allQuestions: QuestionType[] = [
                       "Demand and supply increase equally, no change in real interest rate or investment."
                     ],
                     "correctAnswer": "C",
-                    "explanation": "Government borrowing increases the demand for loanable funds (shifts demand right). This leads to a higher real interest rate. The higher real interest rate increases the cost of borrowing for private firms, causing a decrease in private investment spending (crowding out)."
+                    "explanation": "Government borrowing increases the demand for loanable funds (shifts demand right). This leads to a higher real interest rate. The higher real interest rate increases the cost of borrowing for private firms, causing a decrease in private investment spending (crowding out).",
+                  "videoExplanation": null
                   },
                   {
                     "id": 314,
@@ -9159,7 +9636,8 @@ export const allQuestions: QuestionType[] = [
                       "Savings account"
                     ],
                     "correctAnswer": "C",
-                    "explanation": "Stock represents equity or ownership in a corporation. Bondholders are creditors (lenders) to the corporation, while stockholders are part owners."
+                    "explanation": "Stock represents equity or ownership in a corporation. Bondholders are creditors (lenders) to the corporation, while stockholders are part owners.",
+                  "videoExplanation": null
                   },
                   {
                     "id": 315,
@@ -9177,7 +9655,8 @@ export const allQuestions: QuestionType[] = [
                       "25%" // Correct
                     ],
                     "correctAnswer": "E",
-                    "explanation": "The simple money multiplier is calculated as 1 / Required Reserve Ratio (RRR). If the multiplier is 4, then 4 = 1 / RRR. Solving for RRR gives RRR = 1 / 4 = 0.25, or 25%."
+                    "explanation": "The simple money multiplier is calculated as 1 / Required Reserve Ratio (RRR). If the multiplier is 4, then 4 = 1 / RRR. Solving for RRR gives RRR = 1 / 4 = 0.25, or 25%.",
+                  "videoExplanation": null
                   },
                   {
                     "id": 316,
@@ -9195,7 +9674,8 @@ export const allQuestions: QuestionType[] = [
                       "Having no significant impact on the domestic loanable funds market." // Longer distractor
                     ],
                     "correctAnswer": "B",
-                    "explanation": "Financial capital inflows from abroad represent a source of saving available to the domestic loanable funds market, thus contributing to the supply of loanable funds. A decrease in these inflows shifts the supply curve for loanable funds to the left, resulting in a higher equilibrium real interest rate."
+                    "explanation": "Financial capital inflows from abroad represent a source of saving available to the domestic loanable funds market, thus contributing to the supply of loanable funds. A decrease in these inflows shifts the supply curve for loanable funds to the left, resulting in a higher equilibrium real interest rate.",
+                  "videoExplanation": null
                   }, 
                     {
                       "id": 317,
@@ -9213,7 +9693,8 @@ export const allQuestions: QuestionType[] = [
                         "Higher government spending due to automatic stabilizers."
                       ],
                       "correctAnswer": "B",
-                      "explanation": "The interest rate effect posits that a lower price level reduces the demand for money, which lowers the nominal interest rate. Lower interest rates encourage borrowing for investment and some types of consumption, thus increasing the aggregate quantity of goods and services demanded."
+                      "explanation": "The interest rate effect posits that a lower price level reduces the demand for money, which lowers the nominal interest rate. Lower interest rates encourage borrowing for investment and some types of consumption, thus increasing the aggregate quantity of goods and services demanded.",
+                    "videoExplanation": null
                     },
                     {
                       "id": 318,
@@ -9231,7 +9712,8 @@ export const allQuestions: QuestionType[] = [
                         "An increase in the overall price level." // Movement along curve
                       ],
                       "correctAnswer": "D",
-                      "explanation": "A decrease in net export spending, caused by factors like decreased foreign income or an appreciation of the domestic currency, reduces overall demand for domestically produced goods and services, shifting the aggregate demand curve to the left."
+                      "explanation": "A decrease in net export spending, caused by factors like decreased foreign income or an appreciation of the domestic currency, reduces overall demand for domestically produced goods and services, shifting the aggregate demand curve to the left.",
+                    "videoExplanation": null
                     },
                     {
                       "id": 319,
@@ -9249,7 +9731,8 @@ export const allQuestions: QuestionType[] = [
                         "Technology improves quickly when prices rise." // Shorter distractor
                       ],
                       "correctAnswer": "B",
-                      "explanation": "In the short run, many input costs, especially nominal wages, are 'sticky'. When the overall price level rises, output prices increase relative to these sticky input costs, making production more profitable and inducing firms to increase their quantity supplied."
+                      "explanation": "In the short run, many input costs, especially nominal wages, are 'sticky'. When the overall price level rises, output prices increase relative to these sticky input costs, making production more profitable and inducing firms to increase their quantity supplied.",
+                    "videoExplanation": null
                     },
                     {
                       "id": 320,
@@ -9267,7 +9750,8 @@ export const allQuestions: QuestionType[] = [
                         "A fall in the aggregate price level." // Movement along curve
                       ],
                       "correctAnswer": "C",
-                      "explanation": "An increase in nominal wages raises the cost of production for firms across the economy. At any given output price level, firms are willing to supply less output, causing the short-run aggregate supply curve to shift to the left."
+                      "explanation": "An increase in nominal wages raises the cost of production for firms across the economy. At any given output price level, firms are willing to supply less output, causing the short-run aggregate supply curve to shift to the left.",
+                    "videoExplanation": null
                     },
                     {
                       "id": 321,
@@ -9285,7 +9769,8 @@ export const allQuestions: QuestionType[] = [
                         "Government spending equals tax revenue exactly." // Longer distractor
                       ],
                       "correctAnswer": "C",
-                      "explanation": "In the long run, all prices, including nominal wages and other input costs, are assumed to be fully flexible. Therefore, changes in the overall price level do not affect the economy's underlying productive capacity (potential output), which depends on resources, technology, and institutions. The LRAS curve is vertical at potential output."
+                      "explanation": "In the long run, all prices, including nominal wages and other input costs, are assumed to be fully flexible. Therefore, changes in the overall price level do not affect the economy's underlying productive capacity (potential output), which depends on resources, technology, and institutions. The LRAS curve is vertical at potential output.",
+                    "videoExplanation": null
                     },
                     {
                       "id": 322,
@@ -9303,7 +9788,8 @@ export const allQuestions: QuestionType[] = [
                         "Zero cyclical unemployment."
                       ],
                       "correctAnswer": "B",
-                      "explanation": "An inflationary gap occurs when the short-run equilibrium level of real GDP is above the economy's potential output level (full-employment output). This implies that the unemployment rate is below the natural rate."
+                      "explanation": "An inflationary gap occurs when the short-run equilibrium level of real GDP is above the economy's potential output level (full-employment output). This implies that the unemployment rate is below the natural rate.",
+                    "videoExplanation": null
                     },
                     {
                       "id": 323,
@@ -9321,7 +9807,8 @@ export const allQuestions: QuestionType[] = [
                         "The price level will fall continuously."
                       ],
                       "correctAnswer": "B",
-                      "explanation": "The increase in AD creates an inflationary gap (output above potential, low unemployment). The tight labor market puts upward pressure on nominal wages. As wages rise, production costs increase, causing the SRAS curve to shift leftward until the economy returns to potential output at a higher price level."
+                      "explanation": "The increase in AD creates an inflationary gap (output above potential, low unemployment). The tight labor market puts upward pressure on nominal wages. As wages rise, production costs increase, causing the SRAS curve to shift leftward until the economy returns to potential output at a higher price level.",
+                    "videoExplanation": null
                     },
                     {
                       "id": 324,
@@ -9339,7 +9826,8 @@ export const allQuestions: QuestionType[] = [
                         "5" // Correct
                       ],
                       "correctAnswer": "E",
-                      "explanation": "The simple spending multiplier is calculated as 1 / MPS. Given MPS = 0.2, the multiplier is 1 / 0.2 = 5."
+                      "explanation": "The simple spending multiplier is calculated as 1 / MPS. Given MPS = 0.2, the multiplier is 1 / 0.2 = 5.",
+                    "videoExplanation": null
                     },
                     {
                       "id": 325,
@@ -9357,7 +9845,8 @@ export const allQuestions: QuestionType[] = [
                         "$125 billion"
                       ],
                       "correctAnswer": "C",
-                      "explanation": "The tax multiplier is -MPC / (1 - MPC) = -MPC / MPS. Here, MPC = 0.8, so MPS = 0.2. Tax multiplier = -0.8 / 0.2 = -4. A decrease in taxes of $100 billion will increase real GDP by: (-$100 billion) * (-4) = +$400 billion."
+                      "explanation": "The tax multiplier is -MPC / (1 - MPC) = -MPC / MPS. Here, MPC = 0.8, so MPS = 0.2. Tax multiplier = -0.8 / 0.2 = -4. A decrease in taxes of $100 billion will increase real GDP by: (-$100 billion) * (-4) = +$400 billion.",
+                    "videoExplanation": null
                     },
                     {
                       "id": 326,
@@ -9375,7 +9864,8 @@ export const allQuestions: QuestionType[] = [
                         "Selling government bonds by the central bank."
                       ],
                       "correctAnswer": "D",
-                      "explanation": "Expansionary fiscal policy aims to increase aggregate demand, typically during a recession. Decreasing personal income taxes increases households' disposable income, leading to higher consumption spending and shifting AD to the right."
+                      "explanation": "Expansionary fiscal policy aims to increase aggregate demand, typically during a recession. Decreasing personal income taxes increases households' disposable income, leading to higher consumption spending and shifting AD to the right.",
+                    "videoExplanation": null
                     },
                     {
                       "id": 327,
@@ -9393,7 +9883,8 @@ export const allQuestions: QuestionType[] = [
                         "Increase transfer payments."
                       ],
                       "correctAnswer": "C",
-                      "explanation": "To combat demand-pull inflation (caused by excess AD), contractionary fiscal policy is needed. This involves either increasing taxes (to reduce disposable income and consumption) or decreasing government spending, both of which shift the AD curve to the left."
+                      "explanation": "To combat demand-pull inflation (caused by excess AD), contractionary fiscal policy is needed. This involves either increasing taxes (to reduce disposable income and consumption) or decreasing government spending, both of which shift the AD curve to the left.",
+                    "videoExplanation": null
                     },
                     {
                       "id": 328,
@@ -9411,7 +9902,8 @@ export const allQuestions: QuestionType[] = [
                         "No change in the price level but lower real GDP." // Longer distractor
                       ],
                       "correctAnswer": "C",
-                      "explanation": "An increase in aggregate demand (rightward shift) pushes both price level and real GDP up. An increase in short-run aggregate supply (rightward shift) pushes price level down and real GDP up. Since both shifts increase real GDP, the overall effect on real GDP is unambiguously an increase. The effect on the price level is indeterminate."
+                      "explanation": "An increase in aggregate demand (rightward shift) pushes both price level and real GDP up. An increase in short-run aggregate supply (rightward shift) pushes price level down and real GDP up. Since both shifts increase real GDP, the overall effect on real GDP is unambiguously an increase. The effect on the price level is indeterminate.",
+                    "videoExplanation": null
                     },
                     {
                       "id": 329,
@@ -9429,7 +9921,8 @@ export const allQuestions: QuestionType[] = [
                         "A decrease in long-run aggregate supply."
                       ],
                       "correctAnswer": "D",
-                      "explanation": "An increase in short-run aggregate supply (a rightward shift), perhaps due to falling input prices or increased productivity, leads to a lower equilibrium price level and a higher equilibrium real GDP."
+                      "explanation": "An increase in short-run aggregate supply (a rightward shift), perhaps due to falling input prices or increased productivity, leads to a lower equilibrium price level and a higher equilibrium real GDP.",
+                    "videoExplanation": null
                     },
                     {
                       "id": 330,
@@ -9447,7 +9940,8 @@ export const allQuestions: QuestionType[] = [
                         "Tariffs automatically rising when imports increase."
                       ],
                       "correctAnswer": "C",
-                      "explanation": "Automatic stabilizers are features of the tax and transfer system that automatically work counter-cyclically without requiring new legislation. When unemployment rises during a recession, government spending on unemployment benefits automatically increases, cushioning the fall in aggregate demand."
+                      "explanation": "Automatic stabilizers are features of the tax and transfer system that automatically work counter-cyclically without requiring new legislation. When unemployment rises during a recession, government spending on unemployment benefits automatically increases, cushioning the fall in aggregate demand.",
+                    "videoExplanation": null
                     },
                     {
                       "id": 331,
@@ -9465,7 +9959,8 @@ export const allQuestions: QuestionType[] = [
                         "Requiring legislative action to change tax rates." // Shorter distractor
                       ],
                       "correctAnswer": "C",
-                      "explanation": "In a progressive tax system, as incomes rise during an expansion, individuals move into higher tax brackets, and overall tax revenue increases automatically. This withdrawal of purchasing power slightly dampens the growth in aggregate demand, acting as a stabilizing force."
+                      "explanation": "In a progressive tax system, as incomes rise during an expansion, individuals move into higher tax brackets, and overall tax revenue increases automatically. This withdrawal of purchasing power slightly dampens the growth in aggregate demand, acting as a stabilizing force.",
+                    "videoExplanation": null
                     },
                     {
                       "id": 332,
@@ -9483,7 +9978,8 @@ export const allQuestions: QuestionType[] = [
                         "An increase of $50 billion."
                       ],
                       "correctAnswer": "D",
-                      "explanation": "The spending multiplier is 1 / MPS = 1 / 0.1 = 10. The maximum change in real GDP is the multiplier times the initial change in autonomous spending: 10 * $50 billion = $500 billion increase."
+                      "explanation": "The spending multiplier is 1 / MPS = 1 / 0.1 = 10. The maximum change in real GDP is the multiplier times the initial change in autonomous spending: 10 * $50 billion = $500 billion increase.",
+                    "videoExplanation": null
                     },
                     {
                       "id": 333,
@@ -9501,7 +9997,8 @@ export const allQuestions: QuestionType[] = [
                         "Not part of GDP calculation."
                       ],
                       "correctAnswer": "B",
-                      "explanation": "Investment (I) in the GDP expenditure approach includes changes in business inventories. A decrease in inventories means businesses sold more than they produced in that period, so the change in inventories is negative, reducing the investment component of GDP."
+                      "explanation": "Investment (I) in the GDP expenditure approach includes changes in business inventories. A decrease in inventories means businesses sold more than they produced in that period, so the change in inventories is negative, reducing the investment component of GDP.",
+                    "videoExplanation": null
                     },
                     {
                       "id": 334,
@@ -9519,7 +10016,8 @@ export const allQuestions: QuestionType[] = [
                         "A balanced budget."
                       ],
                       "correctAnswer": "C",
-                      "explanation": "Contractionary fiscal policy (increasing taxes, decreasing government spending) aims to reduce aggregate demand. This is appropriate when the economy is experiencing demand-pull inflation (high inflation typically associated with output above potential and low unemployment)."
+                      "explanation": "Contractionary fiscal policy (increasing taxes, decreasing government spending) aims to reduce aggregate demand. This is appropriate when the economy is experiencing demand-pull inflation (high inflation typically associated with output above potential and low unemployment).",
+                    "videoExplanation": null
                     },
                     {
                       "id": 335,
@@ -9537,7 +10035,8 @@ export const allQuestions: QuestionType[] = [
                         "Prices fall, causing AD to shift right significantly." // Longer distractor
                       ],
                       "correctAnswer": "C",
-                      "explanation": "In a recessionary gap, unemployment is high, putting downward pressure on nominal wages. As wages fall over time, firms' production costs decrease, shifting the SRAS curve to the right, moving the economy back toward potential output."
+                      "explanation": "In a recessionary gap, unemployment is high, putting downward pressure on nominal wages. As wages fall over time, firms' production costs decrease, shifting the SRAS curve to the right, moving the economy back toward potential output.",
+                    "videoExplanation": null
                     },
                     {
                       "id": 336,
@@ -9555,7 +10054,8 @@ export const allQuestions: QuestionType[] = [
                         "Shifting SRAS left but LRAS right."
                       ],
                       "correctAnswer": "B",
-                      "explanation": "Technological improvements increase productivity, lowering production costs in the short run (shifting SRAS right) and increasing the economy's overall potential output in the long run (shifting LRAS right)."
+                      "explanation": "Technological improvements increase productivity, lowering production costs in the short run (shifting SRAS right) and increasing the economy's overall potential output in the long run (shifting LRAS right).",
+                    "videoExplanation": null
                     },
   
   // Add micro unit questions to allQuestions

@@ -118,7 +118,7 @@ export function FixedSidebar() {
   ];
 
   return (
-    <div className={`fixed top-0 left-0 h-screen bg-white text-gray-700 flex flex-col shadow-lg z-40 border-r border-gray-200 ${
+    <div className={`fixed top-0 left-0 h-screen bg-white text-gray-700 flex flex-col shadow-lg z-40 border-r border-gray-100 ${
       isCompactMode ? 'w-16 p-2 space-y-2' : 'w-72 p-4 space-y-3'
     }`} style={{ paddingTop: '80px' }}>
       {/* TEMPORARY TEST BUTTON */}

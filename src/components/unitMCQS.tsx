@@ -100,6 +100,8 @@ const QuestionCard = ({
   const [selectedAnswerIndex, setSelectedAnswerIndex] = useState<number | null>(initialSelectedIndex);
   const [isSubmitted, setIsSubmitted] = useState(isAnswered);
   const [struckThroughOptions, setStruckThroughOptions] = useState<Set<number>>(new Set());
+  const [isVideoExpanded, setIsVideoExpanded] = useState(false);
+  const [showVideoModal, setShowVideoModal] = useState(false);
 
   // --- State for Overlay --- 
   const [overlayMode, setOverlayMode] = useState<'signup' | 'login'>('signup');
@@ -161,6 +163,8 @@ const QuestionCard = ({
     setLoginLoading(false);
 
     setShowPasswordReqs(false);
+    setIsVideoExpanded(false); // Reset video accordion when question changes
+    setShowVideoModal(false); // Reset video modal when question changes
   }, [question.id, initialSelectedLetter, isAnswered]);
 
   // Effect for password validation (signup only)
@@ -197,6 +201,7 @@ const QuestionCard = ({
     logger.debug(`[QuestionCard] Answer selected for question ${question.id}, index ${index}, isLoggedIn: ${isLoggedIn}, currentIndex: ${currentIndex}`);
     setSelectedAnswerIndex(index);
     setIsSubmitted(true);
+    
     try {
       onAnswerSelect(
         question.id,
@@ -204,11 +209,23 @@ const QuestionCard = ({
         question.options[index],
         question.lessonIDS
       );
+      
+      // Check if answer is incorrect and video explanation exists
+      // Only show modal for newly submitted incorrect answers (not when viewing already-answered questions)
+      const isIncorrect = index !== correctAnswerIndex;
+      if (isIncorrect && question.videoExplanation && !isAnswered) {
+        // Automatically show video modal for incorrect answers
+        // Use setTimeout to ensure state updates are complete
+        setTimeout(() => {
+          setShowVideoModal(true);
+        }, 100);
+      }
     } catch (error) {
       console.error(`[QuestionCard] Error in onAnswerSelect for question ${question.id}:`, error);
       // Reset state on error so user can try again
       setIsSubmitted(false);
       setSelectedAnswerIndex(null);
+      setShowVideoModal(false);
     }
   };
 
@@ -531,6 +548,39 @@ const QuestionCard = ({
               <h4 className="font-semibold text-gray-900 mb-2 text-sm">Explanation</h4>
               <p className="text-gray-900">{aiExplanation}</p>
             </div>
+            
+            {/* Video Explanation Accordion - Also show when AI explanation exists */}
+            {question.videoExplanation && (
+              <div className="border border-gray-200 rounded-lg overflow-hidden">
+                <button
+                  onClick={() => setIsVideoExpanded(!isVideoExpanded)}
+                  className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                >
+                  <span className="font-semibold text-gray-900 flex items-center gap-2">
+                    <Play className="w-5 h-5" />
+                    Watch Video Explanation
+                  </span>
+                  <ChevronDown 
+                    className={`w-5 h-5 text-gray-600 transition-transform ${
+                      isVideoExpanded ? 'transform rotate-180' : ''
+                    }`}
+                  />
+                </button>
+                
+                {isVideoExpanded && (
+                  <div className="p-4 bg-white border-t border-gray-200">
+                    <video
+                      src={question.videoExplanation}
+                      controls
+                      className="w-full aspect-video rounded-lg shadow-md"
+                      playsInline
+                    >
+                      Your browser does not support the video tag.
+                    </video>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         ) : (
           // --- Display Answer Options Mode ---
@@ -607,10 +657,118 @@ const QuestionCard = ({
                 })}
             </div>
             
+            {/* Video Explanation Accordion - Shows after submission if video exists */}
+            {isSubmitted && question.videoExplanation && (
+              <div className="mt-6 pt-6 border-t border-gray-200">
+                {/* Feedback Message */}
+                <div className={`mb-4 p-4 rounded-lg border ${
+                  selectedAnswerIndex === correctAnswerIndex 
+                    ? 'bg-green-50 border-green-200' 
+                    : 'bg-red-50 border-red-200'
+                }`}>
+                  <div className="flex items-center gap-2">
+                    {selectedAnswerIndex === correctAnswerIndex ? (
+                      <>
+                        <Check className="w-5 h-5 text-green-600" />
+                        <span className="font-semibold text-green-800">Correct!</span>
+                      </>
+                    ) : (
+                      <>
+                        <X className="w-5 h-5 text-red-600" />
+                        <span className="font-semibold text-red-800">Incorrect</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Video Explanation Accordion */}
+                <div className="border border-gray-200 rounded-lg overflow-hidden">
+                  <button
+                    onClick={() => setIsVideoExpanded(!isVideoExpanded)}
+                    className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                  >
+                    <span className="font-semibold text-gray-900 flex items-center gap-2">
+                      <Play className="w-5 h-5" />
+                      {selectedAnswerIndex === correctAnswerIndex 
+                        ? 'Watch Explanation' 
+                        : 'Explain this to me'}
+                    </span>
+                    <ChevronDown 
+                      className={`w-5 h-5 text-gray-600 transition-transform ${
+                        isVideoExpanded ? 'transform rotate-180' : ''
+                      }`}
+                    />
+                  </button>
+                  
+                  {isVideoExpanded && (
+                    <div className="p-4 bg-white border-t border-gray-200">
+                      <video
+                        src={question.videoExplanation}
+                        controls
+                        className="w-full aspect-video rounded-lg shadow-md"
+                        playsInline
+                      >
+                        Your browser does not support the video tag.
+                      </video>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
             
           </>
         )}
       </div>
+
+      {/* Video Explanation Modal - Shows automatically for incorrect answers */}
+      {showVideoModal && question.videoExplanation && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowVideoModal(false);
+            }
+          }}
+        >
+          <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto relative">
+            <button
+              onClick={() => setShowVideoModal(false)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-900 transition-colors z-10 bg-white rounded-full p-2 shadow-md hover:bg-gray-100"
+              aria-label="Close Video Explanation"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            
+            <div className="p-6">
+              <div className="mb-4">
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Video Explanation</h2>
+                <p className="text-gray-600">Watch this explanation to understand why your answer was incorrect.</p>
+              </div>
+              
+              <div className="mb-6">
+                <video
+                  src={question.videoExplanation}
+                  controls
+                  autoPlay
+                  className="w-full aspect-video rounded-lg shadow-md"
+                  playsInline
+                >
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+              
+              <div className="flex justify-end">
+                <button
+                  onClick={() => setShowVideoModal(false)}
+                  className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Dojo Drill Modal */}
       {showDojoDrill && dojoDrillVideo && (

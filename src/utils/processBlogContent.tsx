@@ -115,3 +115,4 @@ function processStringContent(content: string, images: string[]): React.ReactNod
 
   return <>{parts}</>;
 }
+

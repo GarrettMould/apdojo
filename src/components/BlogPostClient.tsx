@@ -10,6 +10,7 @@ interface BlogPostClientProps {
   subject?: 'ap_microeconomics' | 'ap_macroeconomics';
   practiceUrl?: string;
   images?: string[];
+  videoUrl?: string | null;
 }
 
 /**
@@ -20,7 +21,8 @@ export function BlogPostClient({
   content,
   subject = 'ap_macroeconomics',
   practiceUrl = '/unitFRQpracticePage',
-  images = []
+  images = [],
+  videoUrl = null
 }: BlogPostClientProps) {
   // Process content to replace [IMAGE:N] placeholders with actual images
   const processedContent = processBlogContent(content, images);
@@ -30,6 +32,20 @@ export function BlogPostClient({
 
   return (
     <div className="prose prose-xl max-w-none prose-blue text-lg [&_p]:leading-relaxed [&_p]:mb-6 [&_li]:leading-relaxed [&_h2]:mb-6 [&_h3]:mb-4">
+      {/* Video at the start of the blog if available */}
+      {videoUrl && (
+        <div className="mb-12 -mx-4 sm:-mx-8">
+          <video
+            src={videoUrl}
+            controls
+            className="w-full aspect-video rounded-lg shadow-lg"
+            playsInline
+          >
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      )}
+      
       <BlogContentWithKeyTerms subject={subject}>
         {mathProcessedContent}
       </BlogContentWithKeyTerms>

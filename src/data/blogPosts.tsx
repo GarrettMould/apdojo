@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { BlogComprehensionCheck } from '@/components/BlogComprehensionCheck';
+import DraggableGraph from '@/components/DraggableGraph';
 
 export type BlogPost = {
   slug: string;
@@ -17,6 +18,7 @@ export type BlogPost = {
   linkedFRQ?: number; // ID of the related FRQ question to link to
   images?: string[]; // Array of image URLs for the blog post
   practiceQuestionId?: number; // ID of a practice question from unitPracticeProblems.ts
+  videoUrl?: string | null; // URL to a video file (e.g., from dojoDrills folder)
 };
 
 export const blogPosts: Record<string, BlogPost> = {
@@ -29,6 +31,7 @@ export const blogPosts: Record<string, BlogPost> = {
     thumbnailUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/image0.jpg',
     keyTakeaway: 'Buy Bonds → MS ↑ → Interest Rate ↓ → Investment ↑ → AD ↑ → GDP ↑. The chain reaction connects money supply changes to aggregate demand through interest rates.',
     images: [],
+    videoUrl: null,
     content: (
       <>
         <p className="mb-6">In AP Macroeconomics, drawing the individual graphs is easy. The hard part—and the part that separates a 3 from a 5—is <strong>connecting them</strong>.</p>
@@ -137,6 +140,7 @@ export const blogPosts: Record<string, BlogPost> = {
     keyTakeaway: 'A change in demand for one currency causes an opposite change in the supply of the other. If one appreciates, the other must depreciate.',
     linkedFRQ: 4, // Links to Unit 6 FRQ - Foreign Exchange Market
     images: [],
+    videoUrl: null,
     content: (
       <>
         <p className="mb-6">When students see the "Foreign Exchange Market" (Forex) on the AP Exam, they panic. They think currency is magical and follows different rules than the rest of economics.</p>
@@ -226,6 +230,7 @@ export const blogPosts: Record<string, BlogPost> = {
       '/images/blog/B3ID.jpg'
     ],
     practiceQuestionId: 150,
+    videoUrl: null,
     content: (
       <>
         <h2 className="mt-12 mb-4 text-4xl font-bold text-gray-800">The Setup: Different People, Different Values</h2>
@@ -286,6 +291,7 @@ export const blogPosts: Record<string, BlogPost> = {
     keyTakeaway: 'Nominal GDP includes price changes, while Real GDP holds prices constant to measure actual production growth. Just like GPA can rise from easier grading (nominal) vs. actual improvement (real).',
     images: [],
     practiceQuestionId: 17,
+    videoUrl: null,
     content: (
       <>
         <h1 className="mt-12 mb-6 text-4xl font-bold text-gray-900">Gradeflation & GDP: Why Your "A" Might Be Worth Less Than You Think</h1>
@@ -421,6 +427,79 @@ export const blogPosts: Record<string, BlogPost> = {
             <BlogComprehensionCheck question={practiceQuestion} />
           );
         })()}
+      </>
+    ),
+  },
+  'the-economy-fixes-itself-long-run-self-adjustment': {
+    slug: 'the-economy-fixes-itself-long-run-self-adjustment',
+    title: 'The Economy Fixes Itself: Long-Run Self-Adjustment',
+    description: 'Understanding how the economy automatically returns to full employment through wage adjustments—without government intervention.',
+    subject: 'Macro',
+    unit: 3,
+    thumbnailUrl: '/images/placeholder.png',
+    keyTakeaway: 'The economy self-adjusts through a 4-step cycle: Output Gap → Wages Adjust → Hiring Changes → Supply Shift. Wages react to the output gap, causing SRAS to shift back to full employment.',
+    images: [],
+    videoUrl: '/images/dojoDrills/dd_macro_3.7.mp4',
+    content: (
+      <>
+        <p className="mb-6 text-lg leading-relaxed">Does the government <em>always</em> need to intervene when the economy is in trouble?</p>
+        
+        <p className="mb-6 text-lg leading-relaxed"><strong>No.</strong></p>
+        
+        <p className="mb-6 text-lg leading-relaxed">If left alone long enough, the economy has a built-in "Auto-Pilot" that steers it back to normal. This process is called <strong>Long-Run Self-Adjustment</strong>. It might seem confusing on a graph, but it actually follows the exact same 4-step cycle every single time.</p>
+        
+        <p className="mb-6 text-lg leading-relaxed">Let's break down the mechanics of how an economy heals itself without the Fed or Congress lifting a finger.</p>
+        
+        <hr className="my-12"/>
+        
+        <h2 className="mt-12 mb-4 text-3xl font-bold text-gray-800">The 4-Step Cycle of Adjustment</h2>
+        
+        <p className="mb-6 text-lg leading-relaxed">Whether we are facing high inflation or a deep recession, the logic is always the same: <strong>Wages react to the Output Gap.</strong></p>
+        
+        <h3 className="mt-10 mb-4 text-2xl font-bold text-gray-800">Step 1: The Output Gap 📉</h3>
+        <p className="mb-6 text-lg leading-relaxed">The economy starts in trouble.</p>
+        <ul className="mb-6 list-disc list-inside space-y-2 text-lg leading-relaxed">
+          <li><strong>Recessionary Gap:</strong> We are producing <em>less</em> than our potential. Unemployment is high.</li>
+          <li><strong>Inflationary Gap:</strong> We are producing <em>more</em> than our potential. The economy is overheating.</li>
+        </ul>
+        
+        <h3 className="mt-10 mb-4 text-2xl font-bold text-gray-800">Step 2: Wages Adjust (The Pivot) 💸</h3>
+        <p className="mb-6 text-lg leading-relaxed">This is the most critical step.</p>
+        <ul className="mb-6 list-disc list-inside space-y-2 text-lg leading-relaxed">
+          <li><strong>In a Recession:</strong> There are lots of unemployed workers desperate for jobs. Because labor is not scarce, <strong>Nominal Wages Fall</strong>. Workers are willing to accept less just to get hired.</li>
+          <li><strong>In Inflation:</strong> Workers are scarce and in high demand. Companies have to bid up salaries to steal employees. <strong>Nominal Wages Rise</strong>.</li>
+        </ul>
+        
+        <h3 className="mt-10 mb-4 text-2xl font-bold text-gray-800">Step 3: Hiring Changes (The Shift) 🏭</h3>
+        <p className="mb-6 text-lg leading-relaxed">Firms react to the price of labor.</p>
+        <ul className="mb-6 list-disc list-inside space-y-2 text-lg leading-relaxed">
+          <li><strong>Cheaper Wages (Recession):</strong> "Labor is on sale!" Firms hire more workers because costs are down.</li>
+          <li><strong>Expensive Wages (Inflation):</strong> "Labor is too pricey!" Firms cut back on hiring or fire workers to save money.</li>
+        </ul>
+        
+        <h3 className="mt-10 mb-4 text-2xl font-bold text-gray-800">Step 4: The Supply Shift ➡️</h3>
+        <p className="mb-6 text-lg leading-relaxed">This change in production costs shifts the <strong>Short-Run Aggregate Supply (SRAS)</strong> curve.</p>
+        <ul className="mb-6 list-disc list-inside space-y-2 text-lg leading-relaxed">
+          <li><strong>Recession Fix:</strong> SRAS shifts <strong>RIGHT</strong> (Cost of production ↓). We return to full employment with a lower price level.</li>
+          <li><strong>Inflation Fix:</strong> SRAS shifts <strong>LEFT</strong> (Cost of production ↑). We return to full employment with a higher price level.</li>
+        </ul>
+        
+        <hr className="my-12"/>
+        
+        <h2 className="mt-12 mb-4 text-3xl font-bold text-gray-800">Visualizing the Shift</h2>
+        
+        <div className="my-8 p-4 border rounded-lg bg-gray-50">
+          <p className="text-center text-gray-500 italic">[ Embed Video: Long Run Adjustment Explainer ]</p>
+          <p className="text-center text-sm text-gray-400 mt-2">(Your 60-second screen recording goes here)</p>
+        </div>
+        
+        <hr className="my-12"/>
+        
+        <div className="bg-gray-50 p-6 rounded-xl border-2 border-blue-100 text-center my-8">
+          <h3 className="text-xl font-bold text-gray-800 mb-4">Suppose fears of a recession cause consumers to spend less. Show the shift that occurs.</h3>
+          
+          <DraggableGraph />
+        </div>
       </>
     ),
   },

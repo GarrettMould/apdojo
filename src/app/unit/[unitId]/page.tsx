@@ -17,7 +17,7 @@ import { microLessons, macroLessons } from '@/data/lessons';
 import { videos, Video } from '@/data/videos';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question as QuestionType } from '@/data/questionBanks/types';
-import { X, ArrowRight, Lock, ArrowLeft, CheckCircle2, XCircle, Download, Bookmark, BookmarkPlus, Play, Check, Brain, Maximize2 } from 'lucide-react';
+import { X, ArrowRight, Lock, ArrowLeft, CheckCircle2, XCircle, Download, Bookmark, BookmarkPlus, Check, Brain, Maximize2 } from 'lucide-react';
 import { dojoIcon } from '@/data/imagePaths';
 
 // Helper to combine and structure whiteboard data
@@ -1289,13 +1289,20 @@ export default function UnitPage() {
           <div className={`fixed top-1/2 -translate-y-1/2 left-8 z-50 transition-all duration-300 ease-in-out ${
             isAnythingSelected ? 'opacity-100' : 'opacity-0 pointer-events-none'
           }`}>
-            <div className="flex flex-col items-center gap-2 bg-white text-gray-800 rounded-2xl shadow-lg p-2 border-4 border-black">
+            <div className="flex flex-col items-center gap-2 bg-white text-gray-800 rounded-2xl shadow-lg p-2 border border-gray-300">
               <button 
                 onClick={handleMakeQuiz}
                 className="flex flex-col items-center justify-center p-2 rounded-md hover:bg-gray-100 transition-colors w-20 h-16"
                 title="Make a Quiz"
               >
-                <Play className="w-6 h-6 text-blue-500" />
+                <Image 
+                  src="/images/play-fill.svg" 
+                  alt="Play" 
+                  width={24} 
+                  height={24} 
+                  className="w-6 h-6"
+                  style={{ filter: 'brightness(0) saturate(100%) invert(40%) sepia(100%) saturate(2000%) hue-rotate(200deg) brightness(0.95) contrast(1.2)' }}
+                />
                 <span className="text-xs font-semibold mt-1">Drill</span>
               </button>
               

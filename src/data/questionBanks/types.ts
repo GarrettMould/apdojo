@@ -14,6 +14,7 @@ export interface Question {
   correctAnswer: string;
   explanation?: string;
   explanationVideo?: string;
+  videoExplanation?: string | null; // Video explanation path for MCQ questions
   lessonIDS: string[];
   isTest?: boolean; // Flag for test-only questions
 }
