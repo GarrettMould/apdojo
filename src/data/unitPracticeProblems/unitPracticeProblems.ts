@@ -1820,6 +1820,240 @@ const microUnit2Questions = [
     "correctAnswer": "B",
     "explanation": "A binding price floor is set above the equilibrium price. At this higher price, quantity supplied exceeds quantity demanded, resulting in a surplus.",
     "videoExplanation": null
+  },
+  {
+    "id": 2062,
+    "unit": 2,
+    "lessonIDS": [],
+    "unitName": "Supply and Demand",
+    "question": "A consumer's income rises by 15%, and as a result, their consumption of instant noodles decreases by 10%. Based on this calculation, the income elasticity of demand is:",
+    "image": null,
+    "options": [
+      "-1.5, suggesting instant noodles are a normal good.",
+      "-0.67, suggesting instant noodles are an inferior good.",
+      "0.67, suggesting instant noodles are a necessity.",
+      "1.5, suggesting instant noodles are a luxury good.",
+      "Negative, suggesting instant noodles are a substitute good."
+    ],
+    "correctAnswer": "B",
+    "explanation": "Income Elasticity = % Change in Quantity / % Change in Income = -10% / +15% = -0.67. A negative income elasticity coefficient identifies the product as an inferior good.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2063,
+    "unit": 2,
+    "lessonIDS": [],
+    "unitName": "Supply and Demand",
+    "question": "If a 5% increase in the price of almond butter leads to a 10% increase in the quantity demanded of cashew butter, then the cross-price elasticity of demand is:",
+    "image": null,
+    "options": [
+      "+2.0, and the goods are substitutes.",
+      "+0.5, and the goods are substitutes.",
+      "-2.0, and the goods are complements.",
+      "-0.5, and the goods are complements.",
+      "Zero, and the goods are unrelated."
+    ],
+    "correctAnswer": "A",
+    "explanation": "Cross-Price Elasticity = % Change in Qty (Cashew) / % Change in Price (Almond) = +10% / +5% = +2.0. A positive coefficient indicates that the two goods are substitutes.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2064,
+    "unit": 2,
+    "lessonIDS": [],
+    "unitName": "Supply and Demand",
+    "question": "A coffee shop decides to raise the price of its lattes from $4 to $5. Consequently, the shop's total monthly revenue from lattes decreases. This change in revenue implies that the demand for lattes in this price range is:",
+    "image": null,
+    "options": [
+      "perfectly inelastic.",
+      "relatively inelastic.",
+      "unit elastic.",
+      "relatively elastic.",
+      "perfectly elastic."
+    ],
+    "correctAnswer": "D",
+    "explanation": "The Total Revenue Test states that if Price and Total Revenue move in opposite directions (Price Up, Revenue Down), the demand curve is relatively elastic.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2065,
+    "unit": 2,
+    "lessonIDS": [],
+    "unitName": "Supply and Demand",
+    "question": "Which of the following scenarios would result in a supply curve that is highly price elastic?",
+    "image": null,
+    "options": [
+      "The time period under consideration is extremely short (the immediate moment).",
+      "The firm is operating at full capacity with no spare resources.",
+      "The inputs needed for production are scarce and difficult to acquire.",
+      "The product is a rare antique that cannot be reproduced.",
+      "The firm has ample inventory and can easily switch production techniques in the long run."
+    ],
+    "correctAnswer": "E",
+    "explanation": "Supply is more elastic when producers have flexibility. Factors like a long time horizon, availability of inputs, and ease of storage allow firms to respond strongly to price changes.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2066,
+    "unit": 2,
+    "lessonIDS": [],
+    "unitName": "Supply and Demand",
+    "question": "Assume the demand for insulin is perfectly inelastic, while the supply curve is upward sloping. If the government imposes a per-unit tax on insulin producers, who will bear the economic burden of the tax?",
+    "image": null,
+    "options": [
+      "Producers will bear the entire burden.",
+      "Consumers will bear the entire burden.",
+      "The burden will be shared equally between consumers and producers.",
+      "Producers will bear most, but not all, of the burden.",
+      "The tax will generate no tax revenue."
+    ],
+    "correctAnswer": "B",
+    "explanation": "When demand is perfectly inelastic, consumers will buy the same quantity regardless of price. Therefore, producers can pass the entire cost of the tax to consumers in the form of higher prices.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2067,
+    "unit": 2,
+    "lessonIDS": [],
+    "unitName": "Supply and Demand",
+    "question": "In a market where the demand is relatively elastic and the supply is relatively inelastic, the imposition of an excise tax will result in which of the following?",
+    "image": null,
+    "options": [
+      "Consumers bearing a larger share of the tax burden than producers.",
+      "Producers bearing a larger share of the tax burden than consumers.",
+      "The market price rising by the full amount of the tax.",
+      "No deadweight loss being created.",
+      "An increase in the quantity traded."
+    ],
+    "correctAnswer": "B",
+    "explanation": "Tax incidence falls more heavily on the side of the market that is less sensitive to price changes (more inelastic). Since supply is inelastic here, producers cannot easily leave the market and thus absorb more of the tax.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2068,
+    "unit": 2,
+    "lessonIDS": [],
+    "unitName": "Supply and Demand",
+    "question": "Deadweight loss resulting from a per-unit tax is minimized when:",
+    "image": null,
+    "options": [
+      "both supply and demand are highly elastic.",
+      "demand is elastic and supply is unit elastic.",
+      "both supply and demand are highly inelastic.",
+      "the tax rate is extremely high.",
+      "the tax is placed on the sellers rather than the buyers."
+    ],
+    "correctAnswer": "C",
+    "explanation": "Deadweight loss is caused by the reduction in the quantity traded. If both curves are inelastic, the change in price leads to a very small change in quantity, resulting in a smaller triangle of deadweight loss.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2069,
+    "unit": 2,
+    "lessonIDS": [],
+    "unitName": "Supply and Demand",
+    "question": "Suppose the government levies a $2 tax on a good. The equilibrium price paid by consumers rises from $10 to $11.50. Which of the following statements about tax incidence is accurate?",
+    "image": null,
+    "options": [
+      "Consumers pay $1.50 of the tax, and producers pay $0.50.",
+      "Consumers pay $2.00 of the tax, and producers pay $0.",
+      "Producers pay $1.50 of the tax, and consumers pay $0.50.",
+      "The supply curve must be perfectly elastic.",
+      "The demand curve must be perfectly elastic."
+    ],
+    "correctAnswer": "A",
+    "explanation": "The consumer's burden is the difference between the new price paid ($11.50) and the original pre-tax price ($10), which is $1.50. Since the total tax is $2.00, the remaining $0.50 is the burden absorbed by the producer.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2070,
+    "unit": 2,
+    "lessonIDS": [],
+    "unitName": "Supply and Demand",
+    "question": "Assume that tea and coffee are substitute goods. If there is a major technological breakthrough that increases the supply of coffee, what will be the likely impact on the market for tea?",
+    "image": null,
+    "options": [
+      "Demand for tea will increase, increasing the price of tea.",
+      "Demand for tea will decrease, decreasing the price of tea.",
+      "Supply of tea will increase, decreasing the price of tea.",
+      "Supply of tea will decrease, increasing the price of tea.",
+      "Demand for tea will increase, while the supply of tea remains constant."
+    ],
+    "correctAnswer": "B",
+    "explanation": "An increase in coffee supply lowers the price of coffee. Because they are substitutes, consumers will switch from tea to the now-cheaper coffee, causing the Demand for tea to decrease, which lowers the price of tea.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2071,
+    "unit": 2,
+    "lessonIDS": [],
+    "unitName": "Supply and Demand",
+    "question": "Consider a linear, downward-sloping demand curve. As you move downward along the curve from high prices to low prices, the price elasticity of demand changes from:",
+    "image": null,
+    "options": [
+      "inelastic to unit elastic to elastic.",
+      "elastic to unit elastic to inelastic.",
+      "perfectly elastic to perfectly inelastic.",
+      "perfectly inelastic to perfectly elastic.",
+      "constant elasticity throughout the curve."
+    ],
+    "correctAnswer": "B",
+    "explanation": "On a linear demand curve, the upper portion (high price, low quantity) is relatively elastic. The midpoint is unit elastic. The lower portion (low price, high quantity) is relatively inelastic.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2072,
+    "unit": 2,
+    "lessonIDS": [],
+    "unitName": "Supply and Demand",
+    "question": "A movie theater raises its ticket prices from $15 to $20, and as a result, its total revenue falls. This indicates that the demand for movie tickets in this price range is:",
+    "image": null,
+    "options": [
+      "price inelastic.",
+      "price elastic.",
+      "unit elastic.",
+      "perfectly inelastic.",
+      "income elastic."
+    ],
+    "correctAnswer": "B",
+    "explanation": "According to the Total Revenue Test, if Price rises and Total Revenue falls (they move in opposite directions), demand is Elastic.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2073,
+    "unit": 2,
+    "lessonIDS": [],
+    "unitName": "Supply and Demand",
+    "question": "When the market price of copper rises from $10.00 to $12.00 per pound, the quantity supplied by mines increases from 500 tons to 700 tons. What is the price elasticity of supply for copper?",
+    "image": null,
+    "options": [
+      "0.5",
+      "1.0",
+      "1.5",
+      "2.0",
+      "2.5"
+    ],
+    "correctAnswer": "D",
+    "explanation": "First calculate % change in Price: ($12.00-$10.00)/$10.00 = 20%. Next calculate % change in Quantity: (700-500)/500 = 40%. Elasticity = 40% / 20% = 2.0.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2074,
+    "unit": 2,
+    "lessonIDS": [],
+    "unitName": "Supply and Demand",
+    "question": "If the cross-price elasticity of demand between Product A and Product B is -3.2, which of the following is true?",
+    "image": null,
+    "options": [
+      "Product A and Product B are substitutes.",
+      "Product A is a normal good and Product B is an inferior good.",
+      "Product A and Product B are complements.",
+      "Demand for Product A is price inelastic.",
+      "Demand for Product B is price elastic."
+    ],
+    "correctAnswer": "C",
+    "explanation": "A negative cross-price elasticity means that when the price of one good goes up, the demand for the other goes down (and vice versa), which defines Complementary goods.",
+    "videoExplanation": null
   }
 ]
 
@@ -3609,6 +3843,132 @@ const microUnit6Questions = [
     "correctAnswer": "C",
     "explanation": "With a negative consumption externality, the marginal social benefit is lower than the marginal private benefit because the externality imposes costs on society. The market equilibrium occurs where marginal private benefit equals marginal social cost, or marginal private cost if no production externality exists. This results in a quantity consumed that is greater than the socially optimal quantity where marginal social benefit equals marginal social cost." // Reworded slightly to remove acronyms in parentheses and clarify the MPC part.
   }, 
+  {
+    "id": 2075,
+    "unit": 6,
+    "lessonIDS": ["6.2"],
+    "unitName": "Market Failure and the Role of Government",
+    "question": "A profit-maximizing firm is currently producing at its optimal level of output. If the government imposes a new lump-sum tax on the firm, how will this affect the firm's short-run Marginal Cost (MC) curve and its profit-maximizing quantity?",
+    "image": null,
+    "options": [
+      "The MC curve shifts upward, and quantity decreases.",
+      "The MC curve shifts upward, and quantity remains the same.",
+      "The MC curve does not shift, and quantity decreases.",
+      "The MC curve does not shift, and quantity remains the same.",
+      "The MC curve shifts downward, and quantity increases."
+    ],
+    "correctAnswer": "D",
+    "explanation": "A lump-sum tax is treated as a Fixed Cost. It changes the Average Total Cost (ATC) but does not change the cost of producing the next unit (Marginal Cost). Since the MC curve does not move, the intersection where MR = MC remains unchanged, so the quantity produced remains the same.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2076,
+    "unit": 6,
+    "lessonIDS": ["6.2"],
+    "unitName": "Market Failure and the Role of Government",
+    "question": "The government introduces a per-unit subsidy for producers of solar panels. Which of the following describes the shift in the firm's cost curves?",
+    "image": null,
+    "options": [
+      "Average Fixed Cost (AFC) shifts downward.",
+      "Marginal Cost (MC) shifts downward, but Average Total Cost (ATC) remains unchanged.",
+      "Marginal Cost (MC) and Average Total Cost (ATC) both shift downward.",
+      "Marginal Cost (MC) and Average Total Cost (ATC) both shift upward.",
+      "Average Total Cost (ATC) shifts downward, but Marginal Cost (MC) remains unchanged."
+    ],
+    "correctAnswer": "C",
+    "explanation": "A per-unit subsidy lowers the variable cost of producing each unit. Since Variable Costs are components of both Marginal Cost and Average Total Cost, both the MC curve and the ATC curve shift downward.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2077,
+    "unit": 6,
+    "lessonIDS": ["6.1"],
+    "unitName": "Market Failure and the Role of Government",
+    "question": "A chemical plant dumps waste into a nearby river, creating a negative production externality. In the absence of government intervention, how does the firm's equilibrium price and quantity compare to the socially optimal price and quantity?",
+    "image": null,
+    "options": [
+      "The market price is too high, and the market quantity is too low.",
+      "The market price is too low, and the market quantity is too high.",
+      "The market price is equal to the social optimal price, but quantity is too high.",
+      "The market price is too high, but the market quantity is socially optimal.",
+      "The market price is too low, and the market quantity is too low."
+    ],
+    "correctAnswer": "B",
+    "explanation": "The firm only considers its Marginal Private Cost (MPC). The Marginal Social Cost (MSC) is higher because of the pollution. The market produces where MPC = MPB (Demand), resulting in a lower price and higher quantity (Overproduction) compared to the social optimum where MSC = MSB.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2078,
+    "unit": 6,
+    "lessonIDS": ["6.3"],
+    "unitName": "Market Failure and the Role of Government",
+    "question": "Which of the following government actions would most effectively correct the allocative inefficiency caused by a positive consumption externality (e.g., vaccines)?",
+    "image": null,
+    "options": [
+      "A lump-sum tax on consumers.",
+      "A per-unit tax on producers.",
+      "A per-unit subsidy to consumers.",
+      "A price floor set above the equilibrium price.",
+      "A lump-sum subsidy to producers."
+    ],
+    "correctAnswer": "C",
+    "explanation": "A positive consumption externality means Marginal Social Benefit (MSB) > Marginal Private Benefit (MPB), leading to underconsumption. A per-unit subsidy effectively lowers the price or increases the value for consumers, shifting demand rightward toward the social optimum.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2079,
+    "unit": 6,
+    "lessonIDS": ["6.2"],
+    "unitName": "Market Failure and the Role of Government",
+    "question": "A monopoly is currently earning positive economic profits. The government decides to regulate the monopoly by imposing a per-unit tax equal to the gap between the price and marginal cost. What is the impact on the firm's profit and output quantity?",
+    "image": null,
+    "options": [
+      "Profit decreases; Quantity decreases.",
+      "Profit decreases; Quantity remains unchanged.",
+      "Profit remains unchanged; Quantity decreases.",
+      "Profit remains unchanged; Quantity remains unchanged.",
+      "Profit increases; Quantity decreases."
+    ],
+    "correctAnswer": "A",
+    "explanation": "A per-unit tax increases Marginal Cost (shifting MC upward). The new intersection of MR = MC will occur at a lower quantity. Additionally, the tax increases Average Total Cost, which reduces the profit margin per unit.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2080,
+    "unit": 6,
+    "lessonIDS": ["6.2"],
+    "unitName": "Market Failure and the Role of Government",
+    "question": "If the government wants to reduce the profits of a polluting monopoly without affecting the quantity of goods producing the pollution, which policy should it use?",
+    "image": null,
+    "options": [
+      "A per-unit tax.",
+      "A per-unit subsidy.",
+      "A lump-sum tax.",
+      "A price ceiling.",
+      "A binding production quota."
+    ],
+    "correctAnswer": "C",
+    "explanation": "A lump-sum tax increases Fixed Costs, which raises Average Total Cost (reducing profit) but does NOT change Marginal Cost. Because MC is unchanged, the profit-maximizing quantity (MR = MC) remains exactly the same.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2081,
+    "unit": 6,
+    "lessonIDS": ["6.3"],
+    "unitName": "Market Failure and the Role of Government",
+    "question": "A perfectly competitive industry is producing a good that generates a positive production externality. Without government intervention, the market outcome will result in:",
+    "image": null,
+    "options": [
+      "A price that is higher than the socially optimal price.",
+      "A quantity that is greater than the socially optimal quantity.",
+      "A quantity that is less than the socially optimal quantity.",
+      "Zero deadweight loss.",
+      "An internalizing of the external benefits."
+    ],
+    "correctAnswer": "C",
+    "explanation": "Because the firm does not get paid for the external benefit (pollination), its Marginal Private Cost (MPC) is higher than the true Marginal Social Cost (MSC). The firm produces where P = MPC, which is a lower quantity than the social optimum where P = MSC. This is an underallocation of resources.",
+    "videoExplanation": null
+  },
   {
     "id": 139,
     "subject": "ap_microeconomics",

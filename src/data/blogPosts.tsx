@@ -496,8 +496,6 @@ export const blogPosts: Record<string, BlogPost> = {
         <hr className="my-12"/>
         
         <div className="bg-gray-50 p-6 rounded-xl border-2 border-blue-100 text-center my-8">
-          <h3 className="text-xl font-bold text-gray-800 mb-4">Suppose fears of a recession cause consumers to spend less. Show the shift that occurs.</h3>
-          
           <DraggableGraph />
         </div>
       </>
