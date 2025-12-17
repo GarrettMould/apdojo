@@ -200,6 +200,232 @@ const macroUnit1Questions = [
     "correctAnswer": "D",
     "explanation": "For a normal good, higher consumer incomes lead to an increase in demand (a rightward shift of the demand curve). This increase in demand causes both the equilibrium price and the equilibrium quantity to rise.",
     "videoExplanation": null
+  },
+  {
+    "id": 2082,
+    "unit": 1,
+    "lessonIDS": ["1.3"],
+    "unitName": "Basic Economic Concepts",
+    "question": "The table below shows the maximum potential output for two countries, Rohan and Gondor, if they use all their resources efficiently.\n\nIf these countries decide to specialize and trade based on comparative advantage, which of the following scenarios represents a mutually beneficial trade agreement?",
+    "image": null,
+    "tableData": {
+      "headers": ["Country", "Tonnes of Steel", "Tonnes of Grain"],
+      "rows": [
+        ["Rohan", "10", "40"],
+        ["Gondor", "20", "20"]
+      ]
+    },
+    "options": [
+      "Rohan exports grain, and they trade at a rate of 1 Steel for 3 Grain.",
+      "Rohan exports steel, and they trade at a rate of 1 Steel for 5 Grain.",
+      "Gondor exports grain, and they trade at a rate of 1 Steel for 2 Grain.",
+      "Gondor exports steel, and they trade at a rate of 1 Steel for 3 Grain.",
+      "Gondor exports steel, and they trade at a rate of 1 Steel for 5 Grain."
+    ],
+    "correctAnswer": "D",
+    "explanation": "Calculate Opportunity Costs for Steel: Rohan gives up 4 Grain (40/10). Gondor gives up 1 Grain (20/20). Gondor has the lower opp. cost (1 < 4) and exports Steel. The terms of trade must fall between the two opportunity costs (between 1 Grain and 4 Grain). 1 Steel for 3 Grain is the only option in that range.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2084,
+    "unit": 1,
+    "lessonIDS": ["1.3"],
+    "unitName": "Comparative Advantage and Gains from Trade",
+    "question": "Dr. Aris is a highly skilled neurosurgeon who earns $300 per hour. He is also an exceptionally fast typist, capable of transcribing medical records twice as fast as the average medical transcriptionist, who earns $20 per hour. According to economic principles of advantage, which course of action is most efficient?",
+    "image": null,
+    "options": [
+      "Dr. Aris should perform his own transcription because he has an absolute advantage in both surgery and typing.",
+      "Dr. Aris should hire a transcriptionist because he has a comparative advantage in surgery.",
+      "Dr. Aris should quit surgery to become a transcriptionist because his typing speed gives him a comparative advantage.",
+      "The transcriptionist should charge Dr. Aris $300 per hour since that is the opportunity cost of the doctor's time.",
+      "Dr. Aris should do his own transcription because saving $20 per hour is economically rational."
+    ],
+    "correctAnswer": "B",
+    "explanation": "Even though Dr. Aris has an absolute advantage in typing (he is faster), his opportunity cost is too high. Every hour he spends typing costs him $300 in lost surgical income. He should specialize where his comparative advantage is highest (surgery) and trade for the other service.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2085,
+    "unit": 1,
+    "lessonIDS": ["1.2"],
+    "unitName": "Comparative Advantage and Gains from Trade",
+    "question": "Consider two factories, Alpha and Beta, that produce only widgets and gadgets. If a worker in Factory Alpha can produce three times as many widgets as a worker in Factory Beta using the same amount of time, which of the following is true?",
+    "image": null,
+    "options": [
+      "Factory Alpha has a comparative advantage in widgets.",
+      "Factory Alpha has an absolute advantage in widgets.",
+      "Factory Beta has a comparative advantage in gadgets.",
+      "Factory Beta has an absolute advantage in gadgets.",
+      "Factory Alpha should specialize in widgets."
+    ],
+    "correctAnswer": "B",
+    "explanation": "Absolute advantage is defined by productivity per unit of input. Since Alpha produces more widgets per worker (input), it has an absolute advantage. We cannot determine comparative advantage without knowing the production data for gadgets to calculate opportunity cost.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2086,
+    "unit": 1,
+    "lessonIDS": ["1.3"],
+    "unitName": "Comparative Advantage and Gains from Trade",
+    "question": "The table below shows the maximum potential output for two countries, Rohan and Gondor, if they use all their resources efficiently.\n\nIf these countries decide to specialize and trade based on comparative advantage, which of the following scenarios represents a mutually beneficial trade agreement?",
+    "image": null,
+    "tableData": {
+      "headers": ["Country", "Tonnes of Steel", "Tonnes of Grain"],
+      "rows": [
+        ["Rohan", "10", "40"],
+        ["Gondor", "20", "20"]
+      ]
+    },
+    "options": [
+      "Rohan exports grain, and they trade at a rate of 1 Steel for 3 Grain.",
+      "Rohan exports steel, and they trade at a rate of 1 Steel for 5 Grain.",
+      "Gondor exports grain, and they trade at a rate of 1 Steel for 2 Grain.",
+      "Gondor exports steel, and they trade at a rate of 1 Steel for 3 Grain.",
+      "Gondor exports steel, and they trade at a rate of 1 Steel for 5 Grain."
+    ],
+    "correctAnswer": "D",
+    "explanation": "Calculate Opportunity Costs for Steel: Rohan gives up 4 Grain (40/10). Gondor gives up 1 Grain (20/20). Gondor has the lower opp. cost (1 < 4) and exports Steel. The terms of trade must fall between the two opportunity costs (between 1 Grain and 4 Grain). 1 Steel for 3 Grain is the only option in that range.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2087,
+    "unit": 1,
+    "lessonIDS": ["1.3"],
+    "unitName": "Comparative Advantage and Gains from Trade",
+    "question": "The production possibilities for two island nations, Island A and Island B, are shown in the table below. The numbers represent the annual output of either Coconuts or Fish using all available resources.\n\nWhich terms of trade would incentivize both islands to specialize and engage in trade?",
+    "image": null,
+    "tableData": {
+      "headers": ["Nation", "Coconuts", "Fish"],
+      "rows": [
+        ["Island A", "100", "50"],
+        ["Island B", "50", "100"]
+      ]
+    },
+    "options": [
+      "1 Coconut for 0.2 Fish",
+      "1 Coconut for 1.5 Fish",
+      "1 Coconut for 3 Fish",
+      "1 Coconut for 4 Fish",
+      "1 Coconut for 5 Fish"
+    ],
+    "correctAnswer": "B",
+    "explanation": "Calculate Opp Cost of 1 Coconut: Island A = 0.5 Fish (50/100). Island B = 2 Fish (100/50). For trade to benefit both, the price must settle between their opportunity costs (0.5 Fish < Price < 2 Fish). 1.5 Fish is the only option within this range.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2088,
+    "unit": 1,
+    "lessonIDS": ["1.3"],
+    "unitName": "Comparative Advantage and Gains from Trade",
+    "question": "Two neighboring countries, Westland and Eastland, have identical resource quantities but different production technologies. If Westland exports microchips to Eastland and imports lumber from Eastland, which of the following conclusions must be true?",
+    "image": null,
+    "options": [
+      "Westland has a higher opportunity cost for producing microchips than Eastland.",
+      "Eastland has a comparative advantage in producing lumber.",
+      "Eastland has an absolute advantage in producing microchips.",
+      "Westland's workers are less productive at making microchips than Eastland's workers.",
+      "Eastland consumers have a stronger preference for microchips."
+    ],
+    "correctAnswer": "B",
+    "explanation": "Trade flows are dictated by comparative advantage. If Eastland is exporting lumber, it must be because it can produce lumber at a lower opportunity cost than Westland, meaning it holds the comparative advantage.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2089,
+    "unit": 1,
+    "lessonIDS": ["1.2"],
+    "unitName": "Comparative Advantage and Gains from Trade",
+    "question": "The table below displays the labor hours required to produce one unit of Cloth and one unit of Wine in France and Italy.\n\nBased on these input requirements, which statement accurately describes the advantages held by each country?",
+    "image": null,
+    "tableData": {
+      "headers": ["Country", "Hours per unit of Cloth", "Hours per unit of Wine"],
+      "rows": [
+        ["France", "10", "5"],
+        ["Italy", "12", "4"]
+      ]
+    },
+    "options": [
+      "France has an absolute advantage in Wine.",
+      "Italy has an absolute advantage in Cloth.",
+      "France has a comparative advantage in Cloth.",
+      "Italy has a comparative advantage in Cloth.",
+      "Neither country has a comparative advantage."
+    ],
+    "correctAnswer": "C",
+    "explanation": "First, Absolute Advantage: France uses fewer hours for Cloth (10 < 12), so France has Abs Adv in Cloth. Italy uses fewer hours for Wine (4 < 5), so Italy has Abs Adv in Wine.\nNext, Comparative Advantage (Input Problem = \"Other goes Under\"): \n- France Opp Cost of Cloth = 10/5 = 2 Wine.\n- Italy Opp Cost of Cloth = 12/4 = 3 Wine.\nSince 2 < 3, France has the lower opportunity cost and thus the Comparative Advantage in Cloth.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2096,
+    "unit": 1,
+    "lessonIDS": ["1.3"],
+    "unitName": "Comparative Advantage and Gains from Trade",
+    "question": "Refer to the production possibilities graph below, which shows the potential output for two nations, Liblis and Tralia, using equal amounts of resources. \n\n[Image of Liblis and Tralia PPF graph]\n\nBased on the graph, which of the following statements correctly identifies the comparative advantage for each country?",
+    "image": null,
+    "options": [
+      "Liblis has a comparative advantage in Good A, and Tralia has a comparative advantage in Good B.",
+      "Liblis has a comparative advantage in Good B, and Tralia has a comparative advantage in Good A.",
+      "Tralia has a comparative advantage in both Good A and Good B.",
+      "Liblis has a comparative advantage in both Good A and Good B.",
+      "Neither country has a comparative advantage in Good A."
+    ],
+    "correctAnswer": "A",
+    "explanation": "Calculate opportunity costs: Liblis gives up 50B to make 100A (1A = 0.5B). Tralia gives up 100B to make 100A (1A = 1B). Liblis has the lower opportunity cost for Good A (0.5B < 1B). Conversely, for Good B, Tralia gives up 1A while Liblis gives up 2A. Tralia has the lower cost for Good B.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2097,
+    "unit": 1,
+    "lessonIDS": ["1.3"],
+    "unitName": "Comparative Advantage and Gains from Trade",
+    "question": "Refer to the graph for Liblis and Tralia. If these two nations decide to specialize and trade, which of the following ratios represents a Terms of Trade that would be mutually beneficial for exchanging 1 unit of Good B?",
+    "image": null,
+    "options": [
+      "1 unit of Good B for 0.5 units of Good A",
+      "1 unit of Good B for 1.5 units of Good A",
+      "1 unit of Good B for 2.5 units of Good A",
+      "1 unit of Good B for 3 units of Good A",
+      "1 unit of Good B for 10 units of Good A"
+    ],
+    "correctAnswer": "B",
+    "explanation": "Calculate the opportunity cost of 1 unit of Good B for each country. \n- Liblis: Needs 100A to get 50B -> 1B costs 2A. \n- Tralia: Needs 100A to get 100B -> 1B costs 1A. \nFor trade to work, the price must fall between their opportunity costs: 1A < Price < 2A. The only option in this range is 1.5 units of Good A.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2098,
+    "unit": 1,
+    "lessonIDS": ["1.2"],
+    "unitName": "Comparative Advantage and Gains from Trade",
+    "question": "Refer to the graph for Liblis and Tralia. Which statement regarding **Absolute Advantage** is supported by the data?",
+    "image": null,
+    "options": [
+      "Tralia has an absolute advantage in the production of Good B.",
+      "Liblis has an absolute advantage in the production of Good B.",
+      "Liblis has an absolute advantage in the production of Good A.",
+      "Tralia has an absolute advantage in the production of Good A.",
+      "Neither country has an absolute advantage in either good."
+    ],
+    "correctAnswer": "A",
+    "explanation": "Absolute advantage is determined by who can produce *more* with the same resources. Tralia can produce 100 units of Good B compared to Liblis's 50 units, giving Tralia the absolute advantage in Good B. (Note: For Good A, both produce 100, so neither has the absolute advantage).",
+    "videoExplanation": null
+  },
+  {
+    "id": 2102,
+    "unit": 1,
+    "lessonIDS": ["1.1"],
+    "unitName": "Comparative Advantage and Gains from Trade",
+    "question": "The graph below shows the Production Possibilities Curve for a nation producing Capital Goods and Consumer Goods. \n\n\n\nCalculate the average **opportunity cost of producing one unit of Consumer Goods** as the economy moves from Point L to Point M.",
+    "image": null,
+    "options": [
+      "0.5 Capital Goods",
+      "1 Capital Good",
+      "2 Capital Goods",
+      "8 Capital Goods",
+      "Zero"
+    ],
+    "correctAnswer": "A",
+    "explanation": "At Point L, the economy has 5 Consumer and 9 Capital goods. At Point M, it has 7 Consumer and 8 Capital goods. \n- **Gain:** +2 Consumer Goods (7 - 5). \n- **Loss:** -1 Capital Good (9 - 8). \n- **Opportunity Cost per unit:** $\\frac{\\text{Loss}}{\\text{Gain}} = \\frac{1 \\text{ Capital}}{2 \\text{ Consumer}} = 0.5$ Capital Goods.",
+    "videoExplanation": null
   }
 ]
 
@@ -1633,6 +1859,232 @@ const microUnit1Questions = [
     ],
     "correctAnswer": "D",
     "explanation": "When countries specialize in goods where they have a lower opportunity cost (comparative advantage) and trade, global efficiency increases. This results in higher total world output and allows countries to consume beyond their individual production possibilities.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2083,
+    "unit": 1,
+    "lessonIDS": ["1.3"],
+    "unitName": "Basic Economic Concepts",
+    "question": "The table below shows the maximum potential output for two countries, Rohan and Gondor, if they use all their resources efficiently.\n\nIf these countries decide to specialize and trade based on comparative advantage, which of the following scenarios represents a mutually beneficial trade agreement?",
+    "image": null,
+    "tableData": {
+      "headers": ["Country", "Tonnes of Steel", "Tonnes of Grain"],
+      "rows": [
+        ["Rohan", "10", "40"],
+        ["Gondor", "20", "20"]
+      ]
+    },
+    "options": [
+      "Rohan exports grain, and they trade at a rate of 1 Steel for 3 Grain.",
+      "Rohan exports steel, and they trade at a rate of 1 Steel for 5 Grain.",
+      "Gondor exports grain, and they trade at a rate of 1 Steel for 2 Grain.",
+      "Gondor exports steel, and they trade at a rate of 1 Steel for 3 Grain.",
+      "Gondor exports steel, and they trade at a rate of 1 Steel for 5 Grain."
+    ],
+    "correctAnswer": "D",
+    "explanation": "Calculate Opportunity Costs for Steel: Rohan gives up 4 Grain (40/10). Gondor gives up 1 Grain (20/20). Gondor has the lower opp. cost (1 < 4) and exports Steel. The terms of trade must fall between the two opportunity costs (between 1 Grain and 4 Grain). 1 Steel for 3 Grain is the only option in that range.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2090,
+    "unit": 1,
+    "lessonIDS": ["1.4"],
+    "unitName": "Comparative Advantage and Gains from Trade",
+    "question": "Dr. Aris is a highly skilled neurosurgeon who earns $300 per hour. He is also an exceptionally fast typist, capable of transcribing medical records twice as fast as the average medical transcriptionist, who earns $20 per hour. According to economic principles of advantage, which course of action is most efficient?",
+    "image": null,
+    "options": [
+      "Dr. Aris should perform his own transcription because he has an absolute advantage in both surgery and typing.",
+      "Dr. Aris should hire a transcriptionist because he has a comparative advantage in surgery.",
+      "Dr. Aris should quit surgery to become a transcriptionist because his typing speed gives him a comparative advantage.",
+      "The transcriptionist should charge Dr. Aris $300 per hour since that is the opportunity cost of the doctor's time.",
+      "Dr. Aris should do his own transcription because saving $20 per hour is economically rational."
+    ],
+    "correctAnswer": "B",
+    "explanation": "Even though Dr. Aris has an absolute advantage in typing (he is faster), his opportunity cost is too high. Every hour he spends typing costs him $300 in lost surgical income. He should specialize where his comparative advantage is highest (surgery) and trade for the other service.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2091,
+    "unit": 1,
+    "lessonIDS": ["1.4"],
+    "unitName": "Comparative Advantage and Gains from Trade",
+    "question": "Consider two factories, Alpha and Beta, that produce only widgets and gadgets. If a worker in Factory Alpha can produce three times as many widgets as a worker in Factory Beta using the same amount of time, which of the following is true?",
+    "image": null,
+    "options": [
+      "Factory Alpha has a comparative advantage in widgets.",
+      "Factory Alpha has an absolute advantage in widgets.",
+      "Factory Beta has a comparative advantage in gadgets.",
+      "Factory Beta has an absolute advantage in gadgets.",
+      "Factory Alpha should specialize in widgets."
+    ],
+    "correctAnswer": "B",
+    "explanation": "Absolute advantage is defined by productivity per unit of input. Since Alpha produces more widgets per worker (input), it has an absolute advantage. We cannot determine comparative advantage without knowing the production data for gadgets to calculate opportunity cost.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2092,
+    "unit": 1,
+    "lessonIDS": ["1.4"],
+    "unitName": "Comparative Advantage and Gains from Trade",
+    "question": "The table below shows the maximum potential output for two countries, Rohan and Gondor, if they use all their resources efficiently.\n\nIf these countries decide to specialize and trade based on comparative advantage, which of the following scenarios represents a mutually beneficial trade agreement?",
+    "image": null,
+    "tableData": {
+      "headers": ["Country", "Tonnes of Steel", "Tonnes of Grain"],
+      "rows": [
+        ["Rohan", "10", "40"],
+        ["Gondor", "20", "20"]
+      ]
+    },
+    "options": [
+      "Rohan exports grain, and they trade at a rate of 1 Steel for 3 Grain.",
+      "Rohan exports steel, and they trade at a rate of 1 Steel for 5 Grain.",
+      "Gondor exports grain, and they trade at a rate of 1 Steel for 2 Grain.",
+      "Gondor exports steel, and they trade at a rate of 1 Steel for 3 Grain.",
+      "Gondor exports steel, and they trade at a rate of 1 Steel for 5 Grain."
+    ],
+    "correctAnswer": "D",
+    "explanation": "Calculate Opportunity Costs for Steel: Rohan gives up 4 Grain (40/10). Gondor gives up 1 Grain (20/20). Gondor has the lower opp. cost (1 < 4) and exports Steel. The terms of trade must fall between the two opportunity costs (between 1 Grain and 4 Grain). 1 Steel for 3 Grain is the only option in that range.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2093,
+    "unit": 1,
+    "lessonIDS": ["1.4"],
+    "unitName": "Comparative Advantage and Gains from Trade",
+    "question": "The production possibilities for two island nations, Island A and Island B, are shown in the table below. The numbers represent the annual output of either Coconuts or Fish using all available resources.\n\nWhich terms of trade would incentivize both islands to specialize and engage in trade?",
+    "image": null,
+    "tableData": {
+      "headers": ["Nation", "Coconuts", "Fish"],
+      "rows": [
+        ["Island A", "100", "50"],
+        ["Island B", "50", "100"]
+      ]
+    },
+    "options": [
+      "1 Coconut for 0.2 Fish",
+      "1 Coconut for 1.5 Fish",
+      "1 Coconut for 3 Fish",
+      "1 Coconut for 4 Fish",
+      "1 Coconut for 5 Fish"
+    ],
+    "correctAnswer": "B",
+    "explanation": "Calculate Opp Cost of 1 Coconut: Island A = 0.5 Fish (50/100). Island B = 2 Fish (100/50). For trade to benefit both, the price must settle between their opportunity costs (0.5 Fish < Price < 2 Fish). 1.5 Fish is the only option within this range.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2094,
+    "unit": 1,
+    "lessonIDS": ["1.4"],
+    "unitName": "Comparative Advantage and Gains from Trade",
+    "question": "Two neighboring countries, Westland and Eastland, have identical resource quantities but different production technologies. If Westland exports microchips to Eastland and imports lumber from Eastland, which of the following conclusions must be true?",
+    "image": null,
+    "options": [
+      "Westland has a higher opportunity cost for producing microchips than Eastland.",
+      "Eastland has a comparative advantage in producing lumber.",
+      "Eastland has an absolute advantage in producing microchips.",
+      "Westland's workers are less productive at making microchips than Eastland's workers.",
+      "Eastland consumers have a stronger preference for microchips."
+    ],
+    "correctAnswer": "B",
+    "explanation": "Trade flows are dictated by comparative advantage. If Eastland is exporting lumber, it must be because it can produce lumber at a lower opportunity cost than Westland, meaning it holds the comparative advantage.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2095,
+    "unit": 1,
+    "lessonIDS": ["1.4"],
+    "unitName": "Comparative Advantage and Gains from Trade",
+    "question": "The table below displays the labor hours required to produce one unit of Cloth and one unit of Wine in France and Italy.\n\nBased on these input requirements, which statement accurately describes the advantages held by each country?",
+    "image": null,
+    "tableData": {
+      "headers": ["Country", "Hours per unit of Cloth", "Hours per unit of Wine"],
+      "rows": [
+        ["France", "10", "5"],
+        ["Italy", "12", "4"]
+      ]
+    },
+    "options": [
+      "France has an absolute advantage in Wine.",
+      "Italy has an absolute advantage in Cloth.",
+      "France has a comparative advantage in Cloth.",
+      "Italy has a comparative advantage in Cloth.",
+      "Neither country has a comparative advantage."
+    ],
+    "correctAnswer": "C",
+    "explanation": "First, Absolute Advantage: France uses fewer hours for Cloth (10 < 12), so France has Abs Adv in Cloth. Italy uses fewer hours for Wine (4 < 5), so Italy has Abs Adv in Wine.\nNext, Comparative Advantage (Input Problem = \"Other goes Under\"): \n- France Opp Cost of Cloth = 10/5 = 2 Wine.\n- Italy Opp Cost of Cloth = 12/4 = 3 Wine.\nSince 2 < 3, France has the lower opportunity cost and thus the Comparative Advantage in Cloth.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2099,
+    "unit": 1,
+    "lessonIDS": ["1.4"],
+    "unitName": "Comparative Advantage and Gains from Trade",
+    "question": "Refer to the production possibilities graph below, which shows the potential output for two nations, Liblis and Tralia, using equal amounts of resources. \n\n[Image of Liblis and Tralia PPF graph]\n\nBased on the graph, which of the following statements correctly identifies the comparative advantage for each country?",
+    "image": null,
+    "options": [
+      "Liblis has a comparative advantage in Good A, and Tralia has a comparative advantage in Good B.",
+      "Liblis has a comparative advantage in Good B, and Tralia has a comparative advantage in Good A.",
+      "Tralia has a comparative advantage in both Good A and Good B.",
+      "Liblis has a comparative advantage in both Good A and Good B.",
+      "Neither country has a comparative advantage in Good A."
+    ],
+    "correctAnswer": "A",
+    "explanation": "Calculate opportunity costs: Liblis gives up 50B to make 100A (1A = 0.5B). Tralia gives up 100B to make 100A (1A = 1B). Liblis has the lower opportunity cost for Good A (0.5B < 1B). Conversely, for Good B, Tralia gives up 1A while Liblis gives up 2A. Tralia has the lower cost for Good B.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2100,
+    "unit": 1,
+    "lessonIDS": ["1.4"],
+    "unitName": "Comparative Advantage and Gains from Trade",
+    "question": "Refer to the graph for Liblis and Tralia. If these two nations decide to specialize and trade, which of the following ratios represents a Terms of Trade that would be mutually beneficial for exchanging 1 unit of Good B?",
+    "image": null,
+    "options": [
+      "1 unit of Good B for 0.5 units of Good A",
+      "1 unit of Good B for 1.5 units of Good A",
+      "1 unit of Good B for 2.5 units of Good A",
+      "1 unit of Good B for 3 units of Good A",
+      "1 unit of Good B for 10 units of Good A"
+    ],
+    "correctAnswer": "B",
+    "explanation": "Calculate the opportunity cost of 1 unit of Good B for each country. \n- Liblis: Needs 100A to get 50B -> 1B costs 2A. \n- Tralia: Needs 100A to get 100B -> 1B costs 1A. \nFor trade to work, the price must fall between their opportunity costs: 1A < Price < 2A. The only option in this range is 1.5 units of Good A.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2101,
+    "unit": 1,
+    "lessonIDS": ["1.4"],
+    "unitName": "Comparative Advantage and Gains from Trade",
+    "question": "Refer to the graph for Liblis and Tralia. Which statement regarding **Absolute Advantage** is supported by the data?",
+    "image": null,
+    "options": [
+      "Tralia has an absolute advantage in the production of Good B.",
+      "Liblis has an absolute advantage in the production of Good B.",
+      "Liblis has an absolute advantage in the production of Good A.",
+      "Tralia has an absolute advantage in the production of Good A.",
+      "Neither country has an absolute advantage in either good."
+    ],
+    "correctAnswer": "A",
+    "explanation": "Absolute advantage is determined by who can produce *more* with the same resources. Tralia can produce 100 units of Good B compared to Liblis's 50 units, giving Tralia the absolute advantage in Good B. (Note: For Good A, both produce 100, so neither has the absolute advantage).",
+    "videoExplanation": null
+  },
+  {
+    "id": 2103,
+    "unit": 1,
+    "lessonIDS": ["1.1"],
+    "unitName": "Comparative Advantage and Gains from Trade",
+    "question": "The graph below shows the Production Possibilities Curve for a nation producing Capital Goods and Consumer Goods. \n\n\n\nCalculate the average **opportunity cost of producing one unit of Consumer Goods** as the economy moves from Point L to Point M.",
+    "image": null,
+    "options": [
+      "0.5 Capital Goods",
+      "1 Capital Good",
+      "2 Capital Goods",
+      "8 Capital Goods",
+      "Zero"
+    ],
+    "correctAnswer": "A",
+    "explanation": "At Point L, the economy has 5 Consumer and 9 Capital goods. At Point M, it has 7 Consumer and 8 Capital goods. \n- **Gain:** +2 Consumer Goods (7 - 5). \n- **Loss:** -1 Capital Good (9 - 8). \n- **Opportunity Cost per unit:** $\\frac{\\text{Loss}}{\\text{Gain}} = \\frac{1 \\text{ Capital}}{2 \\text{ Consumer}} = 0.5$ Capital Goods.",
     "videoExplanation": null
   }
   // Lesson 1.5: (left empty)

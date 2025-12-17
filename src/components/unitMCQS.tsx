@@ -516,6 +516,53 @@ const QuestionCard = ({
             )}
           </p>
 
+          {/* Table Data */}
+          {question.tableData && (
+            <div className="my-6 flex justify-center">
+              <div className="flex items-center gap-4">
+                {question.tableData.playerNames && (
+                  <div className="flex items-center justify-center h-full w-16">
+                    <p className="transform -rotate-90 whitespace-nowrap text-center font-bold text-lg text-gray-900 leading-tight">
+                      {question.tableData.playerNames.row.split(' ')[0]}
+                      <br />
+                      {question.tableData.playerNames.row.split(' ').slice(1).join(' ')}
+                    </p>
+                  </div>
+                )}
+                <div className="flex-1">
+                  <table className="min-w-full border-collapse border border-black">
+                    <thead className="bg-white">
+                      <tr>
+                        {question.tableData.headers.map(header => (
+                          <th key={header} className="border border-black px-4 py-3 text-center text-base font-bold text-gray-900">
+                            {header}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white">
+                      {question.tableData.rows.map((row, rowIndex) => (
+                        <tr key={rowIndex}>
+                          {row.map((cell, cellIndex) => {
+                            const isRowHeader = question.tableData?.rowHeaders && cellIndex === 0;
+                            return (
+                              <td 
+                                key={cellIndex} 
+                                className={`border border-black px-4 py-3 text-center text-base ${isRowHeader ? 'font-bold' : ''}`}
+                              >
+                                {cell}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
         {/* --- ADDED: Question Image Display --- */}
         {question.image && (
           <div className="my-4 rounded-lg overflow-hidden border border-gray-200">

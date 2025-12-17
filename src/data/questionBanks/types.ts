@@ -17,6 +17,15 @@ export interface Question {
   videoExplanation?: string | null; // Video explanation path for MCQ questions
   lessonIDS: string[];
   isTest?: boolean; // Flag for test-only questions
+  tableData?: {
+    headers: string[];
+    rows: string[][];
+    rowHeaders?: boolean;
+    playerNames?: {
+      row: string;
+      column: string;
+    };
+  };
 }
 
 export interface QuestionBank {
