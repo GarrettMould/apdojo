@@ -426,6 +426,85 @@ const macroUnit1Questions = [
     "correctAnswer": "A",
     "explanation": "At Point L, the economy has 5 Consumer and 9 Capital goods. At Point M, it has 7 Consumer and 8 Capital goods. \n- **Gain:** +2 Consumer Goods (7 - 5). \n- **Loss:** -1 Capital Good (9 - 8). \n- **Opportunity Cost per unit:** $\\frac{\\text{Loss}}{\\text{Gain}} = \\frac{1 \\text{ Capital}}{2 \\text{ Consumer}} = 0.5$ Capital Goods.",
     "videoExplanation": null
+  },
+  {
+    "id": 2104,
+    "unit": 1,
+    "lessonIDS": ["1.3"],
+    "unitName": "Comparative Advantage and Gains from Trade",
+    "question": "When two countries specialize based on comparative advantage and carry out mutually beneficial trade, the primary economic outcome is that:",
+    "image": null,
+    "options": [
+      "each country is able to consume beyond their domestic production possibilities curve.",
+      "each country is able to produce beyond their domestic production possibilities curve.",
+      "both countries will experience a decrease in their total consumption.",
+      "one country gains only at the expense of the other country.",
+      "the global efficiency of resource allocation decreases."
+    ],
+    "correctAnswer": "A",
+    "explanation": "Specialization and trade allow nations to access goods at a lower opportunity cost than producing them domestically. While a country cannot *produce* outside its Production Possibilities Curve (PPC) without new resources or technology, trade allows it to *consume* a bundle of goods that lies outside its PPC.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2106,
+    "unit": 1,
+    "lessonIDS": ["1.3"],
+    "unitName": "Comparative Advantage and Gains from Trade",
+    "question": "The graph below displays the linear production possibilities curves for Borneo and Brunei, which produce Bananas and Mangoes. If Borneo and Brunei specialize according to their comparative advantage and agree to trade at a rate of 1 Banana for 3 Mangoes, which of the following is true? ",
+    "image": null,
+    "options": [
+      "Both countries can consume a combination of goods that lies beyond their individual production possibilities curves.",
+      "Borneo will be able to produce beyond its production possibilities curve, but Brunei will not.",
+      "The joint production of both goods will decrease due to specialization.",
+      "Brunei will gain from trade, but Borneo will consume inside its production possibilities curve.",
+      "Both countries will be forced to consume at a point inside their production possibilities curves."
+    ],
+    "correctAnswer": "A",
+    "explanation": "The fundamental gain from voluntary international trade is that it allows nations to consume strictly more than they could produce on their own. While specialization moves production *to* a specific point on the PPC, the terms of trade allow the consumption point to shift *outside* the boundary of the domestic PPC.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2108,
+    "unit": 1,
+    "lessonIDS": ["1.1"],
+    "unitName": "Comparative Advantage and Gains from Trade",
+    "question": "When a production possibilities curve is concave rather than a straight line, it demonstrates increasing opportunity costs, which are primarily due to",
+    "image": null,
+    "options": [
+      "Resources are not perfectly adaptable to the production of different goods.",
+      "The law of diminishing marginal utility affects consumer choices.",
+      "The economy is suffering from cyclical unemployment.",
+      "Consumer tastes shift as the price of goods increases.",
+      "The law of demand causes prices to fall as supply increases."
+    ],
+    "correctAnswer": "A",
+    "explanation": "A bowed-out PPC indicates that as you produce more of one good, you must give up increasingly larger amounts of the other. This happens because resources (land, labor, capital) are specialized; moving resources from a sector where they are efficient to one where they are not results in a loss of productivity.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2110,
+    "unit": 1,
+    "lessonIDS": ["1.2"],
+    "unitName": "Comparative Advantage and Gains from Trade",
+    "question": "The table below displays the labor hours required to produce one unit of Electronics and one unit of Textiles in two different nations.\n\nBased on this data, which country holds the absolute advantage in the production of Textiles?",
+    "image": null,
+    "tableData": {
+      "headers": ["Country", "Hours per unit of Electronics", "Hours per unit of Textiles"],
+      "rows": [
+        ["Norland", "2 hours", "8 hours"],
+        ["Southland", "5 hours", "6 hours"]
+      ]
+    },
+    "options": [
+      "Southland, because it requires fewer labor hours to produce a unit of Textiles than Norland.",
+      "Southland, because its opportunity cost for Textiles is lower.",
+      "Norland, because it takes more time to produce Electronics.",
+      "Norland, because it requires fewer labor hours to produce a unit of Textiles than Southland.",
+      "Neither country, because Norland is faster at Electronics while Southland is faster at Textiles."
+    ],
+    "correctAnswer": "A",
+    "explanation": "Absolute advantage is determined by input efficiency. Southland requires only 6 hours to produce a unit of Textiles, whereas Norland requires 8 hours. Since Southland uses fewer inputs (time) to complete the task, it has the absolute advantage in Textiles.",
+    "videoExplanation": null
   }
 ]
 
@@ -2085,6 +2164,85 @@ const microUnit1Questions = [
     ],
     "correctAnswer": "A",
     "explanation": "At Point L, the economy has 5 Consumer and 9 Capital goods. At Point M, it has 7 Consumer and 8 Capital goods. \n- **Gain:** +2 Consumer Goods (7 - 5). \n- **Loss:** -1 Capital Good (9 - 8). \n- **Opportunity Cost per unit:** $\\frac{\\text{Loss}}{\\text{Gain}} = \\frac{1 \\text{ Capital}}{2 \\text{ Consumer}} = 0.5$ Capital Goods.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2105,
+    "unit": 1,
+    "lessonIDS": ["1.4"],
+    "unitName": "Comparative Advantage and Gains from Trade",
+    "question": "When two countries specialize based on comparative advantage and carry out mutually beneficial trade, the primary economic outcome is that:",
+    "image": null,
+    "options": [
+      "each country is able to consume beyond their domestic production possibilities curve.",
+      "each country is able to produce beyond their domestic production possibilities curve.",
+      "both countries will experience a decrease in their total consumption.",
+      "one country gains only at the expense of the other country.",
+      "the global efficiency of resource allocation decreases."
+    ],
+    "correctAnswer": "A",
+    "explanation": "Specialization and trade allow nations to access goods at a lower opportunity cost than producing them domestically. While a country cannot *produce* outside its Production Possibilities Curve (PPC) without new resources or technology, trade allows it to *consume* a bundle of goods that lies outside its PPC.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2107,
+    "unit": 1,
+    "lessonIDS": ["1.4"],
+    "unitName": "Comparative Advantage and Gains from Trade",
+    "question": "The graph below displays the linear production possibilities curves for Borneo and Brunei, which produce Bananas and Mangoes. If Borneo and Brunei specialize according to their comparative advantage and agree to trade at a rate of 1 Banana for 3 Mangoes, which of the following is true? ",
+    "image": null,
+    "options": [
+      "Both countries can consume a combination of goods that lies beyond their individual production possibilities curves.",
+      "Borneo will be able to produce beyond its production possibilities curve, but Brunei will not.",
+      "The joint production of both goods will decrease due to specialization.",
+      "Brunei will gain from trade, but Borneo will consume inside its production possibilities curve.",
+      "Both countries will be forced to consume at a point inside their production possibilities curves."
+    ],
+    "correctAnswer": "A",
+    "explanation": "The fundamental gain from voluntary international trade is that it allows nations to consume strictly more than they could produce on their own. While specialization moves production *to* a specific point on the PPC, the terms of trade allow the consumption point to shift *outside* the boundary of the domestic PPC.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2109,
+    "unit": 1,
+    "lessonIDS": ["1.1"],
+    "unitName": "Comparative Advantage and Gains from Trade",
+    "question": "When a production possibilities curve is concave rather than a straight line, it demonstrates increasing opportunity costs, which are primarily due to",
+    "image": null,
+    "options": [
+      "Resources are not perfectly adaptable to the production of different goods.",
+      "The law of diminishing marginal utility affects consumer choices.",
+      "The economy is suffering from cyclical unemployment.",
+      "Consumer tastes shift as the price of goods increases.",
+      "The law of demand causes prices to fall as supply increases."
+    ],
+    "correctAnswer": "A",
+    "explanation": "A bowed-out PPC indicates that as you produce more of one good, you must give up increasingly larger amounts of the other. This happens because resources (land, labor, capital) are specialized; moving resources from a sector where they are efficient to one where they are not results in a loss of productivity.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2111,
+    "unit": 1,
+    "lessonIDS": ["1.2"],
+    "unitName": "Comparative Advantage and Gains from Trade",
+    "question": "The table below displays the labor hours required to produce one unit of Electronics and one unit of Textiles in two different nations.\n\nBased on this data, which country holds the absolute advantage in the production of Textiles?",
+    "image": null,
+    "tableData": {
+      "headers": ["Country", "Hours per unit of Electronics", "Hours per unit of Textiles"],
+      "rows": [
+        ["Norland", "2 hours", "8 hours"],
+        ["Southland", "5 hours", "6 hours"]
+      ]
+    },
+    "options": [
+      "Southland, because it requires fewer labor hours to produce a unit of Textiles than Norland.",
+      "Southland, because its opportunity cost for Textiles is lower.",
+      "Norland, because it takes more time to produce Electronics.",
+      "Norland, because it requires fewer labor hours to produce a unit of Textiles than Southland.",
+      "Neither country, because Norland is faster at Electronics while Southland is faster at Textiles."
+    ],
+    "correctAnswer": "A",
+    "explanation": "Absolute advantage is determined by input efficiency. Southland requires only 6 hours to produce a unit of Textiles, whereas Norland requires 8 hours. Since Southland uses fewer inputs (time) to complete the task, it has the absolute advantage in Textiles.",
     "videoExplanation": null
   }
   // Lesson 1.5: (left empty)
