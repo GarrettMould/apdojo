@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Question as QuestionType } from '@/data/questionBanks/types';
 import { Unit } from '@/data/cheatSheets';
 import { Check, X, Brain, FileText, ChevronDown, Triangle, Loader2, RefreshCw, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Clipboard, Lock, Play, Minus, Menu } from 'lucide-react';
+import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
 import Image from 'next/image';
@@ -1682,20 +1683,36 @@ export function UnitMCQs({
             )}
 
             <div className="flex gap-2 mt-4">
-              <button
+              <motion.button
                 onClick={handlePreviousQuestion}
                 disabled={currentQuestionIndex === 0}
-                className={`flex-1 p-2 rounded-md font-semibold text-sm transition-colors text-white disabled:bg-gray-300 disabled:cursor-not-allowed ${subject === 'macro' ? 'bg-blue-500 hover:bg-blue-600' : 'bg-green-500 hover:bg-green-600'}`}
+                whileHover={currentQuestionIndex > 0 ? { scale: 1.02 } : {}}
+                whileTap={currentQuestionIndex > 0 ? { scale: 0.98 } : {}}
+                className={`flex-1 p-2 rounded-lg font-bold text-sm border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all text-white disabled:bg-gray-300 disabled:cursor-not-allowed disabled:shadow-none disabled:border-gray-400 ${
+                  currentQuestionIndex === 0 
+                    ? 'bg-gray-300 cursor-not-allowed' 
+                    : subject === 'macro' 
+                      ? 'bg-blue-500 hover:bg-blue-600 active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' 
+                      : 'bg-green-500 hover:bg-green-600 active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                }`}
               >
                 Previous
-              </button>
-              <button
+              </motion.button>
+              <motion.button
                 onClick={handleNextQuestion}
                 disabled={currentQuestionIndex === totalQuestions - 1 || totalQuestions === 0}
-                className={`flex-1 p-2 rounded-md font-semibold text-sm transition-colors text-white disabled:bg-gray-300 disabled:cursor-not-allowed ${subject === 'macro' ? 'bg-blue-500 hover:bg-blue-600' : 'bg-green-500 hover:bg-green-600'}`}
+                whileHover={currentQuestionIndex < totalQuestions - 1 && totalQuestions > 0 ? { scale: 1.02 } : {}}
+                whileTap={currentQuestionIndex < totalQuestions - 1 && totalQuestions > 0 ? { scale: 0.98 } : {}}
+                className={`flex-1 p-2 rounded-lg font-bold text-sm border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all text-white disabled:bg-gray-300 disabled:cursor-not-allowed disabled:shadow-none disabled:border-gray-400 ${
+                  currentQuestionIndex === totalQuestions - 1 || totalQuestions === 0
+                    ? 'bg-gray-300 cursor-not-allowed' 
+                    : subject === 'macro' 
+                      ? 'bg-blue-500 hover:bg-blue-600 active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' 
+                      : 'bg-green-500 hover:bg-green-600 active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                }`}
               >
                 Next
-              </button>
+              </motion.button>
             </div>
           </div>
 

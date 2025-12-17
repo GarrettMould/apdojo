@@ -360,7 +360,7 @@ const macroUnit1Questions = [
     "unit": 1,
     "lessonIDS": ["1.3"],
     "unitName": "Comparative Advantage and Gains from Trade",
-    "question": "Refer to the production possibilities graph below, which shows the potential output for two nations, Liblis and Tralia, using equal amounts of resources. \n\n[Image of Liblis and Tralia PPF graph]\n\nBased on the graph, which of the following statements correctly identifies the comparative advantage for each country?",
+    "question": "Refer to the production possibilities graph below, which shows the potential output for two nations, Liblis and Tralia, using equal amounts of resources. Based on the graph, which of the following statements correctly identifies the comparative advantage for each country?",
     "image": null,
     "options": [
       "Liblis has a comparative advantage in Good A, and Tralia has a comparative advantage in Good B.",
@@ -396,7 +396,7 @@ const macroUnit1Questions = [
     "unit": 1,
     "lessonIDS": ["1.2"],
     "unitName": "Comparative Advantage and Gains from Trade",
-    "question": "Refer to the graph for Liblis and Tralia. Which statement regarding **Absolute Advantage** is supported by the data?",
+    "question": "Refer to the graph for Liblis and Tralia. Which statement regarding Absolute Advantage is supported by the data?",
     "image": null,
     "options": [
       "Tralia has an absolute advantage in the production of Good B.",
@@ -414,8 +414,8 @@ const macroUnit1Questions = [
     "unit": 1,
     "lessonIDS": ["1.1"],
     "unitName": "Comparative Advantage and Gains from Trade",
-    "question": "The graph below shows the Production Possibilities Curve for a nation producing Capital Goods and Consumer Goods. \n\n\n\nCalculate the average **opportunity cost of producing one unit of Consumer Goods** as the economy moves from Point L to Point M.",
-    "image": null,
+    "question": "The graph below shows the Production Possibilities Curve for a nation producing Capital Goods and Consumer Goods. \n\n\n\nCalculate the average opportunity cost of producing one unit of Consumer Goods as the economy moves from Point L to Point M.",
+    "image": { "src": "/images/allQS2102.svg", "alt": "Production Possibilities Curve showing Capital Goods and Consumer Goods" },
     "options": [
       "0.5 Capital Goods",
       "1 Capital Good",
@@ -424,7 +424,7 @@ const macroUnit1Questions = [
       "Zero"
     ],
     "correctAnswer": "A",
-    "explanation": "At Point L, the economy has 5 Consumer and 9 Capital goods. At Point M, it has 7 Consumer and 8 Capital goods. \n- **Gain:** +2 Consumer Goods (7 - 5). \n- **Loss:** -1 Capital Good (9 - 8). \n- **Opportunity Cost per unit:** $\\frac{\\text{Loss}}{\\text{Gain}} = \\frac{1 \\text{ Capital}}{2 \\text{ Consumer}} = 0.5$ Capital Goods.",
+    "explanation": "At Point L, the economy has 5 Consumer and 9 Capital goods. At Point M, it has 7 Consumer and 8 Capital goods. \n- Gain: +2 Consumer Goods (7 - 5). \n- Loss: -1 Capital Good (9 - 8). \n- Opportunity Cost per unit: $\\frac{\\text{Loss}}{\\text{Gain}} = \\frac{1 \\text{ Capital}}{2 \\text{ Consumer}} = 0.5$ Capital Goods.",
     "videoExplanation": null
   },
   {
@@ -451,7 +451,7 @@ const macroUnit1Questions = [
     "lessonIDS": ["1.3"],
     "unitName": "Comparative Advantage and Gains from Trade",
     "question": "The graph below displays the linear production possibilities curves for Borneo and Brunei, which produce Bananas and Mangoes. If Borneo and Brunei specialize according to their comparative advantage and agree to trade at a rate of 1 Banana for 3 Mangoes, which of the following is true? ",
-    "image": null,
+    "image": { "src": "/images/allQS2106.svg", "alt": "Production possibilities curves for Borneo and Brunei showing Bananas and Mangoes" },
     "options": [
       "Both countries can consume a combination of goods that lies beyond their individual production possibilities curves.",
       "Borneo will be able to produce beyond its production possibilities curve, but Brunei will not.",
@@ -2099,7 +2099,7 @@ const microUnit1Questions = [
     "unit": 1,
     "lessonIDS": ["1.4"],
     "unitName": "Comparative Advantage and Gains from Trade",
-    "question": "Refer to the production possibilities graph below, which shows the potential output for two nations, Liblis and Tralia, using equal amounts of resources. \n\n[Image of Liblis and Tralia PPF graph]\n\nBased on the graph, which of the following statements correctly identifies the comparative advantage for each country?",
+    "question": "Refer to the production possibilities graph below, which shows the potential output for two nations, Liblis and Tralia, using equal amounts of resources. Based on the graph, which of the following statements correctly identifies the comparative advantage for each country?",
     "image": null,
     "options": [
       "Liblis has a comparative advantage in Good A, and Tralia has a comparative advantage in Good B.",
@@ -2135,7 +2135,7 @@ const microUnit1Questions = [
     "unit": 1,
     "lessonIDS": ["1.4"],
     "unitName": "Comparative Advantage and Gains from Trade",
-    "question": "Refer to the graph for Liblis and Tralia. Which statement regarding **Absolute Advantage** is supported by the data?",
+    "question": "Refer to the graph for Liblis and Tralia. Which statement regarding absolute advantage is supported by the data?",
     "image": null,
     "options": [
       "Tralia has an absolute advantage in the production of Good B.",
@@ -2153,7 +2153,7 @@ const microUnit1Questions = [
     "unit": 1,
     "lessonIDS": ["1.1"],
     "unitName": "Comparative Advantage and Gains from Trade",
-    "question": "The graph below shows the Production Possibilities Curve for a nation producing Capital Goods and Consumer Goods. \n\n\n\nCalculate the average **opportunity cost of producing one unit of Consumer Goods** as the economy moves from Point L to Point M.",
+    "question": "The graph below shows the Production Possibilities Curve for a nation producing Capital Goods and Consumer Goods. Calculate the average opportunity cost of producing one unit of Consumer Goods as the economy moves from Point L to Point M.",
     "image": null,
     "options": [
       "0.5 Capital Goods",
@@ -2163,7 +2163,7 @@ const microUnit1Questions = [
       "Zero"
     ],
     "correctAnswer": "A",
-    "explanation": "At Point L, the economy has 5 Consumer and 9 Capital goods. At Point M, it has 7 Consumer and 8 Capital goods. \n- **Gain:** +2 Consumer Goods (7 - 5). \n- **Loss:** -1 Capital Good (9 - 8). \n- **Opportunity Cost per unit:** $\\frac{\\text{Loss}}{\\text{Gain}} = \\frac{1 \\text{ Capital}}{2 \\text{ Consumer}} = 0.5$ Capital Goods.",
+    "explanation": "At Point L, the economy has 5 Consumer and 9 Capital goods. At Point M, it has 7 Consumer and 8 Capital goods. \n- Gain: +2 Consumer Goods (7 - 5). \n- Loss: -1 Capital Good (9 - 8). \n- Opportunity Cost per unit: $\\frac{\\text{Loss}}{\\text{Gain}} = \\frac{1 \\text{ Capital}}{2 \\text{ Consumer}} = 0.5$ Capital Goods.",
     "videoExplanation": null
   },
   {
@@ -2190,7 +2190,7 @@ const microUnit1Questions = [
     "lessonIDS": ["1.4"],
     "unitName": "Comparative Advantage and Gains from Trade",
     "question": "The graph below displays the linear production possibilities curves for Borneo and Brunei, which produce Bananas and Mangoes. If Borneo and Brunei specialize according to their comparative advantage and agree to trade at a rate of 1 Banana for 3 Mangoes, which of the following is true? ",
-    "image": null,
+    "image": { "src": "/images/allQS2106.svg", "alt": "Production possibilities curves for Borneo and Brunei showing Bananas and Mangoes" },
     "options": [
       "Both countries can consume a combination of goods that lies beyond their individual production possibilities curves.",
       "Borneo will be able to produce beyond its production possibilities curve, but Brunei will not.",
@@ -4640,7 +4640,15 @@ const microUnit6Questions = [
 
 export const allQuestions: QuestionType[] = [
   // --- AP Macroeconomics Questions ---
-
+  // Add macro unit questions to allQuestions
+  ...macroUnit1Questions.map(q => ({ ...q, subject: "ap_macroeconomics" as const })),
+  ...macroUnit2Questions.map(q => ({ ...q, subject: "ap_macroeconomics" as const })),
+  ...macroUnit3Questions.map(q => ({ ...q, subject: "ap_macroeconomics" as const })),
+  ...macroUnit4Questions.map(q => ({ ...q, subject: "ap_macroeconomics" as const })),
+  ...macroUnit5Questions.map(q => ({ ...q, subject: "ap_macroeconomics" as const })),
+  ...macroUnit6Questions.map(q => ({ ...q, subject: "ap_macroeconomics" as const })),
+  
+  // Legacy manually listed questions (keeping for backwards compatibility, but macro unit arrays above take precedence)
   // Unit 1: Basic Economic Concepts
   {
     "id": 1,
@@ -4659,6 +4667,25 @@ export const allQuestions: QuestionType[] = [
     ],
     "correctAnswer": "C",
     "explanation": "Scarcity is the core economic problem referring to the conflict between society's unlimited wants and its limited resources, necessitating choices about resource allocation.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2102,
+    "subject": "ap_macroeconomics",
+    "unit": 1,
+    "lessonIDS": ["1.1"],
+    "unitName": "Comparative Advantage and Gains from Trade",
+    "question": "The graph below shows the Production Possibilities Curve for a nation producing Capital Goods and Consumer Goods. \n\n\n\nCalculate the average opportunity cost of producing one unit of Consumer Goods as the economy moves from Point L to Point M.",
+    "image": { "src": "/images/allQS2102.svg", "alt": "Production Possibilities Curve showing Capital Goods and Consumer Goods" },
+    "options": [
+      "0.5 Capital Goods",
+      "1 Capital Good",
+      "2 Capital Goods",
+      "8 Capital Goods",
+      "Zero"
+    ],
+    "correctAnswer": "A",
+    "explanation": "At Point L, the economy has 5 Consumer and 9 Capital goods. At Point M, it has 7 Consumer and 8 Capital goods. \n- Gain: +2 Consumer Goods (7 - 5). \n- Loss: -1 Capital Good (9 - 8). \n- Opportunity Cost per unit: $\\frac{\\text{Loss}}{\\text{Gain}} = \\frac{1 \\text{ Capital}}{2 \\text{ Consumer}} = 0.5$ Capital Goods.",
     "videoExplanation": null
   },
   {
