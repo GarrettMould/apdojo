@@ -11,7 +11,6 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import { LoginModal, SignupModal } from '@/components/AuthModals';
 import { EmailVerificationBanner } from '@/components/EmailVerificationBanner';
 import { Analytics } from "@vercel/analytics/react";
-import { TextSelectionCopier } from '@/components/TextSelectionCopier';
 
 export function LayoutClientWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -123,9 +122,6 @@ export function LayoutClientWrapper({ children }: { children: React.ReactNode })
         onClose={() => setShowSignupModal(false)} 
         switchToLogin={handleSwitchToLogin} 
       />
-      
-      {/* Development tool: Text selection copier */}
-      <TextSelectionCopier />
     </>
   );
 }

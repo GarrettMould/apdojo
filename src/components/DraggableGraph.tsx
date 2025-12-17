@@ -4,7 +4,11 @@ import React, { useState } from "react";
 import { motion, useMotionValue, animate } from "framer-motion";
 import { RefreshCcw } from "lucide-react";
 
-export default function DraggableGraph() {
+interface DraggableGraphProps {
+  onComplete?: () => void;
+}
+
+export default function DraggableGraph({ onComplete }: DraggableGraphProps) {
   const [stage, setStage] = useState<1 | 2 | 3>(1);
   const [feedback, setFeedback] = useState<"neutral" | "correct" | "wrong">("neutral");
   const [isDragging, setIsDragging] = useState(false);
@@ -95,6 +99,12 @@ export default function DraggableGraph() {
         // Snap to right drop spot (correct)
         animate(srasX, rightDropSpot, { type: "spring", stiffness: 300, damping: 20 });
         setFeedback("correct");
+        // Call onComplete callback when graph is successfully completed
+        if (onComplete) {
+          setTimeout(() => {
+            onComplete();
+          }, 400);
+        }
         // Move to stage 3 after animation completes
         setTimeout(() => {
           setStage(3);

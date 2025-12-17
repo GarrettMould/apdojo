@@ -1578,7 +1578,7 @@ const microUnit1Questions = [
     ],
     "correctAnswer": "B",
     "explanation": "Points inside the PPC represent attainable production levels but signify inefficiency, meaning resources (like labor or capital) are either unemployed or not being used to their full potential.",
-    "videoExplanation": "/images/mcqVideoExplanations/q202VideoExplanation.mp4"
+    "videoExplanation": "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/mcqExplanations/q202VideoExplanation.mp4"
   },
   {
     "id": 203,
@@ -1711,7 +1711,7 @@ const microUnit2Questions = [
     ],
     "correctAnswer": "B",
     "explanation": "A negative cross-price elasticity of demand means that as the price of one good increases, the quantity demanded of the other good decreases. This relationship defines complementary goods.",
-    "videoExplanation": "/images/mcqVideoExplanations/q86VideoExplanation.mp4"
+    "videoExplanation": "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/mcqExplanations/q86VideoExplanation.mp4"
   },
   {
     "id": 87,
@@ -1729,7 +1729,7 @@ const microUnit2Questions = [
     ],
     "correctAnswer": "C",
     "explanation": "Consumer surplus represents the net benefit to buyers, calculated as the difference between their willingness to pay for a good and the price they actually pay.",
-    "videoExplanation": "/images/mcqVideoExplanations/q87VideoExplanation.mp4"
+    "videoExplanation": "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/mcqExplanations/q87VideoExplanation.mp4"
   },
   {
     "id": 88,
@@ -2750,7 +2750,7 @@ const microUnit4Questions = [
     "videoExplanation": null
   },
   {
-    "id": 150,
+    "id": 1150,
     "unit": 4,
     "lessonIDS": ["4.2"],
     "unitName": "Imperfect Competition",
@@ -3007,7 +3007,7 @@ const microUnit5Questions = [
     ],
     "correctAnswer": "B",
     "explanation": "Firms maximize profit by hiring factors up to the point where the additional revenue from the factor (MRP) equals the additional cost of the factor (marginal factor cost, MFC). In a perfectly competitive labor market, MFC equals the market wage rate (W). Thus, the firm hires until MRP = W.",
-    "videoExplanation": "/images/mcqVideoExplanations/q115VideoExplanation.mp4"
+    "videoExplanation": "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/mcqExplanations/q115VideoExplanation.mp4"
   },
   {
     "id": 116,
@@ -3323,7 +3323,7 @@ const microUnit5Questions = [
     ],
     "correctAnswer": "E",
     "explanation": "This is a key distinction. For a perfect competitor, P=MR, so MRP=MP*P. But for a firm with market power, price > marginal revenue, so the strictly correct definition is MRP = MP * MR.",
-    "videoExplanation": "/images/mcqVideoExplanations/q2020VideoExplanation.mp4"
+    "videoExplanation": "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/mcqExplanations/q2020VideoExplanation.mp4"
   },
   {
     "id": 2021,
@@ -3399,7 +3399,7 @@ const microUnit5Questions = [
     ],
     "correctAnswer": "C",
     "explanation": "The demand for factors of production, like labor, is derived from the demand for the goods and services they are used to create. If demand for the final product increases, the demand for the labor needed to make it also increases.",
-    "videoExplanation": "/images/mcqVideoExplanations/q2024VideoExplanation.mp4"
+    "videoExplanation": "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/mcqExplanations/q2024VideoExplanation.mp4"
   },
   {
     "id": 2025,
@@ -3709,7 +3709,7 @@ const microUnit6Questions = [
     "unit": 6,
     "lessonIDS": ["6.4"],
     "unitName": "Market Failure and the Role of Government",
-    "question": "If the government imposes a lump-sum tax (a fixed amount regardless of output) on a profit-maximizing monopolist, how will this affect the monopolist's output and price in the short run?",
+    "question": "If the government imposes a lump-sum tax on a profit-maximizing monopolist, how will this affect the monopolist's output and price in the short run?",
     "image": null,
     "options": [
       "Output increases, price decreases",
@@ -3902,7 +3902,7 @@ const microUnit6Questions = [
     "unit": 6,
     "lessonIDS": ["6.3"],
     "unitName": "Market Failure and the Role of Government",
-    "question": "Which of the following government actions would most effectively correct the allocative inefficiency caused by a positive consumption externality (e.g., vaccines)?",
+    "question": "Which of the following government actions would most effectively correct the allocative inefficiency caused by a positive consumption externality?",
     "image": null,
     "options": [
       "A lump-sum tax on consumers.",
@@ -6599,24 +6599,6 @@ export const allQuestions: QuestionType[] = [
     "explanation": "With a positive production externality, the marginal social cost is lower than the marginal private cost. The market produces where marginal private benefit equals marginal private cost, which is less than the socially optimal quantity where marginal social benefit equals marginal social cost. The market underproduces the good." // Reworded slightly to remove acronyms in parentheses
   },
   {
-    "id": 135,
-    "subject": "ap_microeconomics",
-    "unit": 6,
-    "lessonIDS": ["6.2"],
-    "unitName": "Market Failure and the Role of Government",
-    "question": "According to the Coase Theorem, private bargaining between parties can lead to an efficient resolution of externality problems if:",
-    "image": null,
-    "options": [
-      "The government imposes a corrective tax.",
-      "There are many parties involved in the negotiation.",
-      "Property rights are clearly defined and transaction costs are low.",
-      "The externality is positive rather than negative.",
-      "One party has significantly more information than the other."
-    ],
-    "correctAnswer": "C",
-    "explanation": "The Coase Theorem posits that private solutions to externalities are possible and efficient if property rights are well-defined and enforceable, and the costs associated with bargaining are negligible." // Removed (transaction costs)
-  },
-  {
     "id": 136,
     "subject": "ap_microeconomics",
     "unit": 6,
@@ -7775,7 +7757,7 @@ export const allQuestions: QuestionType[] = [
           ],
           "correctAnswer": "B",
           "explanation": "An inferior good is one for which demand increases as consumer income decreases. Therefore, a decrease in consumer incomes will cause the demand curve for good Z to shift to the right.",
-          "videoExplanation": "/images/mcqVideoExplanations/q197VideoExplanation.mp4"
+          "videoExplanation": "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/mcqExplanations/q197VideoExplanation.mp4"
         },
         {
           "id": 198,
@@ -7992,7 +7974,7 @@ export const allQuestions: QuestionType[] = [
           "unit": 2,
           "lessonIDS": ["2.8"],
           "unitName": "Supply and Demand",
-          "question": "An effective (binding) price ceiling imposed on a competitive market will typically result in:",
+          "question": "An effective price ceiling imposed on a competitive market will typically result in:",
           "image": null,
           "options": [
             "A surplus of the good.",
@@ -8041,7 +8023,7 @@ export const allQuestions: QuestionType[] = [
           ],
           "correctAnswer": "C",
           "explanation": "A tariff on imported sugar raises the domestic price of sugar. This benefits domestic sugar producers because they can now sell their sugar at a higher price and face less competition from imports, leading to an increase in their producer surplus.",
-          "videoExplanation": "/images/mcqVideoExplanations/q211VideoExplanation.mp4"
+          "videoExplanation": "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/mcqExplanations/q211VideoExplanation.mp4"
         },
         {
           "id": 212,

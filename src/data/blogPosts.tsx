@@ -229,8 +229,8 @@ export const blogPosts: Record<string, BlogPost> = {
       '/images/blog/B3IC.jpg',
       '/images/blog/B3ID.jpg'
     ],
-    practiceQuestionId: 150,
-    videoUrl: null,
+    practiceQuestionId: 1150,
+    videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_micro_4.2.mp4',
     content: (
       <>
         <h2 className="mt-12 mb-4 text-4xl font-bold text-gray-800">The Setup: Different People, Different Values</h2>
@@ -271,7 +271,7 @@ export const blogPosts: Record<string, BlogPost> = {
         <hr className="my-12"/>
 
         {(() => {
-          const practiceQuestion = allQuestions.find(q => q.id === 150);
+          const practiceQuestion = allQuestions.find(q => q.id === 1150);
           if (!practiceQuestion) return null;
           
           return (
@@ -291,7 +291,7 @@ export const blogPosts: Record<string, BlogPost> = {
     keyTakeaway: 'Nominal GDP includes price changes, while Real GDP holds prices constant to measure actual production growth. Just like GPA can rise from easier grading (nominal) vs. actual improvement (real).',
     images: [],
     practiceQuestionId: 17,
-    videoUrl: null,
+    videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_2.6.mp4',
     content: (
       <>
         <h1 className="mt-12 mb-6 text-4xl font-bold text-gray-900">Gradeflation & GDP: Why Your "A" Might Be Worth Less Than You Think</h1>
@@ -439,7 +439,7 @@ export const blogPosts: Record<string, BlogPost> = {
     thumbnailUrl: '/images/placeholder.png',
     keyTakeaway: 'The economy self-adjusts through a 4-step cycle: Output Gap → Wages Adjust → Hiring Changes → Supply Shift. Wages react to the output gap, causing SRAS to shift back to full employment.',
     images: [],
-    videoUrl: '/images/dojoDrills/dd_macro_3.7.mp4',
+    videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_3.7.mp4',
     content: (
       <>
         <p className="mb-6 text-lg leading-relaxed">Does the government <em>always</em> need to intervene when the economy is in trouble?</p>

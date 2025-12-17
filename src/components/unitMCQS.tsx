@@ -947,7 +947,50 @@ export function UnitMCQs({
   const currentAnswerState = currentQuestion ? answeredQuestions[currentQuestion.id] : undefined;
   const displayUnitId = currentQuestion?.unit ?? currentUnit;
 
+  // Developer check - only show for specific email
+  const isDeveloper = user?.email === 'garrett@apdojo.com' || user?.email === 'garrettmould@gmail.com';
 
+  // Pull Question function - copies question to clipboard in problemsToCheck.ts format
+  const handlePullQuestion = async () => {
+    if (!currentQuestion) return;
+
+    // Format options array with proper escaping
+    const formatOptions = (options: string[]) => {
+      return options.map(opt => {
+        // Escape quotes and newlines in the option text
+        const escaped = opt.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n');
+        return `"${escaped}"`;
+      }).join(',\n        ');
+    };
+
+    // Format the question object to match problemsToCheck.ts structure
+    const imageValue = currentQuestion.image ? 'null' : 'null'; // Handle image if needed
+    const explanationValue = currentQuestion.explanation 
+      ? `"${currentQuestion.explanation.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n')}"`
+      : undefined;
+
+    const formatted = `    {
+      "id": ${currentQuestion.id},
+      "unit": ${currentQuestion.unit},
+      "lessonIDS": [${currentQuestion.lessonIDS.map(id => `"${id}"`).join(', ')}],
+      "unitName": "${currentQuestion.unitName}",
+      "question": "${currentQuestion.question.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n')}",
+      "image": ${imageValue},
+      "options": [
+        ${formatOptions(currentQuestion.options)}
+      ],
+      "correctAnswer": "${currentQuestion.correctAnswer}"${explanationValue ? `,\n      "explanation": ${explanationValue}` : ''}
+    },`;
+
+    try {
+      await navigator.clipboard.writeText(formatted);
+      alert('✅ Question copied to clipboard! Paste it into problemsToCheck.ts');
+    } catch (err) {
+      console.error('Failed to copy:', err);
+      alert('Failed to copy to clipboard. Check console for the question data.');
+      console.log('Question data:\n', formatted);
+    }
+  };
 
   const handleAnswerSelection = async (questionId: number, answerLetter: string, answerText: string, lessonIDS: string[]) => {
     if (!currentQuestion) {
@@ -1379,6 +1422,18 @@ export function UnitMCQs({
       {enableZenMode ? (
         /* Zen Mode: Centered Question Card Only */
         <div className="w-full max-w-4xl mx-auto px-4 z-10">
+          {/* Developer Tool: Pull Question Button */}
+          {isDeveloper && currentQuestion && (
+            <div className="mb-4 flex justify-end">
+              <button
+                onClick={handlePullQuestion}
+                className="px-4 py-2 bg-yellow-500 text-black font-bold text-sm rounded-lg border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-yellow-400 active:translate-y-1 transition-all"
+                title="Copy current question to clipboard in problemsToCheck.ts format"
+              >
+                Pull Question
+              </button>
+            </div>
+          )}
           {currentQuestion && (
             <div className="transform scale-110">
               <div className="bg-white rounded-lg border-2 border-gray-300 shadow-2xl p-1">
@@ -1413,6 +1468,18 @@ export function UnitMCQs({
         <div className="flex flex-col lg:flex-row gap-6 lg:items-stretch">
           {/* Left Column: Question Card */}
           <div className="w-full lg:w-3/5">
+            {/* Developer Tool: Pull Question Button */}
+            {isDeveloper && currentQuestion && (
+              <div className="mb-4 flex justify-end">
+                <button
+                  onClick={handlePullQuestion}
+                  className="px-4 py-2 bg-yellow-500 text-black font-bold text-sm rounded-lg border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-yellow-400 active:translate-y-1 transition-all"
+                  title="Copy current question to clipboard in problemsToCheck.ts format"
+                >
+                  Pull Question
+                </button>
+              </div>
+            )}
             {currentQuestion && (
               <QuestionCard 
                 key={`${currentUnit}-${currentQuestion.id}`} 
