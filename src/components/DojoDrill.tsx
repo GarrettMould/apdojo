@@ -5,94 +5,98 @@ import { motion, AnimatePresence } from "framer-motion";
 import DraggableGraph from "./DraggableGraph";
 import { DojoTable } from "./DojoTable";
 import { MonopolyRevenueVisualizer } from "./MonopolyRevenueVisualizer";
+import { CompAdvantageDrill, CompAdvantageProblem } from "./CompAdvantageDrill";
+import { GDPDrill } from "./GDPDrill";
+import { PPCDrill } from "./PPCDrill";
 import { allQuestions } from "@/data/unitPracticeProblems/unitPracticeProblems";
 import { Question } from "@/data/questionBanks/types";
-import { CheckCircle2, ArrowRight, Trophy, Check } from "lucide-react";
-
-type Step2Type = "graph" | "table" | "monopoly";
+import { CheckCircle2, ArrowRight, Trophy, Check, Lightbulb } from "lucide-react";
+import Image from "next/image";
+import { DojoDrill as DojoDrillType, ComprehensionQuestion } from "@/data/dojoDrills";
 
 interface DojoDrillProps {
-  videoUrl: string;
-  videoTitle?: string;
-  unit?: number;
-  subject?: "ap_macroeconomics" | "ap_microeconomics";
-  lessonIds?: string[];
+  drill: DojoDrillType;
   onComplete?: () => void;
-  step2Type?: Step2Type; // "graph" for DraggableGraph, "table" for DojoTable
 }
 
-export default function DojoDrill({
-  videoUrl,
-  videoTitle = "Dojo Drill",
-  unit,
-  subject = "ap_macroeconomics",
-  lessonIds = [],
-  onComplete,
-  step2Type = "graph", // Default to graph
-}: DojoDrillProps) {
+export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
   const [step, setStep] = useState(1);
   const [videoEnded, setVideoEnded] = useState(false);
+  const [comprehensionAnswers, setComprehensionAnswers] = useState<Record<string, number>>({});
+  const [compQuestionsSubmitted, setCompQuestionsSubmitted] = useState(false);
+  
   const [graphCompleted, setGraphCompleted] = useState(false);
   const [tableCompleted, setTableCompleted] = useState(false);
   const [monopolyCompleted, setMonopolyCompleted] = useState(false);
+  
   const [mcqQuestions, setMcqQuestions] = useState<Question[]>([]);
   const [currentMcqIndex, setCurrentMcqIndex] = useState(0);
   const [mcqAnswers, setMcqAnswers] = useState<Record<number, string>>({});
+  const [showHint, setShowHint] = useState(false);
+  
   const [xpEarned, setXpEarned] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const totalSteps = 4;
 
-  // Get 3 random MCQs when entering step 3
+  // Load MCQs from stage3.mcqIds when entering step 3
   useEffect(() => {
     if (step === 3 && mcqQuestions.length === 0) {
-      let filteredQuestions = allQuestions.filter((q) => {
-        if (subject && q.subject !== subject) return false;
-        if (unit && q.unit !== unit) return false;
-        if (lessonIds.length > 0) {
-          return lessonIds.some((lid) => q.lessonIDS.includes(lid));
-        }
-        return true;
-      });
-
-      // If no filtered questions, just get any 3 from the subject
-      if (filteredQuestions.length === 0) {
-        filteredQuestions = allQuestions.filter((q) => q.subject === subject);
+      const questions = drill.stage3.mcqIds
+        .map(id => allQuestions.find(q => q.id === id))
+        .filter((q): q is Question => q !== undefined);
+      
+      if (questions.length === 3) {
+        setMcqQuestions(questions);
+        setCurrentMcqIndex(0);
+        setMcqAnswers({});
       }
-
-      // Shuffle and take 3
-      const shuffled = [...filteredQuestions].sort(() => Math.random() - 0.5);
-      const selected = shuffled.slice(0, 3);
-      setMcqQuestions(selected);
-      setCurrentMcqIndex(0);
-      setMcqAnswers({});
     }
-  }, [step, subject, unit, lessonIds, mcqQuestions.length]);
+  }, [step, drill.stage3.mcqIds, mcqQuestions.length]);
 
   // Calculate XP when completing MCQs
   useEffect(() => {
     if (step === 3 && mcqQuestions.length > 0) {
       const answeredCount = Object.keys(mcqAnswers).length;
       if (answeredCount === mcqQuestions.length) {
-        // Calculate XP: 10 per correct answer
-        let totalXp = 0;
-        mcqQuestions.forEach((q, idx) => {
+        // Calculate XP: 20 for completion + 10 per correct answer
+        let mcqXp = 0;
+        mcqQuestions.forEach((q) => {
           if (mcqAnswers[q.id] === q.correctAnswer) {
-            totalXp += 10;
+            mcqXp += drill.xpReward.perMcqCorrect;
           }
         });
+        const totalXp = drill.xpReward.completion + mcqXp;
         setXpEarned(totalXp);
       }
     }
-  }, [mcqAnswers, mcqQuestions, step]);
+  }, [mcqAnswers, mcqQuestions, step, drill.xpReward]);
 
   const handleVideoEnd = () => {
     setVideoEnded(true);
   };
 
-  const handleVideoNext = () => {
-    setStep(2);
-    setVideoEnded(false);
+  const handleComprehensionAnswer = (questionId: string, answerIndex: number) => {
+    if (!compQuestionsSubmitted) {
+      setComprehensionAnswers(prev => ({ ...prev, [questionId]: answerIndex }));
+    }
+  };
+
+  const handleCompQuestionsSubmit = () => {
+    const allAnswered = drill.stage1.comprehensionQuestions.every(
+      q => comprehensionAnswers[q.id] !== undefined
+    );
+    if (allAnswered) {
+      setCompQuestionsSubmitted(true);
+    }
+  };
+
+  const handleStage1Next = () => {
+    if (videoEnded && compQuestionsSubmitted) {
+      setStep(2);
+      setVideoEnded(false);
+      setCompQuestionsSubmitted(false);
+    }
   };
 
   const handleGraphComplete = () => {
@@ -115,13 +119,18 @@ export default function DojoDrill({
   };
 
   const isStep2Completed = 
-    step2Type === "graph" ? graphCompleted : 
-    step2Type === "table" ? tableCompleted : 
+    drill.stage2.type === "graph" ? graphCompleted : 
+    drill.stage2.type === "table" ? tableCompleted : 
     monopolyCompleted;
 
   const handleMcqAnswer = (questionId: number, answer: string) => {
     setMcqAnswers((prev) => ({ ...prev, [questionId]: answer }));
   };
+
+  // Reset hint when question changes
+  useEffect(() => {
+    setShowHint(false);
+  }, [currentMcqIndex]);
 
   const handleMcqNext = () => {
     if (currentMcqIndex < mcqQuestions.length - 1) {
@@ -137,16 +146,48 @@ export default function DojoDrill({
     }
   };
 
-  const currentQuestion = mcqQuestions[currentMcqIndex];
-  const isCurrentQuestionAnswered = currentQuestion
-    ? mcqAnswers[currentQuestion.id] !== undefined
+  const allCompQuestionsAnswered = drill.stage1.comprehensionQuestions.every(
+    q => comprehensionAnswers[q.id] !== undefined
+  );
+
+  const currentMcqQuestion = mcqQuestions[currentMcqIndex];
+  const isCurrentMcqAnswered = currentMcqQuestion
+    ? mcqAnswers[currentMcqQuestion.id] !== undefined
     : false;
-  const isCurrentQuestionCorrect = currentQuestion
-    ? mcqAnswers[currentQuestion.id] === currentQuestion.correctAnswer
+  const isCurrentMcqCorrect = currentMcqQuestion
+    ? mcqAnswers[currentMcqQuestion.id] === currentMcqQuestion.correctAnswer
     : false;
 
+  // Activity component mapping
+  const getActivityComponent = () => {
+    switch (drill.stage2.type) {
+      case 'graph':
+        return <DraggableGraph onComplete={handleGraphComplete} />;
+      case 'table':
+        // Use GDPDrill for the nominal vs real GDP drill
+        return (
+          <div className="w-full">
+            <GDPDrill onComplete={handleTableComplete} />
+          </div>
+        );
+      case 'monopoly':
+        return <MonopolyRevenueVisualizer onComplete={handleMonopolyComplete} />;
+      case 'comparative-advantage':
+        // Get problem data from stage2.config
+        const problemData = drill.stage2.config as CompAdvantageProblem;
+        if (problemData) {
+          return <CompAdvantageDrill problem={problemData} onComplete={handleGraphComplete} />;
+        }
+        return null;
+      case 'ppc-drill':
+        return <PPCDrill onComplete={handleGraphComplete} />;
+      default:
+        return null;
+    }
+  };
+
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <div className="w-full max-w-7xl mx-auto">
       {/* Progress Dots - Above Container */}
       <div className="flex justify-center gap-2 mb-6">
         {Array.from({ length: totalSteps }).map((_, index) => {
@@ -168,10 +209,10 @@ export default function DojoDrill({
         })}
       </div>
 
-      {/* Card Container - Just Content */}
+      {/* Card Container */}
       <div className="relative h-[600px]">
         <AnimatePresence mode="wait">
-          {/* Step 1: The Briefing - Video Player */}
+          {/* Step 1: Video + Comprehension Check Sidebar */}
           {step === 1 && (
             <motion.div
               key="step1"
@@ -179,12 +220,13 @@ export default function DojoDrill({
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -100, opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="absolute inset-0 bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-2 flex flex-col"
+              className="absolute inset-0 bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-4 flex gap-4 h-full"
             >
+              {/* Video Section - Left */}
               <div className="flex-1 flex items-center justify-center">
                 <video
                   ref={videoRef}
-                  src={videoUrl}
+                  src={drill.stage1.videoUrl}
                   controls
                   className="w-full h-full aspect-video rounded-lg"
                   playsInline
@@ -193,13 +235,98 @@ export default function DojoDrill({
                   Your browser does not support the video tag.
                 </video>
               </div>
+
+              {/* Comprehension Check Sidebar - Right */}
+              <div className="w-96 h-full flex flex-col pl-4">
+                <div className="pb-4 mb-4">
+                  <h3 className="text-xl font-bold text-gray-900">
+                    Comprehension Check
+                  </h3>
+                </div>
+                
+                {/* Scrollable Questions */}
+                <div className="flex-1 overflow-y-auto space-y-6 pr-2">
+                  {drill.stage1.comprehensionQuestions.map((question, qIndex) => {
+                    const isAnswered = comprehensionAnswers[question.id] !== undefined;
+                    const selectedAnswer = comprehensionAnswers[question.id];
+                    const showResults = compQuestionsSubmitted;
+
+                    return (
+                      <div key={question.id} className="space-y-3">
+                        <p className="text-sm font-semibold text-gray-600">
+                          Question {qIndex + 1}
+                        </p>
+                        <p className="text-base font-medium text-gray-800 leading-relaxed">
+                          {question.question}
+                        </p>
+                        <div className="space-y-2">
+                          {question.options.map((option, index) => {
+                            const isSelected = selectedAnswer === index;
+                            const isCorrect = index === question.correctAnswer;
+                            const showResult = showResults;
+
+                            return (
+                              <button
+                                key={index}
+                                onClick={() => handleComprehensionAnswer(question.id, index)}
+                                disabled={showResults}
+                                className={`w-full text-left p-3 rounded-lg border-2 transition-all ${
+                                  !showResult
+                                    ? isSelected
+                                      ? "bg-blue-50 border-blue-500 text-blue-900"
+                                      : "bg-white border-gray-300 hover:border-black hover:bg-gray-50 cursor-pointer"
+                                    : isSelected && isCorrect
+                                    ? "bg-green-100 border-green-500 text-green-900"
+                                    : isSelected && !isCorrect
+                                    ? "bg-red-100 border-red-500 text-red-900"
+                                    : isCorrect && showResult
+                                    ? "bg-green-100 border-green-500 text-green-900"
+                                    : "bg-gray-50 border-gray-300 text-gray-600"
+                                } ${showResults ? "cursor-default" : ""}`}
+                              >
+                                <span className="font-semibold">{String.fromCharCode(65 + index)}.</span>{" "}
+                                {option}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        
+                        {showResults && question.explanation && (
+                          <div className="mt-3 p-3 bg-blue-50 border-l-4 border-blue-400 rounded">
+                            <p className="text-sm text-gray-800 leading-relaxed">
+                              <strong>Explanation:</strong> {question.explanation}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Submit Button */}
+                {!compQuestionsSubmitted && (
+                  <div className="pt-4 mt-4">
+                    <button
+                      onClick={handleCompQuestionsSubmit}
+                      disabled={!allCompQuestionsAnswered}
+                      className={`w-full px-6 py-3 rounded-lg font-bold text-lg border-2 border-black transition-all ${
+                        allCompQuestionsAnswered
+                          ? "bg-black text-white hover:bg-gray-800 active:translate-y-1"
+                          : "bg-gray-200 text-gray-500 cursor-not-allowed"
+                      }`}
+                    >
+                      Submit Answers
+                    </button>
+                  </div>
+                )}
+              </div>
             </motion.div>
           )}
 
-          {/* Step 2: The Simulator - Draggable Graph or Table */}
-          {step === 2 && step2Type === "graph" && (
+          {/* Step 2: Interactive Activity */}
+          {step === 2 && (
             <motion.div
-              key="step2-graph"
+              key="step2"
               initial={{ x: 100, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -100, opacity: 0 }}
@@ -207,45 +334,15 @@ export default function DojoDrill({
               className="absolute inset-0 bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8 flex flex-col"
             >
               <div className="flex-1 flex items-center justify-center overflow-hidden">
-                <div className="w-full max-w-3xl">
-                  <DraggableGraph onComplete={handleGraphComplete} />
+                <div className="w-full max-w-7xl">
+                  {getActivityComponent()}
                 </div>
               </div>
             </motion.div>
           )}
 
-          {step === 2 && step2Type === "table" && (
-            <motion.div
-              key="step2-table"
-              initial={{ x: 100, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: -100, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="absolute inset-0 bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8 flex flex-col"
-            >
-              <div className="flex-1 flex items-center justify-center overflow-y-auto">
-                <GDPTable onComplete={handleTableComplete} />
-              </div>
-            </motion.div>
-          )}
-
-          {step === 2 && step2Type === "monopoly" && (
-            <motion.div
-              key="step2-monopoly"
-              initial={{ x: 100, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: -100, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="absolute inset-0 bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8 flex flex-col overflow-y-auto"
-            >
-              <div className="flex-1 flex items-center justify-center">
-                <MonopolyRevenueVisualizer onComplete={handleMonopolyComplete} />
-              </div>
-            </motion.div>
-          )}
-
-          {/* Step 3: The Gauntlet - MCQs */}
-          {step === 3 && currentQuestion && (
+          {/* Step 3: MCQs - Split Screen Layout */}
+          {step === 3 && currentMcqQuestion && (
             <motion.div
               key={`step3-${currentMcqIndex}`}
               initial={{ x: 100, opacity: 0 }}
@@ -255,48 +352,112 @@ export default function DojoDrill({
               className="absolute inset-0 bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8 flex flex-col"
             >
               <div className="flex-1 overflow-y-auto">
-                <div className="max-w-2xl mx-auto">
-                  <p className="text-lg font-medium text-gray-800 mb-6 leading-relaxed">
-                    {currentQuestion.question}
-                  </p>
-                  <div className="space-y-3">
-                    {currentQuestion.options.map((option, index) => {
-                      const optionLetter = String.fromCharCode(65 + index);
-                      const isSelected =
-                        mcqAnswers[currentQuestion.id] === optionLetter;
-                      const isCorrect = optionLetter === currentQuestion.correctAnswer;
-                      const showResult = isCurrentQuestionAnswered;
+                <div className="grid grid-cols-5 gap-6 h-full">
+                  {/* Left Column: Question and Options (span-3) */}
+                  <div className="col-span-5 md:col-span-3 flex flex-col">
+                    <p className="text-lg font-medium text-gray-800 mb-6 leading-relaxed">
+                      {currentMcqQuestion.question}
+                    </p>
+                    <div className="space-y-3 flex-1">
+                      {currentMcqQuestion.options.map((option, index) => {
+                        const optionLetter = String.fromCharCode(65 + index);
+                        const isSelected =
+                          mcqAnswers[currentMcqQuestion.id] === optionLetter;
+                        const isCorrect = optionLetter === currentMcqQuestion.correctAnswer;
+                        const showResult = isCurrentMcqAnswered;
 
-                      return (
-                        <button
-                          key={index}
-                          onClick={() =>
-                            !isCurrentQuestionAnswered &&
-                            handleMcqAnswer(currentQuestion.id, optionLetter)
-                          }
-                          disabled={isCurrentQuestionAnswered}
-                          className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
-                            !showResult
-                              ? "bg-white border-gray-300 hover:border-black hover:bg-gray-50 cursor-pointer"
-                              : isSelected && isCorrect
-                              ? "bg-green-100 border-green-500 text-green-900"
-                              : isSelected && !isCorrect
-                              ? "bg-red-100 border-red-500 text-red-900"
-                              : isCorrect && showResult
-                              ? "bg-green-100 border-green-500 text-green-900"
-                              : "bg-gray-50 border-gray-300 text-gray-600"
-                          } ${isCurrentQuestionAnswered ? "cursor-default" : ""}`}
-                        >
-                          <span className="font-semibold">{optionLetter}.</span>{" "}
-                          {option}
-                        </button>
-                      );
-                    })}
+                        return (
+                          <div
+                            key={index}
+                            onClick={() =>
+                              !isCurrentMcqAnswered &&
+                              handleMcqAnswer(currentMcqQuestion.id, optionLetter)
+                            }
+                            className={`w-full p-4 border-2 border-black rounded-xl mb-3 transition-all ${
+                              !showResult
+                                ? "bg-white hover:bg-gray-50 hover:shadow-md cursor-pointer"
+                                : isSelected && isCorrect
+                                ? "bg-green-100 border-green-600 cursor-default"
+                                : isSelected && !isCorrect
+                                ? "bg-red-100 border-red-600 cursor-default"
+                                : isCorrect && showResult
+                                ? "bg-green-100 border-green-600 cursor-default"
+                                : "bg-gray-50 cursor-default"
+                            } ${isCurrentMcqAnswered ? "" : "hover:translate-y-[-2px]"}`}
+                          >
+                            <span className="font-semibold">{optionLetter}.</span>{" "}
+                            {option}
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
-                  {isCurrentQuestionAnswered && currentQuestion.explanation && (
-                    <div className="mt-6 p-4 bg-blue-50 border-l-4 border-blue-400 rounded">
-                      <p className="text-gray-800 leading-relaxed">
-                        <strong>Explanation:</strong> {currentQuestion.explanation}
+
+                  {/* Right Column: Intel Panel (span-2) */}
+                  <div className="col-span-5 md:col-span-2 bg-gray-50 border-l-4 border-black h-full p-6 hidden md:flex flex-col">
+                    {!isCurrentMcqAnswered ? (
+                      /* State A: Before Answer - Image or Hint */
+                      <div className="flex flex-col h-full">
+                        {currentMcqQuestion.image ? (
+                          <div className="flex-1 flex items-center justify-center">
+                            {typeof currentMcqQuestion.image === 'object' && 'src' in currentMcqQuestion.image && !('default' in currentMcqQuestion.image) ? (
+                              <Image
+                                src={(currentMcqQuestion.image as { src: string; alt?: string }).src}
+                                alt={(currentMcqQuestion.image as { src: string; alt?: string }).alt || 'Question image'}
+                                width={400}
+                                height={300}
+                                className="max-w-full h-auto rounded-lg border-2 border-black"
+                              />
+                            ) : (
+                              <Image
+                                src={currentMcqQuestion.image as any}
+                                alt="Question image"
+                                width={400}
+                                height={300}
+                                className="max-w-full h-auto rounded-lg border-2 border-black"
+                              />
+                            )}
+                          </div>
+                        ) : (
+                          <div className="flex-1 flex items-center justify-center">
+                            <button
+                              onClick={() => setShowHint(!showHint)}
+                              className="px-6 py-3 bg-black text-white border-2 border-black rounded-xl font-bold hover:bg-gray-800 active:translate-y-1 transition-all flex items-center gap-2"
+                            >
+                              <Lightbulb className="w-5 h-5" />
+                              {showHint ? 'Hide Hint' : 'Show Hint'}
+                            </button>
+                          </div>
+                        )}
+                        {showHint && !currentMcqQuestion.image && (
+                          <div className="mt-4 p-4 bg-yellow-50 border-2 border-yellow-400 rounded-lg">
+                            <p className="text-sm font-medium text-gray-800">
+                              Think about the key concepts related to this question. Consider what you learned in the video and interactive activity.
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      /* State B: After Answer - Debrief Card */
+                      <div className="flex flex-col h-full">
+                        <h3 className="text-xl font-black text-black mb-4">Analysis</h3>
+                        {currentMcqQuestion.explanation && (
+                          <div className="flex-1 overflow-y-auto">
+                            <p className="text-sm font-medium text-gray-800 leading-relaxed">
+                              {currentMcqQuestion.explanation}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Mobile: Show explanation below options */}
+                  {isCurrentMcqAnswered && currentMcqQuestion.explanation && (
+                    <div className="col-span-5 md:hidden mt-4 p-4 bg-gray-50 border-2 border-black rounded-xl">
+                      <h3 className="text-lg font-black text-black mb-2">Analysis</h3>
+                      <p className="text-sm font-medium text-gray-800 leading-relaxed">
+                        {currentMcqQuestion.explanation}
                       </p>
                     </div>
                   )}
@@ -305,7 +466,7 @@ export default function DojoDrill({
             </motion.div>
           )}
 
-          {/* Step 4: Victory Screen */}
+          {/* Step 4: Results */}
           {step === 4 && (
             <motion.div
               key="step4"
@@ -316,8 +477,11 @@ export default function DojoDrill({
               className="absolute inset-0 bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8 flex flex-col items-center justify-center"
             >
               <Trophy className="w-24 h-24 text-yellow-500 mb-6" />
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                Dojo Drill Complete!
+              </h2>
               <p className="text-2xl font-semibold text-gray-700 mb-8">
-                XP Earned: <span className="text-green-600">{xpEarned}</span>
+                XP Earned: <span className="text-green-600">{xpEarned}</span> / {drill.xpReward.total}
               </p>
               <div className="flex gap-4">
                 <button
@@ -333,23 +497,18 @@ export default function DojoDrill({
         </AnimatePresence>
       </div>
 
-      {/* Next Button - Below Container with Framer Motion */}
+      {/* Next Button - Below Container */}
       <div className="mt-6 flex justify-center">
         <AnimatePresence mode="wait">
-          {step === 1 && (
+          {step === 1 && videoEnded && compQuestionsSubmitted && (
             <motion.button
               key="next-step1"
               initial={{ x: 100, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -100, opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              onClick={handleVideoNext}
-              disabled={!videoEnded}
-              className={`px-8 py-3 rounded-lg font-bold text-lg border-2 border-black transition-all ${
-                videoEnded
-                  ? "bg-black text-white hover:bg-gray-800 active:translate-y-1"
-                  : "bg-gray-200 text-gray-500 cursor-not-allowed"
-              }`}
+              onClick={handleStage1Next}
+              className="px-8 py-3 rounded-lg font-bold text-lg bg-black text-white border-2 border-black hover:bg-gray-800 active:translate-y-1 transition-all"
             >
               Next <ArrowRight className="inline-block ml-2 w-5 h-5" />
             </motion.button>
@@ -372,7 +531,7 @@ export default function DojoDrill({
               Next <ArrowRight className="inline-block ml-2 w-5 h-5" />
             </motion.button>
           )}
-          {step === 3 && currentQuestion && (
+          {step === 3 && currentMcqQuestion && (
             <motion.button
               key="next-step3"
               initial={{ x: 100, opacity: 0 }}
@@ -380,9 +539,9 @@ export default function DojoDrill({
               exit={{ x: -100, opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
               onClick={handleMcqNext}
-              disabled={!isCurrentQuestionAnswered}
+              disabled={!isCurrentMcqAnswered}
               className={`px-8 py-3 rounded-lg font-bold text-lg border-2 border-black transition-all ${
-                isCurrentQuestionAnswered
+                isCurrentMcqAnswered
                   ? "bg-black text-white hover:bg-gray-800 active:translate-y-1"
                   : "bg-gray-200 text-gray-500 cursor-not-allowed"
               }`}
@@ -401,155 +560,3 @@ export default function DojoDrill({
     </div>
   );
 }
-
-// GDP Table Component for Gradeflation Drill
-const GDPTable = ({ onComplete }: { onComplete: () => void }) => {
-  const [correctCount, setCorrectCount] = useState(0);
-  const totalInputs = 3; // Number of input cells in the table
-
-  // Track when all inputs are correct
-  useEffect(() => {
-    if (correctCount === totalInputs) {
-      onComplete();
-    }
-  }, [correctCount, totalInputs, onComplete]);
-
-  const handleInputCorrect = () => {
-    setCorrectCount((prev) => Math.min(prev + 1, totalInputs));
-  };
-
-  return (
-    <div className="w-full">
-      <p className="text-center text-lg font-semibold mb-6 text-gray-800">
-        Calculate the Nominal GDP for each year.
-      </p>
-      <GDPTableWithTracking
-        headers={['Year', 'Price of Pizza', 'Qty Pizza', 'Nominal GDP']}
-        rows={[
-          ['2011', '$10', '400', { type: 'input', answer: '4000' }],
-          ['2012', '$11', '500', { type: 'input', answer: '5500' }],
-          ['2013', '$12', '600', { type: 'input', answer: '7200' }],
-        ]}
-        onInputCorrect={handleInputCorrect}
-      />
-    </div>
-  );
-};
-
-// Wrapper component that tracks input completion
-const GDPTableWithTracking = ({ 
-  headers, 
-  rows, 
-  onInputCorrect 
-}: { 
-  headers: string[]; 
-  rows: Array<string | { type: "input"; answer: string; placeholder?: string }>[]; 
-  onInputCorrect: () => void;
-}) => {
-  const [completedInputs, setCompletedInputs] = useState<Set<number>>(new Set());
-
-  const handleInputComplete = (rowIndex: number) => {
-    if (!completedInputs.has(rowIndex)) {
-      setCompletedInputs((prev) => new Set([...prev, rowIndex]));
-      onInputCorrect();
-    }
-  };
-
-  return (
-    <div className="w-full max-w-2xl mx-auto bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
-      {/* HEADER ROW */}
-      <div 
-        className="grid border-b-4 border-black bg-gray-100"
-        style={{ gridTemplateColumns: `repeat(${headers.length}, 1fr)` }}
-      >
-        {headers.map((header, i) => (
-          <div key={i} className={`p-4 font-black text-center text-sm md:text-lg uppercase tracking-wider flex items-center justify-center ${i !== headers.length - 1 ? 'border-r-4 border-black' : ''}`}>
-            {header}
-          </div>
-        ))}
-      </div>
-
-      {/* BODY ROWS */}
-      {rows.map((row, rowIndex) => (
-        <div 
-          key={rowIndex} 
-          className={`grid ${rowIndex !== rows.length - 1 ? 'border-b-4 border-black' : ''}`}
-          style={{ gridTemplateColumns: `repeat(${headers.length}, 1fr)` }}
-        >
-          {row.map((cell, colIndex) => (
-            <div key={colIndex} className={`relative flex items-center justify-center p-3 ${colIndex !== headers.length - 1 ? 'border-r-4 border-black' : ''}`}>
-              {typeof cell === "string" ? (
-                <span className="font-bold text-lg md:text-xl text-center">{cell}</span>
-              ) : (
-                <GDPInput 
-                  answer={cell.answer} 
-                  placeholder={cell.placeholder}
-                  onCorrect={() => handleInputComplete(rowIndex)}
-                />
-              )}
-            </div>
-          ))}
-        </div>
-      ))}
-    </div>
-  );
-};
-
-// Input component that calls onCorrect when answer is correct
-const GDPInput = ({ 
-  answer, 
-  placeholder,
-  onCorrect 
-}: { 
-  answer: string; 
-  placeholder?: string;
-  onCorrect: () => void;
-}) => {
-  const [val, setVal] = useState("");
-  const [status, setStatus] = useState<"idle" | "correct" | "wrong">("idle");
-
-  const checkAnswer = () => {
-    const cleanVal = val.replace(/[$,]/g, "").trim();
-    const cleanAnswer = answer.replace(/[$,]/g, "").trim();
-
-    if (cleanVal === cleanAnswer) {
-      setStatus("correct");
-      onCorrect(); // Notify parent that this input is correct
-    } else {
-      setStatus("wrong");
-      setTimeout(() => setStatus("idle"), 1000);
-    }
-  };
-
-  return (
-    <div className="relative w-full h-full flex items-center justify-center min-h-[60px]">
-      <motion.input
-        type="text"
-        placeholder={placeholder || "?"}
-        value={val}
-        onChange={(e) => setVal(e.target.value)}
-        onBlur={checkAnswer}
-        onKeyDown={(e) => e.key === "Enter" && checkAnswer()}
-        disabled={status === "correct"}
-        animate={status === "wrong" ? { x: [0, -10, 10, -5, 5, 0] } : {}}
-        whileFocus={{ scale: 1.05 }}
-        className={`w-full max-w-[120px] h-12 text-center text-xl font-bold rounded-xl border-2 outline-none transition-all
-          ${status === "idle" ? "bg-gray-50 border-gray-300 focus:border-black focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] placeholder:text-gray-300" : ""}
-          ${status === "correct" ? "bg-green-100 border-green-500 text-green-800 shadow-none" : ""}
-          ${status === "wrong" ? "bg-red-50 border-red-500 text-red-600" : ""}
-        `}
-      />
-      <AnimatePresence>
-        {status === "correct" && (
-          <motion.div 
-            initial={{ scale: 0 }} 
-            animate={{ scale: 1 }} 
-            className="absolute -top-2 -right-2 bg-green-500 text-white rounded-full p-1 shadow-sm z-10"
-          >
-            <Check size={14} strokeWidth={4} />
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-};

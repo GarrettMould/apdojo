@@ -12,9 +12,25 @@ type TableCell =
 interface DojoTableProps {
   headers: string[];
   rows: TableCell[][];
+  onComplete?: () => void;
 }
 
-export const DojoTable = ({ headers, rows }: DojoTableProps) => {
+export const DojoTable = ({ headers, rows, onComplete }: DojoTableProps) => {
+  const [completedInputs, setCompletedInputs] = useState<Set<string>>(new Set());
+  const totalInputs = rows.flat().filter(cell => typeof cell !== 'string' && cell.type === 'input').length;
+
+  const handleInputCorrect = (cellId: string) => {
+    if (!completedInputs.has(cellId)) {
+      setCompletedInputs(prev => {
+        const newSet = new Set([...prev, cellId]);
+        if (newSet.size === totalInputs && onComplete) {
+          onComplete();
+        }
+        return newSet;
+      });
+    }
+  };
+
   return (
     <div className="w-full max-w-2xl mx-auto bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
       
@@ -44,7 +60,7 @@ export const DojoTable = ({ headers, rows }: DojoTableProps) => {
               {typeof cell === "string" ? (
                 <span className="font-bold text-lg md:text-xl text-center">{cell}</span>
               ) : (
-                <DojoInput answer={cell.answer} placeholder={cell.placeholder} />
+                <DojoInput answer={cell.answer} placeholder={cell.placeholder} onCorrect={() => handleInputCorrect(`${rowIndex}-${colIndex}`)} />
               )}
               
             </div>
@@ -56,7 +72,7 @@ export const DojoTable = ({ headers, rows }: DojoTableProps) => {
 };
 
 // SUB-COMPONENT: The "Juicy" Input
-const DojoInput = ({ answer, placeholder }: { answer: string; placeholder?: string }) => {
+const DojoInput = ({ answer, placeholder, onCorrect }: { answer: string; placeholder?: string; onCorrect?: () => void }) => {
   const [val, setVal] = useState("");
   const [status, setStatus] = useState<"idle" | "correct" | "wrong">("idle");
 
@@ -67,6 +83,9 @@ const DojoInput = ({ answer, placeholder }: { answer: string; placeholder?: stri
 
     if (cleanVal === cleanAnswer) {
       setStatus("correct");
+      if (onCorrect) {
+        onCorrect();
+      }
     } else {
       setStatus("wrong");
       setTimeout(() => setStatus("idle"), 1000); // Reset shake after 1s
