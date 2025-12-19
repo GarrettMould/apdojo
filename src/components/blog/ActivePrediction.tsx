@@ -192,11 +192,11 @@ export function ActivePrediction({
         {hasChecked ? 'Submitted' : 'Check Answers'}
       </button>
 
-      {showExplanation && !showAsText && (
+        {showExplanation && !showAsText && (
         <div className="mt-6 p-5 bg-green-50 border border-green-200 rounded-lg">
-          {explanation}
+              {explanation}
         </div>
-      )}
+        )}
     </div>
   );
 }

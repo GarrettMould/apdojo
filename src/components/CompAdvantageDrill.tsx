@@ -269,7 +269,7 @@ export function CompAdvantageDrill({ problem, onComplete }: CompAdvantageDrillPr
                 <div className="grid grid-cols-2 gap-6">
                   {(['USA', 'France'] as const).map((option) => {
                     const isSelected = stage2TaskAAnswer === option;
-                    const isCorrect = stage2TaskACorrect === true && isSelected;
+                    const isCorrect = false; // Can't be true inside this block
                     const isWrong = stage2TaskACorrect === false && isSelected;
 
                     return (
@@ -438,4 +438,5 @@ export function CompAdvantageDrill({ problem, onComplete }: CompAdvantageDrillPr
     </div>
   );
 }
+
 

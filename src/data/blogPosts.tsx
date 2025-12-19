@@ -3,7 +3,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
-import { BlogComprehensionCheck } from '@/components/BlogComprehensionCheck';
 import DraggableGraph from '@/components/DraggableGraph';
 
 export type BlogPost = {
@@ -274,8 +273,10 @@ export const blogPosts: Record<string, BlogPost> = {
           const practiceQuestion = allQuestions.find(q => q.id === 1150);
           if (!practiceQuestion) return null;
           
+          // BlogComprehensionCheck is a client component and cannot be used in server-side data files
+          // This will be rendered client-side in the blog post page
           return (
-            <BlogComprehensionCheck question={practiceQuestion} />
+            <div data-comprehension-check data-question-id={practiceQuestion.id} />
           );
         })()}
       </>
@@ -423,8 +424,10 @@ export const blogPosts: Record<string, BlogPost> = {
           const practiceQuestion = allQuestions.find(q => q.id === 17);
           if (!practiceQuestion) return null;
           
+          // BlogComprehensionCheck is a client component and cannot be used in server-side data files
+          // This will be rendered client-side in the blog post page
           return (
-            <BlogComprehensionCheck question={practiceQuestion} />
+            <div data-comprehension-check data-question-id={practiceQuestion.id} />
           );
         })()}
       </>

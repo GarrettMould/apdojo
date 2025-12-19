@@ -30,46 +30,46 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   return (
     <div className="bg-gray-50 min-h-screen">
       <div className="max-w-4xl mx-auto px-4 py-12">
-        <Link href="/" className="inline-flex items-center text-blue-600 hover:text-blue-700 mb-8 group">
-          <ArrowLeft className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" />
-          Back to Home
-        </Link>
+          <Link href="/" className="inline-flex items-center text-blue-600 hover:text-blue-700 mb-8 group">
+            <ArrowLeft className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" />
+            Back to Home
+          </Link>
         
         <article className="bg-white p-8 sm:p-12 rounded-xl shadow-md border border-gray-200">
-          {/* Header */}
+            {/* Header */}
           <header className="mb-8 border-b pb-6 text-center">
             <h1 className="text-5xl sm:text-6xl font-extrabold text-gray-900 leading-tight mb-4">
-              {post.title}
-            </h1>
+                {post.title}
+              </h1>
             <p className="text-xl sm:text-2xl text-gray-600 mb-6">
-              {post.description}
-            </p>
-            
+                {post.description}
+              </p>
+              
             <div className="flex items-center justify-center gap-6">
               <div className={`inline-block text-xs font-semibold px-2.5 py-1 rounded-md ${
                 post.subject === 'Macro' 
                   ? 'bg-blue-100 text-blue-800' 
                   : 'bg-green-100 text-green-800'
               }`}>
-                {post.subject} - Unit {post.unit}
+                  {post.subject} - Unit {post.unit}
+                </div>
+                <div className="flex items-center text-sm text-gray-500">
+                  <Clock className="w-4 h-4 mr-1.5" />
+                  <span>{readingTime} min read</span>
+                </div>
               </div>
-              <div className="flex items-center text-sm text-gray-500">
-                <Clock className="w-4 h-4 mr-1.5" />
-                <span>{readingTime} min read</span>
-              </div>
-            </div>
 
-          </header>
+            </header>
 
-          {/* Post Content */}
-          <BlogPostClient 
-            content={post.content}
+            {/* Post Content */}
+            <BlogPostClient 
+              content={post.content}
             subject={post.subject === 'Macro' ? 'ap_macroeconomics' : 'ap_microeconomics'}
-            practiceUrl="/unitFRQpracticePage"
+              practiceUrl="/unitFRQpracticePage"
             images={post.images || []}
             videoUrl={post.videoUrl || null}
-          />
-        </article>
+            />
+          </article>
       </div>
     </div>
   );

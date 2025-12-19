@@ -291,7 +291,7 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
                           })}
                         </div>
                         
-                        {showResults && question.explanation && (
+                        {showResults && question.explanation && selectedAnswer !== undefined && selectedAnswer !== question.correctAnswer && (
                           <div className="mt-3 p-3 bg-blue-50 border-l-4 border-blue-400 rounded">
                             <p className="text-sm text-gray-800 leading-relaxed">
                               <strong>Explanation:</strong> {question.explanation}
