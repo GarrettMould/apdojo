@@ -114,7 +114,7 @@ export function GDPDrill({ onComplete }: GDPDrillProps) {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8">
+    <div className="w-full h-full">
       <AnimatePresence mode="wait">
         {/* Step 1: Nominal GDP */}
         {step === 1 && (

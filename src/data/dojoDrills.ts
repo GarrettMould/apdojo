@@ -279,12 +279,12 @@ export const dojoDrills: Record<string, DojoDrill> = {
     id: 'absolute-and-comparative-advantage',
     title: 'Absolute and Comparative Advantage',
     description: 'Master the concepts of absolute and comparative advantage to understand how countries benefit from specialization and trade.',
-    videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_1.3.mp4',
+    videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_micro_1.4.mp4',
     subject: 'ap_macroeconomics',
     unit: 1,
     lessonIds: ['1.3'],
     stage1: {
-      videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_1.3.mp4',
+      videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_micro_1.4.mp4',
       comprehensionQuestions: [
         {
           id: 'comp-adv-comp-1',
@@ -332,14 +332,14 @@ export const dojoDrills: Record<string, DojoDrill> = {
           headers: ['Country', 'Wheat', 'Cloth'],
           rows: [
             { country: 'USA', wheat: '10 hours', cloth: '5 hours' },
-            { country: 'France', wheat: '20 hours', cloth: '10 hours' }
+            { country: 'France', wheat: '20 hours', cloth: '15 hours' }
           ]
         },
         answers: {
           usaOpportunityCostWheat: '0.5', // 5/10 = 0.5 cloth per wheat
-          franceOpportunityCostWheat: '0.5', // 10/20 = 0.5 cloth per wheat
-          absoluteAdvantageCloth: 'USA' as const, // USA uses fewer hours (5 < 10)
-          comparativeAdvantageWheat: 'USA' as const // Same OC, but typically USA if equal
+          franceOpportunityCostWheat: '0.75', // 15/20 = 0.75 cloth per wheat
+          absoluteAdvantageCloth: 'USA' as const, // USA uses fewer hours (5 < 15)
+          comparativeAdvantageWheat: 'USA' as const // USA has lower opp cost (0.5 < 0.75)
         }
       }
     },

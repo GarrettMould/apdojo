@@ -157,7 +157,7 @@ export function CompAdvantageDrill({ problem, onComplete }: CompAdvantageDrillPr
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8">
+    <div className="w-full h-full flex flex-col">
       {/* Data Table - Always Visible */}
       <div className="mb-8">
         <p className="text-sm font-semibold text-black mb-4">
@@ -317,7 +317,15 @@ export function CompAdvantageDrill({ problem, onComplete }: CompAdvantageDrillPr
                       onFocus={() => setUsaOcFocused(true)}
                       onBlur={() => {
                         setUsaOcFocused(false);
-                        handleUsaOcBlur();
+                        if (!usaOcCorrect) {
+                          handleUsaOcBlur();
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !usaOcCorrect) {
+                          e.currentTarget.blur();
+                          handleUsaOcBlur();
+                        }
                       }}
                       disabled={usaOcCorrect}
                       animate={
@@ -357,7 +365,15 @@ export function CompAdvantageDrill({ problem, onComplete }: CompAdvantageDrillPr
                       onFocus={() => setFranceOcFocused(true)}
                       onBlur={() => {
                         setFranceOcFocused(false);
-                        handleFranceOcBlur();
+                        if (!franceOcCorrect) {
+                          handleFranceOcBlur();
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !franceOcCorrect) {
+                          e.currentTarget.blur();
+                          handleFranceOcBlur();
+                        }
                       }}
                       disabled={franceOcCorrect}
                       animate={

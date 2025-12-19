@@ -13,6 +13,78 @@ import { Question } from "@/data/questionBanks/types";
 import { CheckCircle2, ArrowRight, Trophy, Check, Lightbulb } from "lucide-react";
 import Image from "next/image";
 import { DojoDrill as DojoDrillType, ComprehensionQuestion } from "@/data/dojoDrills";
+import ReactMarkdown from 'react-markdown';
+
+// Helper function to parse markdown table from text
+const parseMarkdownTable = (text: string): { tableData: { headers: string[]; rows: string[][] } | null; textWithoutTable: string } => {
+  const lines = text.split('\n');
+  let tableStartIndex = -1;
+  let tableEndIndex = -1;
+  
+  // Find table boundaries (lines starting with |)
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (line.startsWith('|') && line.endsWith('|')) {
+      if (tableStartIndex === -1) {
+        tableStartIndex = i;
+      }
+      tableEndIndex = i;
+    } else if (tableStartIndex !== -1 && !line.startsWith('|') && line.length > 0) {
+      // Table ended (non-empty line that doesn't start with |)
+      break;
+    }
+  }
+  
+  if (tableStartIndex === -1 || tableEndIndex === -1) {
+    return { tableData: null, textWithoutTable: text };
+  }
+  
+  // Extract table lines
+  const tableLines = lines.slice(tableStartIndex, tableEndIndex + 1);
+  
+  if (tableLines.length < 2) {
+    return { tableData: null, textWithoutTable: text };
+  }
+  
+  // Parse headers (first line)
+  const headerLine = tableLines[0];
+  const headers = headerLine
+    .split('|')
+    .map(h => h.trim())
+    .filter(h => h.length > 0);
+  
+  // Parse rows (skip header and separator line)
+  const rows: string[][] = [];
+  for (let i = 2; i < tableLines.length; i++) {
+    const line = tableLines[i].trim();
+    // Skip empty lines
+    if (!line || !line.startsWith('|')) continue;
+    
+    const cells = line
+      .split('|')
+      .map(c => c.trim())
+      .filter(c => c.length > 0);
+    
+    if (cells.length > 0) {
+      rows.push(cells);
+    }
+  }
+  
+  // Remove table from text
+  const textWithoutTable = [
+    ...lines.slice(0, tableStartIndex),
+    ...lines.slice(tableEndIndex + 1)
+  ].join('\n').trim();
+  
+  if (headers.length === 0 || rows.length === 0) {
+    return { tableData: null, textWithoutTable: text };
+  }
+  
+  return {
+    tableData: { headers, rows },
+    textWithoutTable
+  };
+};
 
 interface DojoDrillProps {
   drill: DojoDrillType;
@@ -165,11 +237,7 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
         return <DraggableGraph onComplete={handleGraphComplete} />;
       case 'table':
         // Use GDPDrill for the nominal vs real GDP drill
-        return (
-          <div className="w-full">
-            <GDPDrill onComplete={handleTableComplete} />
-          </div>
-        );
+        return <GDPDrill onComplete={handleTableComplete} />;
       case 'monopoly':
         return <MonopolyRevenueVisualizer onComplete={handleMonopolyComplete} />;
       case 'comparative-advantage':
@@ -245,7 +313,7 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
                 </div>
                 
                 {/* Scrollable Questions */}
-                <div className="flex-1 overflow-y-auto space-y-6 pr-2">
+                <div className="flex-1 overflow-y-auto space-y-6 pr-2 pb-4">
                   {drill.stage1.comprehensionQuestions.map((question, qIndex) => {
                     const isAnswered = comprehensionAnswers[question.id] !== undefined;
                     const selectedAnswer = comprehensionAnswers[question.id];
@@ -333,10 +401,8 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
               className="absolute inset-0 bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8 flex flex-col"
             >
-              <div className="flex-1 flex items-center justify-center overflow-hidden">
-                <div className="w-full max-w-7xl">
-                  {getActivityComponent()}
-                </div>
+              <div className="flex-1 flex items-center justify-center overflow-hidden px-12">
+                {getActivityComponent()}
               </div>
             </motion.div>
           )}
@@ -355,9 +421,75 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
                 <div className="grid grid-cols-5 gap-6 h-full">
                   {/* Left Column: Question and Options (span-3) */}
                   <div className="col-span-5 md:col-span-3 flex flex-col">
-                    <p className="text-lg font-medium text-gray-800 mb-6 leading-relaxed">
-                      {currentMcqQuestion.question}
-                    </p>
+                    <div className="mb-6">
+                      {/* Parse markdown table from question text */}
+                      {(() => {
+                        const { tableData: parsedTableData, textWithoutTable } = parseMarkdownTable(currentMcqQuestion.question);
+                        const displayTableData = currentMcqQuestion.tableData || parsedTableData;
+                        const displayQuestionText = parsedTableData ? textWithoutTable : currentMcqQuestion.question;
+                        
+                        return (
+                          <>
+                            {/* Table Data from tableData property or parsed from markdown */}
+                            {displayTableData && (
+                              <div className="my-6 flex justify-center">
+                                <div className="flex items-center gap-4">
+                                  {currentMcqQuestion.tableData && 'playerNames' in currentMcqQuestion.tableData && currentMcqQuestion.tableData.playerNames && (
+                                    <div className="flex items-center justify-center h-full w-16">
+                                      <p className="transform -rotate-90 whitespace-nowrap text-center font-bold text-lg text-gray-900 leading-tight">
+                                        {currentMcqQuestion.tableData.playerNames.row.split(' ')[0]}
+                                        <br />
+                                        {currentMcqQuestion.tableData.playerNames.row.split(' ').slice(1).join(' ')}
+                                      </p>
+                                    </div>
+                                  )}
+                                  <div className="flex-1 overflow-x-auto">
+                                    <table className="min-w-full border-collapse border border-black">
+                                      <thead className="bg-white">
+                                        <tr>
+                                          {displayTableData.headers.map((header: string) => (
+                                            <th key={header} className="border border-black px-4 py-3 text-center text-base font-bold text-gray-900">
+                                              {header}
+                                            </th>
+                                          ))}
+                                        </tr>
+                                      </thead>
+                                      <tbody className="bg-white">
+                                        {displayTableData.rows.map((row: string[], rowIndex: number) => (
+                                          <tr key={rowIndex}>
+                                            {row.map((cell: string, cellIndex: number) => {
+                                              const isRowHeader = 'rowHeaders' in displayTableData && displayTableData.rowHeaders && cellIndex === 0;
+                                              return (
+                                                <td 
+                                                  key={cellIndex} 
+                                                  className={`border border-black px-4 py-3 text-center text-base ${isRowHeader ? 'font-bold' : ''}`}
+                                                >
+                                                  {cell}
+                                                </td>
+                                              );
+                                            })}
+                                          </tr>
+                                        ))}
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                            {/* Render question text with markdown support (excluding tables, which are rendered above) */}
+                            <div className="text-lg font-medium text-gray-800 mb-4 leading-relaxed prose prose-sm max-w-none">
+                              <ReactMarkdown
+                                components={{
+                                  p: ({ children }) => <p className="mb-2">{children}</p>,
+                                }}
+                              >
+                                {displayQuestionText}
+                              </ReactMarkdown>
+                            </div>
+                          </>
+                        );
+                      })()}
+                    </div>
                     <div className="space-y-3 flex-1">
                       {currentMcqQuestion.options.map((option, index) => {
                         const optionLetter = String.fromCharCode(65 + index);

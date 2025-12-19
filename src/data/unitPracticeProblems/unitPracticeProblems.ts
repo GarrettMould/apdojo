@@ -511,7 +511,7 @@ const macroUnit1Questions = [
     "unit": 1,
     "lessonIDS": ["1.2"],
     "unitName": "Basic Economic Concepts",
-    "question": "Refer to the Production Possibilities Curve (PPC) below, which shows an economy producing Capital Goods and Consumer Goods. Which of the following movements indicates that the economy can increase its production of Consumer Goods without sacrificing any Capital Goods? ",
+    "question": "Refer to the Production Possibilities Curve (PPC) below, which shows an economy producing capital goods and consumer goods. Which of the following movements indicates that the economy can increase its production of consumer goods without sacrificing any capital goods? ",
     "image": null,
     "options": [
       "From point R to point U",
@@ -565,7 +565,7 @@ const macroUnit1Questions = [
     "unit": 1,
     "lessonIDS": ["1.6"],
     "unitName": "Basic Economic Concepts",
-    "question": "Refer to the market graph below. The market equilibrium quantity is 90 units. If the current market price is established at **$P_2$**, which of the following best describes the quantity exchanged and the resulting pressure on the market price? ",
+    "question": "Refer to the market graph below. The market equilibrium quantity is 90 units. If the current market price is established at $P_2$, which of the following best describes the quantity exchanged and the resulting pressure on the market price? ",
     "image": null,
     "options": [
       "120 units will be exchanged, and there will be upward pressure on the price.",
@@ -583,7 +583,7 @@ const macroUnit1Questions = [
     "unit": 1,
     "lessonIDS": ["1.4"],
     "unitName": "Basic Economic Concepts",
-    "question": "Refer to the diagram below showing the demand for electric scooters. Which of the following changes would most likely cause the demand curve to shift to the right from $D_1$ to $D_2$? ",
+    "question": "Refer to the diagram below showing the demand for electric scooters. Which of the following changes would most likely cause the demand curve to shift to the right from D1 to D2? ",
     "image": null,
     "options": [
       "A decrease in the market price of electric scooters",
@@ -601,7 +601,7 @@ const macroUnit1Questions = [
     "unit": 1,
     "lessonIDS": ["1.4"],
     "unitName": "Basic Economic Concepts",
-    "question": "Refer to the diagram of the market for tablet computers. Which of the following changes would most likely result in a movement downward along the demand curve from Point C (High Price) to Point D (Low Price)? ",
+    "question": "Refer to the diagram of the market for tablet computers. Which of the following changes would most likely result in a movement downward along the demand curve from Point C to Point D? ",
     "image": null,
     "options": [
       "An increase in the productivity of tablet manufacturers",
@@ -2261,7 +2261,7 @@ const microUnit1Questions = [
     "unit": 1,
     "lessonIDS": ["1.4"],
     "unitName": "Comparative Advantage and Gains from Trade",
-    "question": "Refer to the graph for Liblis and Tralia. Which statement regarding absolute advantage is supported by the data?",
+    "question": "Refer to the graph for Liblis and Tralia. Which of the following statements regarding absolute advantage is true?",
     "image": null,
     "options": [
       "Tralia has an absolute advantage in the production of Good B.",
@@ -2376,7 +2376,7 @@ const microUnit1Questions = [
     "unit": 1,
     "lessonIDS": ["1.3"],
     "unitName": "Basic Economic Concepts",
-    "question": "Refer to the Production Possibilities Curve (PPC) below, which shows an economy producing Capital Goods and Consumer Goods. Which of the following movements indicates that the economy can increase its production of Consumer Goods without sacrificing any Capital Goods? ",
+    "question": "Refer to the Production Possibilities Curve (PPC) below, which shows an economy producing capital goods and consumer goods. Which of the following movements indicates that the economy can increase its production of consumer goods without sacrificing any capital goods? ",
     "image": null,
     "options": [
       "From point R to point U",
