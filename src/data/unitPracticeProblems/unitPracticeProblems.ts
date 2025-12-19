@@ -505,6 +505,132 @@ const macroUnit1Questions = [
     "correctAnswer": "A",
     "explanation": "Absolute advantage is determined by input efficiency. Southland requires only 6 hours to produce a unit of Textiles, whereas Norland requires 8 hours. Since Southland uses fewer inputs (time) to complete the task, it has the absolute advantage in Textiles.",
     "videoExplanation": null
+  },
+  {
+    "id": 2123,
+    "unit": 1,
+    "lessonIDS": ["1.2"],
+    "unitName": "Basic Economic Concepts",
+    "question": "Refer to the Production Possibilities Curve (PPC) below, which shows an economy producing Capital Goods and Consumer Goods. Which of the following movements indicates that the economy can increase its production of Consumer Goods without sacrificing any Capital Goods? ",
+    "image": null,
+    "options": [
+      "From point R to point U",
+      "From point U to point R",
+      "From point V to point T",
+      "From point S to point T",
+      "From point T to point U"
+    ],
+    "correctAnswer": "A",
+    "explanation": "Point R represents a state of underutilization or inefficiency, meaning unemployed resources exist. Moving from R to U utilizes these idle resources to increase the output of Consumer Goods while maintaining the same level of Capital Goods. All other movements along the curve (like S to T) would require giving up one good to get more of the other (opportunity cost).",
+    "videoExplanation": null
+  },
+  {
+    "id": 2124,
+    "unit": 1,
+    "lessonIDS": ["1.6"],
+    "unitName": "Basic Economic Concepts",
+    "question": "The table below displays the quantity demanded and quantity supplied for bushels of soybeans at various market prices.\n\n| Price per Bushel | Quantity Demanded (millions) | Quantity Supplied (millions) |\n| :---: | :---: | :---: |\n| $8 | 90 | 30 |\n| $10 | 75 | 45 |\n| $12 | 60 | 60 |\n| $14 | 45 | 75 |\n| $16 | 30 | 90 |\n\nBased on the data, which of the following combinations represents the equilibrium price and quantity for soybeans?",
+    "image": null,
+    "options": [
+      "Price: $10, Quantity: 75 million",
+      "Price: $12, Quantity: 60 million",
+      "Price: $12, Quantity: 120 million",
+      "Price: $14, Quantity: 75 million",
+      "Price: $16, Quantity: 30 million"
+    ],
+    "correctAnswer": "B",
+    "explanation": "Equilibrium occurs where the Quantity Demanded equals the Quantity Supplied ($Q_d = Q_s$). In the table, at a price of $12, both the quantity demanded and quantity supplied are 60 million bushels.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2125,
+    "unit": 1,
+    "lessonIDS": ["1.6"],
+    "unitName": "Basic Economic Concepts",
+    "question": "The table below shows the market data for corn.\n\n| Price per Bushel | Quantity Demanded (bushels) | Quantity Supplied (bushels) |\n| :---: | :---: | :---: |\n| $3.00 | 500 | 100 |\n| $4.00 | 400 | 200 |\n| $5.00 | 300 | 300 |\n| $6.00 | 200 | 400 |\n| $7.00 | 100 | 500 |\n\nSuppose the current market price for corn is **$4.00**. Which of the following statements correctly describes the state of the market?",
+    "image": null,
+    "options": [
+      "There is a surplus of 200 bushels, and the price will decrease.",
+      "There is a shortage of 200 bushels, and the price will decrease.",
+      "There is a surplus of 200 bushels, and the price will increase.",
+      "There is a shortage of 200 bushels, and the price will increase.",
+      "The market is in equilibrium."
+    ],
+    "correctAnswer": "D",
+    "explanation": "At a price of $4.00, Quantity Demanded (400) exceeds Quantity Supplied (200). $400 - 200 = 200$. This condition is a **Shortage**. In a free market, a shortage creates upward pressure on the price as buyers compete for limited goods, driving the price toward the equilibrium of $5.00.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2126,
+    "unit": 1,
+    "lessonIDS": ["1.6"],
+    "unitName": "Basic Economic Concepts",
+    "question": "Refer to the market graph below. The market equilibrium quantity is 90 units. If the current market price is established at **$P_2$**, which of the following best describes the quantity exchanged and the resulting pressure on the market price? ",
+    "image": null,
+    "options": [
+      "120 units will be exchanged, and there will be upward pressure on the price.",
+      "90 units will be exchanged, and the price will remain stable.",
+      "60 units will be exchanged, and the price will increase to clear the shortage.",
+      "60 units will be exchanged, and the price will decrease until the equilibrium quantity of 90 is reached.",
+      "120 units will be exchanged, and the price will decrease to eliminate the surplus."
+    ],
+    "correctAnswer": "D",
+    "explanation": "At price $P_2$ (above equilibrium), the Quantity Demanded is 60 units while the Quantity Supplied is higher (e.g., 120), creating a **surplus**. In a market, the actual quantity exchanged is determined by the 'short side' (whichever is lower between supply and demand), so only 60 units are bought and sold. To eliminate the surplus, market forces will drive the price down until it reaches equilibrium at 90 units.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2127,
+    "unit": 1,
+    "lessonIDS": ["1.4"],
+    "unitName": "Basic Economic Concepts",
+    "question": "Refer to the diagram below showing the demand for electric scooters. Which of the following changes would most likely cause the demand curve to shift to the right from $D_1$ to $D_2$? ",
+    "image": null,
+    "options": [
+      "A decrease in the market price of electric scooters",
+      "A decrease in the price of bicycles, a substitute good",
+      "An increase in the price of electricity, a complementary good",
+      "An increase in the price of public transportation, a substitute good",
+      "A decrease in the number of consumers in the market"
+    ],
+    "correctAnswer": "D",
+    "explanation": "A shift to the right represents an increase in Demand. This is caused by a non-price determinant. An increase in the price of a substitute (public transportation) induces consumers to switch toward the good in question (electric scooters). (Note: Option A would be a movement *along* the curve, not a shift).",
+    "videoExplanation": null
+  },
+  {
+    "id": 2128,
+    "unit": 1,
+    "lessonIDS": ["1.4"],
+    "unitName": "Basic Economic Concepts",
+    "question": "Refer to the diagram of the market for tablet computers. Which of the following changes would most likely result in a movement downward along the demand curve from Point C (High Price) to Point D (Low Price)? ",
+    "image": null,
+    "options": [
+      "An increase in the productivity of tablet manufacturers",
+      "A decrease in the price of tablet computers",
+      "An increase in the popularity of digital art apps",
+      "A decrease in the price of laptops, a substitute good",
+      "An expectation that tablet prices will fall next month"
+    ],
+    "correctAnswer": "B",
+    "explanation": "A movement *along* the demand curve is caused **only** by a change in the price of the good itself. Moving from Point C to Point D represents an increase in Quantity Demanded due to a decrease in the price of the tablet. All other options would cause the entire demand curve to shift.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2129,
+    "unit": 1,
+    "lessonIDS": ["1.2"],
+    "unitName": "Basic Economic Concepts",
+    "question": "The table below displays five possible combinations of Heavy Trucks and Patrol Boats that a nation can produce annually using all available resources on a large scale.\n\n| Combination | Heavy Trucks | Patrol Boats |\n| :---: | :---: | :---: |\n| A | 0 | 20,000 |\n| B | 10,000 | 18,000 |\n| C | 20,000 | 15,000 |\n| D | 30,000 | 11,000 |\n| E | 40,000 | 6,000 |\n\nBased on the data, what is the opportunity cost of changing production from **Combination B** to **Combination C**?",
+    "image": null,
+    "options": [
+      "10,000 Heavy Trucks",
+      "2,000 Patrol Boats",
+      "3,000 Patrol Boats",
+      "4,000 Patrol Boats",
+      "15,000 Patrol Boats"
+    ],
+    "correctAnswer": "C",
+    "explanation": "To move from Combination B to Combination C, the production of Heavy Trucks increases from 10,000 to 20,000. However, the production of Patrol Boats decreases from 18,000 to 15,000. The opportunity cost is the amount of the alternative good given up: $18,000 - 15,000 = 3,000$ Patrol Boats.",
+    "videoExplanation": null
   }
 ]
 
@@ -2243,6 +2369,114 @@ const microUnit1Questions = [
     ],
     "correctAnswer": "A",
     "explanation": "Absolute advantage is determined by input efficiency. Southland requires only 6 hours to produce a unit of Textiles, whereas Norland requires 8 hours. Since Southland uses fewer inputs (time) to complete the task, it has the absolute advantage in Textiles.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2112,
+    "unit": 1,
+    "lessonIDS": ["1.3"],
+    "unitName": "Basic Economic Concepts",
+    "question": "Refer to the Production Possibilities Curve (PPC) below, which shows an economy producing Capital Goods and Consumer Goods. Which of the following movements indicates that the economy can increase its production of Consumer Goods without sacrificing any Capital Goods? ",
+    "image": null,
+    "options": [
+      "From point R to point U",
+      "From point U to point R",
+      "From point V to point T",
+      "From point S to point T",
+      "From point T to point U"
+    ],
+    "correctAnswer": "A",
+    "explanation": "Point R represents a state of underutilization or inefficiency, meaning unemployed resources exist. Moving from R to U utilizes these idle resources to increase the output of Consumer Goods while maintaining the same level of Capital Goods. All other movements along the curve (like S to T) would require giving up one good to get more of the other (opportunity cost).",
+    "videoExplanation": null
+  },
+  {
+    "id": 2113,
+    "unit": 1,
+    "lessonIDS": ["1.6"],
+    "unitName": "Basic Economic Concepts",
+    "question": "Ben consumes only two goods, Pizza and Soda. To maximize his total utility given a limited budget, Ben should adjust his consumption until which of the following conditions is met?",
+    "image": null,
+    "options": [
+      "The marginal utility of the last slice of Pizza equals the marginal utility of the last Soda.",
+      "The marginal utility per dollar spent on Pizza equals the marginal utility per dollar spent on Soda.",
+      "The total utility derived from Pizza equals the total utility derived from Soda.",
+      "The ratio of the price of Pizza to the price of Soda equals the marginal utility of Pizza.",
+      "The marginal utility of Pizza is maximized and the marginal utility of Soda is minimized."
+    ],
+    "correctAnswer": "B",
+    "explanation": "The utility-maximization rule states that a consumer should allocate their budget so that the marginal utility per dollar ($MU/P$) is the same for every good consumed. If $\\frac{MU_x}{P_x} = \\frac{MU_y}{P_y}$, the consumer cannot gain more utility by switching spending from one good to another.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2114,
+    "unit": 1,
+    "lessonIDS": ["1.6"],
+    "unitName": "Basic Economic Concepts",
+    "question": "Assume the price of a movie ticket is $10 and the price of a book is $20. Sarah's marginal utility from watching one more movie is 50 utils, and her marginal utility from reading one more book is 80 utils. If Sarah is currently spending her entire budget, how should she adjust her consumption to maximize total utility?",
+    "image": null,
+    "options": [
+      "Buy more movies and fewer books.",
+      "Buy fewer movies and more books.",
+      "Buy more of both goods.",
+      "Buy fewer of both goods.",
+      "Maintain her current consumption bundle."
+    ],
+    "correctAnswer": "A",
+    "explanation": "Calculate marginal utility per dollar: Movies = $50/10 = 5$ utils/dollar. Books = $80/20 = 4$ utils/dollar. Since movies give more 'bang for the buck' ($5 > 4$), Sarah should shift spending from books to movies until the ratios equalize.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2115,
+    "unit": 1,
+    "lessonIDS": ["1.6"],
+    "unitName": "Basic Economic Concepts",
+    "question": "Leo spends his allowance on Apps and Music Tracks. The price of an App is $2, and the price of a Music Track is $1. Currently, the marginal utility of the last App he purchased is 16 utils, and the marginal utility of the last Music Track is 10 utils. To maximize utility, Leo should:",
+    "image": null,
+    "options": [
+      "buy more Apps and fewer Music Tracks.",
+      "buy fewer Apps and more Music Tracks.",
+      "buy more of both.",
+      "buy equal quantities of Apps and Music Tracks.",
+      "make no changes to his consumption."
+    ],
+    "correctAnswer": "B",
+    "explanation": "Calculate MU/P: Apps = $16/2 = 8$. Music = $10/1 = 10$. Since the marginal utility per dollar is higher for Music ($10 > 8$), Leo gains more utility by spending his last dollar on Music. He should buy more Music and fewer Apps.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2116,
+    "unit": 1,
+    "lessonIDS": ["1.6"],
+    "unitName": "Basic Economic Concepts",
+    "question": "The price of a taco is $4 and the price of a drink is $2. If Juan is maximizing his utility and the marginal utility of the last taco he consumed was 20 utils, what must be the marginal utility of the last drink he consumed?",
+    "image": null,
+    "options": [
+      "5 utils",
+      "10 utils",
+      "20 utils",
+      "40 utils",
+      "80 utils"
+    ],
+    "correctAnswer": "B",
+    "explanation": "At the utility-maximizing point, $\\frac{MU_{taco}}{P_{taco}} = \\frac{MU_{drink}}{P_{drink}}$. Substituting the values: $\\frac{20}{4} = \\frac{x}{2}$. This simplifies to $5 = \\frac{x}{2}$. Solving for $x$, the marginal utility of the drink must be $10$ utils.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2122,
+    "unit": 1,
+    "lessonIDS": ["1.3"],
+    "unitName": "Basic Economic Concepts",
+    "question": "The table below displays five possible combinations of Heavy Trucks and Patrol Boats that a nation can produce annually using all available resources on a large scale.\n\n| Combination | Heavy Trucks | Patrol Boats |\n| :---: | :---: | :---: |\n| A | 0 | 20,000 |\n| B | 10,000 | 18,000 |\n| C | 20,000 | 15,000 |\n| D | 30,000 | 11,000 |\n| E | 40,000 | 6,000 |\n\nBased on the data, what is the opportunity cost of changing production from **Combination B** to **Combination C**?",
+    "image": null,
+    "options": [
+      "10,000 Heavy Trucks",
+      "2,000 Patrol Boats",
+      "3,000 Patrol Boats",
+      "4,000 Patrol Boats",
+      "15,000 Patrol Boats"
+    ],
+    "correctAnswer": "C",
+    "explanation": "To move from Combination B to Combination C, the production of Heavy Trucks increases from 10,000 to 20,000. However, the production of Patrol Boats decreases from 18,000 to 15,000. The opportunity cost is the amount of the alternative good given up: $18,000 - 15,000 = 3,000$ Patrol Boats.",
     "videoExplanation": null
   }
   // Lesson 1.5: (left empty)
