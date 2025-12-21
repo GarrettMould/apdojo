@@ -3,8 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Question as QuestionType } from '@/data/questionBanks/types';
 import { Unit } from '@/data/cheatSheets';
-import { Check, X, Brain, FileText, ChevronDown, Triangle, Loader2, RefreshCw, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Clipboard, Lock, Play, Minus, Menu } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Check, X, Brain, FileText, ChevronDown, Triangle, Loader2, RefreshCw, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Clipboard, Lock, Play, Minus } from 'lucide-react';
 import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
 import Image from 'next/image';
@@ -17,7 +16,6 @@ import { QuestionWithKeyTerms } from './QuestionWithKeyTerms';
 import { keyTerms as apMacroTerms } from '@/data/apMacroTerms';
 import { keyTerms as apMicroTerms } from '@/data/apMicroTerms';
 import { KeyTerm } from '@/data/allContent';
-import { logger } from '@/utils/logger';
 
 import dojoIcon from "../../public/images/dojoIcon.png";
 
@@ -68,8 +66,6 @@ interface QuestionCardProps {
   correctStreak: number;
   highlightedIndex: number | null;
   isParentModalOpen: boolean;
-  enableUnderlining?: boolean;
-  enableStrikethrough?: boolean;
 }
 
 const QuestionCard = ({ 
@@ -87,9 +83,7 @@ const QuestionCard = ({
   dojoProgress,
   correctStreak,
   highlightedIndex,
-  isParentModalOpen,
-  enableUnderlining = true,
-  enableStrikethrough = true
+  isParentModalOpen
 }: QuestionCardProps) => {
   const letterToIndex = (letter?: string): number | null => {
     if (!letter) return null;
@@ -101,8 +95,6 @@ const QuestionCard = ({
   const [selectedAnswerIndex, setSelectedAnswerIndex] = useState<number | null>(initialSelectedIndex);
   const [isSubmitted, setIsSubmitted] = useState(isAnswered);
   const [struckThroughOptions, setStruckThroughOptions] = useState<Set<number>>(new Set());
-  const [isVideoExpanded, setIsVideoExpanded] = useState(false);
-  const [showVideoModal, setShowVideoModal] = useState(false);
 
   // --- State for Overlay --- 
   const [overlayMode, setOverlayMode] = useState<'signup' | 'login'>('signup');
@@ -134,7 +126,7 @@ const QuestionCard = ({
 
   // Effect to sync internal state and reset forms/validation/mode
   useEffect(() => {
-    logger.debug(`[QuestionCard] useEffect triggered for question ${question.id}, isAnswered: ${isAnswered}, initialSelectedLetter: ${initialSelectedLetter}`);
+    console.log(`[QuestionCard] useEffect triggered for question ${question.id}, isAnswered: ${isAnswered}, initialSelectedLetter: ${initialSelectedLetter}`);
     const currentSelectedIndex = letterToIndex(initialSelectedLetter);
     setSelectedAnswerIndex(currentSelectedIndex);
     // Ensure isSubmitted matches isAnswered state - if not answered, definitely not submitted
@@ -164,8 +156,6 @@ const QuestionCard = ({
     setLoginLoading(false);
 
     setShowPasswordReqs(false);
-    setIsVideoExpanded(false); // Reset video accordion when question changes
-    setShowVideoModal(false); // Reset video modal when question changes
   }, [question.id, initialSelectedLetter, isAnswered]);
 
   // Effect for password validation (signup only)
@@ -185,7 +175,7 @@ const QuestionCard = ({
 
   const handleAnswerSelect = (index: number) => {
     if (isSubmitted) {
-      logger.warn(`[QuestionCard] Blocked answer selection: question ${question.id} already submitted (isSubmitted: ${isSubmitted}, isAnswered: ${isAnswered})`);
+      console.warn(`[QuestionCard] Blocked answer selection: question ${question.id} already submitted (isSubmitted: ${isSubmitted}, isAnswered: ${isAnswered})`);
       return;
     }
     
@@ -199,10 +189,9 @@ const QuestionCard = ({
       return;
     }
     
-    logger.debug(`[QuestionCard] Answer selected for question ${question.id}, index ${index}, isLoggedIn: ${isLoggedIn}, currentIndex: ${currentIndex}`);
+    console.log(`[QuestionCard] Answer selected for question ${question.id}, index ${index}, isLoggedIn: ${isLoggedIn}, currentIndex: ${currentIndex}`);
     setSelectedAnswerIndex(index);
     setIsSubmitted(true);
-    
     try {
       onAnswerSelect(
         question.id,
@@ -210,23 +199,11 @@ const QuestionCard = ({
         question.options[index],
         question.lessonIDS
       );
-      
-      // Check if answer is incorrect and video explanation exists
-      // Only show modal for newly submitted incorrect answers (not when viewing already-answered questions)
-      const isIncorrect = index !== correctAnswerIndex;
-      if (isIncorrect && question.videoExplanation && !isAnswered) {
-        // Automatically show video modal for incorrect answers
-        // Use setTimeout to ensure state updates are complete
-        setTimeout(() => {
-          setShowVideoModal(true);
-        }, 100);
-      }
     } catch (error) {
       console.error(`[QuestionCard] Error in onAnswerSelect for question ${question.id}:`, error);
       // Reset state on error so user can try again
       setIsSubmitted(false);
       setSelectedAnswerIndex(null);
-      setShowVideoModal(false);
     }
   };
 
@@ -316,10 +293,10 @@ const QuestionCard = ({
         // Optional: Set background color if transparency is an issue
         // backgroundColor: '#ffffff', 
       });
-      logger.debug("Canvas generated.");
+      console.log("Canvas generated.");
 
       const imageDataUrl = canvas.toDataURL('image/png');
-      logger.debug("Captured Image Data URL (first 100 chars):", imageDataUrl.substring(0, 100) + "...");
+      console.log("Captured Image Data URL (first 100 chars):", imageDataUrl.substring(0, 100) + "...");
 
       // --- TEMPORARY FRONTEND ACTION --- 
       // alert(`Question Card Captured! ...`); // Optional: Remove or keep the alert
@@ -332,7 +309,7 @@ const QuestionCard = ({
          
          // Ensure it's an array (handle potential data corruption)
          if (!Array.isArray(boardBlocks)) {
-             logger.warn('localStorage tempBoardBlocks was not an array, resetting.');
+             console.warn('localStorage tempBoardBlocks was not an array, resetting.');
              boardBlocks = [];
          }
 
@@ -357,7 +334,7 @@ const QuestionCard = ({
 
          // Save back to localStorage
          localStorage.setItem('tempBoardBlocks', JSON.stringify(boardBlocks));
-         logger.debug(`Saved image block ${newImageBlock.id} to localStorage (temporary)`);
+         console.log(`Saved image block ${newImageBlock.id} to localStorage (temporary)`);
          alert('Question Card image saved to temporary local board!'); // Give feedback
 
       } catch (e) {
@@ -506,63 +483,12 @@ const QuestionCard = ({
         <div className="space-y-6"> 
           {/* Question Text */}
           <p className="text-base md:text-lg font-medium font-serif leading-relaxed text-gray-800">
-            {enableUnderlining ? (
-              <QuestionWithKeyTerms 
-                questionText={question.question} 
-                unit={question.unit} 
-                subject={question.subject}
-              />
-            ) : (
-              question.question
-            )}
+            <QuestionWithKeyTerms 
+              questionText={question.question} 
+              unit={question.unit} 
+              subject={question.subject}
+            />
           </p>
-
-          {/* Table Data */}
-          {question.tableData && (
-            <div className="my-6 flex justify-center">
-              <div className="flex items-center gap-4">
-                {question.tableData.playerNames && (
-                  <div className="flex items-center justify-center h-full w-16">
-                    <p className="transform -rotate-90 whitespace-nowrap text-center font-bold text-lg text-gray-900 leading-tight">
-                      {question.tableData.playerNames.row.split(' ')[0]}
-                      <br />
-                      {question.tableData.playerNames.row.split(' ').slice(1).join(' ')}
-                    </p>
-                  </div>
-                )}
-                <div className="flex-1">
-                  <table className="min-w-full border-collapse border border-black">
-                    <thead className="bg-white">
-                      <tr>
-                        {question.tableData.headers.map(header => (
-                          <th key={header} className="border border-black px-4 py-3 text-center text-base font-bold text-gray-900">
-                            {header}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white">
-                      {question.tableData.rows.map((row, rowIndex) => (
-                        <tr key={rowIndex}>
-                          {row.map((cell, cellIndex) => {
-                            const isRowHeader = question.tableData?.rowHeaders && cellIndex === 0;
-                            return (
-                              <td 
-                                key={cellIndex} 
-                                className={`border border-black px-4 py-3 text-center text-base ${isRowHeader ? 'font-bold' : ''}`}
-                              >
-                                {cell}
-                              </td>
-                            );
-                          })}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          )}
 
         {/* --- ADDED: Question Image Display --- */}
         {question.image && (
@@ -596,39 +522,6 @@ const QuestionCard = ({
               <h4 className="font-semibold text-gray-900 mb-2 text-sm">Explanation</h4>
               <p className="text-gray-900">{aiExplanation}</p>
             </div>
-            
-            {/* Video Explanation Accordion - Also show when AI explanation exists */}
-            {question.videoExplanation && (
-              <div className="border border-gray-200 rounded-lg overflow-hidden">
-                <button
-                  onClick={() => setIsVideoExpanded(!isVideoExpanded)}
-                  className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
-                >
-                  <span className="font-semibold text-gray-900 flex items-center gap-2">
-                    <Play className="w-5 h-5" />
-                    Watch Video Explanation
-                  </span>
-                  <ChevronDown 
-                    className={`w-5 h-5 text-gray-600 transition-transform ${
-                      isVideoExpanded ? 'transform rotate-180' : ''
-                    }`}
-                  />
-                </button>
-                
-                {isVideoExpanded && (
-                  <div className="p-4 bg-white border-t border-gray-200">
-                    <video
-                      src={question.videoExplanation}
-                      controls
-                      className="w-full aspect-video rounded-lg shadow-md"
-                      playsInline
-                    >
-                      Your browser does not support the video tag.
-                    </video>
-                  </div>
-                )}
-              </div>
-            )}
           </div>
         ) : (
           // --- Display Answer Options Mode ---
@@ -674,8 +567,8 @@ const QuestionCard = ({
                       </span>
                        {/* Option Text - Reduced Size */}
                       <span className={`flex-1 text-sm ${isStruckThrough ? 'line-through text-gray-400' : ''} ${isSubmitted ? 'text-gray-800' : isHighlighted ? 'text-gray-900' : 'text-gray-900'}`}>{option}</span>
-                      {/* Strikethrough Button - Only show when enabled and not submitted */}
-                      {!isSubmitted && enableStrikethrough && (
+                      {/* Strikethrough Button - Only show when not submitted */}
+                      {!isSubmitted && (
                         <button
                           onClick={handleStrikethroughToggle}
                           className="flex-shrink-0 p-1.5 rounded hover:bg-gray-200 transition-colors flex items-center justify-center"
@@ -705,118 +598,10 @@ const QuestionCard = ({
                 })}
             </div>
             
-            {/* Video Explanation Accordion - Shows after submission if video exists */}
-            {isSubmitted && question.videoExplanation && (
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                {/* Feedback Message */}
-                <div className={`mb-4 p-4 rounded-lg border ${
-                  selectedAnswerIndex === correctAnswerIndex 
-                    ? 'bg-green-50 border-green-200' 
-                    : 'bg-red-50 border-red-200'
-                }`}>
-                  <div className="flex items-center gap-2">
-                    {selectedAnswerIndex === correctAnswerIndex ? (
-                      <>
-                        <Check className="w-5 h-5 text-green-600" />
-                        <span className="font-semibold text-green-800">Correct!</span>
-                      </>
-                    ) : (
-                      <>
-                        <X className="w-5 h-5 text-red-600" />
-                        <span className="font-semibold text-red-800">Incorrect</span>
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                {/* Video Explanation Accordion */}
-                <div className="border border-gray-200 rounded-lg overflow-hidden">
-                  <button
-                    onClick={() => setIsVideoExpanded(!isVideoExpanded)}
-                    className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
-                  >
-                    <span className="font-semibold text-gray-900 flex items-center gap-2">
-                      <Play className="w-5 h-5" />
-                      {selectedAnswerIndex === correctAnswerIndex 
-                        ? 'Watch Explanation' 
-                        : 'Explain this to me'}
-                    </span>
-                    <ChevronDown 
-                      className={`w-5 h-5 text-gray-600 transition-transform ${
-                        isVideoExpanded ? 'transform rotate-180' : ''
-                      }`}
-                    />
-                  </button>
-                  
-                  {isVideoExpanded && (
-                    <div className="p-4 bg-white border-t border-gray-200">
-                      <video
-                        src={question.videoExplanation}
-                        controls
-                        className="w-full aspect-video rounded-lg shadow-md"
-                        playsInline
-                      >
-                        Your browser does not support the video tag.
-                      </video>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
             
           </>
         )}
       </div>
-
-      {/* Video Explanation Modal - Shows automatically for incorrect answers */}
-      {showVideoModal && question.videoExplanation && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              setShowVideoModal(false);
-            }
-          }}
-        >
-          <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto relative">
-            <button
-              onClick={() => setShowVideoModal(false)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-900 transition-colors z-10 bg-white rounded-full p-2 shadow-md hover:bg-gray-100"
-              aria-label="Close Video Explanation"
-            >
-              <X className="w-6 h-6" />
-            </button>
-            
-            <div className="p-6">
-              <div className="mb-4">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Video Explanation</h2>
-                <p className="text-gray-600">Watch this explanation to understand why your answer was incorrect.</p>
-              </div>
-              
-              <div className="mb-6">
-                <video
-                  src={question.videoExplanation}
-                  controls
-                  autoPlay
-                  className="w-full aspect-video rounded-lg shadow-md"
-                  playsInline
-                >
-                  Your browser does not support the video tag.
-                </video>
-              </div>
-              
-              <div className="flex justify-end">
-                <button
-                  onClick={() => setShowVideoModal(false)}
-                  className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Dojo Drill Modal */}
       {showDojoDrill && dojoDrillVideo && (
@@ -943,36 +728,6 @@ export function UnitMCQs({
   const DOUBLE_XP_CHANCE = 0.15;
   const [highlightedIndex, setHighlightedIndex] = useState<number | null>(null);
   const [showAiTooltip, setShowAiTooltip] = useState(false);
-  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
-  const [enableUnderlining, setEnableUnderlining] = useState(true); // Default ON
-  const [enableStrikethrough, setEnableStrikethrough] = useState(true); // Default ON
-  const [enableZenMode, setEnableZenMode] = useState(false);
-  const [showZenModeHelp, setShowZenModeHelp] = useState(false);
-  const settingsButtonRef = useRef<HTMLButtonElement>(null);
-  
-  // Store previous state before zen mode
-  const prevUnderliningRef = useRef<boolean>(true);
-  const prevStrikethroughRef = useRef<boolean>(true);
-
-  // Handle zen mode toggle - disable underlining and strikethrough in zen mode
-  useEffect(() => {
-    if (enableZenMode) {
-      // Save current state before disabling
-      prevUnderliningRef.current = enableUnderlining;
-      prevStrikethroughRef.current = enableStrikethrough;
-      // Disable both features in zen mode
-      setEnableUnderlining(false);
-      setEnableStrikethrough(false);
-      // Show help text when first entering Zen Mode
-      setShowZenModeHelp(true);
-    } else {
-      // Restore to default ON when exiting zen mode
-      setEnableUnderlining(true);
-      setEnableStrikethrough(true);
-      // Hide help text when exiting Zen Mode
-      setShowZenModeHelp(false);
-    }
-  }, [enableZenMode]);
 
 
   useEffect(() => {
@@ -995,50 +750,7 @@ export function UnitMCQs({
   const currentAnswerState = currentQuestion ? answeredQuestions[currentQuestion.id] : undefined;
   const displayUnitId = currentQuestion?.unit ?? currentUnit;
 
-  // Developer check - only show for specific email
-  const isDeveloper = user?.email === 'garrett@apdojo.com' || user?.email === 'garrettmould@gmail.com';
 
-  // Pull Question function - copies question to clipboard in problemsToCheck.ts format
-  const handlePullQuestion = async () => {
-    if (!currentQuestion) return;
-
-    // Format options array with proper escaping
-    const formatOptions = (options: string[]) => {
-      return options.map(opt => {
-        // Escape quotes and newlines in the option text
-        const escaped = opt.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n');
-        return `"${escaped}"`;
-      }).join(',\n        ');
-    };
-
-    // Format the question object to match problemsToCheck.ts structure
-    const imageValue = currentQuestion.image ? 'null' : 'null'; // Handle image if needed
-    const explanationValue = currentQuestion.explanation 
-      ? `"${currentQuestion.explanation.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n')}"`
-      : undefined;
-
-    const formatted = `    {
-      "id": ${currentQuestion.id},
-      "unit": ${currentQuestion.unit},
-      "lessonIDS": [${currentQuestion.lessonIDS.map(id => `"${id}"`).join(', ')}],
-      "unitName": "${currentQuestion.unitName}",
-      "question": "${currentQuestion.question.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n')}",
-      "image": ${imageValue},
-      "options": [
-        ${formatOptions(currentQuestion.options)}
-      ],
-      "correctAnswer": "${currentQuestion.correctAnswer}"${explanationValue ? `,\n      "explanation": ${explanationValue}` : ''}
-    },`;
-
-    try {
-      await navigator.clipboard.writeText(formatted);
-      alert('✅ Question copied to clipboard! Paste it into problemsToCheck.ts');
-    } catch (err) {
-      console.error('Failed to copy:', err);
-      alert('Failed to copy to clipboard. Check console for the question data.');
-      console.log('Question data:\n', formatted);
-    }
-  };
 
   const handleAnswerSelection = async (questionId: number, answerLetter: string, answerText: string, lessonIDS: string[]) => {
     if (!currentQuestion) {
@@ -1049,19 +761,19 @@ export function UnitMCQs({
     const isCorrect = answerLetter === currentQuestion.correctAnswer;
     const unitId = currentQuestion.unit; // Get unitId from the question data
 
-    logger.debug(`[handleAnswerSelection] Processing answer for question ${questionId}, answer: ${answerLetter}, correct: ${isCorrect}, user: ${user?.uid || 'not logged in'}`);
+    console.log(`[handleAnswerSelection] Processing answer for question ${questionId}, answer: ${answerLetter}, correct: ${isCorrect}, user: ${user?.uid || 'not logged in'}`);
 
     // Award XP for correct answers (100 XP per correct question)
     if (isCorrect && awardXp) {
-      logger.debug(`[handleAnswerSelection] Answer is correct! Awarding 100 XP...`);
+      console.log(`[handleAnswerSelection] Answer is correct! Awarding 100 XP...`);
       try {
         await awardXp(100);
-        logger.debug(`[handleAnswerSelection] Successfully awarded 100 XP`);
+        console.log(`[handleAnswerSelection] Successfully awarded 100 XP`);
       } catch (error) {
         console.error(`[handleAnswerSelection] Error awarding XP:`, error);
       }
     } else if (isCorrect && !awardXp) {
-      logger.warn(`[handleAnswerSelection] Answer is correct but awardXp function is not available`);
+      console.warn(`[handleAnswerSelection] Answer is correct but awardXp function is not available`);
     }
 
     // Update local state for immediate UI feedback
@@ -1073,7 +785,7 @@ export function UnitMCQs({
         
         // 1. Update mcqAnswerStatus Map (via API)
         try {
-            logger.debug(`[handleAnswerSelection] Updating MCQ status for question ${questionId}`);
+            console.log(`[handleAnswerSelection] Updating MCQ status for question ${questionId}`);
             const statusResponse = await fetch('/api/update-mcq-status', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -1088,7 +800,7 @@ export function UnitMCQs({
                 const errorData = await statusResponse.json().catch(() => ({}));
                 console.error(`[handleAnswerSelection] Failed to update MCQ status for ${questionId}: ${statusResponse.status}`, errorData);
             } else {
-                logger.debug(`[handleAnswerSelection] Successfully updated MCQ status for question ${questionId}`);
+                console.log(`[handleAnswerSelection] Successfully updated MCQ status for question ${questionId}`);
             }
         } catch (error) {
             console.error(`[handleAnswerSelection] Error calling /api/update-mcq-status for question ${questionId}:`, error);
@@ -1100,7 +812,7 @@ export function UnitMCQs({
 
         // 3. --- >>> Write Detailed Answer to mcqAnswers Subcollection <<< ---
         try {
-            logger.debug(`[handleAnswerSelection] Writing detailed answer log for user ${user.uid}, question ${questionId}`);
+            console.log(`[handleAnswerSelection] Writing detailed answer log for user ${user.uid}, question ${questionId}`);
             const userAnswersColRef = collection(db, 'users', user.uid, 'mcqAnswers');
             const answerData = {
                 questionId: questionId,      // Use the actual number ID
@@ -1110,7 +822,7 @@ export function UnitMCQs({
                 timestamp: serverTimestamp() // Use Firestore server timestamp
             };
             await addDoc(userAnswersColRef, answerData);
-            logger.debug(`[handleAnswerSelection] Successfully wrote detailed answer log for question ${questionId}`);
+            console.log(`[handleAnswerSelection] Successfully wrote detailed answer log for question ${questionId}`);
         } catch (error) {
             console.error(`[handleAnswerSelection] Error writing detailed answer log to Firestore for question ${questionId}:`, error);
             // Don't throw - allow the UI to continue even if logging fails
@@ -1118,7 +830,7 @@ export function UnitMCQs({
         // --- >>> End Subcollection Write <<< ---
 
     } else {
-        logger.warn(`[handleAnswerSelection] User not logged in. Skipping backend updates for question ${questionId}.`);
+        console.warn(`[handleAnswerSelection] User not logged in. Skipping backend updates for question ${questionId}.`);
     }
   };
 
@@ -1127,7 +839,7 @@ export function UnitMCQs({
         onQuestionSelect(index);
         setHighlightedIndex(null);
     } else {
-        logger.warn("Attempted to select invalid question index:", index);
+        console.warn("Attempted to select invalid question index:", index);
     }
   };
 
@@ -1168,76 +880,55 @@ export function UnitMCQs({
   };
 
   const handlePreviousQuestion = () => {
-    logger.debug("Handling Previous Question Request");
+    console.log("Handling Previous Question Request");
     onPreviousQuestion();
   };
 
   const handleNextQuestion = () => {
-    logger.debug("Handling Next Question Request");
+    console.log("Handling Next Question Request");
     proceedToActualNextQuestion(); 
   };
 
-  // --- Keyboard Navigation for Zen Mode Only --- 
+  // --- Updated useEffect for Keyboard Navigation --- 
   useEffect(() => {
-    // Only enable keyboard navigation in zen mode
-    if (!enableZenMode) {
-      return;
-    }
-
+    /* // --- START COMMENT OUT - Keyboard Navigation --- 
     const handleKeyDown = (event: KeyboardEvent) => {
-      // Hide help text when any relevant key is pressed
-      if (showZenModeHelp && (event.key === 'Escape' || event.key === 'ArrowLeft' || event.key === 'ArrowRight' || event.key === 'ArrowUp' || event.key === 'ArrowDown' || event.key === 'Enter')) {
-        setShowZenModeHelp(false);
-      }
-
-      // ESC key to exit zen mode
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        setEnableZenMode(false);
-        return;
-      }
-
-      // Ignore if focused on input/textarea/button or if modal is open
+      // Ignore if focused on input/button or if an overlay/offer is active
       const target = event.target as HTMLElement;
-      if (isParentModalOpen || isSettingsModalOpen || target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON') {
+      if (displayDoubleXpOffer || target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON') {
         return;
       }
 
       const numOptions = currentQuestion?.options?.length ?? 0;
-      if (numOptions === 0) return;
+      if (numOptions === 0) return; // No options to navigate
 
-      // Left/Right arrows for navigation between questions
       if (event.key === 'ArrowLeft') {
-        event.preventDefault();
         handlePreviousQuestion();
       } else if (event.key === 'ArrowRight') {
-        event.preventDefault();
         handleNextQuestion();
-      } 
-      // Up/Down arrows for navigating answer options
-      else if (event.key === 'ArrowUp') {
+      } else if (event.key === 'ArrowUp') {
         event.preventDefault();
         setHighlightedIndex(prevIndex => {
-          if (prevIndex === null) return numOptions - 1; // Start from last option
-          if (prevIndex === 0) return numOptions - 1; // Wrap from first to last
-          return prevIndex - 1; // Move up
+          if (prevIndex === null) return numOptions - 1; // Highlight D first
+          if (prevIndex === 0) return numOptions - 1;    // Wrap from A to D
+          return prevIndex - 1;                   // Go up
         });
       } else if (event.key === 'ArrowDown') {
         event.preventDefault();
         setHighlightedIndex(prevIndex => {
-          if (prevIndex === null) return 0; // Start from first option
-          if (prevIndex === numOptions - 1) return 0; // Wrap from last to first
-          return prevIndex + 1; // Move down
+          if (prevIndex === null) return 0; // Highlight A first
+          if (prevIndex === numOptions - 1) return 0; // Wrap from D to A
+          return prevIndex + 1;                   // Go down
         });
-      } 
-      // Enter key to submit selected answer
-      else if (event.key === 'Enter') {
-        if (highlightedIndex !== null && !currentAnswerState && currentQuestion) {
-          event.preventDefault();
-          const letter = String.fromCharCode(65 + highlightedIndex);
-          const text = currentQuestion.options[highlightedIndex];
-          const lessonIds = currentQuestion.lessonIDS;
-          handleAnswerSelection(currentQuestion.id, letter, text, lessonIds);
+      } else if (event.key === 'Enter') {
+        if (highlightedIndex !== null && !currentAnswerState) { // Only submit if highlighted and not already answered
+           event.preventDefault();
+           console.log("Enter pressed, submitting option:", highlightedIndex); // Debug
+           // Find the actual answer details for the highlighted index
+           const letter = String.fromCharCode(65 + highlightedIndex);
+           const text = currentQuestion.options[highlightedIndex];
+           const lessonIds = currentQuestion.lessonIDS;
+           handleAnswerSelection(currentQuestion.id, letter, text, lessonIds);
         }
       }
     };
@@ -1246,37 +937,25 @@ export function UnitMCQs({
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [enableZenMode, showZenModeHelp, handlePreviousQuestion, handleNextQuestion, isParentModalOpen, isSettingsModalOpen, currentQuestion, highlightedIndex, currentAnswerState, handleAnswerSelection]);
+    // --- END COMMENT OUT - Keyboard Navigation --- */ 
+  }, [handlePreviousQuestion, handleNextQuestion, currentQuestion, highlightedIndex, currentAnswerState, handleAnswerSelection]); // Added dependencies
 
-  // --- Hide Banners when Zen Mode is Active (but keep header visible) ---
+  // --- NEW useEffect to Disable Body Scroll --- 
   useEffect(() => {
-    if (enableZenMode) {
-      // Add class to body for zen mode styling
-      document.body.classList.add('zen-mode-active');
-      // Hide any banners below header
-      const banners = document.querySelectorAll('[class*="top-16"], [class*="top-20"]');
-      banners.forEach(banner => {
-        (banner as HTMLElement).style.display = 'none';
-      });
-    } else {
-      // Remove class
-      document.body.classList.remove('zen-mode-active');
-      // Restore banners
-      const banners = document.querySelectorAll('[class*="top-16"], [class*="top-20"]');
-      banners.forEach(banner => {
-        (banner as HTMLElement).style.display = '';
-      });
-    }
+    /* // --- START COMMENT OUT - Scroll Lock --- 
+    // Store original overflow style
+    const originalOverflow = document.body.style.overflow;
+    // Disable scrolling
+    document.body.style.overflow = 'hidden';
+    console.log("Body scroll disabled"); // Debug
 
+    // Cleanup function to restore scroll
     return () => {
-      // Cleanup on unmount
-      document.body.classList.remove('zen-mode-active');
-      const banners = document.querySelectorAll('[class*="top-16"], [class*="top-20"]');
-      banners.forEach(banner => {
-        (banner as HTMLElement).style.display = '';
-      });
+      document.body.style.overflow = originalOverflow;
+      console.log("Body scroll enabled"); // Debug
     };
-  }, [enableZenMode]);
+    // --- END COMMENT OUT - Scroll Lock --- */
+  }, []); // Empty dependency array runs only on mount and unmount
 
   // --- >>> NEW: Sidebar Rendering Logic <<< ---
   if (isSidebar) {
@@ -1289,15 +968,11 @@ export function UnitMCQs({
           return (
             <div key={question.id} className="p-4 border-b border-gray-200 last:border-b-0">
               <p className="text-sm font-medium text-gray-800 mb-3">
-                {enableUnderlining ? (
-                  <QuestionWithKeyTerms 
-                    questionText={question.question} 
-                    unit={question.unit} 
-                    subject={question.subject}
-                  />
-                ) : (
-                  question.question
-                )}
+                <QuestionWithKeyTerms 
+                  questionText={question.question} 
+                  unit={question.unit} 
+                  subject={question.subject}
+                />
               </p>
               <div className="space-y-2">
                 {question.options.map((option, optIndex) => {
@@ -1350,325 +1025,88 @@ export function UnitMCQs({
   // --- >>> END: Sidebar Rendering Logic <<< ---
 
   return (
-    <div className={`${enableZenMode ? 'fixed inset-0 flex items-center justify-center bg-gray-50' : 'container mx-auto px-4 pt-4 pb-12 relative'}`}>
-      {/* Zen Mode Help Text - Top Left */}
-      {enableZenMode && showZenModeHelp && (
-        <div className="fixed top-4 left-4 z-50 text-sm text-gray-400 font-medium space-y-1 pointer-events-none">
-          <div>ESC to exit</div>
-          <div>← → to change question</div>
-          <div>↑ ↓ to change answer</div>
-          <div>ENTER to submit</div>
-        </div>
-      )}
-      
-      {/* Zen Mode Settings Button - Top Right of Main Content */}
-      {enableZenMode && (
-        <div className="fixed top-4 right-4 z-40">
-          <div className="relative">
-            <button
-              ref={settingsButtonRef}
-              onClick={() => setIsSettingsModalOpen(true)}
-              className="p-3 rounded-lg transition-all hover:scale-110 hover:opacity-80"
-              aria-label="Open settings"
-            >
-              <Image 
-                src={subject === 'macro' ? "/images/sliderBlue.svg" : "/images/sliderGreen.svg"} 
-                alt="Settings" 
-                width={28} 
-                height={28}
-                className="w-7 h-7"
-                style={{
-                  transform: 'scale(1.4)',
-                  filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.15))'
-                }}
-              />
-            </button>
-            
-            {/* Settings Modal - Positioned under button */}
-            {isSettingsModalOpen && (
-              <>
-                {/* Backdrop */}
-                <div 
-                  className="fixed inset-0 bg-black bg-opacity-50 z-40"
-                  onClick={() => setIsSettingsModalOpen(false)}
-                />
-                {/* Modal */}
-                <div 
-                  className="absolute top-full right-0 mt-2 bg-white rounded-lg shadow-xl w-80 p-6 z-50"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <button
-                    onClick={() => setIsSettingsModalOpen(false)}
-                    className="absolute top-4 right-4 text-gray-500 hover:text-gray-900 transition-colors"
-                    aria-label="Close settings"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                  
-                  <h2 className="text-xl font-bold text-gray-900 mb-6">Customize your Dojo Experience</h2>
-                  
-                  <div className="space-y-3">
-                    {/* Underline Key Terms - Item 1 */}
-                    <label className="flex items-center justify-between p-4 rounded-lg border-2 border-gray-300 hover:bg-gray-50 cursor-pointer transition-colors">
-                      <span className="text-gray-900 font-bold text-base">Underline Key Terms</span>
-                      <input
-                        type="checkbox"
-                        checked={enableUnderlining}
-                        onChange={(e) => setEnableUnderlining(e.target.checked)}
-                        className={`w-5 h-5 rounded focus:ring-2 ${
-                          subject === 'macro' 
-                            ? 'text-blue-600 focus:ring-blue-500' 
-                            : 'text-green-600 focus:ring-green-500'
-                        }`}
-                        style={{
-                          accentColor: subject === 'macro' ? '#2563eb' : '#22c55e'
-                        }}
-                      />
-                    </label>
-
-                    {/* Strikethrough - Item 2 */}
-                    <label className="flex items-center justify-between p-4 rounded-lg border-2 border-gray-300 hover:bg-gray-50 cursor-pointer transition-colors">
-                      <span className="text-gray-900 font-bold text-base">Strikethrough</span>
-                      <input
-                        type="checkbox"
-                        checked={enableStrikethrough}
-                        onChange={(e) => setEnableStrikethrough(e.target.checked)}
-                        className={`w-5 h-5 rounded focus:ring-2 ${
-                          subject === 'macro' 
-                            ? 'text-blue-600 focus:ring-blue-500' 
-                            : 'text-green-600 focus:ring-green-500'
-                        }`}
-                        style={{
-                          accentColor: subject === 'macro' ? '#2563eb' : '#22c55e'
-                        }}
-                      />
-                    </label>
-
-                    {/* Zen Mode / Standard Mode - Link */}
-                    <div className="p-4 rounded-lg border-2 border-gray-300">
-                      <button
-                        onClick={() => {
-                          setEnableZenMode(!enableZenMode);
-                          setIsSettingsModalOpen(false);
-                        }}
-                        className={`w-full text-left font-bold text-base ${
-                          subject === 'macro' ? 'text-blue-500' : 'text-green-500'
-                        } hover:opacity-80 transition-opacity`}
-                      >
-                        {enableZenMode ? 'Standard Mode' : 'Zen Mode'}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
-
+    <div className="container mx-auto px-4 pt-4 pb-12 relative">
       {/* Use Flexbox for columns */}
-      {enableZenMode ? (
-        /* Zen Mode: Centered Question Card Only */
-        <div className="w-full max-w-4xl mx-auto px-4 z-10">
-          {/* Developer Tool: Pull Question Button */}
-          {isDeveloper && currentQuestion && (
-            <div className="mb-4 flex justify-end">
-              <button
-                onClick={handlePullQuestion}
-                className="px-4 py-2 bg-yellow-500 text-black font-bold text-sm rounded-lg border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-yellow-400 active:translate-y-1 transition-all"
-                title="Copy current question to clipboard in problemsToCheck.ts format"
-              >
-                Pull Question
-              </button>
-            </div>
-          )}
+      <div className="flex flex-col lg:flex-row gap-6 lg:items-stretch">
+        
+
+        
+        {/* Left Column: Question Card */}
+        <div className="w-full lg:w-3/5">
           {currentQuestion && (
-            <div className="transform scale-110">
-              <div className="bg-white rounded-lg border-2 border-gray-300 shadow-2xl p-1">
-                <div className="bg-white rounded-lg">
-                  <QuestionCard 
-                    key={`${currentUnit}-${currentQuestion.id}`} 
-                    question={currentQuestion} 
-                    currentIndex={currentQuestionIndex}
-                    onAnswerSelect={handleAnswerSelection}
-                    initialSelectedLetter={currentAnswerState?.selectedLetter}
-                    isAnswered={!!currentAnswerState} 
-                    aiExplanation={aiExplanations[currentQuestion.id]}
-                    isLoadingAI={isLoadingExplanation} 
-                    isLoggedIn={isLoggedIn}
-                    signup={signup}
-                    login={login}
-                    dojoProgress={dojoProgress}
-                    correctStreak={correctStreak}
-                    totalQuestions={totalQuestions}
-                    highlightedIndex={highlightedIndex}
-                    isParentModalOpen={isParentModalOpen}
-                    enableUnderlining={enableUnderlining}
-                    enableStrikethrough={enableStrikethrough}
-                  />
-                </div>
-              </div>
-            </div>
+            <QuestionCard 
+              key={`${currentUnit}-${currentQuestion.id}`} 
+              question={currentQuestion} 
+              currentIndex={currentQuestionIndex}
+              onAnswerSelect={handleAnswerSelection}
+              initialSelectedLetter={currentAnswerState?.selectedLetter}
+              isAnswered={!!currentAnswerState} 
+              aiExplanation={aiExplanations[currentQuestion.id]}
+              isLoadingAI={isLoadingExplanation} 
+              isLoggedIn={isLoggedIn}
+              signup={signup}
+              login={login}
+              dojoProgress={dojoProgress}
+              correctStreak={correctStreak}
+              totalQuestions={totalQuestions}
+              highlightedIndex={highlightedIndex}
+              isParentModalOpen={isParentModalOpen}
+            />
           )}
         </div>
-      ) : (
-        /* Normal Mode: Sidebar Layout */
-        <div className="flex flex-col lg:flex-row gap-6 lg:items-stretch">
-          {/* Left Column: Question Card */}
-          <div className="w-full lg:w-3/5">
-            {/* Developer Tool: Pull Question Button */}
-            {isDeveloper && currentQuestion && (
-              <div className="mb-4 flex justify-end">
-                <button
-                  onClick={handlePullQuestion}
-                  className="px-4 py-2 bg-yellow-500 text-black font-bold text-sm rounded-lg border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-yellow-400 active:translate-y-1 transition-all"
-                  title="Copy current question to clipboard in problemsToCheck.ts format"
-                >
-                  Pull Question
-                </button>
-              </div>
-            )}
-            {currentQuestion && (
-              <QuestionCard 
-                key={`${currentUnit}-${currentQuestion.id}`} 
-                question={currentQuestion} 
-                currentIndex={currentQuestionIndex}
-                onAnswerSelect={handleAnswerSelection}
-                initialSelectedLetter={currentAnswerState?.selectedLetter}
-                isAnswered={!!currentAnswerState} 
-                aiExplanation={aiExplanations[currentQuestion.id]}
-                isLoadingAI={isLoadingExplanation} 
-                isLoggedIn={isLoggedIn}
-                signup={signup}
-                login={login}
-                dojoProgress={dojoProgress}
-                correctStreak={correctStreak}
-                totalQuestions={totalQuestions}
-                highlightedIndex={highlightedIndex}
-                isParentModalOpen={isParentModalOpen}
-                enableUnderlining={enableUnderlining}
-                enableStrikethrough={enableStrikethrough}
-              />
-            )}
-          </div>
 
-          {/* Right Column: Controls and Resources */}
-          <div className="w-full lg:w-2/5 bg-white rounded-lg shadow-md border border-gray-200 p-4 lg:p-6 flex flex-col h-full">
+        {/* Right Column: Controls and Resources */}
+        {/* Adjusted column width lg:w-2/5 */}
+        <div className="w-full lg:w-2/5 bg-white rounded-lg shadow-md border border-gray-200 p-4 lg:p-6 flex flex-col h-full">
           {/* Top Section: Headline, Tags, Navigation */}
           <div className="mb-6"> {/* Reduced bottom margin */} 
-            <div className="flex items-center justify-between gap-4 mb-3"> {/* Added justify-between and bottom margin */} 
-              <div className="flex items-center gap-4">
-                <h3 className="font-extrabold tracking-tight text-gray-900 text-2xl">
-                    <span className={subject === 'macro' ? 'text-blue-600' : 'text-green-600'}>Unit MCQ</span> Practice
-                </h3>
-                {/* Subject Pill */}
-                <span className={`px-3 py-1 rounded-md text-sm font-medium bg-gray-100 ${
-                  subject === 'macro' ? 'text-blue-600' : 'text-green-600'
-                }`}>
-                  AP {subject === 'macro' ? 'Macro' : 'Micro'}
-                </span>
-              </div>
+            <div className="flex items-center gap-4 mb-3"> {/* Added bottom margin */} 
+              <h3 className="font-extrabold tracking-tight text-gray-900 text-2xl">
+                  <span className={subject === 'macro' ? 'text-blue-600' : 'text-green-600'}>Unit MCQ</span> Practice
+              </h3>
+              {/* Subject Pill */}
+              <span className={`px-3 py-1 rounded-md text-sm font-medium bg-gray-100 ${
+                subject === 'macro' ? 'text-blue-600' : 'text-green-600'
+              }`}>
+                AP {subject === 'macro' ? 'Macro' : 'Micro'}
+              </span>
               
-              {/* Settings Button */}
-              <div className="relative">
-                <button
-                  ref={settingsButtonRef}
-                  onClick={() => setIsSettingsModalOpen(true)}
-                  className="p-3 rounded-lg transition-all hover:scale-110 hover:opacity-80"
-                  aria-label="Open settings"
-                >
-                  <Image 
-                    src={subject === 'macro' ? "/images/sliderBlue.svg" : "/images/sliderGreen.svg"} 
-                    alt="Settings" 
-                    width={28} 
-                    height={28}
-                    className="w-7 h-7"
-                    style={{
-                      transform: 'scale(1.4)',
-                      filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.15))'
-                    }}
-                  />
-                </button>
-                
-                {/* Settings Modal - Positioned under button */}
-                {isSettingsModalOpen && (
-                  <>
-                    {/* Backdrop */}
-                    <div 
-                      className="fixed inset-0 bg-black bg-opacity-50 z-40"
-                      onClick={() => setIsSettingsModalOpen(false)}
-                    />
-                    {/* Modal */}
-                    <div 
-                      className="absolute top-full right-0 mt-2 bg-white rounded-lg shadow-xl w-80 p-6 z-50"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <button
-                        onClick={() => setIsSettingsModalOpen(false)}
-                        className="absolute top-4 right-4 text-gray-500 hover:text-gray-900 transition-colors"
-                        aria-label="Close settings"
-                      >
-                        <X className="w-5 h-5" />
-                      </button>
-                      
-                      <h2 className="text-xl font-bold text-gray-900 mb-6">Customize your Dojo Experience</h2>
-                      
-                      <div className="space-y-3">
-                        {/* Underline Key Terms - Item 1 */}
-                        <label className="flex items-center justify-between p-4 rounded-lg border-2 border-gray-300 hover:bg-gray-50 cursor-pointer transition-colors">
-                          <span className="text-gray-900 font-bold text-base">Underline Key Terms</span>
-                          <input
-                            type="checkbox"
-                            checked={enableUnderlining}
-                            onChange={(e) => setEnableUnderlining(e.target.checked)}
-                            className={`w-5 h-5 rounded focus:ring-2 ${
-                              subject === 'macro' 
-                                ? 'text-blue-600 focus:ring-blue-500' 
-                                : 'text-green-600 focus:ring-green-500'
-                            }`}
-                            style={{
-                              accentColor: subject === 'macro' ? '#2563eb' : '#22c55e'
-                            }}
-                          />
-                        </label>
 
-                        {/* Strikethrough - Item 2 */}
-                        <label className="flex items-center justify-between p-4 rounded-lg border-2 border-gray-300 hover:bg-gray-50 cursor-pointer transition-colors">
-                          <span className="text-gray-900 font-bold text-base">Strikethrough</span>
-                          <input
-                            type="checkbox"
-                            checked={enableStrikethrough}
-                            onChange={(e) => setEnableStrikethrough(e.target.checked)}
-                            className={`w-5 h-5 rounded focus:ring-2 ${
-                              subject === 'macro' 
-                                ? 'text-blue-600 focus:ring-blue-500' 
-                                : 'text-green-600 focus:ring-green-500'
-                            }`}
-                            style={{
-                              accentColor: subject === 'macro' ? '#2563eb' : '#22c55e'
-                            }}
-                          />
-                        </label>
-
-                        {/* Zen Mode / Standard Mode - Link */}
-                        <div className="p-4 rounded-lg border-2 border-gray-300">
+              {/* Keep dropdown for now, might remove later if tags are sufficient */}
+              {!isWeakestUnitsMode && (
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={() => setIsUnitDropdownOpen(!isUnitDropdownOpen)}
+                    className={`p-1.5 rounded-full text-white transition-colors ${subject === 'macro' ? 'bg-blue-500 hover:bg-blue-600' : 'bg-green-500 hover:bg-green-600'}`}
+                  >
+                    <Triangle className="w-2 h-2 rotate-180 fill-current" />
+                  </button>
+                  {isUnitDropdownOpen && (
+                    <div className="absolute left-0 mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-10">
+                      {units.map(unit => {
+                        const isLocked = false;
+                        return (
                           <button
-                            onClick={() => {
-                              setEnableZenMode(!enableZenMode);
-                              setIsSettingsModalOpen(false);
-                            }}
-                            className={`w-full text-left font-bold text-base ${
-                              subject === 'macro' ? 'text-blue-500' : 'text-green-500'
-                            } hover:opacity-80 transition-opacity`}
+                            key={unit.number}
+                            onClick={() => !isLocked && onUnitChange(unit.number)}
+                            disabled={isLocked}
+                            className={`w-full text-left px-4 py-2 text-sm transition-colors flex items-center justify-between ${
+                              currentUnit === unit.number
+                                ? subject === 'macro' ? 'bg-blue-50 text-blue-600' : 'bg-green-50 text-green-600'
+                                : isLocked
+                                ? 'text-gray-400 bg-gray-50 cursor-not-allowed'
+                                : 'text-gray-700 hover:bg-gray-50'
+                            }`}
                           >
-                            {enableZenMode ? 'Standard Mode' : 'Zen Mode'}
+                            <span>{unit.title}</span>
+                            {isLocked && <Lock className="w-4 h-4 text-gray-400" />}
                           </button>
-                        </div>
-                      </div>
+                        );
+                      })}
                     </div>
-                  </>
-                )}
-              </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* --- Unit Tags --- */}
@@ -1683,36 +1121,20 @@ export function UnitMCQs({
             )}
 
             <div className="flex gap-2 mt-4">
-              <motion.button
+              <button
                 onClick={handlePreviousQuestion}
                 disabled={currentQuestionIndex === 0}
-                whileHover={currentQuestionIndex > 0 ? { scale: 1.02 } : {}}
-                whileTap={currentQuestionIndex > 0 ? { scale: 0.98 } : {}}
-                className={`flex-1 p-2 rounded-lg font-bold text-sm border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all text-white disabled:bg-gray-300 disabled:cursor-not-allowed disabled:shadow-none disabled:border-gray-400 ${
-                  currentQuestionIndex === 0 
-                    ? 'bg-gray-300 cursor-not-allowed' 
-                    : subject === 'macro' 
-                      ? 'bg-blue-500 hover:bg-blue-600 active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' 
-                      : 'bg-green-500 hover:bg-green-600 active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
-                }`}
+                className={`flex-1 p-2 rounded-md font-semibold text-sm transition-colors text-white disabled:bg-gray-300 disabled:cursor-not-allowed ${subject === 'macro' ? 'bg-blue-500 hover:bg-blue-600' : 'bg-green-500 hover:bg-green-600'}`}
               >
                 Previous
-              </motion.button>
-              <motion.button
+              </button>
+              <button
                 onClick={handleNextQuestion}
                 disabled={currentQuestionIndex === totalQuestions - 1 || totalQuestions === 0}
-                whileHover={currentQuestionIndex < totalQuestions - 1 && totalQuestions > 0 ? { scale: 1.02 } : {}}
-                whileTap={currentQuestionIndex < totalQuestions - 1 && totalQuestions > 0 ? { scale: 0.98 } : {}}
-                className={`flex-1 p-2 rounded-lg font-bold text-sm border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all text-white disabled:bg-gray-300 disabled:cursor-not-allowed disabled:shadow-none disabled:border-gray-400 ${
-                  currentQuestionIndex === totalQuestions - 1 || totalQuestions === 0
-                    ? 'bg-gray-300 cursor-not-allowed' 
-                    : subject === 'macro' 
-                      ? 'bg-blue-500 hover:bg-blue-600 active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' 
-                      : 'bg-green-500 hover:bg-green-600 active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
-                }`}
+                className={`flex-1 p-2 rounded-md font-semibold text-sm transition-colors text-white disabled:bg-gray-300 disabled:cursor-not-allowed ${subject === 'macro' ? 'bg-blue-500 hover:bg-blue-600' : 'bg-green-500 hover:bg-green-600'}`}
               >
                 Next
-              </motion.button>
+              </button>
             </div>
           </div>
 
@@ -1849,10 +1271,8 @@ export function UnitMCQs({
                  Change Units
              </Link>
           </div>
-          </div>
         </div>
-      )}
-
+      </div>
     </div>
   );
 }

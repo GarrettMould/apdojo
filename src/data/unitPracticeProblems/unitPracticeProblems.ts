@@ -3613,190 +3613,6 @@ const microUnit4Questions = [
   }
 ]
 
-// Microeconomics Unit 4 TEST Questions (Factor Markets) - Only visible when ?test=true
-const microUnit4TestQuestions = [
-  {
-    "id": 2001,
-    "unit": 4,
-    "lessonIDS": ["4.1"],
-    "unitName": "Factor Markets",
-    "question": "The demand for lithium-ion batteries has skyrocketed due to the increased production of electric vehicles. Consequently, the demand for lithium miners has increased. This relationship best illustrates the concept of:",
-    "image": null,
-    "options": [
-      "Diminishing marginal returns",
-      "Derived demand",
-      "Monopsonistic competition",
-      "Elasticity of supply",
-      "Strategic interdependence"
-    ],
-    "correctAnswer": "B",
-    "explanation": "Derived demand describes the demand for a resource (lithium miners) that results from the demand for the product that resource produces (batteries/EVs).",
-    "isTest": true
-  },
-  {
-    "id": 2002,
-    "unit": 4,
-    "lessonIDS": ["4.2"],
-    "unitName": "Factor Markets",
-    "question": "Refer to the table below. If the firm sells its widgets in a perfectly competitive market for $4 each, what is the Marginal Revenue Product (MRP) of the 3rd worker?",
-    "image": null,
-    "options": [
-      "$7",
-      "$28",
-      "$32",
-      "$40",
-      "$100"
-    ],
-    "correctAnswer": "B",
-    "explanation": "First, calculate the Marginal Product (MP) of the 3rd worker. Total Product moved from 25 to 32, so MP = 7 units. MRP = MP x Price. MRP = 7 x $4 = $28. (Implicit table data: 0 workers=0 units, 1=15, 2=25, 3=32).",
-    "isTest": true
-  },
-  {
-    "id": 2003,
-    "unit": 4,
-    "lessonIDS": ["4.2"],
-    "unitName": "Factor Markets",
-    "question": "A firm operates in a perfectly competitive labor market and a perfectly competitive product market. It pays a market wage of $300 per day. The firm sells its product for $30 per unit. To maximize profit, the firm should hire workers up to the point where the marginal product of the last worker is:",
-    "image": null,
-    "options": [
-      "10 units",
-      "30 units",
-      "300 units",
-      "9000 units",
-      "Equal to the wage rate"
-    ],
-    "correctAnswer": "A",
-    "explanation": "The profit-maximizing rule is MRP = MRC (Wage). Here, Wage = $300. Since MRP = MP x Price, we set up the equation: $300 = MP x $30. Solving for MP, we get 10 units.",
-    "isTest": true
-  },
-  {
-    "id": 2004,
-    "unit": 4,
-    "lessonIDS": ["4.3"],
-    "unitName": "Factor Markets",
-    "question": "Which of the following events would cause the demand curve for labor in the construction industry to shift to the right?",
-    "image": null,
-    "options": [
-      "An increase in the wage rate for construction workers",
-      "A decrease in the price of new homes",
-      "A decrease in the productivity of construction tools",
-      "An increase in the price of new homes",
-      "An increase in the supply of immigrant labor"
-    ],
-    "correctAnswer": "D",
-    "explanation": "Labor is a derived demand. If the price of the final product (new homes) increases, the Marginal Revenue Product (MRP) of the workers increases (since MRP = MP x Price). This shifts the labor demand curve to the right. Option A causes a movement along the curve, not a shift.",
-    "isTest": true
-  },
-  {
-    "id": 2005,
-    "unit": 4,
-    "lessonIDS": ["4.4"],
-    "unitName": "Factor Markets",
-    "question": "A textile firm is currently employing labor and capital such that the Marginal Product of Labor (MPL) is 40 units and the Marginal Product of Capital (MPK) is 100 units. The wage rate is $10 and the rental rate of capital is $50. To minimize costs while maintaining current output, the firm should:",
-    "image": null,
-    "options": [
-      "Hire more labor and use less capital",
-      "Use more capital and hire less labor",
-      "Keep the current combination of resources",
-      "Increase both labor and capital proportionally",
-      "Decrease both labor and capital proportionally"
-    ],
-    "correctAnswer": "A",
-    "explanation": "Compare the marginal product per dollar: Labor = 40/$10 = 4 units per dollar. Capital = 100/$50 = 2 units per dollar. Since the firm gets more output per dollar from labor (4 > 2), it should reallocate funds to hire more labor and use less capital.",
-    "isTest": true
-  },
-  {
-    "id": 2006,
-    "unit": 4,
-    "lessonIDS": ["4.2"],
-    "unitName": "Factor Markets",
-    "question": "Why does the Marginal Revenue Product (MRP) curve for a firm producing in a perfectly competitive product market slope downward?",
-    "image": null,
-    "options": [
-      "Because the firm must lower the price to sell more units",
-      "Because of the law of diminishing marginal returns",
-      "Because the marginal resource cost increases as more workers are hired",
-      "Because the supply of labor is perfectly elastic",
-      "Because workers become more productive as they specialize"
-    ],
-    "correctAnswer": "B",
-    "explanation": "In a perfectly competitive product market, the price is constant. Therefore, the MRP curve slopes downward solely because the Marginal Product (MP) decreases as more workers are added to fixed resources (Law of Diminishing Marginal Returns).",
-    "isTest": true
-  },
-  {
-    "id": 2007,
-    "unit": 4,
-    "lessonIDS": ["4.5"],
-    "unitName": "Factor Markets",
-    "question": "In a monopsonistic labor market, the marginal resource cost (MRC) of labor is:",
-    "image": null,
-    "options": [
-      "Equal to the wage rate",
-      "Less than the wage rate",
-      "Greater than the wage rate",
-      "Equal to the marginal revenue product",
-      "Horizontal and perfectly elastic"
-    ],
-    "correctAnswer": "C",
-    "explanation": "A monopsony must raise the wage to attract an additional worker, but it must also pay that higher wage to all existing workers. Therefore, the cost of hiring one more worker (MRC) is the new wage plus the raises given to previous employees, making MRC higher than the supply curve (wage).",
-    "isTest": true
-  },
-  {
-    "id": 2008,
-    "unit": 4,
-    "lessonIDS": ["4.5"],
-    "unitName": "Factor Markets",
-    "question": "Compared to a perfectly competitive labor market, a profit-maximizing monopsony will hire:",
-    "image": null,
-    "options": [
-      "More workers and pay a higher wage",
-      "More workers and pay a lower wage",
-      "Fewer workers and pay a higher wage",
-      "Fewer workers and pay a lower wage",
-      "The same number of workers but pay a lower wage"
-    ],
-    "correctAnswer": "D",
-    "explanation": "A monopsony restricts the quantity of labor hired (where MRC = MRP) to lower the wage rate required to attract those workers (found on the Supply curve). This results in lower employment and lower wages than the competitive equilibrium.",
-    "isTest": true
-  },
-  {
-    "id": 2009,
-    "unit": 4,
-    "lessonIDS": ["4.2"],
-    "unitName": "Factor Markets",
-    "question": "A firm sells its product in an imperfectly competitive market (e.g., monopoly) and hires labor in a perfectly competitive labor market. Which of the following is true?",
-    "image": null,
-    "options": [
-      "Its Demand for Labor curve lies below its Marginal Revenue Product curve.",
-      "Its Demand for Labor curve is perfectly elastic.",
-      "Its Demand for Labor curve is the same as its Value of Marginal Product (VMP) curve.",
-      "Its Marginal Revenue Product curve slopes downward because both Marginal Product and Product Price decrease as output increases.",
-      "It will hire more workers than a perfectly competitive firm."
-    ],
-    "correctAnswer": "D",
-    "explanation": "For an imperfect competitor, to sell more units (produced by extra workers), it must lower the price. Therefore, MRP declines for two reasons: diminishing marginal product AND the falling price of the output.",
-    "isTest": true
-  },
-  {
-    "id": 2010,
-    "unit": 4,
-    "lessonIDS": ["4.5"],
-    "unitName": "Factor Markets",
-    "question": "Assume a monopsony is currently paying a wage of $15 and hiring 100 workers. If the government imposes a minimum wage of $20, and the new quantity of labor supplied at that wage is 120, what is the likely outcome?",
-    "image": null,
-    "options": [
-      "Employment will decrease significantly.",
-      "The firm will shut down.",
-      "Employment will increase, as the firm becomes a wage taker at $20 up to the supply limit.",
-      "The Marginal Resource Cost curve will shift upward and to the left.",
-      "The demand for labor will decrease."
-    ],
-    "correctAnswer": "C",
-    "explanation": "In a monopsony, a minimum wage can actually increase employment. By setting a floor at $20, the firm's MRC becomes flat (equal to the minimum wage) up to the point it hits the supply curve. If the MRP is still higher than $20 at 120 workers, the firm will hire more workers than it did at the monopsony equilibrium.",
-    "isTest": true
-  }
-]
-
 // Microeconomics Unit 5 Practice Problems
 const microUnit5Questions = [
   {
@@ -4414,6 +4230,186 @@ const microUnit5Questions = [
     ],
     "correctAnswer": "D",
     "explanation": "Because the monopsonist equates MRP with the higher MFC curve (which lies above the supply curve), it chooses a quantity of labor that is lower than the competitive quantity. The wage paid is determined by the supply curve at this lower quantity, resulting in a lower wage than in a competitive market.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2001,
+    "unit": 5,
+    "lessonIDS": ["5.1"],
+    "unitName": "Factor Markets",
+    "question": "The demand for lithium-ion batteries has skyrocketed due to the increased production of electric vehicles. Consequently, the demand for lithium miners has increased. This relationship best illustrates the concept of:",
+    "image": null,
+    "options": [
+      "Diminishing marginal returns",
+      "Derived demand",
+      "Monopsonistic competition",
+      "Elasticity of supply",
+      "Strategic interdependence"
+    ],
+    "correctAnswer": "B",
+    "explanation": "Derived demand describes the demand for a resource (lithium miners) that results from the demand for the product that resource produces (batteries/EVs).",
+    "videoExplanation": null
+  },
+  {
+    "id": 2002,
+    "unit": 5,
+    "lessonIDS": ["5.2"],
+    "unitName": "Factor Markets",
+    "question": "Refer to the table below. If the firm sells its widgets in a perfectly competitive market for $4 each, what is the Marginal Revenue Product (MRP) of the 3rd worker?",
+    "image": null,
+    "options": [
+      "$7",
+      "$28",
+      "$32",
+      "$40",
+      "$100"
+    ],
+    "correctAnswer": "B",
+    "explanation": "First, calculate the Marginal Product (MP) of the 3rd worker. Total Product moved from 25 to 32, so MP = 7 units. MRP = MP x Price. MRP = 7 x $4 = $28. (Implicit table data: 0 workers=0 units, 1=15, 2=25, 3=32).",
+    "videoExplanation": null
+  },
+  {
+    "id": 2003,
+    "unit": 5,
+    "lessonIDS": ["5.2"],
+    "unitName": "Factor Markets",
+    "question": "A firm operates in a perfectly competitive labor market and a perfectly competitive product market. It pays a market wage of $300 per day. The firm sells its product for $30 per unit. To maximize profit, the firm should hire workers up to the point where the marginal product of the last worker is:",
+    "image": null,
+    "options": [
+      "10 units",
+      "30 units",
+      "300 units",
+      "9000 units",
+      "Equal to the wage rate"
+    ],
+    "correctAnswer": "A",
+    "explanation": "The profit-maximizing rule is MRP = MRC (Wage). Here, Wage = $300. Since MRP = MP x Price, we set up the equation: $300 = MP x $30. Solving for MP, we get 10 units.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2004,
+    "unit": 5,
+    "lessonIDS": ["5.1"],
+    "unitName": "Factor Markets",
+    "question": "Which of the following events would cause the demand curve for labor in the construction industry to shift to the right?",
+    "image": null,
+    "options": [
+      "An increase in the wage rate for construction workers",
+      "A decrease in the price of new homes",
+      "A decrease in the productivity of construction tools",
+      "An increase in the price of new homes",
+      "An increase in the supply of immigrant labor"
+    ],
+    "correctAnswer": "D",
+    "explanation": "Labor is a derived demand. If the price of the final product (new homes) increases, the Marginal Revenue Product (MRP) of the workers increases (since MRP = MP x Price). This shifts the labor demand curve to the right. Option A causes a movement along the curve, not a shift.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2005,
+    "unit": 5,
+    "lessonIDS": ["5.3"],
+    "unitName": "Factor Markets",
+    "question": "A textile firm is currently employing labor and capital such that the Marginal Product of Labor (MPL) is 40 units and the Marginal Product of Capital (MPK) is 100 units. The wage rate is $10 and the rental rate of capital is $50. To minimize costs while maintaining current output, the firm should:",
+    "image": null,
+    "options": [
+      "Hire more labor and use less capital",
+      "Use more capital and hire less labor",
+      "Keep the current combination of resources",
+      "Increase both labor and capital proportionally",
+      "Decrease both labor and capital proportionally"
+    ],
+    "correctAnswer": "A",
+    "explanation": "Compare the marginal product per dollar: Labor = 40/$10 = 4 units per dollar. Capital = 100/$50 = 2 units per dollar. Since the firm gets more output per dollar from labor (4 > 2), it should reallocate funds to hire more labor and use less capital.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2006,
+    "unit": 5,
+    "lessonIDS": ["5.2"],
+    "unitName": "Factor Markets",
+    "question": "Why does the Marginal Revenue Product (MRP) curve for a firm producing in a perfectly competitive product market slope downward?",
+    "image": null,
+    "options": [
+      "Because the firm must lower the price to sell more units",
+      "Because of the law of diminishing marginal returns",
+      "Because the marginal resource cost increases as more workers are hired",
+      "Because the supply of labor is perfectly elastic",
+      "Because workers become more productive as they specialize"
+    ],
+    "correctAnswer": "B",
+    "explanation": "In a perfectly competitive product market, the price is constant. Therefore, the MRP curve slopes downward solely because the Marginal Product (MP) decreases as more workers are added to fixed resources (Law of Diminishing Marginal Returns).",
+    "videoExplanation": null
+  },
+  {
+    "id": 2007,
+    "unit": 5,
+    "lessonIDS": ["5.4"],
+    "unitName": "Factor Markets",
+    "question": "In a monopsonistic labor market, the marginal resource cost (MRC) of labor is:",
+    "image": null,
+    "options": [
+      "Equal to the wage rate",
+      "Less than the wage rate",
+      "Greater than the wage rate",
+      "Equal to the marginal revenue product",
+      "Horizontal and perfectly elastic"
+    ],
+    "correctAnswer": "C",
+    "explanation": "A monopsony must raise the wage to attract an additional worker, but it must also pay that higher wage to all existing workers. Therefore, the cost of hiring one more worker (MRC) is the new wage plus the raises given to previous employees, making MRC higher than the supply curve (wage).",
+    "videoExplanation": null
+  },
+  {
+    "id": 2008,
+    "unit": 5,
+    "lessonIDS": ["5.4"],
+    "unitName": "Factor Markets",
+    "question": "Compared to a perfectly competitive labor market, a profit-maximizing monopsony will hire:",
+    "image": null,
+    "options": [
+      "More workers and pay a higher wage",
+      "More workers and pay a lower wage",
+      "Fewer workers and pay a higher wage",
+      "Fewer workers and pay a lower wage",
+      "The same number of workers but pay a lower wage"
+    ],
+    "correctAnswer": "D",
+    "explanation": "A monopsony restricts the quantity of labor hired (where MRC = MRP) to lower the wage rate required to attract those workers (found on the Supply curve). This results in lower employment and lower wages than the competitive equilibrium.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2009,
+    "unit": 5,
+    "lessonIDS": ["5.2"],
+    "unitName": "Factor Markets",
+    "question": "A firm sells its product in an imperfectly competitive market (e.g., monopoly) and hires labor in a perfectly competitive labor market. Which of the following is true?",
+    "image": null,
+    "options": [
+      "Its Demand for Labor curve lies below its Marginal Revenue Product curve.",
+      "Its Demand for Labor curve is perfectly elastic.",
+      "Its Demand for Labor curve is the same as its Value of Marginal Product (VMP) curve.",
+      "Its Marginal Revenue Product curve slopes downward because both Marginal Product and Product Price decrease as output increases.",
+      "It will hire more workers than a perfectly competitive firm."
+    ],
+    "correctAnswer": "D",
+    "explanation": "For an imperfect competitor, to sell more units (produced by extra workers), it must lower the price. Therefore, MRP declines for two reasons: diminishing marginal product AND the falling price of the output.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2010,
+    "unit": 5,
+    "lessonIDS": ["5.4"],
+    "unitName": "Factor Markets",
+    "question": "Assume a monopsony is currently paying a wage of $15 and hiring 100 workers. If the government imposes a minimum wage of $20, and the new quantity of labor supplied at that wage is 120, what is the likely outcome?",
+    "image": null,
+    "options": [
+      "Employment will decrease significantly.",
+      "The firm will shut down.",
+      "Employment will increase, as the firm becomes a wage taker at $20 up to the supply limit.",
+      "The Marginal Resource Cost curve will shift upward and to the left.",
+      "The demand for labor will decrease."
+    ],
+    "correctAnswer": "C",
+    "explanation": "In a monopsony, a minimum wage can actually increase employment. By setting a floor at $20, the firm's MRC becomes flat (equal to the minimum wage) up to the point it hits the supply curve. If the MRP is still higher than $20 at 120 workers, the firm will hire more workers than it did at the monopsony equilibrium.",
     "videoExplanation": null
   }
 
@@ -11277,8 +11273,6 @@ export const allQuestions: QuestionType[] = [
   ...microUnit3Questions.map(q => ({ ...q, subject: "ap_microeconomics" as const })),
   ...microUnit4Questions.map(q => ({ ...q, subject: "ap_microeconomics" as const })),
   ...microUnit5Questions.map(q => ({ ...q, subject: "ap_microeconomics" as const })),
-  ...microUnit6Questions.map(q => ({ ...q, subject: "ap_microeconomics" as const })),
-  // Add test questions (only included when test mode is enabled)
-  ...microUnit4TestQuestions.map(q => ({ ...q, subject: "ap_microeconomics" as const }))
+  ...microUnit6Questions.map(q => ({ ...q, subject: "ap_microeconomics" as const }))
 ];
   

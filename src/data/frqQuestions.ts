@@ -844,9 +844,9 @@ export const macroUnit2Set2: FRQExam = {
       tableData: {
         headers: ["Product", "Market Basket Quantity", "Year 1 Price", "Year 2 Price"],
         rows: [
-          ["Textbooks", "2", "$30.00", "$40.00"],
+          ["Textbooks", "2", "$35.00", "$45.00"],
           ["Calculators", "1", "$20.00", "$20.00"],
-          ["Notebooks", "10", "$2.00", "$5.00"]
+          ["Notebooks", "10", "$3.00", "$4.00"]
         ]
       },
       parts: [
@@ -855,35 +855,35 @@ export const macroUnit2Set2: FRQExam = {
           pointValue: 2,
           text: "Calculate the cost of the market basket of goods in Year 1 and in Year 2. Show your work.",
           answerType: "text",
-          answer: "Year 1: $100. Year 2: $150. Explanation: \nYear 1 Cost = (2 * $30) + (1 * $20) + (10 * $2) = $60 + $20 + $20 = $100. \nYear 2 Cost = (2 * $40) + (1 * $20) + (10 * $5) = $80 + $20 + $50 = $150.",
+          answer: "Year 1: $120. Year 2: $150. Explanation: \nYear 1 Cost = (2 * $35) + (1 * $20) + (10 * $3) = $70 + $20 + $30 = $120. \nYear 2 Cost = (2 * $45) + (1 * $20) + (10 * $4) = $90 + $20 + $40 = $150.",
         },
         {
           label: "B",
           pointValue: 2,
           text: "Use Year 1 as the base year to calculate the price indices (CPI) for Year 1 and Year 2. Show your work.",
           answerType: "text",
-          answer: "Year 1 CPI: 100. Year 2 CPI: 150. Explanation: \nCPI = (Cost of Basket in Current Year / Cost of Basket in Base Year) * 100. \nYear 1: ($100 / $100) * 100 = 100. \nYear 2: ($150 / $100) * 100 = 150.",
+          answer: "Year 1 CPI: 100. Year 2 CPI: 125. Explanation: \nCPI = (Cost of Basket in Current Year / Cost of Basket in Base Year) * 100. \nYear 1: ($120 / $120) * 100 = 100. \nYear 2: ($150 / $120) * 100 = 125.",
         },
         {
           label: "C",
           pointValue: 1,
           text: "Calculate the inflation rate between Year 1 and Year 2.",
           answerType: "text",
-          answer: "50%. Explanation: Inflation Rate = ((Year 2 CPI - Year 1 CPI) / Year 1 CPI) * 100 = ((150 - 100) / 100) * 100 = 50%.",
+          answer: "25%. Explanation: Inflation Rate = ((Year 2 CPI - Year 1 CPI) / Year 1 CPI) * 100 = ((125 - 100) / 100) * 100 = 25%.",
         },
         {
           label: "D",
           pointValue: 1,
           text: "In order for a citizen of Arcadia to maintain the same standard of living between Year 1 and Year 2, what percentage change in nominal income would be needed? Explain.",
           answerType: "text",
-          answer: "50%. Explanation: Since the cost of living (the price level) increased by 50%, nominal income must increase by the same percentage to maintain purchasing power.",
+          answer: "25%. Explanation: Since the cost of living (the price level) increased by 25%, nominal income must increase by the same percentage to maintain purchasing power.",
         },
         {
           label: "E",
           pointValue: 1,
           text: "Assume that the average nominal wage in Arcadia increased by 20% between Year 1 and Year 2. Did the real wage increase, decrease, or stay the same? Explain.",
           answerType: "text",
-          answer: "Decrease. Explanation: The real wage is the nominal wage adjusted for inflation. Since the price level rose by 50% while nominal wages only rose by 20%, the purchasing power of the wage (real wage) decreased.",
+          answer: "Decrease. Explanation: The real wage is the nominal wage adjusted for inflation. Since the price level rose by 25% while nominal wages only rose by 20%, the purchasing power of the wage (real wage) decreased.",
         }
       ]
     }

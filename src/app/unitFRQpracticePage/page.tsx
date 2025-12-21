@@ -32,8 +32,8 @@ const DrawingSelfReview = ({
   // Debug: Log referenceImageUrl (only in development)
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') {
-      console.log('DrawingSelfReview - referenceImageUrl:', referenceImageUrl);
-      console.log('DrawingSelfReview - will encode to:', referenceImageUrl ? referenceImageUrl.replace(/ /g, '%20') : 'undefined');
+    console.log('DrawingSelfReview - referenceImageUrl:', referenceImageUrl);
+    console.log('DrawingSelfReview - will encode to:', referenceImageUrl ? referenceImageUrl.replace(/ /g, '%20') : 'undefined');
     }
   }, [referenceImageUrl]);
 
@@ -121,7 +121,7 @@ const DrawingSelfReview = ({
                 }}
                 onLoad={() => {
                   if (process.env.NODE_ENV === 'development') {
-                    console.log('Successfully loaded reference image:', encodedReferenceUrl);
+                  console.log('Successfully loaded reference image:', encodedReferenceUrl);
                   }
                 }}
               />
@@ -195,10 +195,8 @@ function UnitFRQPracticePageComponent() {
   // Helper function to check if a question is locked
   // All questions are now unlocked
   const isQuestionLocked = (questionId: number | undefined): boolean => {
-    // Unlock FRQ id 1 (macro - Ample Reserves), id 2 (micro - Factor Markets), id 5 (macro - GDP & Inflation Data), and id 33 (micro - Labor Market Shocks)
-    // These are the ones linked from the home page "Try For Free" containers plus Labor Market Shocks and GDP & Inflation Data
-    if (questionId === undefined) return true;
-    return questionId !== 1 && questionId !== 2 && questionId !== 5 && questionId !== 33;
+    // All FRQ questions are unlocked
+    return false;
   };
 
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0);
@@ -283,8 +281,8 @@ function UnitFRQPracticePageComponent() {
   // Calculate points from grading feedback and checklist
   const currentPoints = React.useMemo(() => {
     const feedbackPoints = Object.values(gradingFeedback).reduce((acc, feedback) => {
-      return acc + (feedback.score || 0);
-    }, 0);
+    return acc + (feedback.score || 0);
+  }, 0);
     const checklistPointsTotal = Object.values(checklistPoints).reduce((acc, points) => acc + points, 0);
     return feedbackPoints + checklistPointsTotal;
   }, [gradingFeedback, checklistPoints]);
@@ -392,7 +390,7 @@ function UnitFRQPracticePageComponent() {
     };
 
     if (process.env.NODE_ENV === 'development') {
-      console.log("Sending to API:", requestBody);
+    console.log("Sending to API:", requestBody);
     }
 
     try {
@@ -585,12 +583,12 @@ function UnitFRQPracticePageComponent() {
               <div className="mb-6 pb-4 border-b print:border-b-2 print:border-black">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-1">
-                      {'title' in frqQuestion ? frqQuestion.title : `Question ${frqQuestion.questionNumber}`}
-                    </h1>
-                    <p className="text-md text-gray-600">
-                      From: {frqQuestion.examTitle}
-                    </p>
+                <h1 className="text-3xl font-bold text-gray-900 mb-1">
+                  {'title' in frqQuestion ? frqQuestion.title : `Question ${frqQuestion.questionNumber}`}
+                </h1>
+                <p className="text-md text-gray-600">
+                  From: {frqQuestion.examTitle}
+                </p>
                   </div>
                   {/* Points Display */}
                   <div className="print:hidden flex-shrink-0">

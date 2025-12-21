@@ -1,4 +1,4 @@
-export type InteractiveActivityType = 'graph' | 'table' | 'monopoly' | 'comparative-advantage' | 'ppc-drill';
+export type InteractiveActivityType = 'graph' | 'table' | 'monopoly' | 'comparative-advantage' | 'ppc-drill' | 'demand-change';
 
 export interface ComprehensionQuestion {
   id: string;
@@ -352,6 +352,71 @@ export const dojoDrills: Record<string, DojoDrill> = {
       total: 50
     }
   },
+  'supply-and-demand': {
+    id: 'supply-and-demand',
+    title: 'Supply & Demand',
+    description: 'Master the fundamentals of supply and demand, including shifts versus movements along curves and market equilibrium.',
+    videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_1.6.mp4',
+    subject: 'ap_macroeconomics',
+    unit: 1,
+    lessonIds: ['1.6'],
+    stage1: {
+      videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_1.6.mp4',
+      comprehensionQuestions: [
+        {
+          id: 'supply-demand-comp-1',
+          question: "Graphically, a change in the price of a good is represented by which of the following?",
+          options: [
+            "A shift of the demand curve to the right",
+            "A shift of the supply curve to the left",
+            "A movement along the existing supply or demand curve",
+            "Simultaneous shifts of both the supply and demand curves"
+          ],
+          correctAnswer: 2, // C
+          explanation: "A change in the price of the good itself causes a change in quantity demanded or quantity supplied, which is represented by moving along the existing curve. The curves themselves only shift when a non-price factor changes."
+        },
+        {
+          id: 'supply-demand-comp-2',
+          question: "If sellers expect the price of their product to drop significantly in the near future, how will they likely adjust their behavior in the current market?",
+          options: [
+            "They will decrease their current supply to wait for higher prices",
+            "They will increase their current supply to sell before the price falls",
+            "They will increase their demand for the product",
+            "They will stop production entirely until the price stabilizes"
+          ],
+          correctAnswer: 1, // B
+          explanation: "Sellers want to sell at the highest possible price. If they expect prices to fall next week, they are motivated to increase supply today to capture the current higher price before the drop occurs."
+        },
+        {
+          id: 'supply-demand-comp-3',
+          question: "When both the demand for and the supply of a good increase simultaneously, what is the certain impact on the market equilibrium?",
+          options: [
+            "The equilibrium quantity will increase",
+            "The equilibrium price will increase",
+            "The equilibrium quantity will decrease",
+            "The equilibrium price will decrease"
+          ],
+          correctAnswer: 0, // A
+          explanation: "An increase in demand pushes quantity up, and an increase in supply also pushes quantity up, so the equilibrium quantity definitely increases. However, demand pulls price up while supply pushes price down, making the change in price indeterminate without knowing the magnitude of the shifts."
+        }
+      ]
+    },
+    stage2: {
+      type: 'demand-change',
+      config: {
+        scenario: 'People expect the price of this product to get WAY more expensive in the near future.',
+        correctAnswer: 'shift'
+      }
+    },
+    stage3: {
+      mcqIds: [2124, 2125, 2126] // MCQs from ap macro unit 1, lesson 1.6
+    },
+    xpReward: {
+      completion: 20,
+      perMcqCorrect: 10,
+      total: 50
+    }
+  },
   'ppc-and-opportunity-cost': {
     id: 'ppc-and-opportunity-cost',
     title: 'PPC and Opportunity Cost',
@@ -415,4 +480,5 @@ export const dojoDrills: Record<string, DojoDrill> = {
     }
   }
 };
+
 

@@ -1,15 +1,23 @@
 'use client';
 
-import { use } from 'react';
+import { use, useState } from 'react';
 import { notFound } from 'next/navigation';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { FullExam } from '@/components/FullExam';
 import { macroSetOneQuestions } from '@/data/questionBanks/macro/mcqs/macroSetOne';
-import { FileText } from 'lucide-react';
+import { Clock } from 'lucide-react';
 
 export default function MacroMCQPreview({ params }: { params: Promise<{ num: string }> }) {
   const { num } = use(params);
   const { loadingUserData } = useAuthContext();
+  const [timeRemaining, setTimeRemaining] = useState(60 * 60); // 60 minutes in seconds
+
+  // Format time as MM:SS
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
   // Only show exam 1 for now
   if (num !== '1') {
@@ -33,47 +41,24 @@ export default function MacroMCQPreview({ params }: { params: Promise<{ num: str
   // Show the exam - accessible to everyone
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="flex justify-center pt-16">
-        <div className="w-full max-w-5xl bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
-          {/* Header */}
-          <div className="border-b border-gray-200">
-            <div className="px-6 py-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-xl font-bold text-gray-900">AP Macroeconomics Full MCQ Exam {num}</h1>
-                  <p className="text-sm text-gray-600">Comprehensive practice exam covering all units</p>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <FileText className="w-4 h-4" />
-                  <span>{totalQuestions} questions</span>
-                </div>
+      <div className="pt-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="w-full">
+            <div className="w-full bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+              {/* Exam Content */}
+              <div className="p-6">
+                <FullExam 
+                  questionBank={macroSetOneQuestions}
+                  examType="macro"
+                  questionType="mcq"
+                  examNumber={num}
+                  onTimeUpdate={setTimeRemaining}
+                />
               </div>
             </div>
           </div>
-
-          {/* Instructions */}
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-800 mb-3">Instructions</h2>
-            <ul className="list-disc list-inside space-y-2 text-sm text-gray-600">
-              <li>Answer every question before submitting the practice test.</li>
-              <li>Use the strikethrough tool to eliminate answer choices you don't want.</li>
-              <li>Use the bookmark tool to mark questions you'd like to review before submitting.</li>
-              <li>After submitting, click the video button to watch explanations for each question.</li>
-            </ul>
-          </div>
-
-          {/* Exam Content */}
-          <div className="p-6 pb-24">
-            <FullExam 
-              questionBank={macroSetOneQuestions}
-              examType="macro"
-              questionType="mcq"
-              examNumber={num}
-            />
-          </div>
         </div>
       </div>
-      <div className="pb-16"></div>
     </div>
   );
 }

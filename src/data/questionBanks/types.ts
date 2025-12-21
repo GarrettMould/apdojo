@@ -26,6 +26,9 @@ export interface Question {
       column: string;
     };
   };
+  optionTableHeaders?: string[]; // Column headers for displaying options as a table
+  questionGroup?: string | number; // Optional group identifier to keep questions together (e.g., questions sharing the same graph)
+  sliderExplainer?: string; // URL to video explanation slider
 }
 
 export interface QuestionBank {

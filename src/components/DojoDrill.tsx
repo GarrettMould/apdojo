@@ -8,6 +8,7 @@ import { MonopolyRevenueVisualizer } from "./MonopolyRevenueVisualizer";
 import { CompAdvantageDrill, CompAdvantageProblem } from "./CompAdvantageDrill";
 import { GDPDrill } from "./GDPDrill";
 import { PPCDrill } from "./PPCDrill";
+import { DemandChangeDrill, DemandChangeScenario } from "./DemandChangeDrill";
 import { allQuestions } from "@/data/unitPracticeProblems/unitPracticeProblems";
 import { Question } from "@/data/questionBanks/types";
 import { CheckCircle2, ArrowRight, Trophy, Check, Lightbulb } from "lucide-react";
@@ -173,6 +174,13 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
 
   const handleGraphComplete = () => {
     setGraphCompleted(true);
+    // Auto-advance to step 3 after a delay for demand-change activity
+    if (drill.stage2.type === 'demand-change') {
+      setTimeout(() => {
+        setStep(3);
+        setGraphCompleted(false);
+      }, 2000); // 2 second delay to show the green background
+    }
   };
 
   const handleTableComplete = () => {
@@ -193,7 +201,9 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
   const isStep2Completed = 
     drill.stage2.type === "graph" ? graphCompleted : 
     drill.stage2.type === "table" ? tableCompleted : 
-    monopolyCompleted;
+    drill.stage2.type === "monopoly" ? monopolyCompleted :
+    drill.stage2.type === "demand-change" ? graphCompleted :
+    false;
 
   const handleMcqAnswer = (questionId: number, answer: string) => {
     setMcqAnswers((prev) => ({ ...prev, [questionId]: answer }));
@@ -249,6 +259,12 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
         return null;
       case 'ppc-drill':
         return <PPCDrill onComplete={handleGraphComplete} />;
+      case 'demand-change':
+        const demandChangeData = drill.stage2.config as DemandChangeScenario;
+        if (demandChangeData) {
+          return <DemandChangeDrill problem={demandChangeData} onComplete={handleGraphComplete} />;
+        }
+        return null;
       default:
         return null;
     }
@@ -338,18 +354,18 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
                                 key={index}
                                 onClick={() => handleComprehensionAnswer(question.id, index)}
                                 disabled={showResults}
-                                className={`w-full text-left p-3 rounded-lg border-2 transition-all ${
+                                className={`w-full text-left p-3 rounded-lg transition-all ${
                                   !showResult
                                     ? isSelected
-                                      ? "bg-blue-50 border-blue-500 text-blue-900"
-                                      : "bg-white border-gray-300 hover:border-black hover:bg-gray-50 cursor-pointer"
+                                      ? "bg-gray-200 border-[3px] border-black text-gray-900"
+                                      : "bg-white border-2 border-gray-300 hover:border-black hover:bg-gray-50 cursor-pointer"
                                     : isSelected && isCorrect
-                                    ? "bg-green-100 border-green-500 text-green-900"
+                                    ? "bg-green-100 border-[3px] border-black text-green-900"
                                     : isSelected && !isCorrect
-                                    ? "bg-red-100 border-red-500 text-red-900"
+                                    ? "bg-red-100 border-[3px] border-black text-red-900"
                                     : isCorrect && showResult
-                                    ? "bg-green-100 border-green-500 text-green-900"
-                                    : "bg-gray-50 border-gray-300 text-gray-600"
+                                    ? "bg-green-100 border-[3px] border-black text-green-900"
+                                    : "bg-gray-50 border-2 border-gray-300 text-gray-600"
                                 } ${showResults ? "cursor-default" : ""}`}
                               >
                                 <span className="font-semibold">{String.fromCharCode(65 + index)}.</span>{" "}
@@ -692,3 +708,4 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
     </div>
   );
 }
+

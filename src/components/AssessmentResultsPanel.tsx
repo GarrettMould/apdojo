@@ -21,6 +21,7 @@ interface AssessmentResultsPanelProps {
   questions: Question[];
   answers: Record<number, string>;
   examType: 'micro' | 'macro';
+  onSeeFullResults?: () => void;
 }
 
 export function AssessmentResultsPanel({ 
@@ -28,7 +29,8 @@ export function AssessmentResultsPanel({
   correctAnswers, 
   questions,
   answers,
-  examType
+  examType,
+  onSeeFullResults
 }: AssessmentResultsPanelProps) {
   const percentage = Math.round((correctAnswers / totalQuestions) * 100);
 
@@ -171,6 +173,18 @@ export function AssessmentResultsPanel({
             </div>
           </div>
         </div>
+
+        {/* See Full Results Button */}
+        {onSeeFullResults && (
+          <div className="mt-8">
+            <button
+              onClick={onSeeFullResults}
+              className="w-full py-4 bg-blue-500 hover:bg-blue-600 text-white text-lg font-semibold rounded-xl transition-colors duration-200"
+            >
+              See Full Results
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

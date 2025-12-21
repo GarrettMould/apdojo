@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Question, QuestionBank } from '@/data/questionBanks/types';
 import { Button } from "@/components/ui/button";
-import { Bookmark, BookmarkX, X, Clock, Maximize2, Minimize2, Calculator, Pen, Eraser, Expand, Trash2, Circle, CircleDot, Check, Lock, Brain, FileText, ChevronLeft, ChevronRight, Triangle } from 'lucide-react';
+import { Bookmark, BookmarkX, X, Clock, Maximize2, Minimize2, Calculator, Pen, Eraser, Expand, Trash2, Circle, CircleDot, Check, Lock, Brain, FileText, ChevronLeft, ChevronRight, ChevronsRight, Triangle, Strikethrough, Eye } from 'lucide-react';
 import { StaticImageData } from 'next/image';
 import { redirectToCheckout } from '@/lib/stripe';
 import { useAuthContext } from '@/contexts/AuthContext';
@@ -11,12 +11,16 @@ import { LoginModal, SignupModal } from './AuthModals';
 import { MCQFeedbackModal } from './MCQFeedbackModal';
 import { AssessmentResultsPanel } from './AssessmentResultsPanel';
 import { videos } from '@/data/videos';
+import { createPortal } from 'react-dom';
+import { HighlightableText } from './HighlightableText';
+import { MCQSidecar } from './MCQSidecar';
 
 interface FullExamProps {
   questionBank: QuestionBank;
   examType: 'macro' | 'micro';
   questionType: 'mcq' | 'frq';
   examNumber: string;
+  onTimeUpdate?: (timeRemaining: number) => void;
 }
 
 interface Answers {
@@ -78,11 +82,17 @@ const FeedbackProgressBar = ({ status }: { status: 'incorrect' | 'partial' | 'co
   );
 };
 
-export function FullExam({ questionBank, examType, questionType, examNumber }: FullExamProps) {
+export function FullExam({ questionBank, examType, questionType, examNumber, onTimeUpdate }: FullExamProps) {
   const [answers, setAnswers] = useState<Answers>({});
   const [showResults, setShowResults] = useState(false);
+  const [showFullResults, setShowFullResults] = useState(false);
   const [showExplanations, setShowExplanations] = useState<{[key: number]: boolean}>({});
   const [bookmarkedQuestions, setBookmarkedQuestions] = useState<Set<number>>(new Set());
+  const [strikethroughState, setStrikethroughState] = useState<Record<number, number[]>>({});
+  const [showBookmarkConfirmModal, setShowBookmarkConfirmModal] = useState(false);
+  
+  // Timer state (60 minutes = 3600 seconds)
+  const [timeRemaining, setTimeRemaining] = useState(60 * 60); // 60 minutes in seconds
   
   // Remove the shuffling logic and just use the pre-shuffled questions
   const questions = questionBank.questions;
@@ -106,15 +116,12 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
   // Add to state variables
   const [penColor, setPenColor] = useState('#000000');
 
-  // Add current question index state (for pagination)
+  // Add current question index state (for single question view)
   const [currentPage, setCurrentPage] = useState(0);
-  const questionsPerPage = 10;
+  const questionsPerPage = 1;
 
   // Add completed questions tracking
   const [completedQuestions, setCompletedQuestions] = useState<Set<number>>(new Set());
-
-  // Add state for tracking which set of 10 questions to show
-  const [currentTrackPage, setCurrentTrackPage] = useState(0);
 
   // Add eraser size state
   const [eraserSize, setEraserSize] = useState(20);
@@ -127,27 +134,95 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
 
-  // Update the track size constant to be responsive
-  const getQuestionsPerTrack = () => {
-    if (typeof window === 'undefined') return 20; // Default for SSR
-    
-    const width = window.innerWidth;
-    if (width < 768) return 8;    // Mobile
-    if (width < 1024) return 12;  // Tablet
-    return 20;                    // Desktop
+  // Scroll to top when page changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentPage]);
+
+  // Timer countdown effect
+  useEffect(() => {
+    if (showResults || timeRemaining <= 0) return;
+
+    const interval = setInterval(() => {
+      setTimeRemaining(prev => {
+        if (prev <= 1) {
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [showResults, timeRemaining]);
+
+  // Notify parent of time updates
+  useEffect(() => {
+    if (onTimeUpdate) {
+      onTimeUpdate(timeRemaining);
+    }
+  }, [timeRemaining, onTimeUpdate]);
+
+  // Format time as MM:SS
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const [questionsPerTrack, setQuestionsPerTrack] = useState(getQuestionsPerTrack());
+  // State for feedback panel container (outside exam container)
+  const [feedbackContainer, setFeedbackContainer] = useState<HTMLElement | null>(null);
+  // State for sidecar visibility and position
+  const [showSidecar, setShowSidecar] = useState(false);
+  const sidecarButtonRef = useRef<HTMLButtonElement | null>(null);
 
-  // Add effect to update questions per track on resize
+  // Effect to find or create feedback container
   useEffect(() => {
-    const handleResize = () => {
-      setQuestionsPerTrack(getQuestionsPerTrack());
+    let container = document.getElementById('exam-feedback-container');
+    if (!container) {
+      // Create container if it doesn't exist
+      container = document.createElement('div');
+      container.id = 'exam-feedback-container';
+      document.body.appendChild(container);
+    }
+    setFeedbackContainer(container);
+    
+    // Cleanup: remove container when component unmounts
+    return () => {
+      if (container && container.parentNode) {
+        container.parentNode.removeChild(container);
+      }
+    };
+  }, []);
+
+  // Effect to close sidecar when clicking outside
+  useEffect(() => {
+    if (!showSidecar) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      // Don't close if clicking inside the sidecar or the button that opened it
+      if (
+        sidecarButtonRef.current?.contains(target) ||
+        target.closest('.mcq-sidecar-popup')
+      ) {
+        return;
+      }
+      setShowSidecar(false);
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showSidecar]);
+
+  // State for text highlights
+  const [textHighlights, setTextHighlights] = useState<Record<number, Array<{ start: number; end: number; id: string }>>>({});
+
+  const handleHighlight = (questionId: number, highlights: Array<{ start: number; end: number; id: string }>) => {
+    setTextHighlights(prev => ({
+      ...prev,
+      [questionId]: highlights
+    }));
+  };
 
   // Add these new states
   const [expression, setExpression] = useState<string[]>([]);
@@ -172,6 +247,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
 
   // Add state for video modal
   const [showVideoModal, setShowVideoModal] = useState(false);
+  const [videoUrl, setVideoUrl] = useState<string>('');
 
   // Add state for video loading
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
@@ -203,6 +279,48 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
     setCompletedQuestions(prev => new Set([...prev, questionId]));
   };
 
+  const handleStrikethroughToggle = (questionId: number, optionIndex: number) => {
+    if (showResults) return;
+
+    // If the option being struck through is the currently selected answer, deselect it.
+    const currentAnswer = answers[questionId];
+    if (currentAnswer && String.fromCharCode(65 + optionIndex) === currentAnswer) {
+      setAnswers(prev => {
+        const newAnswers = { ...prev };
+        delete newAnswers[questionId];
+        return newAnswers;
+      });
+      setCompletedQuestions(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(questionId);
+        return newSet;
+      });
+    }
+
+    setStrikethroughState(prev => {
+      const currentStrikes = prev[questionId] || [];
+      const newStrikes = currentStrikes.includes(optionIndex)
+        ? currentStrikes.filter(i => i !== optionIndex)
+        : [...currentStrikes, optionIndex];
+      
+      return { ...prev, [questionId]: newStrikes };
+    });
+  };
+
+  const handleSubmitClick = () => {
+    if (bookmarkedQuestions.size > 0) {
+      setShowBookmarkConfirmModal(true);
+    } else {
+      setShowResults(true);
+    }
+  };
+
+  const handleConfirmSubmit = () => {
+    setShowBookmarkConfirmModal(false);
+    setShowResults(true);
+    setShowFullResults(false); // Show feedback first, not full results
+  };
+
   const calculateScore = () => {
     const totalQuestions = questionBank.questions.length;
     const correctAnswers = questionBank.questions.filter(
@@ -228,6 +346,21 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
       }
       return newBookmarks;
     });
+  };
+
+  // Function to scroll to a question (used by sidecar)
+  const scrollToQuestion = (questionId: number) => {
+    const questionIndex = questions.findIndex(q => q.id === questionId);
+    if (questionIndex === -1) return;
+    
+    setCurrentPage(questionIndex);
+    setShowSidecar(false); // Close sidecar after navigating
+    
+    // Small delay to ensure page change happens first
+    setTimeout(() => {
+      const element = document.getElementById(`question-${questionId}`);
+      element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
   };
 
   // Update the calculator display function
@@ -450,145 +583,6 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
     return `url(${canvas.toDataURL()}) ${size/2} ${size/2}, crosshair`;
   };
 
-  // Update currentQuestionIndex to also handle track pagination
-  const setCurrentQuestionIndexWithTrack = (index: number) => {
-    setCurrentQuestionIndex(index);
-    setCurrentTrackPage(Math.floor(index / questionsPerTrack));
-  };
-
-  // Modify navigation functions to update track
-  const goToNextQuestion = () => {
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndexWithTrack(currentQuestionIndex + 1);
-    }
-  };
-
-  const goToPreviousQuestion = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndexWithTrack(currentQuestionIndex - 1);
-    }
-  };
-
-  // Modify the question track rendering for mobile
-  const renderQuestionIndicators = () => {
-    const startIndex = currentTrackPage * questionsPerTrack;
-    const endIndex = Math.min(startIndex + questionsPerTrack, questions.length);
-    const totalPages = Math.ceil(questions.length / questionsPerTrack);
-
-    return (
-      <div className="w-full max-w-4xl mx-auto mb-8">
-        {/* Single container for all elements */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-          {/* Mobile Question Navigation */}
-          <div className="md:hidden">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-sm font-medium text-gray-600">
-                Question {currentQuestionIndex + 1} of {questions.length}
-              </span>
-              <span className="text-sm font-medium text-blue-600">
-                {completedQuestions.size} Answered
-              </span>
-            </div>
-            <div className="relative">
-              <select
-                value={currentQuestionIndex}
-                onChange={(e) => setCurrentQuestionIndexWithTrack(Number(e.target.value))}
-                className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
-              >
-                {questions.map((_, idx) => {
-                  const isCompleted = completedQuestions.has(questions[idx].id);
-                  const isBookmarked = bookmarkedQuestions.has(questions[idx].id);
-                  return (
-                    <option key={idx} value={idx}>
-                      Question {idx + 1}
-                      {isCompleted ? ' ✓' : ''}
-                      {isBookmarked ? ' ★' : ''}
-                    </option>
-                  );
-                })}
-              </select>
-              {/* Custom dropdown arrow */}
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          {/* Desktop Question Indicators - Keep existing desktop version */}
-          <div className="hidden md:block">
-            <div className="flex items-center">
-              <div
-                onClick={() => {
-                  if (currentTrackPage > 0) {
-                    setCurrentTrackPage(currentTrackPage - 1);
-                  }
-                }}
-                className={`
-                  flex min-w-[32px] h-[32px] items-center justify-center rounded-lg
-                  transition-all duration-200 ease-in-out text-sm font-medium mr-2
-                  ${currentTrackPage === 0
-                    ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
-                    : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200 cursor-pointer hover:scale-105'
-                  }
-                `}
-              >
-                <Triangle className="w-4 h-4 text-blue-600 -rotate-90" />
-              </div>
-
-              <div className="flex-1 flex flex-wrap justify-center gap-1.5">
-                {Array.from({ length: questionsPerTrack }, (_, i) => {
-                  const questionIndex = startIndex + i;
-                  if (questionIndex >= questions.length) return null;
-                  const question = questions[questionIndex];
-                  const isBookmarked = question && bookmarkedQuestions.has(question.id);
-                  
-                  return (
-                    <div
-                      key={questionIndex}
-                      className={`
-                        min-w-[28px] h-[28px] flex items-center justify-center rounded-lg 
-                        transition-all duration-200 ease-in-out text-sm font-medium
-                        ${questionIndex === currentQuestionIndex 
-                          ? 'border-2 border-blue-500 bg-blue-50 text-blue-900 shadow-sm scale-105' 
-                          : completedQuestions.has(questions[questionIndex]?.id)
-                            ? 'border-2 border-blue-400 text-blue-900'
-                            : 'border-2 border-gray-200 text-gray-700 hover:bg-gray-50'}
-                        ${isBookmarked ? 'border-2 border-yellow-300/70' : ''}
-                        hover:scale-105 cursor-pointer
-                      `}
-                      onClick={() => setCurrentQuestionIndexWithTrack(questionIndex)}
-                    >
-                      {questionIndex + 1}
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div
-                onClick={() => {
-                  if (currentTrackPage < totalPages - 1) {
-                    setCurrentTrackPage(currentTrackPage + 1);
-                  }
-                }}
-                className={`
-                  flex min-w-[32px] h-[32px] items-center justify-center rounded-lg
-                  transition-all duration-200 ease-in-out text-sm font-medium ml-2
-                  ${currentTrackPage >= totalPages - 1
-                    ? 'bg-gray-50 text-gray-400 cursor-not-allowed'
-                    : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200 cursor-pointer hover:scale-105'
-                  }
-                `}
-              >
-                <Triangle className="w-4 h-4 text-blue-600 rotate-90" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
 
   // Add effect to reset tools state when component unmounts/remounts
   useEffect(() => {
@@ -649,6 +643,25 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
 
   return (
     <>
+      {/* Assessment Results Panel - Rendered outside exam container via portal */}
+      {typeof window !== 'undefined' && showResults && !showFullResults && feedbackContainer && createPortal(
+        <div className="fixed inset-0 bg-gray-50 z-50 overflow-y-auto" style={{ top: '64px' }}>
+          <div className="min-h-[calc(100vh-64px)] flex items-center justify-center py-12 px-4">
+            <div className="w-full max-w-4xl">
+              <AssessmentResultsPanel 
+                totalQuestions={questions.length}
+                correctAnswers={questions.filter((q) => answers[q.id] === q.correctAnswer).length}
+                questions={questions}
+                answers={answers}
+                examType={examType}
+                onSeeFullResults={() => setShowFullResults(true)}
+              />
+            </div>
+          </div>
+        </div>,
+        feedbackContainer
+      )}
+
       {/* Add the modals */}
       <LoginModal 
         isOpen={showLoginModal}
@@ -693,308 +706,608 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
         </div>
       )}
 
-      {/* Video Modal */}
-      {showVideoModal && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
-          onClick={() => setShowVideoModal(false)}
-        >
-          <div className="relative max-w-4xl max-h-[90vh] bg-white p-4 rounded-lg">
+      {/* Video Slide-Out Panel */}
+      <div 
+        className={`fixed right-0 top-0 h-full w-[45%] bg-white shadow-2xl z-40 border-l border-gray-200 transform transition-transform duration-300 ease-in-out ${
+          showVideoModal && videoUrl ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
+        {showVideoModal && videoUrl && (
+          <div className="h-full flex flex-col p-6 relative">
+            <div className="flex-1 overflow-hidden">
+              <video 
+                key={videoUrl}
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-full rounded-lg object-contain"
+                src={videoUrl}
+                preload="auto"
+                onLoadedData={() => {
+                  setIsVideoLoaded(true);
+                  setIsVideoLoading(false);
+                }}
+                onError={(e) => {
+                  console.error('Error loading video:', e);
+                  console.error('Video URL:', videoUrl);
+                  setIsVideoLoading(false);
+                }}
+                onLoadStart={() => {
+                  console.log('Video loading started:', videoUrl);
+                }}
+              >
+                Your browser does not support the video tag.
+              </video>
+            </div>
             <button
-              onClick={(e) => {
-                e.stopPropagation();
+              onClick={() => {
                 setShowVideoModal(false);
+                setVideoUrl('');
               }}
-              className="absolute top-2 right-2 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 z-10"
-              style={{ margin: '8px' }}
+              className="absolute top-1/2 -left-12 -translate-y-1/2 bg-white p-3 rounded-l-xl border border-r-0 border-gray-200 shadow-md cursor-pointer hover:bg-gray-50 transition-colors"
+              aria-label="Close video"
             >
-              <X className="w-6 h-6" />
+              <ChevronsRight size={24} className="text-gray-700" />
             </button>
-            <video 
-              controls 
-              className="w-full"
-              onLoadedData={() => {
-                setIsVideoLoaded(true);
-                setIsVideoLoading(false); // Stop loading spinner
-              }}
-              onError={() => {
-                console.error('Error loading video');
-                setIsVideoLoading(false); // Stop loading spinner
-              }}
-            >
-              <source src="" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Feedback modal removed - can be re-added per-question if needed */}
 
-      <div className="w-full">
-        {!showResults ? (
-          <>
-            {/* Progress Bar */}
-            <div className="border-b border-gray-200 mb-6">
-              <div className="p-6">
-                <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
-                  <span className="font-bold">Progress Bar</span>
-                  <span>{completedQuestions.size} of {questions.length} answered</span>
-                </div>
-                <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(20, minmax(0, 1fr))' }}>
-                  {questions.map((q, index) => {
-                    const isAnswered = answers[q.id] !== undefined;
-                    const isBookmarked = bookmarkedQuestions.has(q.id);
-                    const questionPage = Math.floor(index / questionsPerPage);
-                    let buttonClasses = 'w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs transition-colors';
-                    let textClasses = '';
-                    if (isBookmarked) {
-                      buttonClasses += ' bg-yellow-200';
-                      textClasses += ' text-yellow-800';
-                    } else if (isAnswered) {
-                      buttonClasses += ' bg-blue-300';
-                      textClasses += ' text-blue-800';
-                    } else {
-                      buttonClasses += ' bg-gray-200';
-                      textClasses += ' text-gray-600';
-                    }
-                    return (
-                      <button
-                        key={q.id}
-                        onClick={() => {
-                          setCurrentPage(questionPage);
-                          // Small delay to ensure page change happens first
-                          setTimeout(() => {
-                            const element = document.getElementById(`question-${q.id}`);
-                            element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                          }, 100);
-                        }}
-                        className={buttonClasses}
-                        title={`Question ${index + 1}`}
-                      >
-                        <span className={textClasses}>{index + 1}</span>
-                      </button>
-                    );
-                  })}
+
+      {/* Only show exam content if not showing results, or if showing full results */}
+      {(!showResults || showFullResults) && (
+        <div className="flex w-full min-h-screen">
+          {/* Question Container (Left Side) */}
+          <div 
+            className={`transition-all duration-300 ease-in-out p-8 ${
+              showVideoModal && videoUrl 
+                ? 'w-[55%] max-w-none' 
+                : 'w-full max-w-5xl mx-auto'
+            }`}
+          >
+            {!showResults ? (
+              <>
+              {/* Progress Bar - Mobile Only */}
+              {!(showVideoModal && videoUrl) && (
+              <div className="border-b border-gray-200 mb-6 lg:hidden">
+                <div className="p-6">
+                  <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
+                    <span className="font-bold">Progress Bar</span>
+                  </div>
+                  <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(20, minmax(0, 1fr))' }}>
+                    {questions.map((q, index) => {
+                      const isAnswered = answers[q.id] !== undefined;
+                      const isBookmarked = bookmarkedQuestions.has(q.id);
+                      let buttonClasses = 'w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs transition-colors';
+                      let textClasses = '';
+                      if (isBookmarked) {
+                        buttonClasses += ' bg-yellow-200';
+                        textClasses += ' text-yellow-800';
+                      } else if (isAnswered) {
+                        buttonClasses += ' bg-blue-300';
+                        textClasses += ' text-blue-800';
+                      } else {
+                        buttonClasses += ' bg-gray-200';
+                        textClasses += ' text-gray-600';
+                      }
+                      return (
+                        <button
+                          key={q.id}
+                          onClick={() => {
+                            setCurrentPage(index);
+                            setTimeout(() => {
+                              const element = document.getElementById(`question-${q.id}`);
+                              element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }, 100);
+                          }}
+                          className={buttonClasses}
+                          title={`Question ${index + 1}`}
+                        >
+                          <span className={textClasses}>{index + 1}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
-            </div>
+              )}
 
-            {/* Paginated Questions */}
-            <div className="space-y-8">
+              {/* Single Question View with Split-Screen Layout */}
               {(() => {
-                const startIndex = currentPage * questionsPerPage;
-                const endIndex = Math.min(startIndex + questionsPerPage, questions.length);
-                const currentPageQuestions = questions.slice(startIndex, endIndex);
-                const totalPages = Math.ceil(questions.length / questionsPerPage);
+                const question = questions[currentPage];
+                if (!question) return null;
                 
-                return (
-                  <>
-                    {/* Page Info at Top */}
-                    <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
-                      <span className="text-sm text-gray-600">
-                        Page {currentPage + 1} of {totalPages}
-                      </span>
-                      <div className="text-sm text-gray-600">
-                        Questions {startIndex + 1}-{endIndex} of {questions.length}
-                      </div>
-                    </div>
-
-                    {/* Current Page Questions */}
-                    {currentPageQuestions.map((question, relativeIndex) => {
-                      const questionIndex = startIndex + relativeIndex;
                 const selectedAnswer = answers[question.id];
                 const selectedIndex = selectedAnswer ? selectedAnswer.charCodeAt(0) - 65 : null;
+                const hasVisualContent = question.image || question.tableData;
                 
                 return (
-                  <div key={question.id} id={`question-${question.id}`} className="bg-white border border-gray-200 rounded-xl shadow-sm p-8">
-                    {/* Question Header */}
-                    <div className="flex items-center gap-4 mb-6">
-                      <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 bg-slate-100 border border-slate-200 rounded-lg">
-                        <span className="text-lg font-bold text-slate-700">{questionIndex + 1}</span>
-                      </div>
-                      <div className="h-px flex-1 bg-slate-200"></div>
-                      <button
-                        onClick={() => {
-                          const newBookmarks = new Set(bookmarkedQuestions);
-                          if (newBookmarks.has(question.id)) {
-                            newBookmarks.delete(question.id);
-                          } else {
-                            newBookmarks.add(question.id);
-                          }
-                          setBookmarkedQuestions(newBookmarks);
-                        }}
-                        className={`flex-shrink-0 p-2 rounded-lg transition-colors ${
-                          bookmarkedQuestions.has(question.id)
-                            ? 'bg-yellow-100 text-yellow-500'
-                            : 'bg-slate-100 hover:bg-slate-200 text-slate-500'
-                        }`}
-                        aria-label={bookmarkedQuestions.has(question.id) ? "Remove bookmark" : "Bookmark question"}
-                      >
-                        <Bookmark className="w-5 h-5" />
-                      </button>
-                    </div>
-
-                    {/* Question Text */}
-                    <div className="mb-8">
-                      <h3 className="text-lg font-medium text-slate-900 leading-relaxed">{question.question}</h3>
-                    </div>
-
-                    {/* Question Image */}
-                    {question.image && (
-                      <div className="mb-8 flex justify-center">
-                        <img
-                          src={question.image.src}
-                          alt={'alt' in question.image && question.image.alt ? question.image.alt : "Question diagram"}
-                          className="max-w-xl w-full h-auto rounded-lg border border-slate-200 shadow-sm cursor-pointer hover:opacity-90 transition-opacity"
+                  <div className="w-full">
+                    {/* Question Info Header */}
+                    {!(showVideoModal && videoUrl) && (
+                    <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
+                      <div className="flex items-center gap-4">
+                        <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 bg-slate-100 border border-slate-200 rounded-lg">
+                          <span className="text-lg font-bold text-slate-700">{currentPage + 1}</span>
+                        </div>
+                        <button
                           onClick={() => {
-                            setSelectedImage(question.image);
-                            setShowImageModal(true);
+                            const newBookmarks = new Set(bookmarkedQuestions);
+                            if (newBookmarks.has(question.id)) {
+                              newBookmarks.delete(question.id);
+                            } else {
+                              newBookmarks.add(question.id);
+                            }
+                            setBookmarkedQuestions(newBookmarks);
                           }}
-                        />
+                          className={`flex-shrink-0 p-2 rounded-lg transition-colors ${
+                            bookmarkedQuestions.has(question.id)
+                              ? 'bg-yellow-100 text-yellow-500'
+                              : 'bg-slate-100 hover:bg-slate-200 text-slate-500'
+                          }`}
+                          aria-label={bookmarkedQuestions.has(question.id) ? "Remove bookmark" : "Bookmark question"}
+                        >
+                          <Bookmark className="w-5 h-5" />
+                        </button>
+                        <div className="relative">
+                          <button
+                            ref={sidecarButtonRef}
+                            onClick={() => setShowSidecar(!showSidecar)}
+                            className="text-sm text-gray-600 hover:text-gray-900 hover:underline cursor-pointer transition-colors"
+                          >
+                            Question {currentPage + 1} of {questions.length}
+                          </button>
+                          {showSidecar && !(showVideoModal && videoUrl) && (
+                            <div className="absolute left-0 top-full mt-2 z-50 mcq-sidecar-popup" style={{ width: '320px' }}>
+                              <MCQSidecar
+                                questions={questions}
+                                answers={answers}
+                                bookmarkedQuestions={bookmarkedQuestions}
+                                onQuestionClick={scrollToQuestion}
+                                onClose={() => setShowSidecar(false)}
+                              />
+                            </div>
+                          )}
+                        </div>
                       </div>
+                      <div className="flex items-center gap-3">
+                        {/* Slider Explainer Video Icon */}
+                        {question.sliderExplainer && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              console.log('Eye icon clicked, sliderExplainer:', question.sliderExplainer);
+                              setVideoUrl(question.sliderExplainer!);
+                              setShowVideoModal(true);
+                            }}
+                            className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+                            aria-label="View video explanation"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                        )}
+                        {/* Timer temporarily hidden */}
+                        {/* <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                          <Clock className="w-4 h-4" />
+                          <span>{formatTime(timeRemaining)}</span>
+                        </div> */}
+                      </div>
+                    </div>
                     )}
 
-                    {/* Answer Options */}
-                    <div className="space-y-4">
-                      {question.options.map((option, index) => {
-                        const isSelected = selectedIndex === index;
-                        return (
-                          <div
-                            key={index}
-                            onClick={() => handleAnswer(question.id, index)}
-                            className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 flex items-center gap-4 cursor-pointer ${
-                              isSelected 
-                                ? 'bg-slate-50 text-slate-900 shadow-md border-slate-300 ring-2 ring-slate-100' 
-                                : 'bg-white hover:bg-slate-50 border-slate-200 hover:border-slate-300 hover:shadow-md'
+                    {/* Split-Screen Grid Container */}
+                    <div className={`grid grid-cols-1 ${hasVisualContent ? 'lg:grid-cols-5' : 'lg:grid-cols-1'} gap-8 min-h-[calc(100vh-300px)]`}>
+                      {/* Left Column: Question Text & Options */}
+                      <div className={`${hasVisualContent ? 'lg:col-span-3' : 'lg:col-span-5'} overflow-y-auto`}>
+                        <div id={`question-${question.id}`} className="bg-white border border-gray-200 rounded-xl shadow-sm p-8">
+                          {/* Question Text */}
+                          <div className="mb-8">
+                            <HighlightableText
+                              text={question.question}
+                              questionId={question.id}
+                              highlights={textHighlights[question.id] || []}
+                              onHighlight={handleHighlight}
+                            />
+                          </div>
+
+                          {/* Answer Options */}
+                          {question.optionTableHeaders ? (
+                            <div className="overflow-x-auto">
+                              <table className="w-full border-collapse">
+                                <thead>
+                                  <tr>
+                                    <th className="w-12 p-2"></th>
+                                    {question.optionTableHeaders.map((header, idx) => (
+                                      <th key={idx} className="px-3 py-2 text-center font-semibold text-sm text-gray-700 border-b-2 border-gray-300">
+                                        {header}
+                                      </th>
+                                    ))}
+                                    {!showResults && <th className="w-12 p-2"></th>}
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {question.options.map((option, index) => {
+                                    const isSelected = selectedIndex === index;
+                                    const isStruckThrough = strikethroughState[question.id]?.includes(index);
+                                    const optionValues = option.split(' | ');
+                                    return (
+                                      <tr
+                                        key={index}
+                                        onClick={() => handleAnswer(question.id, index)}
+                                        className={`transition-all duration-200 group ${
+                                          isSelected 
+                                            ? 'bg-slate-50 hover:bg-slate-100 cursor-pointer' 
+                                            : isStruckThrough
+                                              ? 'bg-gray-100 cursor-default'
+                                              : 'bg-white hover:bg-slate-50 cursor-pointer'
+                                        }`}
+                                      >
+                                        <td className="p-2">
+                                          <div className={`w-8 h-8 flex items-center justify-center rounded-lg border-2 font-semibold text-sm transition-all duration-200 ${
+                                            isSelected ? 'bg-slate-700 border-slate-700 text-white' : isStruckThrough ? 'bg-gray-200 border-gray-300 text-gray-400' : 'bg-white border-slate-300 text-slate-600'
+                                          }`}>
+                                            {String.fromCharCode(65 + index)}
+                                          </div>
+                                        </td>
+                                        {optionValues.map((value, valIdx) => (
+                                          <td key={valIdx} className={`px-3 py-2 text-center text-sm border-b border-gray-200 ${isSelected ? 'text-slate-900' : isStruckThrough ? 'text-gray-500 line-through' : 'text-slate-700'}`}>
+                                            {value.trim()}
+                                          </td>
+                                        ))}
+                                        {!showResults && (
+                                          <td className="p-2">
+                                            <div
+                                              role="button"
+                                              onClick={(e) => { e.stopPropagation(); handleStrikethroughToggle(question.id, index); }}
+                                              className={`p-2 rounded-lg transition-colors cursor-pointer ${
+                                                isStruckThrough ? 'bg-slate-200 text-slate-600' : 'bg-white hover:bg-slate-100 text-slate-400 hover:text-slate-600'
+                                              }`}
+                                              aria-label={isStruckThrough ? "Remove strikethrough" : "Strikethrough option"}
+                                            >
+                                              <Strikethrough className="w-5 h-5" />
+                                            </div>
+                                          </td>
+                                        )}
+                                      </tr>
+                                    );
+                                  })}
+                                </tbody>
+                              </table>
+                            </div>
+                          ) : (
+                            <div className="space-y-4">
+                              {question.options.map((option, index) => {
+                                const isSelected = selectedIndex === index;
+                                const isStruckThrough = strikethroughState[question.id]?.includes(index);
+                                return (
+                                  <div
+                                    key={index}
+                                    onClick={() => handleAnswer(question.id, index)}
+                                    className={`w-full text-left p-2.5 rounded-lg border-2 transition-all duration-200 flex items-center gap-3 group ${
+                                      isSelected 
+                                        ? 'bg-slate-50 text-slate-900 shadow-md border-slate-300 ring-2 ring-slate-100 cursor-pointer' 
+                                        : isStruckThrough
+                                          ? 'bg-gray-100 text-gray-500 border-gray-200 cursor-default'
+                                          : 'bg-white hover:bg-slate-50 border-slate-200 hover:border-slate-300 hover:shadow-md cursor-pointer'
+                                    }`}
+                                  >
+                                    <div className={`flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg border-2 font-semibold text-sm transition-all duration-200 ${
+                                      isSelected ? 'bg-slate-700 border-slate-700 text-white' : isStruckThrough ? 'bg-gray-200 border-gray-300 text-gray-400' : 'bg-white border-slate-300 text-slate-600 group-hover:border-slate-400'
+                                    }`}>
+                                      {String.fromCharCode(65 + index)}
+                                    </div>
+                                    <div className="flex-1">
+                                      <span className={`text-sm ${isSelected ? 'text-slate-900' : 'text-slate-700'} ${isStruckThrough ? 'line-through' : ''}`}>
+                                        {option}
+                                      </span>
+                                    </div>
+                                    {!showResults && (
+                                      <div
+                                        role="button"
+                                        onClick={(e) => { e.stopPropagation(); handleStrikethroughToggle(question.id, index); }}
+                                        className={`ml-auto p-2 rounded-lg transition-colors cursor-pointer flex-shrink-0 ${
+                                          isStruckThrough ? 'bg-slate-200 text-slate-600' : 'bg-white hover:bg-slate-100 text-slate-400 hover:text-slate-600'
+                                        }`}
+                                        aria-label={isStruckThrough ? "Remove strikethrough" : "Strikethrough option"}
+                                      >
+                                        <Strikethrough className="w-5 h-5" />
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Navigation Controls */}
+                        {!(showVideoModal && videoUrl) && (
+                        <div className="flex items-center gap-4 pt-4 mt-4 border-t border-gray-200">
+                          <button
+                            onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
+                            disabled={currentPage === 0}
+                            className={`flex-1 px-6 py-3 text-base rounded-lg font-semibold transition-colors ${
+                              currentPage === 0
+                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                : 'bg-blue-500 text-white hover:bg-blue-600'
                             }`}
                           >
-                            <div className={`flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg border-2 font-semibold text-sm transition-all duration-200 ${
-                              isSelected ? 'bg-slate-700 border-slate-700 text-white' : 'bg-white border-slate-300 text-slate-600'
-                            }`}>
-                              {String.fromCharCode(65 + index)}
-                            </div>
-                            <div className="flex-1">
-                              <span className={`text-sm ${isSelected ? 'text-slate-900' : 'text-slate-700'}`}>
-                                {option}
-                              </span>
-                            </div>
+                            Previous
+                          </button>
+                          
+                          {currentPage === questions.length - 1 ? (
+                            <button
+                              onClick={handleSubmitClick}
+                              className="flex-1 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white text-base font-semibold rounded-lg transition-colors duration-200"
+                            >
+                              Submit Exam
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => setCurrentPage(prev => Math.min(questions.length - 1, prev + 1))}
+                              disabled={currentPage >= questions.length - 1}
+                              className={`flex-1 px-6 py-3 text-base rounded-lg font-semibold transition-colors ${
+                                currentPage >= questions.length - 1
+                                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                  : 'bg-blue-500 text-white hover:bg-blue-600'
+                              }`}
+                            >
+                              Next
+                            </button>
+                          )}
+                        </div>
+                        )}
+                      </div>
+
+                      {/* Right Column: Visual Content (Image and/or Table) */}
+                      {hasVisualContent && (
+                        <div className="lg:col-span-2">
+                          <div className="sticky top-8 space-y-6">
+                            {/* Table Data */}
+                            {question.tableData && (
+                              <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-4">
+                                <div className="flex items-center gap-4">
+                                  {question.tableData.playerNames && (
+                                    <div className="flex items-center justify-center h-full w-16">
+                                      <p className="transform -rotate-90 whitespace-nowrap text-center font-bold text-lg text-gray-900 leading-tight">
+                                        {question.tableData.playerNames.row.split(' ')[0]}
+                                        <br />
+                                        {question.tableData.playerNames.row.split(' ').slice(1).join(' ')}
+                                      </p>
+                                    </div>
+                                  )}
+                                  <div className="flex-1">
+                                    {question.tableData.playerNames && (
+                                      <p className="text-center font-bold text-lg text-gray-900 mb-2">
+                                        {question.tableData.playerNames.column}
+                                      </p>
+                                    )}
+                                    <table className="min-w-full border-collapse border border-black">
+                                      <thead className="bg-white">
+                                        <tr>
+                                          {question.tableData.headers.map(header => (
+                                            <th key={header} className="border border-black px-4 py-3 text-center text-base font-bold text-gray-900">
+                                              {header}
+                                            </th>
+                                          ))}
+                                        </tr>
+                                      </thead>
+                                      <tbody className="bg-white">
+                                        {question.tableData.rows.map((row, rowIndex) => (
+                                          <tr key={rowIndex}>
+                                            {row.map((cell, cellIndex) => {
+                                              const isRowHeader = question.tableData?.rowHeaders && cellIndex === 0;
+                                              return (
+                                                <td 
+                                                  key={cellIndex} 
+                                                  className={`border border-black px-4 py-3 text-center text-base ${isRowHeader ? 'font-bold' : ''}`}
+                                                >
+                                                  {cell}
+                                                </td>
+                                              );
+                                            })}
+                                          </tr>
+                                        ))}
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Question Image */}
+                            {question.image && (
+                              <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-4 flex justify-center">
+                                <img
+                                  src={question.image.src}
+                                  alt={'alt' in question.image && question.image.alt ? question.image.alt : "Question diagram"}
+                                  className={`w-full h-auto object-contain transition-all rounded-lg border border-slate-200 shadow-sm cursor-pointer hover:opacity-90 ${
+                                    showVideoModal && videoUrl ? 'max-w-full' : 'max-w-2xl'
+                                  }`}
+                                  onClick={() => {
+                                    if (question.image) {
+                                      setSelectedImage(question.image as StaticImageData);
+                                      setShowImageModal(true);
+                                    }
+                                  }}
+                                />
+                              </div>
+                            )}
                           </div>
-                        );
-                      })}
+                        </div>
+                      )}
                     </div>
                   </div>
-                );
-                    })}
-
-                    {/* Page Navigation at Bottom */}
-                    <div className="flex items-center justify-between pt-8 mt-8 border-t border-gray-200">
-                      <button
-                        onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
-                        disabled={currentPage === 0}
-                        className={`px-8 py-4 text-lg rounded-lg font-semibold transition-colors ${
-                          currentPage === 0
-                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                            : 'bg-blue-500 text-white hover:bg-blue-600'
-                        }`}
-                      >
-                        Previous
-                      </button>
-                      <button
-                        onClick={() => setCurrentPage(prev => Math.min(totalPages - 1, prev + 1))}
-                        disabled={currentPage >= totalPages - 1}
-                        className={`px-8 py-4 text-lg rounded-lg font-semibold transition-colors ${
-                          currentPage >= totalPages - 1
-                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                            : 'bg-blue-500 text-white hover:bg-blue-600'
-                        }`}
-                      >
-                        Next
-                      </button>
-                    </div>
-
-                    {/* Submit Button - Only show on last page */}
-                    {currentPage === Math.ceil(questions.length / questionsPerPage) - 1 && (
-                      <div className="pt-8 mt-4">
-                        <button
-                          onClick={() => setShowResults(true)}
-                          className="w-full py-4 bg-blue-500 hover:bg-blue-600 text-white text-lg font-semibold rounded-xl disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
-                        >
-                          Submit Exam
-                        </button>
-                      </div>
-                    )}
-                  </>
                 );
               })()}
-            </div>
-          </>
-        ) : (
-          <div className="space-y-8">
-            <AssessmentResultsPanel 
-              totalQuestions={questions.length}
-              correctAnswers={questions.filter((q) => answers[q.id] === q.correctAnswer).length}
-              questions={questions}
-              answers={answers}
-              examType={examType}
-            />
-            
+              </>
+            ) : (
+              <div className="space-y-8">
             {/* Questions Review */}
-            {questions.map((question) => {
-              const isCorrect = answers[question.id] === question.correctAnswer;
-              const selectedAnswer = answers[question.id];
-              
-              return (
-                <div 
-                  key={question.id} 
-                  className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
-                >
-                  {/* Question Header */}
-                  <div className="p-4 border-b border-gray-100">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-medium text-gray-500">Question {questions.indexOf(question) + 1}</span>
-                      <span className={`px-3 py-1 rounded-sm text-sm font-medium ${
-                        isCorrect ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                      }`}>
-                        {isCorrect ? 'Correct' : 'Incorrect'}
-                      </span>
-                    </div>
+                {questions.map((question) => {
+                  const isCorrect = answers[question.id] === question.correctAnswer;
+                  const selectedAnswer = answers[question.id];
+                  
+                  return (
+                    <div 
+                      key={question.id} 
+                      className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+                    >
+                    {/* Question Header */}
+                    <div className="p-4 border-b border-gray-100">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-500">Question {questions.indexOf(question) + 1}</span>
+                        <span className={`px-3 py-1 rounded-sm text-sm font-medium ${
+                          isCorrect ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                        }`}>
+                          {isCorrect ? 'Correct' : 'Incorrect'}
+                        </span>
+                      </div>
                       <p className="text-lg font-medium font-serif leading-relaxed text-gray-900">{question.question}</p>
                     
-                    {/* Add image display */}
-                    {question.image && (
-                      <div className="my-4">
-                        <img 
-                          src={question.image.src}
-                          alt="Question"
-                          className="max-h-[300px] object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
-                          onClick={() => {
-                            setSelectedImage(question.image);
-                            setShowImageModal(true);
-                          }}
-                        />
-                      </div>
-                    )}
-                  </div>
+                      {/* Table Data */}
+                      {question.tableData && (
+                        <div className="my-8 flex justify-center">
+                        <div className="flex items-center gap-4">
+                          {question.tableData.playerNames && (
+                            <div className="flex items-center justify-center h-full w-16">
+                              <p className="transform -rotate-90 whitespace-nowrap text-center font-bold text-lg text-gray-900 leading-tight">
+                                {question.tableData.playerNames.row.split(' ')[0]}
+                                <br />
+                                {question.tableData.playerNames.row.split(' ').slice(1).join(' ')}
+                              </p>
+                            </div>
+                          )}
+                          <div className="flex-1">
+                            {question.tableData.playerNames && (
+                              <p className="text-center font-bold text-lg text-gray-900 mb-2">
+                                {question.tableData.playerNames.column}
+                              </p>
+                            )}
+                            <table className="min-w-full border-collapse border border-black">
+                              <thead className="bg-white">
+                                <tr>
+                                  {question.tableData.headers.map(header => (
+                                    <th key={header} className="border border-black px-4 py-3 text-center text-base font-bold text-gray-900">
+                                      {header}
+                                    </th>
+                                  ))}
+                                </tr>
+                              </thead>
+                              <tbody className="bg-white">
+                                {question.tableData.rows.map((row, rowIndex) => (
+                                  <tr key={rowIndex}>
+                                    {row.map((cell, cellIndex) => {
+                                      const isRowHeader = question.tableData?.rowHeaders && cellIndex === 0;
+                                      return (
+                                        <td 
+                                          key={cellIndex} 
+                                          className={`border border-black px-4 py-3 text-center text-base ${isRowHeader ? 'font-bold' : ''}`}
+                                        >
+                                          {cell}
+                                        </td>
+                                      );
+                                    })}
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                            </div>
+                          </div>
+                        </div>
+                      )}
 
-                  {/* Answer Options */}
-                  <div className="p-4 space-y-2">
-                    {question.options.map((option, idx) => {
-                      const letter = String.fromCharCode(65 + idx);
-                      const isSelected = selectedAnswer === letter;
-                      const isCorrectAnswer = question.correctAnswer === letter;
-                      
-                      return (
-                        <div
-                          key={idx}
-                          className={`p-3 rounded-lg border ${
-                            isCorrectAnswer ? 'bg-green-50 border-green-300' :
-                            (isSelected && !isCorrectAnswer) ? 'bg-red-50 border-red-300' :
-                            'bg-white border-gray-200'
-                          }`}
-                        >
-                          <div className="flex items-center justify-between gap-3">
-                            <div className="flex items-start gap-2 w-[85%]">
+                      {/* Add image display */}
+                      {question.image && (
+                        <div className="my-4">
+                          <img 
+                            src={question.image.src}
+                            alt="Question"
+                            className="max-h-[300px] object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
+                            onClick={() => {
+                              setSelectedImage(question.image as StaticImageData);
+                              setShowImageModal(true);
+                            }}
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Answer Options */}
+                    <div className="p-4 space-y-2">
+                    {question.optionTableHeaders ? (
+                      <div className="overflow-x-auto">
+                        <table className="w-full border-collapse">
+                          <thead>
+                            <tr>
+                              <th className="w-12 p-2"></th>
+                              {question.optionTableHeaders.map((header, idx) => (
+                                <th key={idx} className="px-4 py-3 text-center font-semibold text-sm text-gray-700 border-b-2 border-gray-300">
+                                  {header}
+                                </th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {question.options.map((option, idx) => {
+                              const letter = String.fromCharCode(65 + idx);
+                              const isSelected = selectedAnswer === letter;
+                              const isCorrectAnswer = question.correctAnswer === letter;
+                              const optionValues = option.split(' | ');
+                              
+                              return (
+                                <tr
+                                  key={idx}
+                                  className={`cursor-pointer transition-all duration-200 ${
+                                    isCorrectAnswer ? 'bg-green-50 hover:bg-green-100' :
+                                    (isSelected && !isCorrectAnswer) ? 'bg-red-50 hover:bg-red-100' :
+                                    'bg-white hover:bg-gray-50'
+                                  }`}
+                                >
+                                  <td className="p-3">
+                                    <div className={`w-8 h-8 flex items-center justify-center rounded-lg border-2 font-semibold text-sm ${
+                                      isCorrectAnswer ? 'bg-green-600 border-green-600 text-white' :
+                                      (isSelected && !isCorrectAnswer) ? 'bg-red-600 border-red-600 text-white' :
+                                      'bg-white border-gray-300 text-gray-600'
+                                    }`}>
+                                      {letter}
+                                    </div>
+                                  </td>
+                                  {optionValues.map((value, valIdx) => (
+                                    <td key={valIdx} className={`px-4 py-3 text-center text-sm border-b border-gray-200 ${
+                                      isCorrectAnswer ? 'text-green-900' :
+                                      (isSelected && !isCorrectAnswer) ? 'text-red-900' :
+                                      'text-gray-700'
+                                    }`}>
+                                      {value.trim()}
+                                    </td>
+                                  ))}
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      question.options.map((option, idx) => {
+                        const letter = String.fromCharCode(65 + idx);
+                        const isSelected = selectedAnswer === letter;
+                        const isCorrectAnswer = question.correctAnswer === letter;
+                        
+                        return (
+                          <div
+                            key={idx}
+                            className={`p-3 rounded-lg border ${
+                              isCorrectAnswer ? 'bg-green-50 border-green-300' :
+                              (isSelected && !isCorrectAnswer) ? 'bg-red-50 border-red-300' :
+                              'bg-white border-gray-200'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between gap-3">
+                              <div className="flex items-start gap-2 w-[85%]">
                               <span className="text-gray-700 mt-0.5">
                                 {letter.toLowerCase()})
                               </span>
@@ -1014,34 +1327,71 @@ export function FullExam({ questionBank, examType, questionType, examNumber }: F
                           </div>
                         </div>
                       );
-                    })}
-                  </div>
-
-                  {/* Explanation */}
-                  <div className="p-4 border-t border-gray-100">
-                    <Button
-                      onClick={() => toggleExplanation(question.id)}
-                      variant="outline"
-                      className="w-full justify-between"
-                    >
-                      {showExplanations[question.id] ? 'Hide' : 'Show'} Explanation
-                      <span className="text-gray-400">
-                        {showExplanations[question.id] ? '−' : '+'}
-                      </span>
-                    </Button>
-                    
-                    {showExplanations[question.id] && (
-                      <div className="mt-4 p-4 bg-blue-50 rounded-lg text-blue-800">
-                        {question.explanation}
-                      </div>
+                      })
                     )}
+                    </div>
+
+                    {/* Explanation */}
+                    <div className="p-4 border-t border-gray-100">
+                      <Button
+                        onClick={() => toggleExplanation(question.id)}
+                        variant="outline"
+                        className="w-full justify-between"
+                      >
+                        {showExplanations[question.id] ? 'Hide' : 'Show'} Explanation
+                        <span className="text-gray-400">
+                          {showExplanations[question.id] ? '−' : '+'}
+                        </span>
+                      </Button>
+                      
+                      {showExplanations[question.id] && (
+                        <div className="mt-4 p-4 bg-blue-50 rounded-lg text-blue-800">
+                          {question.explanation}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                  );
+                })}
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* Bookmark Confirmation Modal */}
+      {showBookmarkConfirmModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-lg max-w-md w-full p-6 border border-gray-200">
+            <div className="flex items-center gap-3 mb-4">
+              <Bookmark className="w-6 h-6 text-yellow-500" />
+              <h3 className="text-xl font-semibold text-gray-900">
+                Bookmarked Questions
+              </h3>
+            </div>
+            <p className="text-gray-700 mb-6">
+              You have <span className="font-semibold text-gray-900">{bookmarkedQuestions.size}</span> question{bookmarkedQuestions.size !== 1 ? 's' : ''} bookmarked for review.
+            </p>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to submit the exam anyway?
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setShowBookmarkConfirmModal(false)}
+                className="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors duration-200"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmSubmit}
+                className="px-6 py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors duration-200"
+              >
+                Submit Anyway
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 } 

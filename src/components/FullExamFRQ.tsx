@@ -22,10 +22,21 @@ interface Part {
   subparts?: SubPart[];
 }
 
+interface TableData {
+  headers: string[];
+  rows: (string | number)[][];
+  rowHeaders?: boolean;
+  playerNames?: {
+    row: string;
+    column: string;
+  };
+}
+
 interface Question {
   questionNumber: number;
   prompt: string;
   image?: StaticImageData;
+  tableData?: TableData;
   parts: Part[];
 }
 
@@ -115,6 +126,58 @@ export function FullExamFRQ({ questions }: FullExamFRQProps) {
                   alt="Question"
                   className="max-h-[300px] object-contain rounded-lg"
                 />
+              </div>
+            )}
+
+            {/* Table Data */}
+            {currentQuestion.tableData && (
+              <div className="my-8 flex justify-center">
+                <div className="flex items-center gap-4">
+                  {currentQuestion.tableData.playerNames && (
+                    <div className="flex items-center justify-center h-full w-16">
+                      <p className="transform -rotate-90 whitespace-nowrap text-center font-bold text-lg text-gray-900 leading-tight">
+                        {currentQuestion.tableData.playerNames.row.split(' ')[0]}
+                        <br />
+                        {currentQuestion.tableData.playerNames.row.split(' ').slice(1).join(' ')}
+                      </p>
+                    </div>
+                  )}
+                  <div className="flex-1">
+                    {currentQuestion.tableData.playerNames && (
+                      <p className="text-center font-bold text-lg text-gray-900 mb-2">
+                        {currentQuestion.tableData.playerNames.column}
+                      </p>
+                    )}
+                    <table className="min-w-full border-collapse border border-black">
+                      <thead className="bg-white">
+                        <tr>
+                          {currentQuestion.tableData.headers.map(header => (
+                            <th key={header} className="border border-black px-4 py-3 text-center text-base font-bold text-gray-900">
+                              {header}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white">
+                        {currentQuestion.tableData.rows.map((row, rowIndex) => (
+                          <tr key={rowIndex}>
+                            {row.map((cell, cellIndex) => {
+                              const isRowHeader = currentQuestion.tableData?.rowHeaders && cellIndex === 0;
+                              return (
+                                <td 
+                                  key={cellIndex} 
+                                  className={`border border-black px-4 py-3 text-center text-base ${isRowHeader ? 'font-bold' : ''}`}
+                                >
+                                  {cell}
+                                </td>
+                              );
+                            })}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
               </div>
             )}
           </div>
@@ -356,6 +419,58 @@ export function FullExamFRQ({ questions }: FullExamFRQProps) {
                       }
                     }}
                   />
+                </div>
+              )}
+
+              {/* Table Data */}
+              {currentQuestion.tableData && (
+                <div className="my-8 flex justify-center">
+                  <div className="flex items-center gap-4">
+                    {currentQuestion.tableData.playerNames && (
+                      <div className="flex items-center justify-center h-full w-16">
+                        <p className="transform -rotate-90 whitespace-nowrap text-center font-bold text-lg text-gray-900 leading-tight">
+                          {currentQuestion.tableData.playerNames.row.split(' ')[0]}
+                          <br />
+                          {currentQuestion.tableData.playerNames.row.split(' ').slice(1).join(' ')}
+                        </p>
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      {currentQuestion.tableData.playerNames && (
+                        <p className="text-center font-bold text-lg text-gray-900 mb-2">
+                          {currentQuestion.tableData.playerNames.column}
+                        </p>
+                      )}
+                      <table className="min-w-full border-collapse border border-black">
+                        <thead className="bg-white">
+                          <tr>
+                            {currentQuestion.tableData.headers.map(header => (
+                              <th key={header} className="border border-black px-4 py-3 text-center text-base font-bold text-gray-900">
+                                {header}
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white">
+                          {currentQuestion.tableData.rows.map((row, rowIndex) => (
+                            <tr key={rowIndex}>
+                              {row.map((cell, cellIndex) => {
+                                const isRowHeader = currentQuestion.tableData?.rowHeaders && cellIndex === 0;
+                                return (
+                                  <td 
+                                    key={cellIndex} 
+                                    className={`border border-black px-4 py-3 text-center text-base ${isRowHeader ? 'font-bold' : ''}`}
+                                  >
+                                    {cell}
+                                  </td>
+                                );
+                              })}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
