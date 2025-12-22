@@ -12,21 +12,9 @@ export default function DojoDrillsPage() {
   const drills = Object.values(dojoDrills);
   const currentDrill = selectedDrillId ? dojoDrills[selectedDrillId] : null;
 
-  // Disable scroll when viewing a drill
-  useEffect(() => {
-    if (currentDrill) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [currentDrill]);
-
   if (currentDrill) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12 px-4 overflow-hidden">
+      <div className="min-h-screen bg-gray-50 py-12 px-4">
         <div className="max-w-7xl mx-auto relative">
           <button
             onClick={() => setSelectedDrillId(null)}

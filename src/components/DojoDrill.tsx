@@ -9,6 +9,8 @@ import { CompAdvantageDrill, CompAdvantageProblem } from "./CompAdvantageDrill";
 import { GDPDrill } from "./GDPDrill";
 import { PPCDrill } from "./PPCDrill";
 import { DemandChangeDrill, DemandChangeScenario } from "./DemandChangeDrill";
+import { ElasticityRevenueDrill, ElasticityScenario } from "./ElasticityRevenueDrill";
+import { ConsumerProducerSurplusDrill } from "./ConsumerProducerSurplusDrill";
 import { allQuestions } from "@/data/unitPracticeProblems/unitPracticeProblems";
 import { Question } from "@/data/questionBanks/types";
 import { CheckCircle2, ArrowRight, Trophy, Check, Lightbulb } from "lucide-react";
@@ -203,6 +205,8 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
     drill.stage2.type === "table" ? tableCompleted : 
     drill.stage2.type === "monopoly" ? monopolyCompleted :
     drill.stage2.type === "demand-change" ? graphCompleted :
+    drill.stage2.type === "elasticity-revenue" ? graphCompleted :
+    drill.stage2.type === "consumer-producer-surplus" ? graphCompleted :
     false;
 
   const handleMcqAnswer = (questionId: number, answer: string) => {
@@ -265,6 +269,14 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
           return <DemandChangeDrill problem={demandChangeData} onComplete={handleGraphComplete} />;
         }
         return null;
+      case 'elasticity-revenue':
+        const elasticityData = drill.stage2.config as ElasticityScenario;
+        if (elasticityData) {
+          return <ElasticityRevenueDrill problem={elasticityData} onComplete={handleGraphComplete} />;
+        }
+        return null;
+      case 'consumer-producer-surplus':
+        return <ConsumerProducerSurplusDrill onComplete={handleGraphComplete} />;
       default:
         return null;
     }
@@ -294,7 +306,7 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
       </div>
 
       {/* Card Container */}
-      <div className="relative h-[600px]">
+      <div className="relative min-h-[600px]">
         <AnimatePresence mode="wait">
           {/* Step 1: Video + Comprehension Check Sidebar */}
           {step === 1 && (
@@ -304,7 +316,7 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -100, opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="absolute inset-0 bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-4 flex gap-4 h-full"
+              className="absolute inset-0 bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-4 flex gap-4 min-h-[600px]"
             >
               {/* Video Section - Left */}
               <div className="flex-1 flex items-center justify-center">
@@ -415,9 +427,9 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -100, opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="absolute inset-0 bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8 flex flex-col"
+              className="absolute inset-0 bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8 flex flex-col min-h-[600px] overflow-hidden"
             >
-              <div className="flex-1 flex items-center justify-center overflow-hidden px-12">
+              <div className="flex-1 flex items-center justify-center px-12 py-8 overflow-hidden">
                 {getActivityComponent()}
               </div>
             </motion.div>

@@ -129,6 +129,20 @@ export function Header() {
                 Dojo Drills
               </Link>
 
+              <Link
+                href="/student-dashboard"
+                className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
+              >
+                Dashboard
+              </Link>
+
+              <Link
+                href="/tutor/builder"
+                className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
+              >
+                Assignment Builder
+              </Link>
+
               {/* Test Link - Micro Exam */}
               <Link
                 href="/preview/micro/mcq/1"
@@ -326,6 +340,22 @@ export function Header() {
                   className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
                 >
                   Dojo Drills
+                </Link>
+
+                <Link
+                  href="/student-dashboard"
+                  onClick={closeMobileMenu}
+                  className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
+                >
+                  Dashboard
+                </Link>
+
+                <Link
+                  href="/tutor/builder"
+                  onClick={closeMobileMenu}
+                  className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
+                >
+                  Assignment Builder
                 </Link>
 
                 {/* Test Link - Micro Exam */}

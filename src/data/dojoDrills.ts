@@ -1,4 +1,4 @@
-export type InteractiveActivityType = 'graph' | 'table' | 'monopoly' | 'comparative-advantage' | 'ppc-drill' | 'demand-change';
+export type InteractiveActivityType = 'graph' | 'table' | 'monopoly' | 'comparative-advantage' | 'ppc-drill' | 'demand-change' | 'elasticity-revenue' | 'consumer-producer-surplus';
 
 export interface ComprehensionQuestion {
   id: string;
@@ -472,6 +472,59 @@ export const dojoDrills: Record<string, DojoDrill> = {
     },
     stage3: {
       mcqIds: [2, 3, 4] // MCQs from ap macro unit 1, lesson 1.2
+    },
+    xpReward: {
+      completion: 20,
+      perMcqCorrect: 10,
+      total: 50
+    }
+  },
+  'elasticity-and-revenue': {
+    id: 'elasticity-and-revenue',
+    title: 'Elasticity and Revenue',
+    description: 'Master the relationship between price elasticity of demand and total revenue by drawing demand curves.',
+    videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_1.6.mp4',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIds: [],
+    stage1: {
+      videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_1.6.mp4',
+      comprehensionQuestions: createComprehensionQuestions()
+    },
+    stage2: {
+      type: 'elasticity-revenue',
+      config: {
+        scenario: 'A gas station increases the price of gasoline. Despite the price increase, drivers continue to purchase roughly the same amount because they have no close substitutes and need gasoline for their daily commute.',
+        correctAnswer: 'inelastic'
+      }
+    },
+    stage3: {
+      mcqIds: [84, 2064, 2072] // Elasticity and total revenue test questions
+    },
+    xpReward: {
+      completion: 20,
+      perMcqCorrect: 10,
+      total: 50
+    }
+  },
+  'consumer-producer-surplus': {
+    id: 'consumer-producer-surplus',
+    title: 'Consumer Surplus and Producer Surplus',
+    description: 'Identify Consumer Surplus and Producer Surplus areas on a supply and demand graph.',
+    videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_1.6.mp4',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIds: [],
+    stage1: {
+      videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_1.6.mp4',
+      comprehensionQuestions: createComprehensionQuestions()
+    },
+    stage2: {
+      type: 'consumer-producer-surplus',
+      config: {}
+    },
+    stage3: {
+      mcqIds: [84, 2064, 2072] // Elasticity and total revenue test questions
     },
     xpReward: {
       completion: 20,
