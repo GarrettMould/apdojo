@@ -4,10 +4,13 @@ import { useState, useMemo } from 'react';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question } from '@/data/questionBanks/types';
 import { Copy, CheckCircle2, Search, Filter } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { useAuthContext } from '@/contexts/AuthContext';
+import { db } from '@/lib/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 export default function TutorBuilderPage() {
+  const { user } = useAuthContext();
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [searchTerm, setSearchTerm] = useState('');
   const [unitFilter, setUnitFilter] = useState<number | null>(null);
@@ -53,13 +56,32 @@ export default function TutorBuilderPage() {
   };
 
 
-  const generateLink = () => {
+  const generateLink = async () => {
     if (selectedIds.size === 0) return;
     
     const idsArray = Array.from(selectedIds).sort((a, b) => a - b);
     const idsString = idsArray.join(',');
     const encoded = btoa(idsString);
     const url = `${window.location.origin}/exam/custom?q=${encoded}`;
+    
+    // Save to Firebase if user is logged in
+    if (user) {
+      try {
+        await addDoc(collection(db, 'assignmentLinks'), {
+          tutorId: user.uid,
+          tutorEmail: user.email,
+          questionIds: idsArray,
+          encodedParam: encoded,
+          url: url,
+          subject: subjectFilter,
+          createdAt: serverTimestamp(),
+          totalQuestions: idsArray.length
+        });
+      } catch (error) {
+        console.error('Error saving assignment link to Firebase:', error);
+        // Continue even if Firebase save fails
+      }
+    }
     
     // Copy to clipboard
     navigator.clipboard.writeText(url).then(() => {
@@ -229,13 +251,15 @@ export default function TutorBuilderPage() {
               className={`px-6 py-3 font-black text-white rounded-lg border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all ${
                 selectedIds.size === 0
                   ? 'bg-gray-400 cursor-not-allowed'
+                  : linkCopied
+                  ? 'bg-green-600 hover:bg-green-700 active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
                   : 'bg-blue-600 hover:bg-blue-700 active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
               }`}
             >
               {linkCopied ? (
                 <span className="flex items-center gap-2">
                   <CheckCircle2 className="w-5 h-5" />
-                  Link Copied!
+                  Copied to Clipboard
                 </span>
               ) : (
                 <span className="flex items-center gap-2">
@@ -248,22 +272,6 @@ export default function TutorBuilderPage() {
         </div>
       </div>
 
-      {/* Toast Notification */}
-      <AnimatePresence>
-        {linkCopied && (
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 50 }}
-            className="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-lg border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-50"
-          >
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-5 h-5" />
-              <span className="font-black">Link Copied to Clipboard!</span>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

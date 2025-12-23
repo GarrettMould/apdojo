@@ -15,9 +15,12 @@ import { createPortal } from 'react-dom';
 import { HighlightableText } from './HighlightableText';
 import { MCQSidecar } from './MCQSidecar';
 import { DojoReadinessBand } from './DojoReadinessBand';
-import { getDojoName } from '@/lib/dojoNames';
 import { Scroll } from 'lucide-react';
 import { QuestionWithKeyTerms } from './QuestionWithKeyTerms';
+import { ExamCalculator } from './ExamCalculator';
+import { ExamWhiteboard } from './ExamWhiteboard';
+import { db } from '@/lib/firebase';
+import { collection, addDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 
 interface FullExamProps {
   questionBank: QuestionBank;
@@ -26,6 +29,7 @@ interface FullExamProps {
   examNumber: string;
   onTimeUpdate?: (timeRemaining: number) => void;
   isCustomAssignment?: boolean;
+  assignmentLinkId?: string; // Encoded parameter for custom assignments
 }
 
 interface Answers {
@@ -87,7 +91,7 @@ const FeedbackProgressBar = ({ status }: { status: 'incorrect' | 'partial' | 'co
   );
 };
 
-export function FullExam({ questionBank, examType, questionType, examNumber, onTimeUpdate, isCustomAssignment = false }: FullExamProps) {
+export function FullExam({ questionBank, examType, questionType, examNumber, onTimeUpdate, isCustomAssignment = false, assignmentLinkId }: FullExamProps) {
   const [answers, setAnswers] = useState<Answers>({});
   const [showResults, setShowResults] = useState(false);
   const [showFullResults, setShowFullResults] = useState(false);
@@ -105,10 +109,8 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   // Generate Dojo name for custom assignments only
   const customTitle = useMemo(() => {
     if (!isCustomAssignment) return null;
-    // Create a seed from the question IDs to ensure the name persists on refresh
-    const seed = questions.map(q => q.id).join('');
-    return getDojoName(seed);
-  }, [isCustomAssignment, questions]);
+    return 'Dojo Challenge';
+  }, [isCustomAssignment]);
 
   // Add calculator states
   const [showCalculator, setShowCalculator] = useState(false);
@@ -321,18 +323,76 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
     });
   };
 
-  const handleSubmitClick = () => {
+  const handleSubmitClick = async () => {
     if (bookmarkedQuestions.size > 0) {
       setShowBookmarkConfirmModal(true);
     } else {
       setShowResults(true);
+      // Save results to Firebase if this is a custom assignment
+      if (isCustomAssignment) {
+        await saveAssignmentResults();
+      }
     }
   };
 
-  const handleConfirmSubmit = () => {
+  const handleConfirmSubmit = async () => {
     setShowBookmarkConfirmModal(false);
     setShowResults(true);
     setShowFullResults(false); // Show feedback first, not full results
+    
+    // Save results to Firebase if this is a custom assignment
+    if (isCustomAssignment) {
+      await saveAssignmentResults();
+    }
+  };
+
+  const saveAssignmentResults = async () => {
+    if (!isCustomAssignment || !assignmentLinkId) return;
+    
+    try {
+
+      // Get assignment link document
+      const assignmentLinkDoc = await getDocs(query(collection(db, 'assignmentLinks'), where('encodedParam', '==', assignmentLinkId)));
+      
+      if (assignmentLinkDoc.empty) {
+        console.warn('Assignment link not found in Firebase');
+        return;
+      }
+
+      const linkDoc = assignmentLinkDoc.docs[0];
+      const linkDocId = linkDoc.id;
+
+      // Calculate results
+      const questionResults = questions.map(q => ({
+        questionId: q.id,
+        studentAnswer: answers[q.id] || null,
+        correctAnswer: q.correctAnswer,
+        isCorrect: answers[q.id] === q.correctAnswer,
+        unit: q.unit,
+        unitName: q.unitName
+      }));
+
+      const totalQuestions = questions.length;
+      const correctCount = questionResults.filter(r => r.isCorrect).length;
+      const score = Math.round((correctCount / totalQuestions) * 100);
+
+      // Save results
+      await addDoc(collection(db, 'assignmentResults'), {
+        assignmentLinkId: linkDocId,
+        tutorId: linkDoc.data().tutorId,
+        studentId: user?.uid || null,
+        studentEmail: user?.email || null,
+        questionResults: questionResults,
+        totalQuestions: totalQuestions,
+        correctCount: correctCount,
+        incorrectCount: totalQuestions - correctCount,
+        score: score,
+        answers: answers,
+        submittedAt: serverTimestamp()
+      });
+    } catch (error) {
+      console.error('Error saving assignment results to Firebase:', error);
+    }
   };
 
   const calculateScore = () => {
@@ -600,9 +660,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
 
   // Add effect to reset tools state when component unmounts/remounts
   useEffect(() => {
-    setShowCalculator(false);
-    setShowDrawingPad(false);
-    
+    // Don't reset calculator/drawing pad on mount - let user control it
     return () => {
       setShowCalculator(false);
       setShowDrawingPad(false);
@@ -811,24 +869,17 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
 
       {/* Only show exam content if not showing results, or if showing full results */}
       {(!showResults || showFullResults) && (
-        <div className="flex w-full min-h-screen">
+        <div className={`flex w-full ${isCustomAssignment ? 'min-h-screen justify-center' : ''}`}>
           {/* Question Container (Left Side) */}
           <div 
-            className={`transition-all duration-300 ease-in-out p-8 ${
-              showVideoModal && videoUrl 
-                ? 'w-[55%] max-w-none' 
-                : 'w-full max-w-5xl mx-auto'
+            className={`transition-all duration-300 ease-in-out ${
+              isCustomAssignment 
+                ? 'p-8 max-w-4xl w-full' 
+                : showVideoModal && videoUrl 
+                  ? 'fixed left-0 top-20 w-[55%] p-8' 
+                  : 'fixed left-[50%] top-20 -translate-x-1/2 w-[1200px] p-8'
             }`}
           >
-            {/* Custom Assignment Title and Exit Button */}
-            {isCustomAssignment && customTitle && (
-              <div className="mb-6 border-b-4 border-black pb-4">
-                <div className="flex items-center gap-2 text-blue-600 font-black uppercase tracking-wider">
-                  <Scroll className="w-6 h-6" />
-                  <h1 className="text-3xl">{customTitle}</h1>
-                </div>
-              </div>
-            )}
             {!showResults ? (
               <>
               {/* Progress Bar - Mobile Only */}
@@ -960,9 +1011,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                     )}
 
                     {/* Split-Screen Grid Container */}
-                    <div className={`grid grid-cols-1 ${hasVisualContent ? 'lg:grid-cols-5' : 'lg:grid-cols-1'} gap-8 min-h-[calc(100vh-300px)]`}>
+                    <div className={`grid grid-cols-1 ${hasVisualContent && !isCustomAssignment ? 'lg:grid-cols-5' : 'lg:grid-cols-1'} gap-8`}>
                       {/* Left Column: Question Text & Options */}
-                      <div className={`${hasVisualContent ? 'lg:col-span-3' : 'lg:col-span-5'} overflow-y-auto`}>
+                      <div className={`${hasVisualContent && !isCustomAssignment ? 'lg:col-span-4' : 'lg:col-span-1'}`}>
                         <div id={`question-${question.id}`} className={`bg-white p-6 md:p-8 ${
                           isCustomAssignment 
                             ? 'border-2 border-black rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' 
@@ -972,7 +1023,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                           <div className="space-y-6">
                             {/* Question Text */}
                             <div className="flex items-start gap-3">
-                              <p className="flex-1 text-base md:text-lg font-medium font-serif leading-relaxed text-gray-800">
+                              <p className="flex-1 text-base md:text-lg font-medium font-serif leading-relaxed text-gray-800 max-h-48 overflow-y-auto pr-2">
                                 <QuestionWithKeyTerms 
                                   questionText={question.question} 
                                   unit={question.unit} 
@@ -995,6 +1046,74 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                 </button>
                               )}
                             </div>
+
+                            {/* Visual Content - Show below question text for custom assignments */}
+                            {isCustomAssignment && question.image && (
+                              <div className="bg-white border-2 border-gray-300 rounded-xl shadow-sm p-4 flex justify-center">
+                                <img
+                                  src={question.image.src}
+                                  alt={'alt' in question.image && question.image.alt ? question.image.alt : "Question diagram"}
+                                  className="w-full max-w-3xl h-auto object-contain transition-all rounded-lg border border-slate-200 shadow-sm cursor-pointer hover:opacity-90"
+                                  onClick={() => {
+                                    if (question.image) {
+                                      setSelectedImage(question.image as StaticImageData);
+                                      setShowImageModal(true);
+                                    }
+                                  }}
+                                />
+                              </div>
+                            )}
+
+                            {isCustomAssignment && question.tableData && (
+                              <div className="bg-white border-2 border-gray-300 rounded-xl shadow-sm p-4">
+                                <div className="flex items-center gap-4">
+                                  {question.tableData.playerNames && (
+                                    <div className="flex items-center justify-center h-full w-16">
+                                      <p className="transform -rotate-90 whitespace-nowrap text-center font-bold text-lg text-gray-900 leading-tight">
+                                        {question.tableData.playerNames.row.split(' ')[0]}
+                                        <br />
+                                        {question.tableData.playerNames.row.split(' ').slice(1).join(' ')}
+                                      </p>
+                                    </div>
+                                  )}
+                                  <div className="flex-1">
+                                    {question.tableData.playerNames && (
+                                      <p className="text-center font-bold text-lg text-gray-900 mb-2">
+                                        {question.tableData.playerNames.column}
+                                      </p>
+                                    )}
+                                    <table className="min-w-full border-collapse border border-black">
+                                      <thead className="bg-white">
+                                        <tr>
+                                          {question.tableData.headers.map(header => (
+                                            <th key={header} className="border border-black px-4 py-3 text-center text-base font-bold text-gray-900">
+                                              {header}
+                                            </th>
+                                          ))}
+                                        </tr>
+                                      </thead>
+                                      <tbody className="bg-white">
+                                        {question.tableData.rows.map((row, rowIndex) => (
+                                          <tr key={rowIndex}>
+                                            {row.map((cell, cellIndex) => {
+                                              const isRowHeader = question.tableData?.rowHeaders && cellIndex === 0;
+                                              return (
+                                                <td 
+                                                  key={cellIndex} 
+                                                  className={`border border-black px-4 py-3 text-center text-base ${isRowHeader ? 'font-bold' : ''}`}
+                                                >
+                                                  {cell}
+                                                </td>
+                                              );
+                                            })}
+                                          </tr>
+                                        ))}
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
 
                             {/* Answer Options */}
                             {question.optionTableHeaders ? (
@@ -1022,7 +1141,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                           onClick={() => handleAnswer(question.id, index)}
                                           className={`transition-all duration-200 group ${
                                             isSelected 
-                                              ? 'bg-slate-50 hover:bg-slate-100 cursor-pointer' 
+                                              ? 'bg-blue-100 hover:bg-blue-100 cursor-pointer border-l-4 border-blue-500' 
                                               : isStruckThrough
                                                 ? 'bg-gray-100 cursor-default'
                                                 : 'bg-white hover:bg-slate-50 cursor-pointer'
@@ -1030,7 +1149,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                         >
                                           <td className="p-2">
                                             <div className={`w-8 h-8 flex items-center justify-center rounded-lg border-2 font-semibold text-sm transition-all duration-200 ${
-                                              isSelected ? 'bg-slate-700 border-slate-700 text-white' : isStruckThrough ? 'bg-gray-200 border-gray-300 text-gray-400' : 'bg-white border-slate-300 text-slate-600'
+                                              isSelected ? 'bg-blue-600 border-blue-700 text-white shadow-md' : isStruckThrough ? 'bg-gray-200 border-gray-300 text-gray-400' : 'bg-white border-slate-300 text-slate-600'
                                             }`}>
                                               {String.fromCharCode(65 + index)}
                                             </div>
@@ -1087,8 +1206,8 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                             : 'bg-gray-100 border-gray-300 opacity-60 cursor-pointer'
                                         : isSelected ? 
                                           isCustomAssignment
-                                            ? 'bg-gray-100 border-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]'
-                                            : 'bg-gray-100 border-gray-400 shadow-sm'
+                                            ? 'bg-blue-100 border-2 border-blue-500 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                                            : 'bg-blue-100 border-2 border-blue-500 shadow-md'
                                         : 
                                           isCustomAssignment
                                             ? 'bg-white hover:bg-gray-50 border-black hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
@@ -1099,7 +1218,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                       <span className={`w-6 h-6 flex items-center justify-center rounded-full text-xs font-medium flex-shrink-0 ${
                                         isCustomAssignment ? 'border-2 border-black' : 'border'
                                       } ${
-                                        showResults ? (isCorrect ? 'bg-green-100 border-green-300 text-green-700' : isSelected ? 'bg-red-100 border-red-300 text-red-700' : 'bg-white border-gray-300 text-gray-500') : isSelected ? 'bg-white border-gray-400 text-gray-700' : 'bg-white border-gray-300 text-gray-600'
+                                        showResults ? (isCorrect ? 'bg-green-100 border-green-300 text-green-700' : isSelected ? 'bg-red-100 border-red-300 text-red-700' : 'bg-white border-gray-300 text-gray-500') : isSelected ? 'bg-blue-500 border-blue-600 text-white font-semibold' : 'bg-white border-gray-300 text-gray-600'
                                       }`}> 
                                         {String.fromCharCode(65 + index)}
                                       </span>
@@ -1107,18 +1226,16 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                       <span className={`flex-1 text-sm ${isStruckThrough ? 'line-through text-gray-400' : ''} ${showResults ? 'text-gray-800' : isSelected ? 'text-gray-900' : 'text-gray-900'}`}>{option}</span>
                                       {/* Strikethrough Button - Only show when not submitted */}
                                       {!showResults && (
-                                        <button
+                                        <div
+                                          role="button"
                                           onClick={(e) => { e.stopPropagation(); handleStrikethroughToggle(question.id, index); }}
-                                          className="flex-shrink-0 p-1.5 rounded hover:bg-gray-200 transition-colors flex items-center justify-center"
-                                          title={isStruckThrough ? "Remove strikethrough" : "Strikethrough option"}
+                                          className={`flex-shrink-0 p-2 rounded-lg transition-colors cursor-pointer ${
+                                            isStruckThrough ? 'bg-slate-200 text-slate-600' : 'bg-white hover:bg-slate-100 text-slate-400 hover:text-slate-600'
+                                          }`}
+                                          aria-label={isStruckThrough ? "Remove strikethrough" : "Strikethrough option"}
                                         >
-                                          <span className="relative inline-block text-sm font-bold text-gray-400" style={{ lineHeight: '1' }}>
-                                            <span className="relative inline-block">
-                                              S
-                                              <span className="absolute top-1/2 left-0 right-0 h-[2px] bg-gray-600 transform -translate-y-1/2" style={{ width: '100%' }}></span>
-                                            </span>
-                                          </span>
-                                        </button>
+                                          <Strikethrough className="w-5 h-5" />
+                                        </div>
                                       )}
                                       {/* Feedback Icon */}
                                       {showResults && (
@@ -1182,83 +1299,6 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                         )}
                       </div>
 
-                      {/* Right Column: Visual Content (Image and/or Table) */}
-                      {hasVisualContent && (
-                        <div className="lg:col-span-2">
-                          <div className="sticky top-8 space-y-6">
-                            {/* Table Data */}
-                            {question.tableData && (
-                              <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-4">
-                                <div className="flex items-center gap-4">
-                                  {question.tableData.playerNames && (
-                                    <div className="flex items-center justify-center h-full w-16">
-                                      <p className="transform -rotate-90 whitespace-nowrap text-center font-bold text-lg text-gray-900 leading-tight">
-                                        {question.tableData.playerNames.row.split(' ')[0]}
-                                        <br />
-                                        {question.tableData.playerNames.row.split(' ').slice(1).join(' ')}
-                                      </p>
-                                    </div>
-                                  )}
-                                  <div className="flex-1">
-                                    {question.tableData.playerNames && (
-                                      <p className="text-center font-bold text-lg text-gray-900 mb-2">
-                                        {question.tableData.playerNames.column}
-                                      </p>
-                                    )}
-                                    <table className="min-w-full border-collapse border border-black">
-                                      <thead className="bg-white">
-                                        <tr>
-                                          {question.tableData.headers.map(header => (
-                                            <th key={header} className="border border-black px-4 py-3 text-center text-base font-bold text-gray-900">
-                                              {header}
-                                            </th>
-                                          ))}
-                                        </tr>
-                                      </thead>
-                                      <tbody className="bg-white">
-                                        {question.tableData.rows.map((row, rowIndex) => (
-                                          <tr key={rowIndex}>
-                                            {row.map((cell, cellIndex) => {
-                                              const isRowHeader = question.tableData?.rowHeaders && cellIndex === 0;
-                                              return (
-                                                <td 
-                                                  key={cellIndex} 
-                                                  className={`border border-black px-4 py-3 text-center text-base ${isRowHeader ? 'font-bold' : ''}`}
-                                                >
-                                                  {cell}
-                                                </td>
-                                              );
-                                            })}
-                                          </tr>
-                                        ))}
-                                      </tbody>
-                                    </table>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-
-                            {/* Question Image */}
-                            {question.image && (
-                              <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-4 flex justify-center">
-                                <img
-                                  src={question.image.src}
-                                  alt={'alt' in question.image && question.image.alt ? question.image.alt : "Question diagram"}
-                                  className={`w-full h-auto object-contain transition-all rounded-lg border border-slate-200 shadow-sm cursor-pointer hover:opacity-90 ${
-                                    showVideoModal && videoUrl ? 'max-w-full' : 'max-w-2xl'
-                                  }`}
-                                  onClick={() => {
-                                    if (question.image) {
-                                      setSelectedImage(question.image as StaticImageData);
-                                      setShowImageModal(true);
-                                    }
-                                  }}
-                                />
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      )}
                     </div>
                   </div>
                 );
@@ -1364,7 +1404,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                       )}
 
                       {/* Add image display */}
-                      {question.image && (
+                      {question.image && !isCustomAssignment && (
                         <div className="my-4">
                           <img 
                             src={question.image.src}
@@ -1492,6 +1532,43 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
             )}
           </div>
         </div>
+      )}
+
+      {/* Tool Buttons */}
+      {!showResults && (
+        <div className="fixed bottom-8 right-8 z-40 flex flex-col gap-3">
+          {/* Calculator Toggle Button */}
+          {!showCalculator && (
+            <button
+              onClick={() => setShowCalculator(true)}
+              className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-3 hover:bg-gray-50 transition-all active:scale-95"
+              aria-label="Open calculator"
+            >
+              <Calculator className="w-6 h-6 text-black" />
+            </button>
+          )}
+
+          {/* Whiteboard Toggle Button */}
+          {!showDrawingPad && (
+            <button
+              onClick={() => setShowDrawingPad(true)}
+              className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-3 hover:bg-gray-50 transition-all active:scale-95"
+              aria-label="Open whiteboard"
+            >
+              <Pen className="w-6 h-6 text-black" />
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Exam Calculator */}
+      {showCalculator && !showResults && (
+        <ExamCalculator onClose={() => setShowCalculator(false)} />
+      )}
+
+      {/* Exam Whiteboard */}
+      {showDrawingPad && !showResults && (
+        <ExamWhiteboard onClose={() => setShowDrawingPad(false)} />
       )}
 
       {/* Bookmark Confirmation Modal */}

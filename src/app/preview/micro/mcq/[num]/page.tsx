@@ -42,22 +42,13 @@ export default function MicroMCQPreview({ params }: { params: Promise<{ num: str
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="pt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="w-full">
-            <div className="w-full bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
-              {/* Exam Content */}
-              <div className="p-6">
-                <FullExam 
-                  questionBank={microSetOneQuestions}
-                  examType="micro"
-                  questionType="mcq"
-                  examNumber={num}
-                  onTimeUpdate={setTimeRemaining}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
+        <FullExam 
+          questionBank={microSetOneQuestions}
+          examType="micro"
+          questionType="mcq"
+          examNumber={num}
+          onTimeUpdate={setTimeRemaining}
+        />
       </div>
     </div>
   );

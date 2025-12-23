@@ -508,69 +508,6 @@ function UnitMCQPracticeContent() {
         </div>
         {/* Add padding-top to account for fixed banner below header */}
         <div className={`max-w-7xl mx-auto px-4 py-8 ${showPracticeTestBanner ? 'pt-20' : 'pt-8'}`}>
-          {/* Developer Tool: Test Question by ID */}
-          {isDeveloper && (
-            <div className="mb-6 p-4 bg-yellow-50 border-2 border-yellow-400 rounded-lg">
-              <div className="flex items-center gap-4">
-                <label className="font-bold text-sm text-gray-800">
-                  Test Question ID:
-                </label>
-                <input
-                  type="number"
-                  value={testQuestionId}
-                  onChange={(e) => setTestQuestionId(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && testQuestionId) {
-                      const testId = parseInt(testQuestionId, 10);
-                      const testQuestion = allQuestions.find(q => q.id === testId);
-                      if (testQuestion) {
-                        setQuestionsForPractice([testQuestion]);
-                        setTotalQuestionsInSet(1);
-                        setCurrentQuestionIndex(0);
-                        setAnsweredQuestions({});
-                        setCurrentUnitName(`Testing Question #${testId}`);
-                      } else {
-                        alert(`Question with ID ${testId} not found.`);
-                      }
-                    }
-                  }}
-                  placeholder="Enter question ID"
-                  className="px-3 py-2 border-2 border-black rounded-lg font-mono text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                />
-                <button
-                  onClick={() => {
-                    if (testQuestionId) {
-                      const testId = parseInt(testQuestionId, 10);
-                      const testQuestion = allQuestions.find(q => q.id === testId);
-                      if (testQuestion) {
-                        setQuestionsForPractice([testQuestion]);
-                        setTotalQuestionsInSet(1);
-                        setCurrentQuestionIndex(0);
-                        setAnsweredQuestions({});
-                        setCurrentUnitName(`Testing Question #${testId}`);
-                      } else {
-                        alert(`Question with ID ${testId} not found.`);
-                      }
-                    }
-                  }}
-                  className="px-4 py-2 bg-yellow-500 text-black font-bold text-sm rounded-lg border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-yellow-400 active:translate-y-1 transition-all"
-                >
-                  Load Question
-                </button>
-                {testQuestionId && (
-                  <button
-                    onClick={() => {
-                      setTestQuestionId("");
-                      // This will trigger the useEffect to reload normal questions
-                    }}
-                    className="px-3 py-2 bg-gray-200 text-gray-800 font-semibold text-sm rounded-lg border border-gray-400 hover:bg-gray-300 transition-all"
-                  >
-                    Reset
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
           {isLoadingQuestionSet ? (
             <div className="flex items-center justify-center min-h-[400px]">
               <Loader2 className={`h-12 w-12 animate-spin ${subject === 'macro' ? 'text-blue-500' : 'text-green-500'}`} />

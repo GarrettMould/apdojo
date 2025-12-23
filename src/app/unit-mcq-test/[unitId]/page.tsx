@@ -309,12 +309,12 @@ export default function UnitMCQTestPage() {
   const correctAnswers = Object.values(answeredQuestions).filter(answer => answer.isCorrect).length;
 
     return (
-    <div className="min-h-screen">
-      {/* Main Content */}
-      <div className={`flex-1 mb-16`}>
-        {/* Unified Container */}
-        <div className={`mt-16 ${isSubmitted ? 'max-w-4xl mx-auto px-4 sm:px-6 lg:px-8' : 'flex justify-center'}`}>
-          {isSubmitted ? (
+      <div className="min-h-screen">
+        {/* Main Content */}
+        <div className={`flex-1 mb-16`}>
+          {/* Unified Container */}
+          <div className={`mt-16 ${isSubmitted ? 'max-w-4xl mx-auto px-4 sm:px-6 lg:px-8' : 'flex justify-center'}`}>
+            {isSubmitted ? (
             <div>
               {/* Results Header Container */}
               <div className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden mb-8">
@@ -697,13 +697,10 @@ export default function UnitMCQTestPage() {
                     </button>
                   </div>
                 </div>
-                    </div>
-                                </div>
-                              )}
-                            </div>
-                                </div>
-                              )}
-                            </div>
+              </div>
+            </div>
+          )}
+        </div>
 
         {isModalOpen && selectedVideoQuestion && (
           <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
@@ -725,16 +722,14 @@ export default function UnitMCQTestPage() {
                   ) : (
                     <div className="flex items-center justify-center h-full">
                       <p className="text-white">No video available for this question.</p>
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
             </div>
           </div>
-        </div>
-          </div>
         )}
-
-        {/* Navigation Buttons REMOVED */}
       </div>
     </div>
   );
-} 
+}

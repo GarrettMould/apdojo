@@ -12,8 +12,6 @@ import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 export function Header() {
   const { user, logout, selectedSubject, setSelectedSubject, totalXP, guestXp, isCharacterClosetOpen, setIsCharacterClosetOpen } = useAuthContext();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isCoursesDropdownOpen, setIsCoursesDropdownOpen] = useState(false);
-  const [isTutoringDropdownOpen, setIsTutoringDropdownOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -94,7 +92,6 @@ export function Header() {
               >
                 Full Practice Tests
               </Link>
-              
               <Link
                 href="/select-practice-units"
                 className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
@@ -107,48 +104,11 @@ export function Header() {
               >
                 FRQ Practice
               </Link>
-              
               <Link
                 href="/unit/1"
                 className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
               >
                 Unit Cheat Sheets
-              </Link>
-
-              <Link
-                href="/ap-blog-home"
-                className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
-              >
-                Blog
-              </Link>
-
-              <Link
-                href="/dojo-drills"
-                className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
-              >
-                Dojo Drills
-              </Link>
-
-              <Link
-                href="/student-dashboard"
-                className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
-              >
-                Dashboard
-              </Link>
-
-              <Link
-                href="/tutor/builder"
-                className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
-              >
-                Assignment Builder
-              </Link>
-
-              {/* Test Link - Micro Exam */}
-              <Link
-                href="/preview/micro/mcq/1"
-                className="text-gray-700 hover:text-green-600 transition-colors font-semibold"
-              >
-                Micro Exam
               </Link>
 
               {/* Tutoring Dropdown - HIDDEN */}
@@ -311,61 +271,19 @@ export function Header() {
                 MCQ Practice
               </Link>
               <Link
-                  href={`/unitFRQpracticePage?subject=${selectedSubject}&frqId=${selectedSubject === 'macro' ? 1 : 2}`}
-                  onClick={closeMobileMenu}
-                  className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
-                >
-                  FRQ Practice
-                </Link>
-                
-                <Link
-                  href="/unit/1"
-                  onClick={closeMobileMenu}
-                  className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
-                >
-                  Unit Cheat Sheets
-                </Link>
-
-                <Link
-                  href="/ap-blog-home"
-                  onClick={closeMobileMenu}
-                  className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
-                >
-                  Blog
-                </Link>
-
-                <Link
-                  href="/dojo-drills"
-                  onClick={closeMobileMenu}
-                  className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
-                >
-                  Dojo Drills
-                </Link>
-
-                <Link
-                  href="/student-dashboard"
-                  onClick={closeMobileMenu}
-                  className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
-                >
-                  Dashboard
-                </Link>
-
-                <Link
-                  href="/tutor/builder"
-                  onClick={closeMobileMenu}
-                  className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
-                >
-                  Assignment Builder
-                </Link>
-
-                {/* Test Link - Micro Exam */}
-                <Link
-                  href="/preview/micro/mcq/1"
-                  onClick={closeMobileMenu}
-                  className="px-4 py-2 text-gray-700 hover:text-green-600 hover:bg-gray-50 transition-colors font-semibold"
-                >
-                  Micro Exam
-                </Link>
+                href={`/unitFRQpracticePage?subject=${selectedSubject}&frqId=${selectedSubject === 'macro' ? 1 : 2}`}
+                onClick={closeMobileMenu}
+                className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
+              >
+                FRQ Practice
+              </Link>
+              <Link
+                href="/unit/1"
+                onClick={closeMobileMenu}
+                className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
+              >
+                Unit Cheat Sheets
+              </Link>
 
                 {/* Tutoring Dropdown (Mobile) - HIDDEN */}
                 {/* <div className="px-4 py-2">

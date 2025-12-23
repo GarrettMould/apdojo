@@ -193,10 +193,11 @@ function UnitFRQPracticePageComponent() {
   ).sort((a, b) => (a.unit || 99) - (b.unit || 99) || a.title.localeCompare(b.title)), [relevantExams]);
 
   // Helper function to check if a question is locked
-  // All questions are now unlocked
+  // Only Ample Reserves (id: 1) and Factor Markets (id: 2) are unlocked
   const isQuestionLocked = (questionId: number | undefined): boolean => {
-    // All FRQ questions are unlocked
-    return false;
+    if (questionId === undefined) return true;
+    // Only unlock Ample Reserves (id: 1) and Factor Markets (id: 2)
+    return questionId !== 1 && questionId !== 2;
   };
 
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0);
@@ -209,13 +210,26 @@ function UnitFRQPracticePageComponent() {
       if (!isNaN(frqId)) {
         // Find the question with matching ID
         const questionIndex = allQuestions.findIndex(q => q.id === frqId);
-        if (questionIndex !== -1) {
-          // All questions are unlocked, so auto-select the question
+        if (questionIndex !== -1 && !isQuestionLocked(frqId)) {
+          // Only auto-select if the question is unlocked
           setSelectedQuestionIndex(questionIndex);
         }
       }
     }
   }, [searchParams, allQuestions]);
+
+  // Set initial question to first unlocked one if current is locked
+  useEffect(() => {
+    if (allQuestions.length > 0) {
+      const currentQuestion = allQuestions[selectedQuestionIndex];
+      if (!currentQuestion || isQuestionLocked(currentQuestion.id)) {
+        const firstUnlockedIndex = allQuestions.findIndex(q => q.id === 1 || q.id === 2);
+        if (firstUnlockedIndex !== -1) {
+          setSelectedQuestionIndex(firstUnlockedIndex);
+        }
+      }
+    }
+  }, [allQuestions]);
 
   // Use only real questions from frqQuestions.ts
   const allDisplayQuestions = allQuestions;

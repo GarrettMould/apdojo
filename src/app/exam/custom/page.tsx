@@ -80,7 +80,7 @@ function CustomExamContent() {
 
       // Create QuestionBank
       const bank: QuestionBank = {
-        name: 'Tutor Assignment',
+        name: 'Dojo Challenge',
         questions: filteredQuestions
       };
 
@@ -139,6 +139,9 @@ function CustomExamContent() {
     );
   }
 
+  // Get the encoded parameter to pass to FullExam
+  const encodedParam = searchParams.get('q');
+
   return (
     <FullExam
       questionBank={questionBank}
@@ -146,6 +149,7 @@ function CustomExamContent() {
       questionType="mcq"
       examNumber="custom"
       isCustomAssignment={true}
+      assignmentLinkId={encodedParam || undefined}
     />
   );
 }

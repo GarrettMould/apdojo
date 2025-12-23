@@ -1,8 +1,18 @@
 import type { Metadata } from 'next';
 import { macroUnits, microUnits } from '@/data/cheatSheets';
 
-export async function generateMetadata({ params }: { params: { unitId: string } }): Promise<Metadata> {
-  const unitId = parseInt(params.unitId);
+export async function generateMetadata({ params }: { params: Promise<{ unitId: string }> | { unitId: string } }): Promise<Metadata> {
+  // Handle both Promise and direct params (for Next.js version compatibility)
+  const resolvedParams = params instanceof Promise ? await params : params;
+  const unitId = parseInt(resolvedParams.unitId, 10);
+  
+  // Validate unitId is a valid number
+  if (isNaN(unitId) || unitId < 1 || unitId > 6) {
+    return {
+      title: 'Unit Not Found | AP Dojo',
+      description: 'The requested unit could not be found.',
+    };
+  }
   
   // Try macro first, then micro
   let unit = macroUnits.find(u => u.number === unitId);

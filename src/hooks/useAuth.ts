@@ -52,6 +52,8 @@ export interface UserData {
   viewedMcqIds?: (string | number)[]; 
   // Add purchases field for premium features
   purchases?: string[];
+  // Add purchasedTests field for unit MCQ tests
+  purchasedTests?: string[];
 }
 
 // --- ADD LEVELING LOGIC --- 
