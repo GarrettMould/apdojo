@@ -11,14 +11,18 @@ export default function TutorBuilderPage() {
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [searchTerm, setSearchTerm] = useState('');
   const [unitFilter, setUnitFilter] = useState<number | null>(null);
-  const [subjectFilter, setSubjectFilter] = useState<'ap_macroeconomics' | 'ap_microeconomics' | 'all'>('all');
+  const [subjectFilter, setSubjectFilter] = useState<'ap_macroeconomics' | 'ap_microeconomics'>('ap_macroeconomics');
   const [linkCopied, setLinkCopied] = useState(false);
 
-  // Get unique units and subjects for filters
+  // Get unique units for the selected subject
   const uniqueUnits = useMemo(() => {
-    const units = new Set(allQuestions.map(q => q.unit));
+    const units = new Set(
+      allQuestions
+        .filter(q => q.subject === subjectFilter)
+        .map(q => q.unit)
+    );
     return Array.from(units).sort((a, b) => a - b);
-  }, []);
+  }, [subjectFilter]);
 
   // Filter questions based on search and filters
   const filteredQuestions = useMemo(() => {
@@ -30,7 +34,7 @@ export default function TutorBuilderPage() {
       
       const matchesUnit = unitFilter === null || q.unit === unitFilter;
       
-      const matchesSubject = subjectFilter === 'all' || q.subject === subjectFilter;
+      const matchesSubject = q.subject === subjectFilter;
       
       return matchesSearch && matchesUnit && matchesSubject;
     });
@@ -108,18 +112,37 @@ export default function TutorBuilderPage() {
               </select>
             </div>
 
-            {/* Subject Filter */}
-            <div className="relative">
-              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <select
-                value={subjectFilter}
-                onChange={(e) => setSubjectFilter(e.target.value as typeof subjectFilter)}
-                className="w-full pl-10 pr-4 py-2 border-2 border-black rounded-lg font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
-              >
-                <option value="all">All Subjects</option>
-                <option value="ap_macroeconomics">Macroeconomics</option>
-                <option value="ap_microeconomics">Microeconomics</option>
-              </select>
+            {/* Subject Toggle */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-semibold text-gray-700">Subject:</span>
+              <div className="flex border-2 border-black rounded-lg overflow-hidden">
+                <button
+                  onClick={() => {
+                    setSubjectFilter('ap_macroeconomics');
+                    setUnitFilter(null); // Reset unit filter when switching subjects
+                  }}
+                  className={`px-4 py-2 font-black transition-colors ${
+                    subjectFilter === 'ap_macroeconomics'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-white text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  Macro
+                </button>
+                <button
+                  onClick={() => {
+                    setSubjectFilter('ap_microeconomics');
+                    setUnitFilter(null); // Reset unit filter when switching subjects
+                  }}
+                  className={`px-4 py-2 font-black transition-colors border-l-2 border-black ${
+                    subjectFilter === 'ap_microeconomics'
+                      ? 'bg-green-600 text-white'
+                      : 'bg-white text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  Micro
+                </button>
+              </div>
             </div>
           </div>
         </div>

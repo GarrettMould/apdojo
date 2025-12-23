@@ -46,8 +46,27 @@ function CustomExamContent() {
         return;
       }
 
-      // Filter questions from allQuestions
-      const filteredQuestions = allQuestions.filter(q => ids.includes(q.id));
+      // Create a Map to store questions by ID (ensures uniqueness and fast lookup)
+      const questionsMap = new Map<number, Question>();
+      allQuestions.forEach(q => {
+        if (!questionsMap.has(q.id)) {
+          questionsMap.set(q.id, q);
+        }
+      });
+
+      // Filter questions in the order of IDs from the link, ensuring uniqueness
+      const filteredQuestions: Question[] = [];
+      const foundIds = new Set<number>();
+      
+      for (const id of ids) {
+        if (!foundIds.has(id)) {
+          const question = questionsMap.get(id);
+          if (question) {
+            filteredQuestions.push(question);
+            foundIds.add(id);
+          }
+        }
+      }
 
       if (filteredQuestions.length === 0) {
         setError('No questions found matching the provided IDs.');

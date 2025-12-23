@@ -1255,11 +1255,7 @@ export const microSetOneQuestions: QuestionBank = {
     }
     ];
     
-    // TEMPORARY: Filter to only show specific question IDs
-    // TODO: Remove this filter when done testing
-    const filteredQuestions = allQuestions.filter((q) => [7, 18, 35, 37, 40, 43, 56, 59].includes(q.id));
-    
-    return shuffleWithGroups(filteredQuestions);
+    return shuffleWithGroups(allQuestions);
   })()
 };
 

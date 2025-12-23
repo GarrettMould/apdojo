@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Question, QuestionBank } from '@/data/questionBanks/types';
 import { Button } from "@/components/ui/button";
-import { Bookmark, BookmarkX, X, Clock, Maximize2, Minimize2, Calculator, Pen, Eraser, Expand, Trash2, Circle, CircleDot, Check, Lock, Brain, FileText, ChevronLeft, ChevronRight, ChevronsRight, Triangle, Strikethrough, Eye } from 'lucide-react';
+import { Bookmark, BookmarkX, X, Clock, Maximize2, Minimize2, Calculator, Pen, Eraser, Expand, Trash2, Circle, CircleDot, Check, Lock, Brain, FileText, ChevronLeft, ChevronRight, ChevronsRight, Triangle, Strikethrough, Eye, Play } from 'lucide-react';
 import { StaticImageData } from 'next/image';
 import { redirectToCheckout } from '@/lib/stripe';
 import { useAuthContext } from '@/contexts/AuthContext';
@@ -17,6 +17,7 @@ import { MCQSidecar } from './MCQSidecar';
 import { DojoReadinessBand } from './DojoReadinessBand';
 import { getDojoName } from '@/lib/dojoNames';
 import { Scroll } from 'lucide-react';
+import { QuestionWithKeyTerms } from './QuestionWithKeyTerms';
 
 interface FullExamProps {
   questionBank: QuestionBank;
@@ -770,8 +771,8 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                 key={videoUrl}
                 autoPlay
                 loop
-                muted
                 playsInline
+                controls
                 className="w-full h-full rounded-lg object-contain"
                 src={videoUrl}
                 preload="auto"
@@ -962,125 +963,180 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                     <div className={`grid grid-cols-1 ${hasVisualContent ? 'lg:grid-cols-5' : 'lg:grid-cols-1'} gap-8 min-h-[calc(100vh-300px)]`}>
                       {/* Left Column: Question Text & Options */}
                       <div className={`${hasVisualContent ? 'lg:col-span-3' : 'lg:col-span-5'} overflow-y-auto`}>
-                        <div id={`question-${question.id}`} className="bg-white border border-gray-200 rounded-xl shadow-sm p-8">
-                          {/* Question Text */}
-                          <div className="mb-8">
-                            <HighlightableText
-                              text={question.question}
-                              questionId={question.id}
-                              highlights={textHighlights[question.id] || []}
-                              onHighlight={handleHighlight}
-                            />
-                          </div>
+                        <div id={`question-${question.id}`} className={`bg-white p-6 md:p-8 ${
+                          isCustomAssignment 
+                            ? 'border-2 border-black rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' 
+                            : 'rounded-lg shadow-md border border-gray-200'
+                        }`}>
+                          {/* Main Question Content */}
+                          <div className="space-y-6">
+                            {/* Question Text */}
+                            <div className="flex items-start gap-3">
+                              <p className="flex-1 text-base md:text-lg font-medium font-serif leading-relaxed text-gray-800">
+                                <QuestionWithKeyTerms 
+                                  questionText={question.question} 
+                                  unit={question.unit} 
+                                  subject={examType === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics'}
+                                />
+                              </p>
+                              {/* Video Explanation Icon */}
+                              {question.videoExplanation && typeof question.videoExplanation === 'string' && question.videoExplanation.trim() !== '' && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setVideoUrl(question.videoExplanation!);
+                                    setShowVideoModal(true);
+                                  }}
+                                  className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 hover:text-blue-700 transition-colors"
+                                  aria-label="View video explanation"
+                                  title="Watch video explanation"
+                                >
+                                  <Play className="w-4 h-4 ml-0.5" />
+                                </button>
+                              )}
+                            </div>
 
-                          {/* Answer Options */}
-                          {question.optionTableHeaders ? (
-                            <div className="overflow-x-auto">
-                              <table className="w-full border-collapse">
-                                <thead>
-                                  <tr>
-                                    <th className="w-12 p-2"></th>
-                                    {question.optionTableHeaders.map((header, idx) => (
-                                      <th key={idx} className="px-3 py-2 text-center font-semibold text-sm text-gray-700 border-b-2 border-gray-300">
-                                        {header}
-                                      </th>
-                                    ))}
-                                    {!showResults && <th className="w-12 p-2"></th>}
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {question.options.map((option, index) => {
-                                    const isSelected = selectedIndex === index;
-                                    const isStruckThrough = strikethroughState[question.id]?.includes(index);
-                                    const optionValues = option.split(' | ');
-                                    return (
-                                      <tr
-                                        key={index}
-                                        onClick={() => handleAnswer(question.id, index)}
-                                        className={`transition-all duration-200 group ${
-                                          isSelected 
-                                            ? 'bg-slate-50 hover:bg-slate-100 cursor-pointer' 
-                                            : isStruckThrough
-                                              ? 'bg-gray-100 cursor-default'
-                                              : 'bg-white hover:bg-slate-50 cursor-pointer'
-                                        }`}
-                                      >
-                                        <td className="p-2">
-                                          <div className={`w-8 h-8 flex items-center justify-center rounded-lg border-2 font-semibold text-sm transition-all duration-200 ${
-                                            isSelected ? 'bg-slate-700 border-slate-700 text-white' : isStruckThrough ? 'bg-gray-200 border-gray-300 text-gray-400' : 'bg-white border-slate-300 text-slate-600'
-                                          }`}>
-                                            {String.fromCharCode(65 + index)}
-                                          </div>
-                                        </td>
-                                        {optionValues.map((value, valIdx) => (
-                                          <td key={valIdx} className={`px-3 py-2 text-center text-sm border-b border-gray-200 ${isSelected ? 'text-slate-900' : isStruckThrough ? 'text-gray-500 line-through' : 'text-slate-700'}`}>
-                                            {value.trim()}
-                                          </td>
-                                        ))}
-                                        {!showResults && (
+                            {/* Answer Options */}
+                            {question.optionTableHeaders ? (
+                              <div className="overflow-x-auto">
+                                <table className="w-full border-collapse">
+                                  <thead>
+                                    <tr>
+                                      <th className="w-12 p-2"></th>
+                                      {question.optionTableHeaders.map((header, idx) => (
+                                        <th key={idx} className="px-3 py-2 text-center font-semibold text-sm text-gray-700 border-b-2 border-gray-300">
+                                          {header}
+                                        </th>
+                                      ))}
+                                      {!showResults && <th className="w-12 p-2"></th>}
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {question.options.map((option, index) => {
+                                      const isSelected = selectedIndex === index;
+                                      const isStruckThrough = strikethroughState[question.id]?.includes(index);
+                                      const optionValues = option.split(' | ');
+                                      return (
+                                        <tr
+                                          key={index}
+                                          onClick={() => handleAnswer(question.id, index)}
+                                          className={`transition-all duration-200 group ${
+                                            isSelected 
+                                              ? 'bg-slate-50 hover:bg-slate-100 cursor-pointer' 
+                                              : isStruckThrough
+                                                ? 'bg-gray-100 cursor-default'
+                                                : 'bg-white hover:bg-slate-50 cursor-pointer'
+                                          }`}
+                                        >
                                           <td className="p-2">
-                                            <div
-                                              role="button"
-                                              onClick={(e) => { e.stopPropagation(); handleStrikethroughToggle(question.id, index); }}
-                                              className={`p-2 rounded-lg transition-colors cursor-pointer ${
-                                                isStruckThrough ? 'bg-slate-200 text-slate-600' : 'bg-white hover:bg-slate-100 text-slate-400 hover:text-slate-600'
-                                              }`}
-                                              aria-label={isStruckThrough ? "Remove strikethrough" : "Strikethrough option"}
-                                            >
-                                              <Strikethrough className="w-5 h-5" />
+                                            <div className={`w-8 h-8 flex items-center justify-center rounded-lg border-2 font-semibold text-sm transition-all duration-200 ${
+                                              isSelected ? 'bg-slate-700 border-slate-700 text-white' : isStruckThrough ? 'bg-gray-200 border-gray-300 text-gray-400' : 'bg-white border-slate-300 text-slate-600'
+                                            }`}>
+                                              {String.fromCharCode(65 + index)}
                                             </div>
                                           </td>
-                                        )}
-                                      </tr>
-                                    );
-                                  })}
-                                </tbody>
-                              </table>
-                            </div>
-                          ) : (
-                            <div className="space-y-4">
-                              {question.options.map((option, index) => {
-                                const isSelected = selectedIndex === index;
-                                const isStruckThrough = strikethroughState[question.id]?.includes(index);
-                                return (
-                                  <div
-                                    key={index}
-                                    onClick={() => handleAnswer(question.id, index)}
-                                    className={`w-full text-left p-2.5 rounded-lg border-2 transition-all duration-200 flex items-center gap-3 group ${
-                                      isSelected 
-                                        ? 'bg-slate-50 text-slate-900 shadow-md border-slate-300 ring-2 ring-slate-100 cursor-pointer' 
-                                        : isStruckThrough
-                                          ? 'bg-gray-100 text-gray-500 border-gray-200 cursor-default'
-                                          : 'bg-white hover:bg-slate-50 border-slate-200 hover:border-slate-300 hover:shadow-md cursor-pointer'
-                                    }`}
-                                  >
-                                    <div className={`flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg border-2 font-semibold text-sm transition-all duration-200 ${
-                                      isSelected ? 'bg-slate-700 border-slate-700 text-white' : isStruckThrough ? 'bg-gray-200 border-gray-300 text-gray-400' : 'bg-white border-slate-300 text-slate-600 group-hover:border-slate-400'
-                                    }`}>
-                                      {String.fromCharCode(65 + index)}
-                                    </div>
-                                    <div className="flex-1">
-                                      <span className={`text-sm ${isSelected ? 'text-slate-900' : 'text-slate-700'} ${isStruckThrough ? 'line-through' : ''}`}>
-                                        {option}
+                                          {optionValues.map((value, valIdx) => (
+                                            <td key={valIdx} className={`px-3 py-2 text-center text-sm border-b border-gray-200 ${isSelected ? 'text-slate-900' : isStruckThrough ? 'text-gray-500 line-through' : 'text-slate-700'}`}>
+                                              {value.trim()}
+                                            </td>
+                                          ))}
+                                          {!showResults && (
+                                            <td className="p-2">
+                                              <div
+                                                role="button"
+                                                onClick={(e) => { e.stopPropagation(); handleStrikethroughToggle(question.id, index); }}
+                                                className={`p-2 rounded-lg transition-colors cursor-pointer ${
+                                                  isStruckThrough ? 'bg-slate-200 text-slate-600' : 'bg-white hover:bg-slate-100 text-slate-400 hover:text-slate-600'
+                                                }`}
+                                                aria-label={isStruckThrough ? "Remove strikethrough" : "Strikethrough option"}
+                                              >
+                                                <Strikethrough className="w-5 h-5" />
+                                              </div>
+                                            </td>
+                                          )}
+                                        </tr>
+                                      );
+                                    })}
+                                  </tbody>
+                                </table>
+                              </div>
+                            ) : (
+                              <div className="space-y-3">
+                                {question.options.map((option, index) => {
+                                  const isSelected = selectedIndex !== null && selectedIndex === index;
+                                  const isStruckThrough = strikethroughState[question.id]?.includes(index);
+                                  const correctAnswerIndex = question.correctAnswer ? question.correctAnswer.charCodeAt(0) - 65 : -1;
+                                  const isCorrect = index === correctAnswerIndex;
+                                  return (
+                                    <button
+                                      key={index}
+                                      onClick={() => handleAnswer(question.id, index)}
+                                      disabled={showResults}
+                                      className={`w-full text-left p-3 text-sm font-medium transition-all duration-150 flex items-center gap-3 ${
+                                        isCustomAssignment 
+                                          ? 'border-2 border-black rounded-lg shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]' 
+                                          : 'rounded-lg border'
+                                      } ${
+                                        showResults ? 
+                                          (isCorrect ? 'bg-green-50 text-gray-900 shadow-sm border-green-200 cursor-default' : 
+                                          isSelected ? 'bg-red-50 text-gray-900 shadow-sm border-red-200 cursor-default' : 
+                                          'bg-transparent text-gray-900 border-gray-200 cursor-default') 
+                                        : isStruckThrough ?
+                                          isCustomAssignment 
+                                            ? 'bg-gray-100 border-black opacity-60 cursor-pointer' 
+                                            : 'bg-gray-100 border-gray-300 opacity-60 cursor-pointer'
+                                        : isSelected ? 
+                                          isCustomAssignment
+                                            ? 'bg-gray-100 border-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]'
+                                            : 'bg-gray-100 border-gray-400 shadow-sm'
+                                        : 
+                                          isCustomAssignment
+                                            ? 'bg-white hover:bg-gray-50 border-black hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                                            : 'bg-transparent hover:bg-gray-50 border-gray-200 hover:border-gray-300 hover:shadow-sm'
+                                      }`}
+                                    >
+                                      {/* Letter bubble */}
+                                      <span className={`w-6 h-6 flex items-center justify-center rounded-full text-xs font-medium flex-shrink-0 ${
+                                        isCustomAssignment ? 'border-2 border-black' : 'border'
+                                      } ${
+                                        showResults ? (isCorrect ? 'bg-green-100 border-green-300 text-green-700' : isSelected ? 'bg-red-100 border-red-300 text-red-700' : 'bg-white border-gray-300 text-gray-500') : isSelected ? 'bg-white border-gray-400 text-gray-700' : 'bg-white border-gray-300 text-gray-600'
+                                      }`}> 
+                                        {String.fromCharCode(65 + index)}
                                       </span>
-                                    </div>
-                                    {!showResults && (
-                                      <div
-                                        role="button"
-                                        onClick={(e) => { e.stopPropagation(); handleStrikethroughToggle(question.id, index); }}
-                                        className={`ml-auto p-2 rounded-lg transition-colors cursor-pointer flex-shrink-0 ${
-                                          isStruckThrough ? 'bg-slate-200 text-slate-600' : 'bg-white hover:bg-slate-100 text-slate-400 hover:text-slate-600'
-                                        }`}
-                                        aria-label={isStruckThrough ? "Remove strikethrough" : "Strikethrough option"}
-                                      >
-                                        <Strikethrough className="w-5 h-5" />
-                                      </div>
-                                    )}
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          )}
+                                      {/* Option Text */}
+                                      <span className={`flex-1 text-sm ${isStruckThrough ? 'line-through text-gray-400' : ''} ${showResults ? 'text-gray-800' : isSelected ? 'text-gray-900' : 'text-gray-900'}`}>{option}</span>
+                                      {/* Strikethrough Button - Only show when not submitted */}
+                                      {!showResults && (
+                                        <button
+                                          onClick={(e) => { e.stopPropagation(); handleStrikethroughToggle(question.id, index); }}
+                                          className="flex-shrink-0 p-1.5 rounded hover:bg-gray-200 transition-colors flex items-center justify-center"
+                                          title={isStruckThrough ? "Remove strikethrough" : "Strikethrough option"}
+                                        >
+                                          <span className="relative inline-block text-sm font-bold text-gray-400" style={{ lineHeight: '1' }}>
+                                            <span className="relative inline-block">
+                                              S
+                                              <span className="absolute top-1/2 left-0 right-0 h-[2px] bg-gray-600 transform -translate-y-1/2" style={{ width: '100%' }}></span>
+                                            </span>
+                                          </span>
+                                        </button>
+                                      )}
+                                      {/* Feedback Icon */}
+                                      {showResults && (
+                                        <div className="flex-shrink-0">
+                                          {isCorrect
+                                            ? <Check className="w-5 h-5 text-green-500" />
+                                            : isSelected
+                                              ? <X className="w-5 h-5 text-red-500" />
+                                              : null
+                                          }
+                                        </div>
+                                      )}
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
                         </div>
 
                         {/* Navigation Controls */}
@@ -1230,7 +1286,30 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                           {isCorrect ? 'Correct' : 'Incorrect'}
                         </span>
                       </div>
-                      <p className="text-lg font-medium font-serif leading-relaxed text-gray-900">{question.question}</p>
+                      <div className="flex items-start gap-3">
+                        <p className="flex-1 text-base md:text-lg font-medium font-serif leading-relaxed text-gray-800">
+                          <QuestionWithKeyTerms 
+                            questionText={question.question} 
+                            unit={question.unit} 
+                            subject={examType === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics'}
+                          />
+                        </p>
+                        {/* Video Explanation Icon */}
+                        {question.videoExplanation && typeof question.videoExplanation === 'string' && question.videoExplanation.trim() !== '' && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setVideoUrl(question.videoExplanation!);
+                              setShowVideoModal(true);
+                            }}
+                            className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 hover:text-blue-700 transition-colors"
+                            aria-label="View video explanation"
+                            title="Watch video explanation"
+                          >
+                            <Play className="w-4 h-4 ml-0.5" />
+                          </button>
+                        )}
+                      </div>
                     
                       {/* Table Data */}
                       {question.tableData && (
@@ -1301,7 +1380,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                     </div>
 
                     {/* Answer Options */}
-                    <div className="p-4 space-y-2">
+                    <div className="p-4 space-y-3">
                     {question.optionTableHeaders ? (
                       <div className="overflow-x-auto">
                         <table className="w-full border-collapse">
@@ -1325,10 +1404,10 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                               return (
                                 <tr
                                   key={idx}
-                                  className={`cursor-pointer transition-all duration-200 ${
-                                    isCorrectAnswer ? 'bg-green-50 hover:bg-green-100' :
-                                    (isSelected && !isCorrectAnswer) ? 'bg-red-50 hover:bg-red-100' :
-                                    'bg-white hover:bg-gray-50'
+                                  className={`cursor-default transition-all duration-200 ${
+                                    isCorrectAnswer ? 'bg-green-50' :
+                                    (isSelected && !isCorrectAnswer) ? 'bg-red-50' :
+                                    'bg-white'
                                   }`}
                                 >
                                   <td className="p-3">
@@ -1364,33 +1443,34 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                         return (
                           <div
                             key={idx}
-                            className={`p-3 rounded-lg border ${
-                              isCorrectAnswer ? 'bg-green-50 border-green-300' :
-                              (isSelected && !isCorrectAnswer) ? 'bg-red-50 border-red-300' :
-                              'bg-white border-gray-200'
+                            className={`w-full text-left p-3 rounded-lg text-sm font-medium border flex items-center gap-3 cursor-default ${
+                              isCorrectAnswer ? 'bg-green-50 text-gray-900 shadow-sm border-green-200' :
+                              (isSelected && !isCorrectAnswer) ? 'bg-red-50 text-gray-900 shadow-sm border-red-200' :
+                              'bg-transparent text-gray-900 border-gray-200'
                             }`}
                           >
-                            <div className="flex items-center justify-between gap-3">
-                              <div className="flex items-start gap-2 w-[85%]">
-                              <span className="text-gray-700 mt-0.5">
-                                {letter.toLowerCase()})
-                              </span>
-                              <span className={isCorrectAnswer ? 'font-medium' : ''}>
-                                {option}
-                              </span>
-                            </div>
+                            {/* Letter bubble */}
+                            <span className={`w-6 h-6 flex items-center justify-center rounded-full border text-xs font-medium flex-shrink-0 ${
+                              isCorrectAnswer ? 'bg-green-100 border-green-300 text-green-700' :
+                              (isSelected && !isCorrectAnswer) ? 'bg-red-100 border-red-300 text-red-700' :
+                              'bg-white border-gray-300 text-gray-500'
+                            }`}>
+                              {letter}
+                            </span>
+                            {/* Option Text */}
+                            <span className="flex-1 text-sm text-gray-800">{option}</span>
+                            {/* Feedback Icon */}
                             {(isCorrectAnswer || (isSelected && !isCorrectAnswer)) && (
                               <div className="flex-shrink-0">
                                 {isCorrectAnswer ? (
-                                  <Check className="w-4 h-4 text-green-600" />
+                                  <Check className="w-5 h-5 text-green-500" />
                                 ) : (
-                                  <X className="w-4 h-4 text-red-600" />
+                                  <X className="w-5 h-5 text-red-500" />
                                 )}
                               </div>
                             )}
                           </div>
-                        </div>
-                      );
+                        );
                       })
                     )}
                     </div>
