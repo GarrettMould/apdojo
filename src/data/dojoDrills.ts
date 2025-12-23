@@ -483,13 +483,50 @@ export const dojoDrills: Record<string, DojoDrill> = {
     id: 'elasticity-and-revenue',
     title: 'Elasticity and Revenue',
     description: 'Master the relationship between price elasticity of demand and total revenue by drawing demand curves.',
-    videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_1.6.mp4',
+    videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_micro_elasticity.mp4',
     subject: 'ap_microeconomics',
     unit: 2,
     lessonIds: [],
     stage1: {
-      videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_1.6.mp4',
-      comprehensionQuestions: createComprehensionQuestions()
+      videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_micro_elasticity.mp4',
+      comprehensionQuestions: [
+        {
+          id: '1',
+          question: 'A firm determines that the demand for its product is price inelastic. Based on the total revenue test, what strategy should the firm pursue if it wants to increase its total revenue?',
+          options: [
+            'Lower the price to attract significantly more customers.',
+            'Raise the price, as the quantity demanded will decrease by a smaller percentage.',
+            'Keep the price the same, as price changes do not affect revenue for inelastic goods.',
+            'Increase the supply of the good to lower production costs.'
+          ],
+          correctAnswer: 1, // B
+          explanation: 'When demand is inelastic (elasticity < 1), consumers are not very responsive to price changes. Therefore, raising the price leads to an increase in total revenue because the percentage increase in price outweighs the relatively small percentage decrease in the quantity of units sold.'
+        },
+        {
+          id: '2',
+          question: 'How does the time horizon available to a consumer affect the price elasticity of demand for a product?',
+          options: [
+            'Demand becomes more elastic as the time horizon increases.',
+            'Demand becomes less elastic as the time horizon increases.',
+            'The time horizon has no impact on elasticity, only the number of substitutes does.',
+            'Demand becomes perfectly inelastic in the long run.'
+          ],
+          correctAnswer: 0, // A
+          explanation: 'The amount of time a consumer has to make a decision is a key determinant of elasticity. When consumers have a longer time horizon (e.g., weeks or months), they can be more selective and find substitutes, making their demand more elastic compared to a situation where they need a good immediately.'
+        },
+        {
+          id: '3',
+          question: 'If a 20% increase in the price of a good leads to a 5% decrease in the quantity demanded, what is the elasticity coefficient and how is the demand classified?',
+          options: [
+            '4.0; Elastic',
+            '0.25; Elastic',
+            '4.0; Inelastic',
+            '0.25; Inelastic'
+          ],
+          correctAnswer: 3, // D
+          explanation: 'Price elasticity of demand is calculated as the absolute value of the percentage change in quantity divided by the percentage change in price ($5\\% / 20\\% = 0.25$). Since the resulting coefficient is less than 1, the demand for the good is classified as inelastic.'
+        }
+      ]
     },
     stage2: {
       type: 'elasticity-revenue',
@@ -511,13 +548,50 @@ export const dojoDrills: Record<string, DojoDrill> = {
     id: 'consumer-producer-surplus',
     title: 'Consumer Surplus and Producer Surplus',
     description: 'Identify Consumer Surplus and Producer Surplus areas on a supply and demand graph.',
-    videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_1.6.mp4',
+    videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_micro_2.6.mp4',
     subject: 'ap_microeconomics',
     unit: 2,
     lessonIds: [],
     stage1: {
-      videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_1.6.mp4',
-      comprehensionQuestions: createComprehensionQuestions()
+      videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_micro_2.6.mp4',
+      comprehensionQuestions: [
+        {
+          id: '1',
+          question: 'Which of the following best defines consumer surplus?',
+          options: [
+            'The difference between the price a producer is willing to accept and the price they actually receive.',
+            'The difference between the maximum price a consumer is willing to pay and the price they actually pay.',
+            'The sum of the quantity supplied and the quantity demanded at the equilibrium price.',
+            'The area below the supply curve and above the equilibrium price.'
+          ],
+          correctAnswer: 1, // B
+          explanation: 'Consumer surplus is defined as the difference between a consumer\'s willingness to pay (the maximum amount they would spend) and the actual market price they end up paying.'
+        },
+        {
+          id: '2',
+          question: 'Graphically, how is total producer surplus represented in a market without government intervention?',
+          options: [
+            'The area above the equilibrium price and below the demand curve.',
+            'The area below the equilibrium price and above the supply curve.',
+            'The total area between the supply and demand curves up to the quantity exchanged.',
+            'The area below the supply curve and above the horizontal axis.'
+          ],
+          correctAnswer: 1, // B
+          explanation: 'Producer surplus represents the benefit to sellers and is found graphically by measuring the area below the equilibrium price line and above the supply curve.'
+        },
+        {
+          id: '3',
+          question: 'When a binding price floor is imposed on a market, why is there a loss in total economic surplus?',
+          options: [
+            'Because consumers are forced to buy more goods than they want at the higher price.',
+            'Because the quantity of goods actually exchanged in the market decreases.',
+            'Because the government collects the surplus as tax revenue.',
+            'Because producers lower their prices to compete for fewer customers.'
+          ],
+          correctAnswer: 1, // B
+          explanation: 'A binding price floor raises the price above equilibrium, which reduces the quantity demanded by buyers. Since trades can only happen if someone is willing to buy, the quantity exchanged decreases. This reduction in trades creates deadweight loss, which represents the potential surplus from transactions that no longer occur.'
+        }
+      ]
     },
     stage2: {
       type: 'consumer-producer-surplus',
