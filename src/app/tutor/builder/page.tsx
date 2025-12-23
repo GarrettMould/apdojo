@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question } from '@/data/questionBanks/types';
-import { Check, Copy, CheckCircle2, Search, Filter } from 'lucide-react';
+import { Copy, CheckCircle2, Search, Filter } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 
@@ -48,13 +48,6 @@ export default function TutorBuilderPage() {
     });
   };
 
-  const toggleSelectAll = () => {
-    if (selectedIds.size === filteredQuestions.length) {
-      setSelectedIds(new Set());
-    } else {
-      setSelectedIds(new Set(filteredQuestions.map(q => q.id)));
-    }
-  };
 
   const generateLink = () => {
     if (selectedIds.size === 0) return;
@@ -78,16 +71,13 @@ export default function TutorBuilderPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b-4 border-black sticky top-0 z-50 shadow-md">
-        <div className="max-w-7xl mx-auto px-6 py-4">
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-6 pt-12 pb-6">
+        {/* Title */}
+        <div className="mb-6">
           <h1 className="text-3xl font-black text-black">Assignment Builder</h1>
           <p className="text-sm text-gray-600 mt-1">Select questions to create a custom assignment link</p>
         </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-6">
         {/* Filters */}
         <div className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -140,15 +130,6 @@ export default function TutorBuilderPage() {
             <table className="w-full">
               <thead className="bg-gray-100 border-b-4 border-black">
                 <tr>
-                  <th className="px-4 py-3 text-left">
-                    <button
-                      onClick={toggleSelectAll}
-                      className="flex items-center gap-2 font-black text-black hover:text-blue-600 transition-colors"
-                    >
-                      <Check className={`w-5 h-5 ${selectedIds.size === filteredQuestions.length && filteredQuestions.length > 0 ? 'text-blue-600' : 'text-gray-400'}`} />
-                      Select All
-                    </button>
-                  </th>
                   <th className="px-4 py-3 text-left font-black text-black">ID</th>
                   <th className="px-4 py-3 text-left font-black text-black">Unit</th>
                   <th className="px-4 py-3 text-left font-black text-black">Question Text</th>

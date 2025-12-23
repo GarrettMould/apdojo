@@ -1,6 +1,7 @@
 import dojoIcon from "../../public/images/dojoIcon.png"
+import { Question } from '@/data/questionBanks/types';
 
-interface Question {
+interface QuestionSummary {
   id: number;
   unit: number;
   unitName: string;
@@ -22,6 +23,7 @@ interface AssessmentResultsPanelProps {
   answers: Record<number, string>;
   examType: 'micro' | 'macro';
   onSeeFullResults?: () => void;
+  customTitle?: string | null;
 }
 
 export function AssessmentResultsPanel({ 
@@ -30,9 +32,14 @@ export function AssessmentResultsPanel({
   questions,
   answers,
   examType,
-  onSeeFullResults
+  onSeeFullResults,
+  customTitle
 }: AssessmentResultsPanelProps) {
   const percentage = Math.round((correctAnswers / totalQuestions) * 100);
+
+  // Calculate XP using dojo drill rules: 20 for completion + 10 per correct answer
+  const xpEarned = 20 + (correctAnswers * 10);
+  const maxXp = 20 + (totalQuestions * 10);
 
   // Calculate performance for each unit
   const getUnitPerformance = (): UnitPerformance[] => {
@@ -70,7 +77,9 @@ export function AssessmentResultsPanel({
       {/* New Header Section */}
       <div className="flex items-center gap-3 mb-6">
         <img src={dojoIcon.src} alt="AP Dojo Logo" className="w-8 h-8" />
-        <h1 className="text-xl font-extrabold tracking-tight text-gray-900">AP Dojo Exam Feedback</h1>
+        <h1 className="text-xl font-extrabold tracking-tight text-gray-900">
+          {customTitle ? customTitle : 'AP Dojo Exam Feedback'}
+        </h1>
       </div>
 
       {/* Overall Score */}
@@ -80,12 +89,17 @@ export function AssessmentResultsPanel({
             <h2 className="font-semibold text-gray-900">Assessment Results</h2>
           </div>
           <div className="p-4 bg-white">
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-6 flex-wrap">
               <div className="bg-blue-50 text-blue-800 px-4 py-2 rounded-md font-semibold text-lg">
                 Score: {percentage}%
               </div>
               <div className="text-gray-600 font-medium">
                 {correctAnswers} correct out of {totalQuestions}
+              </div>
+              <div className="bg-green-50 text-green-800 px-4 py-2 rounded-md font-semibold text-lg flex items-center gap-2">
+                <span>⚡</span>
+                <span>{xpEarned} XP</span>
+                <span className="text-green-600 text-sm font-normal">/ {maxXp} max</span>
               </div>
             </div>
           </div>

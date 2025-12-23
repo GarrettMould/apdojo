@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Question, QuestionBank } from '@/data/questionBanks/types';
 import { Button } from "@/components/ui/button";
 import { Bookmark, BookmarkX, X, Clock, Maximize2, Minimize2, Calculator, Pen, Eraser, Expand, Trash2, Circle, CircleDot, Check, Lock, Brain, FileText, ChevronLeft, ChevronRight, ChevronsRight, Triangle, Strikethrough, Eye } from 'lucide-react';
@@ -14,6 +14,9 @@ import { videos } from '@/data/videos';
 import { createPortal } from 'react-dom';
 import { HighlightableText } from './HighlightableText';
 import { MCQSidecar } from './MCQSidecar';
+import { DojoReadinessBand } from './DojoReadinessBand';
+import { getDojoName } from '@/lib/dojoNames';
+import { Scroll } from 'lucide-react';
 
 interface FullExamProps {
   questionBank: QuestionBank;
@@ -21,6 +24,7 @@ interface FullExamProps {
   questionType: 'mcq' | 'frq';
   examNumber: string;
   onTimeUpdate?: (timeRemaining: number) => void;
+  isCustomAssignment?: boolean;
 }
 
 interface Answers {
@@ -82,7 +86,7 @@ const FeedbackProgressBar = ({ status }: { status: 'incorrect' | 'partial' | 'co
   );
 };
 
-export function FullExam({ questionBank, examType, questionType, examNumber, onTimeUpdate }: FullExamProps) {
+export function FullExam({ questionBank, examType, questionType, examNumber, onTimeUpdate, isCustomAssignment = false }: FullExamProps) {
   const [answers, setAnswers] = useState<Answers>({});
   const [showResults, setShowResults] = useState(false);
   const [showFullResults, setShowFullResults] = useState(false);
@@ -96,6 +100,14 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   
   // Remove the shuffling logic and just use the pre-shuffled questions
   const questions = questionBank.questions;
+
+  // Generate Dojo name for custom assignments only
+  const customTitle = useMemo(() => {
+    if (!isCustomAssignment) return null;
+    // Create a seed from the question IDs to ensure the name persists on refresh
+    const seed = questions.map(q => q.id).join('');
+    return getDojoName(seed);
+  }, [isCustomAssignment, questions]);
 
   // Add calculator states
   const [showCalculator, setShowCalculator] = useState(false);
@@ -133,6 +145,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   const { user } = useAuthContext();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
+  const [showExitConfirmModal, setShowExitConfirmModal] = useState(false);
 
   // Scroll to top when page changes
   useEffect(() => {
@@ -648,14 +661,47 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
         <div className="fixed inset-0 bg-gray-50 z-50 overflow-y-auto" style={{ top: '64px' }}>
           <div className="min-h-[calc(100vh-64px)] flex items-center justify-center py-12 px-4">
             <div className="w-full max-w-4xl">
-              <AssessmentResultsPanel 
-                totalQuestions={questions.length}
-                correctAnswers={questions.filter((q) => answers[q.id] === q.correctAnswer).length}
-                questions={questions}
-                answers={answers}
-                examType={examType}
-                onSeeFullResults={() => setShowFullResults(true)}
-              />
+              {isCustomAssignment && !user ? (
+                // Guest Result Card for Custom Assignments
+                <div className="bg-white rounded-lg shadow-xl p-8">
+                  <div className="text-center mb-6">
+                    <h1 className="text-3xl font-black text-gray-900 mb-2">
+                      {customTitle ? customTitle : 'Your Results'}
+                    </h1>
+                    <div className="text-6xl font-black text-blue-600 mb-4">
+                      {Math.round((questions.filter((q) => answers[q.id] === q.correctAnswer).length / questions.length) * 100)}%
+                    </div>
+                    <p className="text-gray-600 font-semibold">
+                      {questions.filter((q) => answers[q.id] === q.correctAnswer).length} correct out of {questions.length}
+                    </p>
+                  </div>
+                  
+                  {/* Dojo Readiness Band */}
+                  <div className="mb-8">
+                    <DojoReadinessBand 
+                      score={Math.round((questions.filter((q) => answers[q.id] === q.correctAnswer).length / questions.length) * 100)} 
+                    />
+                  </div>
+                  
+                  {/* Call to Action Button */}
+                  <button
+                    onClick={() => setShowSignupModal(true)}
+                    className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white text-lg font-black rounded-xl transition-colors duration-200 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                  >
+                    Claim Your Dojo Belt & Save Progress
+                  </button>
+                </div>
+              ) : (
+                <AssessmentResultsPanel 
+                  totalQuestions={questions.length}
+                  correctAnswers={questions.filter((q) => answers[q.id] === q.correctAnswer).length}
+                  questions={questions}
+                  answers={answers}
+                  examType={examType}
+                  onSeeFullResults={() => setShowFullResults(true)}
+                  customTitle={customTitle}
+                />
+              )}
             </div>
           </div>
         </div>,
@@ -678,6 +724,11 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
         switchToLogin={() => {
           setShowSignupModal(false);
           setShowLoginModal(true);
+        }}
+        onAuthSuccess={() => {
+          setShowSignupModal(false);
+          // After signup, the user object will be available and results can be saved
+          // The results are already displayed, so the user can see them
         }}
       />
 
@@ -768,6 +819,15 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                 : 'w-full max-w-5xl mx-auto'
             }`}
           >
+            {/* Custom Assignment Title and Exit Button */}
+            {isCustomAssignment && customTitle && (
+              <div className="mb-6 border-b-4 border-black pb-4">
+                <div className="flex items-center gap-2 text-blue-600 font-black uppercase tracking-wider">
+                  <Scroll className="w-6 h-6" />
+                  <h1 className="text-3xl">{customTitle}</h1>
+                </div>
+              </div>
+            )}
             {!showResults ? (
               <>
               {/* Progress Bar - Mobile Only */}
@@ -1025,27 +1085,20 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
 
                         {/* Navigation Controls */}
                         {!(showVideoModal && videoUrl) && (
-                        <div className="flex items-center gap-4 pt-4 mt-4 border-t border-gray-200">
-                          <button
-                            onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
-                            disabled={currentPage === 0}
-                            className={`flex-1 px-6 py-3 text-base rounded-lg font-semibold transition-colors ${
-                              currentPage === 0
-                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                : 'bg-blue-500 text-white hover:bg-blue-600'
-                            }`}
-                          >
-                            Previous
-                          </button>
-                          
-                          {currentPage === questions.length - 1 ? (
+                        <div className="pt-4 mt-4 border-t border-gray-200">
+                          <div className="flex items-center gap-4">
                             <button
-                              onClick={handleSubmitClick}
-                              className="flex-1 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white text-base font-semibold rounded-lg transition-colors duration-200"
+                              onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
+                              disabled={currentPage === 0}
+                              className={`flex-1 px-6 py-3 text-base rounded-lg font-semibold transition-colors ${
+                                currentPage === 0
+                                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                  : 'bg-blue-500 text-white hover:bg-blue-600'
+                              }`}
                             >
-                              Submit Exam
+                              Previous
                             </button>
-                          ) : (
+                            
                             <button
                               onClick={() => setCurrentPage(prev => Math.min(questions.length - 1, prev + 1))}
                               disabled={currentPage >= questions.length - 1}
@@ -1057,6 +1110,17 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                             >
                               Next
                             </button>
+                          </div>
+                          
+                          {currentPage === questions.length - 1 && (
+                            <div className="mt-4">
+                              <button
+                                onClick={handleSubmitClick}
+                                className="w-full px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white text-base font-semibold rounded-lg transition-colors duration-200"
+                              >
+                                Submit Exam
+                              </button>
+                            </div>
                           )}
                         </div>
                         )}
@@ -1331,25 +1395,16 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                     )}
                     </div>
 
-                    {/* Explanation */}
-                    <div className="p-4 border-t border-gray-100">
-                      <Button
-                        onClick={() => toggleExplanation(question.id)}
-                        variant="outline"
-                        className="w-full justify-between"
-                      >
-                        {showExplanations[question.id] ? 'Hide' : 'Show'} Explanation
-                        <span className="text-gray-400">
-                          {showExplanations[question.id] ? '−' : '+'}
-                        </span>
-                      </Button>
-                      
-                      {showExplanations[question.id] && (
-                        <div className="mt-4 p-4 bg-blue-50 rounded-lg text-blue-800">
-                          {question.explanation}
+                    {/* Explanation - Comp Check Style */}
+                    {question.explanation && selectedAnswer && (
+                      <div className="p-4 border-t border-gray-100">
+                        <div className="mt-3 p-3 bg-blue-50 border-l-4 border-blue-400 rounded">
+                          <p className="text-sm text-gray-800 leading-relaxed">
+                            <strong>Explanation:</strong> {question.explanation}
+                          </p>
                         </div>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
                   );
                 })}
@@ -1387,6 +1442,40 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                 className="px-6 py-2.5 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors duration-200"
               >
                 Submit Anyway
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Exit Confirmation Modal for Custom Assignments */}
+      {showExitConfirmModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-lg max-w-md w-full p-6 border-4 border-black">
+            <div className="flex items-center gap-3 mb-4">
+              <X className="w-6 h-6 text-red-600" />
+              <h3 className="text-xl font-black text-gray-900">
+                Exit assignment?
+              </h3>
+            </div>
+            <p className="text-gray-700 mb-6 font-semibold">
+              Progress will not be saved.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setShowExitConfirmModal(false)}
+                className="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors duration-200"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  setShowExitConfirmModal(false);
+                  window.location.href = '/';
+                }}
+                className="px-6 py-2.5 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg transition-colors duration-200"
+              >
+                Exit
               </button>
             </div>
           </div>

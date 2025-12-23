@@ -126,6 +126,7 @@ function CustomExamContent() {
       examType={examType}
       questionType="mcq"
       examNumber="custom"
+      isCustomAssignment={true}
     />
   );
 }
