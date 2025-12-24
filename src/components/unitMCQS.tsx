@@ -718,7 +718,7 @@ export function UnitMCQs({
   hasTestModeAccess,
   onEnterTestMode,
 }: UnitMCQSProps) {
-  const { login, signup, userData, loadingUserData, user, awardXp } = useAuthContext();
+  const { login, signup, userData, loadingUserData, user, awardXp, totalXP, guestXp } = useAuthContext();
   const [aiExplanations, setAiExplanations] = useState<Record<number, string>>({});
   const [isLoadingExplanation, setIsLoadingExplanation] = useState(false);
   const [explanationError, setExplanationError] = useState<string | null>(null);
@@ -1058,6 +1058,47 @@ export function UnitMCQs({
         {/* Right Column: Controls and Resources */}
         {/* Adjusted column width lg:w-2/5 */}
         <div className="w-full lg:w-2/5 bg-white rounded-lg shadow-md border border-gray-200 p-4 lg:p-6 flex flex-col h-full">
+          {/* Belt and XP Display */}
+          {(() => {
+            const userXP = user ? (totalXP ?? 0) : (guestXp ?? 0);
+            
+            // Calculate belt based on XP (using same logic as select-practice-units page)
+            const getBeltInfo = (xp: number): { name: string; color: string; bgColor: string; textColor: string } => {
+              const score = Math.min(100, (xp / 20));
+              
+              if (score < 20) return { name: 'WHITE BELT', color: 'gray', bgColor: 'bg-gray-100', textColor: 'text-gray-900' };
+              if (score < 40) return { name: 'YELLOW BELT', color: 'yellow', bgColor: 'bg-yellow-400', textColor: 'text-gray-900' };
+              if (score < 60) return { name: 'GREEN BELT', color: 'green', bgColor: 'bg-green-500', textColor: 'text-white' };
+              if (score < 80) return { name: 'BROWN BELT', color: 'amber', bgColor: 'bg-amber-700', textColor: 'text-white' };
+              return { name: 'BLACK BELT', color: 'black', bgColor: 'bg-black', textColor: 'text-white' };
+            };
+            
+            const beltInfo = getBeltInfo(userXP);
+            
+            return (
+              <div className="flex justify-between items-center mb-6 pb-6 border-b border-gray-200">
+                {/* Left Side - Belt Badge */}
+                <div className={`h-8 px-4 flex items-center justify-center border-2 border-black font-bold uppercase text-xs tracking-wider ${beltInfo.bgColor} ${beltInfo.textColor}`}>
+                  {beltInfo.name}
+                </div>
+                
+                {/* Right Side - XP Display */}
+                <div className="font-black text-xl flex items-center gap-2">
+                  <span>{userXP}</span>
+                  <span className="inline-flex items-center">
+                    <Image
+                      src="/images/flame100.png"
+                      alt="XP Flame"
+                      width={24}
+                      height={24}
+                      className="w-6 h-6"
+                    />
+                  </span>
+                </div>
+              </div>
+            );
+          })()}
+          
           {/* Top Section: Headline, Tags, Navigation */}
           <div className="mb-6"> {/* Reduced bottom margin */} 
             <div className="flex items-center gap-4 mb-3"> {/* Added bottom margin */} 

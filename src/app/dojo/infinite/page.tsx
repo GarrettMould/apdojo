@@ -2,15 +2,12 @@
 
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, X, FileText, Image as ImageIcon, Loader2, Check, Save, Sparkles } from 'lucide-react';
+import { Upload, X, FileText, Image as ImageIcon, Loader2, Check, Sparkles, CheckCircle2, XCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Question } from '@/data/questionBanks/types';
-import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { useAuthContext } from '@/contexts/AuthContext';
-// Question display will be inline
 
+// --- TYPES ---
 interface InfiniteDrillResult {
   conceptDetected: string;
   questions: Question[];
@@ -19,31 +16,46 @@ interface InfiniteDrillResult {
 type LoadingStage = 'idle' | 'analyzing' | 'identifying' | 'generating' | 'complete';
 
 export default function InfinitePracticePage() {
-  const { user } = useAuthContext();
   const [inputMode, setInputMode] = useState<'image' | 'text'>('image');
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [fileData, setFileData] = useState<{ file: File; preview: string; base64: string } | null>(null);
   const [textInput, setTextInput] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [loadingStage, setLoadingStage] = useState<LoadingStage>('idle');
   const [result, setResult] = useState<InfiniteDrillResult | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [isConvertingPDF, setIsConvertingPDF] = useState(false);
+  const [userAnswers, setUserAnswers] = useState<Record<string, string>>({});
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleFileSelect = useCallback((file: File) => {
+  // Helper: Convert any file to Base64
+  const convertFileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleFileSelect = useCallback(async (file: File) => {
     const isImage = file.type.startsWith('image/');
     const isPDF = file.type === 'application/pdf';
     
     if (file && (isImage || isPDF)) {
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setImagePreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-      setError(null);
+      try {
+        const base64 = await convertFileToBase64(file);
+        
+        // For preview: if it's an image, use the base64. If PDF, use a placeholder logic or the base64 (browser can't always display PDF base64 in img tag)
+        const preview = isImage ? base64 : 'pdf-placeholder';
+        
+        setFileData({
+          file,
+          preview,
+          base64
+        });
+        setError(null);
+      } catch (err) {
+        setError('Failed to process file');
+      }
     } else {
       setError('Please select a valid image or PDF file');
     }
@@ -52,9 +64,7 @@ export default function InfinitePracticePage() {
   const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
-    if (file) {
-      handleFileSelect(file);
-    }
+    if (file) handleFileSelect(file);
   }, [handleFileSelect]);
 
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
@@ -63,78 +73,11 @@ export default function InfinitePracticePage() {
 
   const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      handleFileSelect(file);
-    }
+    if (file) handleFileSelect(file);
   }, [handleFileSelect]);
 
-  const convertImageToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const result = reader.result as string;
-        resolve(result);
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  };
-
-  const convertPDFToImage = async (file: File): Promise<string> => {
-    try {
-      // Dynamically import pdfjs-dist
-      const pdfjsLib = await import('pdfjs-dist');
-      
-      // Set worker source - use unpkg CDN for reliability
-      if (typeof window !== 'undefined') {
-        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
-      }
-      
-      // Read file as array buffer
-      const arrayBuffer = await file.arrayBuffer();
-      
-      // Load PDF
-      const pdf = await pdfjsLib.getDocument({ 
-        data: arrayBuffer,
-        useSystemFonts: true,
-      }).promise;
-      
-      // Get first page
-      const page = await pdf.getPage(1);
-      
-      // Set scale for rendering (higher = better quality)
-      const scale = 2.0;
-      const viewport = page.getViewport({ scale });
-      
-      // Create canvas
-      const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d');
-      if (!context) {
-        throw new Error('Could not get canvas context');
-      }
-      
-      canvas.height = viewport.height;
-      canvas.width = viewport.width;
-      
-      // Render PDF page to canvas
-      const renderContext = {
-        canvasContext: context,
-        viewport: viewport,
-      };
-      
-      await page.render(renderContext).promise;
-      
-      // Convert canvas to base64 image
-      const imageDataUrl = canvas.toDataURL('image/png');
-      return imageDataUrl;
-    } catch (error) {
-      console.error('Error converting PDF to image:', error);
-      throw new Error('Failed to convert PDF to image. Please try converting your PDF to an image manually or use text input mode.');
-    }
-  };
-
   const handleGenerate = async () => {
-    if (inputMode === 'image' && !imageFile) {
+    if (inputMode === 'image' && !fileData) {
       setError('Please upload an image or PDF');
       return;
     }
@@ -149,61 +92,32 @@ export default function InfinitePracticePage() {
     setLoadingStage('analyzing');
 
     try {
-      // Simulate loading stages
-      setTimeout(() => setLoadingStage('identifying'), 2000);
-      setTimeout(() => setLoadingStage('generating'), 4000);
+      // Cosmetic loading stages
+      const stageTimer1 = setTimeout(() => setLoadingStage('identifying'), 2000);
+      const stageTimer2 = setTimeout(() => setLoadingStage('generating'), 4500);
 
-      let imageBase64: string | undefined;
-      if (inputMode === 'image' && imageFile) {
-        if (imageFile.type === 'application/pdf') {
-          // Convert PDF to image
-          setIsConvertingPDF(true);
-          setLoadingStage('analyzing');
-          try {
-            imageBase64 = await convertPDFToImage(imageFile);
-          } catch (pdfError: any) {
-            setError(pdfError.message || 'Failed to process PDF. Please try converting it to an image manually or use text input mode.');
-            setIsGenerating(false);
-            setIsConvertingPDF(false);
-            return;
-          } finally {
-            setIsConvertingPDF(false);
-          }
-        } else {
-          // Regular image
-          imageBase64 = await convertImageToBase64(imageFile);
-        }
-      }
+      const payload = {
+        textInput: inputMode === 'text' ? textInput : undefined,
+        imageBase64: inputMode === 'image' ? fileData?.base64 : undefined,
+        mimeType: inputMode === 'image' ? fileData?.file.type : undefined
+      };
 
       const response = await fetch('/api/infinite-drill', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          imageBase64: imageBase64,
-          textInput: inputMode === 'text' ? textInput : undefined,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
 
-      // Check content type before parsing
-      const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        const text = await response.text();
-        console.error('Non-JSON response received:', text.substring(0, 500));
-        throw new Error('Server returned an invalid response. This might be a server error. Please check the console or try again.');
-      }
-
       if (!response.ok) {
-        try {
-          const errorData = await response.json();
-          throw new Error(errorData.error || `Server error: ${response.status}`);
-        } catch (jsonError) {
-          throw new Error(`Server error: ${response.status}. Please try again.`);
-        }
+        const errData = await response.json();
+        throw new Error(errData.error || 'Failed to generate');
       }
 
       const data = await response.json();
+      
+      clearTimeout(stageTimer1);
+      clearTimeout(stageTimer2);
+      
       setResult(data);
       setLoadingStage('complete');
     } catch (err: any) {
@@ -215,47 +129,37 @@ export default function InfinitePracticePage() {
     }
   };
 
-  const handleSaveToDashboard = async () => {
-    if (!user || !result) {
-      setError('Please log in to save drills');
-      return;
-    }
-
-    setIsSaving(true);
-    setError(null);
-
-    try {
-      await addDoc(collection(db, 'infiniteDrills'), {
-        userId: user.uid,
-        userEmail: user.email,
-        conceptDetected: result.conceptDetected,
-        questions: result.questions,
-        createdAt: serverTimestamp(),
-        imagePreview: imagePreview || null,
-        textInput: textInput || null,
-      });
-
-      setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
-    } catch (err: any) {
-      setError('Failed to save drill. Please try again.');
-      console.error('Error saving drill:', err);
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
   const handleReset = () => {
-    setImageFile(null);
-    setImagePreview(null);
+    setFileData(null);
     setTextInput('');
     setResult(null);
     setError(null);
     setLoadingStage('idle');
-    setSaved(false);
+    setUserAnswers({});
+    setIsSubmitted(false);
   };
 
-  const canGenerate = inputMode === 'image' ? !!imageFile : !!textInput.trim();
+  const handleAnswerSelect = (questionId: string, answer: string) => {
+    if (!isSubmitted) {
+      setUserAnswers(prev => ({ ...prev, [questionId]: answer }));
+    }
+  };
+
+  const handleSubmit = () => {
+    if (!result) return;
+    
+    // Check if all questions are answered
+    const allAnswered = result.questions.every(q => userAnswers[q.id || '']);
+    if (!allAnswered) {
+      setError('Please answer all questions before submitting');
+      return;
+    }
+    
+    setIsSubmitted(true);
+    setError(null);
+  };
+
+  const canGenerate = inputMode === 'image' ? !!fileData : !!textInput.trim();
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -266,7 +170,7 @@ export default function InfinitePracticePage() {
             Infinite Practice Generator
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Upload a question you got wrong. We will generate 5 fresh ones just like it.
+            Upload your class notes, diagrams, or PDFs. We generate AP-style questions instantly.
           </p>
         </div>
 
@@ -275,7 +179,7 @@ export default function InfinitePracticePage() {
           <Card className="mb-8 border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-2xl">Input Your Question</CardTitle>
+                <CardTitle className="text-2xl">Input Source</CardTitle>
                 <div className="flex gap-2">
                   <Button
                     variant={inputMode === 'image' ? 'default' : 'outline'}
@@ -288,21 +192,20 @@ export default function InfinitePracticePage() {
                     className="flex items-center gap-2"
                   >
                     <ImageIcon className="w-4 h-4" />
-                    Image
+                    File Upload
                   </Button>
                   <Button
                     variant={inputMode === 'text' ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => {
                       setInputMode('text');
-                      setImageFile(null);
-                      setImagePreview(null);
+                      setFileData(null);
                       setError(null);
                     }}
                     className="flex items-center gap-2"
                   >
                     <FileText className="w-4 h-4" />
-                    Text
+                    Text Input
                   </Button>
                 </div>
               </div>
@@ -313,34 +216,33 @@ export default function InfinitePracticePage() {
                   onDrop={handleDrop}
                   onDragOver={handleDragOver}
                   className={`border-4 border-dashed rounded-lg p-12 text-center transition-colors ${
-                    imagePreview
+                    fileData
                       ? 'border-gray-300 bg-gray-50'
                       : 'border-gray-400 bg-white hover:border-gray-500 hover:bg-gray-50'
                   }`}
                 >
-                  {imagePreview ? (
+                  {fileData ? (
                     <div className="relative">
-                      {imageFile?.type === 'application/pdf' ? (
-                        <div className="max-w-full max-h-96 mx-auto rounded-lg shadow-lg bg-gray-100 p-8 flex flex-col items-center justify-center">
-                          <FileText className="w-24 h-24 text-gray-400 mb-4" />
-                          <p className="text-lg font-semibold text-gray-700 mb-2">
-                            {imageFile.name}
+                      {fileData.file.type === 'application/pdf' ? (
+                        <div className="max-w-full h-64 mx-auto rounded-lg shadow-lg bg-blue-50 border border-blue-200 p-8 flex flex-col items-center justify-center">
+                          <FileText className="w-24 h-24 text-blue-500 mb-4" />
+                          <p className="text-lg font-semibold text-gray-700 mb-2 truncate w-full max-w-full px-4 text-center">
+                            {fileData.file.name}
                           </p>
                           <p className="text-sm text-gray-500 text-center">
-                            PDF file ready to upload. First page will be converted to an image.
+                            PDF Ready for Analysis
                           </p>
                         </div>
                       ) : (
                         <img
-                          src={imagePreview}
+                          src={fileData.preview}
                           alt="Preview"
-                          className="max-w-full max-h-96 mx-auto rounded-lg shadow-lg"
+                          className="max-w-full max-h-96 mx-auto rounded-lg shadow-lg object-contain"
                         />
                       )}
                       <button
                         onClick={() => {
-                          setImageFile(null);
-                          setImagePreview(null);
+                          setFileData(null);
                         }}
                         className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-2 hover:bg-red-600 transition-colors"
                       >
@@ -351,10 +253,10 @@ export default function InfinitePracticePage() {
                     <>
                       <Upload className="w-16 h-16 mx-auto text-gray-400 mb-4" />
                       <p className="text-lg font-semibold text-gray-700 mb-2">
-                        Drag & drop an image or PDF here, or click to select
+                        Drag & drop an image or PDF here
                       </p>
                       <p className="text-sm text-gray-500 mb-4">
-                        Supports JPG, PNG, GIF, PDF
+                        We scan your notes to build custom questions
                       </p>
                       <input
                         type="file"
@@ -365,7 +267,7 @@ export default function InfinitePracticePage() {
                       />
                       <label htmlFor="image-upload">
                         <Button asChild variant="outline" className="cursor-pointer">
-                          <span>Select Image</span>
+                          <span>Select File</span>
                         </Button>
                       </label>
                     </>
@@ -378,7 +280,7 @@ export default function InfinitePracticePage() {
                     setTextInput(e.target.value);
                     setError(null);
                   }}
-                  placeholder="Paste your question text here..."
+                  placeholder="Paste your notes or a topic here (e.g., 'Explain the causes of the Great Depression')..."
                   className="w-full min-h-[300px] p-4 border-4 border-gray-300 rounded-lg font-mono text-sm focus:outline-none focus:border-blue-500 resize-y"
                 />
               )}
@@ -391,16 +293,11 @@ export default function InfinitePracticePage() {
 
               <Button
                 onClick={handleGenerate}
-                disabled={!canGenerate || isGenerating || isConvertingPDF}
+                disabled={!canGenerate || isGenerating}
                 className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-6 text-lg"
                 size="lg"
               >
-                {isConvertingPDF ? (
-                  <span className="flex items-center gap-2">
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Converting PDF...
-                  </span>
-                ) : isGenerating ? (
+                {isGenerating ? (
                   <span className="flex items-center gap-2">
                     <Loader2 className="w-5 h-5 animate-spin" />
                     Generating...
@@ -428,9 +325,9 @@ export default function InfinitePracticePage() {
                     <div className="flex items-center gap-3">
                       <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
                       <p className="text-lg font-semibold text-gray-900">
-                        {loadingStage === 'analyzing' && 'Analyzing Graph...'}
-                        {loadingStage === 'identifying' && 'Identifying Concept...'}
-                        {loadingStage === 'generating' && 'Writing Scenarios...'}
+                        {loadingStage === 'analyzing' && 'Analyzing Content...'}
+                        {loadingStage === 'identifying' && 'Extracting Concepts...'}
+                        {loadingStage === 'generating' && 'Writing AP Questions...'}
                       </p>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
@@ -455,7 +352,7 @@ export default function InfinitePracticePage() {
           )}
         </AnimatePresence>
 
-        {/* Results */}
+        {/* Results Display - Identical to your original code */}
         {result && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -465,113 +362,212 @@ export default function InfinitePracticePage() {
             {/* Concept Detected Card */}
             <Card className="border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-gradient-to-r from-blue-50 to-purple-50">
               <CardHeader>
-                <CardTitle className="text-2xl flex items-center gap-2">
-                  <Sparkles className="w-6 h-6 text-blue-600" />
-                  Concept Detected: {result.conceptDetected}
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-2xl flex items-center gap-2">
+                    <Sparkles className="w-6 h-6 text-blue-600" />
+                    Concept Detected: {result.conceptDetected}
+                  </CardTitle>
+                  <button
+                    onClick={handleReset}
+                    className="p-2 rounded-lg hover:bg-blue-100 transition-colors"
+                    title="Generate New Questions"
+                  >
+                    <RefreshCw className="w-6 h-6 text-blue-600" />
+                  </button>
+                </div>
               </CardHeader>
             </Card>
 
             {/* Questions */}
             <div className="space-y-6">
-              {result.questions.map((question, index) => (
-                <Card
-                  key={question.id}
-                  className="border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
-                >
-                  <CardHeader>
-                    <CardTitle className="text-xl">
-                      Question {index + 1} of 5
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <p className="text-lg font-semibold text-gray-900">
-                        {question.question}
-                      </p>
-                      <div className="space-y-2">
-                        {question.options.map((option, optIndex) => {
-                          const letter = String.fromCharCode(65 + optIndex);
-                          const isCorrect = letter === question.correctAnswer;
-                          return (
-                            <div
-                              key={optIndex}
-                              className={`p-3 rounded-lg border-2 ${
-                                isCorrect
-                                  ? 'bg-green-50 border-green-500'
-                                  : 'bg-white border-gray-300'
-                              }`}
-                            >
-                              <div className="flex items-center gap-3">
-                                <span
-                                  className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
-                                    isCorrect
-                                      ? 'bg-green-500 text-white'
-                                      : 'bg-gray-200 text-gray-700'
-                                  }`}
-                                >
-                                  {letter}
-                                </span>
-                                <span className="flex-1">{option}</span>
-                                {isCorrect && (
-                                  <Check className="w-5 h-5 text-green-600" />
-                                )}
-                              </div>
-                            </div>
-                          );
-                        })}
+              {result.questions.map((question, index) => {
+                const questionId = String(question.id || `q${index}`);
+                const userAnswer = userAnswers[questionId];
+                const isCorrect = userAnswer === question.correctAnswer;
+                const showResults = isSubmitted;
+
+                return (
+                  <Card
+                    key={questionId}
+                    className={`border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] ${
+                      showResults
+                        ? isCorrect
+                          ? 'bg-green-50/30'
+                          : 'bg-red-50/30'
+                        : ''
+                    }`}
+                  >
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-xl">
+                          Question {index + 1} of 5
+                        </CardTitle>
+                        {showResults && (
+                          <div className="flex items-center gap-2">
+                            {isCorrect ? (
+                              <>
+                                <CheckCircle2 className="w-6 h-6 text-green-600" />
+                                <span className="text-green-600 font-semibold">Correct!</span>
+                              </>
+                            ) : (
+                              <>
+                                <XCircle className="w-6 h-6 text-red-600" />
+                                <span className="text-red-600 font-semibold">Incorrect</span>
+                              </>
+                            )}
+                          </div>
+                        )}
                       </div>
-                      {question.explanation && (
-                        <div className="mt-4 p-4 bg-blue-50 border-2 border-blue-200 rounded-lg">
-                          <p className="text-sm font-semibold text-blue-900 mb-1">
-                            Explanation:
-                          </p>
-                          <p className="text-sm text-blue-800">
-                            {question.explanation}
-                          </p>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <p className="text-lg font-semibold text-gray-900">
+                          {question.question}
+                        </p>
+                        {question.tableData && (
+                          <div className="my-4 overflow-x-auto">
+                            <table className="min-w-full border-collapse border border-black">
+                              <thead className="bg-white">
+                                <tr>
+                                  {question.tableData.headers.map((header, headerIndex) => (
+                                    <th 
+                                      key={headerIndex} 
+                                      className="border border-black px-4 py-3 text-center text-base font-bold text-gray-900"
+                                    >
+                                      {header}
+                                    </th>
+                                  ))}
+                                </tr>
+                              </thead>
+                              <tbody className="bg-white">
+                                {question.tableData.rows.map((row, rowIndex) => (
+                                  <tr key={rowIndex}>
+                                    {row.map((cell, cellIndex) => {
+                                      const isRowHeader = question.tableData?.rowHeaders && cellIndex === 0;
+                                      return (
+                                        <td 
+                                          key={cellIndex} 
+                                          className={`border border-black px-4 py-3 text-center text-base ${
+                                            isRowHeader ? 'font-bold' : ''
+                                          }`}
+                                        >
+                                          {cell}
+                                        </td>
+                                      );
+                                    })}
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        )}
+                        <div className="space-y-2">
+                          {question.options.map((option, optIndex) => {
+                            const letter = String.fromCharCode(65 + optIndex);
+                            const isSelected = userAnswer === letter;
+                            const isCorrectAnswer = letter === question.correctAnswer;
+                            
+                            // Determine styling based on state
+                            let optionStyle = 'bg-white border-gray-300';
+                            if (showResults) {
+                              if (isCorrectAnswer) {
+                                optionStyle = 'bg-green-50 border-green-500';
+                              } else if (isSelected && !isCorrectAnswer) {
+                                optionStyle = 'bg-red-50 border-red-500';
+                              }
+                            } else if (isSelected) {
+                              optionStyle = 'bg-blue-50 border-blue-500';
+                            }
+
+                            return (
+                              <div
+                                key={optIndex}
+                                className={`p-3 rounded-lg border-2 transition-colors ${optionStyle} ${
+                                  !showResults ? 'cursor-pointer hover:bg-blue-50 hover:border-blue-300' : ''
+                                }`}
+                                onClick={!showResults ? () => handleAnswerSelect(questionId, letter) : undefined}
+                              >
+                                <div className="flex items-center gap-3">
+                                  {!showResults ? (
+                                    <>
+                                      <input
+                                        type="radio"
+                                        name={questionId}
+                                        value={letter}
+                                        checked={isSelected}
+                                        onChange={() => handleAnswerSelect(questionId, letter)}
+                                        className="w-5 h-5 text-blue-600 flex-shrink-0"
+                                        onClick={(e) => e.stopPropagation()}
+                                      />
+                                      <span className="flex-1 text-gray-900">{option}</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <span
+                                        className={`w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0 ${
+                                          isCorrectAnswer
+                                            ? 'bg-green-500 text-white'
+                                            : isSelected
+                                            ? 'bg-red-500 text-white'
+                                            : 'bg-gray-200 text-gray-700'
+                                        }`}
+                                      >
+                                        {letter}
+                                      </span>
+                                      <span className="flex-1 text-gray-900">{option}</span>
+                                      {isCorrectAnswer && (
+                                        <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
+                                      )}
+                                      {isSelected && !isCorrectAnswer && (
+                                        <X className="w-5 h-5 text-red-600 flex-shrink-0" />
+                                      )}
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                        {showResults && question.explanation && (
+                          <div className="mt-4 p-4 bg-blue-50 border-2 border-blue-200 rounded-lg">
+                            <p className="text-sm font-semibold text-blue-900 mb-1">
+                              Explanation:
+                            </p>
+                            <p className="text-sm text-blue-800">
+                              {question.explanation}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-4">
-              <Button
-                onClick={handleSaveToDashboard}
-                disabled={isSaving || saved || !user}
-                className="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-6 text-lg"
-                size="lg"
-              >
-                {saved ? (
-                  <span className="flex items-center gap-2">
-                    <Check className="w-5 h-5" />
-                    Saved!
-                  </span>
-                ) : isSaving ? (
-                  <span className="flex items-center gap-2">
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Saving...
-                  </span>
-                ) : !user ? (
-                  'Log in to Save'
-                ) : (
-                  <span className="flex items-center gap-2">
-                    <Save className="w-5 h-5" />
-                    Save This Drill to My Dashboard
-                  </span>
-                )}
-              </Button>
-              <Button
-                onClick={handleReset}
-                variant="outline"
-                className="px-8 border-4 border-black font-semibold py-6 text-lg"
-                size="lg"
-              >
-                Generate New
-              </Button>
+            <div className="space-y-4">
+              {!isSubmitted ? (
+                <Button
+                  onClick={handleSubmit}
+                  disabled={result.questions.some(q => !userAnswers[String(q.id || '')])}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-6 text-lg"
+                  size="lg"
+                >
+                  Submit Answers
+                </Button>
+              ) : (
+                <div className="p-4 bg-gray-100 rounded-lg border-2 border-gray-300">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-lg font-semibold text-gray-900">
+                      Score: {result.questions.filter(q => userAnswers[String(q.id || '')] === q.correctAnswer).length} / {result.questions.length}
+                    </span>
+                    <span className="text-sm text-gray-600">
+                      {Math.round((result.questions.filter(q => userAnswers[String(q.id || '')] === q.correctAnswer).length / result.questions.length) * 100)}%
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
           </motion.div>
         )}
@@ -579,4 +575,3 @@ export default function InfinitePracticePage() {
     </div>
   );
 }
-

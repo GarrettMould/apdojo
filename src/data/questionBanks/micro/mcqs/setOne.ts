@@ -225,11 +225,12 @@ export const microSetOneQuestions: QuestionBank = {
       "unitName": "Supply and Demand",
       "question": "If a 10 percent increase in the price of Good X the quantity demanded of Good Y by 15 percent, what is the cross-price elasticity of demand and relationship between these goods?",
       "image": null,
+      "optionTableHeaders": ["Elasticity", "Type of Goods"],
       "options": [
-        "1.5, implying they are substitutes",
-        "-1.5, implying they are complements",
-        "1.5, implying they are complements",
-        "0.67, implying they are substitutes"
+        "1.5 | Substitutes",
+        "-1.5 | Complements",
+        "1.5 | Complements",
+        "0.67 | Substitutes"
       ],
       "correctAnswer": "A",
       "explanation": "Cross-Price Elasticity = % Change Qty X / % Change Price Y (+15% / +10% = +1.5). A positive cross-price elasticity indicates that an increase in the price of one good leads to an increase in consumption of the other, defining them as substitutes."
@@ -983,12 +984,13 @@ export const microSetOneQuestions: QuestionBank = {
       "unitName": "Market Failure and the Role of Government",
       "question": "The production of Good X creates a negative externality. If the government imposes a per-unit tax on the producers of Good X equal to the marginal external cost, how will the equilibrium price, equilibrium quantity, and deadweight loss change?",
       "image": null,
+      "optionTableHeaders": ["Price", "Quantity", "Deadweight Loss"],
       "options": [
-        "Price: Increase; Quantity: Increase; Deadweight loss: Increase",
-        "Price: Decrease; Quantity: Increase; Deadweight loss: Decrease",
-        "Price: Decrease; Quantity: Decrease; Deadweight loss: Increase",
-        "Price: Increase; Quantity: Decrease; Deadweight loss: Decrease",
-        "Price: Decrease; Quantity: Decrease; Deadweight loss: Decrease"
+        "Increase | Increase | Increase",
+        "Decrease | Increase | Decrease",
+        "Decrease | Decrease | Increase",
+        "Increase | Decrease | Decrease",
+        "Decrease | Decrease | Decrease"
       ],
       "correctAnswer": "D",
       "explanation": "The tax increases the marginal cost for producers, shifting the supply curve to the left (upward) to align with the marginal social cost. This decreases the supply, driving the market price up and the quantity down towards the socially optimal level. Since the market outcome now aligns with allocative efficiency, the deadweight loss is eliminated or reduced."

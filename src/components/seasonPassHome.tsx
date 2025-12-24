@@ -2,15 +2,15 @@
 
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, BookOpen, FileText, Target, PlayCircle, Sparkles, Brain, Award, Search, Filter, X } from 'lucide-react';
+import { Check, BookOpen, FileText, Target, PlayCircle, Sparkles, Brain, Award, Search, Filter, X, ChevronRight } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question } from '@/data/questionBanks/types';
 import { dojoDrills } from '@/data/dojoDrills';
 import { frqExams } from '@/data/frqQuestions';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 interface FeatureItem {
   icon: React.ReactNode;
@@ -175,11 +175,10 @@ export function SeasonPassHome() {
 
 // Question List Component
 function QuestionListSection() {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
   const [unitFilter, setUnitFilter] = useState<number | null>(null);
   const [subjectFilter, setSubjectFilter] = useState<'ap_macroeconomics' | 'ap_microeconomics'>('ap_macroeconomics');
-  const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Get unique units for the selected subject
   const uniqueUnits = useMemo(() => {
@@ -213,8 +212,10 @@ function QuestionListSection() {
   }, [searchTerm, unitFilter, subjectFilter]);
 
   const handleQuestionClick = (question: Question) => {
-    setSelectedQuestion(question);
-    setIsModalOpen(true);
+    // Determine courseType from subjectFilter
+    const courseType = subjectFilter === 'ap_macroeconomics' ? 'macro' : 'micro';
+    // Navigate to purchase page
+    router.push(`/purchase/season-pass?courseType=${courseType}`);
   };
 
   const truncateText = (text: string, maxLength: number) => {
@@ -240,7 +241,12 @@ function QuestionListSection() {
         </motion.div>
 
         {/* Filters */}
-        <div className="bg-white border-2 border-gray-200 rounded-xl shadow-lg p-6 mb-8">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="bg-white border border-gray-200 rounded-xl shadow-lg p-6 mb-8"
+        >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Search */}
             <div className="relative">
@@ -250,7 +256,7 @@ function QuestionListSection() {
                 placeholder="Search by question text or unit..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-lg font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white transition-all"
               />
             </div>
 
@@ -260,7 +266,7 @@ function QuestionListSection() {
               <select
                 value={unitFilter || ''}
                 onChange={(e) => setUnitFilter(e.target.value ? parseInt(e.target.value) : null)}
-                className="w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-lg font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-white"
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-white transition-all"
               >
                 <option value="">All Units</option>
                 {uniqueUnits.map(unit => (
@@ -272,16 +278,16 @@ function QuestionListSection() {
             {/* Subject Toggle */}
             <div className="flex items-center gap-2">
               <span className="text-sm font-semibold text-gray-700">Subject:</span>
-              <div className="flex border-2 border-gray-300 rounded-lg overflow-hidden">
+              <div className="flex border border-gray-300 rounded-lg overflow-hidden">
                 <button
                   onClick={() => {
                     setSubjectFilter('ap_macroeconomics');
                     setUnitFilter(null);
                   }}
-                  className={`px-4 py-3 font-semibold transition-colors ${
+                  className={`px-4 py-2.5 font-semibold transition-all ${
                     subjectFilter === 'ap_macroeconomics'
                       ? 'bg-blue-600 text-white'
-                      : 'bg-white text-gray-700 hover:bg-gray-100'
+                      : 'bg-white text-gray-700 hover:bg-gray-50'
                   }`}
                 >
                   Macro
@@ -291,10 +297,10 @@ function QuestionListSection() {
                     setSubjectFilter('ap_microeconomics');
                     setUnitFilter(null);
                   }}
-                  className={`px-4 py-3 font-semibold transition-colors border-l-2 border-gray-300 ${
+                  className={`px-4 py-2.5 font-semibold transition-all border-l border-gray-300 ${
                     subjectFilter === 'ap_microeconomics'
                       ? 'bg-green-600 text-white'
-                      : 'bg-white text-gray-700 hover:bg-gray-100'
+                      : 'bg-white text-gray-700 hover:bg-gray-50'
                   }`}
                 >
                   Micro
@@ -302,47 +308,62 @@ function QuestionListSection() {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Questions Table */}
-        <div className="bg-white border-2 border-gray-200 rounded-xl shadow-lg overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b-2 border-gray-200">
-                <tr>
-                  <th className="px-6 py-4 text-left font-bold text-gray-900">Unit</th>
-                  <th className="px-6 py-4 text-left font-bold text-gray-900">Question Text</th>
-                  <th className="px-6 py-4 text-left font-bold text-gray-900">Unit Name</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredQuestions.map((question, index) => (
-                  <tr
-                    key={`${question.id}-${index}`}
-                    className="border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
-                    onClick={() => handleQuestionClick(question)}
-                  >
-                    <td className="px-6 py-4 font-semibold text-gray-900">
-                      Unit {question.unit}
-                    </td>
-                    <td className="px-6 py-4 text-gray-700 max-w-2xl">
-                      {truncateText(question.question, 150)}
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-semibold rounded-full">
-                        {question.unitName}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {filteredQuestions.length === 0 && (
-            <div className="p-12 text-center">
-              <p className="text-gray-500 font-semibold text-lg">No questions found matching your filters.</p>
-            </div>
+        {/* Questions Grid - Card Based */}
+        <div className="space-y-3">
+          {filteredQuestions.length === 0 ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="bg-white border border-gray-200 rounded-xl shadow-lg p-12 text-center"
+            >
+              <p className="text-gray-600 font-medium text-lg">No questions found matching your filters.</p>
+            </motion.div>
+          ) : (
+            filteredQuestions.map((question, index) => (
+              <motion.div
+                key={`${question.id}-${index}`}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2, delay: index * 0.03 }}
+              >
+                <motion.button
+                  onClick={() => handleQuestionClick(question)}
+                  whileHover={{ y: -2 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md p-5 text-left transition-all duration-200 group"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                    {/* Left side - Question content */}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className={`px-2.5 py-1 rounded-md text-xs font-semibold ${
+                          subjectFilter === 'ap_macroeconomics'
+                            ? 'bg-blue-100 text-blue-800'
+                            : 'bg-green-100 text-green-800'
+                        }`}>
+                          Unit {question.unit}
+                        </span>
+                        <span className="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-md text-xs font-semibold">
+                          {question.unitName}
+                        </span>
+                      </div>
+                      <p className="text-gray-900 font-medium text-sm leading-relaxed group-hover:text-gray-700 transition-colors">
+                        {truncateText(question.question, 200)}
+                      </p>
+                    </div>
+                    
+                    {/* Right side - Arrow indicator */}
+                    <div className="flex-shrink-0 flex items-center">
+                      <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+                        <ChevronRight className="w-4 h-4 text-gray-600" />
+                      </div>
+                    </div>
+                  </div>
+                </motion.button>
+              </motion.div>
+            ))
           )}
         </div>
 
@@ -355,27 +376,6 @@ function QuestionListSection() {
         </div>
       </div>
 
-      {/* Modal */}
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-extrabold text-gray-900">
-              AP Dojo Season Pass
-            </DialogTitle>
-            <DialogDescription className="text-base text-gray-600 mt-2">
-              We'll fill this in later
-            </DialogDescription>
-          </DialogHeader>
-          <div className="mt-4">
-            <Button
-              onClick={() => setIsModalOpen(false)}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              Close
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
@@ -415,65 +415,61 @@ function DojoDrillsSection() {
             <p className="text-gray-600">No Dojo Drills available yet. Check back soon!</p>
           </div>
         ) : (
-          <div className="relative" style={{ minHeight: `${drills.length * 200 + 100}px` }}>
-            {/* SVG Path connecting all drills - positioned absolutely behind cards */}
-            <svg
-              className="absolute top-0 left-0 w-full h-full pointer-events-none z-0"
-              style={{ height: '100%', minHeight: `${drills.length * 200 + 100}px` }}
-            >
-              <defs>
-                <marker
-                  id="arrowhead"
-                  markerWidth="12"
-                  markerHeight="12"
-                  refX="10"
-                  refY="4"
-                  orient="auto"
-                >
-                  <polygon points="0 0, 12 4, 0 8" fill="black" />
-                </marker>
-              </defs>
-              <path
-                d={(() => {
-                  let path = '';
-                  const cardHeight = 200; // Approximate height of each card + spacing
-                  const startY = 100; // Starting Y position
+          <div className="relative">
+            {/* SVG Overlay for connecting lines - Dashed thick black lines */}
+            {drills.length > 1 && (
+              <svg 
+                className="absolute top-0 left-0 w-full h-full pointer-events-none z-0"
+                viewBox="0 0 100 100"
+                preserveAspectRatio="none"
+                style={{ 
+                  height: '100%',
+                  minHeight: `${drills.length * 250}px`
+                }}
+              >
+                <defs>
+                  <marker
+                    id="arrowhead-drill"
+                    markerWidth="8"
+                    markerHeight="8"
+                    refX="7"
+                    refY="4"
+                    orient="auto"
+                    markerUnits="userSpaceOnUse"
+                  >
+                    <polygon points="0 0, 8 4, 0 8" fill="black" />
+                  </marker>
+                </defs>
+                {drills.slice(0, -1).map((_, index) => {
+                  const isEven = index % 2 === 0;
+                  const nextIsEven = (index + 1) % 2 === 0;
                   
-                  drills.forEach((drill, index) => {
-                    const isEven = index % 2 === 0;
-                    // Position: left cards at ~10% from left, right cards at ~90% from left
-                    // On mobile, cards are centered, so we'll adjust
-                    const xPercent = isEven ? 10 : 90;
-                    const y = startY + (index * cardHeight);
-                    
-                    if (index === 0) {
-                      path = `M ${xPercent}% ${y}`;
-                    } else {
-                      // Create a smooth weaving path
-                      const prevIsEven = (index - 1) % 2 === 0;
-                      const prevXPercent = prevIsEven ? 10 : 90;
-                      const prevY = startY + ((index - 1) * cardHeight);
-                      
-                      // Control points for smooth curve
-                      const midXPercent = 50; // Middle of the screen
-                      const midY = (prevY + y) / 2;
-                      
-                      // Create a smooth S-curve connecting the points
-                      path += ` C ${prevXPercent}% ${prevY + 40} ${midXPercent}% ${midY - 20} ${midXPercent}% ${midY} C ${midXPercent}% ${midY + 20} ${xPercent}% ${y - 40} ${xPercent}% ${y}`;
-                    }
-                  });
-                  return path;
-                })()}
-                stroke="black"
-                strokeWidth="6"
-                fill="none"
-                strokeDasharray="30 20"
-                markerEnd="url(#arrowhead)"
-                className="opacity-90"
-                vectorEffect="non-scaling-stroke"
-              />
-            </svg>
-
+                  // Calculate Y positions - evenly spaced across 100 units
+                  const cardSpacingPercent = 100 / drills.length;
+                  const startY = (index + 1) * cardSpacingPercent;
+                  const endY = (index + 2) * cardSpacingPercent;
+                  
+                  // X positions: left cards at 10%, right cards at 90%
+                  const startX = isEven ? 10 : 90;
+                  const endX = nextIsEven ? 10 : 90;
+                  const midX = 50;
+                  const midY = (startY + endY) / 2;
+                  
+                  return (
+                    <path
+                      key={index}
+                      d={`M ${startX} ${startY} Q ${midX} ${startY + 2} ${midX} ${midY} Q ${midX} ${endY - 2} ${endX} ${endY}`}
+                      stroke="black"
+                      strokeWidth="2"
+                      fill="none"
+                      strokeDasharray="6 4"
+                      markerEnd="url(#arrowhead-drill)"
+                    />
+                  );
+                })}
+              </svg>
+            )}
+            
             {/* Path container with alternating offset */}
             <div className="space-y-8 relative z-10">
               {drills.map((drill, index) => {

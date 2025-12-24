@@ -19,6 +19,7 @@ import { Scroll } from 'lucide-react';
 import { QuestionWithKeyTerms } from './QuestionWithKeyTerms';
 import { ExamCalculator } from './ExamCalculator';
 import { ExamWhiteboard } from './ExamWhiteboard';
+import { ExamTutorialModal } from './ExamTutorialModal';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 
@@ -149,8 +150,19 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
   const [showExitConfirmModal, setShowExitConfirmModal] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
 
   // Scroll to top when page changes
+  // Check if user has seen tutorial on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const hasSeenTutorial = localStorage.getItem('hasSeenExamTutorial');
+      if (!hasSeenTutorial) {
+        setShowTutorial(true);
+      }
+    }
+  }, []);
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [currentPage]);
@@ -768,6 +780,17 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
       )}
 
       {/* Add the modals */}
+      {showTutorial && (
+        <ExamTutorialModal
+          onClose={() => {
+            setShowTutorial(false);
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('hasSeenExamTutorial', 'true');
+            }
+          }}
+        />
+      )}
+
       <LoginModal 
         isOpen={showLoginModal}
         onClose={() => setShowLoginModal(false)}
@@ -876,8 +899,8 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
               isCustomAssignment 
                 ? 'p-8 max-w-4xl w-full' 
                 : showVideoModal && videoUrl 
-                  ? 'fixed left-0 top-20 w-[55%] p-8' 
-                  : 'fixed left-[50%] top-20 -translate-x-1/2 w-[1200px] p-8'
+                  ? 'fixed left-0 top-20 w-[55%] h-[calc(100vh-5rem)] overflow-y-auto p-8' 
+                  : 'fixed left-[50%] top-20 -translate-x-1/2 w-[1200px] h-[calc(100vh-5rem)] overflow-y-auto p-8'
             }`}
           >
             {!showResults ? (
@@ -1011,9 +1034,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                     )}
 
                     {/* Split-Screen Grid Container */}
-                    <div className={`grid grid-cols-1 ${hasVisualContent && !isCustomAssignment ? 'lg:grid-cols-5' : 'lg:grid-cols-1'} gap-8`}>
+                    <div className={`grid grid-cols-1 ${hasVisualContent && !isCustomAssignment && !(showVideoModal && videoUrl) ? 'lg:grid-cols-5' : 'lg:grid-cols-1'} gap-8`}>
                       {/* Left Column: Question Text & Options */}
-                      <div className={`${hasVisualContent && !isCustomAssignment ? 'lg:col-span-4' : 'lg:col-span-1'}`}>
+                      <div className={`${hasVisualContent && !isCustomAssignment && !(showVideoModal && videoUrl) ? 'lg:col-span-4' : 'lg:col-span-1'}`}>
                         <div id={`question-${question.id}`} className={`bg-white p-6 md:p-8 ${
                           isCustomAssignment 
                             ? 'border-2 border-black rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' 
@@ -1046,6 +1069,75 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                 </button>
                               )}
                             </div>
+
+                            {/* Visual Content - Show below question text when video modal is open */}
+                            {showVideoModal && videoUrl && hasVisualContent && !isCustomAssignment && (
+                              <div className="space-y-4">
+                                {question.image && (
+                                  <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4 flex justify-center">
+                                    <img 
+                                      src={question.image.src}
+                                      alt="Question diagram"
+                                      className="w-full max-w-2xl h-auto object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
+                                      onClick={() => {
+                                        setSelectedImage(question.image as StaticImageData);
+                                        setShowImageModal(true);
+                                      }}
+                                    />
+                                  </div>
+                                )}
+                                {question.tableData && (
+                                  <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
+                                    <div className="flex items-center gap-4">
+                                      {question.tableData.playerNames && (
+                                        <div className="flex items-center justify-center h-full w-16">
+                                          <p className="transform -rotate-90 whitespace-nowrap text-center font-bold text-lg text-gray-900 leading-tight">
+                                            {question.tableData.playerNames.row.split(' ')[0]}
+                                            <br />
+                                            {question.tableData.playerNames.row.split(' ').slice(1).join(' ')}
+                                          </p>
+                                        </div>
+                                      )}
+                                      <div className="flex-1">
+                                        {question.tableData.playerNames && (
+                                          <p className="text-center font-bold text-lg text-gray-900 mb-2">
+                                            {question.tableData.playerNames.column}
+                                          </p>
+                                        )}
+                                        <table className="min-w-full border-collapse border border-black">
+                                          <thead className="bg-white">
+                                            <tr>
+                                              {question.tableData.headers.map(header => (
+                                                <th key={header} className="border border-black px-4 py-3 text-center text-base font-bold text-gray-900">
+                                                  {header}
+                                                </th>
+                                              ))}
+                                            </tr>
+                                          </thead>
+                                          <tbody className="bg-white">
+                                            {question.tableData.rows.map((row, rowIndex) => (
+                                              <tr key={rowIndex}>
+                                                {row.map((cell, cellIndex) => {
+                                                  const isRowHeader = question.tableData?.rowHeaders && cellIndex === 0;
+                                                  return (
+                                                    <td 
+                                                      key={cellIndex} 
+                                                      className={`border border-black px-4 py-3 text-center text-base ${isRowHeader ? 'font-bold' : ''}`}
+                                                    >
+                                                      {cell}
+                                                    </td>
+                                                  );
+                                                })}
+                                              </tr>
+                                            ))}
+                                          </tbody>
+                                        </table>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            )}
 
                             {/* Visual Content - Show below question text for custom assignments */}
                             {isCustomAssignment && question.image && (
@@ -1299,6 +1391,76 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                         )}
                       </div>
 
+                      {/* Right Column: Visual Content (Image/Table) - Only show when video modal is NOT open */}
+                      {hasVisualContent && !isCustomAssignment && !(showVideoModal && videoUrl) && (
+                        <div className="lg:col-span-1">
+                          <div className="bg-white rounded-lg shadow-md border border-gray-200 p-4 sticky top-4">
+                            {question.image && (
+                              <div className="flex justify-center">
+                                <img 
+                                  src={question.image.src}
+                                  alt="Question diagram"
+                                  className="w-full h-auto max-h-[500px] object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
+                                  onClick={() => {
+                                    setSelectedImage(question.image as StaticImageData);
+                                    setShowImageModal(true);
+                                  }}
+                                />
+                              </div>
+                            )}
+                            {question.tableData && (
+                              <div className="flex justify-center">
+                                <div className="flex items-center gap-4">
+                                  {question.tableData.playerNames && (
+                                    <div className="flex items-center justify-center h-full w-16">
+                                      <p className="transform -rotate-90 whitespace-nowrap text-center font-bold text-lg text-gray-900 leading-tight">
+                                        {question.tableData.playerNames.row.split(' ')[0]}
+                                        <br />
+                                        {question.tableData.playerNames.row.split(' ').slice(1).join(' ')}
+                                      </p>
+                                    </div>
+                                  )}
+                                  <div className="flex-1">
+                                    {question.tableData.playerNames && (
+                                      <p className="text-center font-bold text-lg text-gray-900 mb-2">
+                                        {question.tableData.playerNames.column}
+                                      </p>
+                                    )}
+                                    <table className="min-w-full border-collapse border border-black">
+                                      <thead className="bg-white">
+                                        <tr>
+                                          {question.tableData.headers.map(header => (
+                                            <th key={header} className="border border-black px-4 py-3 text-center text-base font-bold text-gray-900">
+                                              {header}
+                                            </th>
+                                          ))}
+                                        </tr>
+                                      </thead>
+                                      <tbody className="bg-white">
+                                        {question.tableData.rows.map((row, rowIndex) => (
+                                          <tr key={rowIndex}>
+                                            {row.map((cell, cellIndex) => {
+                                              const isRowHeader = question.tableData?.rowHeaders && cellIndex === 0;
+                                              return (
+                                                <td 
+                                                  key={cellIndex} 
+                                                  className={`border border-black px-4 py-3 text-center text-base ${isRowHeader ? 'font-bold' : ''}`}
+                                                >
+                                                  {cell}
+                                                </td>
+                                              );
+                                            })}
+                                          </tr>
+                                        ))}
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 );
