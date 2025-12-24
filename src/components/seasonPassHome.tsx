@@ -415,9 +415,67 @@ function DojoDrillsSection() {
             <p className="text-gray-600">No Dojo Drills available yet. Check back soon!</p>
           </div>
         ) : (
-          <div className="relative">
+          <div className="relative" style={{ minHeight: `${drills.length * 200 + 100}px` }}>
+            {/* SVG Path connecting all drills - positioned absolutely behind cards */}
+            <svg
+              className="absolute top-0 left-0 w-full h-full pointer-events-none z-0"
+              style={{ height: '100%', minHeight: `${drills.length * 200 + 100}px` }}
+            >
+              <defs>
+                <marker
+                  id="arrowhead"
+                  markerWidth="12"
+                  markerHeight="12"
+                  refX="10"
+                  refY="4"
+                  orient="auto"
+                >
+                  <polygon points="0 0, 12 4, 0 8" fill="black" />
+                </marker>
+              </defs>
+              <path
+                d={(() => {
+                  let path = '';
+                  const cardHeight = 200; // Approximate height of each card + spacing
+                  const startY = 100; // Starting Y position
+                  
+                  drills.forEach((drill, index) => {
+                    const isEven = index % 2 === 0;
+                    // Position: left cards at ~10% from left, right cards at ~90% from left
+                    // On mobile, cards are centered, so we'll adjust
+                    const xPercent = isEven ? 10 : 90;
+                    const y = startY + (index * cardHeight);
+                    
+                    if (index === 0) {
+                      path = `M ${xPercent}% ${y}`;
+                    } else {
+                      // Create a smooth weaving path
+                      const prevIsEven = (index - 1) % 2 === 0;
+                      const prevXPercent = prevIsEven ? 10 : 90;
+                      const prevY = startY + ((index - 1) * cardHeight);
+                      
+                      // Control points for smooth curve
+                      const midXPercent = 50; // Middle of the screen
+                      const midY = (prevY + y) / 2;
+                      
+                      // Create a smooth S-curve connecting the points
+                      path += ` C ${prevXPercent}% ${prevY + 40} ${midXPercent}% ${midY - 20} ${midXPercent}% ${midY} C ${midXPercent}% ${midY + 20} ${xPercent}% ${y - 40} ${xPercent}% ${y}`;
+                    }
+                  });
+                  return path;
+                })()}
+                stroke="black"
+                strokeWidth="6"
+                fill="none"
+                strokeDasharray="30 20"
+                markerEnd="url(#arrowhead)"
+                className="opacity-90"
+                vectorEffect="non-scaling-stroke"
+              />
+            </svg>
+
             {/* Path container with alternating offset */}
-            <div className="space-y-8">
+            <div className="space-y-8 relative z-10">
               {drills.map((drill, index) => {
                 const isEven = index % 2 === 0;
                 return (
@@ -430,7 +488,7 @@ function DojoDrillsSection() {
                   >
                     <button
                       onClick={() => handleDrillClick(drill.id)}
-                      className="bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 text-left hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 w-full max-w-md flex flex-col"
+                      className="bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 text-left hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 w-full max-w-md flex flex-col relative z-10"
                     >
                       <div className="flex items-center justify-between mb-4">
                         <div

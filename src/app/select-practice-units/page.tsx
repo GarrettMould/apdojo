@@ -4,17 +4,37 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Loader2, ArrowLeft } from 'lucide-react';
+import { Loader2, ArrowLeft, Zap } from 'lucide-react';
 import { macroUnits as allMacroCheatSheets, microUnits as allMicroCheatSheets, Unit as UnitDetailsType } from '@/data/cheatSheets';
 import { useAuthContext } from '@/contexts/AuthContext';
+import Image from 'next/image';
 
 function SelectPracticeUnitsContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { lastSelectedPracticeUnits, setLastSelectedPracticeUnits, selectedSubject } = useAuthContext();
-    const { user } = useAuthContext();
+    const { lastSelectedPracticeUnits, setLastSelectedPracticeUnits, selectedSubject, user, totalXP, guestXp } = useAuthContext();
     
     const subject = selectedSubject;
+    
+    // Calculate user XP
+    const userXP = user ? (totalXP ?? 0) : (guestXp ?? 0);
+    
+    // Calculate belt based on XP (using same logic as DojoReadinessBand)
+    // Assuming belt is based on a score/percentage, we'll use XP ranges
+    // For now, let's use a simple XP-based calculation
+    const getBeltInfo = (xp: number): { name: string; color: string; bgColor: string; textColor: string } => {
+        // Convert XP to a score (0-100) - adjust these ranges as needed
+        // For example, if max XP is 2000, then 0-400 = White, 400-800 = Yellow, etc.
+        const score = Math.min(100, (xp / 20)); // Adjust divisor based on your XP system
+        
+        if (score < 20) return { name: 'WHITE BELT', color: 'gray', bgColor: 'bg-gray-100', textColor: 'text-gray-900' };
+        if (score < 40) return { name: 'YELLOW BELT', color: 'yellow', bgColor: 'bg-yellow-400', textColor: 'text-gray-900' };
+        if (score < 60) return { name: 'GREEN BELT', color: 'green', bgColor: 'bg-green-500', textColor: 'text-white' };
+        if (score < 80) return { name: 'BROWN BELT', color: 'amber', bgColor: 'bg-amber-700', textColor: 'text-white' };
+        return { name: 'BLACK BELT', color: 'black', bgColor: 'bg-black', textColor: 'text-white' };
+    };
+    
+    const beltInfo = getBeltInfo(userXP);
 
     const [selectedUnits, setSelectedUnits] = useState<number[]>([]);
     const [unitsData, setUnitsData] = useState<UnitDetailsType[]>([]);
@@ -86,81 +106,107 @@ function SelectPracticeUnitsContent() {
     return (
         <div className="min-h-screen bg-gray-50 py-2 px-4 sm:px-6 lg:px-8 flex flex-col justify-center overflow-hidden">
             <div className="max-w-3xl mx-auto w-full">
-                {/* Header */}
-                <div className="text-center mb-4">
-                    <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight">
-                        Choose Your <span className={isMicro ? 'text-green-500' : 'text-blue-500'}>Units</span>
-                    </h1>
-                    <p className="mt-4 text-xl text-gray-600 max-w-2xl mx-auto">
-                        Select the {subject === 'micro' ? 'Microeconomics' : 'Macroeconomics'} units you want to focus on.
-                    </p>
-                </div>
+                {/* Dojo Player Card - Unified Container */}
+                <div className="bg-white border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-xl p-6 sm:p-8">
+                    {/* Header Row - Belt Badge & XP */}
+                    <div className="flex justify-between items-center mb-6">
+                        {/* Left Side - Belt Badge */}
+                        <div className={`h-8 px-4 flex items-center justify-center border-2 border-black font-bold uppercase text-xs tracking-wider ${beltInfo.bgColor} ${beltInfo.textColor}`}>
+                            {beltInfo.name}
+                        </div>
+                        
+                        {/* Right Side - XP Display */}
+                        <div className="font-black text-xl flex items-center gap-2">
+                            <span>{userXP}</span>
+                            <span className="inline-flex items-center">
+                                <Image
+                                    src="/images/flame100.png"
+                                    alt="XP Flame"
+                                    width={24}
+                                    height={24}
+                                    className="w-6 h-6"
+                                />
+                            </span>
+                        </div>
+                    </div>
 
-                {/* Units List */}
-                <div className="space-y-2 mb-3">
-                    {displayUnits.map((unit) => {
-                        const isSelected = selectedUnits.includes(unit.number);
-                        return (
-                            <button
-                                key={unit.number}
-                                onClick={() => handleUnitToggle(unit.number)}
-                                className={`group relative w-full p-3 border-2 rounded-lg cursor-pointer transition-all duration-300 text-left ${
-                                    isSelected 
-                                        ? isMicro
-                                            ? 'border-green-500 shadow-md shadow-green-100/50 bg-gradient-to-br from-green-50 to-green-100'
-                                            : 'border-blue-500 shadow-md shadow-blue-100/50 bg-gradient-to-br from-blue-50 to-blue-100'
-                                        : isMicro
-                                            ? 'border-gray-200 hover:border-green-400 hover:shadow-md hover:shadow-green-100/30 bg-white hover:bg-green-50'
-                                            : 'border-gray-200 hover:border-blue-400 hover:shadow-md hover:shadow-blue-100/30 bg-white hover:bg-blue-50'
-                                }`}
-                            >
-                                <div className="flex items-center justify-between">
-                                    {/* Unit content */}
-                                    <div className="flex-1 flex items-center gap-2">
-                                        <div className={`text-3xl font-bold ${isMicro ? 'text-green-500' : 'text-blue-500'}`}>
-                                            {unit.number}
-                                            <span className="text-black">.</span>
-                                        </div>
-                                        <h3 className="text-sm font-semibold text-gray-800 leading-tight">
-                                            {unit.title}
-                                        </h3>
-                                    </div>
+                    {/* Body Content */}
+                    {/* Headline */}
+                    <div className="text-center mb-6">
+                        <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
+                            Choose Your <span className={isMicro ? 'text-green-500' : 'text-blue-500'}>Units</span>
+                        </h1>
+                        <p className="mt-2 text-lg text-gray-600">
+                            Select the {subject === 'micro' ? 'Microeconomics' : 'Macroeconomics'} units you want to focus on.
+                        </p>
+                    </div>
 
-                                    {/* Selection indicator */}
-                                    <div className={`ml-4 w-4 h-4 rounded-full border-2 transition-all duration-200 flex items-center justify-center ${
+                    {/* Units List */}
+                    <div className="space-y-2 mb-6">
+                        {displayUnits.map((unit) => {
+                            const isSelected = selectedUnits.includes(unit.number);
+                            return (
+                                <button
+                                    key={unit.number}
+                                    onClick={() => handleUnitToggle(unit.number)}
+                                    className={`group relative w-full p-3 border-2 rounded-lg cursor-pointer transition-all duration-300 text-left ${
                                         isSelected 
                                             ? isMicro
-                                                ? 'border-green-500 bg-green-500'
-                                                : 'border-blue-500 bg-blue-500'
+                                                ? 'border-green-500 shadow-md shadow-green-100/50 bg-gradient-to-br from-green-50 to-green-100'
+                                                : 'border-blue-500 shadow-md shadow-blue-100/50 bg-gradient-to-br from-blue-50 to-blue-100'
                                             : isMicro
-                                                ? 'border-gray-300 group-hover:border-green-400'
-                                                : 'border-gray-300 group-hover:border-blue-400'
-                                    }`}>
-                                        {isSelected && (
-                                            <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
-                                        )}
-                                    </div>
-                                </div>
-                            </button>
-                        );
-                    })}
-                </div>
+                                                ? 'border-gray-200 hover:border-green-400 hover:shadow-md hover:shadow-green-100/30 bg-white hover:bg-green-50'
+                                                : 'border-gray-200 hover:border-blue-400 hover:shadow-md hover:shadow-blue-100/30 bg-white hover:bg-blue-50'
+                                    }`}
+                                >
+                                    <div className="flex items-center justify-between">
+                                        {/* Unit content */}
+                                        <div className="flex-1 flex items-center gap-2">
+                                            <div className={`text-3xl font-bold ${isMicro ? 'text-green-500' : 'text-blue-500'}`}>
+                                                {unit.number}
+                                                <span className="text-black">.</span>
+                                            </div>
+                                            <h3 className="text-sm font-semibold text-gray-800 leading-tight">
+                                                {unit.title}
+                                            </h3>
+                                        </div>
 
-                {/* Action Button */}
-                <div className="w-full">
-                    <button
-                        onClick={handleStartPractice}
-                        disabled={selectedUnits.length === 0}
-                        className={`w-full px-6 py-4 rounded-lg font-bold text-lg transition-all duration-300 ${
-                            selectedUnits.length === 0 
-                                ? 'bg-gray-200 text-gray-500 cursor-not-allowed' 
-                                : isMicro
-                                    ? 'bg-green-600 hover:bg-green-700 text-white shadow-md hover:shadow-lg hover:shadow-green-500/25'
-                                    : 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg hover:shadow-blue-500/25'
-                        }`}
-                    >
-                        Start Practice
-                    </button>
+                                        {/* Selection indicator */}
+                                        <div className={`ml-4 w-4 h-4 rounded-full border-2 transition-all duration-200 flex items-center justify-center ${
+                                            isSelected 
+                                                ? isMicro
+                                                    ? 'border-green-500 bg-green-500'
+                                                    : 'border-blue-500 bg-blue-500'
+                                                : isMicro
+                                                    ? 'border-gray-300 group-hover:border-green-400'
+                                                    : 'border-gray-300 group-hover:border-blue-400'
+                                        }`}>
+                                            {isSelected && (
+                                                <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    {/* Action Button - Full Width */}
+                    <div className="w-full">
+                        <button
+                            onClick={handleStartPractice}
+                            disabled={selectedUnits.length === 0}
+                            className={`w-full px-6 py-4 rounded-lg font-bold text-lg transition-all duration-300 ${
+                                selectedUnits.length === 0 
+                                    ? 'bg-gray-200 text-gray-500 cursor-not-allowed' 
+                                    : isMicro
+                                        ? 'bg-green-600 hover:bg-green-700 text-white shadow-md hover:shadow-lg hover:shadow-green-500/25'
+                                        : 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg hover:shadow-blue-500/25'
+                            }`}
+                        >
+                            Start Practice
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

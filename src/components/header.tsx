@@ -110,6 +110,12 @@ export function Header() {
               >
                 Unit Cheat Sheets
               </Link>
+              <Link
+                href="/dojo/infinite"
+                className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
+              >
+                Create a Quiz
+              </Link>
 
               {/* Tutoring Dropdown - HIDDEN */}
               {/* <div 
@@ -283,6 +289,13 @@ export function Header() {
                 className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
               >
                 Unit Cheat Sheets
+              </Link>
+              <Link
+                href="/dojo/infinite"
+                onClick={closeMobileMenu}
+                className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
+              >
+                Create a Quiz
               </Link>
 
                 {/* Tutoring Dropdown (Mobile) - HIDDEN */}
