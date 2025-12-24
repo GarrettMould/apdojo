@@ -9,6 +9,7 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import { topicBundles, TopicBundle } from '@/data/topicBundles';
 import { useRouter } from 'next/navigation';
 import { frqExams } from '@/data/frqQuestions';
+import { SeasonPassHome } from '@/components/seasonPassHome';
 // import { ReviewsSection } from '@/components/ReviewsSection';
 // import { UniversityLogos } from '@/components/UniversityLogos';
 
@@ -258,5 +259,5 @@ export default function Home() {
     return <HomePageLoadingFallback />;
   }
   
-  return <LoggedOutHomePage />;
+  return <SeasonPassHome />;
 }

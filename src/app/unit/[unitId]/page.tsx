@@ -19,6 +19,7 @@ import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question as QuestionType } from '@/data/questionBanks/types';
 import { X, ArrowRight, Lock, ArrowLeft, CheckCircle2, XCircle, Download, Bookmark, BookmarkPlus, Check, Brain, Maximize2 } from 'lucide-react';
 import { dojoIcon } from '@/data/imagePaths';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Helper to combine and structure whiteboard data
 const getUnitWhiteboards = (unitNumber: number): WhiteboardImage[] => {
@@ -252,91 +253,155 @@ function Checkpoint({ lessonId, question, options, correctAnswer, explanation, s
       </div>
 
       {/* Dojo Drill Modal */}
-      {showDojoDrill && dojoDrillVideo && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4 overflow-y-auto"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              setShowDojoDrill(false);
-            }
-          }}
-        >
-          <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto relative my-8">
-            <button
-              onClick={() => setShowDojoDrill(false)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-900 transition-colors z-10 bg-white rounded-full p-2 shadow-md"
-              aria-label="Close Dojo Drill"
+      <AnimatePresence>
+        {showDojoDrill && dojoDrillVideo && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                setShowDojoDrill(false);
+              }
+            }}
+          >
+            <motion.div 
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.95 }}
+              transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+              className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto relative my-8 border border-gray-200"
             >
-              <X className="w-6 h-6" />
-            </button>
-            
-            <div className="p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Dojo Drill: {dojoDrillVideo.title}</h2>
+              <motion.button
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.1 }}
+                onClick={() => setShowDojoDrill(false)}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className="absolute top-4 right-4 text-gray-400 hover:text-gray-900 transition-colors z-10 bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-sm hover:shadow-md"
+                aria-label="Close Dojo Drill"
+              >
+                <X className="w-5 h-5" />
+              </motion.button>
               
-              {/* Video Section */}
-              <div className="mb-6">
-                <video
-                  src={dojoDrillVideo.videoUrl}
-                  controls
-                  autoPlay
-                  className="w-full aspect-video rounded-lg shadow-lg"
-                  playsInline
+              <div className="p-6">
+                <motion.h2 
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15 }}
+                  className="text-2xl font-bold text-gray-900 mb-4"
                 >
-                  Your browser does not support the video tag.
-                </video>
-              </div>
+                  Dojo Drill: {dojoDrillVideo.title}
+                </motion.h2>
+                
+                {/* Video Section */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="mb-6"
+                >
+                  <video
+                    src={dojoDrillVideo.videoUrl}
+                    controls
+                    autoPlay
+                    className="w-full aspect-video rounded-lg shadow-md"
+                    playsInline
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                </motion.div>
 
-              {/* Questions Section */}
-              {dojoDrillVideo.questions && dojoDrillVideo.questions.length > 0 && (
-                <div className="mt-8">
-                  <h3 className="text-xl font-bold text-gray-800 mb-4">Practice Questions</h3>
-                  <div className="space-y-4">
-                    {dojoDrillVideo.questions.map((q, index) => (
-                      <div key={q.id} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                        <p className="font-semibold text-gray-900 mb-3">
-                          {index + 1}. {q.text}
-                        </p>
-                        <div className="space-y-2">
-                          {q.options.map((option, optIndex) => (
-                            <div
-                              key={optIndex}
-                              className={`p-3 rounded-lg border-2 ${
-                                optIndex === q.correctAnswer
-                                  ? 'bg-green-100 border-green-400 text-green-800'
-                                  : 'bg-white border-gray-300 text-gray-700'
-                              }`}
+                {/* Questions Section */}
+                {dojoDrillVideo.questions && dojoDrillVideo.questions.length > 0 && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.25 }}
+                    className="mt-8"
+                  >
+                    <h3 className="text-xl font-bold text-gray-800 mb-4">Practice Questions</h3>
+                    <div className="space-y-4">
+                      {dojoDrillVideo.questions.map((q, index) => (
+                        <motion.div 
+                          key={q.id}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.3 + index * 0.1 }}
+                          className="border border-gray-200 rounded-lg p-4 bg-gray-50 hover:bg-gray-100/50 transition-colors"
+                        >
+                          <p className="font-semibold text-gray-900 mb-3">
+                            {index + 1}. {q.text}
+                          </p>
+                          <div className="space-y-2">
+                            {q.options.map((option, optIndex) => (
+                              <motion.div
+                                key={optIndex}
+                                initial={{ opacity: 0, x: -5 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: 0.35 + index * 0.1 + optIndex * 0.05 }}
+                                whileHover={{ scale: 1.02 }}
+                                className={`p-3 rounded-lg border-2 transition-all ${
+                                  optIndex === q.correctAnswer
+                                    ? 'bg-green-50 border-green-400 text-green-800'
+                                    : 'bg-white border-gray-300 text-gray-700 hover:border-gray-400'
+                                }`}
+                              >
+                                <span className="font-medium">
+                                  {String.fromCharCode(65 + optIndex)}. {option}
+                                </span>
+                                {optIndex === q.correctAnswer && (
+                                  <motion.span
+                                    initial={{ scale: 0 }}
+                                    animate={{ scale: 1 }}
+                                    transition={{ delay: 0.4 + index * 0.1 + optIndex * 0.05, type: "spring" }}
+                                  >
+                                    <CheckCircle2 className="w-5 h-5 text-green-600 inline-block ml-2" />
+                                  </motion.span>
+                                )}
+                              </motion.div>
+                            ))}
+                          </div>
+                          {q.explanation && (
+                            <motion.p 
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              transition={{ delay: 0.45 + index * 0.1 }}
+                              className="mt-3 text-sm text-gray-600 italic"
                             >
-                              <span className="font-medium">
-                                {String.fromCharCode(65 + optIndex)}. {option}
-                              </span>
-                              {optIndex === q.correctAnswer && (
-                                <CheckCircle2 className="w-5 h-5 text-green-600 inline-block ml-2" />
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                        {q.explanation && (
-                          <p className="mt-3 text-sm text-gray-600 italic">{q.explanation}</p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+                              {q.explanation}
+                            </motion.p>
+                          )}
+                        </motion.div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
 
-              {/* Done Button */}
-              <div className="mt-8 text-center">
-                <button
-                  onClick={() => setShowDojoDrill(false)}
-                  className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-md"
+                {/* Done Button */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  className="mt-8 text-center"
                 >
-                  Done
-                </button>
+                  <motion.button
+                    onClick={() => setShowDojoDrill(false)}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-sm hover:shadow-md"
+                  >
+                    Done
+                  </motion.button>
+                </motion.div>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -1495,117 +1560,200 @@ export default function UnitPage() {
       )}
 
       {/* Image Slides Modal */}
-      {showImageSlides && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4 overflow-y-auto"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              setShowImageSlides(false);
-              setHasSeenExplainer(true);
-            }
-          }}
-        >
-          <div className="bg-white rounded-lg shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto relative my-8 border-4 border-black">
-            <button
-              onClick={() => {
+      <AnimatePresence>
+        {showImageSlides && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
                 setShowImageSlides(false);
                 setHasSeenExplainer(true);
-              }}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-900 transition-colors z-10 bg-white rounded-full p-2 shadow-md"
-              aria-label="Close Image Slides"
+              }
+            }}
+          >
+            <motion.div 
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.95 }}
+              transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+              className="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto relative my-8 border border-gray-200"
             >
-              <X className="w-6 h-6" />
-            </button>
-            
-            <div className="p-4">
-              <h2 className="text-lg font-bold text-gray-900 mb-3 text-center">Dojo Drill</h2>
+              <motion.button
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.1 }}
+                onClick={() => {
+                  setShowImageSlides(false);
+                  setHasSeenExplainer(true);
+                }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className="absolute top-4 right-4 text-gray-400 hover:text-gray-900 transition-colors z-10 bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-sm hover:shadow-md"
+                aria-label="Close Image Slides"
+              >
+                <X className="w-5 h-5" />
+              </motion.button>
               
-              {/* Image Slides Container */}
-              <div className="relative">
-                {/* Previous Button */}
-                {currentImageIndex > 0 && (
-                  <button
-                    onClick={() => setCurrentImageIndex(prev => prev - 1)}
-                    className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 transition-colors z-10"
-                    aria-label="Previous image"
-                  >
-                    <ArrowLeft className="w-4 h-4 text-gray-700" />
-                  </button>
-                )}
+              <div className="p-6">
+                <motion.h2 
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15 }}
+                  className="text-xl font-bold text-gray-900 mb-4 text-center"
+                >
+                  Dojo Drill
+                </motion.h2>
+                
+                {/* Image Slides Container */}
+                <div className="relative">
+                  {/* Previous Button */}
+                  <AnimatePresence>
+                    {currentImageIndex > 0 && (
+                      <motion.button
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -10 }}
+                        onClick={() => setCurrentImageIndex(prev => prev - 1)}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 bg-white/90 backdrop-blur-sm rounded-full p-2.5 shadow-lg hover:shadow-xl transition-all z-10 border border-gray-200"
+                        aria-label="Previous image"
+                      >
+                        <ArrowLeft className="w-4 h-4 text-gray-700" />
+                      </motion.button>
+                    )}
+                  </AnimatePresence>
 
-                {/* Current Image */}
-                <div className="flex flex-col justify-center items-center min-h-[200px]">
-                  <img
-                    src={currentImageIndex === 0 
-                      ? '/images/dojoDrillPreviewB.png'
-                      : currentImageIndex === 1
-                      ? '/images/dojoDrillPreviewC.png'
-                      : '/images/dojoDrillPreviewA.png'}
-                    alt={`Dojo Drill Slide ${currentImageIndex + 1}`}
-                    className="max-w-full max-h-[300px] h-auto rounded-lg shadow-lg object-contain mb-4"
-                  />
-                  {/* Text overlay for slides 0 and 1 */}
-                  {currentImageIndex === 0 && (
-                    <p className="text-center font-bold text-black text-lg">
-                      Choose any term or whiteboard
-                    </p>
-                  )}
-                  {currentImageIndex === 1 && (
-                    <p className="text-center font-bold text-black text-lg">
-                      Create a custom Dojo Drill
-                    </p>
-                  )}
+                  {/* Current Image */}
+                  <div className="flex flex-col justify-center items-center min-h-[200px]">
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={currentImageIndex}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+                        className="w-full flex flex-col items-center"
+                      >
+                        <img
+                          src={currentImageIndex === 0 
+                            ? '/images/dojoDrillPreviewB.png'
+                            : currentImageIndex === 1
+                            ? '/images/dojoDrillPreviewC.png'
+                            : '/images/dojoDrillPreviewA.png'}
+                          alt={`Dojo Drill Slide ${currentImageIndex + 1}`}
+                          className="max-w-full max-h-[300px] h-auto rounded-lg shadow-md object-contain mb-4"
+                        />
+                        {/* Text overlay for slides 0 and 1 */}
+                        {currentImageIndex === 0 && (
+                          <motion.p 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.2 }}
+                            className="text-center font-semibold text-gray-900 text-base"
+                          >
+                            Choose any term or whiteboard
+                          </motion.p>
+                        )}
+                        {currentImageIndex === 1 && (
+                          <motion.p 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.2 }}
+                            className="text-center font-semibold text-gray-900 text-base"
+                          >
+                            Create a custom Dojo Drill
+                          </motion.p>
+                        )}
+                      </motion.div>
+                    </AnimatePresence>
+                  </div>
+
+                  {/* Next Button */}
+                  <AnimatePresence>
+                    {currentImageIndex < 2 && (
+                      <motion.button
+                        initial={{ opacity: 0, x: 10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 10 }}
+                        onClick={() => setCurrentImageIndex(prev => prev + 1)}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 bg-white/90 backdrop-blur-sm rounded-full p-2.5 shadow-lg hover:shadow-xl transition-all z-10 border border-gray-200"
+                        aria-label="Next image"
+                      >
+                        <ArrowRight className="w-4 h-4 text-gray-700" />
+                      </motion.button>
+                    )}
+                  </AnimatePresence>
                 </div>
 
-                {/* Next Button */}
-                {currentImageIndex < 2 && (
-                  <button
-                    onClick={() => setCurrentImageIndex(prev => prev + 1)}
-                    className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 transition-colors z-10"
-                    aria-label="Next image"
-                  >
-                    <ArrowRight className="w-4 h-4 text-gray-700" />
-                  </button>
-                )}
-              </div>
-
-              {/* Slide Indicators */}
-              <div className="flex justify-center gap-2 mt-3">
-                {[0, 1, 2].map((index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentImageIndex(index)}
-                    className={`w-2 h-2 rounded-full transition-all ${
-                      currentImageIndex === index
-                        ? 'bg-blue-500 scale-110'
-                        : 'bg-gray-300 hover:bg-gray-400'
-                    }`}
-                    aria-label={`Go to slide ${index + 1}`}
-                  />
-                ))}
-              </div>
-
-              {/* Slide Counter */}
-              <div className="text-center mt-2 text-sm text-gray-600">
-                {currentImageIndex + 1} of 3
-              </div>
-
-              {/* Done Button */}
-              <div className="mt-4 text-center">
-                <button
-                  onClick={() => {
-                    setShowImageSlides(false);
-                    setHasSeenExplainer(true);
-                  }}
-                  className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-md"
+                {/* Slide Indicators */}
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.25 }}
+                  className="flex justify-center gap-2 mt-6"
                 >
-                  Done
-                </button>
+                  {[0, 1, 2].map((index) => (
+                    <motion.button
+                      key={index}
+                      onClick={() => setCurrentImageIndex(index)}
+                      whileHover={{ scale: 1.2 }}
+                      whileTap={{ scale: 0.9 }}
+                      className={`w-2 h-2 rounded-full transition-all ${
+                        currentImageIndex === index
+                          ? 'bg-blue-600'
+                          : 'bg-gray-300 hover:bg-gray-400'
+                      }`}
+                      aria-label={`Go to slide ${index + 1}`}
+                      animate={{
+                        scale: currentImageIndex === index ? 1.3 : 1,
+                        opacity: currentImageIndex === index ? 1 : 0.5
+                      }}
+                      transition={{ duration: 0.2 }}
+                    />
+                  ))}
+                </motion.div>
+
+                {/* Slide Counter */}
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="text-center mt-3 text-sm text-gray-500 font-medium"
+                >
+                  {currentImageIndex + 1} of 3
+                </motion.div>
+
+                {/* Done Button */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.35 }}
+                  className="mt-6 text-center"
+                >
+                  <motion.button
+                    onClick={() => {
+                      setShowImageSlides(false);
+                      setHasSeenExplainer(true);
+                    }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="px-6 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-sm hover:shadow-md"
+                  >
+                    Done
+                  </motion.button>
+                </motion.div>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Fullscreen Whiteboard Modal */}
       {showFullscreen && selectedWhiteboards.size === 1 && (() => {
