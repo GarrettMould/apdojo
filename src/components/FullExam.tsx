@@ -300,6 +300,21 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   }, [showVideoModal]);
 
   const handleAnswer = (questionId: number, answerIndex: number) => {
+    // If option is struck through, just remove strikethrough and don't select
+    // This matches the exact logic from unitMCQS.tsx
+    if (strikethroughState[questionId]?.includes(answerIndex)) {
+      setStrikethroughState(prev => {
+        const currentStrikes = prev[questionId] || [];
+        const newStrikes = currentStrikes.filter(i => i !== answerIndex);
+        if (newStrikes.length === 0) {
+          const { [questionId]: _, ...rest } = prev;
+          return rest;
+        }
+        return { ...prev, [questionId]: newStrikes };
+      });
+      return; // Exit early - do NOT select
+    }
+    
     setAnswers({
       ...answers,
       [questionId]: String.fromCharCode(65 + answerIndex)
@@ -1224,30 +1239,31 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                   </thead>
                                   <tbody>
                                     {question.options.map((option, index) => {
-                                      const isSelected = selectedIndex === index;
                                       const isStruckThrough = strikethroughState[question.id]?.includes(index);
+                                      // Only show as selected if NOT struck through (strikethrough takes priority)
+                                      const isSelected = !isStruckThrough && selectedIndex === index;
                                       const optionValues = option.split(' | ');
                                       return (
                                         <tr
                                           key={index}
                                           onClick={() => handleAnswer(question.id, index)}
                                           className={`transition-all duration-200 group ${
-                                            isSelected 
-                                              ? 'bg-blue-100 hover:bg-blue-100 cursor-pointer border-l-4 border-blue-500' 
-                                              : isStruckThrough
-                                                ? 'bg-gray-100 cursor-default'
+                                            isStruckThrough
+                                              ? 'bg-gray-100 cursor-default'
+                                              : isSelected 
+                                                ? 'bg-blue-100 hover:bg-blue-100 cursor-pointer border-l-4 border-blue-500' 
                                                 : 'bg-white hover:bg-slate-50 cursor-pointer'
                                           }`}
                                         >
                                           <td className="p-2">
                                             <div className={`w-8 h-8 flex items-center justify-center rounded-lg border-2 font-semibold text-sm transition-all duration-200 ${
-                                              isSelected ? 'bg-blue-600 border-blue-700 text-white shadow-md' : isStruckThrough ? 'bg-gray-200 border-gray-300 text-gray-400' : 'bg-white border-slate-300 text-slate-600'
+                                              isStruckThrough ? 'bg-gray-200 border-gray-300 text-gray-400' : isSelected ? 'bg-blue-600 border-blue-700 text-white shadow-md' : 'bg-white border-slate-300 text-slate-600'
                                             }`}>
                                               {String.fromCharCode(65 + index)}
                                             </div>
                                           </td>
                                           {optionValues.map((value, valIdx) => (
-                                            <td key={valIdx} className={`px-3 py-2 text-center text-sm border-b border-gray-200 ${isSelected ? 'text-slate-900' : isStruckThrough ? 'text-gray-500 line-through' : 'text-slate-700'}`}>
+                                            <td key={valIdx} className={`px-3 py-2 text-center text-sm border-b border-gray-200 ${isStruckThrough ? 'text-gray-500 line-through' : isSelected ? 'text-slate-900' : 'text-slate-700'}`}>
                                               {value.trim()}
                                             </td>
                                           ))}
@@ -1274,8 +1290,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                             ) : (
                               <div className="space-y-3">
                                 {question.options.map((option, index) => {
-                                  const isSelected = selectedIndex !== null && selectedIndex === index;
                                   const isStruckThrough = strikethroughState[question.id]?.includes(index);
+                                  // Only show as selected if NOT struck through (strikethrough takes priority)
+                                  const isSelected = !isStruckThrough && selectedIndex !== null && selectedIndex === index;
                                   const correctAnswerIndex = question.correctAnswer ? question.correctAnswer.charCodeAt(0) - 65 : -1;
                                   const isCorrect = index === correctAnswerIndex;
                                   return (
@@ -1310,7 +1327,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                       <span className={`w-6 h-6 flex items-center justify-center rounded-full text-xs font-medium flex-shrink-0 ${
                                         isCustomAssignment ? 'border-2 border-black' : 'border'
                                       } ${
-                                        showResults ? (isCorrect ? 'bg-green-100 border-green-300 text-green-700' : isSelected ? 'bg-red-100 border-red-300 text-red-700' : 'bg-white border-gray-300 text-gray-500') : isSelected ? 'bg-blue-500 border-blue-600 text-white font-semibold' : 'bg-white border-gray-300 text-gray-600'
+                                        showResults ? (isCorrect ? 'bg-green-100 border-green-300 text-green-700' : isSelected ? 'bg-red-100 border-red-300 text-red-700' : 'bg-white border-gray-300 text-gray-500') : isStruckThrough ? 'bg-gray-200 border-gray-300 text-gray-400' : isSelected ? 'bg-blue-500 border-blue-600 text-white font-semibold' : 'bg-white border-gray-300 text-gray-600'
                                       }`}> 
                                         {String.fromCharCode(65 + index)}
                                       </span>

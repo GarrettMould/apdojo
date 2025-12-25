@@ -18,6 +18,7 @@ import Image from "next/image";
 import { DojoDrill as DojoDrillType, ComprehensionQuestion } from "@/data/dojoDrills";
 import ReactMarkdown from 'react-markdown';
 import { useAuthContext } from '@/contexts/AuthContext';
+import { saveDojoDrillProgress } from '@/lib/dojoDrillProgress';
 
 // Helper function to parse markdown table from text
 const parseMarkdownTable = (text: string): { tableData: { headers: string[]; rows: string[][] } | null; textWithoutTable: string } => {
@@ -96,7 +97,7 @@ interface DojoDrillProps {
 }
 
 export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
-  const { awardXp } = useAuthContext();
+  const { awardXp, user } = useAuthContext();
   const [step, setStep] = useState(1);
   const [videoEnded, setVideoEnded] = useState(false);
   const [comprehensionAnswers, setComprehensionAnswers] = useState<Record<string, number>>({});
@@ -164,6 +165,12 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
 
   const handleVideoEnd = () => {
     setVideoEnded(true);
+    // Save stage1 progress when video ends (if comprehension questions already submitted)
+    if (compQuestionsSubmitted && user) {
+      saveDojoDrillProgress(user.uid, drill.id, 'stage1').catch((error) => {
+        console.error('[DojoDrill] Error saving stage1 progress:', error);
+      });
+    }
   };
 
   const handleComprehensionAnswer = (questionId: string, answerIndex: number) => {
@@ -178,11 +185,23 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
     );
     if (allAnswered) {
       setCompQuestionsSubmitted(true);
+      // Save stage1 progress when comprehension questions are submitted (if video also ended)
+      if (videoEnded && user) {
+        saveDojoDrillProgress(user.uid, drill.id, 'stage1').catch((error) => {
+          console.error('[DojoDrill] Error saving stage1 progress:', error);
+        });
+      }
     }
   };
 
   const handleStage1Next = () => {
     if (videoEnded && compQuestionsSubmitted) {
+      // Ensure stage1 progress is saved (in case video ended after submission)
+      if (user) {
+        saveDojoDrillProgress(user.uid, drill.id, 'stage1').catch((error) => {
+          console.error('[DojoDrill] Error saving stage1 progress:', error);
+        });
+      }
       setStep(2);
       setVideoEnded(false);
       setCompQuestionsSubmitted(false);
@@ -209,6 +228,12 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
   };
 
   const handleStep2Next = () => {
+    // Save stage2 progress
+    if (user) {
+      saveDojoDrillProgress(user.uid, drill.id, 'stage2').catch((error) => {
+        console.error('[DojoDrill] Error saving stage2 progress:', error);
+      });
+    }
     setStep(3);
     setGraphCompleted(false);
     setTableCompleted(false);
@@ -237,6 +262,12 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
     if (currentMcqIndex < mcqQuestions.length - 1) {
       setCurrentMcqIndex(currentMcqIndex + 1);
     } else {
+      // All MCQs answered - save stage3 progress
+      if (user) {
+        saveDojoDrillProgress(user.uid, drill.id, 'stage3').catch((error) => {
+          console.error('[DojoDrill] Error saving stage3 progress:', error);
+        });
+      }
       setStep(4);
     }
   };

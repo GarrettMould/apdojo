@@ -1,17 +1,47 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { dojoDrills } from '@/data/dojoDrills';
 import { DojoDrillPreview } from '@/components/DojoDrillPreview';
 import { ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useAuthContext } from '@/contexts/AuthContext';
+import { loadDojoDrillProgress, getDrillProgress } from '@/lib/dojoDrillProgress';
 
 export default function DojoDrillPreviewPage() {
   const params = useParams();
   const router = useRouter();
+  const { user, loading: authLoading } = useAuthContext();
   const drillId = params.drillId as string;
+  const [progress, setProgress] = useState<{ stage1: boolean; stage2: boolean; stage3: boolean } | null>(null);
+  const [loadingProgress, setLoadingProgress] = useState(true);
   
   const drill = drillId ? dojoDrills[drillId] : null;
+
+  // Load progress when user and drill are available
+  useEffect(() => {
+    const fetchProgress = async () => {
+      if (user && drillId) {
+        setLoadingProgress(true);
+        try {
+          const allProgress = await loadDojoDrillProgress(user.uid);
+          const drillProgress = getDrillProgress(allProgress, drillId);
+          setProgress(drillProgress);
+        } catch (error) {
+          console.error('[DojoDrillPreview] Error loading progress:', error);
+        } finally {
+          setLoadingProgress(false);
+        }
+      } else {
+        setLoadingProgress(false);
+      }
+    };
+
+    if (!authLoading) {
+      fetchProgress();
+    }
+  }, [user, drillId, authLoading]);
 
   if (!drill) {
     return (
@@ -73,6 +103,7 @@ export default function DojoDrillPreviewPage() {
               difficulty={difficulty}
               onStart={handleStart}
               isLocked={false}
+              progress={progress}
             />
           </motion.div>
         </div>

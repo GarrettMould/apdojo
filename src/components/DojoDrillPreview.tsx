@@ -10,13 +10,18 @@ interface DojoDrillPreviewProps {
   difficulty: 'Easy' | 'Medium' | 'Hard';
   onStart: () => void;
   isLocked?: boolean;
+  progress?: {
+    stage1: boolean;
+    stage2: boolean;
+    stage3: boolean;
+  } | null;
 }
 
 const learningPathItems = [
-  'Video Briefing',
-  'Interactive Simulation',
-  'MCQ Gauntlet',
-  'Mastery Challenge',
+  { label: 'Video Briefing', stage: 'stage1' as const },
+  { label: 'Interactive Simulation', stage: 'stage2' as const },
+  { label: 'MCQ Gauntlet', stage: 'stage3' as const },
+  { label: 'Mastery Challenge', stage: null }, // Final step, no tracking needed
 ];
 
 export function DojoDrillPreview({
@@ -26,6 +31,7 @@ export function DojoDrillPreview({
   difficulty,
   onStart,
   isLocked = false,
+  progress = null,
 }: DojoDrillPreviewProps) {
   return (
     <div className="bg-white border-4 border-black rounded-3xl shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] p-8 sm:p-12 flex flex-col min-h-full"
@@ -67,17 +73,42 @@ export function DojoDrillPreview({
         
         {/* Learning Path Items */}
         <div>
-          {learningPathItems.map((item, index) => (
-            <div
-              key={index}
-              className="flex items-center gap-4 py-3 border-b-2 border-dashed border-gray-100 last:border-0"
-            >
-              <Circle className="w-8 h-8 text-gray-300 stroke-[3px] flex-shrink-0" />
-              <span className="text-lg font-bold text-gray-800">
-                {item}
-              </span>
-            </div>
-          ))}
+          {learningPathItems.map((item, index) => {
+            const isCompleted = item.stage && progress?.[item.stage];
+            return (
+              <div
+                key={index}
+                className={`flex items-center gap-4 py-3 border-b-2 border-dashed border-gray-100 last:border-0 ${
+                  isCompleted ? 'opacity-100' : ''
+                }`}
+              >
+                {isCompleted ? (
+                  <div className="relative w-8 h-8 flex-shrink-0">
+                    <Circle className="w-8 h-8 text-gray-300 stroke-[3px] absolute" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-4 h-4 bg-blue-600 rounded-full" />
+                    </div>
+                  </div>
+                ) : (
+                  <Circle className="w-8 h-8 text-gray-300 stroke-[3px] flex-shrink-0" />
+                )}
+                <span
+                  className={`text-lg font-bold relative ${
+                    isCompleted
+                      ? 'text-gray-900'
+                      : 'text-gray-800'
+                  }`}
+                  style={isCompleted ? {
+                    textDecoration: 'line-through',
+                    textDecorationColor: '#2563eb', // blue-600
+                    textDecorationThickness: '2px'
+                  } : {}}
+                >
+                  {item.label}
+                </span>
+              </div>
+            );
+          })}
         </div>
       </div>
 

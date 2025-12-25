@@ -1348,10 +1348,62 @@ export default function UnitPage() {
                     }))}
                   />
                 )}
-              </>
+              </> 
             );
               })()}
         </div>
+
+        {/* Unit Navigation - Previous/Next Buttons */}
+        {(() => {
+          const unitsToDisplay = selectedSubject === 'macro' ? allMacroUnits : allMicroUnits;
+          const prevUnit = unitsToDisplay.find(u => u.number === activeUnitNum - 1);
+          const nextUnit = unitsToDisplay.find(u => u.number === activeUnitNum + 1);
+          const buttonColorClass = themeColor === 'blue' 
+            ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600' 
+            : 'bg-green-600 hover:bg-green-700 text-white border-green-600';
+          
+          return (
+            <div className="mt-12 pt-8 border-t border-gray-200">
+              <div className="flex gap-4">
+                {/* Previous Unit Button */}
+                {prevUnit ? (
+                  <Link
+                    href={`/unit/${prevUnit.number}`}
+                    className={`flex-1 flex items-center gap-3 px-6 py-4 ${buttonColorClass} border-2 rounded-lg transition-all duration-200 group shadow-sm hover:shadow-md`}
+                  >
+                    <ArrowLeft className="w-5 h-5 flex-shrink-0" />
+                    <div className="text-left min-w-0">
+                      <div className="text-xs opacity-80 uppercase tracking-wide">Previous</div>
+                      <div className="text-base font-semibold truncate">
+                        Unit {prevUnit.number}: {prevUnit.title}
+                      </div>
+                    </div>
+                  </Link>
+                ) : (
+                  <div className="flex-1" /> // Spacer when no previous unit
+                )}
+
+                {/* Next Unit Button */}
+                {nextUnit ? (
+                  <Link
+                    href={`/unit/${nextUnit.number}`}
+                    className={`flex-1 flex items-center justify-end gap-3 px-6 py-4 ${buttonColorClass} border-2 rounded-lg transition-all duration-200 group shadow-sm hover:shadow-md`}
+                  >
+                    <div className="text-right min-w-0">
+                      <div className="text-xs opacity-80 uppercase tracking-wide">Next</div>
+                      <div className="text-base font-semibold truncate">
+                        Unit {nextUnit.number}: {nextUnit.title}
+                      </div>
+                    </div>
+                    <ArrowRight className="w-5 h-5 flex-shrink-0" />
+                  </Link>
+                ) : (
+                  <div className="flex-1" /> // Spacer when no next unit
+                )}
+              </div>
+            </div>
+          );
+        })()}
       </div>
       
       {/* Whiteboard Modal */}

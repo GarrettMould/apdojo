@@ -7,6 +7,7 @@ import { Check, X, Brain, FileText, ChevronDown, Triangle, Loader2, RefreshCw, A
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
+import { getBeltProgress } from '@/lib/beltSystem';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { db } from '@/lib/firebase';
@@ -1059,24 +1060,24 @@ export function UnitMCQs({
         {/* Right Column: Controls and Resources */}
         {/* Adjusted column width lg:w-2/5 */}
         <div className="w-full lg:w-2/5 bg-white rounded-lg shadow-md border border-gray-200 p-4 lg:p-6 flex flex-col h-full">
-          {/* Progress Bar */}
+          {/* Progress Bar - Belt Progress to Next Belt */}
           {(() => {
-            const answeredCount = Object.keys(answeredQuestions).length;
-            const totalCount = questions.length;
-            const progressPercentage = totalCount > 0 ? (answeredCount / totalCount) * 100 : 0;
+            const userXP = user ? (totalXP ?? 0) : (guestXp ?? 0);
+            const beltProgress = getBeltProgress(userXP);
+            const { percent, nextBelt, xpToNext } = beltProgress;
             
             return (
               <div className="mb-6 flex items-center gap-3">
-                <div className="flex-1 bg-gray-200 rounded-full h-4 border border-gray-300">
+                <div className="flex-1 bg-gray-200 rounded-full h-4 border border-gray-300 overflow-hidden">
                   <motion.div
                     className="bg-blue-600 h-4 rounded-full"
                     initial={{ width: 0 }}
-                    animate={{ width: `${progressPercentage}%` }}
+                    animate={{ width: `${percent}%` }}
                     transition={{ duration: 0.3 }}
                   />
                 </div>
                 <span className="text-sm font-semibold text-gray-700 whitespace-nowrap">
-                  {answeredCount}/{totalCount}
+                  {nextBelt ? `${xpToNext?.toLocaleString() || 0} to ${nextBelt.name.replace(' Belt', '')}` : 'Max Rank'}
                 </span>
               </div>
             );

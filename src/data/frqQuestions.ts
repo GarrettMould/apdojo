@@ -252,7 +252,7 @@ export const microUnit5Set1: FRQExam = {
 
 export const microUnit4Set2: FRQExam = {
   examTitle: "AP Microeconomics Unit 4 FRQ: Game Theory",
-  thumbnailUrl: '/images/frqPracticePage/microGameTheoryMatrix.png',
+  thumbnailUrl: '/images/frqPracticePage/microUnit4Set3.svg', // Using existing image as fallback
   unit: 4,
   questions: [
     {
@@ -1355,7 +1355,7 @@ export const macroUnit6Set1: FRQExam = {
 
 export const microUnit2Set5: FRQExam = {
   examTitle: "AP Microeconomics Unit 2 FRQ: Tax Calculation and Allocative Efficiency",
-  thumbnailUrl: "/images/frqPracticePage/U2FRQMicroCover.jpg",
+  thumbnailUrl: "/images/frqPracticePage/microUnit2Set2.svg", // Using existing image as fallback
   unit: 2,
   questions: [
     {
@@ -1485,7 +1485,7 @@ export const microUnit1Set1: FRQExam = {
 
 export const microUnit2Set2: FRQExam = {
   examTitle: "AP Microeconomics Unit 2 FRQ: International Trade and Tariffs",
-  thumbnailUrl: "/images/frqPracticePage/U2FRQMicroCover.jpg",
+  thumbnailUrl: "/images/frqPracticePage/microUnit2Set2.svg", // Using existing image as fallback
   unit: 2,
   questions: [
     {
@@ -1553,7 +1553,7 @@ export const microUnit2Set2: FRQExam = {
 
 export const microUnit2Set6: FRQExam = {
   examTitle: "AP Microeconomics Unit 2 FRQ: Utility Maximization",
-  thumbnailUrl: "/images/frqPracticePage/U2FRQMicroCover.jpg",
+  thumbnailUrl: "/images/frqPracticePage/microUnit2Set2.svg", // Using existing image as fallback
   unit: 2,
   questions: [
     {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ArrowLeft, FileText, Check, X, CheckCircle, Lock } from 'lucide-react';
+import { ArrowLeft, FileText, Check, X, CheckCircle, Lock, Strikethrough } from 'lucide-react';
 import Link from 'next/link';
 // MVP: Removed authentication imports
 // import { useAuthContext } from '@/contexts/AuthContext';
@@ -24,6 +24,7 @@ export default function FullMCQExamPage() {
   const isExamLocked = false;
   
   const [answeredQuestions, setAnsweredQuestions] = useState<Record<string, { selectedAnswer: number; isCorrect: boolean }>>({});
+  const [strikethroughState, setStrikethroughState] = useState<Record<number, Set<number>>>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [expandedImage, setExpandedImage] = useState<string | null>(null);
   const [isLoadingProgress, setIsLoadingProgress] = useState(true);
@@ -180,18 +181,72 @@ export default function FullMCQExamPage() {
   const handleAnswerSelect = (questionId: number, answerIndex: number) => {
     if (isSubmitted) return; // Can't change answers after submission
     
+    // If option is struck through, just remove strikethrough and don't select
+    // This matches the exact logic from unitMCQS.tsx
+    if (strikethroughState[questionId]?.has(answerIndex)) {
+      setStrikethroughState(prev => {
+        const currentStrikes = prev[questionId] || new Set<number>();
+        const newSet = new Set(currentStrikes);
+        newSet.delete(answerIndex);
+        if (newSet.size === 0) {
+          const { [questionId]: _, ...rest } = prev;
+          return rest;
+        }
+        return { ...prev, [questionId]: newSet };
+      });
+      return; // Exit early - do NOT select
+    }
+    
+    // If the clicked answer is already selected, unselect it
+    const currentSelection = answeredQuestions[questionId];
+    if (currentSelection && currentSelection.selectedAnswer === answerIndex) {
+      setAnsweredQuestions(prev => {
+        const newState = { ...prev };
+        delete newState[questionId];
+        return newState;
+      });
+      return;
+    }
+    
     const question = questions.find(q => q.id === questionId);
     if (!question) return;
     
     const isCorrect = String.fromCharCode(65 + answerIndex) === question.correctAnswer;
-    console.log('Answer selected:', { questionId, answerIndex, isCorrect });
     setAnsweredQuestions(prev => {
-      const newState = {
+      return {
         ...prev,
         [questionId]: { selectedAnswer: answerIndex, isCorrect }
       };
-      console.log('New answeredQuestions state:', newState);
-      return newState;
+    });
+  };
+
+  const handleStrikethroughToggle = (questionId: number, optionIndex: number) => {
+    if (isSubmitted) return;
+
+    // If the option being struck through is the currently selected answer, deselect it.
+    if (answeredQuestions[questionId]?.selectedAnswer === optionIndex) {
+      setAnsweredQuestions(prev => {
+        const newState = { ...prev };
+        delete newState[questionId];
+        return newState;
+      });
+    }
+
+    // Toggle strikethrough using Set (matches unitMCQS logic)
+    setStrikethroughState(prev => {
+      const currentStrikes = prev[questionId] || new Set<number>();
+      const newSet = new Set(currentStrikes);
+      if (newSet.has(optionIndex)) {
+        newSet.delete(optionIndex);
+      } else {
+        newSet.add(optionIndex);
+      }
+      
+      if (newSet.size === 0) {
+        const { [questionId]: _, ...rest } = prev;
+        return rest;
+      }
+      return { ...prev, [questionId]: newSet };
     });
   };
 
@@ -331,24 +386,29 @@ export default function FullMCQExamPage() {
                         {/* Answer Options */}
                         <div className="space-y-3">
                           {question.options.map((option, index) => {
-                            const isSelected = currentAnswer?.selectedAnswer === index;
+                            const isStruckThrough = strikethroughState[question.id]?.has(index) ?? false;
+                            // Only show as selected if NOT struck through (strikethrough takes priority)
+                            const isSelected = !isStruckThrough && currentAnswer?.selectedAnswer === index;
                             
                             return (
-                              <button
+                              <div
                                 key={index}
                                 onClick={() => handleAnswerSelect(question.id, index)}
-                                disabled={isSubmitted}
-                                className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 flex items-start gap-4 group ${
-                                  isSelected 
-                                    ? 'bg-slate-50 text-slate-900 shadow-md border-slate-300 ring-2 ring-slate-100' 
-                                    : 'bg-white hover:bg-slate-50 border-slate-200 hover:border-slate-300 hover:shadow-md'
+                                className={`w-full text-left p-4 rounded-xl border-2 transition-all duration-200 flex items-center gap-4 group ${
+                                  isStruckThrough
+                                    ? 'bg-gray-100 text-gray-500 border-gray-200 cursor-default'
+                                    : isSelected 
+                                      ? 'bg-slate-50 text-slate-900 shadow-md border-slate-300 ring-2 ring-slate-100 cursor-pointer' 
+                                      : 'bg-white hover:bg-slate-50 border-slate-200 hover:border-slate-300 hover:shadow-md cursor-pointer'
                                 }`}
                               >
                                 {/* Letter indicator */}
                                 <div className={`flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg border-2 font-semibold text-sm transition-all duration-200 ${
-                                  isSelected 
-                                    ? 'bg-slate-700 border-slate-700 text-white' 
-                                    : 'bg-white border-slate-300 text-slate-600 group-hover:border-slate-400'
+                                  isStruckThrough
+                                    ? 'bg-gray-200 border-gray-300 text-gray-400'
+                                    : isSelected 
+                                      ? 'bg-slate-700 border-slate-700 text-white' 
+                                      : 'bg-white border-slate-300 text-slate-600 group-hover:border-slate-400'
                                 }`}>
                                   {String.fromCharCode(65 + index)}
                                 </div>
@@ -356,12 +416,24 @@ export default function FullMCQExamPage() {
                                 {/* Option Text */}
                                 <div className="flex-1 pt-1">
                                   <span className={`text-base ${
-                                    isSelected ? 'text-slate-900' : 'text-slate-700'
+                                    isStruckThrough ? 'text-gray-500 line-through' : isSelected ? 'text-slate-900' : 'text-slate-700'
                                   }`}>
                                     {option}
                                   </span>
                                 </div>
-                              </button>
+
+                                {/* Strikethrough Button */}
+                                <div
+                                  role="button"
+                                  onClick={(e) => { e.stopPropagation(); handleStrikethroughToggle(question.id, index); }}
+                                  className={`ml-auto p-2 rounded-lg transition-opacity cursor-pointer ${
+                                    isStruckThrough ? 'opacity-100 bg-slate-200 text-slate-600' : 'opacity-0 group-hover:opacity-100 bg-white hover:bg-slate-100 text-slate-400 hover:text-slate-600'
+                                  }`}
+                                  aria-label={isStruckThrough ? "Remove strikethrough" : "Strikethrough option"}
+                                >
+                                  <Strikethrough className="w-5 h-5" />
+                                </div>
+                              </div>
                             );
                           })}
                         </div>

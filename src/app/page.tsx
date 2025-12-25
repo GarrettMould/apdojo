@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation';
 import { frqExams } from '@/data/frqQuestions';
 import { SeasonPassHome } from '@/components/seasonPassHome';
 import { DojoDashboard } from '@/components/DojoDashboard';
+import { CourseProvider } from '@/contexts/CourseContext';
 // import { ReviewsSection } from '@/components/ReviewsSection';
 // import { UniversityLogos } from '@/components/UniversityLogos';
 
@@ -262,7 +263,11 @@ export default function Home() {
   
   // Show DojoDashboard for logged-in users, SeasonPassHome for logged-out users
   if (user) {
-    return <DojoDashboard />;
+    return (
+      <CourseProvider>
+        <DojoDashboard />
+      </CourseProvider>
+    );
   }
   
   return <SeasonPassHome />;

@@ -1,8 +1,19 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['cdn.sanity.io', 'apdojowhiteboards.s3.amazonaws.com'], // For Sanity images and S3 whiteboards
     remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'cdn.sanity.io',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'apdojowhiteboards.s3.amazonaws.com',
+        port: '',
+        pathname: '/**',
+      },
       {
         protocol: 'https',
         hostname: 'apdojovideos.s3.ap-southeast-2.amazonaws.com',
