@@ -1,50 +1,79 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShieldCheck, AlertTriangle, ChevronDown, ChevronUp, Play, BookOpen, Target, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
+import { useAuthContext } from '@/contexts/AuthContext';
+import { getBeltProgress } from '@/lib/beltSystem';
+import { dojoDrills } from '@/data/dojoDrills';
 
-// Mock Data
-const userData = {
-  belt: 'Yellow',
-  xp: 3450,
-  nextBeltXP: 7500,
-  unitScores: [
-    { id: 1, name: 'Basic Concepts', score: 85, status: 'strong' },
-    { id: 2, name: 'Supply & Demand', score: 45, status: 'weak' },
-    { id: 3, name: 'Production, Cost, and Perfect Competition', score: 72, status: 'medium' },
-    { id: 4, name: 'Imperfect Competition', score: 68, status: 'medium' },
-    { id: 5, name: 'Factor Markets', score: 78, status: 'strong' },
-    { id: 6, name: 'Market Failure and the Role of Government', score: 65, status: 'medium' },
-  ],
-  weakestUnit: 'Unit 2: Supply & Demand',
-  strongestUnit: 'Unit 1: Basic Concepts',
-};
+// Mock Data for unit scores (this will be replaced with real data later)
+const unitScores = [
+  { id: 1, name: 'Basic Concepts', score: 85, status: 'strong' },
+  { id: 2, name: 'Supply & Demand', score: 45, status: 'weak' },
+  { id: 3, name: 'Production, Cost, and Perfect Competition', score: 72, status: 'medium' },
+  { id: 4, name: 'Imperfect Competition', score: 68, status: 'medium' },
+  { id: 5, name: 'Factor Markets', score: 78, status: 'strong' },
+  { id: 6, name: 'Market Failure and the Role of Government', score: 65, status: 'medium' },
+];
 
 export function DojoDashboard() {
   const [showFullRecord, setShowFullRecord] = useState(false);
+  const { user, totalXP, guestXp, selectedSubject } = useAuthContext();
+  
+  // Get XP from user or guest
+  const xp = user ? (totalXP ?? 0) : (guestXp ?? 0);
+  
+  // Calculate belt progress using the belt system
+  const beltProgress = getBeltProgress(xp);
+  const { currentBelt, nextBelt, xpToNext, percent, nextBeltXP } = beltProgress;
+  
+  // Calculate display values
+  const xpProgress = percent;
+  const xpRemaining = xpToNext ?? 0;
+  
+  // Get belt name without "Belt" suffix for display
+  const beltName = currentBelt.name.replace(' Belt', '');
+  const nextBeltName = nextBelt?.name.replace(' Belt', '') ?? '';
+  
+  // Mock data for weakest/strongest units (will be replaced with real data later)
+  const weakestUnit = 'Unit 2: Supply & Demand';
+  const strongestUnit = 'Unit 1: Basic Concepts';
+  
+  // Extract unit number from weakestUnit (e.g., "Unit 2: Supply & Demand" -> 2)
+  const unitNumberMatch = weakestUnit.match(/Unit (\d+)/);
+  const unitNumber = unitNumberMatch ? parseInt(unitNumberMatch[1], 10) : 1;
 
-  const { belt, xp, nextBeltXP, unitScores, weakestUnit, strongestUnit } = userData;
-  const xpProgress = (xp / nextBeltXP) * 100;
-  const xpRemaining = nextBeltXP - xp;
+  // Find a dojo drill for the weakest unit and current subject
+  const relevantDrill = useMemo(() => {
+    const subjectFilter = selectedSubject === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics';
+    const drillsForUnit = Object.values(dojoDrills).filter(
+      drill => drill.unit === unitNumber && drill.subject === subjectFilter
+    );
+    return drillsForUnit.length > 0 ? drillsForUnit[0] : null;
+  }, [unitNumber, selectedSubject]);
 
   // Recommended training missions targeting weakest unit
   const missions = [
     {
       icon: Target,
       title: `Fix ${weakestUnit} Drill`,
-      description: 'Targeted practice for supply shifters',
+      description: relevantDrill ? relevantDrill.description : 'Targeted practice for this unit',
+      href: relevantDrill ? `/dojo-drills/preview/${relevantDrill.id}` : '/dojo-drills', // Link to specific drill preview or general page
     },
     {
       icon: BookOpen,
       title: `${weakestUnit} Cheat Sheet`,
       description: 'Review key concepts and formulas',
+      href: `/unit/${unitNumber}`, // Link to unit cheat sheet
     },
     {
       icon: Play,
       title: `${weakestUnit} MCQ Speed Run`,
       description: 'Quick-fire practice questions',
+      href: `/unitMCQPracticePage?subject=${selectedSubject}&mode=custom&units=${unitNumber}`, // Link to MCQ practice for that unit
     },
   ];
 
@@ -66,8 +95,8 @@ export function DojoDashboard() {
               className="flex-shrink-0"
             >
               <Image
-                src="/images/beltYellow.svg"
-                alt={`${belt} Belt`}
+                src="/images/belt.svg"
+                alt={`${currentBelt.name}`}
                 width={120}
                 height={120}
                 className="w-30 h-30"
@@ -77,22 +106,24 @@ export function DojoDashboard() {
             {/* Right: Stats */}
             <div className="flex-1 w-full">
               <h2 className="text-3xl font-black text-gray-900 mb-6">
-                Current Rank: {belt} Belt
+                Current Rank: {currentBelt.name}
               </h2>
 
               {/* XP Bar */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-bold text-gray-700">
-                    {xp.toLocaleString()} / {nextBeltXP.toLocaleString()} XP to Orange
+                    {xp.toLocaleString()} / {nextBeltXP ? nextBeltXP.toLocaleString() : 'MAX'} XP {nextBelt ? `to ${nextBeltName}` : ''}
                   </span>
-                  <span className="text-sm font-bold text-gray-600">
-                    {xpRemaining.toLocaleString()} XP remaining
-                  </span>
+                  {xpRemaining > 0 && (
+                    <span className="text-sm font-bold text-gray-600">
+                      {xpRemaining.toLocaleString()} XP remaining
+                    </span>
+                  )}
                 </div>
                 <div className="h-6 w-full bg-gray-200 rounded-full border-2 border-black overflow-hidden">
                   <motion.div
-                    className="h-full bg-yellow-400 rounded-full"
+                    className="h-full bg-blue-600 rounded-full"
                     initial={{ width: 0 }}
                     animate={{ width: `${xpProgress}%` }}
                     transition={{ duration: 1, ease: 'easeOut' }}
@@ -219,29 +250,30 @@ export function DojoDashboard() {
             {missions.map((mission, index) => {
               const IconComponent = mission.icon;
               return (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.4 + index * 0.1, duration: 0.5 }}
-                  className="bg-white border-2 border-black rounded-xl p-4 hover:translate-x-1 transition-transform cursor-pointer shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4 flex-1">
-                      <div className="flex-shrink-0">
-                        <IconComponent className="w-6 h-6 text-gray-700" />
+                <Link key={index} href={mission.href}>
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.4 + index * 0.1, duration: 0.5 }}
+                    className="bg-white border-2 border-black rounded-xl p-4 hover:translate-x-1 transition-transform cursor-pointer shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4 flex-1">
+                        <div className="flex-shrink-0">
+                          <IconComponent className="w-6 h-6 text-gray-700" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-lg font-bold text-gray-900">{mission.title}</h3>
+                          <p className="text-sm text-gray-600">{mission.description}</p>
+                        </div>
                       </div>
-                      <div className="flex-1">
-                        <h3 className="text-lg font-bold text-gray-900">{mission.title}</h3>
-                        <p className="text-sm text-gray-600">{mission.description}</p>
+                      <div className="flex items-center gap-2 text-blue-600 font-bold hover:text-blue-700">
+                        <span>Start Mission</span>
+                        <ArrowRight className="w-5 h-5" />
                       </div>
                     </div>
-                    <button className="flex items-center gap-2 text-blue-600 font-bold hover:text-blue-700">
-                      <span>Start Mission</span>
-                      <ArrowRight className="w-5 h-5" />
-                    </button>
-                  </div>
-                </motion.div>
+                  </motion.div>
+                </Link>
               );
             })}
           </div>

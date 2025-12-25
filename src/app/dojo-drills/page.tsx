@@ -1,34 +1,46 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { dojoDrills } from '@/data/dojoDrills';
 import DojoDrill from '@/components/DojoDrill';
 import { ArrowLeft } from 'lucide-react';
 import Image from 'next/image';
 
 export default function DojoDrillsPage() {
-  const [selectedDrillId, setSelectedDrillId] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const drillIdFromQuery = searchParams.get('drill');
+  const [selectedDrillId, setSelectedDrillId] = useState<string | null>(drillIdFromQuery);
+
+  // Update selectedDrillId when query param changes
+  useEffect(() => {
+    if (drillIdFromQuery) {
+      setSelectedDrillId(drillIdFromQuery);
+    }
+  }, [drillIdFromQuery]);
 
   const drills = Object.values(dojoDrills);
   const currentDrill = selectedDrillId ? dojoDrills[selectedDrillId] : null;
 
   if (currentDrill) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12 px-4">
-        <div className="max-w-7xl mx-auto relative">
+      <div className="h-screen overflow-hidden bg-gradient-to-b from-gray-50 to-white px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-7xl mx-auto relative h-full flex gap-6">
           <button
             onClick={() => setSelectedDrillId(null)}
-            className="absolute -left-16 top-0 w-12 h-12 bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 group"
+            className="w-12 h-12 bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 group flex-shrink-0 self-start"
           >
             <ArrowLeft className="w-6 h-6 text-gray-900 group-hover:text-gray-700 transition-colors" />
           </button>
-          <DojoDrill
-            drill={currentDrill}
-            onComplete={() => {
-              // Handle completion - maybe show a success message or navigate
-              console.log('Dojo Drill completed!');
-            }}
-          />
+          <div className="flex-1 h-full overflow-y-auto">
+            <DojoDrill
+              drill={currentDrill}
+              onComplete={() => {
+                // Handle completion - maybe show a success message or navigate
+                console.log('Dojo Drill completed!');
+              }}
+            />
+          </div>
         </div>
       </div>
     );

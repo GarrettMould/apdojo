@@ -299,27 +299,6 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
 
   return (
     <div className="w-full max-w-7xl mx-auto">
-      {/* Progress Dots - Above Container */}
-      <div className="flex justify-center gap-2 mb-6">
-        {Array.from({ length: totalSteps }).map((_, index) => {
-          const stepNum = index + 1;
-          const isActive = step === stepNum;
-          const isCompleted = step > stepNum;
-          return (
-            <div
-              key={stepNum}
-              className={`w-3 h-3 rounded-full transition-all ${
-                isActive
-                  ? "bg-black scale-125"
-                  : isCompleted
-                  ? "bg-green-500"
-                  : "bg-gray-300"
-              }`}
-            />
-          );
-        })}
-      </div>
-
       {/* Card Container */}
       <div className="relative min-h-[600px]">
         <AnimatePresence mode="wait">

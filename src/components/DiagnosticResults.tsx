@@ -28,8 +28,8 @@ export function DiagnosticResults({ results, onClaimRank }: DiagnosticResultsPro
   
   // Determine belt image and headline based on belt
   const isYellowBelt = belt === 'Yellow Belt';
-  // Using beltYellow for both until beltWhite.svg is added
-  const beltImage = '/images/beltYellow.svg';
+  // Using belt for both until beltWhite.svg is added
+  const beltImage = '/images/belt.svg';
   const headline = isYellowBelt ? 'Excellent Start!' : 'Good Effort, Rookie!';
 
   // Resource prescription cards

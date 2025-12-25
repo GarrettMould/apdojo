@@ -1,0 +1,83 @@
+'use client';
+
+import { useParams, useRouter } from 'next/navigation';
+import { dojoDrills } from '@/data/dojoDrills';
+import { DojoDrillPreview } from '@/components/DojoDrillPreview';
+import { ArrowLeft } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+export default function DojoDrillPreviewPage() {
+  const params = useParams();
+  const router = useRouter();
+  const drillId = params.drillId as string;
+  
+  const drill = drillId ? dojoDrills[drillId] : null;
+
+  if (!drill) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-12 px-4 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Drill Not Found</h1>
+          <button
+            onClick={() => router.push('/dojo-drills')}
+            className="bg-black text-white px-6 py-3 rounded-lg font-bold hover:bg-gray-800 transition-colors"
+          >
+            Back to Drills
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const handleStart = () => {
+    router.push(`/dojo-drills?drill=${drill.id}`);
+  };
+
+  // Determine difficulty - default to Medium for now
+  // You can add a difficulty field to the DojoDrill interface later if needed
+  const difficulty: 'Easy' | 'Medium' | 'Hard' = 'Medium';
+
+  return (
+    <div className="h-screen overflow-hidden bg-gradient-to-b from-gray-50 to-white px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-4xl mx-auto relative h-full flex gap-6">
+        {/* Back Button */}
+        <button
+          onClick={() => router.back()}
+          className="w-12 h-12 bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 group flex-shrink-0 self-start"
+        >
+          <ArrowLeft className="w-6 h-6 text-gray-900 group-hover:text-gray-700 transition-colors" />
+        </button>
+
+        {/* Card Container with Stacked Paper Effect */}
+        <div className="flex-1 relative h-full flex flex-col">
+          {/* Stacked Paper Effect - Background layers */}
+          <div className="absolute inset-0 -z-10">
+            {/* First layer */}
+            <div className="absolute top-2 left-2 right-2 bottom-2 bg-white border-4 border-black rounded-3xl opacity-20 transform rotate-1" />
+            {/* Second layer */}
+            <div className="absolute top-4 left-4 right-4 bottom-4 bg-white border-4 border-black rounded-3xl opacity-10 transform -rotate-1" />
+          </div>
+
+          {/* Preview Card */}
+          <motion.div
+            initial={{ opacity: 0, x: 300 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -300 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            className="relative flex-1 overflow-y-auto"
+          >
+            <DojoDrillPreview
+              title={drill.title}
+              description={drill.description}
+              xpReward={drill.xpReward.total}
+              difficulty={difficulty}
+              onStart={handleStart}
+              isLocked={false}
+            />
+          </motion.div>
+        </div>
+      </div>
+    </div>
+  );
+}
+

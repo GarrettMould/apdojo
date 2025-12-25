@@ -42,7 +42,7 @@ const onboardingSteps: OnboardingStep[] = [
     title: 'Belt System',
     description: 'Progress through belt levels as you master concepts and earn XP. Start your journey to mastery!',
     icon: Award,
-    image: '/images/beltYellow.svg',
+    image: '/images/belt.svg',
   },
 ];
 

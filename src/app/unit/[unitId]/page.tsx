@@ -1022,12 +1022,12 @@ export default function UnitPage() {
           return (
             <div className="mb-8">
               <h2 className="text-xl font-bold text-gray-900 mb-3">Dojo Drills</h2>
-              <div className="flex flex-wrap gap-4">
+              <div className="flex md:flex-row md:flex-wrap gap-4 overflow-x-auto md:overflow-x-visible pb-2 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0">
                 {relevantDrills.map((drill) => (
                   <button
                     key={drill.id}
-                    onClick={() => router.push(`/dojo-drills?drill=${drill.id}`)}
-                    className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4 text-left hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 flex-1 min-w-[240px] max-w-[320px] flex flex-col group"
+                    onClick={() => router.push(`/dojo-drills/preview/${drill.id}`)}
+                    className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4 text-left hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 flex-shrink-0 w-[45%] md:flex-1 md:min-w-[240px] md:max-w-[320px] flex flex-col group aspect-[5/6] md:aspect-auto"
                   >
                     <div className="flex items-center justify-between mb-2">
                       <div
@@ -1052,10 +1052,10 @@ export default function UnitPage() {
                         </span>
                       </div>
                     </div>
-                    <h3 className="text-base font-bold text-gray-900 mb-1.5 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                    <h3 className="text-base font-bold text-gray-900 mb-1.5 line-clamp-2 group-hover:text-blue-600 transition-colors flex-1">
                       {drill.title}
                     </h3>
-                    <p className="text-xs text-gray-600 line-clamp-2 mb-2">
+                    <p className="hidden md:block text-xs text-gray-600 line-clamp-2 mb-2">
                       {drill.description}
                     </p>
                     <div className="text-xs font-semibold text-blue-600 mt-auto flex items-center gap-1">

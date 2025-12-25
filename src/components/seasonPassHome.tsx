@@ -406,8 +406,8 @@ function DojoDrillsSection() {
   };
 
   const handleDrillClick = (drillId: string) => {
-    // Navigate to dojo drills page with the selected drill
-    window.location.href = `/dojo-drills?drill=${drillId}`;
+    // Navigate to dojo drill preview page
+    window.location.href = `/dojo-drills/preview/${drillId}`;
   };
 
   return (
