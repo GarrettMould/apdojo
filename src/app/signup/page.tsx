@@ -49,7 +49,7 @@ export default function Signup() {
 
     try {
       await signup(email, password, isSubscribed)
-      router.push('/select-subject')
+      router.push('/')
     } catch (err: any) {
       // User-friendly error messages
       if (err instanceof FirebaseError) {

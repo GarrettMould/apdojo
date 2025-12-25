@@ -11,6 +11,7 @@ import { dojoDrills } from '@/data/dojoDrills';
 import { frqExams } from '@/data/frqQuestions';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 interface FeatureItem {
   icon: React.ReactNode;
@@ -54,9 +55,25 @@ export function SeasonPassHome() {
               Score a 5 in AP Econ.
             </span>
           </h1>
-          <p className="text-xl sm:text-2xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl sm:text-2xl text-gray-600 max-w-3xl mx-auto mb-8">
             Get everything you need to master AP Macroeconomics and AP Microeconomics in one comprehensive pass.
           </p>
+          {/* Diagnostic Test Button */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="flex justify-center"
+          >
+            <Link href="/diagnostic-test">
+              <Button
+                className="bg-black text-white hover:bg-gray-800 font-bold px-8 py-6 text-lg rounded-full shadow-lg transition-all hover:scale-105"
+                size="lg"
+              >
+                Take Diagnostic Test
+              </Button>
+            </Link>
+          </motion.div>
         </motion.div>
 
         {/* Season Pass Cards */}

@@ -185,7 +185,7 @@ export function SignupModal({ isOpen, onClose, switchToLogin, onAuthSuccess }: A
       await signup(email, password, isSubscribed);
       onClose();
       onAuthSuccess?.();
-      router.push('/select-subject');
+      router.push('/');
     } catch (err: any) {
       // User-friendly error messages
       if (err.code) {

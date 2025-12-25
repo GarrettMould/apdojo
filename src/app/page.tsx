@@ -10,6 +10,7 @@ import { topicBundles, TopicBundle } from '@/data/topicBundles';
 import { useRouter } from 'next/navigation';
 import { frqExams } from '@/data/frqQuestions';
 import { SeasonPassHome } from '@/components/seasonPassHome';
+import { DojoDashboard } from '@/components/DojoDashboard';
 // import { ReviewsSection } from '@/components/ReviewsSection';
 // import { UniversityLogos } from '@/components/UniversityLogos';
 
@@ -257,6 +258,11 @@ export default function Home() {
 
   if (loading) {
     return <HomePageLoadingFallback />;
+  }
+  
+  // Show DojoDashboard for logged-in users, SeasonPassHome for logged-out users
+  if (user) {
+    return <DojoDashboard />;
   }
   
   return <SeasonPassHome />;
