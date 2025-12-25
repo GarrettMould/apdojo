@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, X, FileText, Image as ImageIcon, Loader2, Check, Sparkles, CheckCircle2, XCircle, RefreshCw } from 'lucide-react';
+import { Upload, X, FileText, Image as ImageIcon, Loader2, Check, Sparkles, CheckCircle2, XCircle, RefreshCw, Lightbulb } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Question } from '@/data/questionBanks/types';
@@ -15,7 +15,7 @@ interface InfiniteDrillResult {
 
 type LoadingStage = 'idle' | 'analyzing' | 'identifying' | 'generating' | 'complete';
 
-export default function InfinitePracticePage() {
+function InfinitePracticePage() {
   const [inputMode, setInputMode] = useState<'image' | 'text'>('image');
   const [fileData, setFileData] = useState<{ file: File; preview: string; base64: string } | null>(null);
   const [textInput, setTextInput] = useState('');
@@ -25,6 +25,9 @@ export default function InfinitePracticePage() {
   const [error, setError] = useState<string | null>(null);
   const [userAnswers, setUserAnswers] = useState<Record<string, string>>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [showExplanation, setShowExplanation] = useState(false);
+  const [answeredQuestions, setAnsweredQuestions] = useState<Set<number>>(new Set());
 
   // Helper: Convert any file to Base64
   const convertFileToBase64 = (file: File): Promise<string> => {
@@ -120,6 +123,11 @@ export default function InfinitePracticePage() {
       
       setResult(data);
       setLoadingStage('complete');
+      setCurrentQuestionIndex(0);
+      setShowExplanation(false);
+      setAnsweredQuestions(new Set());
+      setUserAnswers({});
+      setIsSubmitted(false);
     } catch (err: any) {
       console.error('Error generating questions:', err);
       setError(err.message || 'Failed to generate practice questions. Please try again.');
@@ -137,26 +145,38 @@ export default function InfinitePracticePage() {
     setLoadingStage('idle');
     setUserAnswers({});
     setIsSubmitted(false);
+    setCurrentQuestionIndex(0);
+    setShowExplanation(false);
+    setAnsweredQuestions(new Set());
   };
 
   const handleAnswerSelect = (questionId: string, answer: string) => {
-    if (!isSubmitted) {
-      setUserAnswers(prev => ({ ...prev, [questionId]: answer }));
-    }
+    if (!result) return;
+    const question = result.questions.find(q => String(q.id) === questionId);
+    if (!question) return;
+    
+    // Only allow selection if question hasn't been answered yet
+    if (answeredQuestions.has(question.id || 0)) return;
+    
+    setUserAnswers(prev => ({ ...prev, [questionId]: answer }));
+    setAnsweredQuestions(prev => new Set(prev).add(question.id || 0));
+    setShowExplanation(false);
   };
 
-  const handleSubmit = () => {
+  const handleShowExplanation = () => {
+    setShowExplanation(true);
+  };
+
+  const handleNextQuestion = () => {
     if (!result) return;
     
-    // Check if all questions are answered
-    const allAnswered = result.questions.every(q => userAnswers[q.id || '']);
-    if (!allAnswered) {
-      setError('Please answer all questions before submitting');
-      return;
+    if (currentQuestionIndex < result.questions.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
+      setShowExplanation(false);
+    } else {
+      // All questions answered, show final results
+      setIsSubmitted(true);
     }
-    
-    setIsSubmitted(true);
-    setError(null);
   };
 
   const canGenerate = inputMode === 'image' ? !!fileData : !!textInput.trim();
@@ -378,200 +398,229 @@ export default function InfinitePracticePage() {
               </CardHeader>
             </Card>
 
-            {/* Questions */}
-            <div className="space-y-6">
-              {result.questions.map((question, index) => {
-                const questionId = String(question.id || `q${index}`);
-                const userAnswer = userAnswers[questionId];
-                const isCorrect = userAnswer === question.correctAnswer;
-                const showResults = isSubmitted;
+            {/* Progress Bar */}
+            {!isSubmitted && (
+              <div className="mb-6 flex items-center gap-3">
+                <div className="flex-1 bg-gray-200 rounded-full h-4 border border-gray-300">
+                  <motion.div
+                    className="bg-blue-600 h-4 rounded-full"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${((answeredQuestions.size) / result.questions.length) * 100}%` }}
+                    transition={{ duration: 0.3 }}
+                  />
+                </div>
+                <span className="text-sm font-semibold text-gray-700 whitespace-nowrap">
+                  {answeredQuestions.size}/{result.questions.length}
+                </span>
+              </div>
+            )}
 
-                return (
-                  <Card
-                    key={questionId}
-                    className={`border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] ${
-                      showResults
-                        ? isCorrect
-                          ? 'bg-green-50/30'
-                          : 'bg-red-50/30'
-                        : ''
-                    }`}
-                  >
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="text-xl">
-                          Question {index + 1} of 5
-                        </CardTitle>
-                        {showResults && (
-                          <div className="flex items-center gap-2">
-                            {isCorrect ? (
-                              <>
-                                <CheckCircle2 className="w-6 h-6 text-green-600" />
-                                <span className="text-green-600 font-semibold">Correct!</span>
-                              </>
-                            ) : (
-                              <>
-                                <XCircle className="w-6 h-6 text-red-600" />
-                                <span className="text-red-600 font-semibold">Incorrect</span>
-                              </>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        <p className="text-lg font-semibold text-gray-900">
-                          {question.question}
-                        </p>
-                        {question.tableData && (
-                          <div className="my-4 overflow-x-auto">
-                            <table className="min-w-full border-collapse border border-black">
-                              <thead className="bg-white">
-                                <tr>
-                                  {question.tableData.headers.map((header, headerIndex) => (
-                                    <th 
-                                      key={headerIndex} 
-                                      className="border border-black px-4 py-3 text-center text-base font-bold text-gray-900"
-                                    >
-                                      {header}
-                                    </th>
-                                  ))}
-                                </tr>
-                              </thead>
-                              <tbody className="bg-white">
-                                {question.tableData.rows.map((row, rowIndex) => (
-                                  <tr key={rowIndex}>
-                                    {row.map((cell, cellIndex) => {
-                                      const isRowHeader = question.tableData?.rowHeaders && cellIndex === 0;
-                                      return (
-                                        <td 
-                                          key={cellIndex} 
-                                          className={`border border-black px-4 py-3 text-center text-base ${
-                                            isRowHeader ? 'font-bold' : ''
-                                          }`}
-                                        >
-                                          {cell}
-                                        </td>
-                                      );
-                                    })}
-                                  </tr>
+            {/* Single Question Display */}
+            {!isSubmitted && result.questions[currentQuestionIndex] && (() => {
+              const question = result.questions[currentQuestionIndex];
+              const questionId = String(question.id || `q${currentQuestionIndex}`);
+              const userAnswer = userAnswers[questionId];
+              const isAnswered = answeredQuestions.has(question.id || 0);
+              const isCorrect = userAnswer === question.correctAnswer;
+
+              return (
+                <Card className="border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] relative">
+                  <CardHeader>
+                    <CardTitle className="text-xl">
+                      Question {currentQuestionIndex + 1} of {result.questions.length}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <p className="text-lg font-semibold text-gray-900">
+                        {question.question}
+                      </p>
+                      {question.tableData && (
+                        <div className="my-4 overflow-x-auto">
+                          <table className="min-w-full border-collapse border border-black">
+                            <thead className="bg-white">
+                              <tr>
+                                {question.tableData.headers.map((header, headerIndex) => (
+                                  <th 
+                                    key={headerIndex} 
+                                    className="border border-black px-4 py-3 text-center text-base font-bold text-gray-900"
+                                  >
+                                    {header}
+                                  </th>
                                 ))}
-                              </tbody>
-                            </table>
-                          </div>
-                        )}
-                        <div className="space-y-2">
-                          {question.options.map((option, optIndex) => {
-                            const letter = String.fromCharCode(65 + optIndex);
-                            const isSelected = userAnswer === letter;
-                            const isCorrectAnswer = letter === question.correctAnswer;
-                            
-                            // Determine styling based on state
-                            let optionStyle = 'bg-white border-gray-300';
-                            if (showResults) {
-                              if (isCorrectAnswer) {
-                                optionStyle = 'bg-green-50 border-green-500';
-                              } else if (isSelected && !isCorrectAnswer) {
-                                optionStyle = 'bg-red-50 border-red-500';
-                              }
-                            } else if (isSelected) {
-                              optionStyle = 'bg-blue-50 border-blue-500';
-                            }
-
-                            return (
-                              <div
-                                key={optIndex}
-                                className={`p-3 rounded-lg border-2 transition-colors ${optionStyle} ${
-                                  !showResults ? 'cursor-pointer hover:bg-blue-50 hover:border-blue-300' : ''
-                                }`}
-                                onClick={!showResults ? () => handleAnswerSelect(questionId, letter) : undefined}
-                              >
-                                <div className="flex items-center gap-3">
-                                  {!showResults ? (
-                                    <>
-                                      <input
-                                        type="radio"
-                                        name={questionId}
-                                        value={letter}
-                                        checked={isSelected}
-                                        onChange={() => handleAnswerSelect(questionId, letter)}
-                                        className="w-5 h-5 text-blue-600 flex-shrink-0"
-                                        onClick={(e) => e.stopPropagation()}
-                                      />
-                                      <span className="flex-1 text-gray-900">{option}</span>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <span
-                                        className={`w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0 ${
-                                          isCorrectAnswer
-                                            ? 'bg-green-500 text-white'
-                                            : isSelected
-                                            ? 'bg-red-500 text-white'
-                                            : 'bg-gray-200 text-gray-700'
+                              </tr>
+                            </thead>
+                            <tbody className="bg-white">
+                              {question.tableData.rows.map((row, rowIndex) => (
+                                <tr key={rowIndex}>
+                                  {row.map((cell, cellIndex) => {
+                                    const isRowHeader = question.tableData?.rowHeaders && cellIndex === 0;
+                                    return (
+                                      <td 
+                                        key={cellIndex} 
+                                        className={`border border-black px-4 py-3 text-center text-base ${
+                                          isRowHeader ? 'font-bold' : ''
                                         }`}
                                       >
-                                        {letter}
-                                      </span>
-                                      <span className="flex-1 text-gray-900">{option}</span>
-                                      {isCorrectAnswer && (
-                                        <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
-                                      )}
-                                      {isSelected && !isCorrectAnswer && (
-                                        <X className="w-5 h-5 text-red-600 flex-shrink-0" />
-                                      )}
-                                    </>
-                                  )}
-                                </div>
-                              </div>
-                            );
-                          })}
+                                        {cell}
+                                      </td>
+                                    );
+                                  })}
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
                         </div>
-                        {showResults && question.explanation && (
-                          <div className="mt-4 p-4 bg-blue-50 border-2 border-blue-200 rounded-lg">
-                            <p className="text-sm font-semibold text-blue-900 mb-1">
-                              Explanation:
-                            </p>
-                            <p className="text-sm text-blue-800">
-                              {question.explanation}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
+                      )}
+                      <div className="space-y-2">
+                        {question.options.map((option, optIndex) => {
+                          const letter = String.fromCharCode(65 + optIndex);
+                          const isSelected = userAnswer === letter;
+                          const isCorrectAnswer = letter === question.correctAnswer;
+                          
+                          // Determine styling based on state
+                          let optionStyle = 'bg-white border-gray-300';
+                          if (isAnswered) {
+                            if (isCorrectAnswer) {
+                              optionStyle = 'bg-green-50 border-green-500';
+                            } else if (isSelected && !isCorrectAnswer) {
+                              optionStyle = 'bg-red-50 border-red-500';
+                            }
+                          } else if (isSelected) {
+                            optionStyle = 'bg-blue-50 border-blue-500';
+                          }
 
-            {/* Action Buttons */}
-            <div className="space-y-4">
-              {!isSubmitted ? (
-                <Button
-                  onClick={handleSubmit}
-                  disabled={result.questions.some(q => !userAnswers[String(q.id || '')])}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-6 text-lg"
-                  size="lg"
-                >
-                  Submit Answers
-                </Button>
-              ) : (
-                <div className="p-4 bg-gray-100 rounded-lg border-2 border-gray-300">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-lg font-semibold text-gray-900">
-                      Score: {result.questions.filter(q => userAnswers[String(q.id || '')] === q.correctAnswer).length} / {result.questions.length}
-                    </span>
-                    <span className="text-sm text-gray-600">
-                      {Math.round((result.questions.filter(q => userAnswers[String(q.id || '')] === q.correctAnswer).length / result.questions.length) * 100)}%
-                    </span>
-                  </div>
+                          return (
+                            <motion.div
+                              key={optIndex}
+                              initial={false}
+                              animate={isAnswered && isCorrectAnswer ? { scale: [1, 1.05, 1] } : {}}
+                              transition={{ duration: 0.3 }}
+                              className={`p-3 rounded-lg border-2 transition-colors ${optionStyle} ${
+                                !isAnswered ? 'cursor-pointer hover:bg-blue-50 hover:border-blue-300' : ''
+                              }`}
+                              onClick={!isAnswered ? () => handleAnswerSelect(questionId, letter) : undefined}
+                            >
+                              <div className="flex items-center gap-3">
+                                {!isAnswered ? (
+                                  <>
+                                    <input
+                                      type="radio"
+                                      name={questionId}
+                                      value={letter}
+                                      checked={isSelected}
+                                      onChange={() => handleAnswerSelect(questionId, letter)}
+                                      className="w-5 h-5 text-blue-600 flex-shrink-0"
+                                      onClick={(e) => e.stopPropagation()}
+                                    />
+                                    <span className="flex-1 text-gray-900">{option}</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <span
+                                      className={`w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0 ${
+                                        isCorrectAnswer
+                                          ? 'bg-green-500 text-white'
+                                          : isSelected
+                                          ? 'bg-red-500 text-white'
+                                          : 'bg-gray-200 text-gray-700'
+                                      }`}
+                                    >
+                                      {letter}
+                                    </span>
+                                    <span className="flex-1 text-gray-900">{option}</span>
+                                    {isCorrectAnswer && (
+                                      <CheckCircle2 className="w-6 h-6 text-green-600 flex-shrink-0" />
+                                    )}
+                                    {isSelected && !isCorrectAnswer && (
+                                      <XCircle className="w-6 h-6 text-red-600 flex-shrink-0" />
+                                    )}
+                                  </>
+                                )}
+                              </div>
+                            </motion.div>
+                          );
+                        })}
+                      </div>
+
+                      {/* Explanation */}
+                      {isAnswered && showExplanation && question.explanation && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="mt-4 p-4 bg-blue-50 border-2 border-blue-200 rounded-lg"
+                        >
+                          <p className="text-sm font-semibold text-blue-900 mb-1">
+                            Explanation:
+                          </p>
+                          <p className="text-sm text-blue-800">
+                            {question.explanation}
+                          </p>
+                        </motion.div>
+                      )}
+                    </div>
+                  </CardContent>
+
+                  {/* Show Explanation Button - Bottom Left */}
+                  {isAnswered && !showExplanation && (
+                    <div className="absolute bottom-4 left-4">
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                      >
+                        <Button
+                          onClick={handleShowExplanation}
+                          className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-4 py-2 flex items-center gap-2"
+                        >
+                          <Lightbulb className="w-4 h-4" />
+                          Show Explanation
+                        </Button>
+                      </motion.div>
+                    </div>
+                  )}
+
+                  {/* Next Button - Bottom Right */}
+                  {isAnswered && (
+                    <div className="absolute bottom-4 right-4">
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                      >
+                        <Button
+                          onClick={handleNextQuestion}
+                          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2"
+                        >
+                          Next
+                        </Button>
+                      </motion.div>
+                    </div>
+                  )}
+                </Card>
+              );
+            })()}
+
+            {/* Final Results */}
+            {isSubmitted && (
+              <div className="p-6 bg-gray-100 rounded-lg border-2 border-gray-300">
+                <h3 className="text-2xl font-bold text-gray-900 mb-4 text-center">
+                  Quiz Complete!
+                </h3>
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-lg font-semibold text-gray-900">
+                    Score: {result.questions.filter(q => userAnswers[String(q.id || '')] === q.correctAnswer).length} / {result.questions.length}
+                  </span>
+                  <span className="text-lg font-semibold text-gray-900">
+                    {Math.round((result.questions.filter(q => userAnswers[String(q.id || '')] === q.correctAnswer).length / result.questions.length) * 100)}%
+                  </span>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </motion.div>
         )}
       </div>
     </div>
   );
 }
+
+export default InfinitePracticePage;
+export { InfinitePracticePage };

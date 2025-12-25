@@ -2910,7 +2910,7 @@ const microUnit3Questions = [
     "lessonIDS": ["3.1"],
     "unitName": "Production, Cost, and the Perfect Competition Model",
     "question": "Suppose the marginal product of labor initially increases, hits a peak, and then decreases. If the average product of labor is currently declining, which of the following statements must be true?",
-    "image": { "src": "./images/allQS2034.svg", "alt": "Marginal and average product of labor graph" },
+    "image": { "src": "/images/allQS2034.svg", "alt": "Marginal and average product of labor graph" },
     "options": [
     "The total product of labor is decreasing.",
     "The marginal product of labor is negative.",
@@ -3360,7 +3360,7 @@ const microUnit3Questions = [
     "lessonIDS": ["3.6"],
     "unitName": "Production, Cost, and the Perfect Competition Model",
     "question": "On the cost curve diagram below, the points P, Q, R, and S lie on the marginal cost curve. Point Q is at the minimum of the average variable cost curve, and Point R is at the minimum of the average total cost curve. Which segment identifies the firm's supply curve? ",
-    "image": { "src": "./images/allQS2059.svg", "alt": "Cost curve diagram showing Marginal Cost, Average Variable Cost, and Average Total Cost curves" },
+    "image": { "src": "/images/allQS2059.svg", "alt": "Cost curve diagram showing Marginal Cost, Average Variable Cost, and Average Total Cost curves" },
     "options": [
     "Segment QRS (points at or above AVC)",
     "Segment PQR (points below ATC)",
@@ -3396,7 +3396,7 @@ const microUnit3Questions = [
     "lessonIDS": ["3.2"],
     "unitName": "Production, Cost, and the Perfect Competition Model",
     "question": "Refer to the graph below, which shows the short run product cost curves for a profit maximizing firm. The marginal cost curve has shifted upward from MC1 to MC2. Which of the following changes could have caused this shift? ",
-    "image": { "src": "./images/allQS2061.svg", "alt": "Short run product cost curves showing Marginal Cost curve shift" },
+    "image": { "src": "/images/allQS2061.svg", "alt": "Short run product cost curves showing Marginal Cost curve shift" },
     "options": [
     "An increase in the monthly rent for the factory",
     "An increase in the hourly wage paid to workers",

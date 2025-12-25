@@ -42,9 +42,9 @@ export interface DojoDrill {
   
   // XP rewards
   xpReward: {
-    completion: number; // XP for completing the drill (20)
-    perMcqCorrect: number; // XP per correct MCQ (10, max 30 for all 3)
-    total: number; // Total possible XP (50)
+    completion: number; // XP for completing the drill (200)
+    perMcqCorrect: number; // XP per correct MCQ (100, max 300 for all 3)
+    total: number; // Total possible XP (500)
   };
 }
 
@@ -146,9 +146,9 @@ export const dojoDrills: Record<string, DojoDrill> = {
       mcqIds: [17, 18, 19] // Replace with actual MCQ IDs
     },
     xpReward: {
-      completion: 20,
-      perMcqCorrect: 10,
-      total: 50
+      completion: 200,
+      perMcqCorrect: 100,
+      total: 500
     }
   },
   'monopoly-marginal-revenue': {
@@ -208,9 +208,9 @@ export const dojoDrills: Record<string, DojoDrill> = {
       mcqIds: [1150, 1151, 1152] // Replace with actual MCQ IDs
     },
     xpReward: {
-      completion: 20,
-      perMcqCorrect: 10,
-      total: 50
+      completion: 200,
+      perMcqCorrect: 100,
+      total: 500
     }
   },
   'the-economy-fixes-itself-long-run-self-adjustment': {
@@ -270,9 +270,9 @@ export const dojoDrills: Record<string, DojoDrill> = {
       mcqIds: [100, 101, 102] // Replace with actual MCQ IDs
     },
     xpReward: {
-      completion: 20,
-      perMcqCorrect: 10,
-      total: 50
+      completion: 200,
+      perMcqCorrect: 100,
+      total: 500
     }
   },
   'absolute-and-comparative-advantage': {
@@ -347,9 +347,9 @@ export const dojoDrills: Record<string, DojoDrill> = {
       mcqIds: [5, 6, 2084] // MCQs from ap macro unit 1, lesson 1.3
     },
     xpReward: {
-      completion: 20,
-      perMcqCorrect: 10,
-      total: 50
+      completion: 200,
+      perMcqCorrect: 100,
+      total: 500
     }
   },
   'supply-and-demand': {
@@ -412,9 +412,9 @@ export const dojoDrills: Record<string, DojoDrill> = {
       mcqIds: [2124, 2125, 2126] // MCQs from ap macro unit 1, lesson 1.6
     },
     xpReward: {
-      completion: 20,
-      perMcqCorrect: 10,
-      total: 50
+      completion: 200,
+      perMcqCorrect: 100,
+      total: 500
     }
   },
   'ppc-and-opportunity-cost': {
@@ -474,9 +474,9 @@ export const dojoDrills: Record<string, DojoDrill> = {
       mcqIds: [2, 3, 4] // MCQs from ap macro unit 1, lesson 1.2
     },
     xpReward: {
-      completion: 20,
-      perMcqCorrect: 10,
-      total: 50
+      completion: 200,
+      perMcqCorrect: 100,
+      total: 500
     }
   },
   'elasticity-and-revenue': {
@@ -539,9 +539,9 @@ export const dojoDrills: Record<string, DojoDrill> = {
       mcqIds: [84, 2064, 2072] // Elasticity and total revenue test questions
     },
     xpReward: {
-      completion: 20,
-      perMcqCorrect: 10,
-      total: 50
+      completion: 200,
+      perMcqCorrect: 100,
+      total: 500
     }
   },
   'consumer-producer-surplus': {
@@ -601,9 +601,133 @@ export const dojoDrills: Record<string, DojoDrill> = {
       mcqIds: [84, 2064, 2072] // Elasticity and total revenue test questions
     },
     xpReward: {
-      completion: 20,
-      perMcqCorrect: 10,
-      total: 50
+      completion: 200,
+      perMcqCorrect: 100,
+      total: 500
+    }
+  },
+  'foreign-exchange-market': {
+    id: 'foreign-exchange-market',
+    title: 'The Foreign Exchange Market',
+    description: 'Master the fundamentals of foreign exchange markets, currency appreciation and depreciation, and the factors that drive currency demand and supply.',
+    videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_6.3.mp4',
+    subject: 'ap_macroeconomics',
+    unit: 6,
+    lessonIds: ['6.3'],
+    stage1: {
+      videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_6.3.mp4',
+      comprehensionQuestions: [
+        {
+          id: 'forex-comp-1',
+          question: 'If United States citizens increase their demand for goods produced in Japan, how will this affect the supply of U.S. dollars and the demand for Japanese yen in the foreign exchange market?',
+          options: [
+            'Supply of U.S. dollars increases; Demand for Japanese yen increases.',
+            'Supply of U.S. dollars decreases; Demand for Japanese yen increases.',
+            'Supply of U.S. dollars increases; Demand for Japanese yen decreases.',
+            'Supply of U.S. dollars decreases; Demand for Japanese yen decreases.'
+          ],
+          correctAnswer: 0, // A
+          explanation: 'To purchase goods from Japan, U.S. citizens must exchange their dollars for yen. This simultaneous action increases the demand for the foreign currency (yen) while increasing the supply of the domestic currency (dollars) on the global market.'
+        },
+        {
+          id: 'forex-comp-2',
+          question: 'In a floating exchange rate system involving only the U.S. dollar and the Euro, if the Euro appreciates in value, what must necessarily happen to the U.S. dollar?',
+          options: [
+            'The U.S. dollar depreciates.',
+            'The U.S. dollar also appreciates.',
+            'The value of the U.S. dollar remains unchanged.',
+            'The supply of the U.S. dollar shifts to the left.'
+          ],
+          correctAnswer: 0, // A
+          explanation: 'Currencies in a floating exchange rate system function like a seesaw. If the value of one currency rises (appreciates) relative to another, the value of the other currency must fall (depreciate). It is impossible for both currencies to appreciate against one another simultaneously.'
+        },
+        {
+          id: 'forex-comp-3',
+          question: 'Which of the following best summarizes the two primary reasons why a demand for a foreign currency exists?',
+          options: [
+            'To pay for domestic government spending and to reduce inflation.',
+            'To purchase foreign goods/services and to purchase foreign financial assets.',
+            'To increase the domestic money supply and to lower interest rates.',
+            'To decrease the trade deficit and to increase tariffs.'
+          ],
+          correctAnswer: 1, // B
+          explanation: 'The demand for a foreign currency is derived from the desire to buy things denominated in that currency. This primarily includes purchasing foreign products (imports) or purchasing foreign financial assets, such as government bonds or stocks in foreign companies.'
+        }
+      ]
+    },
+    stage2: {
+      type: 'graph',
+      config: {}
+    },
+    stage3: {
+      mcqIds: [0, 0, 0] // Replace with actual MCQ IDs from unit 6 foreign exchange questions
+    },
+    xpReward: {
+      completion: 200,
+      perMcqCorrect: 100,
+      total: 500
+    }
+  },
+  'phillips-curve-ad-as-graph': {
+    id: 'phillips-curve-ad-as-graph',
+    title: 'Phillips Curve & AD-AS Graph',
+    description: 'Understanding the relationship between the Phillips Curve and the AD-AS model, including how changes in aggregate demand and supply affect inflation and unemployment.',
+    videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_5.2.mp4',
+    subject: 'ap_macroeconomics',
+    unit: 5,
+    lessonIds: ['5.2'],
+    stage1: {
+      videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_5.2.mp4',
+      comprehensionQuestions: [
+        {
+          id: 'phillips-comp-1',
+          question: 'If consumer optimism leads to an increase in Aggregate Demand, how is this change represented on the Short-Run Phillips Curve (SRPC)?',
+          options: [
+            'The SRPC shifts to the right.',
+            'The SRPC shifts to the left.',
+            'There is a movement upward and to the left along the SRPC.',
+            'There is a movement downward and to the right along the SRPC.'
+          ],
+          correctAnswer: 2, // C
+          explanation: 'An increase in Aggregate Demand leads to a higher price level (inflation) and higher output (lower unemployment). On the Phillips Curve, this inverse relationship is represented by a movement along the existing curve to a point with higher inflation and lower unemployment.'
+        },
+        {
+          id: 'phillips-comp-2',
+          question: 'How does a negative supply shock, such as a sudden decrease in the availability of oil, affect the Short-Run Phillips Curve?',
+          options: [
+            'The curve shifts to the right, indicating higher inflation and higher unemployment.',
+            'The curve shifts to the left, indicating lower inflation and lower unemployment.',
+            'There is a movement along the curve to the right, indicating higher unemployment but lower inflation.',
+            'There is a movement along the curve to the left, indicating lower unemployment but higher inflation.'
+          ],
+          correctAnswer: 0, // A
+          explanation: 'A negative supply shock shifts the Short-Run Aggregate Supply curve to the left, causing stagflation (higher price levels and lower output). Since both inflation and unemployment increase simultaneously, the inverse relationship of the SRPC breaks down, and the entire curve shifts to the right.'
+        },
+        {
+          id: 'phillips-comp-3',
+          question: 'What does the vertical shape of the Long-Run Phillips Curve (LRPC) indicate about the relationship between inflation and unemployment in the long run?',
+          options: [
+            'As inflation increases, unemployment decreases permanently.',
+            'As inflation decreases, unemployment increases permanently.',
+            'The economy produces at the natural rate of unemployment regardless of the inflation rate.',
+            'The economy cannot sustain any level of inflation without causing hyperinflation.'
+          ],
+          correctAnswer: 2, // C
+          explanation: 'In the long run, the economy returns to its potential output and the natural rate of unemployment. Changes in the money supply or price level may alter the inflation rate, but they do not create permanent jobs or change real output, resulting in a vertical LRPC at the natural rate of unemployment.'
+        }
+      ]
+    },
+    stage2: {
+      type: 'graph',
+      config: {}
+    },
+    stage3: {
+      mcqIds: [0, 0, 0] // Replace with actual MCQ IDs from unit 5 Phillips Curve questions
+    },
+    xpReward: {
+      completion: 200,
+      perMcqCorrect: 100,
+      total: 500
     }
   }
 };

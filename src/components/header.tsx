@@ -2,16 +2,19 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Menu, X, ChevronDown } from 'lucide-react';
 import dojoIcon from "../../public/images/dojoIcon.png";
 import { useAuthContext } from '@/contexts/AuthContext';
 import { Button } from './ui/button';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { UserBeltProgress } from './dashboard/UserBeltProgress';
 
-export function Header() {
+function Header() {
   const { user, logout, selectedSubject, setSelectedSubject, totalXP, guestXp, isCharacterClosetOpen, setIsCharacterClosetOpen } = useAuthContext();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isBeltDropdownOpen, setIsBeltDropdownOpen] = useState(false);
+  const beltDropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -62,6 +65,28 @@ export function Header() {
       setSelectedSubject(newSubject);
     }
   };
+
+  // Close belt dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (beltDropdownRef.current && !beltDropdownRef.current.contains(event.target as Node)) {
+        // Check if the click was on the XP button
+        const target = event.target as HTMLElement;
+        if (target.closest('[data-xp-button="true"]')) {
+          return; // Don't close if clicking the XP button itself
+        }
+        setIsBeltDropdownOpen(false);
+      }
+    };
+
+    if (isBeltDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isBeltDropdownOpen]);
 
   return (
     <header className="bg-white sticky top-0 z-50 shadow-md">
@@ -192,8 +217,8 @@ export function Header() {
                 </button>
               </div>
               
-              {/* XP bar with subtle red glow - Clickable to open character closet */}
-              <div className="flex items-center">
+              {/* XP bar with subtle red glow - Clickable to open belt dropdown */}
+              <div className="flex items-center relative" ref={beltDropdownRef}>
                 {(() => {
                   const xp = user ? (totalXP ?? 0) : (guestXp ?? 0);
                   const clamped = Math.max(0, Math.min(xp, 2000));
@@ -204,28 +229,40 @@ export function Header() {
                   const alpha = baseAlpha + (maxAlpha - baseAlpha) * ratio;
                   const background = `rgba(248, 113, 113, ${alpha})`; // red-400 with low opacity
                   return (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        setIsCharacterClosetOpen(prev => !prev);
-                      }}
-                      className="flex items-center gap-2 px-4 py-1.5 rounded-md border border-red-100 text-sm font-semibold text-gray-800 transition-colors duration-300 cursor-pointer hover:opacity-80"
-                      style={{ background }}
-                      data-xp-button="true"
-                    >
-                      <span className="uppercase tracking-tight text-[11px] text-gray-600">XP</span>
-                      <span>{xp}</span>
-                      <span className="inline-flex items-center">
-                        <Image
-                          src="/images/flame100.png"
-                          alt="XP Flame"
-                          width={20}
-                          height={20}
-                          className="w-5 h-5"
-                        />
-                      </span>
-                    </button>
+                    <>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          e.preventDefault();
+                          setIsBeltDropdownOpen(prev => !prev);
+                        }}
+                        className="flex items-center gap-2 px-4 py-1.5 rounded-md border border-red-100 text-sm font-semibold text-gray-800 transition-colors duration-300 cursor-pointer hover:opacity-80"
+                        style={{ background }}
+                        data-xp-button="true"
+                      >
+                        <span className="uppercase tracking-tight text-[11px] text-gray-600">XP</span>
+                        <span>{xp}</span>
+                        <span className="inline-flex items-center">
+                          <Image
+                            src="/images/flame100.png"
+                            alt="XP Flame"
+                            width={20}
+                            height={20}
+                            className="w-5 h-5"
+                          />
+                        </span>
+                        <ChevronDown className={`w-4 h-4 transition-transform ${isBeltDropdownOpen ? 'rotate-180' : ''}`} />
+                      </button>
+
+                      {/* Belt System Dropdown */}
+                      {isBeltDropdownOpen && (
+                        <div className="absolute top-full right-0 mt-2 w-[400px] z-50">
+                          <div className="bg-white border-2 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-3">
+                            <UserBeltProgress totalXP={xp} animateOnChange={true} />
+                          </div>
+                        </div>
+                      )}
+                    </>
                   );
                 })()}
               </div>
@@ -402,4 +439,7 @@ export function Header() {
       </div>
     </header>
   );
-} 
+}
+
+export default Header;
+export { Header }; 

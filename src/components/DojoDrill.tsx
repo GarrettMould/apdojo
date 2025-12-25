@@ -17,6 +17,7 @@ import { CheckCircle2, ArrowRight, Trophy, Check, Lightbulb } from "lucide-react
 import Image from "next/image";
 import { DojoDrill as DojoDrillType, ComprehensionQuestion } from "@/data/dojoDrills";
 import ReactMarkdown from 'react-markdown';
+import { useAuthContext } from '@/contexts/AuthContext';
 
 // Helper function to parse markdown table from text
 const parseMarkdownTable = (text: string): { tableData: { headers: string[]; rows: string[][] } | null; textWithoutTable: string } => {
@@ -95,6 +96,7 @@ interface DojoDrillProps {
 }
 
 export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
+  const { awardXp } = useAuthContext();
   const [step, setStep] = useState(1);
   const [videoEnded, setVideoEnded] = useState(false);
   const [comprehensionAnswers, setComprehensionAnswers] = useState<Record<string, number>>({});
@@ -110,6 +112,7 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
   const [showHint, setShowHint] = useState(false);
   
   const [xpEarned, setXpEarned] = useState(0);
+  const [xpAwarded, setXpAwarded] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const totalSteps = 4;
@@ -134,7 +137,7 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
     if (step === 3 && mcqQuestions.length > 0) {
       const answeredCount = Object.keys(mcqAnswers).length;
       if (answeredCount === mcqQuestions.length) {
-        // Calculate XP: 20 for completion + 10 per correct answer
+        // Calculate XP: 200 for completion + 100 per correct answer
         let mcqXp = 0;
         mcqQuestions.forEach((q) => {
           if (mcqAnswers[q.id] === q.correctAnswer) {
@@ -146,6 +149,18 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
       }
     }
   }, [mcqAnswers, mcqQuestions, step, drill.xpReward]);
+
+  // Award XP when drill is completed (step 4)
+  useEffect(() => {
+    if (step === 4 && xpEarned > 0 && !xpAwarded && awardXp) {
+      awardXp(xpEarned).then(() => {
+        setXpAwarded(true);
+        console.log(`[DojoDrill] Awarded ${xpEarned} XP for completing drill: ${drill.id}`);
+      }).catch((error) => {
+        console.error('[DojoDrill] Error awarding XP:', error);
+      });
+    }
+  }, [step, xpEarned, xpAwarded, awardXp, drill.id]);
 
   const handleVideoEnd = () => {
     setVideoEnded(true);

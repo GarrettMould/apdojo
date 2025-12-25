@@ -7,6 +7,18 @@ export default {
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  safelist: [
+    // Belt system colors
+    'bg-gray-100',
+    'bg-yellow-400',
+    'bg-orange-500',
+    'bg-green-600',
+    'bg-blue-600',
+    'bg-gray-900',
+    'text-gray-800',
+    'text-yellow-900',
+    'text-white',
+  ],
   theme: {
   	extend: {
   		colors: {

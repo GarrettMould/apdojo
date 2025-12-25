@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Question as QuestionType } from '@/data/questionBanks/types';
 import { Unit } from '@/data/cheatSheets';
 import { Check, X, Brain, FileText, ChevronDown, Triangle, Loader2, RefreshCw, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Clipboard, Lock, Play, Minus } from 'lucide-react';
+import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
 import Image from 'next/image';
@@ -1058,6 +1059,29 @@ export function UnitMCQs({
         {/* Right Column: Controls and Resources */}
         {/* Adjusted column width lg:w-2/5 */}
         <div className="w-full lg:w-2/5 bg-white rounded-lg shadow-md border border-gray-200 p-4 lg:p-6 flex flex-col h-full">
+          {/* Progress Bar */}
+          {(() => {
+            const answeredCount = Object.keys(answeredQuestions).length;
+            const totalCount = questions.length;
+            const progressPercentage = totalCount > 0 ? (answeredCount / totalCount) * 100 : 0;
+            
+            return (
+              <div className="mb-6 flex items-center gap-3">
+                <div className="flex-1 bg-gray-200 rounded-full h-4 border border-gray-300">
+                  <motion.div
+                    className="bg-blue-600 h-4 rounded-full"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progressPercentage}%` }}
+                    transition={{ duration: 0.3 }}
+                  />
+                </div>
+                <span className="text-sm font-semibold text-gray-700 whitespace-nowrap">
+                  {answeredCount}/{totalCount}
+                </span>
+              </div>
+            );
+          })()}
+          
           {/* Belt and XP Display */}
           {(() => {
             const userXP = user ? (totalXP ?? 0) : (guestXp ?? 0);

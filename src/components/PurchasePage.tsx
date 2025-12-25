@@ -2,59 +2,58 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, Play, FileText, Monitor } from 'lucide-react';
+import { CheckCircle2, Play, FileText, Monitor, Star, ShieldCheck, Sparkles } from 'lucide-react';
 import { redirectToCheckout } from '@/lib/stripe';
 import { useAuthContext } from '@/contexts/AuthContext';
+import Image from 'next/image';
+import Link from 'next/link';
 
 interface PurchasePageProps {
   courseType: 'macro' | 'micro';
 }
 
-interface CarouselSlide {
-  id: string;
-  title: string;
-  icon: React.ReactNode;
-  description: string;
-  imagePlaceholder: string;
+interface CourseConfig {
+  themeColor: 'green' | 'blue';
+  badge: string;
+  headline: string;
+  price: number;
+  features: Array<{ text: string; key: string }>;
 }
 
-const carouselSlides: CarouselSlide[] = [
-  {
-    id: 'drills',
-    title: 'Interactive Drills',
-    icon: <Play className="w-16 h-16" />,
-    description: 'Master concepts through hands-on practice',
-    imagePlaceholder: 'Graph movement animation',
+const COURSE_CONFIG: Record<'macro' | 'micro', CourseConfig> = {
+  micro: {
+    themeColor: 'green',
+    badge: 'AP MICRO SEASON PASS',
+    headline: 'The Complete AP Micro Toolkit for a 5.',
+    price: 29,
+    features: [
+      { text: 'Endless AP-Style MCQ Bank', key: 'Endless' },
+      { text: 'AI-Graded FRQs with Graphing Help', key: 'AI-Graded' },
+      { text: 'Interactive Drill Simulator', key: 'Interactive' },
+      { text: 'Visual Cheat Sheets (PDF)', key: 'Visual Cheat Sheets' },
+      { text: 'Upload Notes to Create Quizzes', key: 'Upload Notes' },
+    ],
   },
-  {
-    id: 'cheatsheets',
-    title: 'Visual Cheat Sheets',
-    icon: <FileText className="w-16 h-16" />,
-    description: 'Downloadable PDF study guides',
-    imagePlaceholder: 'Sleek PDF preview',
+  macro: {
+    themeColor: 'blue',
+    badge: 'AP MACRO SEASON PASS',
+    headline: 'The Complete AP Macro Toolkit for a 5.',
+    price: 29,
+    features: [
+      { text: 'Endless AP-Style MCQ Bank', key: 'Endless' },
+      { text: 'AI-Graded FRQs with Graphing Help', key: 'AI-Graded' },
+      { text: 'Interactive Drill Simulator', key: 'Interactive' },
+      { text: 'Visual Cheat Sheets (PDF)', key: 'Visual Cheat Sheets' },
+      { text: 'Upload Notes to Create Quizzes', key: 'Upload Notes' },
+    ],
   },
-  {
-    id: 'exam',
-    title: 'Premium Exam UI',
-    icon: <Monitor className="w-16 h-16" />,
-    description: 'Split-screen exam interface',
-    imagePlaceholder: 'Exam interface preview',
-  },
-];
+};
 
 export function PurchasePage({ courseType }: PurchasePageProps) {
-  const [currentSlide, setCurrentSlide] = useState(0);
   const { user } = useAuthContext();
   const [isLoading, setIsLoading] = useState(false);
-
-  // Auto-rotate carousel every 4 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % carouselSlides.length);
-    }, 4000);
-
-    return () => clearInterval(interval);
-  }, []);
+  const config = COURSE_CONFIG[courseType];
+  const isGreen = config.themeColor === 'green';
 
   const handlePurchase = async () => {
     if (!user) {
@@ -77,61 +76,35 @@ export function PurchasePage({ courseType }: PurchasePageProps) {
     }
   };
 
-  const currentSlideData = carouselSlides[currentSlide];
-
   return (
     <div className="min-h-[calc(100vh-4rem)] grid grid-cols-1 lg:grid-cols-4">
       {/* Left Column - Visual Hook (Col Span 1) */}
-      <div className="bg-gray-100 border-r-2 border-black p-6 flex items-center justify-center sticky top-0 h-screen lg:col-span-1">
-        <div className="w-full max-w-md">
-          {/* Tablet/Monitor Frame */}
-          <div className="bg-white border-4 border-black rounded-2xl shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] p-4 overflow-hidden">
-            {/* Screen Area */}
-            <div className="bg-gray-900 rounded-lg aspect-video flex items-center justify-center relative overflow-hidden">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={currentSlide}
-                  initial={{ opacity: 0, x: 50 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -50 }}
-                  transition={{ duration: 0.5 }}
-                  className="absolute inset-0 flex flex-col items-center justify-center p-8 text-white"
-                >
-                  <div className="mb-4 text-white">
-                    {currentSlideData.icon}
-                  </div>
-                  <h3 className="text-xl font-bold mb-2 text-center">
-                    {currentSlideData.title}
-                  </h3>
-                  <p className="text-sm text-gray-300 text-center">
-                    {currentSlideData.description}
-                  </p>
-                  {/* Placeholder visual content */}
-                  <div className="mt-6 w-full h-32 bg-gray-800 rounded border-2 border-gray-700 flex items-center justify-center">
-                    <span className="text-gray-500 text-xs">
-                      {currentSlideData.imagePlaceholder}
-                    </span>
-                  </div>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-            
-            {/* Slide Indicators */}
-            <div className="flex justify-center gap-2 mt-4">
-              {carouselSlides.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentSlide(index)}
-                  className={`w-2 h-2 rounded-full transition-all ${
-                    index === currentSlide
-                      ? 'bg-black w-8'
-                      : 'bg-gray-300 hover:bg-gray-400'
-                  }`}
-                  aria-label={`Go to slide ${index + 1}`}
+      <div className="bg-gradient-to-b from-gray-50 to-gray-100 border-r-2 border-black p-6 flex flex-col items-center justify-center sticky top-0 h-screen lg:col-span-1 overflow-y-auto">
+        <div className="w-full max-w-md space-y-8">
+          {/* Three images stacked vertically */}
+          {[1, 2, 3].map((num, index) => (
+            <motion.div
+              key={num}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.15, duration: 0.6 }}
+              whileHover={{ y: -4, scale: 1.02 }}
+              className="w-full rounded-xl overflow-hidden shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] border-4 border-black bg-white group cursor-pointer"
+            >
+              <div className="relative overflow-hidden">
+                <Image
+                  src={`/images/purchasePage${num}.png`}
+                  alt={`Purchase page preview ${num}`}
+                  width={800}
+                  height={600}
+                  className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105"
+                  priority={num === 1}
                 />
-              ))}
-            </div>
-          </div>
+                {/* Subtle gradient overlay on hover */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </div>
+            </motion.div>
+          ))}
         </div>
       </div>
 
@@ -140,14 +113,27 @@ export function PurchasePage({ courseType }: PurchasePageProps) {
         <div className="max-w-2xl mx-auto w-full space-y-8">
           {/* Badge */}
           <div className="inline-block">
-            <span className="px-4 py-2 bg-black text-white font-bold text-sm uppercase tracking-wider border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-              {courseType.toUpperCase()} SEASON PASS
+            <span className={`px-5 py-2.5 ${isGreen ? 'bg-green-600' : 'bg-blue-600'} text-white font-bold text-sm uppercase tracking-wider border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rounded-lg`}>
+              {config.badge}
             </span>
           </div>
 
           {/* Headline */}
           <h1 className="text-5xl lg:text-6xl font-extrabold text-black leading-tight">
-            The Complete Toolkit for a 5.
+            {config.headline.split('AP ').map((part, index) => {
+              if (index === 0) return part;
+              const courseName = part.split(' ')[0]; // Get "Macro" or "Micro"
+              const rest = part.substring(courseName.length);
+              return (
+                <React.Fragment key={index}>
+                  AP{' '}
+                  <span className={isGreen ? 'text-green-600' : 'text-blue-600'}>
+                    {courseName}
+                  </span>
+                  {rest}
+                </React.Fragment>
+              );
+            })}
           </h1>
 
           {/* Price Section */}
@@ -156,13 +142,28 @@ export function PurchasePage({ courseType }: PurchasePageProps) {
               One-time payment of
             </p>
             <div className="flex items-baseline gap-3">
-              <span className="text-6xl font-extrabold text-green-500">
-                $29
+              <span className={`text-6xl font-extrabold ${isGreen ? 'text-green-600' : 'text-blue-600'}`}>
+                ${config.price}
               </span>
-              <span className="text-2xl text-gray-400 line-through">
+              <span className="text-lg text-gray-400 line-through ml-2">
                 $59
               </span>
             </div>
+            <p className="text-sm text-gray-600 mt-2">
+              Valid until May 30th, 2026
+            </p>
+          </div>
+
+          {/* Star Rating */}
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-0.5">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+              ))}
+            </div>
+            <span className="text-sm font-medium text-gray-600">
+              500+ Students Tutored
+            </span>
           </div>
 
           {/* Benefits Stack */}
@@ -171,26 +172,25 @@ export function PurchasePage({ courseType }: PurchasePageProps) {
               What's Included:
             </h2>
             <ul className="space-y-3">
-              {[
-                'Endless AP-Style MCQ Bank',
-                'AI-Graded FRQs with Graphing Help',
-                'Interactive Dojo Drills for Hard Topics',
-                'Downloadable Visual Cheat Sheets',
-                'New: Upload Notes to Create Custom Quizzes',
-              ].map((benefit, index) => (
-                <motion.li
-                  key={index}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="flex items-start gap-3"
-                >
-                  <CheckCircle2 className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-lg font-semibold text-gray-900">
-                    {benefit}
-                  </span>
-                </motion.li>
-              ))}
+              {config.features.map((benefit, index) => {
+                const parts = benefit.text.split(benefit.key);
+                return (
+                  <motion.li
+                    key={index}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="flex items-start gap-3"
+                  >
+                    <CheckCircle2 className={`w-6 h-6 flex-shrink-0 mt-0.5 ${isGreen ? 'text-green-600' : 'text-blue-600'}`} />
+                    <span className="text-lg font-semibold text-gray-900">
+                      {parts[0]}
+                      <strong>{benefit.key}</strong>
+                      {parts[1]}
+                    </span>
+                  </motion.li>
+                );
+              })}
             </ul>
           </div>
 
@@ -201,15 +201,43 @@ export function PurchasePage({ courseType }: PurchasePageProps) {
               disabled={isLoading}
               whileHover={{ y: -4 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full bg-green-500 hover:bg-green-600 text-white font-extrabold text-xl py-6 px-8 border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 uppercase tracking-wide disabled:opacity-50 disabled:cursor-not-allowed"
+              className={`w-full text-white font-extrabold text-xl py-6 px-8 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 uppercase tracking-wide disabled:opacity-50 disabled:cursor-not-allowed ${
+                isGreen 
+                  ? 'bg-green-600 hover:bg-green-700' 
+                  : 'bg-blue-600 hover:bg-blue-700'
+              }`}
             >
               {isLoading ? 'Processing...' : 'UNLOCK INSTANT ACCESS'}
             </motion.button>
 
             {/* Trust Elements */}
-            <p className="text-sm text-gray-600 text-center mt-4">
-              Secure Checkout via Stripe. 100% Money-Back Guarantee.
+            <p className="text-xs text-gray-500 text-center mt-4 flex items-center justify-center gap-1.5">
+              <ShieldCheck className="w-4 h-4 text-gray-400" />
+              100% Money-Back Guarantee
             </p>
+          </div>
+
+          {/* Bundle Upsell Card */}
+          <div className="w-full p-4 mt-6 bg-yellow-50 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            {/* Left Side */}
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <Sparkles className="w-5 h-5 text-yellow-600" />
+                <h3 className="text-lg font-bold text-gray-900">
+                  Taking both exams?
+                </h3>
+              </div>
+              <p className="text-gray-700 text-sm">
+                Get the Macro + Micro Bundle for just $49.
+              </p>
+            </div>
+            {/* Right Side */}
+            <Link
+              href="/purchase/bundle"
+              className="bg-white border-2 border-black hover:bg-gray-100 font-bold px-4 py-2 text-sm transition-colors whitespace-nowrap flex-shrink-0"
+            >
+              View Bundle
+            </Link>
           </div>
         </div>
       </div>
