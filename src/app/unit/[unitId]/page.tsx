@@ -53,7 +53,8 @@ const getUnitWhiteboards = (unitNumber: number): WhiteboardImage[] => {
     unit: unitNumber,
     lessonIDs: [wb.lessonID], // Ensure lessonIDs is an array
     imageUrl: wb.url,
-    title: wb.topic
+    title: wb.topic,
+    topic: wb.topic // Preserve topic as separate field
   }));
 };
 
@@ -455,6 +456,8 @@ export default function UnitPage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showFullscreen, setShowFullscreen] = useState(false);
   const [hasSeenExplainer, setHasSeenExplainer] = useState(false);
+  const [isGeneratingQuiz, setIsGeneratingQuiz] = useState(false);
+  const [quizError, setQuizError] = useState<string | null>(null);
 
   // --- FAQ Schema Data ---
   const faqSchema = {
@@ -837,17 +840,117 @@ export default function UnitPage() {
     return bestMatch ? bestMatch.question : availableQuizQuestions[0];
   };
 
-  const handleMakeQuiz = () => {
-    const question = findMostRelevantQuestion();
-    if (question) {
-      setQuizQuestion(question);
+  const handleMakeQuiz = async () => {
+    // Check if we have selections
+    if (selectedTerms.size === 0 && selectedWhiteboards.size === 0) {
+      return;
+    }
+
+    setIsGeneratingQuiz(true);
+    setQuizError(null);
+
+    try {
+      // Get selected term objects - only send term names
+      const allTerms = selectedSubject === 'macro' ? apMacroTerms : apMicroTerms;
+      const selectedTermObjects = Array.from(selectedTerms)
+        .map(termId => allTerms.find(t => t.id === termId))
+        .filter(Boolean) as KeyTerm[];
+
+      // Get selected whiteboard objects
+      const selectedWhiteboardObjects = Array.from(selectedWhiteboards)
+        .map(wbId => unitWhiteboards.find(wb => wb.id === wbId))
+        .filter(Boolean) as WhiteboardImage[];
+
+      // For each selected image, find all terms that match its lessonIDs
+      const imageRelatedTerms: string[] = [];
+      selectedWhiteboardObjects.forEach(img => {
+        if (img.lessonIDs && img.lessonIDs.length > 0) {
+          img.lessonIDs.forEach(lessonId => {
+            // Find all terms for this lessonID in the current unit
+            const termsForLesson = allTerms.filter(term => 
+              term.unit === activeUnitNum && 
+              term.lessonIDs && 
+              term.lessonIDs.includes(lessonId)
+            );
+            // Add term names (avoid duplicates)
+            termsForLesson.forEach(term => {
+              if (!imageRelatedTerms.includes(term.term)) {
+                imageRelatedTerms.push(term.term);
+              }
+            });
+          });
+        }
+      });
+
+      // Combine selected term names with image-related term names (no duplicates)
+      const allTermNames = [
+        ...selectedTermObjects.map(term => term.term),
+        ...imageRelatedTerms
+      ].filter((term, index, self) => self.indexOf(term) === index); // Remove duplicates
+
+      // Prepare data for API
+      const payload = {
+        selectedTerms: allTermNames, // Just an array of term names
+        selectedImages: selectedWhiteboardObjects.map(img => ({
+          title: img.title || '',
+          lessonIDs: img.lessonIDs || [],
+          imageUrl: img.imageUrl,
+          topic: (img as any).topic || null // Include topic if available (from Whiteboard type)
+        })),
+        subject: subjectFilter,
+        unit: activeUnitNum
+      };
+
+      // Call the API
+      const response = await fetch('/api/generate-unit-drill', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate quiz');
+      }
+
+      const data = await response.json();
+
+      // Debug: Log how many questions were generated
+      console.log(`Generated ${data.questions?.length || 0} questions (expected 3-5)`);
+
+      // Convert generated questions to QuestionType format
+      const convertedQuestions: QuestionType[] = data.questions.map((q: any, index: number) => ({
+        id: parseInt(q.id?.replace(/\D/g, '') || `${Date.now()}${index}`, 10),
+        unit: activeUnitNum,
+        subject: subjectFilter,
+        unitName: unitsToDisplay.find(u => u.number === activeUnitNum)?.title || '',
+        question: q.question,
+        image: null,
+        options: q.options,
+        correctAnswer: q.correctAnswer,
+        explanation: q.explanation,
+        lessonIDS: selectedTermObjects[0]?.lessonIDs || selectedWhiteboardObjects[0]?.lessonIDs || [],
+        tableData: q.tableData || undefined
+      }));
+
+      if (convertedQuestions.length === 0) {
+        throw new Error('No questions were generated');
+      }
+
+      // Set up the quiz
+      setAvailableQuizQuestions(convertedQuestions);
+      setOriginalQuizQuestions(convertedQuestions);
+      setQuizQuestion(convertedQuestions[0]);
       setSelectedQuizAnswer(null);
       setIsAnimatingOut(false);
       setShowQuizModal(true);
-      // Store original questions when quiz starts
-      if (availableQuizQuestions.length > 0) {
-        setOriginalQuizQuestions([...availableQuizQuestions]);
-      }
+      setAnsweredQuizQuestions(new Set()); // Reset answered questions for new quiz
+
+    } catch (error: any) {
+      console.error('Error generating quiz:', error);
+      setQuizError(error.message || 'Failed to generate quiz. Please try again.');
+    } finally {
+      setIsGeneratingQuiz(false);
     }
   };
 
@@ -861,23 +964,17 @@ export default function UnitPage() {
     if (quizQuestion && selectedQuizAnswer) {
       // Mark question as answered
       setAnsweredQuizQuestions(prev => new Set(prev).add(quizQuestion.id));
-      // Remove from available questions (will be handled by useEffect)
+      
+      // Find the current question index in available questions
+      const currentIndex = availableQuizQuestions.findIndex(q => q.id === quizQuestion.id);
       
       // If there are more questions, show the next one
-      const remainingQuestions = availableQuizQuestions.filter(q => q.id !== quizQuestion.id);
-      if (remainingQuestions.length > 0) {
-        // Find the next most relevant question
-        const nextQuestion = findMostRelevantQuestion();
-        if (nextQuestion && nextQuestion.id !== quizQuestion.id) {
-          setQuizQuestion(nextQuestion);
-          setSelectedQuizAnswer(null);
-          setIsAnimatingOut(false);
-        } else {
-          // Fallback to first remaining question
-          setQuizQuestion(remainingQuestions[0]);
-          setSelectedQuizAnswer(null);
-          setIsAnimatingOut(false);
-        }
+      if (currentIndex >= 0 && currentIndex < availableQuizQuestions.length - 1) {
+        // Show the next question in sequence
+        const nextQuestion = availableQuizQuestions[currentIndex + 1];
+        setQuizQuestion(nextQuestion);
+        setSelectedQuizAnswer(null);
+        setIsAnimatingOut(false);
       } else {
         // No more questions, close modal
         setShowQuizModal(false);
@@ -1535,18 +1632,27 @@ export default function UnitPage() {
             <div className="flex flex-col items-center gap-2 bg-white text-gray-800 rounded-2xl shadow-lg p-2 border border-gray-300">
               <button 
                 onClick={handleMakeQuiz}
-                className="flex flex-col items-center justify-center p-2 rounded-md hover:bg-gray-100 transition-colors w-20 h-16"
+                disabled={isGeneratingQuiz}
+                className={`flex flex-col items-center justify-center p-2 rounded-md transition-colors w-20 h-16 ${
+                  isGeneratingQuiz 
+                    ? 'opacity-50 cursor-not-allowed' 
+                    : 'hover:bg-gray-100'
+                }`}
                 title="Make a Quiz"
               >
-                <Image 
-                  src="/images/play-fill.svg" 
-                  alt="Play" 
-                  width={24} 
-                  height={24} 
-                  className="w-6 h-6"
-                  style={{ filter: 'brightness(0) saturate(100%) invert(40%) sepia(100%) saturate(2000%) hue-rotate(200deg) brightness(0.95) contrast(1.2)' }}
-                />
-                <span className="text-xs font-semibold mt-1">Drill</span>
+                {isGeneratingQuiz ? (
+                  <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Image 
+                    src="/images/play-fill.svg" 
+                    alt="Play" 
+                    width={24} 
+                    height={24} 
+                    className="w-6 h-6"
+                    style={{ filter: 'brightness(0) saturate(100%) invert(40%) sepia(100%) saturate(2000%) hue-rotate(200deg) brightness(0.95) contrast(1.2)' }}
+                  />
+                )}
+                <span className="text-xs font-semibold mt-1">{isGeneratingQuiz ? 'Generating...' : 'Drill'}</span>
               </button>
               
               <div className="w-px h-6 bg-gray-300" />
@@ -1590,13 +1696,15 @@ export default function UnitPage() {
       })()}
 
       {/* Quiz Modal */}
-      {showQuizModal && quizQuestion && (
+      {(showQuizModal && quizQuestion) || (showQuizModal && isGeneratingQuiz) || (showQuizModal && quizError) ? (
         <div 
           className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50 p-4"
           onClick={(e) => {
             if (e.target === e.currentTarget) {
               setShowQuizModal(false);
               setIsAnimatingOut(false);
+              setQuizError(null);
+              setIsGeneratingQuiz(false);
             }
           }}
         >
@@ -1605,6 +1713,8 @@ export default function UnitPage() {
               onClick={() => {
                 setShowQuizModal(false);
                 setIsAnimatingOut(false);
+                setQuizError(null);
+                setIsGeneratingQuiz(false);
               }}
               className="absolute top-4 right-4 text-blue-500 hover:text-blue-600 transition-colors z-10"
               aria-label="Close Quiz"
@@ -1617,9 +1727,32 @@ export default function UnitPage() {
                 <h2 className="text-5xl font-extrabold tracking-tight text-gray-900">
                   <span className="text-blue-500">Dojo</span> Drill
                 </h2>
-                <p className="text-gray-500 mt-1">A quick question to test your knowledge.</p>
+                <p className="text-gray-500 mt-1">
+                  {isGeneratingQuiz ? 'Generating your custom quiz...' : quizError ? 'Error generating quiz' : 'A quick question to test your knowledge.'}
+                </p>
               </div>
               
+              {isGeneratingQuiz ? (
+                <div className="flex flex-col items-center justify-center py-12 space-y-4">
+                  <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                  <p className="text-gray-600 font-medium">Creating your personalized quiz...</p>
+                </div>
+              ) : quizError ? (
+                <div className="space-y-4">
+                  <div className="bg-red-50 border-2 border-red-200 rounded-lg p-6">
+                    <p className="text-red-800 font-medium">{quizError}</p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setQuizError(null);
+                      setShowQuizModal(false);
+                    }}
+                    className="w-full px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
+              ) : quizQuestion ? (
               <div className="space-y-6">
                 <p className="text-2xl font-bold text-gray-800 leading-snug">
                   {quizQuestion.question}
@@ -1732,10 +1865,11 @@ export default function UnitPage() {
                   </div>
                 )}
               </div>
+              ) : null}
             </div>
           </div>
         </div>
-      )}
+      ) : null}
 
       {/* Image Slides Modal */}
       <AnimatePresence>

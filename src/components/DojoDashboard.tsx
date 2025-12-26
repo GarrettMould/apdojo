@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, FileText, Target, ChevronRight, CheckCircle2, Clock, ClipboardList, BookOpen, ChevronDown, ChevronUp, Lock } from 'lucide-react';
+import { Play, FileText, Target, ChevronRight, CheckCircle2, Clock, ClipboardList, BookOpen, ChevronDown, ChevronUp, Lock, Zap } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
@@ -13,6 +13,7 @@ import { frqExams } from '@/data/frqQuestions';
 import { getBeltProgress } from '@/lib/beltSystem';
 import { loadDojoDrillProgress, getDrillProgress, DojoDrillProgress } from '@/lib/dojoDrillProgress';
 import { getSubjectXP } from '@/hooks/useUserProgress';
+import DojoThumbnail from '@/components/DojoThumbnail';
 
 // Container animation variants (LITE - very subtle)
 const containerVariants = {
@@ -367,7 +368,7 @@ export function DojoDashboard() {
                         <div className="space-y-3">
                           {currentSubjectStats.map((stat) => (
                             <div key={stat.unitId} className="flex items-center gap-4">
-                              <div className="flex-shrink-0 w-16">
+                      <div className="flex-shrink-0 w-16">
                                 <span className="text-sm font-semibold text-gray-900">Unit {stat.unitId}</span>
                       </div>
                       <div className="flex-1">
@@ -522,7 +523,7 @@ export function DojoDashboard() {
                           variants={cardHoverVariants}
                           initial="rest"
                           whileHover="hover"
-                          className={`bg-white rounded-xl p-5 cursor-pointer relative border border-gray-200 ${theme.hoverBorder} transition-all`}
+                          className={`bg-white rounded-xl p-5 cursor-pointer relative border border-gray-200 ${theme.hoverBorder} transition-all flex flex-col h-full`}
                         >
                           {/* Progress Badge */}
                           {(isCompleted || inProgress) && (
@@ -538,16 +539,22 @@ export function DojoDashboard() {
                               )}
                             </div>
                           )}
-                          {/* Thumbnail/Icon */}
-                          <div className={`aspect-square bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg mb-4 flex items-center justify-center group-hover:from-blue-100 group-hover:to-blue-200 transition-colors relative ${isCompleted ? 'ring-2 ring-green-500' : inProgress ? 'ring-2 ring-blue-500' : ''}`}>
-                            <Target className="w-12 h-12 text-blue-600" />
+                          {/* Thumbnail */}
+                          <div className="mb-4 -mx-5 -mt-5 flex-shrink-0">
+                            <DojoThumbnail
+                              type="drill"
+                              title={drill.title}
+                              icon={Zap}
+                              unitNumber={drill.unit.toString().padStart(2, '0')}
+                              className="rounded-t-xl"
+                            />
                           </div>
-                          {/* Title */}
-                          <h3 className="font-semibold text-base text-gray-900 line-clamp-2 mb-2">
+                          {/* Title - Fixed height for 2 lines */}
+                          <h3 className="font-semibold text-base text-gray-900 line-clamp-2 mb-2 min-h-[3rem] flex items-start">
                             {drill.title}
                           </h3>
                           {/* Meta */}
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-center justify-between mt-auto">
                             <p className="text-sm text-gray-500">Unit {drill.unit}</p>
                             {inProgress && (
                               <span className="text-xs text-blue-600 font-medium">Continue</span>
@@ -592,29 +599,24 @@ export function DojoDashboard() {
                         variants={cardHoverVariants}
                         initial="rest"
                         whileHover="hover"
-                        className={`bg-white rounded-xl p-5 cursor-pointer border border-gray-200 ${theme.hoverBorder} transition-all`}
+                        className={`bg-white rounded-xl p-5 cursor-pointer border border-gray-200 ${theme.hoverBorder} transition-all flex flex-col h-full`}
                       >
                         {/* Thumbnail */}
-                        <div className="aspect-square bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg mb-4 overflow-hidden group-hover:from-purple-100 group-hover:to-purple-200 transition-colors relative">
-                          {frq.thumbnailUrl ? (
-                            <Image
-                              src={frq.thumbnailUrl}
-                              alt={frq.title}
-                              fill
-                              className="object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <FileText className="w-12 h-12 text-purple-600" />
-                            </div>
-                          )}
+                        <div className="mb-4 -mx-5 -mt-5 flex-shrink-0">
+                          <DojoThumbnail
+                            type="exam"
+                            title={frq.title}
+                            icon={FileText}
+                            unitNumber={frq.unit ? frq.unit.toString().padStart(2, '0') : undefined}
+                            className="rounded-t-xl"
+                          />
                         </div>
-                        {/* Title */}
-                        <h3 className="font-semibold text-base text-gray-900 line-clamp-2 mb-2">
+                        {/* Title - Fixed height for 2 lines */}
+                        <h3 className="font-semibold text-base text-gray-900 line-clamp-2 mb-2 min-h-[3rem] flex items-start">
                           {frq.title}
                         </h3>
                         {/* Meta */}
-                        <p className="text-sm text-gray-500">Unit {frq.unit || 'N/A'}</p>
+                        <p className="text-sm text-gray-500 mt-auto">Unit {frq.unit || 'N/A'}</p>
                       </motion.div>
                     </Link>
                   </motion.div>
@@ -650,18 +652,23 @@ export function DojoDashboard() {
                         variants={cardHoverVariants}
                         initial="rest"
                         whileHover="hover"
-                        className={`bg-white rounded-xl p-5 cursor-pointer border border-gray-200 ${theme.hoverBorder} transition-all`}
+                        className={`bg-white rounded-xl p-5 cursor-pointer border border-gray-200 ${theme.hoverBorder} transition-all flex flex-col h-full`}
                       >
-                        {/* Thumbnail/Icon */}
-                        <div className="aspect-square bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-lg mb-4 flex items-center justify-center group-hover:from-indigo-100 group-hover:to-indigo-200 transition-colors">
-                          <ClipboardList className="w-12 h-12 text-indigo-600" />
+                        {/* Thumbnail */}
+                        <div className="mb-4 -mx-5 -mt-5 flex-shrink-0">
+                          <DojoThumbnail
+                            type="exam"
+                            title={exam.title}
+                            icon={ClipboardList}
+                            className="rounded-t-xl"
+                          />
                         </div>
-                        {/* Title */}
-                        <h3 className="font-semibold text-base text-gray-900 line-clamp-2 mb-2">
+                        {/* Title - Fixed height for 2 lines */}
+                        <h3 className="font-semibold text-base text-gray-900 line-clamp-2 mb-2 min-h-[3rem] flex items-start">
                           {exam.title}
                         </h3>
                         {/* Meta */}
-                        <p className="text-sm text-gray-500">{exam.description}</p>
+                        <p className="text-sm text-gray-500 mt-auto">{exam.description}</p>
                       </motion.div>
                     </Link>
                   </motion.div>
@@ -697,7 +704,7 @@ export function DojoDashboard() {
                         variants={cardHoverVariants}
                         initial="rest"
                         whileHover="hover"
-                        className={`bg-white rounded-xl p-5 cursor-pointer border border-gray-200 ${exam.isLocked ? '' : theme.hoverBorder} transition-all relative overflow-hidden`}
+                        className={`bg-white rounded-xl p-5 cursor-pointer border border-gray-200 ${exam.isLocked ? '' : theme.hoverBorder} transition-all relative overflow-hidden flex flex-col h-full`}
                       >
                         {/* Lock Overlay */}
                         {exam.isLocked && (
@@ -708,16 +715,30 @@ export function DojoDashboard() {
                             </div>
                           </div>
                         )}
-                        {/* Thumbnail/Icon */}
-                        <div className={`aspect-square bg-gradient-to-br ${exam.isLocked ? 'from-gray-100 to-gray-200' : 'from-orange-50 to-orange-100'} rounded-lg mb-4 flex items-center justify-center group-hover:from-orange-100 group-hover:to-orange-200 transition-colors`}>
-                          <BookOpen className={`w-12 h-12 ${exam.isLocked ? 'text-gray-400' : 'text-orange-600'}`} />
+                        {/* Thumbnail */}
+                        <div className="mb-4 -mx-5 -mt-5 relative flex-shrink-0">
+                          <DojoThumbnail
+                            type="exam"
+                            title={exam.title}
+                            icon={BookOpen}
+                            unitNumber={exam.unitNumber ? exam.unitNumber.toString().padStart(2, '0') : undefined}
+                            className="rounded-t-xl"
+                          />
+                          {exam.isLocked && (
+                            <div className="absolute inset-0 bg-gray-900/50 flex items-center justify-center z-30 rounded-t-xl">
+                              <div className="text-center">
+                                <Lock className="w-8 h-8 text-white mx-auto mb-2" />
+                                <p className="text-white text-sm font-semibold">Locked</p>
+                              </div>
+                            </div>
+                          )}
                         </div>
-                        {/* Title */}
-                        <h3 className={`font-semibold text-base line-clamp-2 mb-2 ${exam.isLocked ? 'text-gray-400' : 'text-gray-900'}`}>
+                        {/* Title - Fixed height for 2 lines */}
+                        <h3 className={`font-semibold text-base line-clamp-2 mb-2 min-h-[3rem] flex items-start ${exam.isLocked ? 'text-gray-400' : 'text-gray-900'}`}>
                           {exam.title}
                         </h3>
                         {/* Meta */}
-                        <p className={`text-sm line-clamp-2 ${exam.isLocked ? 'text-gray-400' : 'text-gray-500'}`}>{exam.description}</p>
+                        <p className={`text-sm line-clamp-2 mt-auto ${exam.isLocked ? 'text-gray-400' : 'text-gray-500'}`}>{exam.description}</p>
                       </motion.div>
                     </Link>
                   </motion.div>
