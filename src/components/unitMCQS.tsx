@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Question as QuestionType } from '@/data/questionBanks/types';
 import { Unit } from '@/data/cheatSheets';
-import { Check, X, Brain, FileText, ChevronDown, Triangle, Loader2, RefreshCw, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Clipboard, Lock, Play, Minus } from 'lucide-react';
+import { Check, X, Brain, FileText, ChevronDown, Triangle, Loader2, RefreshCw, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Clipboard, Lock, Play, Minus, Book, Lightbulb, Calculator, Pen } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
@@ -20,6 +20,8 @@ import { keyTerms as apMacroTerms } from '@/data/apMacroTerms';
 import { keyTerms as apMicroTerms } from '@/data/apMicroTerms';
 import { KeyTerm } from '@/data/allContent';
 import ReactMarkdown from 'react-markdown';
+import { ExamCalculator } from './ExamCalculator';
+import { ExamWhiteboard } from './ExamWhiteboard';
 
 import dojoIcon from "../../public/images/dojoIcon.png";
 
@@ -125,6 +127,151 @@ interface UnitMCQSProps {
   hasTestModeAccess: boolean;
   onEnterTestMode: () => void;
 }
+
+// BeltHUD Component
+interface BeltHUDProps {
+  currentXP: number;
+  nextBeltXP: number | null;
+  currentBelt: { name: string; color: string; textColor: string };
+  percent: number;
+}
+
+const BeltHUD = ({ currentXP, nextBeltXP, currentBelt, percent }: BeltHUDProps) => {
+  return (
+    <div className="w-full flex items-center gap-4 mb-6">
+      {/* Left: Belt Badge */}
+      <div className={`px-4 py-2 flex items-center gap-2 border-2 border-black font-bold uppercase text-sm tracking-wider ${currentBelt.color} ${currentBelt.textColor} rounded-lg`}>
+        <span>{currentBelt.name}</span>
+      </div>
+      
+      {/* Right: Progress Bar */}
+      <div className="flex-1 relative">
+        <div className="h-6 bg-gray-200 border-2 border-black rounded-full overflow-hidden relative">
+          <motion.div
+            className={`h-full ${currentBelt.color === 'bg-yellow-400' ? 'bg-yellow-400' : currentBelt.color === 'bg-orange-500' ? 'bg-orange-500' : currentBelt.color === 'bg-green-600' ? 'bg-green-600' : currentBelt.color === 'bg-blue-600' ? 'bg-blue-600' : currentBelt.color === 'bg-gray-900' ? 'bg-gray-900' : 'bg-yellow-400'}`}
+            initial={{ width: 0 }}
+            animate={{ width: `${percent}%` }}
+            transition={{ duration: 0.3 }}
+          />
+          {/* Text Overlay */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-xs font-bold text-gray-900 z-10">
+              {currentXP.toLocaleString()} / {nextBeltXP ? nextBeltXP.toLocaleString() : 'MAX'} XP
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// TacticalToolbar Component
+interface TacticalToolbarProps {
+  onCalculatorClick: () => void;
+  onWhiteboardClick: () => void;
+}
+
+const TacticalToolbar = ({ onCalculatorClick, onWhiteboardClick }: TacticalToolbarProps) => {
+  return (
+    <>
+      {/* Desktop: Fixed on right side */}
+      <div className="hidden lg:flex fixed right-4 top-1/2 -translate-y-1/2 z-30">
+        <div className="bg-white border-2 border-black shadow-lg rounded-full p-2 flex flex-col gap-4">
+          {/* Calculator Button */}
+          <button
+            onClick={onCalculatorClick}
+            className="p-3 rounded-full bg-white border-2 border-black hover:bg-gray-50 transition-all active:scale-95"
+            title="Open Calculator"
+          >
+            <Calculator className="w-6 h-6 text-gray-900" />
+          </button>
+          
+          {/* Whiteboard Button */}
+          <button
+            onClick={onWhiteboardClick}
+            className="p-3 rounded-full bg-white border-2 border-black hover:bg-gray-50 transition-all active:scale-95"
+            title="Open Whiteboard"
+          >
+            <Pen className="w-6 h-6 text-gray-900" />
+          </button>
+        </div>
+      </div>
+      
+      {/* Mobile: Fixed bottom bar */}
+      <div className="lg:hidden fixed bottom-4 left-4 right-4 z-30">
+        <div className="bg-white border-2 border-black shadow-lg rounded-full p-2 flex flex-row gap-4 justify-center">
+          <button
+            onClick={onCalculatorClick}
+            className="p-3 rounded-full bg-white border-2 border-black hover:bg-gray-50 transition-all active:scale-95"
+            title="Open Calculator"
+          >
+            <Calculator className="w-6 h-6 text-gray-900" />
+          </button>
+          
+          <button
+            onClick={onWhiteboardClick}
+            className="p-3 rounded-full bg-white border-2 border-black hover:bg-gray-50 transition-all active:scale-95"
+            title="Open Whiteboard"
+          >
+            <Pen className="w-6 h-6 text-gray-900" />
+          </button>
+        </div>
+      </div>
+    </>
+  );
+};
+
+// InlineExplanation Component
+interface InlineExplanationProps {
+  question: QuestionType;
+  aiExplanation?: string;
+  isLoadingAI: boolean;
+  isVisible: boolean;
+}
+
+const InlineExplanation = ({ question, aiExplanation, isLoadingAI, isVisible }: InlineExplanationProps) => {
+  const correctAnswerIndex = question.options.findIndex((opt, index) => String.fromCharCode(65 + index) === question.correctAnswer);
+  
+  if (!isVisible) return null;
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: 'auto' }}
+      exit={{ opacity: 0, height: 0 }}
+      transition={{ duration: 0.3 }}
+      className="mt-6 pt-6 border-t border-gray-200 space-y-6"
+    >
+      {/* Correct Answer Summary */}
+      <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+        <h4 className="font-semibold text-gray-900 mb-2 text-sm">Correct Answer</h4>
+        <div className="flex items-center gap-3">
+          <span className="w-6 h-6 flex items-center justify-center rounded-full bg-white border border-green-200 text-green-600 font-medium">
+            {question.correctAnswer}
+          </span>
+          <span className="font-medium text-gray-900">
+            {question.options[correctAnswerIndex]}
+          </span>
+        </div>
+      </div>
+      
+      {/* Explanation Box */}
+      {isLoadingAI ? (
+        <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <div className="flex items-center gap-3">
+            <Loader2 className="w-5 h-5 animate-spin text-gray-600" />
+            <span className="text-sm text-gray-600">Loading explanation...</span>
+          </div>
+        </div>
+      ) : aiExplanation ? (
+        <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+          <h4 className="font-semibold text-gray-900 mb-2 text-sm">Explanation</h4>
+          <p className="text-gray-900">{aiExplanation}</p>
+        </div>
+      ) : null}
+    </motion.div>
+  );
+};
 
 interface QuestionCardProps {
   question: QuestionType;
@@ -819,6 +966,260 @@ const QuestionCard = ({
   );
 };
 
+// QuestionArena Component (Refactored from QuestionCard for Focus Mode)
+interface QuestionArenaProps {
+  question: QuestionType;
+  onAnswerSelect: (questionId: number, answerLetter: string, answerText: string, lessonIDS: string[]) => void;
+  initialSelectedLetter?: string;
+  isAnswered: boolean;
+  highlightedIndex: number | null;
+  aiExplanation?: string;
+  isLoadingAI: boolean;
+  onExplanationClick?: () => void;
+  showExplanationForCorrect?: boolean;
+}
+
+const QuestionArena = ({ question, onAnswerSelect, initialSelectedLetter, isAnswered, highlightedIndex, aiExplanation, isLoadingAI, onExplanationClick, showExplanationForCorrect }: QuestionArenaProps) => {
+  const letterToIndex = (letter?: string): number | null => {
+    if (!letter) return null;
+    const index = letter.charCodeAt(0) - 65;
+    return index >= 0 && index < question.options.length ? index : null;
+  };
+
+  const initialSelectedIndex = letterToIndex(initialSelectedLetter);
+  const [selectedAnswerIndex, setSelectedAnswerIndex] = useState<number | null>(initialSelectedIndex);
+  const [isSubmitted, setIsSubmitted] = useState(isAnswered);
+  const correctAnswerIndex = letterToIndex(question.correctAnswer);
+
+  useEffect(() => {
+    const currentSelectedIndex = letterToIndex(initialSelectedLetter);
+    setSelectedAnswerIndex(currentSelectedIndex);
+    setIsSubmitted(isAnswered && !!initialSelectedLetter);
+  }, [question.id, initialSelectedLetter, isAnswered]);
+
+  const handleAnswerSelect = (index: number) => {
+    if (isSubmitted) return;
+    
+    setSelectedAnswerIndex(index);
+    setIsSubmitted(true);
+    try {
+      onAnswerSelect(
+        question.id,
+        String.fromCharCode(65 + index),
+        question.options[index],
+        question.lessonIDS
+      );
+    } catch (error) {
+      console.error(`[QuestionArena] Error in onAnswerSelect:`, error);
+      setIsSubmitted(false);
+      setSelectedAnswerIndex(null);
+    }
+  };
+
+  // Parse markdown table if present
+  const { tableData: parsedTableData, textWithoutTable } = parseMarkdownTable(question.question);
+  const displayTableData = question.tableData || parsedTableData;
+  const displayQuestionText = parsedTableData ? textWithoutTable : question.question;
+
+  return (
+    <div className="space-y-8">
+      {/* Question Text - Large and Readable */}
+      <div className="space-y-6">
+        <div className="text-2xl font-black leading-tight text-gray-900 prose prose-lg max-w-none">
+          <ReactMarkdown
+            components={{
+              p: ({ children }) => <p className="mb-4">{children}</p>,
+              strong: ({ children }) => <strong className="font-black">{children}</strong>,
+            }}
+          >
+            {displayQuestionText}
+          </ReactMarkdown>
+        </div>
+        
+        {/* Table Data */}
+        {displayTableData && (
+          <div className="my-6 flex justify-center">
+            <div className="flex-1 overflow-x-auto">
+              <table className="min-w-full border-collapse border border-black">
+                <thead className="bg-white">
+                  <tr>
+                    {displayTableData.headers.map((header: string) => (
+                      <th key={header} className="border border-black px-4 py-3 text-center text-base font-bold text-gray-900">
+                        {header}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="bg-white">
+                  {displayTableData.rows.map((row: string[], rowIndex: number) => (
+                    <tr key={rowIndex}>
+                      {row.map((cell: string, cellIndex: number) => (
+                        <td 
+                          key={cellIndex} 
+                          className="border border-black px-4 py-3 text-center text-base"
+                        >
+                          {cell}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+        
+        {/* Question Image */}
+        {question.image && (
+          <div className="my-4 rounded-lg overflow-hidden border border-gray-200">
+            <img
+              src={typeof question.image === 'string' ? question.image : (question.image as any).src}
+              alt={question.unitName || 'Question related image'}
+              className="max-h-60 w-auto mx-auto object-contain"
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Answer Options - Vertical Stack */}
+      <div className="space-y-4">
+        {question.options.map((option, optIndex) => {
+          const isHighlighted = !isSubmitted && highlightedIndex === optIndex;
+          const isSelected = selectedAnswerIndex === optIndex;
+          const isCorrect = optIndex === correctAnswerIndex;
+          
+          let optionClass = 'w-full text-left p-6 border-4 rounded-xl cursor-pointer transition-all ';
+          
+          if (isSubmitted) {
+            if (isCorrect) {
+              optionClass += 'bg-green-50 border-green-500 shadow-sm';
+            } else if (isSelected) {
+              optionClass += 'bg-red-50 border-red-500 shadow-sm';
+            } else {
+              optionClass += 'bg-transparent border-gray-100';
+            }
+          } else {
+            if (isSelected) {
+              optionClass += 'bg-blue-50 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]';
+            } else {
+              optionClass += 'bg-transparent border-gray-100 hover:border-black';
+            }
+          }
+          
+          return (
+            <button
+              key={optIndex}
+              onClick={() => handleAnswerSelect(optIndex)}
+              disabled={isSubmitted}
+              className={optionClass}
+            >
+              <div className="flex items-center gap-4">
+                <span className={`w-8 h-8 flex items-center justify-center rounded-full border-2 text-sm font-bold flex-shrink-0 ${
+                  isSubmitted
+                    ? isCorrect
+                      ? 'bg-green-100 border-green-500 text-green-700'
+                      : isSelected
+                        ? 'bg-red-100 border-red-500 text-red-700'
+                        : 'bg-white border-gray-300 text-gray-500'
+                    : isSelected
+                      ? 'bg-blue-100 border-black text-blue-900'
+                      : 'bg-white border-gray-300 text-gray-600'
+                }`}>
+                  {String.fromCharCode(65 + optIndex)}
+                </span>
+                <span className="flex-1 text-lg font-medium text-gray-900">{option}</span>
+                {isSubmitted && (
+                  <div className="flex-shrink-0">
+                    {isCorrect ? (
+                      <Check className="w-6 h-6 text-green-500" />
+                    ) : isSelected ? (
+                      <X className="w-6 h-6 text-red-500" />
+                    ) : null}
+                  </div>
+                )}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+      
+      {/* Explanation Section - Show based on answer correctness */}
+      {isSubmitted && (() => {
+        const isCorrect = selectedAnswerIndex === correctAnswerIndex;
+        
+        // If incorrect, show explanation automatically
+        if (!isCorrect) {
+          return (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              transition={{ duration: 0.3 }}
+              className="mt-6 pt-6 border-t border-gray-200"
+            >
+              {/* Explanation */}
+              {isLoadingAI ? (
+                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className="flex items-center gap-3">
+                    <Loader2 className="w-5 h-5 animate-spin text-gray-600" />
+                    <span className="text-sm text-gray-600">Loading explanation...</span>
+                  </div>
+                </div>
+              ) : aiExplanation ? (
+                <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                  <h4 className="font-semibold text-gray-900 mb-2 text-sm">Explanation</h4>
+                  <p className="text-gray-900">{aiExplanation}</p>
+                </div>
+              ) : null}
+            </motion.div>
+          );
+        }
+        
+        // If correct, show explanation as a link
+        if (isCorrect && onExplanationClick) {
+          return (
+            <div className="mt-6 pt-6 border-t border-gray-200">
+              <button
+                onClick={onExplanationClick}
+                className="text-blue-600 hover:text-blue-800 font-semibold text-sm flex items-center gap-2 underline"
+              >
+                <Lightbulb className="w-4 h-4" />
+                View Explanation
+              </button>
+              {/* Show explanation if it exists and was requested */}
+              {showExplanationForCorrect && (
+                <>
+                  {isLoadingAI ? (
+                    <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                      <div className="flex items-center gap-3">
+                        <Loader2 className="w-5 h-5 animate-spin text-gray-600" />
+                        <span className="text-sm text-gray-600">Loading explanation...</span>
+                      </div>
+                    </div>
+                  ) : aiExplanation ? (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      transition={{ duration: 0.3 }}
+                      className="mt-4"
+                    >
+                      <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                        <h4 className="font-semibold text-gray-900 mb-2 text-sm">Explanation</h4>
+                        <p className="text-gray-900">{aiExplanation}</p>
+                      </div>
+                    </motion.div>
+                  ) : null}
+                </>
+              )}
+            </div>
+          );
+        }
+        
+        return null;
+      })()}
+    </div>
+  );
+};
+
 export function UnitMCQs({ 
   currentUnit, 
   currentQuestionIndex, 
@@ -1150,321 +1551,121 @@ export function UnitMCQs({
   }
   // --- >>> END: Sidebar Rendering Logic <<< ---
 
-  return (
-    <div className="container mx-auto px-4 pt-4 pb-12 relative">
-      {/* Use Flexbox for columns */}
-      <div className="flex flex-col lg:flex-row gap-6 lg:items-stretch">
-        
+  // State for Focus Mode features
+  const [showCalculator, setShowCalculator] = useState(false);
+  const [showWhiteboard, setShowWhiteboard] = useState(false);
+  const [showExplanationForCorrect, setShowExplanationForCorrect] = useState(false);
+  
+  // Get belt progress
+  const userXP = user ? getSubjectXP(userData, subject) : (guestXp ?? 0);
+  const beltProgress = getBeltProgress(userXP);
+  const { percent, nextBelt, xpToNext, currentBelt } = beltProgress;
 
-        
-        {/* Left Column: Question Card */}
-        <div className="w-full lg:w-3/5">
-          {currentQuestion && (
-            <QuestionCard 
-              key={`${currentUnit}-${currentQuestion.id}`} 
-              question={currentQuestion} 
-              currentIndex={currentQuestionIndex}
-              onAnswerSelect={handleAnswerSelection}
-              initialSelectedLetter={currentAnswerState?.selectedLetter}
-              isAnswered={!!currentAnswerState} 
-              aiExplanation={aiExplanations[currentQuestion.id]}
-              isLoadingAI={isLoadingExplanation} 
-              isLoggedIn={isLoggedIn}
-              signup={signup}
-              login={login}
-              dojoProgress={dojoProgress}
-              correctStreak={correctStreak}
-              totalQuestions={totalQuestions}
-              highlightedIndex={highlightedIndex}
-              isParentModalOpen={isParentModalOpen}
-            />
-          )}
-        </div>
+  // Handle calculator click
+  const handleCalculatorClick = () => {
+    setShowCalculator(true);
+  };
 
-        {/* Right Column: Controls and Resources */}
-        {/* Adjusted column width lg:w-2/5 */}
-        <div className="w-full lg:w-2/5 bg-white rounded-lg shadow-md border border-gray-200 p-4 lg:p-6 flex flex-col h-full">
-          {/* Progress Bar - Belt Progress to Next Belt */}
-          {(() => {
-            const userXP = user ? getSubjectXP(userData, subject) : (guestXp ?? 0);
-            const beltProgress = getBeltProgress(userXP);
-            const { percent, nextBelt, xpToNext } = beltProgress;
-            
-            return (
-              <div className="mb-6 flex items-center gap-3">
-                <div className="flex-1 bg-gray-200 rounded-full h-4 border border-gray-300 overflow-hidden">
-                  <motion.div
-                    className="bg-blue-600 h-4 rounded-full"
-                    initial={{ width: 0 }}
-                    animate={{ width: `${percent}%` }}
-                    transition={{ duration: 0.3 }}
-                  />
-                </div>
-                <span className="text-sm font-semibold text-gray-700 whitespace-nowrap">
-                  {nextBelt ? `${xpToNext?.toLocaleString() || 0} to ${nextBelt.name.replace(' Belt', '')}` : 'Max Rank'}
-                </span>
-              </div>
-            );
-          })()}
-          
-          {/* Belt and XP Display */}
-          {(() => {
-            const userXP = user ? getSubjectXP(userData, subject) : (guestXp ?? 0);
-            
-            // Calculate belt based on XP (using same logic as select-practice-units page)
-            const getBeltInfo = (xp: number): { name: string; color: string; bgColor: string; textColor: string } => {
-              const score = Math.min(100, (xp / 20));
-              
-              if (score < 20) return { name: 'WHITE BELT', color: 'gray', bgColor: 'bg-gray-100', textColor: 'text-gray-900' };
-              if (score < 40) return { name: 'YELLOW BELT', color: 'yellow', bgColor: 'bg-yellow-400', textColor: 'text-gray-900' };
-              if (score < 60) return { name: 'GREEN BELT', color: 'green', bgColor: 'bg-green-500', textColor: 'text-white' };
-              if (score < 80) return { name: 'BROWN BELT', color: 'amber', bgColor: 'bg-amber-700', textColor: 'text-white' };
-              return { name: 'BLACK BELT', color: 'black', bgColor: 'bg-black', textColor: 'text-white' };
-            };
-            
-            const beltInfo = getBeltInfo(userXP);
-            
-            return (
-              <div className="flex justify-between items-center mb-6 pb-6 border-b border-gray-200">
-                {/* Left Side - Belt Badge */}
-                <div className={`h-8 px-4 flex items-center justify-center border-2 border-black font-bold uppercase text-xs tracking-wider ${beltInfo.bgColor} ${beltInfo.textColor}`}>
-                  {beltInfo.name}
-                </div>
-                
-                {/* Right Side - XP Display */}
-                <div className="font-black text-xl flex items-center gap-2">
-                  <span>{userXP}</span>
-                  <span className="inline-flex items-center">
-                    <Image
-                      src="/images/flame100.png"
-                      alt="XP Flame"
-                      width={24}
-                      height={24}
-                      className="w-6 h-6"
-                    />
-                  </span>
-                </div>
-              </div>
-            );
-          })()}
-          
-          {/* Top Section: Headline, Tags, Navigation */}
-          <div className="mb-6"> {/* Reduced bottom margin */} 
-            <div className="flex items-center gap-4 mb-3"> {/* Added bottom margin */} 
-              <h3 className="font-extrabold tracking-tight text-gray-900 text-2xl">
-                  <span className={subject === 'macro' ? 'text-blue-600' : 'text-green-600'}>Unit MCQ</span> Practice
-              </h3>
-              {/* Subject Pill */}
-              <span className={`px-3 py-1 rounded-md text-sm font-medium bg-gray-100 ${
-                subject === 'macro' ? 'text-blue-600' : 'text-green-600'
-              }`}>
-                AP {subject === 'macro' ? 'Macro' : 'Micro'}
-              </span>
-              
+  // Handle whiteboard click
+  const handleWhiteboardClick = () => {
+    setShowWhiteboard(true);
+  };
 
-              {/* Keep dropdown for now, might remove later if tags are sufficient */}
-              {/* Hide dropdown in weakest/custom mode and topic mode */}
-              {!isWeakestUnitsMode && !isTopicMode && (
-                <div className="relative" ref={dropdownRef}>
-                  <button
-                    onClick={() => setIsUnitDropdownOpen(!isUnitDropdownOpen)}
-                    className={`p-1.5 rounded-full text-white transition-colors ${subject === 'macro' ? 'bg-blue-500 hover:bg-blue-600' : 'bg-green-500 hover:bg-green-600'}`}
-                  >
-                    <Triangle className="w-2 h-2 rotate-180 fill-current" />
-                  </button>
-                  {isUnitDropdownOpen && (
-                    <div className="absolute left-0 mt-1 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-10">
-                      {units.map(unit => {
-                        const isLocked = false;
+  // Handle explanation click (for correct answers - shows as link)
+  const handleExplanationClick = () => {
+    if (!currentAnswerState) return;
+    
+    // Toggle explanation visibility
+    setShowExplanationForCorrect(!showExplanationForCorrect);
+    
+    // If explanation doesn't exist yet, load it
+    if (!aiExplanations[currentQuestion?.id || 0] && !isLoadingExplanation) {
+      handleAIExplanation();
+    }
+  };
+  
+  // Reset explanation visibility when question changes
+  useEffect(() => {
+    setShowExplanationForCorrect(false);
+  }, [currentQuestion?.id]);
+
+  // Auto-load explanation for incorrect answers
+  useEffect(() => {
+    if (currentAnswerState && currentQuestion) {
+      const isCorrect = currentAnswerState.selectedLetter === currentQuestion.correctAnswer;
+      // If incorrect, automatically load explanation
+      if (!isCorrect && !aiExplanations[currentQuestion.id] && !isLoadingExplanation) {
+        handleAIExplanation();
+      }
+    }
+  }, [currentAnswerState, currentQuestion?.id, aiExplanations, isLoadingExplanation]);
+            
                         return (
-                          <button
-                            key={unit.number}
-                            onClick={() => !isLocked && onUnitChange(unit.number)}
-                            disabled={isLocked}
-                            className={`w-full text-left px-4 py-2 text-sm transition-colors flex items-center justify-between ${
-                              currentUnit === unit.number
-                                ? subject === 'macro' ? 'bg-blue-50 text-blue-600' : 'bg-green-50 text-green-600'
-                                : isLocked
-                                ? 'text-gray-400 bg-gray-50 cursor-not-allowed'
-                                : 'text-gray-700 hover:bg-gray-50'
-                            }`}
-                          >
-                            <span>{unit.title}</span>
-                            {isLocked && <Lock className="w-4 h-4 text-gray-400" />}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+    <>
+      {/* Calculator */}
+      {showCalculator && (
+        <ExamCalculator onClose={() => setShowCalculator(false)} />
+      )}
 
-            {/* --- Unit Tags --- */}
-            {practiceUnitIds && practiceUnitIds.length > 0 && (
-                <div className="flex flex-wrap gap-1 mb-4"> {/* Container for tags */} 
-                    {practiceUnitIds.map(unitId => (
-                        <span key={unitId} className="inline-block bg-gray-100 text-gray-700 text-xs font-medium px-2 py-0.5 rounded-md">
-                            Unit {unitId}
-                        </span>
-                    ))}
+      {/* Whiteboard */}
+      {showWhiteboard && (
+        <ExamWhiteboard onClose={() => setShowWhiteboard(false)} />
+      )}
+
+      {/* Focus Mode Layout */}
+      <div className="min-h-screen bg-gray-50 pb-20 lg:pb-4">
+        <div className="max-w-3xl mx-auto px-4 pt-6 pb-12">
+          {/* Top Row: BeltHUD */}
+          <BeltHUD
+            currentXP={userXP}
+            nextBeltXP={beltProgress.nextBeltXP}
+            currentBelt={currentBelt}
+            percent={percent}
+          />
+
+          {/* Center: QuestionArena */}
+          {currentQuestion && (
+            <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6 md:p-8 mb-8">
+              <QuestionArena
+                question={currentQuestion}
+                onAnswerSelect={handleAnswerSelection}
+                initialSelectedLetter={currentAnswerState?.selectedLetter}
+                isAnswered={!!currentAnswerState}
+                highlightedIndex={highlightedIndex}
+                aiExplanation={aiExplanations[currentQuestion.id]}
+                isLoadingAI={isLoadingExplanation}
+                onExplanationClick={handleExplanationClick}
+                showExplanationForCorrect={showExplanationForCorrect}
+              />
                 </div>
             )}
 
-            <div className="flex gap-2 mt-4">
+          {/* Bottom: Navigation Buttons */}
+          <div className="flex gap-4">
               <button
-                onClick={handlePreviousQuestion}
+              onClick={onPreviousQuestion}
                 disabled={currentQuestionIndex === 0}
-                className={`flex-1 p-2 rounded-md font-semibold text-sm transition-colors text-white disabled:bg-gray-300 disabled:cursor-not-allowed ${subject === 'macro' ? 'bg-blue-500 hover:bg-blue-600' : 'bg-green-500 hover:bg-green-600'}`}
+              className="flex-1 px-6 py-4 border-4 border-black rounded-xl font-black text-lg bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:translate-y-1 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
               >
                 Previous
               </button>
               <button
-                onClick={handleNextQuestion}
+              onClick={onNextQuestion}
                 disabled={currentQuestionIndex === totalQuestions - 1 || totalQuestions === 0}
-                className={`flex-1 p-2 rounded-md font-semibold text-sm transition-colors text-white disabled:bg-gray-300 disabled:cursor-not-allowed ${subject === 'macro' ? 'bg-blue-500 hover:bg-blue-600' : 'bg-green-500 hover:bg-green-600'}`}
+              className="flex-1 px-6 py-4 border-4 border-black rounded-xl font-black text-lg bg-black text-white hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:translate-y-1 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
               >
                 Next
               </button>
             </div>
           </div>
 
-          {/* Middle Section: Study Resources (Takes remaining space) */}
-          <div className="space-y-3 flex-grow"> {/* Added flex-grow */}
-             {/* Reduced heading size */}
-             <h3 className="font-extrabold tracking-tight text-gray-900 text-lg mb-3">Study Resources</h3>
-            
-
-            
-            {/* Study Guide Link - Reduced padding */} 
-            {(() => {
-              const isLocked = false;
-              if (isLocked) {
-                return (
-                  <div className="w-full p-3 rounded-lg border border-gray-200 bg-gray-50 group block opacity-60">
-                    <div className="flex items-center gap-3 justify-start">
-                      <div className="p-1.5 rounded-lg bg-gray-200 text-gray-400"> {/* Reduced icon padding */} 
-                        <FileText className="w-5 h-5" />
+        {/* Right Side: TacticalToolbar */}
+        <TacticalToolbar
+          onCalculatorClick={handleCalculatorClick}
+          onWhiteboardClick={handleWhiteboardClick}
+        />
                       </div>
-                      <span className="font-semibold text-sm text-gray-500"> {/* Reduced text size */} 
-                        Unit {displayUnitId} Study Guide (Coming Soon)
-                      </span>
-                    </div>
-                  </div>
-                );
-              }
-              return (
-                <a
-                  href={`/unit/${displayUnitId}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full p-3 rounded-lg border border-gray-200 hover:border-gray-300 transition-all duration-200 bg-white hover:bg-gray-50 group block"
-                >
-                   <div className="flex items-center gap-3 justify-start">
-                     <div className="p-1.5 rounded-lg bg-gray-100 text-gray-600 group-hover:bg-gray-200 transition-colors"> {/* Reduced icon padding */} 
-                       <FileText className="w-5 h-5" />
-                     </div>
-                     <span className="font-semibold text-sm text-gray-900"> {/* Reduced text size */} 
-                       Unit {displayUnitId} Study Guide
-                     </span>
-                   </div>
-                </a>
-              );
-            })()}
-
-            {/* Test Mode CTA */}
-            {currentUnit > 0 && (
-              <div className="w-full p-3 rounded-lg border border-gray-200 bg-white flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-sm font-semibold text-gray-900">Test Mode</p>
-                  <p className="text-xs text-gray-600">
-                    Timed, exam-style practice for Unit {displayUnitId}.
-                  </p>
-                </div>
-                <button
-                  onClick={onEnterTestMode}
-                  className={`inline-flex items-center gap-1 px-3 py-1.5 text-xs font-semibold rounded-md border transition-colors ${
-                    hasTestModeAccess
-                      ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700'
-                      : 'bg-gray-100 text-gray-500 border-gray-200 cursor-pointer hover:bg-gray-100'
-                  }`}
-                >
-                  {hasTestModeAccess ? (
-                    <>Enter Test</>
-                  ) : (
-                    <>
-                      <Lock className="w-3 h-3" />
-                      <span>Locked</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            )}
-
-            {/* Video Lessons - Removed: Now using "Teach Me..." button on question card */}
-
-            {/* AI Explanation Button - Reduced padding */}
-            <div 
-               className="relative" 
-               onMouseEnter={() => { if (!currentAnswerState) setShowAiTooltip(true); }}
-               onMouseLeave={() => setShowAiTooltip(false)}
-            >
-              <button
-                onClick={handleAIExplanation}
-                disabled={!currentAnswerState}
-                className={`w-full p-3 rounded-lg border transition-all duration-200 bg-white group relative
-                  ${explanationError ? 'border-red-200 hover:border-red-300' : 'border-gray-200 hover:border-gray-300'} 
-                  hover:bg-gray-50
-                  disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white`}
-              >
-                <div className="flex items-center gap-3 justify-start">
-                  <div className={`p-1.5 rounded-lg text-white transition-colors ${explanationError ? 'bg-red-500 group-hover:bg-red-600' : subject === 'macro' ? 'bg-blue-500 group-hover:bg-blue-600' : 'bg-green-500 group-hover:bg-green-600'} group-disabled:bg-gray-400`}>
-                    {isLoadingExplanation ? (
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                      <Brain className="w-5 h-5" />
-                    )}
-                  </div>
-                  <span className={`font-semibold text-sm text-left ${explanationError ? 'text-red-600' : 'text-gray-900'} group-disabled:text-gray-500`}>
-                    Explain with AI Dojo
-                  </span>
-                </div>
-              </button>
-
-              {/* Tooltip */}
-              {showAiTooltip && (
-                 <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-max max-w-xs px-3 py-1.5 bg-gray-800 text-white text-xs rounded shadow-lg z-10">
-                   Choose an answer before using AI Dojo
-                   <div className="absolute left-1/2 transform -translate-x-1/2 top-full w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-gray-800"></div>
-                 </div>
-              )}
-            </div>
-            
-             {/* Conditional Error Message */} 
-             {explanationError && (
-               <div className="px-3 py-1.5 bg-red-50 border border-red-200 rounded-md"> {/* Reduced padding */} 
-                 <p className="text-xs text-red-600"> {/* Reduced text size */} 
-                   {explanationError}
-                 </p>
-               </div>
-             )}
-
-          </div>
-
-          {/* Footer Section: Change Units Link */}
-          <div className="mt-auto pt-6"> {/* Increased top padding */} 
-             {/* Change Units Link - Adjusted size/styling */}
-             <Link 
-                 href={`/select-practice-units?subject=${subject}`}
-                 className="inline-flex items-center justify-center w-full text-base text-gray-900 hover:underline" /* Increased size */ 
-             >
-                 <RefreshCw className={`w-5 h-5 mr-2 ${subject === 'macro' ? 'text-blue-600' : 'text-green-600'}`} /> 
-                 Change Units
-             </Link>
-          </div>
-        </div>
-      </div>
-    </div>
+    </>
   );
 }
 

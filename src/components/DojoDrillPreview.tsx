@@ -15,6 +15,7 @@ interface DojoDrillPreviewProps {
     stage2: boolean;
     stage3: boolean;
   } | null;
+  buttonText?: string; // Optional custom button text
 }
 
 const learningPathItems = [
@@ -32,6 +33,7 @@ export function DojoDrillPreview({
   onStart,
   isLocked = false,
   progress = null,
+  buttonText,
 }: DojoDrillPreviewProps) {
   return (
     <div className="bg-white border-4 border-black rounded-3xl shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] p-8 sm:p-12 flex flex-col min-h-full"
@@ -115,16 +117,16 @@ export function DojoDrillPreview({
       {/* Footer CTA */}
       <button
         onClick={onStart}
-        disabled={isLocked}
+        disabled={isLocked && !buttonText} // Allow clicking if buttonText is provided (e.g., "Join the Dojo")
         className={`w-full font-bold py-4 rounded-lg uppercase tracking-widest transition-colors ${
-          isLocked
+          isLocked && !buttonText
             ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
             : 'bg-black text-white hover:bg-gray-800'
         }`}
       >
         <div className="flex items-center justify-center gap-2">
-          {isLocked && <Lock className="w-5 h-5" />}
-          <span>{isLocked ? 'Locked (Season Pass)' : 'Start Drill'}</span>
+          {isLocked && !buttonText && <Lock className="w-5 h-5" />}
+          <span>{buttonText || (isLocked ? 'Locked (Season Pass)' : 'Start Drill')}</span>
         </div>
       </button>
     </div>

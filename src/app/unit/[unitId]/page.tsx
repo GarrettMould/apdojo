@@ -432,6 +432,75 @@ function formatSubNote(note: string): React.ReactNode {
   return <span>{note}</span>;
 }
 
+// JoinDojoModal Component
+interface JoinDojoModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  selectedSubject: 'macro' | 'micro';
+}
+
+function JoinDojoModal({ isOpen, onClose, selectedSubject }: JoinDojoModalProps) {
+  // Handle Escape key
+  useEffect(() => {
+    if (!isOpen) return;
+    
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 bg-black bg-opacity-75 z-[100] flex items-center justify-center p-4"
+        onClick={(e) => {
+          // Close when clicking outside the modal content
+          if (e.target === e.currentTarget) {
+            onClose();
+          }
+        }}
+      >
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.8, opacity: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+          className="bg-white border-4 border-black rounded-3xl shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] p-8 max-w-md w-full text-center relative"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <h3 className="text-3xl font-black text-gray-900 mb-4">
+            Join the Dojo for this Feature and more!
+          </h3>
+          <p className="text-gray-700 mb-6">
+            Unlock unlimited quiz generation, all Dojo Drills, FRQ practice, and full-length exams with a Season Pass.
+          </p>
+          <Link
+            href={`/purchase/season-pass?courseType=${selectedSubject}`}
+            className={`inline-flex items-center justify-center w-full px-6 py-3 text-white font-bold rounded-lg transition-colors shadow-md hover:shadow-lg ${
+              selectedSubject === 'macro'
+                ? 'bg-blue-600 hover:bg-blue-700'
+                : 'bg-green-600 hover:bg-green-700'
+            }`}
+            onClick={() => onClose()}
+          >
+            Learn More <ArrowRight className="ml-2 w-5 h-5" />
+          </Link>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
 export default function UnitPage() {
   const params = useParams();
   const router = useRouter(); // Initialize useRouter
@@ -463,6 +532,17 @@ export default function UnitPage() {
   const [hasSeenExplainer, setHasSeenExplainer] = useState(false);
   const [isGeneratingQuiz, setIsGeneratingQuiz] = useState(false);
   const [quizError, setQuizError] = useState<string | null>(null);
+  const [showJoinDojoModal, setShowJoinDojoModal] = useState(false);
+
+  // Check if user is a pro customer (has season pass)
+  const isProCustomer = useMemo(() => {
+    if (!user || !userData) return false;
+    const seasonPass = userData.seasonPass as string[] | undefined;
+    if (!seasonPass) return false;
+    // Check if user has season pass for current subject
+    const subjectKey = selectedSubject === 'macro' ? 'macro' : 'micro';
+    return seasonPass.includes(subjectKey) || seasonPass.includes('macro') || seasonPass.includes('micro');
+  }, [user, userData, selectedSubject]);
 
   // --- FAQ Schema Data ---
   const faqSchema = {
@@ -846,6 +926,12 @@ export default function UnitPage() {
   };
 
   const handleMakeQuiz = async () => {
+    // Check if user is pro customer
+    if (!isProCustomer) {
+      setShowJoinDojoModal(true);
+      return;
+    }
+
     // Check if we have selections
     if (selectedTerms.size === 0 && selectedWhiteboards.size === 0) {
       return;
@@ -958,9 +1044,9 @@ export default function UnitPage() {
       setAvailableQuizQuestions(convertedQuestions);
       setOriginalQuizQuestions(convertedQuestions);
       setQuizQuestion(convertedQuestions[0]);
-      setSelectedQuizAnswer(null);
+        setSelectedQuizAnswer(null);
       setQuizAnswers({}); // Reset all answers
-      setIsAnimatingOut(false);
+        setIsAnimatingOut(false);
       setShowQuizPanel(true);
       setLeftPanelWidth(65); // Reset to default width
       setAnsweredQuizQuestions(new Set()); // Reset answered questions for new quiz
@@ -1202,7 +1288,7 @@ export default function UnitPage() {
           }}
           className="flex-shrink-0 overflow-y-auto min-w-0"
         >
-          <div className="max-w-7xl mx-auto px-4 py-12 mt-12">
+      <div className="max-w-7xl mx-auto px-4 py-12 mt-12">
         {/* Page Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight">
@@ -1262,7 +1348,7 @@ export default function UnitPage() {
                   </button>
                 ) : (
                   <Link 
-                    href={`/purchase/mcq-practice?units=${activeUnitNum}&total=${unitPrice.toFixed(2)}&bundle=false`}
+                    href={`/purchase/season-pass?courseType=${selectedSubject}`}
                     className={`inline-flex items-center gap-2 px-6 py-3 text-white font-semibold rounded-lg transition-colors shadow-md hover:shadow-lg ${
                       themeColor === 'blue'
                         ? 'bg-blue-600 hover:bg-blue-700'
@@ -1627,7 +1713,7 @@ export default function UnitPage() {
                     }))}
                   />
                 )}
-              </> 
+              </>
             );
               })()}
         </div>
@@ -2650,6 +2736,17 @@ export default function UnitPage() {
               </div>
             </motion.div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Join the Dojo Modal */}
+      <AnimatePresence>
+        {showJoinDojoModal && (
+          <JoinDojoModal
+            isOpen={showJoinDojoModal}
+            onClose={() => setShowJoinDojoModal(false)}
+            selectedSubject={selectedSubject}
+          />
         )}
       </AnimatePresence>
     </>

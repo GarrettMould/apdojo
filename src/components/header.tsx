@@ -8,8 +8,9 @@ import dojoIcon from "../../public/images/dojoIcon.png";
 import { useAuthContext } from '@/contexts/AuthContext';
 import { Button } from './ui/button';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { UserBeltProgress } from './dashboard/UserBeltProgress';
 import { getSubjectXP } from '@/hooks/useUserProgress';
+import { getBeltProgress } from '@/lib/beltSystem';
+import { motion } from 'framer-motion';
 
 function Header() {
   const { user, logout, selectedSubject, totalXP, guestXp, isCharacterClosetOpen, setIsCharacterClosetOpen, userData } = useAuthContext();
@@ -205,13 +206,48 @@ function Header() {
                       </button>
 
                       {/* Belt System Dropdown */}
-                      {isBeltDropdownOpen && (
-                        <div className="absolute top-full right-0 mt-2 w-[400px] z-50">
-                          <div className="bg-white border-2 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-3">
-                            <UserBeltProgress totalXP={xp} animateOnChange={true} />
+                      {isBeltDropdownOpen && (() => {
+                        const beltProgress = getBeltProgress(xp);
+                        const { percent, xpToNext, currentBelt } = beltProgress;
+                        
+                        return (
+                          <div className="absolute top-full right-0 mt-2 w-[320px] z-50">
+                            <div className="bg-white border-2 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4">
+                              {/* Belt Badge */}
+                              <div className="mb-4">
+                                <div className={`px-4 py-2 flex items-center justify-center border-2 border-black font-bold uppercase text-sm tracking-wider ${currentBelt.color} ${currentBelt.textColor} rounded-lg`}>
+                                  <span>{currentBelt.name}</span>
+                                </div>
+                              </div>
+                              
+                              {/* Progress Bar */}
+                              <div className="mb-4">
+                                <div className="h-6 bg-gray-200 border-2 border-black rounded-full overflow-hidden relative">
+                                  <motion.div
+                                    className={`h-full ${currentBelt.color === 'bg-yellow-400' ? 'bg-yellow-400' : currentBelt.color === 'bg-orange-500' ? 'bg-orange-500' : currentBelt.color === 'bg-green-600' ? 'bg-green-600' : currentBelt.color === 'bg-blue-600' ? 'bg-blue-600' : currentBelt.color === 'bg-gray-900' ? 'bg-gray-900' : 'bg-yellow-400'}`}
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${percent}%` }}
+                                    transition={{ duration: 0.3 }}
+                                  />
+                                </div>
+                              </div>
+                              
+                              {/* XP to Go */}
+                              <div className="text-center">
+                                {xpToNext !== null ? (
+                                  <p className="text-sm font-bold text-gray-900">
+                                    {xpToNext.toLocaleString()} XP to go
+                                  </p>
+                                ) : (
+                                  <p className="text-sm font-bold text-gray-900">
+                                    Max Rank
+                                  </p>
+                                )}
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        );
+                      })()}
                     </>
                   );
                 })()}

@@ -108,11 +108,18 @@ function SelectPracticeUnitsContent() {
             <div className="max-w-3xl mx-auto w-full">
                 {/* Dojo Player Card - Unified Container */}
                 <div className="bg-white border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-xl p-6 sm:p-8">
-                    {/* Header Row - Belt Badge & XP */}
+                    {/* Header Row - Belt Badge, Headline & XP */}
                     <div className="flex justify-between items-center mb-6">
                         {/* Left Side - Belt Badge */}
                         <div className={`h-8 px-4 flex items-center justify-center border-2 border-black font-bold uppercase text-xs tracking-wider ${beltInfo.bgColor} ${beltInfo.textColor}`}>
                             {beltInfo.name}
+                        </div>
+                        
+                        {/* Center - Headline */}
+                        <div className="flex-1 text-center">
+                            <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
+                                Choose Your <span className={isMicro ? 'text-green-500' : 'text-blue-500'}>Units</span>
+                            </h1>
                         </div>
                         
                         {/* Right Side - XP Display */}
@@ -128,17 +135,6 @@ function SelectPracticeUnitsContent() {
                                 />
                             </span>
                         </div>
-                    </div>
-
-                    {/* Body Content */}
-                    {/* Headline */}
-                    <div className="text-center mb-6">
-                        <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
-                            Choose Your <span className={isMicro ? 'text-green-500' : 'text-blue-500'}>Units</span>
-                        </h1>
-                        <p className="mt-2 text-lg text-gray-600">
-                            Select the {subject === 'micro' ? 'Microeconomics' : 'Macroeconomics'} units you want to focus on.
-                        </p>
                     </div>
 
                     {/* Units List */}

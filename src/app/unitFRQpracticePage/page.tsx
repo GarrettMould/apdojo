@@ -16,6 +16,7 @@ import { ShareFRQButton } from '@/components/ShareFRQButton';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CheckCircle2 } from 'lucide-react';
 import { LoginModal, SignupModal } from '@/components/AuthModals';
+import FRQLibrarySidebar, { FRQItem } from '@/components/FRQLibrarySidebar';
 
 // Self-Review Component for Drawings
 const DrawingSelfReview = ({ 
@@ -174,9 +175,19 @@ const DrawingSelfReview = ({
 function UnitFRQPracticePageComponent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { selectedSubject, awardXp, user } = useAuthContext();
+  const { selectedSubject, awardXp, user, userData } = useAuthContext();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
+
+  // Check if user is a pro customer (has season pass)
+  const isProCustomer = React.useMemo(() => {
+    if (!user || !userData) return false;
+    const seasonPass = userData.seasonPass as string[] | undefined;
+    if (!seasonPass) return false;
+    // Check if user has season pass for current subject
+    const subjectKey = selectedSubject === 'macro' ? 'macro' : 'micro';
+    return seasonPass.includes(subjectKey) || seasonPass.includes('macro') || seasonPass.includes('micro');
+  }, [user, userData, selectedSubject]);
 
   // Memoize the filtering of relevant exams
   const relevantExams = React.useMemo(() => frqExams.filter(exam =>
@@ -193,11 +204,24 @@ function UnitFRQPracticePageComponent() {
   ).sort((a, b) => (a.unit || 99) - (b.unit || 99) || a.title.localeCompare(b.title)), [relevantExams]);
 
   // Helper function to check if a question is locked
-  // All questions are now unlocked
-  const isQuestionLocked = (questionId: number | undefined): boolean => {
-    // All questions are unlocked
-    return false;
-  };
+  const isQuestionLocked = React.useCallback((questionId: number | undefined, questionUnit?: number): boolean => {
+    if (!questionId) return true;
+    
+    // Pro customers: All FRQs unlocked
+    if (isProCustomer) {
+      return false;
+    }
+    
+    // Free customers: Only GDP FRQ from Unit 2 (question ID 5) is unlocked for macro
+    if (selectedSubject === 'macro') {
+      // Only question ID 5 (GDP & Inflation Data from Unit 2) is unlocked
+      return questionId !== 5;
+    }
+    
+    // For micro, all are locked for free customers (can be updated later)
+    // For now, free customers only get the macro GDP FRQ
+    return true;
+  }, [isProCustomer, selectedSubject]);
 
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0);
 
@@ -209,7 +233,8 @@ function UnitFRQPracticePageComponent() {
       if (!isNaN(frqId)) {
         // Find the question with matching ID
         const questionIndex = allQuestions.findIndex(q => q.id === frqId);
-        if (questionIndex !== -1 && !isQuestionLocked(frqId)) {
+        const question = allQuestions[questionIndex];
+        if (questionIndex !== -1 && !isQuestionLocked(frqId, question?.unit)) {
           // Only auto-select if the question is unlocked
           setSelectedQuestionIndex(questionIndex);
         }
@@ -221,21 +246,52 @@ function UnitFRQPracticePageComponent() {
   useEffect(() => {
     if (allQuestions.length > 0) {
       const currentQuestion = allQuestions[selectedQuestionIndex];
-      if (!currentQuestion || isQuestionLocked(currentQuestion.id)) {
-        const firstUnlockedIndex = allQuestions.findIndex(q => q.id === 1 || q.id === 2);
+      if (!currentQuestion || isQuestionLocked(currentQuestion.id, currentQuestion.unit)) {
+        // Find first unlocked question
+        const firstUnlockedIndex = allQuestions.findIndex(q => !isQuestionLocked(q.id, q.unit));
         if (firstUnlockedIndex !== -1) {
           setSelectedQuestionIndex(firstUnlockedIndex);
         }
       }
     }
-  }, [allQuestions]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allQuestions, isProCustomer, selectedSubject]);
 
   // Use only real questions from frqQuestions.ts
   const allDisplayQuestions = allQuestions;
 
+  // Convert questions to FRQItem format for the sidebar
+  const frqItems: FRQItem[] = React.useMemo(() => {
+    return allDisplayQuestions.map((question) => {
+      // Calculate total points from all parts and subparts
+      const totalPoints = question.parts.reduce((sum, part) => {
+        const partPoints = part.answerType ? (part.pointValue || 0) : 0;
+        const subpartPoints = part.subparts?.reduce((subSum, subpart) => {
+          return subSum + (subpart.answerType ? (subpart.pointValue || 0) : 0);
+        }, 0) || 0;
+        return sum + partPoints + subpartPoints;
+      }, 0);
+
+      // Determine status
+      const isLocked = isQuestionLocked(question.id, question.unit);
+      // TODO: Add logic to check if question is completed (from user progress)
+      const status: 'locked' | 'completed' | 'available' = isLocked 
+        ? 'locked' 
+        : 'available'; // For now, all unlocked questions are 'available'
+
+      return {
+        id: question.id.toString(),
+        title: question.title,
+        unit: question.unit || 0,
+        totalPoints: totalPoints || 0,
+        status,
+      };
+    });
+  }, [allDisplayQuestions]);
+
   // Get the selected question, or fallback to first question if index is invalid
   const selectedQuestion = allDisplayQuestions[selectedQuestionIndex] || allDisplayQuestions[0];
-  const isCurrentQuestionLocked = isQuestionLocked(selectedQuestion?.id);
+  const isCurrentQuestionLocked = isQuestionLocked(selectedQuestion?.id, selectedQuestion?.unit);
   
   // If the selected question is locked, we'll show a locked message
   // Otherwise, use the selected question
@@ -356,7 +412,7 @@ function UnitFRQPracticePageComponent() {
   const handleSelectQuestion = (index: number) => {
     const question = allDisplayQuestions[index];
     // Prevent selecting locked questions
-    if (question && isQuestionLocked(question.id)) {
+    if (question && isQuestionLocked(question.id, question.unit)) {
       return;
     }
     setSelectedQuestionIndex(index);
@@ -538,12 +594,12 @@ function UnitFRQPracticePageComponent() {
 
       {/* Left Sidebar: FRQ Library (Sliding Panel) */}
       <div 
-        className={`fixed top-16 left-0 h-[calc(100vh-4rem)] bg-white lg:w-1/4 w-4/5 z-40 shadow-xl border-r border-gray-200 transition-transform duration-300 ease-in-out print:hidden ${
+        className={`fixed top-16 left-0 h-[calc(100vh-4rem)] bg-white lg:w-1/4 w-4/5 z-40 shadow-xl transition-transform duration-300 ease-in-out print:hidden ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="p-4 h-full flex flex-col">
-          <div className="flex justify-between items-center mb-4 border-b pb-2">
+        <div className="h-full flex flex-col">
+          <div className="flex justify-between items-center p-4 border-b-2 border-black bg-gray-50">
             <h2 className="text-xl font-bold text-gray-800">FRQ Library</h2>
             <button
               onClick={() => setIsSidebarOpen(false)}
@@ -552,36 +608,19 @@ function UnitFRQPracticePageComponent() {
               <ChevronsLeft className="w-6 h-6 text-gray-700" />
             </button>
           </div>
-          <div className="space-y-4 overflow-y-auto flex-1">
-            {allDisplayQuestions.map((question, index) => {
-              const isSelected = 'id' in question && question.id === frqQuestion.id;
-              const isLocked = isQuestionLocked(question.id);
-
-              return (
-                <button
-                  key={question.id}
-                  onClick={() => {
-                    if (!isLocked) {
-                      handleSelectQuestion(index);
-                      setIsSidebarOpen(false); // Close sidebar on selection
-                    }
-                  }}
-                  disabled={isLocked}
-                  className={`w-full text-left py-4 px-4 rounded-md transition-all duration-200 flex items-center justify-between min-h-[65px] ${
-                    isLocked
-                      ? 'bg-gray-50 text-gray-400 cursor-not-allowed opacity-60'
-                      : isSelected
-                      ? 'bg-blue-600 text-white shadow-md'
-                      : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-                  }`}
-                >
-                  <div className="flex items-center gap-3 flex-1">
-                    <span className="font-semibold text-base">{question.title}</span>
-                    {isLocked && <Lock className="w-4 h-4 flex-shrink-0" />}
-                  </div>
-                </button>
-              );
-            })}
+          <div className="flex-1 overflow-hidden">
+            <FRQLibrarySidebar
+              items={frqItems}
+              selectedId={selectedQuestion?.id?.toString() || ''}
+              onSelect={(id) => {
+                const questionIndex = allDisplayQuestions.findIndex(q => q.id.toString() === id);
+                const question = allDisplayQuestions[questionIndex];
+                if (questionIndex !== -1 && question && !isQuestionLocked(parseInt(id, 10), question.unit)) {
+                  handleSelectQuestion(questionIndex);
+                  setIsSidebarOpen(false); // Close sidebar on selection
+                }
+              }}
+            />
           </div>
         </div>
       </div>

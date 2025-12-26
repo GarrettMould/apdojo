@@ -532,27 +532,27 @@ export function DojoDashboard() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         {/* Strongest Unit */}
                         {strongestUnit && (
-                          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                            <div className="flex items-center gap-2 mb-2">
-                              <CheckCircle2 className="w-5 h-5 text-green-600" />
-                              <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide">Strongest Unit</h3>
+                          <div className="bg-green-100 border-4 border-black rounded-xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-5">
+                            <div className="flex items-center gap-2 mb-3">
+                              <CheckCircle2 className="w-6 h-6 text-green-700" />
+                              <h3 className="text-sm font-black text-gray-900 uppercase tracking-wider">Strongest Unit</h3>
                 </div>
-                            <p className="text-base font-semibold text-green-700">{getUnitName(strongestUnit.unitId)}</p>
-                            <p className="text-sm text-gray-600 mt-1">{strongestUnit.percentage}% correct</p>
+                            <p className="text-lg font-black text-green-800 mb-1">{getUnitName(strongestUnit.unitId)}</p>
+                            <p className="text-base font-bold text-gray-700">{strongestUnit.percentage}% correct</p>
                 </div>
                         )}
                         {/* Weakest Unit */}
                         {weakestUnit && (
-                          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Target className="w-5 h-5 text-red-600" />
-                              <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide">Weakest Unit</h3>
+                          <div className="bg-red-100 border-4 border-black rounded-xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-5">
+                            <div className="flex items-center gap-2 mb-3">
+                              <Target className="w-6 h-6 text-red-700" />
+                              <h3 className="text-sm font-black text-gray-900 uppercase tracking-wider">Weakest Unit</h3>
               </div>
-                            <p className="text-base font-semibold text-red-700">{getUnitName(weakestUnit.unitId)}</p>
-                            <p className="text-sm text-gray-600 mt-1">{weakestUnit.percentage}% correct</p>
-          </div>
+                            <p className="text-lg font-black text-red-800 mb-1">{getUnitName(weakestUnit.unitId)}</p>
+                            <p className="text-base font-bold text-gray-700">{weakestUnit.percentage}% correct</p>
+                </div>
                         )}
-                      </div>
+          </div>
                     )}
 
                     {/* All Units Performance */}
@@ -739,7 +739,7 @@ export function DojoDashboard() {
                           variants={cardHoverVariants}
                           initial="rest"
                           whileHover="hover"
-                          className={`bg-white rounded-xl p-5 cursor-pointer border border-gray-200 ${theme.hoverBorder} transition-all flex flex-col h-full relative`}
+                          className="bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 text-left hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 flex flex-col h-full relative"
                           style={{ 
                             backgroundColor: '#ffffff',
                             opacity: 1,
@@ -748,13 +748,15 @@ export function DojoDashboard() {
                           }}
                         >
                           {/* Thumbnail */}
-                          <div className="mb-4 -mx-5 -mt-5 flex-shrink-0 relative">
+                          <div className="mb-4 -mx-6 -mt-6 flex-shrink-0 relative">
                             <DojoThumbnail
                               type={thumbnailType}
                               title={activity.title}
                               icon={Icon}
                               unitNumber={unitNumber}
-                              className="rounded-t-xl"
+                              xpReward={activity.xpReward}
+                              activityType={activity.type === 'dojo-drill' ? 'Drill' : activity.type === 'full-exam' ? 'Exam' : activity.type === 'unit-exam' ? 'Test' : activity.type === 'frq-exam' ? 'FRQ' : 'Quiz'}
+                              className="rounded-t-3xl"
                             />
                             {/* Score/Progress Overlay */}
                             {activity.score !== undefined && (
@@ -773,29 +775,29 @@ export function DojoDashboard() {
                               </div>
                             )}
                           </div>
-                          {/* Title - Fixed height for 2 lines */}
-                          <h3 className="font-semibold text-base line-clamp-2 mb-2 min-h-[3rem] flex items-start" style={{ color: '#111827' }}>
+                          {/* Title */}
+                          <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
                             {activity.title}
                           </h3>
                           {/* Meta */}
                           <div className="mt-auto space-y-1">
                             {activity.score !== undefined && (
-                              <p className="text-sm" style={{ color: '#6B7280' }}>
+                              <p className="text-sm text-gray-600">
                                 {activity.correctCount || activity.score}% correct
                               </p>
                             )}
                             {activity.answeredCount && !activity.isSubmitted && (
-                              <p className="text-sm" style={{ color: '#6B7280' }}>
+                              <p className="text-sm text-gray-600">
                                 {activity.answeredCount} of {activity.totalQuestions} answered
                               </p>
                             )}
                             {activity.stagesCompleted && (
-                              <p className="text-sm" style={{ color: '#6B7280' }}>
+                              <p className="text-sm text-gray-600">
                                 {activity.stagesCompleted} of 3 stages completed
                               </p>
                             )}
                             {activity.timestamp && (
-                              <p className="text-xs" style={{ color: '#9CA3AF' }}>
+                              <p className="text-xs text-gray-500">
                                 {activity.timestamp.toDate ? new Date(activity.timestamp.toDate()).toLocaleDateString() : 
                                  activity.timestamp ? new Date(activity.timestamp).toLocaleDateString() : 'Recently'}
                               </p>
@@ -841,7 +843,7 @@ export function DojoDashboard() {
                           variants={cardHoverVariants}
                           initial="rest"
                           whileHover="hover"
-                          className={`bg-white rounded-xl p-5 cursor-pointer relative border border-gray-200 ${theme.hoverBorder} transition-all flex flex-col h-full`}
+                          className="bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 text-left hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 flex flex-col h-full"
                         >
                           {/* Progress Badge */}
                           {isCompleted && (
@@ -852,17 +854,19 @@ export function DojoDashboard() {
                             </div>
                           )}
                           {/* Thumbnail */}
-                          <div className="mb-4 -mx-5 -mt-5 flex-shrink-0">
+                          <div className="mb-4 -mx-6 -mt-6 flex-shrink-0">
                             <DojoThumbnail
                               type="drill"
                               title={drill.title}
                               icon={Zap}
                               unitNumber={drill.unit.toString().padStart(2, '0')}
-                              className="rounded-t-xl"
+                              xpReward={drill.xpReward.total}
+                              activityType="Drill"
+                              className="rounded-t-3xl"
                             />
                           </div>
-                          {/* Title - Fixed height for 2 lines */}
-                          <h3 className="font-semibold text-base text-gray-900 line-clamp-2 mb-2 min-h-[3rem] flex items-start">
+                          {/* Title */}
+                          <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
                             {drill.title}
                           </h3>
                           {/* Meta */}
@@ -911,20 +915,22 @@ export function DojoDashboard() {
                         variants={cardHoverVariants}
                         initial="rest"
                         whileHover="hover"
-                        className={`bg-white rounded-xl p-5 cursor-pointer border border-gray-200 ${theme.hoverBorder} transition-all flex flex-col h-full`}
+                        className="bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 text-left hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 flex flex-col h-full"
                       >
                         {/* Thumbnail */}
-                        <div className="mb-4 -mx-5 -mt-5 flex-shrink-0">
+                        <div className="mb-4 -mx-6 -mt-6 flex-shrink-0">
                           <DojoThumbnail
                             type="exam"
                             title={frq.title}
                             icon={FileText}
                             unitNumber={frq.unit ? frq.unit.toString().padStart(2, '0') : undefined}
-                            className="rounded-t-xl"
+                            xpReward={frq.totalPoints ? frq.totalPoints * 100 : undefined}
+                            activityType="FRQ"
+                            className="rounded-t-3xl"
                           />
                         </div>
-                        {/* Title - Fixed height for 2 lines */}
-                        <h3 className="font-semibold text-base text-gray-900 line-clamp-2 mb-2 min-h-[3rem] flex items-start">
+                        {/* Title */}
+                        <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
                           {frq.title}
                         </h3>
                         {/* Meta */}
@@ -964,19 +970,21 @@ export function DojoDashboard() {
                         variants={cardHoverVariants}
                         initial="rest"
                         whileHover="hover"
-                        className={`bg-white rounded-xl p-5 cursor-pointer border border-gray-200 ${theme.hoverBorder} transition-all flex flex-col h-full`}
+                        className="bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 text-left hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 flex flex-col h-full"
                       >
                         {/* Thumbnail */}
-                        <div className="mb-4 -mx-5 -mt-5 flex-shrink-0">
+                        <div className="mb-4 -mx-6 -mt-6 flex-shrink-0">
                           <DojoThumbnail
                             type="exam"
                             title={exam.title}
                             icon={ClipboardList}
-                            className="rounded-t-xl"
+                            xpReward={6000}
+                            activityType="Exam"
+                            className="rounded-t-3xl"
                           />
                         </div>
-                        {/* Title - Fixed height for 2 lines */}
-                        <h3 className="font-semibold text-base text-gray-900 line-clamp-2 mb-2 min-h-[3rem] flex items-start">
+                        {/* Title */}
+                        <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
                           {exam.title}
                         </h3>
                         {/* Meta */}
@@ -1016,11 +1024,11 @@ export function DojoDashboard() {
                         variants={cardHoverVariants}
                         initial="rest"
                         whileHover="hover"
-                        className={`bg-white rounded-xl p-5 cursor-pointer border border-gray-200 ${exam.isLocked ? '' : theme.hoverBorder} transition-all relative overflow-hidden flex flex-col h-full`}
+                        className={`bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 text-left hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 relative overflow-hidden flex flex-col h-full ${exam.isLocked ? 'opacity-60' : ''}`}
                       >
                         {/* Lock Overlay */}
                         {exam.isLocked && (
-                          <div className="absolute inset-0 bg-gray-900/50 flex items-center justify-center z-10 rounded-xl">
+                          <div className="absolute inset-0 bg-gray-900/50 flex items-center justify-center z-10 rounded-3xl">
                             <div className="text-center">
                               <Lock className="w-8 h-8 text-white mx-auto mb-2" />
                               <p className="text-white text-sm font-semibold">Locked</p>
@@ -1028,16 +1036,18 @@ export function DojoDashboard() {
                           </div>
                         )}
                         {/* Thumbnail */}
-                        <div className="mb-4 -mx-5 -mt-5 relative flex-shrink-0">
+                        <div className="mb-4 -mx-6 -mt-6 relative flex-shrink-0">
                           <DojoThumbnail
                             type="exam"
                             title={exam.title}
                             icon={BookOpen}
                             unitNumber={exam.unitNumber ? exam.unitNumber.toString().padStart(2, '0') : undefined}
-                            className="rounded-t-xl"
+                            xpReward={1000}
+                            activityType="Test"
+                            className="rounded-t-3xl"
                           />
                           {exam.isLocked && (
-                            <div className="absolute inset-0 bg-gray-900/50 flex items-center justify-center z-30 rounded-t-xl">
+                            <div className="absolute inset-0 bg-gray-900/50 flex items-center justify-center z-30 rounded-t-3xl">
                               <div className="text-center">
                                 <Lock className="w-8 h-8 text-white mx-auto mb-2" />
                                 <p className="text-white text-sm font-semibold">Locked</p>
@@ -1045,8 +1055,8 @@ export function DojoDashboard() {
                             </div>
                           )}
                         </div>
-                        {/* Title - Fixed height for 2 lines */}
-                        <h3 className={`font-semibold text-base line-clamp-2 mb-2 min-h-[3rem] flex items-start ${exam.isLocked ? 'text-gray-400' : 'text-gray-900'}`}>
+                        {/* Title */}
+                        <h3 className={`text-xl font-bold line-clamp-2 mb-2 ${exam.isLocked ? 'text-gray-400' : 'text-gray-900'}`}>
                           {exam.title}
                         </h3>
                         {/* Meta */}
@@ -1106,7 +1116,7 @@ export function DojoDashboard() {
                           variants={cardHoverVariants}
                           initial="rest"
                           whileHover="hover"
-                          className={`bg-white rounded-xl p-5 cursor-pointer border border-gray-200 ${theme.hoverBorder} transition-all flex flex-col h-full relative`}
+                          className="bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 text-left hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 flex flex-col h-full relative"
                           style={{ 
                             backgroundColor: '#ffffff',
                             opacity: 1,
@@ -1115,41 +1125,43 @@ export function DojoDashboard() {
                           }}
                         >
                           {/* Thumbnail */}
-                          <div className="mb-4 -mx-5 -mt-5 flex-shrink-0 relative">
+                          <div className="mb-4 -mx-6 -mt-6 flex-shrink-0 relative">
                             <DojoThumbnail
                               type={thumbnailType}
                               title={entry.title}
                               icon={Icon}
                               unitNumber={unitNumber}
-                              className="rounded-t-xl"
+                              xpReward={entry.xpEarned}
+                              activityType={entry.type === 'cheat-sheet' ? 'Quiz' : entry.type === 'infinite-drill' ? 'Drill' : 'Quiz'}
+                              className="rounded-t-3xl"
                             />
                             {/* Score Overlay */}
                             <div className="absolute bottom-4 right-4 bg-black/80 text-white px-3 py-1.5 rounded-lg font-bold text-lg shadow-lg z-30">
                               {entry.score}%
                             </div>
                           </div>
-                          {/* Title - Fixed height for 2 lines */}
-                          <h3 className="font-semibold text-base line-clamp-2 mb-2 min-h-[3rem] flex items-start" style={{ color: '#111827' }}>
+                          {/* Title */}
+                          <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
                             {entry.title}
                           </h3>
                           {/* Meta */}
                           <div className="mt-auto space-y-1">
-                            <p className="text-sm" style={{ color: '#6B7280' }}>
+                            <p className="text-sm text-gray-600">
                               {entry.correctCount} / {entry.totalQuestions} correct
                             </p>
                             {entry.timestamp && (
-                              <p className="text-xs" style={{ color: '#9CA3AF' }}>
+                              <p className="text-xs text-gray-500">
                                 {entry.timestamp.toDate ? new Date(entry.timestamp.toDate()).toLocaleDateString() : 'Recently'}
                               </p>
                             )}
                           </div>
                         </motion.div>
                       </Link>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            </section>
+                </motion.div>
+              );
+            })}
+          </div>
+        </section>
           )}
 
           </motion.div>

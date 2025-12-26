@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { dojoDrills } from '@/data/dojoDrills';
 import { DojoDrillPreview } from '@/components/DojoDrillPreview';
 import { ArrowLeft } from 'lucide-react';
@@ -12,12 +12,22 @@ import { loadDojoDrillProgress, getDrillProgress } from '@/lib/dojoDrillProgress
 export default function DojoDrillPreviewPage() {
   const params = useParams();
   const router = useRouter();
-  const { user, loading: authLoading } = useAuthContext();
+  const { user, userData, selectedSubject, loading: authLoading } = useAuthContext();
   const drillId = params.drillId as string;
   const [progress, setProgress] = useState<{ stage1: boolean; stage2: boolean; stage3: boolean } | null>(null);
   const [loadingProgress, setLoadingProgress] = useState(true);
   
   const drill = drillId ? dojoDrills[drillId] : null;
+
+  // Check if user is a pro customer (has season pass)
+  const isProCustomer = useMemo(() => {
+    if (!user || !userData) return false;
+    const seasonPass = userData.seasonPass as string[] | undefined;
+    if (!seasonPass) return false;
+    // Check if user has season pass for current subject
+    const subjectKey = selectedSubject === 'macro' ? 'macro' : 'micro';
+    return seasonPass.includes(subjectKey) || seasonPass.includes('macro') || seasonPass.includes('micro');
+  }, [user, userData, selectedSubject]);
 
   // Load progress when user and drill are available
   useEffect(() => {
@@ -60,6 +70,11 @@ export default function DojoDrillPreviewPage() {
   }
 
   const handleStart = () => {
+    if (!isProCustomer) {
+      const subjectKey = selectedSubject === 'macro' ? 'macro' : 'micro';
+      router.push(`/purchase/season-pass?courseType=${subjectKey}`);
+      return;
+    }
     router.push(`/dojo-drills?drill=${drill.id}`);
   };
 
@@ -102,8 +117,9 @@ export default function DojoDrillPreviewPage() {
               xpReward={drill.xpReward.total}
               difficulty={difficulty}
               onStart={handleStart}
-              isLocked={false}
+              isLocked={!isProCustomer}
               progress={progress}
+              buttonText={isProCustomer ? undefined : 'Join the Dojo'}
             />
           </motion.div>
         </div>

@@ -59,6 +59,8 @@ export interface UserData {
   purchases?: string[];
   // Add purchasedTests field for unit MCQ tests
   purchasedTests?: string[];
+  // Add seasonPass field for pro customers (array of 'macro' | 'micro')
+  seasonPass?: string[];
 }
 
 // --- ADD LEVELING LOGIC --- 

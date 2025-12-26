@@ -1,28 +1,47 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { dojoDrills } from '@/data/dojoDrills';
 import DojoDrill from '@/components/DojoDrill';
 import { ArrowLeft } from 'lucide-react';
 import Image from 'next/image';
 import { useAuthContext } from '@/contexts/AuthContext';
+import React from 'react';
 
 export default function DojoDrillsPage() {
   const searchParams = useSearchParams();
-  const { selectedSubject } = useAuthContext();
+  const router = useRouter();
+  const { selectedSubject, user, userData } = useAuthContext();
   const drillIdFromQuery = searchParams.get('drill');
   const [selectedDrillId, setSelectedDrillId] = useState<string | null>(drillIdFromQuery);
 
-  // Update selectedDrillId when query param changes
+  // Check if user is a pro customer (has season pass)
+  const isProCustomer = useMemo(() => {
+    if (!user || !userData) return false;
+    const seasonPass = userData.seasonPass as string[] | undefined;
+    if (!seasonPass) return false;
+    // Check if user has season pass for current subject
+    const subjectKey = selectedSubject === 'macro' ? 'macro' : 'micro';
+    return seasonPass.includes(subjectKey) || seasonPass.includes('macro') || seasonPass.includes('micro');
+  }, [user, userData, selectedSubject]);
+
+  // Handle drill click - redirect non-pro users to purchase page
+  const handleDrillClick = (drillId: string) => {
+    // Always route to preview page first
+    router.push(`/dojo-drills/preview/${drillId}`);
+  };
+
+  // Update selectedDrillId when query param changes - redirect to preview page
   useEffect(() => {
     if (drillIdFromQuery) {
-      setSelectedDrillId(drillIdFromQuery);
+      router.push(`/dojo-drills/preview/${drillIdFromQuery}`);
     }
-  }, [drillIdFromQuery]);
+  }, [drillIdFromQuery, router]);
 
   const currentDrill = selectedDrillId ? dojoDrills[selectedDrillId] : null;
 
+  // If accessing drill directly, redirect to preview page
   if (currentDrill) {
     return (
       <div className="h-screen overflow-hidden bg-gradient-to-b from-gray-50 to-white px-4 sm:px-6 lg:px-8 py-12">
@@ -83,7 +102,7 @@ export default function DojoDrillsPage() {
             {filteredAndSortedDrills.map((drill) => (
               <button
                 key={drill.id}
-                onClick={() => setSelectedDrillId(drill.id)}
+                onClick={() => handleDrillClick(drill.id)}
                 className="bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 text-left hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 flex flex-col"
               >
                 <div className="flex items-center justify-between mb-4">
@@ -115,8 +134,10 @@ export default function DojoDrillsPage() {
                 <p className="text-gray-600 text-sm line-clamp-3 mb-4">
                   {drill.description}
                 </p>
-                <div className="text-sm font-semibold text-blue-600 mt-auto">
-                  Start Drill →
+                <div className={`text-sm font-semibold mt-auto ${
+                  isProCustomer ? 'text-blue-600' : 'text-orange-600'
+                }`}>
+                  {isProCustomer ? 'Start Drill →' : 'Join the Dojo'}
                 </div>
               </button>
             ))}

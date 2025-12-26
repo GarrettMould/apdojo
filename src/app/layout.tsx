@@ -6,6 +6,7 @@ import { Footer } from '@/components/Footer';
 import { AuthProvider } from '@/contexts/AuthContext'
 import { LayoutClientWrapper } from '@/components/LayoutClientWrapper'
 import { LayoutWrapper } from '@/components/LayoutWrapper'
+import Script from 'next/script'
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -79,6 +80,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet" />
+      </head>
       <body className={inter.className}>
         <AuthProvider>
           <LayoutWrapper>

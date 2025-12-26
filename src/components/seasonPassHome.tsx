@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, BookOpen, FileText, Target, PlayCircle, Sparkles, Brain, Award, Search, Filter, X, ChevronRight } from 'lucide-react';
+import { Check, BookOpen, FileText, Target, PlayCircle, Sparkles, Brain, Award, Search, Filter, X, ChevronRight, ArrowDown } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
@@ -58,23 +58,28 @@ export function SeasonPassHome() {
           <p className="text-xl sm:text-2xl text-gray-600 max-w-3xl mx-auto mb-8">
             Get everything you need to master AP Macroeconomics and AP Microeconomics in one comprehensive pass.
           </p>
-          {/* Diagnostic Test Button */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="flex justify-center"
-          >
-            <Link href="/diagnostic-test">
-              <Button
-                className="bg-black text-white hover:bg-gray-800 font-bold px-8 py-6 text-lg rounded-full shadow-lg transition-all hover:scale-105"
-                size="lg"
-              >
-                Take Diagnostic Test
-              </Button>
-            </Link>
-          </motion.div>
         </motion.div>
+
+        {/* Take Diagnostic Test CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="text-center mb-12"
+        >
+          <Link href="/diagnostic-test" className="inline-flex flex-col items-center gap-2 group">
+            <span 
+              className="text-2xl font-bold text-gray-900 drop-shadow-sm"
+              style={{ fontFamily: 'Permanent Marker, cursive' }}
+            >
+              Take the<br />Diagnostic Test
+            </span>
+            <ArrowDown className="w-6 h-6 text-gray-900 group-hover:translate-y-1 transition-transform" />
+          </Link>
+        </motion.div>
+
+        {/* Diagnostic Test Question Preview */}
+        <DiagnosticQuestionPreview />
 
         {/* Season Pass Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
@@ -801,6 +806,84 @@ function FRQPreviewSection() {
         </motion.div>
       </div>
     </div>
+  );
+}
+
+// Diagnostic Question Preview Component
+function DiagnosticQuestionPreview() {
+  const router = useRouter();
+  
+  // First question from diagnostic test
+  const firstQuestion = {
+    id: '1',
+    question: 'If an economy\'s production possibilities frontier becomes steeper as it moves from point A to point B, this indicates that',
+    options: [
+      'resources are becoming more specialized',
+      'the economy is becoming more efficient',
+      'opportunity costs are increasing',
+      'technology is improving'
+    ],
+  };
+
+  const handleOptionClick = (optionIndex: number) => {
+    // Navigate directly to diagnostic test (no login required)
+    router.push(`/diagnostic-test?answer=1&option=${optionIndex}`);
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: 0.2 }}
+      className="mb-16"
+    >
+      <div className="max-w-5xl mx-auto relative">
+        {/* Stacked Paper Effect - Background layers */}
+        <div className="absolute inset-0 -z-10 top-2">
+          {/* First layer */}
+          <div className="absolute top-2 left-2 right-2 bottom-2 bg-white border-4 border-black rounded-3xl opacity-20 transform rotate-1" />
+          {/* Second layer */}
+          <div className="absolute top-4 left-4 right-4 bottom-4 bg-white border-4 border-black rounded-3xl opacity-10 transform -rotate-1" />
+        </div>
+
+        {/* Main Card - Question text and options */}
+        <div className="relative bg-white border-4 border-black rounded-3xl shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] p-8 sm:p-12">
+          {/* Header - Removed question count */}
+
+          {/* Question Text */}
+          <div className="mb-12">
+            <h2 className="text-2xl sm:text-3xl font-serif text-gray-900 leading-relaxed text-center sm:text-left">
+              {firstQuestion.question}
+            </h2>
+          </div>
+
+          {/* Options Grid */}
+          <div className="space-y-4">
+            {firstQuestion.options.map((option, index) => {
+              const keyLabel = String.fromCharCode(65 + index); // A, B, C, D
+
+              return (
+                <motion.button
+                  key={index}
+                  onClick={() => handleOptionClick(index)}
+                  className="w-full text-left p-6 rounded-xl border-2 border-gray-200 bg-white hover:border-black hover:bg-gray-50 flex items-center gap-4 transition-all duration-200 cursor-pointer"
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
+                >
+                  {/* Keycap Hint */}
+                  <div className="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm border-2 bg-gray-100 text-gray-700 border-gray-300">
+                    {keyLabel}
+                  </div>
+
+                  {/* Option Text */}
+                  <span className="text-lg font-medium flex-1">{option}</span>
+                </motion.button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </motion.div>
   );
 }
 

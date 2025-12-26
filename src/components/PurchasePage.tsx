@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, Play, FileText, Monitor, Star, ShieldCheck, Sparkles } from 'lucide-react';
+import { CheckCircle2, Play, FileText, Monitor, Star, ShieldCheck, Sparkles, Quote } from 'lucide-react';
 import { redirectToCheckout } from '@/lib/stripe';
 import { useAuthContext } from '@/contexts/AuthContext';
 import Image from 'next/image';
@@ -77,40 +77,11 @@ export function PurchasePage({ courseType }: PurchasePageProps) {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] grid grid-cols-1 lg:grid-cols-4">
-      {/* Left Column - Visual Hook (Col Span 1) */}
-      <div className="bg-gradient-to-b from-gray-50 to-gray-100 border-r-2 border-black p-6 flex flex-col items-center justify-center sticky top-0 h-screen lg:col-span-1 overflow-y-auto">
-        <div className="w-full max-w-md space-y-8">
-          {/* Three images stacked vertically */}
-          {[1, 2, 3].map((num, index) => (
-            <motion.div
-              key={num}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.15, duration: 0.6 }}
-              whileHover={{ y: -4, scale: 1.02 }}
-              className="w-full rounded-xl overflow-hidden shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] border-4 border-black bg-white group cursor-pointer"
-            >
-              <div className="relative overflow-hidden">
-                <Image
-                  src={`/images/purchasePage${num}.png`}
-                  alt={`Purchase page preview ${num}`}
-                  width={800}
-                  height={600}
-                  className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105"
-                  priority={num === 1}
-                />
-                {/* Subtle gradient overlay on hover */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-
-      {/* Right Column - Sales Pitch (Col Span 3) */}
-      <div className="bg-white p-8 lg:p-12 flex flex-col justify-center lg:col-span-3">
-        <div className="max-w-2xl mx-auto w-full space-y-8">
+    <div className="min-h-[calc(100vh-4rem)] bg-white">
+      <div className="max-w-7xl mx-auto p-8 lg:p-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
+          {/* Left Column - Season Pass Content */}
+          <div className="lg:col-span-2 space-y-8">
           {/* Badge */}
           <div className="inline-block">
             <span className={`px-5 py-2.5 ${isGreen ? 'bg-green-600' : 'bg-blue-600'} text-white font-bold text-sm uppercase tracking-wider border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rounded-lg`}>
@@ -238,6 +209,58 @@ export function PurchasePage({ courseType }: PurchasePageProps) {
             >
               View Bundle
             </Link>
+          </div>
+          </div>
+
+          {/* Right Column - Testimonial Bubble */}
+          <div className="lg:col-span-1">
+            <div className="lg:sticky lg:top-8">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.5 }}
+                className="bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 relative"
+              >
+                {/* Speech Bubble Tail */}
+                <div className="absolute -left-4 top-8 w-0 h-0 border-t-[16px] border-t-transparent border-b-[16px] border-b-transparent border-r-[16px] border-r-black"></div>
+                <div className="absolute -left-3 top-9 w-0 h-0 border-t-[14px] border-t-transparent border-b-[14px] border-b-transparent border-r-[14px] border-r-white"></div>
+
+                {/* Quote Icon */}
+                <div className="flex justify-center mb-3">
+                  <Quote className={`w-8 h-8 ${isGreen ? 'text-green-600' : 'text-blue-600'}`} />
+                </div>
+                
+                {/* Stars - Framer Motion Style */}
+                <div className="flex items-center justify-center gap-1 mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, scale: 0 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.4 + (i * 0.1), type: "spring", stiffness: 200 }}
+                      whileHover={{ scale: 1.2, rotate: 15 }}
+                    >
+                      <Star className="w-5 h-5 fill-yellow-400 text-yellow-400 border-2 border-black rounded-sm" />
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* Review Text */}
+                <p className="text-base font-semibold text-gray-900 text-center mb-4 leading-relaxed">
+                  "This season pass was a game-changer for my AP exam prep! The AI-graded FRQs helped me understand exactly where I was going wrong, and the endless MCQ bank kept me practicing until I felt confident."
+                </p>
+
+                {/* Reviewer Info */}
+                <div className="text-center">
+                  <p className="font-bold text-gray-900 text-sm">
+                    Sarah M.
+                  </p>
+                  <p className="text-xs text-gray-600 mt-1">
+                    AP {courseType === 'macro' ? 'Macro' : 'Micro'} Student
+                  </p>
+                </div>
+              </motion.div>
+            </div>
           </div>
         </div>
       </div>

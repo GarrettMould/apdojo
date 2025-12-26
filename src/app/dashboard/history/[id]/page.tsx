@@ -6,17 +6,22 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { QuizHistoryEntry, restoreTableData } from '@/lib/quizHistory';
 import { Question } from '@/data/questionBanks/types';
-import { Check, X, ArrowLeft, Loader2 } from 'lucide-react';
+import { Check, X, ArrowLeft, Loader2, Copy, Users, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { StaticImageData } from 'next/image';
+import { useAuthContext } from '@/contexts/AuthContext';
 
 function QuizReviewContent() {
   const params = useParams();
   const router = useRouter();
+  const { user } = useAuthContext();
   const [quizEntry, setQuizEntry] = useState<QuizHistoryEntry | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [challengeLink, setChallengeLink] = useState<string | null>(null);
+  const [isCreatingChallenge, setIsCreatingChallenge] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
 
   useEffect(() => {
     const fetchQuizHistory = async () => {
@@ -105,6 +110,55 @@ function QuizReviewContent() {
     return 'Recently';
   };
 
+  const handleChallengeFriend = async () => {
+    if (!user || !quizEntry) {
+      alert('Please log in to challenge a friend');
+      return;
+    }
+
+    setIsCreatingChallenge(true);
+    try {
+      const response = await fetch('/api/create-quiz-challenge', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.uid,
+          quizHistoryId: quizEntry.id,
+          questions: quizEntry.questions,
+          subject: quizEntry.type === 'cheat-sheet' ? (quizEntry.subject || 'macro') : 'macro',
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create challenge');
+      }
+
+      const data = await response.json();
+      const link = `${window.location.origin}/quiz-history-challenge/${data.challengeId}`;
+      setChallengeLink(link);
+    } catch (error) {
+      console.error('Error creating challenge:', error);
+      alert('Failed to create challenge. Please try again.');
+    } finally {
+      setIsCreatingChallenge(false);
+    }
+  };
+
+  const handleCopyLink = async () => {
+    if (!challengeLink) return;
+
+    try {
+      await navigator.clipboard.writeText(challengeLink);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    } catch (error) {
+      console.error('Failed to copy link:', error);
+      alert('Failed to copy link. Please try again.');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -112,24 +166,81 @@ function QuizReviewContent() {
         <div className="mb-8">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 transition-colors"
+            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
             <span className="font-medium">Back to Dashboard</span>
           </Link>
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">{quizEntry.title}</h1>
-            <div className="flex items-center gap-4 flex-wrap">
-              <div className="flex items-center gap-2">
-                <span className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold text-lg">
-                  Score: {quizEntry.score}%
-                </span>
+          
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+            {/* Title Section */}
+            <div className="mb-6">
+              <h1 className="text-3xl font-bold text-gray-900 mb-4">{quizEntry.title}</h1>
+              
+              {/* Stats Row */}
+              <div className="flex items-center gap-6 flex-wrap mb-6">
+                <div className="flex items-center gap-3">
+                  <span className="text-4xl font-bold text-gray-400">
+                    {quizEntry.score}%
+                  </span>
+                  <div className="text-sm text-gray-500">
+                    <div className="font-medium">{quizEntry.correctCount} / {quizEntry.totalQuestions} correct</div>
+                    <div className="text-xs mt-0.5">Taken: {formatDate(quizEntry.timestamp)}</div>
+                  </div>
+                </div>
               </div>
-              <div className="text-gray-700 font-medium">
-                {quizEntry.correctCount} / {quizEntry.totalQuestions} correct
-              </div>
-              <div className="text-sm text-gray-500">
-                Taken: {formatDate(quizEntry.timestamp)}
+            </div>
+
+            {/* Challenge a Friend Section */}
+            <div className="border-t border-gray-200 pt-6">
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1">Challenge a Friend</h3>
+                  <p className="text-sm text-gray-600">
+                    Share this quiz with a friend and see who scores higher!
+                  </p>
+                </div>
+                {challengeLink ? (
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1 px-4 py-3 bg-gray-100 border-2 border-black rounded-xl text-sm text-gray-700 font-mono truncate">
+                      {challengeLink}
+                    </div>
+                    <button
+                      onClick={handleCopyLink}
+                      className="px-6 py-3 bg-white border-4 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] font-black text-base text-gray-900 hover:bg-gray-50 active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center gap-2"
+                    >
+                      {isCopied ? (
+                        <>
+                          <CheckCircle2 className="w-5 h-5" />
+                          Copied!
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-5 h-5" />
+                          Copy Link
+                        </>
+                      )}
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={handleChallengeFriend}
+                    disabled={isCreatingChallenge || !user}
+                    className="w-full px-6 py-4 bg-blue-50 border-4 border-black rounded-xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] font-black text-lg text-gray-900 hover:bg-blue-100 active:translate-y-1 active:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:active:translate-y-0 disabled:active:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center gap-3"
+                  >
+                    {isCreatingChallenge ? (
+                      <>
+                        <Loader2 className="w-6 h-6 animate-spin" />
+                        Creating Challenge...
+                      </>
+                    ) : (
+                      <>
+                        <Users className="w-6 h-6" />
+                        Challenge a Friend
+                      </>
+                    )}
+                  </button>
+                )}
               </div>
             </div>
           </div>

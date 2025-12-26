@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
-import { DiagnosticResults } from './DiagnosticResults';
+import { PlacementResults } from './PlacementResults';
+import { useAuthContext } from '@/contexts/AuthContext';
 
 interface Question {
   id: string;
@@ -13,33 +13,68 @@ interface Question {
   unit: string; // e.g., 'Unit 1', 'Unit 2'
 }
 
-type TestResults = {
-  score: number;       // e.g., 15
-  total: number;       // e.g., 20
-  percent: number;     // e.g., 75
-  belt: string;        // 'White', 'Yellow', etc.
-  weakestUnit: string; // The unit with the most wrong answers
+type PlacementTestResults = {
+  score: number;       // 0-5
+  total: number;       // 5
+  belt: string;        // 'White Belt', 'Yellow Belt', 'Orange Belt'
+  beltTitle: string;   // 'The Rookie', 'The Apprentice', 'The Scholar'
+  message: string;
 };
 
 interface DiagnosticTestProps {
   questions: Question[];
   onComplete?: (answers: Record<string, number>) => void;
+  initialAnswers?: Record<string, number>;
+  user?: any; // User from auth context
 }
 
-export function DiagnosticTest({ questions, onComplete }: DiagnosticTestProps) {
+export function DiagnosticTest({ questions, onComplete, initialAnswers = {}, user: userProp }: DiagnosticTestProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-  const [answers, setAnswers] = useState<Record<string, number>>({});
-  const [testResults, setTestResults] = useState<TestResults | null>(null);
+  const [answers, setAnswers] = useState<Record<string, number>>(initialAnswers);
+  const [testResults, setTestResults] = useState<PlacementTestResults | null>(null);
 
   const currentQuestion = questions[currentIndex];
   const isLastQuestion = currentIndex === questions.length - 1;
   const totalQuestions = questions.length;
   const isComplete = testResults !== null;
+  const currentQuestionAnswered = answers[currentQuestion.id] !== undefined;
+
+  // If question is already answered, set it as selected and show submitted state
+  useEffect(() => {
+    if (currentQuestionAnswered && answers[currentQuestion.id] !== undefined) {
+      setSelectedAnswer(answers[currentQuestion.id]);
+    } else {
+      setSelectedAnswer(null);
+    }
+  }, [currentIndex, currentQuestionAnswered, answers, currentQuestion.id]);
 
   const handleOptionSelect = (optionIndex: number) => {
+    // Don't allow selection if question is already answered
+    if (currentQuestionAnswered) return;
     setSelectedAnswer(optionIndex);
   };
+
+  const handleNext = () => {
+    if (selectedAnswer === null) return;
+
+    // Save answer
+    const newAnswers = {
+      ...answers,
+      [currentQuestion.id]: selectedAnswer,
+    };
+    setAnswers(newAnswers);
+
+    if (isLastQuestion) {
+      // Complete the test
+      handleFinish(newAnswers);
+    } else {
+      // Move to next question
+      setCurrentIndex(currentIndex + 1);
+      setSelectedAnswer(null);
+    }
+  };
+
 
   const handleFinish = (finalAnswers: Record<string, number>) => {
     // Calculate score
@@ -52,97 +87,36 @@ export function DiagnosticTest({ questions, onComplete }: DiagnosticTestProps) {
     });
 
     const total = questions.length;
-    const percent = Math.round((score / total) * 100);
 
-    // Calculate weakness detection - track missed questions per unit
-    const unitErrors: Record<string, number> = {};
-    
-    questions.forEach((question) => {
-      const userAnswer = finalAnswers[question.id];
-      if (userAnswer !== question.correctAnswer) {
-        // Wrong answer - increment error count for this unit
-        if (!unitErrors[question.unit]) {
-          unitErrors[question.unit] = 0;
-        }
-        unitErrors[question.unit]++;
-      }
-    });
-
-    // Identify the unit with the highest error count
-    let weakestUnit = 'Unit 1: Basic Economic Concepts'; // Default fallback
-    let maxErrors = 0;
-    
-    Object.entries(unitErrors).forEach(([unit, errorCount]) => {
-      if (errorCount > maxErrors) {
-        maxErrors = errorCount;
-        weakestUnit = unit;
-      }
-    });
-
-    // If no errors, find the unit with the most questions (as a fallback)
-    if (maxErrors === 0 && Object.keys(unitErrors).length === 0) {
-      const unitCounts: Record<string, number> = {};
-      questions.forEach((question) => {
-        unitCounts[question.unit] = (unitCounts[question.unit] || 0) + 1;
-      });
-      
-      let maxCount = 0;
-      Object.entries(unitCounts).forEach(([unit, count]) => {
-        if (count > maxCount) {
-          maxCount = count;
-          weakestUnit = unit;
-        }
-      });
-    }
-
-    // Belt assignment
+    // Belt assignment based on score (0-2, 3-4, 5)
     let belt = 'White Belt';
-    if (percent > 80) {
+    let beltTitle = 'The Rookie';
+    let message = 'Great start. We have a lot of foundational work to do.';
+
+    if (score === 5) {
+      belt = 'Orange Belt';
+      beltTitle = 'The Scholar';
+      message = 'Impressive. You are ready for advanced drills.';
+    } else if (score >= 3) {
       belt = 'Yellow Belt';
+      beltTitle = 'The Apprentice';
+      message = 'You have strong instincts! Let\'s refine your graphs.';
     }
 
-    const results: TestResults = {
+    const results: PlacementTestResults = {
       score,
       total,
-      percent,
       belt,
-      weakestUnit,
+      beltTitle,
+      message,
     };
-
-    // Log results to console
-    console.log('Diagnostic Test Results:', results);
-    console.log('Unit Error Breakdown:', unitErrors);
 
     setTestResults(results);
     onComplete?.(finalAnswers);
   };
 
-  const handleNext = () => {
-    if (selectedAnswer === null) return;
+  // Removed handleNext - auto-advance is handled in handleOptionSelect
 
-    // Save answer
-    const newAnswers = {
-      ...answers,
-      [currentQuestion.id]: selectedAnswer,
-    };
-    
-    // Update answers state
-    setAnswers(newAnswers);
-
-    if (isLastQuestion) {
-      // Complete the test - calculate and show results
-      handleFinish(newAnswers);
-    } else {
-      // Move to next question
-      setCurrentIndex(currentIndex + 1);
-      setSelectedAnswer(null);
-    }
-  };
-
-  const handleClaimRank = () => {
-    // Redirect to dashboard or home
-    window.location.href = '/';
-  };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key >= '1' && e.key <= '4') {
@@ -160,35 +134,39 @@ export function DiagnosticTest({ questions, onComplete }: DiagnosticTestProps) {
 
   return (
     <div
-      className="h-screen overflow-hidden bg-gradient-to-b from-blue-50 to-white px-4 sm:px-6 lg:px-8 py-12"
+      className="min-h-screen bg-gradient-to-b from-blue-50 to-white px-4 sm:px-6 lg:px-8 py-12"
       onKeyDown={handleKeyPress}
       tabIndex={0}
     >
-      <div className="max-w-5xl mx-auto relative h-full flex flex-col">
-        {/* Progress Bar - Hide when showing results */}
+      <div className="max-w-5xl mx-auto relative min-h-full flex flex-col">
+        {/* Progress Bar - Prominent for placement test */}
         {!isComplete && (
-          <div className="mb-6 flex items-center gap-3">
-            <div className="flex-1 bg-gray-200 rounded-full h-4 border border-gray-300">
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-lg font-black text-gray-900 uppercase tracking-wide">
+                Question {currentIndex + 1} of {totalQuestions}
+              </span>
+              <span className="text-lg font-bold text-gray-700">
+                {answeredCount}/{totalQuestions}
+              </span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-6 border-4 border-black">
               <motion.div
-                className="bg-blue-600 h-4 rounded-full"
+                className="bg-blue-600 h-full rounded-full"
                 initial={{ width: 0 }}
                 animate={{ width: `${progressPercentage}%` }}
                 transition={{ duration: 0.3 }}
               />
             </div>
-            <span className="text-sm font-semibold text-gray-700 whitespace-nowrap">
-              {answeredCount}/{totalQuestions}
-            </span>
           </div>
         )}
 
         {/* Results or Question Card */}
         <AnimatePresence mode="wait">
           {isComplete && testResults ? (
-            <DiagnosticResults
+            <PlacementResults
               key="results"
               results={testResults}
-              onClaimRank={handleClaimRank}
             />
           ) : (
             <>
@@ -207,7 +185,7 @@ export function DiagnosticTest({ questions, onComplete }: DiagnosticTestProps) {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -300 }}
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
-                className="relative bg-white border-4 border-black rounded-3xl shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] flex-1 p-8 sm:p-12 flex flex-col"
+                className="relative bg-white border-4 border-black rounded-3xl shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] p-8 sm:p-12 flex flex-col overflow-y-auto"
               >
             {/* Header */}
             <div className="text-center mb-8">
@@ -227,24 +205,30 @@ export function DiagnosticTest({ questions, onComplete }: DiagnosticTestProps) {
             <div className="space-y-4 mb-6">
               {currentQuestion.options.map((option, index) => {
                 const isSelected = selectedAnswer === index;
+                const isSubmitted = currentQuestionAnswered && answers[currentQuestion.id] === index;
                 const keyLabel = String.fromCharCode(65 + index); // A, B, C, D
 
                 return (
                   <motion.button
                     key={index}
                     onClick={() => handleOptionSelect(index)}
+                    disabled={currentQuestionAnswered}
                     className={`w-full text-left p-6 rounded-xl border-2 transition-all duration-200 flex items-center gap-4 ${
-                      isSelected
+                      isSubmitted
+                        ? 'bg-gray-200 text-gray-900 border-gray-500 cursor-default'
+                        : isSelected
                         ? 'bg-gray-100 text-gray-900 border-gray-400'
                         : 'bg-white border-gray-200 hover:border-black hover:bg-gray-50'
-                    }`}
-                    whileHover={{ scale: 1.01 }}
-                    whileTap={{ scale: 0.99 }}
+                    } ${currentQuestionAnswered ? 'opacity-75' : ''}`}
+                    whileHover={currentQuestionAnswered ? {} : { scale: 1.01 }}
+                    whileTap={currentQuestionAnswered ? {} : { scale: 0.99 }}
                   >
                     {/* Keycap Hint */}
                     <div
                       className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm border-2 ${
-                        isSelected
+                        isSubmitted
+                          ? 'bg-gray-300 text-gray-900 border-gray-500'
+                          : isSelected
                           ? 'bg-gray-200 text-gray-800 border-gray-400'
                           : 'bg-gray-100 text-gray-700 border-gray-300'
                       }`}
@@ -254,12 +238,15 @@ export function DiagnosticTest({ questions, onComplete }: DiagnosticTestProps) {
 
                     {/* Option Text */}
                     <span className="text-lg font-medium flex-1">{option}</span>
+                    {isSubmitted && (
+                      <span className="text-sm font-semibold text-gray-600">Submitted</span>
+                    )}
                   </motion.button>
                 );
               })}
             </div>
 
-            {/* Navigation Button - Inside Card at Bottom */}
+            {/* Next Button */}
             <AnimatePresence>
               {selectedAnswer !== null && (
                 <motion.div
@@ -275,8 +262,7 @@ export function DiagnosticTest({ questions, onComplete }: DiagnosticTestProps) {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <span>{isLastQuestion ? 'Finish Diagnostic' : 'Next'}</span>
-                    <ArrowRight className="w-5 h-5" />
+                    <span>{isLastQuestion ? 'Finish' : 'Next'}</span>
                   </motion.button>
                 </motion.div>
               )}

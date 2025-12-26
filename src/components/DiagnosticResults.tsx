@@ -16,9 +16,10 @@ type TestResults = {
 interface DiagnosticResultsProps {
   results: TestResults;
   onClaimRank: () => void;
+  user?: any; // User from auth context
 }
 
-export function DiagnosticResults({ results, onClaimRank }: DiagnosticResultsProps) {
+export function DiagnosticResults({ results, onClaimRank, user }: DiagnosticResultsProps) {
   const { score, total, percent, belt, weakestUnit } = results;
   const scoreDisplay = `${score}/${total}`;
   
@@ -212,15 +213,20 @@ export function DiagnosticResults({ results, onClaimRank }: DiagnosticResultsPro
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.4, duration: 0.4 }}
-          className="w-full max-w-2xl"
+          className="w-full max-w-2xl space-y-3"
         >
+          {!user && (
+            <p className="text-center text-sm text-gray-600 font-medium">
+              Log in to claim your rank and access personalized training recommendations
+            </p>
+          )}
           <motion.button
             onClick={onClaimRank}
             className="w-full bg-green-600 text-white px-12 py-4 rounded-lg font-bold shadow-lg flex items-center justify-center gap-2 hover:bg-green-700 transition-colors"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            <span>Get Started</span>
+            <span>{user ? 'Get Started' : 'Log In to Get Started'}</span>
             <CheckCircle className="w-5 h-5" />
           </motion.button>
         </motion.div>
