@@ -60,25 +60,11 @@ export default function UnitMCQTestPage() {
   const totalQuestions = questions.length;
 
   // --- ACCESS VERIFICATION LOGIC ---
+  // All exams are now open - no paywall
   useEffect(() => {
-    if (loading) {
-      return; // Wait until auth state is loaded
-    }
-    if (!user) {
-      setHasAccess(false);
-      setIsVerifying(false);
-      return;
-    }
-    
-    const purchasedTests = userData?.purchasedTests || [];
-    if (purchasedTests.includes(unitId as string)) {
-      setHasAccess(true);
-    } else {
-      setHasAccess(false);
-    }
+    setHasAccess(true);
     setIsVerifying(false);
-
-  }, [user, userData, loading, unitId]);
+  }, []);
 
   // MVP: Removed user-dependent progress loading for MVP
   // useEffect(() => {

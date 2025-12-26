@@ -1,6 +1,7 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, ReactNode } from 'react';
+import { useAuthContext } from './AuthContext';
 
 type Course = 'macro' | 'micro';
 
@@ -11,31 +12,17 @@ interface CourseContextValue {
 
 const CourseContext = createContext<CourseContextValue | null>(null);
 
-const STORAGE_KEY = 'dojo_course_preference';
-
 export function CourseProvider({ children }: { children: ReactNode }) {
-  const [currentCourse, setCurrentCourse] = useState<Course>('macro');
+  const { selectedSubject, setSelectedSubject } = useAuthContext();
 
-  // Load preference from localStorage on mount
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem(STORAGE_KEY) as Course | null;
-      if (saved === 'macro' || saved === 'micro') {
-        setCurrentCourse(saved);
-      }
-    }
-  }, []);
-
-  // Save to localStorage on change
+  // Sync CourseContext with useAuth's selectedSubject
+  // This maintains backward compatibility for components using CourseContext
   const switchCourse = (course: Course) => {
-    setCurrentCourse(course);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(STORAGE_KEY, course);
-    }
+    setSelectedSubject(course);
   };
 
   return (
-    <CourseContext.Provider value={{ currentCourse, switchCourse }}>
+    <CourseContext.Provider value={{ currentCourse: selectedSubject, switchCourse }}>
       {children}
     </CourseContext.Provider>
   );

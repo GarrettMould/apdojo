@@ -9,9 +9,10 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import { Button } from './ui/button';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { UserBeltProgress } from './dashboard/UserBeltProgress';
+import { getSubjectXP } from '@/hooks/useUserProgress';
 
 function Header() {
-  const { user, logout, selectedSubject, setSelectedSubject, totalXP, guestXp, isCharacterClosetOpen, setIsCharacterClosetOpen } = useAuthContext();
+  const { user, logout, selectedSubject, totalXP, guestXp, isCharacterClosetOpen, setIsCharacterClosetOpen, userData } = useAuthContext();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isBeltDropdownOpen, setIsBeltDropdownOpen] = useState(false);
   const beltDropdownRef = useRef<HTMLDivElement>(null);
@@ -44,27 +45,6 @@ function Header() {
     }
   };
 
-  const handleSubjectChange = (newSubject: 'macro' | 'micro') => {
-    // If we're on the unit MCQ practice page, preserve the unit and reload with new subject
-    if (pathname === '/unitMCQPracticePage') {
-      const unitsParam = searchParams.get('units');
-      const modeParam = searchParams.get('mode');
-      const lessonIdParam = searchParams.get('lessonId');
-      const testMode = searchParams.get('test');
-      
-      const params = new URLSearchParams();
-      params.set('subject', newSubject);
-      if (unitsParam) params.set('units', unitsParam);
-      if (modeParam) params.set('mode', modeParam);
-      if (lessonIdParam) params.set('lessonId', lessonIdParam);
-      if (testMode) params.set('test', testMode);
-      
-      router.push(`/unitMCQPracticePage?${params.toString()}`);
-    } else {
-      // For other pages, just update the subject
-      setSelectedSubject(newSubject);
-    }
-  };
 
   // Close belt dropdown when clicking outside
   useEffect(() => {
@@ -191,36 +171,12 @@ function Header() {
               </div> */}
             </nav>
 
-            {/* Subject Segmented Control & User Icon & Auth Buttons */}
+            {/* User Icon & Auth Buttons */}
             <div className="flex items-center gap-3">
-              {/* Subject Segmented Control */}
-              <div className="inline-flex items-center bg-gray-100 rounded p-0.5 border border-gray-200">
-                <button
-                  onClick={() => handleSubjectChange('macro')}
-                  className={`px-2.5 py-1.5 text-xs font-medium rounded transition-all duration-200 ${
-                    displaySubject === 'macro'
-                      ? 'bg-blue-600 text-white shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  Macro
-                </button>
-                <button
-                  onClick={() => handleSubjectChange('micro')}
-                  className={`px-2.5 py-1.5 text-xs font-medium rounded transition-all duration-200 ${
-                    displaySubject === 'micro'
-                      ? 'bg-green-600 text-white shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  Micro
-                </button>
-              </div>
-              
               {/* XP bar with subtle red glow - Clickable to open belt dropdown */}
               <div className="flex items-center relative" ref={beltDropdownRef}>
                 {(() => {
-                  const xp = user ? (totalXP ?? 0) : (guestXp ?? 0);
+                  const xp = user ? getSubjectXP(userData, displaySubject) : (guestXp ?? 0);
                   const clamped = Math.max(0, Math.min(xp, 2000));
                   const ratio = clamped / 2000; // 0 to 1
                   // Very light opaque red glow that intensifies slightly with XP

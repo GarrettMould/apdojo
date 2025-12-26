@@ -303,13 +303,8 @@ function UnitMCQPracticeContent() {
       return;
     }
 
-    // Check if user has purchased the test
-    const purchasedTests = userData?.purchasedTests || [];
-    if (purchasedTests.includes(currentUnitForAccessCheck)) {
-      setHasAccess(true);
-    } else {
-      setHasAccess(false);
-    }
+    // All exams are now open - no paywall
+    setHasAccess(true);
     setIsVerifying(false);
   }, [user, userData, currentUnitForAccessCheck, practiceMode]);
 
@@ -532,6 +527,7 @@ function UnitMCQPracticeContent() {
               dojoProgress={dojoProgress}
               correctStreak={correctStreak}
               isWeakestUnitsMode={practiceMode === 'weakest' || practiceMode === 'custom'} 
+              isTopicMode={practiceMode === 'topic'}
               totalQuestions={totalQuestionsInSet}
               unitName={currentUnitName}
               subject={subject} 

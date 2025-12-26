@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { getBeltProgress } from '@/lib/beltSystem';
+import { getSubjectXP } from '@/hooks/useUserProgress';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { db } from '@/lib/firebase';
@@ -41,6 +42,7 @@ interface UnitMCQSProps {
   dojoProgress: number;
   correctStreak: number;
   isWeakestUnitsMode: boolean;
+  isTopicMode?: boolean; // New prop to indicate topic mode (from unit cheat sheet)
   totalQuestions: number;
   unitName: string;
   questions: QuestionType[];
@@ -710,6 +712,7 @@ export function UnitMCQs({
   dojoProgress,
   correctStreak,
   isWeakestUnitsMode,
+  isTopicMode = false, // Default to false
   totalQuestions,
   unitName,
   questions,
@@ -1062,7 +1065,7 @@ export function UnitMCQs({
         <div className="w-full lg:w-2/5 bg-white rounded-lg shadow-md border border-gray-200 p-4 lg:p-6 flex flex-col h-full">
           {/* Progress Bar - Belt Progress to Next Belt */}
           {(() => {
-            const userXP = user ? (totalXP ?? 0) : (guestXp ?? 0);
+            const userXP = user ? getSubjectXP(userData, subject) : (guestXp ?? 0);
             const beltProgress = getBeltProgress(userXP);
             const { percent, nextBelt, xpToNext } = beltProgress;
             
@@ -1085,7 +1088,7 @@ export function UnitMCQs({
           
           {/* Belt and XP Display */}
           {(() => {
-            const userXP = user ? (totalXP ?? 0) : (guestXp ?? 0);
+            const userXP = user ? getSubjectXP(userData, subject) : (guestXp ?? 0);
             
             // Calculate belt based on XP (using same logic as select-practice-units page)
             const getBeltInfo = (xp: number): { name: string; color: string; bgColor: string; textColor: string } => {
@@ -1139,7 +1142,8 @@ export function UnitMCQs({
               
 
               {/* Keep dropdown for now, might remove later if tags are sufficient */}
-              {!isWeakestUnitsMode && (
+              {/* Hide dropdown in weakest/custom mode and topic mode */}
+              {!isWeakestUnitsMode && !isTopicMode && (
                 <div className="relative" ref={dropdownRef}>
                   <button
                     onClick={() => setIsUnitDropdownOpen(!isUnitDropdownOpen)}

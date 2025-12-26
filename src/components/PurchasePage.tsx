@@ -246,3 +246,4 @@ export function PurchasePage({ courseType }: PurchasePageProps) {
 }
 
 
+

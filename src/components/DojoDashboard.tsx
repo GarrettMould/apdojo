@@ -12,6 +12,7 @@ import { dojoDrills } from '@/data/dojoDrills';
 import { frqExams } from '@/data/frqQuestions';
 import { getBeltProgress } from '@/lib/beltSystem';
 import { loadDojoDrillProgress, getDrillProgress, DojoDrillProgress } from '@/lib/dojoDrillProgress';
+import { getSubjectXP } from '@/hooks/useUserProgress';
 
 // Container animation variants (LITE - very subtle)
 const containerVariants = {
@@ -79,8 +80,8 @@ export function DojoDashboard() {
     return !hasCourseAccess; // Units 2-6 require access
   };
 
-  // Get XP from user or guest
-  const xp = user ? (totalXP ?? 0) : (guestXp ?? 0);
+  // Get XP from user or guest using the helper (with legacy fallback)
+  const xp = user ? getSubjectXP(userData, currentCourse) : (guestXp ?? 0);
 
   // Calculate belt progress
   const beltProgress = getBeltProgress(xp);

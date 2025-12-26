@@ -12,6 +12,7 @@ import {
 import { auth, db } from '@/lib/firebase'
 import { doc, setDoc, serverTimestamp, collection, query, getDocs, onSnapshot, getDoc, where, increment } from 'firebase/firestore'
 import { UnitDetails } from '@/components/UnitPerformanceDisplay'
+import { getSubjectXP } from './useUserProgress'
 
 // Define the structure of your MCQ answer data
 interface McqAnswer {
@@ -45,7 +46,11 @@ export interface UserData {
   hasCompletedInitialUnitSelection?: boolean;
   initialPracticeUnitIds?: number[];
   // Add level/XP fields if they are part of UserData
+  /** @deprecated Use xp_macro and xp_micro instead. Legacy field for backward compatibility. */
   totalXP?: number;
+  // New subject-specific XP fields
+  xp_macro?: number;
+  xp_micro?: number;
   // Add the new map field for MCQ answer status
   mcqAnswerStatus?: { [key: string]: boolean }; 
   // Keep viewedMcqIds for now if needed elsewhere, remove later if redundant
@@ -162,7 +167,7 @@ export interface AuthContextValue {
 
   // --- ADD: XP Helper + Guest XP + Toast ---
   guestXp: number;
-  awardXp: (amount: number) => Promise<void>;
+  awardXp: (amount: number, subject?: 'macro' | 'micro') => Promise<void>;
   xpToast: { amount: number; total: number } | null;
   // --- END: XP Helper + Guest XP + Toast ---
 
@@ -302,6 +307,17 @@ export function useAuth() {
     return () => clearTimeout(timer);
   }, [xpToast]);
 
+  // Update totalXP when selectedSubject or userData changes
+  useEffect(() => {
+    if (user && userData) {
+      const currentXP = getSubjectXP(userData, selectedSubject);
+      setTotalXP(currentXP);
+      const levelInfo = calculateLevelAndProgress(currentXP);
+      setGlobalLevel(levelInfo.level);
+      setGlobalProgress(levelInfo.progress);
+    }
+  }, [user, userData, selectedSubject]);
+
   // Function to set selected subject (updates both state and storage)
   const setSelectedSubject = async (subject: 'macro' | 'micro') => {
     setSelectedSubjectState(subject);
@@ -403,19 +419,21 @@ export function useAuth() {
                 console.log("[useAuth] User document data updated:", fetchedUserData);
 
                 // --- Calculate Total XP and Level/Progress from user data --- 
-                const currentTotalXP = fetchedUserData.totalXP ?? 0;
+                // Use the helper to get XP for the current subject (with legacy fallback)
+                const currentSubject = fetchedUserData?.selectedSubject ?? 'macro';
+                const currentTotalXP = getSubjectXP(fetchedUserData, currentSubject);
                 setTotalXP(currentTotalXP);
                 const levelInfo = calculateLevelAndProgress(currentTotalXP);
                 setGlobalLevel(levelInfo.level);
                 setGlobalProgress(levelInfo.progress);
-                console.log(`[useAuth] Read Total XP: ${currentTotalXP}, Calculated Level: ${levelInfo.level}, Progress: ${levelInfo.progress}%`);
+                console.log(`[useAuth] Read Total XP for ${currentSubject}: ${currentTotalXP}, Calculated Level: ${levelInfo.level}, Progress: ${levelInfo.progress}%`);
                 // --- End calculation ---
 
                 console.log("[useAuth] Setting loadingUserData to FALSE.");
                 setLoadingUserData(false); // User data is loaded
 
                 // --- Setup MCQ Answers Listener (using fetchedUserData.selectedSubject) --- 
-                const currentSubject = fetchedUserData?.selectedSubject;
+                // currentSubject already defined above
                 if (currentSubject && !unsubscribeAnswersRef.current) {
                      console.log(`[useAuth] Setting up MCQ answers listener for user ${firebaseUser.uid}, subject ${currentSubject}`);
                      const answersColRef = collection(db, 'users', firebaseUser.uid, 'mcqAnswers');
@@ -512,20 +530,28 @@ export function useAuth() {
   }, []) // Empty dependency array ensures this runs only once on mount
 
   // --- ADD: awardXp helper ---
-  const awardXp = async (amount: number): Promise<void> => {
-    console.log('[XP] ===== awardXp FUNCTION CALLED =====', { amount, hasUser: !!user, userId: user?.uid });
+  const awardXp = async (amount: number, subject: 'macro' | 'micro' = selectedSubject): Promise<void> => {
+    console.log('[XP] ===== awardXp FUNCTION CALLED =====', { amount, subject, hasUser: !!user, userId: user?.uid });
     try {
-      console.log('[XP] Awarding XP:', { amount, hasUser: !!user });
+      console.log('[XP] Awarding XP:', { amount, subject, hasUser: !!user });
       if (user) {
-        // Logged-in: increment totalXP in Firestore; let the user doc listener update local totalXP/level
+        // Use the helper to get current XP (with legacy fallback)
+        const currentXP = getSubjectXP(userData, subject);
+        const newTotal = currentXP + amount;
+        
+        // Determine which field to update
+        const fieldName = subject === 'macro' ? 'xp_macro' : 'xp_micro';
+        
+        // Logged-in: update subject-specific XP in Firestore
         const userDocRef = doc(db, 'users', user.uid);
-        await setDoc(userDocRef, { totalXP: increment(amount) }, { merge: true });
+        await setDoc(userDocRef, { [fieldName]: newTotal }, { merge: true });
 
-        // Optimistic toast using current totalXP + amount, without mutating totalXP state here
-        const optimisticTotal = (totalXP ?? 0) + amount;
-        setXpToast({ amount, total: optimisticTotal });
+        // Optimistic toast using calculated new total
+        setXpToast({ amount, total: newTotal });
+        console.log(`[XP] Updated ${fieldName} to ${newTotal} (was ${currentXP}, added ${amount})`);
       } else {
-        // Guest: track XP locally
+        // Guest: track XP locally (for now, we'll use a single guest XP value)
+        // In the future, you might want to separate guest macro/micro XP too
         console.log('[XP] Guest user - updating guestXp state and localStorage');
         setGuestXp(prev => {
           const next = prev + amount;

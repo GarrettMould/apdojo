@@ -1,14 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { dojoDrills } from '@/data/dojoDrills';
 import DojoDrill from '@/components/DojoDrill';
 import { ArrowLeft } from 'lucide-react';
 import Image from 'next/image';
+import { useAuthContext } from '@/contexts/AuthContext';
 
 export default function DojoDrillsPage() {
   const searchParams = useSearchParams();
+  const { selectedSubject } = useAuthContext();
   const drillIdFromQuery = searchParams.get('drill');
   const [selectedDrillId, setSelectedDrillId] = useState<string | null>(drillIdFromQuery);
 
@@ -19,7 +21,6 @@ export default function DojoDrillsPage() {
     }
   }, [drillIdFromQuery]);
 
-  const drills = Object.values(dojoDrills);
   const currentDrill = selectedDrillId ? dojoDrills[selectedDrillId] : null;
 
   if (currentDrill) {
@@ -46,6 +47,16 @@ export default function DojoDrillsPage() {
     );
   }
 
+  // Filter drills by selected subject and order by unit
+  const filteredAndSortedDrills = useMemo(() => {
+    const subjectFilter = selectedSubject === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics';
+    const filtered = Object.values(dojoDrills).filter(
+      drill => drill.subject === subjectFilter
+    );
+    // Sort by unit number
+    return filtered.sort((a, b) => a.unit - b.unit);
+  }, [selectedSubject]);
+
   const getSubjectLabel = (subject: string) => {
     return subject === 'ap_macroeconomics' ? 'Macro' : 'Micro';
   };
@@ -58,15 +69,18 @@ export default function DojoDrillsPage() {
           <p className="text-lg text-gray-600">
             Master key concepts through interactive video lessons, graph simulations, and practice questions.
           </p>
+          <p className="text-sm text-gray-500 mt-2">
+            Showing {selectedSubject === 'macro' ? 'Macro' : 'Micro'} drills, ordered by unit
+          </p>
         </div>
 
-        {drills.length === 0 ? (
+        {filteredAndSortedDrills.length === 0 ? (
           <div className="bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8 text-center">
-            <p className="text-gray-600">No Dojo Drills available yet. Check back soon!</p>
+            <p className="text-gray-600">No {selectedSubject === 'macro' ? 'Macro' : 'Micro'} Dojo Drills available yet. Check back soon!</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {drills.map((drill) => (
+            {filteredAndSortedDrills.map((drill) => (
               <button
                 key={drill.id}
                 onClick={() => setSelectedDrillId(drill.id)}

@@ -8,8 +8,7 @@ import { Button } from '@/components/ui/button';
 import { useAuthContext } from '@/contexts/AuthContext';
 
 export default function UnitFinalPracticeTestsPage() {
-  const { user, userData, selectedSubject } = useAuthContext();
-  const purchasedTests = userData?.purchasedTests || [];
+  const { selectedSubject } = useAuthContext();
   const units = selectedSubject === 'micro' ? allMicroUnitsData : allMacroUnitsData;
   const isMicro = selectedSubject === 'micro';
   const subjectName = selectedSubject === 'macro' ? 'Macroeconomics' : 'Microeconomics';
@@ -85,41 +84,18 @@ export default function UnitFinalPracticeTestsPage() {
               </div>
               <div className="flex flex-col items-end gap-4 min-w-[200px]">
                 {(() => {
-                  if (isMicro) {
-                    return (
-                      <Button disabled className="bg-gray-400 text-white font-semibold cursor-not-allowed">
-                        Coming Soon
-                      </Button>
-                    );
-                  }
-                  const hasPurchased = user && userData?.purchases?.includes('macro-mcq-1');
+                  // Link to appropriate exam based on subject
+                  const examHref = isMicro 
+                    ? '/preview/micro/mcq/1'  // Link to micro setOne.ts
+                    : '/preview/macro/mcq/1';
+                  
                   return (
-                    <>
-                      {!hasPurchased && (
-                        <span className="text-2xl font-bold text-gray-900">$30.00</span>
-                      )}
-                      {hasPurchased ? (
-                        <Link 
-                          href="/preview/macro/mcq/1"
-                          passHref
-                        >
-                          <Button className="bg-green-500 hover:bg-green-600 text-white font-semibold">
-                            Start Test
-                            <PlayCircle className="w-5 h-5 ml-2" />
-                          </Button>
-                        </Link>
-                      ) : (
-                        <Link 
-                          href="/purchase/full-exam?examType=macro&questionType=mcq&examNumber=1&total=30.00"
-                          passHref
-                        >
-                          <Button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold">
-                            Purchase Test
-                            <ArrowRight className="w-5 h-5 ml-2" />
-                          </Button>
-                        </Link>
-                      )}
-                    </>
+                    <Link href={examHref} passHref>
+                      <Button className={`${isMicro ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600'} text-white font-semibold`}>
+                        Start Test
+                        <PlayCircle className="w-5 h-5 ml-2" />
+                      </Button>
+                    </Link>
                   );
                 })()}
               </div>
@@ -142,41 +118,18 @@ export default function UnitFinalPracticeTestsPage() {
               </div>
               <div className="flex flex-col items-end gap-4 min-w-[200px]">
                 {(() => {
-                  if (isMicro) {
-                    return (
-                      <Button disabled className="bg-gray-400 text-white font-semibold cursor-not-allowed">
-                        Coming Soon
-                      </Button>
-                    );
-                  }
-                  const hasPurchased = user && userData?.purchases?.includes('macro-frq-1');
+                  // Link to appropriate exam based on subject
+                  const examHref = isMicro 
+                    ? '/preview/micro/frq/1'
+                    : '/preview/macro/frq/1';
+                  
                   return (
-                    <>
-                      {!hasPurchased && (
-                        <span className="text-2xl font-bold text-gray-900">$20.00</span>
-                      )}
-                      {hasPurchased ? (
-                        <Link 
-                          href="/preview/macro/frq/1"
-                          passHref
-                        >
-                          <Button className="bg-green-500 hover:bg-green-600 text-white font-semibold">
-                            Start Test
-                            <PlayCircle className="w-5 h-5 ml-2" />
-                          </Button>
-                        </Link>
-                      ) : (
-                        <Link 
-                          href="/purchase/full-exam?examType=macro&questionType=frq&examNumber=1&total=20.00"
-                          passHref
-                        >
-                          <Button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold">
-                            Purchase Test
-                            <ArrowRight className="w-5 h-5 ml-2" />
-                          </Button>
-                        </Link>
-                      )}
-                    </>
+                    <Link href={examHref} passHref>
+                      <Button className={`${isMicro ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600'} text-white font-semibold`}>
+                        Start Test
+                        <PlayCircle className="w-5 h-5 ml-2" />
+                      </Button>
+                    </Link>
                   );
                 })()}
               </div>
@@ -191,9 +144,6 @@ export default function UnitFinalPracticeTestsPage() {
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {units.map((unit) => {
-              const hasPurchased = user && purchasedTests.includes(unit.number.toString());
-              const isDisabled = isMicro; // Disable all Micro tests
-
               return (
                 <div 
                   key={unit.number}
@@ -213,39 +163,17 @@ export default function UnitFinalPracticeTestsPage() {
                       {unit.description}
                     </p>
                   </div>
-                  <div className="mt-8 flex items-center justify-between">
-                    {!hasPurchased && !isDisabled && (
-                      <span className="text-2xl font-bold text-gray-900">${unit.price.toFixed(2)}</span>
-                    )}
-                    {isDisabled ? (
-                      <Button 
-                        disabled
-                        className="bg-gray-400 text-white font-semibold cursor-not-allowed"
-                      >
-                        Coming Soon
+                  <div className="mt-8 flex items-center justify-end">
+                    <Link 
+                      href={`/unit-mcq-test/${unit.number}`}
+                      passHref
+                      className="w-full"
+                    >
+                      <Button className={`w-full ${isMicro ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600'} text-white font-semibold`}>
+                        Start Test
+                        <PlayCircle className="w-5 h-5 ml-2" />
                       </Button>
-                    ) : hasPurchased ? (
-                      <Link 
-                        href={`/unit-mcq-test/${unit.number}`}
-                        passHref
-                        className="w-full"
-                      >
-                        <Button className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold">
-                          Start Test
-                          <PlayCircle className="w-5 h-5 ml-2" />
-                        </Button>
-                      </Link>
-                    ) : (
-                      <Link 
-                        href={`/purchase/mcq-practice?units=${unit.number}&total=${unit.price.toFixed(2)}&bundle=false`}
-                        passHref
-                      >
-                        <Button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold">
-                          Purchase Test
-                          <ArrowRight className="w-5 h-5 ml-2" />
-                        </Button>
-                      </Link>
-                    )}
+                    </Link>
                   </div>
                 </div>
               );

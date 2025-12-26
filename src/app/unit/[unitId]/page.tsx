@@ -15,9 +15,10 @@ import { unit1Whiteboards, apMacroUnit2Whiteboards, apMacroUnit3Whiteboards, apM
 import { getCheckpointForLesson, microCheckpoints, macroCheckpoints } from '@/data/checkpoints';
 import { microLessons, macroLessons } from '@/data/lessons';
 import { videos, Video } from '@/data/videos';
+import { getVideosForLessonId } from '@/data/videosByLessonId';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question as QuestionType } from '@/data/questionBanks/types';
-import { X, ArrowRight, Lock, ArrowLeft, CheckCircle2, XCircle, Download, Bookmark, BookmarkPlus, Check, Brain, Maximize2 } from 'lucide-react';
+import { X, ArrowRight, Lock, ArrowLeft, CheckCircle2, XCircle, Download, Bookmark, BookmarkPlus, Check, Brain, Maximize2, Play } from 'lucide-react';
 import { dojoIcon } from '@/data/imagePaths';
 import { motion, AnimatePresence } from 'framer-motion';
 import { dojoDrills } from '@/data/dojoDrills';
@@ -436,6 +437,9 @@ export default function UnitPage() {
   
   const [activeUnit, setActiveUnit] = useState((params.unitId as string) || '1');
   const [selectedWhiteboard, setSelectedWhiteboard] = useState<WhiteboardImage | null>(null);
+  const [showVideoModal, setShowVideoModal] = useState(false);
+  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
+  const [videoQuestionAnswers, setVideoQuestionAnswers] = useState<Record<string, number>>({});
   const [selectedWhiteboards, setSelectedWhiteboards] = useState<Set<string>>(new Set());
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [visibleWhiteboardsCount, setVisibleWhiteboardsCount] = useState<Record<string, number>>({});
@@ -1010,64 +1014,6 @@ export default function UnitPage() {
           <p className="mt-4 text-xl text-gray-600 max-w-2xl mx-auto">Key terms, formulas, and graphs for every unit.</p>
         </div>
 
-        {/* Mini Dojo Drills Row */}
-        {(() => {
-          // Filter drills by current unit and subject
-          const relevantDrills = Object.values(dojoDrills).filter(
-            drill => drill.unit === activeUnitNum && drill.subject === subjectFilter
-          );
-
-          if (relevantDrills.length === 0) return null;
-
-          return (
-            <div className="mb-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-3">Dojo Drills</h2>
-              <div className="flex md:flex-row md:flex-wrap gap-4 overflow-x-auto md:overflow-x-visible pb-2 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0">
-                {relevantDrills.map((drill) => (
-                  <button
-                    key={drill.id}
-                    onClick={() => router.push(`/dojo-drills/preview/${drill.id}`)}
-                    className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4 text-left hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 flex-shrink-0 w-[45%] md:flex-1 md:min-w-[240px] md:max-w-[320px] flex flex-col group aspect-[5/6] md:aspect-auto"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div
-                        className={`inline-block text-xs font-semibold px-2 py-1 rounded ${
-                          subjectFilter === 'ap_macroeconomics'
-                            ? 'bg-blue-100 text-blue-800'
-                            : 'bg-green-100 text-green-800'
-                        }`}
-                      >
-                        Unit {drill.unit}
-                      </div>
-                      <div className="flex items-center gap-1 text-sm font-semibold text-gray-800">
-                        <span>{drill.xpReward.total}</span>
-                        <span className="inline-flex items-center">
-                          <Image
-                            src="/images/flame100.png"
-                            alt="XP Flame"
-                            width={16}
-                            height={16}
-                            className="w-4 h-4"
-                          />
-                        </span>
-                      </div>
-                    </div>
-                    <h3 className="text-base font-bold text-gray-900 mb-1.5 line-clamp-2 group-hover:text-blue-600 transition-colors flex-1">
-                      {drill.title}
-                    </h3>
-                    <p className="hidden md:block text-xs text-gray-600 line-clamp-2 mb-2">
-                      {drill.description}
-                    </p>
-                    <div className="text-xs font-semibold text-blue-600 mt-auto flex items-center gap-1">
-                      Start →
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          );
-        })()}
-
         {/* Unit Navigation Tabs */}
         <div className="mb-8 border-b border-gray-200">
           <nav className="-mb-px flex space-x-6" aria-label="Tabs">
@@ -1135,6 +1081,64 @@ export default function UnitPage() {
           );
         })()}
 
+        {/* Dojo Drills Row - Below Strengthen your mastery button */}
+        {(() => {
+          // Filter drills by current unit and subject
+          const relevantDrills = Object.values(dojoDrills).filter(
+            drill => drill.unit === activeUnitNum && drill.subject === subjectFilter
+          );
+
+          if (relevantDrills.length === 0) return null;
+
+          return (
+            <div className="mb-8">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Dojo Drills</h2>
+              <div className="flex md:flex-row md:flex-wrap gap-4 overflow-x-auto md:overflow-x-visible pb-2 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0">
+                {relevantDrills.map((drill) => (
+                  <button
+                    key={drill.id}
+                    onClick={() => router.push(`/dojo-drills/preview/${drill.id}`)}
+                    className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4 text-left hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 flex-shrink-0 w-[45%] md:flex-1 md:min-w-[240px] md:max-w-[320px] flex flex-col group aspect-[5/6] md:aspect-auto"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div
+                        className={`inline-block text-xs font-semibold px-2 py-1 rounded ${
+                          subjectFilter === 'ap_macroeconomics'
+                            ? 'bg-blue-100 text-blue-800'
+                            : 'bg-green-100 text-green-800'
+                        }`}
+                      >
+                        Unit {drill.unit}
+                      </div>
+                      <div className="flex items-center gap-1 text-sm font-semibold text-gray-800">
+                        <span>{drill.xpReward.total}</span>
+                        <span className="inline-flex items-center">
+                          <Image
+                            src="/images/flame100.png"
+                            alt="XP Flame"
+                            width={16}
+                            height={16}
+                            className="w-4 h-4"
+                          />
+                        </span>
+                      </div>
+                    </div>
+                    <h3 className="text-base font-bold text-gray-900 mb-1.5 line-clamp-2 group-hover:text-blue-600 transition-colors flex-1">
+                      {drill.title}
+                    </h3>
+                    <p className="hidden md:block text-xs text-gray-600 line-clamp-2 mb-2">
+                      {drill.description}
+                    </p>
+                    <div className="text-xs font-semibold text-blue-600 mt-auto flex items-center gap-1">
+                      Start →
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
+
         {/* Main Content Layout */}
         <div className="space-y-12">
           {(() => {
@@ -1190,6 +1194,69 @@ export default function UnitPage() {
               <h2 className="text-2xl font-bold text-gray-800 pb-2 border-b border-gray-200">
                 {lessonId}{lessonName ? ` - ${lessonName}` : ''}
               </h2>
+              
+              {/* Videos Section */}
+              {(() => {
+                const lessonVideos = getVideosForLessonId(lessonId);
+                // Filter by subject
+                const subjectFilter = selectedSubject === 'macro' ? 'AP Macroeconomics' : 'AP Microeconomics';
+                const relevantVideos = lessonVideos.filter(video => 
+                  video.subjects.includes(subjectFilter)
+                );
+
+                if (relevantVideos.length === 0) return null;
+
+                return (
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold text-gray-700 mb-3">Videos</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {relevantVideos.map((video) => (
+                        <button
+                          key={video.id}
+                          onClick={() => {
+                            setSelectedVideo(video);
+                            setShowVideoModal(true);
+                            // Reset answers when opening a new video
+                            setVideoQuestionAnswers({});
+                          }}
+                          className="group bg-white border-2 border-gray-200 rounded-lg overflow-hidden hover:border-blue-500 hover:shadow-lg transition-all duration-200 text-left"
+                        >
+                          <div className="relative aspect-video bg-gray-100">
+                            {video.thumbnail ? (
+                              <Image
+                                src={video.thumbnail}
+                                alt={video.title}
+                                fill
+                                className="object-cover group-hover:scale-105 transition-transform duration-200"
+                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200">
+                                <Play className="w-12 h-12 text-blue-600" />
+                              </div>
+                            )}
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200 flex items-center justify-center">
+                              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/90 rounded-full p-3">
+                                <Play className="w-6 h-6 text-blue-600 fill-blue-600" />
+                              </div>
+                            </div>
+                          </div>
+                          <div className="p-4">
+                            <h4 className="font-semibold text-gray-900 mb-1 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                              {video.title}
+                            </h4>
+                            {video.description && (
+                              <p className="text-sm text-gray-600 line-clamp-2">
+                                {video.description}
+                              </p>
+                            )}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
               
               {/* Key Terms Section */}
               {keyTerms.length > 0 && (
@@ -1905,6 +1972,137 @@ export default function UnitPage() {
           </div>
         );
       })()}
+
+      {/* Video Modal - Similar to Dojo Drill Modal */}
+      <AnimatePresence>
+        {showVideoModal && selectedVideo && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                setShowVideoModal(false);
+              }
+            }}
+          >
+            <motion.div 
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.95 }}
+              transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+              className="bg-white rounded-xl shadow-2xl w-full max-w-7xl max-h-[85vh] overflow-hidden relative my-8 border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
+            >
+              <motion.button
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.1 }}
+                onClick={() => setShowVideoModal(false)}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className="absolute top-4 right-4 text-gray-400 hover:text-gray-900 transition-colors z-10 bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-sm hover:shadow-md"
+                aria-label="Close Video"
+              >
+                <X className="w-5 h-5" />
+              </motion.button>
+              
+              <div className="p-4 flex gap-4 h-[75vh]">
+                {/* Video Section - Left */}
+                <div className="flex-1 flex items-center justify-center">
+                  <video
+                    src={selectedVideo.videoUrl}
+                    controls
+                    autoPlay
+                    className="w-full h-full aspect-video rounded-lg"
+                    playsInline
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+
+                {/* Comprehension Check Sidebar - Right */}
+                {selectedVideo.questions && selectedVideo.questions.length > 0 && (
+                  <div className="w-96 h-full flex flex-col pl-4">
+                    <div className="pb-4 mb-4 flex-shrink-0">
+                      <h3 className="text-xl font-bold text-gray-900">
+                        Comprehension Check
+                      </h3>
+                    </div>
+                    
+                    {/* Scrollable Questions */}
+                    <div className="flex-1 overflow-y-auto space-y-6 pr-2">
+                      {selectedVideo.questions.map((question, qIndex) => {
+                        const selectedAnswer = videoQuestionAnswers[question.id];
+                        const isAnswered = selectedAnswer !== undefined;
+                        const isCorrect = selectedAnswer === question.correctAnswer;
+                        
+                        return (
+                          <div key={question.id} className="space-y-3">
+                            <p className="text-sm font-semibold text-gray-600">
+                              Question {qIndex + 1}
+                            </p>
+                            <p className="text-base font-medium text-gray-800 leading-relaxed">
+                              {question.text}
+                            </p>
+                            <div className="space-y-2">
+                              {question.options.map((option, index) => {
+                                const isSelected = selectedAnswer === index;
+                                const isCorrectOption = index === question.correctAnswer;
+                                const showResult = isAnswered;
+                                
+                                return (
+                                  <button
+                                    key={index}
+                                    onClick={() => {
+                                      if (!isAnswered) {
+                                        setVideoQuestionAnswers(prev => ({
+                                          ...prev,
+                                          [question.id]: index
+                                        }));
+                                      }
+                                    }}
+                                    disabled={isAnswered}
+                                    className={`w-full text-left p-3 rounded-lg transition-all ${
+                                      !showResult
+                                        ? isSelected
+                                          ? "bg-gray-200 border-[3px] border-black text-gray-900"
+                                          : "bg-white border-2 border-gray-300 hover:border-black hover:bg-gray-50 cursor-pointer"
+                                        : isSelected && isCorrectOption
+                                        ? "bg-green-100 border-[3px] border-black text-green-900"
+                                        : isSelected && !isCorrectOption
+                                        ? "bg-red-100 border-[3px] border-black text-red-900"
+                                        : isCorrectOption && showResult
+                                        ? "bg-green-100 border-[3px] border-black text-green-900"
+                                        : "bg-gray-50 border-2 border-gray-300 text-gray-600"
+                                    } ${showResult ? "cursor-default" : ""}`}
+                                  >
+                                    <span className="font-semibold">{String.fromCharCode(65 + index)}.</span>{" "}
+                                    {option}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                            
+                            {isAnswered && question.explanation && (
+                              <div className="mt-3 p-3 bg-blue-50 border-l-4 border-blue-400 rounded">
+                                <p className="text-sm text-gray-800 leading-relaxed">
+                                  <strong>Explanation:</strong> {question.explanation}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 } 

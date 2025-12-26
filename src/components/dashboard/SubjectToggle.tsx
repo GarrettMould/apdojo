@@ -2,11 +2,38 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { useCourseContext, useCourseTheme } from '@/contexts/CourseContext';
+import { useAuthContext } from '@/contexts/AuthContext';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 
 export function SubjectToggle() {
-  const { currentCourse, switchCourse } = useCourseContext();
-  const { primary } = useCourseTheme();
+  const { selectedSubject, setSelectedSubject } = useAuthContext();
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const handleSubjectChange = (newSubject: 'macro' | 'micro') => {
+    // If we're on the unit MCQ practice page, preserve the unit and reload with new subject
+    if (pathname === '/unitMCQPracticePage') {
+      const unitsParam = searchParams.get('units');
+      const modeParam = searchParams.get('mode');
+      const lessonIdParam = searchParams.get('lessonId');
+      const testMode = searchParams.get('test');
+      
+      const params = new URLSearchParams();
+      params.set('subject', newSubject);
+      if (unitsParam) params.set('units', unitsParam);
+      if (modeParam) params.set('mode', modeParam);
+      if (lessonIdParam) params.set('lessonId', lessonIdParam);
+      if (testMode) params.set('test', testMode);
+      
+      router.push(`/unitMCQPracticePage?${params.toString()}`);
+    } else {
+      // For other pages, just update the subject
+      setSelectedSubject(newSubject);
+    }
+  };
+
+  const primary = selectedSubject === 'macro' ? 'bg-blue-600' : 'bg-green-600';
 
   return (
     <div className="bg-gray-100 rounded-full p-1 flex relative w-fit mx-auto">
@@ -16,7 +43,7 @@ export function SubjectToggle() {
         className={`absolute inset-y-1 rounded-full ${primary}`}
         style={{
           width: 'calc(50% - 4px)',
-          left: currentCourse === 'macro' ? '4px' : 'calc(50% + 4px)',
+          left: selectedSubject === 'macro' ? '4px' : 'calc(50% + 4px)',
         }}
         transition={{
           type: 'spring',
@@ -27,9 +54,9 @@ export function SubjectToggle() {
 
       {/* AP Macro Button */}
       <button
-        onClick={() => switchCourse('macro')}
+        onClick={() => handleSubjectChange('macro')}
         className={`relative z-10 px-6 py-2 rounded-full font-semibold transition-colors ${
-          currentCourse === 'macro'
+          selectedSubject === 'macro'
             ? 'text-white font-bold'
             : 'text-gray-500 font-medium'
         }`}
@@ -39,9 +66,9 @@ export function SubjectToggle() {
 
       {/* AP Micro Button */}
       <button
-        onClick={() => switchCourse('micro')}
+        onClick={() => handleSubjectChange('micro')}
         className={`relative z-10 px-6 py-2 rounded-full font-semibold transition-colors ${
-          currentCourse === 'micro'
+          selectedSubject === 'micro'
             ? 'text-white font-bold'
             : 'text-gray-500 font-medium'
         }`}

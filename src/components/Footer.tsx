@@ -70,11 +70,11 @@ export function Footer() {
                 Have questions or want to book lessons? <br />Contact via email.
               </p>
               <a 
-                href="mailto:garrett@apdojo.com"
+                href="mailto:service@apdojo.com"
                 className="text-sm text-gray-500 hover:text-blue-600 transition-colors flex items-center gap-2 mt-4"
               >
                 <Mail className="w-4 h-4" />
-                <span>garrett@apdojo.com</span>
+                <span>service@apdojo.com</span>
               </a>
             </div>
           </div>

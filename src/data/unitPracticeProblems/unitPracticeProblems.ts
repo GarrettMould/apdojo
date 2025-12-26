@@ -10,6 +10,11 @@ import allQS143 from "../../../public/images/allQS143.png"
 import allQS144 from "../../../public/images/allQS144.png"
 import allQS145 from "../../../public/images/allQS145.png"
 import allQS146 from "../../../public/images/allQS146.png"
+import q2096 from "../../../public/images/unitMCQs/q2096.svg"
+import q2037 from "../../../public/images/unitMCQs/q2037.svg"
+import q2103 from "../../../public/images/unitMCQs/q2103.svg"
+import q2126 from "../../../public/images/unitMCQs/q2126.svg"
+import q2122 from "../../../public/images/unitMCQs/q2122.svg"
 // Create arrays for each unit
 const unit1Questions = macroSetTwoQuestions.questions.filter(q => q.unit === 1);
 const unit2Questions = macroSetTwoQuestions.questions.filter(q => q.unit === 2);
@@ -361,7 +366,7 @@ const macroUnit1Questions = [
     "lessonIDS": ["1.3"],
     "unitName": "Comparative Advantage and Gains from Trade",
     "question": "Refer to the production possibilities graph below, which shows the potential output for two nations, Liblis and Tralia, using equal amounts of resources. Based on the graph, which of the following statements correctly identifies the comparative advantage for each country?",
-    "image": null,
+    "image": q2096,
     "options": [
       "Liblis has a comparative advantage in Good A, and Tralia has a comparative advantage in Good B.",
       "Liblis has a comparative advantage in Good B, and Tralia has a comparative advantage in Good A.",
@@ -379,7 +384,7 @@ const macroUnit1Questions = [
     "lessonIDS": ["1.3"],
     "unitName": "Comparative Advantage and Gains from Trade",
     "question": "Refer to the graph for Liblis and Tralia. If these two nations decide to specialize and trade, which of the following ratios represents a Terms of Trade that would be mutually beneficial for exchanging 1 unit of Good B?",
-    "image": null,
+    "image": q2096,
     "options": [
       "1 unit of Good B for 0.5 units of Good A",
       "1 unit of Good B for 1.5 units of Good A",
@@ -396,8 +401,8 @@ const macroUnit1Questions = [
     "unit": 1,
     "lessonIDS": ["1.2"],
     "unitName": "Comparative Advantage and Gains from Trade",
-    "question": "Refer to the graph for Liblis and Tralia. Which statement regarding Absolute Advantage is supported by the data?",
-    "image": null,
+    "question": "Refer to the graph for Liblis and Tralia. Which statement regarding absolute advantage is supported by the data?",
+    "image": q2096,
     "options": [
       "Tralia has an absolute advantage in the production of Good B.",
       "Liblis has an absolute advantage in the production of Good B.",
@@ -566,7 +571,7 @@ const macroUnit1Questions = [
     "lessonIDS": ["1.6"],
     "unitName": "Basic Economic Concepts",
     "question": "Refer to the market graph below. The market equilibrium quantity is 90 units. If the current market price is established at $P_2$, which of the following best describes the quantity exchanged and the resulting pressure on the market price? ",
-    "image": null,
+    "image": q2126,
     "options": [
       "120 units will be exchanged, and there will be upward pressure on the price.",
       "90 units will be exchanged, and the price will remain stable.",
@@ -2226,7 +2231,7 @@ const microUnit1Questions = [
     "lessonIDS": ["1.4"],
     "unitName": "Comparative Advantage and Gains from Trade",
     "question": "Refer to the production possibilities graph below, which shows the potential output for two nations, Liblis and Tralia, using equal amounts of resources. Based on the graph, which of the following statements correctly identifies the comparative advantage for each country?",
-    "image": null,
+    "image": q2096,
     "options": [
       "Liblis has a comparative advantage in Good A, and Tralia has a comparative advantage in Good B.",
       "Liblis has a comparative advantage in Good B, and Tralia has a comparative advantage in Good A.",
@@ -2244,7 +2249,7 @@ const microUnit1Questions = [
     "lessonIDS": ["1.4"],
     "unitName": "Comparative Advantage and Gains from Trade",
     "question": "Refer to the graph for Liblis and Tralia. If these two nations decide to specialize and trade, which of the following ratios represents a Terms of Trade that would be mutually beneficial for exchanging 1 unit of Good B?",
-    "image": null,
+    "image": q2096,
     "options": [
       "1 unit of Good B for 0.5 units of Good A",
       "1 unit of Good B for 1.5 units of Good A",
@@ -2262,7 +2267,7 @@ const microUnit1Questions = [
     "lessonIDS": ["1.4"],
     "unitName": "Comparative Advantage and Gains from Trade",
     "question": "Refer to the graph for Liblis and Tralia. Which of the following statements regarding absolute advantage is true?",
-    "image": null,
+    "image": q2096,
     "options": [
       "Tralia has an absolute advantage in the production of Good B.",
       "Liblis has an absolute advantage in the production of Good B.",
@@ -2280,7 +2285,7 @@ const microUnit1Questions = [
     "lessonIDS": ["1.1"],
     "unitName": "Comparative Advantage and Gains from Trade",
     "question": "The graph below shows the Production Possibilities Curve for a nation producing Capital Goods and Consumer Goods. Calculate the average opportunity cost of producing one unit of Consumer Goods as the economy moves from Point L to Point M.",
-    "image": null,
+    "image": q2103,
     "options": [
       "0.5 Capital Goods",
       "1 Capital Good",
@@ -2377,7 +2382,7 @@ const microUnit1Questions = [
     "lessonIDS": ["1.3"],
     "unitName": "Basic Economic Concepts",
     "question": "Refer to the Production Possibilities Curve (PPC) below, which shows an economy producing capital goods and consumer goods. Which of the following movements indicates that the economy can increase its production of consumer goods without sacrificing any capital goods? ",
-    "image": null,
+    "image": q2122,
     "options": [
       "From point R to point U",
       "From point U to point R",
@@ -2964,7 +2969,7 @@ const microUnit3Questions = [
     "lessonIDS": ["3.1"],
     "unitName": "Production, Cost, and the Perfect Competition Model",
     "question": "The graph below shows the total product curve for a firm. At Point B, which marks the peak of the total output curve, which of the following statements is true? ",
-    "image": null,
+    "image": q2037,
     "options": [
     "The marginal product of labor is zero.",
     "The average product of labor is negative.",
