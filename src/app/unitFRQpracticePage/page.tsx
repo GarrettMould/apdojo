@@ -193,11 +193,10 @@ function UnitFRQPracticePageComponent() {
   ).sort((a, b) => (a.unit || 99) - (b.unit || 99) || a.title.localeCompare(b.title)), [relevantExams]);
 
   // Helper function to check if a question is locked
-  // Only Ample Reserves (id: 1) and Factor Markets (id: 2) are unlocked
+  // All questions are now unlocked
   const isQuestionLocked = (questionId: number | undefined): boolean => {
-    if (questionId === undefined) return true;
-    // Only unlock Ample Reserves (id: 1) and Factor Markets (id: 2)
-    return questionId !== 1 && questionId !== 2;
+    // All questions are unlocked
+    return false;
   };
 
   const [selectedQuestionIndex, setSelectedQuestionIndex] = useState(0);

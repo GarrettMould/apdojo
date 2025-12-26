@@ -22,6 +22,7 @@ import { ExamWhiteboard } from './ExamWhiteboard';
 import { ExamTutorialModal } from './ExamTutorialModal';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
+import { saveQuizResult } from '@/lib/quizHistory';
 
 interface FullExamProps {
   questionBank: QuestionBank;
@@ -146,7 +147,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState<StaticImageData | null>(null);
 
-  const { user } = useAuthContext();
+  const { user, awardXp, selectedSubject } = useAuthContext();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
   const [showExitConfirmModal, setShowExitConfirmModal] = useState(false);
@@ -417,6 +418,40 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
         answers: answers,
         submittedAt: serverTimestamp()
       });
+
+      // Award XP for correct answers (100 XP per correct question)
+      if (awardXp && correctCount > 0) {
+        try {
+          const totalXP = correctCount * 100;
+          await awardXp(totalXP, examType);
+          console.log(`[Custom Assignment] Awarded ${totalXP} XP (${correctCount} correct answers × 100 XP)`);
+        } catch (xpError) {
+          console.error('[Custom Assignment] Error awarding XP:', xpError);
+        }
+      }
+
+      // Save quiz history
+      if (user && questions.length > 0) {
+        try {
+          const title = linkDoc.data().subject === 'macro' 
+            ? `Macro Custom Assignment` 
+            : `Micro Custom Assignment`;
+          
+          await saveQuizResult({
+            userId: user.uid,
+            type: 'custom-link',
+            title,
+            score,
+            correctCount,
+            totalQuestions,
+            questions: questions,
+            userAnswers: answers,
+          });
+          console.log('[Custom Assignment] Saved quiz history');
+        } catch (historyError) {
+          console.error('[Custom Assignment] Error saving quiz history:', historyError);
+        }
+      }
     } catch (error) {
       console.error('Error saving assignment results to Firebase:', error);
     }

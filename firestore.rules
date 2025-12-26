@@ -124,6 +124,19 @@ service cloud.firestore {
     }
     // --- End assignmentResults Collection Rules ---
 
+    // --- RULES FOR userQuizHistory COLLECTION ---
+    match /userQuizHistory/{quizId} {
+      // Allow users to create quiz history entries for themselves
+      allow create: if request.auth.uid != null && request.resource.data.userId == request.auth.uid;
+      
+      // Allow users to read their own quiz history entries
+      allow read: if request.auth.uid != null && resource.data.userId == request.auth.uid;
+      
+      // Allow users to update/delete their own quiz history entries (optional, for future use)
+      allow update, delete: if request.auth.uid != null && resource.data.userId == request.auth.uid;
+    }
+    // --- End userQuizHistory Collection Rules ---
+
     // (Add rules for any other top-level collections)
 
   } // Closing brace for match /databases/{database}/documents

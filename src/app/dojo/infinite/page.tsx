@@ -6,6 +6,8 @@ import { Upload, X, FileText, Image as ImageIcon, Loader2, Check, Sparkles, Chec
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Question } from '@/data/questionBanks/types';
+import { useAuthContext } from '@/contexts/AuthContext';
+import { saveQuizResult } from '@/lib/quizHistory';
 
 // --- TYPES ---
 interface InfiniteDrillResult {
@@ -16,6 +18,7 @@ interface InfiniteDrillResult {
 type LoadingStage = 'idle' | 'analyzing' | 'identifying' | 'generating' | 'complete';
 
 function InfinitePracticePage() {
+  const { user } = useAuthContext();
   const [inputMode, setInputMode] = useState<'image' | 'text'>('image');
   const [fileData, setFileData] = useState<{ file: File; preview: string; base64: string } | null>(null);
   const [textInput, setTextInput] = useState('');
@@ -167,7 +170,7 @@ function InfinitePracticePage() {
     setShowExplanation(true);
   };
 
-  const handleNextQuestion = () => {
+  const handleNextQuestion = async () => {
     if (!result) return;
     
     if (currentQuestionIndex < result.questions.length - 1) {
@@ -176,6 +179,38 @@ function InfinitePracticePage() {
     } else {
       // All questions answered, show final results
       setIsSubmitted(true);
+      
+      // Save quiz history
+      if (user && result.questions.length > 0 && Object.keys(userAnswers).length > 0) {
+        try {
+          const correctCount = result.questions.filter(q => userAnswers[String(q.id)] === q.correctAnswer).length;
+          const totalQuestions = result.questions.length;
+          const score = Math.round((correctCount / totalQuestions) * 100);
+          
+          // Convert userAnswers keys to match question IDs (ensure consistency)
+          const normalizedAnswers: Record<string, string> = {};
+          result.questions.forEach((q) => {
+            const answerKey = String(q.id);
+            if (userAnswers[answerKey]) {
+              normalizedAnswers[q.id.toString()] = userAnswers[answerKey];
+            }
+          });
+
+          await saveQuizResult({
+            userId: user.uid,
+            type: 'infinite-drill',
+            title: result.conceptDetected || 'Infinite Practice Drill',
+            score,
+            correctCount,
+            totalQuestions,
+            questions: result.questions,
+            userAnswers: normalizedAnswers,
+          });
+          console.log('[Infinite Drill] Saved quiz history');
+        } catch (error) {
+          console.error('[Infinite Drill] Error saving quiz history:', error);
+        }
+      }
     }
   };
 

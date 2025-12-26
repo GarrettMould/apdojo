@@ -19,8 +19,80 @@ import { QuestionWithKeyTerms } from './QuestionWithKeyTerms';
 import { keyTerms as apMacroTerms } from '@/data/apMacroTerms';
 import { keyTerms as apMicroTerms } from '@/data/apMicroTerms';
 import { KeyTerm } from '@/data/allContent';
+import ReactMarkdown from 'react-markdown';
 
 import dojoIcon from "../../public/images/dojoIcon.png";
+
+// Helper function to parse markdown table from text
+const parseMarkdownTable = (text: string): { tableData: { headers: string[]; rows: string[][] } | null; textWithoutTable: string } => {
+  const lines = text.split('\n');
+  let tableStartIndex = -1;
+  let tableEndIndex = -1;
+  
+  // Find table boundaries (lines starting with |)
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (line.startsWith('|') && line.endsWith('|')) {
+      if (tableStartIndex === -1) {
+        tableStartIndex = i;
+      }
+      tableEndIndex = i;
+    } else if (tableStartIndex !== -1 && !line.startsWith('|') && line.length > 0) {
+      // Table ended (non-empty line that doesn't start with |)
+      break;
+    }
+  }
+  
+  if (tableStartIndex === -1 || tableEndIndex === -1) {
+    return { tableData: null, textWithoutTable: text };
+  }
+  
+  // Extract table lines
+  const tableLines = lines.slice(tableStartIndex, tableEndIndex + 1);
+  
+  if (tableLines.length < 2) {
+    return { tableData: null, textWithoutTable: text };
+  }
+  
+  // Parse headers (first line)
+  const headerLine = tableLines[0];
+  const headers = headerLine
+    .split('|')
+    .map(h => h.trim())
+    .filter(h => h.length > 0);
+  
+  // Parse rows (skip header and separator line)
+  const rows: string[][] = [];
+  for (let i = 2; i < tableLines.length; i++) {
+    const line = tableLines[i].trim();
+    // Skip empty lines
+    if (!line || !line.startsWith('|')) continue;
+    
+    const cells = line
+      .split('|')
+      .map(c => c.trim())
+      .filter(c => c.length > 0);
+    
+    if (cells.length > 0) {
+      rows.push(cells);
+    }
+  }
+  
+  // Remove table from text
+  const textWithoutTable = [
+    ...lines.slice(0, tableStartIndex),
+    ...lines.slice(tableEndIndex + 1)
+  ].join('\n').trim();
+  
+  if (headers.length === 0 || rows.length === 0) {
+    return { tableData: null, textWithoutTable: text };
+  }
+  
+  return {
+    tableData: { headers, rows },
+    textWithoutTable
+  };
+};
 
 // Type definition consistent with the parent page
 interface AnsweredQuestionState {
@@ -485,14 +557,63 @@ const QuestionCard = ({
 
         {/* Main Question Content */}
         <div className="space-y-6"> 
-          {/* Question Text */}
-          <p className="text-base md:text-lg font-medium font-serif leading-relaxed text-gray-800">
-            <QuestionWithKeyTerms 
-              questionText={question.question} 
-              unit={question.unit} 
-              subject={question.subject}
-            />
-          </p>
+          {/* Parse and render markdown table if present */}
+          {(() => {
+            const { tableData: parsedTableData, textWithoutTable } = parseMarkdownTable(question.question);
+            const displayTableData = question.tableData || parsedTableData;
+            const displayQuestionText = parsedTableData ? textWithoutTable : question.question;
+            
+            return (
+              <>
+                {/* Question Text with markdown support */}
+                <div className="text-base md:text-lg font-medium font-serif leading-relaxed text-gray-800 prose prose-sm max-w-none">
+                  <ReactMarkdown
+                    components={{
+                      p: ({ children }) => <p className="mb-2">{children}</p>,
+                      strong: ({ children }) => <strong className="font-bold">{children}</strong>,
+                    }}
+                  >
+                    {displayQuestionText}
+                  </ReactMarkdown>
+                </div>
+                {/* Table Data from tableData property or parsed from markdown - shown below question text */}
+                {displayTableData && (
+                  <div className="my-6 flex justify-center">
+                    <div className="flex-1 overflow-x-auto">
+                      <table className="min-w-full border-collapse border border-black">
+                        <thead className="bg-white">
+                          <tr>
+                            {displayTableData.headers.map((header: string) => (
+                              <th key={header} className="border border-black px-4 py-3 text-center text-base font-bold text-gray-900">
+                                {header}
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white">
+                          {displayTableData.rows.map((row: string[], rowIndex: number) => (
+                            <tr key={rowIndex}>
+                              {row.map((cell: string, cellIndex: number) => {
+                                const isRowHeader = 'rowHeaders' in displayTableData && displayTableData.rowHeaders && cellIndex === 0;
+                                return (
+                                  <td 
+                                    key={cellIndex} 
+                                    className={`border border-black px-4 py-3 text-center text-base ${isRowHeader ? 'font-bold' : ''}`}
+                                  >
+                                    {cell}
+                                  </td>
+                                );
+                              })}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+              </>
+            );
+          })()}
 
         {/* --- ADDED: Question Image Display --- */}
         {question.image && (

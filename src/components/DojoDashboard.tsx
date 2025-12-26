@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, FileText, Target, ChevronRight, CheckCircle2, Clock, ClipboardList, BookOpen, ChevronDown, ChevronUp, Lock, Zap } from 'lucide-react';
+import { Play, FileText, Target, ChevronRight, CheckCircle2, Clock, ClipboardList, BookOpen, ChevronDown, ChevronUp, Lock, Zap, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
@@ -14,6 +14,9 @@ import { getBeltProgress } from '@/lib/beltSystem';
 import { loadDojoDrillProgress, getDrillProgress, DojoDrillProgress } from '@/lib/dojoDrillProgress';
 import { getSubjectXP } from '@/hooks/useUserProgress';
 import DojoThumbnail from '@/components/DojoThumbnail';
+import { collection, query, where, orderBy, limit, getDocs, getDoc, doc, collectionGroup } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { QuizHistoryEntry, restoreTableData } from '@/lib/quizHistory';
 
 // Container animation variants (LITE - very subtle)
 const containerVariants = {
@@ -62,6 +65,10 @@ export function DojoDashboard() {
   const [drillProgress, setDrillProgress] = useState<DojoDrillProgress | null>(null);
   const [loadingProgress, setLoadingProgress] = useState(true);
   const [isProgressExpanded, setIsProgressExpanded] = useState(false);
+  const [quizHistory, setQuizHistory] = useState<QuizHistoryEntry[]>([]);
+  const [loadingQuizHistory, setLoadingQuizHistory] = useState(true);
+  const [recentActivities, setRecentActivities] = useState<any[]>([]);
+  const [loadingActivities, setLoadingActivities] = useState(true);
 
   // Helper to check if user has access to a course
   const hasCourseAccess = useMemo(() => {
@@ -110,6 +117,193 @@ export function DojoDashboard() {
 
     fetchProgress();
   }, [user]);
+
+  // Load quiz history
+  useEffect(() => {
+    const fetchQuizHistory = async () => {
+      if (user) {
+        setLoadingQuizHistory(true);
+        try {
+          const q = query(
+            collection(db, 'userQuizHistory'),
+            where('userId', '==', user.uid),
+            orderBy('timestamp', 'desc'),
+            limit(10)
+          );
+          const querySnapshot = await getDocs(q);
+          const history: QuizHistoryEntry[] = [];
+          querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            // Restore tableData format if present
+            if (data.questions && Array.isArray(data.questions)) {
+              data.questions = data.questions.map((q: any) => {
+                if (q.tableData) {
+                  q.tableData = restoreTableData(q.tableData);
+                }
+                return q;
+              });
+            }
+            history.push({
+              id: doc.id,
+              ...data,
+            } as QuizHistoryEntry);
+          });
+          console.log('[DojoDashboard] Loaded quiz history:', history.length, 'entries');
+          setQuizHistory(history);
+        } catch (error: any) {
+          console.error('[DojoDashboard] Error loading quiz history:', error);
+          // If it's an index error, log it but don't break
+          if (error.code === 'failed-precondition') {
+            console.warn('[DojoDashboard] Firestore index may need to be created. Check console for index URL.');
+          }
+          setQuizHistory([]); // Set empty array on error
+        } finally {
+          setLoadingQuizHistory(false);
+        }
+      } else {
+        setLoadingQuizHistory(false);
+        setQuizHistory([]);
+      }
+    };
+
+    fetchQuizHistory();
+  }, [user]);
+
+  // Load recent activities from multiple sources
+  useEffect(() => {
+    const fetchRecentActivities = async () => {
+      if (user) {
+        setLoadingActivities(true);
+        try {
+          const activities: any[] = [];
+
+          // 1. Get quiz history (already have this, but need to format for activity feed)
+          if (quizHistory.length > 0) {
+            quizHistory.forEach(entry => {
+              if (entry.totalQuestions > 0) { // At least one question answered
+                activities.push({
+                  id: entry.id,
+                  type: entry.type === 'cheat-sheet' ? 'quiz' : entry.type === 'infinite-drill' ? 'drill' : 'custom-quiz',
+                  title: entry.title,
+                  timestamp: entry.timestamp,
+                  score: entry.score,
+                  correctCount: entry.correctCount,
+                  totalQuestions: entry.totalQuestions,
+                  source: 'quizHistory'
+                });
+              }
+            });
+          }
+
+          // 2. Get test progress (exams with at least one answer)
+          try {
+            const testProgressRef = doc(db, 'userTestProgress', user.uid);
+            const testProgressDoc = await getDoc(testProgressRef);
+            if (testProgressDoc.exists()) {
+              const testsRef = collection(testProgressRef, 'tests');
+              const testsSnapshot = await getDocs(testsRef);
+              testsSnapshot.forEach(testDoc => {
+                const testData = testDoc.data();
+                const progress = testData.progress;
+                if (progress && (
+                  (progress.answeredQuestions && Object.keys(progress.answeredQuestions).length > 0) ||
+                  (progress.textAnswers && Object.keys(progress.textAnswers).length > 0)
+                )) {
+                  const answeredCount = progress.answeredQuestions 
+                    ? Object.keys(progress.answeredQuestions).length 
+                    : (progress.textAnswers ? Object.keys(progress.textAnswers).length : 0);
+                  
+                  activities.push({
+                    id: testDoc.id,
+                    type: testData.testType === 'full_exam' ? 'full-exam' : testData.testType === 'unit_mcq' ? 'unit-exam' : 'frq-exam',
+                    title: testData.testType === 'full_exam' ? 'Full MCQ Exam' : 
+                           testData.testType === 'unit_mcq' ? `Unit ${testData.testId} MCQ Test` :
+                           'Full FRQ Exam',
+                    timestamp: progress.lastUpdated || progress.startedAt,
+                    answeredCount,
+                    totalQuestions: progress.totalQuestions,
+                    isSubmitted: progress.isSubmitted,
+                    score: progress.score,
+                    source: 'testProgress'
+                  });
+                }
+              });
+            }
+          } catch (error) {
+            console.error('[DojoDashboard] Error loading test progress:', error);
+          }
+
+          // 3. Get test results (completed exams)
+          try {
+            const testResultsRef = doc(db, 'userTestResults', user.uid);
+            const testResultsDoc = await getDoc(testResultsRef);
+            if (testResultsDoc.exists()) {
+              const resultsRef = collection(testResultsRef, 'results');
+              const resultsSnapshot = await getDocs(query(resultsRef, orderBy('completedAt', 'desc'), limit(10)));
+              resultsSnapshot.forEach(resultDoc => {
+                const resultData = resultDoc.data();
+                activities.push({
+                  id: resultDoc.id,
+                  type: resultData.testType === 'full_exam' ? 'full-exam' : resultData.testType === 'unit_mcq' ? 'unit-exam' : 'frq-exam',
+                  title: resultData.testType === 'full_exam' ? 'Full MCQ Exam' : 
+                         resultData.testType === 'unit_mcq' ? `Unit ${resultData.testId} MCQ Test` :
+                         'Full FRQ Exam',
+                  timestamp: resultData.completedAt,
+                  score: resultData.score,
+                  totalQuestions: resultData.totalQuestions,
+                  source: 'testResults'
+                });
+              });
+            }
+          } catch (error) {
+            console.error('[DojoDashboard] Error loading test results:', error);
+          }
+
+          // 4. Get dojo drill progress (drills with at least one stage completed)
+          if (drillProgress) {
+            Object.entries(drillProgress).forEach(([drillId, progress]) => {
+              if (progress.stage1 || progress.stage2 || progress.stage3) {
+                const drill = Object.values(dojoDrills).find(d => d.id === drillId);
+                if (drill) {
+                  activities.push({
+                    id: `drill-${drillId}`,
+                    type: 'dojo-drill',
+                    title: drill.title,
+                    timestamp: (progress as any).lastUpdated,
+                    unit: drill.unit,
+                    stagesCompleted: [progress.stage1, progress.stage2, progress.stage3].filter(Boolean).length,
+                    source: 'drillProgress'
+                  });
+                }
+              }
+            });
+          }
+
+          // Sort by timestamp (most recent first) and limit to 10
+          activities.sort((a, b) => {
+            const timeA = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : (a.timestamp ? new Date(a.timestamp).getTime() : 0);
+            const timeB = b.timestamp?.toDate ? b.timestamp.toDate().getTime() : (b.timestamp ? new Date(b.timestamp).getTime() : 0);
+            return timeB - timeA;
+          });
+
+          setRecentActivities(activities.slice(0, 10));
+        } catch (error) {
+          console.error('[DojoDashboard] Error loading recent activities:', error);
+          setRecentActivities([]);
+        } finally {
+          setLoadingActivities(false);
+        }
+      } else {
+        setLoadingActivities(false);
+        setRecentActivities([]);
+      }
+    };
+
+    // Only fetch activities if we have quiz history and drill progress loaded
+    if (!loadingQuizHistory && !loadingProgress) {
+      fetchRecentActivities();
+    }
+  }, [user, quizHistory, drillProgress, loadingQuizHistory, loadingProgress]);
 
   // Filter dojo drills by course
   const filteredDrills = Object.values(dojoDrills).filter(
@@ -492,6 +686,130 @@ export function DojoDashboard() {
             </div>
           </motion.section>
 
+          {/* Recent Activity Row */}
+          {!loadingActivities && recentActivities.length > 0 && (
+            <section style={{ opacity: 1, visibility: 'visible', position: 'relative', zIndex: 10 }}>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">Recent Activity</h2>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {recentActivities.map((activity) => {
+                  // Determine thumbnail type and icon
+                  let thumbnailType: 'micro' | 'macro' | 'drill' | 'exam' | 'resource' = 'exam';
+                  let Icon = FileText;
+                  let href = '#';
+                  
+                  if (activity.type === 'dojo-drill') {
+                    thumbnailType = 'drill';
+                    Icon = Zap;
+                    href = `/dojo-drills#${activity.id.replace('drill-', '')}`;
+                  } else if (activity.type === 'quiz' || activity.type === 'custom-quiz') {
+                    thumbnailType = currentCourse === 'macro' ? 'macro' : 'micro';
+                    Icon = Zap;
+                    href = `/dashboard/history/${activity.id}`;
+                  } else if (activity.type === 'full-exam') {
+                    thumbnailType = 'exam';
+                    Icon = ClipboardList;
+                    href = '/full-mcq-exam';
+                  } else if (activity.type === 'unit-exam') {
+                    thumbnailType = 'exam';
+                    Icon = BookOpen;
+                    const unitMatch = activity.title.match(/Unit (\d+)/);
+                    href = unitMatch ? `/unit-mcq-test/${unitMatch[1]}` : '#';
+                  } else if (activity.type === 'frq-exam') {
+                    thumbnailType = 'exam';
+                    Icon = FileText;
+                    href = '/full-frq-exam';
+                  }
+
+                  const unitMatch = activity.title.match(/Unit (\d+)/i);
+                  const unitNumber = unitMatch ? unitMatch[1] : undefined;
+
+                  return (
+                    <motion.div
+                      key={activity.id}
+                      variants={cardHoverVariants}
+                      initial="rest"
+                      whileHover="hover"
+                      className="group"
+                      style={{ opacity: 1, visibility: 'visible' }}
+                    >
+                      <Link href={href}>
+                        <motion.div
+                          variants={cardHoverVariants}
+                          initial="rest"
+                          whileHover="hover"
+                          className={`bg-white rounded-xl p-5 cursor-pointer border border-gray-200 ${theme.hoverBorder} transition-all flex flex-col h-full relative`}
+                          style={{ 
+                            backgroundColor: '#ffffff',
+                            opacity: 1,
+                            visibility: 'visible',
+                            zIndex: 1
+                          }}
+                        >
+                          {/* Thumbnail */}
+                          <div className="mb-4 -mx-5 -mt-5 flex-shrink-0 relative">
+                            <DojoThumbnail
+                              type={thumbnailType}
+                              title={activity.title}
+                              icon={Icon}
+                              unitNumber={unitNumber}
+                              className="rounded-t-xl"
+                            />
+                            {/* Score/Progress Overlay */}
+                            {activity.score !== undefined && (
+                              <div className="absolute bottom-4 right-4 bg-black/80 text-white px-3 py-1.5 rounded-lg font-bold text-lg shadow-lg z-30">
+                                {activity.score}%
+                              </div>
+                            )}
+                            {activity.stagesCompleted && (
+                              <div className="absolute bottom-4 right-4 bg-black/80 text-white px-3 py-1.5 rounded-lg font-bold text-sm shadow-lg z-30">
+                                {activity.stagesCompleted}/3 stages
+                              </div>
+                            )}
+                            {activity.answeredCount && !activity.isSubmitted && (
+                              <div className="absolute bottom-4 right-4 bg-blue-600/80 text-white px-3 py-1.5 rounded-lg font-bold text-sm shadow-lg z-30">
+                                {activity.answeredCount}/{activity.totalQuestions}
+                              </div>
+                            )}
+                          </div>
+                          {/* Title - Fixed height for 2 lines */}
+                          <h3 className="font-semibold text-base line-clamp-2 mb-2 min-h-[3rem] flex items-start" style={{ color: '#111827' }}>
+                            {activity.title}
+                          </h3>
+                          {/* Meta */}
+                          <div className="mt-auto space-y-1">
+                            {activity.score !== undefined && (
+                              <p className="text-sm" style={{ color: '#6B7280' }}>
+                                {activity.correctCount || activity.score}% correct
+                              </p>
+                            )}
+                            {activity.answeredCount && !activity.isSubmitted && (
+                              <p className="text-sm" style={{ color: '#6B7280' }}>
+                                {activity.answeredCount} of {activity.totalQuestions} answered
+                              </p>
+                            )}
+                            {activity.stagesCompleted && (
+                              <p className="text-sm" style={{ color: '#6B7280' }}>
+                                {activity.stagesCompleted} of 3 stages completed
+                              </p>
+                            )}
+                            {activity.timestamp && (
+                              <p className="text-xs" style={{ color: '#9CA3AF' }}>
+                                {activity.timestamp.toDate ? new Date(activity.timestamp.toDate()).toLocaleDateString() : 
+                                 activity.timestamp ? new Date(activity.timestamp).toLocaleDateString() : 'Recently'}
+                              </p>
+                            )}
+                          </div>
+                        </motion.div>
+                      </Link>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
           {/* Dojo Drills Row */}
           {displayedDrills.length > 0 && (
             <motion.section variants={itemVariants}>
@@ -526,17 +844,11 @@ export function DojoDashboard() {
                           className={`bg-white rounded-xl p-5 cursor-pointer relative border border-gray-200 ${theme.hoverBorder} transition-all flex flex-col h-full`}
                         >
                           {/* Progress Badge */}
-                          {(isCompleted || inProgress) && (
+                          {isCompleted && (
                             <div className="absolute top-3 right-3 z-10">
-                              {isCompleted ? (
-                                <div className="bg-green-500 rounded-full p-1.5">
-                                  <CheckCircle2 className="w-4 h-4 text-white" />
-                                </div>
-                              ) : (
-                                <div className="bg-blue-500 rounded-full p-1.5">
-                                  <Clock className="w-4 h-4 text-white" />
-                                </div>
-                              )}
+                              <div className="bg-green-500 rounded-full p-1.5">
+                                <CheckCircle2 className="w-4 h-4 text-white" />
+                              </div>
                             </div>
                           )}
                           {/* Thumbnail */}
@@ -745,6 +1057,99 @@ export function DojoDashboard() {
                 ))}
               </div>
             </motion.section>
+          )}
+
+          {/* Custom Quiz Results Row */}
+          {!loadingQuizHistory && quizHistory.length > 0 && (
+            <section style={{ opacity: 1, visibility: 'visible', position: 'relative', zIndex: 10 }}>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">Custom Quiz Results</h2>
+                <Link
+                  href="/dashboard/history"
+                  className="text-sm font-medium text-gray-600 hover:text-gray-900 flex items-center gap-1 transition-colors"
+                >
+                  See all
+                  <ChevronRight className="w-4 h-4" />
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {quizHistory.map((entry) => {
+                  // Map quiz type to DojoThumbnail type
+                  const thumbnailType = entry.type === 'cheat-sheet' 
+                    ? (currentCourse === 'macro' ? 'macro' : 'micro')
+                    : entry.type === 'infinite-drill'
+                    ? 'drill'
+                    : 'exam';
+                  
+                  // Get icon based on type
+                  const Icon = entry.type === 'cheat-sheet' 
+                    ? Zap 
+                    : entry.type === 'infinite-drill'
+                    ? Sparkles
+                    : FileText;
+
+                  // Extract unit number from title if available
+                  const unitMatch = entry.title.match(/Unit (\d+)/i);
+                  const unitNumber = unitMatch ? unitMatch[1] : undefined;
+
+                  return (
+                    <motion.div
+                      key={entry.id}
+                      variants={cardHoverVariants}
+                      initial="rest"
+                      whileHover="hover"
+                      className="group"
+                      style={{ opacity: 1, visibility: 'visible' }}
+                    >
+                      <Link href={`/dashboard/history/${entry.id}`}>
+                        <motion.div
+                          variants={cardHoverVariants}
+                          initial="rest"
+                          whileHover="hover"
+                          className={`bg-white rounded-xl p-5 cursor-pointer border border-gray-200 ${theme.hoverBorder} transition-all flex flex-col h-full relative`}
+                          style={{ 
+                            backgroundColor: '#ffffff',
+                            opacity: 1,
+                            visibility: 'visible',
+                            zIndex: 1
+                          }}
+                        >
+                          {/* Thumbnail */}
+                          <div className="mb-4 -mx-5 -mt-5 flex-shrink-0 relative">
+                            <DojoThumbnail
+                              type={thumbnailType}
+                              title={entry.title}
+                              icon={Icon}
+                              unitNumber={unitNumber}
+                              className="rounded-t-xl"
+                            />
+                            {/* Score Overlay */}
+                            <div className="absolute bottom-4 right-4 bg-black/80 text-white px-3 py-1.5 rounded-lg font-bold text-lg shadow-lg z-30">
+                              {entry.score}%
+                            </div>
+                          </div>
+                          {/* Title - Fixed height for 2 lines */}
+                          <h3 className="font-semibold text-base line-clamp-2 mb-2 min-h-[3rem] flex items-start" style={{ color: '#111827' }}>
+                            {entry.title}
+                          </h3>
+                          {/* Meta */}
+                          <div className="mt-auto space-y-1">
+                            <p className="text-sm" style={{ color: '#6B7280' }}>
+                              {entry.correctCount} / {entry.totalQuestions} correct
+                            </p>
+                            {entry.timestamp && (
+                              <p className="text-xs" style={{ color: '#9CA3AF' }}>
+                                {entry.timestamp.toDate ? new Date(entry.timestamp.toDate()).toLocaleDateString() : 'Recently'}
+                              </p>
+                            )}
+                          </div>
+                        </motion.div>
+                      </Link>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </section>
           )}
 
           </motion.div>

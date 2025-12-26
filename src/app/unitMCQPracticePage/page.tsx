@@ -198,6 +198,7 @@ function UnitMCQPracticeContent() {
   const [showPracticeTestBanner, setShowPracticeTestBanner] = useState(false);
   const [practiceBannerDismissed, setPracticeBannerDismissed] = useState(false);
   const [questionsAnsweredSinceBannerShown, setQuestionsAnsweredSinceBannerShown] = useState(0);
+  const [showAllQuestions, setShowAllQuestions] = useState(false); // Bypass filter to show all questions
   const purchasedTests = (userData?.purchasedTests || []) as string[];
 
   // Developer tool: Test specific question by ID
@@ -225,6 +226,12 @@ function UnitMCQPracticeContent() {
   useEffect(() => {
     // Skip normal loading if we're in test mode (testQuestionId is set)
     if (isDeveloper && testQuestionId) {
+      return;
+    }
+
+    // Wait for MCQ data to load if user is logged in (to avoid filtering issues)
+    if (user && loadingMcqData) {
+      setIsLoadingQuestionSet(true);
       return;
     }
 
@@ -264,6 +271,23 @@ function UnitMCQPracticeContent() {
       );
     }
 
+    // Filter out correctly answered questions (unless showAllQuestions is true)
+    // Only filter if user is logged in and data is loaded (or user is not logged in)
+    if (!showAllQuestions && (!user || (user && mcqAnswersData && !loadingMcqData))) {
+      if (user && mcqAnswersData) {
+        // Create a set of question IDs that have been answered correctly
+        const correctlyAnsweredQuestionIds = new Set<number>();
+        mcqAnswersData.forEach((answer: McqAnswer) => {
+          if (answer.isCorrect && typeof answer.questionId === 'number') {
+            correctlyAnsweredQuestionIds.add(answer.questionId);
+          }
+        });
+
+        // Filter out questions that have been answered correctly
+        questions = questions.filter(q => !correctlyAnsweredQuestionIds.has(q.id));
+      }
+    }
+
     // Shuffle questions
     const shuffled = shuffleArray(questions);
     setQuestionsForPractice(shuffled);
@@ -286,7 +310,7 @@ function UnitMCQPracticeContent() {
     }
 
     setIsLoadingQuestionSet(false);
-  }, [practiceMode, currentUnit, customUnitIds, weakestUnitIds, lessonIdParam, subject, testQuestionId, isDeveloper]);
+  }, [practiceMode, currentUnit, customUnitIds, weakestUnitIds, lessonIdParam, subject, testQuestionId, isDeveloper, showAllQuestions, user, mcqAnswersData, loadingMcqData]);
 
   // Access control check
   useEffect(() => {
@@ -506,6 +530,43 @@ function UnitMCQPracticeContent() {
           {isLoadingQuestionSet ? (
             <div className="flex items-center justify-center min-h-[400px]">
               <Loader2 className={`h-12 w-12 animate-spin ${subject === 'macro' ? 'text-blue-500' : 'text-green-500'}`} />
+            </div>
+          ) : questionsForPractice.length === 0 && !showAllQuestions && practiceMode === 'singleUnit' ? (
+            // Congratulations panel - user has mastered the unit
+            <div className="max-w-2xl mx-auto">
+              <div className="bg-white rounded-xl shadow-lg border-2 border-gray-200 p-8 md:p-12 text-center">
+                <div className="mb-6">
+                  <div className={`inline-flex items-center justify-center w-20 h-20 rounded-full ${subject === 'macro' ? 'bg-blue-100' : 'bg-green-100'} mb-4`}>
+                    <span className="text-4xl">🎉</span>
+                  </div>
+                  <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+                    Congratulations!
+                  </h2>
+                  <p className="text-xl md:text-2xl text-gray-700">
+                    You have mastered {currentUnitName}
+                  </p>
+                </div>
+                <div className="space-y-4 mt-8">
+                  <Link href={`/select-practice-units?subject=${subject}`} className="block">
+                    <Button 
+                      size="lg" 
+                      className={`w-full ${subject === 'macro' ? 'bg-blue-500 hover:bg-blue-600' : 'bg-green-500 hover:bg-green-600'} text-white font-semibold text-lg py-6`}
+                    >
+                      Practice another unit
+                    </Button>
+                  </Link>
+                  <Button 
+                    size="lg" 
+                    variant="outline"
+                    onClick={() => {
+                      setShowAllQuestions(true);
+                    }}
+                    className={`w-full border-2 ${subject === 'macro' ? 'border-blue-500 text-blue-600 hover:bg-blue-50' : 'border-green-500 text-green-600 hover:bg-green-50'} font-semibold text-lg py-6`}
+                  >
+                    Keep Practicing {currentUnitName}
+                  </Button>
+                </div>
+              </div>
             </div>
           ) : questionsForPractice.length === 0 ? (
             <div className="text-center py-12">

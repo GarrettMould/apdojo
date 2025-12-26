@@ -121,12 +121,6 @@ function Header() {
               >
                 Create a Quiz
               </Link>
-              <Link
-                href="/preview/micro/mcq/1"
-                className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
-              >
-                Micro MCQ Exam
-              </Link>
 
               {/* Tutoring Dropdown - HIDDEN */}
               {/* <div 
@@ -295,13 +289,6 @@ function Header() {
                 className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
               >
                 Create a Quiz
-              </Link>
-              <Link
-                href="/preview/micro/mcq/1"
-                onClick={closeMobileMenu}
-                className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
-              >
-                Micro MCQ Exam
               </Link>
 
                 {/* Tutoring Dropdown (Mobile) - HIDDEN */}

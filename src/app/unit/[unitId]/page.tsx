@@ -18,10 +18,11 @@ import { videos, Video } from '@/data/videos';
 import { getVideosForLessonId } from '@/data/videosByLessonId';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question as QuestionType } from '@/data/questionBanks/types';
-import { X, ArrowRight, Lock, ArrowLeft, CheckCircle2, XCircle, Download, Bookmark, BookmarkPlus, Check, Brain, Maximize2, Play } from 'lucide-react';
+import { X, ArrowRight, Lock, ArrowLeft, CheckCircle2, XCircle, Download, Bookmark, BookmarkPlus, Check, Brain, Maximize2, Play, FileText, Zap } from 'lucide-react';
 import { dojoIcon } from '@/data/imagePaths';
 import { motion, AnimatePresence } from 'framer-motion';
 import { dojoDrills } from '@/data/dojoDrills';
+import { saveQuizResult } from '@/lib/quizHistory';
 
 // Helper to combine and structure whiteboard data
 const getUnitWhiteboards = (unitNumber: number): WhiteboardImage[] => {
@@ -434,7 +435,7 @@ function formatSubNote(note: string): React.ReactNode {
 export default function UnitPage() {
   const params = useParams();
   const router = useRouter(); // Initialize useRouter
-  const { user, userData, selectedSubject } = useAuthContext(); // Correctly destructure userData and selectedSubject
+  const { user, userData, selectedSubject, awardXp } = useAuthContext(); // Correctly destructure userData and selectedSubject
   
   const [activeUnit, setActiveUnit] = useState((params.unitId as string) || '1');
   const [selectedWhiteboard, setSelectedWhiteboard] = useState<WhiteboardImage | null>(null);
@@ -445,13 +446,17 @@ export default function UnitPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [visibleWhiteboardsCount, setVisibleWhiteboardsCount] = useState<Record<string, number>>({});
   const [selectedTerms, setSelectedTerms] = useState<Set<string>>(new Set());
-  const [showQuizModal, setShowQuizModal] = useState(false);
+  const [showQuizPanel, setShowQuizPanel] = useState(false);
   const [quizQuestion, setQuizQuestion] = useState<QuestionType | null>(null);
   const [availableQuizQuestions, setAvailableQuizQuestions] = useState<QuestionType[]>([]);
   const [originalQuizQuestions, setOriginalQuizQuestions] = useState<QuestionType[]>([]); // Track original questions for dots
   const [answeredQuizQuestions, setAnsweredQuizQuestions] = useState<Set<number>>(new Set());
   const [selectedQuizAnswer, setSelectedQuizAnswer] = useState<string | null>(null);
+  const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>({}); // Track answers per question
   const [isAnimatingOut, setIsAnimatingOut] = useState(false);
+  const [leftPanelWidth, setLeftPanelWidth] = useState(65); // Percentage width for left panel
+  const [isResizing, setIsResizing] = useState(false);
+  const containerRef = React.useRef<HTMLDivElement>(null);
   const [showImageSlides, setShowImageSlides] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showFullscreen, setShowFullscreen] = useState(false);
@@ -919,19 +924,31 @@ export default function UnitPage() {
       console.log(`Generated ${data.questions?.length || 0} questions (expected 3-5)`);
 
       // Convert generated questions to QuestionType format
-      const convertedQuestions: QuestionType[] = data.questions.map((q: any, index: number) => ({
-        id: parseInt(q.id?.replace(/\D/g, '') || `${Date.now()}${index}`, 10),
-        unit: activeUnitNum,
-        subject: subjectFilter,
-        unitName: unitsToDisplay.find(u => u.number === activeUnitNum)?.title || '',
-        question: q.question,
-        image: null,
-        options: q.options,
-        correctAnswer: q.correctAnswer,
-        explanation: q.explanation,
-        lessonIDS: selectedTermObjects[0]?.lessonIDs || selectedWhiteboardObjects[0]?.lessonIDs || [],
-        tableData: q.tableData || undefined
-      }));
+      const convertedQuestions: QuestionType[] = data.questions.map((q: any, index: number) => {
+        // Debug: Log tableData if present
+        if (q.tableData) {
+          console.log(`[Quiz] Question ${index + 1} has tableData:`, q.tableData);
+        }
+        const question: QuestionType = {
+          id: parseInt(q.id?.replace(/\D/g, '') || `${Date.now()}${index}`, 10),
+          unit: activeUnitNum,
+          subject: subjectFilter,
+          unitName: unitsToDisplay.find(u => u.number === activeUnitNum)?.title || '',
+          question: q.question || '',
+          image: null,
+          options: q.options || [],
+          correctAnswer: q.correctAnswer || '',
+          explanation: q.explanation || null,
+          lessonIDS: selectedTermObjects[0]?.lessonIDs || selectedWhiteboardObjects[0]?.lessonIDs || [],
+        };
+        
+        // Only add tableData if it exists
+        if (q.tableData) {
+          question.tableData = q.tableData;
+        }
+        
+        return question;
+      });
 
       if (convertedQuestions.length === 0) {
         throw new Error('No questions were generated');
@@ -942,9 +959,15 @@ export default function UnitPage() {
       setOriginalQuizQuestions(convertedQuestions);
       setQuizQuestion(convertedQuestions[0]);
       setSelectedQuizAnswer(null);
+      setQuizAnswers({}); // Reset all answers
       setIsAnimatingOut(false);
-      setShowQuizModal(true);
+      setShowQuizPanel(true);
+      setLeftPanelWidth(65); // Reset to default width
       setAnsweredQuizQuestions(new Set()); // Reset answered questions for new quiz
+      
+      // Clear selections immediately
+      setSelectedTerms(new Set());
+      setSelectedWhiteboards(new Set());
 
     } catch (error: any) {
       console.error('Error generating quiz:', error);
@@ -954,41 +977,105 @@ export default function UnitPage() {
     }
   };
 
-  const handleQuizAnswerSelect = (answerLetter: string) => {
-    if (selectedQuizAnswer) return;
-    setSelectedQuizAnswer(answerLetter);
-    setIsAnimatingOut(true);
-  };
-
-  const handleQuizSubmit = () => {
-    if (quizQuestion && selectedQuizAnswer) {
-      // Mark question as answered
-      setAnsweredQuizQuestions(prev => new Set(prev).add(quizQuestion.id));
-      
-      // Find the current question index in available questions
-      const currentIndex = availableQuizQuestions.findIndex(q => q.id === quizQuestion.id);
-      
-      // If there are more questions, show the next one
-      if (currentIndex >= 0 && currentIndex < availableQuizQuestions.length - 1) {
-        // Show the next question in sequence
-        const nextQuestion = availableQuizQuestions[currentIndex + 1];
-        setQuizQuestion(nextQuestion);
-        setSelectedQuizAnswer(null);
-        setIsAnimatingOut(false);
-      } else {
-        // No more questions, close modal
-        setShowQuizModal(false);
-        setQuizQuestion(null);
-        setSelectedQuizAnswer(null);
-        setIsAnimatingOut(false);
-        setOriginalQuizQuestions([]); // Reset when quiz is done
+  const handleQuizAnswerSelect = async (questionId: number, answerLetter: string) => {
+    // Don't allow changing answer if already answered
+    if (quizAnswers[questionId]) return;
+    
+    // Find the question to check if answer is correct
+    const question = originalQuizQuestions.find(q => q.id === questionId);
+    if (!question) return;
+    
+    const isCorrect = answerLetter === question.correctAnswer;
+    
+    setQuizAnswers(prev => ({
+      ...prev,
+      [questionId]: answerLetter
+    }));
+    
+    // Mark question as answered
+    setAnsweredQuizQuestions(prev => new Set(prev).add(questionId));
+    
+    // Award XP for correct answers (100 XP per correct question)
+    if (isCorrect && awardXp) {
+      try {
+        await awardXp(100, selectedSubject);
+        console.log(`[Quiz Me] Awarded 100 XP for correct answer to question ${questionId}`);
+      } catch (error) {
+        console.error('[Quiz Me] Error awarding XP:', error);
       }
     }
   };
 
-  // Lock body scroll when modal is open
+  const handleCloseQuizPanel = async () => {
+    // Save quiz history if user has answered at least one question
+    if (user && originalQuizQuestions.length > 0 && Object.keys(quizAnswers).length > 0) {
+      try {
+        const correctCount = originalQuizQuestions.filter(q => quizAnswers[q.id] === q.correctAnswer).length;
+        const totalQuestions = originalQuizQuestions.length;
+        const score = Math.round((correctCount / totalQuestions) * 100);
+        
+        const unitsToDisplay = selectedSubject === 'macro' ? allMacroUnits : allMicroUnits;
+        const currentUnit = unitsToDisplay.find(u => u.number === activeUnitNum);
+        const title = `Unit ${activeUnitNum} Cheat Sheet Quiz${currentUnit ? `: ${currentUnit.title}` : ''}`;
+
+        await saveQuizResult({
+          userId: user.uid,
+          type: 'cheat-sheet',
+          title,
+          score,
+          correctCount,
+          totalQuestions,
+          questions: originalQuizQuestions,
+          userAnswers: quizAnswers,
+        });
+        console.log('[Quiz Me] Saved quiz history');
+      } catch (error) {
+        console.error('[Quiz Me] Error saving quiz history:', error);
+      }
+    }
+
+    setShowQuizPanel(false);
+    setIsAnimatingOut(false);
+    setQuizError(null);
+    setIsGeneratingQuiz(false);
+  };
+
+  // Handle resizing the divider
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
+  };
+
   useEffect(() => {
-    if (showQuizModal) {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isResizing || !containerRef.current) return;
+      
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const newLeftWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100;
+      
+      // Constrain between 30% and 80%
+      const constrainedWidth = Math.max(30, Math.min(80, newLeftWidth));
+      setLeftPanelWidth(constrainedWidth);
+    };
+
+    const handleMouseUp = () => {
+      setIsResizing(false);
+    };
+
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizing]);
+
+  // Lock body scroll when panel is open
+  useEffect(() => {
+    if (showQuizPanel) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'auto';
@@ -997,7 +1084,7 @@ export default function UnitPage() {
     return () => {
       document.body.style.overflow = 'auto';
     };
-  }, [showQuizModal]);
+  }, [showQuizPanel]);
 
   const unitsToDisplay = selectedSubject === 'macro' ? allMacroUnits : allMicroUnits;
   const pageTitleSubject = selectedSubject === 'macro' ? 'Macroeconomics' : 'Microeconomics';
@@ -1102,7 +1189,20 @@ export default function UnitPage() {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
         />
       </Head>
-      <div className="max-w-7xl mx-auto px-4 py-12 mt-12">
+      <div ref={containerRef} className="flex h-[calc(100vh-4rem)] overflow-hidden">
+        {/* Left Side - Cheat Sheet Content */}
+        <motion.div
+          animate={{
+            width: showQuizPanel ? `${leftPanelWidth}%` : '100%',
+          }}
+          transition={{
+            type: 'spring',
+            stiffness: 300,
+            damping: 30,
+          }}
+          className="flex-shrink-0 overflow-y-auto min-w-0"
+        >
+          <div className="max-w-7xl mx-auto px-4 py-12 mt-12">
         {/* Page Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight">
@@ -1306,7 +1406,7 @@ export default function UnitPage() {
                 return (
                   <div className="mb-6">
                     <h3 className="text-lg font-semibold text-gray-700 mb-3">Videos</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="flex gap-4 overflow-x-auto pb-2">
                       {relevantVideos.map((video) => (
                         <button
                           key={video.id}
@@ -1316,37 +1416,52 @@ export default function UnitPage() {
                             // Reset answers when opening a new video
                             setVideoQuestionAnswers({});
                           }}
-                          className="group bg-white border-2 border-gray-200 rounded-lg overflow-hidden hover:border-blue-500 hover:shadow-lg transition-all duration-200 text-left"
+                          className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4 text-left hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 flex-shrink-0 w-[45%] md:flex-1 md:min-w-[240px] md:max-w-[320px] flex flex-col group aspect-[5/6] md:aspect-auto"
                         >
-                          <div className="relative aspect-video bg-gray-100">
-                            {video.thumbnail ? (
+                          {/* Thumbnail Image */}
+                          {video.thumbnail && (
+                            <div className="relative w-full aspect-video mb-3 rounded-lg overflow-hidden bg-gray-100">
                               <Image
                                 src={video.thumbnail}
                                 alt={video.title}
                                 fill
                                 className="object-cover group-hover:scale-105 transition-transform duration-200"
-                                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                sizes="(max-width: 640px) 45vw, (max-width: 1024px) 33vw, 320px"
                               />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200">
-                                <Play className="w-12 h-12 text-blue-600" />
-                              </div>
-                            )}
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200 flex items-center justify-center">
-                              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/90 rounded-full p-3">
-                                <Play className="w-6 h-6 text-blue-600 fill-blue-600" />
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200 flex items-center justify-center">
+                                <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/90 rounded-full p-2">
+                                  <Play className="w-5 h-5 text-blue-600 fill-blue-600" />
+                                </div>
                               </div>
                             </div>
-                          </div>
-                          <div className="p-4">
-                            <h4 className="font-semibold text-gray-900 mb-1 line-clamp-2 group-hover:text-blue-600 transition-colors">
-                              {video.title}
-                            </h4>
-                            {video.description && (
-                              <p className="text-sm text-gray-600 line-clamp-2">
-                                {video.description}
-                              </p>
+                          )}
+                          <div className="flex items-center justify-between mb-2">
+                            <div
+                              className={`inline-block text-xs font-semibold px-2 py-1 rounded ${
+                                subjectFilter === 'AP Macroeconomics'
+                                  ? 'bg-blue-100 text-blue-800'
+                                  : 'bg-green-100 text-green-800'
+                              }`}
+                            >
+                              Video
+                            </div>
+                            {video.questions && video.questions.length > 0 && (
+                              <div className="flex items-center gap-1 text-sm font-semibold text-gray-800">
+                                <span>{video.questions.length}</span>
+                                <span className="text-xs text-gray-600">questions</span>
+                              </div>
                             )}
+                          </div>
+                          <h3 className="text-base font-bold text-gray-900 mb-1.5 line-clamp-2 group-hover:text-blue-600 transition-colors flex-1">
+                            {video.title}
+                          </h3>
+                          {video.description && (
+                            <p className="hidden md:block text-xs text-gray-600 line-clamp-2 mb-2">
+                              {video.description}
+                            </p>
+                          )}
+                          <div className="text-xs font-semibold text-blue-600 mt-auto flex items-center gap-1">
+                            Watch →
                           </div>
                         </button>
                       ))}
@@ -1568,6 +1683,456 @@ export default function UnitPage() {
             </div>
           );
         })()}
+          </div>
+        </motion.div>
+
+        {/* Resizable Divider */}
+        {showQuizPanel && (
+          <div
+            onMouseDown={handleMouseDown}
+            className={`hidden md:flex items-center justify-center w-2 bg-black cursor-col-resize hover:bg-gray-800 hover:w-3 transition-all flex-shrink-0 z-10 relative group ${
+              isResizing ? 'bg-gray-800 w-3' : ''
+            }`}
+            style={{ cursor: 'col-resize' }}
+          >
+            <div className="w-1 h-12 bg-gray-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+          </div>
+        )}
+
+        {/* Right Side - Quiz Panel */}
+        <AnimatePresence>
+          {showQuizPanel && (
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{
+                type: 'spring',
+                stiffness: 300,
+                damping: 30,
+              }}
+              className="hidden md:block border-l-4 border-black bg-white shadow-[-10px_0px_20px_rgba(0,0,0,0.1)] h-full overflow-y-auto flex-shrink-0 relative"
+              style={{ width: `${100 - leftPanelWidth}%` }}
+            >
+              {/* Close Button */}
+              <button
+                onClick={handleCloseQuizPanel}
+                className="absolute top-4 right-4 text-gray-400 hover:text-gray-900 transition-colors z-10 bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-sm hover:shadow-md"
+                aria-label="Close Quiz"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="p-6 md:p-8">
+                {/* Header */}
+                <div className="border-b border-gray-200 mb-6 pb-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h1 className="text-xl font-bold text-gray-900">Quiz Me!</h1>
+                      <p className="text-sm text-gray-600">
+                        {isGeneratingQuiz ? 'Generating your custom quiz...' : quizError ? 'Error generating quiz' : 'A quick question to test your knowledge.'}
+                      </p>
+                    </div>
+                    {originalQuizQuestions.length > 0 && (
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <FileText className="w-4 h-4" />
+                        <span>{originalQuizQuestions.length} Question{originalQuizQuestions.length !== 1 ? 's' : ''}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                {isGeneratingQuiz ? (
+                  <div className="flex flex-col items-center justify-center py-12 space-y-4">
+                    <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                    <p className="text-gray-600 font-medium">Creating your personalized quiz...</p>
+                  </div>
+                ) : quizError ? (
+                  <div className="space-y-4">
+                    <div className="bg-red-50 border-2 border-red-200 rounded-lg p-6">
+                      <p className="text-red-800 font-medium">{quizError}</p>
+                    </div>
+                    <button
+                      onClick={handleCloseQuizPanel}
+                      className="w-full px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg transition-colors"
+                    >
+                      Close
+                    </button>
+                  </div>
+                ) : originalQuizQuestions.length > 0 ? (
+                  <div className="space-y-8">
+                    {originalQuizQuestions.map((question, questionIndex) => {
+                      const selectedAnswer = quizAnswers[question.id] || null;
+                      const showResult = selectedAnswer !== null;
+                      const isCorrect = selectedAnswer === question.correctAnswer;
+
+                      return (
+                        <div key={question.id} id={`question-${question.id}`} className="bg-white rounded-lg pb-6 border-b border-gray-200 last:border-b-0">
+                          {/* Question Content */}
+                          <div className="space-y-6">
+                            {/* Question Text */}
+                            <div className="flex items-start gap-3">
+                              <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 bg-slate-100 border border-slate-200 rounded-lg">
+                                <span className="text-lg font-bold text-slate-700">{questionIndex + 1}</span>
+                              </div>
+                              <p className="flex-1 text-base md:text-lg font-medium font-serif leading-relaxed text-gray-800">
+                                {question.question}
+                              </p>
+                            </div>
+
+                            {/* Question Image */}
+                            {question.image && (
+                              <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4 flex justify-center">
+                                <img
+                                  src={typeof question.image === 'string' ? question.image : (question.image as any).src} 
+                                  alt="Question related image" 
+                                  className="w-full max-w-2xl h-auto object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
+                                />
+                              </div>
+                            )}
+
+                            {/* Table Data */}
+                            {question.tableData && (
+                              <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
+                                <div className="flex items-center gap-4">
+                                  {question.tableData.playerNames && (
+                                    <div className="flex items-center justify-center h-full w-16">
+                                      <p className="transform -rotate-90 whitespace-nowrap text-center font-bold text-lg text-gray-900 leading-tight">
+                                        {question.tableData.playerNames.row.split(' ')[0]}
+                                        <br />
+                                        {question.tableData.playerNames.row.split(' ').slice(1).join(' ')}
+                                      </p>
+                                    </div>
+                                  )}
+                                  <div className="flex-1">
+                                    {question.tableData.playerNames && (
+                                      <p className="text-center font-bold text-lg text-gray-900 mb-2">
+                                        {question.tableData.playerNames.column}
+                                      </p>
+                                    )}
+                                    <table className="min-w-full border-collapse border border-black">
+                                      <thead className="bg-white">
+                                        <tr>
+                                          {question.tableData.headers.map((header: string) => (
+                                            <th key={header} className="border border-black px-4 py-3 text-center text-base font-bold text-gray-900">
+                                              {header}
+                                            </th>
+                                          ))}
+                                        </tr>
+                                      </thead>
+                                      <tbody className="bg-white">
+                                        {question.tableData.rows.map((row: string[], rowIndex: number) => (
+                                          <tr key={rowIndex}>
+                                            {row.map((cell: string, cellIndex: number) => {
+                                              const isRowHeader = question.tableData?.rowHeaders && cellIndex === 0;
+                                              return (
+                                                <td 
+                                                  key={cellIndex} 
+                                                  className={`border border-black px-4 py-3 text-center text-base ${isRowHeader ? 'font-bold' : ''}`}
+                                                >
+                                                  {cell}
+                                                </td>
+                                              );
+                                            })}
+                                          </tr>
+                                        ))}
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Answer Options */}
+                            <div className="space-y-3">
+                              {question.options.map((option, index) => {
+                                const optionLetter = String.fromCharCode(65 + index);
+                                const isCorrectOption = optionLetter === question.correctAnswer;
+                                const isSelected = selectedAnswer === optionLetter;
+
+                                return (
+                                  <button
+                                    key={index}
+                                    onClick={() => !showResult && handleQuizAnswerSelect(question.id, optionLetter)}
+                                    disabled={showResult}
+                                    className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-200 ${
+                                      showResult
+                                      ? isCorrectOption
+                                        ? 'bg-green-50 border-green-400 text-green-800'
+                                        : isSelected && !isCorrectOption
+                                        ? 'bg-red-50 border-red-400 text-red-800'
+                                        : 'bg-gray-50 border-gray-200 text-gray-600'
+                                      : isSelected
+                                      ? 'bg-blue-50 border-blue-400 text-blue-800'
+                                      : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300'
+                                    }`}
+                                  >
+                                    <div className="flex items-center gap-3">
+                                      <div className={`flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg border-2 font-bold ${
+                                        showResult
+                                          ? isCorrectOption
+                                            ? 'bg-green-100 border-green-400 text-green-700'
+                                            : isSelected && !isCorrectOption
+                                            ? 'bg-red-100 border-red-400 text-red-700'
+                                            : 'bg-white border-gray-300 text-gray-500'
+                                          : isSelected
+                                          ? 'bg-blue-100 border-blue-400 text-blue-700'
+                                          : 'bg-white border-gray-300 text-gray-600'
+                                      }`}>
+                                        {optionLetter}
+                                      </div>
+                                      <span className="flex-1 font-medium">{option}</span>
+                                      {showResult && isCorrectOption && (
+                                        <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+                                      )}
+                                      {showResult && isSelected && !isCorrectOption && (
+                                        <X className="w-5 h-5 text-red-500 flex-shrink-0" />
+                                      )}
+                                    </div>
+                                  </button>
+                                );
+                              })}
+                            </div>
+
+                            {/* Explanation */}
+                            {selectedAnswer && question.explanation && (
+                              <div className="p-6 bg-slate-50 rounded-xl border border-slate-200">
+                                <h4 className="font-semibold text-slate-900 mb-3 text-lg">Explanation</h4>
+                                <p className="text-slate-700 leading-relaxed">{question.explanation}</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : null}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Mobile Full-Screen Panel */}
+        <AnimatePresence>
+          {showQuizPanel && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-50"
+              onClick={handleCloseQuizPanel}
+            >
+              <motion.div
+                initial={{ x: '100%' }}
+                animate={{ x: 0 }}
+                exit={{ x: '100%' }}
+                transition={{
+                  type: 'spring',
+                  stiffness: 300,
+                  damping: 30,
+                }}
+                onClick={(e) => e.stopPropagation()}
+                className="w-full h-full bg-white shadow-lg overflow-y-auto relative"
+              >
+                {/* Close Button */}
+                <button
+                  onClick={handleCloseQuizPanel}
+                  className="absolute top-4 right-4 text-gray-400 hover:text-gray-900 transition-colors z-10 bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-sm hover:shadow-md"
+                  aria-label="Close Quiz"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+
+                <div className="p-6 md:p-8">
+                  {/* Header */}
+                  <div className="border-b border-gray-200 mb-6 pb-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h1 className="text-xl font-bold text-gray-900">Quiz Me!</h1>
+                        <p className="text-sm text-gray-600">
+                          {isGeneratingQuiz ? 'Generating your custom quiz...' : quizError ? 'Error generating quiz' : 'A quick question to test your knowledge.'}
+                        </p>
+                      </div>
+                      {originalQuizQuestions.length > 0 && (
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <FileText className="w-4 h-4" />
+                          <span>{originalQuizQuestions.length} Question{originalQuizQuestions.length !== 1 ? 's' : ''}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {isGeneratingQuiz ? (
+                    <div className="flex flex-col items-center justify-center py-12 space-y-4">
+                      <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                      <p className="text-gray-600 font-medium">Creating your personalized quiz...</p>
+                    </div>
+                  ) : quizError ? (
+                    <div className="space-y-4">
+                      <div className="bg-red-50 border-2 border-red-200 rounded-lg p-6">
+                        <p className="text-red-800 font-medium">{quizError}</p>
+                      </div>
+                      <button
+                        onClick={handleCloseQuizPanel}
+                        className="w-full px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg transition-colors"
+                      >
+                        Close
+                      </button>
+                    </div>
+                  ) : originalQuizQuestions.length > 0 ? (
+                    <div className="space-y-8">
+                      {originalQuizQuestions.map((question, questionIndex) => {
+                        const selectedAnswer = quizAnswers[question.id] || null;
+                        const showResult = selectedAnswer !== null;
+                        const isCorrect = selectedAnswer === question.correctAnswer;
+
+                        return (
+                          <div key={question.id} id={`question-${question.id}`} className="bg-white rounded-lg pb-6 border-b border-gray-200 last:border-b-0">
+                            {/* Question Content */}
+                            <div className="space-y-6">
+                              {/* Question Text */}
+                              <div className="flex items-start gap-3">
+                                <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 bg-slate-100 border border-slate-200 rounded-lg">
+                                  <span className="text-lg font-bold text-slate-700">{questionIndex + 1}</span>
+                                </div>
+                                <p className="flex-1 text-base md:text-lg font-medium font-serif leading-relaxed text-gray-800">
+                                  {question.question}
+                                </p>
+                              </div>
+
+                              {/* Question Image */}
+                              {question.image && (
+                                <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4 flex justify-center">
+                                  <img
+                                    src={typeof question.image === 'string' ? question.image : (question.image as any).src} 
+                                    alt="Question related image" 
+                                    className="w-full max-w-2xl h-auto object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
+                                  />
+                                </div>
+                              )}
+
+                              {/* Table Data */}
+                              {question.tableData && (
+                                <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
+                                  <div className="flex items-center gap-4">
+                                    {question.tableData.playerNames && (
+                                      <div className="flex items-center justify-center h-full w-16">
+                                        <p className="transform -rotate-90 whitespace-nowrap text-center font-bold text-lg text-gray-900 leading-tight">
+                                          {question.tableData.playerNames.row.split(' ')[0]}
+                                          <br />
+                                          {question.tableData.playerNames.row.split(' ').slice(1).join(' ')}
+                                        </p>
+                                      </div>
+                                    )}
+                                    <div className="flex-1">
+                                      {question.tableData.playerNames && (
+                                        <p className="text-center font-bold text-lg text-gray-900 mb-2">
+                                          {question.tableData.playerNames.column}
+                                        </p>
+                                      )}
+                                      <table className="min-w-full border-collapse border border-black">
+                                        <thead className="bg-white">
+                                          <tr>
+                                            {question.tableData.headers.map((header: string) => (
+                                              <th key={header} className="border border-black px-4 py-3 text-center text-base font-bold text-gray-900">
+                                                {header}
+                                              </th>
+                                            ))}
+                                          </tr>
+                                        </thead>
+                                        <tbody className="bg-white">
+                                          {question.tableData.rows.map((row: string[], rowIndex: number) => (
+                                            <tr key={rowIndex}>
+                                              {row.map((cell: string, cellIndex: number) => {
+                                                const isRowHeader = question.tableData?.rowHeaders && cellIndex === 0;
+                                                return (
+                                                  <td 
+                                                    key={cellIndex} 
+                                                    className={`border border-black px-4 py-3 text-center text-base ${isRowHeader ? 'font-bold' : ''}`}
+                                                  >
+                                                    {cell}
+                                                  </td>
+                                                );
+                                              })}
+                                            </tr>
+                                          ))}
+                                        </tbody>
+                                      </table>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Answer Options */}
+                              <div className="space-y-3">
+                                {question.options.map((option, index) => {
+                                  const optionLetter = String.fromCharCode(65 + index);
+                                  const isCorrectOption = optionLetter === question.correctAnswer;
+                                  const isSelected = selectedAnswer === optionLetter;
+
+                                  return (
+                                    <button
+                                      key={index}
+                                      onClick={() => !showResult && handleQuizAnswerSelect(question.id, optionLetter)}
+                                      disabled={showResult}
+                                      className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-200 ${
+                                        showResult
+                                        ? isCorrectOption
+                                          ? 'bg-green-50 border-green-400 text-green-800'
+                                          : isSelected && !isCorrectOption
+                                          ? 'bg-red-50 border-red-400 text-red-800'
+                                          : 'bg-gray-50 border-gray-200 text-gray-600'
+                                        : isSelected
+                                        ? 'bg-blue-50 border-blue-400 text-blue-800'
+                                        : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300'
+                                      }`}
+                                    >
+                                      <div className="flex items-center gap-3">
+                                        <div className={`flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg border-2 font-bold ${
+                                          showResult
+                                            ? isCorrectOption
+                                              ? 'bg-green-100 border-green-400 text-green-700'
+                                              : isSelected && !isCorrectOption
+                                              ? 'bg-red-100 border-red-400 text-red-700'
+                                              : 'bg-white border-gray-300 text-gray-500'
+                                            : isSelected
+                                            ? 'bg-blue-100 border-blue-400 text-blue-700'
+                                            : 'bg-white border-gray-300 text-gray-600'
+                                        }`}>
+                                          {optionLetter}
+                                        </div>
+                                        <span className="flex-1 font-medium">{option}</span>
+                                        {showResult && isCorrectOption && (
+                                          <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+                                        )}
+                                        {showResult && isSelected && !isCorrectOption && (
+                                          <X className="w-5 h-5 text-red-500 flex-shrink-0" />
+                                        )}
+                                      </div>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+
+                              {/* Explanation */}
+                              {selectedAnswer && question.explanation && (
+                                <div className="p-6 bg-slate-50 rounded-xl border border-slate-200">
+                                  <h4 className="font-semibold text-slate-900 mb-3 text-lg">Explanation</h4>
+                                  <p className="text-slate-700 leading-relaxed">{question.explanation}</p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : null}
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
       
       {/* Whiteboard Modal */}
@@ -1626,34 +2191,59 @@ export default function UnitPage() {
         };
 
         return (
-          <div className={`fixed top-1/2 -translate-y-1/2 left-8 z-50 transition-all duration-300 ease-in-out ${
-            isAnythingSelected ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          }`}>
-            <div className="flex flex-col items-center gap-2 bg-white text-gray-800 rounded-2xl shadow-lg p-2 border border-gray-300">
-              <button 
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ 
+              opacity: isAnythingSelected ? 1 : 0,
+              x: isAnythingSelected ? 0 : -20
+            }}
+            transition={{ 
+              duration: 0.3,
+              ease: [0.4, 0, 0.2, 1]
+            }}
+            className={`fixed top-1/2 -translate-y-1/2 left-8 z-50 ${
+              isAnythingSelected ? 'pointer-events-auto' : 'pointer-events-none'
+            }`}
+          >
+            <motion.div 
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="flex flex-col items-center gap-2 bg-white text-gray-800 rounded-2xl shadow-lg p-2 border border-gray-300"
+            >
+              <motion.button 
                 onClick={handleMakeQuiz}
                 disabled={isGeneratingQuiz}
-                className={`flex flex-col items-center justify-center p-2 rounded-md transition-colors w-20 h-16 ${
+                whileHover={!isGeneratingQuiz ? { scale: 1.05 } : {}}
+                whileTap={!isGeneratingQuiz ? { scale: 0.95 } : {}}
+                className={`flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-200 w-20 h-16 ${
                   isGeneratingQuiz 
                     ? 'opacity-50 cursor-not-allowed' 
-                    : 'hover:bg-gray-100'
+                    : 'hover:bg-gradient-to-br hover:from-blue-50 hover:to-blue-100'
                 }`}
-                title="Make a Quiz"
+                title="Generate Quiz"
               >
                 {isGeneratingQuiz ? (
-                  <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <Image 
-                    src="/images/play-fill.svg" 
-                    alt="Play" 
-                    width={24} 
-                    height={24} 
-                    className="w-6 h-6"
-                    style={{ filter: 'brightness(0) saturate(100%) invert(40%) sepia(100%) saturate(2000%) hue-rotate(200deg) brightness(0.95) contrast(1.2)' }}
+                  <motion.div 
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full"
                   />
+                ) : (
+                  <motion.div
+                    animate={{ 
+                      scale: [1, 1.1, 1],
+                    }}
+                    transition={{ 
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                  >
+                    <Zap className="w-6 h-6 text-blue-600" fill="currentColor" />
+                  </motion.div>
                 )}
-                <span className="text-xs font-semibold mt-1">{isGeneratingQuiz ? 'Generating...' : 'Drill'}</span>
-              </button>
+                <span className="text-xs font-semibold mt-1">{isGeneratingQuiz ? 'Generating...' : 'Quiz Me!'}</span>
+              </motion.button>
               
               <div className="w-px h-6 bg-gray-300" />
 
@@ -1690,186 +2280,11 @@ export default function UnitPage() {
                   </button>
                 </>
               )}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         );
       })()}
 
-      {/* Quiz Modal */}
-      {(showQuizModal && quizQuestion) || (showQuizModal && isGeneratingQuiz) || (showQuizModal && quizError) ? (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              setShowQuizModal(false);
-              setIsAnimatingOut(false);
-              setQuizError(null);
-              setIsGeneratingQuiz(false);
-            }
-          }}
-        >
-            <div className={`bg-[#F2F2F0] rounded-xl border-4 border-black shadow-2xl max-w-3xl w-full max-h-[80vh] overflow-y-auto relative`}>
-            <button
-              onClick={() => {
-                setShowQuizModal(false);
-                setIsAnimatingOut(false);
-                setQuizError(null);
-                setIsGeneratingQuiz(false);
-              }}
-              className="absolute top-4 right-4 text-blue-500 hover:text-blue-600 transition-colors z-10"
-              aria-label="Close Quiz"
-            >
-              <X className="w-6 h-6" />
-            </button>
-            
-            <div className="p-8">
-              <div className="text-center mb-8">
-                <h2 className="text-5xl font-extrabold tracking-tight text-gray-900">
-                  <span className="text-blue-500">Dojo</span> Drill
-                </h2>
-                <p className="text-gray-500 mt-1">
-                  {isGeneratingQuiz ? 'Generating your custom quiz...' : quizError ? 'Error generating quiz' : 'A quick question to test your knowledge.'}
-                </p>
-              </div>
-              
-              {isGeneratingQuiz ? (
-                <div className="flex flex-col items-center justify-center py-12 space-y-4">
-                  <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-                  <p className="text-gray-600 font-medium">Creating your personalized quiz...</p>
-                </div>
-              ) : quizError ? (
-                <div className="space-y-4">
-                  <div className="bg-red-50 border-2 border-red-200 rounded-lg p-6">
-                    <p className="text-red-800 font-medium">{quizError}</p>
-                  </div>
-                  <button
-                    onClick={() => {
-                      setQuizError(null);
-                      setShowQuizModal(false);
-                    }}
-                    className="w-full px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold rounded-lg transition-colors"
-                  >
-                    Close
-                  </button>
-                </div>
-              ) : quizQuestion ? (
-              <div className="space-y-6">
-                <p className="text-2xl font-bold text-gray-800 leading-snug">
-                  {quizQuestion.question}
-                </p>
-
-                {quizQuestion.image && (
-                  <div className="my-4 rounded-lg overflow-hidden border-2 border-gray-200 bg-white">
-                    <img
-                      src={typeof quizQuestion.image === 'string' ? quizQuestion.image : (quizQuestion.image as any).src} 
-                      alt="Question related image" 
-                      className="max-h-72 w-auto mx-auto object-contain p-2"
-                    />
-                  </div>
-                )}
-
-                <div className="space-y-3">
-                  {quizQuestion.options.map((option, index) => {
-                    const optionLetter = String.fromCharCode(65 + index);
-                    const isCorrect = optionLetter === quizQuestion.correctAnswer;
-                    const isSelected = selectedQuizAnswer === optionLetter;
-                    const showResult = selectedQuizAnswer !== null;
-                    const shouldDisappear = isAnimatingOut && !isCorrect && !isSelected;
-
-                    if (shouldDisappear) {
-                      return null;
-                    }
-
-                    return (
-                      <div 
-                        key={index}
-                      >
-                        <button
-                          onClick={() => !showResult && handleQuizAnswerSelect(optionLetter)}
-                          disabled={showResult}
-                          className={`w-full text-left py-3.5 px-3 rounded-lg border-2 transition-all duration-200 group ${
-                            showResult
-                            ? isCorrect
-                              ? 'bg-green-50 border-green-400 text-green-800 shadow-sm'
-                              : isSelected && !isCorrect
-                              ? 'bg-red-50 border-red-400 text-red-800 shadow-sm'
-                              : 'bg-[#F5F5F3] border-gray-200 text-gray-600'
-                            : isSelected
-                            ? 'bg-blue-50 border-blue-400 text-blue-800'
-                            : 'bg-[#F7F7F5] border-gray-200 text-gray-700 hover:bg-[#F5F5F3] hover:border-gray-300 hover:shadow-sm'
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className={`w-7 h-7 flex items-center justify-center rounded-lg border-2 font-bold text-base ${
-                            showResult
-                              ? isCorrect
-                                ? 'bg-green-100 border-green-400 text-green-700'
-                                : isSelected && !isCorrect
-                                ? 'bg-red-100 border-red-400 text-red-700'
-                                : 'bg-white border-gray-300 text-gray-500'
-                              : isSelected
-                              ? 'bg-blue-100 border-blue-400 text-blue-700'
-                              : 'bg-white border-gray-300 text-gray-600 group-hover:border-gray-400'
-                          }`}>
-                            {optionLetter}
-                          </span>
-                          <span className="flex-1 font-medium">{option}</span>
-                          {showResult && isCorrect && (
-                            <CheckCircle2 className="w-6 h-6 text-green-600" />
-                          )}
-                          {showResult && isSelected && !isCorrect && (
-                            <XCircle className="w-6 h-6 text-red-600" />
-                          )}
-                        </div>
-                      </button>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {selectedQuizAnswer && quizQuestion.explanation && (
-                  <div className={`mt-6 p-5 rounded-lg border-2 ${themeColor === 'blue' ? 'bg-blue-50 border-blue-200' : 'bg-green-50 border-green-200'}`}>
-                    <h3 className="font-bold text-gray-900 mb-2 text-lg">Explanation</h3>
-                    <p className="text-gray-700 leading-relaxed">{quizQuestion.explanation}</p>
-                  </div>
-                )}
-
-                {/* Submit/Next Button */}
-                {selectedQuizAnswer && (
-                  <div className="mt-6">
-                    <button
-                      onClick={handleQuizSubmit}
-                      className="w-full flex items-center justify-center gap-2 px-8 py-3 rounded-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl bg-blue-500 hover:bg-blue-600 text-white"
-                    >
-                      <span>{availableQuizQuestions.length > 1 ? 'Next Question' : 'Done'}</span>
-                      <ArrowRight className="w-5 h-5" />
-                    </button>
-                  </div>
-                )}
-
-                {/* Progress Dots */}
-                {originalQuizQuestions.length > 1 && (
-                  <div className="flex justify-center gap-2 mt-8 pt-4 border-t border-gray-200">
-                    {originalQuizQuestions.map((question, index) => {
-                      const isActive = quizQuestion && question.id === quizQuestion.id;
-                      const isAnswered = answeredQuizQuestions.has(question.id);
-                      return (
-                        <div 
-                          key={question.id}
-                          className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
-                            isActive ? 'bg-blue-500 scale-110' : isAnswered ? 'bg-gray-400' : 'bg-gray-300'
-                          }`}
-                        />
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-              ) : null}
-            </div>
-          </div>
-        </div>
-      ) : null}
 
       {/* Image Slides Modal */}
       <AnimatePresence>
