@@ -1,29 +1,16 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { ArrowLeft, ArrowRight, FileText, Check, X, CheckCircle, Lock, Strikethrough, Bookmark, Expand, Play } from 'lucide-react';
+import { ArrowLeft, Lock, FileText, CheckCircle, Bookmark, Strikethrough, Play, X, Check } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image'; // Import the Next.js Image component
-import { useAuthContext } from '@/contexts/AuthContext'; // Re-enabled authentication
-import { AuthGate } from '@/components/AuthGate';
+import Image from 'next/image';
+import { useAuthContext } from '@/contexts/AuthContext';
 import { getUnitMCQTest } from '@/data/unitMCQTests';
 import { apMacroCourseInfo } from '@/data/courseInfo';
-import { videos as allVideos } from '@/data/videos';
-import { saveTestProgress, loadTestProgress, saveTestResult } from '@/lib/testProgress';
-import { Question as QuestionType } from '@/data/questionBanks/types';
+import { QuestionBank } from '@/data/questionBanks/types';
+import { FullExam } from '@/components/FullExam';
 import { Button } from '@/components/ui/button';
-
-interface UnitMCQTestPageProps {
-  params: Promise<{
-    unitId: string;
-  }>;
-}
-
-// Helper function to convert letter answer to index
-const getCorrectAnswerIndex = (correctAnswer: string): number => {
-  return correctAnswer.charCodeAt(0) - 65; // Convert A=0, B=1, C=2, etc.
-};
 
 function AccessDenied({ unitId }: { unitId: string }) {
   return (
@@ -48,13 +35,11 @@ function AccessDenied({ unitId }: { unitId: string }) {
 }
 
 export default function UnitMCQTestPage() {
-  // --- ALL HOOKS MOVED TO TOP ---
   const { unitId } = useParams();
   const { user, userData, loading } = useAuthContext();
   
   const unitNumber = parseInt(unitId as string);
   const questions = getUnitMCQTest(unitNumber);
-  const totalQuestions = questions.length;
   const unitInfo = apMacroCourseInfo.units.find(unit => 
     unit.unit.split(':')[0].split(' ')[1] === (unitId as string)
   );
@@ -62,17 +47,17 @@ export default function UnitMCQTestPage() {
   const [hasAccess, setHasAccess] = useState(false);
   const [isVerifying, setIsVerifying] = useState(true);
   
-  // State from the original component
-  const [answeredQuestions, setAnsweredQuestions] = useState<Record<string, { selectedAnswer: number; isCorrect: boolean }>>({});
+  // State for test progress
+  const [answeredQuestions, setAnsweredQuestions] = useState<Record<number, { selectedAnswer: number; isCorrect: boolean }>>({});
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [strikethroughState, setStrikethroughState] = useState<Record<number, number[]>>({});
   const [bookmarkedQuestions, setBookmarkedQuestions] = useState<number[]>([]);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isLoadingProgress, setIsLoadingProgress] = useState(true);
   const [hasSavedProgress, setHasSavedProgress] = useState(false);
   const [isScoreBreakdownOpen, setIsScoreBreakdownOpen] = useState(false);
-  const [selectedVideoQuestion, setSelectedVideoQuestion] = useState<QuestionType | null>(null);
+  const [selectedVideoQuestion, setSelectedVideoQuestion] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeQuestion, setActiveQuestion] = useState<number | null>(questions.length > 0 ? questions[0].id : null);
+  
+  const totalQuestions = questions.length;
 
   // --- ACCESS VERIFICATION LOGIC ---
   useEffect(() => {
@@ -118,11 +103,6 @@ export default function UnitMCQTestPage() {
 
   //   loadProgress();
   // }, [user, unitId]);
-
-  // MVP: Set loading to false immediately since we're not loading user progress
-  useEffect(() => {
-    setIsLoadingProgress(false);
-  }, [unitId]);
 
   // MVP: Removed user-dependent progress saving for MVP
   // useEffect(() => {
@@ -207,18 +187,6 @@ export default function UnitMCQTestPage() {
   // if (!user) {
   //   return <AuthGate />;
   // }
-
-  // Show loading state while progress is being loaded
-  if (isLoadingProgress) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading your progress...</p>
-        </div>
-      </div>
-    );
-  }
 
   const handleAnswerSelect = (questionId: number, answerIndex: number) => {
     if (isSubmitted) return; // Can't change answers after submission

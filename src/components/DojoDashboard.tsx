@@ -283,7 +283,7 @@ export function DojoDashboard() {
                   <div className={`w-12 h-12 rounded-full ${currentBelt.color} flex items-center justify-center flex-shrink-0`}>
                     <span className={`text-xs font-bold ${currentBelt.textColor}`}>
                       {beltName.charAt(0)}
-                    </span>
+                  </span>
                   </div>
                   <div>
                     <h2 className="text-lg font-semibold text-gray-900">{currentBelt.name}</h2>
@@ -298,9 +298,9 @@ export function DojoDashboard() {
                   {nextBelt && (
                     <div className="hidden sm:flex items-center gap-3 flex-1 max-w-xs">
                       <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <motion.div
+                  <motion.div
                           className={`h-full ${theme.primary} rounded-full`}
-                          initial={{ width: 0 }}
+                    initial={{ width: 0 }}
                           animate={{ width: `${percent}%` }}
                           transition={{ duration: 0.5, ease: 'easeOut' }}
                         />
@@ -323,7 +323,7 @@ export function DojoDashboard() {
             {/* Expanded Content */}
             <AnimatePresence>
               {isProgressExpanded && (
-                <motion.div
+            <motion.div
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
@@ -340,10 +340,10 @@ export function DojoDashboard() {
                             <div className="flex items-center gap-2 mb-2">
                               <CheckCircle2 className="w-5 h-5 text-green-600" />
                               <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide">Strongest Unit</h3>
-                            </div>
+                </div>
                             <p className="text-base font-semibold text-green-700">{getUnitName(strongestUnit.unitId)}</p>
                             <p className="text-sm text-gray-600 mt-1">{strongestUnit.percentage}% correct</p>
-                          </div>
+                </div>
                         )}
                         {/* Weakest Unit */}
                         {weakestUnit && (
@@ -351,10 +351,10 @@ export function DojoDashboard() {
                             <div className="flex items-center gap-2 mb-2">
                               <Target className="w-5 h-5 text-red-600" />
                               <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide">Weakest Unit</h3>
-                            </div>
+              </div>
                             <p className="text-base font-semibold text-red-700">{getUnitName(weakestUnit.unitId)}</p>
                             <p className="text-sm text-gray-600 mt-1">{weakestUnit.percentage}% correct</p>
-                          </div>
+          </div>
                         )}
                       </div>
                     )}
@@ -368,17 +368,17 @@ export function DojoDashboard() {
                             <div key={stat.unitId} className="flex items-center gap-4">
                               <div className="flex-shrink-0 w-16">
                                 <span className="text-sm font-semibold text-gray-900">Unit {stat.unitId}</span>
-                              </div>
-                              <div className="flex-1">
+                      </div>
+                      <div className="flex-1">
                                 <div className="flex items-center justify-between mb-1">
                                   <span className="text-sm text-gray-700">{getUnitName(stat.unitId).split(': ')[1]}</span>
                                   <span className="text-sm font-semibold text-gray-900">{stat.percentage}%</span>
-                                </div>
+                        </div>
                                 <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                                  <div
-                                    className={`h-full rounded-full ${
+                          <div
+                            className={`h-full rounded-full ${
                                       stat.percentage >= 80
-                                        ? 'bg-green-500'
+                                ? 'bg-green-500'
                                         : stat.percentage >= 60
                                         ? 'bg-yellow-500'
                                         : 'bg-red-500'
@@ -399,10 +399,10 @@ export function DojoDashboard() {
                         <p className="text-sm text-gray-500">Complete practice questions to see your unit performance</p>
                       </div>
                     )}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
           </div>
         </motion.div>
 
@@ -465,7 +465,7 @@ export function DojoDashboard() {
                       <h3 className="font-semibold text-gray-900">Infinite Drill</h3>
                       <p className="text-sm text-gray-600">Continuous practice mode</p>
                     </div>
-                  </div>
+                      </div>
                 </motion.div>
               </Link>
 
@@ -479,7 +479,7 @@ export function DojoDashboard() {
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
                       <FileText className="w-6 h-6 text-yellow-600" />
-                    </div>
+                      </div>
                     <div>
                       <h3 className="font-semibold text-gray-900">Diagnostic Test</h3>
                       <p className="text-sm text-gray-600">Assess your knowledge</p>
@@ -557,10 +557,10 @@ export function DojoDashboard() {
                           </div>
                         </motion.div>
                       </Link>
-                    </motion.div>
-                  );
-                })}
-              </div>
+                </motion.div>
+              );
+            })}
+          </div>
             </motion.section>
           )}
 

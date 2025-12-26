@@ -1062,11 +1062,15 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                             {/* Question Text */}
                             <div className="flex items-start gap-3">
                               <p className="flex-1 text-base md:text-lg font-medium font-serif leading-relaxed text-gray-800 max-h-48 overflow-y-auto pr-2">
-                                <QuestionWithKeyTerms 
-                                  questionText={question.question} 
-                                  unit={question.unit} 
-                                  subject={examType === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics'}
-                                />
+                                {isCustomAssignment ? (
+                                  <QuestionWithKeyTerms 
+                                    questionText={question.question} 
+                                    unit={question.unit} 
+                                    subject={examType === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics'}
+                                  />
+                                ) : (
+                                  question.question
+                                )}
                               </p>
                               {/* Video Explanation Icon */}
                               {question.videoExplanation && typeof question.videoExplanation === 'string' && question.videoExplanation.trim() !== '' && (
@@ -1507,11 +1511,15 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                       </div>
                       <div className="flex items-start gap-3">
                         <p className="flex-1 text-base md:text-lg font-medium font-serif leading-relaxed text-gray-800">
-                          <QuestionWithKeyTerms 
-                            questionText={question.question} 
-                            unit={question.unit} 
-                            subject={examType === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics'}
-                          />
+                          {isCustomAssignment ? (
+                            <QuestionWithKeyTerms 
+                              questionText={question.question} 
+                              unit={question.unit} 
+                              subject={examType === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics'}
+                            />
+                          ) : (
+                            question.question
+                          )}
                         </p>
                         {/* Video Explanation Icon */}
                         {question.videoExplanation && typeof question.videoExplanation === 'string' && question.videoExplanation.trim() !== '' && (

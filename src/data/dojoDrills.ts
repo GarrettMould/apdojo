@@ -729,6 +729,130 @@ export const dojoDrills: Record<string, DojoDrill> = {
       perMcqCorrect: 100,
       total: 500
     }
+  },
+  'the-money-market-graph': {
+    id: 'the-money-market-graph',
+    title: 'The Money Market Graph',
+    description: 'Master the money market graph, understanding money demand, money supply, and how the Federal Reserve influences interest rates.',
+    videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_4.5.mp4',
+    subject: 'ap_macroeconomics',
+    unit: 4,
+    lessonIds: ['4.5'],
+    stage1: {
+      videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_4.5.mp4',
+      comprehensionQuestions: [
+        {
+          id: 'money-market-comp-1',
+          question: 'Why is the money demand curve downward sloping?',
+          options: [
+            'As the price level rises, people need more money to purchase goods.',
+            'As nominal interest rates increase, the opportunity cost of holding cash increases.',
+            'As nominal interest rates decrease, banks are less willing to lend money.',
+            'As the money supply increases, the value of the currency decreases.'
+          ],
+          correctAnswer: 1, // B
+          explanation: 'The downward slope is due to the opportunity cost of holding liquid money. When interest rates are high, holding cash means missing out on the interest that could be earned in savings accounts or bonds. Therefore, at high interest rates, the quantity of money demanded is low.'
+        },
+        {
+          id: 'money-market-comp-2',
+          question: 'Which of the following changes would cause the money demand curve to shift to the right?',
+          options: [
+            'A decrease in the nominal interest rate.',
+            'An increase in the price level or an increase in Real GDP.',
+            'A decrease in the price level or a decrease in Real GDP.',
+            'An open market purchase of bonds by the Federal Reserve.'
+          ],
+          correctAnswer: 1, // B
+          explanation: 'Money demand shifts when people need more or less cash for transactions at every interest rate. An increase in the price level (goods are more expensive) or an increase in Real GDP (people have more income/wealth to spend) both increase the demand for liquid money.'
+        },
+        {
+          id: 'money-market-comp-3',
+          question: 'Which of the following best describes the shape and determinant of the money supply curve?',
+          options: [
+            'Upward sloping, determined by the willingness of banks to lend.',
+            'Downward sloping, determined by the demand for loans.',
+            'Vertical, determined by the policies of the Federal Reserve.',
+            'Horizontal, determined by the target federal funds rate.'
+          ],
+          correctAnswer: 2, // C
+          explanation: 'The money supply curve is vertical because the quantity of money in the economy is controlled by the central bank (the Federal Reserve), independent of the current nominal interest rate.'
+        }
+      ]
+    },
+    stage2: {
+      type: 'graph',
+      config: {}
+    },
+    stage3: {
+      mcqIds: [0, 0, 0] // Replace with actual MCQ IDs from unit 4 money market questions
+    },
+    xpReward: {
+      completion: 200,
+      perMcqCorrect: 100,
+      total: 500
+    }
+  },
+  'monetary-policy': {
+    id: 'monetary-policy',
+    title: 'Monetary Policy',
+    description: 'Master monetary policy tools and their effects on the money supply, interest rates, and aggregate demand.',
+    videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_4.6.mp4',
+    subject: 'ap_macroeconomics',
+    unit: 4,
+    lessonIds: ['4.6'],
+    stage1: {
+      videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_4.6.mp4',
+      comprehensionQuestions: [
+        {
+          id: 'monetary-policy-comp-1',
+          question: 'Which of the following best describes the effect of expansionary monetary policy on the economy?',
+          options: [
+            'The money supply decreases, nominal interest rates increase, and aggregate demand decreases.',
+            'The money supply increases, nominal interest rates decrease, and aggregate demand increases.',
+            'The money supply increases, nominal interest rates increase, and aggregate demand decreases.',
+            'The money supply decreases, nominal interest rates decrease, and aggregate demand increases.'
+          ],
+          correctAnswer: 1, // B
+          explanation: 'Expansionary policy aims to grow the economy. By shifting the money supply curve to the right (increasing money supply), the equilibrium nominal interest rate falls. Lower interest rates incentivize borrowing and spending, leading to an increase in aggregate demand.'
+        },
+        {
+          id: 'monetary-policy-comp-2',
+          question: 'How does a decrease in the required reserve ratio affect the money supply?',
+          options: [
+            'It decreases the money supply because banks must hold more money in their vaults.',
+            'It increases the money supply because banks can lend out a larger percentage of deposits.',
+            'It has no effect on the money supply, only on the interest rate banks charge each other.',
+            'It decreases the money supply because it discourages individuals from depositing money.'
+          ],
+          correctAnswer: 1, // B
+          explanation: 'The required reserve ratio determines the portion of deposits banks must keep. Lowering this ratio allows banks to lend out a greater fraction of every dollar deposited. These loans circulate through the economy, creating more deposits and loans, which expands the overall money supply.'
+        },
+        {
+          id: 'monetary-policy-comp-3',
+          question: 'According to the video, what is the impact of the Federal Reserve buying government bonds?',
+          options: [
+            'It removes money from the economy, decreasing the money supply (Selling makes it smaller).',
+            'It injects money into the economy, increasing the money supply (Buy makes it bigger).',
+            'It increases the discount rate, making borrowing more expensive for commercial banks.',
+            'It forces commercial banks to increase their required reserves.'
+          ],
+          correctAnswer: 1, // B
+          explanation: 'When the Fed buys government bonds from banks or investors, it pays for them with money. This transaction moves bonds into the Fed and moves liquid money out into the general economy, thereby increasing the money supply. A helpful mnemonic is \'Buy = Bigger\'.'
+        }
+      ]
+    },
+    stage2: {
+      type: 'graph',
+      config: {}
+    },
+    stage3: {
+      mcqIds: [0, 0, 0] // Replace with actual MCQ IDs from unit 4 monetary policy questions
+    },
+    xpReward: {
+      completion: 200,
+      perMcqCorrect: 100,
+      total: 500
+    }
   }
 };
 
