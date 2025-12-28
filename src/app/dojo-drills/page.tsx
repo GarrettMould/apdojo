@@ -1,16 +1,16 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { dojoDrills, drillAppliesToSubject, getDrillUnitForSubject } from '@/data/dojoDrills';
 import DojoDrill from '@/components/DojoDrill';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { useAuthContext } from '@/contexts/AuthContext';
 import React from 'react';
 import { hasValidSeasonPass } from '@/lib/utils';
 
-export default function DojoDrillsPage() {
+function DojoDrillsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { selectedSubject, user, userData } = useAuthContext();
@@ -148,5 +148,17 @@ export default function DojoDrillsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function DojoDrillsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-gray-600" />
+      </div>
+    }>
+      <DojoDrillsContent />
+    </Suspense>
   );
 }
