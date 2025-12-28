@@ -3,7 +3,7 @@
 import { DiagnosticTest } from '@/components/DiagnosticTest';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthContext } from '@/contexts/AuthContext';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 
 // 5-Question Placement Test - High-signal questions covering range of difficulty
@@ -134,7 +134,7 @@ const MICRO_PLACEMENT_QUESTIONS = [
   },
 ]; // 5 questions for micro placement test
 
-export default function DiagnosticTestPage() {
+function DiagnosticTestContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, loading } = useAuthContext();
@@ -171,16 +171,26 @@ export default function DiagnosticTestPage() {
   };
 
   return (
-    <>
-      <DiagnosticTest 
-        questions={questions} 
-        onComplete={handleComplete} 
-        initialAnswers={initialAnswers} 
-        user={user}
-        onSubjectToggle={handleSubjectToggle}
-        currentSubject={subject}
-      />
-    </>
+    <DiagnosticTest 
+      questions={questions} 
+      onComplete={handleComplete} 
+      initialAnswers={initialAnswers} 
+      user={user}
+      onSubjectToggle={handleSubjectToggle}
+      currentSubject={subject}
+    />
+  );
+}
+
+export default function DiagnosticTestPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-gray-600" />
+      </div>
+    }>
+      <DiagnosticTestContent />
+    </Suspense>
   );
 }
 
