@@ -8,6 +8,7 @@ import { ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { loadDojoDrillProgress, getDrillProgress } from '@/lib/dojoDrillProgress';
+import { hasValidSeasonPass } from '@/lib/utils';
 
 export default function DojoDrillPreviewPage() {
   const params = useParams();
@@ -22,11 +23,9 @@ export default function DojoDrillPreviewPage() {
   // Check if user is a pro customer (has season pass)
   const isProCustomer = useMemo(() => {
     if (!user || !userData) return false;
-    const seasonPass = userData.seasonPass as string[] | undefined;
-    if (!seasonPass) return false;
-    // Check if user has season pass for current subject
+    // Check if user has valid season pass for current subject
     const subjectKey = selectedSubject === 'macro' ? 'macro' : 'micro';
-    return seasonPass.includes(subjectKey) || seasonPass.includes('macro') || seasonPass.includes('micro');
+    return hasValidSeasonPass(userData, subjectKey) || hasValidSeasonPass(userData);
   }, [user, userData, selectedSubject]);
 
   // Load progress when user and drill are available

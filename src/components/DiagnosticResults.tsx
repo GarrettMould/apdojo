@@ -29,8 +29,22 @@ export function DiagnosticResults({ results, onClaimRank, user }: DiagnosticResu
   
   // Determine belt image and headline based on belt
   const isYellowBelt = belt === 'Yellow Belt';
-  // Using belt for both until beltWhite.svg is added
-  const beltImage = '/images/belt.svg';
+  const getBeltImage = () => {
+    if (belt === 'White Belt') {
+      return '/images/beltNewWhite.svg';
+    } else if (belt === 'Yellow Belt') {
+      return '/images/beltNewYellow.svg';
+    } else if (belt === 'Green Belt') {
+      return '/images/beltNewGreen.svg';
+    } else if (belt === 'Purple Belt') {
+      return '/images/beltNewPurple.svg';
+    } else if (belt === 'Black Belt') {
+      return '/images/beltNewBlack.svg';
+    } else {
+      return '/images/beltNewWhite.svg'; // Default to white
+    }
+  };
+  const beltImage = getBeltImage();
   const headline = isYellowBelt ? 'Excellent Start!' : 'Good Effort, Rookie!';
 
   // Resource prescription cards

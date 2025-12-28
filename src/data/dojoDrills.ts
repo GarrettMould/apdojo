@@ -1,5 +1,28 @@
 export type InteractiveActivityType = 'graph' | 'table' | 'monopoly' | 'comparative-advantage' | 'ppc-drill' | 'demand-change' | 'elasticity-revenue' | 'consumer-producer-surplus';
 
+// Helper function to check if a drill applies to a subject
+export function drillAppliesToSubject(drill: DojoDrill, subject: 'ap_macroeconomics' | 'ap_microeconomics'): boolean {
+  // If subjects array is defined, use it
+  if (drill.subjects && drill.subjects.length > 0) {
+    return drill.subjects.includes(subject);
+  }
+  // Otherwise fall back to the old subject field
+  return drill.subject === subject;
+}
+
+// Helper function to get the unit number for a drill for a specific subject
+export function getDrillUnitForSubject(drill: DojoDrill, subject: 'ap_macroeconomics' | 'ap_microeconomics'): number | null {
+  // If subjectUnits is defined, use it
+  if (drill.subjectUnits && drill.subjectUnits[subject] !== undefined) {
+    return drill.subjectUnits[subject];
+  }
+  // Otherwise fall back to the old unit field (only if the drill applies to this subject)
+  if (drillAppliesToSubject(drill, subject)) {
+    return drill.unit;
+  }
+  return null;
+}
+
 export interface ComprehensionQuestion {
   id: string;
   question: string;
@@ -22,8 +45,10 @@ export interface DojoDrill {
   title: string;
   description: string; // for the card display
   videoUrl: string;
-  subject: 'ap_macroeconomics' | 'ap_microeconomics';
-  unit: number;
+  subject: 'ap_macroeconomics' | 'ap_microeconomics'; // Deprecated: use subjects instead
+  subjects?: Array<'ap_macroeconomics' | 'ap_microeconomics'>; // Array of subjects this drill applies to
+  unit: number; // Deprecated: use subjectUnits instead
+  subjectUnits?: Record<'ap_macroeconomics' | 'ap_microeconomics', number>; // Map each subject to its unit number
   lessonIds: string[];
   
   // Stage 1: Video + Comprehension Check
@@ -280,8 +305,13 @@ export const dojoDrills: Record<string, DojoDrill> = {
     title: 'Absolute and Comparative Advantage',
     description: 'Master the concepts of absolute and comparative advantage to understand how countries benefit from specialization and trade.',
     videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_micro_1.4.mp4',
-    subject: 'ap_macroeconomics',
-    unit: 1,
+    subject: 'ap_macroeconomics', // Keep for backward compatibility
+    subjects: ['ap_macroeconomics', 'ap_microeconomics'],
+    unit: 1, // Keep for backward compatibility
+    subjectUnits: {
+      'ap_macroeconomics': 1,
+      'ap_microeconomics': 1
+    },
     lessonIds: ['1.3'],
     stage1: {
       videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_micro_1.4.mp4',
@@ -357,8 +387,13 @@ export const dojoDrills: Record<string, DojoDrill> = {
     title: 'Supply & Demand',
     description: 'Master the fundamentals of supply and demand, including shifts versus movements along curves and market equilibrium.',
     videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_1.6.mp4',
-    subject: 'ap_macroeconomics',
-    unit: 1,
+    subject: 'ap_macroeconomics', // Keep for backward compatibility
+    subjects: ['ap_macroeconomics', 'ap_microeconomics'],
+    unit: 1, // Keep for backward compatibility
+    subjectUnits: {
+      'ap_macroeconomics': 1,
+      'ap_microeconomics': 2
+    },
     lessonIds: ['1.6'],
     stage1: {
       videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_1.6.mp4',
@@ -422,8 +457,13 @@ export const dojoDrills: Record<string, DojoDrill> = {
     title: 'PPC and Opportunity Cost',
     description: 'Master the Production Possibilities Curve and understand how opportunity cost shapes economic decisions.',
     videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_1.2.mp4',
-    subject: 'ap_macroeconomics',
-    unit: 1,
+    subject: 'ap_macroeconomics', // Keep for backward compatibility
+    subjects: ['ap_macroeconomics', 'ap_microeconomics'],
+    unit: 1, // Keep for backward compatibility
+    subjectUnits: {
+      'ap_macroeconomics': 1,
+      'ap_microeconomics': 1
+    },
     lessonIds: ['1.2'],
     stage1: {
       videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_1.2.mp4',

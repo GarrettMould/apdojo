@@ -1,16 +1,31 @@
 'use client';
 
-import { use, useState, useEffect } from 'react';
-import { notFound } from 'next/navigation';
+import { use, useState, useEffect, useMemo } from 'react';
+import { notFound, useRouter } from 'next/navigation';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { FullExam } from '@/components/FullExam';
+import { hasValidSeasonPass } from '@/lib/utils';
 import { microSetOneQuestions } from '@/data/questionBanks/micro/mcqs/setOne';
 import { Clock } from 'lucide-react';
 
 export default function MicroMCQPreview({ params }: { params: Promise<{ num: string }> }) {
   const { num } = use(params);
-  const { loadingUserData } = useAuthContext();
+  const { loadingUserData, user, userData } = useAuthContext();
+  const router = useRouter();
   const [timeRemaining, setTimeRemaining] = useState(60 * 60); // 60 minutes in seconds
+
+  // Check if user is a pro customer (has season pass)
+  const isProCustomer = useMemo(() => {
+    if (!user || !userData) return false;
+    return hasValidSeasonPass(userData, 'micro') || hasValidSeasonPass(userData, 'macro');
+  }, [user, userData]);
+
+  // Redirect free users to purchase page
+  useEffect(() => {
+    if (!loadingUserData && !isProCustomer) {
+      router.push('/purchase/season-pass?courseType=micro');
+    }
+  }, [loadingUserData, isProCustomer, router]);
 
   // Format time as MM:SS
   const formatTime = (seconds: number): string => {
@@ -26,8 +41,8 @@ export default function MicroMCQPreview({ params }: { params: Promise<{ num: str
 
   const totalQuestions = microSetOneQuestions.questions.length;
 
-  // Show loading state while checking auth
-  if (loadingUserData) {
+  // Show loading state while checking auth or redirecting
+  if (loadingUserData || !isProCustomer) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -38,7 +53,7 @@ export default function MicroMCQPreview({ params }: { params: Promise<{ num: str
     );
   }
 
-  // Show the exam - accessible to everyone
+  // Show the exam - only accessible to pro customers
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="pt-16">

@@ -1,17 +1,25 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, BookOpen, FileText, Target, PlayCircle, Sparkles, Brain, Award, Search, Filter, X, ChevronRight, ArrowDown } from 'lucide-react';
+import { Check, BookOpen, FileText, Target, PlayCircle, Sparkles, Brain, Award, Search, Filter, X, ChevronRight, ArrowDown, Upload, Image as ImageIcon, Loader2, CheckCircle2, XCircle, RefreshCw, Lightbulb } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question } from '@/data/questionBanks/types';
-import { dojoDrills } from '@/data/dojoDrills';
+import { dojoDrills, drillAppliesToSubject, getDrillUnitForSubject } from '@/data/dojoDrills';
 import { frqExams } from '@/data/frqQuestions';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { InfinitePracticeSection } from '@/components/InfinitePracticeSection';
+import { HeroDojoDrills } from '@/components/HeroDojoDrills';
+import { FRQFeedbackDemo } from '@/components/FRQFeedbackDemo';
+import { SeasonPassShowcase } from '@/components/SeasonPassShowcase';
+import { HomeDojoDrills } from '@/components/HomeDojoDrills';
+import { useAuthContext } from '@/contexts/AuthContext';
+import { useCreditSystem } from '@/hooks/useCreditSystem';
+import { LoginModal, SignupModal } from '@/components/AuthModals';
 
 interface FeatureItem {
   icon: React.ReactNode;
@@ -39,158 +47,121 @@ const microFeatures: FeatureItem[] = [
 ];
 
 export function SeasonPassHome() {
+  const [activeFrame, setActiveFrame] = useState(0);
+
+  // Cycle through frames every 5 seconds (4 frames: infinite practice, diagnostic test, dojo drills, product shot)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveFrame((prev) => (prev + 1) % 4);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-        {/* Main Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-gray-900 mb-6">
-            Stop Guessing.{' '}
-            <span className="bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
-              Score a 5 in AP Econ.
-            </span>
-          </h1>
-          <p className="text-xl sm:text-2xl text-gray-600 max-w-3xl mx-auto mb-8">
-            Get everything you need to master AP Macroeconomics and AP Microeconomics in one comprehensive pass.
-          </p>
-        </motion.div>
-
-        {/* Take Diagnostic Test CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="text-center mb-12"
-        >
-          <Link href="/diagnostic-test" className="inline-flex flex-col items-center gap-2 group">
-            <span 
-              className="text-2xl font-bold text-gray-900 drop-shadow-sm"
-              style={{ fontFamily: 'Permanent Marker, cursive' }}
+        {/* Alternating Hero Content */}
+        <AnimatePresence mode="wait">
+          {activeFrame === 0 && (
+            <motion.div
+              key="infinite-practice"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
             >
-              Take the<br />Diagnostic Test
-            </span>
-            <ArrowDown className="w-6 h-6 text-gray-900 group-hover:translate-y-1 transition-transform" />
-          </Link>
-        </motion.div>
-
-        {/* Diagnostic Test Question Preview */}
-        <DiagnosticQuestionPreview />
-
-        {/* Season Pass Cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-          {/* AP Macro Season Pass */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            <Card className="h-full bg-white rounded-xl shadow-lg border border-gray-100 hover:shadow-2xl transition-shadow duration-300">
-              <CardHeader className="pb-4">
-                <div className="flex items-center justify-between mb-2">
-                  <CardTitle className="text-3xl font-extrabold text-gray-900">
-                    AP Macro Season Pass
-                  </CardTitle>
-                  <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                    <span className="text-2xl font-bold text-blue-600">M</span>
-                  </div>
-                </div>
-                <p className="text-gray-600 text-lg">
-                  Complete access to all AP Macroeconomics resources
+              <InfinitePracticeSection />
+            </motion.div>
+          )}
+          {activeFrame === 1 && (
+            <motion.div
+              key="diagnostic-test"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+            >
+              {/* Main Header */}
+              <div className="text-center mb-12">
+                <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-gray-900 mb-4">
+                  Stop Guessing.
+                  <br />
+                  <span className="bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
+                    Score a 5 in AP Econ.
+                  </span>
+                </h1>
+                <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                  Get everything you need to master AP Macroeconomics and AP Microeconomics in one comprehensive pass.
                 </p>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4 mb-6">
-                  {macroFeatures.map((feature, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.4, delay: 0.3 + index * 0.1 }}
-                      className="flex items-center gap-3"
-                    >
-                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
-                        <Check className="w-4 h-4 text-blue-600" />
-                      </div>
-                      <span className="text-gray-700 font-medium text-lg">
-                        {feature.text}
-                      </span>
-                    </motion.div>
-                  ))}
-                </div>
-                <Button
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-6 text-lg rounded-md transition-colors"
-                  size="lg"
-                >
-                  Get AP Macro Season Pass
-                </Button>
-              </CardContent>
-            </Card>
-          </motion.div>
+              </div>
 
-          {/* AP Micro Season Pass */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            <Card className="h-full bg-white rounded-xl shadow-lg border border-gray-100 hover:shadow-2xl transition-shadow duration-300">
-              <CardHeader className="pb-4">
-                <div className="flex items-center justify-between mb-2">
-                  <CardTitle className="text-3xl font-extrabold text-gray-900">
-                    AP Micro Season Pass
-                  </CardTitle>
-                  <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
-                    <span className="text-2xl font-bold text-green-600">μ</span>
-                  </div>
-                </div>
-                <p className="text-gray-600 text-lg">
-                  Complete access to all AP Microeconomics resources
+              {/* Take Diagnostic Test CTA */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="text-center mb-12"
+              >
+                <Link href="/diagnostic-test" className="inline-flex flex-col items-center gap-2 group">
+                  <span 
+                    className="text-2xl font-bold text-gray-900 drop-shadow-sm"
+                    style={{ fontFamily: 'Permanent Marker, cursive' }}
+                  >
+                    Take the<br />Diagnostic Test
+                  </span>
+                  <ArrowDown className="w-6 h-6 text-gray-900 group-hover:translate-y-1 transition-transform" />
+                </Link>
+              </motion.div>
+
+              {/* Diagnostic Test Question Preview */}
+              <DiagnosticQuestionPreview />
+            </motion.div>
+          )}
+          {activeFrame === 2 && (
+            <motion.div
+              key="dojo-drills"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+            >
+              <HeroDojoDrills />
+            </motion.div>
+          )}
+          {activeFrame === 3 && (
+            <motion.div
+              key="frq-feedback"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+              className="w-full"
+            >
+              <div className="text-center mb-8">
+                <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-4">
+                  Grade Your FRQs in <span className="text-blue-500">Seconds</span>, Not Days
+                </h2>
+                <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                  See exactly how AP graders score your responses with detailed explanations and grading criteria.
                 </p>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4 mb-6">
-                  {microFeatures.map((feature, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.4, delay: 0.3 + index * 0.1 }}
-                      className="flex items-center gap-3"
-                    >
-                      <div className="flex-shrink-0 w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
-                        <Check className="w-4 h-4 text-green-600" />
-                      </div>
-                      <span className="text-gray-700 font-medium text-lg">
-                        {feature.text}
-                      </span>
-                    </motion.div>
-                  ))}
-                </div>
-                <Button
-                  className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-6 text-lg rounded-md transition-colors"
-                  size="lg"
-                >
-                  Get AP Micro Season Pass
-                </Button>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
+              </div>
+              <FRQFeedbackDemo />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Season Pass Showcase */}
+        <SeasonPassShowcase />
+      </div>
+
+      {/* Home Dojo Drills Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 pb-16 sm:pb-24">
+        <HomeDojoDrills />
       </div>
 
       {/* Question List Section */}
       <QuestionListSection />
-
-      {/* Dojo Drills Section */}
-      <DojoDrillsSection />
-
-      {/* FRQ Practice Preview Section */}
-      <FRQPreviewSection />
     </div>
   );
 }
@@ -255,7 +226,7 @@ function QuestionListSection() {
           className="mb-12"
         >
           <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-4 text-center">
-            The Ultimate AP Question Vault.
+            The Ultimate MCQ Question Vault.
           </h2>
           <p className="text-xl text-gray-600 text-center max-w-3xl mx-auto">
             Filter by Unit. Aligned with the 2026 CED. Designed to mimic the real exam.
@@ -388,14 +359,6 @@ function QuestionListSection() {
             ))
           )}
         </div>
-
-        {/* Results Count */}
-        <div className="mt-6 text-center">
-          <p className="text-gray-600 font-medium">
-            Showing {filteredQuestions.length} question{filteredQuestions.length !== 1 ? 's' : ''}
-            {totalCount > 20 && ` of ${totalCount} total`}
-          </p>
-        </div>
       </div>
 
     </div>
@@ -425,7 +388,7 @@ function DojoDrillsSection() {
           className="mb-12"
         >
           <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-4 text-center">
-            Master the Hardest Topics with Interactive Drills
+            Master the Hardest Topics with <span className="text-blue-500">Interactive</span> Drills
           </h2>
           <p className="text-xl text-gray-600 text-center max-w-3xl mx-auto">
             Master key concepts through interactive video lessons, graph simulations, and practice questions.
@@ -509,15 +472,24 @@ function DojoDrillsSection() {
                       className="bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 text-left hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 w-full max-w-md flex flex-col relative z-10"
                     >
                       <div className="flex items-center justify-between mb-4">
-                        <div
-                          className={`inline-block text-xs font-semibold px-2.5 py-1 rounded-md ${
-                            drill.subject === 'ap_macroeconomics'
-                              ? 'bg-blue-100 text-blue-800'
-                              : 'bg-green-100 text-green-800'
-                          }`}
-                        >
-                          {getSubjectLabel(drill.subject)} - Unit {drill.unit}
-                        </div>
+                        {(() => {
+                          // Determine which subject to display (prefer macro, then micro, then fallback)
+                          const displaySubject = drill.subjects?.[0] || drill.subject;
+                          const displayUnit = drill.subjects && drill.subjects.length > 0 
+                            ? getDrillUnitForSubject(drill, displaySubject) || drill.unit
+                            : drill.unit;
+                          return (
+                            <div
+                              className={`inline-block text-xs font-semibold px-2.5 py-1 rounded-md ${
+                                displaySubject === 'ap_macroeconomics'
+                                  ? 'bg-blue-100 text-blue-800'
+                                  : 'bg-green-100 text-green-800'
+                              }`}
+                            >
+                              {getSubjectLabel(displaySubject)} - Unit {displayUnit}
+                            </div>
+                          );
+                        })()}
                         <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-800">
                           <span>{drill.xpReward.total}</span>
                           <span className="inline-flex items-center">

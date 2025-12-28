@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { X, Loader2, Lock, ArrowRight } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
+import { useCreditSystem } from '@/hooks/useCreditSystem';
 import { UnitMCQs } from '@/components/unitMCQS';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems'; // Reverted import
 import { Question as QuestionType } from '@/data/questionBanks/types';
@@ -155,6 +156,7 @@ function UnitMCQPracticeContent() {
     setIsNextQuestionDoubleXp,
     awardXp,
   } = useAuthContext();
+  const { consumeDailyCredit, isPremium } = useCreditSystem();
   
   // --- Access Control State ---
   const [hasAccess, setHasAccess] = useState(false);
@@ -187,10 +189,19 @@ function UnitMCQPracticeContent() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answeredQuestions, setAnsweredQuestions] = useState<Record<number, any>>({});
   const [questionsForPractice, setQuestionsForPractice] = useState<QuestionType[]>([]);
+  
+  // Log currentQuestionIndex changes
+  useEffect(() => {
+    console.log('[Parent] currentQuestionIndex changed to:', currentQuestionIndex, {
+      questionId: questionsForPractice[currentQuestionIndex]?.id,
+      totalQuestions: questionsForPractice.length
+    });
+  }, [currentQuestionIndex, questionsForPractice]);
   const [isLoadingQuestionSet, setIsLoadingQuestionSet] = useState(true);
   const [customUnitIds, setCustomUnitIds] = useState<number[]>(initialCustomUnitIds);
   const [weakestUnitIds, setWeakestUnitIds] = useState<number[]>([]);
   const [dojoProgress, setDojoProgress] = useState(0);
+  const [hasConsumedDailyCredit, setHasConsumedDailyCredit] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
   const [totalQuestionsInSet, setTotalQuestionsInSet] = useState(0);
@@ -204,6 +215,9 @@ function UnitMCQPracticeContent() {
   // Developer tool: Test specific question by ID
   const [testQuestionId, setTestQuestionId] = useState<string>("");
   const isDeveloper = user?.email === 'garrett@apdojo.com' || user?.email === 'garrettmould@gmail.com' || (typeof window !== 'undefined' && window.location.hostname === 'localhost');
+  
+  // Track previous filter criteria to prevent unnecessary reloads
+  const prevFilterCriteriaRef = useRef<string>('');
 
   const hasTestModeAccess =
     !!user &&
@@ -224,18 +238,61 @@ function UnitMCQPracticeContent() {
 
   // Load questions based on practice mode
   useEffect(() => {
+    // Create a unique key for the current filter criteria
+    const filterKey = JSON.stringify({
+      practiceMode,
+      currentUnit,
+      customUnitIds: customUnitIds.sort().join(','),
+      weakestUnitIds: weakestUnitIds.sort().join(','),
+      lessonIdParam,
+      subject,
+      testQuestionId,
+      showAllQuestions,
+      loadingMcqData: loadingMcqData ? 'loading' : 'loaded'
+    });
+    
+    // Only reload if filter criteria actually changed
+    if (filterKey === prevFilterCriteriaRef.current) {
+      console.log('[Parent] Filter criteria unchanged, skipping reload', {
+        currentIndex: currentQuestionIndex
+      });
+      return;
+    }
+    
+    console.log('[Parent] useEffect (load questions) triggered', {
+      practiceMode,
+      currentUnit,
+      customUnitIds,
+      weakestUnitIds,
+      lessonIdParam,
+      subject,
+      testQuestionId,
+      isDeveloper,
+      user: !!user,
+      loadingMcqData,
+      showAllQuestions,
+      currentQuestionIndex,
+      filterKeyChanged: filterKey !== prevFilterCriteriaRef.current
+    });
+    
+    // Update the ref with the new filter criteria
+    prevFilterCriteriaRef.current = filterKey;
+    
     // Skip normal loading if we're in test mode (testQuestionId is set)
     if (isDeveloper && testQuestionId) {
+      console.log('[Parent] Skipping question load - test mode');
       return;
     }
 
     // Wait for MCQ data to load if user is logged in (to avoid filtering issues)
     if (user && loadingMcqData) {
+      console.log('[Parent] Waiting for MCQ data to load');
       setIsLoadingQuestionSet(true);
       return;
     }
 
     // Normal question loading
+    console.log('[Parent] Starting question loading...');
     setIsLoadingQuestionSet(true);
     let questions: QuestionType[] = [];
     const subjectFilter = subject === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics';
@@ -290,9 +347,14 @@ function UnitMCQPracticeContent() {
 
     // Shuffle questions
     const shuffled = shuffleArray(questions);
+    console.log('[Parent] Questions loaded and shuffled', {
+      questionCount: shuffled.length,
+      previousIndex: currentQuestionIndex,
+      resettingIndexTo: 0
+    });
     setQuestionsForPractice(shuffled);
     setTotalQuestionsInSet(shuffled.length);
-    setCurrentQuestionIndex(0);
+    setCurrentQuestionIndex(0); // ⚠️ This resets the index - could cause jumping!
     setAnsweredQuestions({});
     
     // Set unit name for display
@@ -310,7 +372,7 @@ function UnitMCQPracticeContent() {
     }
 
     setIsLoadingQuestionSet(false);
-  }, [practiceMode, currentUnit, customUnitIds, weakestUnitIds, lessonIdParam, subject, testQuestionId, isDeveloper, showAllQuestions, user, mcqAnswersData, loadingMcqData]);
+  }, [practiceMode, currentUnit, customUnitIds, weakestUnitIds, lessonIdParam, subject, testQuestionId, isDeveloper, showAllQuestions, user, loadingMcqData]);
 
   // Access control check
   useEffect(() => {
@@ -389,6 +451,17 @@ function UnitMCQPracticeContent() {
   const handleAnswer = async (questionId: number, answerLetter: string, isCorrect: boolean, lessonIDS: string[]) => {
     logger.debug('[UnitMCQ] handleAnswer called:', { questionId, answerLetter, isCorrect, hasAwardXp: !!awardXp });
     
+    // Consume daily credit on first answer (if not premium and not already consumed)
+    if (user && !isPremium && !hasConsumedDailyCredit && Object.keys(answeredQuestions).length === 0) {
+      const creditResult = await consumeDailyCredit();
+      if (creditResult.success) {
+        setHasConsumedDailyCredit(true);
+      } else {
+        // No credits remaining - could show a message or redirect
+        console.warn('[UnitMCQ] No daily credits remaining');
+      }
+    }
+    
     setAnsweredQuestions(prev => ({
       ...prev,
       [questionId]: { selectedLetter: answerLetter, isCorrect }
@@ -426,18 +499,42 @@ function UnitMCQPracticeContent() {
   };
 
   const handleNextQuestion = () => {
+    console.log('[Parent] handleNextQuestion called', {
+      currentIndex: currentQuestionIndex,
+      totalQuestions: questionsForPractice.length,
+      canGoNext: currentQuestionIndex < questionsForPractice.length - 1
+    });
     if (currentQuestionIndex < questionsForPractice.length - 1) {
-      setCurrentQuestionIndex(prev => prev + 1);
+      setCurrentQuestionIndex(prev => {
+        const nextIndex = prev + 1;
+        console.log('[Parent] setCurrentQuestionIndex: prev =', prev, 'next =', nextIndex);
+        return nextIndex;
+      });
+    } else {
+      console.log('[Parent] handleNextQuestion: Cannot go next, already at last question');
     }
   };
 
   const handlePreviousQuestion = () => {
+    console.log('[Parent] handlePreviousQuestion called', {
+      currentIndex: currentQuestionIndex,
+      canGoPrev: currentQuestionIndex > 0
+    });
     if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(prev => prev - 1);
+      setCurrentQuestionIndex(prev => {
+        const nextIndex = prev - 1;
+        console.log('[Parent] setCurrentQuestionIndex (prev): prev =', prev, 'next =', nextIndex);
+        return nextIndex;
+      });
     }
   };
 
   const handleQuestionSelect = (index: number) => {
+    console.log('[Parent] handleQuestionSelect called', {
+      requestedIndex: index,
+      currentIndex: currentQuestionIndex,
+      totalQuestions: questionsForPractice.length
+    });
     setCurrentQuestionIndex(index);
   };
 

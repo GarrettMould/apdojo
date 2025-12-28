@@ -40,7 +40,7 @@ const DojoThumbnail: React.FC<DojoThumbnailProps> = ({
   const activityTypeText = activityType || (type === 'drill' ? 'Drill' : type === 'exam' ? 'Exam' : type === 'micro' ? 'Micro' : type === 'macro' ? 'Macro' : 'Resource');
 
   return (
-    <div className={`relative aspect-video overflow-hidden border border-gray-400 ${className}`}>
+    <div className={`relative aspect-video overflow-hidden border border-gray-200 ${className}`}>
       {/* Background Layer */}
       <div className={`absolute inset-0 ${bgColor} opacity-60`} />
 
@@ -53,10 +53,10 @@ const DojoThumbnail: React.FC<DojoThumbnailProps> = ({
         }}
       />
 
-      {/* Top-Left: Unit Number in Whiteboard Font */}
+      {/* Top-Left: Unit Number in Normal Font */}
       {unitNumber && (
         <div className="absolute top-3 left-3 z-20">
-          <span className="text-lg font-bold text-gray-800 drop-shadow-sm" style={{ fontFamily: 'Permanent Marker, cursive' }}>
+          <span className="text-lg font-bold text-gray-800 drop-shadow-sm">
             Unit {unitNumber}
           </span>
         </div>
@@ -83,7 +83,7 @@ const DojoThumbnail: React.FC<DojoThumbnailProps> = ({
       {/* Bottom-Right: Activity Type in Whiteboard Font */}
       {activityType && (
         <div className="absolute bottom-3 right-3 z-20">
-          <span className="text-base font-bold text-gray-800 drop-shadow-sm" style={{ fontFamily: 'Permanent Marker, cursive' }}>
+          <span className="text-2xl font-bold text-gray-800 drop-shadow-sm" style={{ fontFamily: 'Permanent Marker, cursive' }}>
             {activityTypeText}
           </span>
         </div>

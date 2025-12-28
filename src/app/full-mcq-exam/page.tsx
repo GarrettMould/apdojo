@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { ArrowLeft, FileText, Check, X, CheckCircle, Lock, Strikethrough } from 'lucide-react';
 import Link from 'next/link';
-// MVP: Removed authentication imports
-// import { useAuthContext } from '@/contexts/AuthContext';
-// import { AuthGate } from '@/components/AuthGate';
+import { useAuthContext } from '@/contexts/AuthContext';
+import { hasValidSeasonPass } from '@/lib/utils';
 import { CourseSidebar } from '@/components/CourseSidebar';
 import { macroSetOneQuestions } from '@/data/questionBanks/macro/mcqs/macroSetOne';
 import { use } from 'react';
@@ -17,11 +16,25 @@ const getCorrectAnswerIndex = (correctAnswer: string): number => {
 };
 
 export default function FullMCQExamPage() {
-  // MVP: Removed authentication context
-  // const { user } = useAuthContext();
+  const { user, userData, selectedSubject } = useAuthContext();
   
-  // Exam is now unlocked - purchase verification happens in preview pages
-  const isExamLocked = false;
+  // Check if user is a pro customer (has season pass)
+  const isProCustomer = useMemo(() => {
+    if (!user || !userData) return false;
+    const subjectKey = selectedSubject === 'macro' ? 'macro' : 'micro';
+    return hasValidSeasonPass(userData, subjectKey) || hasValidSeasonPass(userData);
+  }, [user, userData, selectedSubject]);
+
+  // Redirect free users to season pass purchase instead of showing lock screen
+  useEffect(() => {
+    if (!isProCustomer) {
+      window.location.href = `/purchase/season-pass?courseType=${selectedSubject || 'macro'}`;
+    }
+  }, [isProCustomer, selectedSubject]);
+
+  if (!isProCustomer) {
+    return null; // Will redirect, so return nothing
+  }
   
   const [answeredQuestions, setAnsweredQuestions] = useState<Record<string, { selectedAnswer: number; isCorrect: boolean }>>({});
   const [strikethroughState, setStrikethroughState] = useState<Record<number, Set<number>>>({});
@@ -135,36 +148,6 @@ export default function FullMCQExamPage() {
   //   return <AuthGate />;
   // }
 
-  // MVP: Check if exam is locked (only Unit 1 content is accessible for MVP)
-  if (isExamLocked) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto px-4">
-          <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Lock className="w-12 h-12 text-gray-400" />
-          </div>
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">Premium Content Locked</h1>
-          <p className="text-gray-600 mb-6">
-            The full MCQ exam covers all units and requires a subscription. 
-            Complete Unit 1 to unlock access to comprehensive exams.
-          </p>
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <p className="text-sm text-blue-800">
-              <strong>What's included:</strong> Comprehensive practice exam covering all AP Macroeconomics units 
-              with detailed explanations and progress tracking.
-            </p>
-          </div>
-          <Link 
-            href="/ap-macro-course"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to AP Macro Course
-          </Link>
-        </div>
-      </div>
-    );
-  }
 
   // Show loading state while progress is being loaded
   if (isLoadingProgress) {

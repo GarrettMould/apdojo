@@ -61,7 +61,7 @@ export function DojoDrillPreview({
         </div>
         
         {/* Description */}
-        <p className="text-gray-600 font-medium mt-4 mb-6 leading-relaxed">
+        <p className="text-gray-600 font-medium mt-4 mb-6 leading-relaxed min-h-[4.5rem]">
           {description}
         </p>
       </div>

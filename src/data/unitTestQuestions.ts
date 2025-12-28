@@ -32,12 +32,12 @@ export const unitTestQuestions: QuestionType[] = [
     "unitName": "Basic Economic Concepts",
     "question": "Assume an economy is currently using all of its resources to efficiently produce two goods, widgets and trinkets. As more widgets are produced, what happens to the production trinkets?",
     "image": null,
-    "options": [
-      "The production of trinkets increases.",
-      "The production of trinkets decreases.",
-      "The production of trinkets remains unchanged.",
-      "The production of trinkets first increases, then decreases.",
-      "The production of trinkets will increase if more resources become available."
+      "options": [
+        "The production of trinkets increases.",
+        "The production of trinkets decreases.",
+        "The production of trinkets remains unchanged.",
+        "The production of trinkets first increases, then decreases.",
+        "The production of trinkets will decrease if more resources become available."
     ],
     "correctAnswer": "B",
     "explanation": "Because the economy is fully utilizing its resources, producing more widgets requires shifting resources away from trinket production. As a result, the production of trinkets decreases, illustrating the concept of opportunity cost.",
@@ -91,7 +91,7 @@ export const unitTestQuestions: QuestionType[] = [
     "image": null,
     "options": [
       "Demand for coffee would decrease.",
-      "Demand for tea would increase.",
+      "Demand for tea would decrease.",
       "Demand for tea would remain unchanged.",
       "Demand for tea would increase.",
       "Supply of tea would decrease."

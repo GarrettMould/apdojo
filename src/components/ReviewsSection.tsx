@@ -1,6 +1,6 @@
 'use client';
 
-import { reviews } from '@/data/reviews'
+import { tutoringReviews as reviews } from '@/data/reviews'
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Star, Quote, GraduationCap } from 'lucide-react'

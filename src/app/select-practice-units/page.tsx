@@ -7,34 +7,40 @@ import { Button } from '@/components/ui/button';
 import { Loader2, ArrowLeft, Zap } from 'lucide-react';
 import { macroUnits as allMacroCheatSheets, microUnits as allMicroCheatSheets, Unit as UnitDetailsType } from '@/data/cheatSheets';
 import { useAuthContext } from '@/contexts/AuthContext';
+import { getBeltProgress } from '@/lib/beltSystem';
+import { getSubjectXP } from '@/hooks/useUserProgress';
 import Image from 'next/image';
 
 function SelectPracticeUnitsContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { lastSelectedPracticeUnits, setLastSelectedPracticeUnits, selectedSubject, user, totalXP, guestXp } = useAuthContext();
+    const { lastSelectedPracticeUnits, setLastSelectedPracticeUnits, selectedSubject, user, userData, guestXp } = useAuthContext();
     
     const subject = selectedSubject;
     
-    // Calculate user XP
-    const userXP = user ? (totalXP ?? 0) : (guestXp ?? 0);
+    // Calculate user XP using the proper helper
+    const userXP = user ? getSubjectXP(userData, subject) : (guestXp ?? 0);
     
-    // Calculate belt based on XP (using same logic as DojoReadinessBand)
-    // Assuming belt is based on a score/percentage, we'll use XP ranges
-    // For now, let's use a simple XP-based calculation
-    const getBeltInfo = (xp: number): { name: string; color: string; bgColor: string; textColor: string } => {
-        // Convert XP to a score (0-100) - adjust these ranges as needed
-        // For example, if max XP is 2000, then 0-400 = White, 400-800 = Yellow, etc.
-        const score = Math.min(100, (xp / 20)); // Adjust divisor based on your XP system
-        
-        if (score < 20) return { name: 'WHITE BELT', color: 'gray', bgColor: 'bg-gray-100', textColor: 'text-gray-900' };
-        if (score < 40) return { name: 'YELLOW BELT', color: 'yellow', bgColor: 'bg-yellow-400', textColor: 'text-gray-900' };
-        if (score < 60) return { name: 'GREEN BELT', color: 'green', bgColor: 'bg-green-500', textColor: 'text-white' };
-        if (score < 80) return { name: 'BROWN BELT', color: 'amber', bgColor: 'bg-amber-700', textColor: 'text-white' };
-        return { name: 'BLACK BELT', color: 'black', bgColor: 'bg-black', textColor: 'text-white' };
+    // Calculate belt based on XP using the belt system
+    const beltProgress = getBeltProgress(userXP);
+    const currentBelt = beltProgress.currentBelt;
+    
+    // Helper function to get belt image path
+    const getBeltImage = () => {
+      if (currentBelt.name === 'White Belt') {
+        return '/images/beltNewWhite.svg';
+      } else if (currentBelt.name === 'Yellow Belt') {
+        return '/images/beltNewYellow.svg';
+      } else if (currentBelt.name === 'Green Belt') {
+        return '/images/beltNewGreen.svg';
+      } else if (currentBelt.name === 'Purple Belt') {
+        return '/images/beltNewPurple.svg';
+      } else if (currentBelt.name === 'Black Belt') {
+        return '/images/beltNewBlack.svg';
+      } else {
+        return '/images/beltNewWhite.svg'; // Default to white
+      }
     };
-    
-    const beltInfo = getBeltInfo(userXP);
 
     const [selectedUnits, setSelectedUnits] = useState<number[]>([]);
     const [unitsData, setUnitsData] = useState<UnitDetailsType[]>([]);
@@ -111,8 +117,14 @@ function SelectPracticeUnitsContent() {
                     {/* Header Row - Belt Badge, Headline & XP */}
                     <div className="flex justify-between items-center mb-6">
                         {/* Left Side - Belt Badge */}
-                        <div className={`h-8 px-4 flex items-center justify-center border-2 border-black font-bold uppercase text-xs tracking-wider ${beltInfo.bgColor} ${beltInfo.textColor}`}>
-                            {beltInfo.name}
+                        <div className="h-8 flex items-center justify-center">
+                            <Image
+                                src={getBeltImage()}
+                                alt={currentBelt.name}
+                                width={32}
+                                height={32}
+                                className="h-8 w-auto"
+                            />
                         </div>
                         
                         {/* Center - Headline */}

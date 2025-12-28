@@ -69,20 +69,86 @@ export async function POST(req: Request) {
       const checkoutSession = event.data.object as Stripe.Checkout.Session;
       console.log(`✅ Checkout session completed: ${checkoutSession.id}`);
       
-      const { examId: checkoutExamId, userId: checkoutUserId } = checkoutSession.metadata || {};
+      const { purchaseType, courseType, examId: checkoutExamId, userId: checkoutUserId } = checkoutSession.metadata || {};
       
-      if (!checkoutExamId || !checkoutUserId) {
-        console.error(`Webhook Error: Missing metadata for checkout session ${checkoutSession.id}`);
-        return NextResponse.json({ error: 'Missing metadata' }, { status: 400 });
+      if (!checkoutUserId) {
+        console.error(`Webhook Error: Missing userId for checkout session ${checkoutSession.id}`);
+        return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
       }
 
       try {
         const userRef = adminDb.collection('users').doc(checkoutUserId);
-        await userRef.set({
-          purchases: FieldValue.arrayUnion(checkoutExamId),
-        }, { merge: true });
         
-        console.log(`✅ Added exam ${checkoutExamId} to user ${checkoutUserId} purchases`);
+        // Handle season pass purchases
+        if (purchaseType === 'season-pass' && courseType) {
+          // Calculate expiration date: June 30th UTC 11:59 PM
+          // Get current year, or next year if we're past June 30th
+          const now = new Date();
+          const currentYear = now.getUTCFullYear();
+          const currentMonth = now.getUTCMonth(); // 0-11, where 5 = June
+          const currentDay = now.getUTCDate();
+          
+          // If we're past June 30th, set expiration for next year
+          // Otherwise, set expiration for current year
+          const expirationYear = (currentMonth > 5 || (currentMonth === 5 && currentDay > 30)) 
+            ? currentYear + 1 
+            : currentYear;
+          
+          // June 30th UTC 11:59:59 PM = June 30th 23:59:59 UTC
+          // Store as ISO string for easy comparison
+          const expirationDate = `${expirationYear}-06-30T23:59:59.999Z`;
+          
+          // Get current user data to merge expiration dates properly
+          const userDoc = await userRef.get();
+          const currentData = userDoc.exists() ? userDoc.data() : {};
+          const currentExpiration = currentData.seasonPassExpiration || {};
+          const currentSeasonPass = currentData.seasonPass || [];
+          
+          // Handle bundle purchase (adds both macro and micro)
+          if (courseType === 'bundle') {
+            const subjectsToAdd = ['macro', 'micro'];
+            const newExpiration = { ...currentExpiration };
+            
+            subjectsToAdd.forEach((subject) => {
+              if (!currentSeasonPass.includes(subject)) {
+                newExpiration[subject] = expirationDate;
+              }
+            });
+            
+            await userRef.set({
+              seasonPass: FieldValue.arrayUnion(...subjectsToAdd),
+              seasonPassExpiration: newExpiration,
+            }, { merge: true });
+            
+            console.log(`✅ Added bundle season pass (macro + micro) to user ${checkoutUserId} (expires ${expirationDate})`);
+          } 
+          // Handle single subject purchase
+          else if (courseType === 'macro' || courseType === 'micro') {
+            await userRef.set({
+              seasonPass: FieldValue.arrayUnion(courseType),
+              seasonPassExpiration: {
+                ...currentExpiration,
+                [courseType]: expirationDate,
+              },
+            }, { merge: true });
+            
+            console.log(`✅ Added ${courseType} season pass to user ${checkoutUserId} (expires ${expirationDate})`);
+          } else {
+            console.error(`Webhook Error: Invalid courseType ${courseType} for season pass`);
+            return NextResponse.json({ error: 'Invalid courseType' }, { status: 400 });
+          }
+        } 
+        // Handle exam purchases (existing logic)
+        else if (checkoutExamId) {
+          await userRef.set({
+            purchases: FieldValue.arrayUnion(checkoutExamId),
+          }, { merge: true });
+          
+          console.log(`✅ Added exam ${checkoutExamId} to user ${checkoutUserId} purchases`);
+        } else {
+          console.error(`Webhook Error: Missing purchaseType or examId for checkout session ${checkoutSession.id}`);
+          return NextResponse.json({ error: 'Missing purchase data' }, { status: 400 });
+        }
       } catch (error: any) {
         console.error(`Error updating user ${checkoutUserId} in Firestore for checkout ${checkoutSession.id}: ${error.message}`);
         return NextResponse.json({ error: 'Firestore update failed.' }, { status: 500 });

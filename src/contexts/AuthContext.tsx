@@ -26,6 +26,7 @@ export function useAuthContext(): AuthContextValue {
       loadingMcqData: true,
       userData: null,
       loadingUserData: true,
+      setUserData: (() => { console.warn('AuthProvider not found, cannot set user data'); }) as React.Dispatch<React.SetStateAction<any>>,
       lastSelectedPracticeUnits: null,
       setLastSelectedPracticeUnits: () => { console.warn('AuthProvider not found, cannot set last selected units'); },
       globalLevel: 1,

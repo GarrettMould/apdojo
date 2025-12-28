@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useCourseContext, useCourseTheme } from '@/contexts/CourseContext';
 import { SubjectToggle } from '@/components/dashboard/SubjectToggle';
-import { dojoDrills } from '@/data/dojoDrills';
+import { dojoDrills, drillAppliesToSubject, getDrillUnitForSubject } from '@/data/dojoDrills';
 import { frqExams } from '@/data/frqQuestions';
 import { getBeltProgress } from '@/lib/beltSystem';
 import { loadDojoDrillProgress, getDrillProgress, DojoDrillProgress } from '@/lib/dojoDrillProgress';
@@ -17,6 +17,7 @@ import DojoThumbnail from '@/components/DojoThumbnail';
 import { collection, query, where, orderBy, limit, getDocs, getDoc, doc, collectionGroup } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { QuizHistoryEntry, restoreTableData } from '@/lib/quizHistory';
+import { hasValidSeasonPass } from '@/lib/utils';
 
 // Container animation variants (LITE - very subtle)
 const containerVariants = {
@@ -73,9 +74,8 @@ export function DojoDashboard() {
   // Helper to check if user has access to a course
   const hasCourseAccess = useMemo(() => {
     if (!user || !userData) return false;
-    // Check if user has season pass for the current course
-    const seasonPass = userData.seasonPass as string[] | undefined;
-    if (seasonPass && seasonPass.includes(currentCourse)) return true;
+    // Check if user has valid season pass for the current course
+    if (hasValidSeasonPass(userData, currentCourse as 'macro' | 'micro')) return true;
     // Check if user has purchased units (for now, assume any purchase = access)
     const purchasedTests = userData.purchasedTests as string[] | undefined;
     if (purchasedTests && purchasedTests.length > 0) return true;
@@ -181,16 +181,30 @@ export function DojoDashboard() {
           if (quizHistory.length > 0) {
             quizHistory.forEach(entry => {
               if (entry.totalQuestions > 0) { // At least one question answered
-                activities.push({
-                  id: entry.id,
-                  type: entry.type === 'cheat-sheet' ? 'quiz' : entry.type === 'infinite-drill' ? 'drill' : 'custom-quiz',
-                  title: entry.title,
-                  timestamp: entry.timestamp,
-                  score: entry.score,
-                  correctCount: entry.correctCount,
-                  totalQuestions: entry.totalQuestions,
-                  source: 'quizHistory'
+                // Filter by subject: check if any question matches current course
+                const subjectMatch = entry.questions?.some(q => {
+                  const questionSubject = q.subject;
+                  if (Array.isArray(questionSubject)) {
+                    return questionSubject.includes(currentCourse);
+                  }
+                  // Map 'ap_macroeconomics' to 'macro' and 'ap_microeconomics' to 'micro'
+                  if (questionSubject === 'ap_macroeconomics' && currentCourse === 'macro') return true;
+                  if (questionSubject === 'ap_microeconomics' && currentCourse === 'micro') return true;
+                  return questionSubject === currentCourse;
                 });
+                
+                if (subjectMatch) {
+                  activities.push({
+                    id: entry.id,
+                    type: entry.type === 'cheat-sheet' ? 'quiz' : entry.type === 'infinite-drill' ? 'drill' : 'custom-quiz',
+                    title: entry.title,
+                    timestamp: entry.timestamp,
+                    score: entry.score,
+                    correctCount: entry.correctCount,
+                    totalQuestions: entry.totalQuestions,
+                    source: 'quizHistory'
+                  });
+                }
               }
             });
           }
@@ -261,16 +275,19 @@ export function DojoDashboard() {
 
           // 4. Get dojo drill progress (drills with at least one stage completed)
           if (drillProgress) {
+            const expectedSubject = currentCourse === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics';
             Object.entries(drillProgress).forEach(([drillId, progress]) => {
               if (progress.stage1 || progress.stage2 || progress.stage3) {
                 const drill = Object.values(dojoDrills).find(d => d.id === drillId);
-                if (drill) {
+                // Filter by subject: only include drills matching current course
+                if (drill && drillAppliesToSubject(drill, expectedSubject)) {
+                  const drillUnit = getDrillUnitForSubject(drill, expectedSubject) || drill.unit;
                   activities.push({
                     id: `drill-${drillId}`,
                     type: 'dojo-drill',
                     title: drill.title,
                     timestamp: (progress as any).lastUpdated,
-                    unit: drill.unit,
+                    unit: drillUnit,
                     stagesCompleted: [progress.stage1, progress.stage2, progress.stage3].filter(Boolean).length,
                     source: 'drillProgress'
                   });
@@ -303,11 +320,12 @@ export function DojoDashboard() {
     if (!loadingQuizHistory && !loadingProgress) {
       fetchRecentActivities();
     }
-  }, [user, quizHistory, drillProgress, loadingQuizHistory, loadingProgress]);
+  }, [user, quizHistory, drillProgress, loadingQuizHistory, loadingProgress, currentCourse]);
 
   // Filter dojo drills by course
+  const subjectFilter = currentCourse === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics';
   const filteredDrills = Object.values(dojoDrills).filter(
-    (drill) => drill.subject === (currentCourse === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics')
+    (drill) => drillAppliesToSubject(drill, subjectFilter)
   );
 
   // Filter FRQ exams by course
@@ -444,21 +462,9 @@ export function DojoDashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Subject Toggle - At the very top */}
-        <div className="mb-8">
+        {/* Subject Toggle - Mobile Only (visible on small screens) */}
+        <div className="mb-4 md:hidden">
           <SubjectToggle />
-          {/* Free Preview Banner */}
-          {!hasCourseAccess && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mt-4 text-center"
-            >
-              <p className="text-sm text-gray-600 bg-gray-100 rounded-full px-4 py-2 inline-block">
-                Viewing Free Preview Mode
-              </p>
-            </motion.div>
-          )}
         </div>
         {/* Compact Progress Header - Expandable */}
         <motion.div
@@ -475,21 +481,51 @@ export function DojoDashboard() {
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  {/* Belt Badge */}
-                  <div className={`w-12 h-12 rounded-full ${currentBelt.color} flex items-center justify-center flex-shrink-0`}>
-                    <span className={`text-xs font-bold ${currentBelt.textColor}`}>
-                      {beltName.charAt(0)}
-                  </span>
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-semibold text-gray-900">{currentBelt.name}</h2>
-                    <p className="text-sm text-gray-600">
-                      {xp.toLocaleString()} XP
-                      {nextBelt && ` • ${xpToNext?.toLocaleString() || 0} to ${nextBeltName}`}
-                    </p>
-                  </div>
+                  {/* Belt Badge with Image */}
+                  {(() => {
+                    const getBeltImage = () => {
+                      if (currentBelt.name === 'White Belt') {
+                        return '/images/beltNewWhite.svg';
+                      } else if (currentBelt.name === 'Yellow Belt') {
+                        return '/images/beltNewYellow.svg';
+                      } else if (currentBelt.name === 'Green Belt') {
+                        return '/images/beltNewGreen.svg';
+                      } else if (currentBelt.name === 'Purple Belt') {
+                        return '/images/beltNewPurple.svg';
+                      } else if (currentBelt.name === 'Black Belt') {
+                        return '/images/beltNewBlack.svg';
+                      } else {
+                        return '/images/beltNewWhite.svg'; // Default to white
+                      }
+                    };
+                    
+                    return (
+                      <>
+                        <div className="flex-shrink-0">
+              <Image
+                            src={getBeltImage()}
+                            alt={currentBelt.name}
+                            width={96}
+                            height={96}
+                            className="w-24 h-auto"
+                          />
+                        </div>
+                        <div>
+                          <h2 className="text-lg font-semibold text-gray-900">{currentBelt.label}</h2>
+                          <p className="text-sm text-gray-600">
+                            {xp.toLocaleString()} XP
+                            {nextBelt && ` • ${xpToNext?.toLocaleString() || 0} to ${nextBeltName}`}
+                          </p>
+                        </div>
+                      </>
+                    );
+                  })()}
                 </div>
                 <div className="flex items-center gap-4">
+                  {/* Subject Toggle */}
+                  <div className="hidden md:block">
+                    <SubjectToggle />
+                  </div>
                   {/* XP Progress Bar */}
                   {nextBelt && (
                     <div className="hidden sm:flex items-center gap-3 flex-1 max-w-xs">
@@ -561,27 +597,27 @@ export function DojoDashboard() {
                         <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-3">Unit Performance</h3>
                         <div className="space-y-3">
                           {currentSubjectStats.map((stat) => (
-                            <div key={stat.unitId} className="flex items-center gap-4">
-                      <div className="flex-shrink-0 w-16">
-                                <span className="text-sm font-semibold text-gray-900">Unit {stat.unitId}</span>
+                            <div key={stat.unitId} className="bg-white border-4 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4">
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center gap-3">
+                                  <span className="text-sm font-black text-gray-900">Unit {stat.unitId}</span>
+                                  <span className="text-sm font-semibold text-gray-700">{getUnitName(stat.unitId).split(': ')[1]}</span>
                       </div>
-                      <div className="flex-1">
-                                <div className="flex items-center justify-between mb-1">
-                                  <span className="text-sm text-gray-700">{getUnitName(stat.unitId).split(': ')[1]}</span>
-                                  <span className="text-sm font-semibold text-gray-900">{stat.percentage}%</span>
+                                <span className="text-lg font-black text-gray-900">{stat.percentage}%</span>
                         </div>
-                                <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                          <div
+                              <div className="h-6 w-full bg-gray-200 border-2 border-black rounded-full overflow-hidden">
+                                <motion.div
+                                  initial={{ width: 0 }}
+                                  animate={{ width: `${stat.percentage}%` }}
+                                  transition={{ duration: 0.5, ease: "easeOut" }}
                             className={`h-full rounded-full ${
-                                      stat.percentage >= 80
+                                    stat.percentage >= 80
                                 ? 'bg-green-500'
-                                        : stat.percentage >= 60
-                                        ? 'bg-yellow-500'
-                                        : 'bg-red-500'
-                                    }`}
-                                    style={{ width: `${stat.percentage}%` }}
-                                  />
-                                </div>
+                                      : stat.percentage >= 60
+                                      ? 'bg-yellow-500'
+                                      : 'bg-red-500'
+                                  }`}
+                                />
                               </div>
                             </div>
                           ))}
@@ -739,7 +775,7 @@ export function DojoDashboard() {
                           variants={cardHoverVariants}
                           initial="rest"
                           whileHover="hover"
-                          className="bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 text-left hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 flex flex-col h-full relative"
+                          className="bg-white border border-gray-300 rounded-3xl p-6 text-left transition-all flex flex-col h-full relative"
                           style={{ 
                             backgroundColor: '#ffffff',
                             opacity: 1,
@@ -760,12 +796,12 @@ export function DojoDashboard() {
                             />
                             {/* Score/Progress Overlay */}
                             {activity.score !== undefined && (
-                              <div className="absolute bottom-4 right-4 bg-black/80 text-white px-3 py-1.5 rounded-lg font-bold text-lg shadow-lg z-30">
+                              <div className="absolute bottom-4 left-4 bg-black/80 text-white px-3 py-1.5 rounded-lg font-bold text-lg shadow-lg z-30">
                                 {activity.score}%
                               </div>
                             )}
                             {activity.stagesCompleted && (
-                              <div className="absolute bottom-4 right-4 bg-black/80 text-white px-3 py-1.5 rounded-lg font-bold text-sm shadow-lg z-30">
+                              <div className="absolute bottom-4 left-4 bg-black/80 text-white px-3 py-1.5 rounded-lg font-bold text-sm shadow-lg z-30">
                                 {activity.stagesCompleted}/3 stages
                               </div>
                             )}
@@ -843,7 +879,7 @@ export function DojoDashboard() {
                           variants={cardHoverVariants}
                           initial="rest"
                           whileHover="hover"
-                          className="bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 text-left hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 flex flex-col h-full"
+                          className="bg-white border border-gray-300 rounded-3xl p-6 text-left transition-all flex flex-col h-full"
                         >
                           {/* Progress Badge */}
                           {isCompleted && (
@@ -859,7 +895,7 @@ export function DojoDashboard() {
                               type="drill"
                               title={drill.title}
                               icon={Zap}
-                              unitNumber={drill.unit.toString().padStart(2, '0')}
+                              unitNumber={(getDrillUnitForSubject(drill, subjectFilter) || drill.unit).toString().padStart(2, '0')}
                               xpReward={drill.xpReward.total}
                               activityType="Drill"
                               className="rounded-t-3xl"
@@ -871,7 +907,7 @@ export function DojoDashboard() {
                           </h3>
                           {/* Meta */}
                           <div className="flex items-center justify-between mt-auto">
-                            <p className="text-sm text-gray-500">Unit {drill.unit}</p>
+                            <p className="text-sm text-gray-500">Unit {getDrillUnitForSubject(drill, subjectFilter) || drill.unit}</p>
                             {inProgress && (
                               <span className="text-xs text-blue-600 font-medium">Continue</span>
                             )}
@@ -915,7 +951,7 @@ export function DojoDashboard() {
                         variants={cardHoverVariants}
                         initial="rest"
                         whileHover="hover"
-                        className="bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 text-left hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 flex flex-col h-full"
+                        className="bg-white border border-gray-300 rounded-3xl p-6 text-left transition-all flex flex-col h-full"
                       >
                         {/* Thumbnail */}
                         <div className="mb-4 -mx-6 -mt-6 flex-shrink-0">
@@ -970,7 +1006,7 @@ export function DojoDashboard() {
                         variants={cardHoverVariants}
                         initial="rest"
                         whileHover="hover"
-                        className="bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 text-left hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 flex flex-col h-full"
+                        className="bg-white border border-gray-300 rounded-3xl p-6 text-left transition-all flex flex-col h-full"
                       >
                         {/* Thumbnail */}
                         <div className="mb-4 -mx-6 -mt-6 flex-shrink-0">
@@ -1024,7 +1060,7 @@ export function DojoDashboard() {
                         variants={cardHoverVariants}
                         initial="rest"
                         whileHover="hover"
-                        className={`bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 text-left hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 relative overflow-hidden flex flex-col h-full ${exam.isLocked ? 'opacity-60' : ''}`}
+                        className={`bg-white border border-gray-300 rounded-3xl p-6 text-left transition-all relative overflow-hidden flex flex-col h-full ${exam.isLocked ? 'opacity-60' : ''}`}
                       >
                         {/* Lock Overlay */}
                         {exam.isLocked && (
@@ -1116,7 +1152,7 @@ export function DojoDashboard() {
                           variants={cardHoverVariants}
                           initial="rest"
                           whileHover="hover"
-                          className="bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 text-left hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 flex flex-col h-full relative"
+                          className="bg-white border border-gray-300 rounded-3xl p-6 text-left transition-all flex flex-col h-full relative"
                           style={{ 
                             backgroundColor: '#ffffff',
                             opacity: 1,
@@ -1136,7 +1172,7 @@ export function DojoDashboard() {
                               className="rounded-t-3xl"
                             />
                             {/* Score Overlay */}
-                            <div className="absolute bottom-4 right-4 bg-black/80 text-white px-3 py-1.5 rounded-lg font-bold text-lg shadow-lg z-30">
+                            <div className="absolute bottom-4 left-4 bg-black/80 text-white px-3 py-1.5 rounded-lg font-bold text-lg shadow-lg z-30">
                               {entry.score}%
                             </div>
                           </div>

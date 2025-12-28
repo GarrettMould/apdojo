@@ -17,6 +17,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { CheckCircle2 } from 'lucide-react';
 import { LoginModal, SignupModal } from '@/components/AuthModals';
 import FRQLibrarySidebar, { FRQItem } from '@/components/FRQLibrarySidebar';
+import { hasValidSeasonPass } from '@/lib/utils';
 
 // Self-Review Component for Drawings
 const DrawingSelfReview = ({ 
@@ -182,11 +183,9 @@ function UnitFRQPracticePageComponent() {
   // Check if user is a pro customer (has season pass)
   const isProCustomer = React.useMemo(() => {
     if (!user || !userData) return false;
-    const seasonPass = userData.seasonPass as string[] | undefined;
-    if (!seasonPass) return false;
-    // Check if user has season pass for current subject
+    // Check if user has valid season pass for current subject
     const subjectKey = selectedSubject === 'macro' ? 'macro' : 'micro';
-    return seasonPass.includes(subjectKey) || seasonPass.includes('macro') || seasonPass.includes('micro');
+    return hasValidSeasonPass(userData, subjectKey) || hasValidSeasonPass(userData);
   }, [user, userData, selectedSubject]);
 
   // Memoize the filtering of relevant exams
@@ -212,14 +211,27 @@ function UnitFRQPracticePageComponent() {
       return false;
     }
     
-    // Free customers: Only GDP FRQ from Unit 2 (question ID 5) is unlocked for macro
+    // Free customers: All Unit 1 FRQs are unlocked, plus GDP FRQ from Unit 2 (question ID 5) for macro
     if (selectedSubject === 'macro') {
-      // Only question ID 5 (GDP & Inflation Data from Unit 2) is unlocked
-      return questionId !== 5;
+      // Unit 1 FRQs are unlocked (questionUnit === 1)
+      // Also unlock question ID 5 (GDP & Inflation Data from Unit 2)
+      if (questionUnit === 1) {
+        return false; // Unit 1 FRQs are unlocked
+      }
+      return questionId !== 5; // Only question ID 5 from Unit 2 is unlocked
     }
     
-    // For micro, all are locked for free customers (can be updated later)
-    // For now, free customers only get the macro GDP FRQ
+    // For micro: All Unit 1 FRQs are unlocked, plus Game Theory FRQ from Unit 4 (question ID 3)
+    if (selectedSubject === 'micro') {
+      // Unit 1 FRQs are unlocked (questionUnit === 1)
+      if (questionUnit === 1) {
+        return false; // Unit 1 FRQs are unlocked
+      }
+      // Also unlock question ID 3 (Game Theory from Unit 4)
+      return questionId !== 3; // Only question ID 3 from Unit 4 is unlocked
+    }
+    
+    // Default: locked
     return true;
   }, [isProCustomer, selectedSubject]);
 
@@ -615,7 +627,12 @@ function UnitFRQPracticePageComponent() {
               onSelect={(id) => {
                 const questionIndex = allDisplayQuestions.findIndex(q => q.id.toString() === id);
                 const question = allDisplayQuestions[questionIndex];
-                if (questionIndex !== -1 && question && !isQuestionLocked(parseInt(id, 10), question.unit)) {
+                if (questionIndex !== -1 && question) {
+                  // If question is locked, redirect to season pass purchase
+                  if (isQuestionLocked(parseInt(id, 10), question.unit)) {
+                    window.location.href = `/purchase/season-pass?courseType=${selectedSubject}`;
+                    return;
+                  }
                   handleSelectQuestion(questionIndex);
                   setIsSidebarOpen(false); // Close sidebar on selection
                 }

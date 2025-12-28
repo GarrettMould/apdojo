@@ -6,7 +6,7 @@ import Link from 'next/link'
 
 export function Footer() {
   return (
-    <footer className="border-t relative z-50 bg-white">
+    <footer className="border-t bg-white">
       <div className="max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Row */}
         <div className="pt-12 pb-8 flex flex-col sm:flex-row items-start justify-between gap-12">

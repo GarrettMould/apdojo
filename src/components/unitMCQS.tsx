@@ -137,18 +137,41 @@ interface BeltHUDProps {
 }
 
 const BeltHUD = ({ currentXP, nextBeltXP, currentBelt, percent }: BeltHUDProps) => {
+  // Helper function to get belt image path
+  const getBeltImage = () => {
+    if (currentBelt.name === 'White Belt') {
+      return '/images/beltNewWhite.svg';
+    } else if (currentBelt.name === 'Yellow Belt') {
+      return '/images/beltNewYellow.svg';
+    } else if (currentBelt.name === 'Green Belt') {
+      return '/images/beltNewGreen.svg';
+    } else if (currentBelt.name === 'Purple Belt') {
+      return '/images/beltNewPurple.svg';
+    } else if (currentBelt.name === 'Black Belt') {
+      return '/images/beltNewBlack.svg';
+    } else {
+      return '/images/beltNewWhite.svg'; // Default to white
+    }
+  };
+
   return (
     <div className="w-full flex items-center gap-4 mb-6">
       {/* Left: Belt Badge */}
-      <div className={`px-4 py-2 flex items-center gap-2 border-2 border-black font-bold uppercase text-sm tracking-wider ${currentBelt.color} ${currentBelt.textColor} rounded-lg`}>
-        <span>{currentBelt.name}</span>
+      <div className="flex items-center">
+        <Image
+          src={getBeltImage()}
+          alt={currentBelt.name}
+          width={40}
+          height={40}
+          className="h-10 w-auto"
+        />
       </div>
       
       {/* Right: Progress Bar */}
       <div className="flex-1 relative">
         <div className="h-6 bg-gray-200 border-2 border-black rounded-full overflow-hidden relative">
           <motion.div
-            className={`h-full ${currentBelt.color === 'bg-yellow-400' ? 'bg-yellow-400' : currentBelt.color === 'bg-orange-500' ? 'bg-orange-500' : currentBelt.color === 'bg-green-600' ? 'bg-green-600' : currentBelt.color === 'bg-blue-600' ? 'bg-blue-600' : currentBelt.color === 'bg-gray-900' ? 'bg-gray-900' : 'bg-yellow-400'}`}
+            className={`h-full ${currentBelt.color === 'bg-yellow-400' ? 'bg-yellow-400' : currentBelt.color === 'bg-green-600' ? 'bg-green-600' : currentBelt.color === 'bg-purple-600' ? 'bg-purple-600' : currentBelt.color === 'bg-gray-900' ? 'bg-gray-900' : 'bg-gray-100'}`}
             initial={{ width: 0 }}
             animate={{ width: `${percent}%` }}
             transition={{ duration: 0.3 }}
@@ -1273,6 +1296,16 @@ export function UnitMCQs({
 
 
 
+  // Log when currentQuestionIndex prop changes
+  useEffect(() => {
+    console.log('[Child] currentQuestionIndex prop changed', {
+      newIndex: currentQuestionIndex,
+      questionId: questions[currentQuestionIndex]?.id,
+      totalQuestions: totalQuestions,
+      questionText: questions[currentQuestionIndex]?.question?.substring(0, 50) + '...'
+    });
+  }, [currentQuestionIndex, questions, totalQuestions]);
+
   const currentQuestion = questions[currentQuestionIndex];
   const currentAnswerState = currentQuestion ? answeredQuestions[currentQuestion.id] : undefined;
   const displayUnitId = currentQuestion?.unit ?? currentUnit;
@@ -1324,8 +1357,21 @@ export function UnitMCQs({
             });
             
             if (!statusResponse.ok) {
-                const errorData = await statusResponse.json().catch(() => ({}));
-                console.error(`[handleAnswerSelection] Failed to update MCQ status for ${questionId}: ${statusResponse.status}`, errorData);
+                // Try to get error details from response
+                let errorData: any = {};
+                try {
+                    const responseText = await statusResponse.text();
+                    if (responseText) {
+                        errorData = JSON.parse(responseText);
+                    }
+                } catch (parseError) {
+                    errorData = { rawResponse: await statusResponse.text().catch(() => 'Unable to read response') };
+                }
+                console.error(`[handleAnswerSelection] Failed to update MCQ status for ${questionId}: ${statusResponse.status}`, {
+                    status: statusResponse.status,
+                    statusText: statusResponse.statusText,
+                    error: errorData
+                });
             } else {
                 console.log(`[handleAnswerSelection] Successfully updated MCQ status for question ${questionId}`);
             }
@@ -1362,11 +1408,17 @@ export function UnitMCQs({
   };
 
   const handleQuestionSelect = (index: number) => {
+    console.log('[Child] handleQuestionSelect called', {
+      requestedIndex: index,
+      currentIndex: currentQuestionIndex,
+      totalQuestions: totalQuestions,
+      isValid: index >= 0 && index < totalQuestions
+    });
     if (index >= 0 && index < totalQuestions) {
         onQuestionSelect(index);
         setHighlightedIndex(null);
     } else {
-        console.warn("Attempted to select invalid question index:", index);
+        console.warn("[Child] Attempted to select invalid question index:", index);
     }
   };
 
@@ -1396,24 +1448,20 @@ export function UnitMCQs({
     }, 1500); 
   };
 
-  const proceedToActualNextQuestion = () => {
-     if (totalQuestions === 0) return;
-     const nextIndex = currentQuestionIndex + 1;
-     if (nextIndex >= totalQuestions) {
-       handleQuestionSelect(0); // Wrap to start
-     } else {
-       handleQuestionSelect(nextIndex);
-     }
-  };
-
   const handlePreviousQuestion = () => {
-    console.log("Handling Previous Question Request");
+    console.log('[Child] handlePreviousQuestion called', {
+      currentIndex: currentQuestionIndex,
+      totalQuestions: totalQuestions
+    });
     onPreviousQuestion();
   };
 
   const handleNextQuestion = () => {
-    console.log("Handling Next Question Request");
-    proceedToActualNextQuestion(); 
+    console.log('[Child] handleNextQuestion called', {
+      currentIndex: currentQuestionIndex,
+      totalQuestions: totalQuestions
+    });
+    onNextQuestion(); 
   };
 
   // --- Updated useEffect for Keyboard Navigation --- 
@@ -1643,14 +1691,27 @@ export function UnitMCQs({
           {/* Bottom: Navigation Buttons */}
           <div className="flex gap-4">
               <button
-              onClick={onPreviousQuestion}
+              onClick={() => {
+                console.log('[Child] Previous button clicked', {
+                  currentIndex: currentQuestionIndex,
+                  totalQuestions: totalQuestions
+                });
+                onPreviousQuestion();
+              }}
                 disabled={currentQuestionIndex === 0}
               className="flex-1 px-6 py-4 border-4 border-black rounded-xl font-black text-lg bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:translate-y-1 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
               >
                 Previous
               </button>
               <button
-              onClick={onNextQuestion}
+              onClick={() => {
+                console.log('[Child] Next button clicked', {
+                  currentIndex: currentQuestionIndex,
+                  totalQuestions: totalQuestions,
+                  willBeDisabled: currentQuestionIndex === totalQuestions - 1 || totalQuestions === 0
+                });
+                onNextQuestion();
+              }}
                 disabled={currentQuestionIndex === totalQuestions - 1 || totalQuestions === 0}
               className="flex-1 px-6 py-4 border-4 border-black rounded-xl font-black text-lg bg-black text-white hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:translate-y-1 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
               >

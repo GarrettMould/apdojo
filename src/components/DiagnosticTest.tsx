@@ -16,7 +16,7 @@ interface Question {
 type PlacementTestResults = {
   score: number;       // 0-5
   total: number;       // 5
-  belt: string;        // 'White Belt', 'Yellow Belt', 'Orange Belt'
+  belt: string;        // 'White Belt', 'Yellow Belt', 'Green Belt'
   beltTitle: string;   // 'The Rookie', 'The Apprentice', 'The Scholar'
   message: string;
 };
@@ -26,13 +26,23 @@ interface DiagnosticTestProps {
   onComplete?: (answers: Record<string, number>) => void;
   initialAnswers?: Record<string, number>;
   user?: any; // User from auth context
+  onSubjectToggle?: () => void;
+  currentSubject?: 'macro' | 'micro';
 }
 
-export function DiagnosticTest({ questions, onComplete, initialAnswers = {}, user: userProp }: DiagnosticTestProps) {
+export function DiagnosticTest({ questions, onComplete, initialAnswers = {}, user: userProp, onSubjectToggle, currentSubject = 'macro' }: DiagnosticTestProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [answers, setAnswers] = useState<Record<string, number>>(initialAnswers);
   const [testResults, setTestResults] = useState<PlacementTestResults | null>(null);
+
+  // Reset test state when questions change (subject switch)
+  useEffect(() => {
+    setCurrentIndex(0);
+    setSelectedAnswer(null);
+    setAnswers({});
+    setTestResults(null);
+  }, [questions]);
 
   const currentQuestion = questions[currentIndex];
   const isLastQuestion = currentIndex === questions.length - 1;
@@ -94,8 +104,8 @@ export function DiagnosticTest({ questions, onComplete, initialAnswers = {}, use
     let message = 'Great start. We have a lot of foundational work to do.';
 
     if (score === 5) {
-      belt = 'Orange Belt';
-      beltTitle = 'The Scholar';
+      belt = 'Green Belt';
+      beltTitle = 'The Expert';
       message = 'Impressive. You are ready for advanced drills.';
     } else if (score >= 3) {
       belt = 'Yellow Belt';
@@ -271,6 +281,19 @@ export function DiagnosticTest({ questions, onComplete, initialAnswers = {}, use
             </>
           )}
         </AnimatePresence>
+
+        {/* Subject Toggle Link */}
+        {!isComplete && onSubjectToggle && (
+          <div className="mt-8 text-center">
+            <button
+              onClick={onSubjectToggle}
+              className="text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors"
+              style={{ fontFamily: 'Permanent Marker, cursive' }}
+            >
+              Switch to {currentSubject === 'macro' ? 'Micro' : 'Macro'}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

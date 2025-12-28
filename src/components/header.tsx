@@ -11,9 +11,10 @@ import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { getSubjectXP } from '@/hooks/useUserProgress';
 import { getBeltProgress } from '@/lib/beltSystem';
 import { motion } from 'framer-motion';
+import { SubjectToggle } from '@/components/dashboard/SubjectToggle';
 
 function Header() {
-  const { user, logout, selectedSubject, totalXP, guestXp, isCharacterClosetOpen, setIsCharacterClosetOpen, userData } = useAuthContext();
+  const { user, logout, selectedSubject, setSelectedSubject, totalXP, guestXp, isCharacterClosetOpen, setIsCharacterClosetOpen, userData } = useAuthContext();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isBeltDropdownOpen, setIsBeltDropdownOpen] = useState(false);
   const beltDropdownRef = useRef<HTMLDivElement>(null);
@@ -34,6 +35,10 @@ function Header() {
 
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
+  };
+
+  const handleSubjectChange = (newSubject: 'macro' | 'micro') => {
+    setSelectedSubject(newSubject);
   };
 
   const handleLogout = async () => {
@@ -117,6 +122,12 @@ function Header() {
                 Unit Cheat Sheets
               </Link>
               <Link
+                href="/dojo-drills"
+                className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
+              >
+                Dojo Drills
+              </Link>
+              <Link
                 href="/dojo/infinite"
                 className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
               >
@@ -166,6 +177,13 @@ function Header() {
               </div> */}
             </nav>
 
+            {/* Subject Toggle for Logged-Out Users */}
+            {!user && (
+              <div className="flex items-center">
+                <SubjectToggle />
+              </div>
+            )}
+
             {/* User Icon & Auth Buttons */}
             <div className="flex items-center gap-3">
               {/* XP bar with subtle red glow - Clickable to open belt dropdown */}
@@ -210,21 +228,48 @@ function Header() {
                         const beltProgress = getBeltProgress(xp);
                         const { percent, xpToNext, currentBelt } = beltProgress;
                         
+                        // Helper function to get belt image path
+                        const getBeltImage = () => {
+                          if (currentBelt.name === 'White Belt') {
+                            return '/images/beltNewWhite.svg';
+                          } else if (currentBelt.name === 'Yellow Belt') {
+                            return '/images/beltNewYellow.svg';
+                          } else if (currentBelt.name === 'Green Belt') {
+                            return '/images/beltNewGreen.svg';
+                          } else if (currentBelt.name === 'Purple Belt') {
+                            return '/images/beltNewPurple.svg';
+                          } else if (currentBelt.name === 'Black Belt') {
+                            return '/images/beltNewBlack.svg';
+                          } else {
+                            return '/images/beltNewWhite.svg'; // Default to white
+                          }
+                        };
+                        
                         return (
                           <div className="absolute top-full right-0 mt-2 w-[320px] z-50">
                             <div className="bg-white border-2 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4">
-                              {/* Belt Badge */}
-                              <div className="mb-4">
-                                <div className={`px-4 py-2 flex items-center justify-center border-2 border-black font-bold uppercase text-sm tracking-wider ${currentBelt.color} ${currentBelt.textColor} rounded-lg`}>
-                                  <span>{currentBelt.name}</span>
-                                </div>
+                              {/* Belt Badge with Image */}
+                              <div className="mb-4 flex flex-col items-center">
+                                <Image
+                                  src={getBeltImage()}
+                                  alt={currentBelt.name}
+                                  width={80}
+                                  height={80}
+                                  className="w-20 h-auto mb-2"
+                                />
+                                <span className={`font-bold uppercase text-sm tracking-wider ${currentBelt.textColor}`}>
+                                  {currentBelt.name}
+                                </span>
+                                <span className="text-xs font-semibold text-gray-600 mt-1">
+                                  {currentBelt.label}
+                                </span>
                               </div>
                               
                               {/* Progress Bar */}
                               <div className="mb-4">
                                 <div className="h-6 bg-gray-200 border-2 border-black rounded-full overflow-hidden relative">
                                   <motion.div
-                                    className={`h-full ${currentBelt.color === 'bg-yellow-400' ? 'bg-yellow-400' : currentBelt.color === 'bg-orange-500' ? 'bg-orange-500' : currentBelt.color === 'bg-green-600' ? 'bg-green-600' : currentBelt.color === 'bg-blue-600' ? 'bg-blue-600' : currentBelt.color === 'bg-gray-900' ? 'bg-gray-900' : 'bg-yellow-400'}`}
+                                    className={`h-full ${currentBelt.color === 'bg-yellow-400' ? 'bg-yellow-400' : currentBelt.color === 'bg-green-600' ? 'bg-green-600' : currentBelt.color === 'bg-purple-600' ? 'bg-purple-600' : currentBelt.color === 'bg-gray-900' ? 'bg-gray-900' : 'bg-gray-100'}`}
                                     initial={{ width: 0 }}
                                     animate={{ width: `${percent}%` }}
                                     transition={{ duration: 0.3 }}
@@ -318,6 +363,13 @@ function Header() {
                 className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
               >
                 Unit Cheat Sheets
+              </Link>
+              <Link
+                href="/dojo-drills"
+                onClick={closeMobileMenu}
+                className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
+              >
+                Dojo Drills
               </Link>
               <Link
                 href="/dojo/infinite"

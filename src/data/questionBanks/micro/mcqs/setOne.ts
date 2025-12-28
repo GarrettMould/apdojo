@@ -1128,7 +1128,7 @@ export const microSetOneQuestions: QuestionBank = {
       "subject": "ap_microeconomics",
       "lessonIDS": ["5.3"],
       "unitName": "Factor Markets",
-      "question": "A bakery hires labor and capital to produce bread. Currently, the marginal product of labor ($MP_L$) is 40 loaves, and the wage rate ($P_L$) is $10. The marginal product of capital ($MP_K$) is 100 loaves, and the rental rate of capital ($P_K$) is $20. To minimize costs while maintaining current output, the firm should:",
+      "question": "A bakery hires labor and capital to produce bread. Currently, the marginal product of labor is 40 loaves, and the wage rate is $10. The marginal product of capital is 100 loaves, and the rental rate of capital is $20. To minimize costs while maintaining current output, the firm should:",
       "image": null,
       "options": [
         "Hire more Capital and less Labor.",

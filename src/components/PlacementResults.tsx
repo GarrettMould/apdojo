@@ -9,8 +9,8 @@ import { Loader2 } from 'lucide-react';
 type PlacementResults = {
   score: number;       // 0-5
   total: number;      // 5
-  belt: string;        // 'White Belt', 'Yellow Belt', 'Orange Belt'
-  beltTitle: string;  // 'The Rookie', 'The Apprentice', 'The Scholar'
+  belt: string;        // 'White Belt', 'Yellow Belt', 'Green Belt'
+  beltTitle: string;  // 'The Rookie', 'The Apprentice', 'The Expert'
   message: string;
 };
 
@@ -49,12 +49,18 @@ export function PlacementResults({ results }: PlacementResultsProps) {
 
   // Determine belt image
   const getBeltImage = () => {
-    if (results.belt === 'Orange Belt') {
-      return '/images/belt.svg'; // Use existing belt image for orange
+    if (results.belt === 'White Belt') {
+      return '/images/beltNewWhite.svg';
     } else if (results.belt === 'Yellow Belt') {
-      return '/images/belt.svg';
+      return '/images/beltNewYellow.svg';
+    } else if (results.belt === 'Green Belt') {
+      return '/images/beltNewGreen.svg';
+    } else if (results.belt === 'Purple Belt') {
+      return '/images/beltNewPurple.svg';
+    } else if (results.belt === 'Black Belt') {
+      return '/images/beltNewBlack.svg';
     } else {
-      return '/images/belt.svg'; // White belt - can use same or different
+      return '/images/beltNewWhite.svg'; // Default to white
     }
   };
 
@@ -142,6 +148,7 @@ export function PlacementResults({ results }: PlacementResultsProps) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6, duration: 0.5 }}
         className="text-xl text-gray-800 max-w-2xl leading-relaxed"
+        style={{ fontFamily: 'Permanent Marker, cursive' }}
       >
         {results.message}
       </motion.p>
@@ -156,7 +163,10 @@ export function PlacementResults({ results }: PlacementResultsProps) {
         <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-2">
           Your Score
         </p>
-        <p className="text-3xl font-bold text-gray-900">
+        <p 
+          className="text-3xl font-bold text-gray-900"
+          style={{ fontFamily: 'Permanent Marker, cursive' }}
+        >
           {results.score}/{results.total}
         </p>
       </motion.div>

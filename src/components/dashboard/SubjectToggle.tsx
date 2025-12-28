@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 
@@ -33,47 +32,27 @@ export function SubjectToggle() {
     }
   };
 
-  const primary = selectedSubject === 'macro' ? 'bg-blue-600' : 'bg-green-600';
-
   return (
-    <div className="bg-gray-100 rounded-full p-1 flex relative w-fit mx-auto">
-      {/* Sliding Background Pill */}
-      <motion.div
-        layoutId="activeTab"
-        className={`absolute inset-y-1 rounded-full ${primary}`}
-        style={{
-          width: 'calc(50% - 4px)',
-          left: selectedSubject === 'macro' ? '4px' : 'calc(50% + 4px)',
-        }}
-        transition={{
-          type: 'spring',
-          stiffness: 500,
-          damping: 30,
-        }}
-      />
-
-      {/* AP Macro Button */}
+    <div className="inline-flex items-center bg-gray-100 rounded p-1 border border-gray-200">
       <button
         onClick={() => handleSubjectChange('macro')}
-        className={`relative z-10 px-6 py-2 rounded-full font-semibold transition-colors ${
+        className={`flex-1 px-4 py-2.5 text-sm font-medium rounded transition-all duration-200 ${
           selectedSubject === 'macro'
-            ? 'text-white font-bold'
-            : 'text-gray-500 font-medium'
+            ? 'bg-blue-600 text-white shadow-sm'
+            : 'text-gray-600 hover:text-gray-900'
         }`}
       >
-        AP Macro
+        Macro
       </button>
-
-      {/* AP Micro Button */}
       <button
         onClick={() => handleSubjectChange('micro')}
-        className={`relative z-10 px-6 py-2 rounded-full font-semibold transition-colors ${
+        className={`flex-1 px-4 py-2.5 text-sm font-medium rounded transition-all duration-200 ${
           selectedSubject === 'micro'
-            ? 'text-white font-bold'
-            : 'text-gray-500 font-medium'
+            ? 'bg-green-600 text-white shadow-sm'
+            : 'text-gray-600 hover:text-gray-900'
         }`}
       >
-        AP Micro
+        Micro
       </button>
     </div>
   );

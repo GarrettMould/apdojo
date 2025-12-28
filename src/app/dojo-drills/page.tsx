@@ -2,12 +2,13 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { dojoDrills } from '@/data/dojoDrills';
+import { dojoDrills, drillAppliesToSubject, getDrillUnitForSubject } from '@/data/dojoDrills';
 import DojoDrill from '@/components/DojoDrill';
 import { ArrowLeft } from 'lucide-react';
 import Image from 'next/image';
 import { useAuthContext } from '@/contexts/AuthContext';
 import React from 'react';
+import { hasValidSeasonPass } from '@/lib/utils';
 
 export default function DojoDrillsPage() {
   const searchParams = useSearchParams();
@@ -19,11 +20,9 @@ export default function DojoDrillsPage() {
   // Check if user is a pro customer (has season pass)
   const isProCustomer = useMemo(() => {
     if (!user || !userData) return false;
-    const seasonPass = userData.seasonPass as string[] | undefined;
-    if (!seasonPass) return false;
-    // Check if user has season pass for current subject
+    // Check if user has valid season pass for current subject
     const subjectKey = selectedSubject === 'macro' ? 'macro' : 'micro';
-    return seasonPass.includes(subjectKey) || seasonPass.includes('macro') || seasonPass.includes('micro');
+    return hasValidSeasonPass(userData, subjectKey) || hasValidSeasonPass(userData);
   }, [user, userData, selectedSubject]);
 
   // Handle drill click - redirect non-pro users to purchase page
@@ -70,10 +69,14 @@ export default function DojoDrillsPage() {
   const filteredAndSortedDrills = useMemo(() => {
     const subjectFilter = selectedSubject === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics';
     const filtered = Object.values(dojoDrills).filter(
-      drill => drill.subject === subjectFilter
+      drill => drillAppliesToSubject(drill, subjectFilter)
     );
-    // Sort by unit number
-    return filtered.sort((a, b) => a.unit - b.unit);
+    // Sort by unit number for the current subject
+    return filtered.sort((a, b) => {
+      const unitA = getDrillUnitForSubject(a, subjectFilter) || 0;
+      const unitB = getDrillUnitForSubject(b, subjectFilter) || 0;
+      return unitA - unitB;
+    });
   }, [selectedSubject]);
 
   const getSubjectLabel = (subject: string) => {

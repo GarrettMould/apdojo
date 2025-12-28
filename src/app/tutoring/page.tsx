@@ -2,7 +2,7 @@
 
 import { Check, Star, Quote, GraduationCap } from 'lucide-react'
 import { Card } from "@/components/ui/card"
-import { reviews } from '@/data/reviews'
+import { tutoringReviews as reviews } from '@/data/reviews'
 import { Button } from "@/components/ui/button"
 import { useAuthContext } from '@/contexts/AuthContext'
 import { useState } from 'react'

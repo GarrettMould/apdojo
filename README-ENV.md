@@ -47,6 +47,30 @@ At minimum, you need the Firebase variables to run the app:
 - `NEXT_PUBLIC_FIREBASE_APP_ID`
 - `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
 
+## Required for Server-Side Features (API Routes)
+
+For server-side operations like updating MCQ status, XP, and other API routes, you also need **Firebase Admin SDK** credentials:
+
+1. Go to [Firebase Console](https://console.firebase.google.com/)
+2. Select your project
+3. Go to **Project Settings** (gear icon) → **Service Accounts** tab
+4. Click **Generate New Private Key**
+5. Download the JSON file (this contains your service account credentials)
+
+6. Extract these values from the JSON file and add them to your `.env.local`:
+   - `FIREBASE_CLIENT_EMAIL` - The `client_email` field from the JSON (e.g., `firebase-adminsdk-xxxxx@your-project.iam.gserviceaccount.com`)
+   - `FIREBASE_PRIVATE_KEY` - The `private_key` field from the JSON (keep the `\n` characters, they'll be handled automatically)
+
+**Important**: The `FIREBASE_PRIVATE_KEY` should be the entire private key string from the JSON, including the `-----BEGIN PRIVATE KEY-----` and `-----END PRIVATE KEY-----` lines. You can paste it as a single line or keep the newlines - the code will handle both formats.
+
+Example `.env.local` entries:
+```
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@your-project.iam.gserviceaccount.com
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC...\n-----END PRIVATE KEY-----\n"
+```
+
+**Note**: `NEXT_PUBLIC_FIREBASE_PROJECT_ID` is shared between client and server, so you only need to set it once.
+
 ## Optional Services
 
 Other services are only needed if you're using those features:

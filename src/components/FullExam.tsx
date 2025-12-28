@@ -5,6 +5,7 @@ import { Question, QuestionBank } from '@/data/questionBanks/types';
 import { Button } from "@/components/ui/button";
 import { Bookmark, BookmarkX, X, Clock, Maximize2, Minimize2, Calculator, Pen, Eraser, Expand, Trash2, Circle, CircleDot, Check, Lock, Brain, FileText, ChevronLeft, ChevronRight, ChevronsRight, Triangle, Strikethrough, Eye, Play } from 'lucide-react';
 import { StaticImageData } from 'next/image';
+import Link from 'next/link';
 import { redirectToCheckout } from '@/lib/stripe';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { LoginModal, SignupModal } from './AuthModals';
@@ -32,6 +33,7 @@ interface FullExamProps {
   onTimeUpdate?: (timeRemaining: number) => void;
   isCustomAssignment?: boolean;
   assignmentLinkId?: string; // Encoded parameter for custom assignments
+  isFreeUser?: boolean; // If true, blur and restrict questions beyond question 1
 }
 
 interface Answers {
@@ -93,7 +95,7 @@ const FeedbackProgressBar = ({ status }: { status: 'incorrect' | 'partial' | 'co
   );
 };
 
-export function FullExam({ questionBank, examType, questionType, examNumber, onTimeUpdate, isCustomAssignment = false, assignmentLinkId }: FullExamProps) {
+export function FullExam({ questionBank, examType, questionType, examNumber, onTimeUpdate, isCustomAssignment = false, assignmentLinkId, isFreeUser = false }: FullExamProps) {
   const [answers, setAnswers] = useState<Answers>({});
   const [showResults, setShowResults] = useState(false);
   const [showFullResults, setShowFullResults] = useState(false);
@@ -982,14 +984,19 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                         <button
                           key={q.id}
                           onClick={() => {
+                            if (isFreeUser && index > 1) {
+                              // Prevent free users from navigating to questions beyond question 2 (index 1)
+                              return;
+                            }
                             setCurrentPage(index);
                             setTimeout(() => {
                               const element = document.getElementById(`question-${q.id}`);
                               element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
                             }, 100);
                           }}
-                          className={buttonClasses}
-                          title={`Question ${index + 1}`}
+                          disabled={isFreeUser && index > 1}
+                          className={`${buttonClasses} ${isFreeUser && index > 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          title={isFreeUser && index > 1 ? 'Join the Dojo to unlock' : `Question ${index + 1}`}
                         >
                           <span className={textClasses}>{index + 1}</span>
                         </button>
@@ -1000,7 +1007,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
               </div>
               )}
 
-              {/* Single Question View with Split-Screen Layout */}
+              {/* Single Question View - Same for both free and pro users */}
               {(() => {
                 const question = questions[currentPage];
                 if (!question) return null;
@@ -1008,16 +1015,28 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                 const selectedAnswer = answers[question.id];
                 const selectedIndex = selectedAnswer ? selectedAnswer.charCodeAt(0) - 65 : null;
                 const hasVisualContent = question.image || question.tableData;
+                // For free users, blur question 2 and beyond (index >= 1)
+                const isQuestionLocked = isFreeUser && currentPage >= 1;
                 
                 return (
+                  <div className="w-full relative">
+                    {/* Question Container */}
                   <div className="w-full">
-                    {/* Question Info Header */}
-                    {!(showVideoModal && videoUrl) && (
-                    <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
-                      <div className="flex items-center gap-4">
-                        <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 bg-slate-100 border border-slate-200 rounded-lg">
+                      <div id={`question-${question.id}`} className={`bg-white p-6 md:p-8 relative ${
+                        isCustomAssignment 
+                          ? 'border-2 border-black rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' 
+                          : 'rounded-lg shadow-md border border-gray-200'
+                      } ${isQuestionLocked ? 'blur-sm' : ''}`}>
+                        {/* Main Question Content */}
+                        <div className={`space-y-6 ${isQuestionLocked ? 'pointer-events-none' : ''}`}>
+                          {/* Question Number, Bookmark, and Question Text */}
+                          <div className="w-full">
+                            <div className="flex items-start gap-3">
+                              {/* Question Number */}
+                              <div className="flex-shrink-0 flex items-start justify-center w-10 h-10 bg-slate-100 border border-slate-200 rounded-lg pt-2">
                           <span className="text-lg font-bold text-slate-700">{currentPage + 1}</span>
                         </div>
+                              {/* Bookmark Button */}
                         <button
                           onClick={() => {
                             const newBookmarks = new Set(bookmarkedQuestions);
@@ -1028,7 +1047,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                             }
                             setBookmarkedQuestions(newBookmarks);
                           }}
-                          className={`flex-shrink-0 p-2 rounded-lg transition-colors ${
+                                className={`flex-shrink-0 p-2 rounded-lg transition-colors mt-0.5 ${
                             bookmarkedQuestions.has(question.id)
                               ? 'bg-yellow-100 text-yellow-500'
                               : 'bg-slate-100 hover:bg-slate-200 text-slate-500'
@@ -1037,29 +1056,37 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                         >
                           <Bookmark className="w-5 h-5" />
                         </button>
-                        <div className="relative">
+                              {/* Question Text */}
+                              <div className="flex-1 min-w-0">
+                                <p className="text-base md:text-lg font-medium font-serif leading-relaxed text-gray-800 max-h-48 overflow-y-auto pr-2">
+                                  {isCustomAssignment ? (
+                                    <QuestionWithKeyTerms 
+                                      questionText={question.question} 
+                                      unit={question.unit} 
+                                      subject={examType === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics'}
+                                    />
+                                  ) : (
+                                    question.question
+                                  )}
+                                </p>
+                                {/* Icons Row */}
+                                <div className="flex items-center gap-2 mt-2">
+                                  {/* Video Explanation Icon */}
+                                  {question.videoExplanation && typeof question.videoExplanation === 'string' && question.videoExplanation.trim() !== '' && (
                           <button
-                            ref={sidecarButtonRef}
-                            onClick={() => setShowSidecar(!showSidecar)}
-                            className="text-sm text-gray-600 hover:text-gray-900 hover:underline cursor-pointer transition-colors"
-                          >
-                            Question {currentPage + 1} of {questions.length}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setVideoUrl(question.videoExplanation!);
+                                        setShowVideoModal(true);
+                                      }}
+                                      className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 hover:text-blue-700 transition-colors"
+                                      aria-label="View video explanation"
+                                      title="Watch video explanation"
+                                    >
+                                      <Play className="w-4 h-4 ml-0.5" />
                           </button>
-                          {showSidecar && !(showVideoModal && videoUrl) && (
-                            <div className="absolute left-0 top-full mt-2 z-50 mcq-sidecar-popup" style={{ width: '320px' }}>
-                              <MCQSidecar
-                                questions={questions}
-                                answers={answers}
-                                bookmarkedQuestions={bookmarkedQuestions}
-                                onQuestionClick={scrollToQuestion}
-                                onClose={() => setShowSidecar(false)}
-                              />
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        {/* Slider Explainer Video Icon */}
+                                  )}
+                                  {/* Slider Explainer Icon */}
                         {question.sliderExplainer && (
                           <button
                             onClick={(e) => {
@@ -1068,101 +1095,57 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                               setVideoUrl(question.sliderExplainer!);
                               setShowVideoModal(true);
                             }}
-                            className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+                                      className="flex-shrink-0 flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
                             aria-label="View video explanation"
                           >
                             <Eye className="w-4 h-4" />
                           </button>
                         )}
-                        {/* Timer temporarily hidden */}
-                        {/* <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                          <Clock className="w-4 h-4" />
-                          <span>{formatTime(timeRemaining)}</span>
-                        </div> */}
                       </div>
                     </div>
-                    )}
-
-                    {/* Split-Screen Grid Container */}
-                    <div className={`grid grid-cols-1 ${hasVisualContent && !isCustomAssignment && !(showVideoModal && videoUrl) ? 'lg:grid-cols-5' : 'lg:grid-cols-1'} gap-8`}>
-                      {/* Left Column: Question Text & Options */}
-                      <div className={`${hasVisualContent && !isCustomAssignment && !(showVideoModal && videoUrl) ? 'lg:col-span-4' : 'lg:col-span-1'}`}>
-                        <div id={`question-${question.id}`} className={`bg-white p-6 md:p-8 ${
-                          isCustomAssignment 
-                            ? 'border-2 border-black rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' 
-                            : 'rounded-lg shadow-md border border-gray-200'
-                        }`}>
-                          {/* Main Question Content */}
-                          <div className="space-y-6">
-                            {/* Question Text */}
-                            <div className="flex items-start gap-3">
-                              <p className="flex-1 text-base md:text-lg font-medium font-serif leading-relaxed text-gray-800 max-h-48 overflow-y-auto pr-2">
-                                {isCustomAssignment ? (
-                                  <QuestionWithKeyTerms 
-                                    questionText={question.question} 
-                                    unit={question.unit} 
-                                    subject={examType === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics'}
-                                  />
-                                ) : (
-                                  question.question
-                                )}
-                              </p>
-                              {/* Video Explanation Icon */}
-                              {question.videoExplanation && typeof question.videoExplanation === 'string' && question.videoExplanation.trim() !== '' && (
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setVideoUrl(question.videoExplanation!);
-                                    setShowVideoModal(true);
-                                  }}
-                                  className="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-600 hover:text-blue-700 transition-colors"
-                                  aria-label="View video explanation"
-                                  title="Watch video explanation"
-                                >
-                                  <Play className="w-4 h-4 ml-0.5" />
-                                </button>
-                              )}
                             </div>
+                          </div>
 
-                            {/* Visual Content - Show below question text when video modal is open */}
-                            {showVideoModal && videoUrl && hasVisualContent && !isCustomAssignment && (
-                              <div className="space-y-4">
-                                {question.image && (
-                                  <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4 flex justify-center">
-                                    <img 
-                                      src={question.image.src}
-                                      alt="Question diagram"
-                                      className="w-full max-w-2xl h-auto object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
-                                      onClick={() => {
-                                        setSelectedImage(question.image as StaticImageData);
-                                        setShowImageModal(true);
-                                      }}
-                                    />
-                                  </div>
-                                )}
-                                {question.tableData && (
-                                  <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
-                                    <div className="flex items-center gap-4">
+                          {/* Visual Content - Directly Below Question Text */}
+                          {hasVisualContent && !isCustomAssignment && !(showVideoModal && videoUrl) && (
+                            <div className="w-full">
+                              {question.image && (
+                                <div className="bg-white rounded-lg border border-gray-200 p-4">
+                                  <img 
+                                    src={question.image.src}
+                                    alt="Question diagram"
+                                    className="w-full h-auto max-h-[400px] object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
+                                    onClick={() => {
+                                      setSelectedImage(question.image as StaticImageData);
+                                      setShowImageModal(true);
+                                    }}
+                                  />
+                                </div>
+                              )}
+                              {question.tableData && (
+                                <div className="bg-white rounded-lg border border-gray-200 p-4">
+                                  <div className="flex items-center gap-4">
+                                    {question.tableData.playerNames && (
+                                      <div className="flex items-center justify-center h-full w-12">
+                                        <p className="transform -rotate-90 whitespace-nowrap text-center font-bold text-sm text-gray-900 leading-tight">
+                                          {question.tableData.playerNames.row.split(' ')[0]}
+                                          <br />
+                                          {question.tableData.playerNames.row.split(' ').slice(1).join(' ')}
+                                        </p>
+                                      </div>
+                                    )}
+                                    <div className="flex-1">
                                       {question.tableData.playerNames && (
-                                        <div className="flex items-center justify-center h-full w-16">
-                                          <p className="transform -rotate-90 whitespace-nowrap text-center font-bold text-lg text-gray-900 leading-tight">
-                                            {question.tableData.playerNames.row.split(' ')[0]}
-                                            <br />
-                                            {question.tableData.playerNames.row.split(' ').slice(1).join(' ')}
-                                          </p>
-                                        </div>
+                                        <p className="text-center font-bold text-sm text-gray-900 mb-2">
+                                          {question.tableData.playerNames.column}
+                                        </p>
                                       )}
-                                      <div className="flex-1">
-                                        {question.tableData.playerNames && (
-                                          <p className="text-center font-bold text-lg text-gray-900 mb-2">
-                                            {question.tableData.playerNames.column}
-                                          </p>
-                                        )}
-                                        <table className="min-w-full border-collapse border border-black">
+                                      <div className="overflow-x-auto">
+                                        <table className="min-w-full border-collapse border border-black text-xs">
                                           <thead className="bg-white">
                                             <tr>
                                               {question.tableData.headers.map(header => (
-                                                <th key={header} className="border border-black px-4 py-3 text-center text-base font-bold text-gray-900">
+                                                <th key={header} className="border border-black px-2 py-2 text-center font-bold text-gray-900">
                                                   {header}
                                                 </th>
                                               ))}
@@ -1176,7 +1159,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                                   return (
                                                     <td 
                                                       key={cellIndex} 
-                                                      className={`border border-black px-4 py-3 text-center text-base ${isRowHeader ? 'font-bold' : ''}`}
+                                                      className={`border border-black px-2 py-2 text-center ${isRowHeader ? 'font-bold' : ''}`}
                                                     >
                                                       {cell}
                                                     </td>
@@ -1189,77 +1172,156 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                       </div>
                                     </div>
                                   </div>
-                                )}
-                              </div>
-                            )}
+                                </div>
+                              )}
+                            </div>
+                          )}
 
-                            {/* Visual Content - Show below question text for custom assignments */}
-                            {isCustomAssignment && question.image && (
-                              <div className="bg-white border-2 border-gray-300 rounded-xl shadow-sm p-4 flex justify-center">
-                                <img
-                                  src={question.image.src}
-                                  alt={'alt' in question.image && question.image.alt ? question.image.alt : "Question diagram"}
-                                  className="w-full max-w-3xl h-auto object-contain transition-all rounded-lg border border-slate-200 shadow-sm cursor-pointer hover:opacity-90"
-                                  onClick={() => {
-                                    if (question.image) {
+                          {/* Visual Content - Show below question text when video modal is open */}
+                          {showVideoModal && videoUrl && hasVisualContent && !isCustomAssignment && (
+                            <div className="space-y-4 w-full">
+                              {question.image && (
+                                <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4 flex justify-center">
+                                  <img 
+                                    src={question.image.src}
+                                    alt="Question diagram"
+                                    className="w-full max-w-2xl h-auto object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
+                                    onClick={() => {
                                       setSelectedImage(question.image as StaticImageData);
                                       setShowImageModal(true);
-                                    }
-                                  }}
-                                />
-                              </div>
-                            )}
-
-                            {isCustomAssignment && question.tableData && (
-                              <div className="bg-white border-2 border-gray-300 rounded-xl shadow-sm p-4">
-                                <div className="flex items-center gap-4">
-                                  {question.tableData.playerNames && (
-                                    <div className="flex items-center justify-center h-full w-16">
-                                      <p className="transform -rotate-90 whitespace-nowrap text-center font-bold text-lg text-gray-900 leading-tight">
-                                        {question.tableData.playerNames.row.split(' ')[0]}
-                                        <br />
-                                        {question.tableData.playerNames.row.split(' ').slice(1).join(' ')}
-                                      </p>
-                                    </div>
-                                  )}
-                                  <div className="flex-1">
+                                    }}
+                                  />
+                                </div>
+                              )}
+                              {question.tableData && (
+                                <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
+                                  <div className="flex items-center gap-4">
                                     {question.tableData.playerNames && (
-                                      <p className="text-center font-bold text-lg text-gray-900 mb-2">
-                                        {question.tableData.playerNames.column}
-                                      </p>
+                                      <div className="flex items-center justify-center h-full w-16">
+                                        <p className="transform -rotate-90 whitespace-nowrap text-center font-bold text-lg text-gray-900 leading-tight">
+                                          {question.tableData.playerNames.row.split(' ')[0]}
+                                          <br />
+                                          {question.tableData.playerNames.row.split(' ').slice(1).join(' ')}
+                                        </p>
+                                      </div>
                                     )}
-                                    <table className="min-w-full border-collapse border border-black">
-                                      <thead className="bg-white">
-                                        <tr>
-                                          {question.tableData.headers.map(header => (
-                                            <th key={header} className="border border-black px-4 py-3 text-center text-base font-bold text-gray-900">
-                                              {header}
-                                            </th>
-                                          ))}
-                                        </tr>
-                                      </thead>
-                                      <tbody className="bg-white">
-                                        {question.tableData.rows.map((row, rowIndex) => (
-                                          <tr key={rowIndex}>
-                                            {row.map((cell, cellIndex) => {
-                                              const isRowHeader = question.tableData?.rowHeaders && cellIndex === 0;
-                                              return (
-                                                <td 
-                                                  key={cellIndex} 
-                                                  className={`border border-black px-4 py-3 text-center text-base ${isRowHeader ? 'font-bold' : ''}`}
-                                                >
-                                                  {cell}
-                                                </td>
-                                              );
-                                            })}
+                                    <div className="flex-1">
+                                      {question.tableData.playerNames && (
+                                        <p className="text-center font-bold text-lg text-gray-900 mb-2">
+                                          {question.tableData.playerNames.column}
+                                        </p>
+                                      )}
+                                      <table className="min-w-full border-collapse border border-black">
+                                        <thead className="bg-white">
+                                          <tr>
+                                            {question.tableData.headers.map(header => (
+                                              <th key={header} className="border border-black px-4 py-3 text-center text-base font-bold text-gray-900">
+                                                {header}
+                                              </th>
+                                            ))}
                                           </tr>
-                                        ))}
-                                      </tbody>
-                                    </table>
+                                        </thead>
+                                        <tbody className="bg-white">
+                                          {question.tableData.rows.map((row, rowIndex) => (
+                                            <tr key={rowIndex}>
+                                              {row.map((cell, cellIndex) => {
+                                                const isRowHeader = question.tableData?.rowHeaders && cellIndex === 0;
+                                                return (
+                                                  <td 
+                                                    key={cellIndex} 
+                                                    className={`border border-black px-4 py-3 text-center text-base ${isRowHeader ? 'font-bold' : ''}`}
+                                                  >
+                                                    {cell}
+                                                  </td>
+                                                );
+                                              })}
+                                            </tr>
+                                          ))}
+                                        </tbody>
+                                      </table>
+                                    </div>
                                   </div>
                                 </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Visual Content - Show below question text for custom assignments */}
+                          {isCustomAssignment && question.image && (
+                            <div className="bg-white border-2 border-gray-300 rounded-xl shadow-sm p-4 flex justify-center">
+                              <img
+                                src={
+                                  typeof question.image === 'string'
+                                    ? question.image
+                                    : (question.image as any).src
+                                }
+                                alt={
+                                  typeof question.image === 'string'
+                                    ? "Question diagram"
+                                    : (question.image as any).alt || "Question diagram"
+                                }
+                                className="w-full max-w-3xl h-auto object-contain transition-all rounded-lg border border-slate-200 shadow-sm cursor-pointer hover:opacity-90"
+                                onClick={() => {
+                                  if (question.image && typeof question.image !== 'string') {
+                                    // Only open modal if image is an object (not a string)
+                                    setSelectedImage(question.image as StaticImageData);
+                                    setShowImageModal(true);
+                                  }
+                                }}
+                              />
+                            </div>
+                          )}
+
+                          {isCustomAssignment && question.tableData && (
+                            <div className="bg-white border-2 border-gray-300 rounded-xl shadow-sm p-4">
+                              <div className="flex items-center gap-4">
+                                {question.tableData.playerNames && (
+                                  <div className="flex items-center justify-center h-full w-16">
+                                    <p className="transform -rotate-90 whitespace-nowrap text-center font-bold text-lg text-gray-900 leading-tight">
+                                      {question.tableData.playerNames.row.split(' ')[0]}
+                                      <br />
+                                      {question.tableData.playerNames.row.split(' ').slice(1).join(' ')}
+                                    </p>
+                                  </div>
+                                )}
+                                <div className="flex-1">
+                                  {question.tableData.playerNames && (
+                                    <p className="text-center font-bold text-lg text-gray-900 mb-2">
+                                      {question.tableData.playerNames.column}
+                                    </p>
+                                  )}
+                                  <table className="min-w-full border-collapse border border-black">
+                                    <thead className="bg-white">
+                                      <tr>
+                                        {question.tableData.headers.map(header => (
+                                          <th key={header} className="border border-black px-4 py-3 text-center text-base font-bold text-gray-900">
+                                            {header}
+                                          </th>
+                                        ))}
+                                      </tr>
+                                    </thead>
+                                    <tbody className="bg-white">
+                                      {question.tableData.rows.map((row, rowIndex) => (
+                                        <tr key={rowIndex}>
+                                          {row.map((cell, cellIndex) => {
+                                            const isRowHeader = question.tableData?.rowHeaders && cellIndex === 0;
+                                            return (
+                                              <td 
+                                                key={cellIndex} 
+                                                className={`border border-black px-4 py-3 text-center text-base ${isRowHeader ? 'font-bold' : ''}`}
+                                              >
+                                                {cell}
+                                              </td>
+                                            );
+                                          })}
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>
                               </div>
-                            )}
+                            </div>
+                          )}
 
                             {/* Answer Options */}
                             {question.optionTableHeaders ? (
@@ -1288,7 +1350,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                           onClick={() => handleAnswer(question.id, index)}
                                           className={`transition-all duration-200 group ${
                                             isStruckThrough
-                                              ? 'bg-gray-100 cursor-default'
+                                                ? 'bg-gray-100 cursor-default'
                                               : isSelected 
                                                 ? 'bg-blue-100 hover:bg-blue-100 cursor-pointer border-l-4 border-blue-500' 
                                                 : 'bg-white hover:bg-slate-50 cursor-pointer'
@@ -1404,6 +1466,25 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                           </div>
                         </div>
 
+                        {/* Free User Upgrade Overlay - Centered in question card */}
+                        {isQuestionLocked && (
+                          <div className="absolute inset-0 flex items-center justify-center z-50 pointer-events-none">
+                            <div className="text-center p-8 max-w-md bg-white border-4 border-black rounded-xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] pointer-events-auto">
+                              <Lock className="w-16 h-16 mx-auto text-blue-500 mb-4" />
+                              <h3 className="text-2xl font-bold text-gray-900 mb-2">Unlock Full Access</h3>
+                              <p className="text-gray-600 mb-6">
+                                Join the Dojo to access all questions and unlock unlimited practice tests, drills, and FRQ practice.
+                              </p>
+                              <Link
+                                href={`/purchase/season-pass?courseType=${examType}`}
+                                className="inline-block px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors"
+                              >
+                                Join the Dojo
+                              </Link>
+                            </div>
+                          </div>
+                        )}
+
                         {/* Navigation Controls */}
                         {!(showVideoModal && videoUrl) && (
                         <div className="pt-4 mt-4 border-t border-gray-200">
@@ -1421,10 +1502,16 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                             </button>
                             
                             <button
-                              onClick={() => setCurrentPage(prev => Math.min(questions.length - 1, prev + 1))}
-                              disabled={currentPage >= questions.length - 1}
+                              onClick={() => {
+                                // Allow free users to navigate to question 2 (index 1), but no further
+                                if (isFreeUser && currentPage >= 1) {
+                                  return;
+                                }
+                                setCurrentPage(prev => Math.min(questions.length - 1, prev + 1));
+                              }}
+                              disabled={currentPage >= questions.length - 1 || (isFreeUser && currentPage >= 1)}
                               className={`flex-1 px-6 py-3 text-base rounded-lg font-semibold transition-colors ${
-                                currentPage >= questions.length - 1
+                                currentPage >= questions.length - 1 || (isFreeUser && currentPage >= 1)
                                   ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                                   : 'bg-blue-500 text-white hover:bg-blue-600'
                               }`}
@@ -1446,78 +1533,6 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                         </div>
                         )}
                       </div>
-
-                      {/* Right Column: Visual Content (Image/Table) - Only show when video modal is NOT open */}
-                      {hasVisualContent && !isCustomAssignment && !(showVideoModal && videoUrl) && (
-                        <div className="lg:col-span-1">
-                          <div className="bg-white rounded-lg shadow-md border border-gray-200 p-4 sticky top-4">
-                            {question.image && (
-                              <div className="flex justify-center">
-                                <img 
-                                  src={question.image.src}
-                                  alt="Question diagram"
-                                  className="w-full h-auto max-h-[500px] object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
-                                  onClick={() => {
-                                    setSelectedImage(question.image as StaticImageData);
-                                    setShowImageModal(true);
-                                  }}
-                                />
-                              </div>
-                            )}
-                            {question.tableData && (
-                              <div className="flex justify-center">
-                                <div className="flex items-center gap-4">
-                                  {question.tableData.playerNames && (
-                                    <div className="flex items-center justify-center h-full w-16">
-                                      <p className="transform -rotate-90 whitespace-nowrap text-center font-bold text-lg text-gray-900 leading-tight">
-                                        {question.tableData.playerNames.row.split(' ')[0]}
-                                        <br />
-                                        {question.tableData.playerNames.row.split(' ').slice(1).join(' ')}
-                                      </p>
-                                    </div>
-                                  )}
-                                  <div className="flex-1">
-                                    {question.tableData.playerNames && (
-                                      <p className="text-center font-bold text-lg text-gray-900 mb-2">
-                                        {question.tableData.playerNames.column}
-                                      </p>
-                                    )}
-                                    <table className="min-w-full border-collapse border border-black">
-                                      <thead className="bg-white">
-                                        <tr>
-                                          {question.tableData.headers.map(header => (
-                                            <th key={header} className="border border-black px-4 py-3 text-center text-base font-bold text-gray-900">
-                                              {header}
-                                            </th>
-                                          ))}
-                                        </tr>
-                                      </thead>
-                                      <tbody className="bg-white">
-                                        {question.tableData.rows.map((row, rowIndex) => (
-                                          <tr key={rowIndex}>
-                                            {row.map((cell, cellIndex) => {
-                                              const isRowHeader = question.tableData?.rowHeaders && cellIndex === 0;
-                                              return (
-                                                <td 
-                                                  key={cellIndex} 
-                                                  className={`border border-black px-4 py-3 text-center text-base ${isRowHeader ? 'font-bold' : ''}`}
-                                                >
-                                                  {cell}
-                                                </td>
-                                              );
-                                            })}
-                                          </tr>
-                                        ))}
-                                      </tbody>
-                                    </table>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </div>
                   </div>
                 );
               })()}
@@ -1547,11 +1562,11 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                       <div className="flex items-start gap-3">
                         <p className="flex-1 text-base md:text-lg font-medium font-serif leading-relaxed text-gray-800">
                           {isCustomAssignment ? (
-                            <QuestionWithKeyTerms 
-                              questionText={question.question} 
-                              unit={question.unit} 
-                              subject={examType === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics'}
-                            />
+                          <QuestionWithKeyTerms 
+                            questionText={question.question} 
+                            unit={question.unit} 
+                            subject={examType === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics'}
+                          />
                           ) : (
                             question.question
                           )}
@@ -1758,29 +1773,29 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
 
       {/* Tool Buttons */}
       {!showResults && (
-        <div className="fixed bottom-8 right-8 z-40 flex flex-col gap-3">
-          {/* Calculator Toggle Button */}
-          {!showCalculator && (
-            <button
-              onClick={() => setShowCalculator(true)}
-              className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-3 hover:bg-gray-50 transition-all active:scale-95"
-              aria-label="Open calculator"
-            >
-              <Calculator className="w-6 h-6 text-black" />
-            </button>
-          )}
+      <div className="fixed bottom-8 right-8 z-40 flex flex-col gap-3">
+        {/* Calculator Toggle Button */}
+        {!showCalculator && (
+          <button
+            onClick={() => setShowCalculator(true)}
+            className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-3 hover:bg-gray-50 transition-all active:scale-95"
+            aria-label="Open calculator"
+          >
+            <Calculator className="w-6 h-6 text-black" />
+          </button>
+        )}
 
-          {/* Whiteboard Toggle Button */}
-          {!showDrawingPad && (
-            <button
-              onClick={() => setShowDrawingPad(true)}
-              className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-3 hover:bg-gray-50 transition-all active:scale-95"
-              aria-label="Open whiteboard"
-            >
-              <Pen className="w-6 h-6 text-black" />
-            </button>
-          )}
-        </div>
+        {/* Whiteboard Toggle Button */}
+        {!showDrawingPad && (
+          <button
+            onClick={() => setShowDrawingPad(true)}
+            className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-3 hover:bg-gray-50 transition-all active:scale-95"
+            aria-label="Open whiteboard"
+          >
+            <Pen className="w-6 h-6 text-black" />
+          </button>
+        )}
+      </div>
       )}
 
       {/* Exam Calculator */}

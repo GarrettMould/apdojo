@@ -3,11 +3,14 @@
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, X, FileText, Image as ImageIcon, Loader2, Check, Sparkles, CheckCircle2, XCircle, RefreshCw, Lightbulb } from 'lucide-react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Question } from '@/data/questionBanks/types';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { saveQuizResult } from '@/lib/quizHistory';
+import { useCreditSystem } from '@/hooks/useCreditSystem';
+import { LoginModal, SignupModal } from '@/components/AuthModals';
 
 // --- TYPES ---
 interface InfiniteDrillResult {
@@ -18,7 +21,8 @@ interface InfiniteDrillResult {
 type LoadingStage = 'idle' | 'analyzing' | 'identifying' | 'generating' | 'complete';
 
 function InfinitePracticePage() {
-  const { user } = useAuthContext();
+  const { user, setShowLoginModal } = useAuthContext();
+  const { consumeLifetimeCredit, getCreditStatus, isPremium } = useCreditSystem();
   const [inputMode, setInputMode] = useState<'image' | 'text'>('image');
   const [fileData, setFileData] = useState<{ file: File; preview: string; base64: string } | null>(null);
   const [textInput, setTextInput] = useState('');
@@ -32,6 +36,9 @@ function InfinitePracticePage() {
   const [showExplanation, setShowExplanation] = useState(false);
   const [answeredQuestions, setAnsweredQuestions] = useState<Set<number>>(new Set());
   const [loadingQuestionIndex, setLoadingQuestionIndex] = useState(0); // Track which question card to show during loading
+  const [showCreditConfirmModal, setShowCreditConfirmModal] = useState(false);
+  const [showLoginModal, setShowLoginModalState] = useState(false);
+  const [showSignupModal, setShowSignupModal] = useState(false);
 
   // Helper: Convert any file to Base64
   const convertFileToBase64 = (file: File): Promise<string> => {
@@ -84,6 +91,32 @@ function InfinitePracticePage() {
   }, [handleFileSelect]);
 
   const handleGenerate = async () => {
+    // Check if user is logged in
+    if (!user) {
+      setShowLoginModalState(true);
+      return;
+    }
+
+    // Check if user is premium (unlimited)
+    if (isPremium) {
+      // Premium users can generate without confirmation
+      await proceedWithGeneration();
+      return;
+    }
+
+    // Check credit status
+    const creditStatus = getCreditStatus();
+    if (creditStatus.lifetimeAiGenerations === 0) {
+      // No credits remaining - show upgrade modal
+      setError('You have used your free AI generation credit. Join the Dojo for unlimited access!');
+      return;
+    }
+
+    // Show confirmation modal for free users
+    setShowCreditConfirmModal(true);
+  };
+
+  const proceedWithGeneration = async () => {
     if (inputMode === 'image' && !fileData) {
       setError('Please upload an image or PDF');
       return;
@@ -91,6 +124,15 @@ function InfinitePracticePage() {
     if (inputMode === 'text' && !textInput.trim()) {
       setError('Please enter question text');
       return;
+    }
+
+    // Consume lifetime credit (if not premium)
+    if (!isPremium) {
+      const creditResult = await consumeLifetimeCredit();
+      if (!creditResult.success) {
+        setError('Unable to use credit. Please try again or join the Dojo for unlimited access.');
+        return;
+      }
     }
 
     setIsGenerating(true);
@@ -230,6 +272,79 @@ function InfinitePracticePage() {
   const canGenerate = inputMode === 'image' ? !!fileData : !!textInput.trim();
 
   return (
+    <>
+      {/* Login Modal */}
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModalState(false)}
+        switchToSignup={() => {
+          setShowLoginModalState(false);
+          setShowSignupModal(true);
+        }}
+        onAuthSuccess={() => {
+          setShowLoginModalState(false);
+        }}
+      />
+      
+      {/* Signup Modal */}
+      <SignupModal
+        isOpen={showSignupModal}
+        onClose={() => setShowSignupModal(false)}
+        switchToLogin={() => {
+          setShowSignupModal(false);
+          setShowLoginModalState(true);
+        }}
+        onAuthSuccess={() => {
+          setShowSignupModal(false);
+        }}
+      />
+
+      {/* Credit Confirmation Modal */}
+      {showCreditConfirmModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 z-[100] flex items-center justify-center p-4">
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.8, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            className="bg-white border-4 border-black rounded-3xl shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] p-8 max-w-md w-full text-center relative"
+          >
+            <h3 className="text-3xl font-black text-gray-900 mb-4">
+              Use Your Free Credit?
+            </h3>
+            <div className="flex justify-center mb-4">
+              <Image
+                src="/images/fire.png"
+                alt="Fire"
+                width={80}
+                height={80}
+                className="w-20 h-20"
+              />
+            </div>
+            <p className="text-gray-700 mb-6">
+              You're about to use your one free AI generation credit. After this, you'll need to join the Dojo for unlimited access.
+            </p>
+            <div className="flex gap-4">
+              <button
+                onClick={() => setShowCreditConfirmModal(false)}
+                className="flex-1 px-6 py-3 border-4 border-black rounded-xl font-bold text-gray-900 hover:bg-gray-100 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  setShowCreditConfirmModal(false);
+                  await proceedWithGeneration();
+                }}
+                className="flex-1 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl transition-colors"
+              >
+                Confirm
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
@@ -421,14 +536,26 @@ Example: 'Explain the causes of the Great Depression and how fiscal policy was u
                   </motion.div>
                 )}
 
+                {!user && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mt-4 p-4 bg-blue-50 border-4 border-blue-300 rounded-xl"
+                  >
+                    <p className="text-blue-800 font-semibold text-center">
+                      🔒 Please log in to try this feature for free! You'll get one free AI generation credit.
+                    </p>
+                  </motion.div>
+                )}
+
                 <motion.div
-                  whileHover={canGenerate && !isGenerating ? { scale: 1.02 } : {}}
-                  whileTap={canGenerate && !isGenerating ? { scale: 0.98 } : {}}
+                  whileHover={canGenerate && !isGenerating && user ? { scale: 1.02 } : {}}
+                  whileTap={canGenerate && !isGenerating && user ? { scale: 0.98 } : {}}
                   className="mt-6"
                 >
                   <Button
                     onClick={handleGenerate}
-                    disabled={!canGenerate || isGenerating}
+                    disabled={!canGenerate || isGenerating || !user}
                     className={`w-full font-black py-6 text-xl border-4 transition-all ${
                       canGenerate && !isGenerating
                         ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-blue-800 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]'
@@ -830,6 +957,7 @@ Example: 'Explain the causes of the Great Depression and how fiscal policy was u
         )}
       </div>
     </div>
+    </>
   );
 }
 

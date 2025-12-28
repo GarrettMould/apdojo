@@ -517,7 +517,7 @@ const macroUnit1Questions = [
     "lessonIDS": ["1.2"],
     "unitName": "Basic Economic Concepts",
     "question": "Refer to the Production Possibilities Curve (PPC) below, which shows an economy producing capital goods and consumer goods. Which of the following movements indicates that the economy can increase its production of consumer goods without sacrificing any capital goods? ",
-    "image": null,
+    "image": { "src": "/images/allQS2123.svg", "alt": "Production Possibilities Curve showing capital goods and consumer goods with points R, U, V, T, and S" },
     "options": [
       "From point R to point U",
       "From point U to point R",
@@ -534,8 +534,18 @@ const macroUnit1Questions = [
     "unit": 1,
     "lessonIDS": ["1.6"],
     "unitName": "Basic Economic Concepts",
-    "question": "The table below displays the quantity demanded and quantity supplied for bushels of soybeans at various market prices.\n\n| Price per Bushel | Quantity Demanded (millions) | Quantity Supplied (millions) |\n| :---: | :---: | :---: |\n| $8 | 90 | 30 |\n| $10 | 75 | 45 |\n| $12 | 60 | 60 |\n| $14 | 45 | 75 |\n| $16 | 30 | 90 |\n\nBased on the data, which of the following combinations represents the equilibrium price and quantity for soybeans?",
+    "question": "The table below displays the quantity demanded and quantity supplied for bushels of soybeans at various market prices. Based on the data, which of the following combinations represents the equilibrium price and quantity for soybeans?",
     "image": null,
+    "tableData": {
+      "headers": ["Price per Bushel", "Quantity Demanded (millions)", "Quantity Supplied (millions)"],
+      "rows": [
+        ["$8", "90", "30"],
+        ["$10", "75", "45"],
+        ["$12", "60", "60"],
+        ["$14", "45", "75"],
+        ["$16", "30", "90"]
+      ]
+    },
     "options": [
       "Price: $10, Quantity: 75 million",
       "Price: $12, Quantity: 60 million",
@@ -552,8 +562,18 @@ const macroUnit1Questions = [
     "unit": 1,
     "lessonIDS": ["1.6"],
     "unitName": "Basic Economic Concepts",
-    "question": "The table below shows the market data for corn.\n\n| Price per Bushel | Quantity Demanded (bushels) | Quantity Supplied (bushels) |\n| :---: | :---: | :---: |\n| $3.00 | 500 | 100 |\n| $4.00 | 400 | 200 |\n| $5.00 | 300 | 300 |\n| $6.00 | 200 | 400 |\n| $7.00 | 100 | 500 |\n\nSuppose the current market price for corn is **$4.00**. Which of the following statements correctly describes the state of the market?",
+    "question": "The table below shows the market data for corn. Suppose the current market price for corn is $4.00. Which of the following statements correctly describes the state of the market?",
     "image": null,
+    "tableData": {
+      "headers": ["Price per Bushel", "Quantity Demanded (bushels)", "Quantity Supplied (bushels)"],
+      "rows": [
+        ["$3.00", "500", "100"],
+        ["$4.00", "400", "200"],
+        ["$5.00", "300", "300"],
+        ["$6.00", "200", "400"],
+        ["$7.00", "100", "500"]
+      ]
+    },
     "options": [
       "There is a surplus of 200 bushels, and the price will decrease.",
       "There is a shortage of 200 bushels, and the price will decrease.",
@@ -562,7 +582,7 @@ const macroUnit1Questions = [
       "The market is in equilibrium."
     ],
     "correctAnswer": "D",
-    "explanation": "At a price of $4.00, Quantity Demanded (400) exceeds Quantity Supplied (200). $400 - 200 = 200$. This condition is a **Shortage**. In a free market, a shortage creates upward pressure on the price as buyers compete for limited goods, driving the price toward the equilibrium of $5.00.",
+    "explanation": "At a price of $4.00, Quantity Demanded (400) exceeds Quantity Supplied (200). $400 - 200 = 200$. This condition is a Shortage. In a free market, a shortage creates upward pressure on the price as buyers compete for limited goods, driving the price toward the equilibrium of $5.00.",
     "videoExplanation": null
   },
   {
@@ -580,7 +600,7 @@ const macroUnit1Questions = [
       "120 units will be exchanged, and the price will decrease to eliminate the surplus."
     ],
     "correctAnswer": "D",
-    "explanation": "At price $P_2$ (above equilibrium), the Quantity Demanded is 60 units while the Quantity Supplied is higher (e.g., 120), creating a **surplus**. In a market, the actual quantity exchanged is determined by the 'short side' (whichever is lower between supply and demand), so only 60 units are bought and sold. To eliminate the surplus, market forces will drive the price down until it reaches equilibrium at 90 units.",
+    "explanation": "At price $P_2$ (above equilibrium), the Quantity Demanded is 60 units while the Quantity Supplied is higher (e.g., 120), creating a surplus. In a market, the actual quantity exchanged is determined by the 'short side' (whichever is lower between supply and demand), so only 60 units are bought and sold. To eliminate the surplus, market forces will drive the price down until it reaches equilibrium at 90 units.",
     "videoExplanation": null
   },
   {
@@ -589,7 +609,7 @@ const macroUnit1Questions = [
     "lessonIDS": ["1.4"],
     "unitName": "Basic Economic Concepts",
     "question": "Refer to the diagram below showing the demand for electric scooters. Which of the following changes would most likely cause the demand curve to shift to the right from D1 to D2? ",
-    "image": null,
+    "image": { "src": "/images/allQS2127.svg", "alt": "Demand curve diagram for electric scooters showing D1 and D2" },
     "options": [
       "A decrease in the market price of electric scooters",
       "A decrease in the price of bicycles, a substitute good",
@@ -607,7 +627,7 @@ const macroUnit1Questions = [
     "lessonIDS": ["1.4"],
     "unitName": "Basic Economic Concepts",
     "question": "Refer to the diagram of the market for tablet computers. Which of the following changes would most likely result in a movement downward along the demand curve from Point C to Point D? ",
-    "image": null,
+    "image": { "src": "/images/allQS2128.svg", "alt": "Market diagram for tablet computers showing demand curve with points C and D" },
     "options": [
       "An increase in the productivity of tablet manufacturers",
       "A decrease in the price of tablet computers",
@@ -616,7 +636,7 @@ const macroUnit1Questions = [
       "An expectation that tablet prices will fall next month"
     ],
     "correctAnswer": "B",
-    "explanation": "A movement *along* the demand curve is caused **only** by a change in the price of the good itself. Moving from Point C to Point D represents an increase in Quantity Demanded due to a decrease in the price of the tablet. All other options would cause the entire demand curve to shift.",
+    "explanation": "A movement *along* the demand curve is caused only by a change in the price of the good itself. Moving from Point C to Point D represents an increase in Quantity Demanded due to a decrease in the price of the tablet. All other options would cause the entire demand curve to shift.",
     "videoExplanation": null
   },
   {
@@ -624,8 +644,18 @@ const macroUnit1Questions = [
     "unit": 1,
     "lessonIDS": ["1.2"],
     "unitName": "Basic Economic Concepts",
-    "question": "The table below displays five possible combinations of Heavy Trucks and Patrol Boats that a nation can produce annually using all available resources on a large scale.\n\n| Combination | Heavy Trucks | Patrol Boats |\n| :---: | :---: | :---: |\n| A | 0 | 20,000 |\n| B | 10,000 | 18,000 |\n| C | 20,000 | 15,000 |\n| D | 30,000 | 11,000 |\n| E | 40,000 | 6,000 |\n\nBased on the data, what is the opportunity cost of changing production from **Combination B** to **Combination C**?",
+    "question": "The table below displays five possible combinations of Heavy Trucks and Patrol Boats that a nation can produce annually using all available resources on a large scale. Based on the data, what is the opportunity cost of changing production from Combination B to Combination C?",
     "image": null,
+    "tableData": {
+      "headers": ["Combination", "Heavy Trucks", "Patrol Boats"],
+      "rows": [
+        ["A", "0", "20,000"],
+        ["B", "10,000", "18,000"],
+        ["C", "20,000", "15,000"],
+        ["D", "30,000", "11,000"],
+        ["E", "40,000", "6,000"]
+      ]
+    },
     "options": [
       "10,000 Heavy Trucks",
       "2,000 Patrol Boats",
@@ -2471,8 +2501,18 @@ const microUnit1Questions = [
     "unit": 1,
     "lessonIDS": ["1.3"],
     "unitName": "Basic Economic Concepts",
-    "question": "The table below displays five possible combinations of Heavy Trucks and Patrol Boats that a nation can produce annually using all available resources on a large scale.\n\n| Combination | Heavy Trucks | Patrol Boats |\n| :---: | :---: | :---: |\n| A | 0 | 20,000 |\n| B | 10,000 | 18,000 |\n| C | 20,000 | 15,000 |\n| D | 30,000 | 11,000 |\n| E | 40,000 | 6,000 |\n\nBased on the data, what is the opportunity cost of changing production from **Combination B** to **Combination C**?",
+    "question": "The table below displays five possible combinations of Heavy Trucks and Patrol Boats that a nation can produce annually using all available resources on a large scale. Based on the data, what is the opportunity cost of changing production from Combination B to Combination C?",
     "image": null,
+    "tableData": {
+      "headers": ["Combination", "Heavy Trucks", "Patrol Boats"],
+      "rows": [
+        ["A", "0", "20,000"],
+        ["B", "10,000", "18,000"],
+        ["C", "20,000", "15,000"],
+        ["D", "30,000", "11,000"],
+        ["E", "40,000", "6,000"]
+      ]
+    },
     "options": [
       "10,000 Heavy Trucks",
       "2,000 Patrol Boats",
@@ -3051,6 +3091,57 @@ const microUnit3Questions = [
     ],
     "correctAnswer": "C",
     "explanation": "Total variable cost = $AVC * Quantity = $8 * 50 = $400$. Total fixed cost = $Total cost - Total variable cost = $600 - $400 = $200$.",
+    "videoExplanation": null
+    },
+    {
+    "id": 3011,
+    "unit": 3,
+    "lessonIDS": ["3.2"],
+    "unitName": "Production, Cost, and the Perfect Competition Model",
+    "question": "The table below shows the total cost of production for a firm at different levels of output. Based on this data, what is the average variable cost (AVC) of producing 3 units?\n\n| Output | Total Cost |\n| :---: | :---: |\n| 0 | $20 |\n| 1 | $40 |\n| 2 | $55 |\n| 3 | $80 |",
+    "image": null,
+    "options": [
+      "$20",
+      "$26.67",
+      "$60",
+      "$80"
+    ],
+    "correctAnswer": "A",
+    "explanation": "To calculate the average variable cost (AVC), you must first determine the total variable cost (TVC). At 0 output, the total cost is $20, which represents the firm's fixed costs. To find the TVC at 3 units, subtract the fixed cost from the total cost: $80 - $20 = $60. Finally, divide the TVC by the quantity to find the AVC: $60 / 3 = $20.",
+    "videoExplanation": null
+    },
+    {
+    "id": 3012,
+    "unit": 3,
+    "lessonIDS": ["3.2"],
+    "unitName": "Production, Cost, and the Perfect Competition Model",
+    "question": "The table below lists a firm's total costs at various output levels. What is the marginal cost of producing the 4th unit?\n\n| Output | Total Cost |\n| :---: | :---: |\n| 2 | $150 |\n| 3 | $190 |\n| 4 | $240 |\n| 5 | $300 |",
+    "image": null,
+    "options": [
+      "$40",
+      "$50",
+      "$60",
+      "$240"
+    ],
+    "correctAnswer": "B",
+    "explanation": "The marginal cost is the additional cost incurred by producing one more unit of output. It is calculated as the change in total cost divided by the change in quantity. As output increases from 3 to 4 units, the total cost rises from $190 to $240. Therefore, the marginal cost of the 4th unit is $240 - $190 = $50.",
+    "videoExplanation": null
+    },
+    {
+    "id": 3013,
+    "unit": 3,
+    "lessonIDS": ["3.2"],
+    "unitName": "Production, Cost, and the Perfect Competition Model",
+    "question": "Based on the cost schedule below, what is the average fixed cost (AFC) of producing 5 units?\n\n| Output | Total Cost |\n| :---: | :---: |\n| 0 | $100 |\n| 1 | $150 |\n| 3 | $230 |\n| 5 | $350 |",
+    "image": null,
+    "options": [
+      "$20",
+      "$50",
+      "$70",
+      "$100"
+    ],
+    "correctAnswer": "A",
+    "explanation": "First, identify the total fixed cost (TFC), which is the total cost when output is zero. In this table, the TFC is $100. The average fixed cost (AFC) is calculated by dividing the total fixed cost by the quantity of output. At 5 units of output, the calculation is $100 / 5 = $20.",
     "videoExplanation": null
     },
     {

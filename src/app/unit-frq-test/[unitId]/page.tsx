@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { ArrowLeft, ArrowRight, FileText, Check, X, CheckCircle, Lock } from 'lucide-react';
 import Link from 'next/link';
+import { useAuthContext } from '@/contexts/AuthContext';
+import { hasValidSeasonPass } from '@/lib/utils';
 import { CourseSidebar } from '@/components/CourseSidebar';
 import { getUnitFRQTest } from '@/data/unitFRQTests';
 import { apMacroCourseInfo } from '@/data/courseInfo';
@@ -34,8 +36,17 @@ export default function UnitFRQTestPage({ params }: UnitFRQTestPageProps) {
   const questions = frqTest?.questions || [];
   const totalQuestions = questions.length;
   
-  // MVP: Only allow access to Units 1 and 2
-  const isUnitLocked = unitNumber > 2;
+  const { user, userData, selectedSubject } = useAuthContext();
+  
+  // Check if user is a pro customer (has season pass)
+  const isProCustomer = useMemo(() => {
+    if (!user || !userData) return false;
+    const subjectKey = selectedSubject === 'macro' ? 'macro' : 'micro';
+    return hasValidSeasonPass(userData, subjectKey) || hasValidSeasonPass(userData);
+  }, [user, userData, selectedSubject]);
+
+  // Free users can only access Unit 1, others require season pass
+  const isUnitLockedForFreeUser = !isProCustomer && unitNumber !== 1;
   
   // Get unit info
   const unitInfo = apMacroCourseInfo.units.find(unit => 
@@ -95,36 +106,16 @@ export default function UnitFRQTestPage({ params }: UnitFRQTestPageProps) {
     );
   }
 
-  if (isUnitLocked) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex">
-        <CourseSidebar 
-          selectedUnit={unitId}
-          onUnitChange={() => {}}
-          isFixed={true}
-        />
-        <div className="flex-1 p-8 ml-80">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center py-16">
-              <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Lock className="w-12 h-12 text-gray-400" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                Unit {unitId} FRQ Test is Locked
-              </h3>
-              <p className="text-gray-600 mb-6 max-w-md mx-auto">
-                This unit FRQ test is locked. Complete Unit 1 to unlock access to all units.
-              </p>
-              <Link href="/ap-macro-course">
-                <Button className="bg-blue-600 hover:bg-blue-700">
-                  Return to Course
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+  // Redirect free users to season pass purchase instead of showing lock screen
+  useEffect(() => {
+    if (isUnitLockedForFreeUser) {
+      const subjectKey = selectedSubject === 'macro' ? 'macro' : 'micro';
+      window.location.href = `/purchase/season-pass?courseType=${subjectKey}`;
+    }
+  }, [isUnitLockedForFreeUser, selectedSubject]);
+
+  if (isUnitLockedForFreeUser) {
+    return null; // Will redirect, so return nothing
   }
 
   if (!frqTest || questions.length === 0) {

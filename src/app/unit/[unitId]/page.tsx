@@ -19,10 +19,12 @@ import { getVideosForLessonId } from '@/data/videosByLessonId';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question as QuestionType } from '@/data/questionBanks/types';
 import { X, ArrowRight, Lock, ArrowLeft, CheckCircle2, XCircle, Download, Bookmark, BookmarkPlus, Check, Brain, Maximize2, Play, FileText, Zap } from 'lucide-react';
+import jsPDF from 'jspdf';
 import { dojoIcon } from '@/data/imagePaths';
 import { motion, AnimatePresence } from 'framer-motion';
-import { dojoDrills } from '@/data/dojoDrills';
+import { dojoDrills, drillAppliesToSubject, getDrillUnitForSubject } from '@/data/dojoDrills';
 import { saveQuizResult } from '@/lib/quizHistory';
+import { hasValidSeasonPass } from '@/lib/utils';
 
 // Helper to combine and structure whiteboard data
 const getUnitWhiteboards = (unitNumber: number): WhiteboardImage[] => {
@@ -526,6 +528,7 @@ export default function UnitPage() {
   const [leftPanelWidth, setLeftPanelWidth] = useState(65); // Percentage width for left panel
   const [isResizing, setIsResizing] = useState(false);
   const containerRef = React.useRef<HTMLDivElement>(null);
+  const cheatSheetContentRef = React.useRef<HTMLDivElement>(null);
   const [showImageSlides, setShowImageSlides] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showFullscreen, setShowFullscreen] = useState(false);
@@ -537,11 +540,9 @@ export default function UnitPage() {
   // Check if user is a pro customer (has season pass)
   const isProCustomer = useMemo(() => {
     if (!user || !userData) return false;
-    const seasonPass = userData.seasonPass as string[] | undefined;
-    if (!seasonPass) return false;
-    // Check if user has season pass for current subject
+    // Check if user has valid season pass for current subject
     const subjectKey = selectedSubject === 'macro' ? 'macro' : 'micro';
-    return seasonPass.includes(subjectKey) || seasonPass.includes('macro') || seasonPass.includes('micro');
+    return hasValidSeasonPass(userData, subjectKey) || hasValidSeasonPass(userData);
   }, [user, userData, selectedSubject]);
 
   // --- FAQ Schema Data ---
@@ -1266,6 +1267,100 @@ export default function UnitPage() {
     }
   }, [activeUnitNum]); // Re-run when unit changes
 
+  // PDF Generation Function - Simple document format
+  const handleGeneratePDF = async () => {
+    // Check if user is free and show JoinDojoModal
+    if (!isProCustomer) {
+      setShowJoinDojoModal(true);
+      return;
+    }
+
+    try {
+      // Get unit information
+      const currentUnit = unitsToDisplay.find(u => u.number === activeUnitNum);
+      if (!currentUnit) {
+        throw new Error('Unit not found');
+      }
+
+      // Get terms for current unit
+      const terms = unitKeyTerms;
+      if (terms.length === 0) {
+        alert('No terms found for this unit.');
+        return;
+      }
+
+      // Create PDF
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = 210; // A4 width in mm
+      const pageHeight = 297; // A4 height in mm
+      const margin = 20; // mm
+      const maxWidth = pageWidth - (margin * 2);
+      let yPosition = margin;
+      const lineHeight = 7; // mm between lines
+      const termSpacing = 10; // mm between terms
+      const subNoteIndent = 5; // mm indent for subnotes
+
+      // Helper function to add text with word wrapping
+      const addText = (text: string, fontSize: number, isBold: boolean = false, indent: number = 0) => {
+        pdf.setFontSize(fontSize);
+        pdf.setFont('helvetica', isBold ? 'bold' : 'normal');
+        
+        const lines = pdf.splitTextToSize(text, maxWidth - indent);
+        
+        // Check if we need a new page
+        if (yPosition + (lines.length * lineHeight) > pageHeight - margin) {
+          pdf.addPage();
+          yPosition = margin;
+        }
+        
+        lines.forEach((line: string) => {
+          pdf.text(line, margin + indent, yPosition);
+          yPosition += lineHeight;
+        });
+      };
+
+      // Add title
+      const title = `Unit ${activeUnitNum} - ${currentUnit.title}`;
+      addText(title, 18, true);
+      yPosition += lineHeight * 0.5; // Small gap after title
+
+      // Add terms
+      terms.forEach((term, index) => {
+        // Check if we need a new page before adding term
+        if (yPosition + termSpacing + lineHeight * 3 > pageHeight - margin) {
+          pdf.addPage();
+          yPosition = margin;
+        } else if (index > 0) {
+          yPosition += termSpacing;
+        }
+
+        // Add term name (bold)
+        addText(term.term, 12, true);
+        
+        // Add definition
+        addText(term.definition, 10, false);
+        
+        // Add subnotes if they exist
+        if (term.subNotes && term.subNotes.length > 0) {
+          term.subNotes.forEach((subNote) => {
+            // Check if we need a new page
+            if (yPosition + lineHeight > pageHeight - margin) {
+              pdf.addPage();
+              yPosition = margin;
+            }
+            addText(`• ${subNote}`, 9, false, subNoteIndent);
+          });
+        }
+      });
+
+      // Save PDF
+      const subjectName = selectedSubject === 'macro' ? 'Macro' : 'Micro';
+      pdf.save(`AP-${subjectName}-Unit-${activeUnitNum}-Cheat-Sheet.pdf`);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Failed to generate PDF. Please try again.');
+    }
+  };
 
   return (
     <>
@@ -1288,7 +1383,7 @@ export default function UnitPage() {
           }}
           className="flex-shrink-0 overflow-y-auto min-w-0"
         >
-      <div className="max-w-7xl mx-auto px-4 py-12 mt-12">
+      <div className="max-w-7xl mx-auto px-4 py-12 mt-12" ref={cheatSheetContentRef}>
         {/* Page Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight">
@@ -1298,7 +1393,7 @@ export default function UnitPage() {
         </div>
 
         {/* Unit Navigation Tabs */}
-        <div className="mb-8 border-b border-gray-200">
+        <div className="mb-8 border-b border-gray-200 flex items-center justify-between">
           <nav className="-mb-px flex space-x-6" aria-label="Tabs">
             {unitsToDisplay.map((unit) => {
               return (
@@ -1316,6 +1411,13 @@ export default function UnitPage() {
               );
             })}
           </nav>
+          <button
+            onClick={handleGeneratePDF}
+            className="flex items-center gap-2 px-4 py-2 bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 font-semibold text-gray-900"
+          >
+            <Download className="w-4 h-4" />
+            Turn this Cheat Sheet into a PDF
+          </button>
         </div>
 
         {/* Unit Practice Test Banner */}
@@ -1325,7 +1427,7 @@ export default function UnitPage() {
           const isMicro = selectedSubject === 'micro';
           
           return (
-            <div className={`mb-8 rounded-xl p-6 shadow-md border ${
+            <div className={`mb-8 rounded-xl p-6 shadow-md border print:hidden ${
               themeColor === 'blue' 
                 ? 'bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200' 
                 : 'bg-gradient-to-r from-green-50 to-green-100 border-green-200'
@@ -1368,7 +1470,10 @@ export default function UnitPage() {
         {(() => {
           // Filter drills by current unit and subject
           const relevantDrills = Object.values(dojoDrills).filter(
-            drill => drill.unit === activeUnitNum && drill.subject === subjectFilter
+            drill => {
+              const drillUnit = getDrillUnitForSubject(drill, subjectFilter);
+              return drillUnit === activeUnitNum && drillAppliesToSubject(drill, subjectFilter);
+            }
           );
 
           if (relevantDrills.length === 0) return null;
@@ -1391,7 +1496,7 @@ export default function UnitPage() {
                             : 'bg-green-100 text-green-800'
                         }`}
                       >
-                        Unit {drill.unit}
+                        Unit {getDrillUnitForSubject(drill, subjectFilter) || drill.unit}
                       </div>
                       <div className="flex items-center gap-1 text-sm font-semibold text-gray-800">
                         <span>{drill.xpReward.total}</span>
@@ -1490,7 +1595,7 @@ export default function UnitPage() {
                 if (relevantVideos.length === 0) return null;
 
                 return (
-                  <div className="mb-6">
+                  <div className="mb-6" data-section="videos">
                     <h3 className="text-lg font-semibold text-gray-700 mb-3">Videos</h3>
                     <div className="flex gap-4 overflow-x-auto pb-2">
                       {relevantVideos.map((video) => (
@@ -1675,21 +1780,23 @@ export default function UnitPage() {
 
                       {/* First Checkpoint - After midpoint lesson */}
                       {isMidpoint && firstHalfCheckpoints.length > 0 && (
-                        <Checkpoint
-                          lessonId={firstHalfCheckpoints[0].lessonId}
-                          question={firstHalfCheckpoints[0].question}
-                          options={firstHalfCheckpoints[0].options}
-                          correctAnswer={firstHalfCheckpoints[0].correctAnswer}
-                          explanation={firstHalfCheckpoints[0].explanation}
-                          subject={selectedSubject}
-                          allCheckpoints={firstHalfCheckpoints.slice(1).map(cp => ({
-                            lessonId: cp.lessonId,
-                            question: cp.question,
-                            options: cp.options,
-                            correctAnswer: cp.correctAnswer,
-                            explanation: cp.explanation
-                          }))}
-                        />
+                        <div data-section="checkpoint">
+                          <Checkpoint
+                            lessonId={firstHalfCheckpoints[0].lessonId}
+                            question={firstHalfCheckpoints[0].question}
+                            options={firstHalfCheckpoints[0].options}
+                            correctAnswer={firstHalfCheckpoints[0].correctAnswer}
+                            explanation={firstHalfCheckpoints[0].explanation}
+                            subject={selectedSubject}
+                            allCheckpoints={firstHalfCheckpoints.slice(1).map(cp => ({
+                              lessonId: cp.lessonId,
+                              question: cp.question,
+                              options: cp.options,
+                              correctAnswer: cp.correctAnswer,
+                              explanation: cp.explanation
+                            }))}
+                          />
+                        </div>
                       )}
                     </React.Fragment>
                   );
@@ -1697,21 +1804,23 @@ export default function UnitPage() {
 
                 {/* Second Checkpoint - After all lessons */}
                 {secondHalfCheckpoints.length > 0 && (
-                  <Checkpoint
-                    lessonId={secondHalfCheckpoints[0].lessonId}
-                    question={secondHalfCheckpoints[0].question}
-                    options={secondHalfCheckpoints[0].options}
-                    correctAnswer={secondHalfCheckpoints[0].correctAnswer}
-                    explanation={secondHalfCheckpoints[0].explanation}
-                    subject={selectedSubject}
-                    allCheckpoints={secondHalfCheckpoints.slice(1).map(cp => ({
-                      lessonId: cp.lessonId,
-                      question: cp.question,
-                      options: cp.options,
-                      correctAnswer: cp.correctAnswer,
-                      explanation: cp.explanation
-                    }))}
-                  />
+                  <div data-section="checkpoint">
+                    <Checkpoint
+                      lessonId={secondHalfCheckpoints[0].lessonId}
+                      question={secondHalfCheckpoints[0].question}
+                      options={secondHalfCheckpoints[0].options}
+                      correctAnswer={secondHalfCheckpoints[0].correctAnswer}
+                      explanation={secondHalfCheckpoints[0].explanation}
+                      subject={selectedSubject}
+                      allCheckpoints={secondHalfCheckpoints.slice(1).map(cp => ({
+                        lessonId: cp.lessonId,
+                        question: cp.question,
+                        options: cp.options,
+                        correctAnswer: cp.correctAnswer,
+                        explanation: cp.explanation
+                      }))}
+                    />
+                  </div>
                 )}
               </>
             );

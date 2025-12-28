@@ -61,6 +61,16 @@ export interface UserData {
   purchasedTests?: string[];
   // Add seasonPass field for pro customers (array of 'macro' | 'micro')
   seasonPass?: string[];
+  // Add seasonPassExpiration field (object with subject keys and ISO date strings)
+  seasonPassExpiration?: Record<string, string>; // e.g., { macro: '2025-06-30T23:59:59.999Z', micro: '2025-06-30T23:59:59.999Z' }
+  // Add credits object for freemium limits
+  credits?: {
+    dailyPractice: {
+      remaining: number;
+      lastResetDate: string; // YYYY-MM-DD format
+    };
+    lifetimeAiGenerations: number;
+  };
 }
 
 // --- ADD LEVELING LOGIC --- 
@@ -141,6 +151,7 @@ export interface AuthContextValue {
   loadingMcqData: boolean;
   userData: UserData | null;
   loadingUserData: boolean;
+  setUserData: React.Dispatch<React.SetStateAction<UserData | null>>;
   lastSelectedPracticeUnits: LastSelectedUnits | null;
   setLastSelectedPracticeUnits: (subject: 'macro' | 'micro', unitIds: number[]) => void;
   globalLevel: number;
@@ -579,6 +590,9 @@ export function useAuth() {
       const newUser = userCredential.user;
       if (newUser) {
         const userDocRef = doc(db, 'users', newUser.uid);
+        const today = new Date();
+        const todayString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        
         await setDoc(userDocRef, {
           uid: newUser.uid,
           email: newUser.email,
@@ -591,7 +605,15 @@ export function useAuth() {
           mcqAnswerStatus: {}, // Initialize the map field
           viewedMcqIds: [],   // Initialize the array field
           totalXP: 150, // <-- Initialize totalXP to 150
-          isSubscribedToMarketing: isSubscribed
+          isSubscribedToMarketing: isSubscribed,
+          // Initialize credits with default values
+          credits: {
+            dailyPractice: {
+              remaining: 3,
+              lastResetDate: todayString,
+            },
+            lifetimeAiGenerations: 1,
+          },
         });
         
         // If user subscribed, add their email to the subscribedEmails collection
@@ -637,7 +659,8 @@ export function useAuth() {
         mcqAnswersData: mcqAnswersData, 
         loadingMcqData: loadingMcqData, 
         userData: userData, 
-        loadingUserData: loadingUserData, 
+        loadingUserData: loadingUserData,
+        setUserData: setUserData,
         lastSelectedPracticeUnits: lastSelectedPracticeUnits, 
         setLastSelectedPracticeUnits: setLastSelectedPracticeUnits, 
         globalLevel: globalLevel, 
@@ -696,7 +719,8 @@ export function useAuth() {
           mcqAnswersData: mcqAnswersData, 
           loadingMcqData: loadingMcqData, 
           userData: userData, 
-          loadingUserData: loadingUserData, 
+          loadingUserData: loadingUserData,
+          setUserData: setUserData,
           lastSelectedPracticeUnits: lastSelectedPracticeUnits, 
           setLastSelectedPracticeUnits: setLastSelectedPracticeUnits, 
           globalLevel: globalLevel, 
@@ -762,6 +786,7 @@ export function useAuth() {
     loadingMcqData,
     userData,
     loadingUserData,
+    setUserData,
     lastSelectedPracticeUnits,
     setLastSelectedPracticeUnits,
     globalLevel,
