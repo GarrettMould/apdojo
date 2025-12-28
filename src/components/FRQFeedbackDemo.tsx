@@ -3,16 +3,23 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export function FRQFeedbackDemo() {
   const [showCriteria, setShowCriteria] = useState(false);
+  const router = useRouter();
+
+  const handleCardClick = () => {
+    router.push('/unitFRQpracticePage?frqId=1');
+  };
 
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5 }}
-      className="w-full max-w-4xl mx-auto bg-white border-4 border-black rounded-3xl shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] p-8 sm:p-10"
+      onClick={handleCardClick}
+      className="w-full max-w-4xl mx-auto bg-white border-4 border-black rounded-3xl shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] p-8 sm:p-10 cursor-pointer hover:shadow-[16px_16px_0px_0px_rgba(0,0,0,1)] transition-all"
     >
       {/* Question Header */}
       <div className="mb-6">
@@ -89,7 +96,10 @@ export function FRQFeedbackDemo() {
         {/* Grading Criteria (Expandable) */}
         <div className="border border-gray-200 rounded-lg overflow-hidden">
           <button
-            onClick={() => setShowCriteria(!showCriteria)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowCriteria(!showCriteria);
+            }}
             className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-colors text-left"
           >
             <span className="text-sm font-medium text-gray-700">View Grading Criteria</span>

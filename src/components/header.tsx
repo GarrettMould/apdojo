@@ -95,7 +95,7 @@ function Header() {
           </div>
 
           {/* Desktop Navigation, XP, and Auth Buttons */}
-          <div className="hidden md:flex items-center gap-x-8">
+          <div className="hidden lg:flex items-center gap-x-8">
             <nav className="flex items-center space-x-8">
               <Link
                 href="/unit-final-practice-tests"
@@ -317,7 +317,7 @@ function Header() {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden">
+          <div className="lg:hidden">
             <button
               onClick={toggleMobileMenu}
               className="p-2 text-gray-700 hover:text-blue-600 transition-colors"
@@ -334,7 +334,7 @@ function Header() {
 
         {/* Mobile Navigation Dropdown */}
         {isMobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-200 bg-white">
+          <div className="lg:hidden border-t border-gray-200 bg-white">
             <nav className="flex flex-col py-4">
               <Link
                 href="/unit-final-practice-tests"
@@ -418,6 +418,76 @@ function Header() {
                 </div> */}
 
                 <div className="border-t border-gray-200 mt-4 pt-4">
+                  {/* XP Bar (Mobile) */}
+                  {(() => {
+                    const xp = user ? getSubjectXP(userData, displaySubject) : (guestXp ?? 0);
+                    const beltProgress = getBeltProgress(xp);
+                    const { percent, xpToNext, currentBelt } = beltProgress;
+                    
+                    const getBeltImage = () => {
+                      if (currentBelt.name === 'White Belt') {
+                        return '/images/beltNewWhite.svg';
+                      } else if (currentBelt.name === 'Yellow Belt') {
+                        return '/images/beltNewYellow.svg';
+                      } else if (currentBelt.name === 'Green Belt') {
+                        return '/images/beltNewGreen.svg';
+                      } else if (currentBelt.name === 'Purple Belt') {
+                        return '/images/beltNewPurple.svg';
+                      } else if (currentBelt.name === 'Black Belt') {
+                        return '/images/beltNewBlack.svg';
+                      } else {
+                        return '/images/beltNewWhite.svg';
+                      }
+                    };
+                    
+                    return (
+                      <div className="px-4 py-3 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Image
+                              src={getBeltImage()}
+                              alt={currentBelt.name}
+                              width={24}
+                              height={24}
+                              className="w-6 h-auto"
+                            />
+                            <span className={`text-xs font-bold uppercase ${currentBelt.textColor}`}>
+                              {currentBelt.name}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-800">
+                            <span className="uppercase tracking-tight text-[10px] text-gray-600">XP</span>
+                            <span>{xp}</span>
+                            <Image
+                              src="/images/flame100.png"
+                              alt="XP Flame"
+                              width={16}
+                              height={16}
+                              className="w-4 h-4"
+                            />
+                          </div>
+                        </div>
+                        <div className="h-3 bg-gray-200 border border-gray-300 rounded-full overflow-hidden">
+                          <motion.div
+                            className={`h-full ${currentBelt.color === 'bg-yellow-400' ? 'bg-yellow-400' : currentBelt.color === 'bg-green-600' ? 'bg-green-600' : currentBelt.color === 'bg-purple-600' ? 'bg-purple-600' : currentBelt.color === 'bg-gray-900' ? 'bg-gray-900' : 'bg-gray-100'}`}
+                            initial={{ width: 0 }}
+                            animate={{ width: `${percent}%` }}
+                            transition={{ duration: 0.3 }}
+                          />
+                        </div>
+                        {xpToNext !== null ? (
+                          <p className="text-xs text-center text-gray-600">
+                            {xpToNext.toLocaleString()} XP to next belt
+                          </p>
+                        ) : (
+                          <p className="text-xs text-center text-gray-600">
+                            Max Rank
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })()}
+                  
                   {/* Subject Segmented Control (Mobile) */}
                   <div className="px-4 py-2">
                     <div className="inline-flex items-center w-full bg-gray-100 rounded p-0.5 border border-gray-200">

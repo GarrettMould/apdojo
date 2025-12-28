@@ -102,7 +102,7 @@ export function PlacementResults({ results }: PlacementResultsProps) {
       transition={{ duration: 0.5 }}
       className="relative bg-white border-4 border-black rounded-3xl shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] flex-1 p-8 sm:p-12 flex flex-col items-center text-center space-y-8 overflow-y-auto"
     >
-      {/* Belt Image */}
+      {/* Belt Image with Title */}
       <motion.div
         initial={{ scale: 0, rotate: -180 }}
         animate={{ scale: 1, rotate: 0 }}
@@ -112,6 +112,7 @@ export function PlacementResults({ results }: PlacementResultsProps) {
           damping: 15,
           delay: 0.2,
         }}
+        className="flex flex-col items-center gap-2"
       >
         <Image
           src={getBeltImage()}
@@ -120,34 +121,32 @@ export function PlacementResults({ results }: PlacementResultsProps) {
           height={192}
           className="w-48 h-auto"
         />
+        {/* Belt Title */}
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
+          className="text-4xl font-black uppercase tracking-wide text-gray-900"
+        >
+          {results.belt}
+        </motion.h1>
+        {/* Belt Subtitle - Close to belt, italic grey */}
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.5 }}
+          className="text-xl italic text-gray-500"
+        >
+          {results.beltTitle}
+        </motion.h2>
       </motion.div>
-
-      {/* Belt Title */}
-      <motion.h1
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4, duration: 0.5 }}
-        className="text-4xl font-black uppercase tracking-wide text-gray-900"
-      >
-        {results.belt}
-      </motion.h1>
-
-      {/* Belt Subtitle */}
-      <motion.h2
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5, duration: 0.5 }}
-        className="text-2xl font-bold text-gray-700"
-      >
-        {results.beltTitle}
-      </motion.h2>
 
       {/* Message */}
       <motion.p
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6, duration: 0.5 }}
-        className="text-xl text-gray-800 max-w-2xl leading-relaxed"
+        className="text-3xl sm:text-4xl text-gray-800 max-w-2xl leading-relaxed font-semibold"
         style={{ fontFamily: 'Permanent Marker, cursive' }}
       >
         {results.message}
@@ -163,10 +162,7 @@ export function PlacementResults({ results }: PlacementResultsProps) {
         <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-2">
           Your Score
         </p>
-        <p 
-          className="text-3xl font-bold text-gray-900"
-          style={{ fontFamily: 'Permanent Marker, cursive' }}
-        >
+        <p className="text-3xl font-bold text-gray-900">
           {results.score}/{results.total}
         </p>
       </motion.div>

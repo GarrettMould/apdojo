@@ -34,6 +34,10 @@ export function HeroDojoDrills() {
     router.push(`/dojo-drills?drill=${drillId}`);
   };
 
+  const handleCardClick = () => {
+    router.push(`/dojo-drills`);
+  };
+
   // Determine difficulty - default to Medium
   const difficulty: 'Easy' | 'Medium' | 'Hard' = 'Medium';
 
@@ -66,7 +70,10 @@ export function HeroDojoDrills() {
             transition={{ duration: 0.5 }}
             className="h-full flex"
           >
-            <div className="flex-1 flex flex-col">
+            <div 
+              className="flex-1 flex flex-col cursor-pointer"
+              onClick={handleCardClick}
+            >
               <DojoDrillPreview
                 title={drill1.title}
                 description={drill1.description}
@@ -87,7 +94,10 @@ export function HeroDojoDrills() {
             transition={{ duration: 0.5 }}
             className="h-full flex"
           >
-            <div className="flex-1 flex flex-col">
+            <div 
+              className="flex-1 flex flex-col cursor-pointer"
+              onClick={handleCardClick}
+            >
               <DojoDrillPreview
                 title={drill2.title}
                 description={drill2.description}

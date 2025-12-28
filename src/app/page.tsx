@@ -154,7 +154,10 @@ function LoggedOutHomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             {/* Left Column: FRQ Dojo Card */}
             <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 text-center flex flex-col transition-shadow hover:shadow-2xl h-full">
-              <div className="relative mb-6 cursor-pointer group rounded-lg overflow-hidden shadow-inner bg-gray-50 aspect-video flex items-center justify-center">
+              <div 
+                onClick={handlePracticeFrqClick}
+                className="relative mb-6 cursor-pointer group rounded-lg overflow-hidden shadow-inner bg-gray-50 aspect-video flex items-center justify-center"
+              >
                 <Image
                   src={thumbnailUrl}
                   alt="FRQ Practice Placeholder"

@@ -116,7 +116,10 @@ export function DojoDrillPreview({
 
       {/* Footer CTA */}
       <button
-        onClick={onStart}
+        onClick={(e) => {
+          e.stopPropagation();
+          onStart();
+        }}
         disabled={isLocked && !buttonText} // Allow clicking if buttonText is provided (e.g., "Join the Dojo")
         className={`w-full font-bold py-4 rounded-lg uppercase tracking-widest transition-colors ${
           isLocked && !buttonText

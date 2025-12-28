@@ -65,40 +65,46 @@ function DojoDrillsContent() {
     );
   }
 
-  // Filter drills by selected subject and order by unit
+  // Show all drills, sorted by unit (prefer macro unit if available)
   const filteredAndSortedDrills = useMemo(() => {
-    const subjectFilter = selectedSubject === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics';
-    const filtered = Object.values(dojoDrills).filter(
-      drill => drillAppliesToSubject(drill, subjectFilter)
-    );
-    // Sort by unit number for the current subject
-    return filtered.sort((a, b) => {
-      const unitA = getDrillUnitForSubject(a, subjectFilter) || 0;
-      const unitB = getDrillUnitForSubject(b, subjectFilter) || 0;
+    const allDrills = Object.values(dojoDrills);
+    // Sort by unit number (prefer macro unit, fallback to micro or deprecated unit field)
+    return allDrills.sort((a, b) => {
+      const unitA = getDrillUnitForSubject(a, 'ap_macroeconomics') || 
+                    getDrillUnitForSubject(a, 'ap_microeconomics') || 
+                    a.unit || 0;
+      const unitB = getDrillUnitForSubject(b, 'ap_macroeconomics') || 
+                    getDrillUnitForSubject(b, 'ap_microeconomics') || 
+                    b.unit || 0;
       return unitA - unitB;
     });
-  }, [selectedSubject]);
+  }, []);
 
-  const getSubjectLabel = (subject: string) => {
-    return subject === 'ap_macroeconomics' ? 'Macro' : 'Micro';
+  const getSubjectLabel = (drill: typeof filteredAndSortedDrills[0]) => {
+    if (drill.subjects && drill.subjects.length > 0) {
+      return drill.subjects[0] === 'ap_macroeconomics' ? 'Macro' : 'Micro';
+    }
+    return drill.subject === 'ap_macroeconomics' ? 'Macro' : 'Micro';
   };
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Dojo Drills</h1>
+          <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight mb-4">
+            <span className="text-blue-500">Dojo</span> Drills
+          </h1>
           <p className="text-lg text-gray-600">
             Master key concepts through interactive video lessons, graph simulations, and practice questions.
           </p>
           <p className="text-sm text-gray-500 mt-2">
-            Showing {selectedSubject === 'macro' ? 'Macro' : 'Micro'} drills, ordered by unit
+            Showing all drills, ordered by unit
           </p>
         </div>
 
         {filteredAndSortedDrills.length === 0 ? (
           <div className="bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8 text-center">
-            <p className="text-gray-600">No {selectedSubject === 'macro' ? 'Macro' : 'Micro'} Dojo Drills available yet. Check back soon!</p>
+            <p className="text-gray-600">No Dojo Drills available yet. Check back soon!</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -111,12 +117,18 @@ function DojoDrillsContent() {
                 <div className="flex items-center justify-between mb-4">
                   <div
                     className={`inline-block text-xs font-semibold px-2.5 py-1 rounded-md ${
-                      drill.subject === 'ap_macroeconomics'
+                      (drill.subjects && drill.subjects.includes('ap_macroeconomics')) || drill.subject === 'ap_macroeconomics'
                         ? 'bg-blue-100 text-blue-800'
                         : 'bg-green-100 text-green-800'
                     }`}
                   >
-                    {getSubjectLabel(drill.subject)} - Unit {drill.unit}
+                    {(() => {
+                      const subject = drill.subjects && drill.subjects.length > 0 
+                        ? drill.subjects[0] 
+                        : drill.subject;
+                      const unit = getDrillUnitForSubject(drill, subject) || drill.unit;
+                      return `${getSubjectLabel(drill)} - Unit ${unit}`;
+                    })()}
                   </div>
                   <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-800">
                     <span>{drill.xpReward.total}</span>

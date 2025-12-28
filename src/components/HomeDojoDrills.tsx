@@ -51,8 +51,8 @@ export function HomeDojoDrills() {
     return shuffleArray(allDrills);
   }, []);
 
-  const handleDrillClick = (drillId: string) => {
-    router.push(`/dojo-drills/preview/${drillId}`);
+  const handleDrillClick = () => {
+    router.push(`/dojo-drills`);
   };
 
   // Helper to get subject label
@@ -119,7 +119,7 @@ export function HomeDojoDrills() {
               whileHover={{ scale: 1.02 }}
               transition={{ type: 'spring', stiffness: 300, damping: 20 }}
               className="bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 text-left hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 flex flex-col"
-              onClick={() => handleDrillClick(drill.id)}
+              onClick={handleDrillClick}
             >
               <div className="flex items-center justify-between mb-4">
                 <div

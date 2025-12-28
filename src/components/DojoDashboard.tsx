@@ -1055,22 +1055,13 @@ export function DojoDashboard() {
                     whileHover="hover"
                     className="group"
                   >
-                    <Link href={exam.isLocked ? `/purchase/season-pass?course=${currentCourse}` : exam.href}>
+                    <Link href={exam.isLocked ? `/purchase/season-pass?courseType=${currentCourse}` : exam.href}>
                       <motion.div
                         variants={cardHoverVariants}
                         initial="rest"
                         whileHover="hover"
-                        className={`bg-white border border-gray-300 rounded-3xl p-6 text-left transition-all relative overflow-hidden flex flex-col h-full ${exam.isLocked ? 'opacity-60' : ''}`}
+                        className="bg-white border border-gray-300 rounded-3xl p-6 text-left transition-all relative overflow-hidden flex flex-col h-full"
                       >
-                        {/* Lock Overlay */}
-                        {exam.isLocked && (
-                          <div className="absolute inset-0 bg-gray-900/50 flex items-center justify-center z-10 rounded-3xl">
-                            <div className="text-center">
-                              <Lock className="w-8 h-8 text-white mx-auto mb-2" />
-                              <p className="text-white text-sm font-semibold">Locked</p>
-                            </div>
-                          </div>
-                        )}
                         {/* Thumbnail */}
                         <div className="mb-4 -mx-6 -mt-6 relative flex-shrink-0">
                           <DojoThumbnail
@@ -1082,21 +1073,13 @@ export function DojoDashboard() {
                             activityType="Test"
                             className="rounded-t-3xl"
                           />
-                          {exam.isLocked && (
-                            <div className="absolute inset-0 bg-gray-900/50 flex items-center justify-center z-30 rounded-t-3xl">
-                              <div className="text-center">
-                                <Lock className="w-8 h-8 text-white mx-auto mb-2" />
-                                <p className="text-white text-sm font-semibold">Locked</p>
-                              </div>
-                            </div>
-                          )}
                         </div>
                         {/* Title */}
-                        <h3 className={`text-xl font-bold line-clamp-2 mb-2 ${exam.isLocked ? 'text-gray-400' : 'text-gray-900'}`}>
+                        <h3 className="text-xl font-bold line-clamp-2 mb-2 text-gray-900">
                           {exam.title}
                         </h3>
                         {/* Meta */}
-                        <p className={`text-sm line-clamp-2 mt-auto ${exam.isLocked ? 'text-gray-400' : 'text-gray-500'}`}>{exam.description}</p>
+                        <p className="text-sm line-clamp-2 mt-auto text-gray-500">{exam.description}</p>
                       </motion.div>
                     </Link>
                   </motion.div>
