@@ -40,23 +40,42 @@ function DojoDrillsContent() {
     }
   }, [drillIdFromQuery]);
 
-  // Show all drills, sorted by unit (prefer macro unit if available)
+  // Filter and sort drills by selected subject
   // This hook must be called before any conditional returns
   const filteredAndSortedDrills = useMemo(() => {
+    // Convert selectedSubject to full subject key
+    const subjectKey = selectedSubject === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics';
+    
+    // Filter drills by selected subject
     const allDrills = Object.values(dojoDrills);
-    // Sort by unit number (prefer macro unit, fallback to micro or deprecated unit field)
-    return allDrills.sort((a, b) => {
-      const unitA = getDrillUnitForSubject(a, 'ap_macroeconomics') || 
-                    getDrillUnitForSubject(a, 'ap_microeconomics') || 
-                    a.unit || 0;
-      const unitB = getDrillUnitForSubject(b, 'ap_macroeconomics') || 
-                    getDrillUnitForSubject(b, 'ap_microeconomics') || 
-                    b.unit || 0;
+    const filteredDrills = allDrills.filter((drill) => 
+      drillAppliesToSubject(drill, subjectKey)
+    );
+    
+    // Sort by unit number for the selected subject
+    return filteredDrills.sort((a, b) => {
+      const unitA = getDrillUnitForSubject(a, subjectKey) || 0;
+      const unitB = getDrillUnitForSubject(b, subjectKey) || 0;
       return unitA - unitB;
     });
-  }, []);
+  }, [selectedSubject]);
 
   const currentDrill = selectedDrillId ? dojoDrills[selectedDrillId] : null;
+
+  // Check if current drill matches selected subject and user has access
+  useEffect(() => {
+    if (currentDrill && user && userData) {
+      const subjectKey = selectedSubject === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics';
+      const drillAppliesToCurrentSubject = drillAppliesToSubject(currentDrill, subjectKey);
+      const hasAccess = hasValidSeasonPass(userData, selectedSubject === 'macro' ? 'macro' : 'micro');
+      
+      // If drill doesn't apply to current subject, or user doesn't have access, redirect
+      if (!drillAppliesToCurrentSubject || !hasAccess) {
+        setSelectedDrillId(null);
+        router.push('/dojo-drills');
+      }
+    }
+  }, [currentDrill, selectedSubject, user, userData, router]);
 
   const getSubjectLabel = (drill: typeof filteredAndSortedDrills[0]) => {
     if (drill.subjects && drill.subjects.length > 0) {
@@ -105,7 +124,7 @@ function DojoDrillsContent() {
             Master key concepts through interactive video lessons, graph simulations, and practice questions.
           </p>
           <p className="text-sm text-gray-500 mt-2">
-            Showing all drills, ordered by unit
+            Showing {selectedSubject === 'macro' ? 'Macro' : 'Micro'} drills, ordered by unit
           </p>
         </div>
 

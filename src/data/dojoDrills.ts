@@ -300,18 +300,13 @@ export const dojoDrills: Record<string, DojoDrill> = {
       total: 500
     }
   },
-  'absolute-and-comparative-advantage': {
-    id: 'absolute-and-comparative-advantage',
+  'absolute-and-comparative-advantage-macro': {
+    id: 'absolute-and-comparative-advantage-macro',
     title: 'Absolute and Comparative Advantage',
     description: 'Master the concepts of absolute and comparative advantage to understand how countries benefit from specialization and trade.',
     videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_micro_1.4.mp4',
-    subject: 'ap_macroeconomics', // Keep for backward compatibility
-    subjects: ['ap_macroeconomics', 'ap_microeconomics'],
-    unit: 1, // Keep for backward compatibility
-    subjectUnits: {
-      'ap_macroeconomics': 1,
-      'ap_microeconomics': 1
-    },
+    subject: 'ap_macroeconomics',
+    unit: 1,
     lessonIds: ['1.3'],
     stage1: {
       videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_micro_1.4.mp4',
@@ -382,18 +377,90 @@ export const dojoDrills: Record<string, DojoDrill> = {
       total: 500
     }
   },
-  'supply-and-demand': {
-    id: 'supply-and-demand',
+  'absolute-and-comparative-advantage-micro': {
+    id: 'absolute-and-comparative-advantage-micro',
+    title: 'Absolute and Comparative Advantage',
+    description: 'Master the concepts of absolute and comparative advantage to understand how countries benefit from specialization and trade.',
+    videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_micro_1.4.mp4',
+    subject: 'ap_microeconomics',
+    unit: 1,
+    lessonIds: ['1.3'],
+    stage1: {
+      videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_micro_1.4.mp4',
+      comprehensionQuestions: [
+        {
+          id: 'comp-adv-comp-1',
+          question: "When determining absolute advantage using a table that shows the number of labor hours required to produce a good, what specific value indicates that a producer has the advantage?",
+          options: [
+            "The larger number",
+            "The smaller number",
+            "The number closest to zero",
+            "The number equal to the output"
+          ],
+          correctAnswer: 1, // B
+          explanation: "The video explains that for input questions (like labor hours), you look for the smaller number because it means the producer uses fewer resources to make the product."
+        },
+        {
+          id: 'comp-adv-comp-2',
+          question: "According to the video, what calculation method should be used to find the opportunity cost when analyzing an output table?",
+          options: [
+            "Place the number for the other good on top of the ratio",
+            "Place the number for the good itself on top of the ratio",
+            "Multiply the two numbers together",
+            "Subtract the smaller number from the larger number"
+          ],
+          correctAnswer: 0, // A
+          explanation: "For output questions, the video provides the rule 'other on top,' meaning you form a ratio where the quantity of the alternative good is in the numerator."
+        },
+        {
+          id: 'comp-adv-comp-3',
+          question: "What is the result on a country's Production Possibilities Curve when it trades based on mutually beneficial terms?",
+          options: [
+            "The country can consume at a point outside of its curve",
+            "The curve shifts inward to reflect specialization",
+            "The curve shifts outward due to increased technology",
+            "The country produces at a point inside the curve"
+          ],
+          correctAnswer: 0, // A
+          explanation: "The video states that while a country is limited to producing along its curve, trading on mutually beneficial terms allows it to actually consume somewhere outside of its Production Possibilities Curve."
+        }
+      ]
+    },
+    stage2: {
+      type: 'comparative-advantage',
+      config: {
+        type: 'input' as const,
+        data: {
+          headers: ['Country', 'Wheat', 'Cloth'],
+          rows: [
+            { country: 'USA', wheat: '10 hours', cloth: '5 hours' },
+            { country: 'France', wheat: '20 hours', cloth: '15 hours' }
+          ]
+        },
+        answers: {
+          usaOpportunityCostWheat: '0.5', // 5/10 = 0.5 cloth per wheat
+          franceOpportunityCostWheat: '0.75', // 15/20 = 0.75 cloth per wheat
+          absoluteAdvantageCloth: 'USA' as const, // USA uses fewer hours (5 < 15)
+          comparativeAdvantageWheat: 'USA' as const // USA has lower opp cost (0.5 < 0.75)
+        }
+      }
+    },
+    stage3: {
+      mcqIds: [5, 6, 2084] // MCQs from ap macro unit 1, lesson 1.3
+    },
+    xpReward: {
+      completion: 200,
+      perMcqCorrect: 100,
+      total: 500
+    }
+  },
+  'supply-and-demand-macro': {
+    id: 'supply-and-demand-macro',
     title: 'Supply & Demand',
     description: 'Master the fundamentals of supply and demand, including shifts versus movements along curves and market equilibrium.',
     videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_1.6.mp4',
-    subject: 'ap_macroeconomics', // Keep for backward compatibility
-    subjects: ['ap_macroeconomics', 'ap_microeconomics'],
-    unit: 1, // Keep for backward compatibility
-    subjectUnits: {
-      'ap_macroeconomics': 1,
-      'ap_microeconomics': 2
-    },
+    subject: 'ap_macroeconomics',
+    unit: 1,
     lessonIds: ['1.6'],
     stage1: {
       videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_1.6.mp4',
@@ -452,18 +519,140 @@ export const dojoDrills: Record<string, DojoDrill> = {
       total: 500
     }
   },
-  'ppc-and-opportunity-cost': {
-    id: 'ppc-and-opportunity-cost',
+  'supply-and-demand-micro': {
+    id: 'supply-and-demand-micro',
+    title: 'Supply & Demand',
+    description: 'Master the fundamentals of supply and demand, including shifts versus movements along curves and market equilibrium.',
+    videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_1.6.mp4',
+    subject: 'ap_microeconomics',
+    unit: 2,
+    lessonIds: ['1.6'],
+    stage1: {
+      videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_1.6.mp4',
+      comprehensionQuestions: [
+        {
+          id: 'supply-demand-comp-1',
+          question: "Graphically, a change in the price of a good is represented by which of the following?",
+          options: [
+            "A shift of the demand curve to the right",
+            "A shift of the supply curve to the left",
+            "A movement along the existing supply or demand curve",
+            "Simultaneous shifts of both the supply and demand curves"
+          ],
+          correctAnswer: 2, // C
+          explanation: "A change in the price of the good itself causes a change in quantity demanded or quantity supplied, which is represented by moving along the existing curve. The curves themselves only shift when a non-price factor changes."
+        },
+        {
+          id: 'supply-demand-comp-2',
+          question: "If sellers expect the price of their product to drop significantly in the near future, how will they likely adjust their behavior in the current market?",
+          options: [
+            "They will decrease their current supply to wait for higher prices",
+            "They will increase their current supply to sell before the price falls",
+            "They will increase their demand for the product",
+            "They will stop production entirely until the price stabilizes"
+          ],
+          correctAnswer: 1, // B
+          explanation: "Sellers want to sell at the highest possible price. If they expect prices to fall next week, they are motivated to increase supply today to capture the current higher price before the drop occurs."
+        },
+        {
+          id: 'supply-demand-comp-3',
+          question: "When both the demand for and the supply of a good increase simultaneously, what is the certain impact on the market equilibrium?",
+          options: [
+            "The equilibrium quantity will increase",
+            "The equilibrium price will increase",
+            "The equilibrium quantity will decrease",
+            "The equilibrium price will decrease"
+          ],
+          correctAnswer: 0, // A
+          explanation: "An increase in demand pushes quantity up, and an increase in supply also pushes quantity up, so the equilibrium quantity definitely increases. However, demand pulls price up while supply pushes price down, making the change in price indeterminate without knowing the magnitude of the shifts."
+        }
+      ]
+    },
+    stage2: {
+      type: 'demand-change',
+      config: {
+        scenario: 'People expect the price of this product to get WAY more expensive in the near future.',
+        correctAnswer: 'shift'
+      }
+    },
+    stage3: {
+      mcqIds: [2124, 2125, 2126] // MCQs from ap macro unit 1, lesson 1.6
+    },
+    xpReward: {
+      completion: 200,
+      perMcqCorrect: 100,
+      total: 500
+    }
+  },
+  'ppc-and-opportunity-cost-macro': {
+    id: 'ppc-and-opportunity-cost-macro',
     title: 'PPC and Opportunity Cost',
     description: 'Master the Production Possibilities Curve and understand how opportunity cost shapes economic decisions.',
     videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_1.2.mp4',
-    subject: 'ap_macroeconomics', // Keep for backward compatibility
-    subjects: ['ap_macroeconomics', 'ap_microeconomics'],
-    unit: 1, // Keep for backward compatibility
-    subjectUnits: {
-      'ap_macroeconomics': 1,
-      'ap_microeconomics': 1
+    subject: 'ap_macroeconomics',
+    unit: 1,
+    lessonIds: ['1.2'],
+    stage1: {
+      videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_1.2.mp4',
+      comprehensionQuestions: [
+        {
+          id: 'ppc-comp-1',
+          question: "Why does a Production Possibilities Curve often have a 'bowed-out' shape rather than being a straight line?",
+          options: [
+            "Because resources are specialized and not perfectly adaptable between producing different goods.",
+            "Because the population is shrinking, leading to reduced production capacity.",
+            "Because opportunity costs are constant regardless of what is being produced.",
+            "Because technology improves faster for one good than for the other."
+          ],
+          correctAnswer: 0, // A
+          explanation: "A bowed-out curve indicates increasing opportunity costs. This occurs because resources are not easily adaptable; moving a resource from one industry to another where it is less efficient results in a significant loss of production for a relatively small gain."
+        },
+        {
+          id: 'ppc-comp-2',
+          question: "What does a point located *inside* the boundary of the Production Possibilities Curve represent?",
+          options: [
+            "A point of allocative efficiency where society is getting the most value.",
+            "An unattainable point that requires better technology to reach.",
+            "A state of underutilization where resources are not being used effectively.",
+            "A point where opportunity costs are zero."
+          ],
+          correctAnswer: 2, // C
+          explanation: "Any point within the curve represents 'underutilization,' meaning the society isn't using its resources effectively and could potentially produce more of both items without needing new resources."
+        },
+        {
+          id: 'ppc-comp-3',
+          question: "Which of the following scenarios would cause a country's PPC to shift outward, making previously unattainable points attainable?",
+          options: [
+            "A decrease in the working-age population.",
+            "A decision to produce more consumer goods and fewer capital goods.",
+            "Moving from a point inside the curve to a point on the curve.",
+            "The discovery of new natural resources or an improvement in technology."
+          ],
+          correctAnswer: 3, // D
+          explanation: "An outward shift occurs due to an increase in the factors of production. Specific drivers include developing better technology, finding new natural resources, or population growth."
+        }
+      ]
     },
+    stage2: {
+      type: 'ppc-drill',
+      config: {}
+    },
+    stage3: {
+      mcqIds: [2, 3, 4] // MCQs from ap macro unit 1, lesson 1.2
+    },
+    xpReward: {
+      completion: 200,
+      perMcqCorrect: 100,
+      total: 500
+    }
+  },
+  'ppc-and-opportunity-cost-micro': {
+    id: 'ppc-and-opportunity-cost-micro',
+    title: 'PPC and Opportunity Cost',
+    description: 'Master the Production Possibilities Curve and understand how opportunity cost shapes economic decisions.',
+    videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_1.2.mp4',
+    subject: 'ap_microeconomics',
+    unit: 1,
     lessonIds: ['1.2'],
     stage1: {
       videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_1.2.mp4',
