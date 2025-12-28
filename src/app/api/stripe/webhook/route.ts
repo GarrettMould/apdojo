@@ -34,6 +34,10 @@ export async function POST(req: Request) {
       }
 
       try {
+        if (!adminDb) {
+          console.error('Firebase Admin DB is not initialized');
+          return NextResponse.json({ error: 'Database not initialized' }, { status: 500 });
+        }
         const userRef = adminDb.collection('users').doc(userId);
         
         // Handle unit test purchases
@@ -77,6 +81,10 @@ export async function POST(req: Request) {
       }
 
       try {
+        if (!adminDb) {
+          console.error('Firebase Admin DB is not initialized');
+          return NextResponse.json({ error: 'Database not initialized' }, { status: 500 });
+        }
         const userRef = adminDb.collection('users').doc(checkoutUserId);
         
         // Handle season pass purchases
@@ -100,7 +108,7 @@ export async function POST(req: Request) {
           
           // Get current user data to merge expiration dates properly
           const userDoc = await userRef.get();
-          const currentData = userDoc.exists() ? userDoc.data() : {};
+          const currentData = userDoc.exists ? (userDoc.data() || {}) : {};
           const currentExpiration = currentData.seasonPassExpiration || {};
           const currentSeasonPass = currentData.seasonPass || [];
           
