@@ -1,4 +1,4 @@
-import { doc, updateDoc, getDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, updateDoc, getDoc, serverTimestamp, deleteField } from 'firebase/firestore';
 import { db } from './firebase';
 
 export interface DojoDrillProgress {
@@ -71,5 +71,27 @@ export function getDrillProgress(
     stage2: progress[drillId].stage2 || false,
     stage3: progress[drillId].stage3 || false,
   };
+}
+
+/**
+ * Reset progress for a specific drill
+ */
+export async function resetDojoDrillProgress(
+  userId: string,
+  drillId: string
+): Promise<void> {
+  try {
+    const userDocRef = doc(db, 'users', userId);
+    
+    // Delete the progress for this drill
+    await updateDoc(userDocRef, {
+      [`dojoDrillProgress.${drillId}`]: deleteField(),
+    });
+    
+    console.log(`[DojoDrillProgress] Reset progress for drill ${drillId}`);
+  } catch (error) {
+    console.error(`[DojoDrillProgress] Error resetting progress:`, error);
+    throw error;
+  }
 }
 

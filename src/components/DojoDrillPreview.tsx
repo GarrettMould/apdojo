@@ -16,13 +16,13 @@ interface DojoDrillPreviewProps {
     stage3: boolean;
   } | null;
   buttonText?: string; // Optional custom button text
+  comingSoon?: boolean; // If true, show "Coming Soon" with lock icon
 }
 
 const learningPathItems = [
   { label: 'Video Briefing', stage: 'stage1' as const },
   { label: 'Interactive Simulation', stage: 'stage2' as const },
   { label: 'MCQ Gauntlet', stage: 'stage3' as const },
-  { label: 'Mastery Challenge', stage: null }, // Final step, no tracking needed
 ];
 
 export function DojoDrillPreview({
@@ -34,7 +34,14 @@ export function DojoDrillPreview({
   isLocked = false,
   progress = null,
   buttonText,
+  comingSoon = false,
 }: DojoDrillPreviewProps) {
+  // Check if all stages are completed
+  const isCompleted = progress?.stage1 && progress?.stage2 && progress?.stage3;
+  const displayButtonText = comingSoon 
+    ? 'Coming Soon' 
+    : (buttonText || (isCompleted ? 'Restart Drill' : (isLocked ? 'Locked (Season Pass)' : 'Start Drill')));
+  
   return (
     <div className="bg-white border-4 border-black rounded-3xl shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] p-8 sm:p-12 flex flex-col min-h-full"
     >
@@ -118,18 +125,22 @@ export function DojoDrillPreview({
       <button
         onClick={(e) => {
           e.stopPropagation();
-          onStart();
+          if (!comingSoon) {
+            onStart();
+          }
         }}
-        disabled={isLocked && !buttonText} // Allow clicking if buttonText is provided (e.g., "Join the Dojo")
+        disabled={comingSoon || (isLocked && !buttonText)} // Disable if coming soon or locked without buttonText
         className={`w-full font-bold py-4 rounded-lg uppercase tracking-widest transition-colors ${
-          isLocked && !buttonText
-            ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
-            : 'bg-black text-white hover:bg-gray-800'
+          comingSoon
+            ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+            : (isLocked && !buttonText
+              ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+              : 'bg-black text-white hover:bg-gray-800')
         }`}
       >
         <div className="flex items-center justify-center gap-2">
-          {isLocked && !buttonText && <Lock className="w-5 h-5" />}
-          <span>{buttonText || (isLocked ? 'Locked (Season Pass)' : 'Start Drill')}</span>
+          {(comingSoon || (isLocked && !buttonText)) && <Lock className="w-5 h-5" />}
+          <span>{displayButtonText}</span>
         </div>
       </button>
     </div>

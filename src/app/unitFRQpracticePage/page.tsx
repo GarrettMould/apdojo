@@ -18,6 +18,7 @@ import { CheckCircle2 } from 'lucide-react';
 import { LoginModal, SignupModal } from '@/components/AuthModals';
 import FRQLibrarySidebar, { FRQItem } from '@/components/FRQLibrarySidebar';
 import { hasValidSeasonPass } from '@/lib/utils';
+import { FRQCompletionModal } from '@/components/FRQCompletionModal';
 
 // Self-Review Component for Drawings
 const DrawingSelfReview = ({ 
@@ -321,6 +322,8 @@ function UnitFRQPracticePageComponent() {
   const [isExpertTipVisible, setIsExpertTipVisible] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [checklistPoints, setChecklistPoints] = useState<Record<string, number>>({});
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [totalXpEarned, setTotalXpEarned] = useState(0);
 
   const handlePrint = () => {
     window.print();
@@ -367,6 +370,85 @@ function UnitFRQPracticePageComponent() {
     const checklistPointsTotal = Object.values(checklistPoints).reduce((acc, points) => acc + points, 0);
     return feedbackPoints + checklistPointsTotal;
   }, [gradingFeedback, checklistPoints]);
+
+  // Calculate total XP earned (sum of all feedback scores * 100)
+  const calculatedTotalXp = React.useMemo(() => {
+    const feedbackXp = Object.values(gradingFeedback).reduce((acc, feedback) => {
+      return acc + ((feedback.score || 0) * 100);
+    }, 0);
+    // Checklist points also contribute to XP (same multiplier)
+    const checklistXp = Object.values(checklistPoints).reduce((acc, points) => acc + (points * 100), 0);
+    return feedbackXp + checklistXp;
+  }, [gradingFeedback, checklistPoints]);
+
+  // Check if all answerable parts/subparts are completed
+  const isAllQuestionsCompleted = React.useMemo(() => {
+    if (!frqQuestion || !frqQuestion.parts) return false;
+
+    // Check all answerable parts and subparts
+    return frqQuestion.parts.every((part) => {
+      // Check if part itself is answerable
+      if (part.answerType) {
+        const partKey = `part-${part.label}`;
+        if (part.answerType === 'draw') {
+          // For drawing answers: must have submitted drawing
+          if (!submittedDrawings[partKey]) {
+            return false;
+          }
+        } else {
+          // For text answers: must have grading feedback
+          if (!gradingFeedback[partKey]) {
+            return false;
+          }
+        }
+      }
+      
+      // Check subparts
+      if (part.subparts) {
+        const allSubpartsCompleted = part.subparts
+          .filter(subpart => subpart.answerType) // Only check answerable subparts
+          .every((subpart) => {
+            const subpartKey = `subpart-${part.label}-${subpart.label}`;
+            if (subpart.answerType === 'draw') {
+              // For drawing answers: must have submitted drawing
+              return !!submittedDrawings[subpartKey];
+            } else {
+              // For text answers: must have grading feedback
+              return !!gradingFeedback[subpartKey];
+            }
+          });
+        
+        if (!allSubpartsCompleted) {
+          return false;
+        }
+      }
+      
+      return true;
+    });
+  }, [frqQuestion, gradingFeedback, submittedDrawings]);
+
+  // Show completion modal when all questions are completed
+  useEffect(() => {
+    if (isAllQuestionsCompleted && !showCompletionModal) {
+      setTotalXpEarned(calculatedTotalXp);
+      setShowCompletionModal(true);
+    }
+  }, [isAllQuestionsCompleted, showCompletionModal, calculatedTotalXp]);
+
+  // Generate completion message based on score
+  const getCompletionMessage = (score: number, total: number): string => {
+    const percentage = total > 0 ? (score / total) * 100 : 0;
+    
+    if (percentage >= 90) {
+      return "Outstanding work! You've mastered this FRQ! 🎉";
+    } else if (percentage >= 75) {
+      return "Great job! You're well on your way to a 5! 💪";
+    } else if (percentage >= 60) {
+      return "Good effort! Keep practicing to improve your score! 📚";
+    } else {
+      return "Nice try! Review the feedback and try again! 🔄";
+    }
+  };
 
   const togglePart = (partLabel: string) => {
     setExpandedParts(prev => ({
@@ -438,6 +520,8 @@ function UnitFRQPracticePageComponent() {
     setIsGrading({});
     setChecklistPoints({});
     setIsExpertTipVisible(false);
+    setShowCompletionModal(false);
+    setTotalXpEarned(0);
   };
 
   const handleGradeTextAnswer = async (answerKey: string, partText: string, gradingCriteria: string, pointValue?: number) => {
@@ -583,6 +667,14 @@ function UnitFRQPracticePageComponent() {
         onClose={() => setVideoModalState(null)}
         videoUrl={videoModalState?.url || ''}
         aspectRatio={videoModalState?.aspectRatio}
+      />
+      <FRQCompletionModal
+        isOpen={showCompletionModal}
+        onClose={() => setShowCompletionModal(false)}
+        xpEarned={totalXpEarned}
+        score={currentPoints}
+        totalPoints={totalPoints}
+        message={getCompletionMessage(currentPoints, totalPoints)}
       />
 
       {/* Sidebar Toggle Button */}

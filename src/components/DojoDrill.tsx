@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
 import DraggableGraph from "./DraggableGraph";
 import { DojoTable } from "./DojoTable";
 import { MonopolyRevenueVisualizer } from "./MonopolyRevenueVisualizer";
@@ -18,7 +19,10 @@ import Image from "next/image";
 import { DojoDrill as DojoDrillType, ComprehensionQuestion } from "@/data/dojoDrills";
 import ReactMarkdown from 'react-markdown';
 import { useAuthContext } from '@/contexts/AuthContext';
-import { saveDojoDrillProgress } from '@/lib/dojoDrillProgress';
+import { saveDojoDrillProgress, loadDojoDrillProgress, getDrillProgress } from '@/lib/dojoDrillProgress';
+import { getBeltProgress } from '@/lib/beltSystem';
+import { getSubjectXP } from '@/hooks/useUserProgress';
+import { DojoDrillResults } from './DojoDrillResults';
 
 // Helper function to parse markdown table from text
 const parseMarkdownTable = (text: string): { tableData: { headers: string[]; rows: string[][] } | null; textWithoutTable: string } => {
@@ -97,7 +101,8 @@ interface DojoDrillProps {
 }
 
 export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
-  const { awardXp, user } = useAuthContext();
+  const { awardXp, user, userData, selectedSubject } = useAuthContext();
+  const router = useRouter();
   const [step, setStep] = useState(1);
   const [videoEnded, setVideoEnded] = useState(false);
   const [comprehensionAnswers, setComprehensionAnswers] = useState<Record<string, number>>({});
@@ -106,6 +111,8 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
   const [graphCompleted, setGraphCompleted] = useState(false);
   const [tableCompleted, setTableCompleted] = useState(false);
   const [monopolyCompleted, setMonopolyCompleted] = useState(false);
+  const [ppcLevel, setPpcLevel] = useState<1 | 2>(1); // Track PPC drill level
+  const [level1Ready, setLevel1Ready] = useState(false); // Track if PPC level 1 is ready to proceed
   
   const [mcqQuestions, setMcqQuestions] = useState<Question[]>([]);
   const [currentMcqIndex, setCurrentMcqIndex] = useState(0);
@@ -117,6 +124,62 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const totalSteps = 4;
+  const [loadingProgress, setLoadingProgress] = useState(true);
+
+  // Load progress and determine starting step
+  useEffect(() => {
+    const loadProgressAndSetStep = async () => {
+      if (!user || !drill) {
+        setLoadingProgress(false);
+        return;
+      }
+
+      try {
+        const allProgress = await loadDojoDrillProgress(user.uid);
+        const drillProgress = getDrillProgress(allProgress, drill.id);
+        
+        if (drillProgress) {
+          // Determine starting step based on completed stages
+          if (drillProgress.stage3) {
+            // All stages complete, show results
+            setStep(4);
+            setCompQuestionsSubmitted(true);
+            setGraphCompleted(true);
+            setTableCompleted(true);
+            setMonopolyCompleted(true);
+            // Load MCQs for XP calculation
+            const questions = drill.stage3.mcqIds
+              .map(id => allQuestions.find(q => q.id === id))
+              .filter((q): q is Question => q !== undefined);
+            setMcqQuestions(questions);
+          } else if (drillProgress.stage2) {
+            // Stage 2 complete, start at MCQs (step 3)
+            setStep(3);
+            setCompQuestionsSubmitted(true);
+            setGraphCompleted(true);
+            setTableCompleted(true);
+            setMonopolyCompleted(true);
+            // Load MCQs
+            const questions = drill.stage3.mcqIds
+              .map(id => allQuestions.find(q => q.id === id))
+              .filter((q): q is Question => q !== undefined);
+            setMcqQuestions(questions);
+          } else if (drillProgress.stage1) {
+            // Stage 1 complete, start at interactive activity (step 2)
+            setStep(2);
+            setCompQuestionsSubmitted(true);
+            setVideoEnded(true);
+          }
+        }
+      } catch (error) {
+        console.error('[DojoDrill] Error loading progress:', error);
+      } finally {
+        setLoadingProgress(false);
+      }
+    };
+
+    loadProgressAndSetStep();
+  }, [user, drill]);
 
   // Load MCQs from stage3.mcqIds when entering step 3
   useEffect(() => {
@@ -209,13 +272,19 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
   };
 
   const handleGraphComplete = () => {
-    setGraphCompleted(true);
-    // Auto-advance to step 3 after a delay for demand-change activity
-    if (drill.stage2.type === 'demand-change') {
-      setTimeout(() => {
-        setStep(3);
-        setGraphCompleted(false);
-      }, 2000); // 2 second delay to show the green background
+    // For PPC drill, only handle level 2 completion
+    if (drill.stage2.type === 'ppc-drill') {
+      // Level 2 complete, mark as done
+      setGraphCompleted(true);
+    } else {
+      setGraphCompleted(true);
+      // Auto-advance to step 3 after a delay for demand-change activity
+      if (drill.stage2.type === 'demand-change') {
+        setTimeout(() => {
+          setStep(3);
+          setGraphCompleted(false);
+        }, 2000); // 2 second delay to show the green background
+      }
     }
   };
 
@@ -228,6 +297,14 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
   };
 
   const handleStep2Next = () => {
+    // For PPC drill, handle level progression
+    if (drill.stage2.type === 'ppc-drill' && ppcLevel === 1) {
+      // Move from level 1 to level 2
+      setPpcLevel(2);
+      setLevel1Ready(false);
+      return;
+    }
+    
     // Save stage2 progress
     if (user) {
       saveDojoDrillProgress(user.uid, drill.id, 'stage2').catch((error) => {
@@ -238,6 +315,8 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
     setGraphCompleted(false);
     setTableCompleted(false);
     setMonopolyCompleted(false);
+    setPpcLevel(1); // Reset PPC level
+    setLevel1Ready(false);
   };
 
   const isStep2Completed = 
@@ -247,6 +326,7 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
     drill.stage2.type === "demand-change" ? graphCompleted :
     drill.stage2.type === "elasticity-revenue" ? graphCompleted :
     drill.stage2.type === "consumer-producer-surplus" ? graphCompleted :
+    drill.stage2.type === "ppc-drill" ? (ppcLevel === 1 ? (level1Ready || false) : graphCompleted) :
     false;
 
   const handleMcqAnswer = (questionId: number, answer: string) => {
@@ -273,6 +353,8 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
   };
 
   const handleFinish = () => {
+    // Navigate to personalized homepage
+    router.push('/');
     if (onComplete) {
       onComplete();
     }
@@ -308,7 +390,7 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
         }
         return null;
       case 'ppc-drill':
-        return <PPCDrill onComplete={handleGraphComplete} />;
+        return <PPCDrill onComplete={handleGraphComplete} currentLevel={ppcLevel} onLevel1Ready={() => setLevel1Ready(true)} />;
       case 'demand-change':
         const demandChangeData = drill.stage2.config as DemandChangeScenario;
         if (demandChangeData) {
@@ -327,6 +409,18 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
         return null;
     }
   };
+
+  // Show loading state while progress is being loaded
+  if (loadingProgress) {
+    return (
+      <div className="w-full max-w-7xl mx-auto flex items-center justify-center min-h-[600px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading progress...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-7xl mx-auto">
@@ -653,31 +747,12 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
 
           {/* Step 4: Results */}
           {step === 4 && (
-            <motion.div
-              key="step4"
-              initial={{ x: 100, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: -100, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="absolute inset-0 bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8 flex flex-col items-center justify-center"
-            >
-              <Trophy className="w-24 h-24 text-yellow-500 mb-6" />
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                Dojo Drill Complete!
-              </h2>
-              <p className="text-2xl font-semibold text-gray-700 mb-8">
-                XP Earned: <span className="text-green-600">{xpEarned}</span> / {drill.xpReward.total}
-              </p>
-              <div className="flex gap-4">
-                <button
-                  onClick={handleFinish}
-                  className="px-8 py-3 rounded-lg font-bold text-lg bg-black text-white border-2 border-black hover:bg-gray-800 active:translate-y-1 transition-all flex items-center gap-2"
-                >
-                  <CheckCircle2 className="w-5 h-5" />
-                  Finish
-                </button>
-              </div>
-            </motion.div>
+            <DojoDrillResults
+              xpEarned={xpEarned}
+              userData={userData}
+              selectedSubject={selectedSubject}
+              onExit={handleFinish}
+            />
           )}
         </AnimatePresence>
       </div>

@@ -590,7 +590,7 @@ const macroUnit1Questions = [
     "unit": 1,
     "lessonIDS": ["1.6"],
     "unitName": "Basic Economic Concepts",
-    "question": "Refer to the market graph below. The market equilibrium quantity is 90 units. If the current market price is established at $P_2$, which of the following best describes the quantity exchanged and the resulting pressure on the market price? ",
+    "question": "Refer to the market graph below. The market equilibrium quantity is 90 units. If the current market price is established at P2, which of the following best describes the quantity exchanged and the resulting pressure on the market price? ",
     "image": q2126,
     "options": [
       "120 units will be exchanged, and there will be upward pressure on the price.",
@@ -600,7 +600,7 @@ const macroUnit1Questions = [
       "120 units will be exchanged, and the price will decrease to eliminate the surplus."
     ],
     "correctAnswer": "D",
-    "explanation": "At price $P_2$ (above equilibrium), the Quantity Demanded is 60 units while the Quantity Supplied is higher (e.g., 120), creating a surplus. In a market, the actual quantity exchanged is determined by the 'short side' (whichever is lower between supply and demand), so only 60 units are bought and sold. To eliminate the surplus, market forces will drive the price down until it reaches equilibrium at 90 units.",
+    "explanation": "At price P2 (above equilibrium), the Quantity Demanded is 60 units while the Quantity Supplied is higher (e.g., 120), creating a surplus. In a market, the actual quantity exchanged is determined by the 'short side' (whichever is lower between supply and demand), so only 60 units are bought and sold. To eliminate the surplus, market forces will drive the price down until it reaches equilibrium at 90 units.",
     "videoExplanation": null
   },
   {

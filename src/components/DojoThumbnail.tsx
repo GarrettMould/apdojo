@@ -64,10 +64,10 @@ const DojoThumbnail: React.FC<DojoThumbnailProps> = ({
 
       {/* Top-Right: XP Reward - Normal Font (not whiteboard) */}
       {xpReward !== undefined && (
-        <div className="absolute top-3 right-3 z-20">
-          <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-800">
-            <span>{xpReward.toLocaleString()}</span>
-            <span className="inline-flex items-center">
+        <div className="absolute top-3 right-3 z-20 bg-transparent">
+          <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-800 bg-transparent">
+            <span className="bg-transparent">{xpReward.toLocaleString()}</span>
+            <span className="inline-flex items-center bg-transparent">
               <Image
                 src="/images/flame100.png"
                 alt="XP Flame"

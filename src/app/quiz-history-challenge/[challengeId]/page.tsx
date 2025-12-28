@@ -1,14 +1,17 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuthContext } from '@/contexts/AuthContext';
-import { Loader2, AlertCircle, Check, X, Copy, Info, CheckCircle2, Lock } from 'lucide-react';
+import { Loader2, AlertCircle, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoginModal, SignupModal } from '@/components/AuthModals';
+import { UnitMCQs } from '@/components/unitMCQS';
+import { Question as QuestionType } from '@/data/questionBanks/types';
+import { macroUnits as allMacroUnitsData, microUnits as allMicroUnitsData } from '@/data/cheatSheets';
 
 interface QuizQuestion {
   id: string | number;
@@ -40,10 +43,45 @@ interface QuizChallenge {
   mode: 'challenge' | 'cooperate';
 }
 
-export default function QuizHistoryChallengePage() {
+// Convert challenge questions to QuestionType format
+function convertToQuestionType(
+  challengeQuestion: QuizQuestion,
+  index: number,
+  subject: 'macro' | 'micro'
+): QuestionType {
+  // Convert correctAnswer index to letter (A, B, C, D, etc.)
+  const correctAnswerLetter = String.fromCharCode(65 + challengeQuestion.correctAnswer);
+  
+  // Convert image string to object format if present
+  const image = challengeQuestion.image
+    ? { src: challengeQuestion.image, alt: 'Question image' }
+    : null;
+
+  return {
+    id: typeof challengeQuestion.id === 'number' ? challengeQuestion.id : index + 10000, // Use index + offset if id is string
+    unit: challengeQuestion.unit,
+    subject: subject === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics',
+    unitName: `Unit ${challengeQuestion.unit}`,
+    question: challengeQuestion.question,
+    image: image,
+    options: challengeQuestion.options,
+    correctAnswer: correctAnswerLetter,
+    explanation: challengeQuestion.explanation,
+    lessonIDS: challengeQuestion.lessonIDS || [],
+    tableData: challengeQuestion.tableData,
+  };
+}
+
+function QuizHistoryChallengeContent() {
   const params = useParams();
   const router = useRouter();
-  const { user } = useAuthContext();
+  const { 
+    user, 
+    userData,
+    correctStreak,
+    setCorrectStreak,
+    awardXp,
+  } = useAuthContext();
   const challengeId = params.challengeId as string;
 
   const [challengeData, setChallengeData] = useState<QuizChallenge | null>(null);
@@ -53,11 +91,19 @@ export default function QuizHistoryChallengePage() {
   const [showSignupModal, setShowSignupModal] = useState(false);
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [selectedAnswers, setSelectedAnswers] = useState<Record<number, number>>({});
+  const [answeredQuestions, setAnsweredQuestions] = useState<Record<number, any>>({});
+  const [questionsForPractice, setQuestionsForPractice] = useState<QuestionType[]>([]);
   const [isQuizFinished, setIsQuizFinished] = useState(false);
   const [score, setScore] = useState(0);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [timeElapsed, setTimeElapsed] = useState(0);
+
+  // Reset streak to 0 for challenge quizzes (introducing users to the dojo way)
+  useEffect(() => {
+    if (user && setCorrectStreak) {
+      setCorrectStreak(0);
+    }
+  }, [user, setCorrectStreak]);
 
   useEffect(() => {
     const fetchChallenge = async () => {
@@ -79,6 +125,12 @@ export default function QuizHistoryChallengePage() {
 
         const data = challengeSnap.data() as QuizChallenge;
         setChallengeData(data);
+
+        // Convert challenge questions to QuestionType format
+        const convertedQuestions = data.quizQuestions.map((q, idx) =>
+          convertToQuestionType(q, idx, data.subject)
+        );
+        setQuestionsForPractice(convertedQuestions);
       } catch (err) {
         console.error('Error fetching challenge:', err);
         setError('Failed to load challenge');
@@ -99,10 +151,10 @@ export default function QuizHistoryChallengePage() {
 
   // Start timer when quiz begins
   useEffect(() => {
-    if (currentQuestionIndex === 0 && challengeData && user && startTime === null) {
+    if (currentQuestionIndex === 0 && challengeData && user && startTime === null && questionsForPractice.length > 0) {
       setStartTime(Date.now());
     }
-  }, [currentQuestionIndex, challengeData, user, startTime]);
+  }, [currentQuestionIndex, challengeData, user, startTime, questionsForPractice.length]);
 
   // Update timer
   useEffect(() => {
@@ -114,28 +166,47 @@ export default function QuizHistoryChallengePage() {
     }
   }, [startTime, isQuizFinished]);
 
-  const handleAnswerSelect = (answerIndex: number) => {
-    setSelectedAnswers({
-      ...selectedAnswers,
-      [currentQuestionIndex]: answerIndex,
-    });
+  const handleAnswer = async (questionId: number, answerLetter: string, isCorrect: boolean, lessonIDS: string[]) => {
+    setAnsweredQuestions(prev => ({
+      ...prev,
+      [questionId]: { selectedLetter: answerLetter, isCorrect }
+    }));
+
+    // Update streak (but don't award XP for challenge quizzes - just track for UI)
+    if (setCorrectStreak) {
+      if (isCorrect) {
+        setCorrectStreak(prev => prev + 1);
+      } else {
+        setCorrectStreak(0);
+      }
+    }
   };
 
   const handleNextQuestion = () => {
-    if (currentQuestionIndex < (challengeData?.numQuestions || 0) - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    if (currentQuestionIndex < questionsForPractice.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
     } else {
       handleSubmitQuiz();
     }
+  };
+
+  const handlePreviousQuestion = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(prev => prev - 1);
+    }
+  };
+
+  const handleQuestionSelect = (index: number) => {
+    setCurrentQuestionIndex(index);
   };
 
   const handleSubmitQuiz = async () => {
     if (!challengeData || !user) return;
 
     let correctCount = 0;
-    challengeData.quizQuestions.forEach((question, index) => {
-      const selectedAnswer = selectedAnswers[index];
-      if (selectedAnswer === question.correctAnswer) {
+    questionsForPractice.forEach((question, index) => {
+      const answered = answeredQuestions[question.id];
+      if (answered && answered.isCorrect) {
         correctCount++;
       }
     });
@@ -190,6 +261,15 @@ export default function QuizHistoryChallengePage() {
     }
   };
 
+  const handleUnitChange = () => {
+    // Not applicable for challenge quizzes
+  };
+
+  const handleAuthSuccess = () => {
+    setShowLoginModal(false);
+    setShowSignupModal(false);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -230,7 +310,7 @@ export default function QuizHistoryChallengePage() {
             setShowLoginModal(false);
             setShowSignupModal(true);
           }}
-          onAuthSuccess={() => setShowLoginModal(false)}
+          onAuthSuccess={handleAuthSuccess}
         />
         <SignupModal
           isOpen={showSignupModal}
@@ -239,7 +319,7 @@ export default function QuizHistoryChallengePage() {
             setShowSignupModal(false);
             setShowLoginModal(true);
           }}
-          onAuthSuccess={() => setShowSignupModal(false)}
+          onAuthSuccess={handleAuthSuccess}
         />
         <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
           <Card className="max-w-md w-full">
@@ -274,12 +354,9 @@ export default function QuizHistoryChallengePage() {
     );
   }
 
-  const currentQuestion = challengeData.quizQuestions[currentQuestionIndex];
-  const selectedAnswer = selectedAnswers[currentQuestionIndex];
-
   if (isQuizFinished) {
-    const correctCount = challengeData.quizQuestions.filter(
-      (q, idx) => selectedAnswers[idx] === q.correctAnswer
+    const correctCount = questionsForPractice.filter(
+      (q) => answeredQuestions[q.id]?.isCorrect
     ).length;
 
     return (
@@ -294,7 +371,9 @@ export default function QuizHistoryChallengePage() {
               <p className="text-gray-600">
                 You got {correctCount} out of {challengeData.numQuestions} questions correct
               </p>
-              <p className="text-sm text-gray-500 mt-2">Time: {Math.floor(timeElapsed / 60)}:{(timeElapsed % 60).toString().padStart(2, '0')}</p>
+              <p className="text-sm text-gray-500 mt-2">
+                Time: {Math.floor(timeElapsed / 60)}:{(timeElapsed % 60).toString().padStart(2, '0')}
+              </p>
             </div>
             <div className="pt-4">
               <Button
@@ -310,6 +389,9 @@ export default function QuizHistoryChallengePage() {
     );
   }
 
+  const unitsData = challengeData.subject === 'micro' ? allMicroUnitsData : allMacroUnitsData;
+  const subject = challengeData.subject;
+
   return (
     <>
       <LoginModal
@@ -319,7 +401,7 @@ export default function QuizHistoryChallengePage() {
           setShowLoginModal(false);
           setShowSignupModal(true);
         }}
-        onAuthSuccess={() => setShowLoginModal(false)}
+        onAuthSuccess={handleAuthSuccess}
       />
       <SignupModal
         isOpen={showSignupModal}
@@ -328,95 +410,58 @@ export default function QuizHistoryChallengePage() {
           setShowSignupModal(false);
           setShowLoginModal(true);
         }}
-        onAuthSuccess={() => setShowSignupModal(false)}
+        onAuthSuccess={handleAuthSuccess}
       />
-      <div className="min-h-screen bg-gray-50 py-8 px-4">
-        <div className="max-w-3xl mx-auto">
-          {/* Header */}
-          <div className="mb-6 flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-gray-900">Quiz Challenge</h1>
-            <div className="text-sm text-gray-600">
-              Question {currentQuestionIndex + 1} of {challengeData.numQuestions}
+      <div className="min-h-screen bg-gray-50 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          {questionsForPractice.length === 0 ? (
+            <div className="flex items-center justify-center min-h-[400px]">
+              <Loader2 className={`h-12 w-12 animate-spin ${subject === 'macro' ? 'text-blue-500' : 'text-green-500'}`} />
             </div>
-          </div>
-
-          {/* Question Card */}
-          <Card className="mb-6">
-            <CardContent className="p-6">
-              {/* Question Image */}
-              {currentQuestion.image && (
-                <div className="mb-6 flex justify-center">
-                  <img
-                    src={currentQuestion.image}
-                    alt="Question"
-                    className="max-h-64 rounded-lg border border-gray-200"
-                  />
-                </div>
-              )}
-
-              {/* Question Text */}
-              <p className="text-lg font-medium text-gray-900 mb-6">
-                {currentQuestion.question}
-              </p>
-
-              {/* Options */}
-              <div className="space-y-3">
-                {currentQuestion.options.map((option, index) => {
-                  const letter = String.fromCharCode(65 + index);
-                  const isSelected = selectedAnswer === index;
-
-                  return (
-                    <button
-                      key={index}
-                      onClick={() => handleAnswerSelect(index)}
-                      className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
-                        isSelected
-                          ? 'border-blue-600 bg-blue-50'
-                          : 'border-gray-200 bg-white hover:border-gray-300'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`w-8 h-8 flex items-center justify-center rounded-full border-2 font-semibold ${
-                            isSelected
-                              ? 'bg-blue-600 border-blue-600 text-white'
-                              : 'bg-white border-gray-300 text-gray-600'
-                          }`}
-                        >
-                          {letter}
-                        </div>
-                        <span className="flex-1 text-gray-800">{option}</span>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Navigation */}
-          <div className="flex justify-between">
-            <Button
-              onClick={() => setCurrentQuestionIndex(Math.max(0, currentQuestionIndex - 1))}
-              disabled={currentQuestionIndex === 0}
-              variant="outline"
-            >
-              Previous
-            </Button>
-            <Button
-              onClick={handleNextQuestion}
-              disabled={selectedAnswer === undefined}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              {currentQuestionIndex === challengeData.numQuestions - 1
-                ? 'Submit Quiz'
-                : 'Next Question'}
-            </Button>
-          </div>
+          ) : (
+            <UnitMCQs
+              currentUnit={0} // Not applicable for challenge quizzes
+              currentQuestionIndex={currentQuestionIndex}
+              isLoggedIn={!!user}
+              onAnswer={handleAnswer}
+              onNextQuestion={handleNextQuestion}
+              questions={questionsForPractice}
+              onPreviousQuestion={handlePreviousQuestion}
+              onQuestionSelect={handleQuestionSelect}
+              onUnitChange={handleUnitChange}
+              answeredQuestions={answeredQuestions}
+              units={unitsData}
+              dojoProgress={0} // Start at 0 for challenge quizzes
+              correctStreak={correctStreak || 0} // Start at 0 for challenge quizzes
+              isWeakestUnitsMode={false}
+              isTopicMode={false}
+              totalQuestions={questionsForPractice.length}
+              unitName="Challenge Quiz"
+              subject={subject}
+              practiceUnitIds={[]}
+              isParentModalOpen={showLoginModal || showSignupModal}
+              hasTestModeAccess={false}
+              onEnterTestMode={() => {}}
+            />
+          )}
         </div>
       </div>
     </>
   );
 }
 
+function PageLoadingFallback() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
+    </div>
+  );
+}
 
+export default function QuizHistoryChallengePage() {
+  return (
+    <Suspense fallback={<PageLoadingFallback />}>
+      <QuizHistoryChallengeContent />
+    </Suspense>
+  );
+}

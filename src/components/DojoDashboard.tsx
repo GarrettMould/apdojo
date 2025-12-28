@@ -70,6 +70,7 @@ export function DojoDashboard() {
   const [loadingQuizHistory, setLoadingQuizHistory] = useState(true);
   const [recentActivities, setRecentActivities] = useState<any[]>([]);
   const [loadingActivities, setLoadingActivities] = useState(true);
+  const [showAllActivities, setShowAllActivities] = useState(false);
 
   // Helper to check if user has access to a course
   const hasCourseAccess = useMemo(() => {
@@ -727,9 +728,18 @@ export function DojoDashboard() {
             <section style={{ opacity: 1, visibility: 'visible', position: 'relative', zIndex: 10 }}>
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-gray-900">Recent Activity</h2>
+                {recentActivities.length > 4 && (
+                  <button
+                    onClick={() => setShowAllActivities(!showAllActivities)}
+                    className="text-sm font-medium text-gray-600 hover:text-gray-900 flex items-center gap-1 transition-colors"
+                  >
+                    {showAllActivities ? 'Show less' : 'See all'}
+                    <ChevronRight className={`w-4 h-4 transition-transform ${showAllActivities ? 'rotate-90' : ''}`} />
+                  </button>
+                )}
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {recentActivities.map((activity) => {
+                {(showAllActivities ? recentActivities : recentActivities.slice(0, 4)).map((activity) => {
                   // Determine thumbnail type and icon
                   let thumbnailType: 'micro' | 'macro' | 'drill' | 'exam' | 'resource' = 'exam';
                   let Icon = FileText;
@@ -881,14 +891,6 @@ export function DojoDashboard() {
                           whileHover="hover"
                           className="bg-white border border-gray-300 rounded-3xl p-6 text-left transition-all flex flex-col h-full"
                         >
-                          {/* Progress Badge */}
-                          {isCompleted && (
-                            <div className="absolute top-3 right-3 z-10">
-                              <div className="bg-green-500 rounded-full p-1.5">
-                                <CheckCircle2 className="w-4 h-4 text-white" />
-                              </div>
-                            </div>
-                          )}
                           {/* Thumbnail */}
                           <div className="mb-4 -mx-6 -mt-6 flex-shrink-0">
                             <DojoThumbnail

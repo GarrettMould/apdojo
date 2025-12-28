@@ -2,12 +2,12 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState, useMemo } from 'react';
-import { dojoDrills } from '@/data/dojoDrills';
+import { dojoDrills, getDrillUnitForSubject } from '@/data/dojoDrills';
 import { DojoDrillPreview } from '@/components/DojoDrillPreview';
 import { ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuthContext } from '@/contexts/AuthContext';
-import { loadDojoDrillProgress, getDrillProgress } from '@/lib/dojoDrillProgress';
+import { loadDojoDrillProgress, getDrillProgress, resetDojoDrillProgress } from '@/lib/dojoDrillProgress';
 import { hasValidSeasonPass } from '@/lib/utils';
 
 export default function DojoDrillPreviewPage() {
@@ -68,18 +68,39 @@ export default function DojoDrillPreviewPage() {
     );
   }
 
-  const handleStart = () => {
+  const handleStart = async () => {
     if (!isProCustomer) {
       const subjectKey = selectedSubject === 'macro' ? 'macro' : 'micro';
       router.push(`/purchase/season-pass?courseType=${subjectKey}`);
       return;
     }
+    
+    // Check if drill is completed (all stages done)
+    const isCompleted = progress?.stage1 && progress?.stage2 && progress?.stage3;
+    
+    // If completed, reset progress before starting
+    if (isCompleted && user) {
+      try {
+        await resetDojoDrillProgress(user.uid, drill.id);
+        // Reload progress to update UI
+        const allProgress = await loadDojoDrillProgress(user.uid);
+        const drillProgress = getDrillProgress(allProgress, drill.id);
+        setProgress(drillProgress);
+      } catch (error) {
+        console.error('[DojoDrillPreview] Error resetting progress:', error);
+      }
+    }
+    
     router.push(`/dojo-drills?drill=${drill.id}`);
   };
 
   // Determine difficulty - default to Medium for now
   // You can add a difficulty field to the DojoDrill interface later if needed
   const difficulty: 'Easy' | 'Medium' | 'Hard' = 'Medium';
+
+  // Check if this drill is unit 4, 5, or 6 for macro (coming soon)
+  const macroUnit = getDrillUnitForSubject(drill, 'ap_macroeconomics');
+  const isComingSoon = macroUnit !== null && (macroUnit === 4 || macroUnit === 5 || macroUnit === 6);
 
   return (
     <div className="h-screen overflow-hidden bg-gradient-to-b from-gray-50 to-white px-4 sm:px-6 lg:px-8 py-12">
@@ -119,6 +140,7 @@ export default function DojoDrillPreviewPage() {
               isLocked={!isProCustomer}
               progress={progress}
               buttonText={isProCustomer ? undefined : 'Join the Dojo'}
+              comingSoon={isComingSoon}
             />
           </motion.div>
         </div>

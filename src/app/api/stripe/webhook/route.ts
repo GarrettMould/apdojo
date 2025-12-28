@@ -148,11 +148,11 @@ export async function POST(req: Request) {
         } 
         // Handle exam purchases (existing logic)
         else if (checkoutExamId) {
-          await userRef.set({
-            purchases: FieldValue.arrayUnion(checkoutExamId),
-          }, { merge: true });
-          
-          console.log(`✅ Added exam ${checkoutExamId} to user ${checkoutUserId} purchases`);
+        await userRef.set({
+          purchases: FieldValue.arrayUnion(checkoutExamId),
+        }, { merge: true });
+        
+        console.log(`✅ Added exam ${checkoutExamId} to user ${checkoutUserId} purchases`);
         } else {
           console.error(`Webhook Error: Missing purchaseType or examId for checkout session ${checkoutSession.id}`);
           return NextResponse.json({ error: 'Missing purchase data' }, { status: 400 });

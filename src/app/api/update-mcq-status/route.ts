@@ -8,13 +8,13 @@ export async function POST(request: Request) {
     if (!adminDb) {
       console.error('Firebase Admin database is not initialized');
       console.error('Check that these environment variables are set:');
-      console.error('- NEXT_PUBLIC_FIREBASE_PROJECT_ID');
+      console.error('- FIREBASE_PROJECT_ID');
       console.error('- FIREBASE_CLIENT_EMAIL');
       console.error('- FIREBASE_PRIVATE_KEY');
       return NextResponse.json({ 
         error: 'Database not initialized',
         details: 'Firebase Admin SDK failed to initialize. Please check server environment variables.',
-        hint: 'Ensure NEXT_PUBLIC_FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, and FIREBASE_PRIVATE_KEY are set'
+        hint: 'Ensure FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, and FIREBASE_PRIVATE_KEY are set'
       }, { status: 500 });
     }
 
@@ -40,14 +40,26 @@ export async function POST(request: Request) {
     // Get user document reference
     const userRef = adminDb.collection('users').doc(userId);
 
-    // Use set with merge: true to create document if it doesn't exist
-    // This is more robust than update() which fails if document doesn't exist
-    await userRef.set({
-      [`mcqAnswerStatus.${questionIdStr}`]: isCorrect 
-    }, { merge: true });
+    try {
+      // Use set with merge: true to create document if it doesn't exist
+      // This is more robust than update() which fails if document doesn't exist
+      await userRef.set({
+        [`mcqAnswerStatus.${questionIdStr}`]: isCorrect 
+      }, { merge: true });
 
-    console.log(`Updated MCQ status for Q:${questionIdStr} to ${isCorrect} for user ${userId}`);
-    return NextResponse.json({ success: true, message: `MCQ status for Q:${questionIdStr} updated.` });
+      console.log(`[update-mcq-status] Updated MCQ status for Q:${questionIdStr} to ${isCorrect} for user ${userId}`);
+      return NextResponse.json({ success: true, message: `MCQ status for Q:${questionIdStr} updated.` });
+    } catch (firestoreError: any) {
+      console.error(`[update-mcq-status] Firestore operation failed:`, {
+        error: firestoreError,
+        code: firestoreError.code,
+        message: firestoreError.message,
+        userId,
+        questionId: questionIdStr
+      });
+      // Re-throw to be caught by outer catch block
+      throw firestoreError;
+    }
 
   } catch (error: any) {
     console.error('Error in /api/update-mcq-status:', error);

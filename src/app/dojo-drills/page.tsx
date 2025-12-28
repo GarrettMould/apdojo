@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { dojoDrills, drillAppliesToSubject, getDrillUnitForSubject } from '@/data/dojoDrills';
 import DojoDrill from '@/components/DojoDrill';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2, Lock } from 'lucide-react';
 import Image from 'next/image';
 import { useAuthContext } from '@/contexts/AuthContext';
 import React from 'react';
@@ -134,54 +134,77 @@ function DojoDrillsContent() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredAndSortedDrills.map((drill) => (
-              <button
-                key={drill.id}
-                onClick={() => handleDrillClick(drill.id)}
-                className="bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 text-left hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 flex flex-col"
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <div
-                    className={`inline-block text-xs font-semibold px-2.5 py-1 rounded-md ${
-                      (drill.subjects && drill.subjects.includes('ap_macroeconomics')) || drill.subject === 'ap_macroeconomics'
-                        ? 'bg-blue-100 text-blue-800'
-                        : 'bg-green-100 text-green-800'
-                    }`}
-                  >
-                    {(() => {
-                      const subject = drill.subjects && drill.subjects.length > 0 
-                        ? drill.subjects[0] 
-                        : drill.subject;
-                      const unit = getDrillUnitForSubject(drill, subject) || drill.unit;
-                      return `${getSubjectLabel(drill)} - Unit ${unit}`;
-                    })()}
+            {filteredAndSortedDrills.map((drill) => {
+              // Check if this drill is unit 4, 5, or 6 for macro (coming soon)
+              const macroUnit = getDrillUnitForSubject(drill, 'ap_macroeconomics');
+              const isComingSoon = macroUnit !== null && (macroUnit === 4 || macroUnit === 5 || macroUnit === 6);
+              
+              return (
+                <button
+                  key={drill.id}
+                  onClick={() => {
+                    if (!isComingSoon) {
+                      handleDrillClick(drill.id);
+                    }
+                  }}
+                  disabled={isComingSoon}
+                  className={`bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 text-left transition-all flex flex-col ${
+                    isComingSoon 
+                      ? 'opacity-75 cursor-not-allowed' 
+                      : 'hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] active:translate-y-1'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <div
+                      className={`inline-block text-xs font-semibold px-2.5 py-1 rounded-md ${
+                        (drill.subjects && drill.subjects.includes('ap_macroeconomics')) || drill.subject === 'ap_macroeconomics'
+                          ? 'bg-blue-100 text-blue-800'
+                          : 'bg-green-100 text-green-800'
+                      }`}
+                    >
+                      {(() => {
+                        const subject = drill.subjects && drill.subjects.length > 0 
+                          ? drill.subjects[0] 
+                          : drill.subject;
+                        const unit = getDrillUnitForSubject(drill, subject) || drill.unit;
+                        return `${getSubjectLabel(drill)} - Unit ${unit}`;
+                      })()}
+                    </div>
+                    <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-800">
+                      <span>{drill.xpReward.total}</span>
+                      <span className="inline-flex items-center">
+                        <Image
+                          src="/images/flame100.png"
+                          alt="XP Flame"
+                          width={20}
+                          height={20}
+                          className="w-5 h-5"
+                        />
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-800">
-                    <span>{drill.xpReward.total}</span>
-                    <span className="inline-flex items-center">
-                      <Image
-                        src="/images/flame100.png"
-                        alt="XP Flame"
-                        width={20}
-                        height={20}
-                        className="w-5 h-5"
-                      />
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">
+                    {drill.title}
+                  </h3>
+                  <p className="text-gray-600 text-sm line-clamp-3 mb-4">
+                    {drill.description}
+                  </p>
+                  <div className={`text-sm font-semibold mt-auto flex items-center gap-2 ${
+                    isComingSoon 
+                      ? 'text-gray-400' 
+                      : (isProCustomer ? 'text-blue-600' : 'text-orange-600')
+                  }`}>
+                    {isComingSoon && <Lock className="w-4 h-4" />}
+                    <span>
+                      {isComingSoon 
+                        ? 'Coming Soon' 
+                        : (isProCustomer ? 'Start Drill →' : 'Join the Dojo')
+                      }
                     </span>
                   </div>
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
-                  {drill.title}
-                </h3>
-                <p className="text-gray-600 text-sm line-clamp-3 mb-4">
-                  {drill.description}
-                </p>
-                <div className={`text-sm font-semibold mt-auto ${
-                  isProCustomer ? 'text-blue-600' : 'text-orange-600'
-                }`}>
-                  {isProCustomer ? 'Start Drill →' : 'Join the Dojo'}
-                </div>
-              </button>
-            ))}
+                </button>
+              );
+            })}
           </div>
         )}
       </div>
