@@ -25,7 +25,7 @@ export default function DojoDrillPreviewPage() {
     if (!user || !userData) return false;
     // Check if user has valid season pass for current subject
     const subjectKey = selectedSubject === 'macro' ? 'macro' : 'micro';
-    return hasValidSeasonPass(userData, subjectKey) || hasValidSeasonPass(userData);
+    return hasValidSeasonPass(userData, subjectKey);
   }, [user, userData, selectedSubject]);
 
   // Load progress when user and drill are available

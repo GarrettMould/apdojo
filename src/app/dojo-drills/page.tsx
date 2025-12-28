@@ -22,7 +22,7 @@ function DojoDrillsContent() {
     if (!user || !userData) return false;
     // Check if user has valid season pass for current subject
     const subjectKey = selectedSubject === 'macro' ? 'macro' : 'micro';
-    return hasValidSeasonPass(userData, subjectKey) || hasValidSeasonPass(userData);
+    return hasValidSeasonPass(userData, subjectKey);
   }, [user, userData, selectedSubject]);
 
   // Handle drill click - redirect non-pro users to purchase page
@@ -31,22 +31,50 @@ function DojoDrillsContent() {
     router.push(`/dojo-drills/preview/${drillId}`);
   };
 
-  // Update selectedDrillId when query param changes - redirect to preview page
+  // Update selectedDrillId when query param changes
   useEffect(() => {
     if (drillIdFromQuery) {
-      router.push(`/dojo-drills/preview/${drillIdFromQuery}`);
+      setSelectedDrillId(drillIdFromQuery);
+    } else {
+      setSelectedDrillId(null);
     }
-  }, [drillIdFromQuery, router]);
+  }, [drillIdFromQuery]);
+
+  // Show all drills, sorted by unit (prefer macro unit if available)
+  // This hook must be called before any conditional returns
+  const filteredAndSortedDrills = useMemo(() => {
+    const allDrills = Object.values(dojoDrills);
+    // Sort by unit number (prefer macro unit, fallback to micro or deprecated unit field)
+    return allDrills.sort((a, b) => {
+      const unitA = getDrillUnitForSubject(a, 'ap_macroeconomics') || 
+                    getDrillUnitForSubject(a, 'ap_microeconomics') || 
+                    a.unit || 0;
+      const unitB = getDrillUnitForSubject(b, 'ap_macroeconomics') || 
+                    getDrillUnitForSubject(b, 'ap_microeconomics') || 
+                    b.unit || 0;
+      return unitA - unitB;
+    });
+  }, []);
 
   const currentDrill = selectedDrillId ? dojoDrills[selectedDrillId] : null;
 
-  // If accessing drill directly, redirect to preview page
+  const getSubjectLabel = (drill: typeof filteredAndSortedDrills[0]) => {
+    if (drill.subjects && drill.subjects.length > 0) {
+      return drill.subjects[0] === 'ap_macroeconomics' ? 'Macro' : 'Micro';
+    }
+    return drill.subject === 'ap_macroeconomics' ? 'Macro' : 'Micro';
+  };
+
+  // If accessing drill directly, show the drill component
   if (currentDrill) {
     return (
       <div className="h-screen overflow-hidden bg-gradient-to-b from-gray-50 to-white px-4 sm:px-6 lg:px-8 py-12">
         <div className="max-w-7xl mx-auto relative h-full flex gap-6">
           <button
-            onClick={() => setSelectedDrillId(null)}
+            onClick={() => {
+              setSelectedDrillId(null);
+              router.push('/dojo-drills');
+            }}
             className="w-12 h-12 bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 group flex-shrink-0 self-start"
           >
             <ArrowLeft className="w-6 h-6 text-gray-900 group-hover:text-gray-700 transition-colors" />
@@ -65,28 +93,7 @@ function DojoDrillsContent() {
     );
   }
 
-  // Show all drills, sorted by unit (prefer macro unit if available)
-  const filteredAndSortedDrills = useMemo(() => {
-    const allDrills = Object.values(dojoDrills);
-    // Sort by unit number (prefer macro unit, fallback to micro or deprecated unit field)
-    return allDrills.sort((a, b) => {
-      const unitA = getDrillUnitForSubject(a, 'ap_macroeconomics') || 
-                    getDrillUnitForSubject(a, 'ap_microeconomics') || 
-                    a.unit || 0;
-      const unitB = getDrillUnitForSubject(b, 'ap_macroeconomics') || 
-                    getDrillUnitForSubject(b, 'ap_microeconomics') || 
-                    b.unit || 0;
-      return unitA - unitB;
-    });
-  }, []);
-
-  const getSubjectLabel = (drill: typeof filteredAndSortedDrills[0]) => {
-    if (drill.subjects && drill.subjects.length > 0) {
-      return drill.subjects[0] === 'ap_macroeconomics' ? 'Macro' : 'Micro';
-    }
-    return drill.subject === 'ap_macroeconomics' ? 'Macro' : 'Micro';
-  };
-
+  // Show all drills list
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">
       <div className="max-w-6xl mx-auto">

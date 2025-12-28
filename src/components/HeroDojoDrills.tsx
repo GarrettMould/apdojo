@@ -22,7 +22,7 @@ export function HeroDojoDrills() {
     if (!user || !userData) return false;
     // Check if user has valid season pass for current subject
     const subjectKey = selectedSubject === 'macro' ? 'macro' : 'micro';
-    return hasValidSeasonPass(userData, subjectKey) || hasValidSeasonPass(userData);
+    return hasValidSeasonPass(userData, subjectKey);
   }, [user, userData, selectedSubject]);
 
   const handleStart = (drillId: string) => {

@@ -10,6 +10,8 @@ import { Question } from '@/data/questionBanks/types';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useCreditSystem } from '@/hooks/useCreditSystem';
 import { LoginModal, SignupModal } from '@/components/AuthModals';
+import { storage } from '@/lib/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 interface InfiniteDrillResult {
   conceptDetected: string;
@@ -31,6 +33,8 @@ export function InfinitePracticeSection() {
   const [showCreditConfirmModal, setShowCreditConfirmModal] = useState(false);
   const [showLoginModal, setShowLoginModalState] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [isUploading, setIsUploading] = useState(false);
 
   const convertFileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -45,15 +49,22 @@ export function InfinitePracticeSection() {
     const isImage = file.type.startsWith('image/');
     const isPDF = file.type === 'application/pdf';
     
+    // Check file size (limit to 15MB - files will be uploaded to Firebase Storage)
+    const maxSize = 15 * 1024 * 1024; // 15MB
+    if (file.size > maxSize) {
+      setError(`File is too large. Please use a file smaller than 15MB (approx. 10 pages). Current size: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+      return;
+    }
+    
     if (file && (isImage || isPDF)) {
       try {
-        const base64 = await convertFileToBase64(file);
-        const preview = isImage ? base64 : 'pdf-placeholder';
+        // For preview: convert to base64 for images, use placeholder for PDFs
+        const preview = isImage ? await convertFileToBase64(file) : 'pdf-placeholder';
         
         setFileData({
           file,
           preview,
-          base64
+          base64: '' // No longer needed, but keeping for compatibility
         });
         setError(null);
       } catch (err) {
@@ -114,8 +125,57 @@ export function InfinitePracticeSection() {
     setIsGenerating(true);
     setError(null);
     setLoadingStage('analyzing');
+    setUploadProgress(0);
+    setIsUploading(false);
 
     try {
+      let fileUrl: string | undefined = undefined;
+      let mimeType: string | undefined = undefined;
+
+      // If image mode, upload to Firebase Storage first
+      if (inputMode === 'image' && fileData) {
+        // Ensure user is authenticated before uploading
+        if (!user) {
+          throw new Error('You must be logged in to upload files');
+        }
+        
+        setIsUploading(true);
+        setLoadingStage('analyzing'); // Show "Uploading..." state
+        
+        try {
+          // Create a unique file path using authenticated user's UID
+          const timestamp = Date.now();
+          const fileExtension = fileData.file.name.split('.').pop() || 'file';
+          const fileName = `${user.uid}/${timestamp}.${fileExtension}`;
+          const storageRef = ref(storage, `infinite-drill-uploads/${fileName}`);
+          
+          // Upload file - Firebase SDK will automatically use the authenticated user's token
+          await uploadBytes(storageRef, fileData.file);
+          
+          // Get download URL
+          fileUrl = await getDownloadURL(storageRef);
+          mimeType = fileData.file.type;
+          
+          setIsUploading(false);
+          setUploadProgress(100);
+        } catch (uploadError: any) {
+          setIsUploading(false);
+          console.error('Firebase Storage upload error:', uploadError);
+          
+          // Provide more specific error messages
+          let errorMessage = 'Failed to upload file. Please try again.';
+          if (uploadError.code === 'storage/unauthorized') {
+            errorMessage = 'You do not have permission to upload files. Please ensure you are logged in.';
+          } else if (uploadError.code === 'storage/canceled') {
+            errorMessage = 'Upload was canceled. Please try again.';
+          } else if (uploadError.message) {
+            errorMessage = `Upload failed: ${uploadError.message}`;
+          }
+          
+          throw new Error(errorMessage);
+        }
+      }
+
       const stageTimer1 = setTimeout(() => {
         setLoadingStage('identifying');
       }, 2000);
@@ -125,8 +185,8 @@ export function InfinitePracticeSection() {
 
       const payload = {
         textInput: inputMode === 'text' ? textInput : undefined,
-        imageBase64: inputMode === 'image' ? fileData?.base64 : undefined,
-        mimeType: inputMode === 'image' ? fileData?.file.type : undefined
+        fileUrl: fileUrl, // Send URL instead of base64
+        mimeType: mimeType
       };
 
       const response = await fetch('/api/infinite-drill', {
@@ -136,7 +196,15 @@ export function InfinitePracticeSection() {
       });
 
       if (!response.ok) {
-        const errData = await response.json();
+        // Try to parse error response, but handle non-JSON responses
+        let errData;
+        try {
+          errData = await response.json();
+        } catch (parseError) {
+          // If response is not JSON, get text instead
+          const errorText = await response.text();
+          throw new Error(errorText || `Server error (${response.status}). Please try again.`);
+        }
         throw new Error(errData.error || 'Failed to generate');
       }
 
@@ -161,6 +229,8 @@ export function InfinitePracticeSection() {
       console.error('Error generating questions:', err);
       setError(err.message || 'Failed to generate practice questions. Please try again.');
       setLoadingStage('idle');
+      setIsUploading(false);
+      setUploadProgress(0);
     } finally {
       setIsGenerating(false);
     }

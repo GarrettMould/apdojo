@@ -22,7 +22,7 @@ export default function FullMCQExamPage() {
   const isProCustomer = useMemo(() => {
     if (!user || !userData) return false;
     const subjectKey = selectedSubject === 'macro' ? 'macro' : 'micro';
-    return hasValidSeasonPass(userData, subjectKey) || hasValidSeasonPass(userData);
+    return hasValidSeasonPass(userData, subjectKey);
   }, [user, userData, selectedSubject]);
 
   // Redirect free users to season pass purchase instead of showing lock screen

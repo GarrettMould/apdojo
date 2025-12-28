@@ -1,6 +1,7 @@
 import { initializeApp, getApps } from 'firebase/app'
 import { getAuth, connectAuthEmulator } from 'firebase/auth'
 import { getFirestore, connectFirestoreEmulator, enableIndexedDbPersistence } from 'firebase/firestore'
+import { getStorage } from 'firebase/storage'
 import { getAnalytics, isSupported } from 'firebase/analytics'
 
 const firebaseConfig = {
@@ -20,6 +21,7 @@ const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0]
 // Initialize Firebase services
 const auth = getAuth(app)
 const db = getFirestore(app)
+const storage = getStorage(app)
 
 // Enable persistence
 if (typeof window !== 'undefined') {
@@ -33,4 +35,4 @@ if (typeof window !== 'undefined') {
 // Initialize Analytics only in browser environment
 const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null
 
-export { app, auth, db, analytics } 
+export { app, auth, db, storage, analytics } 

@@ -42,7 +42,7 @@ export default function UnitFRQTestPage({ params }: UnitFRQTestPageProps) {
   const isProCustomer = useMemo(() => {
     if (!user || !userData) return false;
     const subjectKey = selectedSubject === 'macro' ? 'macro' : 'micro';
-    return hasValidSeasonPass(userData, subjectKey) || hasValidSeasonPass(userData);
+    return hasValidSeasonPass(userData, subjectKey);
   }, [user, userData, selectedSubject]);
 
   // Free users can only access Unit 1, others require season pass

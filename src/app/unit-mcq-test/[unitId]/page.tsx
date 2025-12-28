@@ -49,7 +49,7 @@ export default function UnitMCQTestPage() {
     if (!user || !userData) return false;
     // Check if user has valid season pass for current subject
     const subjectKey = selectedSubject === 'macro' ? 'macro' : 'micro';
-    return hasValidSeasonPass(userData, subjectKey) || hasValidSeasonPass(userData);
+    return hasValidSeasonPass(userData, subjectKey);
   }, [user, userData, selectedSubject]);
 
   // Convert questions to QuestionBank format for FullExam component

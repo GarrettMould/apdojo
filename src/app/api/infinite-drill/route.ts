@@ -1,6 +1,10 @@
 import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 
+// Configure body size limit for this route (20MB for large PDFs/images)
+export const maxDuration = 60; // 60 seconds timeout
+export const runtime = 'nodejs';
+
 // 1. Setup the client
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
@@ -53,7 +57,7 @@ const drillSchema = {
 
 export async function POST(req: Request) {
   try {
-    const { imageBase64, textInput, mimeType } = await req.json();
+    const { fileUrl, textInput, mimeType, imageBase64 } = await req.json();
 
     // 3. USE YOUR WORKING MODEL CONFIGURATION HERE
     // We stick to 'gemini-flash-latest' since you confirmed it works elsewhere
@@ -96,8 +100,35 @@ export async function POST(req: Request) {
 
     const parts = [];
 
-    // Handle File Input (Images or PDF)
-    if (imageBase64) {
+    // Handle File Input (Images or PDF) - prefer fileUrl over base64
+    if (fileUrl) {
+      // Fetch file from Firebase Storage URL
+      try {
+        const fileResponse = await fetch(fileUrl);
+        if (!fileResponse.ok) {
+          throw new Error(`Failed to fetch file from storage: ${fileResponse.statusText}`);
+        }
+        
+        const arrayBuffer = await fileResponse.arrayBuffer();
+        const base64String = Buffer.from(arrayBuffer).toString('base64');
+        
+        parts.push({
+          inlineData: {
+            data: base64String,
+            mimeType: mimeType || "image/jpeg", 
+          },
+        });
+        parts.push({ text: "Generate 5 AP practice questions based on these notes." });
+      } catch (fetchError: any) {
+        console.error("Error fetching file from URL:", fetchError);
+        return NextResponse.json(
+          { error: `Failed to fetch file: ${fetchError.message}` },
+          { status: 500 }
+        );
+      }
+    } 
+    // Fallback: Handle legacy base64 input (for backwards compatibility)
+    else if (imageBase64) {
       // Clean base64 string if it has the prefix
       const base64Data = imageBase64.includes(",") 
         ? imageBase64.split(",")[1] 

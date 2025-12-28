@@ -17,7 +17,7 @@ export default function MacroMCQPreview({ params }: { params: Promise<{ num: str
   // Check if user is a pro customer (has season pass)
   const isProCustomer = useMemo(() => {
     if (!user || !userData) return false;
-    return hasValidSeasonPass(userData, 'macro') || hasValidSeasonPass(userData, 'micro');
+    return hasValidSeasonPass(userData, 'macro');
   }, [user, userData]);
 
   // Redirect free users to purchase page

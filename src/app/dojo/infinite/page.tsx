@@ -11,6 +11,8 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import { saveQuizResult } from '@/lib/quizHistory';
 import { useCreditSystem } from '@/hooks/useCreditSystem';
 import { LoginModal, SignupModal } from '@/components/AuthModals';
+import { storage } from '@/lib/firebase';
+import { ref, uploadBytes, getDownloadURL, UploadTask, getMetadata } from 'firebase/storage';
 
 // --- TYPES ---
 interface InfiniteDrillResult {
@@ -39,6 +41,8 @@ function InfinitePracticePage() {
   const [showCreditConfirmModal, setShowCreditConfirmModal] = useState(false);
   const [showLoginModal, setShowLoginModalState] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [isUploading, setIsUploading] = useState(false);
 
   // Helper: Convert any file to Base64
   const convertFileToBase64 = (file: File): Promise<string> => {
@@ -54,17 +58,22 @@ function InfinitePracticePage() {
     const isImage = file.type.startsWith('image/');
     const isPDF = file.type === 'application/pdf';
     
+    // Check file size (limit to 15MB - files will be uploaded to Firebase Storage)
+    const maxSize = 15 * 1024 * 1024; // 15MB
+    if (file.size > maxSize) {
+      setError(`File is too large. Please use a file smaller than 15MB (approx. 10 pages). Current size: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+      return;
+    }
+    
     if (file && (isImage || isPDF)) {
       try {
-        const base64 = await convertFileToBase64(file);
-        
-        // For preview: if it's an image, use the base64. If PDF, use a placeholder logic or the base64 (browser can't always display PDF base64 in img tag)
-        const preview = isImage ? base64 : 'pdf-placeholder';
+        // For preview: convert to base64 for images, use placeholder for PDFs
+        const preview = isImage ? await convertFileToBase64(file) : 'pdf-placeholder';
         
         setFileData({
           file,
           preview,
-          base64
+          base64: '' // No longer needed, but keeping for compatibility
         });
         setError(null);
       } catch (err) {
@@ -140,8 +149,57 @@ function InfinitePracticePage() {
     setResult(null);
     setLoadingStage('analyzing');
     setLoadingQuestionIndex(0);
+    setUploadProgress(0);
+    setIsUploading(false);
 
     try {
+      let fileUrl: string | undefined = undefined;
+      let mimeType: string | undefined = undefined;
+
+      // If image mode, upload to Firebase Storage first
+      if (inputMode === 'image' && fileData) {
+        // Ensure user is authenticated before uploading
+        if (!user) {
+          throw new Error('You must be logged in to upload files');
+        }
+        
+        setIsUploading(true);
+        setLoadingStage('analyzing'); // Show "Uploading..." state
+        
+        try {
+          // Create a unique file path using authenticated user's UID
+          const timestamp = Date.now();
+          const fileExtension = fileData.file.name.split('.').pop() || 'file';
+          const fileName = `${user.uid}/${timestamp}.${fileExtension}`;
+          const storageRef = ref(storage, `infinite-drill-uploads/${fileName}`);
+          
+          // Upload file - Firebase SDK will automatically use the authenticated user's token
+          await uploadBytes(storageRef, fileData.file);
+          
+          // Get download URL
+          fileUrl = await getDownloadURL(storageRef);
+          mimeType = fileData.file.type;
+          
+          setIsUploading(false);
+          setUploadProgress(100);
+        } catch (uploadError: any) {
+          setIsUploading(false);
+          console.error('Firebase Storage upload error:', uploadError);
+          
+          // Provide more specific error messages
+          let errorMessage = 'Failed to upload file. Please try again.';
+          if (uploadError.code === 'storage/unauthorized') {
+            errorMessage = 'You do not have permission to upload files. Please ensure you are logged in.';
+          } else if (uploadError.code === 'storage/canceled') {
+            errorMessage = 'Upload was canceled. Please try again.';
+          } else if (uploadError.message) {
+            errorMessage = `Upload failed: ${uploadError.message}`;
+          }
+          
+          throw new Error(errorMessage);
+        }
+      }
+
       // Cosmetic loading stages with question cycling
       const stageTimer1 = setTimeout(() => {
         setLoadingStage('identifying');
@@ -156,8 +214,8 @@ function InfinitePracticePage() {
 
       const payload = {
         textInput: inputMode === 'text' ? textInput : undefined,
-        imageBase64: inputMode === 'image' ? fileData?.base64 : undefined,
-        mimeType: inputMode === 'image' ? fileData?.file.type : undefined
+        fileUrl: fileUrl, // Send URL instead of base64
+        mimeType: mimeType
       };
 
       const response = await fetch('/api/infinite-drill', {
@@ -167,7 +225,15 @@ function InfinitePracticePage() {
       });
 
       if (!response.ok) {
-        const errData = await response.json();
+        // Try to parse error response, but handle non-JSON responses
+        let errData;
+        try {
+          errData = await response.json();
+        } catch (parseError) {
+          // If response is not JSON, get text instead
+          const errorText = await response.text();
+          throw new Error(errorText || `Server error (${response.status}). Please try again.`);
+        }
         throw new Error(errData.error || 'Failed to generate');
       }
 
@@ -190,6 +256,8 @@ function InfinitePracticePage() {
       console.error('Error generating questions:', err);
       setError(err.message || 'Failed to generate practice questions. Please try again.');
       setLoadingStage('idle');
+      setIsUploading(false);
+      setUploadProgress(0);
     } finally {
       setIsGenerating(false);
     }
@@ -466,8 +534,11 @@ function InfinitePracticePage() {
                         <p className="text-lg font-semibold text-gray-700 mb-2">
                           Images, PDFs, or any study material
                         </p>
-                        <p className="text-sm text-gray-600 mb-6">
+                        <p className="text-sm text-gray-600 mb-2">
                           We'll analyze your content and generate custom AP-style questions instantly
+                        </p>
+                        <p className="text-xs text-gray-500 mb-6">
+                          Max 15MB (approx. 10 pages)
                         </p>
                         <input
                           type="file"
@@ -563,7 +634,12 @@ Example: 'Explain the causes of the Great Depression and how fiscal policy was u
                     }`}
                     size="lg"
                   >
-                    {isGenerating ? (
+                    {isUploading ? (
+                      <span className="flex items-center gap-3">
+                        <Loader2 className="w-6 h-6 animate-spin" />
+                        Uploading File...
+                      </span>
+                    ) : isGenerating ? (
                       <span className="flex items-center gap-3">
                         <Loader2 className="w-6 h-6 animate-spin" />
                         Generating Questions...
@@ -575,6 +651,16 @@ Example: 'Explain the causes of the Great Depression and how fiscal policy was u
                       </span>
                     )}
                   </Button>
+                  {isUploading && (
+                    <div className="mt-4 w-full bg-gray-200 rounded-full h-2.5">
+                      <motion.div
+                        className="bg-blue-600 h-2.5 rounded-full"
+                        initial={{ width: 0 }}
+                        animate={{ width: '100%' }}
+                        transition={{ duration: 0.5, repeat: Infinity, repeatType: 'reverse' }}
+                      />
+                    </div>
+                  )}
                 </motion.div>
               </CardContent>
             </Card>
