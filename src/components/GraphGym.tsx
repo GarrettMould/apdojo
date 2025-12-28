@@ -51,6 +51,29 @@ function useCanvasDrawing() {
   const historyRef = useRef<ImageData[]>([]);
   const historyIndexRef = useRef(-1);
 
+  const saveToHistory = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Remove any future history if we're not at the end
+    if (historyIndexRef.current < historyRef.current.length - 1) {
+      historyRef.current = historyRef.current.slice(0, historyIndexRef.current + 1);
+    }
+
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    historyRef.current.push(imageData);
+    historyIndexRef.current = historyRef.current.length - 1;
+
+    // Limit history to 50 states
+    if (historyRef.current.length > 50) {
+      historyRef.current.shift();
+      historyIndexRef.current--;
+    }
+  }, []);
+
   // Initialize canvas
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -101,29 +124,6 @@ function useCanvasDrawing() {
     window.addEventListener('resize', resizeCanvas);
     return () => window.removeEventListener('resize', resizeCanvas);
   }, [penColor, penSize, saveToHistory]);
-
-  const saveToHistory = useCallback(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    // Remove any future history if we're not at the end
-    if (historyIndexRef.current < historyRef.current.length - 1) {
-      historyRef.current = historyRef.current.slice(0, historyIndexRef.current + 1);
-    }
-
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    historyRef.current.push(imageData);
-    historyIndexRef.current = historyRef.current.length - 1;
-
-    // Limit history to 50 states
-    if (historyRef.current.length > 50) {
-      historyRef.current.shift();
-      historyIndexRef.current--;
-    }
-  }, []);
 
   const startDrawing = useCallback((e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     // Prevent default to avoid scrolling on touch devices

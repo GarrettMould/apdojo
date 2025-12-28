@@ -48,15 +48,19 @@ const microFeatures: FeatureItem[] = [
 
 export function SeasonPassHome() {
   const [activeFrame, setActiveFrame] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Cycle through frames every 5 seconds (4 frames: infinite practice, diagnostic test, dojo drills, product shot)
+  // Pause when modal is open
   useEffect(() => {
+    if (isModalOpen) return; // Don't auto-advance when modal is open
+    
     const interval = setInterval(() => {
       setActiveFrame((prev) => (prev + 1) % 4);
     }, 5000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [isModalOpen]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
@@ -71,7 +75,10 @@ export function SeasonPassHome() {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5 }}
             >
-              <InfinitePracticeSection />
+              <InfinitePracticeSection 
+                previewMode={true}
+                onModalOpenChange={setIsModalOpen}
+              />
             </motion.div>
           )}
           {activeFrame === 1 && (

@@ -141,4 +141,3 @@ export function FRQFeedbackDemo() {
     </motion.div>
   );
 }
-

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Upload, FileText, Image as ImageIcon, Loader2 } from 'lucide-react';
 import Image from 'next/image';
@@ -12,6 +12,7 @@ import { useCreditSystem } from '@/hooks/useCreditSystem';
 import { LoginModal, SignupModal } from '@/components/AuthModals';
 import { storage } from '@/lib/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { useRouter } from 'next/navigation';
 
 interface InfiniteDrillResult {
   conceptDetected: string;
@@ -20,8 +21,14 @@ interface InfiniteDrillResult {
 
 type LoadingStage = 'idle' | 'analyzing' | 'identifying' | 'generating' | 'complete';
 
-export function InfinitePracticeSection() {
-  const { user, setShowLoginModal } = useAuthContext();
+interface InfinitePracticeSectionProps {
+  previewMode?: boolean; // If true, disable functionality and show login modal
+  onModalOpenChange?: (isOpen: boolean) => void; // Callback to notify parent when modal opens/closes
+}
+
+export function InfinitePracticeSection({ previewMode = false, onModalOpenChange }: InfinitePracticeSectionProps = {}) {
+  const { user, setShowLoginModal, setRedirectOnLogin, selectedSubject } = useAuthContext();
+  const router = useRouter();
   const { consumeLifetimeCredit, getCreditStatus, isPremium } = useCreditSystem();
   const [inputMode, setInputMode] = useState<'image' | 'text'>('image');
   const [fileData, setFileData] = useState<{ file: File; preview: string; base64: string } | null>(null);
@@ -33,6 +40,7 @@ export function InfinitePracticeSection() {
   const [showCreditConfirmModal, setShowCreditConfirmModal] = useState(false);
   const [showLoginModal, setShowLoginModalState] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
+  const [showLoginToTryModal, setShowLoginToTryModal] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -46,6 +54,12 @@ export function InfinitePracticeSection() {
   };
 
   const handleFileSelect = useCallback(async (file: File) => {
+    if (previewMode && !user) {
+      setShowLoginToTryModal(true);
+      onModalOpenChange?.(true);
+      return;
+    }
+    
     const isImage = file.type.startsWith('image/');
     const isPDF = file.type === 'application/pdf';
     
@@ -73,22 +87,33 @@ export function InfinitePracticeSection() {
     } else {
       setError('Please select a valid image or PDF file');
     }
-  }, []);
+  }, [previewMode, user, onModalOpenChange]);
 
   const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+    if (previewMode && !user) {
+      setShowLoginToTryModal(true);
+      onModalOpenChange?.(true);
+      return;
+    }
     const file = e.dataTransfer.files[0];
     if (file) handleFileSelect(file);
-  }, [handleFileSelect]);
+  }, [handleFileSelect, previewMode, user, onModalOpenChange]);
 
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
   }, []);
 
   const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    if (previewMode && !user) {
+      e.preventDefault();
+      setShowLoginToTryModal(true);
+      onModalOpenChange?.(true);
+      return;
+    }
     const file = e.target.files?.[0];
     if (file) handleFileSelect(file);
-  }, [handleFileSelect]);
+  }, [handleFileSelect, previewMode, user, onModalOpenChange]);
 
   const handleGenerate = async () => {
     if (!user) {
@@ -238,6 +263,15 @@ export function InfinitePracticeSection() {
 
   const canGenerate = inputMode === 'image' ? !!fileData : !!textInput.trim();
 
+  // Redirect to /dojo/infinite after successful login when modal was shown
+  useEffect(() => {
+    if (user && showLoginToTryModal) {
+      setShowLoginToTryModal(false);
+      onModalOpenChange?.(false);
+      router.push('/dojo/infinite');
+    }
+  }, [user, showLoginToTryModal, router, onModalOpenChange]);
+
   return (
     <>
       <LoginModal
@@ -308,7 +342,65 @@ export function InfinitePracticeSection() {
         </div>
       )}
 
-      <div className="mb-16">
+      {/* Login to Generate Free Quiz Modal */}
+      {showLoginToTryModal && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-75 z-[100] flex items-center justify-center p-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowLoginToTryModal(false);
+              onModalOpenChange?.(false);
+            }
+          }}
+        >
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            className="bg-white border-4 border-black rounded-3xl shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] p-8 max-w-md w-full text-center relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-3xl font-black text-gray-900 mb-4">
+              Log in to Generate a Free Quiz!
+            </h3>
+            <p className="text-gray-700 mb-6">
+              Create an account to start generating custom AP-style questions from your notes.
+            </p>
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={() => {
+                  setShowLoginToTryModal(false);
+                  onModalOpenChange?.(false);
+                  setRedirectOnLogin('/dojo/infinite');
+                  setShowLoginModal(true);
+                }}
+                className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors"
+              >
+                Log In
+              </button>
+              <button
+                onClick={() => {
+                  setShowLoginToTryModal(false);
+                  onModalOpenChange?.(false);
+                }}
+                className="w-full px-6 py-3 border-4 border-black rounded-xl font-bold text-gray-900 hover:bg-gray-100 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      <div 
+        className={`mb-16 ${previewMode && !user ? 'cursor-pointer' : ''}`}
+        onClick={() => {
+          if (previewMode && !user) {
+            setShowLoginToTryModal(true);
+            onModalOpenChange?.(true);
+          }
+        }}
+      >
         {/* Header */}
         <div className="text-center mb-12">
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-4">
@@ -359,10 +451,18 @@ export function InfinitePracticeSection() {
               <CardContent>
                 {inputMode === 'image' ? (
                   <div
-                    onDrop={handleDrop}
-                    onDragOver={handleDragOver}
+                    onDrop={previewMode && !user ? undefined : handleDrop}
+                    onDragOver={previewMode && !user ? undefined : handleDragOver}
                     className="border-4 border-dashed border-gray-400 rounded-xl p-12 text-center hover:border-blue-500 transition-colors cursor-pointer bg-white"
-                    onClick={() => document.getElementById('file-input')?.click()}
+                    onClick={(e) => {
+                      if (previewMode && !user) {
+                        e.stopPropagation();
+                        setShowLoginToTryModal(true);
+                        onModalOpenChange?.(true);
+                      } else {
+                        document.getElementById('file-input')?.click();
+                      }
+                    }}
                   >
                     <input
                       id="file-input"
@@ -370,6 +470,7 @@ export function InfinitePracticeSection() {
                       accept="image/*,.pdf"
                       onChange={handleFileInput}
                       className="hidden"
+                      disabled={previewMode && !user}
                     />
                     {fileData ? (
                       <div className="space-y-4">
