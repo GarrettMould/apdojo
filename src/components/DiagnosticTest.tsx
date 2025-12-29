@@ -16,8 +16,8 @@ interface Question {
 type PlacementTestResults = {
   score: number;       // 0-5
   total: number;       // 5
-  belt: string;        // 'White Belt', 'Yellow Belt', 'Green Belt'
-  beltTitle: string;   // 'The Rookie', 'The Apprentice', 'The Scholar'
+  belt: string;        // 'White Belt', 'Yellow Belt' (capped at Yellow Belt)
+  beltTitle: string;   // 'The Rookie', 'The Apprentice'
   message: string;
 };
 
@@ -98,19 +98,17 @@ export function DiagnosticTest({ questions, onComplete, initialAnswers = {}, use
 
     const total = questions.length;
 
-    // Belt assignment based on score (0-2, 3-4, 5)
+    // Belt assignment based on score (0-2: White, 3-5: Yellow - capped at Yellow Belt)
     let belt = 'White Belt';
     let beltTitle = 'The Rookie';
     let message = 'Great start. We have a lot of foundational work to do.';
 
-    if (score === 5) {
-      belt = 'Green Belt';
-      beltTitle = 'The Expert';
-      message = 'Impressive. You are ready for advanced drills.';
-    } else if (score >= 3) {
+    if (score >= 3) {
       belt = 'Yellow Belt';
       beltTitle = 'The Apprentice';
-      message = 'You have strong instincts! Let\'s refine your graphs.';
+      message = score === 5 
+        ? 'Impressive! You have strong instincts. Let\'s refine your graphs.'
+        : 'You have strong instincts! Let\'s refine your graphs.';
     }
 
     const results: PlacementTestResults = {

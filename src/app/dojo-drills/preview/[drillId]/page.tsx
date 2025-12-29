@@ -94,6 +94,20 @@ export default function DojoDrillPreviewPage() {
     router.push(`/dojo-drills?drill=${drill.id}`);
   };
 
+  const handleReset = async () => {
+    if (!user || !drill) return;
+    
+    try {
+      await resetDojoDrillProgress(user.uid, drill.id);
+      // Reload progress to update UI
+      const allProgress = await loadDojoDrillProgress(user.uid);
+      const drillProgress = getDrillProgress(allProgress, drill.id);
+      setProgress(drillProgress);
+    } catch (error) {
+      console.error('[DojoDrillPreview] Error resetting progress:', error);
+    }
+  };
+
   // Determine difficulty - default to Medium for now
   // You can add a difficulty field to the DojoDrill interface later if needed
   const difficulty: 'Easy' | 'Medium' | 'Hard' = 'Medium';
@@ -141,6 +155,7 @@ export default function DojoDrillPreviewPage() {
               progress={progress}
               buttonText={isProCustomer ? undefined : 'Join the Dojo'}
               comingSoon={isComingSoon}
+              onReset={user ? handleReset : undefined}
             />
           </motion.div>
         </div>

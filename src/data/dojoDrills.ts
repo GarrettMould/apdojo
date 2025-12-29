@@ -230,7 +230,7 @@ export const dojoDrills: Record<string, DojoDrill> = {
       config: {}
     },
     stage3: {
-      mcqIds: [1150, 1151, 1152] // Replace with actual MCQ IDs
+      mcqIds: [1150, 104, 106] // MCQ IDs: 1150 (MR falls faster), 104 (MR = MC profit max), 106 (Monopoly vs perfect competition)
     },
     xpReward: {
       completion: 200,

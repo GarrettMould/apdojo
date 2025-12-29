@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Circle, Lock } from 'lucide-react';
+import { Circle, Lock, RotateCcw } from 'lucide-react';
 
 interface DojoDrillPreviewProps {
   title: string;
@@ -17,6 +17,7 @@ interface DojoDrillPreviewProps {
   } | null;
   buttonText?: string; // Optional custom button text
   comingSoon?: boolean; // If true, show "Coming Soon" with lock icon
+  onReset?: () => void; // Optional reset handler
 }
 
 const learningPathItems = [
@@ -35,12 +36,17 @@ export function DojoDrillPreview({
   progress = null,
   buttonText,
   comingSoon = false,
+  onReset,
 }: DojoDrillPreviewProps) {
   // Check if all stages are completed
   const isCompleted = progress?.stage1 && progress?.stage2 && progress?.stage3;
+  // Check if at least one stage is completed (but not all)
+  const hasProgress = progress && (progress.stage1 || progress.stage2 || progress.stage3);
+  const isInProgress = hasProgress && !isCompleted;
+  
   const displayButtonText = comingSoon 
     ? 'Coming Soon' 
-    : (buttonText || (isCompleted ? 'Restart Drill' : (isLocked ? 'Locked (Season Pass)' : 'Start Drill')));
+    : (buttonText || (isCompleted ? 'Restart Drill' : (isInProgress ? 'Resume Drill' : (isLocked ? 'Locked (Season Pass)' : 'Start Drill'))));
   
   return (
     <div className="bg-white border-4 border-black rounded-3xl shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] p-8 sm:p-12 flex flex-col min-h-full"
@@ -76,8 +82,22 @@ export function DojoDrillPreview({
       {/* Learning Path Section */}
       <div className="mb-6">
         {/* Kicker Header */}
-        <div className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">
-          LEARNING PATH
+        <div className="flex items-center gap-2 mb-3">
+          <div className="text-xs font-black text-gray-400 uppercase tracking-widest">
+            LEARNING PATH
+          </div>
+          {onReset && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onReset();
+              }}
+              className="p-1 hover:bg-gray-100 rounded transition-colors group"
+              title="Reset progress"
+            >
+              <RotateCcw className="w-3 h-3 text-gray-400 group-hover:text-gray-600 transition-colors" />
+            </button>
+          )}
         </div>
         
         {/* Learning Path Items */}

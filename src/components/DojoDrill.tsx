@@ -311,7 +311,23 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
         console.error('[DojoDrill] Error saving stage2 progress:', error);
       });
     }
-    setStep(3);
+    
+    // Load MCQs before advancing to step 3
+    const questions = drill.stage3.mcqIds
+      .map(id => allQuestions.find(q => q.id === id))
+      .filter((q): q is Question => q !== undefined);
+    
+    if (questions.length === 3) {
+      setMcqQuestions(questions);
+      setCurrentMcqIndex(0);
+      setMcqAnswers({});
+      setStep(3);
+    } else {
+      console.error('[DojoDrill] Failed to load MCQs. Expected 3, found:', questions.length);
+      console.error('[DojoDrill] MCQ IDs:', drill.stage3.mcqIds);
+      // Still set step to 3 so loading state shows
+      setStep(3);
+    }
     setGraphCompleted(false);
     setTableCompleted(false);
     setMonopolyCompleted(false);
@@ -555,15 +571,17 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
           )}
 
           {/* Step 3: MCQs - Split Screen Layout */}
-          {step === 3 && currentMcqQuestion && (
-            <motion.div
-              key={`step3-${currentMcqIndex}`}
-              initial={{ x: 100, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: -100, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="absolute inset-0 bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8 flex flex-col"
-            >
+          {step === 3 && (
+            <>
+              {currentMcqQuestion ? (
+                <motion.div
+                  key={`step3-${currentMcqIndex}`}
+                  initial={{ x: 100, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: -100, opacity: 0 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  className="absolute inset-0 bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8 flex flex-col"
+                >
               <div className="flex-1 overflow-y-auto">
                 <div className="grid grid-cols-5 gap-6 h-full">
                   {/* Left Column: Question and Options (span-3) */}
@@ -743,6 +761,20 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
                 </div>
               </div>
             </motion.div>
+              ) : (
+                <motion.div
+                  key="step3-loading"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="absolute inset-0 bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8 flex items-center justify-center"
+                >
+                  <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-4"></div>
+                    <p className="text-gray-600">Loading questions...</p>
+                  </div>
+                </motion.div>
+              )}
+            </>
           )}
 
           {/* Step 4: Results */}

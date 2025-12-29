@@ -121,12 +121,13 @@ function Header() {
               >
                 Unit Cheat Sheets
               </Link>
-              <Link
+              {/* Graph Gym Link - HIDDEN */}
+              {/* <Link
                 href="/graph-gym"
                 className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
               >
                 Graph Gym
-              </Link>
+              </Link> */}
               <Link
                 href="/dojo-drills"
                 className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
@@ -370,13 +371,14 @@ function Header() {
               >
                 Unit Cheat Sheets
               </Link>
-              <Link
+              {/* Graph Gym Link - HIDDEN */}
+              {/* <Link
                 href="/graph-gym"
                 onClick={closeMobileMenu}
                 className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
               >
                 Graph Gym
-              </Link>
+              </Link> */}
               <Link
                 href="/dojo-drills"
                 onClick={closeMobileMenu}

@@ -1,23 +1,52 @@
 "use client";
 
-import React, { useState, useRef } from "react";
-import { motion } from "framer-motion";
-import { RefreshCcw, CheckCircle2 } from "lucide-react";
+import React, { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { RefreshCcw, CheckCircle2, Check, AlertCircle } from "lucide-react";
 
 interface ConsumerProducerSurplusDrillProps {
   onComplete?: () => void;
 }
 
+interface TableRow {
+  person: string;
+  price: number;
+  maxWillingnessToPay: number;
+  willBuy: boolean; // true if maxWillingnessToPay > price
+}
+
 export function ConsumerProducerSurplusDrill({ onComplete }: ConsumerProducerSurplusDrillProps) {
-  // Track which hotspots have been clicked (by index)
+  const [stage, setStage] = useState<1 | 2 | 3>(1); // 1 = will buy table, 2 = consumer surplus table, 3 = graph
+  
+  // Stage 1: Will Buy table state
+  const [tableAnswers, setTableAnswers] = useState<Record<number, 'yes' | 'no' | null>>({});
+  const [tableCorrect, setTableCorrect] = useState<Record<number, boolean>>({});
+  const [tableCompleted, setTableCompleted] = useState(false);
+  
+  // Stage 2: Consumer Surplus table state
+  const [csAnswers, setCsAnswers] = useState<Record<number, string>>({});
+  const [csCorrect, setCsCorrect] = useState<Record<number, boolean>>({});
+  const [csFocused, setCsFocused] = useState<Record<number, boolean>>({});
+  const [csCompleted, setCsCompleted] = useState(false);
+  
+  // Graph stage state
   const [csHotspotsClicked, setCsHotspotsClicked] = useState<Set<number>>(new Set());
-  const [psHotspotsClicked, setPsHotspotsClicked] = useState<Set<number>>(new Set());
+  const [wrongClick, setWrongClick] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const svgRef = useRef<SVGSVGElement>(null);
   
-  // Number of hotspots for each area
-  const numCSHotspots = 4;
-  const numPSHotspots = 4;
+  // Table data
+  const tableData: TableRow[] = [
+    { person: 'Person 1', price: 50, maxWillingnessToPay: 80, willBuy: true },
+    { person: 'Person 2', price: 50, maxWillingnessToPay: 60, willBuy: true },
+    { person: 'Person 3', price: 50, maxWillingnessToPay: 50, willBuy: true }, // Equal means they will buy
+    { person: 'Person 4', price: 50, maxWillingnessToPay: 40, willBuy: false },
+    { person: 'Person 5', price: 50, maxWillingnessToPay: 30, willBuy: false },
+  ];
+  
+  // Number of hotspots - just one big triangle for each
+  const numCSHotspots = 1;
+  const numPSHotspots = 1;
 
   // Graph dimensions
   const graphWidth = 600;
@@ -52,87 +81,110 @@ export function ConsumerProducerSurplusDrill({ onComplete }: ConsumerProducerSur
   const demandYIntercept = demandSlope * padding + demandIntercept;
   const supplyYIntercept = supplySlope * padding + supplyIntercept;
 
-  // Create multiple Consumer Surplus hotspots (divided triangles)
+  // Create one big Consumer Surplus triangle (above price, below demand)
   const createCSHotspots = () => {
-    const hotspots = [];
-    for (let i = 0; i < numCSHotspots; i++) {
-      const t1 = i / numCSHotspots; // Start of this segment
-      const t2 = (i + 1) / numCSHotspots; // End of this segment
-      
-      // Points along demand curve
-      const x1 = padding + (intersectX - padding) * t1;
-      const y1 = demandSlope * x1 + demandIntercept;
-      const x2 = padding + (intersectX - padding) * t2;
-      const y2 = demandSlope * x2 + demandIntercept;
-      
-      // Create triangle: point on demand curve, next point on demand curve, point on price line
-      const path = `
-        M ${x1} ${y1}
-        L ${x2} ${y2}
-        L ${x2} ${intersectY}
-        L ${x1} ${intersectY}
-        Z
-      `;
-      
-      hotspots.push({
-        path,
-        centerX: (x1 + x2) / 2,
-        centerY: (y1 + y2 + intersectY * 2) / 4
-      });
-    }
-    return hotspots;
+    const x1 = padding; // Start of demand curve at y-axis
+    const y1 = demandSlope * x1 + demandIntercept; // Point on demand curve at y-axis
+    const x2 = intersectX; // Equilibrium quantity
+    const y2 = intersectY; // Equilibrium price
+    
+    // Create triangle: from demand curve at y-axis, to equilibrium point, to price line at y-axis
+    // Extend slightly below price line to ensure clicks near price line are captured
+    const priceLineBuffer = 3; // Small buffer to capture clicks near price line
+    const path = `
+      M ${x1} ${y1}
+      L ${x2} ${y2 + priceLineBuffer}
+      L ${x1} ${y2 + priceLineBuffer}
+      Z
+    `;
+    
+    return [{
+      path,
+      centerX: (x1 + x2) / 2,
+      centerY: (y1 + y2) / 2
+    }];
   };
 
-  // Create multiple Producer Surplus hotspots (divided triangles)
+  // Create one big Producer Surplus triangle (below price, above supply)
   const createPSHotspots = () => {
-    const hotspots = [];
-    for (let i = 0; i < numPSHotspots; i++) {
-      const t1 = i / numPSHotspots; // Start of this segment
-      const t2 = (i + 1) / numPSHotspots; // End of this segment
-      
-      // Points along supply curve
-      const x1 = padding + (intersectX - padding) * t1;
-      const y1 = supplySlope * x1 + supplyIntercept;
-      const x2 = padding + (intersectX - padding) * t2;
-      const y2 = supplySlope * x2 + supplyIntercept;
-      
-      // Create triangle: point on supply curve, next point on supply curve, point on price line
-      const path = `
-        M ${x1} ${y1}
-        L ${x2} ${y2}
-        L ${x2} ${intersectY}
-        L ${x1} ${intersectY}
-        Z
-      `;
-      
-      hotspots.push({
-        path,
-        centerX: (x1 + x2) / 2,
-        centerY: (y1 + y2 + intersectY * 2) / 4
-      });
-    }
-    return hotspots;
+    const x1 = padding; // Start of supply curve at y-axis
+    const y1 = supplySlope * x1 + supplyIntercept; // Point on supply curve at y-axis
+    const x2 = intersectX; // Equilibrium quantity
+    const y2 = intersectY; // Equilibrium price
+    
+    // Create triangle: from price line at y-axis, to equilibrium point, to supply curve at y-axis
+    // Start well below the price line to avoid capturing clicks meant for CS
+    const priceLineBuffer = 5; // Buffer to ensure PS doesn't overlap with CS area
+    const path = `
+      M ${x1} ${y2 + priceLineBuffer}
+      L ${x2} ${y2 + priceLineBuffer}
+      L ${x1} ${y1}
+      Z
+    `;
+    
+    return [{
+      path,
+      centerX: (x1 + x2) / 2,
+      centerY: (y1 + y2) / 2
+    }];
   };
 
   const csHotspots = createCSHotspots();
   const psHotspots = createPSHotspots();
   
   const allCSClicked = csHotspotsClicked.size === numCSHotspots;
-  const allPSClicked = psHotspotsClicked.size === numPSHotspots;
 
   const handleCSHotspotClick = (index: number) => {
-    if (isComplete) return;
+    if (isComplete || wrongClick) return;
     setCsHotspotsClicked(prev => new Set(prev).add(index));
   };
 
   const handlePSHotspotClick = (index: number) => {
-    if (isComplete) return;
-    setPsHotspotsClicked(prev => new Set(prev).add(index));
+    if (isComplete || wrongClick) return;
+    // Wrong click - show red screen
+    setWrongClick(true);
+  };
+  
+  const handleRetry = () => {
+    setCsHotspotsClicked(new Set());
+    setWrongClick(false);
+    setIsComplete(false);
   };
 
-  // Check completion when all hotspots are clicked
-  React.useEffect(() => {
-    if (allCSClicked && allPSClicked && !isComplete) {
+  // Check stage 1 table completion
+  useEffect(() => {
+    const allAnswered = tableData.every((_, index) => tableAnswers[index] !== null);
+    const allCorrect = tableData.every((_, index) => tableCorrect[index] === true);
+    
+    if (allAnswered && allCorrect && !tableCompleted) {
+      setTableCompleted(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tableAnswers, tableCorrect, tableCompleted]);
+  
+  // Check stage 2 consumer surplus completion
+  useEffect(() => {
+    // Only check rows where willBuy is true
+    const buyerIndices = tableData
+      .map((row, index) => row.willBuy ? index : -1)
+      .filter(index => index !== -1);
+    
+    const allAnswered = buyerIndices.every(index => 
+      csAnswers[index] !== undefined && csAnswers[index] !== ''
+    );
+    const allCorrect = buyerIndices.every(index => 
+      csCorrect[index] === true
+    );
+    
+    if (allAnswered && allCorrect && !csCompleted) {
+      setCsCompleted(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [csAnswers, csCorrect, csCompleted]);
+  
+  // Check graph completion - only need CS clicked (PS is visible but not required)
+  useEffect(() => {
+    if (stage === 3 && allCSClicked && !isComplete) {
       setIsComplete(true);
       setTimeout(() => {
         if (onComplete) {
@@ -140,79 +192,344 @@ export function ConsumerProducerSurplusDrill({ onComplete }: ConsumerProducerSur
         }
       }, 1500);
     }
-  }, [allCSClicked, allPSClicked, isComplete, onComplete]);
+  }, [stage, allCSClicked, isComplete, onComplete]);
+  
+  const handleTableAnswer = (index: number, answer: 'yes' | 'no') => {
+    if (tableCompleted) return;
+    
+    setTableAnswers(prev => ({ ...prev, [index]: answer }));
+    
+    const correctAnswer = tableData[index].willBuy ? 'yes' : 'no';
+    const isCorrect = answer === correctAnswer;
+    setTableCorrect(prev => ({ ...prev, [index]: isCorrect }));
+  };
+  
+  const handleTableNext = () => {
+    if (tableCompleted) {
+      setStage(2);
+    }
+  };
+  
+  const normalizeAnswer = (value: string): string => {
+    return value.trim().replace(/[$,]/g, '');
+  };
+  
+  const handleCsInput = (index: number, value: string) => {
+    setCsAnswers(prev => ({ ...prev, [index]: value }));
+  };
+  
+  const handleCsBlur = (index: number) => {
+    const userAnswer = normalizeAnswer(csAnswers[index] || '');
+    const correctAnswer = (tableData[index].maxWillingnessToPay - tableData[index].price).toString();
+    
+    if (userAnswer === correctAnswer) {
+      setCsCorrect(prev => ({ ...prev, [index]: true }));
+    } else {
+      setCsCorrect(prev => ({ ...prev, [index]: false }));
+    }
+  };
+  
+  const handleCsKeyDown = (index: number, e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleCsBlur(index);
+      e.currentTarget.blur();
+    }
+  };
+  
+  const handleCsNext = () => {
+    if (csCompleted) {
+      setStage(3);
+    }
+  };
 
   const handleReset = () => {
     setCsHotspotsClicked(new Set());
-    setPsHotspotsClicked(new Set());
+    setWrongClick(false);
     setIsComplete(false);
   };
 
   return (
-    <div className="w-full h-full flex flex-row items-center justify-center gap-6 px-6 py-6">
+    <div className="w-full h-full">
+      <AnimatePresence mode="wait">
+        {/* Stage 1: Table */}
+        {stage === 1 && (
+          <motion.div
+            key="stage1"
+            initial={{ x: 100, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -100, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="w-full space-y-4"
+          >
+            {/* Instruction */}
+            <div className="mb-4 text-center">
+              <h2 className="text-xl font-black text-black mb-1">
+                Will This Person Buy?
+              </h2>
+              <p className="text-sm font-semibold text-gray-800 mb-1">
+                A person will buy if their maximum willingness to pay is greater than or equal to the price.
+              </p>
+              <p className="text-xs text-gray-600">
+                Remember: If Max Willingness to Pay ≥ Price, then Yes
+              </p>
+            </div>
+
+            {/* Table */}
+            <div className="w-full bg-white border-2 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden relative">
+              {/* Vertical Borders */}
+              <div className="absolute inset-0 pointer-events-none z-20">
+                <div className="absolute top-0 bottom-0 w-[2px] bg-black" style={{ left: '25%' }}></div>
+                <div className="absolute top-0 bottom-0 w-[2px] bg-black" style={{ left: '50%' }}></div>
+                <div className="absolute top-0 bottom-0 w-[2px] bg-black" style={{ left: '75%' }}></div>
+              </div>
+              
+              {/* Header Row */}
+              <div 
+                className="grid border-b-2 border-black bg-gray-100 relative z-30"
+                style={{ gridTemplateColumns: '1fr 1fr 1fr 1fr' }}
+              >
+                {['Person', 'Price', 'Max Willingness to Pay', 'Will This Person Buy?'].map((header, i) => (
+                  <div 
+                    key={i} 
+                    className="p-3 font-black text-center text-xs md:text-sm uppercase tracking-wide flex items-center justify-center"
+                  >
+                    {header}
+                  </div>
+                ))}
+              </div>
+
+              {/* Body Rows */}
+              {tableData.map((row, rowIndex) => {
+                const isCorrect = tableCorrect[rowIndex] === true;
+                const isWrong = tableCorrect[rowIndex] === false;
+                const answer = tableAnswers[rowIndex];
+
+                return (
+                  <div 
+                    key={rowIndex}
+                    className={`grid relative z-30 ${rowIndex !== tableData.length - 1 ? 'border-b-2 border-black' : ''}`}
+                    style={{ gridTemplateColumns: '1fr 1fr 1fr 1fr' }}
+                  >
+                    {/* Person */}
+                    <div className="p-3 font-black text-center text-base md:text-lg">
+                      {row.person}
+                    </div>
+                    
+                    {/* Price */}
+                    <div className="p-3 font-bold text-center text-base md:text-lg">
+                      ${row.price}
+                    </div>
+                    
+                    {/* Max Willingness to Pay */}
+                    <div className="p-3 font-bold text-center text-base md:text-lg">
+                      ${row.maxWillingnessToPay}
+                    </div>
+                    
+                    {/* Will Buy - Radio Buttons */}
+                    <div className="p-3 relative flex items-center justify-center gap-4">
+                      <button
+                        onClick={() => handleTableAnswer(rowIndex, 'yes')}
+                        disabled={tableCompleted}
+                        className={`px-4 py-2 rounded-lg border-2 border-black font-bold text-sm transition-all ${
+                          answer === 'yes'
+                            ? isCorrect
+                              ? 'bg-green-100 border-green-500 text-green-800'
+                              : 'bg-red-50 border-red-500 text-red-600'
+                            : 'bg-white hover:bg-gray-50'
+                        } ${tableCompleted ? 'cursor-default' : 'cursor-pointer hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'}`}
+                      >
+                        Yes
+                      </button>
+                      <button
+                        onClick={() => handleTableAnswer(rowIndex, 'no')}
+                        disabled={tableCompleted}
+                        className={`px-4 py-2 rounded-lg border-2 border-black font-bold text-sm transition-all ${
+                          answer === 'no'
+                            ? isCorrect
+                              ? 'bg-green-100 border-green-500 text-green-800'
+                              : 'bg-red-50 border-red-500 text-red-600'
+                            : 'bg-white hover:bg-gray-50'
+                        } ${tableCompleted ? 'cursor-default' : 'cursor-pointer hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'}`}
+                      >
+                        No
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Next Button */}
+            {tableCompleted && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-6 text-center"
+              >
+                <motion.button
+                  onClick={handleTableNext}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-8 py-3 bg-black text-white font-bold text-base rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 transition-all"
+                >
+                  Next: Identify Surplus Areas
+                </motion.button>
+              </motion.div>
+            )}
+          </motion.div>
+        )}
+
+        {/* Stage 2: Consumer Surplus Table */}
+        {stage === 2 && (
+          <motion.div
+            key="stage2"
+            initial={{ x: 100, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -100, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="w-full space-y-4"
+          >
+            {/* Instruction */}
+            <div className="mb-4 text-center">
+              <h2 className="text-xl font-black text-black mb-1">
+                Calculate Consumer Surplus
+              </h2>
+              <p className="text-sm font-semibold text-gray-800 mb-1">
+                Consumer Surplus = Max Willingness to Pay - Price
+              </p>
+              <p className="text-xs text-gray-600">
+                Only calculate for people who will buy the product
+              </p>
+            </div>
+
+            {/* Table */}
+            <div className="w-full bg-white border-2 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden relative">
+              {/* Vertical Borders */}
+              <div className="absolute inset-0 pointer-events-none z-20">
+                <div className="absolute top-0 bottom-0 w-[2px] bg-black" style={{ left: '25%' }}></div>
+                <div className="absolute top-0 bottom-0 w-[2px] bg-black" style={{ left: '50%' }}></div>
+                <div className="absolute top-0 bottom-0 w-[2px] bg-black" style={{ left: '75%' }}></div>
+              </div>
+              
+              {/* Header Row */}
+              <div 
+                className="grid border-b-2 border-black bg-gray-100 relative z-30"
+                style={{ gridTemplateColumns: '1fr 1fr 1fr 1fr' }}
+              >
+                {['Person', 'Price', 'Max Willingness to Pay', 'Consumer Surplus'].map((header, i) => (
+                  <div 
+                    key={i} 
+                    className="p-3 font-black text-center text-xs md:text-sm uppercase tracking-wide flex items-center justify-center"
+                  >
+                    {header}
+                  </div>
+                ))}
+              </div>
+
+              {/* Body Rows */}
+              {tableData.map((row, rowIndex) => {
+                const isCorrect = csCorrect[rowIndex] === true;
+                const isWrong = csCorrect[rowIndex] === false;
+                const willBuy = row.willBuy;
+                const correctCs = row.maxWillingnessToPay - row.price;
+
+                return (
+                  <div 
+                    key={rowIndex}
+                    className={`grid relative z-30 ${rowIndex !== tableData.length - 1 ? 'border-b-2 border-black' : ''}`}
+                    style={{ gridTemplateColumns: '1fr 1fr 1fr 1fr' }}
+                  >
+                    {/* Person */}
+                    <div className="p-3 font-black text-center text-base md:text-lg">
+                      {row.person}
+                    </div>
+                    
+                    {/* Price */}
+                    <div className="p-3 font-bold text-center text-base md:text-lg">
+                      ${row.price}
+                    </div>
+                    
+                    {/* Max Willingness to Pay */}
+                    <div className="p-3 font-bold text-center text-base md:text-lg">
+                      ${row.maxWillingnessToPay}
+                    </div>
+                    
+                    {/* Consumer Surplus - Input or N/A */}
+                    <div className="p-3 relative flex items-center justify-center">
+                      {willBuy ? (
+                        <motion.input
+                          type="text"
+                          value={csAnswers[rowIndex] || ''}
+                          onChange={(e) => handleCsInput(rowIndex, e.target.value)}
+                          onKeyDown={(e) => handleCsKeyDown(rowIndex, e)}
+                          onFocus={() => setCsFocused(prev => ({ ...prev, [rowIndex]: true }))}
+                          onBlur={() => {
+                            setCsFocused(prev => ({ ...prev, [rowIndex]: false }));
+                            handleCsBlur(rowIndex);
+                          }}
+                          disabled={isCorrect}
+                          animate={
+                            isWrong
+                              ? { x: [0, -10, 10, -5, 5, 0] }
+                              : {}
+                          }
+                          whileFocus={{ scale: 1.02 }}
+                          className={`w-full h-10 text-center text-base font-black border-2 border-black rounded-lg outline-none transition-all ${
+                            isCorrect
+                              ? "bg-green-100 border-green-500 text-green-800"
+                              : isWrong
+                              ? "bg-red-50 border-red-500 text-red-600"
+                              : "bg-white focus:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                          } ${isCorrect ? "cursor-default" : ""}`}
+                          placeholder={csFocused[rowIndex] || csAnswers[rowIndex] ? "" : "?"}
+                        />
+                      ) : (
+                        <div className="w-full h-10 flex items-center justify-center text-base font-bold text-gray-400">
+                          N/A
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Next Button */}
+            {csCompleted && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-6 text-center"
+              >
+                <motion.button
+                  onClick={handleCsNext}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-8 py-3 bg-black text-white font-bold text-base rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 transition-all"
+                >
+                  Next: Identify Surplus Areas
+                </motion.button>
+              </motion.div>
+            )}
+          </motion.div>
+        )}
+
+        {/* Stage 3: Graph */}
+        {stage === 3 && (
+          <motion.div
+            key="stage2"
+            initial={{ x: 100, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -100, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="w-full h-full flex flex-row items-center justify-center gap-6 px-6 py-6"
+          >
       {/* Left Side: Instructions */}
       <div className="flex-1 flex flex-col gap-4 max-w-md">
         <div className="w-full">
-          <p className="text-xl font-black text-black mb-2">Instructions:</p>
-          <p className="text-lg font-bold text-black leading-relaxed mb-4">
-            Click on the areas representing Consumer Surplus and Producer Surplus on the graph.
+          <p className="text-2xl font-black text-black leading-relaxed">
+            Click on the area representing Consumer Surplus on the graph.
           </p>
-          <div className="space-y-3 text-base">
-            <p className="font-semibold text-gray-700">
-              • Consumer Surplus: Area above the equilibrium price line and below the demand curve
-            </p>
-            <p className="font-semibold text-gray-700">
-              • Producer Surplus: Area below the equilibrium price line and above the supply curve
-            </p>
-          </div>
-        </div>
-
-        {/* Progress Indicators */}
-        <div className="space-y-3 mt-4">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              {allCSClicked ? (
-                <CheckCircle2 className="w-5 h-5 text-green-600" />
-              ) : (
-                <div className="w-5 h-5 border-2 border-gray-300 rounded-full" />
-              )}
-              <span className={`font-bold ${allCSClicked ? "text-green-600" : "text-gray-500"}`}>
-                Consumer Surplus ({csHotspotsClicked.size}/{numCSHotspots})
-              </span>
-            </div>
-            <div className="flex gap-1 ml-7">
-              {Array.from({ length: numCSHotspots }).map((_, i) => (
-                <div
-                  key={i}
-                  className={`w-3 h-3 rounded-full ${
-                    csHotspotsClicked.has(i) ? "bg-green-600" : "bg-gray-300"
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              {allPSClicked ? (
-                <CheckCircle2 className="w-5 h-5 text-green-600" />
-              ) : (
-                <div className="w-5 h-5 border-2 border-gray-300 rounded-full" />
-              )}
-              <span className={`font-bold ${allPSClicked ? "text-green-600" : "text-gray-500"}`}>
-                Producer Surplus ({psHotspotsClicked.size}/{numPSHotspots})
-              </span>
-            </div>
-            <div className="flex gap-1 ml-7">
-              {Array.from({ length: numPSHotspots }).map((_, i) => (
-                <div
-                  key={i}
-                  className={`w-3 h-3 rounded-full ${
-                    psHotspotsClicked.has(i) ? "bg-blue-600" : "bg-gray-300"
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
         </div>
 
         {/* Reset Button */}
@@ -223,7 +540,7 @@ export function ConsumerProducerSurplusDrill({ onComplete }: ConsumerProducerSur
             className="p-4 bg-green-100 border-2 border-green-600 rounded-lg"
           >
             <p className="text-base font-bold text-green-900">
-              Excellent! You've correctly identified both Consumer Surplus and Producer Surplus.
+              Excellent! You've correctly identified Consumer Surplus.
             </p>
           </motion.div>
         )}
@@ -232,7 +549,21 @@ export function ConsumerProducerSurplusDrill({ onComplete }: ConsumerProducerSur
       {/* Right Side: Graph */}
       <div className="flex-1 flex items-center justify-center w-full min-h-0">
         <div className="relative border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 bg-white">
-          {/* Reset Button */}
+          {/* Retry Button - Shows when wrong click */}
+          {wrongClick && (
+            <div className="absolute top-4 right-4 z-50">
+              <motion.button
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                onClick={handleRetry}
+                className="p-2 bg-white border-2 border-black rounded-full hover:bg-gray-100 active:translate-y-1 transition-transform"
+              >
+                <RefreshCcw size={16} />
+              </motion.button>
+            </div>
+          )}
+
+          {/* Reset Button - Shows when complete */}
           {isComplete && (
             <div className="absolute top-4 right-4 z-10">
               <button
@@ -254,6 +585,18 @@ export function ConsumerProducerSurplusDrill({ onComplete }: ConsumerProducerSur
               <CheckCircle2 size={24} className="text-green-600" />
             </motion.div>
           )}
+          
+          {/* Red Overlay when wrong click */}
+          <AnimatePresence>
+            {wrongClick && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 bg-red-500 bg-opacity-20 z-40 rounded-3xl pointer-events-none"
+              />
+            )}
+          </AnimatePresence>
 
           <svg
             ref={svgRef}
@@ -376,123 +719,69 @@ export function ConsumerProducerSurplusDrill({ onComplete }: ConsumerProducerSur
               strokeWidth="2"
             />
 
-            {/* Consumer Surplus Hotspots (multiple clickable areas) */}
+            {/* Consumer Surplus Triangle - Clickable (Correct Answer) */}
             {csHotspots.map((hotspot, index) => {
               const isClicked = csHotspotsClicked.has(index);
               return (
                 <g key={`cs-${index}`}>
                   <path
                     d={hotspot.path}
-                    fill={isClicked ? "rgba(16, 185, 129, 0.3)" : "transparent"}
-                    stroke={isClicked ? "#10b981" : "transparent"}
-                    strokeWidth="3"
-                    strokeDasharray={isClicked ? "0" : "4 4"}
-                    className="cursor-pointer"
+                    fill={isClicked ? "rgba(16, 185, 129, 0.4)" : "rgba(16, 185, 129, 0.1)"}
+                    stroke={isClicked ? "#10b981" : "#10b981"}
+                    strokeWidth={isClicked ? "4" : "3"}
+                    strokeDasharray={isClicked ? "0" : "8 4"}
+                    className={wrongClick ? "cursor-not-allowed opacity-50" : "cursor-pointer"}
                     onClick={() => handleCSHotspotClick(index)}
+                    style={{ pointerEvents: 'auto' }}
                   />
-                  {/* Invisible larger hit area */}
+                  {/* Invisible larger hit area - smaller to avoid overlap */}
                   <path
                     d={hotspot.path}
                     fill="transparent"
                     stroke="transparent"
-                    strokeWidth="20"
-                    className="cursor-pointer"
+                    strokeWidth="15"
+                    className={wrongClick ? "cursor-not-allowed" : "cursor-pointer"}
                     onClick={() => handleCSHotspotClick(index)}
+                    style={{ pointerEvents: 'auto' }}
                   />
-                  {/* Label for clicked hotspot */}
-                  {isClicked && (
-                    <motion.text
-                      initial={{ opacity: 0, scale: 0 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      x={hotspot.centerX}
-                      y={hotspot.centerY}
-                      fill="#10b981"
-                      fontSize="14"
-                      fontWeight="900"
-                      textAnchor="middle"
-                    >
-                      CS
-                    </motion.text>
-                  )}
                 </g>
               );
             })}
 
-            {/* Producer Surplus Hotspots (multiple clickable areas) */}
+            {/* Producer Surplus Triangle - Clickable (Wrong Answer) */}
             {psHotspots.map((hotspot, index) => {
-              const isClicked = psHotspotsClicked.has(index);
               return (
                 <g key={`ps-${index}`}>
                   <path
                     d={hotspot.path}
-                    fill={isClicked ? "rgba(59, 130, 246, 0.3)" : "transparent"}
-                    stroke={isClicked ? "#3b82f6" : "transparent"}
+                    fill="rgba(59, 130, 246, 0.1)"
+                    stroke="#3b82f6"
                     strokeWidth="3"
-                    strokeDasharray={isClicked ? "0" : "4 4"}
-                    className="cursor-pointer"
+                    strokeDasharray="8 4"
+                    className={wrongClick ? "cursor-not-allowed opacity-50" : "cursor-pointer"}
                     onClick={() => handlePSHotspotClick(index)}
+                    style={{ pointerEvents: 'auto' }}
                   />
-                  {/* Invisible larger hit area */}
+                  {/* Invisible larger hit area - smaller and only for lower portion */}
                   <path
                     d={hotspot.path}
                     fill="transparent"
                     stroke="transparent"
-                    strokeWidth="20"
-                    className="cursor-pointer"
+                    strokeWidth="10"
+                    className={wrongClick ? "cursor-not-allowed" : "cursor-pointer"}
                     onClick={() => handlePSHotspotClick(index)}
+                    style={{ pointerEvents: 'auto' }}
                   />
-                  {/* Label for clicked hotspot */}
-                  {isClicked && (
-                    <motion.text
-                      initial={{ opacity: 0, scale: 0 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      x={hotspot.centerX}
-                      y={hotspot.centerY}
-                      fill="#3b82f6"
-                      fontSize="14"
-                      fontWeight="900"
-                      textAnchor="middle"
-                    >
-                      PS
-                    </motion.text>
-                  )}
                 </g>
               );
             })}
 
-            {/* Final labels when all are clicked */}
-            {allCSClicked && (
-              <motion.text
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{ opacity: 1, scale: 1 }}
-                x={demandStartX + (intersectX - demandStartX) / 2}
-                y={demandStartY + 20}
-                fill="#10b981"
-                fontSize="18"
-                fontWeight="900"
-                textAnchor="middle"
-              >
-                Consumer Surplus
-              </motion.text>
-            )}
-
-            {allPSClicked && (
-              <motion.text
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{ opacity: 1, scale: 1 }}
-                x={supplyStartX + (intersectX - supplyStartX) / 2}
-                y={supplyStartY - 20}
-                fill="#3b82f6"
-                fontSize="18"
-                fontWeight="900"
-                textAnchor="middle"
-              >
-                Producer Surplus
-              </motion.text>
-            )}
           </svg>
         </div>
       </div>
+    </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
