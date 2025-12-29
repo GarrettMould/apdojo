@@ -98,13 +98,19 @@ export default function DojoDrillPreviewPage() {
     if (!user || !drill) return;
     
     try {
+      // Immediately set progress to null to update UI
+      setProgress(null);
+      
       await resetDojoDrillProgress(user.uid, drill.id);
-      // Reload progress to update UI
+      
+      // Reload progress to confirm it's reset (should be null)
       const allProgress = await loadDojoDrillProgress(user.uid);
       const drillProgress = getDrillProgress(allProgress, drill.id);
-      setProgress(drillProgress);
+      setProgress(drillProgress); // This should be null after reset
     } catch (error) {
       console.error('[DojoDrillPreview] Error resetting progress:', error);
+      // On error, still set to null to clear UI
+      setProgress(null);
     }
   };
 
