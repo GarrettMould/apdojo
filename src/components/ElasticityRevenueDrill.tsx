@@ -32,6 +32,8 @@ export function ElasticityRevenueDrill({ problem, onComplete }: ElasticityRevenu
   
   const [pricePercentCorrect, setPricePercentCorrect] = useState(false);
   const [quantityPercentCorrect, setQuantityPercentCorrect] = useState(false);
+  const [pricePercentIncorrect, setPricePercentIncorrect] = useState(false);
+  const [quantityPercentIncorrect, setQuantityPercentIncorrect] = useState(false);
   const [elasticityCorrect, setElasticityCorrect] = useState<boolean | null>(null);
   const [revenueCorrect, setRevenueCorrect] = useState<boolean | null>(null);
   
@@ -83,7 +85,10 @@ export function ElasticityRevenueDrill({ problem, onComplete }: ElasticityRevenu
       y >= padding &&
       y <= padding + graphInnerHeight
     ) {
-      setPoints([...points, { x, y }]);
+      const newPoints = [...points, { x, y }];
+      setPoints(newPoints);
+      
+      // Don't auto-submit - let user click submit button
     }
   };
 
@@ -131,21 +136,65 @@ export function ElasticityRevenueDrill({ problem, onComplete }: ElasticityRevenu
   };
   
   // Stage 2 handlers
-  const handlePricePercentBlur = () => {
+  const checkPricePercent = () => {
+    if (!pricePercent.trim()) return;
     const normalized = pricePercent.trim().replace(/[^0-9.-]/g, '');
     const numValue = parseFloat(normalized);
     if (Math.abs(numValue) === Math.abs(correctPricePercent)) {
       setPricePercentCorrect(true);
+      setPricePercentIncorrect(false);
+    } else {
+      setPricePercentCorrect(false);
+      setPricePercentIncorrect(true);
     }
   };
-  
-  const handleQuantityPercentBlur = () => {
+
+  const handlePricePercentBlur = () => {
+    checkPricePercent();
+  };
+
+  const handlePricePercentKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      checkPricePercent();
+    }
+  };
+
+  const checkQuantityPercent = () => {
+    if (!quantityPercent.trim()) return;
     const normalized = quantityPercent.trim().replace(/[^0-9.-]/g, '');
     const numValue = parseFloat(normalized);
     // Accept both -30 and 30 as correct (absolute value comparison)
     if (Math.abs(numValue) === Math.abs(correctQuantityPercent)) {
       setQuantityPercentCorrect(true);
+      setQuantityPercentIncorrect(false);
+    } else {
+      setQuantityPercentCorrect(false);
+      setQuantityPercentIncorrect(true);
     }
+  };
+
+  const handleQuantityPercentBlur = () => {
+    checkQuantityPercent();
+  };
+
+  const handleQuantityPercentKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      checkQuantityPercent();
+    }
+  };
+
+  const handlePricePercentRedo = () => {
+    setPricePercent('');
+    setPricePercentCorrect(false);
+    setPricePercentIncorrect(false);
+  };
+
+  const handleQuantityPercentRedo = () => {
+    setQuantityPercent('');
+    setQuantityPercentCorrect(false);
+    setQuantityPercentIncorrect(false);
   };
   
   const handleElasticitySelect = (type: "elastic" | "inelastic") => {
@@ -184,61 +233,73 @@ export function ElasticityRevenueDrill({ problem, onComplete }: ElasticityRevenu
 
   return (
     <div className="w-full h-full flex flex-row items-start justify-center gap-6 px-6 py-6">
-      {/* Left Side: Static Content (Scenario and Info) */}
-      <div className="flex-1 flex flex-col gap-4 max-w-md">
-        <div className="w-full">
-          <p className="text-xl font-black text-black mb-2">Scenario:</p>
-          <p className="text-lg font-bold text-black leading-relaxed">
-            {stage === 1 ? problem.scenario : stage2Scenario}
-          </p>
-        </div>
-        
-        {/* Stage 1: Submit Button under scenario */}
-        {stage === 1 && !isComplete && (
-          <button
-            onClick={handleStage1Submit}
-            disabled={!canSubmit}
-            className={`w-full px-6 py-3 rounded-lg font-bold text-lg border-2 border-black transition-all ${
-              canSubmit
-                ? "bg-black text-white hover:bg-gray-800 active:translate-y-1"
-                : "bg-gray-200 text-gray-500 cursor-not-allowed"
-            }`}
-          >
-            Submit
-          </button>
-        )}
-        
-        {/* Stage 1: Feedback */}
-        {stage === 1 && isComplete && (
-          <div className="w-full">
-            {isCorrect ? (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="p-4 bg-green-100 border-2 border-green-600 rounded-lg"
-              >
-                <p className="text-base font-bold text-green-900">
-                  Correct! Your line represents an {problem.correctAnswer} demand curve.
-                </p>
-              </motion.div>
-            ) : (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="p-4 bg-red-100 border-2 border-red-600 rounded-lg"
-              >
-                <p className="text-base font-bold text-red-900">
-                  Incorrect. Your line represents a{" "}
-                  {slope && slope > 1 ? "inelastic" : "elastic"} demand curve, but the scenario
-                  indicates {problem.correctAnswer} demand.
-                </p>
-              </motion.div>
-            )}
+      {/* Left Side: Submit Button (Stage 1) or Price/Quantity Info (Stage 2) */}
+      {stage === 1 && (
+        <div className="flex flex-col items-center justify-center gap-6">
+          {/* Scenario Text */}
+          <div className="w-full max-w-md">
+            <p className="text-xl font-black text-black mb-3">Scenario:</p>
+            <p className="text-lg font-bold text-black leading-relaxed">
+              When the price of Good X increases, consumers barely change their purchasing habits due to a lack of close substitutes. Draw the demand for Good X.
+            </p>
           </div>
-        )}
-        
-        {/* Stage 2: Price and Quantity Info */}
-        {stage === 2 && (
+          
+          {!isComplete && (
+            <button
+              onClick={handleStage1Submit}
+              disabled={!canSubmit}
+              className={`px-8 py-4 rounded-xl font-black text-xl border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all ${
+                canSubmit
+                  ? "bg-blue-600 text-white hover:bg-blue-700 active:translate-x-1 active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                  : "bg-gray-200 text-gray-500 cursor-not-allowed"
+              }`}
+            >
+              Submit
+            </button>
+          )}
+          
+          {/* Stage 1: Feedback */}
+          {isComplete && (
+            <div className="w-full">
+              {isCorrect ? (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="p-4 bg-green-100 border-2 border-green-600 rounded-lg"
+                >
+                  <p className="text-base font-bold text-green-900">
+                    Correct! Your line represents an {problem.correctAnswer} demand curve.
+                  </p>
+                </motion.div>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="p-4 bg-red-100 border-2 border-red-600 rounded-lg"
+                >
+                  <p className="text-base font-bold text-red-900">
+                    Incorrect. Your line represents a{" "}
+                    {slope && slope > 1 ? "inelastic" : "elastic"} demand curve, but the scenario
+                    indicates {problem.correctAnswer} demand.
+                  </p>
+                </motion.div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+      
+      {/* Stage 2: Price and Quantity Info */}
+      {stage === 2 && (
+        <div className="flex-1 flex flex-col gap-4 max-w-md">
+          {/* Scenario Text */}
+          <div className="w-full">
+            <p className="text-xl font-black text-black mb-3">Scenario:</p>
+            <p className="text-lg font-bold text-black leading-relaxed mb-4">
+              Changes to price and quantity demanded for Good Z can be found below.
+            </p>
+          </div>
+          
           <div className="w-full space-y-4">
             <div>
               <p className="text-lg font-black text-black mb-3">Price and Quantity Changes:</p>
@@ -248,8 +309,8 @@ export function ElasticityRevenueDrill({ problem, onComplete }: ElasticityRevenu
               </div>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Right Side: Interactive Questions */}
       <div className="flex-1 flex flex-col gap-4 max-w-md">
@@ -279,15 +340,28 @@ export function ElasticityRevenueDrill({ problem, onComplete }: ElasticityRevenu
                     <motion.input
                       type="text"
                       value={pricePercent}
-                      onChange={(e) => setPricePercent(e.target.value)}
+                      onChange={(e) => {
+                        setPricePercent(e.target.value);
+                        if (pricePercentIncorrect) {
+                          setPricePercentIncorrect(false);
+                        }
+                      }}
                       onBlur={handlePricePercentBlur}
-                      onFocus={() => setPricePercentFocused(true)}
+                      onKeyDown={handlePricePercentKeyDown}
+                      onFocus={() => {
+                        setPricePercentFocused(true);
+                        if (pricePercentIncorrect) {
+                          setPricePercentIncorrect(false);
+                        }
+                      }}
                       disabled={pricePercentCorrect}
-                      placeholder="?"
-                      animate={pricePercentFocused && !pricePercentCorrect ? { scale: [1, 1.02, 1] } : {}}
+                      placeholder={pricePercentFocused || pricePercent ? "" : "?"}
+                      animate={pricePercentFocused && !pricePercentCorrect && !pricePercentIncorrect ? { scale: [1, 1.02, 1] } : {}}
                       className={`w-full px-4 py-3 text-center text-xl font-bold rounded-xl border-2 outline-none transition-all ${
                         pricePercentCorrect
                           ? "bg-green-100 border-green-500 text-green-800"
+                          : pricePercentIncorrect
+                          ? "bg-red-100 border-red-500 text-red-800"
                           : "bg-gray-50 border-gray-300 focus:border-black focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
                       }`}
                     />
@@ -299,6 +373,17 @@ export function ElasticityRevenueDrill({ problem, onComplete }: ElasticityRevenu
                       >
                         <Check size={14} strokeWidth={4} />
                       </motion.div>
+                    )}
+                    {pricePercentIncorrect && (
+                      <div className="absolute -top-2 -right-2">
+                        <button
+                          onClick={handlePricePercentRedo}
+                          className="p-1.5 bg-white border-2 border-black rounded-full hover:bg-gray-100 active:translate-y-0.5 transition-transform"
+                          title="Try again"
+                        >
+                          <RefreshCcw size={14} className="text-gray-900" />
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -321,15 +406,28 @@ export function ElasticityRevenueDrill({ problem, onComplete }: ElasticityRevenu
                     <motion.input
                       type="text"
                       value={quantityPercent}
-                      onChange={(e) => setQuantityPercent(e.target.value)}
+                      onChange={(e) => {
+                        setQuantityPercent(e.target.value);
+                        if (quantityPercentIncorrect) {
+                          setQuantityPercentIncorrect(false);
+                        }
+                      }}
                       onBlur={handleQuantityPercentBlur}
-                      onFocus={() => setQuantityPercentFocused(true)}
+                      onKeyDown={handleQuantityPercentKeyDown}
+                      onFocus={() => {
+                        setQuantityPercentFocused(true);
+                        if (quantityPercentIncorrect) {
+                          setQuantityPercentIncorrect(false);
+                        }
+                      }}
                       disabled={quantityPercentCorrect}
-                      placeholder="?"
-                      animate={quantityPercentFocused && !quantityPercentCorrect ? { scale: [1, 1.02, 1] } : {}}
+                      placeholder={quantityPercentFocused || quantityPercent ? "" : "?"}
+                      animate={quantityPercentFocused && !quantityPercentCorrect && !quantityPercentIncorrect ? { scale: [1, 1.02, 1] } : {}}
                       className={`w-full px-4 py-3 text-center text-xl font-bold rounded-xl border-2 outline-none transition-all ${
                         quantityPercentCorrect
                           ? "bg-green-100 border-green-500 text-green-800"
+                          : quantityPercentIncorrect
+                          ? "bg-red-100 border-red-500 text-red-800"
                           : "bg-gray-50 border-gray-300 focus:border-black focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
                       }`}
                     />
@@ -341,6 +439,17 @@ export function ElasticityRevenueDrill({ problem, onComplete }: ElasticityRevenu
                       >
                         <Check size={14} strokeWidth={4} />
                       </motion.div>
+                    )}
+                    {quantityPercentIncorrect && (
+                      <div className="absolute -top-2 -right-2">
+                        <button
+                          onClick={handleQuantityPercentRedo}
+                          className="p-1.5 bg-white border-2 border-black rounded-full hover:bg-gray-100 active:translate-y-0.5 transition-transform"
+                          title="Try again"
+                        >
+                          <RefreshCcw size={14} className="text-gray-900" />
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -545,20 +654,6 @@ export function ElasticityRevenueDrill({ problem, onComplete }: ElasticityRevenu
               />
             ))}
 
-            {/* Instructions overlay */}
-            {points.length < 2 && !isComplete && (
-              <text
-                x={padding + graphInnerWidth / 2}
-                y={padding + graphInnerHeight / 2}
-                fill="gray"
-                fontSize="16"
-                fontWeight="600"
-                textAnchor="middle"
-                opacity={0.5}
-              >
-                Click on the graph to place {points.length === 0 ? "first" : "second"} point
-              </text>
-            )}
           </svg>
         </div>
       </div>

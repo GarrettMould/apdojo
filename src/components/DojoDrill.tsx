@@ -278,12 +278,33 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
       setGraphCompleted(true);
     } else {
       setGraphCompleted(true);
-      // Auto-advance to step 3 after a delay for demand-change activity
-      if (drill.stage2.type === 'demand-change') {
-        setTimeout(() => {
-          setStep(3);
-          setGraphCompleted(false);
-        }, 2000); // 2 second delay to show the green background
+      
+      // Save stage2 progress
+      if (user) {
+        saveDojoDrillProgress(user.uid, drill.id, 'stage2').catch((error) => {
+          console.error('[DojoDrill] Error saving stage2 progress:', error);
+        });
+      }
+      
+      // Load MCQs before advancing to step 3
+      const questions = drill.stage3.mcqIds
+        .map(id => allQuestions.find(q => q.id === id))
+        .filter((q): q is Question => q !== undefined);
+      
+      if (questions.length > 0) {
+        setMcqQuestions(questions);
+        setCurrentMcqIndex(0);
+        setMcqAnswers({});
+        // Auto-advance to step 3 after a delay for demand-change and elasticity-revenue activities
+        if (drill.stage2.type === 'demand-change' || drill.stage2.type === 'elasticity-revenue') {
+          setTimeout(() => {
+            setStep(3);
+            setGraphCompleted(false);
+          }, 1500); // 1.5 second delay to show completion feedback
+        }
+      } else {
+        console.error('[DojoDrill] Failed to load MCQs. Expected questions, found:', questions.length);
+        console.error('[DojoDrill] MCQ IDs:', drill.stage3.mcqIds);
       }
     }
   };
