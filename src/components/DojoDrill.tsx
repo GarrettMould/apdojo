@@ -363,6 +363,7 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
     drill.stage2.type === "demand-change" ? graphCompleted :
     drill.stage2.type === "elasticity-revenue" ? graphCompleted :
     drill.stage2.type === "consumer-producer-surplus" ? graphCompleted :
+    drill.stage2.type === "comparative-advantage" ? graphCompleted :
     drill.stage2.type === "ppc-drill" ? (ppcLevel === 1 ? (level1Ready || false) : graphCompleted) :
     false;
 
@@ -472,7 +473,7 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -100, opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="absolute inset-0 bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-4 flex gap-4 min-h-[600px]"
+              className="absolute inset-0 bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-4 flex gap-4 min-h-[600px] overflow-y-auto"
             >
               {/* Video Section - Left */}
               <div className="flex-1 flex items-center justify-center">
@@ -583,9 +584,9 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -100, opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="absolute inset-0 bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8 flex flex-col min-h-[600px] overflow-hidden"
+              className="absolute inset-0 bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8 flex flex-col min-h-[600px] overflow-y-auto"
             >
-              <div className="flex-1 flex items-center justify-center px-12 py-8 overflow-hidden">
+              <div className="flex-1 flex items-center justify-center px-12 py-8 min-h-0">
                 {getActivityComponent()}
               </div>
             </motion.div>
@@ -601,9 +602,9 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
                   animate={{ x: 0, opacity: 1 }}
                   exit={{ x: -100, opacity: 0 }}
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                  className="absolute inset-0 bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8 flex flex-col"
+                  className="absolute inset-0 bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8 flex flex-col overflow-y-auto"
                 >
-              <div className="flex-1 overflow-y-auto">
+              <div className="flex-1">
                 <div className="grid grid-cols-5 gap-6 h-full">
                   {/* Left Column: Question and Options (span-3) */}
                   <div className="col-span-5 md:col-span-3 flex flex-col">

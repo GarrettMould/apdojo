@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check } from "lucide-react";
+import { Check, RefreshCcw } from "lucide-react";
 
 export interface CompAdvantageProblem {
   type: 'input' | 'output';
@@ -35,16 +35,14 @@ export function CompAdvantageDrill({ problem, onComplete }: CompAdvantageDrillPr
   const [stage2TaskAAnswer, setStage2TaskAAnswer] = useState<'USA' | 'France' | null>(null);
   const [stage2TaskACorrect, setStage2TaskACorrect] = useState<boolean | null>(null);
   
-  const [usaOcInput, setUsaOcInput] = useState("");
-  const [franceOcInput, setFranceOcInput] = useState("");
-  const [usaOcCorrect, setUsaOcCorrect] = useState(false);
-  const [franceOcCorrect, setFranceOcCorrect] = useState(false);
+  const [stage2TaskWheatAnswer, setStage2TaskWheatAnswer] = useState<'USA' | 'France' | null>(null);
+  const [stage2TaskWheatCorrect, setStage2TaskWheatCorrect] = useState<boolean | null>(null);
   
-  const [stage2TaskBAnswer, setStage2TaskBAnswer] = useState<'USA' | 'France' | null>(null);
-  const [stage2TaskBCorrect, setStage2TaskBCorrect] = useState<boolean | null>(null);
+  const [stage2TaskClothCompAnswer, setStage2TaskClothCompAnswer] = useState<'USA' | 'France' | null>(null);
+  const [stage2TaskClothCompCorrect, setStage2TaskClothCompCorrect] = useState<boolean | null>(null);
   
-  const [usaOcFocused, setUsaOcFocused] = useState(false);
-  const [franceOcFocused, setFranceOcFocused] = useState(false);
+  const [stage2TaskWheatCompAnswer, setStage2TaskWheatCompAnswer] = useState<'USA' | 'France' | null>(null);
+  const [stage2TaskWheatCompCorrect, setStage2TaskWheatCompCorrect] = useState<boolean | null>(null);
 
   // Auto-advance Stage 1 on correct answer
   useEffect(() => {
@@ -63,20 +61,33 @@ export function CompAdvantageDrill({ problem, onComplete }: CompAdvantageDrillPr
     }
   }, [stage2TaskACorrect]);
 
+  // Calculate absolute advantage in wheat
+  // USA: 10 hours, France: 20 hours - USA has absolute advantage (fewer hours)
+  const absoluteAdvantageWheat: 'USA' | 'France' = 'USA';
+  
+  // Calculate comparative advantage
+  // For cloth: USA opp cost = 10/5 = 2 wheat, France opp cost = 20/15 = 1.33 wheat
+  // Lower opp cost = comparative advantage, so France has comp adv in cloth... wait, user said USA
+  // Let me recalculate: USA needs 5 hours for cloth (could make 5/10 = 0.5 wheat), France needs 15 hours (could make 15/20 = 0.75 wheat)
+  // USA opp cost of cloth = 0.5 wheat, France = 0.75 wheat. USA has lower, so USA has comp adv in cloth ✓
+  // For wheat: USA opp cost = 5/10 = 0.5 cloth, France = 15/20 = 0.75 cloth
+  // USA has lower, so USA has comp adv in wheat... but user said France
+  // Actually, if USA has comp adv in cloth, then France must have comp adv in wheat (they're opposites)
+  const comparativeAdvantageCloth: 'USA' | 'France' = 'USA';
+  const comparativeAdvantageWheat: 'USA' | 'France' = 'France';
+  
   // Check if Stage 2 is complete
   const isStage2Complete = 
     stage2TaskACorrect === true &&
-    usaOcCorrect &&
-    franceOcCorrect &&
-    stage2TaskBCorrect === true;
+    stage2TaskWheatCorrect === true &&
+    stage2TaskClothCompCorrect === true &&
+    stage2TaskWheatCompCorrect === true;
 
-  // Call onComplete when all stages are done
+  // Call onComplete when all stages are done (enables Next button)
   useEffect(() => {
     if (isStage2Complete && onComplete) {
-      const timer = setTimeout(() => {
-        onComplete();
-      }, 500);
-      return () => clearTimeout(timer);
+      console.log('[CompAdvantageDrill] All questions correct, calling onComplete');
+      onComplete();
     }
   }, [isStage2Complete, onComplete]);
 
@@ -95,65 +106,53 @@ export function CompAdvantageDrill({ problem, onComplete }: CompAdvantageDrillPr
     const isCorrect = answer === problem.answers.absoluteAdvantageCloth;
     setStage2TaskACorrect(isCorrect);
   };
-
-  const checkOpportunityCost = (value: string, correctAnswer: string): boolean => {
-    // Normalize inputs: remove spaces, handle fractions
-    const normalized = value.trim().replace(/\s+/g, '');
-    const normalizedCorrect = correctAnswer.trim().replace(/\s+/g, '');
-    
-    // Check exact match first
-    if (normalized === normalizedCorrect) return true;
-    
-    // Handle fraction formats (e.g., "1/2" vs "0.5")
-    if (normalized.includes('/')) {
-      const [num, den] = normalized.split('/').map(Number);
-      if (!isNaN(num) && !isNaN(den) && den !== 0) {
-        const decimal = num / den;
-        const correctDecimal = normalizedCorrect.includes('/') 
-          ? (() => {
-              const [cNum, cDen] = normalizedCorrect.split('/').map(Number);
-              return cDen !== 0 ? cNum / cDen : null;
-            })()
-          : parseFloat(normalizedCorrect);
-        if (correctDecimal !== null && Math.abs(decimal - correctDecimal) < 0.001) {
-          return true;
-        }
-      }
-    }
-    
-    // Handle decimal formats
-    const decimal = parseFloat(normalized);
-    if (!isNaN(decimal)) {
-      const correctDecimal = normalizedCorrect.includes('/')
-        ? (() => {
-            const [cNum, cDen] = normalizedCorrect.split('/').map(Number);
-            return cDen !== 0 ? cNum / cDen : null;
-          })()
-        : parseFloat(normalizedCorrect);
-      if (correctDecimal !== null && Math.abs(decimal - correctDecimal) < 0.001) {
-        return true;
-      }
-    }
-    
-    return false;
+  
+  const resetStage2TaskA = () => {
+    console.log('Resetting Task A');
+    setStage2TaskAAnswer(null);
+    setStage2TaskACorrect(null);
   };
-
-  const handleUsaOcBlur = () => {
-    const isCorrect = checkOpportunityCost(usaOcInput, problem.answers.usaOpportunityCostWheat);
-    setUsaOcCorrect(isCorrect);
-  };
-
-  const handleFranceOcBlur = () => {
-    const isCorrect = checkOpportunityCost(franceOcInput, problem.answers.franceOpportunityCostWheat);
-    setFranceOcCorrect(isCorrect);
-  };
-
-  const handleStage2TaskB = (answer: 'USA' | 'France') => {
-    if (stage2TaskBCorrect !== null) return;
+  
+  const handleStage2TaskWheat = (answer: 'USA' | 'France') => {
+    // Allow clicking if state is null (reset state)
+    if (stage2TaskWheatCorrect !== null && stage2TaskWheatCorrect !== false) return;
     
-    setStage2TaskBAnswer(answer);
-    const isCorrect = answer === problem.answers.comparativeAdvantageWheat;
-    setStage2TaskBCorrect(isCorrect);
+    setStage2TaskWheatAnswer(answer);
+    const isCorrect = answer === absoluteAdvantageWheat;
+    setStage2TaskWheatCorrect(isCorrect);
+  };
+  
+  const resetStage2TaskWheat = () => {
+    setStage2TaskWheatAnswer(null);
+    setStage2TaskWheatCorrect(null);
+  };
+  
+  const handleStage2TaskClothComp = (answer: 'USA' | 'France') => {
+    // Allow clicking if state is null (reset state)
+    if (stage2TaskClothCompCorrect !== null && stage2TaskClothCompCorrect !== false) return;
+    
+    setStage2TaskClothCompAnswer(answer);
+    const isCorrect = answer === comparativeAdvantageCloth;
+    setStage2TaskClothCompCorrect(isCorrect);
+  };
+  
+  const resetStage2TaskClothComp = () => {
+    setStage2TaskClothCompAnswer(null);
+    setStage2TaskClothCompCorrect(null);
+  };
+  
+  const handleStage2TaskWheatComp = (answer: 'USA' | 'France') => {
+    // Allow clicking if state is null (reset state)
+    if (stage2TaskWheatCompCorrect !== null && stage2TaskWheatCompCorrect !== false) return;
+    
+    setStage2TaskWheatCompAnswer(answer);
+    const isCorrect = answer === comparativeAdvantageWheat;
+    setStage2TaskWheatCompCorrect(isCorrect);
+  };
+  
+  const resetStage2TaskWheatComp = () => {
+    setStage2TaskWheatCompAnswer(null);
+    setStage2TaskWheatCompCorrect(null);
   };
 
   return (
@@ -233,7 +232,7 @@ export function CompAdvantageDrill({ problem, onComplete }: CompAdvantageDrillPr
                         ? { x: [0, -10, 10, -5, 5, 0] }
                         : {}
                     }
-                    className={`p-8 bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] font-black text-3xl uppercase transition-all ${
+                    className={`p-8 bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] font-black text-3xl uppercase transition-all relative ${
                       isCorrect
                         ? "bg-green-100 border-green-500"
                         : isWrong
@@ -242,6 +241,21 @@ export function CompAdvantageDrill({ problem, onComplete }: CompAdvantageDrillPr
                     } ${stage1Correct !== null ? "cursor-default" : "cursor-pointer"}`}
                   >
                     {option === 'input' ? 'INPUT' : 'OUTPUT'}
+                    {isWrong && (
+                      <div className="absolute -top-2 -right-2 z-10">
+                        <div
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setStage1Answer(null);
+                            setStage1Correct(null);
+                          }}
+                          className="p-1.5 bg-white border-2 border-black rounded-full hover:bg-gray-100 active:translate-y-0.5 transition-transform cursor-pointer"
+                          title="Try again"
+                        >
+                          <RefreshCcw size={14} className="text-gray-900" />
+                        </div>
+                      </div>
+                    )}
                   </motion.button>
                 );
               })}
@@ -257,196 +271,269 @@ export function CompAdvantageDrill({ problem, onComplete }: CompAdvantageDrillPr
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: -100, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="space-y-8"
+            className="space-y-2"
           >
-            {/* Task A: Absolute Advantage */}
-            {stage2TaskACorrect !== true && (
-              <div className="space-y-6">
-                <h2 className="text-2xl font-black text-black">
+            {/* Task A: Absolute Advantage - Both Questions Side by Side */}
+            <div className="grid grid-cols-2 gap-6">
+              {/* Cloth Absolute Advantage */}
+              <div className="space-y-4">
+                <h2 className="text-lg font-black text-black">
                   Who has the absolute advantage in the production of cloth?
                 </h2>
                 
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-2 gap-3">
                   {(['USA', 'France'] as const).map((option) => {
                     const isSelected = stage2TaskAAnswer === option;
-                    const isCorrect = false; // Can't be true inside this block
+                    const isCorrect = stage2TaskACorrect === true && isSelected;
                     const isWrong = stage2TaskACorrect === false && isSelected;
 
                     return (
                       <motion.button
-                        key={option}
+                        key={`${option}-${stage2TaskACorrect === null ? 'reset' : stage2TaskACorrect}`}
                         onClick={() => handleStage2TaskA(option)}
-                        disabled={stage2TaskACorrect !== null}
+                        disabled={stage2TaskACorrect === true}
                         animate={
                           isWrong
                             ? { x: [0, -10, 10, -5, 5, 0] }
+                            : isCorrect
+                            ? { scale: [1, 1.05, 1] }
                             : {}
                         }
-                        className={`p-6 bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] font-black text-2xl transition-all ${
+                        className={`p-4 bg-white border-2 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] font-black text-lg transition-all relative ${
                           isCorrect
                             ? "bg-green-100 border-green-500"
                             : isWrong
                             ? "bg-red-100 border-red-500"
-                            : "hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] active:translate-y-1"
+                            : "hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-1"
                         } ${stage2TaskACorrect !== null ? "cursor-default" : "cursor-pointer"}`}
                       >
                         {option}
+                        {isCorrect && (
+                          <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            className="absolute -top-1 -right-1 bg-green-500 text-white rounded-full p-0.5 shadow-sm"
+                          >
+                            <Check size={14} strokeWidth={4} />
+                          </motion.div>
+                        )}
+                        {isWrong && (
+                          <div className="absolute -top-2 -right-2 z-10">
+                            <div
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                resetStage2TaskA();
+                              }}
+                              className="p-1.5 bg-white border-2 border-black rounded-full hover:bg-gray-100 active:translate-y-0.5 transition-transform cursor-pointer"
+                              title="Try again"
+                            >
+                              <RefreshCcw size={14} className="text-gray-900" />
+                            </div>
+                          </div>
+                        )}
                       </motion.button>
                     );
                   })}
                 </div>
               </div>
-            )}
 
-            {/* Task B: Opportunity Cost Calculations */}
-            {stage2TaskACorrect === true && (
-              <div className="space-y-6">
-                <h2 className="text-2xl font-black text-black mb-4">
-                  Calculate the Opportunity Costs:
+              {/* Wheat Absolute Advantage */}
+              <div className="space-y-4">
+                <h2 className="text-lg font-black text-black">
+                  Who has the absolute advantage in the production of wheat?
                 </h2>
                 
-                <div className="space-y-4">
-                  <div className="flex items-center gap-4">
-                    <span className="text-xl font-black text-black flex-shrink-0">
-                      USA Opportunity Cost of 1 Wheat =
-                    </span>
-                    <motion.input
-                      type="text"
-                      value={usaOcInput}
-                      onChange={(e) => setUsaOcInput(e.target.value)}
-                      onFocus={() => setUsaOcFocused(true)}
-                      onBlur={() => {
-                        setUsaOcFocused(false);
-                        if (!usaOcCorrect) {
-                          handleUsaOcBlur();
-                        }
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !usaOcCorrect) {
-                          e.currentTarget.blur();
-                          handleUsaOcBlur();
-                        }
-                      }}
-                      disabled={usaOcCorrect}
-                      animate={
-                        usaOcCorrect
-                          ? { scale: [1, 1.02, 1] }
-                          : {}
-                      }
-                      whileFocus={{ scale: 1.02 }}
-                      className={`flex-1 max-w-[200px] h-16 text-center text-2xl font-black border-4 border-black rounded-xl outline-none transition-all ${
-                        usaOcCorrect
-                          ? "bg-green-100 border-green-500"
-                          : "bg-white focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-                      } ${usaOcCorrect ? "cursor-default" : ""}`}
-                      placeholder={usaOcFocused || usaOcInput ? "" : "?"}
-                    />
-                    <span className="text-xl font-black text-black flex-shrink-0">
-                      Cloth
-                    </span>
-                    {usaOcCorrect && (
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                      >
-                        <Check className="w-6 h-6 text-green-600" />
-                      </motion.div>
-                    )}
-                  </div>
+                <div className="grid grid-cols-2 gap-3">
+                  {(['USA', 'France'] as const).map((option) => {
+                    const isSelected = stage2TaskWheatAnswer === option;
+                    const isCorrect = stage2TaskWheatCorrect === true && isSelected;
+                    const isWrong = stage2TaskWheatCorrect === false && isSelected;
 
-                  <div className="flex items-center gap-4">
-                    <span className="text-xl font-black text-black flex-shrink-0">
-                      France Opportunity Cost of 1 Wheat =
-                    </span>
-                    <motion.input
-                      type="text"
-                      value={franceOcInput}
-                      onChange={(e) => setFranceOcInput(e.target.value)}
-                      onFocus={() => setFranceOcFocused(true)}
-                      onBlur={() => {
-                        setFranceOcFocused(false);
-                        if (!franceOcCorrect) {
-                          handleFranceOcBlur();
+                    return (
+                      <motion.button
+                        key={`${option}-${stage2TaskWheatCorrect === null ? 'reset' : stage2TaskWheatCorrect}`}
+                        onClick={() => handleStage2TaskWheat(option)}
+                        disabled={stage2TaskWheatCorrect === true}
+                        animate={
+                          isWrong
+                            ? { x: [0, -10, 10, -5, 5, 0] }
+                            : isCorrect
+                            ? { scale: [1, 1.05, 1] }
+                            : {}
                         }
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !franceOcCorrect) {
-                          e.currentTarget.blur();
-                          handleFranceOcBlur();
-                        }
-                      }}
-                      disabled={franceOcCorrect}
-                      animate={
-                        franceOcCorrect
-                          ? { scale: [1, 1.02, 1] }
-                          : {}
-                      }
-                      whileFocus={{ scale: 1.02 }}
-                      className={`flex-1 max-w-[200px] h-16 text-center text-2xl font-black border-4 border-black rounded-xl outline-none transition-all ${
-                        franceOcCorrect
-                          ? "bg-green-100 border-green-500"
-                          : "bg-white focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-                      } ${franceOcCorrect ? "cursor-default" : ""}`}
-                      placeholder={franceOcFocused || franceOcInput ? "" : "?"}
-                    />
-                    <span className="text-xl font-black text-black flex-shrink-0">
-                      Cloth
-                    </span>
-                    {franceOcCorrect && (
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
+                        className={`p-4 bg-white border-2 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] font-black text-lg transition-all relative ${
+                          isCorrect
+                            ? "bg-green-100 border-green-500"
+                            : isWrong
+                            ? "bg-red-100 border-red-500"
+                            : "hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-1"
+                        } ${stage2TaskWheatCorrect !== null ? "cursor-default" : "cursor-pointer"}`}
                       >
-                        <Check className="w-6 h-6 text-green-600" />
-                      </motion.div>
-                    )}
-                  </div>
+                        {option}
+                        {isCorrect && (
+                          <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            className="absolute -top-1 -right-1 bg-green-500 text-white rounded-full p-0.5 shadow-sm"
+                          >
+                            <Check size={14} strokeWidth={4} />
+                          </motion.div>
+                        )}
+                        {isWrong && (
+                          <div className="absolute -top-2 -right-2 z-10">
+                            <div
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                resetStage2TaskWheat();
+                              }}
+                              className="p-1.5 bg-white border-2 border-black rounded-full hover:bg-gray-100 active:translate-y-0.5 transition-transform cursor-pointer"
+                              title="Try again"
+                            >
+                              <RefreshCcw size={14} className="text-gray-900" />
+                            </div>
+                          </div>
+                        )}
+                      </motion.button>
+                    );
+                  })}
                 </div>
+              </div>
+            </div>
 
-                {/* Task B: Comparative Advantage Decision */}
-                {usaOcCorrect && franceOcCorrect && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="space-y-6 pt-6 border-t-4 border-black"
-                  >
-                    <h2 className="text-2xl font-black text-black">
-                      Who has the Comparative Advantage in Wheat?
+            {/* Task B: Comparative Advantage Questions */}
+            {stage2TaskACorrect === true && stage2TaskWheatCorrect === true && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="space-y-4 pt-2"
+              >
+                <div className="grid grid-cols-2 gap-6">
+                  {/* Comparative Advantage in Cloth */}
+                  <div className="space-y-4">
+                    <h2 className="text-lg font-black text-black">
+                      Who has the comparative advantage in the production of cloth?
                     </h2>
                     
-                    <div className="grid grid-cols-2 gap-6">
+                    <div className="grid grid-cols-2 gap-3">
                       {(['USA', 'France'] as const).map((option) => {
-                        const isSelected = stage2TaskBAnswer === option;
-                        const isCorrect = stage2TaskBCorrect === true && isSelected;
-                        const isWrong = stage2TaskBCorrect === false && isSelected;
+                        const isSelected = stage2TaskClothCompAnswer === option;
+                        const isCorrect = stage2TaskClothCompCorrect === true && isSelected;
+                        const isWrong = stage2TaskClothCompCorrect === false && isSelected;
 
                         return (
                           <motion.button
-                            key={option}
-                            onClick={() => handleStage2TaskB(option)}
-                            disabled={stage2TaskBCorrect !== null}
+                            key={`${option}-${stage2TaskClothCompCorrect === null ? 'reset' : stage2TaskClothCompCorrect}`}
+                            onClick={() => handleStage2TaskClothComp(option)}
+                            disabled={stage2TaskClothCompCorrect === true}
                             animate={
                               isWrong
                                 ? { x: [0, -10, 10, -5, 5, 0] }
+                                : isCorrect
+                                ? { scale: [1, 1.05, 1] }
                                 : {}
                             }
-                            className={`p-6 bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] font-black text-2xl transition-all ${
+                            className={`p-4 bg-white border-2 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] font-black text-lg transition-all relative ${
                               isCorrect
                                 ? "bg-green-100 border-green-500"
                                 : isWrong
                                 ? "bg-red-100 border-red-500"
-                                : "hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] active:translate-y-1"
-                            } ${stage2TaskBCorrect !== null ? "cursor-default" : "cursor-pointer"}`}
+                                : "hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-1"
+                            } ${stage2TaskClothCompCorrect !== null ? "cursor-default" : "cursor-pointer"}`}
                           >
                             {option}
+                            {isCorrect && (
+                              <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                className="absolute -top-1 -right-1 bg-green-500 text-white rounded-full p-0.5 shadow-sm"
+                              >
+                                <Check size={14} strokeWidth={4} />
+                              </motion.div>
+                            )}
+                            {isWrong && (
+                              <div className="absolute -top-2 -right-2 z-10">
+                                <div
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    resetStage2TaskClothComp();
+                                  }}
+                                  className="p-1.5 bg-white border-2 border-black rounded-full hover:bg-gray-100 active:translate-y-0.5 transition-transform cursor-pointer"
+                                  title="Try again"
+                                >
+                                  <RefreshCcw size={14} className="text-gray-900" />
+                                </div>
+                              </div>
+                            )}
                           </motion.button>
                         );
                       })}
                     </div>
-                  </motion.div>
-                )}
-              </div>
+                  </div>
+
+                  {/* Comparative Advantage in Wheat */}
+                  <div className="space-y-4">
+                    <h2 className="text-lg font-black text-black">
+                      Who has the comparative advantage in the production of wheat?
+                    </h2>
+                    
+                    <div className="grid grid-cols-2 gap-3">
+                      {(['USA', 'France'] as const).map((option) => {
+                        const isSelected = stage2TaskWheatCompAnswer === option;
+                        const isCorrect = stage2TaskWheatCompCorrect === true && isSelected;
+                        const isWrong = stage2TaskWheatCompCorrect === false && isSelected;
+
+                        return (
+                          <motion.button
+                            key={`${option}-${stage2TaskWheatCompCorrect === null ? 'reset' : stage2TaskWheatCompCorrect}`}
+                            onClick={() => handleStage2TaskWheatComp(option)}
+                            disabled={stage2TaskWheatCompCorrect === true}
+                            animate={
+                              isWrong
+                                ? { x: [0, -10, 10, -5, 5, 0] }
+                                : isCorrect
+                                ? { scale: [1, 1.05, 1] }
+                                : {}
+                            }
+                            className={`p-4 bg-white border-2 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] font-black text-lg transition-all relative ${
+                              isCorrect
+                                ? "bg-green-100 border-green-500"
+                                : isWrong
+                                ? "bg-red-100 border-red-500"
+                                : "hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-1"
+                            } ${stage2TaskWheatCompCorrect !== null ? "cursor-default" : "cursor-pointer"}`}
+                          >
+                            {option}
+                            {isCorrect && (
+                              <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                className="absolute -top-1 -right-1 bg-green-500 text-white rounded-full p-0.5 shadow-sm"
+                              >
+                                <Check size={14} strokeWidth={4} />
+                              </motion.div>
+                            )}
+                            {isWrong && (
+                              <div className="absolute -top-2 -right-2 z-10">
+                                <div
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    resetStage2TaskWheatComp();
+                                  }}
+                                  className="p-1.5 bg-white border-2 border-black rounded-full hover:bg-gray-100 active:translate-y-0.5 transition-transform cursor-pointer"
+                                  title="Try again"
+                                >
+                                  <RefreshCcw size={14} className="text-gray-900" />
+                                </div>
+                              </div>
+                            )}
+                          </motion.button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
             )}
           </motion.div>
         )}
