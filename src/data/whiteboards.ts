@@ -260,7 +260,7 @@ export interface Whiteboard {
   export const apMicroUnit3Whiteboards: Whiteboard[] = [
     { lessonID: "3.1", unit: 3, topic: "Diminishing Marginal Returns", url: "https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Micro_Unit_3/3.1_wb1.jpg" },
     { lessonID: "3.1", unit: 3, topic: "Marginal and Average Product", url: "https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Micro_Unit_3/3.1_wb2.jpg" },
-    { lessonID: "3.1", unit: 3, topic: "Marginal Costs", url: "https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Micro_Unit_3/3.1_wb%203.jpg" },
+    { lessonID: "3.1", unit: 3, topic: "Marginal Costs", url: "https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Micro_Unit_3/3.1_wb3.jpg" },
   { lessonID: "3.2", unit: 3, topic: "Diminishing Marginal Returns", url: "https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Micro_Unit_3/3.2_wb 1 2.jpg" },
   { lessonID: "3.2", unit: 3, topic: "Short Run Production Costs", url: "https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Micro_Unit_3/3.2_wb 1.jpg" },
   { lessonID: "3.2", unit: 3, topic: "Marginal and Average Costs", url: "https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Micro_Unit_3/3.2_wb 2.jpg" },
