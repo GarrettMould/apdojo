@@ -88,7 +88,7 @@ function Header() {
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-3">
               <Image
-                src="/images/dojoHeaderIcon.png"
+                src="/images/dojoIconBold.png"
                 alt="AP Dojo"
                 width={32}
                 height={32}

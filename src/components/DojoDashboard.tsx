@@ -14,7 +14,6 @@ import { frqExams } from '@/data/frqQuestions';
 import { getBeltProgress } from '@/lib/beltSystem';
 import { loadDojoDrillProgress, getDrillProgress, DojoDrillProgress } from '@/lib/dojoDrillProgress';
 import { getSubjectXP } from '@/hooks/useUserProgress';
-import DojoThumbnail from '@/components/DojoThumbnail';
 import { collection, query, where, orderBy, limit, getDocs, getDoc, doc, collectionGroup } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { QuizHistoryEntry, restoreTableData } from '@/lib/quizHistory';
@@ -475,7 +474,7 @@ export function DojoDashboard() {
           transition={{ duration: 0.3 }}
           className="mb-8"
         >
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <div className="bg-white rounded-md shadow-sm border border-gray-200 overflow-hidden">
             {/* Main Header - Always Visible */}
             <div 
               className="p-4 cursor-pointer hover:bg-gray-50 transition-colors"
@@ -543,7 +542,7 @@ export function DojoDashboard() {
                     </div>
                   )}
                   {/* Expand/Collapse Button */}
-                  <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                  <button className="p-2 hover:bg-gray-100 rounded-md transition-colors">
                     {isProgressExpanded ? (
                       <ChevronUp className="w-5 h-5 text-gray-600" />
                     ) : (
@@ -570,7 +569,7 @@ export function DojoDashboard() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         {/* Strongest Unit */}
                         {strongestUnit && (
-                          <div className="bg-green-100 border-4 border-black rounded-xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-5">
+                          <div className="bg-green-100 border-4 border-black rounded-lg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-5">
                             <div className="flex items-center gap-2 mb-3">
                               <CheckCircle2 className="w-6 h-6 text-green-700" />
                               <h3 className="text-sm font-black text-gray-900 uppercase tracking-wider">Strongest Unit</h3>
@@ -581,7 +580,7 @@ export function DojoDashboard() {
                         )}
                         {/* Weakest Unit */}
                         {weakestUnit && (
-                          <div className="bg-red-100 border-4 border-black rounded-xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-5">
+                          <div className="bg-red-100 border-4 border-black rounded-lg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-5">
                             <div className="flex items-center gap-2 mb-3">
                               <Target className="w-6 h-6 text-red-700" />
                               <h3 className="text-sm font-black text-gray-900 uppercase tracking-wider">Weakest Unit</h3>
@@ -599,7 +598,7 @@ export function DojoDashboard() {
                         <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-3">Unit Performance</h3>
                         <div className="space-y-3">
                           {currentSubjectStats.map((stat) => (
-                            <div key={stat.unitId} className="bg-white border-4 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4">
+                            <div key={stat.unitId} className="bg-white border-4 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4">
                               <div className="flex items-center justify-between mb-2">
                                 <div className="flex items-center gap-3">
                                   <span className="text-sm font-black text-gray-900">Unit {stat.unitId}</span>
@@ -670,10 +669,10 @@ export function DojoDashboard() {
                   variants={cardHoverVariants}
                   initial="rest"
                   whileHover="hover"
-                  className={`bg-white rounded-xl p-6 cursor-pointer border border-gray-200 ${theme.hoverBorder} transition-all`}
+                  className={`bg-white rounded-lg p-6 cursor-pointer border border-gray-200 ${theme.hoverBorder} transition-all`}
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <div className="w-12 h-12 bg-blue-100 rounded-md flex items-center justify-center">
                       <Play className="w-6 h-6 text-blue-600" />
                     </div>
                     <div>
@@ -689,10 +688,10 @@ export function DojoDashboard() {
                   variants={cardHoverVariants}
                   initial="rest"
                   whileHover="hover"
-                  className={`bg-white rounded-xl p-6 cursor-pointer border border-gray-200 ${theme.hoverBorder} transition-all`}
+                  className={`bg-white rounded-lg p-6 cursor-pointer border border-gray-200 ${theme.hoverBorder} transition-all`}
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                    <div className="w-12 h-12 bg-green-100 rounded-md flex items-center justify-center">
                       <Target className="w-6 h-6 text-green-600" />
                     </div>
                     <div>
@@ -708,10 +707,10 @@ export function DojoDashboard() {
                   variants={cardHoverVariants}
                   initial="rest"
                   whileHover="hover"
-                  className={`bg-white rounded-xl p-6 cursor-pointer border border-gray-200 ${theme.hoverBorder} transition-all`}
+                  className={`bg-white rounded-lg p-6 cursor-pointer border border-gray-200 ${theme.hoverBorder} transition-all`}
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                    <div className="w-12 h-12 bg-yellow-100 rounded-md flex items-center justify-center">
                       <FileText className="w-6 h-6 text-yellow-600" />
                       </div>
                     <div>
@@ -786,7 +785,7 @@ export function DojoDashboard() {
                           variants={cardHoverVariants}
                           initial="rest"
                           whileHover="hover"
-                          className="bg-white border border-gray-300 rounded-3xl p-6 text-left transition-all flex flex-col h-full relative"
+                          className="bg-white border border-gray-300 rounded-lg p-6 text-left transition-all flex flex-col h-full relative overflow-hidden"
                           style={{ 
                             backgroundColor: '#ffffff',
                             opacity: 1,
@@ -794,57 +793,62 @@ export function DojoDashboard() {
                             zIndex: 1
                           }}
                         >
-                          {/* Thumbnail */}
-                          <div className="mb-4 -mx-6 -mt-6 flex-shrink-0 relative">
-                            <DojoThumbnail
-                              type={thumbnailType}
-                              title={activity.title}
-                              icon={Icon}
-                              unitNumber={unitNumber}
-                              xpReward={activity.xpReward}
-                              activityType={activity.type === 'dojo-drill' ? 'Drill' : activity.type === 'full-exam' ? 'Exam' : activity.type === 'unit-exam' ? 'Test' : activity.type === 'frq-exam' ? 'FRQ' : 'Quiz'}
-                              className="rounded-t-3xl"
-                            />
-                            {/* Score/Progress Overlay */}
-                            {activity.score !== undefined && (
-                              <div className="absolute bottom-4 left-4 bg-black/80 text-white px-3 py-1.5 rounded-lg font-bold text-lg shadow-lg z-30">
-                                {activity.score}%
+                          {/* Header: Icon, XP, Activity Type */}
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-md bg-gray-100 flex items-center justify-center flex-shrink-0">
+                                <Icon className="w-5 h-5 text-gray-700" />
                               </div>
-                            )}
-                            {activity.stagesCompleted && (
-                              <div className="absolute bottom-4 left-4 bg-black/80 text-white px-3 py-1.5 rounded-lg font-bold text-sm shadow-lg z-30">
-                                {activity.stagesCompleted}/3 stages
+                              <div className="flex flex-col gap-1">
+                                {unitNumber && (
+                                  <span className="text-xs font-medium text-gray-500">Unit {unitNumber}</span>
+                                )}
+                                <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                                  {activity.type === 'dojo-drill' ? 'Drill' : activity.type === 'full-exam' ? 'Exam' : activity.type === 'unit-exam' ? 'Test' : activity.type === 'frq-exam' ? 'FRQ' : 'Quiz'}
+                                </span>
                               </div>
-                            )}
-                            {activity.answeredCount && !activity.isSubmitted && (
-                              <div className="absolute bottom-4 right-4 bg-blue-600/80 text-white px-3 py-1.5 rounded-lg font-bold text-sm shadow-lg z-30">
-                                {activity.answeredCount}/{activity.totalQuestions}
+                            </div>
+                            {activity.xpReward !== undefined && (
+                              <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
+                                <span>{activity.xpReward.toLocaleString()}</span>
+                                <Image
+                                  src="/images/flame100.png"
+                                  alt="XP"
+                                  width={16}
+                                  height={16}
+                                  className="w-4 h-4"
+                                />
                               </div>
                             )}
                           </div>
+                          
                           {/* Title */}
-                          <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
+                          <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
                             {activity.title}
                           </h3>
+                          
                           {/* Meta */}
-                          <div className="mt-auto space-y-1">
+                          <div className="mt-auto space-y-2">
                             {activity.score !== undefined && (
-                              <p className="text-sm text-gray-600">
-                                {activity.correctCount || activity.score}% correct
-                              </p>
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-semibold text-gray-900">{activity.score}%</span>
+                                <span className="text-sm text-gray-500">correct</span>
+                              </div>
                             )}
                             {activity.answeredCount && !activity.isSubmitted && (
-                              <p className="text-sm text-gray-600">
-                                {activity.answeredCount} of {activity.totalQuestions} answered
-                              </p>
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-semibold text-gray-900">{activity.answeredCount}/{activity.totalQuestions}</span>
+                                <span className="text-sm text-gray-500">answered</span>
+                              </div>
                             )}
                             {activity.stagesCompleted && (
-                              <p className="text-sm text-gray-600">
-                                {activity.stagesCompleted} of 3 stages completed
-                              </p>
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-semibold text-gray-900">{activity.stagesCompleted}/3</span>
+                                <span className="text-sm text-gray-500">stages completed</span>
+                              </div>
                             )}
                             {activity.timestamp && (
-                              <p className="text-xs text-gray-500">
+                              <p className="text-xs text-gray-400 mt-2">
                                 {activity.timestamp.toDate ? new Date(activity.timestamp.toDate()).toLocaleDateString() : 
                                  activity.timestamp ? new Date(activity.timestamp).toLocaleDateString() : 'Recently'}
                               </p>
@@ -890,33 +894,53 @@ export function DojoDashboard() {
                           variants={cardHoverVariants}
                           initial="rest"
                           whileHover="hover"
-                          className="bg-white border border-gray-300 rounded-3xl p-6 text-left transition-all flex flex-col h-full"
+                          className="bg-white border border-gray-300 rounded-lg p-6 text-left transition-all flex flex-col h-full overflow-hidden"
                         >
-                          {/* Thumbnail */}
-                          <div className="mb-4 -mx-6 -mt-6 flex-shrink-0">
-                            <DojoThumbnail
-                              type="drill"
-                              title={drill.title}
-                              icon={Zap}
-                              unitNumber={(getDrillUnitForSubject(drill, subjectFilter) || drill.unit).toString().padStart(2, '0')}
-                              xpReward={drill.xpReward.total}
-                              activityType="Drill"
-                              className="rounded-t-3xl"
-                            />
+                          {/* Header: Icon, XP, Activity Type */}
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-md bg-gray-100 flex items-center justify-center flex-shrink-0">
+                                <Image
+                                  src="/images/lightning.svg"
+                                  alt="Drill"
+                                  width={20}
+                                  height={20}
+                                  className="w-5 h-5"
+                                />
+                              </div>
+                              <div className="flex flex-col gap-1">
+                                <span className="text-xs font-medium text-gray-500">Unit {(getDrillUnitForSubject(drill, subjectFilter) || drill.unit).toString().padStart(2, '0')}</span>
+                                <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Drill</span>
+                              </div>
+                            </div>
+                            {drill.xpReward.total !== undefined && (
+                              <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
+                                <span>{drill.xpReward.total.toLocaleString()}</span>
+                                <Image
+                                  src="/images/flame100.png"
+                                  alt="XP"
+                                  width={16}
+                                  height={16}
+                                  className="w-4 h-4"
+                                />
+                              </div>
+                            )}
                           </div>
+                          
                           {/* Title */}
-                          <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
+                          <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
                             {drill.title}
                           </h3>
+                          
                           {/* Meta */}
                           <div className="flex items-center justify-between mt-auto">
-                            <p className="text-sm text-gray-500">Unit {getDrillUnitForSubject(drill, subjectFilter) || drill.unit}</p>
                             {inProgress && (
                               <span className="text-xs text-blue-600 font-medium">Continue</span>
                             )}
                             {isCompleted && (
                               <span className="text-xs text-green-600 font-medium">Completed</span>
                             )}
+                            {!inProgress && !isCompleted && <span></span>}
                           </div>
                         </motion.div>
                       </Link>
@@ -954,26 +978,44 @@ export function DojoDashboard() {
                         variants={cardHoverVariants}
                         initial="rest"
                         whileHover="hover"
-                        className="bg-white border border-gray-300 rounded-3xl p-6 text-left transition-all flex flex-col h-full"
+                        className="bg-white border border-gray-300 rounded-lg p-6 text-left transition-all flex flex-col h-full overflow-hidden"
                       >
-                        {/* Thumbnail */}
-                        <div className="mb-4 -mx-6 -mt-6 flex-shrink-0">
-                          <DojoThumbnail
-                            type="exam"
-                            title={frq.title}
-                            icon={FileText}
-                            unitNumber={frq.unit ? frq.unit.toString().padStart(2, '0') : undefined}
-                            xpReward={frq.totalPoints ? frq.totalPoints * 100 : undefined}
-                            activityType="FRQ"
-                            className="rounded-t-3xl"
-                          />
+                        {/* Header: Icon, XP, Activity Type */}
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-md bg-gray-100 flex items-center justify-center flex-shrink-0">
+                              <FileText className="w-5 h-5 text-gray-700" />
+                            </div>
+                            <div className="flex flex-col gap-1">
+                              {frq.unit && (
+                                <span className="text-xs font-medium text-gray-500">Unit {frq.unit.toString().padStart(2, '0')}</span>
+                              )}
+                              <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">FRQ</span>
+                            </div>
+                          </div>
+                          {frq.totalPoints && (
+                            <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
+                              <span>{(frq.totalPoints * 100).toLocaleString()}</span>
+                              <Image
+                                src="/images/flame100.png"
+                                alt="XP"
+                                width={16}
+                                height={16}
+                                className="w-4 h-4"
+                              />
+                            </div>
+                          )}
                         </div>
+                        
                         {/* Title */}
-                        <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
+                        <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
                           {frq.title}
                         </h3>
+                        
                         {/* Meta */}
-                        <p className="text-sm text-gray-500 mt-auto">Unit {frq.unit || 'N/A'}</p>
+                        {frq.unit && (
+                          <p className="text-sm text-gray-500 mt-auto">Unit {frq.unit}</p>
+                        )}
                       </motion.div>
                     </Link>
                   </motion.div>
@@ -1009,23 +1051,41 @@ export function DojoDashboard() {
                         variants={cardHoverVariants}
                         initial="rest"
                         whileHover="hover"
-                        className="bg-white border border-gray-300 rounded-3xl p-6 text-left transition-all flex flex-col h-full"
+                        className="bg-white border border-gray-300 rounded-lg p-6 text-left transition-all flex flex-col h-full overflow-hidden"
                       >
-                        {/* Thumbnail */}
-                        <div className="mb-4 -mx-6 -mt-6 flex-shrink-0">
-                          <DojoThumbnail
-                            type="exam"
-                            title={exam.title}
-                            icon={ClipboardList}
-                            xpReward={6000}
-                            activityType="Exam"
-                            className="rounded-t-3xl"
-                          />
+                        {/* Header: Icon, XP, Activity Type */}
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-md bg-gray-100 flex items-center justify-center flex-shrink-0">
+                              <Image
+                                src="/images/exam.svg"
+                                alt="Exam"
+                                width={20}
+                                height={20}
+                                className="w-5 h-5"
+                              />
+                            </div>
+                            <div className="flex flex-col gap-1">
+                              <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Exam</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
+                            <span>6,000</span>
+                            <Image
+                              src="/images/flame100.png"
+                              alt="XP"
+                              width={16}
+                              height={16}
+                              className="w-4 h-4"
+                            />
+                          </div>
                         </div>
+                        
                         {/* Title */}
-                        <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
+                        <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
                           {exam.title}
                         </h3>
+                        
                         {/* Meta */}
                         <p className="text-sm text-gray-500 mt-auto">{exam.description}</p>
                       </motion.div>
@@ -1063,24 +1123,38 @@ export function DojoDashboard() {
                         variants={cardHoverVariants}
                         initial="rest"
                         whileHover="hover"
-                        className="bg-white border border-gray-300 rounded-3xl p-6 text-left transition-all relative overflow-hidden flex flex-col h-full"
+                        className="bg-white border border-gray-300 rounded-lg p-6 text-left transition-all relative overflow-hidden flex flex-col h-full"
                       >
-                        {/* Thumbnail */}
-                        <div className="mb-4 -mx-6 -mt-6 relative flex-shrink-0">
-                          <DojoThumbnail
-                            type="exam"
-                            title={exam.title}
-                            icon={BookOpen}
-                            unitNumber={exam.unitNumber ? exam.unitNumber.toString().padStart(2, '0') : undefined}
-                            xpReward={1000}
-                            activityType="Test"
-                            className="rounded-t-3xl"
-                          />
+                        {/* Header: Icon, XP, Activity Type */}
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-md bg-gray-100 flex items-center justify-center flex-shrink-0">
+                              <BookOpen className="w-5 h-5 text-gray-700" />
+                            </div>
+                            <div className="flex flex-col gap-1">
+                              {exam.unitNumber && (
+                                <span className="text-xs font-medium text-gray-500">Unit {exam.unitNumber.toString().padStart(2, '0')}</span>
+                              )}
+                              <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Test</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
+                            <span>1,000</span>
+                            <Image
+                              src="/images/flame100.png"
+                              alt="XP"
+                              width={16}
+                              height={16}
+                              className="w-4 h-4"
+                            />
+                          </div>
                         </div>
+                        
                         {/* Title */}
-                        <h3 className="text-xl font-bold line-clamp-2 mb-2 text-gray-900">
+                        <h3 className="text-xl font-bold line-clamp-2 mb-3 text-gray-900">
                           {exam.title}
                         </h3>
+                        
                         {/* Meta */}
                         <p className="text-sm line-clamp-2 mt-auto text-gray-500">{exam.description}</p>
                       </motion.div>
@@ -1138,7 +1212,7 @@ export function DojoDashboard() {
                           variants={cardHoverVariants}
                           initial="rest"
                           whileHover="hover"
-                          className="bg-white border border-gray-300 rounded-3xl p-6 text-left transition-all flex flex-col h-full relative"
+                          className="bg-white border border-gray-300 rounded-lg p-6 text-left transition-all flex flex-col h-full relative overflow-hidden"
                           style={{ 
                             backgroundColor: '#ffffff',
                             opacity: 1,
@@ -1146,33 +1220,48 @@ export function DojoDashboard() {
                             zIndex: 1
                           }}
                         >
-                          {/* Thumbnail */}
-                          <div className="mb-4 -mx-6 -mt-6 flex-shrink-0 relative">
-                            <DojoThumbnail
-                              type={thumbnailType}
-                              title={entry.title}
-                              icon={Icon}
-                              unitNumber={unitNumber}
-                              xpReward={entry.xpEarned}
-                              activityType={entry.type === 'cheat-sheet' ? 'Quiz' : entry.type === 'infinite-drill' ? 'Drill' : 'Quiz'}
-                              className="rounded-t-3xl"
-                            />
-                            {/* Score Overlay */}
-                            <div className="absolute bottom-4 left-4 bg-black/80 text-white px-3 py-1.5 rounded-lg font-bold text-lg shadow-lg z-30">
-                              {entry.score}%
+                          {/* Header: Icon, XP, Activity Type */}
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-md bg-gray-100 flex items-center justify-center flex-shrink-0">
+                                <Icon className="w-5 h-5 text-gray-700" />
+                              </div>
+                              <div className="flex flex-col gap-1">
+                                {unitNumber && (
+                                  <span className="text-xs font-medium text-gray-500">Unit {unitNumber}</span>
+                                )}
+                                <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                                  {entry.type === 'cheat-sheet' ? 'Quiz' : entry.type === 'infinite-drill' ? 'Drill' : 'Quiz'}
+                                </span>
+                              </div>
                             </div>
+                            {entry.xpEarned !== undefined && (
+                              <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
+                                <span>{entry.xpEarned.toLocaleString()}</span>
+                                <Image
+                                  src="/images/flame100.png"
+                                  alt="XP"
+                                  width={16}
+                                  height={16}
+                                  className="w-4 h-4"
+                                />
+                              </div>
+                            )}
                           </div>
+                          
                           {/* Title */}
-                          <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
+                          <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
                             {entry.title}
                           </h3>
+                          
                           {/* Meta */}
-                          <div className="mt-auto space-y-1">
-                            <p className="text-sm text-gray-600">
-                              {entry.correctCount} / {entry.totalQuestions} correct
-                            </p>
+                          <div className="mt-auto space-y-2">
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-semibold text-gray-900">{entry.score}%</span>
+                              <span className="text-sm text-gray-500">({entry.correctCount} / {entry.totalQuestions} correct)</span>
+                            </div>
                             {entry.timestamp && (
-                              <p className="text-xs text-gray-500">
+                              <p className="text-xs text-gray-400">
                                 {entry.timestamp.toDate ? new Date(entry.timestamp.toDate()).toLocaleDateString() : 'Recently'}
                               </p>
                             )}
