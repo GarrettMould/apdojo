@@ -1,14 +1,23 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 
 export function SubjectToggle() {
   const { selectedSubject, setSelectedSubject } = useAuthContext();
+  const [mounted, setMounted] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  // Ensure component is mounted before using selectedSubject to prevent hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Use 'macro' as default until mounted to match server render
+  const displaySubject = mounted ? selectedSubject : 'macro';
 
   const handleSubjectChange = (newSubject: 'macro' | 'micro') => {
     // If we're on the unit MCQ practice page, preserve the unit and reload with new subject
@@ -37,7 +46,7 @@ export function SubjectToggle() {
       <button
         onClick={() => handleSubjectChange('macro')}
         className={`flex-1 px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 border-2 ${
-          selectedSubject === 'macro'
+          displaySubject === 'macro'
             ? 'bg-blue-500 text-white shadow-sm border-black'
             : 'bg-stone-50 text-gray-700 hover:text-gray-900 border-black'
         }`}
@@ -47,7 +56,7 @@ export function SubjectToggle() {
       <button
         onClick={() => handleSubjectChange('micro')}
         className={`flex-1 px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 border-2 ${
-          selectedSubject === 'micro'
+          displaySubject === 'micro'
             ? 'bg-blue-500 text-white shadow-sm border-black'
             : 'bg-stone-50 text-gray-700 hover:text-gray-900 border-black'
         }`}

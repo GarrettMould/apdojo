@@ -4,7 +4,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
 import { Menu, X, ChevronDown } from 'lucide-react';
-import dojoIcon from "../../public/images/dojoIcon.png";
 import { useAuthContext } from '@/contexts/AuthContext';
 import { Button } from './ui/button';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
@@ -17,17 +16,24 @@ function Header() {
   const { user, logout, selectedSubject, setSelectedSubject, totalXP, guestXp, isCharacterClosetOpen, setIsCharacterClosetOpen, userData } = useAuthContext();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isBeltDropdownOpen, setIsBeltDropdownOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const beltDropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  // Ensure component is mounted before using selectedSubject to prevent hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // If on unit MCQ practice page, use subject from URL, otherwise use context
+  // Use 'macro' as default until mounted to match server render
   const displaySubject = pathname === '/unitMCQPracticePage' 
     ? (searchParams.get('subject') === 'macro' || searchParams.get('subject') === 'micro' 
         ? searchParams.get('subject') as 'macro' | 'micro'
-        : selectedSubject)
-    : selectedSubject;
+        : (mounted ? selectedSubject : 'macro'))
+    : (mounted ? selectedSubject : 'macro');
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -82,7 +88,7 @@ function Header() {
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-3">
               <Image
-                src="/images/dojoIconJan2026.png"
+                src="/images/dojoHeaderIcon.png"
                 alt="AP Dojo"
                 width={32}
                 height={32}
@@ -110,7 +116,7 @@ function Header() {
                 MCQ Practice
               </Link>
               <Link
-                href={`/unitFRQpracticePage?subject=${selectedSubject}&frqId=${selectedSubject === 'macro' ? 1 : 2}`}
+                href={`/unitFRQpracticePage?subject=${displaySubject}&frqId=${displaySubject === 'macro' ? 1 : 2}`}
                 className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
               >
                 FRQ Practice
@@ -358,7 +364,7 @@ function Header() {
                 MCQ Practice
               </Link>
               <Link
-                href={`/unitFRQpracticePage?subject=${selectedSubject}&frqId=${selectedSubject === 'macro' ? 1 : 2}`}
+                href={`/unitFRQpracticePage?subject=${displaySubject}&frqId=${displaySubject === 'macro' ? 1 : 2}`}
                 onClick={closeMobileMenu}
                 className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
               >
