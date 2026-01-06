@@ -11,7 +11,7 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import Link from 'next/link';
 import { keyTerms as apMacroTerms } from '@/data/apMacroTerms';
 import { keyTerms as apMicroTerms } from '@/data/apMicroTerms';
-import { unit1Whiteboards, apMacroUnit2Whiteboards, apMacroUnit3Whiteboards, apMacroUnit4Whiteboards, apMacroUnit5Whiteboards, Whiteboard } from '@/data/whiteboards';
+import { unit1Whiteboards, apMacroUnit2Whiteboards, apMacroUnit3Whiteboards, apMacroUnit4Whiteboards, apMacroUnit5Whiteboards, apMicroUnit3Whiteboards, apMicroUnit4Whiteboards, apMicroUnit5Whiteboards, apMicroUnit6Whiteboards, Whiteboard } from '@/data/whiteboards';
 import { getCheckpointForLesson, microCheckpoints, macroCheckpoints } from '@/data/checkpoints';
 import { microLessons, macroLessons } from '@/data/lessons';
 import { videos, Video } from '@/data/videos';
@@ -26,7 +26,7 @@ import { dojoDrills, drillAppliesToSubject, getDrillUnitForSubject } from '@/dat
 import { saveQuizResult } from '@/lib/quizHistory';
 import { hasValidSeasonPass } from '@/lib/utils';
 
-// Helper to combine and structure whiteboard data
+// Helper to combine and structure whiteboard data for Macro
 const getUnitWhiteboards = (unitNumber: number): WhiteboardImage[] => {
   let rawWhiteboards: Whiteboard[] = [];
   
@@ -53,6 +53,41 @@ const getUnitWhiteboards = (unitNumber: number): WhiteboardImage[] => {
   return rawWhiteboards.map((wb, index) => ({
     id: `wb-unit${unitNumber}-${index}`,
     subject: 'ap_macroeconomics',
+    unit: unitNumber,
+    lessonIDs: [wb.lessonID], // Ensure lessonIDs is an array
+    imageUrl: wb.url,
+    title: wb.topic,
+    topic: wb.topic // Preserve topic as separate field
+  }));
+};
+
+// Helper to combine and structure whiteboard data for Micro
+const getMicroUnitWhiteboards = (unitNumber: number): WhiteboardImage[] => {
+  let rawWhiteboards: Whiteboard[] = [];
+  
+  switch (unitNumber) {
+    case 2:
+      // Unit 2 might be in allContentWhiteboards or could have its own array
+      return allContentWhiteboards.filter(wb => wb.subject === 'ap_microeconomics' && wb.unit === unitNumber);
+    case 3:
+      rawWhiteboards = apMicroUnit3Whiteboards;
+      break;
+    case 4:
+      rawWhiteboards = apMicroUnit4Whiteboards;
+      break;
+    case 5:
+      rawWhiteboards = apMicroUnit5Whiteboards;
+      break;
+    case 6:
+      rawWhiteboards = apMicroUnit6Whiteboards;
+      break;
+    default:
+      return allContentWhiteboards.filter(wb => wb.subject === 'ap_microeconomics' && wb.unit === unitNumber);
+  }
+  
+  return rawWhiteboards.map((wb, index) => ({
+    id: `wb-micro-unit${unitNumber}-${index}`,
+    subject: 'ap_microeconomics',
     unit: unitNumber,
     lessonIDs: [wb.lessonID], // Ensure lessonIDs is an array
     imageUrl: wb.url,
@@ -587,7 +622,7 @@ export default function UnitPage() {
   
   const unitWhiteboards: WhiteboardImage[] = useMemo(() => selectedSubject === 'macro'
     ? getUnitWhiteboards(activeUnitNum)
-    : allContentWhiteboards.filter(img => img.subject === subjectFilter && img.unit === activeUnitNum), [selectedSubject, activeUnitNum, subjectFilter]);
+    : getMicroUnitWhiteboards(activeUnitNum), [selectedSubject, activeUnitNum]);
 
   // --- Modal Logic ---
   const openModal = (whiteboard: WhiteboardImage) => {

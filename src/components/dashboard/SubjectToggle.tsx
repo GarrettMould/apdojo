@@ -33,23 +33,23 @@ export function SubjectToggle() {
   };
 
   return (
-    <div className="inline-flex items-center bg-gray-100 rounded p-1 border border-gray-200">
+    <div className="inline-flex items-center bg-stone-50 rounded-xl p-1 border-2 border-black">
       <button
         onClick={() => handleSubjectChange('macro')}
-        className={`flex-1 px-4 py-2.5 text-sm font-medium rounded transition-all duration-200 ${
+        className={`flex-1 px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 border-2 ${
           selectedSubject === 'macro'
-            ? 'bg-blue-600 text-white shadow-sm'
-            : 'text-gray-600 hover:text-gray-900'
+            ? 'bg-blue-500 text-white shadow-sm border-black'
+            : 'bg-stone-50 text-gray-700 hover:text-gray-900 border-black'
         }`}
       >
         Macro
       </button>
       <button
         onClick={() => handleSubjectChange('micro')}
-        className={`flex-1 px-4 py-2.5 text-sm font-medium rounded transition-all duration-200 ${
+        className={`flex-1 px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 border-2 ${
           selectedSubject === 'micro'
-            ? 'bg-green-600 text-white shadow-sm'
-            : 'text-gray-600 hover:text-gray-900'
+            ? 'bg-blue-500 text-white shadow-sm border-black'
+            : 'bg-stone-50 text-gray-700 hover:text-gray-900 border-black'
         }`}
       >
         Micro

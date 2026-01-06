@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useCourseContext, useCourseTheme } from '@/contexts/CourseContext';
 import { SubjectToggle } from '@/components/dashboard/SubjectToggle';
+import { CourseToggle } from '@/components/CourseToggle';
 import { dojoDrills, drillAppliesToSubject, getDrillUnitForSubject } from '@/data/dojoDrills';
 import { frqExams } from '@/data/frqQuestions';
 import { getBeltProgress } from '@/lib/beltSystem';
@@ -60,7 +61,7 @@ const cardHoverVariants = {
 };
 
 export function DojoDashboard() {
-  const { user, totalXP, guestXp, unitPerformanceStats, userData } = useAuthContext();
+  const { user, totalXP, guestXp, unitPerformanceStats, userData, selectedSubject, setSelectedSubject } = useAuthContext();
   const { currentCourse } = useCourseContext();
   const theme = useCourseTheme();
   const [drillProgress, setDrillProgress] = useState<DojoDrillProgress | null>(null);
@@ -465,7 +466,7 @@ export function DojoDashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Subject Toggle - Mobile Only (visible on small screens) */}
         <div className="mb-4 md:hidden">
-          <SubjectToggle />
+          <CourseToggle activeTab={selectedSubject} onToggle={setSelectedSubject} />
         </div>
         {/* Compact Progress Header - Expandable */}
         <motion.div
@@ -525,7 +526,7 @@ export function DojoDashboard() {
                 <div className="flex items-center gap-4">
                   {/* Subject Toggle */}
                   <div className="hidden md:block">
-                    <SubjectToggle />
+                    <CourseToggle activeTab={selectedSubject} onToggle={setSelectedSubject} />
                   </div>
                   {/* XP Progress Bar */}
                   {nextBelt && (

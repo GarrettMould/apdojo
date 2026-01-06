@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -257,7 +257,7 @@ function HomePageLoadingFallback() {
   );
 }
 
-export default function Home() {
+function Home() {
   const { user, loading } = useAuthContext();
 
   if (loading) {
@@ -275,3 +275,5 @@ export default function Home() {
   
   return <SeasonPassHome />;
 }
+
+export default Home;

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Question as QuestionType } from '@/data/questionBanks/types';
 import { Unit } from '@/data/cheatSheets';
-import { Check, X, Brain, FileText, ChevronDown, Triangle, Loader2, RefreshCw, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Clipboard, Lock, Play, Minus, Book, Lightbulb, Calculator, Pen } from 'lucide-react';
+import { Check, X, Brain, FileText, ChevronDown, Triangle, Loader2, RefreshCw, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Clipboard, Lock, Play, Minus, Book, Lightbulb, Calculator, Pen, Strikethrough, CheckCircle2, XCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
@@ -11,6 +11,7 @@ import { getBeltProgress } from '@/lib/beltSystem';
 import { getSubjectXP } from '@/hooks/useUserProgress';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import html2canvas from 'html2canvas';
@@ -341,6 +342,7 @@ const QuestionCard = ({
   const [selectedAnswerIndex, setSelectedAnswerIndex] = useState<number | null>(initialSelectedIndex);
   const [isSubmitted, setIsSubmitted] = useState(isAnswered);
   const [struckThroughOptions, setStruckThroughOptions] = useState<Set<number>>(new Set());
+  const [showExplanation, setShowExplanation] = useState(false);
 
   // --- State for Overlay --- 
   const [overlayMode, setOverlayMode] = useState<'signup' | 'login'>('signup');
@@ -425,14 +427,15 @@ const QuestionCard = ({
       return;
     }
     
-    // If option is struck through, just remove strikethrough and don't submit
+    // If option is struck through, just remove strikethrough and don't select
+    // This matches the exact logic from FullExam.tsx
     if (struckThroughOptions.has(index)) {
       setStruckThroughOptions(prev => {
         const newSet = new Set(prev);
         newSet.delete(index);
         return newSet;
       });
-      return;
+      return; // Exit early - do NOT select
     }
     
     console.log(`[QuestionCard] Answer selected for question ${question.id}, index ${index}, isLoggedIn: ${isLoggedIn}, currentIndex: ${currentIndex}`);
@@ -713,7 +716,7 @@ const QuestionCard = ({
 
   return (
     <>
-      <div ref={cardRef} className="bg-white rounded-lg shadow-md border border-gray-200 p-6 md:p-8 relative">
+      <Card ref={cardRef} className="border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] relative">
         {/* Overlay: Simplified or removed if parent modal is sufficient */} 
         {showInternalOverlay && (
           <div className="absolute inset-0 bg-white bg-opacity-80 backdrop-blur-sm z-10 flex items-center justify-center p-4 rounded-lg">
@@ -725,8 +728,13 @@ const QuestionCard = ({
           </div>
         )}
 
-        {/* Main Question Content */}
-        <div className="space-y-6"> 
+        <CardHeader>
+          <CardTitle className="text-xl">
+            Question {currentIndex + 1} of {totalQuestions}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4"> 
           {/* Parse and render markdown table if present */}
           {(() => {
             const { tableData: parsedTableData, textWithoutTable } = parseMarkdownTable(question.question);
@@ -735,17 +743,17 @@ const QuestionCard = ({
             
             return (
               <>
-                {/* Question Text with markdown support */}
-                <div className="text-base md:text-lg font-medium font-serif leading-relaxed text-gray-800 prose prose-sm max-w-none">
-                  <ReactMarkdown
-                    components={{
-                      p: ({ children }) => <p className="mb-2">{children}</p>,
-                      strong: ({ children }) => <strong className="font-bold">{children}</strong>,
-                    }}
-                  >
-                    {displayQuestionText}
-                  </ReactMarkdown>
-                </div>
+            {/* Question Text with markdown support */}
+            <p className="text-lg font-semibold text-gray-900">
+              <ReactMarkdown
+                components={{
+                  p: ({ children }) => <span>{children}</span>,
+                  strong: ({ children }) => <strong className="font-bold">{children}</strong>,
+                }}
+              >
+                {displayQuestionText}
+              </ReactMarkdown>
+            </p>
                 {/* Table Data from tableData property or parsed from markdown - shown below question text */}
                 {displayTableData && (
                   <div className="my-6 flex justify-center">
@@ -785,118 +793,177 @@ const QuestionCard = ({
             );
           })()}
 
-        {/* --- ADDED: Question Image Display --- */}
-        {question.image && (
-          <div className="my-4 rounded-lg overflow-hidden border border-gray-200">
-            <img
-              src={typeof question.image === 'string' ? question.image : (question.image as any).src} 
-              alt={question.unitName || 'Question related image'} 
-              className="max-h-60 w-auto mx-auto object-contain"
-            />
-          </div>
-        )}
-        {/* --- End Image Display --- */}
-
-        {isSubmitted && aiExplanation ? (
-          // --- Display Explanation Mode ---
-          <div className="mt-6 pt-6 border-t border-gray-200 space-y-6">
-            {/* Correct Answer Summary */}
-             <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-              <h4 className="font-semibold text-gray-900 mb-2 text-sm">Correct Answer</h4>
-              <div className="flex items-center gap-3">
-                <span className="w-6 h-6 flex items-center justify-center rounded-full bg-white border border-green-200 text-green-600 font-medium">
-                  {question.correctAnswer}
-                </span>
-                <span className="font-medium text-gray-900">
-                  {question.options[correctAnswerIndex ?? 0]}
-                </span>
+            {/* Question Image Display */}
+            {question.image && (
+              <div className="my-4 rounded-lg overflow-hidden border border-gray-200">
+                <img
+                  src={typeof question.image === 'string' ? question.image : (question.image as any).src} 
+                  alt={question.unitName || 'Question related image'} 
+                  className="max-h-60 w-auto mx-auto object-contain"
+                />
               </div>
-            </div>
-            {/* Explanation Box */}
-            <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-              <h4 className="font-semibold text-gray-900 mb-2 text-sm">Explanation</h4>
-              <p className="text-gray-900">{aiExplanation}</p>
-            </div>
-          </div>
-        ) : (
-          // --- Display Answer Options Mode ---
-          <>
-            {/* Answer Options */}
-            <div className="space-y-3">
+            )}
+
+            {/* Answer Options (Dojo Infinite Style) */}
+            <div className="space-y-2">
               {question.options.map((option, optIndex) => {
-                 const isHighlighted = !isSubmitted && highlightedIndex === optIndex;
-                 const isStruckThrough = struckThroughOptions.has(optIndex);
-                 const handleStrikethroughToggle = (e: React.MouseEvent) => {
-                   e.stopPropagation();
-                   setStruckThroughOptions(prev => {
-                     const newSet = new Set(prev);
-                     if (newSet.has(optIndex)) {
-                       newSet.delete(optIndex);
-                     } else {
-                       newSet.add(optIndex);
-                     }
-                     return newSet;
-                   });
-                 };
-                 return (
-                    <button
-                      key={optIndex}
-                      onClick={() => handleAnswerSelect(optIndex)}
-                      disabled={isSubmitted}
-                      className={`w-full text-left p-3 rounded-lg text-sm font-medium transition-all duration-150 border flex items-center gap-3
-                        ${isSubmitted ? 
-                          (optIndex === correctAnswerIndex ? 'bg-green-50 text-gray-900 shadow-sm border-green-200 cursor-default' : 
-                          optIndex === selectedAnswerIndex ? 'bg-red-50 text-gray-900 shadow-sm border-red-200 cursor-default' : 
-                          'bg-transparent text-gray-900 border-gray-200 cursor-default') 
-                        : isStruckThrough ?
-                          'bg-gray-100 border-gray-300 opacity-60 cursor-pointer' // Struck through style - locked but clickable to unlock
-                        : isHighlighted ? 
-                          'bg-gray-100 border-gray-400 shadow-sm' // Highlight style
-                        : 
-                          'bg-transparent hover:bg-gray-50 border-gray-200 hover:border-gray-300 hover:shadow-sm' // Default non-submitted style
-                        }`}
-                    >
-                       {/* Letter bubble */}
-                      <span className={`w-6 h-6 flex items-center justify-center rounded-full border text-xs font-medium flex-shrink-0 ${isSubmitted ? (optIndex === correctAnswerIndex ? 'bg-green-100 border-green-300 text-green-700' : optIndex === selectedAnswerIndex ? 'bg-red-100 border-red-300 text-red-700' : 'bg-white border-gray-300 text-gray-500') : isHighlighted ? 'bg-white border-gray-400 text-gray-700' : 'bg-white border-gray-300 text-gray-600'}`}> 
-                        {String.fromCharCode(65 + optIndex)}
-                      </span>
-                       {/* Option Text - Reduced Size */}
-                      <span className={`flex-1 text-sm ${isStruckThrough ? 'line-through text-gray-400' : ''} ${isSubmitted ? 'text-gray-800' : isHighlighted ? 'text-gray-900' : 'text-gray-900'}`}>{option}</span>
-                      {/* Strikethrough Button - Only show when not submitted */}
-                      {!isSubmitted && (
-                        <button
-                          onClick={handleStrikethroughToggle}
-                          className="flex-shrink-0 p-1.5 rounded hover:bg-gray-200 transition-colors flex items-center justify-center"
-                          title={isStruckThrough ? "Remove strikethrough" : "Strikethrough option"}
-                        >
-                          <span className="relative inline-block text-sm font-bold text-gray-400" style={{ lineHeight: '1' }}>
-                            <span className="relative inline-block">
-                              S
-                              <span className="absolute top-1/2 left-0 right-0 h-[2px] bg-gray-600 transform -translate-y-1/2" style={{ width: '100%' }}></span>
-                            </span>
+                const letter = String.fromCharCode(65 + optIndex);
+                const isSelected = selectedAnswerIndex === optIndex;
+                const isCorrectAnswer = optIndex === correctAnswerIndex;
+                const isStruckThrough = struckThroughOptions.has(optIndex);
+                
+                const handleStrikethroughToggle = (e: React.MouseEvent) => {
+                  e.stopPropagation();
+                  
+                  // If the option being struck through is the currently selected answer, deselect it.
+                  if (selectedAnswerIndex === optIndex && !isStruckThrough) {
+                    setSelectedAnswerIndex(null);
+                    setIsSubmitted(false);
+                  }
+                  
+                  setStruckThroughOptions(prev => {
+                    const newSet = new Set(prev);
+                    if (newSet.has(optIndex)) {
+                      newSet.delete(optIndex);
+                    } else {
+                      newSet.add(optIndex);
+                    }
+                    return newSet;
+                  });
+                };
+                
+                // Determine styling based on state (matching dojo infinite)
+                let optionStyle = 'bg-white border-gray-300';
+                if (isSubmitted) {
+                  if (isCorrectAnswer) {
+                    optionStyle = 'bg-green-50 border-green-500';
+                  } else if (isSelected && !isCorrectAnswer) {
+                    optionStyle = 'bg-red-50 border-red-500';
+                  }
+                } else if (isStruckThrough) {
+                  optionStyle = 'bg-gray-100 border-gray-300 opacity-60';
+                } else if (isSelected) {
+                  optionStyle = 'bg-blue-50 border-blue-500';
+                }
+
+                return (
+                  <motion.div
+                    key={optIndex}
+                    initial={false}
+                    animate={isSubmitted && isCorrectAnswer ? { scale: [1, 1.05, 1] } : {}}
+                    transition={{ duration: 0.3 }}
+                    className={`p-3 rounded-lg border-2 transition-colors ${optionStyle} ${
+                      !isSubmitted && !isStruckThrough ? 'cursor-pointer hover:bg-blue-50 hover:border-blue-300' : ''
+                    }`}
+                    onClick={!isSubmitted && !isStruckThrough ? () => handleAnswerSelect(optIndex) : isStruckThrough ? () => handleStrikethroughToggle({ stopPropagation: () => {} } as React.MouseEvent) : undefined}
+                  >
+                    <div className="flex items-center gap-3">
+                      {!isSubmitted ? (
+                        <>
+                          <input
+                            type="radio"
+                            name={`question-${question.id}`}
+                            value={letter}
+                            checked={isSelected}
+                            onChange={() => handleAnswerSelect(optIndex)}
+                            className="w-5 h-5 text-blue-600 flex-shrink-0"
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                          <span className={`flex-1 text-gray-900 ${isStruckThrough ? 'line-through text-gray-400' : ''}`}>{option}</span>
+                          {/* Strikethrough Button */}
+                          <div
+                            role="button"
+                            onClick={handleStrikethroughToggle}
+                            className={`flex-shrink-0 p-2 rounded-lg transition-colors cursor-pointer ${
+                              isStruckThrough ? 'bg-slate-200 text-slate-600' : 'bg-white hover:bg-slate-100 text-slate-400 hover:text-slate-600'
+                            }`}
+                            aria-label={isStruckThrough ? "Remove strikethrough" : "Strikethrough option"}
+                          >
+                            <Strikethrough className="w-5 h-5" />
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <span
+                            className={`w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0 ${
+                              isCorrectAnswer
+                                ? 'bg-green-500 text-white'
+                                : isSelected
+                                  ? 'bg-red-500 text-white'
+                                  : 'bg-gray-200 text-gray-700'
+                            }`}
+                          >
+                            {letter}
                           </span>
-                        </button>
+                          <span className="flex-1 text-gray-900">{option}</span>
+                          {isCorrectAnswer && (
+                            <CheckCircle2 className="w-6 h-6 text-green-600 flex-shrink-0" />
+                          )}
+                          {isSelected && !isCorrectAnswer && (
+                            <XCircle className="w-6 h-6 text-red-600 flex-shrink-0" />
+                          )}
+                        </>
                       )}
-                      {/* Feedback Icon */}
-                      {isSubmitted && (
-                        <div className="flex-shrink-0">
-                          {optIndex === correctAnswerIndex
-                            ? <Check className="w-5 h-5 text-green-500" />
-                            : optIndex === selectedAnswerIndex
-                              ? <X className="w-5 h-5 text-red-500" />
-                              : null
-                          }
-                        </div>
-                      )}
-                    </button>
-                 );
-                })}
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
-            
-            
-          </>
-        )}
-      </div>
+
+            {/* Explanation Section - Show based on answer correctness (matching dojo infinite) */}
+            {isSubmitted && (() => {
+              const isCorrect = selectedAnswerIndex === correctAnswerIndex;
+              
+              // If incorrect, show explanation automatically
+              if (!isCorrect && aiExplanation) {
+                return (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    transition={{ duration: 0.3 }}
+                    className="mt-6 pt-6 border-t border-gray-200"
+                  >
+                    <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                      <h4 className="font-semibold text-gray-900 mb-2 text-sm">Explanation</h4>
+                      <p className="text-gray-900">{aiExplanation}</p>
+                    </div>
+                  </motion.div>
+                );
+              }
+              
+              // If correct, show explanation as a link
+              if (isCorrect && aiExplanation) {
+                return (
+                  <div className="mt-6 pt-6 border-t border-gray-200">
+                    <button
+                      onClick={() => setShowExplanation(!showExplanation)}
+                      className="text-blue-600 hover:text-blue-800 font-semibold text-sm flex items-center gap-2 underline"
+                    >
+                      <Lightbulb className="w-4 h-4" />
+                      View Explanation
+                    </button>
+                    {showExplanation && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        transition={{ duration: 0.3 }}
+                        className="mt-4"
+                      >
+                        <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                          <h4 className="font-semibold text-gray-900 mb-2 text-sm">Explanation</h4>
+                          <p className="text-gray-900">{aiExplanation}</p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </div>
+                );
+              }
+              
+              return null;
+            })()}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Dojo Drill Modal */}
       {showDojoDrill && dojoDrillVideo && (
@@ -984,7 +1051,6 @@ const QuestionCard = ({
           </div>
         </div>
       )}
-    </div>
     </>
   );
 };
