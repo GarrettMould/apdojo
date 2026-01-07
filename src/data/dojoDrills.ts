@@ -446,7 +446,7 @@ export const dojoDrills: Record<string, DojoDrill> = {
       }
     },
     stage3: {
-      mcqIds: [5, 6, 2084] // MCQs from ap macro unit 1, lesson 1.3
+      mcqIds: [2083, 204, 2090] // MCQs from ap micro unit 1, lessons 1.3 and 1.4 (comparative advantage)
     },
     xpReward: {
       completion: 200,

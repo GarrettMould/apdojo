@@ -18,7 +18,8 @@ import { videos, Video } from '@/data/videos';
 import { getVideosForLessonId } from '@/data/videosByLessonId';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question as QuestionType } from '@/data/questionBanks/types';
-import { X, ArrowRight, Lock, ArrowLeft, CheckCircle2, XCircle, Download, Bookmark, BookmarkPlus, Check, Brain, Maximize2, Play, FileText, Zap } from 'lucide-react';
+import { X, ArrowRight, Lock, ArrowLeft, CheckCircle2, XCircle, Download, Bookmark, BookmarkPlus, Check, Brain, Maximize2, Play, FileText, Zap, Lightbulb } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import jsPDF from 'jspdf';
 import { dojoIcon } from '@/data/imagePaths';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -569,7 +570,9 @@ export default function UnitPage() {
   const [showFullscreen, setShowFullscreen] = useState(false);
   const [hasSeenExplainer, setHasSeenExplainer] = useState(false);
   const [isGeneratingQuiz, setIsGeneratingQuiz] = useState(false);
+  const [loadingQuestionIndex, setLoadingQuestionIndex] = useState(0);
   const [quizError, setQuizError] = useState<string | null>(null);
+  const [showExplanations, setShowExplanations] = useState<Set<number>>(new Set());
   const [showJoinDojoModal, setShowJoinDojoModal] = useState(false);
 
   // Check if user is a pro customer (has season pass)
@@ -973,8 +976,12 @@ export default function UnitPage() {
       return;
     }
 
+    // Open the quiz panel immediately and show loading animation
+    setShowQuizPanel(true);
+    setLeftPanelWidth(65); // Set default width
     setIsGeneratingQuiz(true);
     setQuizError(null);
+    setLoadingQuestionIndex(0);
 
     try {
       // Get selected term objects - only send term names
@@ -1083,8 +1090,6 @@ export default function UnitPage() {
         setSelectedQuizAnswer(null);
       setQuizAnswers({}); // Reset all answers
         setIsAnimatingOut(false);
-      setShowQuizPanel(true);
-      setLeftPanelWidth(65); // Reset to default width
       setAnsweredQuizQuestions(new Set()); // Reset answered questions for new quiz
       
       // Clear selections immediately
@@ -1096,8 +1101,23 @@ export default function UnitPage() {
       setQuizError(error.message || 'Failed to generate quiz. Please try again.');
     } finally {
       setIsGeneratingQuiz(false);
+      setLoadingQuestionIndex(0);
     }
   };
+
+  // Cycle through loading question indices while generating
+  useEffect(() => {
+    if (!isGeneratingQuiz) {
+      setLoadingQuestionIndex(0);
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setLoadingQuestionIndex((prev) => (prev + 1) % 5);
+    }, 2000); // Change question every 2 seconds
+
+    return () => clearInterval(interval);
+  }, [isGeneratingQuiz]);
 
   const handleQuizAnswerSelect = async (questionId: number, answerLetter: string) => {
     // Don't allow changing answer if already answered
@@ -1941,7 +1961,7 @@ export default function UnitPage() {
                 stiffness: 300,
                 damping: 30,
               }}
-              className="hidden md:block border-l-4 border-black bg-white shadow-[-10px_0px_20px_rgba(0,0,0,0.1)] h-full overflow-y-auto flex-shrink-0 relative"
+              className="hidden md:block border-l-2 border-black bg-white shadow-[-10px_0px_20px_rgba(0,0,0,0.1)] h-full overflow-y-auto flex-shrink-0 relative"
               style={{ width: `${100 - leftPanelWidth}%` }}
             >
               {/* Close Button */}
@@ -1973,10 +1993,100 @@ export default function UnitPage() {
                 </div>
                 
                 {isGeneratingQuiz ? (
-                  <div className="flex flex-col items-center justify-center py-12 space-y-4">
-                    <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-                    <p className="text-gray-600 font-medium">Creating your personalized quiz...</p>
-                  </div>
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={loadingQuestionIndex}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ duration: 0.3 }}
+                      className="space-y-6"
+                    >
+                      <Card className="border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] relative">
+                        <CardHeader>
+                          <CardTitle className="text-xl">
+                            Question {loadingQuestionIndex + 1} of 5
+                          </CardTitle>
+                          <p className="text-sm text-gray-600 mt-1">
+                            Generating questions...
+                          </p>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-4">
+                            {/* Animated Text Bars for Question */}
+                            <div className="space-y-3">
+                              <motion.div
+                                className="h-6 bg-gray-200 rounded-lg"
+                                animate={{
+                                  width: ['100%', '95%', '100%', '98%', '100%'],
+                                }}
+                                transition={{
+                                  duration: 1.5,
+                                  repeat: Infinity,
+                                  ease: 'easeInOut',
+                                }}
+                              />
+                              <motion.div
+                                className="h-6 bg-gray-200 rounded-lg"
+                                animate={{
+                                  width: ['98%', '100%', '96%', '100%', '97%'],
+                                }}
+                                transition={{
+                                  duration: 1.5,
+                                  repeat: Infinity,
+                                  ease: 'easeInOut',
+                                  delay: 0.2,
+                                }}
+                              />
+                              <motion.div
+                                className="h-6 bg-gray-200 rounded-lg"
+                                animate={{
+                                  width: ['96%', '100%', '94%', '100%', '99%'],
+                                }}
+                                transition={{
+                                  duration: 1.5,
+                                  repeat: Infinity,
+                                  ease: 'easeInOut',
+                                  delay: 0.4,
+                                }}
+                              />
+                              <motion.div
+                                className="h-6 bg-gray-200 rounded-lg w-3/4"
+                                animate={{
+                                  width: ['75%', '80%', '70%', '78%', '75%'],
+                                }}
+                                transition={{
+                                  duration: 1.5,
+                                  repeat: Infinity,
+                                  ease: 'easeInOut',
+                                  delay: 0.6,
+                                }}
+                              />
+                            </div>
+
+                            {/* Animated Text Bars for Options */}
+                            <div className="space-y-2 mt-6">
+                              {[1, 2, 3, 4].map((i) => (
+                                <motion.div
+                                  key={i}
+                                  className="h-12 bg-gray-100 rounded-lg border-2 border-gray-200"
+                                  animate={{
+                                    opacity: [0.6, 1, 0.6],
+                                  }}
+                                  transition={{
+                                    duration: 1.2,
+                                    repeat: Infinity,
+                                    ease: 'easeInOut',
+                                    delay: i * 0.15,
+                                  }}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  </AnimatePresence>
                 ) : quizError ? (
                   <div className="space-y-4">
                     <div className="bg-red-50 border-2 border-red-200 rounded-lg p-6">
@@ -1990,149 +2100,223 @@ export default function UnitPage() {
                     </button>
                   </div>
                 ) : originalQuizQuestions.length > 0 ? (
-                  <div className="space-y-8">
+                  <div className="space-y-6">
                     {originalQuizQuestions.map((question, questionIndex) => {
                       const selectedAnswer = quizAnswers[question.id] || null;
                       const showResult = selectedAnswer !== null;
                       const isCorrect = selectedAnswer === question.correctAnswer;
+                      const showExplanation = showExplanations.has(question.id);
 
                       return (
-                        <div key={question.id} id={`question-${question.id}`} className="bg-white rounded-lg pb-6 border-b border-gray-200 last:border-b-0">
-                          {/* Question Content */}
-                          <div className="space-y-6">
-                            {/* Question Text */}
-                            <div className="flex items-start gap-3">
-                              <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 bg-slate-100 border border-slate-200 rounded-lg">
-                                <span className="text-lg font-bold text-slate-700">{questionIndex + 1}</span>
-                              </div>
-                              <p className="flex-1 text-base md:text-lg font-medium font-serif leading-relaxed text-gray-800">
+                        <Card key={question.id} id={`question-${question.id}`} className="border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] relative">
+                          <CardHeader>
+                            <CardTitle className="text-xl">
+                              Question {questionIndex + 1} of {originalQuizQuestions.length}
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-4">
+                              <p className="text-lg font-semibold text-gray-900">
                                 {question.question}
                               </p>
-                            </div>
+                              
+                              {/* Question Image */}
+                              {question.image && (
+                                <div className="my-4">
+                                  <img
+                                    src={typeof question.image === 'string' ? question.image : (question.image as any).src} 
+                                    alt="Question related image" 
+                                    className="w-full max-w-2xl h-auto object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
+                                  />
+                                </div>
+                              )}
 
-                            {/* Question Image */}
-                            {question.image && (
-                              <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4 flex justify-center">
-                                <img
-                                  src={typeof question.image === 'string' ? question.image : (question.image as any).src} 
-                                  alt="Question related image" 
-                                  className="w-full max-w-2xl h-auto object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
-                                />
-                              </div>
-                            )}
-
-                            {/* Table Data */}
-                            {question.tableData && (
-                              <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
-                                <div className="flex items-center gap-4">
-                                  {question.tableData.playerNames && (
-                                    <div className="flex items-center justify-center h-full w-16">
-                                      <p className="transform -rotate-90 whitespace-nowrap text-center font-bold text-lg text-gray-900 leading-tight">
-                                        {question.tableData.playerNames.row.split(' ')[0]}
-                                        <br />
-                                        {question.tableData.playerNames.row.split(' ').slice(1).join(' ')}
-                                      </p>
-                                    </div>
-                                  )}
-                                  <div className="flex-1">
+                              {/* Table Data */}
+                              {question.tableData && (
+                                <div className="my-4 overflow-x-auto">
+                                  <div className="flex items-center gap-4">
                                     {question.tableData.playerNames && (
-                                      <p className="text-center font-bold text-lg text-gray-900 mb-2">
-                                        {question.tableData.playerNames.column}
-                                      </p>
+                                      <div className="flex items-center justify-center h-full w-16">
+                                        <p className="transform -rotate-90 whitespace-nowrap text-center font-bold text-lg text-gray-900 leading-tight">
+                                          {question.tableData.playerNames.row.split(' ')[0]}
+                                          <br />
+                                          {question.tableData.playerNames.row.split(' ').slice(1).join(' ')}
+                                        </p>
+                                      </div>
                                     )}
-                                    <table className="min-w-full border-collapse border border-black">
-                                      <thead className="bg-white">
-                                        <tr>
-                                          {question.tableData.headers.map((header: string) => (
-                                            <th key={header} className="border border-black px-4 py-3 text-center text-base font-bold text-gray-900">
-                                              {header}
-                                            </th>
-                                          ))}
-                                        </tr>
-                                      </thead>
-                                      <tbody className="bg-white">
-                                        {question.tableData.rows.map((row: string[], rowIndex: number) => (
-                                          <tr key={rowIndex}>
-                                            {row.map((cell: string, cellIndex: number) => {
-                                              const isRowHeader = question.tableData?.rowHeaders && cellIndex === 0;
-                                              return (
-                                                <td 
-                                                  key={cellIndex} 
-                                                  className={`border border-black px-4 py-3 text-center text-base ${isRowHeader ? 'font-bold' : ''}`}
-                                                >
-                                                  {cell}
-                                                </td>
-                                              );
-                                            })}
+                                    <div className="flex-1">
+                                      {question.tableData.playerNames && (
+                                        <p className="text-center font-bold text-lg text-gray-900 mb-2">
+                                          {question.tableData.playerNames.column}
+                                        </p>
+                                      )}
+                                      <table className="min-w-full border-collapse border border-black">
+                                        <thead className="bg-white">
+                                          <tr>
+                                            {question.tableData.headers.map((header: string) => (
+                                              <th key={header} className="border border-black px-4 py-3 text-center text-base font-bold text-gray-900">
+                                                {header}
+                                              </th>
+                                            ))}
                                           </tr>
-                                        ))}
-                                      </tbody>
-                                    </table>
+                                        </thead>
+                                        <tbody className="bg-white">
+                                          {question.tableData.rows.map((row: string[], rowIndex: number) => (
+                                            <tr key={rowIndex}>
+                                              {row.map((cell: string, cellIndex: number) => {
+                                                const isRowHeader = question.tableData?.rowHeaders && cellIndex === 0;
+                                                return (
+                                                  <td 
+                                                    key={cellIndex} 
+                                                    className={`border border-black px-4 py-3 text-center text-base ${isRowHeader ? 'font-bold' : ''}`}
+                                                  >
+                                                    {cell}
+                                                  </td>
+                                                );
+                                              })}
+                                            </tr>
+                                          ))}
+                                        </tbody>
+                                      </table>
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            )}
+                              )}
 
-                            {/* Answer Options */}
-                            <div className="space-y-3">
-                              {question.options.map((option, index) => {
-                                const optionLetter = String.fromCharCode(65 + index);
-                                const isCorrectOption = optionLetter === question.correctAnswer;
-                                const isSelected = selectedAnswer === optionLetter;
+                              {/* Answer Options */}
+                              <div className="space-y-2">
+                                {question.options.map((option, index) => {
+                                  const optionLetter = String.fromCharCode(65 + index);
+                                  const isCorrectAnswer = optionLetter === question.correctAnswer;
+                                  const isSelected = selectedAnswer === optionLetter;
+                                  
+                                  // Determine styling based on state
+                                  let optionStyle = 'bg-white border-gray-300';
+                                  if (showResult) {
+                                    if (isCorrectAnswer) {
+                                      optionStyle = 'bg-green-50 border-green-500';
+                                    } else if (isSelected && !isCorrectAnswer) {
+                                      optionStyle = 'bg-red-50 border-red-500';
+                                    }
+                                  } else if (isSelected) {
+                                    optionStyle = 'bg-blue-50 border-blue-500';
+                                  }
 
-                                return (
-                                  <button
-                                    key={index}
-                                    onClick={() => !showResult && handleQuizAnswerSelect(question.id, optionLetter)}
-                                    disabled={showResult}
-                                    className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-200 ${
-                                      showResult
-                                      ? isCorrectOption
-                                        ? 'bg-green-50 border-green-400 text-green-800'
-                                        : isSelected && !isCorrectOption
-                                        ? 'bg-red-50 border-red-400 text-red-800'
-                                        : 'bg-gray-50 border-gray-200 text-gray-600'
-                                      : isSelected
-                                      ? 'bg-blue-50 border-blue-400 text-blue-800'
-                                      : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300'
-                                    }`}
-                                  >
-                                    <div className="flex items-center gap-3">
-                                      <div className={`flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg border-2 font-bold ${
-                                        showResult
-                                          ? isCorrectOption
-                                            ? 'bg-green-100 border-green-400 text-green-700'
-                                            : isSelected && !isCorrectOption
-                                            ? 'bg-red-100 border-red-400 text-red-700'
-                                            : 'bg-white border-gray-300 text-gray-500'
-                                          : isSelected
-                                          ? 'bg-blue-100 border-blue-400 text-blue-700'
-                                          : 'bg-white border-gray-300 text-gray-600'
-                                      }`}>
-                                        {optionLetter}
+                                  return (
+                                    <motion.div
+                                      key={index}
+                                      initial={false}
+                                      animate={showResult && isCorrectAnswer ? { scale: [1, 1.05, 1] } : {}}
+                                      transition={{ duration: 0.3 }}
+                                      className={`p-3 rounded-lg border-2 transition-colors ${optionStyle} ${
+                                        !showResult ? 'cursor-pointer hover:bg-blue-50 hover:border-blue-300' : ''
+                                      }`}
+                                      onClick={!showResult ? () => handleQuizAnswerSelect(question.id, optionLetter) : undefined}
+                                    >
+                                      <div className="flex items-center gap-3">
+                                        {!showResult ? (
+                                          <>
+                                            <input
+                                              type="radio"
+                                              name={`question-${question.id}`}
+                                              value={optionLetter}
+                                              checked={isSelected}
+                                              onChange={() => handleQuizAnswerSelect(question.id, optionLetter)}
+                                              className="w-5 h-5 text-blue-600 flex-shrink-0"
+                                              onClick={(e) => e.stopPropagation()}
+                                            />
+                                            <span className="flex-1 text-gray-900">{option}</span>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <span
+                                              className={`w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0 ${
+                                                isCorrectAnswer
+                                                  ? 'bg-green-500 text-white'
+                                                  : isSelected && !isCorrectAnswer
+                                                  ? 'bg-red-500 text-white'
+                                                  : 'bg-gray-200 text-gray-700'
+                                              }`}
+                                            >
+                                              {optionLetter}
+                                            </span>
+                                            <span className="flex-1 text-gray-900">{option}</span>
+                                            {isCorrectAnswer && (
+                                              <CheckCircle2 className="w-6 h-6 text-green-600 flex-shrink-0" />
+                                            )}
+                                            {isSelected && !isCorrectAnswer && (
+                                              <XCircle className="w-6 h-6 text-red-600 flex-shrink-0" />
+                                            )}
+                                          </>
+                                        )}
                                       </div>
-                                      <span className="flex-1 font-medium">{option}</span>
-                                      {showResult && isCorrectOption && (
-                                        <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+                                    </motion.div>
+                                  );
+                                })}
+                              </div>
+
+                              {/* Explanation Section - Show based on answer correctness */}
+                              {showResult && (() => {
+                                // If incorrect, show explanation automatically
+                                if (!isCorrect) {
+                                  return (
+                                    <motion.div
+                                      initial={{ opacity: 0, height: 0 }}
+                                      animate={{ opacity: 1, height: 'auto' }}
+                                      transition={{ duration: 0.3 }}
+                                      className="mt-6 pt-6 border-t border-gray-200"
+                                    >
+                                      {question.explanation && (
+                                        <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                                          <h4 className="font-semibold text-gray-900 mb-2 text-sm">Explanation</h4>
+                                          <p className="text-gray-900">{question.explanation}</p>
+                                        </div>
                                       )}
-                                      {showResult && isSelected && !isCorrectOption && (
-                                        <X className="w-5 h-5 text-red-500 flex-shrink-0" />
+                                    </motion.div>
+                                  );
+                                }
+                                
+                                // If correct, show explanation as a link
+                                if (isCorrect && question.explanation) {
+                                  return (
+                                    <div className="mt-6 pt-6 border-t border-gray-200">
+                                      <button
+                                        onClick={() => {
+                                          const newSet = new Set(showExplanations);
+                                          if (showExplanation) {
+                                            newSet.delete(question.id);
+                                          } else {
+                                            newSet.add(question.id);
+                                          }
+                                          setShowExplanations(newSet);
+                                        }}
+                                        className="text-blue-600 hover:text-blue-800 font-semibold text-sm flex items-center gap-2 underline"
+                                      >
+                                        <Lightbulb className="w-4 h-4" />
+                                        View Explanation
+                                      </button>
+                                      {showExplanation && (
+                                        <motion.div
+                                          initial={{ opacity: 0, height: 0 }}
+                                          animate={{ opacity: 1, height: 'auto' }}
+                                          transition={{ duration: 0.3 }}
+                                          className="mt-4"
+                                        >
+                                          <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                                            <h4 className="font-semibold text-gray-900 mb-2 text-sm">Explanation</h4>
+                                            <p className="text-gray-900">{question.explanation}</p>
+                                          </div>
+                                        </motion.div>
                                       )}
                                     </div>
-                                  </button>
-                                );
-                              })}
+                                  );
+                                }
+                                
+                                return null;
+                              })()}
                             </div>
-
-                            {/* Explanation */}
-                            {selectedAnswer && question.explanation && (
-                              <div className="p-6 bg-slate-50 rounded-xl border border-slate-200">
-                                <h4 className="font-semibold text-slate-900 mb-3 text-lg">Explanation</h4>
-                                <p className="text-slate-700 leading-relaxed">{question.explanation}</p>
-                              </div>
-                            )}
-                          </div>
-                        </div>
+                          </CardContent>
+                        </Card>
                       );
                     })}
                   </div>
@@ -2194,10 +2378,100 @@ export default function UnitPage() {
                   </div>
                   
                   {isGeneratingQuiz ? (
-                    <div className="flex flex-col items-center justify-center py-12 space-y-4">
-                      <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
-                      <p className="text-gray-600 font-medium">Creating your personalized quiz...</p>
-                    </div>
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={loadingQuestionIndex}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ duration: 0.3 }}
+                        className="space-y-6"
+                      >
+                        <Card className="border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] relative">
+                          <CardHeader>
+                            <CardTitle className="text-xl">
+                              Question {loadingQuestionIndex + 1} of 5
+                            </CardTitle>
+                            <p className="text-sm text-gray-600 mt-1">
+                              Generating questions...
+                            </p>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-4">
+                              {/* Animated Text Bars for Question */}
+                              <div className="space-y-3">
+                                <motion.div
+                                  className="h-6 bg-gray-200 rounded-lg"
+                                  animate={{
+                                    width: ['100%', '95%', '100%', '98%', '100%'],
+                                  }}
+                                  transition={{
+                                    duration: 1.5,
+                                    repeat: Infinity,
+                                    ease: 'easeInOut',
+                                  }}
+                                />
+                                <motion.div
+                                  className="h-6 bg-gray-200 rounded-lg"
+                                  animate={{
+                                    width: ['98%', '100%', '96%', '100%', '97%'],
+                                  }}
+                                  transition={{
+                                    duration: 1.5,
+                                    repeat: Infinity,
+                                    ease: 'easeInOut',
+                                    delay: 0.2,
+                                  }}
+                                />
+                                <motion.div
+                                  className="h-6 bg-gray-200 rounded-lg"
+                                  animate={{
+                                    width: ['96%', '100%', '94%', '100%', '99%'],
+                                  }}
+                                  transition={{
+                                    duration: 1.5,
+                                    repeat: Infinity,
+                                    ease: 'easeInOut',
+                                    delay: 0.4,
+                                  }}
+                                />
+                                <motion.div
+                                  className="h-6 bg-gray-200 rounded-lg w-3/4"
+                                  animate={{
+                                    width: ['75%', '80%', '70%', '78%', '75%'],
+                                  }}
+                                  transition={{
+                                    duration: 1.5,
+                                    repeat: Infinity,
+                                    ease: 'easeInOut',
+                                    delay: 0.6,
+                                  }}
+                                />
+                              </div>
+
+                              {/* Animated Text Bars for Options */}
+                              <div className="space-y-2 mt-6">
+                                {[1, 2, 3, 4].map((i) => (
+                                  <motion.div
+                                    key={i}
+                                    className="h-12 bg-gray-100 rounded-lg border-2 border-gray-200"
+                                    animate={{
+                                      opacity: [0.6, 1, 0.6],
+                                    }}
+                                    transition={{
+                                      duration: 1.2,
+                                      repeat: Infinity,
+                                      ease: 'easeInOut',
+                                      delay: i * 0.15,
+                                    }}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </motion.div>
+                    </AnimatePresence>
                   ) : quizError ? (
                     <div className="space-y-4">
                       <div className="bg-red-50 border-2 border-red-200 rounded-lg p-6">
@@ -2211,149 +2485,223 @@ export default function UnitPage() {
                       </button>
                     </div>
                   ) : originalQuizQuestions.length > 0 ? (
-                    <div className="space-y-8">
+                    <div className="space-y-6">
                       {originalQuizQuestions.map((question, questionIndex) => {
                         const selectedAnswer = quizAnswers[question.id] || null;
                         const showResult = selectedAnswer !== null;
                         const isCorrect = selectedAnswer === question.correctAnswer;
+                        const showExplanation = showExplanations.has(question.id);
 
                         return (
-                          <div key={question.id} id={`question-${question.id}`} className="bg-white rounded-lg pb-6 border-b border-gray-200 last:border-b-0">
-                            {/* Question Content */}
-                            <div className="space-y-6">
-                              {/* Question Text */}
-                              <div className="flex items-start gap-3">
-                                <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 bg-slate-100 border border-slate-200 rounded-lg">
-                                  <span className="text-lg font-bold text-slate-700">{questionIndex + 1}</span>
-                                </div>
-                                <p className="flex-1 text-base md:text-lg font-medium font-serif leading-relaxed text-gray-800">
+                          <Card key={question.id} id={`question-${question.id}`} className="border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] relative">
+                            <CardHeader>
+                              <CardTitle className="text-xl">
+                                Question {questionIndex + 1} of {originalQuizQuestions.length}
+                              </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="space-y-4">
+                                <p className="text-lg font-semibold text-gray-900">
                                   {question.question}
                                 </p>
-                              </div>
+                                
+                                {/* Question Image */}
+                                {question.image && (
+                                  <div className="my-4">
+                                    <img
+                                      src={typeof question.image === 'string' ? question.image : (question.image as any).src} 
+                                      alt="Question related image" 
+                                      className="w-full max-w-2xl h-auto object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
+                                    />
+                                  </div>
+                                )}
 
-                              {/* Question Image */}
-                              {question.image && (
-                                <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4 flex justify-center">
-                                  <img
-                                    src={typeof question.image === 'string' ? question.image : (question.image as any).src} 
-                                    alt="Question related image" 
-                                    className="w-full max-w-2xl h-auto object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
-                                  />
-                                </div>
-                              )}
-
-                              {/* Table Data */}
-                              {question.tableData && (
-                                <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
-                                  <div className="flex items-center gap-4">
-                                    {question.tableData.playerNames && (
-                                      <div className="flex items-center justify-center h-full w-16">
-                                        <p className="transform -rotate-90 whitespace-nowrap text-center font-bold text-lg text-gray-900 leading-tight">
-                                          {question.tableData.playerNames.row.split(' ')[0]}
-                                          <br />
-                                          {question.tableData.playerNames.row.split(' ').slice(1).join(' ')}
-                                        </p>
-                                      </div>
-                                    )}
-                                    <div className="flex-1">
+                                {/* Table Data */}
+                                {question.tableData && (
+                                  <div className="my-4 overflow-x-auto">
+                                    <div className="flex items-center gap-4">
                                       {question.tableData.playerNames && (
-                                        <p className="text-center font-bold text-lg text-gray-900 mb-2">
-                                          {question.tableData.playerNames.column}
-                                        </p>
+                                        <div className="flex items-center justify-center h-full w-16">
+                                          <p className="transform -rotate-90 whitespace-nowrap text-center font-bold text-lg text-gray-900 leading-tight">
+                                            {question.tableData.playerNames.row.split(' ')[0]}
+                                            <br />
+                                            {question.tableData.playerNames.row.split(' ').slice(1).join(' ')}
+                                          </p>
+                                        </div>
                                       )}
-                                      <table className="min-w-full border-collapse border border-black">
-                                        <thead className="bg-white">
-                                          <tr>
-                                            {question.tableData.headers.map((header: string) => (
-                                              <th key={header} className="border border-black px-4 py-3 text-center text-base font-bold text-gray-900">
-                                                {header}
-                                              </th>
-                                            ))}
-                                          </tr>
-                                        </thead>
-                                        <tbody className="bg-white">
-                                          {question.tableData.rows.map((row: string[], rowIndex: number) => (
-                                            <tr key={rowIndex}>
-                                              {row.map((cell: string, cellIndex: number) => {
-                                                const isRowHeader = question.tableData?.rowHeaders && cellIndex === 0;
-                                                return (
-                                                  <td 
-                                                    key={cellIndex} 
-                                                    className={`border border-black px-4 py-3 text-center text-base ${isRowHeader ? 'font-bold' : ''}`}
-                                                  >
-                                                    {cell}
-                                                  </td>
-                                                );
-                                              })}
+                                      <div className="flex-1">
+                                        {question.tableData.playerNames && (
+                                          <p className="text-center font-bold text-lg text-gray-900 mb-2">
+                                            {question.tableData.playerNames.column}
+                                          </p>
+                                        )}
+                                        <table className="min-w-full border-collapse border border-black">
+                                          <thead className="bg-white">
+                                            <tr>
+                                              {question.tableData.headers.map((header: string) => (
+                                                <th key={header} className="border border-black px-4 py-3 text-center text-base font-bold text-gray-900">
+                                                  {header}
+                                                </th>
+                                              ))}
                                             </tr>
-                                          ))}
-                                        </tbody>
-                                      </table>
+                                          </thead>
+                                          <tbody className="bg-white">
+                                            {question.tableData.rows.map((row: string[], rowIndex: number) => (
+                                              <tr key={rowIndex}>
+                                                {row.map((cell: string, cellIndex: number) => {
+                                                  const isRowHeader = question.tableData?.rowHeaders && cellIndex === 0;
+                                                  return (
+                                                    <td 
+                                                      key={cellIndex} 
+                                                      className={`border border-black px-4 py-3 text-center text-base ${isRowHeader ? 'font-bold' : ''}`}
+                                                    >
+                                                      {cell}
+                                                    </td>
+                                                  );
+                                                })}
+                                              </tr>
+                                            ))}
+                                          </tbody>
+                                        </table>
+                                      </div>
                                     </div>
                                   </div>
-                                </div>
-                              )}
+                                )}
 
-                              {/* Answer Options */}
-                              <div className="space-y-3">
-                                {question.options.map((option, index) => {
-                                  const optionLetter = String.fromCharCode(65 + index);
-                                  const isCorrectOption = optionLetter === question.correctAnswer;
-                                  const isSelected = selectedAnswer === optionLetter;
+                                {/* Answer Options */}
+                                <div className="space-y-2">
+                                  {question.options.map((option, index) => {
+                                    const optionLetter = String.fromCharCode(65 + index);
+                                    const isCorrectAnswer = optionLetter === question.correctAnswer;
+                                    const isSelected = selectedAnswer === optionLetter;
+                                    
+                                    // Determine styling based on state
+                                    let optionStyle = 'bg-white border-gray-300';
+                                    if (showResult) {
+                                      if (isCorrectAnswer) {
+                                        optionStyle = 'bg-green-50 border-green-500';
+                                      } else if (isSelected && !isCorrectAnswer) {
+                                        optionStyle = 'bg-red-50 border-red-500';
+                                      }
+                                    } else if (isSelected) {
+                                      optionStyle = 'bg-blue-50 border-blue-500';
+                                    }
 
-                                  return (
-                                    <button
-                                      key={index}
-                                      onClick={() => !showResult && handleQuizAnswerSelect(question.id, optionLetter)}
-                                      disabled={showResult}
-                                      className={`w-full text-left p-4 rounded-lg border-2 transition-all duration-200 ${
-                                        showResult
-                                        ? isCorrectOption
-                                          ? 'bg-green-50 border-green-400 text-green-800'
-                                          : isSelected && !isCorrectOption
-                                          ? 'bg-red-50 border-red-400 text-red-800'
-                                          : 'bg-gray-50 border-gray-200 text-gray-600'
-                                        : isSelected
-                                        ? 'bg-blue-50 border-blue-400 text-blue-800'
-                                        : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300'
-                                      }`}
-                                    >
-                                      <div className="flex items-center gap-3">
-                                        <div className={`flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg border-2 font-bold ${
-                                          showResult
-                                            ? isCorrectOption
-                                              ? 'bg-green-100 border-green-400 text-green-700'
-                                              : isSelected && !isCorrectOption
-                                              ? 'bg-red-100 border-red-400 text-red-700'
-                                              : 'bg-white border-gray-300 text-gray-500'
-                                            : isSelected
-                                            ? 'bg-blue-100 border-blue-400 text-blue-700'
-                                            : 'bg-white border-gray-300 text-gray-600'
-                                        }`}>
-                                          {optionLetter}
+                                    return (
+                                      <motion.div
+                                        key={index}
+                                        initial={false}
+                                        animate={showResult && isCorrectAnswer ? { scale: [1, 1.05, 1] } : {}}
+                                        transition={{ duration: 0.3 }}
+                                        className={`p-3 rounded-lg border-2 transition-colors ${optionStyle} ${
+                                          !showResult ? 'cursor-pointer hover:bg-blue-50 hover:border-blue-300' : ''
+                                        }`}
+                                        onClick={!showResult ? () => handleQuizAnswerSelect(question.id, optionLetter) : undefined}
+                                      >
+                                        <div className="flex items-center gap-3">
+                                          {!showResult ? (
+                                            <>
+                                              <input
+                                                type="radio"
+                                                name={`question-${question.id}`}
+                                                value={optionLetter}
+                                                checked={isSelected}
+                                                onChange={() => handleQuizAnswerSelect(question.id, optionLetter)}
+                                                className="w-5 h-5 text-blue-600 flex-shrink-0"
+                                                onClick={(e) => e.stopPropagation()}
+                                              />
+                                              <span className="flex-1 text-gray-900">{option}</span>
+                                            </>
+                                          ) : (
+                                            <>
+                                              <span
+                                                className={`w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0 ${
+                                                  isCorrectAnswer
+                                                    ? 'bg-green-500 text-white'
+                                                    : isSelected && !isCorrectAnswer
+                                                    ? 'bg-red-500 text-white'
+                                                    : 'bg-gray-200 text-gray-700'
+                                                }`}
+                                              >
+                                                {optionLetter}
+                                              </span>
+                                              <span className="flex-1 text-gray-900">{option}</span>
+                                              {isCorrectAnswer && (
+                                                <CheckCircle2 className="w-6 h-6 text-green-600 flex-shrink-0" />
+                                              )}
+                                              {isSelected && !isCorrectAnswer && (
+                                                <XCircle className="w-6 h-6 text-red-600 flex-shrink-0" />
+                                              )}
+                                            </>
+                                          )}
                                         </div>
-                                        <span className="flex-1 font-medium">{option}</span>
-                                        {showResult && isCorrectOption && (
-                                          <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+                                      </motion.div>
+                                    );
+                                  })}
+                                </div>
+
+                                {/* Explanation Section - Show based on answer correctness */}
+                                {showResult && (() => {
+                                  // If incorrect, show explanation automatically
+                                  if (!isCorrect) {
+                                    return (
+                                      <motion.div
+                                        initial={{ opacity: 0, height: 0 }}
+                                        animate={{ opacity: 1, height: 'auto' }}
+                                        transition={{ duration: 0.3 }}
+                                        className="mt-6 pt-6 border-t border-gray-200"
+                                      >
+                                        {question.explanation && (
+                                          <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                                            <h4 className="font-semibold text-gray-900 mb-2 text-sm">Explanation</h4>
+                                            <p className="text-gray-900">{question.explanation}</p>
+                                          </div>
                                         )}
-                                        {showResult && isSelected && !isCorrectOption && (
-                                          <X className="w-5 h-5 text-red-500 flex-shrink-0" />
+                                      </motion.div>
+                                    );
+                                  }
+                                  
+                                  // If correct, show explanation as a link
+                                  if (isCorrect && question.explanation) {
+                                    return (
+                                      <div className="mt-6 pt-6 border-t border-gray-200">
+                                        <button
+                                          onClick={() => {
+                                            const newSet = new Set(showExplanations);
+                                            if (showExplanation) {
+                                              newSet.delete(question.id);
+                                            } else {
+                                              newSet.add(question.id);
+                                            }
+                                            setShowExplanations(newSet);
+                                          }}
+                                          className="text-blue-600 hover:text-blue-800 font-semibold text-sm flex items-center gap-2 underline"
+                                        >
+                                          <Lightbulb className="w-4 h-4" />
+                                          View Explanation
+                                        </button>
+                                        {showExplanation && (
+                                          <motion.div
+                                            initial={{ opacity: 0, height: 0 }}
+                                            animate={{ opacity: 1, height: 'auto' }}
+                                            transition={{ duration: 0.3 }}
+                                            className="mt-4"
+                                          >
+                                            <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                                              <h4 className="font-semibold text-gray-900 mb-2 text-sm">Explanation</h4>
+                                              <p className="text-gray-900">{question.explanation}</p>
+                                            </div>
+                                          </motion.div>
                                         )}
                                       </div>
-                                    </button>
-                                  );
-                                })}
+                                    );
+                                  }
+                                  
+                                  return null;
+                                })()}
                               </div>
-
-                              {/* Explanation */}
-                              {selectedAnswer && question.explanation && (
-                                <div className="p-6 bg-slate-50 rounded-xl border border-slate-200">
-                                  <h4 className="font-semibold text-slate-900 mb-3 text-lg">Explanation</h4>
-                                  <p className="text-slate-700 leading-relaxed">{question.explanation}</p>
-                                </div>
-                              )}
-                            </div>
-                          </div>
+                            </CardContent>
+                          </Card>
                         );
                       })}
                     </div>

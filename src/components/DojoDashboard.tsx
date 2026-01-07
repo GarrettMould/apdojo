@@ -673,7 +673,13 @@ export function DojoDashboard() {
                 >
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-blue-100 rounded-md flex items-center justify-center">
-                      <Play className="w-6 h-6 text-blue-600" />
+                      <Image
+                        src="/images/boltIcon.svg"
+                        alt="MCQ Practice"
+                        width={24}
+                        height={24}
+                        className="w-6 h-6"
+                      />
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900">MCQ Practice</h3>
@@ -711,7 +717,13 @@ export function DojoDashboard() {
                 >
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-yellow-100 rounded-md flex items-center justify-center">
-                      <FileText className="w-6 h-6 text-yellow-600" />
+                      <Image
+                        src="/images/fiveFill.svg"
+                        alt="Diagnostic Test"
+                        width={24}
+                        height={24}
+                        className="w-6 h-6"
+                      />
                       </div>
                     <div>
                       <h3 className="font-semibold text-gray-900">Diagnostic Test</h3>
@@ -797,7 +809,33 @@ export function DojoDashboard() {
                           <div className="flex items-start justify-between mb-4">
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-md bg-gray-100 flex items-center justify-center flex-shrink-0">
-                                <Icon className="w-5 h-5 text-gray-700" />
+                                {activity.type === 'dojo-drill' ? (
+                                  <Image
+                                    src="/images/dojoIconBold.png"
+                                    alt="Drill"
+                                    width={20}
+                                    height={20}
+                                    className="w-5 h-5"
+                                  />
+                                ) : activity.type === 'frq-exam' ? (
+                                  <Image
+                                    src="/images/pencilLineIcon.svg"
+                                    alt="FRQ"
+                                    width={20}
+                                    height={20}
+                                    className="w-5 h-5"
+                                  />
+                                ) : activity.type === 'unit-exam' || activity.type === 'full-exam' ? (
+                                  <Image
+                                    src="/images/exam.svg"
+                                    alt="Exam"
+                                    width={20}
+                                    height={20}
+                                    className="w-5 h-5"
+                                  />
+                                ) : (
+                                  <Icon className="w-5 h-5 text-gray-700" />
+                                )}
                               </div>
                               <div className="flex flex-col gap-1">
                                 {unitNumber && (
@@ -901,7 +939,7 @@ export function DojoDashboard() {
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-md bg-gray-100 flex items-center justify-center flex-shrink-0">
                                 <Image
-                                  src="/images/lightning.svg"
+                                  src="/images/dojoIconBold.png"
                                   alt="Drill"
                                   width={20}
                                   height={20}
@@ -984,7 +1022,13 @@ export function DojoDashboard() {
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-md bg-gray-100 flex items-center justify-center flex-shrink-0">
-                              <FileText className="w-5 h-5 text-gray-700" />
+                              <Image
+                                src="/images/pencilLineIcon.svg"
+                                alt="FRQ"
+                                width={20}
+                                height={20}
+                                className="w-5 h-5"
+                              />
                             </div>
                             <div className="flex flex-col gap-1">
                               {frq.unit && (
@@ -1129,7 +1173,13 @@ export function DojoDashboard() {
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-md bg-gray-100 flex items-center justify-center flex-shrink-0">
-                              <BookOpen className="w-5 h-5 text-gray-700" />
+                              <Image
+                                src="/images/exam.svg"
+                                alt="Exam"
+                                width={20}
+                                height={20}
+                                className="w-5 h-5"
+                              />
                             </div>
                             <div className="flex flex-col gap-1">
                               {exam.unitNumber && (
@@ -1224,7 +1274,23 @@ export function DojoDashboard() {
                           <div className="flex items-start justify-between mb-4">
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-md bg-gray-100 flex items-center justify-center flex-shrink-0">
-                                <Icon className="w-5 h-5 text-gray-700" />
+                                {entry.type === 'infinite-drill' ? (
+                                  <Image
+                                    src="/images/dojoIconBold.png"
+                                    alt="Drill"
+                                    width={20}
+                                    height={20}
+                                    className="w-5 h-5"
+                                  />
+                                ) : (
+                                  <Image
+                                    src="/images/boltIcon.svg"
+                                    alt="Quiz"
+                                    width={20}
+                                    height={20}
+                                    className="w-5 h-5"
+                                  />
+                                )}
                               </div>
                               <div className="flex flex-col gap-1">
                                 {unitNumber && (

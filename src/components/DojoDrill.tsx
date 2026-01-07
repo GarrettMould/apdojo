@@ -14,7 +14,7 @@ import { ElasticityRevenueDrill, ElasticityScenario } from "./ElasticityRevenueD
 import { ConsumerProducerSurplusDrill } from "./ConsumerProducerSurplusDrill";
 import { allQuestions } from "@/data/unitPracticeProblems/unitPracticeProblems";
 import { Question } from "@/data/questionBanks/types";
-import { CheckCircle2, ArrowRight, Trophy, Check, Lightbulb } from "lucide-react";
+import { CheckCircle2, ArrowRight, Trophy, Check, Lightbulb, Calculator, Pen } from "lucide-react";
 import Image from "next/image";
 import { DojoDrill as DojoDrillType, ComprehensionQuestion } from "@/data/dojoDrills";
 import ReactMarkdown from 'react-markdown';
@@ -23,6 +23,10 @@ import { saveDojoDrillProgress, loadDojoDrillProgress, getDrillProgress } from '
 import { getBeltProgress } from '@/lib/beltSystem';
 import { getSubjectXP } from '@/hooks/useUserProgress';
 import { DojoDrillResults } from './DojoDrillResults';
+import { whiteboardImages as allContentWhiteboards, WhiteboardImage } from '@/data/allContent';
+import { unit1Whiteboards, apMacroUnit2Whiteboards, apMacroUnit3Whiteboards, apMacroUnit4Whiteboards, apMacroUnit5Whiteboards, apMicroUnit3Whiteboards, apMicroUnit4Whiteboards, apMicroUnit5Whiteboards, apMicroUnit6Whiteboards, Whiteboard } from '@/data/whiteboards';
+import { ExamCalculator } from './ExamCalculator';
+import { ExamWhiteboard } from './ExamWhiteboard';
 
 // Helper function to parse markdown table from text
 const parseMarkdownTable = (text: string): { tableData: { headers: string[]; rows: string[][] } | null; textWithoutTable: string } => {
@@ -118,6 +122,8 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
   const [currentMcqIndex, setCurrentMcqIndex] = useState(0);
   const [mcqAnswers, setMcqAnswers] = useState<Record<number, string>>({});
   const [showHint, setShowHint] = useState(false);
+  const [showCalculator, setShowCalculator] = useState(false);
+  const [showDrawingPad, setShowDrawingPad] = useState(false);
   
   const [xpEarned, setXpEarned] = useState(0);
   const [xpAwarded, setXpAwarded] = useState(false);
@@ -147,9 +153,10 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
             setGraphCompleted(true);
             setTableCompleted(true);
             setMonopolyCompleted(true);
-            // Load MCQs for XP calculation
+            // Load MCQs for XP calculation - filter by subject
+            const subjectFilter = selectedSubject === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics';
             const questions = drill.stage3.mcqIds
-              .map(id => allQuestions.find(q => q.id === id))
+              .map(id => allQuestions.find(q => q.id === id && q.subject === subjectFilter))
               .filter((q): q is Question => q !== undefined);
             setMcqQuestions(questions);
           } else if (drillProgress.stage2) {
@@ -159,9 +166,10 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
             setGraphCompleted(true);
             setTableCompleted(true);
             setMonopolyCompleted(true);
-            // Load MCQs
+            // Load MCQs - filter by subject
+            const subjectFilter = selectedSubject === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics';
             const questions = drill.stage3.mcqIds
-              .map(id => allQuestions.find(q => q.id === id))
+              .map(id => allQuestions.find(q => q.id === id && q.subject === subjectFilter))
               .filter((q): q is Question => q !== undefined);
             setMcqQuestions(questions);
           } else if (drillProgress.stage1) {
@@ -184,17 +192,22 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
   // Load MCQs from stage3.mcqIds when entering step 3
   useEffect(() => {
     if (step === 3 && mcqQuestions.length === 0) {
+      // Determine the subject filter based on selectedSubject
+      const subjectFilter = selectedSubject === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics';
+      
       const questions = drill.stage3.mcqIds
-        .map(id => allQuestions.find(q => q.id === id))
+        .map(id => allQuestions.find(q => q.id === id && q.subject === subjectFilter))
         .filter((q): q is Question => q !== undefined);
       
       if (questions.length === 3) {
         setMcqQuestions(questions);
         setCurrentMcqIndex(0);
         setMcqAnswers({});
+      } else {
+        console.error(`[DojoDrill] Expected 3 questions for subject ${subjectFilter}, but found ${questions.length}. MCQ IDs:`, drill.stage3.mcqIds);
       }
     }
-  }, [step, drill.stage3.mcqIds, mcqQuestions.length]);
+  }, [step, drill.stage3.mcqIds, mcqQuestions.length, selectedSubject]);
 
   // Calculate XP when completing MCQs
   useEffect(() => {
@@ -286,9 +299,10 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
         });
       }
       
-      // Load MCQs before advancing to step 3
+      // Load MCQs before advancing to step 3 - filter by subject
+      const subjectFilter = selectedSubject === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics';
       const questions = drill.stage3.mcqIds
-        .map(id => allQuestions.find(q => q.id === id))
+        .map(id => allQuestions.find(q => q.id === id && q.subject === subjectFilter))
         .filter((q): q is Question => q !== undefined);
       
       if (questions.length > 0) {
@@ -303,7 +317,7 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
           }, 1500); // 1.5 second delay to show completion feedback
         }
       } else {
-        console.error('[DojoDrill] Failed to load MCQs. Expected questions, found:', questions.length);
+        console.error(`[DojoDrill] Failed to load MCQs for subject ${subjectFilter}. Expected questions, found:`, questions.length);
         console.error('[DojoDrill] MCQ IDs:', drill.stage3.mcqIds);
       }
     }
@@ -333,9 +347,10 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
       });
     }
     
-    // Load MCQs before advancing to step 3
+    // Load MCQs before advancing to step 3 - filter by subject
+    const subjectFilter = selectedSubject === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics';
     const questions = drill.stage3.mcqIds
-      .map(id => allQuestions.find(q => q.id === id))
+      .map(id => allQuestions.find(q => q.id === id && q.subject === subjectFilter))
       .filter((q): q is Question => q !== undefined);
     
     if (questions.length === 3) {
@@ -344,7 +359,7 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
       setMcqAnswers({});
       setStep(3);
     } else {
-      console.error('[DojoDrill] Failed to load MCQs. Expected 3, found:', questions.length);
+      console.error(`[DojoDrill] Failed to load MCQs for subject ${subjectFilter}. Expected 3, found:`, questions.length);
       console.error('[DojoDrill] MCQ IDs:', drill.stage3.mcqIds);
       // Still set step to 3 so loading state shows
       setStep(3);
@@ -409,6 +424,80 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
   const isCurrentMcqCorrect = currentMcqQuestion
     ? mcqAnswers[currentMcqQuestion.id] === currentMcqQuestion.correctAnswer
     : false;
+
+  // Get whiteboards for current question's lesson IDs
+  const relevantWhiteboards: WhiteboardImage[] = React.useMemo(() => {
+    if (!currentMcqQuestion || !currentMcqQuestion.lessonIDS || currentMcqQuestion.lessonIDS.length === 0) {
+      return [];
+    }
+    
+    const subjectFilter = selectedSubject === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics';
+    const questionUnit = currentMcqQuestion.unit;
+    
+    // Get unit-specific whiteboards
+    let unitWhiteboards: Whiteboard[] = [];
+    if (selectedSubject === 'macro') {
+      switch (questionUnit) {
+        case 1:
+          unitWhiteboards = unit1Whiteboards;
+          break;
+        case 2:
+          unitWhiteboards = apMacroUnit2Whiteboards;
+          break;
+        case 3:
+          unitWhiteboards = apMacroUnit3Whiteboards;
+          break;
+        case 4:
+          unitWhiteboards = apMacroUnit4Whiteboards;
+          break;
+        case 5:
+          unitWhiteboards = apMacroUnit5Whiteboards;
+          break;
+      }
+    } else {
+      switch (questionUnit) {
+        case 3:
+          unitWhiteboards = apMicroUnit3Whiteboards;
+          break;
+        case 4:
+          unitWhiteboards = apMicroUnit4Whiteboards;
+          break;
+        case 5:
+          unitWhiteboards = apMicroUnit5Whiteboards;
+          break;
+        case 6:
+          unitWhiteboards = apMicroUnit6Whiteboards;
+          break;
+      }
+    }
+    
+    // Convert unit-specific whiteboards to WhiteboardImage format
+    const unitWhiteboardImages: WhiteboardImage[] = unitWhiteboards
+      .filter(wb => currentMcqQuestion.lessonIDS?.includes(wb.lessonID))
+      .map((wb, index) => ({
+        id: `wb-unit${questionUnit}-${index}`,
+        subject: subjectFilter,
+        unit: questionUnit,
+        lessonIDs: [wb.lessonID],
+        imageUrl: wb.url,
+        title: wb.topic,
+      }));
+    
+    // Get whiteboards from allContent
+    const contentWhiteboards = allContentWhiteboards.filter(wb => 
+      wb.subject === subjectFilter &&
+      wb.unit === questionUnit &&
+      wb.lessonIDs.some(lessonId => currentMcqQuestion.lessonIDS?.includes(lessonId))
+    );
+    
+    // Combine and deduplicate by imageUrl
+    const allRelevant = [...unitWhiteboardImages, ...contentWhiteboards];
+    const uniqueWhiteboards = Array.from(
+      new Map(allRelevant.map(wb => [wb.imageUrl, wb])).values()
+    );
+    
+    return uniqueWhiteboards;
+  }, [currentMcqQuestion, selectedSubject]);
 
   // Activity component mapping
   const getActivityComponent = () => {
@@ -573,6 +662,38 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
                   </div>
                 )}
               </div>
+
+              {/* Calculator and Drawing Pad Buttons - Fixed position to the right */}
+              <div className="fixed bottom-8 right-8 z-40 flex flex-col gap-3">
+                {!showCalculator && (
+                  <button
+                    onClick={() => setShowCalculator(true)}
+                    className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-3 hover:bg-gray-50 transition-all active:scale-95"
+                    aria-label="Open calculator"
+                  >
+                    <Calculator className="w-6 h-6 text-black" />
+                  </button>
+                )}
+                {!showDrawingPad && (
+                  <button
+                    onClick={() => setShowDrawingPad(true)}
+                    className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-3 hover:bg-gray-50 transition-all active:scale-95"
+                    aria-label="Open whiteboard"
+                  >
+                    <Pen className="w-6 h-6 text-black" />
+                  </button>
+                )}
+              </div>
+
+              {/* Calculator Component */}
+              {showCalculator && (
+                <ExamCalculator onClose={() => setShowCalculator(false)} />
+              )}
+
+              {/* Drawing Pad Component */}
+              {showDrawingPad && (
+                <ExamWhiteboard onClose={() => setShowDrawingPad(false)} />
+              )}
             </motion.div>
           )}
 
@@ -607,7 +728,7 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
               <div className="flex-1">
                 <div className="grid grid-cols-5 gap-6 h-full">
                   {/* Left Column: Question and Options (span-3) */}
-                  <div className="col-span-5 md:col-span-3 flex flex-col">
+                  <div className="col-span-5 md:col-span-3 flex flex-col h-full">
                     <div className="mb-6">
                       {/* Parse markdown table from question text */}
                       {(() => {
@@ -737,8 +858,25 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
                               />
                             )}
                           </div>
+                        ) : relevantWhiteboards.length > 0 ? (
+                          /* State: Show Whiteboards */
+                          <div className="flex-1 overflow-y-auto space-y-4 pr-2">
+                            {relevantWhiteboards.map((whiteboard) => (
+                              <div key={whiteboard.id} className="bg-white border-2 border-gray-300 rounded-lg overflow-hidden">
+                                <Image
+                                  src={whiteboard.imageUrl}
+                                  alt="Whiteboard"
+                                  width={400}
+                                  height={300}
+                                  className="w-full h-auto"
+                                  unoptimized
+                                />
+                              </div>
+                            ))}
+                          </div>
                         ) : (
-                          <div className="flex-1 flex items-center justify-center">
+                          /* State: Show Hint (only if no whiteboards) */
+                          <div className="flex-1 flex flex-col items-center justify-center">
                             <button
                               onClick={() => setShowHint(!showHint)}
                               className="px-6 py-3 bg-black text-white border-2 border-black rounded-xl font-bold hover:bg-gray-800 active:translate-y-1 transition-all flex items-center gap-2"
@@ -746,13 +884,13 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
                               <Lightbulb className="w-5 h-5" />
                               {showHint ? 'Hide Hint' : 'Show Hint'}
                             </button>
-                          </div>
-                        )}
-                        {showHint && !currentMcqQuestion.image && (
-                          <div className="mt-4 p-4 bg-yellow-50 border-2 border-yellow-400 rounded-lg">
-                            <p className="text-sm font-medium text-gray-800">
-                              Think about the key concepts related to this question. Consider what you learned in the video and interactive activity.
-                            </p>
+                            {showHint && (
+                              <div className="mt-4 p-4 bg-yellow-50 border-2 border-yellow-400 rounded-lg">
+                                <p className="text-sm font-medium text-gray-800">
+                                  Think about the key concepts related to this question. Consider what you learned in the video and interactive activity.
+                                </p>
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
@@ -782,6 +920,38 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
                   )}
                 </div>
               </div>
+
+              {/* Calculator and Drawing Pad Buttons - Fixed position to the right */}
+              <div className="fixed bottom-8 right-8 z-40 flex flex-col gap-3">
+                {!showCalculator && (
+                  <button
+                    onClick={() => setShowCalculator(true)}
+                    className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-3 hover:bg-gray-50 transition-all active:scale-95"
+                    aria-label="Open calculator"
+                  >
+                    <Calculator className="w-6 h-6 text-black" />
+                  </button>
+                )}
+                {!showDrawingPad && (
+                  <button
+                    onClick={() => setShowDrawingPad(true)}
+                    className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-3 hover:bg-gray-50 transition-all active:scale-95"
+                    aria-label="Open whiteboard"
+                  >
+                    <Pen className="w-6 h-6 text-black" />
+                  </button>
+                )}
+              </div>
+
+              {/* Calculator Component */}
+              {showCalculator && (
+                <ExamCalculator onClose={() => setShowCalculator(false)} />
+              )}
+
+              {/* Drawing Pad Component */}
+              {showDrawingPad && (
+                <ExamWhiteboard onClose={() => setShowDrawingPad(false)} />
+              )}
             </motion.div>
               ) : (
                 <motion.div
