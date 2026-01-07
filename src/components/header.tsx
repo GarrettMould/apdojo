@@ -193,7 +193,28 @@ function Header() {
             {/* Subject Toggle for Logged-Out Users */}
             {!user && (
               <div className="flex items-center">
-                <SubjectToggle />
+                <div className="inline-flex items-center bg-gray-100 rounded-lg p-1 border border-gray-300">
+                  <button
+                    onClick={() => handleSubjectChange('macro')}
+                    className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all duration-200 ${
+                      displaySubject === 'macro'
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:text-gray-900'
+                    }`}
+                  >
+                    Macro
+                  </button>
+                  <button
+                    onClick={() => handleSubjectChange('micro')}
+                    className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all duration-200 ${
+                      displaySubject === 'micro'
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:text-gray-900'
+                    }`}
+                  >
+                    Micro
+                  </button>
+                </div>
               </div>
             )}
 
