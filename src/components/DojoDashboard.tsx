@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, FileText, Target, ChevronRight, CheckCircle2, Clock, ClipboardList, BookOpen, ChevronDown, ChevronUp, Lock, Zap, Sparkles } from 'lucide-react';
+import { Play, FileText, Target, ChevronRight, CheckCircle2, Clock, ClipboardList, BookOpen, ChevronDown, ChevronUp, Lock, Zap, Sparkles, Brain } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
@@ -672,9 +672,9 @@ export function DojoDashboard() {
                   className={`bg-white rounded-lg p-6 cursor-pointer border border-gray-200 ${theme.hoverBorder} transition-all`}
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-blue-100 rounded-md flex items-center justify-center">
+                    <div className="w-12 h-12 bg-gray-100 rounded-md flex items-center justify-center">
                       <Image
-                        src="/images/boltIcon.svg"
+                        src="/images/boltGrey.svg"
                         alt="MCQ Practice"
                         width={24}
                         height={24}
@@ -697,12 +697,12 @@ export function DojoDashboard() {
                   className={`bg-white rounded-lg p-6 cursor-pointer border border-gray-200 ${theme.hoverBorder} transition-all`}
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-green-100 rounded-md flex items-center justify-center">
-                      <Target className="w-6 h-6 text-green-600" />
+                    <div className="w-12 h-12 bg-gray-100 rounded-md flex items-center justify-center">
+                      <Brain className="w-6 h-6 text-gray-700" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">Infinite Drill</h3>
-                      <p className="text-sm text-gray-600">Continuous practice mode</p>
+                      <h3 className="font-semibold text-gray-900">Generate Quiz</h3>
+                      <p className="text-sm text-gray-600">AI-powered practice mode</p>
                     </div>
                       </div>
                 </motion.div>
@@ -716,9 +716,9 @@ export function DojoDashboard() {
                   className={`bg-white rounded-lg p-6 cursor-pointer border border-gray-200 ${theme.hoverBorder} transition-all`}
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-yellow-100 rounded-md flex items-center justify-center">
+                    <div className="w-12 h-12 bg-gray-100 rounded-md flex items-center justify-center">
                       <Image
-                        src="/images/fiveFill.svg"
+                        src="/images/fiveGrey.svg"
                         alt="Diagnostic Test"
                         width={24}
                         height={24}
@@ -760,7 +760,7 @@ export function DojoDashboard() {
                   if (activity.type === 'dojo-drill') {
                     thumbnailType = 'drill';
                     Icon = Zap;
-                    href = `/dojo-drills#${activity.id.replace('drill-', '')}`;
+                    href = `/dojo-drills/preview/${activity.id.replace('drill-', '')}`;
                   } else if (activity.type === 'quiz' || activity.type === 'custom-quiz') {
                     thumbnailType = currentCourse === 'macro' ? 'macro' : 'micro';
                     Icon = Zap;
@@ -819,7 +819,7 @@ export function DojoDashboard() {
                                   />
                                 ) : activity.type === 'frq-exam' ? (
                                   <Image
-                                    src="/images/pencilLineIcon.svg"
+                                    src="/images/pencilFinal.svg"
                                     alt="FRQ"
                                     width={20}
                                     height={20}
@@ -1023,7 +1023,7 @@ export function DojoDashboard() {
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-md bg-gray-100 flex items-center justify-center flex-shrink-0">
                               <Image
-                                src="/images/pencilLineIcon.svg"
+                                src="/images/pencilFinal.svg"
                                 alt="FRQ"
                                 width={20}
                                 height={20}

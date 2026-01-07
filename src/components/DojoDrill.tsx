@@ -725,7 +725,7 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   className="absolute inset-0 bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8 flex flex-col overflow-y-auto"
                 >
-              <div className="flex-1">
+              <div className="flex-1 min-h-0 pb-8">
                 <div className="grid grid-cols-5 gap-6 h-full">
                   {/* Left Column: Question and Options (span-3) */}
                   <div className="col-span-5 md:col-span-3 flex flex-col h-full">
@@ -834,10 +834,10 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
                   </div>
 
                   {/* Right Column: Intel Panel (span-2) */}
-                  <div className="col-span-5 md:col-span-2 bg-gray-50 border-l-4 border-black h-full p-6 hidden md:flex flex-col">
+                  <div className="col-span-5 md:col-span-2 bg-gray-50 border-l-4 border-black p-6 hidden md:flex flex-col h-full overflow-hidden">
                     {!isCurrentMcqAnswered ? (
                       /* State A: Before Answer - Image or Hint */
-                      <div className="flex flex-col h-full">
+                      <div className="flex flex-col h-full min-h-0">
                         {currentMcqQuestion.image ? (
                           <div className="flex-1 flex items-center justify-center">
                             {typeof currentMcqQuestion.image === 'object' && 'src' in currentMcqQuestion.image && !('default' in currentMcqQuestion.image) ? (
@@ -860,7 +860,7 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
                           </div>
                         ) : relevantWhiteboards.length > 0 ? (
                           /* State: Show Whiteboards */
-                          <div className="flex-1 overflow-y-auto space-y-4 pr-2">
+                          <div className="flex-1 overflow-y-auto space-y-4 pr-2 min-h-0">
                             {relevantWhiteboards.map((whiteboard) => (
                               <div key={whiteboard.id} className="bg-white border-2 border-gray-300 rounded-lg overflow-hidden">
                                 <Image
@@ -896,10 +896,10 @@ export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
                       </div>
                     ) : (
                       /* State B: After Answer - Debrief Card */
-                      <div className="flex flex-col h-full">
+                      <div className="flex flex-col h-full min-h-0">
                         <h3 className="text-xl font-black text-black mb-4">Analysis</h3>
                         {currentMcqQuestion.explanation && (
-                          <div className="flex-1 overflow-y-auto">
+                          <div className="flex-1 overflow-y-auto min-h-0">
                             <p className="text-sm font-medium text-gray-800 leading-relaxed">
                               {currentMcqQuestion.explanation}
                             </p>
