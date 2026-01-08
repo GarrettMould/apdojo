@@ -18,12 +18,20 @@ import { MCQSidecar } from './MCQSidecar';
 import { DojoReadinessBand } from './DojoReadinessBand';
 import { Scroll } from 'lucide-react';
 import { QuestionWithKeyTerms } from './QuestionWithKeyTerms';
-import { ExamCalculator } from './ExamCalculator';
-import { ExamWhiteboard } from './ExamWhiteboard';
 import { ExamTutorialModal } from './ExamTutorialModal';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 import { saveQuizResult } from '@/lib/quizHistory';
+import { motion, AnimatePresence } from 'framer-motion';
+import dynamic from 'next/dynamic';
+import '@excalidraw/excalidraw/index.css';
+
+const Excalidraw = dynamic(
+  async () => (await import("@excalidraw/excalidraw")).Excalidraw,
+  {
+    ssr: false,
+  },
+);
 
 interface FullExamProps {
   questionBank: QuestionBank;
@@ -116,24 +124,28 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
     return 'Dojo Challenge';
   }, [isCustomAssignment]);
 
-  // Add calculator states
-  const [showCalculator, setShowCalculator] = useState(false);
-  const [isLargeCalculator, setIsLargeCalculator] = useState(false);
+  // Add tools panel state (slide-out panel for calculator and drawing pad)
+  const [showToolsPanel, setShowToolsPanel] = useState(false);
+  const [leftPanelWidth, setLeftPanelWidth] = useState(65); // Percentage width for left panel when tools panel is open
+
+  // Update leftPanelWidth when tools panel opens/closes
+  useEffect(() => {
+    if (showToolsPanel) {
+      setLeftPanelWidth(65);
+    } else {
+      setLeftPanelWidth(100);
+    }
+  }, [showToolsPanel]);
+
+  // Add calculator states (for inline calculator in slide-out)
   const [calculatorDisplay, setCalculatorDisplay] = useState('0');
-  const [previousValue, setPreviousValue] = useState<number | null>(null);
-  const [operation, setOperation] = useState<string | null>(null);
-  const [newNumber, setNewNumber] = useState(true);
+  const [calculatorPreviousValue, setCalculatorPreviousValue] = useState<number | null>(null);
+  const [calculatorOperation, setCalculatorOperation] = useState<string | null>(null);
+  const [calculatorWaitingForNewValue, setCalculatorWaitingForNewValue] = useState(false);
 
-  // Add drawing pad states
-  const [showDrawingPad, setShowDrawingPad] = useState(false);
-  const [isDrawing, setIsDrawing] = useState(false);
-  const [isEraser, setIsEraser] = useState(false);
-  const [isLargeDrawingPad, setIsLargeDrawingPad] = useState(false);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const lastPosRef = useRef<{ x: number; y: number } | null>(null);
-
-  // Add to state variables
-  const [penColor, setPenColor] = useState('#000000');
+  // Excalidraw state
+  const [excalidrawElements, setExcalidrawElements] = useState<any[]>([]);
+  const [excalidrawAppState, setExcalidrawAppState] = useState<any>(null);
 
   // Add current question index state (for single question view)
   const [currentPage, setCurrentPage] = useState(0);
@@ -141,9 +153,6 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
 
   // Add completed questions tracking
   const [completedQuestions, setCompletedQuestions] = useState<Set<number>>(new Set());
-
-  // Add eraser size state
-  const [eraserSize, setEraserSize] = useState(20);
 
   // Add state for image modal
   const [showImageModal, setShowImageModal] = useState(false);
@@ -255,9 +264,6 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
     }));
   };
 
-  // Add these new states
-  const [expression, setExpression] = useState<string[]>([]);
-  const [openParenCount, setOpenParenCount] = useState(0);
 
   // Add this state to store the canvas image data
   const [canvasHistory, setCanvasHistory] = useState<ImageData | null>(null);
@@ -501,250 +507,82 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
     }, 100);
   };
 
-  // Update the calculator display function
-  const getDisplayText = () => {
-    return expression.join(' ');
+  // Calculator functions for slide-out panel
+  const handleCalculatorNumber = (num: string) => {
+    if (calculatorWaitingForNewValue) {
+      setCalculatorDisplay(num);
+      setCalculatorWaitingForNewValue(false);
+    } else {
+      setCalculatorDisplay(calculatorDisplay === '0' ? num : calculatorDisplay + num);
+    }
   };
 
-  // Update calculator functions
-  const handleNumber = (num: string) => {
-    if (num === '(') {
-      setExpression(prev => [...prev, '(']);
-      setOpenParenCount(prev => prev + 1);
-      return;
+  const handleCalculatorOperation = (op: string) => {
+    const inputValue = parseFloat(calculatorDisplay);
+
+    if (calculatorPreviousValue === null) {
+      setCalculatorPreviousValue(inputValue);
+    } else if (calculatorOperation) {
+      const result = calculateResult(calculatorPreviousValue, inputValue, calculatorOperation);
+      setCalculatorDisplay(String(result));
+      setCalculatorPreviousValue(result);
     }
 
-    if (num === ')' && openParenCount > 0) {
-      setExpression(prev => [...prev, ')']);
-      setOpenParenCount(prev => prev - 1);
-      return;
+    setCalculatorWaitingForNewValue(true);
+    setCalculatorOperation(op);
+  };
+
+  const calculateResult = (firstValue: number, secondValue: number, op: string): number => {
+    switch (op) {
+      case '+':
+        return firstValue + secondValue;
+      case '-':
+        return firstValue - secondValue;
+      case '×':
+        return firstValue * secondValue;
+      case '÷':
+        return secondValue !== 0 ? firstValue / secondValue : 0;
+      default:
+        return secondValue;
     }
-
-    if (num === '(' || num === ')') return;
-
-    setExpression(prev => {
-      const last = prev[prev.length - 1];
-      if (!last || last === '(' || isOperator(last)) {
-        return [...prev, num];
-      }
-      return [...prev.slice(0, -1), last + num];
-    });
   };
 
-  const handleOperation = (op: string) => {
-    setExpression(prev => {
-      const last = prev[prev.length - 1];
-      if (!last || last === '(' || isOperator(last)) return prev;
-      return [...prev, op];
-    });
-  };
-
-  const handleClear = () => {
-    setExpression([]);
-    setOpenParenCount(0);
-  };
-
-  const handleDecimal = () => {
-    setExpression(prev => {
-      const last = prev[prev.length - 1];
-      if (!last || last === '(' || isOperator(last)) {
-        return [...prev, '0.'];
-      }
-      if (!last.includes('.')) {
-        return [...prev.slice(0, -1), last + '.'];
-      }
-      return prev;
-    });
-  };
-
-  const evaluateExpression = (exp: string[]): number => {
-    const precedence = {
-      '×': 2,
-      '÷': 2,
-      '+': 1,
-      '-': 1,
-    };
-
-    const applyOp = (a: number, b: number, op: string): number => {
-      switch (op) {
-        case '+': return a + b;
-        case '-': return a - b;
-        case '×': return a * b;
-        case '÷': return b === 0 ? NaN : a / b;
-        default: return NaN;
-      }
-    };
-
-    const evaluate = (tokens: string[]): number => {
-      const values: number[] = [];
-      const ops: (Operator | '(')[] = [];
-
-      for (let i = 0; i < tokens.length; i++) {
-        const token = tokens[i];
-
-        if (token === '(') {
-          ops.push(token);
-        }
-        else if (token === ')') {
-          while (ops.length && ops[ops.length - 1] !== '(') {
-            const b = values.pop() ?? 0;
-            const a = values.pop() ?? 0;
-            const op = ops.pop() as Operator;
-            values.push(applyOp(a, b, op));
-          }
-          ops.pop(); // Remove '('
-        }
-        else if (isOperator(token)) {
-          while (ops.length && ops[ops.length - 1] !== '(' && 
-                 precedence[ops[ops.length - 1] as Operator] >= precedence[token as Operator]) {
-            const b = values.pop() ?? 0;
-            const a = values.pop() ?? 0;
-            const op = ops.pop() as Operator;
-            values.push(applyOp(a, b, op));
-          }
-          ops.push(token as Operator);
-        }
-        else {
-          values.push(parseFloat(token));
-        }
-      }
-
-      while (ops.length) {
-        const b = values.pop() ?? 0;
-        const a = values.pop() ?? 0;
-        const op = ops.pop() as Operator;
-        values.push(applyOp(a, b, op));
-      }
-
-      return values[0] || 0;
-    };
-
-    return evaluate(exp);
-  };
-
-  const handleEquals = () => {
-    if (expression.length === 0) return;
-    
-    try {
-      const result = evaluateExpression(expression);
-      if (isNaN(result)) {
-        setExpression(['Error']);
-      } else {
-        setExpression([result.toString()]);
-      }
-    } catch (error) {
-      setExpression(['Error']);
+  const handleCalculatorEquals = () => {
+    if (calculatorPreviousValue !== null && calculatorOperation) {
+      const inputValue = parseFloat(calculatorDisplay);
+      const result = calculateResult(calculatorPreviousValue, inputValue, calculatorOperation);
+      setCalculatorDisplay(String(result));
+      setCalculatorPreviousValue(null);
+      setCalculatorOperation(null);
+      setCalculatorWaitingForNewValue(true);
     }
-    setOpenParenCount(0);
   };
 
-  // Add drawing functions
-  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    
-    setIsDrawing(true);
-    lastPosRef.current = { x, y };
+  const handleCalculatorClear = () => {
+    setCalculatorDisplay('0');
+    setCalculatorPreviousValue(null);
+    setCalculatorOperation(null);
+    setCalculatorWaitingForNewValue(false);
   };
 
-  const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    const canvas = canvasRef.current;
-    if (!canvas || !isDrawing || !lastPosRef.current) return;
-    
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    
-    ctx.beginPath();
-    ctx.moveTo(lastPosRef.current.x, lastPosRef.current.y);
-    ctx.lineTo(x, y);
-    ctx.strokeStyle = isEraser ? '#ffffff' : penColor;
-    ctx.lineWidth = isEraser ? eraserSize : 2;
-    ctx.lineCap = 'round';
-    ctx.stroke();
-    
-    lastPosRef.current = { x, y };
-  };
-
-  const stopDrawing = () => {
-    setIsDrawing(false);
-    lastPosRef.current = null;
-  };
-
-  const clearCanvas = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-  };
-
-  // Add this CSS style to create custom cursors
-  const getPenCursor = (color: string) => {
-    const size = 10;
-    const canvas = document.createElement('canvas');
-    canvas.width = size * 2;
-    canvas.height = size * 2;
-    const ctx = canvas.getContext('2d');
-    if (ctx) {
-      ctx.beginPath();
-      ctx.arc(size, size, size/2, 0, Math.PI * 2);
-      ctx.fillStyle = color;
-      ctx.fill();
+  const handleCalculatorDecimal = () => {
+    if (calculatorWaitingForNewValue) {
+      setCalculatorDisplay('0.');
+      setCalculatorWaitingForNewValue(false);
+    } else if (!calculatorDisplay.includes('.')) {
+      setCalculatorDisplay(calculatorDisplay + '.');
     }
-    return `url(${canvas.toDataURL()}) ${size} ${size}, crosshair`;
-  };
-
-  const getEraserCursor = () => {
-    const size = eraserSize;
-    const canvas = document.createElement('canvas');
-    canvas.width = size;
-    canvas.height = size;
-    const ctx = canvas.getContext('2d');
-    if (ctx) {
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, size, size);
-      ctx.strokeStyle = '#000000';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(0, 0, size, size);
-    }
-    return `url(${canvas.toDataURL()}) ${size/2} ${size/2}, crosshair`;
   };
 
 
   // Add effect to reset tools state when component unmounts/remounts
   useEffect(() => {
-    // Don't reset calculator/drawing pad on mount - let user control it
+    // Don't reset tools panel on mount - let user control it
     return () => {
-      setShowCalculator(false);
-      setShowDrawingPad(false);
+      setShowToolsPanel(false);
     };
   }, []);
 
-  // Add reset function for drawing tools
-  const resetDrawingTools = () => {
-    setIsEraser(false);
-    setPenColor('#000000');
-    setEraserSize(20);
-  };
-
-  // Modify showDrawingPad state setter to include reset
-  const toggleDrawingPad = (show: boolean) => {
-    setShowDrawingPad(show);
-    if (!show) {
-      resetDrawingTools();
-    }
-  };
 
   const handlePurchase = async () => {
     console.log('Current user state:', user); // Add debugging
@@ -944,17 +782,28 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
 
       {/* Only show exam content if not showing results, or if showing full results */}
       {(!showResults || showFullResults) && (
-        <div className={`flex w-full ${isCustomAssignment ? 'min-h-screen justify-center' : ''}`}>
-          {/* Question Container (Left Side) */}
-          <div 
-            className={`transition-all duration-300 ease-in-out ${
-              isCustomAssignment 
-                ? 'p-8 max-w-4xl w-full' 
-                : showVideoModal && videoUrl 
-                  ? 'fixed left-0 top-20 w-[55%] h-[calc(100vh-5rem)] overflow-y-auto p-8' 
-                  : 'fixed left-[50%] top-20 -translate-x-1/2 w-[1200px] h-[calc(100vh-5rem)] overflow-y-auto p-8'
-            }`}
+        <div className={`flex w-full ${isCustomAssignment ? '' : 'lg:h-[calc(100vh-4rem)]'} overflow-hidden ${isCustomAssignment || !showToolsPanel ? 'flex-col' : 'lg:flex-row flex-col'}`}>
+          {/* Question Container (Left Side / Top on Mobile) */}
+          <motion.div 
+            animate={{
+              width: showToolsPanel && !isCustomAssignment ? (typeof window !== 'undefined' && window.innerWidth >= 1024 ? `${leftPanelWidth}%` : '100%') : (isCustomAssignment ? '100%' : '100%'),
+            }}
+            transition={{
+              type: 'spring',
+              stiffness: 300,
+              damping: 30,
+            }}
+            className="flex-shrink-0 overflow-y-auto min-w-0 w-full lg:w-auto"
           >
+            <div className={`w-full ${
+              isCustomAssignment 
+                ? 'p-8 max-w-4xl mx-auto' 
+                : showVideoModal && videoUrl 
+                  ? 'p-8' 
+                  : showToolsPanel
+                    ? 'p-8'
+                    : 'p-8 max-w-5xl mx-auto'
+            }`}>
             {!showResults ? (
               <>
               {/* Progress Bar - Mobile Only */}
@@ -1538,7 +1387,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
               })()}
               </>
             ) : (
-              <div className="space-y-8">
+              <div className="space-y-8 max-w-4xl mx-auto w-full">
             {/* Questions Review */}
                 {questions.map((question) => {
                   const isCorrect = answers[question.id] === question.correctAnswer;
@@ -1767,7 +1616,390 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                 })}
               </div>
             )}
-          </div>
+            </div>
+          </motion.div>
+
+          {/* Tools Panel Slide-Out (Calculator and Excalidraw) - Right Side on Desktop, Below on Mobile */}
+          {!isCustomAssignment && (
+            <>
+              {/* Desktop: Slide-out panel from right */}
+              <AnimatePresence>
+                {showToolsPanel && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="hidden lg:block flex-shrink-0 w-[35%] h-full bg-white shadow-2xl z-40 border-l border-gray-200 overflow-hidden"
+                  >
+                  <motion.div
+                    initial={{ x: '100%' }}
+                    animate={{ x: 0 }}
+                    exit={{ x: '100%' }}
+                    transition={{
+                      type: 'spring',
+                      stiffness: 300,
+                      damping: 30,
+                    }}
+                    className="w-full h-full flex flex-col overflow-hidden"
+                  >
+                    {/* Header */}
+                    <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between flex-shrink-0">
+                      <span className="text-sm font-semibold text-gray-900">Calculator & Drawing Pad</span>
+                      <button
+                        onClick={() => setShowToolsPanel(false)}
+                        className="text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded p-1.5 transition-colors"
+                        aria-label="Close tools panel"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+
+                    {/* Calculator Section - Top */}
+                    <div className="flex-shrink-0 border-b border-gray-200 bg-gray-50">
+                      <div className="p-4">
+                        {/* Calculator Display */}
+                        <div className="bg-white border border-gray-200 rounded-lg mb-3 p-4 shadow-sm">
+                          <div className="text-right text-3xl font-semibold text-gray-900 overflow-hidden min-h-[48px] flex items-center justify-end">
+                            {calculatorDisplay}
+                          </div>
+                        </div>
+
+                        {/* Calculator Buttons */}
+                        <div className="grid grid-cols-4 gap-2.5">
+                          {/* Row 1 */}
+                          <button
+                            onClick={handleCalculatorClear}
+                            className="col-span-2 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 font-semibold py-3 rounded-lg transition-colors text-sm"
+                          >
+                            Clear
+                          </button>
+                          <button
+                            onClick={() => handleCalculatorOperation('÷')}
+                            className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
+                          >
+                            ÷
+                          </button>
+                          <button
+                            onClick={() => handleCalculatorOperation('×')}
+                            className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
+                          >
+                            ×
+                          </button>
+
+                          {/* Row 2 */}
+                          <button
+                            onClick={() => handleCalculatorNumber('7')}
+                            className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                          >
+                            7
+                          </button>
+                          <button
+                            onClick={() => handleCalculatorNumber('8')}
+                            className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                          >
+                            8
+                          </button>
+                          <button
+                            onClick={() => handleCalculatorNumber('9')}
+                            className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                          >
+                            9
+                          </button>
+                          <button
+                            onClick={() => handleCalculatorOperation('-')}
+                            className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
+                          >
+                            −
+                          </button>
+
+                          {/* Row 3 */}
+                          <button
+                            onClick={() => handleCalculatorNumber('4')}
+                            className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                          >
+                            4
+                          </button>
+                          <button
+                            onClick={() => handleCalculatorNumber('5')}
+                            className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                          >
+                            5
+                          </button>
+                          <button
+                            onClick={() => handleCalculatorNumber('6')}
+                            className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                          >
+                            6
+                          </button>
+                          <button
+                            onClick={() => handleCalculatorOperation('+')}
+                            className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
+                          >
+                            +
+                          </button>
+
+                          {/* Row 4 */}
+                          <button
+                            onClick={() => handleCalculatorNumber('1')}
+                            className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                          >
+                            1
+                          </button>
+                          <button
+                            onClick={() => handleCalculatorNumber('2')}
+                            className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                          >
+                            2
+                          </button>
+                          <button
+                            onClick={() => handleCalculatorNumber('3')}
+                            className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                          >
+                            3
+                          </button>
+                          <button
+                            onClick={handleCalculatorEquals}
+                            className={`row-span-2 ${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-xl`}
+                          >
+                            =
+                          </button>
+
+                          {/* Row 5 */}
+                          <button
+                            onClick={() => handleCalculatorNumber('0')}
+                            className="col-span-2 bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                          >
+                            0
+                          </button>
+                          <button
+                            onClick={handleCalculatorDecimal}
+                            className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                          >
+                            .
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                      {/* Excalidraw Section - Bottom */}
+                      <div className="flex-1 flex flex-col overflow-hidden bg-white">
+                        <div className="h-full w-full relative">
+                          <Excalidraw
+                            zenModeEnabled={true}
+                            viewModeEnabled={false}
+                            gridModeEnabled={false}
+                            UIOptions={{
+                              library: false,
+                              canvasActions: {
+                                toggleTheme: false, // Hide dark mode toggle
+                                changeViewBackgroundColor: false, // Hide background color picker
+                                loadScene: false, // Hide load scene option
+                                saveToActiveFile: false, // Hide save option
+                                export: false, // Hide export option (removes export/share links)
+                              },
+                            }}
+                            initialData={{
+                              elements: excalidrawElements,
+                              appState: {
+                                ...excalidrawAppState,
+                                zenModeEnabled: true,
+                                theme: "light", // Force light theme
+                                // Set default pencil thickness to 1 (thinner)
+                                currentItemStrokeWidth: excalidrawAppState?.currentItemStrokeWidth ?? 1,
+                              },
+                            }}
+                            onChange={(elements, appState) => {
+                              setExcalidrawElements(elements);
+                              setExcalidrawAppState(appState);
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Mobile: Panel appears below question content */}
+              {showToolsPanel && (
+                <div className="lg:hidden w-full bg-white shadow-lg border-t border-gray-200">
+                  {/* Header */}
+                  <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between flex-shrink-0">
+                    <span className="text-sm font-semibold text-gray-900">Calculator & Drawing Pad</span>
+                    <button
+                      onClick={() => setShowToolsPanel(false)}
+                      className="text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded p-1.5 transition-colors"
+                      aria-label="Close tools panel"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  {/* Calculator Section - Top */}
+                  <div className="flex-shrink-0 border-b border-gray-200 bg-gray-50">
+                    <div className="p-4">
+                      {/* Calculator Display */}
+                      <div className="bg-white border border-gray-200 rounded-lg mb-3 p-4 shadow-sm">
+                        <div className="text-right text-3xl font-semibold text-gray-900 overflow-hidden min-h-[48px] flex items-center justify-end">
+                          {calculatorDisplay}
+                        </div>
+                      </div>
+
+                      {/* Calculator Buttons */}
+                      <div className="grid grid-cols-4 gap-2.5">
+                        {/* Row 1 */}
+                        <button
+                          onClick={handleCalculatorClear}
+                          className="col-span-2 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 font-semibold py-3 rounded-lg transition-colors text-sm"
+                        >
+                          Clear
+                        </button>
+                        <button
+                          onClick={() => handleCalculatorOperation('÷')}
+                          className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
+                        >
+                          ÷
+                        </button>
+                        <button
+                          onClick={() => handleCalculatorOperation('×')}
+                          className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
+                        >
+                          ×
+                        </button>
+
+                        {/* Row 2 */}
+                        <button
+                          onClick={() => handleCalculatorNumber('7')}
+                          className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                        >
+                          7
+                        </button>
+                        <button
+                          onClick={() => handleCalculatorNumber('8')}
+                          className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                        >
+                          8
+                        </button>
+                        <button
+                          onClick={() => handleCalculatorNumber('9')}
+                          className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                        >
+                          9
+                        </button>
+                        <button
+                          onClick={() => handleCalculatorOperation('-')}
+                          className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
+                        >
+                          −
+                        </button>
+
+                        {/* Row 3 */}
+                        <button
+                          onClick={() => handleCalculatorNumber('4')}
+                          className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                        >
+                          4
+                        </button>
+                        <button
+                          onClick={() => handleCalculatorNumber('5')}
+                          className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                        >
+                          5
+                        </button>
+                        <button
+                          onClick={() => handleCalculatorNumber('6')}
+                          className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                        >
+                          6
+                        </button>
+                        <button
+                          onClick={() => handleCalculatorOperation('+')}
+                          className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
+                        >
+                          +
+                        </button>
+
+                        {/* Row 4 */}
+                        <button
+                          onClick={() => handleCalculatorNumber('1')}
+                          className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                        >
+                          1
+                        </button>
+                        <button
+                          onClick={() => handleCalculatorNumber('2')}
+                          className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                        >
+                          2
+                        </button>
+                        <button
+                          onClick={() => handleCalculatorNumber('3')}
+                          className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                        >
+                          3
+                        </button>
+                        <button
+                          onClick={handleCalculatorEquals}
+                          className={`row-span-2 ${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-xl`}
+                        >
+                          =
+                        </button>
+
+                        {/* Row 5 */}
+                        <button
+                          onClick={() => handleCalculatorNumber('0')}
+                          className="col-span-2 bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                        >
+                          0
+                        </button>
+                        <button
+                          onClick={handleCalculatorDecimal}
+                          className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                        >
+                          .
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Excalidraw Section - Bottom */}
+                  <div className="flex flex-col bg-white" style={{ height: '400px' }}>
+                    <div className="h-full w-full relative">
+                      <Excalidraw
+                        zenModeEnabled={true}
+                        viewModeEnabled={false}
+                        gridModeEnabled={false}
+                        UIOptions={{
+                          library: false,
+                          canvasActions: {
+                            toggleTheme: false,
+                            changeViewBackgroundColor: false,
+                            loadScene: false,
+                            saveToActiveFile: false,
+                            export: false,
+                          },
+                        }}
+                        initialData={{
+                          elements: excalidrawElements,
+                          appState: {
+                            ...excalidrawAppState,
+                            zenModeEnabled: true,
+                            theme: "light",
+                            currentItemStrokeWidth: excalidrawAppState?.currentItemStrokeWidth ?? 1,
+                          },
+                        }}
+                        onChange={(elements, appState) => {
+                          setExcalidrawElements(elements);
+                          setExcalidrawAppState(appState);
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
         </div>
       )}
 
@@ -1775,22 +2007,22 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
       {!showResults && (
       <div className="fixed bottom-8 right-8 z-40 flex flex-col gap-3">
         {/* Calculator Toggle Button */}
-        {!showCalculator && (
+        {!showToolsPanel && (
           <button
-            onClick={() => setShowCalculator(true)}
+            onClick={() => setShowToolsPanel(true)}
             className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-3 hover:bg-gray-50 transition-all active:scale-95"
-            aria-label="Open calculator"
+            aria-label="Open calculator and drawing pad"
           >
             <Calculator className="w-6 h-6 text-black" />
           </button>
         )}
 
         {/* Whiteboard Toggle Button */}
-        {!showDrawingPad && (
+        {!showToolsPanel && (
           <button
-            onClick={() => setShowDrawingPad(true)}
+            onClick={() => setShowToolsPanel(true)}
             className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-3 hover:bg-gray-50 transition-all active:scale-95"
-            aria-label="Open whiteboard"
+            aria-label="Open calculator and drawing pad"
           >
             <Pen className="w-6 h-6 text-black" />
           </button>
@@ -1798,15 +2030,6 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
       </div>
       )}
 
-      {/* Exam Calculator */}
-      {showCalculator && !showResults && (
-        <ExamCalculator onClose={() => setShowCalculator(false)} />
-      )}
-
-      {/* Exam Whiteboard */}
-      {showDrawingPad && !showResults && (
-        <ExamWhiteboard onClose={() => setShowDrawingPad(false)} />
-      )}
 
       {/* Bookmark Confirmation Modal */}
       {showBookmarkConfirmModal && (

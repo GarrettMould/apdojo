@@ -171,3 +171,42 @@ html {
     }
   }
 }
+
+/* Excalidraw customizations */
+/* Hide library button - multiple selectors to catch all variations */
+.excalidraw button[aria-label*="library" i],
+.excalidraw button[aria-label*="Library" i],
+.excalidraw .library-menu-button,
+.excalidraw [data-testid="library-button"],
+.excalidraw .ToolIcon_type_button[title*="library" i],
+.excalidraw .ToolIcon_type_button[title*="Library" i],
+.excalidraw button[title*="library" i],
+.excalidraw button[title*="Library" i],
+.excalidraw .ToolIcon[aria-label*="library" i],
+.excalidraw .ToolIcon[aria-label*="Library" i] {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* Keep toolbar visible - prevent auto-hide during drawing */
+.excalidraw .Toolbar,
+.excalidraw .Toolbar__content,
+.excalidraw .Island {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+/* Prevent toolbar from hiding on hover or interaction */
+.excalidraw .Toolbar:hover,
+.excalidraw .Toolbar:active,
+.excalidraw .Toolbar:focus-within {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Keep sidebar/toolbar visible when canvas is active */
+.excalidraw .App-menu {
+  opacity: 1 !important;
+  visibility: visible !important;
+}

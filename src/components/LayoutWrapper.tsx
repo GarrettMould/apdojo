@@ -14,6 +14,9 @@ function HeaderWithSuspense() {
 }
 
 export function LayoutWrapper({ children }: LayoutWrapperProps) {
+  const pathname = usePathname();
+  const isGraphGymPage = pathname === '/graph-gym';
+  
   return (
     <div className="flex flex-col min-h-screen">
       <Suspense fallback={<div className="h-16 bg-white" />}>
@@ -22,7 +25,7 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
       <main className="flex-1">
         {children}
       </main>
-      <Footer />
+      {!isGraphGymPage && <Footer />}
     </div>
   );
 } 
