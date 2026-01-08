@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, X, FileText, Image as ImageIcon, Loader2, Check, Sparkles, CheckCircle2, XCircle, RefreshCw, Lightbulb } from 'lucide-react';
+import { Upload, X, FileText, Image as ImageIcon, Loader2, Check, Sparkles, CheckCircle2, XCircle, RefreshCw, Lightbulb, Strikethrough } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -41,8 +41,10 @@ function InfinitePracticePage() {
   const [showCreditConfirmModal, setShowCreditConfirmModal] = useState(false);
   const [showLoginModal, setShowLoginModalState] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
+  const [showLoginToGenerateModal, setShowLoginToGenerateModal] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [isUploading, setIsUploading] = useState(false);
+  const [strikethroughState, setStrikethroughState] = useState<Record<string, number[]>>({});
 
   // Helper: Convert any file to Base64
   const convertFileToBase64 = (file: File): Promise<string> => {
@@ -102,7 +104,7 @@ function InfinitePracticePage() {
   const handleGenerate = async () => {
     // Check if user is logged in
     if (!user) {
-      setShowLoginModalState(true);
+      setShowLoginToGenerateModal(true);
       return;
     }
 
@@ -274,6 +276,7 @@ function InfinitePracticePage() {
     setCurrentQuestionIndex(0);
     setShowExplanation(false);
     setAnsweredQuestions(new Set());
+    setStrikethroughState({});
   };
 
   const handleAnswerSelect = (questionId: string, answer: string) => {
@@ -284,9 +287,61 @@ function InfinitePracticePage() {
     // Only allow selection if question hasn't been answered yet
     if (answeredQuestions.has(question.id || 0)) return;
     
+    // Get the answer index (0-3 for A-D)
+    const answerIndex = answer.charCodeAt(0) - 65;
+    
+    // If option is struck through, just remove strikethrough and don't select
+    if (strikethroughState[questionId]?.includes(answerIndex)) {
+      setStrikethroughState(prev => {
+        const currentStrikes = prev[questionId] || [];
+        const newStrikes = currentStrikes.filter(i => i !== answerIndex);
+        if (newStrikes.length === 0) {
+          const { [questionId]: _, ...rest } = prev;
+          return rest;
+        }
+        return { ...prev, [questionId]: newStrikes };
+      });
+      return; // Exit early - do NOT select
+    }
+    
     setUserAnswers(prev => ({ ...prev, [questionId]: answer }));
     setAnsweredQuestions(prev => new Set(prev).add(question.id || 0));
     setShowExplanation(false);
+  };
+
+  const handleStrikethroughToggle = (questionId: string, optionIndex: number) => {
+    if (isSubmitted) return;
+    
+    // If the option being struck through is the currently selected answer, deselect it.
+    const currentAnswer = userAnswers[questionId];
+    if (currentAnswer && String.fromCharCode(65 + optionIndex) === currentAnswer) {
+      setUserAnswers(prev => {
+        const newAnswers = { ...prev };
+        delete newAnswers[questionId];
+        return newAnswers;
+      });
+      setAnsweredQuestions(prev => {
+        const newSet = new Set(prev);
+        const question = result?.questions.find(q => String(q.id) === questionId);
+        if (question) {
+          newSet.delete(question.id || 0);
+        }
+        return newSet;
+      });
+    }
+
+    setStrikethroughState(prev => {
+      const currentStrikes = prev[questionId] || [];
+      const newStrikes = currentStrikes.includes(optionIndex)
+        ? currentStrikes.filter(i => i !== optionIndex)
+        : [...currentStrikes, optionIndex];
+      
+      if (newStrikes.length === 0) {
+        const { [questionId]: _, ...rest } = prev;
+        return rest;
+      }
+      return { ...prev, [questionId]: newStrikes };
+    });
   };
 
   const handleShowExplanation = () => {
@@ -366,6 +421,52 @@ function InfinitePracticePage() {
           setShowSignupModal(false);
         }}
       />
+
+      {/* Login to Generate Modal */}
+      {showLoginToGenerateModal && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-75 z-[100] flex items-center justify-center p-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowLoginToGenerateModal(false);
+            }
+          }}
+        >
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            className="bg-white border-4 border-black rounded-3xl shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] p-8 max-w-md w-full text-center relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-3xl font-black text-gray-900 mb-4">
+              Log in to Generate a Free Quiz!
+            </h3>
+            <p className="text-gray-700 mb-6">
+              Create an account to start generating custom AP-style questions from your notes. You'll get one free AI generation credit.
+            </p>
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={() => {
+                  setShowLoginToGenerateModal(false);
+                  setShowLoginModalState(true);
+                }}
+                className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors"
+              >
+                Log In
+              </button>
+              <button
+                onClick={() => {
+                  setShowLoginToGenerateModal(false);
+                }}
+                className="w-full px-6 py-3 border-4 border-black rounded-xl font-bold text-gray-900 hover:bg-gray-100 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
 
       {/* Credit Confirmation Modal */}
       {showCreditConfirmModal && (
@@ -607,18 +708,6 @@ Example: 'Explain the causes of the Great Depression and how fiscal policy was u
                   </motion.div>
                 )}
 
-                {!user && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="mt-4 p-4 bg-blue-50 border-4 border-blue-300 rounded-xl"
-                  >
-                    <p className="text-blue-800 font-semibold text-center">
-                      🔒 Please log in to try this feature for free! You'll get one free AI generation credit.
-                    </p>
-                  </motion.div>
-                )}
-
                 <motion.div
                   whileHover={canGenerate && !isGenerating && user ? { scale: 1.02 } : {}}
                   whileTap={canGenerate && !isGenerating && user ? { scale: 0.98 } : {}}
@@ -626,7 +715,7 @@ Example: 'Explain the causes of the Great Depression and how fiscal policy was u
                 >
                   <Button
                     onClick={handleGenerate}
-                    disabled={!canGenerate || isGenerating || !user}
+                    disabled={!canGenerate || isGenerating}
                     className={`w-full font-black py-6 text-xl border-4 transition-all ${
                       canGenerate && !isGenerating
                         ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-blue-800 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]'
@@ -870,7 +959,9 @@ Example: 'Explain the causes of the Great Depression and how fiscal policy was u
                       <div className="space-y-2">
                         {question.options.map((option, optIndex) => {
                           const letter = String.fromCharCode(65 + optIndex);
-                          const isSelected = userAnswer === letter;
+                          const isStruckThrough = strikethroughState[questionId]?.includes(optIndex);
+                          // Only show as selected if NOT struck through (strikethrough takes priority)
+                          const isSelected = !isStruckThrough && userAnswer === letter;
                           const isCorrectAnswer = letter === question.correctAnswer;
                           
                           // Determine styling based on state
@@ -883,6 +974,8 @@ Example: 'Explain the causes of the Great Depression and how fiscal policy was u
                             }
                           } else if (isSelected) {
                             optionStyle = 'bg-blue-50 border-blue-500';
+                          } else if (isStruckThrough) {
+                            optionStyle = 'bg-gray-100 border-gray-300 opacity-60';
                           }
 
                           return (
@@ -892,9 +985,9 @@ Example: 'Explain the causes of the Great Depression and how fiscal policy was u
                               animate={isAnswered && isCorrectAnswer ? { scale: [1, 1.05, 1] } : {}}
                               transition={{ duration: 0.3 }}
                               className={`p-3 rounded-lg border-2 transition-colors ${optionStyle} ${
-                                !isAnswered ? 'cursor-pointer hover:bg-blue-50 hover:border-blue-300' : ''
+                                !isAnswered && !isStruckThrough ? 'cursor-pointer hover:bg-blue-50 hover:border-blue-300' : ''
                               }`}
-                              onClick={!isAnswered ? () => handleAnswerSelect(questionId, letter) : undefined}
+                              onClick={!isAnswered && !isStruckThrough ? () => handleAnswerSelect(questionId, letter) : undefined}
                             >
                               <div className="flex items-center gap-3">
                                 {!isAnswered ? (
@@ -905,10 +998,24 @@ Example: 'Explain the causes of the Great Depression and how fiscal policy was u
                                       value={letter}
                                       checked={isSelected}
                                       onChange={() => handleAnswerSelect(questionId, letter)}
+                                      disabled={isStruckThrough}
                                       className="w-5 h-5 text-blue-600 flex-shrink-0"
                                       onClick={(e) => e.stopPropagation()}
                                     />
-                                    <span className="flex-1 text-gray-900">{option}</span>
+                                    <span className={`flex-1 text-gray-900 ${isStruckThrough ? 'line-through text-gray-400' : ''}`}>{option}</span>
+                                    {/* Strikethrough Button - Only show when not submitted */}
+                                    {!isSubmitted && (
+                                      <div
+                                        role="button"
+                                        onClick={(e) => { e.stopPropagation(); handleStrikethroughToggle(questionId, optIndex); }}
+                                        className={`flex-shrink-0 p-2 rounded-lg transition-colors cursor-pointer ${
+                                          isStruckThrough ? 'bg-slate-200 text-slate-600' : 'bg-white hover:bg-slate-100 text-slate-400 hover:text-slate-600'
+                                        }`}
+                                        aria-label={isStruckThrough ? "Remove strikethrough" : "Strikethrough option"}
+                                      >
+                                        <Strikethrough className="w-5 h-5" />
+                                      </div>
+                                    )}
                                   </>
                                 ) : (
                                   <>
@@ -923,7 +1030,7 @@ Example: 'Explain the causes of the Great Depression and how fiscal policy was u
                                     >
                                       {letter}
                                     </span>
-                                    <span className="flex-1 text-gray-900">{option}</span>
+                                    <span className={`flex-1 text-gray-900 ${isStruckThrough ? 'line-through text-gray-400' : ''}`}>{option}</span>
                                     {isCorrectAnswer && (
                                       <CheckCircle2 className="w-6 h-6 text-green-600 flex-shrink-0" />
                                     )}
