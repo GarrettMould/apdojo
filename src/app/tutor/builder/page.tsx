@@ -54,11 +54,12 @@ export default function TutorBuilderPage() {
     });
   }, [searchTerm, unitFilter, subjectFilter, assignmentType]);
 
-  // Filter Graph Gym scenarios based on search and filters
+  // Filter Graph Gym scenarios based on search and filters - only show IDs 41-45
   const filteredScenarios = useMemo(() => {
     if (assignmentType === 'mcq') return [];
     return graphGymScenarios.filter(scenario => {
       const matchesSubject = scenario.subject === graphGymSubject;
+      const matchesIdRange = scenario.id >= 41 && scenario.id <= 45;
       
       const matchesSearch = searchTerm === '' || 
         scenario.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -66,7 +67,7 @@ export default function TutorBuilderPage() {
         scenario.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
         scenario.topics.some(topic => topic.toLowerCase().includes(searchTerm.toLowerCase()));
       
-      return matchesSubject && matchesSearch;
+      return matchesSubject && matchesIdRange && matchesSearch;
     });
   }, [searchTerm, graphGymSubject, assignmentType]);
 
@@ -157,21 +158,23 @@ export default function TutorBuilderPage() {
               >
                 MCQs
               </button>
-              <button
-                onClick={() => {
-                  setAssignmentType('graphGym');
-                  setSelectedIds(new Set());
-                  setSearchTerm('');
-                  setUnitFilter(null);
-                }}
-                className={`px-6 py-2 font-black transition-colors border-l-2 border-black ${
-                  assignmentType === 'graphGym'
-                    ? 'bg-green-600 text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                Graph Gym FRQs
-              </button>
+              {subjectFilter === 'ap_microeconomics' && (
+                <button
+                  onClick={() => {
+                    setAssignmentType('graphGym');
+                    setSelectedIds(new Set());
+                    setSearchTerm('');
+                    setUnitFilter(null);
+                  }}
+                  className={`px-6 py-2 font-black transition-colors border-l-2 border-black ${
+                    assignmentType === 'graphGym'
+                      ? 'bg-green-600 text-white'
+                      : 'bg-white text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  Graph Gym FRQs
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -217,6 +220,11 @@ export default function TutorBuilderPage() {
                   onClick={() => {
                     setSubjectFilter('ap_macroeconomics');
                     setUnitFilter(null); // Reset unit filter when switching subjects
+                    // If Graph Gym is selected, switch to MCQ since Graph Gym is only for micro
+                    if (assignmentType === 'graphGym') {
+                      setAssignmentType('mcq');
+                      setSelectedIds(new Set());
+                    }
                   }}
                   className={`px-4 py-2 font-black transition-colors ${
                     subjectFilter === 'ap_macroeconomics'

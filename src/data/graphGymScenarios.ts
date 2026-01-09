@@ -17,6 +17,7 @@ export interface GraphGymScenario {
   description: string;
   toDoList?: string[]; // Optional array of to-do items to display as bullet points
   correctImage: string;
+  videoExplanation?: string; // Optional video explanation URL
   checklist: ChecklistItem[];
 }
 
@@ -770,7 +771,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     subject: 'micro',
     lessonId: "2.8",
     topics: ["Taxes", "Tax Incidence", "Demand Shift"],
-    difficulty: 'hard',
+    difficulty: 'medium',
     title: "Excise Tax on Consumers",
     description: "Draw a competitive market in equilibrium. Show the impact of a per-unit excise tax levied on producers.",
     toDoList: [
@@ -779,7 +780,8 @@ export const graphGymScenarios: GraphGymScenario[] = [
       "Label the net price received by producers (Pp)",
       "Shade the specific area representing the consumer's tax burden and the area representing the producer's tax burden"
     ],
-    correctImage: "/images/graphs/micro/tax-on-consumers.svg",
+    correctImage: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/wb41.jpg",
+    videoExplanation: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/explanation41.mp4",
     checklist: [
       { id: 1, text: "Demand curve shifts vertically downward by the amount of the tax" },
       { id: 2, text: "New intersection determines Producer Price (Pp) and Quantity (Qt)" },
@@ -795,7 +797,8 @@ export const graphGymScenarios: GraphGymScenario[] = [
     difficulty: 'medium',
     title: "Welfare Analysis of a Price Floor",
     description: "Draw a market with a binding price floor. Visually identify the Consumer Surplus (CS), Producer Surplus (PS), and Deadweight Loss (DWL) resulting from this intervention.",
-    correctImage: "/images/graphs/micro/price-floor-welfare.svg",
+    correctImage: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/wb42.jpg",
+    videoExplanation: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/explanation42.mp4",
     checklist: [
       { id: 1, text: "Price Floor is drawn above the equilibrium price" },
       { id: 2, text: "Consumer Surplus is the small triangle above the floor price" },
@@ -811,7 +814,8 @@ export const graphGymScenarios: GraphGymScenario[] = [
     difficulty: 'hard',
     title: "Welfare Effects of a Tariff",
     description: "Draw a domestic market importing goods at the World Price (Pw). Show a Tariff (Pt) imposed above the world price. Label the new domestic quantity supplied (Qs) and domestic quantity demanded (Qd) at the tariff price. Shade the rectangular area representing the government's tariff revenue and the two separate areas representing deadweight loss.",
-    correctImage: "/images/graphs/micro/tariff-welfare.svg",
+    correctImage: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/wb43.jpg",
+    videoExplanation: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/explanation43.mp4",
     checklist: [
       { id: 1, text: "Tariff Price (Pt) line is drawn above World Price (Pw) but below equilibrium" },
       { id: 2, text: "New Domestic Quantity Supplied (Qs) and Quantity Demanded (Qd) are labeled on the x-axis" },
@@ -827,7 +831,8 @@ export const graphGymScenarios: GraphGymScenario[] = [
     difficulty: 'medium',
     title: "Correcting a Negative Production Externality",
     description: "Draw a market where production causes pollution. Show the specific Per-Unit Tax required to fix this market failure and achieve the socially optimal quantity.",
-    correctImage: "/images/graphs/micro/neg-prod-tax.svg",
+    correctImage: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/wb44.jpg",
+    videoExplanation: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/explanation44.mp4",
     checklist: [
       { id: 1, text: "Marginal Social Cost (MSC) is above Marginal Private Cost (MPC)" },
       { id: 2, text: "Socially optimal quantity is where MSC intersects Demand (MSB)" },
@@ -843,7 +848,8 @@ export const graphGymScenarios: GraphGymScenario[] = [
     difficulty: 'medium',
     title: "Positive Consumption Externality",
     description: "Draw a market for flu shots, which generates a marginal external benefit on consumption. Label the Market Quantity, Socially Optimal Quantity, and the area of Deadweight Loss if left unregulated.",
-    correctImage: "/images/graphs/micro/pos-cons-externality.svg",
+    correctImage: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/wb45.jpg",
+    videoExplanation: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/explanation45.mp4",
     checklist: [
       { id: 1, text: "Marginal Social Benefit (MSB) is above Marginal Private Benefit (MPB)" },
       { id: 2, text: "Market Quantity is where MPB intersects Supply (MPC)" },
