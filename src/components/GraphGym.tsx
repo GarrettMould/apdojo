@@ -79,7 +79,12 @@ function JoinDojoModal({ isOpen, onClose, selectedSubject }: { isOpen: boolean; 
   );
 }
 
-export function GraphGym() {
+interface GraphGymProps {
+  assignmentScenarios?: GraphGymScenario[]; // Scenarios from assignment link
+  isAssignment?: boolean; // Whether this is an assignment (no shuffle, show next)
+}
+
+export function GraphGym({ assignmentScenarios, isAssignment = false }: GraphGymProps) {
   const theme = useCourseTheme();
   const { currentCourse } = useCourseContext();
   const { user, userData } = useAuthContext();
@@ -98,8 +103,14 @@ export function GraphGym() {
     return hasValidSeasonPass(userData, currentCourse);
   }, [user, userData, currentCourse]);
 
-  // Filter scenarios by current subject
+  // Filter scenarios by current subject (or use assignment scenarios)
   const filteredScenarios = useMemo(() => {
+    // If this is an assignment, use the provided scenarios
+    if (isAssignment && assignmentScenarios) {
+      return assignmentScenarios;
+    }
+    
+    // Otherwise, filter from all scenarios
     let scenarios = graphGymScenarios.filter(scenario => scenario.subject === currentCourse);
     
     // Filter by unit if selected
@@ -111,7 +122,7 @@ export function GraphGym() {
     }
     
     return scenarios;
-  }, [currentCourse, selectedUnit]);
+  }, [currentCourse, selectedUnit, isAssignment, assignmentScenarios]);
 
   // Get available units from scenarios
   const availableUnits = useMemo(() => {
@@ -183,6 +194,20 @@ export function GraphGym() {
     } else {
       // If only one scenario, just reset to it
       setCurrentScenarioIndex(0);
+    }
+  };
+
+  const handleNextScenario = () => {
+    // Reset submission state and checked items
+    setIsSubmitted(false);
+    setCheckedItems(new Set());
+    
+    // Clear Excalidraw by forcing a remount with new key
+    setExcalidrawKey(prev => prev + 1);
+    
+    // Move to next scenario in order
+    if (currentScenarioIndex < filteredScenarios.length - 1) {
+      setCurrentScenarioIndex(prev => prev + 1);
     }
   };
 
@@ -284,25 +309,27 @@ export function GraphGym() {
 
           {/* Right Column - Instructions & Sample Answer (Neo-Brutalist Style) */}
           <div className="w-[420px] flex-shrink-0 flex flex-col bg-white border-l-4 border-black h-screen">
-        {/* Scenario Instructions Section - Reduced Height */}
-        <div className="h-[40%] border-b-2 border-black p-6 bg-white flex flex-col">
+        {/* Scenario Instructions Section - Only show when not submitted, take more height */}
+        {!isSubmitted && (
+          <div className="h-[60%] border-b-2 border-black p-6 bg-white flex flex-col">
           <div className="flex-1 overflow-y-auto space-y-4">
             <div className="flex items-center justify-between gap-3 mb-3">
               <h2 className="uppercase font-black tracking-widest text-xs text-black">
                 Scenario
               </h2>
               
-              {/* Unit Dropdown */}
-              <div className="relative unit-dropdown-container flex-shrink-0">
-                <button
-                  onClick={handleUnitDropdownClick}
-                  className="bg-white rounded-lg border-2 border-black px-3 py-1.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center justify-between gap-2 font-bold text-black text-xs"
-                >
-                  <span>
-                    {selectedUnit !== null ? `Unit ${selectedUnit}` : 'All Units'}
-                  </span>
-                  <ChevronDown className={`w-4 h-4 transition-transform ${showUnitDropdown ? 'rotate-180' : ''}`} />
-                </button>
+              {/* Unit Dropdown - Hide in assignment mode */}
+              {!isAssignment && (
+                <div className="relative unit-dropdown-container flex-shrink-0">
+                  <button
+                    onClick={handleUnitDropdownClick}
+                    className="bg-white rounded-lg border-2 border-black px-3 py-1.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center justify-between gap-2 font-bold text-black text-xs"
+                  >
+                    <span>
+                      {selectedUnit !== null ? `Unit ${selectedUnit}` : 'All Units'}
+                    </span>
+                    <ChevronDown className={`w-4 h-4 transition-transform ${showUnitDropdown ? 'rotate-180' : ''}`} />
+                  </button>
                 
                 {/* Dropdown Menu */}
                 {showUnitDropdown && hasAccess && (
@@ -331,7 +358,8 @@ export function GraphGym() {
                     ))}
                   </div>
                 )}
-              </div>
+                </div>
+              )}
             </div>
 
             <div>
@@ -362,14 +390,95 @@ export function GraphGym() {
             {!isSubmitted ? (
               <>
                 {/* Scenario Description Card */}
-                <div className="bg-white rounded-xl border-2 border-black p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                  <p className="text-base text-black leading-relaxed font-medium">
+                <div className="bg-white rounded-xl border-2 border-black p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-4">
+                  <p className="text-base text-black leading-relaxed font-medium mb-3">
                     {activeScenario.description}
                   </p>
+                  {/* To-Do List */}
+                  {activeScenario.toDoList && activeScenario.toDoList.length > 0 && (
+                    <ul className="list-disc list-inside space-y-1 mt-3">
+                      {activeScenario.toDoList.map((item, index) => (
+                        <li key={index} className="text-base text-black leading-relaxed font-medium">
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
+                
+                {/* Shuffle Button - Only show for non-assignment sessions */}
+                {!isAssignment && (
+                  <button
+                    onClick={handleShuffleScenario}
+                    className="w-full bg-white rounded-lg border-2 border-black p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-0.5 flex items-center justify-between font-bold text-black"
+                  >
+                    <span>Shuffle Scenario</span>
+                    <Shuffle className="w-5 h-5" />
+                  </button>
+                )}
               </>
-            ) : (
-              <div className="space-y-3">
+            ) : null}
+          </div>
+          </div>
+        )}
+
+        {/* Sample Answer Section - Full height when submitted, smaller when not */}
+        <div className={isSubmitted ? "h-full bg-white p-6 flex flex-col relative overflow-y-auto" : "h-[40%] bg-white p-6 flex flex-col relative overflow-y-auto"}>
+          {!isSubmitted ? (
+            <>
+              <div className="mb-4 flex-shrink-0">
+                <h3 className="uppercase font-black tracking-widest text-xs text-black mb-3">Resources</h3>
+              </div>
+              
+              {/* Locked Rows */}
+              <div className="space-y-3 mb-4">
+                {/* Sample Answer Row */}
+                <div className="bg-white rounded-lg border-2 border-black p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-between">
+                  <span className="text-base font-bold text-black">Sample Answer</span>
+                  <Lock className="w-5 h-5 text-black" />
+                </div>
+                
+                {/* Video Walkthrough Row */}
+                <div className="bg-white rounded-lg border-2 border-black p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-between">
+                  <span className="text-base font-bold text-black">Video Walkthrough</span>
+                  <Lock className="w-5 h-5 text-black" />
+                </div>
+              </div>
+              
+              {/* Submit Button */}
+              <div className="mt-auto">
+                <Button
+                  onClick={handleSubmit}
+                  size="lg"
+                  className="bg-blue-500 hover:bg-blue-600 text-white font-bold px-8 py-3 text-lg rounded-lg shadow-lg w-full flex items-center justify-center"
+                >
+                  Submit Answer
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Sample Answer Image */}
+              <div className="mb-6">
+                <h3 className="uppercase font-black tracking-widest text-xs text-black mb-3">Sample Answer</h3>
+                <div className="bg-white rounded-xl border-2 border-black overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                  {activeScenario.correctImage ? (
+                    <img
+                      src={activeScenario.correctImage}
+                      alt="Sample answer"
+                      className="w-full h-auto object-contain"
+                    />
+                  ) : (
+                    <div className="w-full aspect-video bg-gray-100 border-2 border-gray-300 rounded flex items-center justify-center">
+                      <p className="text-gray-500 font-bold">Sample Answer Image</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Checklist */}
+              <div className="mb-6">
                 <p className="uppercase font-black tracking-widest text-xs text-black mb-3">Self-Correction Checklist</p>
                 <div className="space-y-2">
                   {activeScenario.checklist.map((item) => {
@@ -401,52 +510,43 @@ export function GraphGym() {
                   })}
                 </div>
               </div>
-            )}
-          </div>
-          
-          {/* Shuffle Scenario Button - Fixed at bottom */}
-          {!isSubmitted && (
-            <button
-              onClick={handleShuffleScenario}
-              className="w-full mt-4 bg-white rounded-lg border-2 border-black p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-0.5 flex items-center justify-between font-bold text-black flex-shrink-0"
-            >
-              <span>Shuffle Scenario</span>
-              <Shuffle className="w-5 h-5" />
-            </button>
-          )}
-        </div>
 
-        {/* Sample Answer Section - Increased Height */}
-        <div className="h-[60%] bg-white p-6 flex flex-col relative">
-          <div className="mb-4 flex-shrink-0">
-            <h3 className="uppercase font-black tracking-widest text-xs text-black mb-3">Sample Answer</h3>
-          </div>
-          <div className="relative bg-white rounded-xl border-2 border-black overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-4" style={{ height: 'calc(100% - 180px)' }}>
-            <img
-              src={activeScenario.correctImage}
-              alt="Sample answer"
-              className={`w-full h-full object-contain ${!isSubmitted ? 'blur-md' : ''}`}
-            />
-            {!isSubmitted && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-white bg-opacity-95">
-                <LockKeyhole className="w-12 h-12 text-black mb-3" strokeWidth={2.5} />
-                <p className="text-black font-black text-lg uppercase tracking-widest">Locked</p>
+              {/* Video Walkthrough */}
+              <div className="mb-6">
+                <h3 className="uppercase font-black tracking-widest text-xs text-black mb-3">Video Walkthrough</h3>
+                <div className="bg-white rounded-xl border-2 border-black overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] aspect-video flex items-center justify-center bg-gray-100">
+                  <div className="text-center">
+                    <LockKeyhole className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                    <p className="text-gray-600 font-bold">Video Placeholder</p>
+                  </div>
+                </div>
               </div>
-            )}
-          </div>
-          
-          {/* Submit Button - Fixed at bottom */}
-          {!isSubmitted && (
-            <div className="absolute bottom-4 left-6 right-6">
-              <Button
-                onClick={handleSubmit}
-                size="lg"
-                className="bg-blue-500 hover:bg-blue-600 text-white font-bold px-8 py-3 text-lg rounded-lg shadow-lg w-full flex items-center justify-center"
-              >
-                Submit Answer
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-            </div>
+
+              {/* Next/Shuffle Button */}
+              <div className="mt-auto">
+                <button
+                  onClick={isAssignment ? handleNextScenario : handleShuffleScenario}
+                  disabled={isAssignment && currentScenarioIndex >= filteredScenarios.length - 1}
+                  className={`w-full bg-white rounded-lg border-2 border-black p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-0.5 flex items-center justify-between font-bold text-black ${
+                    isAssignment && currentScenarioIndex >= filteredScenarios.length - 1 ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                >
+                  <span>
+                    {isAssignment 
+                      ? currentScenarioIndex >= filteredScenarios.length - 1 
+                        ? 'Last Scenario' 
+                        : `Next Scenario (${currentScenarioIndex + 1}/${filteredScenarios.length})`
+                      : 'Shuffle Scenario'
+                    }
+                  </span>
+                  {isAssignment ? (
+                    <ArrowRight className="w-5 h-5" />
+                  ) : (
+                    <Shuffle className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
+            </>
           )}
         </div>
       </div>
@@ -455,16 +555,12 @@ export function GraphGym() {
         <>
           {/* Mobile View */}
           <div className="flex-1 flex flex-col overflow-y-auto w-full">
-            {/* Top Section - Title, Description, Unit Tag, Belt */}
+            {/* Top Section - Title, Unit Tag, Belt, Description */}
             <div className="w-full px-4 pt-16 pb-6 bg-white border-b-4 border-black">
               <div className="max-w-2xl mx-auto text-center space-y-4">
                 <h2 className="text-2xl font-black text-black leading-tight">
                   {activeScenario.title}
                 </h2>
-                
-                <p className="text-base text-black leading-relaxed font-medium">
-                  {activeScenario.description}
-                </p>
                 
                 {/* Unit Tag and Difficulty Belt */}
                 <div className="flex items-center justify-center gap-3 flex-wrap">
@@ -485,6 +581,21 @@ export function GraphGym() {
                     className="w-10 h-10"
                   />
                 </div>
+                
+                <p className="text-base text-black leading-relaxed font-medium mb-3">
+                  {activeScenario.description}
+                </p>
+                
+                {/* To-Do List */}
+                {activeScenario.toDoList && activeScenario.toDoList.length > 0 && (
+                  <ul className="list-disc list-inside space-y-1 mt-3 text-left max-w-lg mx-auto">
+                    {activeScenario.toDoList.map((item, index) => (
+                      <li key={index} className="text-base text-black leading-relaxed font-medium">
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             </div>
 
@@ -535,17 +646,122 @@ export function GraphGym() {
                 )}
               </div>
 
-              {/* Shuffle Button - Below the board */}
+              {/* Shuffle/Next Button - Below the board (only when not submitted) */}
               {!isSubmitted && (
                 <button
-                  onClick={handleShuffleScenario}
-                  className="w-full mt-4 bg-white rounded-lg border-2 border-black p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-0.5 flex items-center justify-between font-bold text-black"
+                  onClick={isAssignment ? handleNextScenario : handleShuffleScenario}
+                  disabled={isAssignment && currentScenarioIndex >= filteredScenarios.length - 1}
+                  className={`w-full mt-4 bg-white rounded-lg border-2 border-black p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-0.5 flex items-center justify-between font-bold text-black ${
+                    isAssignment && currentScenarioIndex >= filteredScenarios.length - 1 ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
                 >
-                  <span>Shuffle Scenario</span>
-                  <Shuffle className="w-5 h-5" />
+                  <span>
+                    {isAssignment 
+                      ? currentScenarioIndex >= filteredScenarios.length - 1 
+                        ? 'Last Scenario' 
+                        : `Next Scenario (${currentScenarioIndex + 1}/${filteredScenarios.length})`
+                      : 'Shuffle Scenario'
+                    }
+                  </span>
+                  {isAssignment ? (
+                    <ArrowRight className="w-5 h-5" />
+                  ) : (
+                    <Shuffle className="w-5 h-5" />
+                  )}
                 </button>
               )}
             </div>
+
+            {/* Submitted Content - Sample Answer, Checklist, Video, Next Button */}
+            {isSubmitted && (
+              <div className="w-full px-4 py-6 space-y-6 bg-white">
+                {/* Sample Answer */}
+                <div>
+                  <h3 className="uppercase font-black tracking-widest text-xs text-black mb-3">Sample Answer</h3>
+                  <div className="bg-white rounded-xl border-2 border-black overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                    {activeScenario.correctImage ? (
+                      <img
+                        src={activeScenario.correctImage}
+                        alt="Sample answer"
+                        className="w-full h-auto object-contain"
+                      />
+                    ) : (
+                      <div className="w-full aspect-video bg-gray-100 border-2 border-gray-300 rounded flex items-center justify-center">
+                        <p className="text-gray-500 font-bold">Sample Answer Image</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Checklist */}
+                <div>
+                  <p className="uppercase font-black tracking-widest text-xs text-black mb-3">Self-Correction Checklist</p>
+                  <div className="space-y-2">
+                    {activeScenario.checklist.map((item) => {
+                      const isChecked = checkedItems.has(item.id);
+                      return (
+                        <button
+                          key={item.id}
+                          onClick={() => handleChecklistToggle(item.id)}
+                          className={`w-full text-left p-3 rounded-lg border-2 border-black transition-transform hover:-translate-y-1 ${
+                            isChecked
+                              ? 'bg-green-100 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                              : 'bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            {isChecked ? (
+                              <CheckCircle2 className="w-5 h-5 text-black flex-shrink-0" />
+                            ) : (
+                              <Circle className="w-5 h-5 text-black border-2 border-black rounded-full flex-shrink-0" />
+                            )}
+                            <span className={`text-sm font-bold ${
+                              isChecked ? 'text-black line-through' : 'text-black'
+                            }`}>
+                              {item.text}
+                            </span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Video Walkthrough */}
+                <div>
+                  <h3 className="uppercase font-black tracking-widest text-xs text-black mb-3">Video Walkthrough</h3>
+                  <div className="bg-white rounded-xl border-2 border-black overflow-hidden shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] aspect-video flex items-center justify-center bg-gray-100">
+                    <div className="text-center">
+                      <LockKeyhole className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                      <p className="text-gray-600 font-bold">Video Placeholder</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Next/Shuffle Button */}
+                <button
+                  onClick={isAssignment ? handleNextScenario : handleShuffleScenario}
+                  disabled={isAssignment && currentScenarioIndex >= filteredScenarios.length - 1}
+                  className={`w-full bg-white rounded-lg border-2 border-black p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-0.5 flex items-center justify-between font-bold text-black ${
+                    isAssignment && currentScenarioIndex >= filteredScenarios.length - 1 ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                >
+                  <span>
+                    {isAssignment 
+                      ? currentScenarioIndex >= filteredScenarios.length - 1 
+                        ? 'Last Scenario' 
+                        : `Next Scenario (${currentScenarioIndex + 1}/${filteredScenarios.length})`
+                      : 'Shuffle Scenario'
+                    }
+                  </span>
+                  {isAssignment ? (
+                    <ArrowRight className="w-5 h-5" />
+                  ) : (
+                    <Shuffle className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
+            )}
           </div>
         </>
       )}

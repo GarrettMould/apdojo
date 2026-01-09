@@ -15,6 +15,7 @@ export interface GraphGymScenario {
   difficulty: 'easy' | 'medium' | 'hard'; // Difficulty level of the scenario
   title: string;
   description: string;
+  toDoList?: string[]; // Optional array of to-do items to display as bullet points
   correctImage: string;
   checklist: ChecklistItem[];
 }
@@ -27,13 +28,18 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Monopoly", "Long Run Equilibrium", "Profit Maximization", "Market Structure"],
     difficulty: 'medium',
     title: "Long Run Equilibrium in a Pure Monopoly",
-    description: "Draw the Demand, MR, MC, and ATC curves. Label the profit-maximizing price and quantity.",
+    description: "Draw the Demand, MR, MC, and ATC curves for a pure monopoly in long-run equilibrium.",
+    toDoList: [
+      "Label the profit-maximizing price and quantity",
+      "Show the allocatively efficient quantity",
+      "Shade in the area that represents economic profit or losses"
+    ],
     correctImage: "https://placehold.co/600x400?text=Correct+Graph",
     checklist: [
-      { id: 1, text: "MR intersects MC (Profit Max)" },
-      { id: 2, text: "Price is set at Demand Curve" },
-      { id: 3, text: "ATC is tangent to Demand (Zero Profit)" },
-      { id: 4, text: "All curves are properly labeled" }
+      { id: 1, text: "Profit-maximizing quantity is where MR intersects MC" },
+      { id: 2, text: "Price is set on the Demand curve directly above the MR=MC intersection" },
+      { id: 3, text: "Allocatively efficient quantity is labeled where MC intersects Demand" },
+      { id: 4, text: "ATC is tangent to Demand (Zero Profit) or area of profit/loss is correctly shaded" }
     ]
   },
   {
@@ -43,13 +49,18 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Market Equilibrium", "Surplus", "Allocative Efficiency"],
     difficulty: 'easy',
     title: "Consumer and Producer Surplus",
-    description: "Draw a standard supply and demand graph. Label the areas of consumer surplus, producer surplus, and total economic surplus at the equilibrium price.",
+    description: "Draw a standard supply and demand graph showing market equilibrium.",
+    toDoList: [
+      "Label the areas of consumer surplus",
+      "Label the areas of producer surplus",
+      "Mark the equilibrium price (Pe) and quantity (Qe)"
+    ],
     correctImage: "/images/sampleAnswer2.jpg",
     checklist: [
-      { id: 1, text: "Demand is downward-sloping and Supply is upward-sloping" },
-      { id: 2, text: "Consumer Surplus is the triangle below Demand and above Price" },
-      { id: 3, text: "Producer Surplus is the triangle above Supply and below Price" },
-      { id: 4, text: "Equilibrium Price (Pe) and Quantity (Qe) are labeled" }
+      { id: 1, text: "Equilibrium Price (Pe) and Quantity (Qe) are correctly labeled at the intersection" },
+      { id: 2, text: "Consumer Surplus is the area below Demand and above the equilibrium Price" },
+      { id: 3, text: "Producer Surplus is the area above Supply and below the equilibrium Price" },
+      { id: 4, text: "Demand is downward-sloping and Supply is upward-sloping" }
     ]
   },
   {
@@ -59,13 +70,19 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Tax Incidence", "Excise Tax", "Deadweight Loss"],
     difficulty: 'medium',
     title: "Effect of an Excise Tax",
-    description: "Show a market where an excise tax is placed on producers. Label the new supply curve, price paid by consumers, price received by producers, and the area of deadweight loss.",
+    description: "Show a market where an excise tax is placed on producers.",
+    toDoList: [
+      "Label the new supply curve",
+      "Label the price paid by consumers (Pc)",
+      "Label the price received by producers (Pp)",
+      "Shade the area of deadweight loss"
+    ],
     correctImage: "/images/graphs/micro/excise-tax.svg",
     checklist: [
-      { id: 1, text: "Supply shifts vertically upward by the amount of the tax" },
-      { id: 2, text: "Price paid by consumers (Pc) is labeled at the new equilibrium" },
-      { id: 3, text: "Price received by producers (Pp) is labeled on the original supply curve" },
-      { id: 4, text: "Deadweight loss triangle is correctly shaded" }
+      { id: 1, text: "New Supply curve is shifted vertically upward by the tax amount" },
+      { id: 2, text: "Price paid by consumers (Pc) is labeled at the new equilibrium intersection" },
+      { id: 3, text: "Price received by producers (Pp) is labeled on the original supply curve directly below the new equilibrium" },
+      { id: 4, text: "Deadweight loss triangle is correctly shaded between the new and old quantities" }
     ]
   },
   {
@@ -76,12 +93,18 @@ export const graphGymScenarios: GraphGymScenario[] = [
     difficulty: 'medium',
     title: "Perfectly Competitive Firm earning Profit",
     description: "Draw a side-by-side graph of a perfectly competitive market and a single firm earning short-run economic profit.",
+    toDoList: [
+      "Show the market graph on the left",
+      "Show the firm graph on the right",
+      "Label the profit-maximizing quantity",
+      "Shade or label the area of economic profit, if any"
+    ],
     correctImage: "/images/graphs/micro/perfect-comp-profit.svg",
     checklist: [
-      { id: 1, text: "Market price is transferred to the firm as a horizontal MR=D=A=P line" },
-      { id: 2, text: "Firm produces where MR = MC" },
-      { id: 3, text: "ATC is below the Price at the profit-maximizing quantity" },
-      { id: 4, text: "Profit area is correctly shaded or labeled" }
+      { id: 1, text: "Market graph sets the price where Market Supply equals Market Demand" },
+      { id: 2, text: "Firm's Demand curve is horizontal (perfectly elastic) at the market price (MR=D=AR=P)" },
+      { id: 3, text: "Profit-maximizing quantity is labeled where the firm's MC equals MR" },
+      { id: 4, text: "Economic profit area is shaded (Price is above ATC at the profit-maximizing quantity)" }
     ]
   },
   {
@@ -91,13 +114,18 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Monopolistic Competition", "Long Run Equilibrium", "Excess Capacity"],
     difficulty: 'medium',
     title: "Monopolistic Competition in the Long Run",
-    description: "Draw a monopolistically competitive firm in long-run equilibrium. Ensure the firm is earning zero economic profit.",
+    description: "Draw a monopolistically competitive firm in long-run equilibrium.",
+    toDoList: [
+      "Show that the firm is earning zero economic profit",
+      "Label the profit-maximizing quantity and price",
+      "Label the allocatively efficient quantity"
+    ],
     correctImage: "/images/graphs/micro/monop-comp-long-run.svg",
     checklist: [
-      { id: 1, text: "MR is below Demand and both are downward sloping" },
-      { id: 2, text: "ATC is tangent to the Demand curve at the profit-maximizing quantity" },
-      { id: 3, text: "The quantity is less than the productively efficient quantity (Excess Capacity)" },
-      { id: 4, text: "Price is set on the Demand curve above the MR=MC intersection" }
+      { id: 1, text: "Profit-maximizing quantity is where MR intersects MC" },
+      { id: 2, text: "Price is set on the Demand curve above the intersection, tangent to the ATC curve (Zero Profit)" },
+      { id: 3, text: "Allocatively efficient quantity is labeled where MC intersects Demand" },
+      { id: 4, text: "Demand and MR curves are both downward sloping, with MR below Demand" }
     ]
   },
   {
@@ -108,12 +136,18 @@ export const graphGymScenarios: GraphGymScenario[] = [
     difficulty: 'hard',
     title: "Competitive Labor Market and Firm",
     description: "Draw a side-by-side graph for a perfectly competitive labor market and an individual firm hiring labor.",
+    toDoList: [
+      "Show the market graph on the left",
+      "Show the firm graph on the right",
+      "Label the equilibrium wage in the market",
+      "Label the quantity of labor hired by the firm"
+    ],
     correctImage: "/images/graphs/micro/labor-market.svg",
     checklist: [
-      { id: 1, text: "Market graph shows upward Supply and downward Demand (MRP)" },
-      { id: 2, text: "Firm graph shows a horizontal Supply curve (MRC = Wage)" },
-      { id: 3, text: "Firm's Demand for labor (MRP) is downward sloping" },
-      { id: 4, text: "Firm hires where MRC = MRP" }
+      { id: 1, text: "Market graph shows the intersection of Labor Supply and Labor Demand establishing the equilibrium wage" },
+      { id: 2, text: "Firm's Supply of Labor (MRC) is horizontal at the market wage" },
+      { id: 3, text: "Firm's Demand for Labor (MRP) is downward sloping" },
+      { id: 4, text: "Quantity of labor hired by the firm is where MRP equals MRC" }
     ]
   },
   {
@@ -123,13 +157,18 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Monopsony", "Wage Maker", "Factor Market Failure"],
     difficulty: 'hard',
     title: "Monopsony in the Labor Market",
-    description: "Draw the MFC (MRC), Supply, and MRP curves for a monopsonist. Label the quantity of labor hired and the wage rate paid.",
+    description: "Draw the MFC (MRC), Supply, and MRP curves for a monopsonist.",
+    toDoList: [
+      "Label the quantity of labor hired (Qm)",
+      "Label the wage rate paid (Wm)",
+      "Show the quantity of workers that would be hired in a perfectly competitive market"
+    ],
     correctImage: "/images/graphs/micro/monopsony.svg",
     checklist: [
-      { id: 1, text: "MFC curve is above the Supply of labor curve" },
-      { id: 2, text: "Quantity (Qm) is determined where MFC = MRP" },
-      { id: 3, text: "Wage (Wm) is labeled on the Supply curve below the MFC=MRP intersection" },
-      { id: 4, text: "Both axis are labeled correctly (Wage and Quantity of Labor)" }
+      { id: 1, text: "MFC (MRC) curve is above the Supply of labor curve" },
+      { id: 2, text: "Quantity hired (Qm) is labeled where MFC equals MRP" },
+      { id: 3, text: "Wage (Wm) is labeled on the Supply curve directly below the MFC=MRP intersection" },
+      { id: 4, text: "Competitive quantity is indicated where Supply intersects MRP" }
     ]
   },
   {
@@ -139,7 +178,13 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Negative Externality", "Marginal Social Cost", "Market Failure"],
     difficulty: 'medium',
     title: "Negative Production Externality",
-    description: "Draw a market with a negative production externality (like pollution). Label the market quantity and the socially optimal quantity.",
+    description: "Draw a market with a negative production externality (like pollution).",
+    toDoList: [
+      "Label the market quantity (Qm)",
+      "Label the socially optimal quantity (Qs)",
+      "Show the MSC curve above the MPC curve",
+      "Shade the deadweight loss area"
+    ],
     correctImage: "/images/graphs/micro/negative-externality.svg",
     checklist: [
       { id: 1, text: "MSC curve is above the MPC (Supply) curve" },
@@ -155,7 +200,13 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Positive Externality", "Marginal Social Benefit", "Underconsumption"],
     difficulty: 'medium',
     title: "Positive Consumption Externality",
-    description: "Draw a market with a positive consumption externality. Label the market equilibrium and the deadweight loss.",
+    description: "Draw a market with a positive consumption externality.",
+    toDoList: [
+      "Label the market equilibrium quantity",
+      "Label the socially optimal quantity",
+      "Show the MSB curve above the MPB curve",
+      "Shade the deadweight loss area"
+    ],
     correctImage: "/images/graphs/micro/positive-externality.svg",
     checklist: [
       { id: 1, text: "MSB curve is above the MPB (Demand) curve" },
@@ -171,7 +222,13 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Natural Monopoly", "Price Regulation", "Fair Return"],
     difficulty: 'hard',
     title: "Natural Monopoly Regulation",
-    description: "Draw a natural monopoly with declining ATC. Label the socially optimal price and the fair-return price.",
+    description: "Draw a natural monopoly with declining ATC.",
+    toDoList: [
+      "Label the socially optimal price (P=MC)",
+      "Label the fair-return price (P=ATC)",
+      "Show that P=MC results in a loss",
+      "Label the quantities at each price level"
+    ],
     correctImage: "/images/graphs/micro/natural-monopoly.svg",
     checklist: [
       { id: 1, text: "ATC is downward sloping and above MC throughout the relevant range" },
@@ -188,6 +245,12 @@ export const graphGymScenarios: GraphGymScenario[] = [
     difficulty: 'easy',
     title: "Long Run Equilibrium (Full Employment)",
     description: "Draw the AD, SRAS, and LRAS curves showing an economy in long-run equilibrium.",
+    toDoList: [
+      "Show all three curves intersecting at the same point",
+      "Label the full employment output (Yf)",
+      "Label the equilibrium price level",
+      "Ensure LRAS is vertical at Yf"
+    ],
     correctImage: "/images/graphs/macro/full-employment.svg",
     checklist: [
       { id: 1, text: "LRAS is a vertical line at Yf" },
@@ -204,6 +267,12 @@ export const graphGymScenarios: GraphGymScenario[] = [
     difficulty: 'medium',
     title: "Economy in a Recessionary Gap",
     description: "Draw an AD-AS graph showing an economy currently producing at an output level below full employment.",
+    toDoList: [
+      "Label the full employment output (Yf)",
+      "Label the actual output (Y1)",
+      "Show the short-run equilibrium",
+      "Indicate the recessionary gap"
+    ],
     correctImage: "/images/graphs/macro/recessionary-gap.svg",
     checklist: [
       { id: 1, text: "Short-run equilibrium (AD=SRAS) is to the left of the LRAS" },
@@ -220,6 +289,12 @@ export const graphGymScenarios: GraphGymScenario[] = [
     difficulty: 'medium',
     title: "Economy in an Inflationary Gap",
     description: "Draw an AD-AS graph showing an economy currently producing at an output level above full employment.",
+    toDoList: [
+      "Label the full employment output (Yf)",
+      "Label the actual output (Y1)",
+      "Show the short-run equilibrium",
+      "Indicate the inflationary gap"
+    ],
     correctImage: "/images/graphs/macro/inflationary-gap.svg",
     checklist: [
       { id: 1, text: "Short-run equilibrium (AD=SRAS) is to the right of the LRAS" },
@@ -236,6 +311,12 @@ export const graphGymScenarios: GraphGymScenario[] = [
     difficulty: 'medium',
     title: "The Money Market",
     description: "Draw the Money Supply and Money Demand curves. Show the effect of an expansionary monetary policy (Open Market Purchase).",
+    toDoList: [
+      "Show the initial equilibrium",
+      "Show the Money Supply shift",
+      "Label the new equilibrium interest rate",
+      "Label the new quantity of money"
+    ],
     correctImage: "/images/graphs/macro/money-market.svg",
     checklist: [
       { id: 1, text: "Money Supply (Sm) is a vertical line" },
@@ -252,6 +333,12 @@ export const graphGymScenarios: GraphGymScenario[] = [
     difficulty: 'hard',
     title: "The Loanable Funds Market",
     description: "Draw the Supply and Demand for Loanable Funds. Show the effect of increased government deficit spending.",
+    toDoList: [
+      "Show the initial equilibrium",
+      "Show the Demand shift",
+      "Label the new equilibrium real interest rate",
+      "Label the new quantity of loanable funds"
+    ],
     correctImage: "/images/graphs/macro/loanable-funds.svg",
     checklist: [
       { id: 1, text: "Demand for loanable funds shifts to the right" },
@@ -267,7 +354,13 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Phillips Curve", "Inflation", "Unemployment"],
     difficulty: 'hard',
     title: "Short Run and Long Run Phillips Curves",
-    description: "Draw the SRPC and LRPC. Label the point showing an economy in long-run equilibrium with 5% natural unemployment.",
+    description: "Draw the SRPC and LRPC.",
+    toDoList: [
+      "Label the point showing an economy in long-run equilibrium",
+      "Show the natural rate of unemployment (5%)",
+      "Show where SRPC and LRPC intersect",
+      "Label the inflation and unemployment rates at equilibrium"
+    ],
     correctImage: "/images/graphs/macro/phillips-curve.svg",
     checklist: [
       { id: 1, text: "LRPC is vertical at the Natural Rate of Unemployment (NRU)" },
@@ -284,6 +377,12 @@ export const graphGymScenarios: GraphGymScenario[] = [
     difficulty: 'hard',
     title: "SRPC Shift (Stagflation)",
     description: "Show the effect of a negative supply shock (e.g., oil prices) on the Short-Run Phillips Curve.",
+    toDoList: [
+      "Show the initial SRPC",
+      "Show the SRPC shift",
+      "Label point A (before) and point B (after)",
+      "Indicate that both inflation and unemployment increase"
+    ],
     correctImage: "/images/graphs/macro/phillips-curve-shift.svg",
     checklist: [
       { id: 1, text: "SRPC shifts to the right" },
@@ -300,6 +399,12 @@ export const graphGymScenarios: GraphGymScenario[] = [
     difficulty: 'hard',
     title: "Foreign Exchange Market (USD)",
     description: "Draw the Supply and Demand for US Dollars. Show the effect of increased European demand for US goods.",
+    toDoList: [
+      "Show the initial equilibrium",
+      "Show the Demand shift",
+      "Label the new equilibrium exchange rate",
+      "Label the new quantity of USD exchanged"
+    ],
     correctImage: "/images/graphs/macro/forex-usd.svg",
     checklist: [
       { id: 1, text: "Demand for USD shifts to the right" },
@@ -316,6 +421,12 @@ export const graphGymScenarios: GraphGymScenario[] = [
     difficulty: 'easy',
     title: "Economic Growth on the PPC",
     description: "Draw a PPC for two goods. Show how an increase in the quality of resources shifts the curve to represent economic growth.",
+    toDoList: [
+      "Show the original PPC",
+      "Show the new PPC after growth",
+      "Label both axes with specific goods",
+      "Indicate that both maximum outputs increase"
+    ],
     correctImage: "/images/graphs/macro/ppc-growth.svg",
     checklist: [
       { id: 1, text: "Curve shifts outward (to the right)" },
@@ -332,6 +443,12 @@ export const graphGymScenarios: GraphGymScenario[] = [
     difficulty: 'medium',
     title: "Contractionary Monetary Policy",
     description: "Show how an Open Market Sale of bonds affects the Money Market graph.",
+    toDoList: [
+      "Show the initial equilibrium",
+      "Show the Money Supply shift",
+      "Label the new equilibrium interest rate",
+      "Label the new quantity of money"
+    ],
     correctImage: "/images/graphs/macro/money-market-contraction.svg",
     checklist: [
       { id: 1, text: "Money Supply (Sm) shifts to the left" },
@@ -646,6 +763,92 @@ export const graphGymScenarios: GraphGymScenario[] = [
       { id: 2, text: "SRPC shifts to the right (upward)" },
       { id: 3, text: "Higher inflation rate at the same unemployment rate" },
       { id: 4, text: "Axes labeled Inflation Rate and Unemployment Rate" }
+    ]
+  }, 
+  {
+    id: 41,
+    subject: 'micro',
+    lessonId: "2.8",
+    topics: ["Taxes", "Tax Incidence", "Demand Shift"],
+    difficulty: 'hard',
+    title: "Excise Tax on Consumers",
+    description: "Draw a competitive market in equilibrium. Show the impact of a per-unit excise tax levied on producers.",
+    toDoList: [
+      "Label the new quantity exchanged (Qt)",
+      "Label the total price paid by consumers (Pc)",
+      "Label the net price received by producers (Pp)",
+      "Shade the specific area representing the consumer's tax burden and the area representing the producer's tax burden"
+    ],
+    correctImage: "/images/graphs/micro/tax-on-consumers.svg",
+    checklist: [
+      { id: 1, text: "Demand curve shifts vertically downward by the amount of the tax" },
+      { id: 2, text: "New intersection determines Producer Price (Pp) and Quantity (Qt)" },
+      { id: 3, text: "Consumer Price (Pc) is labeled on the original Demand curve directly above Qt" },
+      { id: 4, text: "Rectangles for Consumer Burden (Pc to Pe) and Producer Burden (Pe to Pp) are shaded" }
+    ]
+  },
+  {
+    id: 42,
+    subject: 'micro',
+    lessonId: "2.8",
+    topics: ["Price Controls", "Surplus", "Deadweight Loss"],
+    difficulty: 'medium',
+    title: "Welfare Analysis of a Price Floor",
+    description: "Draw a market with a binding price floor. Visually identify the Consumer Surplus (CS), Producer Surplus (PS), and Deadweight Loss (DWL) resulting from this intervention.",
+    correctImage: "/images/graphs/micro/price-floor-welfare.svg",
+    checklist: [
+      { id: 1, text: "Price Floor is drawn above the equilibrium price" },
+      { id: 2, text: "Consumer Surplus is the small triangle above the floor price" },
+      { id: 3, text: "Producer Surplus is the trapezoid below the floor price and above Supply" },
+      { id: 4, text: "Deadweight Loss is the triangle pointing to the equilibrium" }
+    ]
+  },
+  {
+    id: 43,
+    subject: 'micro',
+    lessonId: "2.5",
+    topics: ["International Trade", "Tariffs", "Welfare"],
+    difficulty: 'hard',
+    title: "Welfare Effects of a Tariff",
+    description: "Draw a domestic market importing goods at the World Price (Pw). Show a Tariff (Pt) imposed above the world price. Label the new domestic quantity supplied (Qs) and domestic quantity demanded (Qd) at the tariff price. Shade the rectangular area representing the government's tariff revenue and the two separate areas representing deadweight loss.",
+    correctImage: "/images/graphs/micro/tariff-welfare.svg",
+    checklist: [
+      { id: 1, text: "Tariff Price (Pt) line is drawn above World Price (Pw) but below equilibrium" },
+      { id: 2, text: "New Domestic Quantity Supplied (Qs) and Quantity Demanded (Qd) are labeled on the x-axis" },
+      { id: 3, text: "Tariff Revenue rectangle (width is Qd - Qs, height is Pt - Pw) is shaded" },
+      { id: 4, text: "Two separate triangles (representing production and consumption inefficiency) are shaded as Deadweight Loss" }
+    ]
+  },
+  {
+    id: 44,
+    subject: 'micro',
+    lessonId: "6.2",
+    topics: ["Externalities", "Negative Production", "Corrective Tax"],
+    difficulty: 'medium',
+    title: "Correcting a Negative Production Externality",
+    description: "Draw a market where production causes pollution. Show the specific Per-Unit Tax required to fix this market failure and achieve the socially optimal quantity.",
+    correctImage: "/images/graphs/micro/neg-prod-tax.svg",
+    checklist: [
+      { id: 1, text: "Marginal Social Cost (MSC) is above Marginal Private Cost (MPC)" },
+      { id: 2, text: "Socially optimal quantity is where MSC intersects Demand (MSB)" },
+      { id: 3, text: "Per-unit tax is equal to the vertical distance between MSC and MPC" },
+      { id: 4, text: "New supply curve (with tax) aligns with the MSC curve" }
+    ]
+  },
+  {
+    id: 45,
+    subject: 'micro',
+    lessonId: "6.2",
+    topics: ["Externalities", "Positive Consumption", "Subsidies"],
+    difficulty: 'medium',
+    title: "Positive Consumption Externality",
+    description: "Draw a market for flu shots, which generates a marginal external benefit on consumption. Label the Market Quantity, Socially Optimal Quantity, and the area of Deadweight Loss if left unregulated.",
+    correctImage: "/images/graphs/micro/pos-cons-externality.svg",
+    checklist: [
+      { id: 1, text: "Marginal Social Benefit (MSB) is above Marginal Private Benefit (MPB)" },
+      { id: 2, text: "Market Quantity is where MPB intersects Supply (MPC)" },
+      { id: 3, text: "Socially Optimal Quantity is higher, where MSB intersects Supply" },
+      { id: 4, text: "Deadweight Loss triangle points toward the social optimum (right)" }
     ]
   }
 ];

@@ -953,6 +953,34 @@ function UnitFRQPracticePageComponent() {
                    <span className="text-gray-800">{part.text}</span>
                 </div>
 
+                {/* Print-only: Show Instructional Subparts */}
+                {part.subparts && part.subparts.some(sp => !sp.answerType) && (
+                  <div className="hidden print:block p-4 bg-white">
+                    <p className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+                      Include the Following in Your Answer:
+                    </p>
+                    <ul className="space-y-2">
+                      {part.subparts.filter(sp => !sp.answerType).map((subpart) => (
+                        <li key={subpart.label} className="text-sm text-gray-800">
+                          <span className="font-semibold">{part.label}{subpart.label}.</span> {subpart.text}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Print-only: Show Answerable Subparts */}
+                {part.subparts && part.subparts.some(sp => sp.answerType) && (
+                  <div className="hidden print:block p-4 bg-white space-y-4">
+                    {part.subparts.filter(sp => sp.answerType).map((subpart) => (
+                      <div key={`print-subpart-${part.label}-${subpart.label}`} className="pl-4 border-l-2 border-gray-300">
+                        <p className="text-gray-800 mb-2">
+                          <span className="font-bold text-lg text-gray-900">{part.label}{subpart.label}.</span> {subpart.text}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 {/* Part Answer */}
                 {expandedParts[part.label] && (
