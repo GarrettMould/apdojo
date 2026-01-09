@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { ArrowRight, Lock, CheckCircle2, Circle, LockKeyhole, Shuffle, ChevronDown } from 'lucide-react';
+import { ArrowRight, Lock, CheckCircle2, Circle, LockKeyhole, Shuffle, ChevronDown, Monitor, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCourseTheme, useCourseContext } from '@/contexts/CourseContext';
 import { useAuthContext } from '@/contexts/AuthContext';
@@ -90,6 +90,7 @@ export function GraphGym() {
   const [selectedUnit, setSelectedUnit] = useState<number | null>(null);
   const [showUnitDropdown, setShowUnitDropdown] = useState(false);
   const [showJoinDojoModal, setShowJoinDojoModal] = useState(false);
+  const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
 
   // Check if user has access (logged in + season pass)
   const hasAccess = useMemo(() => {
@@ -220,41 +221,69 @@ export function GraphGym() {
 
   return (
     <div className="h-screen w-screen flex overflow-hidden bg-gray-50">
-      {/* Main Drawing Area - Excalidraw Container */}
-      <div className="flex-1 relative" style={{ minWidth: 0 }}>
-        <Excalidraw
-          key={excalidrawKey}
-          viewModeEnabled={isSubmitted}
-          gridModeEnabled={false}
-          UIOptions={{
-            canvasActions: {
-              toggleTheme: false,
-              changeViewBackgroundColor: false,
-              loadScene: false,
-              saveToActiveFile: false,
-              export: false,
-            },
-          }}
-          initialData={useMemo(() => ({
-            elements: [],
-            appState: {
-              theme: "light",
-              currentItemStrokeWidth: 1,
-            },
-          }), [])}
-        />
-        
-        
-        {/* Lock Icon - Show when submitted */}
-        {isSubmitted && (
-          <div className="absolute top-6 left-6 z-50 bg-white rounded-full p-3 shadow-lg border-2 border-gray-300">
-            <Lock className="w-6 h-6 text-gray-600" />
-          </div>
-        )}
+      {/* View Toggle Button - Fixed top right */}
+      <div className="fixed top-4 right-4 z-50 flex gap-2 bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-1">
+        <button
+          onClick={() => setViewMode('desktop')}
+          className={`p-2 rounded transition-colors ${
+            viewMode === 'desktop'
+              ? 'bg-black text-white'
+              : 'bg-white text-black hover:bg-gray-100'
+          }`}
+          aria-label="Desktop view"
+        >
+          <Monitor className="w-5 h-5" />
+        </button>
+        <button
+          onClick={() => setViewMode('mobile')}
+          className={`p-2 rounded transition-colors ${
+            viewMode === 'mobile'
+              ? 'bg-black text-white'
+              : 'bg-white text-black hover:bg-gray-100'
+          }`}
+          aria-label="Mobile view"
+        >
+          <Smartphone className="w-5 h-5" />
+        </button>
       </div>
 
-      {/* Right Column - Instructions & Sample Answer (Neo-Brutalist Style) */}
-      <div className="w-[420px] flex-shrink-0 flex flex-col bg-white border-l-4 border-black h-screen">
+      {viewMode === 'desktop' ? (
+        <>
+          {/* Main Drawing Area - Excalidraw Container */}
+          <div className="flex-1 relative" style={{ minWidth: 0 }}>
+            <Excalidraw
+              key={excalidrawKey}
+              viewModeEnabled={isSubmitted}
+              gridModeEnabled={false}
+              UIOptions={{
+                canvasActions: {
+                  toggleTheme: false,
+                  changeViewBackgroundColor: false,
+                  loadScene: false,
+                  saveToActiveFile: false,
+                  export: false,
+                },
+              }}
+              initialData={useMemo(() => ({
+                elements: [],
+                appState: {
+                  theme: "light",
+                  currentItemStrokeWidth: 1,
+                },
+              }), [])}
+            />
+            
+            
+            {/* Lock Icon - Show when submitted */}
+            {isSubmitted && (
+              <div className="absolute top-6 left-6 z-50 bg-white rounded-full p-3 shadow-lg border-2 border-gray-300">
+                <Lock className="w-6 h-6 text-gray-600" />
+              </div>
+            )}
+          </div>
+
+          {/* Right Column - Instructions & Sample Answer (Neo-Brutalist Style) */}
+          <div className="w-[420px] flex-shrink-0 flex flex-col bg-white border-l-4 border-black h-screen">
         {/* Scenario Instructions Section - Reduced Height */}
         <div className="h-[40%] border-b-2 border-black p-6 bg-white flex flex-col">
           <div className="flex-1 overflow-y-auto space-y-4">
@@ -421,6 +450,105 @@ export function GraphGym() {
           )}
         </div>
       </div>
+        </>
+      ) : (
+        <>
+          {/* Mobile View */}
+          <div className="flex-1 flex flex-col overflow-y-auto w-full">
+            {/* Top Section - Title, Description, Unit Tag, Belt */}
+            <div className="w-full px-4 pt-16 pb-6 bg-white border-b-4 border-black">
+              <div className="max-w-2xl mx-auto text-center space-y-4">
+                <h2 className="text-2xl font-black text-black leading-tight">
+                  {activeScenario.title}
+                </h2>
+                
+                <p className="text-base text-black leading-relaxed font-medium">
+                  {activeScenario.description}
+                </p>
+                
+                {/* Unit Tag and Difficulty Belt */}
+                <div className="flex items-center justify-center gap-3 flex-wrap">
+                  <span className="inline-block bg-white text-black px-3 py-1 rounded-lg font-bold text-xs border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                    Unit {parseInt(activeScenario.lessonId.split('.')[0])}
+                  </span>
+                  
+                  {/* Difficulty Belt Icon */}
+                  <img
+                    src={
+                      activeScenario.difficulty === 'easy'
+                        ? '/images/beltNewWhite.svg'
+                        : activeScenario.difficulty === 'medium'
+                        ? '/images/beltNewYellow.svg'
+                        : '/images/beltNewBlack.svg'
+                    }
+                    alt={`${activeScenario.difficulty} difficulty`}
+                    className="w-10 h-10"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Excalidraw Board - Taller than wide */}
+            <div className="flex-1 flex flex-col px-4 pb-4">
+              <div className="relative flex-1 w-full" style={{ aspectRatio: '3/4', maxWidth: '100%' }}>
+                <Excalidraw
+                  key={excalidrawKey}
+                  viewModeEnabled={isSubmitted}
+                  gridModeEnabled={false}
+                  UIOptions={{
+                    canvasActions: {
+                      toggleTheme: false,
+                      changeViewBackgroundColor: false,
+                      loadScene: false,
+                      saveToActiveFile: false,
+                      export: false,
+                    },
+                  }}
+                  initialData={useMemo(() => ({
+                    elements: [],
+                    appState: {
+                      theme: "light",
+                      currentItemStrokeWidth: 1,
+                    },
+                  }), [])}
+                />
+                
+                {/* Lock Icon - Show when submitted */}
+                {isSubmitted && (
+                  <div className="absolute top-4 left-4 z-50 bg-white rounded-full p-2 shadow-lg border-2 border-gray-300">
+                    <Lock className="w-5 h-5 text-gray-600" />
+                  </div>
+                )}
+
+                {/* Submit Button - Fixed at bottom of board */}
+                {!isSubmitted && (
+                  <div className="absolute bottom-4 left-4 right-4 z-50">
+                    <Button
+                      onClick={handleSubmit}
+                      size="lg"
+                      className="bg-blue-500 hover:bg-blue-600 text-white font-bold px-6 py-3 text-base rounded-lg shadow-lg w-full flex items-center justify-center"
+                    >
+                      Submit Answer
+                      <ArrowRight className="w-5 h-5 ml-2" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+
+              {/* Shuffle Button - Below the board */}
+              {!isSubmitted && (
+                <button
+                  onClick={handleShuffleScenario}
+                  className="w-full mt-4 bg-white rounded-lg border-2 border-black p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-0.5 flex items-center justify-between font-bold text-black"
+                >
+                  <span>Shuffle Scenario</span>
+                  <Shuffle className="w-5 h-5" />
+                </button>
+              )}
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Join Dojo Modal */}
       <JoinDojoModal

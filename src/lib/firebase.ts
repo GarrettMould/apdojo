@@ -2,7 +2,6 @@ import { initializeApp, getApps } from 'firebase/app'
 import { getAuth, connectAuthEmulator } from 'firebase/auth'
 import { getFirestore, connectFirestoreEmulator, enableIndexedDbPersistence } from 'firebase/firestore'
 import { getStorage } from 'firebase/storage'
-import { getAnalytics, isSupported } from 'firebase/analytics'
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -32,7 +31,24 @@ if (typeof window !== 'undefined') {
   }
 }
 
-// Initialize Analytics only in browser environment
-const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null
+// Initialize Analytics lazily (only in browser environment)
+let analytics: any = null
 
-export { app, auth, db, storage, analytics } 
+const getAnalyticsInstance = () => {
+  if (typeof window === 'undefined') return null
+  
+  if (!analytics) {
+    try {
+      // Dynamically import analytics to avoid SSR issues
+      const { getAnalytics } = require('firebase/analytics')
+      analytics = getAnalytics(app)
+    } catch (error) {
+      console.error('Error initializing analytics:', error)
+      return null
+    }
+  }
+  
+  return analytics
+}
+
+export { app, auth, db, storage, getAnalyticsInstance } 

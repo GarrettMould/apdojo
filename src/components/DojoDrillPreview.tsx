@@ -26,7 +26,7 @@ const learningPathItems = [
   { label: 'MCQ Gauntlet', stage: 'stage3' as const },
 ];
 
-export function DojoDrillPreview({
+function DojoDrillPreview({
   title,
   description,
   xpReward,
@@ -167,3 +167,4 @@ export function DojoDrillPreview({
   );
 }
 
+export { DojoDrillPreview };
