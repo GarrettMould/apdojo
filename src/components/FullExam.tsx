@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Question, QuestionBank } from '@/data/questionBanks/types';
 import { Button } from "@/components/ui/button";
-import { Bookmark, BookmarkX, X, Clock, Maximize2, Minimize2, Calculator, Pen, Eraser, Expand, Trash2, Circle, CircleDot, Check, Lock, Brain, FileText, ChevronLeft, ChevronRight, ChevronsRight, Triangle, Strikethrough, Eye, Play } from 'lucide-react';
+import { Bookmark, BookmarkX, X, Clock, Maximize2, Minimize2, Calculator, Pen, Eraser, Expand, Trash2, Circle, CircleDot, Check, Lock, Brain, FileText, ChevronLeft, ChevronRight, ChevronsRight, Triangle, Strikethrough, Eye, EyeOff, Play, ChevronDown, ChevronUp, List, Pause, Play as PlayIcon } from 'lucide-react';
 import { StaticImageData } from 'next/image';
 import Link from 'next/link';
 import { redirectToCheckout } from '@/lib/stripe';
@@ -142,6 +142,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   
   // State to hide/show timer
   const [showTimer, setShowTimer] = useState(true);
+  
+  // State to pause/resume timer
+  const [isTimerPaused, setIsTimerPaused] = useState(false);
 
   // Update timeRemaining when initialTimeLimit changes
   useEffect(() => {
@@ -155,10 +158,12 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   }, [isCustomAssignment]);
 
   // Add tools panel state (slide-out panel for calculator and drawing pad)
-  // For unit tests and preview exams, always show the tools panel
+  // For unit tests, preview exams, and full exams, always show the tools panel
   const isPreviewExam = examNumber && (examNumber.includes('preview') || examNumber.startsWith('preview'));
-  const [showToolsPanel, setShowToolsPanel] = useState(isUnitTest || isPreviewExam);
-  const [leftPanelWidth, setLeftPanelWidth] = useState((isUnitTest || isPreviewExam) ? 65 : 100); // Percentage width for left panel when tools panel is open
+  const isFullExam = examNumber === 'full';
+  const shouldShowToolsByDefault = isUnitTest || isPreviewExam || isFullExam;
+  const [showToolsPanel, setShowToolsPanel] = useState(shouldShowToolsByDefault);
+  const [leftPanelWidth, setLeftPanelWidth] = useState(shouldShowToolsByDefault ? 65 : 100); // Percentage width for left panel when tools panel is open
 
   // Update leftPanelWidth when tools panel opens/closes
   useEffect(() => {
@@ -190,6 +195,27 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState<StaticImageData | null>(null);
 
+  // Add state for expandable question navigation
+  const [showQuestionNavigator, setShowQuestionNavigator] = useState(false);
+  const questionNavigatorRef = useRef<HTMLDivElement>(null);
+
+  // Close question navigator when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (questionNavigatorRef.current && !questionNavigatorRef.current.contains(event.target as Node)) {
+        setShowQuestionNavigator(false);
+      }
+    };
+
+    if (showQuestionNavigator) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showQuestionNavigator]);
+
   const { user, awardXp, selectedSubject } = useAuthContext();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
@@ -213,7 +239,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
 
   // Timer countdown effect
   useEffect(() => {
-    if (showResults || timeRemaining <= 0) return;
+    if (showResults || timeRemaining <= 0 || isTimerPaused) return;
 
     const interval = setInterval(() => {
       setTimeRemaining(prev => {
@@ -225,7 +251,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [showResults, timeRemaining]);
+  }, [showResults, timeRemaining, isTimerPaused]);
 
   // Notify parent of time updates
   useEffect(() => {
@@ -875,47 +901,144 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
 
       {/* Only show exam content if not showing results, or if showing full results */}
       {(!showResults || showFullResults) && (
-        <div className={`flex w-full flex-col ${(isUnitTest || isPreviewExam) ? 'min-h-screen' : isCustomAssignment ? '' : 'lg:h-[calc(100vh-4rem)]'} ${(isUnitTest || isPreviewExam) ? '' : 'overflow-hidden'}`} style={(isUnitTest || isPreviewExam) ? { paddingBottom: '200px', marginBottom: '200px' } : {}}>
-          {/* Countdown Timer - At the very top for unit tests and preview exams */}
-          {(isUnitTest || isPreviewExam) && showTimer && (
-            <div className={`w-full ${examType === 'macro' ? 'bg-blue-600' : 'bg-green-600'} text-white px-6 py-4 flex items-center justify-between border-b-4 border-black shadow-lg flex-shrink-0`}>
-              <div className="flex items-center gap-3">
-                <Clock className="w-6 h-6" />
-                <span className="text-2xl font-black tracking-wider">
-                  {formatTime(timeRemaining)}
-                </span>
-                {timeRemaining <= 300 && timeRemaining > 0 && (
-                  <span className="text-lg font-bold animate-pulse">⚠️ Less than 5 minutes remaining!</span>
-                )}
-                {timeRemaining === 0 && (
-                  <span className="text-lg font-bold">⏰ Time's Up!</span>
-                )}
+        <div className={`flex w-full flex-col relative ${shouldShowToolsByDefault ? 'min-h-screen' : isCustomAssignment ? '' : 'lg:h-[calc(100vh-4rem)]'} ${shouldShowToolsByDefault ? '' : 'overflow-hidden'}`} style={shouldShowToolsByDefault ? { paddingBottom: '80px' } : {}}>
+          {/* Blur Overlay when timer is paused */}
+          {isTimerPaused && shouldShowToolsByDefault && (
+            <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-50 flex items-center justify-center">
+              <div className="bg-white border-4 border-black rounded-xl shadow-xl p-8">
+                <div className="flex flex-col items-center gap-4">
+                  <Pause className="w-16 h-16 text-gray-700" />
+                  <h3 className="text-2xl font-black text-gray-900">Test Paused</h3>
+                  <p className="text-gray-700 font-semibold">Click Resume to continue</p>
+                  <button
+                    onClick={() => setIsTimerPaused(false)}
+                    className={`mt-4 px-8 py-3 rounded-lg font-bold text-white transition-colors ${
+                      examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-green-600 hover:bg-green-700'
+                    }`}
+                  >
+                    Resume Test
+                  </button>
+                </div>
               </div>
-              <button
-                onClick={() => setShowTimer(false)}
-                className="text-white hover:text-gray-200 transition-colors p-2 rounded-lg hover:bg-white/10"
-                aria-label="Hide timer"
-                title="Hide timer"
-              >
-                <X className="w-5 h-5" />
-              </button>
             </div>
           )}
-          {/* Show timer button when timer is hidden */}
-          {(isUnitTest || isPreviewExam) && !showTimer && (
-            <div className="w-full bg-gray-100 px-6 py-2 flex items-center justify-end border-b border-gray-300 flex-shrink-0">
-              <button
-                onClick={() => setShowTimer(true)}
-                className="text-gray-600 hover:text-gray-800 transition-colors flex items-center gap-2 px-3 py-1 rounded-lg hover:bg-gray-200"
-                aria-label="Show timer"
-                title="Show timer"
-              >
-                <Clock className="w-4 h-4" />
-                <span className="text-sm font-semibold">Show Timer</span>
-              </button>
+          {/* Countdown Timer - At the very top for unit tests, preview exams, and full exams */}
+          {shouldShowToolsByDefault && (
+            <div className="w-full bg-gray-200 px-6 py-4 flex items-center justify-between border-b-4 border-black shadow-lg flex-shrink-0">
+              {showTimer ? (
+                <>
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl font-black tracking-wider text-gray-900 font-mono w-24 text-right">
+                      {formatTime(timeRemaining)}
+                    </span>
+                    {timeRemaining <= 300 && timeRemaining > 0 && !isTimerPaused && (
+                      <span className="text-lg font-bold animate-pulse text-gray-900">⚠️ Less than 5 minutes remaining!</span>
+                    )}
+                    {timeRemaining === 0 && (
+                      <span className="text-lg font-bold text-gray-900">⏰ Time's Up!</span>
+                    )}
+                    {isTimerPaused && (
+                      <span className="text-lg font-bold text-gray-700">⏸️ Paused</span>
+                    )}
+                    {/* Hide Timer Button - Next to timer */}
+                    <button
+                      onClick={() => setShowTimer(false)}
+                      className="text-gray-900 hover:text-gray-700 transition-colors p-2 rounded-lg hover:bg-gray-300 flex-shrink-0"
+                      aria-label="Hide timer"
+                      title="Hide timer"
+                    >
+                      <EyeOff className="w-5 h-5" />
+                    </button>
+                    {/* Pause/Resume Button - After hide button */}
+                    <button
+                      onClick={() => setIsTimerPaused(!isTimerPaused)}
+                      className="text-gray-900 hover:text-gray-700 transition-colors p-2 rounded-lg hover:bg-gray-300 flex-shrink-0"
+                      aria-label={isTimerPaused ? "Resume timer" : "Pause timer"}
+                      title={isTimerPaused ? "Resume timer" : "Pause timer"}
+                    >
+                      {isTimerPaused ? (
+                        <PlayIcon className="w-5 h-5" />
+                      ) : (
+                        <Pause className="w-5 h-5" />
+                      )}
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    {/* Calculator Toggle Button */}
+                    <button
+                      onClick={() => setShowToolsPanel(!showToolsPanel)}
+                      className={`p-2 rounded-lg transition-colors ${
+                        showToolsPanel 
+                          ? 'bg-gray-300 hover:bg-gray-400' 
+                          : 'hover:bg-gray-300'
+                      }`}
+                      aria-label="Toggle calculator and drawing pad"
+                      title="Toggle calculator and drawing pad"
+                    >
+                      <Calculator className="w-5 h-5 text-gray-900" />
+                    </button>
+                    {/* Drawing Pad Toggle Button */}
+                    <button
+                      onClick={() => setShowToolsPanel(!showToolsPanel)}
+                      className={`p-2 rounded-lg transition-colors ${
+                        showToolsPanel 
+                          ? 'bg-gray-300 hover:bg-gray-400' 
+                          : 'hover:bg-gray-300'
+                      }`}
+                      aria-label="Toggle calculator and drawing pad"
+                      title="Toggle calculator and drawing pad"
+                    >
+                      <Pen className="w-5 h-5 text-gray-900" />
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center gap-3">
+                    {/* Show Timer Button - In place of timer on left */}
+                    <button
+                      onClick={() => setShowTimer(true)}
+                      className="text-gray-900 hover:text-gray-700 transition-colors flex items-center gap-2 px-3 py-1 rounded-lg hover:bg-gray-300"
+                      aria-label="Show timer"
+                      title="Show timer"
+                    >
+                      <Clock className="w-4 h-4" />
+                      <span className="text-sm font-semibold">Show Timer</span>
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    {/* Calculator Toggle Button */}
+                    <button
+                      onClick={() => setShowToolsPanel(!showToolsPanel)}
+                      className={`p-2 rounded-lg transition-colors ${
+                        showToolsPanel 
+                          ? 'bg-gray-300 hover:bg-gray-400' 
+                          : 'hover:bg-gray-300'
+                      }`}
+                      aria-label="Toggle calculator and drawing pad"
+                      title="Toggle calculator and drawing pad"
+                    >
+                      <Calculator className="w-5 h-5 text-gray-900" />
+                    </button>
+                    {/* Drawing Pad Toggle Button */}
+                    <button
+                      onClick={() => setShowToolsPanel(!showToolsPanel)}
+                      className={`p-2 rounded-lg transition-colors ${
+                        showToolsPanel 
+                          ? 'bg-gray-300 hover:bg-gray-400' 
+                          : 'hover:bg-gray-300'
+                      }`}
+                      aria-label="Toggle calculator and drawing pad"
+                      title="Toggle calculator and drawing pad"
+                    >
+                      <Pen className="w-5 h-5 text-gray-900" />
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           )}
-          <div className={`flex w-full flex-1 overflow-hidden ${isCustomAssignment || !showToolsPanel ? 'flex-col' : 'lg:flex-row flex-col'}`} style={(isUnitTest || isPreviewExam) ? { height: 'calc(100vh - 64px)' } : {}}>
+          <div className={`flex w-full flex-1 overflow-hidden ${isCustomAssignment || !showToolsPanel ? 'flex-col' : 'lg:flex-row flex-col'}`} style={shouldShowToolsByDefault ? { height: 'calc(100vh - 64px - 80px)' } : {}}>
           {/* Question Container (Left Side / Top on Mobile) */}
           <motion.div 
             animate={{
@@ -926,7 +1049,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
               stiffness: 300,
               damping: 30,
             }}
-            className={`flex-shrink-0 overflow-y-auto min-w-0 w-full lg:w-auto ${(isUnitTest || isPreviewExam) ? 'pb-32' : ''}`}
+            className={`flex-shrink-0 overflow-y-auto min-w-0 w-full lg:w-auto ${shouldShowToolsByDefault ? 'pb-24' : ''}`}
           >
             <div className={`w-full ${
               isCustomAssignment 
@@ -936,7 +1059,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                   : showToolsPanel
                     ? 'p-8'
                     : 'p-8 max-w-5xl mx-auto'
-            } ${(isUnitTest || isPreviewExam) ? 'pb-16' : ''}`}>
+             } ${shouldShowToolsByDefault ? 'pb-24' : ''}`}>
             {!showResults ? (
               <>
               {/* Progress Bar - Mobile Only */}
@@ -1467,52 +1590,16 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                           </div>
                         )}
 
-                        {/* Navigation Controls */}
-                        {!(showVideoModal && videoUrl) && (
-                        <div className={`pt-4 mt-4 border-t border-gray-200 ${(isUnitTest || isPreviewExam) ? 'mb-8 pb-8' : ''}`}>
-                          <div className="flex items-center gap-4">
+                        {/* Submit button for last question - only show if not using fixed bottom bar */}
+                        {!(showVideoModal && videoUrl) && !shouldShowToolsByDefault && currentPage === questions.length - 1 && (
+                          <div className={`pt-4 mt-4 border-t border-gray-200`}>
                             <button
-                              onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
-                              disabled={currentPage === 0}
-                              className={`flex-1 px-6 py-3 text-base rounded-lg font-semibold transition-colors ${
-                                currentPage === 0
-                                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                  : 'bg-blue-500 text-white hover:bg-blue-600'
-                              }`}
+                              onClick={handleSubmitClick}
+                              className="w-full px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white text-base font-semibold rounded-lg transition-colors duration-200"
                             >
-                              Previous
-                            </button>
-                            
-                            <button
-                              onClick={() => {
-                                // Allow free users to navigate to question 2 (index 1), but no further
-                                if (isFreeUser && currentPage >= 1) {
-                                  return;
-                                }
-                                setCurrentPage(prev => Math.min(questions.length - 1, prev + 1));
-                              }}
-                              disabled={currentPage >= questions.length - 1 || (isFreeUser && currentPage >= 1)}
-                              className={`flex-1 px-6 py-3 text-base rounded-lg font-semibold transition-colors ${
-                                currentPage >= questions.length - 1 || (isFreeUser && currentPage >= 1)
-                                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                  : 'bg-blue-500 text-white hover:bg-blue-600'
-                              }`}
-                            >
-                              Next
+                              Submit Exam
                             </button>
                           </div>
-                          
-                          {currentPage === questions.length - 1 && (
-                            <div className="mt-4">
-                              <button
-                                onClick={handleSubmitClick}
-                                className="w-full px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white text-base font-semibold rounded-lg transition-colors duration-200"
-                              >
-                                Submit Exam
-                              </button>
-                            </div>
-                          )}
-                        </div>
                         )}
                       </div>
                   </div>
@@ -1756,8 +1843,8 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
           {!isCustomAssignment && (
             <>
               {/* Desktop: Slide-out panel from right */}
-              {/* For unit tests and preview exams, always show panel without animation */}
-              {(isUnitTest || isPreviewExam) ? (
+              {/* For unit tests, preview exams, and full exams, always show panel without animation */}
+              {shouldShowToolsByDefault ? (
                 showToolsPanel && (
                   <div className="hidden lg:block flex-shrink-0 w-[35%] bg-white shadow-2xl z-40 border-l border-gray-200 overflow-hidden" style={{ height: 'calc(100vh - 64px)' }}>
                     <div className="w-full h-full flex flex-col overflow-hidden">
@@ -1766,7 +1853,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                       <span className="text-sm font-semibold text-gray-900">Calculator & Drawing Pad</span>
                     </div>
 
-                    {/* For unit tests: Whiteboard on top, Calculator on bottom */}
+                    {/* For unit tests, preview exams, and full exams: Whiteboard on top, Calculator on bottom */}
                     <>
                       {/* Excalidraw Section - Top */}
                         <div className="flex-1 flex flex-col overflow-hidden bg-white" style={{ minHeight: '400px', flex: '1 1 auto' }}>
@@ -1956,13 +2043,15 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                       {/* Header */}
                       <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between flex-shrink-0">
                         <span className="text-sm font-semibold text-gray-900">Calculator & Drawing Pad</span>
-                        <button
-                          onClick={() => setShowToolsPanel(false)}
-                          className="text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded p-1.5 transition-colors"
-                          aria-label="Close tools panel"
-                        >
-                          <X className="w-5 h-5" />
-                        </button>
+                        {!shouldShowToolsByDefault && (
+                          <button
+                            onClick={() => setShowToolsPanel(false)}
+                            className="text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded p-1.5 transition-colors"
+                            aria-label="Close tools panel"
+                          >
+                            <X className="w-5 h-5" />
+                          </button>
+                        )}
                       </div>
 
                       {/* For non-unit tests: Calculator on top, Excalidraw on bottom */}
@@ -2140,7 +2229,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                   {/* Header */}
                   <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between flex-shrink-0">
                     <span className="text-sm font-semibold text-gray-900">Calculator & Drawing Pad</span>
-                    {!isUnitTest && !isPreviewExam && (
+                    {!shouldShowToolsByDefault && (
                       <button
                         onClick={() => setShowToolsPanel(false)}
                         className="text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded p-1.5 transition-colors"
@@ -2151,8 +2240,8 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                     )}
                   </div>
 
-                  {/* For unit tests and preview exams: Whiteboard on top, Calculator on bottom */}
-                  {(isUnitTest || isPreviewExam) ? (
+                  {/* For unit tests, preview exams, and full exams: Whiteboard on top, Calculator on bottom */}
+                  {shouldShowToolsByDefault ? (
                     <>
                       {/* Excalidraw Section - Top */}
                       <div className="flex flex-col bg-white" style={{ height: '400px' }}>
@@ -2488,8 +2577,118 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
         </div>
       )}
 
+      {/* Fixed Bottom Bar - Navigation and Question Selector */}
+      {!showResults && shouldShowToolsByDefault && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t-4 border-black shadow-lg z-50">
+          <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+            {/* Question Navigator Button */}
+            <div className="relative flex-1 max-w-md" ref={questionNavigatorRef}>
+              <button
+                onClick={() => setShowQuestionNavigator(!showQuestionNavigator)}
+                disabled={isTimerPaused}
+                className={`w-full px-4 py-2.5 rounded-lg font-semibold flex items-center justify-between transition-colors ${
+                  isTimerPaused 
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                    : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <List className="w-5 h-5" />
+                  <span>Question {currentPage + 1} of {questions.length}</span>
+                </div>
+                {showQuestionNavigator ? (
+                  <ChevronUp className="w-5 h-5" />
+                ) : (
+                  <ChevronDown className="w-5 h-5" />
+                )}
+              </button>
+
+              {/* Expandable Question Grid */}
+              {showQuestionNavigator && (
+                <div className="absolute bottom-full left-0 right-0 mb-2 bg-white border-2 border-black rounded-lg shadow-xl p-4 max-h-96 overflow-y-auto z-10">
+                  <div className="grid grid-cols-10 gap-2">
+                    {questions.map((q, index) => {
+                      const isAnswered = answers[q.id] !== undefined;
+                      const isBookmarked = bookmarkedQuestions.has(q.id);
+                      const isCurrent = index === currentPage;
+                      
+                      return (
+                        <button
+                          key={q.id}
+                          onClick={() => {
+                            if (!isTimerPaused) {
+                              setCurrentPage(index);
+                              setShowQuestionNavigator(false);
+                            }
+                          }}
+                          disabled={isTimerPaused}
+                          className={`w-10 h-10 rounded-lg font-semibold text-sm transition-all ${
+                            isTimerPaused
+                              ? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-300'
+                              : isCurrent
+                              ? `${examType === 'macro' ? 'bg-blue-600' : 'bg-green-600'} text-white ring-2 ring-black`
+                              : isBookmarked
+                              ? 'bg-yellow-200 text-yellow-900 border-2 border-yellow-400'
+                              : isAnswered
+                              ? 'bg-blue-200 text-blue-900 border border-blue-300'
+                              : 'bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200'
+                          }`}
+                          title={`Question ${index + 1}${isBookmarked ? ' (Bookmarked)' : ''}${isTimerPaused ? ' (Test Paused)' : ''}`}
+                        >
+                          {index + 1}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Navigation Buttons */}
+            <div className="flex items-center gap-3">
+              {/* Previous Button */}
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
+                disabled={currentPage === 0 || isTimerPaused}
+                className={`px-6 py-2.5 rounded-lg font-semibold transition-colors flex items-center gap-2 ${
+                  currentPage === 0 || isTimerPaused
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : `${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-green-600 hover:bg-green-700'} text-white`
+                }`}
+              >
+                <ChevronLeft className="w-5 h-5" />
+                Back
+              </button>
+
+              {/* Next Button */}
+              <button
+                onClick={() => {
+                  if (isTimerPaused || (isFreeUser && currentPage >= 1)) {
+                    return;
+                  }
+                  if (currentPage === questions.length - 1) {
+                    handleSubmitClick();
+                  } else {
+                    setCurrentPage(prev => Math.min(questions.length - 1, prev + 1));
+                  }
+                }}
+                disabled={isFreeUser && currentPage >= 1 || isTimerPaused}
+                className={`px-6 py-2.5 rounded-lg font-semibold transition-colors flex items-center gap-2 ${
+                  (isFreeUser && currentPage >= 1) || isTimerPaused
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : `${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-green-600 hover:bg-green-700'} text-white`
+                }`}
+              >
+                {currentPage === questions.length - 1 ? 'Submit' : 'Next'}
+                {currentPage < questions.length - 1 && <ChevronRight className="w-5 h-5" />}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Tool Buttons */}
-      {!showResults && !isUnitTest && !isPreviewExam && (
+      {!showResults && !shouldShowToolsByDefault && (
       <div className="fixed bottom-8 right-8 z-40 flex flex-col gap-3">
         {/* Calculator Toggle Button */}
         {!showToolsPanel && (
