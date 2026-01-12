@@ -88,8 +88,10 @@ export default function TutorBuilderPage() {
   const filteredScenarios = useMemo(() => {
     if (assignmentType === 'mcq') return [];
     return graphGymScenarios.filter(scenario => {
-      const matchesSubject = scenario.subject === graphGymSubject;
-      // Show IDs: 1, 13-17, 41-45, 46, 47, 48, 50, 51
+      // Handle both single subject and array of subjects
+      const scenarioSubjects = Array.isArray(scenario.subject) ? scenario.subject : [scenario.subject];
+      const matchesSubject = scenarioSubjects.includes(graphGymSubject);
+      // Show IDs: 1, 13-17, 41-45, 46, 47, 48, 50, 51, 52
       const matchesIdRange = scenario.id === 1 ||
              (scenario.id >= 13 && scenario.id <= 17) ||
              (scenario.id >= 41 && scenario.id <= 45) ||
@@ -97,7 +99,8 @@ export default function TutorBuilderPage() {
              scenario.id === 47 ||
              scenario.id === 48 ||
              scenario.id === 50 ||
-             scenario.id === 51;
+             scenario.id === 51 ||
+             scenario.id === 52;
       
       const matchesSearch = searchTerm === '' || 
         scenario.title.toLowerCase().includes(searchTerm.toLowerCase()) ||

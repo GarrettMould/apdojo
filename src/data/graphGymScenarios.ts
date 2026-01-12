@@ -9,7 +9,7 @@ export interface ChecklistItem {
 
 export interface GraphGymScenario {
   id: number; // Unique numeric ID starting from 1
-  subject: 'macro' | 'micro'; // Subject this scenario belongs to
+  subject: 'macro' | 'micro' | ('macro' | 'micro')[]; // Subject(s) this scenario belongs to - can be single or array
   lessonId: string; // Lesson ID from syllabus (e.g., "4.2" for Unit 4, Lesson 2)
   topics: string[]; // Array of relevant topics covered in this scenario
   difficulty: 'easy' | 'medium' | 'hard'; // Difficulty level of the scenario
@@ -134,7 +134,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     subject: 'micro',
     lessonId: "5.3",
     topics: ["Labor Market", "Perfectly Competitive Factor Market", "MRP", "MRC"],
-    difficulty: 'medium',
+    difficulty: 'hard',
     title: "Competitive Labor Market and Firm",
     description: "Draw a side-by-side graph for a perfectly competitive labor market and an individual firm hiring labor.",
     toDoList: [
@@ -143,7 +143,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
       "Label the equilibrium wage in the market",
       "Label the quantity of labor hired by the firm"
     ],
-    correctImage: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/wb6.jpg",
+    correctImage: "/images/graphs/micro/labor-market.svg",
     checklist: [
       { id: 1, text: "Market graph shows the intersection of Labor Supply and Labor Demand establishing the equilibrium wage" },
       { id: 2, text: "Firm's Supply of Labor (MRC) is horizontal at the market wage" },
@@ -156,7 +156,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     subject: 'micro',
     lessonId: "5.4",
     topics: ["Monopsony", "Wage Maker", "Factor Market Failure"],
-    difficulty: 'medium',
+    difficulty: 'hard',
     title: "Monopsony in the Labor Market",
     description: "Draw the MFC (MRC), Supply, and MRP curves for a monopsonist.",
     toDoList: [
@@ -164,7 +164,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
       "Label the wage rate paid (Wm)",
       "Show the quantity of workers that would be hired in a perfectly competitive market"
     ],
-    correctImage: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/wb7.jpg",
+    correctImage: "/images/graphs/micro/monopsony.svg",
     checklist: [
       { id: 1, text: "MFC (MRC) curve is above the Supply of labor curve" },
       { id: 2, text: "Quantity hired (Qm) is labeled where MFC equals MRP" },
@@ -980,6 +980,22 @@ export const graphGymScenarios: GraphGymScenario[] = [
         { id: 4, text: "Showed the discount rate and / or interest on reserves being raised." },
       
       ]
-    }
+    }, 
+    {
+    id: 52,
+    subject: ['macro', 'micro'], // PPC is Unit 1 in both Macro and Micro, available for both
+    lessonId: "1.3",
+    topics: ["PPC", "Economic Growth", "Technology Shocks"],
+    difficulty: 'medium',
+    title: "Specific Technological Growth",
+    description: "Draw a Production Possibilities Curve for Good X and Good Y. Show the effect of a new technology that improves the efficiency of producing Good X ONLY.",
+    correctImage: "/images/graphs/macro/ppc-rotation-x.svg",
+    checklist: [
+      { id: 1, text: "Good Y intercept remains exactly at the original point" },
+      { id: 2, text: "Good X intercept shifts outward to the right" },
+      { id: 3, text: "The new curve is outside the old curve (showing growth for X)" },
+      { id: 4, text: "Arrows clearly show a rotation/pivot, not a parallel shift" }
+    ]
+  }
 ];
 

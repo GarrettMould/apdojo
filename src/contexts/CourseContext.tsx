@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode } from 'react';
 import { useAuthContext } from './AuthContext';
 
 type Course = 'macro' | 'micro';
@@ -12,7 +12,7 @@ interface CourseContextValue {
 
 const CourseContext = createContext<CourseContextValue | null>(null);
 
-export function CourseProvider({ children, initialSubject }: { children: ReactNode; initialSubject?: Course }) {
+function CourseProvider({ children, initialSubject }: { children: ReactNode; initialSubject?: Course }) {
   const { selectedSubject, setSelectedSubject } = useAuthContext();
 
   // Use initialSubject if provided, otherwise use selectedSubject from AuthContext
@@ -31,7 +31,7 @@ export function CourseProvider({ children, initialSubject }: { children: ReactNo
   );
 }
 
-export function useCourseContext(): CourseContextValue {
+function useCourseContext(): CourseContextValue {
   const context = useContext(CourseContext);
   if (!context) {
     throw new Error('useCourseContext must be used within CourseProvider');
@@ -40,7 +40,7 @@ export function useCourseContext(): CourseContextValue {
 }
 
 // Theme helper hook
-export function useCourseTheme() {
+function useCourseTheme() {
   const { currentCourse } = useCourseContext();
   
   return {
@@ -52,4 +52,6 @@ export function useCourseTheme() {
     hoverBorder: currentCourse === 'macro' ? 'hover:border-blue-600' : 'hover:border-green-600',
   };
 }
+
+export { CourseProvider, useCourseContext, useCourseTheme };
 
