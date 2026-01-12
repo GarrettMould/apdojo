@@ -1,4 +1,4 @@
-import { initializeApp, getApps } from 'firebase/app'
+import { initializeApp, getApps, type FirebaseApp } from 'firebase/app'
 import { getAuth, connectAuthEmulator } from 'firebase/auth'
 import { getFirestore, connectFirestoreEmulator, enableIndexedDbPersistence } from 'firebase/firestore'
 import { getStorage } from 'firebase/storage'
@@ -15,12 +15,20 @@ const firebaseConfig = {
 }
 
 // Initialize Firebase only if it hasn't been initialized already
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0]
+function getFirebaseApp(): FirebaseApp {
+  const existingApps = getApps()
+  if (existingApps.length > 0) {
+    return existingApps[0]
+  }
+  return initializeApp(firebaseConfig)
+}
+
+export const app = getFirebaseApp()
 
 // Initialize Firebase services
-const auth = getAuth(app)
-const db = getFirestore(app)
-const storage = getStorage(app)
+export const auth = getAuth(app)
+export const db = getFirestore(app)
+export const storage = getStorage(app)
 
 // Enable persistence
 if (typeof window !== 'undefined') {
@@ -34,7 +42,7 @@ if (typeof window !== 'undefined') {
 // Initialize Analytics lazily (only in browser environment)
 let analytics: any = null
 
-const getAnalyticsInstance = () => {
+export const getAnalyticsInstance = () => {
   if (typeof window === 'undefined') return null
   
   if (!analytics) {
@@ -49,6 +57,4 @@ const getAnalyticsInstance = () => {
   }
   
   return analytics
-}
-
-export { app, auth, db, storage, getAnalyticsInstance } 
+} 

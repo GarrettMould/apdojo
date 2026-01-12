@@ -111,12 +111,19 @@ export function GraphGym({ assignmentScenarios, isAssignment = false }: GraphGym
       return assignmentScenarios;
     }
     
-    // Otherwise, filter from all scenarios - only show IDs 41-45
-    let scenarios = graphGymScenarios.filter(scenario => 
-      scenario.subject === currentCourse && 
-      scenario.id >= 41 && 
-      scenario.id <= 45
-    );
+    // Otherwise, filter from all scenarios - only show IDs 1, 13-17, 41-45, 46, 47, 48, 50, 51
+    let scenarios = graphGymScenarios.filter(scenario => {
+      if (scenario.subject !== currentCourse) return false;
+      // Show IDs: 1, 13-17, 41-45, 46, 47, 48, 50, 51
+      return scenario.id === 1 || 
+             (scenario.id >= 13 && scenario.id <= 17) ||
+             (scenario.id >= 41 && scenario.id <= 45) ||
+             scenario.id === 46 ||
+             scenario.id === 47 ||
+             scenario.id === 48 ||
+             scenario.id === 50 ||
+             scenario.id === 51;
+    });
     
     // Filter by unit if selected
     if (selectedUnit !== null) {
@@ -391,8 +398,8 @@ export function GraphGym({ assignmentScenarios, isAssignment = false }: GraphGym
                 </span>
               </div>
 
-              {/* Shuffle Button - Only show when not submitted and not assignment */}
-              {!isSubmitted && !isAssignment && (
+              {/* Shuffle Button - Always show in scenario section (not in assignment mode) */}
+              {!isAssignment && (
                 <button
                   onClick={handleShuffleScenario}
                   className="w-full bg-white rounded-lg border-2 border-black p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-0.5 flex items-center justify-between font-bold text-black"
@@ -572,30 +579,26 @@ export function GraphGym({ assignmentScenarios, isAssignment = false }: GraphGym
                     </div>
                   )}
 
-                  {/* Next/Shuffle Button */}
-                  <div className={`pt-4 transition-opacity ${isVideoExpanded ? 'opacity-0 pointer-events-none' : ''}`}>
-                    <button
-                      onClick={isAssignment ? handleNextScenario : handleShuffleScenario}
-                      disabled={isAssignment && currentScenarioIndex >= filteredScenarios.length - 1}
-                      className={`w-full bg-white rounded-lg border-2 border-black p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-0.5 flex items-center justify-between font-bold text-black ${
-                        isAssignment && currentScenarioIndex >= filteredScenarios.length - 1 ? 'opacity-50 cursor-not-allowed' : ''
-                      }`}
-                    >
-                      <span>
-                        {isAssignment 
-                          ? currentScenarioIndex >= filteredScenarios.length - 1 
+                  {/* Next Button - Only show for assignments */}
+                  {isAssignment && (
+                    <div className={`pt-4 transition-opacity ${isVideoExpanded ? 'opacity-0 pointer-events-none' : ''}`}>
+                      <button
+                        onClick={handleNextScenario}
+                        disabled={currentScenarioIndex >= filteredScenarios.length - 1}
+                        className={`w-full bg-white rounded-lg border-2 border-black p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-0.5 flex items-center justify-between font-bold text-black ${
+                          currentScenarioIndex >= filteredScenarios.length - 1 ? 'opacity-50 cursor-not-allowed' : ''
+                        }`}
+                      >
+                        <span>
+                          {currentScenarioIndex >= filteredScenarios.length - 1 
                             ? 'Last Scenario' 
                             : `Next Scenario (${currentScenarioIndex + 1}/${filteredScenarios.length})`
-                          : 'Shuffle Scenario'
-                        }
-                      </span>
-                      {isAssignment ? (
+                          }
+                        </span>
                         <ArrowRight className="w-5 h-5" />
-                      ) : (
-                        <Shuffle className="w-5 h-5" />
-                      )}
-                    </button>
-                  </div>
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -693,28 +696,22 @@ export function GraphGym({ assignmentScenarios, isAssignment = false }: GraphGym
                 )}
               </div>
 
-              {/* Shuffle/Next Button - Below the board (only when not submitted) */}
-              {!isSubmitted && (
+              {/* Next Button - Only show for assignments when not submitted */}
+              {!isSubmitted && isAssignment && (
                 <button
-                  onClick={isAssignment ? handleNextScenario : handleShuffleScenario}
-                  disabled={isAssignment && currentScenarioIndex >= filteredScenarios.length - 1}
+                  onClick={handleNextScenario}
+                  disabled={currentScenarioIndex >= filteredScenarios.length - 1}
                   className={`w-full mt-4 bg-white rounded-lg border-2 border-black p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-0.5 flex items-center justify-between font-bold text-black ${
-                    isAssignment && currentScenarioIndex >= filteredScenarios.length - 1 ? 'opacity-50 cursor-not-allowed' : ''
+                    currentScenarioIndex >= filteredScenarios.length - 1 ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 >
                   <span>
-                    {isAssignment 
-                      ? currentScenarioIndex >= filteredScenarios.length - 1 
-                        ? 'Last Scenario' 
-                        : `Next Scenario (${currentScenarioIndex + 1}/${filteredScenarios.length})`
-                      : 'Shuffle Scenario'
+                    {currentScenarioIndex >= filteredScenarios.length - 1 
+                      ? 'Last Scenario' 
+                      : `Next Scenario (${currentScenarioIndex + 1}/${filteredScenarios.length})`
                     }
                   </span>
-                  {isAssignment ? (
-                    <ArrowRight className="w-5 h-5" />
-                  ) : (
-                    <Shuffle className="w-5 h-5" />
-                  )}
+                  <ArrowRight className="w-5 h-5" />
                 </button>
               )}
             </div>
@@ -866,28 +863,24 @@ export function GraphGym({ assignmentScenarios, isAssignment = false }: GraphGym
                   </div>
                 )}
 
-                {/* Next/Shuffle Button */}
-                <button
-                  onClick={isAssignment ? handleNextScenario : handleShuffleScenario}
-                  disabled={isAssignment && currentScenarioIndex >= filteredScenarios.length - 1}
-                  className={`w-full bg-white rounded-lg border-2 border-black p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-0.5 flex items-center justify-between font-bold text-black ${
-                    isAssignment && currentScenarioIndex >= filteredScenarios.length - 1 ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
-                >
-                  <span>
-                    {isAssignment 
-                      ? currentScenarioIndex >= filteredScenarios.length - 1 
+                {/* Next Button - Only show for assignments */}
+                {isAssignment && (
+                  <button
+                    onClick={handleNextScenario}
+                    disabled={currentScenarioIndex >= filteredScenarios.length - 1}
+                    className={`w-full bg-white rounded-lg border-2 border-black p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-0.5 flex items-center justify-between font-bold text-black ${
+                      currentScenarioIndex >= filteredScenarios.length - 1 ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
+                  >
+                    <span>
+                      {currentScenarioIndex >= filteredScenarios.length - 1 
                         ? 'Last Scenario' 
                         : `Next Scenario (${currentScenarioIndex + 1}/${filteredScenarios.length})`
-                      : 'Shuffle Scenario'
-                    }
-                  </span>
-                  {isAssignment ? (
+                      }
+                    </span>
                     <ArrowRight className="w-5 h-5" />
-                  ) : (
-                    <Shuffle className="w-5 h-5" />
-                  )}
-                </button>
+                  </button>
+                )}
               </div>
             )}
           </div>

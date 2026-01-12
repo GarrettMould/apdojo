@@ -12,8 +12,11 @@ interface CourseContextValue {
 
 const CourseContext = createContext<CourseContextValue | null>(null);
 
-export function CourseProvider({ children }: { children: ReactNode }) {
+export function CourseProvider({ children, initialSubject }: { children: ReactNode; initialSubject?: Course }) {
   const { selectedSubject, setSelectedSubject } = useAuthContext();
+
+  // Use initialSubject if provided, otherwise use selectedSubject from AuthContext
+  const currentCourse = initialSubject || selectedSubject;
 
   // Sync CourseContext with useAuth's selectedSubject
   // This maintains backward compatibility for components using CourseContext
@@ -22,7 +25,7 @@ export function CourseProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <CourseContext.Provider value={{ currentCourse: selectedSubject, switchCourse }}>
+    <CourseContext.Provider value={{ currentCourse, switchCourse }}>
       {children}
     </CourseContext.Provider>
   );

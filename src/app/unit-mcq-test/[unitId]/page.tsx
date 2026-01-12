@@ -157,6 +157,7 @@ export default function UnitMCQTestPage() {
         questionType="mcq"
         examNumber={unitId as string}
         isFreeUser={false} // Only show if user has access
+        isUnitTest={true} // Enable test-like layout with always-visible tools
       />
     </div>
   );

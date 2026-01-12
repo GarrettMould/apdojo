@@ -35,12 +35,12 @@ export const graphGymScenarios: GraphGymScenario[] = [
       "Show the allocatively efficient quantity",
       "Shade in the area that represents economic profit or losses"
     ],
-    correctImage: "https://placehold.co/600x400?text=Correct+Graph",
+    correctImage: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/wb1.jpg",
     checklist: [
       { id: 1, text: "Profit-maximizing quantity is where MR intersects MC" },
       { id: 2, text: "Price is set on the Demand curve directly above the MR=MC intersection" },
       { id: 3, text: "Allocatively efficient quantity is labeled where MC intersects Demand" },
-      { id: 4, text: "ATC is tangent to Demand (Zero Profit) or area of profit/loss is correctly shaded" }
+      { id: 4, text: "ATC < P at the profit-maximizing quantity and area of profit is correctly shaded" }
     ]
   },
   {
@@ -296,7 +296,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
       "Show the short-run equilibrium",
       "Indicate the inflationary gap"
     ],
-    correctImage: "/images/graphs/macro/inflationary-gap.svg",
+    correctImage: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/wb13.jpg",
     checklist: [
       { id: 1, text: "Short-run equilibrium (AD=SRAS) is to the right of the LRAS" },
       { id: 2, text: "Full employment output (Yf) is labeled at LRAS" },
@@ -318,7 +318,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
       "Label the new equilibrium interest rate",
       "Label the new quantity of money"
     ],
-    correctImage: "/images/graphs/macro/money-market.svg",
+    correctImage: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/wb14.jpg",
     checklist: [
       { id: 1, text: "Money Supply (Sm) is a vertical line" },
       { id: 2, text: "Money Demand (Dm) is downward sloping" },
@@ -340,10 +340,10 @@ export const graphGymScenarios: GraphGymScenario[] = [
       "Label the new equilibrium real interest rate",
       "Label the new quantity of loanable funds"
     ],
-    correctImage: "/images/graphs/macro/loanable-funds.svg",
+    correctImage: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/wb15.jpg",
     checklist: [
       { id: 1, text: "Demand for loanable funds shifts to the right" },
-      { id: 2, text: "Real Interest Rate (r) increases on the y-axis" },
+      { id: 2, text: "Real Interest Rate (rir) increases on the y-axis" },
       { id: 3, text: "Quantity of loanable funds increases on the x-axis" },
       { id: 4, text: "Axes are labeled 'Real Interest Rate' and 'Quantity of Loanable Funds'" }
     ]
@@ -362,7 +362,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
       "Show where SRPC and LRPC intersect",
       "Label the inflation and unemployment rates at equilibrium"
     ],
-    correctImage: "/images/graphs/macro/phillips-curve.svg",
+    correctImage: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/wb16.jpg",
     checklist: [
       { id: 1, text: "LRPC is vertical at the Natural Rate of Unemployment (NRU)" },
       { id: 2, text: "SRPC is downward-sloping" },
@@ -384,7 +384,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
       "Label point A (before) and point B (after)",
       "Indicate that both inflation and unemployment increase"
     ],
-    correctImage: "/images/graphs/macro/phillips-curve-shift.svg",
+    correctImage: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/wb17.jpg",
     checklist: [
       { id: 1, text: "SRPC shifts to the right" },
       { id: 2, text: "Shift indicates higher inflation and higher unemployment simultaneously" },
@@ -856,6 +856,130 @@ export const graphGymScenarios: GraphGymScenario[] = [
       { id: 3, text: "Socially Optimal Quantity is higher, where MSB intersects Supply" },
       { id: 4, text: "Deadweight Loss triangle points toward the social optimum (right)" }
     ]
-  }
+  }, 
+  {
+    id: 46,
+    subject: 'micro',
+    lessonId: "3.7",
+    topics: ["Perfect Competition", "Long Run Equilibrium", "Efficiency"],
+    difficulty: 'medium',
+    title: "Short-Run Equilibrium in Perfect Competition",
+    description: "Draw side-by-side graphs for the market and a representative firm earning economic losses in the short run. Show how the firm returns to long-run equilibrium.",
+    correctImage: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/wb46.jpg",
+    checklist: [
+      { id: 1, text: "Initial firm graph shows economic losses (P < ATC)" },
+      { id: 3, text: "Market graphs shows decrease in supply (shift left)" },
+      { id: 4, text: "Firm MR increases to a point where P = ATC (zero economic profit)" }
+    ]
+  },
+    {
+      id: 47,
+      subject: 'macro',
+      lessonId: "4.6",
+      topics: ["Loanable Funds", "Fiscal Policy", "Crowding Out", "Capital Flows"],
+      difficulty: 'hard',
+      title: "Crowding Out with International Capital Flows",
+      description: "Draw the Loanable Funds Market. Show the impact of expansionary fiscal policy. Then, show the secondary effect of international capital inflows seeking higher returns.",
+      toDoList: [
+        "Shift the Demand for Loanable Funds to the right (Deficit Spending)",
+        "Show the initial increase in Real Interest Rate",
+        "Shift the Supply of Loanable Funds to the right (Capital Inflow)",
+        "Show the final indeterminate effect on Quantity of Loans"
+      ],
+      correctImage: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/wb47.jpg",
+      checklist: [
+        { id: 1, text: "Initial Demand shift increases Real Interest Rate" },
+        { id: 2, text: "Higher interest rate attracts foreign capital, shifting Supply right" },
+        { id: 3, text: "Final Real Interest Rate is lower than the initial spike but higher than original equilibrium (partial crowding out)" },
+        { id: 4, text: "Quantity of Loanable Funds increases in both steps" }
+      ]
+    },
+    {
+      id: 48,
+      subject: 'macro',
+      lessonId: "6.6",
+      topics: ["Foreign Exchange", "Interest Rates", "Net Exports", "AD-AS"],
+      difficulty: 'hard',
+      title: "Monetary Policy Transmission to Net Exports",
+      description: "This is a two-part graph scenario. First, draw the Money Market showing contractionary monetary policy. Second, draw the Foreign Exchange Market for the USD showing the result of their monetary policy.",
+      toDoList: [
+        "Money Market: Shift Supply Left, Nominal Interest Rate Up",
+        "Forex Market: Shift Demand for USD Right and Supply of USD Left",
+        "Show the appreciation of the US Dollar",
+        "Explain/Label the resulting decrease in Net Exports"
+      ],
+      correctImage: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/wb48.jpg",
+      checklist: [
+        { id: 1, text: "Money Supply decreases, raising Interest Rates" },
+        { id: 2, text: "Higher rates increase Demand for USD (Capital Inflow)" },
+        { id: 3, text: "Higher rates decrease Supply of USD (Less Capital Outflow)" },
+        { id: 4, text: "Equilibrium Exchange Rate rises (Appreciation)" }
+      ]
+    },
+    {
+      id: 49,
+      subject: 'macro',
+      lessonId: "5.3",
+      topics: ["Phillips Curve", "Long Run Adjustment", "Inflation Expectations"],
+      difficulty: 'hard',
+      title: "Long-Run Adjustment on the Phillips Curve",
+      description: "Draw an economy in a short-run equilibrium with high inflation. Show the movement to the long-run equilibrium as inflation expectations adjust.",
+      toDoList: [
+        "Plot initial point on SRPC1 to the left of LRPC (Inflationary Gap)",
+        "Shift SRPC to the right/up to show increased inflation expectations",
+        "Plot final point on the new SRPC and LRPC",
+        "Show that Unemployment returns to the Natural Rate (NRU)"
+      ],
+      correctImage: "/images/graphs/macro/phillips-curve-adjustment.svg",
+      checklist: [
+        { id: 1, text: "Initial point is at low unemployment, high inflation" },
+        { id: 2, text: "SRPC shifts right as expected inflation rises" },
+        { id: 3, text: "Final point is at the intersection of new SRPC and LRPC" },
+        { id: 4, text: "Final inflation rate is higher than initial" }
+      ]
+    },
+    {
+      id: 50,
+      subject: 'macro',
+      lessonId: "3.5",
+      topics: ["AD-AS Model", "Stagflation", "Self-Correction"],
+      difficulty: 'hard',
+      title: "Self-Correction from Stagflation",
+      description: "Draw an economy experiencing stagflation. Show the long-run self-correction mechanism assuming no government intervention.",
+      toDoList: [
+        "Draw initial SRAS shift to the left (Stagflation)",
+        "Label the Recessionary Gap",
+        "Shift SRAS back to the right (Wages fall due to high unemployment)",
+        "Return to original Long-Run Equilibrium"
+      ],
+      correctImage: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/wb50.jpg",
+      checklist: [
+        { id: 1, text: "Initial equilibrium has higher Price Level and lower GDP" },
+        { id: 2, text: "High unemployment puts downward pressure on nominal wages" },
+        { id: 3, text: "SRAS shifts right as input costs fall" },
+        { id: 4, text: "Economy returns to Yf at the original Price Level" }
+      ]
+    },
+    {
+      id: 51,
+      subject: 'macro',
+      lessonId: "4.6",
+      topics: ["Ample Reserves", "Administered Rates", "Monetary Policy"],
+      difficulty: 'hard',
+      title: "Ample Reserves Market: Ceiling and Floor",
+      description: "Draw the Market for Reserves in an ample regime. Show the equilibrium Federal Funds Rate (FFR). Suppose the actual output in the economy is greater than the natural rate of output.",
+      toDoList: [
+        "Identify the monetary policy tool that the central bank is using to close the output gap.",
+        "Show the impact of the monetary policy actions on the policy rate.",
+      ],
+      correctImage: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/wb51.jpg",
+      checklist: [
+        { id: 1, text: "Drew a vertical supply of reserves curve intersecting the lower horizontal section of the reserve demand curve."  },
+        { id: 2, text: "Drew a Z-shaped demand curve for reserves, with the upper horizontal section representing the discount rate and the lower horizontal section representing the interest on reserves." },
+        { id: 3, text: "Identified that the central bank raises the discount rate and / or interest on reserves to close the output gap." },
+        { id: 4, text: "Showed the discount rate and / or interest on reserves being raised." },
+      
+      ]
+    }
 ];
 

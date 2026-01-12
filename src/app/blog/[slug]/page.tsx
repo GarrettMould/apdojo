@@ -4,6 +4,9 @@ import { ArrowLeft, Clock } from 'lucide-react';
 import { blogPosts } from '@/data/blogPosts';
 import { BlogPostClient } from '@/components/BlogPostClient';
 import { calculateReadingTime } from '@/utils/readingTime';
+import { GraphExplanationPost as GraphExplanationPostComponent } from '@/components/GraphExplanationPost';
+import { GraphExplanationPost as GraphExplanationPostType } from '@/types/blogPost';
+import { graphExplanationPosts } from '@/data/graphExplanationPosts';
 
 interface BlogPostPageProps {
   params: Promise<{
@@ -12,13 +15,42 @@ interface BlogPostPageProps {
 }
 
 export async function generateStaticParams() {
-  return Object.keys(blogPosts).map((slug) => ({
-    slug,
-  }));
+  // Return both regular blog posts and graph explanation posts
+  const regularPostSlugs = Object.keys(blogPosts).map((slug) => ({ slug }));
+  const graphPostSlugs = Object.keys(graphExplanationPosts).map((slug) => ({ slug }));
+  return [...regularPostSlugs, ...graphPostSlugs];
+}
+
+// Fetch the graph explanation post data based on slug
+async function getGraphExplanationPost(slug: string): Promise<GraphExplanationPostType | null> {
+  return graphExplanationPosts[slug] || null;
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = await params;
+  
+  // Check if this is a graph explanation post
+  const graphPost = await getGraphExplanationPost(slug);
+  
+  if (graphPost) {
+    // Render as Graph Explanation Post
+    return (
+      <div className="bg-gray-50 min-h-screen">
+        <div className="max-w-4xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+          <Link 
+            href="/ap-blog-home" 
+            className="inline-flex items-center text-black hover:text-gray-700 mb-8 group font-bold"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" />
+            Back to Blog
+          </Link>
+          <GraphExplanationPostComponent post={graphPost} />
+        </div>
+      </div>
+    );
+  }
+
+  // Otherwise, check for regular blog post
   const post = blogPosts[slug];
 
   if (!post) {

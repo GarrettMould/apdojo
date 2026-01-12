@@ -539,12 +539,20 @@ function JoinDojoModal({ isOpen, onClose, selectedSubject }: JoinDojoModalProps)
   );
 }
 
-export default function UnitPage() {
+interface UnitPageProps {
+  unitNumber?: number;
+  subject?: 'macro' | 'micro';
+}
+
+export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubject }: UnitPageProps = {}) {
   const params = useParams();
   const router = useRouter(); // Initialize useRouter
-  const { user, userData, selectedSubject, awardXp } = useAuthContext(); // Correctly destructure userData and selectedSubject
+  const { user, userData, selectedSubject: contextSubject, awardXp } = useAuthContext(); // Correctly destructure userData and selectedSubject
   
-  const [activeUnit, setActiveUnit] = useState((params.unitId as string) || '1');
+  // Use props if provided, otherwise use params/context
+  const selectedSubject = propSubject || contextSubject;
+  const initialUnit = propUnitNumber ? String(propUnitNumber) : ((params.unitId as string) || '1');
+  const [activeUnit, setActiveUnit] = useState(initialUnit);
   const [selectedWhiteboard, setSelectedWhiteboard] = useState<WhiteboardImage | null>(null);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
@@ -652,7 +660,14 @@ export default function UnitPage() {
 
   const handleUnitChange = (unitNumber: string) => {
     setActiveUnit(unitNumber);
-    router.push(`/unit/${unitNumber}`, { scroll: false });
+    // If we have props (new static routes), use the new URL format
+    if (propSubject && propUnitNumber) {
+      const subjectPrefix = selectedSubject === 'macro' ? 'ap-macro' : 'ap-micro';
+      router.push(`/${subjectPrefix}-unit-${unitNumber}-cheat-sheet`, { scroll: false });
+    } else {
+      // Otherwise, use the old dynamic route (backwards compatibility)
+      router.push(`/unit/${unitNumber}`, { scroll: false });
+    }
   };
 
   // Find all relevant questions for a specific term
@@ -1897,7 +1912,9 @@ export default function UnitPage() {
                 {/* Previous Unit Button */}
                 {prevUnit ? (
                   <Link
-                    href={`/unit/${prevUnit.number}`}
+                    href={propSubject && propUnitNumber 
+                      ? `/${selectedSubject === 'macro' ? 'ap-macro' : 'ap-micro'}-unit-${prevUnit.number}-cheat-sheet`
+                      : `/unit/${prevUnit.number}`}
                     className={`flex-1 flex items-center gap-3 px-6 py-4 ${buttonColorClass} border-2 rounded-lg transition-all duration-200 group shadow-sm hover:shadow-md`}
                   >
                     <ArrowLeft className="w-5 h-5 flex-shrink-0" />
@@ -1915,7 +1932,9 @@ export default function UnitPage() {
                 {/* Next Unit Button */}
                 {nextUnit ? (
                   <Link
-                    href={`/unit/${nextUnit.number}`}
+                    href={propSubject && propUnitNumber 
+                      ? `/${selectedSubject === 'macro' ? 'ap-macro' : 'ap-micro'}-unit-${nextUnit.number}-cheat-sheet`
+                      : `/unit/${nextUnit.number}`}
                     className={`flex-1 flex items-center justify-end gap-3 px-6 py-4 ${buttonColorClass} border-2 rounded-lg transition-all duration-200 group shadow-sm hover:shadow-md`}
                   >
                     <div className="text-right min-w-0">

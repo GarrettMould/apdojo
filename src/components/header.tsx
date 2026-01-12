@@ -12,7 +12,7 @@ import { getBeltProgress } from '@/lib/beltSystem';
 import { motion } from 'framer-motion';
 import { SubjectToggle } from '@/components/dashboard/SubjectToggle';
 
-function Header() {
+export function Header() {
   const { user, logout, selectedSubject, setSelectedSubject, totalXP, guestXp, isCharacterClosetOpen, setIsCharacterClosetOpen, userData } = useAuthContext();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isBeltDropdownOpen, setIsBeltDropdownOpen] = useState(false);
@@ -122,19 +122,17 @@ function Header() {
                 FRQ Practice
               </Link>
               <Link
-                href="/unit/1"
+                href={displaySubject === 'macro' ? '/ap-macro-unit-1-cheat-sheet' : '/ap-micro-unit-1-cheat-sheet'}
                 className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
               >
                 Unit Cheat Sheets
               </Link>
-              {displaySubject === 'micro' && (
-                <Link
-                  href="/graph-gym"
-                  className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
-                >
-                  Graph Gym
-                </Link>
-              )}
+              <Link
+                href="/graph-gym"
+                className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
+              >
+                Graph Gym
+              </Link>
               <Link
                 href="/dojo-drills"
                 className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
@@ -146,6 +144,12 @@ function Header() {
                 className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
               >
                 Create a Quiz
+              </Link>
+              <Link
+                href="/ap-blog-home"
+                className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
+              >
+                Blog
               </Link>
 
               {/* Tutoring Dropdown - HIDDEN */}
@@ -393,21 +397,19 @@ function Header() {
                 FRQ Practice
               </Link>
               <Link
-                href="/unit/1"
+                href={displaySubject === 'macro' ? '/ap-macro-unit-1-cheat-sheet' : '/ap-micro-unit-1-cheat-sheet'}
                 onClick={closeMobileMenu}
                 className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
               >
                 Unit Cheat Sheets
               </Link>
-              {displaySubject === 'micro' && (
-                <Link
-                  href="/graph-gym"
-                  onClick={closeMobileMenu}
-                  className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
-                >
-                  Graph Gym
-                </Link>
-              )}
+              <Link
+                href="/graph-gym"
+                onClick={closeMobileMenu}
+                className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
+              >
+                Graph Gym
+              </Link>
               <Link
                 href="/dojo-drills"
                 onClick={closeMobileMenu}
@@ -421,6 +423,13 @@ function Header() {
                 className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
               >
                 Create a Quiz
+              </Link>
+              <Link
+                href="/ap-blog-home"
+                onClick={closeMobileMenu}
+                className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
+              >
+                Blog
               </Link>
 
                 {/* Tutoring Dropdown (Mobile) - HIDDEN */}
@@ -585,6 +594,3 @@ function Header() {
     </header>
   );
 }
-
-export default Header;
-export { Header }; 

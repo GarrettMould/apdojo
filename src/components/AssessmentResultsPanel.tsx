@@ -238,7 +238,9 @@ export function AssessmentResultsPanel({
                     whileTap={{ scale: 0.99 }}
                   >
                     <Link
-                      href={`/unit/${unit.unit}`}
+                      href={examType === 'macro' 
+                        ? `/ap-macro-unit-${unit.unit}-cheat-sheet`
+                        : `/ap-micro-unit-${unit.unit}-cheat-sheet`}
                       className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg hover:bg-blue-50 transition-all shadow-sm"
                     >
                       <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold">

@@ -25,7 +25,7 @@ export default function FullMCQExamPage() {
 
   // Convert questions to QuestionBank format for FullExam component
   const questionBank: QuestionBank = useMemo(() => {
-    return {
+      return {
       name: 'AP Macroeconomics Full MCQ Exam',
       questions: macroSetOneQuestions.questions
     };
@@ -45,4 +45,4 @@ export default function FullMCQExamPage() {
       />
     </div>
   );
-}
+} 

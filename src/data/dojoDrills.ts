@@ -1,28 +1,5 @@
 export type InteractiveActivityType = 'graph' | 'table' | 'monopoly' | 'comparative-advantage' | 'ppc-drill' | 'demand-change' | 'elasticity-revenue' | 'consumer-producer-surplus';
 
-// Helper function to check if a drill applies to a subject
-export function drillAppliesToSubject(drill: DojoDrill, subject: 'ap_macroeconomics' | 'ap_microeconomics'): boolean {
-  // If subjects array is defined, use it
-  if (drill.subjects && drill.subjects.length > 0) {
-    return drill.subjects.includes(subject);
-  }
-  // Otherwise fall back to the old subject field
-  return drill.subject === subject;
-}
-
-// Helper function to get the unit number for a drill for a specific subject
-export function getDrillUnitForSubject(drill: DojoDrill, subject: 'ap_macroeconomics' | 'ap_microeconomics'): number | null {
-  // If subjectUnits is defined, use it
-  if (drill.subjectUnits && drill.subjectUnits[subject] !== undefined) {
-    return drill.subjectUnits[subject];
-  }
-  // Otherwise fall back to the old unit field (only if the drill applies to this subject)
-  if (drillAppliesToSubject(drill, subject)) {
-    return drill.unit;
-  }
-  return null;
-}
-
 export interface ComprehensionQuestion {
   id: string;
   question: string;
@@ -71,6 +48,29 @@ export interface DojoDrill {
     perMcqCorrect: number; // XP per correct MCQ (100, max 300 for all 3)
     total: number; // Total possible XP (500)
   };
+}
+
+// Helper function to check if a drill applies to a subject
+export function drillAppliesToSubject(drill: DojoDrill, subject: 'ap_macroeconomics' | 'ap_microeconomics'): boolean {
+  // If subjects array is defined, use it
+  if (drill.subjects && drill.subjects.length > 0) {
+    return drill.subjects.includes(subject);
+  }
+  // Otherwise fall back to the old subject field
+  return drill.subject === subject;
+}
+
+// Helper function to get the unit number for a drill for a specific subject
+export function getDrillUnitForSubject(drill: DojoDrill, subject: 'ap_macroeconomics' | 'ap_microeconomics'): number | null {
+  // If subjectUnits is defined, use it
+  if (drill.subjectUnits && drill.subjectUnits[subject] !== undefined) {
+    return drill.subjectUnits[subject];
+  }
+  // Otherwise fall back to the old unit field (only if the drill applies to this subject)
+  if (drillAppliesToSubject(drill, subject)) {
+    return drill.unit;
+  }
+  return null;
 }
 
 // Lorem ipsum comprehension questions for Stage 1
