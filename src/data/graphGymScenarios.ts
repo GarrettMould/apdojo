@@ -134,7 +134,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     subject: 'micro',
     lessonId: "5.3",
     topics: ["Labor Market", "Perfectly Competitive Factor Market", "MRP", "MRC"],
-    difficulty: 'hard',
+    difficulty: 'medium',
     title: "Competitive Labor Market and Firm",
     description: "Draw a side-by-side graph for a perfectly competitive labor market and an individual firm hiring labor.",
     toDoList: [
@@ -143,7 +143,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
       "Label the equilibrium wage in the market",
       "Label the quantity of labor hired by the firm"
     ],
-    correctImage: "/images/graphs/micro/labor-market.svg",
+    correctImage: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/wb6.jpg",
     checklist: [
       { id: 1, text: "Market graph shows the intersection of Labor Supply and Labor Demand establishing the equilibrium wage" },
       { id: 2, text: "Firm's Supply of Labor (MRC) is horizontal at the market wage" },
@@ -156,7 +156,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     subject: 'micro',
     lessonId: "5.4",
     topics: ["Monopsony", "Wage Maker", "Factor Market Failure"],
-    difficulty: 'hard',
+    difficulty: 'medium',
     title: "Monopsony in the Labor Market",
     description: "Draw the MFC (MRC), Supply, and MRP curves for a monopsonist.",
     toDoList: [
@@ -164,7 +164,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
       "Label the wage rate paid (Wm)",
       "Show the quantity of workers that would be hired in a perfectly competitive market"
     ],
-    correctImage: "/images/graphs/micro/monopsony.svg",
+    correctImage: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/wb7.jpg",
     checklist: [
       { id: 1, text: "MFC (MRC) curve is above the Supply of labor curve" },
       { id: 2, text: "Quantity hired (Qm) is labeled where MFC equals MRP" },

@@ -71,6 +71,8 @@ export interface UserData {
     };
     lifetimeAiGenerations: number;
   };
+  // Add teacher field to indicate if user is a teacher/tutor
+  teacher?: boolean;
 }
 
 // --- ADD LEVELING LOGIC --- 
@@ -614,6 +616,7 @@ export function useAuth() {
             },
             lifetimeAiGenerations: 1,
           },
+          teacher: false, // Default to false, can be set to true manually in Firebase
         });
         
         // If user subscribed, add their email to the subscribedEmails collection

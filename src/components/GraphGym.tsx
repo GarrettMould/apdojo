@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
-import { ArrowRight, Lock, CheckCircle2, Circle, LockKeyhole, Shuffle, ChevronDown, Monitor, Smartphone, Play, X } from 'lucide-react';
+import { ArrowRight, Lock, CheckCircle2, Circle, LockKeyhole, Shuffle, ChevronDown, Monitor, Smartphone, Play, X, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCourseTheme, useCourseContext } from '@/contexts/CourseContext';
 import { useAuthContext } from '@/contexts/AuthContext';
@@ -10,6 +10,9 @@ import { graphGymScenarios, GraphGymScenario } from '@/data/graphGymScenarios';
 import { hasValidSeasonPass } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { db, storage } from '@/lib/firebase';
+import { collection, addDoc, serverTimestamp, query, where, getDocs, doc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import '@excalidraw/excalidraw/index.css';
 
 const Excalidraw = dynamic(
@@ -18,6 +21,16 @@ const Excalidraw = dynamic(
     ssr: false,
   },
 );
+
+// Import Excalidraw export utilities
+let exportToCanvas: any = null;
+const loadExcalidrawExports = async () => {
+  if (!exportToCanvas) {
+    const excalidrawModule = await import("@excalidraw/excalidraw");
+    exportToCanvas = excalidrawModule.exportToCanvas;
+  }
+  return exportToCanvas;
+};
 
 function JoinDojoModal({ isOpen, onClose, selectedSubject }: { isOpen: boolean; onClose: () => void; selectedSubject: 'macro' | 'micro' }) {
   useEffect(() => {
@@ -82,9 +95,10 @@ function JoinDojoModal({ isOpen, onClose, selectedSubject }: { isOpen: boolean; 
 interface GraphGymProps {
   assignmentScenarios?: GraphGymScenario[]; // Scenarios from assignment link
   isAssignment?: boolean; // Whether this is an assignment (no shuffle, show next)
+  assignmentLinkId?: string; // The encoded param from the assignment link
 }
 
-export function GraphGym({ assignmentScenarios, isAssignment = false }: GraphGymProps) {
+export function GraphGym({ assignmentScenarios, isAssignment = false, assignmentLinkId }: GraphGymProps) {
   const theme = useCourseTheme();
   const { currentCourse } = useCourseContext();
   const { user, userData } = useAuthContext();
@@ -97,6 +111,13 @@ export function GraphGym({ assignmentScenarios, isAssignment = false }: GraphGym
   const [showJoinDojoModal, setShowJoinDojoModal] = useState(false);
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [isVideoExpanded, setIsVideoExpanded] = useState(false);
+  const [completedScenarios, setCompletedScenarios] = useState<Set<number>>(new Set());
+  const [scenarioImages, setScenarioImages] = useState<Map<number, string>>(new Map()); // Map of scenarioId -> imageUrl
+  const excalidrawRef = useRef<any>(null); // Excalidraw API ref
+  const [showNameInputModal, setShowNameInputModal] = useState(false);
+  const [studentName, setStudentName] = useState('');
+  const [currentElements, setCurrentElements] = useState<any[]>([]); // Track current Excalidraw elements
+  const [currentAppState, setCurrentAppState] = useState<any>(null); // Track current Excalidraw app state
 
   // Check if user has access (logged in + season pass)
   const hasAccess = useMemo(() => {
@@ -233,7 +254,179 @@ export function GraphGym({ assignmentScenarios, isAssignment = false }: GraphGym
     }
   };
 
-  const handleNextScenario = () => {
+  // Capture and upload Excalidraw board snapshot
+  const captureAndUploadBoard = async (scenarioId: number): Promise<string | null> => {
+    if (!user || !assignmentLinkId) {
+      console.warn('[Graph Gym] Missing user or assignmentLinkId', { user: !!user, assignmentLinkId: !!assignmentLinkId });
+      return null;
+    }
+    
+    try {
+      // Prioritize tracked state (from onChange callback) - this is more reliable
+      let elements: any[] | null = null;
+      let appState: any = null;
+      let files: any = {};
+      
+      // Use tracked elements first (most reliable)
+      if (currentElements && Array.isArray(currentElements)) {
+        elements = currentElements;
+        appState = currentAppState || {};
+        console.log('[Graph Gym] Using tracked elements from state:', { count: elements.length });
+      }
+      
+      // Try to get from Excalidraw API as fallback
+      if (!elements && excalidrawRef.current) {
+        const excalidrawAPI = excalidrawRef.current;
+        if (typeof excalidrawAPI.getSceneElements === 'function') {
+          elements = excalidrawAPI.getSceneElements();
+          appState = excalidrawAPI.getAppState();
+          console.log('[Graph Gym] Using API methods:', { count: elements?.length || 0 });
+        }
+      }
+      
+      console.log('[Graph Gym] Capturing board for scenario', scenarioId, {
+        elementsCount: elements?.length || 0,
+        hasElements: !!(elements && elements.length > 0),
+        refAvailable: !!excalidrawRef.current,
+        currentElementsCount: currentElements?.length || 0,
+        currentElementsExists: !!currentElements,
+        hasAppState: !!appState,
+        usingTrackedState: !!(currentElements && Array.isArray(currentElements))
+      });
+      
+      // Check if elements array exists (it should always be an array)
+      if (!elements || !Array.isArray(elements)) {
+        console.error('[Graph Gym] Elements array is null or not an array - cannot export', { 
+          elements,
+          currentElements: currentElements,
+          currentElementsType: typeof currentElements,
+          currentElementsIsArray: Array.isArray(currentElements),
+          refExists: !!excalidrawRef.current
+        });
+        return null;
+      }
+      
+      // Log if using tracked state
+      if (elements === currentElements) {
+        console.log('[Graph Gym] Successfully using tracked elements:', elements.length);
+      }
+      
+      // Allow export even with empty elements (student might not have drawn anything)
+      // But log a warning if there are no elements
+      if (elements.length === 0) {
+        console.warn('[Graph Gym] No elements on board, but will still export empty board');
+      }
+
+      // Load export function
+      const exportFn = await loadExcalidrawExports();
+      if (!exportFn) {
+        console.error('[Graph Gym] Failed to load Excalidraw export function');
+        return null;
+      }
+
+      // Export canvas
+      // Try to get files from API if available, otherwise use empty object
+      if (excalidrawRef.current && typeof excalidrawRef.current.getFiles === 'function') {
+        try {
+          files = excalidrawRef.current.getFiles() || {};
+        } catch (e) {
+          console.warn('[Graph Gym] Error getting files from API, using empty object:', e);
+          files = {};
+        }
+      }
+      
+      console.log('[Graph Gym] Exporting with:', {
+        elementsCount: elements.length,
+        hasAppState: !!appState,
+        hasFiles: Object.keys(files).length > 0
+      });
+      
+      const canvas = await exportFn({
+        elements,
+        appState: appState || {},
+        files,
+      });
+
+      // Convert canvas to blob
+      const blob = await new Promise<Blob | null>((resolve) => {
+        canvas.toBlob((blob: Blob | null) => resolve(blob), 'image/png', 0.9);
+      });
+
+      if (!blob) {
+        console.error('[Graph Gym] Failed to convert canvas to blob');
+        return null;
+      }
+
+      // Create storage path: assignment-images/{assignmentLinkId}/{userId}/{scenarioId}-{timestamp}.png
+      const timestamp = Date.now();
+      const storagePath = `assignment-images/${assignmentLinkId}/${user.uid}/${scenarioId}-${timestamp}.png`;
+      const storageRef = ref(storage, storagePath);
+
+      // Upload blob to Firebase Storage
+      await uploadBytes(storageRef, blob);
+      
+      // Get download URL
+      const downloadURL = await getDownloadURL(storageRef);
+      
+      console.log('[Graph Gym] Board snapshot uploaded:', downloadURL);
+      return downloadURL;
+    } catch (error) {
+      console.error('[Graph Gym] Error capturing/uploading board snapshot:', error);
+      return null;
+    }
+  };
+
+  const handleNextScenario = async () => {
+    // Mark current scenario as completed if this is an assignment
+    if (isAssignment && filteredScenarios[currentScenarioIndex]) {
+      const currentScenario = filteredScenarios[currentScenarioIndex];
+      
+      // Capture board snapshot before moving to next scenario
+      // Wait a tiny bit to ensure Excalidraw API is fully ready
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      console.log('[Graph Gym] Capturing board for scenario', currentScenario.id);
+      console.log('[Graph Gym] Excalidraw ref state:', {
+        refExists: !!excalidrawRef.current,
+        apiExists: !!excalidrawRef.current?.getSceneElements,
+        currentIndex: currentScenarioIndex
+      });
+      
+      const imageUrl = await captureAndUploadBoard(currentScenario.id);
+      console.log('[Graph Gym] Capture result:', { scenarioId: currentScenario.id, imageUrl });
+      
+      if (imageUrl) {
+        // Update state immediately
+        setScenarioImages(prev => {
+          const newMap = new Map(prev);
+          newMap.set(currentScenario.id, imageUrl);
+          console.log('[Graph Gym] Updated scenarioImages:', Array.from(newMap.entries()));
+          return newMap;
+        });
+      } else {
+        console.warn('[Graph Gym] Failed to capture image for scenario', currentScenario.id);
+      }
+      
+      const newCompleted = new Set([...completedScenarios, currentScenario.id]);
+      setCompletedScenarios(newCompleted);
+      
+      // If this is the last scenario, show name input modal before saving
+      // Store the last captured image URL in a way that's immediately accessible
+      if (currentScenarioIndex >= filteredScenarios.length - 1) {
+        // Ensure the last scenario's image is stored before showing modal
+        if (imageUrl) {
+          setScenarioImages(prev => {
+            const newMap = new Map(prev);
+            newMap.set(currentScenario.id, imageUrl);
+            return newMap;
+          });
+        }
+        // Show name input modal
+        setShowNameInputModal(true);
+        return; // Don't move to next since we're already on the last one
+      }
+    }
+    
     // Reset submission state and checked items
     setIsSubmitted(false);
     setCheckedItems(new Set());
@@ -244,6 +437,101 @@ export function GraphGym({ assignmentScenarios, isAssignment = false }: GraphGym
     // Move to next scenario in order
     if (currentScenarioIndex < filteredScenarios.length - 1) {
       setCurrentScenarioIndex(prev => prev + 1);
+    }
+  };
+
+  const handleNameSubmit = async () => {
+    if (!studentName.trim()) {
+      alert('Please enter your name');
+      return;
+    }
+    setShowNameInputModal(false);
+    
+    // Save results with student name
+    // Wait a bit to ensure state has updated
+    await new Promise(resolve => setTimeout(resolve, 100));
+    const allCompleted = new Set([...completedScenarios, filteredScenarios[filteredScenarios.length - 1].id]);
+    await saveAssignmentResults(allCompleted, studentName.trim());
+  };
+
+  const saveAssignmentResults = async (finalCompleted: Set<number>, studentNameInput?: string) => {
+    if (!isAssignment || !assignmentLinkId) return;
+    
+    try {
+      // Get assignment link document
+      const assignmentLinkQuery = query(
+        collection(db, 'assignmentLinks'),
+        where('encodedParam', '==', assignmentLinkId)
+      );
+      const assignmentLinkDoc = await getDocs(assignmentLinkQuery);
+      
+      if (assignmentLinkDoc.empty) {
+        console.warn('Assignment link not found in Firebase');
+        return;
+      }
+
+      const linkDoc = assignmentLinkDoc.docs[0];
+      const linkDocId = linkDoc.id;
+
+      // Create scenario results (for Graph Gym, we track completion and images)
+      // Create a fresh copy of the map to ensure we have the latest state
+      const currentScenarioImages = new Map(scenarioImages);
+      const scenarioResults = filteredScenarios.map(scenario => {
+        const imageUrl = currentScenarioImages.get(scenario.id) || null;
+        return {
+          scenarioId: scenario.id,
+          scenarioTitle: scenario.title,
+          completed: finalCompleted.has(scenario.id),
+          imageUrl: imageUrl
+        };
+      });
+      
+      console.log('[Graph Gym] Saving assignment results:', {
+        totalScenarios: filteredScenarios.length,
+        completedCount: finalCompleted.size,
+        scenarioImagesMap: Array.from(currentScenarioImages.entries()).map(([id, url]) => ({ id, url: url ? 'present' : 'missing' })),
+        scenarioResults: scenarioResults.map(sr => ({
+          id: sr.scenarioId,
+          completed: sr.completed,
+          hasImage: !!sr.imageUrl,
+          imageUrl: sr.imageUrl || 'NULL'
+        }))
+      });
+
+      const totalScenarios = filteredScenarios.length;
+      const completedCount = finalCompleted.size;
+      const completionPercentage = Math.round((completedCount / totalScenarios) * 100);
+
+      // Prepare the data to save
+      const resultData = {
+        assignmentLinkId: linkDocId,
+        tutorId: linkDoc.data().tutorId,
+        studentId: user?.uid || null,
+        studentEmail: user?.email || null,
+        studentName: studentNameInput || user?.displayName || user?.email?.split('@')[0] || 'Student',
+        scenarioResults: scenarioResults,
+        totalQuestions: totalScenarios, // Using same field name for consistency
+        correctCount: completedCount,
+        incorrectCount: totalScenarios - completedCount,
+        score: completionPercentage, // Completion percentage as score
+        assignmentType: 'graphGym',
+        submittedAt: serverTimestamp()
+      };
+
+      console.log('[Graph Gym] Attempting to save results:', {
+        tutorId: resultData.tutorId,
+        studentId: resultData.studentId,
+        studentName: resultData.studentName,
+        scenarioResultsCount: scenarioResults.length,
+        hasImages: scenarioResults.filter(sr => sr.imageUrl).length
+      });
+
+      // Save results
+      await addDoc(collection(db, 'assignmentResults'), resultData);
+
+      console.log('[Graph Gym Assignment] Results saved successfully');
+    } catch (error) {
+      console.error('[Graph Gym Assignment] Error saving results:', error);
     }
   };
 
@@ -298,6 +586,7 @@ export function GraphGym({ assignmentScenarios, isAssignment = false }: GraphGym
           {/* Main Drawing Area - Excalidraw Container */}
           <div className="flex-1 relative" style={{ minWidth: 0 }}>
             <Excalidraw
+              ref={excalidrawRef}
               key={excalidrawKey}
               viewModeEnabled={isSubmitted}
               gridModeEnabled={false}
@@ -311,6 +600,11 @@ export function GraphGym({ assignmentScenarios, isAssignment = false }: GraphGym
                 },
               }}
               initialData={excalidrawInitialData}
+              onChange={(elements, appState) => {
+                // Track elements and appState for capture
+                setCurrentElements(elements);
+                setCurrentAppState(appState);
+              }}
             />
             
             
@@ -584,18 +878,19 @@ export function GraphGym({ assignmentScenarios, isAssignment = false }: GraphGym
                     <div className={`pt-4 transition-opacity ${isVideoExpanded ? 'opacity-0 pointer-events-none' : ''}`}>
                       <button
                         onClick={handleNextScenario}
-                        disabled={currentScenarioIndex >= filteredScenarios.length - 1}
-                        className={`w-full bg-white rounded-lg border-2 border-black p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-0.5 flex items-center justify-between font-bold text-black ${
-                          currentScenarioIndex >= filteredScenarios.length - 1 ? 'opacity-50 cursor-not-allowed' : ''
-                        }`}
+                        className="w-full bg-white rounded-lg border-2 border-black p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-0.5 flex items-center justify-between font-bold text-black"
                       >
                         <span>
                           {currentScenarioIndex >= filteredScenarios.length - 1 
-                            ? 'Last Scenario' 
+                            ? 'Submit Assignment' 
                             : `Next Scenario (${currentScenarioIndex + 1}/${filteredScenarios.length})`
                           }
                         </span>
-                        <ArrowRight className="w-5 h-5" />
+                        {currentScenarioIndex >= filteredScenarios.length - 1 ? (
+                          <CheckCircle2 className="w-5 h-5" />
+                        ) : (
+                          <ArrowRight className="w-5 h-5" />
+                        )}
                       </button>
                     </div>
                   )}
@@ -659,6 +954,7 @@ export function GraphGym({ assignmentScenarios, isAssignment = false }: GraphGym
             <div className="flex-1 flex flex-col px-4 pb-4 min-h-0">
               <div className="relative flex-1 w-full min-h-0" style={{ aspectRatio: '3/4', maxWidth: '100%' }}>
                 <Excalidraw
+                  ref={excalidrawRef}
                   key={excalidrawKey}
                   viewModeEnabled={isSubmitted}
                   gridModeEnabled={false}
@@ -672,6 +968,11 @@ export function GraphGym({ assignmentScenarios, isAssignment = false }: GraphGym
                     },
                   }}
                   initialData={excalidrawInitialData}
+                  onChange={(elements, appState) => {
+                    // Track elements and appState for capture
+                    setCurrentElements(elements);
+                    setCurrentAppState(appState);
+                  }}
                 />
                 
                 {/* Lock Icon - Show when submitted */}
@@ -700,18 +1001,19 @@ export function GraphGym({ assignmentScenarios, isAssignment = false }: GraphGym
               {!isSubmitted && isAssignment && (
                 <button
                   onClick={handleNextScenario}
-                  disabled={currentScenarioIndex >= filteredScenarios.length - 1}
-                  className={`w-full mt-4 bg-white rounded-lg border-2 border-black p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-0.5 flex items-center justify-between font-bold text-black ${
-                    currentScenarioIndex >= filteredScenarios.length - 1 ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
+                  className="w-full mt-4 bg-white rounded-lg border-2 border-black p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-0.5 flex items-center justify-between font-bold text-black"
                 >
                   <span>
                     {currentScenarioIndex >= filteredScenarios.length - 1 
-                      ? 'Last Scenario' 
+                      ? 'Submit Assignment' 
                       : `Next Scenario (${currentScenarioIndex + 1}/${filteredScenarios.length})`
                     }
                   </span>
-                  <ArrowRight className="w-5 h-5" />
+                  {currentScenarioIndex >= filteredScenarios.length - 1 ? (
+                    <CheckCircle2 className="w-5 h-5" />
+                  ) : (
+                    <ArrowRight className="w-5 h-5" />
+                  )}
                 </button>
               )}
             </div>
@@ -867,18 +1169,19 @@ export function GraphGym({ assignmentScenarios, isAssignment = false }: GraphGym
                 {isAssignment && (
                   <button
                     onClick={handleNextScenario}
-                    disabled={currentScenarioIndex >= filteredScenarios.length - 1}
-                    className={`w-full bg-white rounded-lg border-2 border-black p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-0.5 flex items-center justify-between font-bold text-black ${
-                      currentScenarioIndex >= filteredScenarios.length - 1 ? 'opacity-50 cursor-not-allowed' : ''
-                    }`}
+                    className="w-full bg-white rounded-lg border-2 border-black p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-0.5 flex items-center justify-between font-bold text-black"
                   >
                     <span>
                       {currentScenarioIndex >= filteredScenarios.length - 1 
-                        ? 'Last Scenario' 
+                        ? 'Submit Assignment' 
                         : `Next Scenario (${currentScenarioIndex + 1}/${filteredScenarios.length})`
                       }
                     </span>
-                    <ArrowRight className="w-5 h-5" />
+                    {currentScenarioIndex >= filteredScenarios.length - 1 ? (
+                      <CheckCircle2 className="w-5 h-5" />
+                    ) : (
+                      <ArrowRight className="w-5 h-5" />
+                    )}
                   </button>
                 )}
               </div>
@@ -894,6 +1197,46 @@ export function GraphGym({ assignmentScenarios, isAssignment = false }: GraphGym
         selectedSubject={currentCourse}
       />
 
+      {/* Name Input Modal for Assignments */}
+      {showNameInputModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4">
+          <div className="bg-white rounded-xl shadow-lg max-w-md w-full p-6 border-4 border-black">
+            <div className="flex items-center gap-3 mb-4">
+              <FileText className="w-6 h-6 text-blue-600" />
+              <h3 className="text-xl font-black text-gray-900">
+                Enter Your Name
+              </h3>
+            </div>
+            <p className="text-gray-700 mb-6 font-semibold">
+              Please enter your name so your teacher can identify your submission.
+            </p>
+            <div className="mb-6">
+              <input
+                type="text"
+                value={studentName}
+                onChange={(e) => setStudentName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && studentName.trim()) {
+                    handleNameSubmit();
+                  }
+                }}
+                placeholder="Your name"
+                className="w-full px-4 py-3 border-2 border-black rounded-lg font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                autoFocus
+              />
+            </div>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={handleNameSubmit}
+                disabled={!studentName.trim()}
+                className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold rounded-lg transition-colors duration-200 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,25 +1,55 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question } from '@/data/questionBanks/types';
-import { Copy, CheckCircle2, Search, Filter } from 'lucide-react';
+import { Copy, CheckCircle2, Search, Filter, Eye, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, where, getDocs, getDoc, doc, orderBy } from 'firebase/firestore';
 import { graphGymScenarios, GraphGymScenario } from '@/data/graphGymScenarios';
 
 type AssignmentType = 'mcq' | 'graphGym';
+type ViewMode = 'builder' | 'results';
+
+interface AssignmentResult {
+  id: string;
+  assignmentLinkId: string;
+  assignmentName: string;
+  studentId: string | null;
+  studentEmail: string | null;
+  studentName: string | null;
+  score: number;
+  totalQuestions: number;
+  correctCount: number;
+  submittedAt: any;
+  assignmentType: 'mcq' | 'graphGym';
+}
 
 export default function TutorBuilderPage() {
   const { user } = useAuthContext();
+  const [viewMode, setViewMode] = useState<ViewMode>('builder');
+  
+  // Check URL hash or localStorage for view mode preference
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash;
+      if (hash === '#results') {
+        setViewMode('results');
+      }
+    }
+  }, []);
   const [assignmentType, setAssignmentType] = useState<AssignmentType>('mcq');
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [searchTerm, setSearchTerm] = useState('');
   const [unitFilter, setUnitFilter] = useState<number | null>(null);
   const [subjectFilter, setSubjectFilter] = useState<'ap_macroeconomics' | 'ap_microeconomics'>('ap_macroeconomics');
   const [linkCopied, setLinkCopied] = useState(false);
+  
+  // Assignment results state
+  const [assignmentResults, setAssignmentResults] = useState<AssignmentResult[]>([]);
+  const [loadingResults, setLoadingResults] = useState(false);
 
   // Convert subject filter to graph gym format
   const graphGymSubject = useMemo(() => {
@@ -136,15 +166,194 @@ export default function TutorBuilderPage() {
     return text.substring(0, maxLength) + '...';
   };
 
+  // Fetch assignment results
+  useEffect(() => {
+    if (!user || viewMode !== 'results') return;
+
+    const fetchResults = async () => {
+      setLoadingResults(true);
+      try {
+        // Fetch all assignment results for this tutor
+        const resultsQuery = query(
+          collection(db, 'assignmentResults'),
+          where('tutorId', '==', user.uid),
+          orderBy('submittedAt', 'desc')
+        );
+        
+        const resultsSnapshot = await getDocs(resultsQuery);
+        const results: AssignmentResult[] = [];
+        
+        // Note: We no longer fetch student names from user documents
+        // because tutors don't have permission to read other users' documents.
+        // We rely on studentName stored in assignmentResults instead.
+
+        // Fetch assignment link details and build results
+        for (const resultDoc of resultsSnapshot.docs) {
+          const data = resultDoc.data();
+          try {
+            let assignmentName = 'Unknown Assignment';
+            
+            // Try to fetch assignment link, but handle permission errors gracefully
+            try {
+              const assignmentLinkDoc = await getDoc(doc(db, 'assignmentLinks', data.assignmentLinkId));
+              if (assignmentLinkDoc.exists()) {
+                const linkData = assignmentLinkDoc.data();
+                const subjectLabel = linkData.subject === 'ap_macroeconomics' ? 'Macro' : 'Micro';
+                const typeLabel = linkData.assignmentType === 'mcq' ? 'MCQ' : 'Graph Gym';
+                assignmentName = `${subjectLabel} ${typeLabel} - ${linkData.totalQuestions} questions`;
+              }
+            } catch (linkError: any) {
+              // If we can't read the assignment link, use a fallback name
+              console.warn(`Could not read assignment link ${data.assignmentLinkId}:`, linkError);
+              const typeLabel = data.assignmentType === 'mcq' ? 'MCQ' : 'Graph Gym';
+              assignmentName = `${typeLabel} Assignment - ${data.totalQuestions || '?'} questions`;
+            }
+
+            // Use studentName from result if available, otherwise fall back to email
+            const studentName = data.studentName || data.studentEmail || 'Guest';
+
+            results.push({
+              id: resultDoc.id,
+              assignmentLinkId: data.assignmentLinkId,
+              assignmentName,
+              studentId: data.studentId || null,
+              studentEmail: data.studentEmail || null,
+              studentName,
+              score: data.score || 0,
+              totalQuestions: data.totalQuestions || 0,
+              correctCount: data.correctCount || 0,
+              submittedAt: data.submittedAt,
+              assignmentType: data.assignmentType || 'mcq'
+            });
+          } catch (error) {
+            console.error(`Error processing result ${resultDoc.id}:`, error);
+          }
+        }
+
+        setAssignmentResults(results);
+      } catch (error) {
+        console.error('Error fetching assignment results:', error);
+      } finally {
+        setLoadingResults(false);
+      }
+    };
+
+    fetchResults();
+  }, [user, viewMode]);
+
+  const formatDate = (timestamp: any) => {
+    if (!timestamp) return 'Unknown date';
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 pt-12 pb-6">
-        {/* Title */}
+        {/* Title and Tabs */}
         <div className="mb-6">
-          <h1 className="text-3xl font-black text-black">Assignment Builder</h1>
-          <p className="text-sm text-gray-600 mt-1">Select questions to create a custom assignment link</p>
+          <h1 className="text-3xl font-black text-black mb-4">Tutor Dashboard</h1>
+          
+          {/* Tabs */}
+          <div className="flex border-2 border-black rounded-lg overflow-hidden w-fit">
+            <button
+              onClick={() => setViewMode('builder')}
+              className={`px-6 py-2 font-black transition-colors ${
+                viewMode === 'builder'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-white text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              Assignment Builder
+            </button>
+            <button
+              onClick={() => setViewMode('results')}
+              className={`px-6 py-2 font-black transition-colors border-l-2 border-black ${
+                viewMode === 'results'
+                  ? 'bg-green-600 text-white'
+                  : 'bg-white text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              Assignment Results
+            </button>
+          </div>
         </div>
+
+        {/* Assignment Results View */}
+        {viewMode === 'results' && (
+          <div className="bg-white border-4 border-black rounded-lg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+            {loadingResults ? (
+              <div className="p-12 text-center">
+                <Loader2 className="h-8 w-8 animate-spin text-blue-500 mx-auto mb-4" />
+                <p className="text-gray-500 font-semibold">Loading results...</p>
+              </div>
+            ) : assignmentResults.length === 0 ? (
+              <div className="p-12 text-center">
+                <p className="text-gray-500 font-semibold">No assignment results yet. Share your assignment links with students to see their submissions here.</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-100 border-b-4 border-black">
+                    <tr>
+                      <th className="px-4 py-3 text-left font-black text-black">Assignment</th>
+                      <th className="px-4 py-3 text-left font-black text-black">Student Name</th>
+                      <th className="px-4 py-3 text-left font-black text-black">Score</th>
+                      <th className="px-4 py-3 text-left font-black text-black">Submitted</th>
+                      <th className="px-4 py-3 text-left font-black text-black">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {assignmentResults.map((result) => (
+                      <tr
+                        key={result.id}
+                        className="border-b-2 border-gray-200 hover:bg-gray-50 transition-colors"
+                      >
+                        <td className="px-4 py-3 font-semibold text-gray-900">
+                          {result.assignmentName}
+                        </td>
+                        <td className="px-4 py-3 text-gray-700">
+                          {result.studentName || result.studentEmail || 'Guest'}
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className={`px-3 py-1 rounded-full text-sm font-bold ${
+                            result.score >= 80
+                              ? 'bg-green-100 text-green-800'
+                              : result.score >= 60
+                              ? 'bg-yellow-100 text-yellow-800'
+                              : 'bg-red-100 text-red-800'
+                          }`}>
+                            {result.score}% ({result.correctCount}/{result.totalQuestions})
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-gray-600 text-sm">
+                          {formatDate(result.submittedAt)}
+                        </td>
+                        <td className="px-4 py-3">
+                          <Link
+                            href={`/tutor/results/${result.id}`}
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                          >
+                            <Eye className="w-4 h-4" />
+                            View Results
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Assignment Builder View */}
+        {viewMode === 'builder' && (
+          <>
+            <div className="mb-6">
+              <p className="text-sm text-gray-600">Select questions to create a custom assignment link</p>
+            </div>
 
         {/* Assignment Type Selection */}
         <div className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4 mb-6">
@@ -404,10 +613,13 @@ export default function TutorBuilderPage() {
             )}
           </div>
         )}
+          </>
+        )}
       </div>
 
-      {/* Sticky Footer */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-4 border-black shadow-[0_-4px_8px_rgba(0,0,0,0.1)] z-50">
+      {/* Sticky Footer - Only show for builder view */}
+      {viewMode === 'builder' && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t-4 border-black shadow-[0_-4px_8px_rgba(0,0,0,0.1)] z-50">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -442,7 +654,8 @@ export default function TutorBuilderPage() {
             </button>
           </div>
         </div>
-      </div>
+        </div>
+      )}
 
     </div>
   );

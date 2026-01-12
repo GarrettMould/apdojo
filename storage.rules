@@ -8,6 +8,21 @@ service firebase.storage {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
     
+    // Allow assignment image uploads and reads
+    // Path structure: assignment-images/{assignmentLinkId}/{userId}/{scenarioId}-{timestamp}.png
+    // Note: assignmentLinkId may contain encoded characters like =, /, etc.
+    // Use wildcard to match any path structure under assignment-images
+    match /assignment-images/{allPaths=**} {
+      // Allow authenticated users to upload assignment images
+      // The path structure ensures userId is in the path, and we trust the app logic
+      // to only allow users to upload to their own paths
+      allow write: if request.auth != null;
+      
+      // Allow authenticated users to read assignment images
+      // This allows tutors to view student submissions and students to view their own
+      allow read: if request.auth != null;
+    }
+    
     // Default: deny all other access
     match /{allPaths=**} {
       allow read, write: if false;

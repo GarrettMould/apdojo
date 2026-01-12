@@ -131,6 +131,7 @@ function CustomGraphGymContent() {
       <GraphGym 
         assignmentScenarios={scenarios}
         isAssignment={true}
+        assignmentLinkId={searchParams.get('q') || undefined}
       />
     </CourseProvider>
   );

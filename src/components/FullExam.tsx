@@ -112,12 +112,41 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   const [bookmarkedQuestions, setBookmarkedQuestions] = useState<Set<number>>(new Set());
   const [strikethroughState, setStrikethroughState] = useState<Record<number, number[]>>({});
   const [showBookmarkConfirmModal, setShowBookmarkConfirmModal] = useState(false);
-  
-  // Timer state (60 minutes = 3600 seconds)
-  const [timeRemaining, setTimeRemaining] = useState(60 * 60); // 60 minutes in seconds
+  const [showNameInputModal, setShowNameInputModal] = useState(false);
+  const [studentName, setStudentName] = useState('');
   
   // Remove the shuffling logic and just use the pre-shuffled questions
   const questions = questionBank.questions;
+
+  // Calculate time limit dynamically for unit tests and preview exams
+  // AP Econ MCQ: 70 minutes for 60 questions = 1.167 minutes per question
+  // For unit tests, calculate based on number of questions
+  // For preview exams (when isUnitTest is true), use fixed 70 minutes
+  const initialTimeLimit = useMemo(() => {
+    if (isUnitTest) {
+      // Check if this is a preview exam (examNumber like "preview/macro/mcq/1")
+      if (examNumber && (examNumber.includes('preview') || examNumber.startsWith('preview'))) {
+        // Preview MCQ exam: 70 minutes = 4200 seconds
+        return 70 * 60;
+      }
+      // Unit tests: 70 minutes = 4200 seconds for 60 questions
+      // Time per question = 4200 / 60 = 70 seconds per question
+      return Math.round(70 * questions.length);
+    }
+    // Default to 60 minutes for other exams
+    return 60 * 60;
+  }, [isUnitTest, questions.length, examNumber]);
+
+  // Timer state
+  const [timeRemaining, setTimeRemaining] = useState(initialTimeLimit);
+  
+  // State to hide/show timer
+  const [showTimer, setShowTimer] = useState(true);
+
+  // Update timeRemaining when initialTimeLimit changes
+  useEffect(() => {
+    setTimeRemaining(initialTimeLimit);
+  }, [initialTimeLimit]);
 
   // Generate Dojo name for custom assignments only
   const customTitle = useMemo(() => {
@@ -126,9 +155,10 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   }, [isCustomAssignment]);
 
   // Add tools panel state (slide-out panel for calculator and drawing pad)
-  // For unit tests, always show the tools panel
-  const [showToolsPanel, setShowToolsPanel] = useState(isUnitTest);
-  const [leftPanelWidth, setLeftPanelWidth] = useState(isUnitTest ? 65 : 100); // Percentage width for left panel when tools panel is open
+  // For unit tests and preview exams, always show the tools panel
+  const isPreviewExam = examNumber && (examNumber.includes('preview') || examNumber.startsWith('preview'));
+  const [showToolsPanel, setShowToolsPanel] = useState(isUnitTest || isPreviewExam);
+  const [leftPanelWidth, setLeftPanelWidth] = useState((isUnitTest || isPreviewExam) ? 65 : 100); // Percentage width for left panel when tools panel is open
 
   // Update leftPanelWidth when tools panel opens/closes
   useEffect(() => {
@@ -365,26 +395,43 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
     if (bookmarkedQuestions.size > 0) {
       setShowBookmarkConfirmModal(true);
     } else {
-      setShowResults(true);
-      // Save results to Firebase if this is a custom assignment
+      // For assignments, show results but blurred until name is entered
       if (isCustomAssignment) {
-        await saveAssignmentResults();
+        setShowResults(true);
+        setShowNameInputModal(true); // Show name input overlay
+      } else {
+        setShowResults(true);
       }
     }
   };
 
   const handleConfirmSubmit = async () => {
     setShowBookmarkConfirmModal(false);
-    setShowResults(true);
-    setShowFullResults(false); // Show feedback first, not full results
-    
-    // Save results to Firebase if this is a custom assignment
+    // For assignments, show results but blurred until name is entered
     if (isCustomAssignment) {
-      await saveAssignmentResults();
+      setShowResults(true);
+      setShowNameInputModal(true); // Show name input overlay
+    } else {
+      setShowResults(true);
+      setShowFullResults(false);
     }
   };
 
-  const saveAssignmentResults = async () => {
+  const handleNameSubmit = async () => {
+    if (!studentName.trim()) {
+      alert('Please enter your name');
+      return;
+    }
+    setShowNameInputModal(false); // Hide name input, reveal results
+    setShowFullResults(false);
+    
+    // Save results to Firebase with student name
+    if (isCustomAssignment) {
+      await saveAssignmentResults(studentName.trim());
+    }
+  };
+
+  const saveAssignmentResults = async (studentNameInput?: string) => {
     if (!isCustomAssignment || !assignmentLinkId) return;
     
     try {
@@ -420,12 +467,14 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
         tutorId: linkDoc.data().tutorId,
         studentId: user?.uid || null,
         studentEmail: user?.email || null,
+        studentName: studentNameInput || user?.displayName || user?.email?.split('@')[0] || 'Student',
         questionResults: questionResults,
         totalQuestions: totalQuestions,
         correctCount: correctCount,
         incorrectCount: totalQuestions - correctCount,
         score: score,
         answers: answers,
+        assignmentType: 'mcq', // Add assignment type
         submittedAt: serverTimestamp()
       });
 
@@ -622,8 +671,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
       {/* Assessment Results Panel - Rendered outside exam container via portal */}
       {typeof window !== 'undefined' && showResults && !showFullResults && feedbackContainer && createPortal(
         <div className="fixed inset-0 bg-gray-50 z-50 overflow-y-auto" style={{ top: '64px' }}>
-          <div className="min-h-[calc(100vh-64px)] flex items-center justify-center py-12 px-4">
-            <div className="w-full max-w-4xl">
+          <div className="min-h-[calc(100vh-64px)] flex items-center justify-center py-12 px-4 relative">
+            {/* Results Content - Blurred when name input is showing */}
+            <div className={`w-full max-w-4xl transition-all duration-300 ${showNameInputModal && isCustomAssignment ? 'blur-sm pointer-events-none' : ''}`}>
               {isCustomAssignment && !user ? (
                 // Guest Result Card for Custom Assignments
                 <div className="bg-white rounded-lg shadow-xl p-8">
@@ -666,6 +716,47 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                 />
               )}
             </div>
+            
+            {/* Name Input Overlay for Assignments - Shows on top of blurred results (NOT blurred) */}
+            {showNameInputModal && isCustomAssignment && (
+              <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-auto">
+                <div className="bg-white rounded-xl shadow-lg max-w-md w-full p-6 border-4 border-black">
+                  <div className="flex items-center gap-3 mb-4">
+                    <FileText className="w-6 h-6 text-blue-600" />
+                    <h3 className="text-xl font-black text-gray-900">
+                      Enter Your Name
+                    </h3>
+                  </div>
+                  <p className="text-gray-700 mb-6 font-semibold">
+                    Please enter your name so your teacher can identify your submission.
+                  </p>
+                  <div className="mb-6">
+                    <input
+                      type="text"
+                      value={studentName}
+                      onChange={(e) => setStudentName(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && studentName.trim()) {
+                          handleNameSubmit();
+                        }
+                      }}
+                      placeholder="Your name"
+                      className="w-full px-4 py-3 border-2 border-black rounded-lg font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      autoFocus
+                    />
+                  </div>
+                  <div className="flex gap-3 justify-end">
+                    <button
+                      onClick={handleNameSubmit}
+                      disabled={!studentName.trim()}
+                      className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold rounded-lg transition-colors duration-200 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                    >
+                      Reveal Results
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>,
         feedbackContainer
@@ -784,10 +875,10 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
 
       {/* Only show exam content if not showing results, or if showing full results */}
       {(!showResults || showFullResults) && (
-        <div className={`flex w-full flex-col ${isUnitTest ? 'h-screen' : isCustomAssignment ? '' : 'lg:h-[calc(100vh-4rem)]'} overflow-hidden`}>
-          {/* Countdown Timer - At the very top for unit tests */}
-          {isUnitTest && (
-            <div className={`w-full ${examType === 'macro' ? 'bg-blue-600' : 'bg-green-600'} text-white px-6 py-4 flex items-center justify-center border-b-4 border-black shadow-lg flex-shrink-0`}>
+        <div className={`flex w-full flex-col ${(isUnitTest || isPreviewExam) ? 'min-h-screen' : isCustomAssignment ? '' : 'lg:h-[calc(100vh-4rem)]'} ${(isUnitTest || isPreviewExam) ? '' : 'overflow-hidden'}`} style={(isUnitTest || isPreviewExam) ? { paddingBottom: '200px', marginBottom: '200px' } : {}}>
+          {/* Countdown Timer - At the very top for unit tests and preview exams */}
+          {(isUnitTest || isPreviewExam) && showTimer && (
+            <div className={`w-full ${examType === 'macro' ? 'bg-blue-600' : 'bg-green-600'} text-white px-6 py-4 flex items-center justify-between border-b-4 border-black shadow-lg flex-shrink-0`}>
               <div className="flex items-center gap-3">
                 <Clock className="w-6 h-6" />
                 <span className="text-2xl font-black tracking-wider">
@@ -800,9 +891,31 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                   <span className="text-lg font-bold">⏰ Time's Up!</span>
                 )}
               </div>
+              <button
+                onClick={() => setShowTimer(false)}
+                className="text-white hover:text-gray-200 transition-colors p-2 rounded-lg hover:bg-white/10"
+                aria-label="Hide timer"
+                title="Hide timer"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
           )}
-          <div className={`flex w-full flex-1 overflow-hidden ${isCustomAssignment || !showToolsPanel ? 'flex-col' : 'lg:flex-row flex-col'}`}>
+          {/* Show timer button when timer is hidden */}
+          {(isUnitTest || isPreviewExam) && !showTimer && (
+            <div className="w-full bg-gray-100 px-6 py-2 flex items-center justify-end border-b border-gray-300 flex-shrink-0">
+              <button
+                onClick={() => setShowTimer(true)}
+                className="text-gray-600 hover:text-gray-800 transition-colors flex items-center gap-2 px-3 py-1 rounded-lg hover:bg-gray-200"
+                aria-label="Show timer"
+                title="Show timer"
+              >
+                <Clock className="w-4 h-4" />
+                <span className="text-sm font-semibold">Show Timer</span>
+              </button>
+            </div>
+          )}
+          <div className={`flex w-full flex-1 overflow-hidden ${isCustomAssignment || !showToolsPanel ? 'flex-col' : 'lg:flex-row flex-col'}`} style={(isUnitTest || isPreviewExam) ? { height: 'calc(100vh - 64px)' } : {}}>
           {/* Question Container (Left Side / Top on Mobile) */}
           <motion.div 
             animate={{
@@ -813,7 +926,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
               stiffness: 300,
               damping: 30,
             }}
-            className="flex-shrink-0 overflow-y-auto min-w-0 w-full lg:w-auto"
+            className={`flex-shrink-0 overflow-y-auto min-w-0 w-full lg:w-auto ${(isUnitTest || isPreviewExam) ? 'pb-32' : ''}`}
           >
             <div className={`w-full ${
               isCustomAssignment 
@@ -823,7 +936,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                   : showToolsPanel
                     ? 'p-8'
                     : 'p-8 max-w-5xl mx-auto'
-            }`}>
+            } ${(isUnitTest || isPreviewExam) ? 'pb-16' : ''}`}>
             {!showResults ? (
               <>
               {/* Progress Bar - Mobile Only */}
@@ -1356,7 +1469,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
 
                         {/* Navigation Controls */}
                         {!(showVideoModal && videoUrl) && (
-                        <div className="pt-4 mt-4 border-t border-gray-200">
+                        <div className={`pt-4 mt-4 border-t border-gray-200 ${(isUnitTest || isPreviewExam) ? 'mb-8 pb-8' : ''}`}>
                           <div className="flex items-center gap-4">
                             <button
                               onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
@@ -1643,46 +1756,21 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
           {!isCustomAssignment && (
             <>
               {/* Desktop: Slide-out panel from right */}
-              <AnimatePresence>
-                {showToolsPanel && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="hidden lg:block flex-shrink-0 w-[35%] h-full bg-white shadow-2xl z-40 border-l border-gray-200 overflow-hidden"
-                  >
-                  <motion.div
-                    initial={{ x: '100%' }}
-                    animate={{ x: 0 }}
-                    exit={{ x: '100%' }}
-                    transition={{
-                      type: 'spring',
-                      stiffness: 300,
-                      damping: 30,
-                    }}
-                    className="w-full h-full flex flex-col overflow-hidden"
-                  >
+              {/* For unit tests and preview exams, always show panel without animation */}
+              {(isUnitTest || isPreviewExam) ? (
+                showToolsPanel && (
+                  <div className="hidden lg:block flex-shrink-0 w-[35%] bg-white shadow-2xl z-40 border-l border-gray-200 overflow-hidden" style={{ height: 'calc(100vh - 64px)' }}>
+                    <div className="w-full h-full flex flex-col overflow-hidden">
                     {/* Header */}
                     <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between flex-shrink-0">
                       <span className="text-sm font-semibold text-gray-900">Calculator & Drawing Pad</span>
-                      {!isUnitTest && (
-                        <button
-                          onClick={() => setShowToolsPanel(false)}
-                          className="text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded p-1.5 transition-colors"
-                          aria-label="Close tools panel"
-                        >
-                          <X className="w-5 h-5" />
-                        </button>
-                      )}
                     </div>
 
                     {/* For unit tests: Whiteboard on top, Calculator on bottom */}
-                    {isUnitTest ? (
-                      <>
-                        {/* Excalidraw Section - Top */}
-                        <div className="flex-1 flex flex-col overflow-hidden bg-white min-h-0">
-                          <div className="h-full w-full relative">
+                    <>
+                      {/* Excalidraw Section - Top */}
+                        <div className="flex-1 flex flex-col overflow-hidden bg-white" style={{ minHeight: '400px', flex: '1 1 auto' }}>
+                          <div className="w-full relative" style={{ height: '100%', minHeight: '400px', width: '100%', position: 'relative' }}>
                             <Excalidraw
                               zenModeEnabled={true}
                               viewModeEnabled={false}
@@ -1840,10 +1928,45 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                         </div>
                       </div>
                     </div>
-                      </>
-                    ) : (
+                    </>
+                  </div>
+                  </div>
+                )
+              ) : (
+                <AnimatePresence>
+                  {showToolsPanel && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="hidden lg:block flex-shrink-0 w-[35%] h-full bg-white shadow-2xl z-40 border-l border-gray-200 overflow-hidden"
+                    >
+                    <motion.div
+                      initial={{ x: '100%' }}
+                      animate={{ x: 0 }}
+                      exit={{ x: '100%' }}
+                      transition={{
+                        type: 'spring',
+                        stiffness: 300,
+                        damping: 30,
+                      }}
+                      className="w-full h-full flex flex-col overflow-hidden"
+                    >
+                      {/* Header */}
+                      <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between flex-shrink-0">
+                        <span className="text-sm font-semibold text-gray-900">Calculator & Drawing Pad</span>
+                        <button
+                          onClick={() => setShowToolsPanel(false)}
+                          className="text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded p-1.5 transition-colors"
+                          aria-label="Close tools panel"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
+
+                      {/* For non-unit tests: Calculator on top, Excalidraw on bottom */}
                       <>
-                        {/* For non-unit tests: Calculator on top, Excalidraw on bottom */}
                         {/* Calculator Section - Top */}
                         <div className="flex-shrink-0 border-b border-gray-200 bg-gray-50">
                           <div className="p-4">
@@ -2005,11 +2128,11 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                           </div>
                         </div>
                       </>
-                    )}
                     </motion.div>
                   </motion.div>
-                )}
-              </AnimatePresence>
+                  )}
+                </AnimatePresence>
+              )}
 
               {/* Mobile: Panel appears below question content */}
               {showToolsPanel && (
@@ -2017,7 +2140,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                   {/* Header */}
                   <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between flex-shrink-0">
                     <span className="text-sm font-semibold text-gray-900">Calculator & Drawing Pad</span>
-                    {!isUnitTest && (
+                    {!isUnitTest && !isPreviewExam && (
                       <button
                         onClick={() => setShowToolsPanel(false)}
                         className="text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded p-1.5 transition-colors"
@@ -2028,8 +2151,8 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                     )}
                   </div>
 
-                  {/* For unit tests: Whiteboard on top, Calculator on bottom */}
-                  {isUnitTest ? (
+                  {/* For unit tests and preview exams: Whiteboard on top, Calculator on bottom */}
+                  {(isUnitTest || isPreviewExam) ? (
                     <>
                       {/* Excalidraw Section - Top */}
                       <div className="flex flex-col bg-white" style={{ height: '400px' }}>
@@ -2366,7 +2489,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
       )}
 
       {/* Tool Buttons */}
-      {!showResults && !isUnitTest && (
+      {!showResults && !isUnitTest && !isPreviewExam && (
       <div className="fixed bottom-8 right-8 z-40 flex flex-col gap-3">
         {/* Calculator Toggle Button */}
         {!showToolsPanel && (
@@ -2426,6 +2549,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
           </div>
         </div>
       )}
+
 
       {/* Exit Confirmation Modal for Custom Assignments */}
       {showExitConfirmModal && (

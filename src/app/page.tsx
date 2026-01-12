@@ -12,6 +12,7 @@ import { frqExams } from '@/data/frqQuestions';
 import { SeasonPassHome } from '@/components/seasonPassHome';
 import { DojoDashboard } from '@/components/DojoDashboard';
 import { CourseProvider } from '@/contexts/CourseContext';
+import TutorBuilderPage from '@/app/tutor/builder/page';
 // import { ReviewsSection } from '@/components/ReviewsSection';
 // import { UniversityLogos } from '@/components/UniversityLogos';
 
@@ -258,13 +259,18 @@ function HomePageLoadingFallback() {
 }
 
 function Home() {
-  const { user, loading } = useAuthContext();
+  const { user, loading, userData, loadingUserData } = useAuthContext();
 
-  if (loading) {
+  if (loading || loadingUserData) {
     return <HomePageLoadingFallback />;
   }
   
-  // Show DojoDashboard for logged-in users, SeasonPassHome for logged-out users
+  // Show tutor/builder page for teachers (their default homepage)
+  if (user && userData?.teacher === true) {
+    return <TutorBuilderPage />;
+  }
+  
+  // Show DojoDashboard for logged-in users (non-teachers), SeasonPassHome for logged-out users
   if (user) {
     return (
       <CourseProvider>

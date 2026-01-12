@@ -103,24 +103,27 @@ service cloud.firestore {
 
     // --- RULES FOR assignmentLinks COLLECTION ---
     match /assignmentLinks/{linkId} {
-      // Allow tutors to create and read their own assignment links
+      // Allow tutors to create their own assignment links
       allow create: if request.auth.uid != null && request.resource.data.tutorId == request.auth.uid;
-      allow read: if request.auth.uid != null && resource.data.tutorId == request.auth.uid;
+      
+      // Allow anyone to read assignment links (needed for students/guests to submit results)
+      // The encodedParam in the URL acts as access control - if you have the link, you can read it
+      allow read: if true;
     }
     // --- End assignmentLinks Collection Rules ---
 
     // --- RULES FOR assignmentResults COLLECTION ---
     match /assignmentResults/{resultId} {
       // Allow anyone (including guests) to create results when submitting
+      // This allows students to submit their assignment results
       allow create: if true;
       
-      // Allow tutors to read results for their assignment links
-      allow read: if request.auth.uid != null && 
-        exists(/databases/$(database)/documents/assignmentLinks/$(resource.data.assignmentLinkId)) &&
-        get(/databases/$(database)/documents/assignmentLinks/$(resource.data.assignmentLinkId)).data.tutorId == request.auth.uid;
-      
+      // Allow tutors to read results where they are the tutor
       // Allow students to read their own results
-      allow read: if request.auth.uid != null && resource.data.studentId == request.auth.uid;
+      allow read: if request.auth.uid != null && (
+        resource.data.tutorId == request.auth.uid ||
+        resource.data.studentId == request.auth.uid
+      );
     }
     // --- End assignmentResults Collection Rules ---
 
