@@ -56,7 +56,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
       "Label the areas of producer surplus",
       "Mark the equilibrium price (Pe) and quantity (Qe)"
     ],
-    correctImage: "/images/sampleAnswer2.jpg",
+    correctImage: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/wb2.jpg",
     checklist: [
       { id: 1, text: "Equilibrium Price (Pe) and Quantity (Qe) are correctly labeled at the intersection" },
       { id: 2, text: "Consumer Surplus is the area below Demand and above the equilibrium Price" },
@@ -78,7 +78,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
       "Label the price received by producers (Pp)",
       "Shade the area of deadweight loss"
     ],
-    correctImage: "/images/graphs/micro/excise-tax.svg",
+    correctImage: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/wb3.jpg",
     checklist: [
       { id: 1, text: "New Supply curve is shifted vertically upward by the tax amount" },
       { id: 2, text: "Price paid by consumers (Pc) is labeled at the new equilibrium intersection" },
@@ -100,7 +100,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
       "Label the profit-maximizing quantity",
       "Shade or label the area of economic profit, if any"
     ],
-    correctImage: "/images/graphs/micro/perfect-comp-profit.svg",
+    correctImage: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/wb4.jpg",
     checklist: [
       { id: 1, text: "Market graph sets the price where Market Supply equals Market Demand" },
       { id: 2, text: "Firm's Demand curve is horizontal (perfectly elastic) at the market price (MR=D=AR=P)" },
@@ -121,7 +121,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
       "Label the profit-maximizing quantity and price",
       "Label the allocatively efficient quantity"
     ],
-    correctImage: "/images/graphs/micro/monop-comp-long-run.svg",
+    correctImage: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/wb5.jpg",
     checklist: [
       { id: 1, text: "Profit-maximizing quantity is where MR intersects MC" },
       { id: 2, text: "Price is set on the Demand curve above the intersection, tangent to the ATC curve (Zero Profit)" },

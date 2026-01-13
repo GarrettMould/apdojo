@@ -4,7 +4,7 @@ import { Question as QuestionType } from '@/data/questionBanks/types';
 import { macroSetTwoQuestions } from '../questionBanks/macro/mcqs/macroSetTwo';
 import allQS139 from "../../../public/images/allQS139.png"
 import allQS140 from "../../../public/images/allQS140.png"
-import allQS141 from "../../../public/images/allQS141.png"
+import allQS141 from "../../../public/images/allQS141.svg"
 import allQS142 from "../../../public/images/allQS142.png"
 import allQS143 from "../../../public/images/allQS143.png"
 import allQS144 from "../../../public/images/allQS144.png"
