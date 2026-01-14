@@ -65,8 +65,20 @@ function GraphExplanationCard({ post }: { post: GraphExplanationPost }) {
   return (
     <Link href={`/blog/${seoUrl}`} className="block group">
       <div className="bg-white rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] border-4 border-black overflow-hidden h-full flex flex-col transition-all hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1">
-        <div className="relative w-full h-48 bg-yellow-50 border-b-4 border-black py-4 flex items-center justify-center">
-          <Pen className="w-20 h-20 text-black opacity-20" />
+        <div className="relative w-full h-48 bg-yellow-50 border-b-4 border-black py-4 overflow-hidden">
+          {post.visual?.imageUrl ? (
+            <Image
+              src={post.visual.imageUrl}
+              alt={post.visual.alt || post.headline}
+              fill
+              className="object-contain transition-transform duration-300 group-hover:scale-105"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full">
+              <Pen className="w-20 h-20 text-black opacity-20" />
+            </div>
+          )}
         </div>
         <div className="p-6 flex flex-col flex-grow bg-white">
           <div className="mb-3">

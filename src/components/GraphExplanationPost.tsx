@@ -4,7 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
-import { Check, X, ArrowRight, Pen, ArrowRightCircle, CheckCircle } from 'lucide-react';
+import { Check, X, ArrowRight, Pen, ArrowRightCircle, CheckCircle, CheckCircle2, XCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { GraphExplanationPost as GraphExplanationPostType } from '@/types/blogPost';
 import { EmbeddedGraphGym } from '@/components/EmbeddedGraphGym';
 import { Button } from '@/components/ui/button';
@@ -60,13 +61,19 @@ export function GraphExplanationPost({ post }: GraphExplanationPostProps) {
 
       // Process the HTML content to render math formulas
       const processMathInHTML = (html: string): string => {
+        // First, protect currency dollar signs by temporarily replacing them
+        // Match $ followed by digits (with optional commas and decimal point)
+        const currencyPlaceholder = '___CURRENCY_SIGN___';
+        const currencyMatches: string[] = [];
+        let processed = html.replace(/\$(\d[\d,]*\.?\d*)/g, (match) => {
+          currencyMatches.push(match);
+          return currencyPlaceholder;
+        });
+
         // Pattern to match $$...$$ (display math) - non-greedy, across newlines
         const displayMathPattern = /\$\$([\s\S]*?)\$\$/g;
         // Pattern to match $...$ (inline math) - but not $$...$$
-        // Use negative lookbehind/lookahead to avoid matching $$...$$
         const inlineMathPattern = /(?<!\$)\$(?!\$)([^$\n]+?)\$(?!\$)/g;
-
-        let processed = html;
 
         // First, process display math ($$...$$)
         processed = processed.replace(displayMathPattern, (match, mathContent) => {
@@ -100,11 +107,17 @@ export function GraphExplanationPost({ post }: GraphExplanationPostProps) {
           }
         });
 
+        // Restore currency dollar signs
+        let currencyIndex = 0;
+        processed = processed.replace(new RegExp(currencyPlaceholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), () => {
+          return currencyMatches[currencyIndex++] || '$';
+        });
+
         return processed;
       };
 
       // Process and set the HTML content
-      const processedContent = processMathInHTML(content);
+      const processedContent = processMathInHTML(content.trim());
       containerRef.current.innerHTML = processedContent;
     }, [content]);
 
@@ -151,26 +164,16 @@ export function GraphExplanationPost({ post }: GraphExplanationPostProps) {
       {/* Key Determinants - Notebook Style (optional) */}
       {post.keyDeterminants && post.keyDeterminants.length > 0 && (
         <section className="mb-12">
-          <div className="bg-yellow-50 border-4 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-8 relative">
-            {/* Notebook lines effect */}
-            <div className="absolute top-8 left-12 right-8 bottom-8 pointer-events-none opacity-10">
-              {Array.from({ length: 20 }).map((_, i) => (
-                <div key={i} className="w-full h-px bg-black mb-8" style={{ marginBottom: '2rem' }}></div>
+          <div className="bg-yellow-50 border-4 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-8">
+            <h2 className="text-2xl font-black text-black mb-6">Key Takeaways</h2>
+            <ul className="space-y-4">
+              {post.keyDeterminants.map((determinant, index) => (
+                <li key={index} className="flex items-start gap-4">
+                  <ArrowRightCircle className="w-6 h-6 text-black flex-shrink-0 mt-0.5" />
+                  <span className="text-base text-black leading-relaxed font-medium">{determinant}</span>
+                </li>
               ))}
-            </div>
-            <div className="absolute top-8 left-0 w-12 bottom-8 border-r-2 border-red-400"></div>
-            
-            <div className="relative z-10">
-              <h2 className="text-2xl font-black text-black mb-6">What Shifts This Curve?</h2>
-              <ul className="space-y-4">
-                {post.keyDeterminants.map((determinant, index) => (
-                  <li key={index} className="flex items-start gap-4">
-                    <ArrowRightCircle className="w-6 h-6 text-black flex-shrink-0 mt-0.5" />
-                    <span className="text-base text-black leading-relaxed font-medium">{determinant}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            </ul>
           </div>
         </section>
       )}
@@ -232,46 +235,74 @@ export function GraphExplanationPost({ post }: GraphExplanationPostProps) {
                   {currentMcq.question}
                 </p>
                 
-                {/* Stacked vertical buttons */}
-                <div className="space-y-3 mb-6">
+                {/* Answer Options - Matching Quiz Me styling */}
+                <div className="space-y-2 mb-6">
                   {currentMcq.options.map((option, optIndex) => {
-                    const isSelectedOption = selectedAnswer === optIndex;
-                    const isCorrectOption = optIndex === currentMcq.correctAnswer;
-                    const showAsCorrect = showFeedback && isSelectedOption && isCorrectOption;
-                    const showAsIncorrect = showFeedback && isSelectedOption && !isCorrectOption;
-                    const showCorrectAnswer = showFeedback && isCorrectOption && !isSelectedOption;
+                    const optionLetter = getLetter(optIndex);
+                    const isCorrectAnswer = optIndex === currentMcq.correctAnswer;
+                    const isSelected = selectedAnswer === optIndex;
+                    
+                    // Determine styling based on state (matching Quiz Me)
+                    let optionStyle = 'bg-white border-gray-300';
+                    if (showFeedback) {
+                      if (isCorrectAnswer) {
+                        optionStyle = 'bg-green-50 border-green-500';
+                      } else if (isSelected && !isCorrectAnswer) {
+                        optionStyle = 'bg-red-50 border-red-500';
+                      }
+                    } else if (isSelected) {
+                      optionStyle = 'bg-blue-50 border-blue-500';
+                    }
 
                     return (
-                      <button
+                      <motion.div
                         key={optIndex}
-                        onClick={() => handleMcqSelect(currentMcq.id, optIndex)}
-                        disabled={showFeedback}
-                        className={`w-full text-left p-4 rounded-xl border-4 border-black transition-all font-bold text-base ${
-                          showFeedback
-                            ? showAsCorrect
-                              ? 'bg-green-400 border-green-600 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
-                              : showAsIncorrect
-                              ? 'bg-red-400 border-red-600 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
-                              : showCorrectAnswer
-                              ? 'bg-green-400 border-green-600 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
-                              : 'bg-white border-gray-300 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
-                            : isSelectedOption
-                            ? 'bg-blue-100 border-blue-500 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]'
-                            : 'bg-white hover:bg-gray-50 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1'
+                        initial={false}
+                        animate={showFeedback && isCorrectAnswer ? { scale: [1, 1.05, 1] } : {}}
+                        transition={{ duration: 0.3 }}
+                        className={`p-3 rounded-lg border-2 transition-colors ${optionStyle} ${
+                          !showFeedback ? 'cursor-pointer hover:bg-blue-50 hover:border-blue-300' : ''
                         }`}
+                        onClick={!showFeedback ? () => handleMcqSelect(currentMcq.id, optIndex) : undefined}
                       >
                         <div className="flex items-center gap-3">
-                          <span className="font-black text-lg">{getLetter(optIndex)}.</span>
-                          <span className={`flex-1 ${showAsCorrect || showCorrectAnswer ? 'text-green-900' : showAsIncorrect ? 'text-red-900' : 'text-black'}`}>
-                            {option}
-                          </span>
-                          {showAsCorrect || showCorrectAnswer ? (
-                            <CheckCircle className="w-6 h-6 text-green-700 flex-shrink-0" />
-                          ) : showAsIncorrect ? (
-                            <X className="w-6 h-6 text-red-700 flex-shrink-0" />
-                          ) : null}
+                          {!showFeedback ? (
+                            <>
+                              <input
+                                type="radio"
+                                name={`question-${currentMcq.id}`}
+                                value={optionLetter}
+                                checked={isSelected}
+                                onChange={() => handleMcqSelect(currentMcq.id, optIndex)}
+                                className="w-5 h-5 text-blue-600 flex-shrink-0"
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                              <span className="flex-1 text-gray-900">{option}</span>
+                            </>
+                          ) : (
+                            <>
+                              <span
+                                className={`w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0 ${
+                                  isCorrectAnswer
+                                    ? 'bg-green-500 text-white'
+                                    : isSelected && !isCorrectAnswer
+                                    ? 'bg-red-500 text-white'
+                                    : 'bg-gray-200 text-gray-700'
+                                }`}
+                              >
+                                {optionLetter}
+                              </span>
+                              <span className="flex-1 text-gray-900">{option}</span>
+                              {isCorrectAnswer && (
+                                <CheckCircle2 className="w-6 h-6 text-green-600 flex-shrink-0" />
+                              )}
+                              {isSelected && !isCorrectAnswer && (
+                                <XCircle className="w-6 h-6 text-red-600 flex-shrink-0" />
+                              )}
+                            </>
+                          )}
                         </div>
-                      </button>
+                      </motion.div>
                     );
                   })}
                 </div>
@@ -300,10 +331,6 @@ export function GraphExplanationPost({ post }: GraphExplanationPostProps) {
                       <p className="text-base text-black font-medium leading-relaxed">
                         {currentMcq.explanation}
                       </p>
-                      {/* Speech bubble tail */}
-                      <div className={`absolute -bottom-4 left-12 w-8 h-8 border-4 border-black ${
-                        isCorrect ? 'bg-green-400 border-green-400' : 'bg-red-400 border-red-400'
-                      } transform rotate-45 border-t-0 border-l-0`}></div>
                     </div>
                   </div>
                 )}

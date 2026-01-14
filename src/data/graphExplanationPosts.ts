@@ -6,18 +6,51 @@ export const graphExplanationPosts: Record<string, GraphExplanationPost> = {
   'consumer-producer-surplus-deadweight-loss': {
     slug: 'consumer-producer-surplus-deadweight-loss',
     headline: 'Consumer Surplus, Producer Surplus, and Deadweight Loss Graph Explained',
-    intro: 'Consumer Surplus is the difference between what consumers would have paid for a product and what they actually pay. Producer Surplus is the difference between what producers would have sold for and what they actually receive, and Deadweight Loss represents the lost surplus when market efficiency is disrupted by taxes or other interventions.',
+    content: `
+      <p class="mb-6">You walk into a dealership. You are willing to pay <strong>$50,000</strong> for a new car, but you negotiate the dealer down to <strong>$45,000</strong>.</p>
+      <p class="mb-6">You get the car <em>and</em> you keep $5,000 in your pocket.</p>
+      <p class="mb-6">That $5,000 is your <strong>Consumer Surplus</strong>.</p>
+      <p class="mb-6"><strong>Consumer Surplus</strong> = The difference between what you <em>would</em> pay and what you <em>actually</em> pay.</p>
+      <p class="mb-6"><em>(On a graph: It's the area below Demand and above Price).</em></p>
+      <div class="my-8 p-4 border rounded-lg bg-gray-50">
+        <img src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/CS%2C+PS%2C+DWL/image0.jpg" alt="Consumer Surplus graph" class="w-full h-auto rounded-md shadow-sm" />
+      </div>
+      <h2 class="mt-12 mb-4 text-3xl font-bold text-gray-800">Flip the Script (Producer Surplus)</h2>
+      <p class="mb-6">The dealer was secretly willing to sell that car for <strong>$40,000</strong>.</p>
+      <p class="mb-6">Since they sold it to you for $45,000, they gained an extra $5,000.</p>
+      <p class="mb-6">That is <strong>Producer Surplus</strong>.</p>
+      <p class="mb-6"><strong>Definition: Producer Surplus</strong> = The difference between the lowest price a seller <em>would</em> accept and the price they <em>actually</em> get.</p>
+      <p class="mb-6"><em>(On a graph: It's the area above Supply and below Price).</em></p>
+      <div class="my-8 p-4 border rounded-lg bg-gray-50">
+        <img src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/CS%2C+PS%2C+DWL/image1.jpg" alt="Producer Surplus and tax effects graph" class="w-full h-auto rounded-md shadow-sm" />
+      </div>
+      <h2 class="mt-12 mb-4 text-3xl font-bold text-gray-800">What Happens When the Government Interferes?</h2>
+      <p class="mb-6">Let's add a tax.</p>
+      <p class="mb-6">When the government taxes gas cars, the <strong>Supply Curve shifts left</strong>.</p>
+      <p class="mb-6">Firms have higher costs, so they produce less and charge more.</p>
+      <p class="mb-6">Look at the new graph. Three things happen:</p>
+      <ol class="mb-6 list-decimal list-inside space-y-2">
+        <li><strong>Consumer Surplus Shrinks:</strong> Buyers pay a higher price.</li>
+        <li><strong>Producer Surplus Shrinks:</strong> Sellers keep less revenue.</li>
+        <li><strong>Deadweight Loss Appears:</strong> See that little grey triangle?</li>
+      </ol>
+      <p class="mb-6"><strong>The Deadweight Loss (DWL)</strong> represents the deals that <em>didn't happen</em>.</p>
+      <p class="mb-6">These are the cars that <em>would</em> have been sold if there was no tax. Because the tax made them too expensive, those buyers and sellers left the market. Their surplus vanished into thin air.</p>
+      <div class="my-8 p-4 border rounded-lg bg-gray-50">
+        <img src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/CS%2C+PS%2C+DWL/image2.jpg" alt="Consumer Surplus, Producer Surplus, and Deadweight Loss summary" class="w-full h-auto rounded-md shadow-sm" />
+      </div>
+    `,
     subject: 'micro',
     visual: {
-      imageUrl: '/images/sampleAnswer2.jpg',
+      imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/CS%2C+PS%2C+DWL/image2.jpg',
       title: 'Consumer and Producer Surplus at Market Equilibrium',
       alt: 'Supply and Demand graph showing Consumer Surplus (area above price, below demand) and Producer Surplus (area below price, above supply) at equilibrium'
     },
     keyDeterminants: [
-      'What shifts Demand? (Consumer Income, Tastes/Preferences, Price of Related Goods, Number of Buyers, Expectations)',
-      'What shifts Supply? (Input Prices, Technology, Number of Sellers, Government Regulations/Taxes, Expectations)',
-      'How do taxes affect surplus? (Taxes reduce both Consumer and Producer Surplus, creating Deadweight Loss)',
-      'What creates Deadweight Loss? (Any intervention that prevents mutually beneficial trades from occurring at equilibrium)'
+      'Finding Consumer Surplus (CS): Area below the demand curve and above the market price (equilibrium price)',
+      'Finding Producer Surplus (PS): Area above the supply curve and below the market price (equilibrium price)',
+      'Total Surplus = Consumer Surplus + Producer Surplus (the total benefit to society from market transactions)',
+      'How do taxes affect surplus? (Taxes reduce both Consumer and Producer Surplus, creating Deadweight Loss)'
     ],
     graphGymChallenge: {
       scenarioId: 2,
@@ -106,7 +139,7 @@ export const graphExplanationPosts: Record<string, GraphExplanationPost> = {
     `,
     subject: 'macro',
     visual: {
-      imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/image0.jpg',
+      imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/image1.jpg',
       title: 'Recessionary Gap: Economy operating below full employment',
       alt: 'AD-AS graph showing a recessionary gap where actual output is below full employment'
     },
@@ -157,62 +190,77 @@ export const graphExplanationPosts: Record<string, GraphExplanationPost> = {
     headline: 'The Foreign Exchange Market: Why Money is Just Like Cookies',
     intro: 'When students see the "Foreign Exchange Market" (Forex) on the AP Exam, they panic. They think currency is magical and follows different rules than the rest of economics. It doesn\'t. In fact, the market for US Dollars works exactly like the market for Cookies.',
     content: `
-      <p class="mb-6">If more people want cookies, the price of cookies goes up. If fewer people want them, the price goes down. Currency is no different. It is just a commodity that is bought and sold.</p>
+      <p class="mb-6">If more people want cookies, the price of cookies goes up. If fewer people want them, the price goes down.</p>
+      <p class="mb-6">Currency is no different. It is just a commodity that is bought and sold.</p>
       <p class="mb-6">Here is the breakdown of who buys, who sells, and how a shift in one currency forces a shift in another.</p>
       
-      <h2 class="mt-12 mb-4 text-3xl font-bold text-gray-800">1. The Demand Side: The "Cookie" Buyers</h2>
-      <p class="mb-6">In the Forex market, the "Buyers" (Demanders) of US Dollars are usually foreigners.</p>
-      <p class="mb-6">But why do they want USD? It's just fancy green paper. You can't eat it.</p>
-      <p class="mb-6">The demand for currency is <strong>Derived Demand</strong>. They don't want the paper itself; they want what the paper <em>gets</em> them.</p>
+      <h2 class="mt-12 mb-4 text-3xl font-bold text-gray-800">1. The Basics: Why do we buy money?</h2>
+      <p class="mb-6">In the Forex market, nobody wants money just for the sake of having "fancy green paper." You can't eat it.</p>
+      <p class="mb-6">They don't want the paper itself; they want what the paper buys.</p>
+      <p class="mb-6"><strong>The Scenario: The US needs Oil.</strong> Imagine the US wants to import millions of barrels of oil from Kuwait. Kuwaiti oil companies do not want US Dollars. They need Kuwaiti Dinar to pay their workers and taxes.</p>
+      <p class="mb-6">So, for the US to get the oil, a transaction must happen in the currency market first.</p>
+      
+      <h2 class="mt-12 mb-4 text-3xl font-bold text-gray-800">2. The Chain Reaction: Two Currencies, One Trade</h2>
+      <p class="mb-6">Because currency is an exchange, a change in one market automatically triggers an opposite change in the other.</p>
+      <p class="mb-6">Here is exactly what happens when the US buys that oil:</p>
+      
+      <h3 class="mt-10 mb-4 text-2xl font-bold text-gray-800">Graph A: The Market for Kuwaiti Dinar</h3>
+      <p class="mb-6">The US buyers enter the market. They need Dinars to pay for the oil.</p>
       <ul class="mb-6">
-        <li><strong>US Goods:</strong> If a French person wants to buy a Tesla made in Texas, they need USD to pay for it.</li>
-        <li><strong>US Assets:</strong> If a Japanese investor wants to buy stock in Apple or a US Treasury Bond, they need USD to complete the transaction.</li>
+        <li><strong>The Shift:</strong> Demand for Dinar Increases (Shifts Right →).</li>
+        <li><strong>The Result:</strong> The "Price" of the Dinar goes UP.</li>
+        <li><strong>The Term:</strong> The Dinar Appreciates.</li>
       </ul>
-      <p class="mb-6"><strong>The Cookie Analogy:</strong> Imagine you are the French person. You don't want the "Dollar Cookie" just to look at it. You want it because it is the <em>only</em> token that the vending machine accepts to give you a Tesla.</p>
       
-      <h2 class="mt-12 mb-4 text-3xl font-bold text-gray-800">2. The Supply Side: The "Cookie" Sellers</h2>
-      <p class="mb-6">Where do these foreigners get the US Dollars they need? They get them from the people who already have them: <strong>US Citizens and American Banks.</strong></p>
-      <p class="mb-6">This is the <strong>Supply</strong> curve.</p>
-      <p class="mb-6">Americans supply (sell) dollars when they want to buy something foreign. If I want to vacation in Paris or buy Japanese anime merchandise, I have to take my USD and "sell" it to the exchange bank to get Euros or Yen.</p>
+      <div class="my-8 p-4 border rounded-lg bg-gray-50">
+        <img src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/forex/image1.jpg" alt="Graph B: The Market for US Dollars" class="w-full h-auto rounded-md shadow-sm" />
+      </div>
       
-      <h2 class="mt-12 mb-4 text-3xl font-bold text-gray-800">3. The Chain Reaction: Two Currencies, One Transaction</h2>
-      <p class="mb-6">This is the part that shows up on the FRQ. You can't just shift one graph. Because currency is an <em>exchange</em>, a change in one market automatically triggers a change in the other.</p>
-      <p class="mb-6"><strong>The Scenario:</strong> Interest rates in the US increase. European investors now want to buy US Bonds to earn that higher interest rate.</p>
+      <h3 class="mt-10 mb-4 text-2xl font-bold text-gray-800">Graph B: The Market for US Dollars</h3>
+      <p class="mb-6">Where does the US get the Dinar? They have to "sell" their own Dollars to buy it. They are effectively dumping US Dollars onto the foreign exchange market to pick up Dinar.</p>
+      <ul class="mb-6">
+        <li><strong>The Shift:</strong> Supply of USD Increases (Shifts Right →).</li>
+        <li><strong>The Result:</strong> The "Price" of the Dollar goes DOWN.</li>
+        <li><strong>The Term:</strong> The Dollar Depreciates.</li>
+      </ul>
+      
+      
+      <div class="my-8 p-4 border rounded-lg bg-gray-50">
+        <img src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/forex/image0.jpg" alt="Scenario 2: The Interest Rate Play" class="w-full h-auto rounded-md shadow-sm" />
+      </div>
+      
+      <h2 class="mt-12 mb-4 text-3xl font-bold text-gray-800">3. Scenario 2: The Interest Rate Play (US vs. Europe)</h2>
+      <p class="mb-6">Now let's look at the most common FRQ scenario: Financial Capital Flows.</p>
+      <p class="mb-6"><strong>The Scenario:</strong> Interest rates in the US increase. European investors see this and drool. They want to buy US Bonds to earn that higher interest rate.</p>
       <p class="mb-6">Here is the step-by-step chain reaction:</p>
       
       <h3 class="mt-10 mb-4 text-2xl font-bold text-gray-800">Step A: The Market for US Dollars</h3>
-      <p class="mb-6">Europeans need dollars to buy those bonds.</p>
+      <p class="mb-6">Europeans need dollars to buy those US bonds.</p>
       <ul class="mb-6">
-        <li><strong>Demand for USD:</strong> Increases (Shifts Right →)</li>
-        <li><strong>The Result:</strong> The "Price" of the Dollar (Exchange Rate) goes <strong>UP</strong>.</li>
+        <li><strong>The Shift:</strong> Demand for USD Increases (Shifts Right →).</li>
+        <li><strong>The Result:</strong> The Dollar Appreciates.</li>
       </ul>
-      <div class="my-8 p-4 border rounded-lg bg-gray-50">
-        <img src="/images/placeholder.png" alt="Graph of Market for USD with Demand Shifting Right" class="w-full h-auto rounded-md shadow-sm" />
-      </div>
-      <p class="mb-6"><strong>The Cookie Analogy:</strong> Suddenly, everyone wants the Dollar Cookie. Since supply stayed the same but the line out the door got longer, the price of the cookie skyrockets. The Dollar <strong>Appreciates</strong>.</p>
+     
       
       <h3 class="mt-10 mb-4 text-2xl font-bold text-gray-800">Step B: The Market for Euros</h3>
-      <p class="mb-6">This is the "Mirror Effect." To <em>get</em> the US Dollars, the Europeans have to <em>give up</em> their Euros. They are flooding the world market with Euros to make the trade.</p>
+      <p class="mb-6">This is the "Mirror Effect." To get the US Dollars, the Europeans have to give up their Euros. They flood the world market with Euros to make the trade.</p>
       <ul class="mb-6">
-        <li><strong>Supply of Euros:</strong> Increases (Shifts Right →)</li>
-        <li><strong>The Result:</strong> The "Price" of the Euro (Exchange Rate) goes <strong>DOWN</strong>.</li>
+        <li><strong>The Shift:</strong> Supply of Euros Increases (Shifts Right →).</li>
+        <li><strong>The Result:</strong> The Euro Depreciates.</li>
       </ul>
+
       <div class="my-8 p-4 border rounded-lg bg-gray-50">
-        <img src="/images/placeholder.png" alt="Graph of Market for Euros with Supply Shifting Right" class="w-full h-auto rounded-md shadow-sm" />
+        <img src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/forex/image2.jpg" alt="Scenario 2: The Interest Rate Play" class="w-full h-auto rounded-md shadow-sm" />
       </div>
-      <p class="mb-6"><strong>The Cookie Analogy:</strong> The Europeans are dumping their "Euro Cookies" into the trash can to get their hands on Dollar Cookies. Because there is a massive pile of Euro Cookies that nobody wants, their value crashes. The Euro <strong>Depreciates</strong>.</p>
       
       <h2 class="mt-12 mb-4 text-3xl font-bold text-gray-800">4. Summary: The Rule of Opposites</h2>
       <p class="mb-6">If you can remember the "Cookie" logic, you will ace this section.</p>
-      <ul class="mb-6">
-        <li>If Currency A <strong>Appreciates</strong> (gets stronger/more expensive)...</li>
-        <li>Currency B <em>must</em> <strong>Depreciate</strong> (get weaker/cheaper).</li>
-      </ul>
+      <p class="mb-6">If Currency A Appreciates (gets stronger/more expensive)... Currency B must Depreciate (get weaker/cheaper).</p>
       <p class="mb-6">Math cannot allow both currencies to get stronger at the same time. If the Dollar Cookie is worth 2 Euro Cookies today, and 3 Euro Cookies tomorrow, the Dollar got "sweeter" (Appreciated) and the Euro got "staler" (Depreciated).</p>
     `,
     subject: 'macro',
     visual: {
-      imageUrl: '/images/placeholder.png',
+      imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/forex/image0.jpg',
       title: 'Foreign Exchange Market',
       alt: 'Foreign Exchange Market graph'
     },
@@ -316,7 +364,6 @@ export const graphExplanationPosts: Record<string, GraphExplanationPost> = {
       prompt: 'Draw a monopoly practicing perfect (first-degree) price discrimination. Label the profit-maximizing quantity and the area of economic profit.',
       link: '/graph-gym'
     },
-    practiceQuestionId: 1150,
     mcqQuestions: [
       {
         id: 1,
@@ -475,7 +522,6 @@ export const graphExplanationPosts: Record<string, GraphExplanationPost> = {
       'Why use Real GDP? (To measure actual production growth, not price inflation)',
       'How to calculate Real GDP? (Hold prices constant at base year levels)'
     ],
-    practiceQuestionId: 17,
     mcqQuestions: [
       {
         id: 1,

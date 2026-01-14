@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { Question } from '@/data/questionBanks/types';
+import { motion } from 'framer-motion';
+import { CheckCircle2, XCircle } from 'lucide-react';
 
 interface BlogComprehensionCheckProps {
   question: Question;
@@ -18,6 +20,8 @@ export function BlogComprehensionCheck({ question }: BlogComprehensionCheckProps
       setShowExplanation(true);
     }
   };
+
+  const showResult = selectedAnswer !== null;
 
   return (
     <div className="bg-white border-2 border-gray-300 rounded-lg p-8 shadow-md">
@@ -39,32 +43,73 @@ export function BlogComprehensionCheck({ question }: BlogComprehensionCheckProps
         </div>
       )}
       
-      <div className="space-y-3 mb-6">
+      <div className="space-y-2 mb-6">
         {question.options.map((option, index) => {
           const optionLetter = String.fromCharCode(65 + index);
+          const isCorrectAnswer = optionLetter === question.correctAnswer;
           const isSelected = selectedAnswer === optionLetter;
-          const isCorrect = optionLetter === question.correctAnswer;
-          const showResult = selectedAnswer !== null;
+          
+          // Determine styling based on state (matching Quiz Me)
+          let optionStyle = 'bg-white border-gray-300';
+          if (showResult) {
+            if (isCorrectAnswer) {
+              optionStyle = 'bg-green-50 border-green-500';
+            } else if (isSelected && !isCorrectAnswer) {
+              optionStyle = 'bg-red-50 border-red-500';
+            }
+          } else if (isSelected) {
+            optionStyle = 'bg-blue-50 border-blue-500';
+          }
           
           return (
-            <button
+            <motion.div
               key={index}
-              onClick={() => handleAnswerSelect(optionLetter)}
-              disabled={selectedAnswer !== null}
-              className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
-                !showResult
-                  ? 'bg-white border-gray-300 hover:border-blue-400 hover:bg-blue-50 cursor-pointer'
-                  : isSelected && isCorrect
-                  ? 'bg-green-50 border-green-400 text-green-900'
-                  : isSelected && !isCorrect
-                  ? 'bg-red-50 border-red-400 text-red-900'
-                  : isCorrect && showResult
-                  ? 'bg-green-50 border-green-400 text-green-900'
-                  : 'bg-gray-50 border-gray-300 text-gray-800'
-              } ${selectedAnswer !== null ? 'cursor-default' : ''}`}
+              initial={false}
+              animate={showResult && isCorrectAnswer ? { scale: [1, 1.05, 1] } : {}}
+              transition={{ duration: 0.3 }}
+              className={`p-3 rounded-lg border-2 transition-colors ${optionStyle} ${
+                !showResult ? 'cursor-pointer hover:bg-blue-50 hover:border-blue-300' : ''
+              }`}
+              onClick={!showResult ? () => handleAnswerSelect(optionLetter) : undefined}
             >
-              <span className="font-semibold">{optionLetter}.</span> {option}
-            </button>
+              <div className="flex items-center gap-3">
+                {!showResult ? (
+                  <>
+                    <input
+                      type="radio"
+                      name={`question-${question.id}`}
+                      value={optionLetter}
+                      checked={isSelected}
+                      onChange={() => handleAnswerSelect(optionLetter)}
+                      className="w-5 h-5 text-blue-600 flex-shrink-0"
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                    <span className="flex-1 text-gray-900">{option}</span>
+                  </>
+                ) : (
+                  <>
+                    <span
+                      className={`w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0 ${
+                        isCorrectAnswer
+                          ? 'bg-green-500 text-white'
+                          : isSelected && !isCorrectAnswer
+                          ? 'bg-red-500 text-white'
+                          : 'bg-gray-200 text-gray-700'
+                      }`}
+                    >
+                      {optionLetter}
+                    </span>
+                    <span className="flex-1 text-gray-900">{option}</span>
+                    {isCorrectAnswer && (
+                      <CheckCircle2 className="w-6 h-6 text-green-600 flex-shrink-0" />
+                    )}
+                    {isSelected && !isCorrectAnswer && (
+                      <XCircle className="w-6 h-6 text-red-600 flex-shrink-0" />
+                    )}
+                  </>
+                )}
+              </div>
+            </motion.div>
           );
         })}
       </div>

@@ -902,145 +902,220 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
       {/* Only show exam content if not showing results, or if showing full results */}
       {(!showResults || showFullResults) && (
         <div className={`flex w-full flex-col relative ${shouldShowToolsByDefault ? 'min-h-screen' : isCustomAssignment ? '' : 'lg:h-[calc(100vh-4rem)]'} ${shouldShowToolsByDefault ? '' : 'overflow-hidden'}`} style={shouldShowToolsByDefault ? { paddingBottom: '80px' } : {}}>
-          {/* Blur Overlay when timer is paused */}
-          {isTimerPaused && shouldShowToolsByDefault && (
-            <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-50 flex items-center justify-center">
-              <div className="bg-white border-4 border-black rounded-xl shadow-xl p-8">
-                <div className="flex flex-col items-center gap-4">
-                  <Pause className="w-16 h-16 text-gray-700" />
-                  <h3 className="text-2xl font-black text-gray-900">Test Paused</h3>
-                  <p className="text-gray-700 font-semibold">Click Resume to continue</p>
-                  <button
-                    onClick={() => setIsTimerPaused(false)}
-                    className={`mt-4 px-8 py-3 rounded-lg font-bold text-white transition-colors ${
-                      examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-green-600 hover:bg-green-700'
-                    }`}
-                  >
-                    Resume Test
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
           {/* Top Bar - At the very top for unit tests, preview exams, full exams, and custom assignments */}
           {shouldShowToolsByDefault && (
-            <div className="w-full bg-gray-200 px-6 py-4 flex items-center justify-between border-b-4 border-black shadow-lg flex-shrink-0">
+            <div className="w-full bg-gray-200 px-6 py-4 flex items-center justify-between border-b-4 border-black shadow-lg flex-shrink-0 sticky top-16 z-40">
               {/* Timer Section - Only show for non-custom assignments */}
               {!isCustomAssignment && (
                 <>
                   {showTimer ? (
                     <>
-                      <div className="flex items-center gap-3">
-                        <span className="text-2xl font-black tracking-wider text-gray-900 font-mono w-24 text-right">
-                          {formatTime(timeRemaining)}
-                        </span>
-                        {timeRemaining <= 300 && timeRemaining > 0 && !isTimerPaused && (
-                          <span className="text-lg font-bold animate-pulse text-gray-900">⚠️ Less than 5 minutes remaining!</span>
-                        )}
-                        {timeRemaining === 0 && (
-                          <span className="text-lg font-bold text-gray-900">⏰ Time's Up!</span>
-                        )}
-                        {isTimerPaused && (
-                          <span className="text-lg font-bold text-gray-700">⏸️ Paused</span>
-                        )}
-                        {/* Hide Timer Button - Next to timer */}
-                        <button
-                          onClick={() => setShowTimer(false)}
-                          className="text-gray-900 hover:text-gray-700 transition-colors p-2 rounded-lg hover:bg-gray-300 flex-shrink-0"
-                          aria-label="Hide timer"
-                          title="Hide timer"
-                        >
-                          <EyeOff className="w-5 h-5" />
-                        </button>
-                        {/* Pause/Resume Button - After hide button */}
-                        <button
-                          onClick={() => setIsTimerPaused(!isTimerPaused)}
-                          className="text-gray-900 hover:text-gray-700 transition-colors p-2 rounded-lg hover:bg-gray-300 flex-shrink-0"
-                          aria-label={isTimerPaused ? "Resume timer" : "Pause timer"}
-                          title={isTimerPaused ? "Resume timer" : "Pause timer"}
-                        >
-                          {isTimerPaused ? (
-                            <PlayIcon className="w-5 h-5" />
-                          ) : (
-                            <Pause className="w-5 h-5" />
-                          )}
-                        </button>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        {/* Calculator Toggle Button - Hidden for unit tests */}
-                        {!isUnitTest && (
-                          <button
-                            onClick={() => setShowToolsPanel(!showToolsPanel)}
-                            className={`p-2 rounded-lg transition-colors ${
-                              showToolsPanel 
-                                ? 'bg-gray-300 hover:bg-gray-400' 
-                                : 'hover:bg-gray-300'
-                            }`}
-                            aria-label="Toggle calculator and drawing pad"
-                            title="Toggle calculator and drawing pad"
-                          >
-                            <Calculator className="w-5 h-5 text-gray-900" />
-                          </button>
-                        )}
-                        {/* Drawing Pad Toggle Button - Hidden for unit tests */}
-                        {!isUnitTest && (
-                          <button
-                            onClick={() => setShowToolsPanel(!showToolsPanel)}
-                            className={`p-2 rounded-lg transition-colors ${
-                              showToolsPanel 
-                                ? 'bg-gray-300 hover:bg-gray-400' 
-                                : 'hover:bg-gray-300'
-                            }`}
-                            aria-label="Toggle calculator and drawing pad"
-                            title="Toggle calculator and drawing pad"
-                          >
-                            <Pen className="w-5 h-5 text-gray-900" />
-                          </button>
-                        )}
-                      </div>
+                      {isTimerPaused ? (
+                        /* When paused: Center the Resume Test link, keep buttons on right */
+                        <>
+                          <div className="flex-1"></div>
+                          <div className="flex-1 flex items-center justify-center">
+                            <button
+                              onClick={() => setIsTimerPaused(false)}
+                              className={`text-lg font-bold underline transition-colors ${
+                                examType === 'macro' ? 'text-blue-600 hover:text-blue-700' : 'text-green-600 hover:text-green-700'
+                              }`}
+                              aria-label="Resume test"
+                            >
+                              Resume Test
+                            </button>
+                          </div>
+                          <div className="flex-1 flex items-center justify-end gap-3">
+                            {/* Calculator Toggle Button - Hidden for unit tests */}
+                            {!isUnitTest && (
+                              <button
+                                onClick={() => setShowToolsPanel(!showToolsPanel)}
+                                className={`p-2 rounded-lg transition-colors ${
+                                  showToolsPanel 
+                                    ? 'bg-gray-300 hover:bg-gray-400' 
+                                    : 'hover:bg-gray-300'
+                                }`}
+                                aria-label="Toggle calculator and drawing pad"
+                                title="Toggle calculator and drawing pad"
+                              >
+                                <Calculator className="w-5 h-5 text-gray-900" />
+                              </button>
+                            )}
+                            {/* Drawing Pad Toggle Button - Hidden for unit tests */}
+                            {!isUnitTest && (
+                              <button
+                                onClick={() => setShowToolsPanel(!showToolsPanel)}
+                                className={`p-2 rounded-lg transition-colors ${
+                                  showToolsPanel 
+                                    ? 'bg-gray-300 hover:bg-gray-400' 
+                                    : 'hover:bg-gray-300'
+                                }`}
+                                aria-label="Toggle calculator and drawing pad"
+                                title="Toggle calculator and drawing pad"
+                              >
+                                <Pen className="w-5 h-5 text-gray-900" />
+                              </button>
+                            )}
+                          </div>
+                        </>
+                      ) : (
+                        /* When not paused: Normal layout */
+                        <>
+                          <div className="flex items-center gap-3">
+                            <span className="text-2xl font-black tracking-wider text-gray-900 font-mono w-24 text-right">
+                              {formatTime(timeRemaining)}
+                            </span>
+                            {timeRemaining <= 300 && timeRemaining > 0 && (
+                              <span className="text-lg font-bold animate-pulse text-gray-900">⚠️ Less than 5 minutes remaining!</span>
+                            )}
+                            {timeRemaining === 0 && (
+                              <span className="text-lg font-bold text-gray-900">⏰ Time's Up!</span>
+                            )}
+                            {/* Hide Timer Button */}
+                            <button
+                              onClick={() => setShowTimer(false)}
+                              className="text-gray-900 hover:text-gray-700 transition-colors p-2 rounded-lg hover:bg-gray-300 flex-shrink-0"
+                              aria-label="Hide timer"
+                              title="Hide timer"
+                            >
+                              <EyeOff className="w-5 h-5" />
+                            </button>
+                            {/* Pause Button */}
+                            <button
+                              onClick={() => setIsTimerPaused(true)}
+                              className="text-gray-900 hover:text-gray-700 transition-colors p-2 rounded-lg hover:bg-gray-300 flex-shrink-0"
+                              aria-label="Pause timer"
+                              title="Pause timer"
+                            >
+                              <Pause className="w-5 h-5" />
+                            </button>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            {/* Calculator Toggle Button - Hidden for unit tests */}
+                            {!isUnitTest && (
+                              <button
+                                onClick={() => setShowToolsPanel(!showToolsPanel)}
+                                className={`p-2 rounded-lg transition-colors ${
+                                  showToolsPanel 
+                                    ? 'bg-gray-300 hover:bg-gray-400' 
+                                    : 'hover:bg-gray-300'
+                                }`}
+                                aria-label="Toggle calculator and drawing pad"
+                                title="Toggle calculator and drawing pad"
+                              >
+                                <Calculator className="w-5 h-5 text-gray-900" />
+                              </button>
+                            )}
+                            {/* Drawing Pad Toggle Button - Hidden for unit tests */}
+                            {!isUnitTest && (
+                              <button
+                                onClick={() => setShowToolsPanel(!showToolsPanel)}
+                                className={`p-2 rounded-lg transition-colors ${
+                                  showToolsPanel 
+                                    ? 'bg-gray-300 hover:bg-gray-400' 
+                                    : 'hover:bg-gray-300'
+                                }`}
+                                aria-label="Toggle calculator and drawing pad"
+                                title="Toggle calculator and drawing pad"
+                              >
+                                <Pen className="w-5 h-5 text-gray-900" />
+                              </button>
+                            )}
+                          </div>
+                        </>
+                      )}
                     </>
                   ) : (
                     <>
-                      <div className="flex items-center gap-3">
-                        {/* Show Timer Button - In place of timer on left */}
-                        <button
-                          onClick={() => setShowTimer(true)}
-                          className="text-gray-900 hover:text-gray-700 transition-colors flex items-center gap-2 px-3 py-1 rounded-lg hover:bg-gray-300"
-                          aria-label="Show timer"
-                          title="Show timer"
-                        >
-                          <Clock className="w-4 h-4" />
-                          <span className="text-sm font-semibold">Show Timer</span>
-                        </button>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        {/* Calculator Toggle Button */}
-                        <button
-                          onClick={() => setShowToolsPanel(!showToolsPanel)}
-                          className={`p-2 rounded-lg transition-colors ${
-                            showToolsPanel 
-                              ? 'bg-gray-300 hover:bg-gray-400' 
-                              : 'hover:bg-gray-300'
-                          }`}
-                          aria-label="Toggle calculator and drawing pad"
-                          title="Toggle calculator and drawing pad"
-                        >
-                          <Calculator className="w-5 h-5 text-gray-900" />
-                        </button>
-                        {/* Drawing Pad Toggle Button */}
-                        <button
-                          onClick={() => setShowToolsPanel(!showToolsPanel)}
-                          className={`p-2 rounded-lg transition-colors ${
-                            showToolsPanel 
-                              ? 'bg-gray-300 hover:bg-gray-400' 
-                              : 'hover:bg-gray-300'
-                          }`}
-                          aria-label="Toggle calculator and drawing pad"
-                          title="Toggle calculator and drawing pad"
-                        >
-                          <Pen className="w-5 h-5 text-gray-900" />
-                        </button>
-                      </div>
+                      {isTimerPaused ? (
+                        /* When paused and timer hidden: Center the Resume Test link, keep buttons on right */
+                        <>
+                          <div className="flex-1"></div>
+                          <div className="flex-1 flex items-center justify-center">
+                            <button
+                              onClick={() => setIsTimerPaused(false)}
+                              className={`text-lg font-bold underline transition-colors ${
+                                examType === 'macro' ? 'text-blue-600 hover:text-blue-700' : 'text-green-600 hover:text-green-700'
+                              }`}
+                              aria-label="Resume test"
+                            >
+                              Resume Test
+                            </button>
+                          </div>
+                          <div className="flex-1 flex items-center justify-end gap-3">
+                            {/* Calculator Toggle Button */}
+                            <button
+                              onClick={() => setShowToolsPanel(!showToolsPanel)}
+                              className={`p-2 rounded-lg transition-colors ${
+                                showToolsPanel 
+                                  ? 'bg-gray-300 hover:bg-gray-400' 
+                                  : 'hover:bg-gray-300'
+                              }`}
+                              aria-label="Toggle calculator and drawing pad"
+                              title="Toggle calculator and drawing pad"
+                            >
+                              <Calculator className="w-5 h-5 text-gray-900" />
+                            </button>
+                            {/* Drawing Pad Toggle Button */}
+                            <button
+                              onClick={() => setShowToolsPanel(!showToolsPanel)}
+                              className={`p-2 rounded-lg transition-colors ${
+                                showToolsPanel 
+                                  ? 'bg-gray-300 hover:bg-gray-400' 
+                                  : 'hover:bg-gray-300'
+                              }`}
+                              aria-label="Toggle calculator and drawing pad"
+                              title="Toggle calculator and drawing pad"
+                            >
+                              <Pen className="w-5 h-5 text-gray-900" />
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        /* When not paused and timer hidden: Normal layout */
+                        <>
+                          <div className="flex items-center gap-3">
+                            {/* Show Timer Button */}
+                            <button
+                              onClick={() => setShowTimer(true)}
+                              className="text-gray-900 hover:text-gray-700 transition-colors flex items-center gap-2 px-3 py-1 rounded-lg hover:bg-gray-300"
+                              aria-label="Show timer"
+                              title="Show timer"
+                            >
+                              <Clock className="w-4 h-4" />
+                              <span className="text-sm font-semibold">Show Timer</span>
+                            </button>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            {/* Calculator Toggle Button */}
+                            <button
+                              onClick={() => setShowToolsPanel(!showToolsPanel)}
+                              className={`p-2 rounded-lg transition-colors ${
+                                showToolsPanel 
+                                  ? 'bg-gray-300 hover:bg-gray-400' 
+                                  : 'hover:bg-gray-300'
+                              }`}
+                              aria-label="Toggle calculator and drawing pad"
+                              title="Toggle calculator and drawing pad"
+                            >
+                              <Calculator className="w-5 h-5 text-gray-900" />
+                            </button>
+                            {/* Drawing Pad Toggle Button */}
+                            <button
+                              onClick={() => setShowToolsPanel(!showToolsPanel)}
+                              className={`p-2 rounded-lg transition-colors ${
+                                showToolsPanel 
+                                  ? 'bg-gray-300 hover:bg-gray-400' 
+                                  : 'hover:bg-gray-300'
+                              }`}
+                              aria-label="Toggle calculator and drawing pad"
+                              title="Toggle calculator and drawing pad"
+                            >
+                              <Pen className="w-5 h-5 text-gray-900" />
+                            </button>
+                          </div>
+                        </>
+                      )}
                     </>
                   )}
                 </>
@@ -1078,7 +1153,11 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
               )}
             </div>
           )}
-          <div className={`flex w-full flex-1 overflow-hidden ${isCustomAssignment || !showToolsPanel ? 'flex-col' : 'lg:flex-row flex-col'}`} style={shouldShowToolsByDefault ? { height: 'calc(100vh - 64px - 80px)' } : {}}>
+          <div className={`flex w-full flex-1 overflow-hidden relative ${isCustomAssignment || !showToolsPanel ? 'flex-col' : 'lg:flex-row flex-col'}`} style={shouldShowToolsByDefault ? { height: 'calc(100vh - 64px - 80px)' } : {}}>
+          {/* Blur Overlay when timer is paused - covers content but not top/bottom bars */}
+          {isTimerPaused && shouldShowToolsByDefault && (
+            <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-40"></div>
+          )}
           {/* Question Container (Left Side / Top on Mobile) */}
           <motion.div 
             animate={{
