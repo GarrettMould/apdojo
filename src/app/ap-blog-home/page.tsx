@@ -6,12 +6,14 @@ import { ArrowRight, Clock, Pen } from 'lucide-react';
 import { calculateReadingTime } from '@/utils/readingTime';
 import { BlogPost } from '@/data/blogPosts';
 import { GraphExplanationPost } from '@/types/blogPost';
+import { generateSeoUrl } from '@/utils/blogUrls';
 
 function BlogCard({ post }: { post: BlogPost }) {
   const readingTime = calculateReadingTime(post.content);
+  const seoUrl = generateSeoUrl(post.slug, post.subject, post.unit);
 
   return (
-    <Link href={`/blog/${post.slug}`} className="block group">
+    <Link href={`/blog/${seoUrl}`} className="block group">
       <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden h-full flex flex-col transition-shadow hover:shadow-xl">
         <div className="relative w-full h-48 bg-white py-4 overflow-hidden">
           <Image
@@ -35,7 +37,7 @@ function BlogCard({ post }: { post: BlogPost }) {
           <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
             {post.title}
           </h3>
-          <p className="text-gray-600 text-sm mb-4 flex-grow">
+          <p className="text-gray-600 text-sm mb-4 flex-grow line-clamp-2">
             {post.description}
           </p>
           <div className="flex items-center justify-between text-xs text-gray-500 mt-auto">
@@ -55,8 +57,13 @@ function BlogCard({ post }: { post: BlogPost }) {
 }
 
 function GraphExplanationCard({ post }: { post: GraphExplanationPost }) {
+  // Get unit from matching regular post if it exists, otherwise we'll need a fallback
+  const matchingRegularPost = blogPosts[post.slug];
+  const unit = matchingRegularPost?.unit || 0; // Fallback to 0 if no match
+  const seoUrl = generateSeoUrl(post.slug, post.subject, unit);
+  
   return (
-    <Link href={`/blog/${post.slug}`} className="block group">
+    <Link href={`/blog/${seoUrl}`} className="block group">
       <div className="bg-white rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] border-4 border-black overflow-hidden h-full flex flex-col transition-all hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1">
         <div className="relative w-full h-48 bg-yellow-50 border-b-4 border-black py-4 flex items-center justify-center">
           <Pen className="w-20 h-20 text-black opacity-20" />
@@ -74,7 +81,7 @@ function GraphExplanationCard({ post }: { post: GraphExplanationPost }) {
           <h3 className="text-xl font-black text-black mb-2 group-hover:text-blue-600 transition-colors leading-tight">
             {post.headline}
           </h3>
-          <p className="text-gray-700 text-sm mb-4 flex-grow leading-relaxed">
+          <p className="text-gray-700 text-sm mb-4 flex-grow leading-relaxed line-clamp-2">
             {post.intro}
           </p>
           <div className="flex items-center justify-between text-xs text-gray-600 mt-auto">
@@ -96,7 +103,12 @@ function GraphExplanationCard({ post }: { post: GraphExplanationPost }) {
 export default function BlogHomePage() {
   const regularPosts = Object.values(blogPosts);
   const graphPosts = Object.values(graphExplanationPosts);
-  const allPosts = [...regularPosts, ...graphPosts];
+  
+  // Get slugs from graph posts to filter out duplicates
+  const graphPostSlugs = new Set(graphPosts.map(post => post.slug));
+  
+  // Filter out regular posts that have the same slug as graph posts
+  const uniqueRegularPosts = regularPosts.filter(post => !graphPostSlugs.has(post.slug));
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -110,10 +122,10 @@ export default function BlogHomePage() {
           </p>
         </header>
 
-        {allPosts.length > 0 ? (
+        {(uniqueRegularPosts.length > 0 || graphPosts.length > 0) ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Regular Blog Posts */}
-            {regularPosts.map((post) => (
+            {/* Regular Blog Posts (only unique ones not in graph posts) */}
+            {uniqueRegularPosts.map((post) => (
               <BlogCard key={post.slug} post={post} />
             ))}
             {/* Graph Explanation Posts */}

@@ -17,9 +17,6 @@ import { HeroDojoDrills } from '@/components/HeroDojoDrills';
 import { FRQFeedbackDemo } from '@/components/FRQFeedbackDemo';
 import { SeasonPassShowcase } from '@/components/SeasonPassShowcase';
 import { HomeDojoDrills } from '@/components/HomeDojoDrills';
-import { useAuthContext } from '@/contexts/AuthContext';
-import { useCreditSystem } from '@/hooks/useCreditSystem';
-import { LoginModal, SignupModal } from '@/components/AuthModals';
 
 interface FeatureItem {
   icon: React.ReactNode;

@@ -590,7 +590,7 @@ const macroUnit1Questions = [
     "unit": 1,
     "lessonIDS": ["1.6"],
     "unitName": "Basic Economic Concepts",
-    "question": "Refer to the market graph below. The market equilibrium quantity is 90 units. If the current market price is established at P2, which of the following best describes the quantity exchanged and the resulting pressure on the market price? ",
+    "question": "Refer to the market graph below. If the current market price is established at P2, which of the following best describes the quantity exchanged and the resulting pressure on the market price? ",
     "image": q2126,
     "options": [
       "120 units will be exchanged, and there will be upward pressure on the price.",

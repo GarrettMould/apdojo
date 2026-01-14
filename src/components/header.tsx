@@ -11,6 +11,7 @@ import { getSubjectXP } from '@/hooks/useUserProgress';
 import { getBeltProgress } from '@/lib/beltSystem';
 import { motion } from 'framer-motion';
 import { SubjectToggle } from '@/components/dashboard/SubjectToggle';
+import { useTeacherViewMode } from '@/hooks/useTeacherViewMode';
 
 export function Header() {
   const { user, logout, selectedSubject, setSelectedSubject, totalXP, guestXp, isCharacterClosetOpen, setIsCharacterClosetOpen, userData } = useAuthContext();
@@ -21,6 +22,20 @@ export function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { viewMode, toggleViewMode, setIsTeacher } = useTeacherViewMode();
+  
+  // Update teacher status in the hook
+  useEffect(() => {
+    setIsTeacher(!!(user && userData?.teacher === true));
+  }, [user, userData, setIsTeacher]);
+  
+  const isTeacher = !!(user && userData?.teacher === true);
+  
+  const handleViewModeToggle = () => {
+    toggleViewMode();
+    // Navigate to home page to apply the view mode change
+    router.push('/');
+  };
 
   // Ensure component is mounted before using selectedSubject to prevent hydration mismatch
   useEffect(() => {
@@ -138,6 +153,12 @@ export function Header() {
                 className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
               >
                 Dojo Drills
+              </Link>
+              <Link
+                href="/ap-blog-home"
+                className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
+              >
+                Blog
               </Link>
               <Link
                 href="/dojo/infinite"
@@ -331,6 +352,16 @@ export function Header() {
                 })()}
               </div>
 
+              {/* Teacher View Mode Toggle */}
+              {isTeacher && (
+                <button
+                  onClick={handleViewModeToggle}
+                  className="text-sm font-semibold text-gray-700 hover:text-blue-600 transition-colors px-3 py-1.5 rounded-md hover:bg-gray-50"
+                >
+                  {viewMode === 'tutor' ? 'Student View' : 'Tutor View'}
+                </button>
+              )}
+
               {user ? (
                 <div className="flex items-center gap-2">
                   <Button onClick={handleLogout} variant="outline" size="sm">
@@ -410,6 +441,13 @@ export function Header() {
                 className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
               >
                 Dojo Drills
+              </Link>
+              <Link
+                href="/ap-blog-home"
+                onClick={closeMobileMenu}
+                className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
+              >
+                Blog
               </Link>
               <Link
                 href="/dojo/infinite"
@@ -560,6 +598,21 @@ export function Header() {
                     </div>
                   </div>
                   
+                  {/* Teacher View Mode Toggle (Mobile) */}
+                  {isTeacher && (
+                    <div className="px-4 pt-4">
+                      <button
+                        onClick={() => {
+                          handleViewModeToggle();
+                          closeMobileMenu();
+                        }}
+                        className="w-full text-left px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold rounded-md"
+                      >
+                        {viewMode === 'tutor' ? 'Student View' : 'Tutor View'}
+                      </button>
+                    </div>
+                  )}
+
                   {user ? (
                     <>
                       <div className="px-4 py-2">

@@ -7,6 +7,7 @@ import { calculateReadingTime } from '@/utils/readingTime';
 import { GraphExplanationPost as GraphExplanationPostComponent } from '@/components/GraphExplanationPost';
 import { GraphExplanationPost as GraphExplanationPostType } from '@/types/blogPost';
 import { graphExplanationPosts } from '@/data/graphExplanationPosts';
+import { getSlugFromSeoUrl } from '@/utils/blogUrls';
 
 interface BlogPostPageProps {
   params: Promise<{
@@ -15,10 +16,23 @@ interface BlogPostPageProps {
 }
 
 export async function generateStaticParams() {
-  // Return both regular blog posts and graph explanation posts
-  const regularPostSlugs = Object.keys(blogPosts).map((slug) => ({ slug }));
-  const graphPostSlugs = Object.keys(graphExplanationPosts).map((slug) => ({ slug }));
-  return [...regularPostSlugs, ...graphPostSlugs];
+  // Generate SEO URLs for both regular blog posts and graph explanation posts
+  const { generateSeoUrl } = await import('@/utils/blogUrls');
+  
+  const regularPostParams = Object.values(blogPosts).map((post) => ({
+    slug: generateSeoUrl(post.slug, post.subject, post.unit)
+  }));
+  
+  const graphPostParams = Object.values(graphExplanationPosts).map((post) => {
+    // Get unit from matching regular post if available
+    const matchingRegularPost = blogPosts[post.slug];
+    const unit = matchingRegularPost?.unit || 0;
+    return {
+      slug: generateSeoUrl(post.slug, post.subject, unit)
+    };
+  });
+  
+  return [...regularPostParams, ...graphPostParams];
 }
 
 // Fetch the graph explanation post data based on slug
@@ -27,7 +41,28 @@ async function getGraphExplanationPost(slug: string): Promise<GraphExplanationPo
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
-  const { slug } = await params;
+  const { slug: seoSlug } = await params;
+  
+  // Create a map of all posts for reverse lookup
+  const slugToDataMap = new Map<string, { subject: string; unit: number }>();
+  
+  // Add regular posts
+  Object.values(blogPosts).forEach(post => {
+    slugToDataMap.set(post.slug, { subject: post.subject, unit: post.unit });
+  });
+  
+  // Add graph posts (with unit from matching regular post if available)
+  Object.values(graphExplanationPosts).forEach(post => {
+    const matchingRegularPost = blogPosts[post.slug];
+    const unit = matchingRegularPost?.unit || 0;
+    slugToDataMap.set(post.slug, { subject: post.subject, unit });
+  });
+  
+  // Try to get the original slug from SEO URL
+  const originalSlug = getSlugFromSeoUrl(seoSlug, slugToDataMap);
+  
+  // If it's not an SEO URL, try using the slug directly (for backwards compatibility)
+  const slug = originalSlug || seoSlug;
   
   // Check if this is a graph explanation post
   const graphPost = await getGraphExplanationPost(slug);
