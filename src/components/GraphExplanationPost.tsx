@@ -145,17 +145,32 @@ export function GraphExplanationPost({ post }: GraphExplanationPostProps) {
         <h1 className="text-5xl sm:text-6xl md:text-7xl font-black text-black mb-6 leading-tight">
           {post.headline}
         </h1>
-
-        {/* Intro - Large lead text */}
-        <p className="text-xl text-gray-700 leading-relaxed font-medium mb-8">
-          {post.intro}
-        </p>
+        
+        {/* SEO Snippet - After H1 headline */}
+        {post.seoSnippet && (
+          <div className="bg-gray-50 border-l-4 border-yellow-400 rounded-r-lg px-6 py-4 mb-6">
+            <p className="text-lg text-gray-700 leading-relaxed text-center font-bold">
+              {post.seoSnippet}
+            </p>
+          </div>
+        )}
       </section>
 
       {/* Full Content - Rest of the text with inline images */}
       {post.content && (
         <section className="mb-12">
-          <div className="prose prose-xl max-w-none prose-black text-xl [&_p]:leading-relaxed [&_p]:mb-6 [&_h2]:mb-4 [&_h2]:mt-12 [&_h2]:text-3xl [&_h2]:font-bold [&_ul]:mb-6 [&_li]:mb-2 [&_img]:my-8 [&_img]:rounded-lg [&_img]:border-2 [&_img]:border-gray-300">
+          <style dangerouslySetInnerHTML={{__html: `
+            .graph-blog-content p:first-of-type::first-letter {
+              font-size: 4rem;
+              font-weight: bold;
+              float: left;
+              line-height: 1;
+              margin-right: 0.5rem;
+              margin-top: 0.1rem;
+              color: #000000;
+            }
+          `}} />
+          <div className="graph-blog-content prose prose-xl max-w-none prose-black text-xl [&_p]:leading-relaxed [&_p]:mb-6 [&_h2]:mb-4 [&_h2]:mt-12 [&_h2]:text-3xl [&_h2]:font-bold [&_ul]:mb-6 [&_li]:mb-2 [&_img]:my-8 [&_img]:rounded-lg [&_img]:border-2 [&_img]:border-gray-300">
             <ContentWithMath content={post.content} />
           </div>
         </section>

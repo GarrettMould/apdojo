@@ -13,6 +13,7 @@ export type BlogPost = {
   unit: number;
   thumbnailUrl: string;
   keyTakeaway?: string;
+  seoSnippet?: string; // 2-sentence definition for Google snippets (SEO)
   content: ReactNode;
   linkedFRQ?: number; // ID of the related FRQ question to link to
   images?: string[]; // Array of image URLs for the blog post
@@ -28,6 +29,7 @@ export const blogPosts: Record<string, BlogPost> = {
     subject: 'Macro',
     unit: 4,
     thumbnailUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/image0.jpg',
+    seoSnippet: 'Monetary policy refers to actions taken by central banks to influence the money supply and interest rates. These policies affect aggregate demand through changes in investment and consumption spending, creating a chain reaction from money market shifts to AD-AS graph movements.',
     keyTakeaway: 'Buy Bonds → MS ↑ → Interest Rate ↓ → Investment ↑ → AD ↑ → GDP ↑. The chain reaction connects money supply changes to aggregate demand through interest rates.',
     images: [],
     videoUrl: null,
@@ -136,6 +138,7 @@ export const blogPosts: Record<string, BlogPost> = {
     subject: 'Macro',
     unit: 6,
     thumbnailUrl: '/images/placeholder.png', // Using the local placeholder for this one
+    seoSnippet: 'The foreign exchange market is where currencies are bought and sold, functioning like any other commodity market. When demand for one currency increases, it appreciates while the other currency must depreciate, following the rule of opposites.',
     keyTakeaway: 'A change in demand for one currency causes an opposite change in the supply of the other. If one appreciates, the other must depreciate.',
     linkedFRQ: 4, // Links to Unit 6 FRQ - Foreign Exchange Market
     images: [],
@@ -221,6 +224,7 @@ export const blogPosts: Record<string, BlogPost> = {
     subject: 'Micro',
     unit: 4,
     thumbnailUrl: '/images/blog/B3ID.jpg',
+    seoSnippet: 'For a monopolist, marginal revenue falls faster than demand because the firm must lower the price on all previous units sold to sell one additional unit. This price reduction on existing sales reduces the marginal revenue gained from the new sale.',
     keyTakeaway: 'Marginal Revenue falls faster than Demand because the monopolist has to lower the price on all previous units just to sell one more.',
     images: [
       '/images/blog/B3IA.jpg',
@@ -289,6 +293,7 @@ export const blogPosts: Record<string, BlogPost> = {
     subject: 'Macro',
     unit: 2,
     thumbnailUrl: '/images/placeholder.png',
+    seoSnippet: 'Nominal GDP measures economic output using current prices, while Real GDP measures output using constant base-year prices to isolate actual production growth from price inflation. Real GDP allows economists to determine whether an economy is truly growing or just experiencing price increases.',
     keyTakeaway: 'Nominal GDP includes price changes, while Real GDP holds prices constant to measure actual production growth. Just like GPA can rise from easier grading (nominal) vs. actual improvement (real).',
     images: [],
     practiceQuestionId: 17,
@@ -439,7 +444,8 @@ export const blogPosts: Record<string, BlogPost> = {
     description: 'Understanding how the economy automatically returns to full employment through wage adjustments—without government intervention.',
     subject: 'Macro',
     unit: 3,
-    thumbnailUrl: '/images/placeholder.png',
+    thumbnailUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/lrsa/image4.jpg',
+    seoSnippet: 'Long-run self-adjustment is the economy\'s automatic mechanism that returns it to full employment without government intervention. This process occurs through wage adjustments that shift the short-run aggregate supply curve, closing output gaps over time.',
     keyTakeaway: 'The economy self-adjusts through a 4-step cycle: Output Gap → Wages Adjust → Hiring Changes → Supply Shift. Wages react to the output gap, causing SRAS to shift back to full employment.',
     images: [],
     videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/dojoDrills/dd_macro_3.7.mp4',

@@ -31,7 +31,19 @@ export function BlogPostClient({
   const mathProcessedContent = processMathContent(processedContent);
 
   return (
-    <div className="prose prose-xl max-w-none prose-blue text-xl [&_p]:leading-relaxed [&_p]:mb-6 [&_li]:leading-relaxed [&_h2]:mb-6 [&_h3]:mb-4">
+    <>
+      <style dangerouslySetInnerHTML={{__html: `
+        .blog-content p:first-of-type::first-letter {
+          font-size: 4rem;
+          font-weight: bold;
+          float: left;
+          line-height: 1;
+          margin-right: 0.5rem;
+          margin-top: 0.1rem;
+          color: #111827;
+        }
+      `}} />
+      <div className="blog-content prose prose-xl max-w-none prose-blue text-xl [&_p]:leading-relaxed [&_p]:mb-6 [&_li]:leading-relaxed [&_h2]:mb-6 [&_h3]:mb-4">
       {/* Video at the start of the blog if available */}
       {videoUrl && (
         <div className="mb-12 -mx-4 sm:-mx-8">
@@ -51,7 +63,8 @@ export function BlogPostClient({
       </BlogContentWithKeyTerms>
       {/* Trigger that makes practice box appear in sidebar at this scroll position */}
       <SidebarScrollTriggeredBox practiceUrl={practiceUrl} />
-    </div>
+      </div>
+    </>
   );
 }
 

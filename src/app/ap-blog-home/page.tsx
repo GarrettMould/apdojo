@@ -15,7 +15,7 @@ function BlogCard({ post }: { post: BlogPost }) {
   return (
     <Link href={`/blog/${seoUrl}`} className="block group">
       <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden h-full flex flex-col transition-shadow hover:shadow-xl">
-        <div className="relative w-full h-48 bg-white py-4 overflow-hidden">
+        <div className="relative w-full h-48 bg-white overflow-hidden p-2">
           <Image
             src={post.thumbnailUrl}
             alt={post.title}
@@ -65,7 +65,7 @@ function GraphExplanationCard({ post }: { post: GraphExplanationPost }) {
   return (
     <Link href={`/blog/${seoUrl}`} className="block group">
       <div className="bg-white rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] border-4 border-black overflow-hidden h-full flex flex-col transition-all hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1">
-        <div className="relative w-full h-48 bg-yellow-50 border-b-4 border-black py-4 overflow-hidden">
+        <div className="relative w-full h-48 bg-white border-b-4 border-black overflow-hidden p-2">
           {post.visual?.imageUrl ? (
             <Image
               src={post.visual.imageUrl}
@@ -115,12 +115,15 @@ function GraphExplanationCard({ post }: { post: GraphExplanationPost }) {
 export default function BlogHomePage() {
   const regularPosts = Object.values(blogPosts);
   const graphPosts = Object.values(graphExplanationPosts);
+  const hiddenSlugs = new Set(['nominal-vs-real-gdp-explained']);
   
   // Get slugs from graph posts to filter out duplicates
   const graphPostSlugs = new Set(graphPosts.map(post => post.slug));
   
   // Filter out regular posts that have the same slug as graph posts
-  const uniqueRegularPosts = regularPosts.filter(post => !graphPostSlugs.has(post.slug));
+  const uniqueRegularPosts = regularPosts
+    .filter(post => !graphPostSlugs.has(post.slug))
+    .filter(post => !hiddenSlugs.has(post.slug));
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -141,7 +144,7 @@ export default function BlogHomePage() {
               <BlogCard key={post.slug} post={post} />
             ))}
             {/* Graph Explanation Posts */}
-            {graphPosts.map((post) => (
+            {graphPosts.filter(post => !hiddenSlugs.has(post.slug)).map((post) => (
               <GraphExplanationCard key={post.slug} post={post} />
             ))}
           </div>

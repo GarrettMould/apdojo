@@ -39,6 +39,7 @@ export interface GraphExplanationPost {
   headline: string; // H1 Title: [Topic Name] Graph Explained - AP Macroeconomics
   intro: string; // First chunk of text (introduction paragraph)
   subject: 'macro' | 'micro';
+  seoSnippet?: string; // 2-sentence definition for Google snippets (SEO)
   content?: string; // Full narrative content (rest of the text, can include HTML/markdown)
   visual: WhiteboardImage; // Clean, labeled image of the standard graph (first image in gallery)
   keyDeterminants?: string[]; // Optional: Bulleted list (e.g., "What shifts Supply of Loanable Funds?")

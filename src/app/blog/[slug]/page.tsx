@@ -108,9 +108,14 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             <h1 className="text-5xl sm:text-6xl font-extrabold text-gray-900 leading-tight mb-4">
                 {post.title}
               </h1>
-            <p className="text-xl sm:text-2xl text-gray-600 mb-6">
-                {post.description}
-              </p>
+            {/* SEO Snippet - After H1 headline */}
+            {post.seoSnippet && (
+              <div className="bg-gray-50 border-l-4 border-blue-500 rounded-r-lg px-6 py-4 mb-4">
+                <p className="text-lg text-gray-700 leading-relaxed text-center font-bold">
+                  {post.seoSnippet}
+                </p>
+              </div>
+            )}
               
             <div className="flex items-center justify-center gap-6">
               <div className={`inline-block text-xs font-semibold px-2.5 py-1 rounded-md ${

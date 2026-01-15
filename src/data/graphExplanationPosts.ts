@@ -6,6 +6,8 @@ export const graphExplanationPosts: Record<string, GraphExplanationPost> = {
   'consumer-producer-surplus-deadweight-loss': {
     slug: 'consumer-producer-surplus-deadweight-loss',
     headline: 'Consumer Surplus, Producer Surplus, and Deadweight Loss Graph Explained',
+    intro: 'Consumer Surplus is the difference between what consumers would have paid for a product and what they actually pay. Producer Surplus is the difference between what producers would have sold for and what they actually receive, and Deadweight Loss represents the lost surplus when market efficiency is disrupted by taxes or other interventions.',
+    seoSnippet: 'Consumer surplus is the difference between what consumers are willing to pay and what they actually pay, while producer surplus is the difference between the minimum price sellers would accept and the price they receive. When taxes or other market interventions occur, deadweight loss represents the reduction in total surplus from transactions that no longer happen.',
     content: `
       <p class="mb-6">You walk into a dealership. You are willing to pay <strong>$50,000</strong> for a new car, but you negotiate the dealer down to <strong>$45,000</strong>.</p>
       <p class="mb-6">You get the car <em>and</em> you keep $5,000 in your pocket.</p>
@@ -91,6 +93,7 @@ export const graphExplanationPosts: Record<string, GraphExplanationPost> = {
     slug: 'monetary-policy-and-aggregate-demand',
     headline: 'Monetary Policy: Connecting the Money Market to AD-AS',
     intro: 'In AP Macroeconomics, drawing individual graphs is easy. The hard part is connecting them. The most common chain reaction you need to master is the Monetary Transmission Mechanism—how a shift in the Money Market influences Aggregate Demand.',
+    seoSnippet: 'Monetary policy refers to actions taken by central banks to influence the money supply and interest rates. These policies affect aggregate demand through changes in investment and consumption spending, creating a chain reaction from money market shifts to AD-AS graph movements.',
     content: `
       <h2 class="mt-12 mb-4 text-3xl font-bold text-gray-800">1. The Starting Point: The Recessionary Gap</h2>
       <div class="my-8 p-4 border rounded-lg bg-gray-50">
@@ -183,6 +186,7 @@ export const graphExplanationPosts: Record<string, GraphExplanationPost> = {
     slug: 'foreign-exchange-cookies',
     headline: 'The Foreign Exchange Market: Why Money is Just Like Cookies',
     intro: 'What shifts Demand for USD? (US Interest Rates, Demand for US Goods/Assets, Foreign Income). What shifts Supply of USD? (Foreign Interest Rates, Demand for Foreign Goods/Assets, US Income). The Rule of Opposites: If Currency A Appreciates, Currency B must Depreciate. How does interest rate differential affect Forex? (Higher US rates → Increased demand for USD → USD Appreciates).',
+    seoSnippet: 'The foreign exchange market is where currencies are bought and sold, functioning like any other commodity market. When demand for one currency increases, it appreciates while the other currency must depreciate, following the rule of opposites.',
     content: `
       <p class="mb-6">If more people want cookies, the price of cookies goes up. If fewer people want them, the price goes down.</p>
       <p class="mb-6">Currency is no different. It is just a commodity that is bought and sold.</p>
@@ -304,6 +308,7 @@ export const graphExplanationPosts: Record<string, GraphExplanationPost> = {
     slug: 'monopoly-marginal-revenue',
     headline: 'Why Marginal Revenue Falls Faster Than Demand',
     intro: 'Monopolies are the only firm in town. They can choose the price they set, but the law of demand still applies. Whatever price they choose will have an impact on the number of people willing to buy their product. This is why Marginal Revenue falls faster than Demand.',
+    seoSnippet: 'For a monopolist, marginal revenue falls faster than demand because the firm must lower the price on all previous units sold to sell one additional unit. This price reduction on existing sales reduces the marginal revenue gained from the new sale.',
     content: `
       <h2 class="mt-12 mb-4 text-3xl font-bold text-gray-800">The Setup: Different People, Different Values</h2>
       <p class="mb-6">Meet people. Different people have different values and needs, so they are willing to pay different prices for a good. One person is willing to pay <strong>$50</strong> while the other one is only willing to pay <strong>$45</strong>.</p>
@@ -394,6 +399,7 @@ export const graphExplanationPosts: Record<string, GraphExplanationPost> = {
     slug: 'nominal-vs-real-gdp-explained',
     headline: 'Nominal vs Real GDP Explained',
     intro: 'Over the last 30 years, the grades of US college students have steadily increased. Does that mean college students in America are getting smarter? Not so fast. This trend, known as grade inflation, or "Gradeflation", raises an interesting economic question: How do we separate real growth from an illusion? The same way we analyze grades, we analyze the economy—by comparing Nominal vs. Real GDP.',
+    seoSnippet: 'Nominal GDP measures economic output using current prices, while Real GDP measures output using constant base-year prices to isolate actual production growth from price inflation. Real GDP allows economists to determine whether an economy is truly growing or just experiencing price increases.',
     content: `
       <h2 class="mt-12 mb-4 text-3xl font-bold text-gray-800">Part 1: The Gradeflation Trap (Nominal GPA)</h2>
       
@@ -550,6 +556,7 @@ export const graphExplanationPosts: Record<string, GraphExplanationPost> = {
     slug: 'the-economy-fixes-itself-long-run-self-adjustment',
     headline: 'The Economy Fixes Itself: Long-Run Self-Adjustment',
     intro: 'Does the government always need to intervene when the economy is in trouble? No. If left alone long enough, the economy has a built-in "Auto-Pilot" that steers it back to normal. This process is called Long-Run Self-Adjustment. It might seem confusing on a graph, but it actually follows the exact same 4-step cycle every single time.',
+    seoSnippet: 'Long-run self-adjustment is the economy\'s automatic mechanism that returns it to full employment without government intervention. This process occurs through wage adjustments that shift the short-run aggregate supply curve, closing output gaps over time.',
     content: `
       <p class="mb-6">Let's break down the mechanics of how an economy heals itself without the Fed or Congress lifting a finger.</p>
       
@@ -603,7 +610,7 @@ export const graphExplanationPosts: Record<string, GraphExplanationPost> = {
     `,
     subject: 'macro',
     visual: {
-      imageUrl: '/images/placeholder.png',
+      imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/lrsa/image4.jpg',
       title: 'Long-Run Self-Adjustment',
       alt: 'AD-AS graph showing long-run self-adjustment mechanism'
     },
