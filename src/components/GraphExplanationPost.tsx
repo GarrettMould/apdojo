@@ -155,7 +155,7 @@ export function GraphExplanationPost({ post }: GraphExplanationPostProps) {
       {/* Full Content - Rest of the text with inline images */}
       {post.content && (
         <section className="mb-12">
-          <div className="prose prose-xl max-w-none prose-black text-lg [&_p]:leading-relaxed [&_p]:mb-6 [&_h2]:mb-4 [&_h2]:mt-12 [&_h2]:text-3xl [&_h2]:font-bold [&_ul]:mb-6 [&_li]:mb-2 [&_img]:my-8 [&_img]:rounded-lg [&_img]:border-2 [&_img]:border-gray-300">
+          <div className="prose prose-xl max-w-none prose-black text-xl [&_p]:leading-relaxed [&_p]:mb-6 [&_h2]:mb-4 [&_h2]:mt-12 [&_h2]:text-3xl [&_h2]:font-bold [&_ul]:mb-6 [&_li]:mb-2 [&_img]:my-8 [&_img]:rounded-lg [&_img]:border-2 [&_img]:border-gray-300">
             <ContentWithMath content={post.content} />
           </div>
         </section>

@@ -31,7 +31,7 @@ export function BlogPostClient({
   const mathProcessedContent = processMathContent(processedContent);
 
   return (
-    <div className="prose prose-xl max-w-none prose-blue text-lg [&_p]:leading-relaxed [&_p]:mb-6 [&_li]:leading-relaxed [&_h2]:mb-6 [&_h3]:mb-4">
+    <div className="prose prose-xl max-w-none prose-blue text-xl [&_p]:leading-relaxed [&_p]:mb-6 [&_li]:leading-relaxed [&_h2]:mb-6 [&_h3]:mb-4">
       {/* Video at the start of the blog if available */}
       {videoUrl && (
         <div className="mb-12 -mx-4 sm:-mx-8">

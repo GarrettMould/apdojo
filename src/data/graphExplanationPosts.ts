@@ -143,12 +143,6 @@ export const graphExplanationPosts: Record<string, GraphExplanationPost> = {
       title: 'Recessionary Gap: Economy operating below full employment',
       alt: 'AD-AS graph showing a recessionary gap where actual output is below full employment'
     },
-    keyDeterminants: [
-      'What shifts Money Supply? (Open Market Operations, Discount Rate, Reserve Requirement)',
-      'What shifts Investment Demand? (Interest Rates, Business Expectations, Technology)',
-      'What shifts Aggregate Demand? (Consumption, Investment, Government Spending, Net Exports)',
-      'How does monetary policy affect AD? (Buy Bonds → MS ↑ → Interest Rate ↓ → Investment ↑ → AD ↑ → GDP ↑)'
-    ],
     graphGymChallenge: {
       scenarioId: 14,
       prompt: 'Draw the Money Supply and Money Demand curves. Show the effect of an expansionary monetary policy (Open Market Purchase).',
@@ -188,7 +182,7 @@ export const graphExplanationPosts: Record<string, GraphExplanationPost> = {
   'foreign-exchange-cookies': {
     slug: 'foreign-exchange-cookies',
     headline: 'The Foreign Exchange Market: Why Money is Just Like Cookies',
-    intro: 'When students see the "Foreign Exchange Market" (Forex) on the AP Exam, they panic. They think currency is magical and follows different rules than the rest of economics. It doesn\'t. In fact, the market for US Dollars works exactly like the market for Cookies.',
+    intro: 'What shifts Demand for USD? (US Interest Rates, Demand for US Goods/Assets, Foreign Income). What shifts Supply of USD? (Foreign Interest Rates, Demand for Foreign Goods/Assets, US Income). The Rule of Opposites: If Currency A Appreciates, Currency B must Depreciate. How does interest rate differential affect Forex? (Higher US rates → Increased demand for USD → USD Appreciates).',
     content: `
       <p class="mb-6">If more people want cookies, the price of cookies goes up. If fewer people want them, the price goes down.</p>
       <p class="mb-6">Currency is no different. It is just a commodity that is bought and sold.</p>
@@ -570,12 +564,20 @@ export const graphExplanationPosts: Record<string, GraphExplanationPost> = {
         <li><strong>Inflationary Gap:</strong> We are producing <em>more</em> than our potential. The economy is overheating.</li>
       </ul>
       
+      <div class="my-8 p-4 border rounded-lg bg-gray-50">
+        <img src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/lrsa/image0.jpg" alt="Step 2: Wages Adjust" class="w-full h-auto rounded-md shadow-sm" />
+      </div>
+      
       <h3 class="mt-10 mb-4 text-2xl font-bold text-gray-800">Step 2: Wages Adjust (The Pivot) 💸</h3>
       <p class="mb-6">This is the most critical step.</p>
       <ul class="mb-6">
         <li><strong>In a Recession:</strong> There are lots of unemployed workers desperate for jobs. Because labor is not scarce, <strong>Nominal Wages Fall</strong>. Workers are willing to accept less just to get hired.</li>
         <li><strong>In Inflation:</strong> Workers are scarce and in high demand. Companies have to bid up salaries to steal employees. <strong>Nominal Wages Rise</strong>.</li>
       </ul>
+      
+      <div class="my-8 p-4 border rounded-lg bg-gray-50">
+        <img src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/lrsa/image1.jpg" alt="Step 3: Hiring Changes" class="w-full h-auto rounded-md shadow-sm" />
+      </div>
       
       <h3 class="mt-10 mb-4 text-2xl font-bold text-gray-800">Step 3: Hiring Changes (The Shift) 🏭</h3>
       <p class="mb-6">Firms react to the price of labor.</p>
@@ -584,6 +586,10 @@ export const graphExplanationPosts: Record<string, GraphExplanationPost> = {
         <li><strong>Expensive Wages (Inflation):</strong> "Labor is too pricey!" Firms cut back on hiring or fire workers to save money.</li>
       </ul>
       
+      <div class="my-8 p-4 border rounded-lg bg-gray-50">
+        <img src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/lrsa/image2.jpg" alt="Step 4: The Supply Shift" class="w-full h-auto rounded-md shadow-sm" />
+      </div>
+      
       <h3 class="mt-10 mb-4 text-2xl font-bold text-gray-800">Step 4: The Supply Shift ➡️</h3>
       <p class="mb-6">This change in production costs shifts the <strong>Short-Run Aggregate Supply (SRAS)</strong> curve.</p>
       <ul class="mb-6">
@@ -591,11 +597,8 @@ export const graphExplanationPosts: Record<string, GraphExplanationPost> = {
         <li><strong>Inflation Fix:</strong> SRAS shifts <strong>LEFT</strong> (Cost of production ↑). We return to full employment with a higher price level.</li>
       </ul>
       
-      <h2 class="mt-12 mb-4 text-3xl font-bold text-gray-800">Visualizing the Shift</h2>
-      
       <div class="my-8 p-4 border rounded-lg bg-gray-50">
-        <p class="text-center text-gray-500 italic">[Embed Video: Long Run Adjustment Explainer]</p>
-        <p class="text-center text-sm text-gray-400 mt-2">(Your 60-second screen recording goes here)</p>
+        <img src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/lrsa/image3.jpg" alt="Visualizing the Shift" class="w-full h-auto rounded-md shadow-sm" />
       </div>
     `,
     subject: 'macro',
@@ -615,7 +618,6 @@ export const graphExplanationPosts: Record<string, GraphExplanationPost> = {
       prompt: 'Draw an economy in an inflationary gap. Show the long-run self-adjustment mechanism without government intervention.',
       link: '/graph-gym'
     },
-    draggableGraph: true,
     mcqQuestions: [
       {
         id: 1,
