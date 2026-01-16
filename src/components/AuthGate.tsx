@@ -43,7 +43,7 @@ export function AuthGate({ onAuthSuccess }: AuthGateProps) {
     if (!isValidPassword || !validateEmail(email)) return;
     
     try {
-      await signup(email, password);
+      await signup(email, password, false, false);
       onAuthSuccess?.();
     } catch (error: any) {
       switch (error.code) {

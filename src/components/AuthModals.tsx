@@ -139,6 +139,17 @@ export function SignupModal({ isOpen, onClose, switchToLogin, onAuthSuccess }: A
   const [loading, setLoading] = useState(false);
   const { signup } = useAuthContext();
   const router = useRouter();
+  
+  // Check for teacher access code in URL (secret code: 9759)
+  const [isTeacher, setIsTeacher] = useState(false);
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const accessCode = params.get('code');
+      // Secret teacher access code: 9759
+      setIsTeacher(accessCode === '9759');
+    }
+  }, []);
 
   // Password validation states
   const [hasMinLength, setHasMinLength] = useState(false);
@@ -182,7 +193,7 @@ export function SignupModal({ isOpen, onClose, switchToLogin, onAuthSuccess }: A
     setLoading(true);
     
     try {
-      await signup(email, password, isSubscribed);
+      await signup(email, password, isSubscribed, isTeacher);
       onClose();
       onAuthSuccess?.();
       router.push('/');

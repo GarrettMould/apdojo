@@ -146,7 +146,7 @@ export interface AuthContextValue {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<AuthContextValue>;
-  signup: (email: string, password: string, isSubscribed: boolean) => Promise<AuthContextValue>;
+  signup: (email: string, password: string, isSubscribed: boolean, isTeacher?: boolean) => Promise<AuthContextValue>;
   logout: () => Promise<void>;
   resendVerificationEmail: () => Promise<void>;
   mcqAnswersData: McqAnswer[] | null;
@@ -585,7 +585,7 @@ export function useAuth() {
     }
   };
 
-  const signup = async (email: string, password: string, isSubscribed: boolean): Promise<AuthContextValue> => {
+  const signup = async (email: string, password: string, isSubscribed: boolean, isTeacher: boolean = false): Promise<AuthContextValue> => {
     setLoading(true);
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -616,7 +616,7 @@ export function useAuth() {
             },
             lifetimeAiGenerations: 1,
           },
-          teacher: false, // Default to false, can be set to true manually in Firebase
+          teacher: isTeacher, // Set based on signup parameter or default to false
         });
         
         // If user subscribed, add their email to the subscribedEmails collection

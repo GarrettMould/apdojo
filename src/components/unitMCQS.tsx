@@ -467,7 +467,7 @@ const QuestionCard = ({
     }
     setSignupLoading(true);
     try {
-      await signup(signupEmail, signupPassword, false);
+      await signup(signupEmail, signupPassword, false, false);
       // Success will trigger auth context update and re-render
     } catch (err: any) {
       console.error("Signup failed:", err);
