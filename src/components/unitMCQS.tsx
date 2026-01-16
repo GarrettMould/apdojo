@@ -127,6 +127,9 @@ interface UnitMCQSProps {
   isSidebar?: boolean; // New optional prop
   hasTestModeAccess: boolean;
   onEnterTestMode: () => void;
+  isAnswerDisabled?: boolean; // New prop to disable answer selection
+  onLoginPrompt?: () => void; // Callback when user tries to answer but is disabled
+  isNavigationDisabled?: boolean; // New prop to disable Next/Previous buttons
 }
 
 // BeltHUD Component
@@ -313,6 +316,8 @@ interface QuestionCardProps {
   correctStreak: number;
   highlightedIndex: number | null;
   isParentModalOpen: boolean;
+  isAnswerDisabled?: boolean;
+  onLoginPrompt?: () => void;
 }
 
 const QuestionCard = ({ 
@@ -330,7 +335,9 @@ const QuestionCard = ({
   dojoProgress,
   correctStreak,
   highlightedIndex,
-  isParentModalOpen
+  isParentModalOpen,
+  isAnswerDisabled = false,
+  onLoginPrompt
 }: QuestionCardProps) => {
   const letterToIndex = (letter?: string): number | null => {
     if (!letter) return null;
@@ -424,6 +431,14 @@ const QuestionCard = ({
   const handleAnswerSelect = (index: number) => {
     if (isSubmitted) {
       console.warn(`[QuestionCard] Blocked answer selection: question ${question.id} already submitted (isSubmitted: ${isSubmitted}, isAnswered: ${isAnswered})`);
+      return;
+    }
+    
+    // Block if answer selection is disabled (e.g., guest user hit limit)
+    if (isAnswerDisabled) {
+      if (onLoginPrompt) {
+        onLoginPrompt();
+      }
       return;
     }
     
@@ -1066,9 +1081,11 @@ interface QuestionArenaProps {
   isLoadingAI: boolean;
   onExplanationClick?: () => void;
   showExplanationForCorrect?: boolean;
+  isAnswerDisabled?: boolean;
+  onLoginPrompt?: () => void;
 }
 
-const QuestionArena = ({ question, onAnswerSelect, initialSelectedLetter, isAnswered, highlightedIndex, aiExplanation, isLoadingAI, onExplanationClick, showExplanationForCorrect }: QuestionArenaProps) => {
+const QuestionArena = ({ question, onAnswerSelect, initialSelectedLetter, isAnswered, highlightedIndex, aiExplanation, isLoadingAI, onExplanationClick, showExplanationForCorrect, isAnswerDisabled = false, onLoginPrompt }: QuestionArenaProps) => {
   const letterToIndex = (letter?: string): number | null => {
     if (!letter) return null;
     const index = letter.charCodeAt(0) - 65;
@@ -1088,6 +1105,14 @@ const QuestionArena = ({ question, onAnswerSelect, initialSelectedLetter, isAnsw
 
   const handleAnswerSelect = (index: number) => {
     if (isSubmitted) return;
+    
+    // Block if answer selection is disabled (e.g., guest user hit limit)
+    if (isAnswerDisabled) {
+      if (onLoginPrompt) {
+        onLoginPrompt();
+      }
+      return;
+    }
     
     setSelectedAnswerIndex(index);
     setIsSubmitted(true);
@@ -1199,8 +1224,8 @@ const QuestionArena = ({ question, onAnswerSelect, initialSelectedLetter, isAnsw
             <button
               key={optIndex}
               onClick={() => handleAnswerSelect(optIndex)}
-              disabled={isSubmitted}
-              className={optionClass}
+              disabled={isSubmitted || isAnswerDisabled}
+              className={optionClass + (isAnswerDisabled ? ' opacity-60 cursor-not-allowed' : '')}
             >
               <div className="flex items-center gap-4">
                 <span className={`w-8 h-8 flex items-center justify-center rounded-full border-2 text-sm font-bold flex-shrink-0 ${
@@ -1333,6 +1358,9 @@ export function UnitMCQs({
   isSidebar = false, // Default to false
   hasTestModeAccess,
   onEnterTestMode,
+  isAnswerDisabled = false,
+  onLoginPrompt,
+  isNavigationDisabled = false,
 }: UnitMCQSProps) {
   const { login, signup, userData, loadingUserData, user, awardXp, totalXP, guestXp } = useAuthContext();
   const [aiExplanations, setAiExplanations] = useState<Record<number, string>>({});
@@ -1750,6 +1778,8 @@ export function UnitMCQs({
                 isLoadingAI={isLoadingExplanation}
                 onExplanationClick={handleExplanationClick}
                 showExplanationForCorrect={showExplanationForCorrect}
+                isAnswerDisabled={isAnswerDisabled}
+                onLoginPrompt={onLoginPrompt}
               />
                 </div>
             )}
@@ -1758,19 +1788,21 @@ export function UnitMCQs({
           <div className="flex gap-4">
               <button
               onClick={() => {
+                if (isNavigationDisabled) return;
                 console.log('[Child] Previous button clicked', {
                   currentIndex: currentQuestionIndex,
                   totalQuestions: totalQuestions
                 });
                 onPreviousQuestion();
               }}
-                disabled={currentQuestionIndex === 0}
+                disabled={currentQuestionIndex === 0 || isNavigationDisabled}
               className="flex-1 px-6 py-4 border-4 border-black rounded-xl font-black text-lg bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:translate-y-1 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
               >
                 Previous
               </button>
               <button
               onClick={() => {
+                if (isNavigationDisabled) return;
                 console.log('[Child] Next button clicked', {
                   currentIndex: currentQuestionIndex,
                   totalQuestions: totalQuestions,
@@ -1778,7 +1810,7 @@ export function UnitMCQs({
                 });
                 onNextQuestion();
               }}
-                disabled={currentQuestionIndex === totalQuestions - 1 || totalQuestions === 0}
+                disabled={currentQuestionIndex === totalQuestions - 1 || totalQuestions === 0 || isNavigationDisabled}
               className="flex-1 px-6 py-4 border-4 border-black rounded-xl font-black text-lg bg-black text-white hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:translate-y-1 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
               >
                 Next

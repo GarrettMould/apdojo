@@ -129,10 +129,10 @@ export default function BlogHomePage() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-12">
         <header className="mb-12 text-center">
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-3">
-            The AP <span className="text-blue-600">Dojo Blog</span>
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-gray-900 mb-4 tracking-tight">
+            The AP <span className="text-blue-600">Dojo</span> Blog
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
             Deep dives into key concepts, expert tips for mastering difficult topics, and strategies to help you ace your AP Economics exams.
           </p>
         </header>

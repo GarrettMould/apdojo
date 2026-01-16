@@ -62,24 +62,24 @@ export const graphExplanationPosts: Record<string, GraphExplanationPost> = {
     mcqQuestions: [
       {
         id: 1,
-        question: 'If you walk into a car dealership willing to pay $50,000 but negotiate the price down to $45,000, what is your consumer surplus?',
+        question: 'Sarah is shopping for a new laptop. She is willing to pay up to $1,200 for a specific model, but finds it on sale for $950. What is Sarah\'s consumer surplus?',
         options: [
-          '$50,000',
-          '$45,000',
-          '$5,000',
-          'There is no consumer surplus because you paid less than your willingness to pay'
+          '$1,200',
+          '$950',
+          '$250',
+          'There is no consumer surplus because she paid less than her willingness to pay'
         ],
         correctAnswer: 2,
-        explanation: 'Correct! Consumer Surplus is the difference between what you were willing to pay ($50,000) and what you actually paid ($45,000), which equals $5,000. This represents the benefit you receive from the transaction.'
+        explanation: 'Correct! Consumer Surplus is the difference between what Sarah was willing to pay ($1,200) and what she actually paid ($950), which equals $250. This represents the benefit she receives from the transaction.'
       },
       {
         id: 2,
-        question: 'When the government imposes a per-unit tax on gasoline, what happens to total surplus in the market?',
+        question: 'The government imposes a $2 per unit tax on coffee. Which of the following best describes what happens to total surplus in the coffee market?',
         options: [
           'Total surplus increases because the government collects tax revenue',
           'Total surplus decreases because both consumer and producer surplus are reduced, plus deadweight loss is created',
           'Total surplus stays the same because tax revenue replaces the lost surplus',
-          'Total surplus only decreases if the tax is larger than $1 per gallon'
+          'Total surplus only decreases if the tax is larger than $1 per unit'
         ],
         correctAnswer: 1,
         explanation: 'Correct! A tax creates deadweight loss because it prevents some mutually beneficial trades from occurring. Both consumer and producer surplus decrease, and while the government collects tax revenue, the total surplus (consumer surplus + producer surplus + tax revenue) is still less than before the tax due to the deadweight loss.'
