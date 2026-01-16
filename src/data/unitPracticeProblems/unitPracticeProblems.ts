@@ -1004,7 +1004,7 @@ const macroUnit2Questions = [
     "image": null,
     "options": [
       "A household's purchase of corporate bonds.",
-      "The purchase of a newly constructed home by a family.",
+      "The purchase of a newly constructed factory by a business.",
       "The purchase of a new laptop by a college student for personal use.",
       "Government spending on a new interstate highway.",
       "A company's dividend payments to its shareholders."
