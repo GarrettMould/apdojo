@@ -940,6 +940,186 @@ const macroUnit2Questions = [
     "correctAnswer": "D",
     "explanation": "Unanticipated inflation reduces the purchasing power of money repaid in the future. Lenders receiving fixed interest payments find that the real value of those payments is lower than expected, hurting their returns. Borrowers with fixed rates benefit by repaying loans with less valuable dollars.",
     "videoExplanation": null
+  },
+  {
+    "id": 3014,
+    "unit": 2,
+    "lessonIDS": ["2.1"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "In the circular flow model, which of the following is true regarding the flow of resources and money?",
+    "image": null,
+    "options": [
+      "Households provide goods and services to firms in the product market.",
+      "Firms provide productive resources to households in the resource market.",
+      "Households demand resources and firms supply them in the factor market.",
+      "Firms pay wages, rent, and interest to households in exchange for factors of production.",
+      "Government spending is the only source of revenue for firms in a closed economy."
+    ],
+    "correctAnswer": "D",
+    "explanation": "In the circular flow model, households provide the factors of production (labor, land, capital) to firms in the resource (factor) market. In return, firms make factor payments such as wages, rent, and interest to the households.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3015,
+    "unit": 2,
+    "lessonIDS": ["2.1"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "Which of the following would be included in the calculation of a nation's Gross Domestic Product (GDP)?",
+    "image": null,
+    "options": [
+      "The purchase of 100 shares of stock in a major technology company.",
+      "The sale of a used car originally manufactured three years ago.",
+      "The government's monthly Social Security payments to retirees.",
+      "The value of a lawyer's services provided to a client this year.",
+      "The purchase of intermediate goods used to manufacture a smartphone."
+    ],
+    "correctAnswer": "D",
+    "explanation": "GDP includes only final goods and services produced within a country's borders in a given year. Productive services, like legal work, are counted. Stocks are financial assets (not production), used cars were counted in a previous year, Social Security is a transfer payment, and intermediate goods are excluded to avoid double counting.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3016,
+    "unit": 2,
+    "lessonIDS": ["2.1"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "Using the expenditure approach, which of the following is the correct formula for calculating GDP?",
+    "image": null,
+    "options": [
+      "GDP = C + I + G + (M - X)",
+      "GDP = C + I + G + (X - M)",
+      "GDP = Wages + Rent + Interest + Profit",
+      "GDP = C + S + T",
+      "GDP = Value of Output - Intermediate Costs"
+    ],
+    "correctAnswer": "B",
+    "explanation": "The expenditure approach calculates GDP by summing the four components of spending: Consumption (C), Investment (I), Government Spending (G), and Net Exports (X - M, which is Exports minus Imports).",
+    "videoExplanation": null
+  },
+  {
+    "id": 3017,
+    "unit": 2,
+    "lessonIDS": ["2.1"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "In the expenditure approach to GDP, the 'Investment' (I) component includes which of the following?",
+    "image": null,
+    "options": [
+      "A household's purchase of corporate bonds.",
+      "The purchase of a newly constructed factory by a business.",
+      "The purchase of a new laptop by a college student for personal use.",
+      "Government spending on a new interstate highway.",
+      "A company's dividend payments to its shareholders."
+    ],
+    "correctAnswer": "B",
+    "explanation": "In macroeconomics, 'Investment' specifically refers to spending on capital goods, changes in business inventories, and the construction of new residential housing. Personal electronics are consumption, highways are government spending, and bonds/dividends are financial transactions.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3018,
+    "unit": 2,
+    "lessonIDS": ["2.1"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "A country's GDP would decrease if which of the following were to occur, holding all other variables constant?",
+    "image": null,
+    "options": [
+      "Domestic exports to foreign nations increase.",
+      "Government spending on infrastructure projects rises.",
+      "Businesses decrease their spending on new machinery and equipment.",
+      "Households shift their spending from services to durable goods.",
+      "Foreign citizens increase their travel to the domestic country."
+    ],
+    "correctAnswer": "C",
+    "explanation": "According to the formula $GDP = C + I + G + (X - M)$, a decrease in Investment (I), such as spending on machinery, will lead to a direct decrease in total GDP.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3019,
+    "unit": 2,
+    "lessonIDS": ["2.1"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "Which of the following transactions would be classified as a 'leakage' from the circular flow of income?",
+    "image": null,
+    "options": [
+      "A firm borrowing money to build a new factory.",
+      "The government hiring a new public school teacher.",
+      "A household placing a portion of their income into a savings account.",
+      "A foreign company purchasing domestic airplanes.",
+      "A business owner reinvesting profits into the company."
+    ],
+    "correctAnswer": "C",
+    "explanation": "Leakages are parts of national income that are not immediately used for consumption of domestic goods. These include Savings (S), Taxes (T), and Imports (M).",
+    "videoExplanation": null
+  },
+  {
+    "id": 3020,
+    "unit": 2,
+    "lessonIDS": ["2.1"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "If a shoe manufacturer produces $50,000 worth of boots in December but only sells $30,000 worth by December 31st, how is this handled in the GDP calculation for that year?",
+    "image": null,
+    "options": [
+      "Only the $30,000 sold is counted as Consumption.",
+      "The $30,000 is counted as Consumption and the $20,000 is ignored until sold.",
+      "The entire $50,000 is counted as Consumption.",
+      "The $30,000 is counted as Consumption and the $20,000 is counted as Investment.",
+      "The $50,000 is counted as Government Spending."
+    ],
+    "correctAnswer": "D",
+    "explanation": "Goods produced but not sold are added to business inventories. In the expenditure approach, the sold portion is Consumption (C) and the unsold portion is recorded as Change in Private Inventories, which is a component of Investment (I).",
+    "videoExplanation": null
+  },
+  {
+    "id": 3021,
+    "unit": 2,
+    "lessonIDS": ["2.1"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "Which of the following is excluded from GDP because it is considered a non-production transaction?",
+    "image": null,
+    "options": [
+      "The commission earned by a real estate agent on a used home sale.",
+      "A monthly payment made by a tenant to a landlord.",
+      "Public transfer payments, such as unemployment compensation.",
+      "The production of electricity by a utility company.",
+      "Fees paid to an accountant for tax preparation."
+    ],
+    "correctAnswer": "C",
+    "explanation": "Government transfer payments like unemployment or welfare are excluded from GDP because they do not represent current production; they are simply a redistribution of income from the government to individuals.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3022,
+    "unit": 2,
+    "lessonIDS": ["2.1"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "If a country's imports (M) are greater than its exports (X), which of the following must be true?",
+    "image": null,
+    "options": [
+      "The country has a trade surplus.",
+      "Net exports are a positive number.",
+      "Net exports are a negative number.",
+      "The country's GDP is equal to its GNI.",
+      "Domestic consumption must be decreasing."
+    ],
+    "correctAnswer": "C",
+    "explanation": "Net exports are calculated as $X - M$. If imports (M) exceed exports (X), the resulting value for net exports is negative, which is also known as a trade deficit.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3023,
+    "unit": 2,
+    "lessonIDS": ["2.1"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "How does the purchase of a foreign-made car by a domestic consumer affect the domestic GDP components?",
+    "image": null,
+    "options": [
+      "Consumption increases and GDP increases by the same amount.",
+      "Consumption increases and Net Exports increase.",
+      "Consumption remains unchanged and Imports increase.",
+      "Consumption increases and Net Exports decrease by the same amount, leaving GDP unchanged.",
+      "Investment increases and Net Exports decrease."
+    ],
+    "correctAnswer": "D",
+    "explanation": "When a consumer buys an import, Consumption (C) increases because a final good was purchased. However, Imports (M) also increase, which makes Net Exports ($X - M$) decrease by the exact same amount. These two effects cancel each other out, so the domestic GDP does not change because the car was not produced domestically.",
+    "videoExplanation": null
   }
 ]
 

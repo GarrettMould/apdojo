@@ -904,7 +904,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
         <div className={`flex w-full flex-col relative ${shouldShowToolsByDefault ? 'min-h-screen' : isCustomAssignment ? '' : 'lg:h-[calc(100vh-4rem)]'} ${shouldShowToolsByDefault ? '' : 'overflow-hidden'}`} style={shouldShowToolsByDefault ? { paddingBottom: '80px' } : {}}>
           {/* Top Bar - At the very top for unit tests, preview exams, full exams, and custom assignments */}
           {shouldShowToolsByDefault && (
-            <div className="w-full bg-gray-200 px-6 py-4 flex items-center justify-between border-b-4 border-black shadow-lg flex-shrink-0 sticky top-16 z-40">
+            <div className="w-full bg-gray-200 px-6 py-4 flex items-center justify-between border-b-4 border-black shadow-lg flex-shrink-0 fixed top-16 left-0 right-0 z-40">
               {/* Timer Section - Only show for non-custom assignments */}
               {!isCustomAssignment && (
                 <>
@@ -1153,7 +1153,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
               )}
             </div>
           )}
-          <div className={`flex w-full flex-1 overflow-hidden relative ${isCustomAssignment || !showToolsPanel ? 'flex-col' : 'lg:flex-row flex-col'}`} style={shouldShowToolsByDefault ? { height: 'calc(100vh - 64px - 80px)' } : {}}>
+          <div className={`flex w-full flex-1 overflow-hidden relative ${isCustomAssignment || !showToolsPanel ? 'flex-col' : 'lg:flex-row flex-col'}`} style={shouldShowToolsByDefault ? { height: 'calc(100vh - 64px - 80px)', marginTop: '80px' } : {}}>
           {/* Blur Overlay when timer is paused - covers content but not top/bottom bars */}
           {isTimerPaused && shouldShowToolsByDefault && (
             <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-40"></div>

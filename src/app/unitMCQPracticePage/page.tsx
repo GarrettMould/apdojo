@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { X, Loader2, Lock, ArrowRight } from 'lucide-react';
+import { X, Loader2, Lock, ArrowRight, CheckCircle2, Star, ShieldCheck } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useCreditSystem } from '@/hooks/useCreditSystem';
 import { UnitMCQs } from '@/components/unitMCQS';
@@ -115,7 +116,160 @@ function shuffleArray<T>(array: T[]): T[] {
   return shuffled;
 }
 
-function AccessDenied({ unitId, subject }: { unitId: string, subject: string }) {
+// Season Pass Modal Component - Shows purchase page info
+function SeasonPassModal({ subject, onClose }: { subject: 'macro' | 'micro'; onClose: () => void }) {
+  useEffect(() => {
+    // Allow Escape key to close the modal
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [onClose]);
+
+  const isGreen = subject === 'micro';
+  const config = {
+    badge: subject === 'macro' ? 'AP MACRO SEASON PASS' : 'AP MICRO SEASON PASS',
+    price: 29,
+    features: [
+      { text: 'Full Practice Exams based on 2026 AP ' + (subject === 'macro' ? 'Macro' : 'Micro') + ' CED', key: 'Full Practice Exams' },
+      { text: 'Endless AP-Style MCQ Bank', key: 'Endless' },
+      { text: 'AI-Graded FRQs with Graphing Help', key: 'AI-Graded' },
+      { text: 'Interactive Graphing Simulators', key: 'Interactive Graphing Simulators' },
+      { text: 'Interactive Cheat Sheets + Downloadable PDFs', key: 'Interactive Cheat Sheets' },
+      { text: 'Upload Notes to Create Quizzes', key: 'Upload Notes' },
+    ],
+  };
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 bg-black bg-opacity-75 z-[100] flex items-center justify-center p-4 overflow-y-auto"
+        onClick={(e) => {
+          // Close when clicking outside the modal content
+          if (e.target === e.currentTarget) {
+            onClose();
+          }
+        }}
+      >
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.8, opacity: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+          className="bg-white border-4 border-black rounded-3xl shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] p-8 max-w-xl w-full relative my-8"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
+            aria-label="Close modal"
+          >
+            <X className="w-6 h-6 text-gray-600" />
+          </button>
+
+          <div className="space-y-4">
+            {/* Badge */}
+            <div>
+              <h3 className="text-3xl font-black text-black uppercase tracking-wide">
+                {subject === 'macro' ? 'AP MACRO ' : 'AP MICRO '}
+                <span className={isGreen ? 'text-green-600' : 'text-blue-600'}>SEASON PASS</span>
+              </h3>
+            </div>
+
+            {/* Price Section */}
+            <div className="space-y-1">
+              <p className="text-base font-semibold text-gray-700">
+                One-time payment of
+              </p>
+              <div className="flex items-baseline gap-2">
+                <span className={`text-4xl font-extrabold ${isGreen ? 'text-green-600' : 'text-blue-600'}`}>
+                  ${config.price}
+                </span>
+                <span className="text-base text-gray-400 line-through ml-1">
+                  $39
+                </span>
+              </div>
+              <p className="text-xs text-gray-600 mt-1">
+                Valid until June 30th, 2026
+              </p>
+            </div>
+
+            {/* Star Rating */}
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-0.5">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                ))}
+              </div>
+              <span className="text-xs font-medium text-gray-600">
+                500+ Students Trained
+              </span>
+            </div>
+
+            {/* What's Included */}
+            <div className="space-y-3">
+              <h2 className="text-xl font-bold text-black">
+                What's Included:
+              </h2>
+              <ul className="space-y-2">
+                {config.features.map((benefit, index) => {
+                  const parts = benefit.text.split(benefit.key);
+                  return (
+                    <motion.li
+                      key={index}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      className="flex items-start gap-2"
+                    >
+                      <CheckCircle2 className={`w-5 h-5 flex-shrink-0 mt-0.5 ${isGreen ? 'text-green-600' : 'text-blue-600'}`} />
+                      <span className="text-sm font-semibold text-gray-900">
+                        {parts[0]}
+                        <strong>{benefit.key}</strong>
+                        {parts[1]}
+                      </span>
+                    </motion.li>
+                  );
+                })}
+              </ul>
+            </div>
+
+            {/* CTA Button */}
+            <div className="pt-2">
+              <Link
+                href={`/purchase/season-pass?courseType=${subject}`}
+                className={`block w-full text-white font-extrabold text-lg py-4 px-6 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 uppercase tracking-wide text-center ${
+                  isGreen 
+                    ? 'bg-green-600 hover:bg-green-700' 
+                    : 'bg-blue-600 hover:bg-blue-700'
+                }`}
+                onClick={() => onClose()}
+              >
+                UNLOCK INSTANT ACCESS
+              </Link>
+
+              {/* Trust Elements */}
+              <p className="text-xs text-gray-500 text-center mt-3 flex items-center justify-center gap-1.5">
+                <ShieldCheck className="w-3 h-3 text-gray-400" />
+                100% Money-Back Guarantee
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
+function AccessDenied({ unitId, subject, isCreditLimit = false }: { unitId: string, subject: string, isCreditLimit?: boolean }) {
   const unitData = (subject === 'macro' ? allMacroUnitsData : allMicroUnitsData).find(u => u.number === parseInt(unitId));
   const price = unitData?.price || 4.99;
 
@@ -123,19 +277,34 @@ function AccessDenied({ unitId, subject }: { unitId: string, subject: string }) 
     <div className="min-h-screen flex items-center justify-center bg-gray-50 pt-16 pb-12">
       <div className="bg-white p-8 rounded-lg shadow-md border border-gray-200 max-w-md w-full text-center">
         <Lock className="w-12 h-12 mx-auto text-yellow-500 mb-4" />
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">Purchase Required</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">
+          {isCreditLimit ? 'Daily Limit Reached' : 'Purchase Required'}
+        </h2>
         <p className="text-gray-600 mb-6">
-          You need to purchase this test to access the full set of practice questions.
+          {isCreditLimit 
+            ? 'You\'ve used all 3 free practice questions for today. Your limit will reset tomorrow, or upgrade to unlimited access!'
+            : 'You need to purchase this test to access the full set of practice questions.'}
         </p>
-        <Link 
-          href={`/purchase/mcq-practice?units=${unitId}&total=${price}&subject=${subject}`}
-          className="inline-block"
-        >
-          <Button size="lg" className={`w-full ${subject === 'macro' ? 'bg-blue-500 hover:bg-blue-600' : 'bg-green-500 hover:bg-green-600'}`}>
-            Purchase Unit {unitId} Test
-          </Button>
-        </Link>
-
+        <div className="space-y-3">
+          <Link 
+            href={`/purchase/season-pass?courseType=${subject}`}
+            className="inline-block w-full"
+          >
+            <Button size="lg" className={`w-full ${subject === 'macro' ? 'bg-blue-500 hover:bg-blue-600' : 'bg-green-500 hover:bg-green-600'}`}>
+              Get Unlimited Access
+            </Button>
+          </Link>
+          {!isCreditLimit && (
+            <Link 
+              href={`/purchase/mcq-practice?units=${unitId}&total=${price}&subject=${subject}`}
+              className="inline-block w-full"
+            >
+              <Button size="lg" variant="outline" className="w-full">
+                Purchase Unit {unitId} Test
+              </Button>
+            </Link>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -156,11 +325,46 @@ function UnitMCQPracticeContent() {
     setIsNextQuestionDoubleXp,
     awardXp,
   } = useAuthContext();
-  const { consumeDailyCredit, isPremium } = useCreditSystem();
+  const { consumeDailyCredit, isPremium, getCreditStatus } = useCreditSystem();
   
   // --- Access Control State ---
   const [hasAccess, setHasAccess] = useState(false);
   const [isVerifying, setIsVerifying] = useState(true);
+  const [remainingCredits, setRemainingCredits] = useState<number | null>(null);
+  const [showCreditLimitModal, setShowCreditLimitModal] = useState(false);
+  const [guestQuestionsAnswered, setGuestQuestionsAnswered] = useState(0);
+  const [hasHitCreditLimit, setHasHitCreditLimit] = useState(false);
+  const [hasDismissedCreditModal, setHasDismissedCreditModal] = useState(false);
+  const [showGuestLimitModal, setShowGuestLimitModal] = useState(false);
+  const [hasDismissedGuestModal, setHasDismissedGuestModal] = useState(false);
+
+  // Initialize guest questions answered from localStorage
+  useEffect(() => {
+    if (!user && typeof window !== 'undefined') {
+      const stored = localStorage.getItem('guestQuestionsAnswered');
+      const parsed = stored ? parseInt(stored, 10) : 0;
+      if (!Number.isNaN(parsed)) {
+        setGuestQuestionsAnswered(parsed);
+      }
+    } else if (user) {
+      // Clear guest tracking when user logs in
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('guestQuestionsAnswered');
+      }
+      setGuestQuestionsAnswered(0);
+    }
+  }, [user]);
+
+  // Save guest questions answered to localStorage whenever it changes
+  useEffect(() => {
+    if (!user && typeof window !== 'undefined') {
+      if (guestQuestionsAnswered > 0) {
+        localStorage.setItem('guestQuestionsAnswered', guestQuestionsAnswered.toString());
+      } else {
+        localStorage.removeItem('guestQuestionsAnswered');
+      }
+    }
+  }, [guestQuestionsAnswered, user]);
 
   // Determine Subject and Mode from params
   const subjectParam = searchParams.get('subject');
@@ -374,25 +578,43 @@ function UnitMCQPracticeContent() {
     setIsLoadingQuestionSet(false);
   }, [practiceMode, currentUnit, customUnitIds, weakestUnitIds, lessonIdParam, subject, testQuestionId, isDeveloper, showAllQuestions, user, loadingMcqData]);
 
-  // Access control check
+  // Access control check and credit status
   useEffect(() => {
     if (!user) {
-      setHasAccess(true); // Allow access for non-logged-in users in practice mode
-      setIsVerifying(false);
-      return;
-    }
-
-    // For practice mode, allow access
-    if (practiceMode !== 'singleUnit' || !currentUnitForAccessCheck) {
+      // Non-logged-in users can access but will be limited to 1 question
       setHasAccess(true);
       setIsVerifying(false);
+      setRemainingCredits(null);
       return;
     }
 
-    // All exams are now open - no paywall
+    // Premium users have unlimited access
+    if (isPremium) {
+      setHasAccess(true);
+      setIsVerifying(false);
+      setRemainingCredits(null);
+      return;
+    }
+
+    // For practice mode, check credits
+    const creditStatus = getCreditStatus();
+    const dailyRemaining = creditStatus.dailyPractice.remaining;
+    setRemainingCredits(dailyRemaining);
+    
+    // Check if user has hit their credit limit
+    const hitLimit = dailyRemaining === 0;
+    setHasHitCreditLimit(hitLimit);
+    
+    // Show modal if they've hit the limit and haven't dismissed it yet
+    if (hitLimit && !showCreditLimitModal && !hasDismissedCreditModal) {
+      setShowCreditLimitModal(true);
+    }
+    
+    // Always allow access - credit limit is handled by modal overlay, not by blocking access
+    // This ensures the question is visible behind the modal
     setHasAccess(true);
     setIsVerifying(false);
-  }, [user, userData, currentUnitForAccessCheck, practiceMode]);
+  }, [user, userData, isPremium, getCreditStatus, currentUnitForAccessCheck, practiceMode, showCreditLimitModal, hasDismissedCreditModal]);
 
   // Show banner after 3 questions answered (unless dismissed)
   useEffect(() => {
@@ -429,7 +651,10 @@ function UnitMCQPracticeContent() {
     }
 
     if (!user) {
-      setShowLoginModal(true);
+      // Show season pass modal for guest users trying to access test mode
+      if (!hasDismissedGuestModal) {
+        setShowGuestLimitModal(true);
+      }
       return;
     }
 
@@ -451,14 +676,47 @@ function UnitMCQPracticeContent() {
   const handleAnswer = async (questionId: number, answerLetter: string, isCorrect: boolean, lessonIDS: string[]) => {
     logger.debug('[UnitMCQ] handleAnswer called:', { questionId, answerLetter, isCorrect, hasAwardXp: !!awardXp });
     
-    // Consume daily credit on first answer (if not premium and not already consumed)
-    if (user && !isPremium && !hasConsumedDailyCredit && Object.keys(answeredQuestions).length === 0) {
+    // Check if this is a new question (not already answered)
+    const isNewQuestion = !answeredQuestions[questionId];
+    
+    // Handle non-logged-in users: limit to 1 question
+    if (!user && isNewQuestion) {
+      // Block if they've already answered 1 question
+      if (guestQuestionsAnswered >= 1) {
+        // Show season pass modal instead of login modal
+        if (!hasDismissedGuestModal) {
+          setShowGuestLimitModal(true);
+        }
+        return; // Don't process the answer
+      }
+      
+      // This is their first question - allow it and increment counter
+      setGuestQuestionsAnswered(1);
+      // Show season pass modal after they answer (but let this answer go through)
+      setTimeout(() => {
+        if (!hasDismissedGuestModal) {
+          setShowGuestLimitModal(true);
+        }
+      }, 500); // Small delay so they can see their answer was recorded
+    }
+    
+    // Consume daily credit on each new answer (if logged in and not premium)
+    if (user && !isPremium && isNewQuestion) {
       const creditResult = await consumeDailyCredit();
       if (creditResult.success) {
-        setHasConsumedDailyCredit(true);
+        // Update remaining credits
+        if (creditResult.remaining !== undefined) {
+          setRemainingCredits(creditResult.remaining);
+        }
       } else {
-        // No credits remaining - could show a message or redirect
-        console.warn('[UnitMCQ] No daily credits remaining');
+        // No credits remaining - show modal and prevent further answers
+        // Only show modal if they haven't dismissed it yet
+        if (!hasDismissedCreditModal) {
+          setShowCreditLimitModal(true);
+        }
+        setRemainingCredits(0);
+        setHasHitCreditLimit(true);
+        return; // Don't process the answer if they've hit the limit
       }
     }
     
@@ -552,6 +810,12 @@ function UnitMCQPracticeContent() {
   const handleAuthSuccess = () => {
     setShowLoginModal(false);
     setShowSignupModal(false);
+    // Reset guest question count when user logs in
+    setGuestQuestionsAnswered(0);
+    // Clear localStorage tracking
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('guestQuestionsAnswered');
+    }
   };
 
   if (isVerifying) {
@@ -563,7 +827,9 @@ function UnitMCQPracticeContent() {
   }
 
   if (!hasAccess) {
-    return <AccessDenied unitId={currentUnitForAccessCheck} subject={subject} />;
+    // AccessDenied is only for purchase-required scenarios
+    // Credit limit is handled by the modal overlay, not this component
+    return <AccessDenied unitId={currentUnitForAccessCheck} subject={subject} isCreditLimit={false} />;
   }
 
   return (
@@ -586,6 +852,26 @@ function UnitMCQPracticeContent() {
         }}
         onAuthSuccess={handleAuthSuccess}
       />
+      {/* Season Pass Modal for Logged-in Users */}
+      {showCreditLimitModal && (
+        <SeasonPassModal
+          subject={subject}
+          onClose={() => {
+            setShowCreditLimitModal(false);
+            setHasDismissedCreditModal(true);
+          }}
+        />
+      )}
+      {/* Season Pass Modal for Guest Users */}
+      {showGuestLimitModal && (
+        <SeasonPassModal
+          subject={subject}
+          onClose={() => {
+            setShowGuestLimitModal(false);
+            setHasDismissedGuestModal(true);
+          }}
+        />
+      )}
       <div className="min-h-screen bg-gray-50 overflow-hidden">
         {/* Sticky Practice Test Banner - Fixed to bottom of header */}
         <div 
@@ -693,6 +979,25 @@ function UnitMCQPracticeContent() {
               isParentModalOpen={showLoginModal || showSignupModal}
               hasTestModeAccess={hasTestModeAccess}
               onEnterTestMode={handleEnterTestMode}
+              isAnswerDisabled={
+                (!user && guestQuestionsAnswered >= 1) || 
+                (user && !isPremium && hasHitCreditLimit)
+              }
+              onLoginPrompt={() => {
+                if (!user) {
+                  if (!hasDismissedGuestModal) {
+                    setShowGuestLimitModal(true);
+                  }
+                } else if (!isPremium && remainingCredits === 0) {
+                  if (!hasDismissedCreditModal) {
+                    setShowCreditLimitModal(true);
+                  }
+                }
+              }}
+              isNavigationDisabled={
+                (!user && guestQuestionsAnswered >= 1) ||
+                (user && !isPremium && hasHitCreditLimit)
+              }
             />
           )}
         </div>

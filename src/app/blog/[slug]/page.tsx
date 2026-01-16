@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, Clock } from 'lucide-react';
 import { blogPosts } from '@/data/blogPosts';
@@ -7,7 +8,7 @@ import { calculateReadingTime } from '@/utils/readingTime';
 import { GraphExplanationPost as GraphExplanationPostComponent } from '@/components/GraphExplanationPost';
 import { GraphExplanationPost as GraphExplanationPostType } from '@/types/blogPost';
 import { graphExplanationPosts } from '@/data/graphExplanationPosts';
-import { getSlugFromSeoUrl } from '@/utils/blogUrls';
+import { getSlugFromSeoUrl, generateSeoUrl } from '@/utils/blogUrls';
 
 interface BlogPostPageProps {
   params: Promise<{
@@ -40,6 +41,106 @@ async function getGraphExplanationPost(slug: string): Promise<GraphExplanationPo
   return graphExplanationPosts[slug] || null;
 }
 
+// Helper function to get post data for metadata
+async function getPostData(slug: string) {
+  const slugToDataMap = new Map<string, { subject: string; unit: number }>();
+  
+  Object.values(blogPosts).forEach(post => {
+    slugToDataMap.set(post.slug, { subject: post.subject, unit: post.unit });
+  });
+  
+  Object.values(graphExplanationPosts).forEach(post => {
+    const matchingRegularPost = blogPosts[post.slug];
+    const unit = matchingRegularPost?.unit || 0;
+    slugToDataMap.set(post.slug, { subject: post.subject, unit });
+  });
+  
+  const originalSlug = getSlugFromSeoUrl(slug, slugToDataMap);
+  const finalSlug = originalSlug || slug;
+  
+  const graphPost = graphExplanationPosts[finalSlug];
+  const regularPost = blogPosts[finalSlug];
+  
+  return { graphPost, regularPost, finalSlug, slugToDataMap };
+}
+
+export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
+  const { slug: seoSlug } = await params;
+  const { graphPost, regularPost, finalSlug, slugToDataMap } = await getPostData(seoSlug);
+  
+  if (!graphPost && !regularPost) {
+    return {
+      title: 'Blog Post Not Found | AP Dojo',
+      description: 'The requested blog post could not be found.',
+    };
+  }
+  
+  const post = graphPost || regularPost;
+  const isGraphPost = !!graphPost;
+  
+  // Get subject and unit for URL generation
+  const data = slugToDataMap.get(finalSlug);
+  const subject = data?.subject || (graphPost?.subject === 'macro' ? 'Macro' : 'Micro') || 'Macro';
+  const unit = data?.unit || 0;
+  const seoUrl = generateSeoUrl(finalSlug, subject, unit);
+  
+  const title = isGraphPost 
+    ? `${graphPost.headline} | AP Dojo`
+    : `${regularPost.title} | AP Dojo`;
+  
+  const description = post.seoSnippet || 
+    (isGraphPost ? graphPost.intro : regularPost.description) ||
+    `Learn about ${isGraphPost ? graphPost.headline : regularPost.title} for AP ${subject} Economics.`;
+  
+  const subjectFull = subject === 'Macro' ? 'Macroeconomics' : 'Microeconomics';
+  const keywords = [
+    `AP ${subjectFull}`,
+    `AP ${subject}`,
+    isGraphPost ? 'graph explanation' : 'blog post',
+    isGraphPost ? graphPost.headline : regularPost.title,
+    `AP ${subject} Unit ${unit}`,
+    'AP economics',
+    'AP exam prep',
+    'AP economics study guide',
+  ].join(', ');
+  
+  const url = `https://apdojo.com/blog/${seoUrl}`;
+  const imageUrl = isGraphPost 
+    ? graphPost.visual?.imageUrl || 'https://apdojo.com/images/og-default.jpg'
+    : regularPost.thumbnailUrl || 'https://apdojo.com/images/og-default.jpg';
+  
+  return {
+    title,
+    description,
+    keywords,
+    authors: [{ name: 'AP Dojo' }],
+    openGraph: {
+      title,
+      description,
+      type: 'article',
+      url,
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: isGraphPost ? graphPost.visual?.alt || graphPost.headline : regularPost.title,
+        },
+      ],
+      siteName: 'AP Dojo',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [imageUrl],
+    },
+    alternates: {
+      canonical: url,
+    },
+  };
+}
+
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug: seoSlug } = await params;
   
@@ -68,20 +169,63 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const graphPost = await getGraphExplanationPost(slug);
   
   if (graphPost) {
+    // Get data for structured data
+    const data = slugToDataMap.get(slug);
+    const subject = data?.subject || (graphPost.subject === 'macro' ? 'Macro' : 'Micro');
+    const unit = data?.unit || 0;
+    const seoUrl = generateSeoUrl(slug, subject, unit);
+    const url = `https://apdojo.com/blog/${seoUrl}`;
+    
+    // Structured data for SEO
+    const structuredData = {
+      '@context': 'https://schema.org',
+      '@type': 'BlogPosting',
+      headline: graphPost.headline,
+      description: graphPost.seoSnippet || graphPost.intro,
+      image: graphPost.visual?.imageUrl,
+      datePublished: new Date().toISOString(),
+      author: {
+        '@type': 'Organization',
+        name: 'AP Dojo',
+      },
+      publisher: {
+        '@type': 'Organization',
+        name: 'AP Dojo',
+        logo: {
+          '@type': 'ImageObject',
+          url: 'https://apdojo.com/images/logo.png',
+        },
+      },
+      mainEntityOfPage: {
+        '@type': 'WebPage',
+        '@id': url,
+      },
+      about: {
+        '@type': 'Thing',
+        name: `AP ${subject} Graph Explanation`,
+      },
+    };
+    
     // Render as Graph Explanation Post
     return (
-      <div className="bg-gray-50 min-h-screen">
-        <div className="max-w-4xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-          <Link 
-            href="/ap-blog-home" 
-            className="inline-flex items-center text-black hover:text-gray-700 mb-8 group font-bold"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" />
-            Back to Blog
-          </Link>
-          <GraphExplanationPostComponent post={graphPost} />
+      <>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+        <div className="bg-gray-50 min-h-screen">
+          <div className="max-w-4xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+            <Link 
+              href="/ap-blog-home" 
+              className="inline-flex items-center text-black hover:text-gray-700 mb-8 group font-bold"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" />
+              Back to Blog
+            </Link>
+            <GraphExplanationPostComponent post={graphPost} />
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
@@ -93,16 +237,58 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   }
 
   const readingTime = calculateReadingTime(post.content);
+  
+  // Get data for structured data
+  const data = slugToDataMap.get(slug);
+  const subject = data?.subject || post.subject;
+  const unit = data?.unit || post.unit;
+  const seoUrl = generateSeoUrl(slug, subject, unit);
+  const url = `https://apdojo.com/blog/${seoUrl}`;
+  
+  // Structured data for SEO
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: post.title,
+    description: post.seoSnippet || post.description,
+    image: post.thumbnailUrl,
+    datePublished: new Date().toISOString(), // You may want to add actual publish dates
+    author: {
+      '@type': 'Organization',
+      name: 'AP Dojo',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'AP Dojo',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://apdojo.com/images/logo.png',
+      },
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': url,
+    },
+    about: {
+      '@type': 'Thing',
+      name: `AP ${subject} Unit ${unit}`,
+    },
+  };
 
   return (
-    <div className="bg-gray-50 min-h-screen">
-      <div className="max-w-4xl mx-auto px-4 py-12">
-          <Link href="/" className="inline-flex items-center text-blue-600 hover:text-blue-700 mb-8 group">
-            <ArrowLeft className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" />
-            Back to Home
-          </Link>
-        
-        <article className="bg-white p-8 sm:p-12 rounded-xl shadow-md border border-gray-200">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <div className="bg-gray-50 min-h-screen">
+        <div className="max-w-4xl mx-auto px-4 py-12">
+            <Link href="/ap-blog-home" className="inline-flex items-center text-blue-600 hover:text-blue-700 mb-8 group">
+              <ArrowLeft className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" />
+              Back to Blog
+            </Link>
+          
+          <article className="bg-white p-8 sm:p-12 rounded-xl shadow-md border border-gray-200">
             {/* Header */}
           <header className="mb-8 border-b pb-6 text-center">
             <h1 className="text-5xl sm:text-6xl font-extrabold text-gray-900 leading-tight mb-4">
@@ -142,8 +328,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             videoUrl={post.videoUrl || null}
             />
           </article>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

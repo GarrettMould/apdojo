@@ -84,7 +84,7 @@ export function useCreditSystem() {
    * Consume a daily practice credit
    * 
    * Logic:
-   * 1. Lazy Reset: Compare server date vs lastResetDate. If different, reset to 5.
+   * 1. Lazy Reset: Compare server date vs lastResetDate. If different, reset to 3.
    * 2. Premium Check: If user is premium, return success without deduction.
    * 3. Deduction: If remaining > 0, decrement by 1 and update Firestore.
    * 4. Return: success: true/false with remaining count.
@@ -112,7 +112,7 @@ export function useCreditSystem() {
 
         // Initialize credits if they don't exist
         let credits = currentData.credits || {
-          dailyPractice: { remaining: 5, lastResetDate: today },
+          dailyPractice: { remaining: 3, lastResetDate: today },
           lifetimeAiGenerations: 1,
         };
 
@@ -270,7 +270,7 @@ export function useCreditSystem() {
             ...prev,
             credits: {
               ...(prev.credits || {
-                dailyPractice: { remaining: 5, lastResetDate: getTodayDateString() },
+                dailyPractice: { remaining: 3, lastResetDate: getTodayDateString() },
                 lifetimeAiGenerations: 1,
               }),
               lifetimeAiGenerations: result.remaining!,
@@ -302,7 +302,7 @@ export function useCreditSystem() {
 
     const today = getTodayDateString();
     const credits = userData.credits || {
-      dailyPractice: { remaining: 5, lastResetDate: today },
+      dailyPractice: { remaining: 3, lastResetDate: today },
       lifetimeAiGenerations: 1,
     };
 
