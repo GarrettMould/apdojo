@@ -57,6 +57,13 @@ export function Footer() {
               </Link>
 
               <Link 
+                href="/ap-blog-home" 
+                className="text-sm text-gray-500 hover:text-blue-600 transition-colors"
+              >
+                Blog
+              </Link>
+
+              <Link 
                 href="/feedback" 
                 className="text-sm text-gray-500 hover:text-blue-600 transition-colors"
               >

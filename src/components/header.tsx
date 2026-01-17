@@ -17,8 +17,10 @@ export function Header() {
   const { user, logout, selectedSubject, setSelectedSubject, totalXP, guestXp, isCharacterClosetOpen, setIsCharacterClosetOpen, userData } = useAuthContext();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isBeltDropdownOpen, setIsBeltDropdownOpen] = useState(false);
+  const [isPracticeDropdownOpen, setIsPracticeDropdownOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const beltDropdownRef = useRef<HTMLDivElement>(null);
+  const practiceDropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -95,6 +97,23 @@ export function Header() {
     };
   }, [isBeltDropdownOpen]);
 
+  // Close practice dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (practiceDropdownRef.current && !practiceDropdownRef.current.contains(event.target as Node)) {
+        setIsPracticeDropdownOpen(false);
+      }
+    };
+
+    if (isPracticeDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isPracticeDropdownOpen]);
+
   return (
     <header className="bg-white sticky top-0 z-50 shadow-md">
       <div className="px-4 sm:px-8 lg:px-12">
@@ -118,53 +137,68 @@ export function Header() {
           {/* Desktop Navigation, XP, and Auth Buttons */}
           <div className="hidden lg:flex items-center gap-x-8">
             <nav className="flex items-center space-x-8">
-              <Link
-                href="/unit-final-practice-tests"
-                className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
+              {/* Practice Dropdown */}
+              <div 
+                className="relative"
+                ref={practiceDropdownRef}
+                onMouseEnter={() => setIsPracticeDropdownOpen(true)}
+                onMouseLeave={() => setIsPracticeDropdownOpen(false)}
               >
-                Full Practice Tests
-              </Link>
+                <button className="flex items-center gap-1 text-gray-700 hover:text-blue-600 transition-colors font-semibold">
+                  Practice
+                  <ChevronDown className={`w-4 h-4 transition-transform ${isPracticeDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+                
+                {isPracticeDropdownOpen && (
+                  <div className="absolute top-full left-0 mt-2 w-56 z-50">
+                    <div className="bg-white rounded-lg shadow-lg border border-gray-200 py-2">
+                      <Link
+                        href="/unit-final-practice-tests"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                        onClick={() => setIsPracticeDropdownOpen(false)}
+                      >
+                        Full Practice Tests
+                      </Link>
+                      <Link
+                        href="/select-practice-units"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                        onClick={() => setIsPracticeDropdownOpen(false)}
+                      >
+                        MCQ / FRQ Modes
+                      </Link>
+                      <Link
+                        href="/dojo/infinite"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                        onClick={() => setIsPracticeDropdownOpen(false)}
+                      >
+                        Create a Quiz
+                      </Link>
+                      <Link
+                        href="/dojo-drills"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                        onClick={() => setIsPracticeDropdownOpen(false)}
+                      >
+                        Dojo Drills
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Graph Gym - Distinct styling */}
               <Link
-                href="/select-practice-units"
-                className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
+                href="/graph-gym"
+                className="text-blue-500 hover:text-blue-600 transition-colors font-semibold"
               >
-                MCQ Practice
+                Graph Gym
               </Link>
-              <Link
-                href={`/unitFRQpracticePage?subject=${displaySubject}&frqId=${displaySubject === 'macro' ? 1 : 2}`}
-                className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
-              >
-                FRQ Practice
-              </Link>
+
+              {/* Cheat Sheets */}
               <Link
                 href={displaySubject === 'macro' ? '/ap-macro-unit-1-cheat-sheet' : '/ap-micro-unit-1-cheat-sheet'}
                 className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
               >
-                Unit Cheat Sheets
-              </Link>
-              <Link
-                href="/graph-gym"
-                className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
-              >
-                Graph Gym
-              </Link>
-              <Link
-                href="/dojo-drills"
-                className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
-              >
-                Dojo Drills
-              </Link>
-              <Link
-                href="/ap-blog-home"
-                className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
-              >
-                Blog
-              </Link>
-              <Link
-                href="/dojo/infinite"
-                className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
-              >
-                Create a Quiz
+                Cheat Sheets
               </Link>
 
               {/* Tutoring Dropdown - HIDDEN */}
@@ -332,7 +366,7 @@ export function Header() {
                               </div>
                               
                               {/* XP to Go */}
-                              <div className="text-center">
+                              <div className="text-center mb-4">
                                 {xpToNext !== null ? (
                                   <p className="text-sm font-bold text-gray-900">
                                     {xpToNext.toLocaleString()} XP to go
@@ -343,6 +377,35 @@ export function Header() {
                                   </p>
                                 )}
                               </div>
+
+                              {/* Tutor View Toggle and Logout (inside dropdown) */}
+                              {isTeacher && (
+                                <div className="border-t border-gray-200 pt-3 mt-3">
+                                  <button
+                                    onClick={() => {
+                                      handleViewModeToggle();
+                                      setIsBeltDropdownOpen(false);
+                                    }}
+                                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors rounded-md"
+                                  >
+                                    {viewMode === 'tutor' ? 'Student View' : 'Tutor View'}
+                                  </button>
+                                </div>
+                              )}
+
+                              {user && (
+                                <div className="border-t border-gray-200 pt-3 mt-3">
+                                  <button
+                                    onClick={() => {
+                                      handleLogout();
+                                      setIsBeltDropdownOpen(false);
+                                    }}
+                                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors rounded-md font-medium"
+                                  >
+                                    Logout
+                                  </button>
+                                </div>
+                              )}
                             </div>
                           </div>
                         );
@@ -352,23 +415,7 @@ export function Header() {
                 })()}
               </div>
 
-              {/* Teacher View Mode Toggle */}
-              {isTeacher && (
-                <button
-                  onClick={handleViewModeToggle}
-                  className="text-sm font-semibold text-gray-700 hover:text-blue-600 transition-colors px-3 py-1.5 rounded-md hover:bg-gray-50"
-                >
-                  {viewMode === 'tutor' ? 'Student View' : 'Tutor View'}
-                </button>
-              )}
-
-              {user ? (
-                <div className="flex items-center gap-2">
-                  <Button onClick={handleLogout} variant="outline" size="sm">
-                    Logout
-                  </Button>
-                </div>
-              ) : (
+              {!user && (
                 <div className="flex items-center gap-2">
                   <Link href="/login" passHref>
                     <Button variant="outline" size="sm">
@@ -400,62 +447,56 @@ export function Header() {
         {isMobileMenuOpen && (
           <div className="lg:hidden border-t border-gray-200 bg-white">
             <nav className="flex flex-col py-4">
+              {/* Practice Section Header */}
+              <div className="px-4 py-2 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                Practice
+              </div>
               <Link
                 href="/unit-final-practice-tests"
                 onClick={closeMobileMenu}
-                className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
+                className="px-6 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
               >
                 Full Practice Tests
               </Link>
               <Link
                 href="/select-practice-units"
                 onClick={closeMobileMenu}
-                className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
+                className="px-6 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
               >
-                MCQ Practice
-              </Link>
-              <Link
-                href={`/unitFRQpracticePage?subject=${displaySubject}&frqId=${displaySubject === 'macro' ? 1 : 2}`}
-                onClick={closeMobileMenu}
-                className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
-              >
-                FRQ Practice
-              </Link>
-              <Link
-                href={displaySubject === 'macro' ? '/ap-macro-unit-1-cheat-sheet' : '/ap-micro-unit-1-cheat-sheet'}
-                onClick={closeMobileMenu}
-                className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
-              >
-                Unit Cheat Sheets
-              </Link>
-              <Link
-                href="/graph-gym"
-                onClick={closeMobileMenu}
-                className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
-              >
-                Graph Gym
-              </Link>
-              <Link
-                href="/dojo-drills"
-                onClick={closeMobileMenu}
-                className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
-              >
-                Dojo Drills
-              </Link>
-              <Link
-                href="/ap-blog-home"
-                onClick={closeMobileMenu}
-                className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
-              >
-                Blog
+                MCQ / FRQ Modes
               </Link>
               <Link
                 href="/dojo/infinite"
                 onClick={closeMobileMenu}
-                className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
+                className="px-6 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
               >
                 Create a Quiz
               </Link>
+              <Link
+                href="/dojo-drills"
+                onClick={closeMobileMenu}
+                className="px-6 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
+              >
+                Dojo Drills
+              </Link>
+
+              {/* Other Links */}
+              <div className="border-t border-gray-200 mt-2 pt-2">
+                <Link
+                  href="/graph-gym"
+                  onClick={closeMobileMenu}
+                  className="px-4 py-2 text-blue-500 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
+                >
+                  Graph Gym
+                </Link>
+                <Link
+                  href={displaySubject === 'macro' ? '/ap-macro-unit-1-cheat-sheet' : '/ap-micro-unit-1-cheat-sheet'}
+                  onClick={closeMobileMenu}
+                  className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
+                >
+                  Cheat Sheets
+                </Link>
+              </div>
 
                 {/* Tutoring Dropdown (Mobile) - HIDDEN */}
                 {/* <div className="px-4 py-2">
@@ -598,9 +639,9 @@ export function Header() {
                     </div>
                   </div>
                   
-                  {/* Teacher View Mode Toggle (Mobile) */}
+                  {/* Tutor View Toggle and Logout (inside XP section on mobile) */}
                   {isTeacher && (
-                    <div className="px-4 pt-4">
+                    <div className="px-4 pt-2 border-t border-gray-200 mt-3">
                       <button
                         onClick={() => {
                           handleViewModeToggle();
@@ -613,14 +654,22 @@ export function Header() {
                     </div>
                   )}
 
-                  {user ? (
-                    <>
-                      <div className="px-4 py-2">
-                        <Button onClick={handleLogout} variant="outline" className="w-full">Logout</Button>
-                      </div>
-                    </>
-                  ) : (
-                    <div className="px-4 pt-4 space-y-2">
+                  {user && (
+                    <div className="px-4 pt-2 border-t border-gray-200 mt-3">
+                      <button
+                        onClick={() => {
+                          handleLogout();
+                          closeMobileMenu();
+                        }}
+                        className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 transition-colors font-semibold rounded-md"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  )}
+
+                  {!user && (
+                    <div className="px-4 pt-4 space-y-2 border-t border-gray-200 mt-3">
                       <Link href="/login" passHref>
                         <Button onClick={closeMobileMenu} variant="outline" className="w-full">Login</Button>
                       </Link>
