@@ -14,6 +14,18 @@ export default function cloudinaryLoader({ src, width, quality }: { src: string;
 
   // CHECK: If image is already on Cloudinary, don't touch it
   if (src.includes('res.cloudinary.com')) return src;
+  
+  // CHECK: If image is a local path (starts with /images/ or any local path), return as-is
+  // Next.js will handle local images natively when custom loader returns them unchanged
+  if (src.startsWith('/images/') || (src.startsWith('/') && !src.startsWith('//'))) {
+    return src;
+  }
+  
+  // CHECK: If image is from other remote domains (not S3), return as-is
+  // Only process S3 URLs through Cloudinary
+  if (src.startsWith('http') && !src.includes('apdojowhiteboards.s3') && !src.includes('apdojovideos.s3')) {
+    return src;
+  }
 
   // CLEANUP: Remove the AWS domain if it exists in the src
   // This turns "https://apdojowhiteboards.../users/avatar.jpg" into just "users/avatar.jpg"
