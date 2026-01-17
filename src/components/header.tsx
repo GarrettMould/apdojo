@@ -150,8 +150,10 @@ export function Header() {
                 </button>
                 
                 {isPracticeDropdownOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-56 z-50">
-                    <div className="bg-white rounded-lg shadow-lg border border-gray-200 py-2">
+                  <div className="absolute top-full left-0 w-56 z-50">
+                    {/* Invisible bridge area to prevent gap - extends upward to connect with button */}
+                    <div className="h-2 -mt-2 w-full pointer-events-auto"></div>
+                    <div className="bg-white rounded-lg shadow-lg border border-gray-200 py-2 pointer-events-auto">
                       <Link
                         href="/unit-final-practice-tests"
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
@@ -164,7 +166,14 @@ export function Header() {
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
                         onClick={() => setIsPracticeDropdownOpen(false)}
                       >
-                        MCQ / FRQ Modes
+                        MCQ Practice
+                      </Link>
+                      <Link
+                        href={`/unitFRQpracticePage?subject=${displaySubject}&frqId=${displaySubject === 'macro' ? 1 : 2}`}
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                        onClick={() => setIsPracticeDropdownOpen(false)}
+                      >
+                        FRQ Practice
                       </Link>
                       <Link
                         href="/dojo/infinite"
@@ -463,7 +472,14 @@ export function Header() {
                 onClick={closeMobileMenu}
                 className="px-6 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
               >
-                MCQ / FRQ Modes
+                MCQ Practice
+              </Link>
+              <Link
+                href={`/unitFRQpracticePage?subject=${displaySubject}&frqId=${displaySubject === 'macro' ? 1 : 2}`}
+                onClick={closeMobileMenu}
+                className="px-6 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
+              >
+                FRQ Practice
               </Link>
               <Link
                 href="/dojo/infinite"
