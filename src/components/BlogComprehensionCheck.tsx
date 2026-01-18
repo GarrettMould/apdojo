@@ -8,9 +8,10 @@ import { CheckCircle2, XCircle } from 'lucide-react';
 
 interface BlogComprehensionCheckProps {
   question: Question;
+  footer?: React.ReactNode;
 }
 
-export function BlogComprehensionCheck({ question }: BlogComprehensionCheckProps) {
+export function BlogComprehensionCheck({ question, footer }: BlogComprehensionCheckProps) {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
 
@@ -24,9 +25,9 @@ export function BlogComprehensionCheck({ question }: BlogComprehensionCheckProps
   const showResult = selectedAnswer !== null;
 
   return (
-    <div className="bg-white border-2 border-gray-300 rounded-lg p-8 shadow-md">
-      <h3 className="text-2xl font-bold text-gray-900 mb-6">Comprehension Check</h3>
-      <p className="text-lg font-medium text-gray-800 mb-6 leading-relaxed">
+    <div className="my-8 p-6 bg-slate-50 border border-slate-200 rounded-lg shadow-sm">
+      <h3 className="text-2xl font-bold text-slate-900 mb-3">Comprehension Check</h3>
+      <p className="text-slate-700 mb-6 leading-relaxed">
         {question.question}
       </p>
       
@@ -43,22 +44,22 @@ export function BlogComprehensionCheck({ question }: BlogComprehensionCheckProps
         </div>
       )}
       
-      <div className="space-y-2 mb-6">
+      <div className="space-y-3 mb-6">
         {question.options.map((option, index) => {
           const optionLetter = String.fromCharCode(65 + index);
           const isCorrectAnswer = optionLetter === question.correctAnswer;
           const isSelected = selectedAnswer === optionLetter;
           
           // Determine styling based on state (matching Quiz Me)
-          let optionStyle = 'bg-white border-gray-300';
+          let optionStyle = 'bg-white border-slate-200';
           if (showResult) {
             if (isCorrectAnswer) {
-              optionStyle = 'bg-green-50 border-green-500';
+              optionStyle = 'bg-green-50 border-green-200';
             } else if (isSelected && !isCorrectAnswer) {
-              optionStyle = 'bg-red-50 border-red-500';
+              optionStyle = 'bg-red-50 border-red-200';
             }
           } else if (isSelected) {
-            optionStyle = 'bg-blue-50 border-blue-500';
+            optionStyle = 'bg-blue-50 border-blue-200';
           }
           
           return (
@@ -67,7 +68,7 @@ export function BlogComprehensionCheck({ question }: BlogComprehensionCheckProps
               initial={false}
               animate={showResult && isCorrectAnswer ? { scale: [1, 1.05, 1] } : {}}
               transition={{ duration: 0.3 }}
-              className={`p-3 rounded-lg border-2 transition-colors ${optionStyle} ${
+              className={`p-4 rounded-lg border shadow-sm transition-colors ${optionStyle} ${
                 !showResult ? 'cursor-pointer hover:bg-blue-50 hover:border-blue-300' : ''
               }`}
               onClick={!showResult ? () => handleAnswerSelect(optionLetter) : undefined}
@@ -84,7 +85,7 @@ export function BlogComprehensionCheck({ question }: BlogComprehensionCheckProps
                       className="w-5 h-5 text-blue-600 flex-shrink-0"
                       onClick={(e) => e.stopPropagation()}
                     />
-                    <span className="flex-1 text-gray-900">{option}</span>
+                    <span className="flex-1 text-slate-900">{option}</span>
                   </>
                 ) : (
                   <>
@@ -94,12 +95,12 @@ export function BlogComprehensionCheck({ question }: BlogComprehensionCheckProps
                           ? 'bg-green-500 text-white'
                           : isSelected && !isCorrectAnswer
                           ? 'bg-red-500 text-white'
-                          : 'bg-gray-200 text-gray-700'
+                          : 'bg-slate-200 text-slate-700'
                       }`}
                     >
                       {optionLetter}
                     </span>
-                    <span className="flex-1 text-gray-900">{option}</span>
+                    <span className="flex-1 text-slate-900">{option}</span>
                     {isCorrectAnswer && (
                       <CheckCircle2 className="w-6 h-6 text-green-600 flex-shrink-0" />
                     )}
@@ -115,10 +116,16 @@ export function BlogComprehensionCheck({ question }: BlogComprehensionCheckProps
       </div>
       
       {showExplanation && question.explanation && (
-        <div className="mt-6 p-4 bg-blue-50 border-l-4 border-blue-400 rounded">
-          <p className="text-gray-800 leading-relaxed">
+        <div className="mt-6 p-5 bg-green-50 border border-green-200 rounded-lg">
+          <p className="text-slate-800 leading-relaxed">
             <strong>Explanation:</strong> {question.explanation}
           </p>
+        </div>
+      )}
+
+      {footer && (
+        <div className="mt-6 pt-4 border-t border-slate-200">
+          {footer}
         </div>
       )}
     </div>

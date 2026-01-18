@@ -282,51 +282,53 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
       <div className="bg-gray-50 min-h-screen">
-        <div className="max-w-4xl mx-auto px-4 py-12">
-            <Link href="/ap-blog-home" className="inline-flex items-center text-blue-600 hover:text-blue-700 mb-8 group">
-              <ArrowLeft className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" />
-              Back to Blog
-            </Link>
-          
-          <article className="bg-white p-8 sm:p-12 rounded-xl shadow-md border border-gray-200">
-            {/* Header */}
-          <header className="mb-8 border-b pb-6 text-center">
-            <h1 className="text-5xl sm:text-6xl font-extrabold text-gray-900 leading-tight mb-4">
+        <div className="max-w-4xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+          <Link
+            href="/ap-blog-home"
+            className="inline-flex items-center text-black hover:text-gray-700 mb-8 group font-bold"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" />
+            Back to Blog
+          </Link>
+
+          <article>
+            {/* Hero Section (match GraphExplanationPost layout) */}
+            <section className="mb-12">
+              <h2 className="text-2xl sm:text-3xl font-black text-black mb-4 leading-tight relative inline-block">
+                <span className="relative z-10">
+                  {post.subject === 'Macro' ? 'AP Macroeconomics' : 'AP Microeconomics'}
+                </span>
+                <span
+                  className="absolute bottom-1 left-0 right-0 h-4 bg-yellow-300 -z-0"
+                  style={{ transform: 'skew(-12deg)' }}
+                />
+              </h2>
+
+              <h1 className="text-5xl sm:text-6xl md:text-7xl font-black text-black mb-6 leading-tight">
                 {post.title}
               </h1>
-            {/* SEO Snippet - After H1 headline */}
-            {post.seoSnippet && (
-              <div className="bg-gray-50 border-l-4 border-blue-500 rounded-r-lg px-6 py-4 mb-4">
-                <p className="text-lg text-gray-700 leading-relaxed text-center font-bold">
-                  {post.seoSnippet}
-                </p>
-              </div>
-            )}
-              
-            <div className="flex items-center justify-center gap-6">
-              <div className={`inline-block text-xs font-semibold px-2.5 py-1 rounded-md ${
-                post.subject === 'Macro' 
-                  ? 'bg-blue-100 text-blue-800' 
-                  : 'bg-green-100 text-green-800'
-              }`}>
-                  {post.subject} - Unit {post.unit}
-                </div>
-                <div className="flex items-center text-sm text-gray-500">
-                  <Clock className="w-4 h-4 mr-1.5" />
-                  <span>{readingTime} min read</span>
-                </div>
-              </div>
 
-            </header>
+              {post.seoSnippet && (
+                <div className="bg-gray-50 border-l-4 border-yellow-400 rounded-r-lg px-6 py-4 mb-6">
+                  <p className="text-lg text-gray-700 leading-relaxed text-center font-bold">{post.seoSnippet}</p>
+                </div>
+              )}
+            </section>
 
             {/* Post Content */}
-            <BlogPostClient 
-              content={post.content}
-            subject={post.subject === 'Macro' ? 'ap_macroeconomics' : 'ap_microeconomics'}
-              practiceUrl="/unitFRQpracticePage"
-            images={post.images || []}
-            videoUrl={post.videoUrl || null}
-            />
+            <section className="mb-12">
+              <BlogPostClient
+                content={post.content}
+                subject={post.subject === 'Macro' ? 'ap_macroeconomics' : 'ap_microeconomics'}
+                unit={post.unit}
+                practiceUrl="/unitFRQpracticePage"
+                images={post.images || []}
+                videoUrl={post.videoUrl || null}
+                graphGymScenarioId={post.graphGymScenarioId}
+                graphGymPrompt={post.graphGymPrompt}
+                practiceQuestionIds={post.practiceQuestionIds}
+              />
+            </section>
           </article>
         </div>
       </div>

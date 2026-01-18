@@ -18,6 +18,9 @@ export type BlogPost = {
   linkedFRQ?: number; // ID of the related FRQ question to link to
   images?: string[]; // Array of image URLs for the blog post
   practiceQuestionId?: number; // ID of a practice question from unitPracticeProblems.ts
+  practiceQuestionIds?: number[]; // IDs of MCQs for BlogComprehensionCheck (rendered at bottom)
+  graphGymScenarioId?: number; // Graph Gym scenario ID to embed on the post page
+  graphGymPrompt?: string; // Prompt shown on EmbeddedGraphGym header
   videoUrl?: string | null; // URL to a video file (e.g., from dojoDrills folder)
 };
 
@@ -506,6 +509,191 @@ export const blogPosts: Record<string, BlogPost> = {
         
         <div className="bg-gray-50 p-6 rounded-xl border-2 border-blue-100 text-center my-8">
           <DraggableGraph />
+        </div>
+      </>
+    ),
+  },
+  'ppc-and-opportunity-cost': {
+    slug: 'ppc-and-opportunity-cost',
+    title: 'The Production Possibilities Curve (PPC)',
+    description: 'The Production Possibilities Curve (PPC) shows the maximum combinations of two goods an economy can produce and illustrates scarcity, trade-offs, and opportunity cost.',
+    subject: 'Macro',
+    unit: 1,
+    thumbnailUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/PPC/image0.jpg',
+    seoSnippet:
+      'The Production Possibilities Curve (PPC) is a graphical model that shows the maximum combinations of two goods an economy can produce when all resources are fully employed. It illustrates the core economic concepts of scarcity, trade-offs, and opportunity cost.',
+    keyTakeaway:
+      'On the curve = productive efficiency; inside = underutilization; outside = unattainable. A bowed-out PPC reflects increasing opportunity cost as resources become less adaptable.',
+    graphGymScenarioId: 19,
+    graphGymPrompt: 'Draw a PPC for two goods. Show how an increase in the quality of resources shifts the curve outward to represent economic growth.',
+    practiceQuestionIds: [3, 4],
+    images: [],
+    videoUrl: null,
+    content: (
+      <>
+        <h2 className="mt-12 mb-4 text-3xl font-bold text-gray-800">The “Model of Choice”</h2>
+        <p className="mb-6">
+          Imagine you are the ruler of a small country. You have a fixed number of workers, factories, and land. You
+          can’t snap your fingers and have infinite skyscrapers <em>and</em> infinite pizza—you have to choose.
+        </p>
+        <p className="mb-6">
+          That’s what the <strong>Production Possibilities Curve</strong> (also called the frontier) illustrates: the
+          maximum possible output of two goods an economy can achieve when resources are fully employed.
+        </p>
+        <p className="mb-6">
+          In this example, our economy produces just two things: <strong>Robots</strong> and <strong>Corn</strong>.
+        </p>
+        <ul className="mb-6 list-disc list-inside space-y-2">
+          <li>
+            <strong>Point A:</strong> We go all-in on technology. 10 Robots, 0 Corn.
+          </li>
+          <li>
+            <strong>Point E:</strong> We go all-in on agriculture. 12 units of Corn, 0 Robots.
+          </li>
+          <li>
+            <strong>The Curve:</strong> The line connecting them represents every possible combination in between.
+          </li>
+        </ul>
+
+        <div className="my-8 p-4 border rounded-lg bg-gray-50">
+          <Image
+            src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/PPC/image0.jpg"
+            alt="Production Possibilities Curve example (Robots vs Corn)"
+            width={900}
+            height={540}
+            className="w-full h-auto rounded-md shadow-sm"
+          />
+        </div>
+
+        <hr className="my-12" />
+
+        <h2 className="mt-12 mb-4 text-3xl font-bold text-gray-800">The 3 Zones of the PPC</h2>
+        <p className="mb-6">
+          Where your country sits on (or off) this graph tells you everything about the health of your economy.
+        </p>
+
+
+        <h3 className="mt-10 mb-4 text-2xl font-bold text-gray-800">1. On the Curve: Productive Efficiency</h3>
+        <p className="mb-6">
+          Any point that sits directly <strong>on the solid line</strong> represents <strong>Productive Efficiency</strong>.
+        </p>
+        <ul className="mb-6 list-disc list-inside space-y-2">
+          <li>
+            <strong>What it means:</strong> You are squeezing every ounce of productivity out of your resources. There is no waste.
+          </li>
+          <li>
+            <strong>The Catch:</strong> To get more of one thing, you <em>must</em> give up something else. You can't get more corn without giving up some robots.
+          </li>
+        </ul>
+
+        <h3 className="mt-10 mb-4 text-2xl font-bold text-gray-800">2. Inside the Curve: Inefficiency (Recession)</h3>
+        <p className="mb-6">
+          Any point <strong>inside the shaded area</strong> represents <strong>Underutilization</strong>.
+        </p>
+        <ul className="mb-6 list-disc list-inside space-y-2">
+          <li>
+            <strong>What it means:</strong> You have idle factories. You have workers sitting at home.
+          </li>
+          <li>
+            <strong>The Reality:</strong> In Macroeconomics, this gap between where you <em>are</em> and the curve is often a recession. You <em>could</em> produce more if more people were working, but instead there is unemployment and a gap between what you <em>could</em> produce and what your actual output.
+          </li>
+        </ul>
+
+        <h3 className="mt-10 mb-4 text-2xl font-bold text-gray-800">3. Outside the Curve: Unattainable</h3>
+        <p className="mb-6">
+          Any point <strong>beyond the line</strong> is currently i<strong>mpossible</strong>.
+        </p>
+        <ul className="mb-6 list-disc list-inside space-y-2">
+          <li>
+            <strong>What it means:</strong> You simply don't have the technology or resources to reach this level of production yet.
+          </li>
+          <li>
+            <strong>The Goal:</strong> The only way to get here is through economic growth, shifting the entire curve outward. (More on this below!)
+          </li>
+        </ul>
+
+        <div className="my-8 p-4 border rounded-lg bg-gray-50">
+          <Image
+            src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/PPC/image4.jpg"
+            alt="PPC zones: on the curve, inside the curve, and outside the curve"
+            width={900}
+            height={540}
+            className="w-full h-auto rounded-md shadow-sm"
+          />
+        </div>
+
+        <hr className="my-12" />
+
+        <h2 className="mt-12 mb-4 text-3xl font-bold text-gray-800">Why is the Line Curved? Opportunity Cost.</h2>
+        <p className="mb-6">
+          You will notice the graph isn't usually a straight line—it's <strong>bowed out</strong> (concave). This shape tells a story about your workers.
+        </p>
+        <p className="mb-6">
+          <strong>The Law of Increasing Opportunity Cost</strong> states that as you produce more of one good, the
+          opportunity cost (what you give up) gets higher and higher.
+        </p>
+        <ul className="mb-6 list-disc list-inside space-y-2">
+          <li>
+            <strong>Phase 1:</strong> To grow the first few tons of corn, you move farmers who were bad at building robots anyway. You don't lose many robots.
+          </li>
+          <li>
+            <strong>Phase 2:</strong> To grow <em>even more</em> corn, you have to start forcing your best robot engineers to drive tractors. They are bad at farming, and you lose a <em>lot</em> of robot production.
+          </li>
+        </ul>
+
+        <div className="my-8 p-4 border rounded-lg bg-gray-50">
+          <Image
+            src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/PPC/image2.jpg"
+            alt="PPC: increasing opportunity cost as you move along the curve"
+            width={900}
+            height={540}
+            className="w-full h-auto rounded-md shadow-sm"
+          />
+        </div>
+        <p className="mb-6">
+          <strong>What if the line IS straight?</strong>
+          <br />
+          If the PPC is a straight line, it means resources are <strong>perfectly adaptable</strong>. This is like choosing between <strong>red cars vs. blue cars</strong>. The resources you need to make one car are nearly identical to the resources needed to make the other. Your red car experts are also blue car experts. You can switch back and force without a loss of efficiency, so opportunity costs remain constant.
+        </p>
+
+        <div className="my-8 p-4 border rounded-lg bg-gray-50">
+          <Image
+            src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/PPC/image3.jpg"
+            alt="PPC: straight-line curve showing constant opportunity cost"
+            width={900}
+            height={540}
+            className="w-full h-auto rounded-md shadow-sm"
+          />
+        </div>
+
+
+        <hr className="my-12" />
+
+        <h2 className="mt-12 mb-4 text-3xl font-bold text-gray-800">Shifting the Curve</h2>
+        <p className="mb-6">
+          The curve is a prison, but you can break out of it. The PPC can shift Outward (Growth) or Inward (Shrinkage), but only if the <strong>capacity</strong> of the economy changes.
+        </p>
+        <h3 className="mt-10 mb-4 text-2xl font-bold text-gray-800">The 3 Main Shifters:</h3>
+        <ol className="mb-6 list-decimal list-inside space-y-2">
+          <li>
+            <strong>Change in Resource Quantity:</strong> A wave of immigration increases the labor force, or new oil reserves are found. (Shift Right).
+          </li>
+          <li>
+            <strong>Change in Technology:</strong> The internet is invented, making everyone faster. (Shift Right).
+          </li>
+          <li>
+            <strong>Change in Trade:</strong> Trade allows you to <em>consume</em> at a point outside your curve, even if you can't <em>produce</em> there.
+          </li>
+        </ol>
+
+        <div className="my-8 p-4 border rounded-lg bg-gray-50">
+          <Image
+            src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/PPC/image5.jpg"
+            alt="PPC shifters: changes in resources, technology, and trade"
+            width={900}
+            height={540}
+            className="w-full h-auto rounded-md shadow-sm"
+          />
         </div>
       </>
     ),

@@ -14,8 +14,8 @@ function BlogCard({ post }: { post: BlogPost }) {
 
   return (
     <Link href={`/blog/${seoUrl}`} className="block group">
-      <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden h-full flex flex-col transition-shadow hover:shadow-xl">
-        <div className="relative w-full h-48 bg-white overflow-hidden p-2">
+      <div className="bg-white rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] border-4 border-black overflow-hidden h-full flex flex-col transition-all hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1">
+        <div className="relative w-full h-48 bg-white border-b-4 border-black overflow-hidden p-2">
           <Image
             src={post.thumbnailUrl}
             alt={post.title}
@@ -24,30 +24,30 @@ function BlogCard({ post }: { post: BlogPost }) {
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         </div>
-        <div className="p-6 flex flex-col flex-grow">
+        <div className="p-6 flex flex-col flex-grow bg-white">
           <div className="mb-3">
-            <span className={`inline-block text-xs font-semibold px-2.5 py-1 rounded-md ${
-              post.subject === 'Macro' 
-                ? 'bg-blue-100 text-blue-800' 
-                : 'bg-green-100 text-green-800'
-            }`}>
+            <span
+              className={`inline-block text-xs font-black px-3 py-1 rounded-lg border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] ${
+                post.subject === 'Macro' ? 'bg-blue-100 text-blue-900' : 'bg-green-100 text-green-900'
+              }`}
+            >
               {post.subject} - Unit {post.unit}
             </span>
           </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+          <h3 className="text-xl font-black text-black mb-2 group-hover:text-blue-600 transition-colors leading-tight">
             {post.title}
           </h3>
-          <p className="text-gray-600 text-sm mb-4 flex-grow line-clamp-2">
+          <p className="text-gray-700 text-sm mb-4 flex-grow leading-relaxed line-clamp-2">
             {post.description}
           </p>
-          <div className="flex items-center justify-between text-xs text-gray-500 mt-auto">
+          <div className="flex items-center justify-between text-xs text-gray-600 mt-auto">
             <div className="flex items-center">
               <Clock className="w-3 h-3 mr-1" />
               <span>{readingTime} min read</span>
             </div>
-            <div className="flex items-center font-semibold text-blue-600 group-hover:text-blue-700">
+            <div className="flex items-center font-black text-blue-600 group-hover:text-blue-700">
               <span>Read</span>
-              <ArrowRight className="w-3 h-3 ml-1 transition-transform group-hover:translate-x-0.5" />
+              <ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" />
             </div>
           </div>
         </div>
