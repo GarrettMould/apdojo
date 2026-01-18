@@ -421,14 +421,14 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Production Possibilities Curve", "Economic Growth", "Opportunity Cost"],
     difficulty: 'easy',
     title: "Economic Growth on the PPC",
-    description: "Draw a PPC for two goods. Show how an increase in the quality of resources shifts the curve to represent economic growth.",
+    description: "Draw a PPC for two goods. Show how an improvement in technology shifts the curve to represent economic growth.",
     toDoList: [
       "Show the original PPC",
       "Show the new PPC after growth",
       "Label both axes with specific goods",
       "Indicate that both maximum outputs increase"
     ],
-    correctImage: "/images/graphs/macro/ppc-growth.svg",
+    correctImage: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/wb19.jpg",
     checklist: [
       { id: 1, text: "Curve shifts outward (to the right)" },
       { id: 2, text: "Bowed-out shape represents increasing opportunity costs" },
