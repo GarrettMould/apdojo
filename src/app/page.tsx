@@ -28,9 +28,8 @@ function TopicCard({ bundle }: { bundle: TopicBundle }) {
           <Image 
             src={bundle.thumbnailUrl} 
             alt={`Video thumbnail for ${bundle.title}`}
-            layout="fill"
-            objectFit="cover"
-            className="transform group-hover:scale-105 transition-transform duration-300"
+            fill
+            className="object-cover transform group-hover:scale-105 transition-transform duration-300"
           />
           <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/20 transition-colors duration-300">
             <div className="bg-black/50 w-14 h-14 rounded-full flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300">
@@ -163,9 +162,8 @@ function LoggedOutHomePage() {
                 <Image
                   src={thumbnailUrl}
                   alt="FRQ Practice Placeholder"
-                  layout="fill"
-                  objectFit="cover"
-                  className="transform group-hover:scale-105 transition-transform duration-300"
+                  fill
+                  className="object-cover transform group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
 

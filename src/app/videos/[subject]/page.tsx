@@ -178,9 +178,8 @@ export default function VideoLibraryPage({ params }: VideoLibraryPageProps) {
                               <Image
                                 src={video.thumbnail || '/images/placeholder-thumb.png'}
                                 alt={video.title}
-                                layout="fill"
-                                objectFit="cover"
-                                className="transition-transform duration-300 group-hover:scale-105"
+                                fill
+                                className="object-cover transition-transform duration-300 group-hover:scale-105"
                               />
                               <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all duration-300 flex items-center justify-center">
                                 <PlayCircle className="w-12 h-12 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform group-hover:scale-110" />
