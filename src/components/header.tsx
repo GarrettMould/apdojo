@@ -127,6 +127,7 @@ export function Header() {
                 width={32}
                 height={32}
                 className="w-8 h-8"
+                unoptimized={true}
               />
               <span className="text-xl font-extrabold tracking-wide text-gray-900">
                 AP <span className="text-blue-500">Dojo</span>
@@ -150,41 +151,41 @@ export function Header() {
                 </button>
                 
                 {isPracticeDropdownOpen && (
-                  <div className="absolute top-full left-0 w-56 z-50">
+                  <div className="absolute top-full left-0 w-64 z-50">
                     {/* Invisible bridge area to prevent gap - extends upward to connect with button */}
                     <div className="h-2 -mt-2 w-full pointer-events-auto"></div>
                     <div className="bg-white rounded-lg shadow-lg border border-gray-200 py-2 pointer-events-auto">
                       <Link
                         href="/unit-final-practice-tests"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                        className="block px-5 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
                         onClick={() => setIsPracticeDropdownOpen(false)}
                       >
                         Full Practice Tests
                       </Link>
                       <Link
                         href="/select-practice-units"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                        className="block px-5 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
                         onClick={() => setIsPracticeDropdownOpen(false)}
                       >
                         MCQ Practice
                       </Link>
                       <Link
                         href={`/unitFRQpracticePage?subject=${displaySubject}&frqId=${displaySubject === 'macro' ? 1 : 2}`}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                        className="block px-5 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
                         onClick={() => setIsPracticeDropdownOpen(false)}
                       >
                         FRQ Practice
                       </Link>
                       <Link
                         href="/dojo/infinite"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                        className="block px-5 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
                         onClick={() => setIsPracticeDropdownOpen(false)}
                       >
                         Create a Quiz
                       </Link>
                       <Link
                         href="/dojo-drills"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                        className="block px-5 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
                         onClick={() => setIsPracticeDropdownOpen(false)}
                       >
                         Dojo Drills
@@ -315,6 +316,7 @@ export function Header() {
                             width={20}
                             height={20}
                             className="w-5 h-5"
+                            unoptimized={true}
                           />
                         </span>
                         <ChevronDown className={`w-4 h-4 transition-transform ${isBeltDropdownOpen ? 'rotate-180' : ''}`} />
@@ -353,6 +355,7 @@ export function Header() {
                                   width={80}
                                   height={80}
                                   className="w-20 h-auto mb-2"
+                                  unoptimized={true}
                                 />
                                 <span className={`font-bold uppercase text-sm tracking-wider ${currentBelt.textColor}`}>
                                   {currentBelt.name}
@@ -585,6 +588,7 @@ export function Header() {
                               width={24}
                               height={24}
                               className="w-6 h-auto"
+                              unoptimized={true}
                             />
                             <span className={`text-xs font-bold uppercase ${currentBelt.textColor}`}>
                               {currentBelt.name}
@@ -599,6 +603,7 @@ export function Header() {
                               width={16}
                               height={16}
                               className="w-4 h-4"
+                              unoptimized={true}
                             />
                           </div>
                         </div>

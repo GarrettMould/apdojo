@@ -102,9 +102,11 @@ const parseMarkdownTable = (text: string): { tableData: { headers: string[]; row
 interface DojoDrillProps {
   drill: DojoDrillType;
   onComplete?: () => void;
+  isAssignment?: boolean;
+  assignmentLinkId?: string;
 }
 
-export default function DojoDrill({ drill, onComplete }: DojoDrillProps) {
+export default function DojoDrill({ drill, onComplete, isAssignment = false, assignmentLinkId }: DojoDrillProps) {
   const { awardXp, user, userData, selectedSubject } = useAuthContext();
   const router = useRouter();
   const [step, setStep] = useState(1);

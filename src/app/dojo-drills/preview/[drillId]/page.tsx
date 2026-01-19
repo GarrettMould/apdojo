@@ -1,7 +1,7 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState, useMemo } from 'react';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState, useMemo, Suspense } from 'react';
 import { dojoDrills, getDrillUnitForSubject } from '@/data/dojoDrills';
 import { DojoDrillPreview } from '@/components/DojoDrillPreview';
 import { ArrowLeft } from 'lucide-react';
@@ -10,11 +10,13 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import { loadDojoDrillProgress, getDrillProgress, resetDojoDrillProgress } from '@/lib/dojoDrillProgress';
 import { hasValidSeasonPass } from '@/lib/utils';
 
-export default function DojoDrillPreviewPage() {
+function DojoDrillPreviewContent() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user, userData, selectedSubject, loading: authLoading } = useAuthContext();
   const drillId = params.drillId as string;
+  const assignmentLinkId = searchParams.get('q'); // Check for custom assignment link
   const [progress, setProgress] = useState<{ stage1: boolean; stage2: boolean; stage3: boolean } | null>(null);
   const [loadingProgress, setLoadingProgress] = useState(true);
   
@@ -27,6 +29,9 @@ export default function DojoDrillPreviewPage() {
     const subjectKey = selectedSubject === 'macro' ? 'macro' : 'micro';
     return hasValidSeasonPass(userData, subjectKey);
   }, [user, userData, selectedSubject]);
+
+  // If there's an assignment link, allow access even if not premium
+  const hasAccess = isProCustomer || !!assignmentLinkId;
 
   // Load progress when user and drill are available
   useEffect(() => {
@@ -69,7 +74,7 @@ export default function DojoDrillPreviewPage() {
   }
 
   const handleStart = async () => {
-    if (!isProCustomer) {
+    if (!hasAccess) {
       const subjectKey = selectedSubject === 'macro' ? 'macro' : 'micro';
       router.push(`/purchase/season-pass?courseType=${subjectKey}`);
       return;
@@ -91,7 +96,12 @@ export default function DojoDrillPreviewPage() {
       }
     }
     
-    router.push(`/dojo-drills?drill=${drill.id}`);
+    // If there's an assignment link, pass it through
+    if (assignmentLinkId) {
+      router.push(`/dojo-drills?drill=${drill.id}&q=${assignmentLinkId}`);
+    } else {
+      router.push(`/dojo-drills?drill=${drill.id}`);
+    }
   };
 
   const handleReset = async () => {
@@ -157,9 +167,9 @@ export default function DojoDrillPreviewPage() {
               xpReward={drill.xpReward.total}
               difficulty={difficulty}
               onStart={handleStart}
-              isLocked={!isProCustomer}
+              isLocked={!hasAccess}
               progress={progress}
-              buttonText={isProCustomer ? undefined : 'Join the Dojo'}
+              buttonText={hasAccess ? undefined : 'Join the Dojo'}
               comingSoon={isComingSoon}
               onReset={user ? handleReset : undefined}
             />
@@ -167,6 +177,20 @@ export default function DojoDrillPreviewPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function DojoDrillPreviewPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-lg font-semibold text-gray-700">Loading...</p>
+        </div>
+      </div>
+    }>
+      <DojoDrillPreviewContent />
+    </Suspense>
   );
 }
 

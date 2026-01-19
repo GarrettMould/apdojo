@@ -18,11 +18,11 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
   const isGraphGymPage = pathname === '/graph-gym';
   
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col">
       <Suspense fallback={<div className="h-16 bg-white" />}>
         <HeaderWithSuspense />
       </Suspense>
-      <main className="flex-1">
+      <main>
         {children}
       </main>
       {!isGraphGymPage && <Footer />}

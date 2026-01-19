@@ -15,6 +15,7 @@ import q2037 from "../../../public/images/unitMCQs/q2037.svg"
 import q2103 from "../../../public/images/unitMCQs/q2103.svg"
 import q2126 from "../../../public/images/unitMCQs/q2126.svg"
 import q2122 from "../../../public/images/unitMCQs/q2122.svg"
+import q3024 from "../../../public/images/unitMCQs/q3024.svg"
 // Create arrays for each unit
 const unit1Questions = macroSetTwoQuestions.questions.filter(q => q.unit === 1);
 const unit2Questions = macroSetTwoQuestions.questions.filter(q => q.unit === 2);
@@ -1119,6 +1120,242 @@ const macroUnit2Questions = [
     ],
     "correctAnswer": "D",
     "explanation": "When a consumer buys an import, Consumption (C) increases because a final good was purchased. However, Imports (M) also increase, which makes Net Exports ($X - M$) decrease by the exact same amount. These two effects cancel each other out, so the domestic GDP does not change because the car was not produced domestically.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3024,
+    "unit": 2,
+    "lessonIDS": ["2.2"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "Based on the labor market data for Country X below, what is the unemployment rate?",
+    "image": q3024,
+    "options": [
+      "6%",
+      "10%",
+      "11.1%",
+      "12%",
+      "60%"
+    ],
+    "correctAnswer": "B",
+    "explanation": "The unemployment rate is calculated as (Unemployed / Labor Force) x 100. First, find the Labor Force: Employed (10,800) + Unemployed (1,200) = 12,000. Then, calculate the rate: (1,200 / 12,000) x 100 = 10%.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3025,
+    "unit": 2,
+    "lessonIDS": ["2.2"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "Using the data for Country X provided below, calculate the Labor Force Participation Rate (LFPR).",
+    "image": q3024,
+    "options": [
+      "54%",
+      "60%",
+      "65%",
+      "75%",
+      "10%"
+    ],
+    "correctAnswer": "B",
+    "explanation": "The Labor Force Participation Rate is calculated as (Labor Force / Working Age Population) x 100. The Labor Force is 12,000 (10,800 Employed + 1,200 Unemployed). The calculation is (12,000 / 20,000) x 100 = 60%.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3026,
+    "unit": 2,
+    "lessonIDS": ["2.2"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "Refer to the data for Country X. Suppose that 200 unemployed individuals give up looking for work and become discouraged workers. How will this change affect the official unemployment rate?",
+    "image": q3024,
+    "options": [
+      "It will increase because the labor force has decreased.",
+      "It will increase because the number of discouraged workers has risen.",
+      "It will remain unchanged because discouraged workers are still counted as unemployed.",
+      "It will decrease because both the number of unemployed people and the labor force decrease.",
+      "It will decrease because the total working-age population has increased."
+    ],
+    "correctAnswer": "D",
+    "explanation": "When unemployed workers become discouraged, they drop out of the labor force entirely. This reduces the numerator (Unemployed falls to 1,000) and the denominator (Labor Force falls to 11,800). Mathematically, removing people from the 'unemployed' category lowers the ratio significantly more than the reduction in the denominator, causing the unemployment rate to fall (approx 8.5%).",
+    "videoExplanation": null
+  },
+  {
+    "id": 3027,
+    "unit": 2,
+    "lessonIDS": ["2.6"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "The table below shows the Nominal GDP and GDP Deflator for a country over five years. Based on this data, in which year was the Real GDP the largest?",
+    "image": null,
+    "tableData": {
+      "headers": ["Year", "Nominal GDP", "GDP Deflator"],
+      "rows": [
+        ["2018", "$500", "100"],
+        ["2019", "$550", "105"],
+        ["2020", "$650", "115"],
+        ["2021", "$720", "130"],
+        ["2022", "$800", "150"]
+      ]
+    },
+    "options": [
+      "2018",
+      "2019",
+      "2020",
+      "2021",
+      "2022"
+    ],
+    "correctAnswer": "C",
+    "explanation": "Real GDP is calculated using the formula: (Nominal GDP / GDP Deflator) * 100. Calculating for each year:\n- 2018: ($500/100)*100 = $500\n- 2019: ($550/105)*100 ≈ $524\n- 2020: ($650/115)*100 ≈ $565\n- 2021: ($720/130)*100 ≈ $554\n- 2022: ($800/150)*100 ≈ $533\nThe largest Real GDP occurred in 2020.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3028,
+    "unit": 2,
+    "lessonIDS": ["2.6"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "Consider the economic data in the table below. In which year did the country achieve its highest level of Real GDP?",
+    "image": null,
+    "tableData": {
+      "headers": ["Year", "Nominal GDP", "GDP Deflator"],
+      "rows": [
+        ["1", "$1000", "100"],
+        ["2", "$1100", "105"],
+        ["3", "$1300", "120"],
+        ["4", "$1450", "140"],
+        ["5", "$1600", "160"]
+      ]
+    },
+    "options": [
+      "Year 1",
+      "Year 2",
+      "Year 3",
+      "Year 4",
+      "Year 5"
+    ],
+    "correctAnswer": "C",
+    "explanation": "Using the Real GDP formula (Nominal / Deflator) * 100:\n- Year 1: (1000/100)*100 = 1000\n- Year 2: (1100/105)*100 ≈ 1048\n- Year 3: (1300/120)*100 ≈ 1083\n- Year 4: (1450/140)*100 ≈ 1036\n- Year 5: (1600/160)*100 = 1000\nReal GDP peaked in Year 3.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3029,
+    "unit": 2,
+    "lessonIDS": ["2.6"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "Assume that a nation's population grows at a higher rate than its real gross domestic product over a given period of time. It can be concluded that:",
+    "image": null,
+    "options": [
+      "the standard of living has increased",
+      "the price level has decreased",
+      "real GDP per capita has decreased",
+      "real GDP will rise at a slower rate in the future",
+      "nominal GDP has decreased"
+    ],
+    "correctAnswer": "C",
+    "explanation": "Real GDP per capita is calculated by dividing Real GDP by the population. If the denominator (population) grows at a faster percentage rate than the numerator (Real GDP), the overall ratio (Real GDP per capita) must decrease. This generally indicates a decline in the average standard of living.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3030,
+    "unit": 2,
+    "lessonIDS": ["2.4"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "If the Consumer Price Index (CPI) rises from 80 to 120 in a single year, the inflation rate is:",
+    "image": null,
+    "options": [
+      "20 percent",
+      "33 percent",
+      "40 percent",
+      "50 percent",
+      "150 percent"
+    ],
+    "correctAnswer": "D",
+    "explanation": "The inflation rate is calculated as the percentage change in the CPI: ((New CPI - Old CPI) / Old CPI) * 100. In this case: ((120 - 80) / 80) * 100 = (40 / 80) * 100 = 0.50 * 100 = 50%.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3031,
+    "unit": 2,
+    "lessonIDS": ["2.4"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "In year 1, the Consumer Price Index (CPI) was 150. In year 2, the CPI increased to 165. What was the inflation rate between year 1 and year 2?",
+    "image": null,
+    "options": [
+      "10 percent",
+      "15 percent",
+      "90 percent",
+      "110 percent",
+      "150 percent"
+    ],
+    "correctAnswer": "A",
+    "explanation": "Using the percentage change formula: ((165 - 150) / 150) * 100 = (15 / 150) * 100. Since 15 is one-tenth of 150, the result is 0.10 * 100 = 10%.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3032,
+    "unit": 2,
+    "lessonIDS": ["2.5"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "A bank offers a fixed-rate loan with a nominal interest rate of 7 percent, based on an expected inflation rate of 3 percent. If the actual inflation rate turns out to be 5 percent, which of the following is true?",
+    "image": null,
+    "options": [
+      "The real interest rate is 2 percent, and the borrower benefits.",
+      "The real interest rate is 2 percent, and the lender benefits.",
+      "The real interest rate is 12 percent, and the lender benefits.",
+      "The real interest rate is 4 percent, and the borrower benefits.",
+      "The real interest rate is -2 percent, and the borrower benefits."
+    ],
+    "correctAnswer": "A",
+    "explanation": "The Real Interest Rate = Nominal Rate - Inflation Rate. Here, 7% - 5% = 2%. Since the actual real rate (2%) is lower than the expected real rate (7% - 3% = 4%), the borrower pays back money with less purchasing power than anticipated, making them the winner.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3033,
+    "unit": 2,
+    "lessonIDS": ["2.5"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "Which of the following groups would most likely be hurt by an unanticipated increase in the inflation rate?",
+    "image": null,
+    "options": [
+      "Homeowners with fixed-rate mortgages.",
+      "Banks that have issued adjustable-rate loans.",
+      "Retirees living on fixed nominal pensions.",
+      "The government, which has a large national debt.",
+      "Tenants with rent-controlled leases."
+    ],
+    "correctAnswer": "C",
+    "explanation": "Unanticipated inflation erodes purchasing power. Retirees with fixed nominal incomes receive the same amount of money, but that money can buy fewer goods and services. Borrowers (like homeowners or the government) generally benefit because the real value of their debt decreases.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3034,
+    "unit": 2,
+    "lessonIDS": ["2.5"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "Suppose the nominal interest rate on a savings account is 4 percent and the current inflation rate is 6 percent. What is the real interest rate earned on savings?",
+    "image": null,
+    "options": [
+      "10 percent",
+      "2 percent",
+      "-2 percent",
+      "1.5 percent",
+      "-10 percent"
+    ],
+    "correctAnswer": "C",
+    "explanation": "Using the Fisher Equation: Real Interest Rate = Nominal Interest Rate - Inflation Rate. Therefore, 4% - 6% = -2%. The purchasing power of the money in the savings account is actually decreasing.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3035,
+    "unit": 2,
+    "lessonIDS": ["2.4"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "Assume that the price of beef rises significantly while the price of chicken remains stable. As a result, consumers begin buying less beef and more chicken. Because the Consumer Price Index (CPI) is calculated using a fixed market basket, the CPI will:",
+    "image": null,
+    "options": [
+      "understate the true cost of living because it ignores the price increase of beef.",
+      "overstate the true cost of living because it assumes consumers continue to buy the same amount of beef.",
+      "accurately reflect the cost of living because it tracks the prices of all meat products.",
+      "decrease because the demand for beef has fallen.",
+      "remain unchanged because the decrease in beef purchases is offset by the increase in chicken purchases."
+    ],
+    "correctAnswer": "B",
+    "explanation": "This is known as substitution bias. The CPI measures the cost of a fixed basket of goods. If consumers substitute a cheaper good (chicken) for a more expensive one (beef), the CPI does not capture this change in behavior. Instead, it calculates inflation as if consumers were still buying the expensive beef, leading to an overstatement of the true increase in the cost of living.",
     "videoExplanation": null
   }
 ]

@@ -901,7 +901,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
 
       {/* Only show exam content if not showing results, or if showing full results */}
       {(!showResults || showFullResults) && (
-        <div className={`flex w-full flex-col relative ${shouldShowToolsByDefault ? 'min-h-screen' : isCustomAssignment ? '' : 'lg:h-[calc(100vh-4rem)]'} ${shouldShowToolsByDefault ? '' : 'overflow-hidden'}`} style={shouldShowToolsByDefault ? { paddingBottom: '80px' } : {}}>
+        <div className={`flex w-full flex-col relative ${shouldShowToolsByDefault ? 'min-h-screen' : isCustomAssignment ? '' : 'lg:h-[calc(100vh-4rem)]'} ${shouldShowToolsByDefault ? '' : 'overflow-hidden'}`}>
           {/* Top Bar - At the very top for unit tests, preview exams, full exams, and custom assignments */}
           {shouldShowToolsByDefault && (
             <div className="w-full bg-gray-200 px-6 py-4 flex items-center justify-between border-b-4 border-black shadow-lg flex-shrink-0 fixed top-16 left-0 right-0 z-40">
@@ -1153,7 +1153,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
               )}
             </div>
           )}
-          <div className={`flex w-full flex-1 overflow-hidden relative ${isCustomAssignment || !showToolsPanel ? 'flex-col' : 'lg:flex-row flex-col'}`} style={shouldShowToolsByDefault ? { height: 'calc(100vh - 64px - 80px)', marginTop: '80px' } : {}}>
+          <div className={`flex w-full flex-1 overflow-hidden relative ${!showToolsPanel ? 'flex-col' : 'lg:flex-row flex-col'}`} style={shouldShowToolsByDefault ? { height: 'calc(100vh - 64px - 80px)', marginTop: '80px' } : {}}>
           {/* Blur Overlay when timer is paused - covers content but not top/bottom bars */}
           {isTimerPaused && shouldShowToolsByDefault && (
             <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-40"></div>
@@ -1161,7 +1161,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
           {/* Question Container (Left Side / Top on Mobile) */}
           <motion.div 
             animate={{
-              width: showToolsPanel && !isCustomAssignment ? (typeof window !== 'undefined' && window.innerWidth >= 1024 ? `${leftPanelWidth}%` : '100%') : (isCustomAssignment ? '100%' : '100%'),
+              width: showToolsPanel ? (typeof window !== 'undefined' && window.innerWidth >= 1024 ? `${leftPanelWidth}%` : '100%') : '100%',
             }}
             transition={{
               type: 'spring',
@@ -1959,13 +1959,12 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
           </motion.div>
 
           {/* Tools Panel Slide-Out (Calculator and Excalidraw) - Right Side on Desktop, Below on Mobile */}
-          {!isCustomAssignment && (
-            <>
-              {/* Desktop: Slide-out panel from right */}
-              {/* For unit tests, preview exams, and full exams, always show panel without animation */}
-              {shouldShowToolsByDefault ? (
+          <>
+            {/* Desktop: Slide-out panel from right */}
+            {/* For unit tests, preview exams, full exams, and custom assignments, always show panel without animation */}
+            {shouldShowToolsByDefault ? (
                 showToolsPanel && (
-                  <div className="hidden lg:block flex-shrink-0 w-[35%] bg-white shadow-2xl z-40 border-l border-gray-200 overflow-hidden" style={{ height: 'calc(100vh - 64px)' }}>
+                  <div className="hidden lg:block flex-shrink-0 w-[35%] bg-white shadow-2xl z-40 border-l border-gray-200 overflow-hidden fixed right-0" style={{ top: '144px', height: 'calc(100vh - 144px)' }}>
                     <div className="w-full h-full flex flex-col overflow-hidden">
                     {/* Header */}
                     <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between flex-shrink-0">
@@ -2146,7 +2145,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.2 }}
-                      className="hidden lg:block flex-shrink-0 w-[35%] h-full bg-white shadow-2xl z-40 border-l border-gray-200 overflow-hidden"
+                      className="hidden lg:block flex-shrink-0 w-[35%] bg-white shadow-2xl z-40 border-l border-gray-200 overflow-hidden fixed right-0" style={{ top: '144px', height: 'calc(100vh - 144px)' }}
                     >
                     <motion.div
                       initial={{ x: '100%' }}
@@ -2690,13 +2689,12 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                     )}
                 </div>
               )}
-            </>
-          )}
+          </>
           </div>
         </div>
       )}
 
-      {/* Fixed Bottom Bar - Navigation and Question Selector */}
+      {/* Fixed Bottom Bar - Navigation and Question Selector for custom assignments and tests */}
       {!showResults && shouldShowToolsByDefault && (
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t-4 border-black shadow-lg z-50">
           <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">

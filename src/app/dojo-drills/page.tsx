@@ -15,6 +15,7 @@ function DojoDrillsContent() {
   const router = useRouter();
   const { selectedSubject, user, userData } = useAuthContext();
   const drillIdFromQuery = searchParams.get('drill');
+  const assignmentLinkId = searchParams.get('q'); // Check for custom assignment link
   const [selectedDrillId, setSelectedDrillId] = useState<string | null>(drillIdFromQuery);
 
   // Check if user is a pro customer (has season pass)
@@ -24,6 +25,9 @@ function DojoDrillsContent() {
     const subjectKey = selectedSubject === 'macro' ? 'macro' : 'micro';
     return hasValidSeasonPass(userData, subjectKey);
   }, [user, userData, selectedSubject]);
+
+  // If there's an assignment link, allow access even if not premium
+  const hasAccess = isProCustomer || !!assignmentLinkId;
 
   // Handle drill click - redirect non-pro users to purchase page
   const handleDrillClick = (drillId: string) => {
@@ -67,15 +71,18 @@ function DojoDrillsContent() {
     if (currentDrill && user && userData) {
       const subjectKey = selectedSubject === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics';
       const drillAppliesToCurrentSubject = drillAppliesToSubject(currentDrill, subjectKey);
-      const hasAccess = hasValidSeasonPass(userData, selectedSubject === 'macro' ? 'macro' : 'micro');
+      const hasPremiumAccess = hasValidSeasonPass(userData, selectedSubject === 'macro' ? 'macro' : 'micro');
+      
+      // Allow access if premium OR if there's an assignment link
+      const hasDrillAccess = hasPremiumAccess || !!assignmentLinkId;
       
       // If drill doesn't apply to current subject, or user doesn't have access, redirect
-      if (!drillAppliesToCurrentSubject || !hasAccess) {
+      if (!drillAppliesToCurrentSubject || !hasDrillAccess) {
         setSelectedDrillId(null);
         router.push('/dojo-drills');
       }
     }
-  }, [currentDrill, selectedSubject, user, userData, router]);
+  }, [currentDrill, selectedSubject, user, userData, router, assignmentLinkId]);
 
   const getSubjectLabel = (drill: typeof filteredAndSortedDrills[0]) => {
     if (drill.subjects && drill.subjects.length > 0) {
@@ -101,6 +108,8 @@ function DojoDrillsContent() {
           <div className="flex-1 h-full overflow-y-auto">
             <DojoDrill
               drill={currentDrill}
+              isAssignment={!!assignmentLinkId}
+              assignmentLinkId={assignmentLinkId || undefined}
               onComplete={() => {
                 // Handle completion - maybe show a success message or navigate
                 console.log('Dojo Drill completed!');
@@ -192,13 +201,13 @@ function DojoDrillsContent() {
                   <div className={`text-sm font-semibold mt-auto flex items-center gap-2 ${
                     isComingSoon 
                       ? 'text-gray-400' 
-                      : (isProCustomer ? 'text-blue-600' : 'text-orange-600')
+                      : (hasAccess ? 'text-blue-600' : 'text-orange-600')
                   }`}>
                     {isComingSoon && <Lock className="w-4 h-4" />}
                     <span>
                       {isComingSoon 
                         ? 'Coming Soon' 
-                        : (isProCustomer ? 'Start Drill →' : 'Join the Dojo')
+                        : (hasAccess ? 'Start Drill →' : 'Join the Dojo')
                       }
                     </span>
                   </div>
