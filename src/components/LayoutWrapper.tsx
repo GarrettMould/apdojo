@@ -22,7 +22,7 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
   
   return (
     <div className="flex flex-col">
-      <Suspense fallback={<div className="h-16 bg-white" />}>
+      <Suspense fallback={<div className="h-20 bg-white" />}>
         <HeaderWithSuspense />
       </Suspense>
       <main>

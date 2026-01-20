@@ -116,7 +116,7 @@ function LoggedOutHomePage() {
       {/* AP Micro Banner */}
       {showMicroBanner && (
         <div 
-          className="fixed top-16 left-0 right-0 z-40 shadow-lg transition-all duration-500 ease-out bg-gradient-to-r from-green-500 to-green-600"
+          className="fixed top-20 left-0 right-0 z-40 shadow-lg transition-all duration-500 ease-out bg-gradient-to-r from-green-500 to-green-600"
         >
         <div className="max-w-7xl mx-auto px-4 py-2">
           <div className="flex items-center justify-center gap-4">
@@ -142,7 +142,7 @@ function LoggedOutHomePage() {
       </div>
       )}
       {/* Topic Bundles Section */}
-      <div className={`py-16 sm:py-24 bg-white ${showMicroBanner ? 'pt-24 sm:pt-28' : ''}`}>
+      <div className={`py-16 sm:py-24 bg-white ${showMicroBanner ? 'pt-28 sm:pt-32' : ''}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h1 className="text-5xl sm:text-6xl font-extrabold text-gray-900 mb-6">

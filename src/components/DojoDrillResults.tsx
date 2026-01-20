@@ -52,7 +52,7 @@ export function DojoDrillResults({ xpEarned, userData, selectedSubject, onExit }
       className="absolute inset-0 bg-white border-4 border-black rounded-3xl shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] flex-1 px-8 sm:px-12 pt-0 pb-8 sm:pb-12 flex flex-col items-center text-center space-y-8 overflow-y-auto"
     >
       {/* Stacked Paper Effect - Background layers */}
-      <div className="absolute inset-0 -z-10 top-16">
+      <div className="absolute inset-0 -z-10 top-20">
         {/* First layer */}
         <div className="absolute top-2 left-2 right-2 bottom-2 bg-white border-4 border-black rounded-3xl opacity-20 transform rotate-1" />
         {/* Second layer */}

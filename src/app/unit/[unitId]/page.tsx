@@ -1442,7 +1442,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
         />
       </Head>
-      <div ref={containerRef} className="flex h-[calc(100vh-4rem)] overflow-hidden">
+      <div ref={containerRef} className="flex h-[calc(100vh-5rem)] overflow-hidden">
         {/* Left Side - Cheat Sheet Content */}
         <motion.div
           animate={{
@@ -3105,7 +3105,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
             <div className="max-w-7xl mx-auto px-4 h-full flex items-center justify-center relative pt-12 pb-12">
               <button
                 onClick={() => setShowFullscreen(false)}
-                className="absolute top-16 right-4 text-white hover:text-gray-300 transition-colors z-10 bg-black bg-opacity-50 rounded-full p-3 shadow-lg"
+                className="absolute top-20 right-4 text-white hover:text-gray-300 transition-colors z-10 bg-black bg-opacity-50 rounded-full p-3 shadow-lg"
                 aria-label="Close Fullscreen"
               >
                 <X className="w-6 h-6" />

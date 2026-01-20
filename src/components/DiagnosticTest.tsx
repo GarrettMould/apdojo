@@ -179,7 +179,7 @@ export function DiagnosticTest({ questions, onComplete, initialAnswers = {}, use
           ) : (
             <>
               {/* Stacked Paper Effect - Background layers */}
-              <div className="absolute inset-0 -z-10 top-16">
+              <div className="absolute inset-0 -z-10 top-20">
                 {/* First layer */}
                 <div className="absolute top-2 left-2 right-2 bottom-2 bg-white border-4 border-black rounded-3xl opacity-20 transform rotate-1" />
                 {/* Second layer */}

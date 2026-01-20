@@ -698,7 +698,7 @@ function UnitFRQPracticePageComponent() {
 
       {/* Left Sidebar: FRQ Library (Sliding Panel) */}
       <div 
-        className={`fixed top-16 left-0 h-[calc(100vh-4rem)] bg-white lg:w-1/4 w-4/5 z-40 shadow-xl transition-transform duration-300 ease-in-out print:hidden ${
+        className={`fixed top-20 left-0 h-[calc(100vh-5rem)] bg-white lg:w-1/4 w-4/5 z-40 shadow-xl transition-transform duration-300 ease-in-out print:hidden ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >

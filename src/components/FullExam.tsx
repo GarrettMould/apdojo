@@ -901,10 +901,10 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
 
       {/* Only show exam content if not showing results, or if showing full results */}
       {(!showResults || showFullResults) && (
-        <div className={`flex w-full flex-col relative ${shouldShowToolsByDefault ? 'min-h-screen' : isCustomAssignment ? '' : 'lg:h-[calc(100vh-4rem)]'} ${shouldShowToolsByDefault ? '' : 'overflow-hidden'}`}>
+        <div className={`flex w-full flex-col relative ${shouldShowToolsByDefault ? 'min-h-screen' : isCustomAssignment ? '' : 'lg:h-[calc(100vh-5rem)]'} ${shouldShowToolsByDefault ? '' : 'overflow-hidden'}`}>
           {/* Top Bar - At the very top for unit tests, preview exams, full exams, and custom assignments */}
           {shouldShowToolsByDefault && (
-            <div className="w-full bg-gray-200 px-6 py-4 flex items-center justify-between border-b-4 border-black shadow-lg flex-shrink-0 fixed top-16 left-0 right-0 z-40">
+            <div className="w-full bg-gray-200 px-6 py-4 flex items-center justify-between border-b-4 border-black shadow-lg flex-shrink-0 fixed top-20 left-0 right-0 z-40">
               {/* Timer Section - Only show for non-custom assignments */}
               {!isCustomAssignment && (
                 <>

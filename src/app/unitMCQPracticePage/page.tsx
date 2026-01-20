@@ -325,46 +325,78 @@ function UnitMCQPracticeContent() {
     setIsNextQuestionDoubleXp,
     awardXp,
   } = useAuthContext();
-  const { consumeDailyCredit, isPremium, getCreditStatus } = useCreditSystem();
+  const { isPremium } = useCreditSystem();
   
   // --- Access Control State ---
   const [hasAccess, setHasAccess] = useState(false);
   const [isVerifying, setIsVerifying] = useState(true);
-  const [remainingCredits, setRemainingCredits] = useState<number | null>(null);
-  const [showCreditLimitModal, setShowCreditLimitModal] = useState(false);
-  const [guestQuestionsAnswered, setGuestQuestionsAnswered] = useState(0);
-  const [hasHitCreditLimit, setHasHitCreditLimit] = useState(false);
-  const [hasDismissedCreditModal, setHasDismissedCreditModal] = useState(false);
-  const [showGuestLimitModal, setShowGuestLimitModal] = useState(false);
-  const [hasDismissedGuestModal, setHasDismissedGuestModal] = useState(false);
+  const DAILY_FREE_ANSWERS = 3;
+  const [dailyQuestionsAnswered, setDailyQuestionsAnswered] = useState(0);
+  const [showSeasonPassModal, setShowSeasonPassModal] = useState(false);
+  const [hasDismissedSeasonPassModal, setHasDismissedSeasonPassModal] = useState(false);
 
-  // Initialize guest questions answered from localStorage
+  const getLocalDateKey = (d: Date) => {
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  };
+
+  const getDailyLimitStorageKey = (uid: string | null | undefined) =>
+    `dailyQuestionsAnswered:${uid ?? 'guest'}`;
+
+  const isPremiumEffective = Boolean(user) && isPremium;
+
+  const readDailyCount = () => {
+    if (typeof window === 'undefined') return 0;
+    const key = getDailyLimitStorageKey(user?.uid);
+    const raw = localStorage.getItem(key);
+    const today = getLocalDateKey(new Date());
+    if (!raw) return 0;
+    try {
+      const parsed = JSON.parse(raw) as { date?: string; count?: number };
+      if (parsed?.date !== today) return 0;
+      const count = typeof parsed?.count === 'number' && Number.isFinite(parsed.count) ? parsed.count : 0;
+      return Math.max(0, count);
+    } catch {
+      return 0;
+    }
+  };
+
+  const writeDailyCount = (count: number) => {
+    if (typeof window === 'undefined') return;
+    const key = getDailyLimitStorageKey(user?.uid);
+    const today = getLocalDateKey(new Date());
+    localStorage.setItem(key, JSON.stringify({ date: today, count }));
+  };
+
+  // Load daily answered count from localStorage (per-user or guest), reset daily
   useEffect(() => {
-    if (!user && typeof window !== 'undefined') {
-      const stored = localStorage.getItem('guestQuestionsAnswered');
-      const parsed = stored ? parseInt(stored, 10) : 0;
-      if (!Number.isNaN(parsed)) {
-        setGuestQuestionsAnswered(parsed);
+    if (typeof window === 'undefined') return;
+
+    const key = getDailyLimitStorageKey(user?.uid);
+    const raw = localStorage.getItem(key);
+    const today = getLocalDateKey(new Date());
+
+    if (!raw) {
+      setDailyQuestionsAnswered(0);
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(raw) as { date?: string; count?: number };
+      if (parsed?.date !== today) {
+        localStorage.setItem(key, JSON.stringify({ date: today, count: 0 }));
+        setDailyQuestionsAnswered(0);
+        return;
       }
-    } else if (user) {
-      // Clear guest tracking when user logs in
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('guestQuestionsAnswered');
-      }
-      setGuestQuestionsAnswered(0);
+      const count = typeof parsed?.count === 'number' && Number.isFinite(parsed.count) ? parsed.count : 0;
+      setDailyQuestionsAnswered(Math.max(0, count));
+    } catch {
+      localStorage.setItem(key, JSON.stringify({ date: today, count: 0 }));
+      setDailyQuestionsAnswered(0);
     }
   }, [user]);
-
-  // Save guest questions answered to localStorage whenever it changes
-  useEffect(() => {
-    if (!user && typeof window !== 'undefined') {
-      if (guestQuestionsAnswered > 0) {
-        localStorage.setItem('guestQuestionsAnswered', guestQuestionsAnswered.toString());
-      } else {
-        localStorage.removeItem('guestQuestionsAnswered');
-      }
-    }
-  }, [guestQuestionsAnswered, user]);
 
   // Determine Subject and Mode from params
   const subjectParam = searchParams.get('subject');
@@ -410,9 +442,6 @@ function UnitMCQPracticeContent() {
   const [showSignupModal, setShowSignupModal] = useState(false);
   const [totalQuestionsInSet, setTotalQuestionsInSet] = useState(0);
   const [currentUnitName, setCurrentUnitName] = useState('');
-  const [showPracticeTestBanner, setShowPracticeTestBanner] = useState(false);
-  const [practiceBannerDismissed, setPracticeBannerDismissed] = useState(false);
-  const [questionsAnsweredSinceBannerShown, setQuestionsAnsweredSinceBannerShown] = useState(0);
   const [showAllQuestions, setShowAllQuestions] = useState(false); // Bypass filter to show all questions
   const purchasedTests = (userData?.purchasedTests || []) as string[];
 
@@ -580,69 +609,9 @@ function UnitMCQPracticeContent() {
 
   // Access control check and credit status
   useEffect(() => {
-    if (!user) {
-      // Non-logged-in users can access but will be limited to 1 question
-      setHasAccess(true);
-      setIsVerifying(false);
-      setRemainingCredits(null);
-      return;
-    }
-
-    // Premium users have unlimited access
-    if (isPremium) {
-      setHasAccess(true);
-      setIsVerifying(false);
-      setRemainingCredits(null);
-      return;
-    }
-
-    // For practice mode, check credits
-    const creditStatus = getCreditStatus();
-    const dailyRemaining = creditStatus.dailyPractice.remaining;
-    setRemainingCredits(dailyRemaining);
-    
-    // Check if user has hit their credit limit
-    const hitLimit = dailyRemaining === 0;
-    setHasHitCreditLimit(hitLimit);
-    
-    // Show modal if they've hit the limit and haven't dismissed it yet
-    if (hitLimit && !showCreditLimitModal && !hasDismissedCreditModal) {
-      setShowCreditLimitModal(true);
-    }
-    
-    // Always allow access - credit limit is handled by modal overlay, not by blocking access
-    // This ensures the question is visible behind the modal
     setHasAccess(true);
     setIsVerifying(false);
-  }, [user, userData, isPremium, getCreditStatus, currentUnitForAccessCheck, practiceMode, showCreditLimitModal, hasDismissedCreditModal]);
-
-  // Show banner after 3 questions answered (unless dismissed)
-  useEffect(() => {
-    const answeredCount = Object.keys(answeredQuestions).length;
-    if (answeredCount >= 3 && !practiceBannerDismissed && !showPracticeTestBanner) {
-      setShowPracticeTestBanner(true);
-      setQuestionsAnsweredSinceBannerShown(0);
-    }
-  }, [answeredQuestions, practiceBannerDismissed, showPracticeTestBanner]);
-
-  // Auto-close banner after 2 more questions answered (without clicking it)
-  useEffect(() => {
-    if (showPracticeTestBanner && !practiceBannerDismissed) {
-      const answeredCount = Object.keys(answeredQuestions).length;
-      // Count questions answered since banner appeared (banner shows at 3, so count from 3)
-      const questionsSinceBanner = answeredCount >= 3 ? answeredCount - 3 : 0;
-      
-      if (questionsSinceBanner >= 2) {
-        setShowPracticeTestBanner(false);
-        setPracticeBannerDismissed(true);
-      }
-    }
-  }, [answeredQuestions, showPracticeTestBanner, practiceBannerDismissed]);
-
-  const handleClosePracticeTestBanner = () => {
-    setShowPracticeTestBanner(false);
-    setPracticeBannerDismissed(true);
-  };
+  }, [user, userData, isPremium, currentUnitForAccessCheck, practiceMode]);
 
   const handleEnterTestMode = () => {
     // Only Macro has unit MCQ tests wired up currently
@@ -652,8 +621,8 @@ function UnitMCQPracticeContent() {
 
     if (!user) {
       // Show season pass modal for guest users trying to access test mode
-      if (!hasDismissedGuestModal) {
-        setShowGuestLimitModal(true);
+      if (!hasDismissedSeasonPassModal) {
+        setShowSeasonPassModal(true);
       }
       return;
     }
@@ -679,44 +648,31 @@ function UnitMCQPracticeContent() {
     // Check if this is a new question (not already answered)
     const isNewQuestion = !answeredQuestions[questionId];
     
-    // Handle non-logged-in users: limit to 1 question
-    if (!user && isNewQuestion) {
-      // Block if they've already answered 1 question
-      if (guestQuestionsAnswered >= 1) {
-        // Show season pass modal instead of login modal
-        if (!hasDismissedGuestModal) {
-          setShowGuestLimitModal(true);
+    // Daily free-answer limit for ALL non-premium users (guest or logged-in)
+    if (!isPremiumEffective && isNewQuestion) {
+      const currentCount = readDailyCount();
+      if (currentCount >= DAILY_FREE_ANSWERS) {
+        if (!hasDismissedSeasonPassModal) {
+          setShowSeasonPassModal(true);
         }
         return; // Don't process the answer
       }
-      
-      // This is their first question - allow it and increment counter
-      setGuestQuestionsAnswered(1);
-      // Show season pass modal after they answer (but let this answer go through)
-      setTimeout(() => {
-        if (!hasDismissedGuestModal) {
-          setShowGuestLimitModal(true);
-        }
-      }, 500); // Small delay so they can see their answer was recorded
-    }
-    
-    // Consume daily credit on each new answer (if logged in and not premium)
-    if (user && !isPremium && isNewQuestion) {
-      const creditResult = await consumeDailyCredit();
-      if (creditResult.success) {
-        // Update remaining credits
-        if (creditResult.remaining !== undefined) {
-          setRemainingCredits(creditResult.remaining);
-        }
-      } else {
-        // No credits remaining - show modal and prevent further answers
-        // Only show modal if they haven't dismissed it yet
-        if (!hasDismissedCreditModal) {
-          setShowCreditLimitModal(true);
-        }
-        setRemainingCredits(0);
-        setHasHitCreditLimit(true);
-        return; // Don't process the answer if they've hit the limit
+      const nextCount = currentCount + 1;
+      writeDailyCount(nextCount);
+      setDailyQuestionsAnswered(nextCount);
+
+      // Show Season Pass modal after the 3rd answer (delayed),
+      // so the student sees their feedback first.
+      if (
+        nextCount === DAILY_FREE_ANSWERS &&
+        !hasDismissedSeasonPassModal
+      ) {
+        window.setTimeout(() => {
+          // Re-check on timeout in case they upgraded/dismissed
+          if (!hasDismissedSeasonPassModal) {
+            setShowSeasonPassModal(true);
+          }
+        }, 500);
       }
     }
     
@@ -810,12 +766,6 @@ function UnitMCQPracticeContent() {
   const handleAuthSuccess = () => {
     setShowLoginModal(false);
     setShowSignupModal(false);
-    // Reset guest question count when user logs in
-    setGuestQuestionsAnswered(0);
-    // Clear localStorage tracking
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('guestQuestionsAnswered');
-    }
   };
 
   if (isVerifying) {
@@ -852,64 +802,18 @@ function UnitMCQPracticeContent() {
         }}
         onAuthSuccess={handleAuthSuccess}
       />
-      {/* Season Pass Modal for Logged-in Users */}
-      {showCreditLimitModal && (
+      {/* Season Pass Modal (daily limit for non-premium users) */}
+      {showSeasonPassModal && (
         <SeasonPassModal
           subject={subject}
           onClose={() => {
-            setShowCreditLimitModal(false);
-            setHasDismissedCreditModal(true);
-          }}
-        />
-      )}
-      {/* Season Pass Modal for Guest Users */}
-      {showGuestLimitModal && (
-        <SeasonPassModal
-          subject={subject}
-          onClose={() => {
-            setShowGuestLimitModal(false);
-            setHasDismissedGuestModal(true);
+            setShowSeasonPassModal(false);
+            setHasDismissedSeasonPassModal(true);
           }}
         />
       )}
       <div className="min-h-screen bg-gray-50 overflow-hidden">
-        {/* Sticky Practice Test Banner - Fixed to bottom of header */}
-        <div 
-          className={`fixed top-16 left-0 right-0 z-40 ${subject === 'macro' ? 'bg-gradient-to-r from-blue-600 to-blue-700' : 'bg-gradient-to-r from-green-600 to-green-700'} text-white shadow-lg transition-all duration-500 ease-out ${
-            showPracticeTestBanner 
-              ? 'translate-y-0 opacity-100' 
-              : '-translate-y-full opacity-0 pointer-events-none'
-          }`}
-        >
-          <div className="max-w-7xl mx-auto px-4 py-2">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-4">
-                <p className="text-xs md:text-sm font-medium">
-                  Ready for a full-length exam? Test your knowledge with our practice tests! <span className="text-base md:text-lg">🎯</span>
-                </p>
-                <Link href="/unit-final-practice-tests">
-                  <Button 
-                    size="sm" 
-                    variant="outline"
-                    className="bg-white/10 border-white/30 text-white hover:bg-white/20 font-medium whitespace-nowrap backdrop-blur-sm"
-                  >
-                    View Practice Tests
-                    <ArrowRight className="w-4 h-4 ml-2" />
-                  </Button>
-                </Link>
-              </div>
-              <button
-                onClick={handleClosePracticeTestBanner}
-                className="p-1 rounded-full hover:bg-white/20 transition-colors"
-                aria-label="Dismiss practice test banner"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-        {/* Add padding-top to account for fixed banner below header */}
-        <div className={`max-w-7xl mx-auto px-4 py-8 ${showPracticeTestBanner ? 'pt-20' : 'pt-8'}`}>
+        <div className="max-w-7xl mx-auto px-4 py-8 pt-8">
           {isLoadingQuestionSet ? (
             <div className="flex items-center justify-center min-h-[400px]">
               <Loader2 className={`h-12 w-12 animate-spin ${subject === 'macro' ? 'text-blue-500' : 'text-green-500'}`} />
@@ -980,23 +884,17 @@ function UnitMCQPracticeContent() {
               hasTestModeAccess={hasTestModeAccess}
               onEnterTestMode={handleEnterTestMode}
               isAnswerDisabled={
-                (!user && guestQuestionsAnswered >= 1) || 
-                (user && !isPremium && hasHitCreditLimit)
+                (!isPremiumEffective && dailyQuestionsAnswered >= DAILY_FREE_ANSWERS)
               }
               onLoginPrompt={() => {
-                if (!user) {
-                  if (!hasDismissedGuestModal) {
-                    setShowGuestLimitModal(true);
-                  }
-                } else if (!isPremium && remainingCredits === 0) {
-                  if (!hasDismissedCreditModal) {
-                    setShowCreditLimitModal(true);
+                if (!isPremiumEffective && dailyQuestionsAnswered >= DAILY_FREE_ANSWERS) {
+                  if (!hasDismissedSeasonPassModal) {
+                    setShowSeasonPassModal(true);
                   }
                 }
               }}
               isNavigationDisabled={
-                (!user && guestQuestionsAnswered >= 1) ||
-                (user && !isPremium && hasHitCreditLimit)
+                (!isPremiumEffective && dailyQuestionsAnswered >= DAILY_FREE_ANSWERS)
               }
             />
           )}

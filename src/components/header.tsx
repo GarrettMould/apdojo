@@ -117,19 +117,19 @@ export function Header() {
   return (
     <header className="bg-white sticky top-0 z-50 shadow-md">
       <div className="px-4 sm:px-8 lg:px-12">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-20">
           {/* Logo and Brand */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-3">
               <Image
                 src="/images/dojoIconJan26.svg"
                 alt="AP Dojo"
-                width={32}
-                height={32}
-                className="w-8 h-8"
+                width={40}
+                height={40}
+                className="w-10 h-10"
                 unoptimized={true}
               />
-              <span className="text-xl font-extrabold tracking-wide text-gray-900">
+              <span className="text-2xl font-extrabold tracking-wide text-gray-900">
                 AP <span className="text-blue-500">Dojo</span>
               </span>
             </Link>
@@ -137,7 +137,7 @@ export function Header() {
 
           {/* Desktop Navigation, XP, and Auth Buttons */}
           <div className="hidden lg:flex items-center gap-x-8">
-            <nav className="flex items-center space-x-8">
+            <nav className="flex items-center space-x-10">
               {/* Practice Dropdown */}
               <div 
                 className="relative"
@@ -145,9 +145,9 @@ export function Header() {
                 onMouseEnter={() => setIsPracticeDropdownOpen(true)}
                 onMouseLeave={() => setIsPracticeDropdownOpen(false)}
               >
-                <button className="flex items-center gap-1 text-gray-700 hover:text-blue-600 transition-colors font-semibold">
+                <button className="flex items-center gap-1 text-lg text-gray-700 hover:text-blue-600 transition-colors font-bold">
                   Practice
-                  <ChevronDown className={`w-4 h-4 transition-transform ${isPracticeDropdownOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`w-5 h-5 transition-transform ${isPracticeDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
                 
                 {isPracticeDropdownOpen && (
@@ -157,35 +157,35 @@ export function Header() {
                     <div className="bg-white rounded-lg shadow-lg border border-gray-200 py-2 pointer-events-auto">
                       <Link
                         href="/unit-final-practice-tests"
-                        className="block px-5 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                        className="block px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
                         onClick={() => setIsPracticeDropdownOpen(false)}
                       >
                         Full Practice Tests
                       </Link>
                       <Link
                         href="/select-practice-units"
-                        className="block px-5 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                        className="block px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
                         onClick={() => setIsPracticeDropdownOpen(false)}
                       >
                         MCQ Practice
                       </Link>
                       <Link
                         href={`/unitFRQpracticePage?subject=${displaySubject}&frqId=${displaySubject === 'macro' ? 1 : 2}`}
-                        className="block px-5 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                        className="block px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
                         onClick={() => setIsPracticeDropdownOpen(false)}
                       >
                         FRQ Practice
                       </Link>
                       <Link
                         href="/dojo/infinite"
-                        className="block px-5 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                        className="block px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
                         onClick={() => setIsPracticeDropdownOpen(false)}
                       >
                         Create a Quiz
                       </Link>
                       <Link
                         href="/dojo-drills"
-                        className="block px-5 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                        className="block px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
                         onClick={() => setIsPracticeDropdownOpen(false)}
                       >
                         Dojo Drills
@@ -198,7 +198,7 @@ export function Header() {
               {/* Graph Gym - Distinct styling */}
               <Link
                 href="/graph-gym"
-                className="text-blue-500 hover:text-blue-600 transition-colors font-semibold"
+                className="text-lg text-gray-700 hover:text-blue-600 transition-colors font-bold"
               >
                 Graph Gym
               </Link>
@@ -206,9 +206,17 @@ export function Header() {
               {/* Cheat Sheets */}
               <Link
                 href={displaySubject === 'macro' ? '/ap-macro-unit-1-cheat-sheet' : '/ap-micro-unit-1-cheat-sheet'}
-                className="text-gray-700 hover:text-blue-600 transition-colors font-semibold"
+                className="text-lg text-gray-700 hover:text-blue-600 transition-colors font-bold"
               >
                 Cheat Sheets
+              </Link>
+
+              {/* Season Pass */}
+              <Link
+                href={`/purchase/season-pass?courseType=${displaySubject}`}
+                className="text-lg text-gray-700 hover:text-blue-600 transition-colors font-bold"
+              >
+                Season Pass
               </Link>
 
               {/* Tutoring Dropdown - HIDDEN */}
@@ -447,9 +455,9 @@ export function Header() {
               aria-label="Toggle mobile menu"
             >
               {isMobileMenuOpen ? (
-                <X className="w-6 h-6" />
+                <X className="w-7 h-7" />
               ) : (
-                <Menu className="w-6 h-6" />
+                <Menu className="w-7 h-7" />
               )}
             </button>
           </div>
@@ -466,35 +474,35 @@ export function Header() {
               <Link
                 href="/unit-final-practice-tests"
                 onClick={closeMobileMenu}
-                className="px-6 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
+                className="px-6 py-3 text-lg text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
               >
                 Full Practice Tests
               </Link>
               <Link
                 href="/select-practice-units"
                 onClick={closeMobileMenu}
-                className="px-6 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
+                className="px-6 py-3 text-lg text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
               >
                 MCQ Practice
               </Link>
               <Link
                 href={`/unitFRQpracticePage?subject=${displaySubject}&frqId=${displaySubject === 'macro' ? 1 : 2}`}
                 onClick={closeMobileMenu}
-                className="px-6 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
+                className="px-6 py-3 text-lg text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
               >
                 FRQ Practice
               </Link>
               <Link
                 href="/dojo/infinite"
                 onClick={closeMobileMenu}
-                className="px-6 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
+                className="px-6 py-3 text-lg text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
               >
                 Create a Quiz
               </Link>
               <Link
                 href="/dojo-drills"
                 onClick={closeMobileMenu}
-                className="px-6 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
+                className="px-6 py-3 text-lg text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
               >
                 Dojo Drills
               </Link>
@@ -504,16 +512,23 @@ export function Header() {
                 <Link
                   href="/graph-gym"
                   onClick={closeMobileMenu}
-                  className="px-4 py-2 text-blue-500 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
+                  className="px-4 py-3 text-lg text-blue-500 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
                 >
                   Graph Gym
                 </Link>
                 <Link
                   href={displaySubject === 'macro' ? '/ap-macro-unit-1-cheat-sheet' : '/ap-micro-unit-1-cheat-sheet'}
                   onClick={closeMobileMenu}
-                  className="px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
+                  className="px-4 py-3 text-lg text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
                 >
                   Cheat Sheets
+                </Link>
+                <Link
+                  href={`/purchase/season-pass?courseType=${displaySubject}`}
+                  onClick={closeMobileMenu}
+                  className="px-4 py-3 text-lg text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
+                >
+                  Season Pass
                 </Link>
               </div>
 

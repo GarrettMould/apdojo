@@ -56,7 +56,7 @@ export function CourseSidebar({ selectedUnit = '1', onUnitChange, isFixed = fals
   }, [pathname, isOnLessonPage, isOnUnitTestPage, allVideos]);
 
   const sidebarClasses = `w-80 bg-white border-r border-gray-100 flex-shrink-0 ${
-    isFixed ? 'fixed left-0 top-16 h-[calc(100vh-4rem)] overflow-y-auto z-40' : ''
+    isFixed ? 'fixed left-0 top-20 h-[calc(100vh-5rem)] overflow-y-auto z-40' : ''
   }`;
 
   return (

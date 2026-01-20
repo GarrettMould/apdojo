@@ -69,7 +69,7 @@ export function BundlePurchasePage() {
   ];
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-white">
+    <div className="min-h-[calc(100vh-5rem)] bg-white">
       <div className="max-w-7xl mx-auto p-8 lg:p-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-0">
           {/* Left Column - Bundle Content */}

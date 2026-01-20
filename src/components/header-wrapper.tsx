@@ -10,7 +10,7 @@ function HeaderContent() {
 export function HeaderWrapper() {
   return (
     <header className="w-full border-b bg-white">
-      <Suspense fallback={<div className="h-16 bg-white" />}>
+      <Suspense fallback={<div className="h-20 bg-white" />}>
         <HeaderContent />
       </Suspense>
     </header>
