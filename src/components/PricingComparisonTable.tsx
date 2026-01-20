@@ -155,22 +155,6 @@ export function PricingComparisonTable() {
   return (
     <div className="w-full py-16 sm:py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="mb-12 text-center"
-        >
-          <h2 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-gray-900 mb-4">
-            One Pass. <span className="text-blue-500">Unlimited</span> Access Until Exam Day.
-          </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Pay once and own the dojo for the entire 2026 school year. No monthly subscriptions, just results.
-          </p>
-        </motion.div>
-
         {/* Mobile Scroll Hint */}
         <div className="md:hidden mb-4 text-center">
           <p className="text-sm text-gray-500 flex items-center justify-center gap-2">

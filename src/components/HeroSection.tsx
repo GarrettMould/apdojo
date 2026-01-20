@@ -64,7 +64,7 @@ export function HeroSection() {
             variants={itemVariants}
             className="text-xl sm:text-2xl text-gray-600 mb-10 max-w-3xl mx-auto font-medium leading-relaxed"
           >
-            The all-in-one toolkit to crush your AP Economics exam. Stop guessing, start graphing.
+            Unlock acceess to full AP practice tests, unlimited MCQ practice, AI-graded FRQs, interactive cheat sheets, and more. All for $29.
           </motion.p>
 
           {/* Main CTA */}
@@ -72,15 +72,33 @@ export function HeroSection() {
             variants={itemVariants}
             className="mb-16"
           >
-            <Button
-              asChild
-              size="lg"
-              className="text-lg sm:text-xl font-black py-6 px-8 sm:px-12 rounded-xl border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1 bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              <Link href="/purchase/season-pass">
-                Get the Season Pass
-              </Link>
-            </Button>
+            <div className="flex flex-col items-center gap-4">
+              <div className="flex flex-col items-center gap-1">
+                <div className="flex gap-1 text-yellow-400 text-2xl sm:text-3xl" aria-hidden="true">
+                  <span>★</span>
+                  <span>★</span>
+                  <span>★</span>
+                  <span>★</span>
+                  <span>★</span>
+                </div>
+                <p
+                  className="text-2xl font-bold text-gray-900 drop-shadow-sm"
+                  style={{ fontFamily: 'Permanent Marker, cursive' }}
+                >
+                  Trusted by hundreds of students worldwide
+                </p>
+              </div>
+
+              <Button
+                asChild
+                size="lg"
+                className="text-lg sm:text-xl font-black py-6 px-8 sm:px-12 rounded-xl border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1 bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                <Link href="/purchase/season-pass">
+                  Get the Season Pass
+                </Link>
+              </Button>
+            </div>
           </motion.div>
 
           {/* Two Feature Containers Grid */}
