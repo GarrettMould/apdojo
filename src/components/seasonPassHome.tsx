@@ -17,6 +17,7 @@ import { HeroDojoDrills } from '@/components/HeroDojoDrills';
 import { FRQFeedbackDemo } from '@/components/FRQFeedbackDemo';
 import { SeasonPassShowcase } from '@/components/SeasonPassShowcase';
 import { HomeDojoDrills } from '@/components/HomeDojoDrills';
+import { HeroSection } from '@/components/HeroSection';
 
 interface FeatureItem {
   icon: React.ReactNode;
@@ -61,6 +62,9 @@ export function SeasonPassHome() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      {/* New Hero Section */}
+      <HeroSection />
+      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
         {/* Alternating Hero Content */}
         <AnimatePresence mode="wait">

@@ -20,6 +20,7 @@ import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question as QuestionType } from '@/data/questionBanks/types';
 import { X, ArrowRight, Lock, ArrowLeft, CheckCircle2, XCircle, Download, Bookmark, BookmarkPlus, Check, Brain, Maximize2, Play, FileText, Zap, Lightbulb } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import jsPDF from 'jspdf';
 import { dojoIcon } from '@/data/imagePaths';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -1484,9 +1485,9 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           </nav>
           <button
             onClick={handleGeneratePDF}
-            className="flex items-center gap-2 px-4 py-2 bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 font-semibold text-gray-900"
+            className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-900 transition-colors underline-offset-2 hover:underline"
           >
-            <Download className="w-4 h-4" />
+            <Download className="w-3.5 h-3.5" />
             Turn this Cheat Sheet into a PDF
           </button>
         </div>
@@ -1497,42 +1498,45 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           const unitPrice = currentUnit?.price || 4.99;
           const isMicro = selectedSubject === 'micro';
           
+          // Determine if user has premium access
+          const hasPremiumAccess = isProCustomer;
+          
+          // Set the link based on premium status
+          const ctaLink = hasPremiumAccess 
+            ? `/unit-mcq-test/${activeUnitNum}`
+            : `/purchase/season-pass?courseType=${selectedSubject}`;
+          
           return (
-            <div className={`mb-8 rounded-xl p-6 shadow-md border print:hidden ${
-              themeColor === 'blue' 
-                ? 'bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200' 
-                : 'bg-gradient-to-r from-green-50 to-green-100 border-green-200'
-            }`}>
-              <div className="flex items-center justify-between flex-wrap gap-4">
-                <div className="flex-1">
-                  <p className="text-lg font-semibold text-gray-900">
-                    Strengthen your mastery of Unit {activeUnitNum}!
-                  </p>
-                  <p className="text-gray-600 mt-1">
-                    Test your knowledge with a full-length practice test.
-                  </p>
-                </div>
-                {isMicro ? (
-                  <button
-                    disabled
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-gray-400 text-white font-semibold rounded-lg cursor-not-allowed"
-                  >
-                    Coming Soon
-                  </button>
-                ) : (
-                  <Link 
-                    href={`/purchase/season-pass?courseType=${selectedSubject}`}
-                    className={`inline-flex items-center gap-2 px-6 py-3 text-white font-semibold rounded-lg transition-colors shadow-md hover:shadow-lg ${
-                      themeColor === 'blue'
-                        ? 'bg-blue-600 hover:bg-blue-700'
-                        : 'bg-green-600 hover:bg-green-700'
-                    }`}
-                  >
-                    Take the Unit {activeUnitNum} Practice Test now
-                    <ArrowRight className="w-5 h-5" />
-                  </Link>
-                )}
+            <div className="mb-8 bg-white border-4 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 print:hidden">
+              <div>
+                <p className="text-lg font-black text-black">
+                  Ready to test your knowledge?
+                </p>
+                <p className="text-sm text-gray-700 font-medium">
+                  Take the Unit {activeUnitNum} practice test and see how you stack up.
+                </p>
               </div>
+              {isMicro ? (
+                <Button
+                  disabled
+                  className="bg-gray-400 text-white font-black py-3 px-5 rounded-xl border-4 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] cursor-not-allowed"
+                >
+                  Coming Soon
+                </Button>
+              ) : (
+                <Button
+                  asChild
+                  className={`font-black py-3 px-5 rounded-xl border-4 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1 ${
+                    themeColor === 'blue'
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                      : 'bg-green-600 hover:bg-green-700 text-white'
+                  }`}
+                >
+                  <Link href={ctaLink}>
+                    Take the Unit {activeUnitNum} Test <ArrowRight className="w-5 h-5 ml-2" />
+                  </Link>
+                </Button>
+              )}
             </div>
           );
         })()}
