@@ -16,6 +16,9 @@ function HeaderWithSuspense() {
 export function LayoutWrapper({ children }: LayoutWrapperProps) {
   const pathname = usePathname();
   const isGraphGymPage = pathname === '/graph-gym';
+  const isUnitCheatSheetPage =
+    pathname.startsWith('/unit/') ||
+    pathname.includes('-cheat-sheet');
   
   return (
     <div className="flex flex-col">
@@ -25,7 +28,7 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
       <main>
         {children}
       </main>
-      {!isGraphGymPage && <Footer />}
+      {!isGraphGymPage && !isUnitCheatSheetPage && <Footer />}
     </div>
   );
 } 

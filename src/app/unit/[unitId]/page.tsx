@@ -26,6 +26,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { dojoDrills, drillAppliesToSubject, getDrillUnitForSubject } from '@/data/dojoDrills';
 import { saveQuizResult } from '@/lib/quizHistory';
 import { hasValidSeasonPass } from '@/lib/utils';
+import { Footer } from '@/components/Footer';
 
 // Helper to combine and structure whiteboard data for Macro
 const getUnitWhiteboards = (unitNumber: number): WhiteboardImage[] => {
@@ -1953,6 +1954,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           );
         })()}
           </div>
+          <Footer />
         </motion.div>
 
         {/* Resizable Divider */}
