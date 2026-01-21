@@ -123,7 +123,7 @@ export const reviews: Review[] = [
   {
     text: "I couldn't have prepped for AP Micro without this site. It covered every unit thoroughly, and the exam strategies were spot on. The explanations for market structures were particularly helpful. I ended up getting a 5 on the exam!",
     author: "Michelle",
-    badge: "Student (Score: 5)",
+    badge: "Student",
     title: "Achieved a 5 on the exam!"
   },
   {

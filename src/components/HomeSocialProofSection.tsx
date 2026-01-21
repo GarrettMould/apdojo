@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { reviews } from '@/data/reviews';
-import { Quote, Star } from 'lucide-react';
+import { Star } from 'lucide-react';
 
 export function HomeSocialProofSection() {
   const featured = reviews.slice(0, 6);
@@ -62,7 +62,12 @@ export function HomeSocialProofSection() {
                 )}
 
                 <div className="relative flex-1">
-                  <Quote className="w-7 h-7 text-gray-300 absolute -top-1 -left-1" />
+                  <span
+                    aria-hidden="true"
+                    className="text-6xl leading-none text-gray-300 absolute -top-3 -left-1 select-none"
+                  >
+                    “
+                  </span>
                   <p className="text-gray-800 font-medium leading-relaxed pl-8">
                     {r.text}
                   </p>
