@@ -4,7 +4,9 @@ import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { dojoDrills, getDrillUnitForSubject } from '@/data/dojoDrills';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
+import { DojoDrillPreview } from '@/components/DojoDrillPreview';
+import { useAuthContext } from '@/contexts/AuthContext';
+import { hasValidSeasonPass } from '@/lib/utils';
 
 // Framer Motion variants for staggered animation
 const containerVariants = {
@@ -44,6 +46,7 @@ function shuffleArray<T>(array: T[]): T[] {
 
 export function HomeDojoDrills() {
   const router = useRouter();
+  const { user, userData, selectedSubject } = useAuthContext();
   
   // Shuffle drills for random order
   const shuffledDrills = useMemo(() => {
@@ -51,8 +54,22 @@ export function HomeDojoDrills() {
     return shuffleArray(allDrills);
   }, []);
 
-  const handleDrillClick = () => {
-    router.push(`/dojo-drills`);
+  // Show a curated set on the homepage (2 rows = 4 cards)
+  const featuredDrills = useMemo(() => shuffledDrills.slice(0, 4), [shuffledDrills]);
+
+  const isProCustomer = useMemo(() => {
+    if (!user || !userData) return false;
+    const subjectKey = selectedSubject === 'macro' ? 'macro' : 'micro';
+    return hasValidSeasonPass(userData, subjectKey);
+  }, [user, userData, selectedSubject]);
+
+  const handleStart = (drillId: string) => {
+    if (!isProCustomer) {
+      const subjectKey = selectedSubject === 'macro' ? 'macro' : 'micro';
+      router.push(`/purchase/season-pass?courseType=${subjectKey}`);
+      return;
+    }
+    router.push(`/dojo-drills?drill=${drillId}`);
   };
 
   // Helper to get subject label
@@ -91,7 +108,7 @@ export function HomeDojoDrills() {
     <div className="w-full py-12">
       {/* Header Section */}
       <div className="text-center mb-12">
-        <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-4">
+        <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-gray-900 mb-5">
           Master the <span className="text-blue-500">Interactive</span> activities for the hardest topics.
         </h2>
         <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -101,62 +118,48 @@ export function HomeDojoDrills() {
 
       {/* Grid Layout */}
       <motion.div
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-x-6 gap-y-12"
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: '-100px' }}
       >
-        {shuffledDrills.map((drill) => {
-          const unitNumber = getUnitNumber(drill);
-          const subject = getSubject(drill);
-          const subjectLabel = getSubjectLabel(drill);
-          
+        {featuredDrills.map((drill) => {
           return (
-            <motion.button
+            <motion.div
               key={drill.id}
               variants={cardVariants}
               whileHover={{ scale: 1.02 }}
               transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-              className="bg-white border-4 border-black rounded-3xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 text-left hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 flex flex-col"
-              onClick={handleDrillClick}
+              className="h-full cursor-pointer"
+              onClick={() => handleStart(drill.id)}
             >
-              <div className="flex items-center justify-between mb-4">
-                <div
-                  className={`inline-block text-xs font-semibold px-2.5 py-1 rounded-md ${
-                    subject === 'ap_macroeconomics'
-                      ? 'bg-blue-100 text-blue-800'
-                      : 'bg-green-100 text-green-800'
-                  }`}
-                >
-                  {subjectLabel} - Unit {unitNumber}
-                </div>
-                <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-800">
-                  <span>{drill.xpReward.total}</span>
-                  <span className="inline-flex items-center">
-                    <Image
-                      src="/images/flame100.png"
-                      alt="XP Flame"
-                      width={20}
-                      height={20}
-                      className="w-5 h-5"
-                    />
-                  </span>
-                </div>
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
-                {drill.title}
-              </h3>
-              <p className="text-gray-600 text-sm line-clamp-3 mb-4">
-                {drill.description}
-              </p>
-              <div className="text-sm font-semibold text-blue-600 mt-auto">
-                Start Drill →
-              </div>
-            </motion.button>
+              <DojoDrillPreview
+                title={drill.title}
+                description={drill.description}
+                xpReward={drill.xpReward.total}
+                difficulty="Medium"
+                onStart={() => handleStart(drill.id)}
+                isLocked={!isProCustomer}
+                progress={null}
+                buttonText={isProCustomer ? undefined : 'Join the Dojo'}
+              />
+            </motion.div>
           );
         })}
       </motion.div>
+
+      {/* Show more link after 2 rows */}
+      {shuffledDrills.length > 4 && (
+        <div className="mt-16 text-center">
+          <button
+            onClick={() => router.push('/dojo-drills')}
+            className="text-xl sm:text-2xl font-black text-blue-600 hover:text-blue-700 underline underline-offset-4"
+          >
+            Show more →
+          </button>
+        </div>
+      )}
     </div>
   );
 }

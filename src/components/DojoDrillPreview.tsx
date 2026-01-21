@@ -49,7 +49,7 @@ function DojoDrillPreview({
     : (buttonText || (isCompleted ? 'Restart Drill' : (isInProgress ? 'Resume Drill' : (isLocked ? 'Locked (Season Pass)' : 'Start Drill'))));
   
   return (
-    <div className="bg-white border-4 border-black rounded-3xl shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] p-8 sm:p-12 flex flex-col min-h-full"
+    <div className="bg-white border-4 border-black rounded-3xl shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] p-8 sm:p-12 flex flex-col h-full"
     >
       {/* Header Section */}
       <div className="mb-6">
@@ -150,7 +150,7 @@ function DojoDrillPreview({
           }
         }}
         disabled={comingSoon || (isLocked && !buttonText)} // Disable if coming soon or locked without buttonText
-        className={`w-full font-bold py-4 rounded-lg uppercase tracking-widest transition-colors ${
+        className={`w-full mt-auto font-bold py-4 rounded-lg uppercase tracking-widest transition-colors ${
           comingSoon
             ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
             : (isLocked && !buttonText

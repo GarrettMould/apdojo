@@ -310,7 +310,7 @@ interface QuestionCardProps {
   aiExplanation?: string;
   isLoadingAI: boolean;
   isLoggedIn: boolean;
-  signup: (email: string, password: string, isSubscribed: boolean) => Promise<any>;
+  signup: (email: string, password: string, isSubscribed: boolean, isTeacher?: boolean) => Promise<any>;
   login: (email: string, password: string) => Promise<any>;
   dojoProgress: number;
   correctStreak: number;
@@ -1705,11 +1705,15 @@ export function UnitMCQs({
 
   // Handle calculator click
   const handleCalculatorClick = () => {
+    // Ensure only one slide-out tool is visible at a time
+    setShowWhiteboard(false);
     setShowCalculator(true);
   };
 
   // Handle whiteboard click
   const handleWhiteboardClick = () => {
+    // Ensure only one slide-out tool is visible at a time
+    setShowCalculator(false);
     setShowWhiteboard(true);
   };
 

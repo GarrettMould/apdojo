@@ -138,8 +138,8 @@ export function SeasonPassShowcase() {
           transition={{ duration: 0.45 }}
           className="text-center mb-12"
         >
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900">
-            Your All‑In‑One AP Econ Season Pass
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-gray-900">
+            Your All‑In‑One AP Econ <span className="text-blue-500">Season Pass</span>
           </h2>
         </motion.div>
 

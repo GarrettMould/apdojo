@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Check, BookOpen, FileText, Target, PlayCircle, Sparkles, Brain, Award, Search, Filter, X, ChevronRight, ArrowDown, Upload, Image as ImageIcon, Loader2, CheckCircle2, XCircle, RefreshCw, Lightbulb } from 'lucide-react';
+import React, { useState, useMemo, useCallback } from 'react';
+import { motion } from 'framer-motion';
+import { Check, BookOpen, FileText, Target, PlayCircle, Sparkles, Brain, Award, Search, Filter, X, ChevronRight, Upload, Image as ImageIcon, Loader2, CheckCircle2, XCircle, RefreshCw, Lightbulb } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
@@ -12,12 +12,10 @@ import { frqExams } from '@/data/frqQuestions';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { InfinitePracticeSection } from '@/components/InfinitePracticeSection';
-import { HeroDojoDrills } from '@/components/HeroDojoDrills';
-import { FRQFeedbackDemo } from '@/components/FRQFeedbackDemo';
 import { SeasonPassShowcase } from '@/components/SeasonPassShowcase';
 import { HomeDojoDrills } from '@/components/HomeDojoDrills';
 import { HeroSection } from '@/components/HeroSection';
+import { HomeSocialProofSection } from '@/components/HomeSocialProofSection';
 
 interface FeatureItem {
   icon: React.ReactNode;
@@ -45,123 +43,16 @@ const microFeatures: FeatureItem[] = [
 ];
 
 export function SeasonPassHome() {
-  const [activeFrame, setActiveFrame] = useState(0);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  // Cycle through frames every 5 seconds (4 frames: infinite practice, diagnostic test, dojo drills, product shot)
-  // Pause when modal is open
-  useEffect(() => {
-    if (isModalOpen) return; // Don't auto-advance when modal is open
-    
-    const interval = setInterval(() => {
-      setActiveFrame((prev) => (prev + 1) % 4);
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [isModalOpen]);
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       {/* New Hero Section */}
       <HeroSection />
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-        {/* Alternating Hero Content */}
-        <AnimatePresence mode="wait">
-          {activeFrame === 0 && (
-            <motion.div
-              key="infinite-practice"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.5 }}
-            >
-              <InfinitePracticeSection 
-                previewMode={true}
-                onModalOpenChange={setIsModalOpen}
-              />
-            </motion.div>
-          )}
-          {activeFrame === 1 && (
-            <motion.div
-              key="diagnostic-test"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.5 }}
-            >
-              {/* Main Header */}
-              <div className="text-center mb-12">
-                <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-gray-900 mb-4">
-                  Stop Guessing.
-                  <br />
-                  <span className="bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
-                    Score a 5 in AP Econ.
-                  </span>
-                </h1>
-                <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                  Get everything you need to master AP Macroeconomics and AP Microeconomics in one comprehensive pass.
-                </p>
-              </div>
+      {/* Social proof section (reviews) */}
+      <HomeSocialProofSection />
 
-              {/* Take Diagnostic Test CTA */}
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="text-center mb-12"
-              >
-                <Link href="/diagnostic-test" className="inline-flex flex-col items-center gap-2 group">
-                  <span 
-                    className="text-2xl font-bold text-gray-900 drop-shadow-sm"
-                    style={{ fontFamily: 'Permanent Marker, cursive' }}
-                  >
-                    Take the<br />Diagnostic Test
-                  </span>
-                  <ArrowDown className="w-6 h-6 text-gray-900 group-hover:translate-y-1 transition-transform" />
-                </Link>
-              </motion.div>
-
-              {/* Diagnostic Test Question Preview */}
-              <DiagnosticQuestionPreview />
-            </motion.div>
-          )}
-          {activeFrame === 2 && (
-            <motion.div
-              key="dojo-drills"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.5 }}
-            >
-              <HeroDojoDrills />
-            </motion.div>
-          )}
-          {activeFrame === 3 && (
-            <motion.div
-              key="frq-feedback"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.5 }}
-              className="w-full"
-            >
-              <div className="text-center mb-8">
-                <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-4">
-                  Grade Your FRQs in <span className="text-blue-500">Seconds</span>, Not Days
-                </h2>
-                <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                  See exactly how AP graders score your responses with detailed explanations and grading criteria.
-                </p>
-              </div>
-              <FRQFeedbackDemo />
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Season Pass Showcase */}
-        <SeasonPassShowcase />
-      </div>
+      {/* Season Pass Showcase */}
+      <SeasonPassShowcase />
 
       {/* Home Dojo Drills Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 pb-16 sm:pb-24">
@@ -225,7 +116,7 @@ function QuestionListSection() {
   };
 
   return (
-    <div className="bg-white py-16 sm:py-24">
+    <div className="bg-gray-50 py-16 sm:py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -233,8 +124,8 @@ function QuestionListSection() {
           transition={{ duration: 0.6 }}
           className="mb-12"
         >
-          <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-4 text-center">
-            The Ultimate MCQ Question Vault.
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-gray-900 mb-5 text-center">
+            The Ultimate <span className="text-blue-500">MCQ</span> Question Vault.
           </h2>
           <p className="text-xl text-gray-600 text-center max-w-3xl mx-auto">
             Filter by Unit. Aligned with the 2026 CED. Designed to mimic the real exam.
@@ -246,7 +137,7 @@ function QuestionListSection() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="bg-white border border-gray-200 rounded-xl shadow-lg p-6 mb-8"
+          className="bg-white border-4 border-black rounded-3xl shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] p-6 sm:p-8 mb-10"
         >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Search */}
@@ -257,7 +148,7 @@ function QuestionListSection() {
                 placeholder="Search by question text or unit..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white transition-all"
+                className="w-full pl-10 pr-4 py-3 border-2 border-black rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white transition-all"
               />
             </div>
 
@@ -267,7 +158,7 @@ function QuestionListSection() {
               <select
                 value={unitFilter || ''}
                 onChange={(e) => setUnitFilter(e.target.value ? parseInt(e.target.value) : null)}
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-white transition-all"
+                className="w-full pl-10 pr-4 py-3 border-2 border-black rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white transition-all"
               >
                 <option value="">All Units</option>
                 {uniqueUnits.map(unit => (
@@ -277,18 +168,18 @@ function QuestionListSection() {
             </div>
 
             {/* Subject Toggle */}
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold text-gray-700">Subject:</span>
-              <div className="flex border border-gray-300 rounded-lg overflow-hidden">
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-black text-gray-900">Subject</span>
+              <div className="flex border-2 border-black rounded-xl overflow-hidden bg-white">
                 <button
                   onClick={() => {
                     setSubjectFilter('ap_macroeconomics');
                     setUnitFilter(null);
                   }}
-                  className={`px-4 py-2.5 font-semibold transition-all ${
+                  className={`px-5 py-3 font-black transition-all ${
                     subjectFilter === 'ap_macroeconomics'
                       ? 'bg-blue-600 text-white'
-                      : 'bg-white text-gray-700 hover:bg-gray-50'
+                      : 'bg-white text-gray-900 hover:bg-gray-50'
                   }`}
                 >
                   Macro
@@ -298,10 +189,10 @@ function QuestionListSection() {
                     setSubjectFilter('ap_microeconomics');
                     setUnitFilter(null);
                   }}
-                  className={`px-4 py-2.5 font-semibold transition-all border-l border-gray-300 ${
+                  className={`px-5 py-3 font-black transition-all border-l-2 border-black ${
                     subjectFilter === 'ap_microeconomics'
                       ? 'bg-green-600 text-white'
-                      : 'bg-white text-gray-700 hover:bg-gray-50'
+                      : 'bg-white text-gray-900 hover:bg-gray-50'
                   }`}
                 >
                   Micro
@@ -312,14 +203,14 @@ function QuestionListSection() {
         </motion.div>
 
         {/* Questions Grid - Card Based */}
-        <div className="space-y-3">
+        <div className="space-y-5">
           {filteredQuestions.length === 0 ? (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="bg-white border border-gray-200 rounded-xl shadow-lg p-12 text-center"
+              className="bg-white border-4 border-black rounded-3xl shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] p-12 text-center"
             >
-              <p className="text-gray-600 font-medium text-lg">No questions found matching your filters.</p>
+              <p className="text-gray-700 font-bold text-lg">No questions found matching your filters.</p>
             </motion.div>
           ) : (
             filteredQuestions.map((question, index) => (
@@ -331,34 +222,34 @@ function QuestionListSection() {
               >
                 <motion.button
                   onClick={() => handleQuestionClick(question)}
-                  whileHover={{ y: -2 }}
+                  whileHover={{ y: -3 }}
                   whileTap={{ scale: 0.98 }}
-                  className="w-full bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md p-5 text-left transition-all duration-200 group"
+                  className="w-full bg-white border-4 border-black rounded-3xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[9px_9px_0px_0px_rgba(0,0,0,1)] p-6 text-left transition-all duration-200 group"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                     {/* Left side - Question content */}
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-3">
-                        <span className={`px-2.5 py-1 rounded-md text-xs font-semibold ${
+                        <span className={`px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-wider border-2 border-black ${
                           subjectFilter === 'ap_macroeconomics'
                             ? 'bg-blue-100 text-blue-800'
                             : 'bg-green-100 text-green-800'
                         }`}>
                           Unit {question.unit}
                         </span>
-                        <span className="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-md text-xs font-semibold">
+                        <span className="px-3 py-1.5 bg-gray-100 text-gray-900 rounded-full text-xs font-black uppercase tracking-wider border-2 border-black">
                           {question.unitName}
                         </span>
                       </div>
-                      <p className="text-gray-900 font-medium text-sm leading-relaxed group-hover:text-gray-700 transition-colors">
+                      <p className="text-gray-900 font-medium text-base sm:text-lg leading-relaxed group-hover:text-gray-700 transition-colors">
                         {truncateText(question.question, 200)}
                       </p>
                     </div>
                     
                     {/* Right side - Arrow indicator */}
                     <div className="flex-shrink-0 flex items-center">
-                      <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-gray-200 transition-colors">
-                        <ChevronRight className="w-4 h-4 text-gray-600" />
+                      <div className="w-10 h-10 rounded-full bg-white border-2 border-black flex items-center justify-center group-hover:bg-gray-50 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                        <ChevronRight className="w-5 h-5 text-gray-900" />
                       </div>
                     </div>
                   </div>

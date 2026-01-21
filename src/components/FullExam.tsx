@@ -26,7 +26,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import '@excalidraw/excalidraw/index.css';
 
-const Excalidraw = dynamic(
+const Excalidraw = dynamic<any>(
   async () => (await import("@excalidraw/excalidraw")).Excalidraw,
   {
     ssr: false,
@@ -164,6 +164,31 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   const shouldShowToolsByDefault = isUnitTest || isPreviewExam || isFullExam || isCustomAssignment;
   const [showToolsPanel, setShowToolsPanel] = useState(shouldShowToolsByDefault);
   const [leftPanelWidth, setLeftPanelWidth] = useState(shouldShowToolsByDefault ? 65 : 100); // Percentage width for left panel when tools panel is open
+  // For custom assignments, only show one tool at a time.
+  const [activeTool, setActiveTool] = useState<'calculator' | 'whiteboard'>('calculator');
+
+  const handleCustomToolToggle = (tool: 'calculator' | 'whiteboard') => {
+    // Only custom assignments need mutually-exclusive tools.
+    if (!isCustomAssignment) {
+      setShowToolsPanel(prev => !prev);
+      return;
+    }
+
+    // If panel is closed, open it and set the requested tool.
+    if (!showToolsPanel) {
+      setActiveTool(tool);
+      setShowToolsPanel(true);
+      return;
+    }
+
+    // If panel is open, clicking the same tool toggles close; otherwise switch tools.
+    if (activeTool === tool) {
+      setShowToolsPanel(false);
+    } else {
+      setActiveTool(tool);
+      setShowToolsPanel(true);
+    }
+  };
 
   // Update leftPanelWidth when tools panel opens/closes
   useEffect(() => {
@@ -530,7 +555,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
             correctCount,
             totalQuestions,
             questions: questions,
-            userAnswers: answers,
+            userAnswers: answers as unknown as Record<string, string>,
           });
           console.log('[Custom Assignment] Saved quiz history');
         } catch (historyError) {
@@ -1125,27 +1150,27 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                 <div className="flex items-center gap-3 ml-auto">
                   {/* Calculator Toggle Button */}
                   <button
-                    onClick={() => setShowToolsPanel(!showToolsPanel)}
+                    onClick={() => handleCustomToolToggle('calculator')}
                     className={`p-2 rounded-lg transition-colors ${
                       showToolsPanel 
                         ? 'bg-gray-300 hover:bg-gray-400' 
                         : 'hover:bg-gray-300'
                     }`}
-                    aria-label="Toggle calculator and drawing pad"
-                    title="Toggle calculator and drawing pad"
+                    aria-label="Toggle calculator"
+                    title="Calculator"
                   >
                     <Calculator className="w-5 h-5 text-gray-900" />
                   </button>
                   {/* Drawing Pad Toggle Button */}
                   <button
-                    onClick={() => setShowToolsPanel(!showToolsPanel)}
+                    onClick={() => handleCustomToolToggle('whiteboard')}
                     className={`p-2 rounded-lg transition-colors ${
                       showToolsPanel 
                         ? 'bg-gray-300 hover:bg-gray-400' 
                         : 'hover:bg-gray-300'
                     }`}
-                    aria-label="Toggle calculator and drawing pad"
-                    title="Toggle calculator and drawing pad"
+                    aria-label="Toggle drawing pad"
+                    title="Drawing Pad"
                   >
                     <Pen className="w-5 h-5 text-gray-900" />
                   </button>
@@ -1968,12 +1993,25 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                     <div className="w-full h-full flex flex-col overflow-hidden">
                     {/* Header */}
                     <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between flex-shrink-0">
-                      <span className="text-sm font-semibold text-gray-900">Calculator & Drawing Pad</span>
+                      <span className="text-sm font-semibold text-gray-900">
+                        {isCustomAssignment ? (activeTool === 'calculator' ? 'Calculator' : 'Drawing Pad') : 'Calculator & Drawing Pad'}
+                      </span>
+                      {isCustomAssignment && (
+                        <button
+                          onClick={() => setShowToolsPanel(false)}
+                          className="text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded p-1.5 transition-colors"
+                          aria-label="Close tools panel"
+                          title="Close"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      )}
                     </div>
 
                     {/* For unit tests, preview exams, and full exams: Whiteboard on top, Calculator on bottom */}
                     <>
-                      {/* Excalidraw Section - Top */}
+                      {/* Excalidraw Section */}
+                      {(!isCustomAssignment || activeTool === 'whiteboard') && (
                         <div className="flex-1 flex flex-col overflow-hidden bg-white" style={{ minHeight: '400px', flex: '1 1 auto' }}>
                           <div className="w-full relative" style={{ height: '100%', minHeight: '400px', width: '100%', position: 'relative' }}>
                             <Excalidraw
@@ -1999,140 +2037,143 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                   currentItemStrokeWidth: excalidrawAppState?.currentItemStrokeWidth ?? 1,
                                 },
                               }}
-                              onChange={(elements, appState) => {
+                              onChange={(elements: any, appState: any) => {
                                 setExcalidrawElements(elements);
                                 setExcalidrawAppState(appState);
                               }}
                             />
                           </div>
                         </div>
+                      )}
 
-                        {/* Calculator Section - Bottom */}
-                        <div className="flex-shrink-0 border-t border-gray-200 bg-gray-50">
-                      <div className="p-4">
-                        {/* Calculator Display */}
-                        <div className="bg-white border border-gray-200 rounded-lg mb-3 p-4 shadow-sm">
-                          <div className="text-right text-3xl font-semibold text-gray-900 overflow-hidden min-h-[48px] flex items-center justify-end">
-                            {calculatorDisplay}
+                      {/* Calculator Section */}
+                      {(!isCustomAssignment || activeTool === 'calculator') && (
+                        <div className={isCustomAssignment ? "flex-1 overflow-y-auto bg-gray-50" : "flex-shrink-0 border-t border-gray-200 bg-gray-50"}>
+                          <div className="p-4">
+                            {/* Calculator Display */}
+                            <div className="bg-white border border-gray-200 rounded-lg mb-3 p-4 shadow-sm">
+                              <div className="text-right text-3xl font-semibold text-gray-900 overflow-hidden min-h-[48px] flex items-center justify-end">
+                                {calculatorDisplay}
+                              </div>
+                            </div>
+
+                            {/* Calculator Buttons */}
+                            <div className="grid grid-cols-4 gap-2.5">
+                              {/* Row 1 */}
+                              <button
+                                onClick={handleCalculatorClear}
+                                className="col-span-2 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 font-semibold py-3 rounded-lg transition-colors text-sm"
+                              >
+                                Clear
+                              </button>
+                              <button
+                                onClick={() => handleCalculatorOperation('÷')}
+                                className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
+                              >
+                                ÷
+                              </button>
+                              <button
+                                onClick={() => handleCalculatorOperation('×')}
+                                className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
+                              >
+                                ×
+                              </button>
+
+                              {/* Row 2 */}
+                              <button
+                                onClick={() => handleCalculatorNumber('7')}
+                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                              >
+                                7
+                              </button>
+                              <button
+                                onClick={() => handleCalculatorNumber('8')}
+                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                              >
+                                8
+                              </button>
+                              <button
+                                onClick={() => handleCalculatorNumber('9')}
+                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                              >
+                                9
+                              </button>
+                              <button
+                                onClick={() => handleCalculatorOperation('-')}
+                                className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
+                              >
+                                −
+                              </button>
+
+                              {/* Row 3 */}
+                              <button
+                                onClick={() => handleCalculatorNumber('4')}
+                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                              >
+                                4
+                              </button>
+                              <button
+                                onClick={() => handleCalculatorNumber('5')}
+                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                              >
+                                5
+                              </button>
+                              <button
+                                onClick={() => handleCalculatorNumber('6')}
+                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                              >
+                                6
+                              </button>
+                              <button
+                                onClick={() => handleCalculatorOperation('+')}
+                                className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
+                              >
+                                +
+                              </button>
+
+                              {/* Row 4 */}
+                              <button
+                                onClick={() => handleCalculatorNumber('1')}
+                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                              >
+                                1
+                              </button>
+                              <button
+                                onClick={() => handleCalculatorNumber('2')}
+                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                              >
+                                2
+                              </button>
+                              <button
+                                onClick={() => handleCalculatorNumber('3')}
+                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                              >
+                                3
+                              </button>
+                              <button
+                                onClick={handleCalculatorEquals}
+                                className={`row-span-2 ${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-xl`}
+                              >
+                                =
+                              </button>
+
+                              {/* Row 5 */}
+                              <button
+                                onClick={() => handleCalculatorNumber('0')}
+                                className="col-span-2 bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                              >
+                                0
+                              </button>
+                              <button
+                                onClick={handleCalculatorDecimal}
+                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                              >
+                                .
+                              </button>
+                            </div>
                           </div>
                         </div>
-
-                        {/* Calculator Buttons */}
-                        <div className="grid grid-cols-4 gap-2.5">
-                          {/* Row 1 */}
-                          <button
-                            onClick={handleCalculatorClear}
-                            className="col-span-2 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 font-semibold py-3 rounded-lg transition-colors text-sm"
-                          >
-                            Clear
-                          </button>
-                          <button
-                            onClick={() => handleCalculatorOperation('÷')}
-                            className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
-                          >
-                            ÷
-                          </button>
-                          <button
-                            onClick={() => handleCalculatorOperation('×')}
-                            className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
-                          >
-                            ×
-                          </button>
-
-                          {/* Row 2 */}
-                          <button
-                            onClick={() => handleCalculatorNumber('7')}
-                            className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                          >
-                            7
-                          </button>
-                          <button
-                            onClick={() => handleCalculatorNumber('8')}
-                            className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                          >
-                            8
-                          </button>
-                          <button
-                            onClick={() => handleCalculatorNumber('9')}
-                            className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                          >
-                            9
-                          </button>
-                          <button
-                            onClick={() => handleCalculatorOperation('-')}
-                            className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
-                          >
-                            −
-                          </button>
-
-                          {/* Row 3 */}
-                          <button
-                            onClick={() => handleCalculatorNumber('4')}
-                            className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                          >
-                            4
-                          </button>
-                          <button
-                            onClick={() => handleCalculatorNumber('5')}
-                            className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                          >
-                            5
-                          </button>
-                          <button
-                            onClick={() => handleCalculatorNumber('6')}
-                            className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                          >
-                            6
-                          </button>
-                          <button
-                            onClick={() => handleCalculatorOperation('+')}
-                            className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
-                          >
-                            +
-                          </button>
-
-                          {/* Row 4 */}
-                          <button
-                            onClick={() => handleCalculatorNumber('1')}
-                            className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                          >
-                            1
-                          </button>
-                          <button
-                            onClick={() => handleCalculatorNumber('2')}
-                            className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                          >
-                            2
-                          </button>
-                          <button
-                            onClick={() => handleCalculatorNumber('3')}
-                            className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                          >
-                            3
-                          </button>
-                          <button
-                            onClick={handleCalculatorEquals}
-                            className={`row-span-2 ${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-xl`}
-                          >
-                            =
-                          </button>
-
-                          {/* Row 5 */}
-                          <button
-                            onClick={() => handleCalculatorNumber('0')}
-                            className="col-span-2 bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                          >
-                            0
-                          </button>
-                          <button
-                            onClick={handleCalculatorDecimal}
-                            className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                          >
-                            .
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+                      )}
                     </>
                   </div>
                   </div>
@@ -2327,7 +2368,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                   currentItemStrokeWidth: excalidrawAppState?.currentItemStrokeWidth ?? 1,
                                 },
                               }}
-                              onChange={(elements, appState) => {
+                              onChange={(elements: any, appState: any) => {
                                 setExcalidrawElements(elements);
                                 setExcalidrawAppState(appState);
                               }}
@@ -2346,8 +2387,10 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                 <div className="lg:hidden w-full bg-white shadow-lg border-t border-gray-200">
                   {/* Header */}
                   <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between flex-shrink-0">
-                    <span className="text-sm font-semibold text-gray-900">Calculator & Drawing Pad</span>
-                    {!shouldShowToolsByDefault && (
+                    <span className="text-sm font-semibold text-gray-900">
+                      {isCustomAssignment ? (activeTool === 'calculator' ? 'Calculator' : 'Drawing Pad') : 'Calculator & Drawing Pad'}
+                    </span>
+                    {(isCustomAssignment || !shouldShowToolsByDefault) && (
                       <button
                         onClick={() => setShowToolsPanel(false)}
                         className="text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded p-1.5 transition-colors"
@@ -2362,165 +2405,169 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                   {shouldShowToolsByDefault ? (
                     <>
                       {/* Excalidraw Section - Top */}
-                      <div className="flex flex-col bg-white" style={{ height: '400px' }}>
-                        <div className="h-full w-full relative">
-                          <Excalidraw
-                            zenModeEnabled={true}
-                            viewModeEnabled={false}
-                            gridModeEnabled={false}
-                            UIOptions={{
-                              library: false,
-                              canvasActions: {
-                                toggleTheme: false,
-                                changeViewBackgroundColor: false,
-                                loadScene: false,
-                                saveToActiveFile: false,
-                                export: false,
-                              },
-                            }}
-                            initialData={{
-                              elements: excalidrawElements,
-                              appState: {
-                                ...excalidrawAppState,
-                                zenModeEnabled: true,
-                                theme: "light",
-                                currentItemStrokeWidth: excalidrawAppState?.currentItemStrokeWidth ?? 1,
-                              },
-                            }}
-                            onChange={(elements, appState) => {
-                              setExcalidrawElements(elements);
-                              setExcalidrawAppState(appState);
-                            }}
-                          />
+                      {(!isCustomAssignment || activeTool === 'whiteboard') && (
+                        <div className="flex flex-col bg-white" style={{ height: '400px' }}>
+                          <div className="h-full w-full relative">
+                            <Excalidraw
+                              zenModeEnabled={true}
+                              viewModeEnabled={false}
+                              gridModeEnabled={false}
+                              UIOptions={{
+                                library: false,
+                                canvasActions: {
+                                  toggleTheme: false,
+                                  changeViewBackgroundColor: false,
+                                  loadScene: false,
+                                  saveToActiveFile: false,
+                                  export: false,
+                                },
+                              }}
+                              initialData={{
+                                elements: excalidrawElements,
+                                appState: {
+                                  ...excalidrawAppState,
+                                  zenModeEnabled: true,
+                                  theme: "light",
+                                  currentItemStrokeWidth: excalidrawAppState?.currentItemStrokeWidth ?? 1,
+                                },
+                              }}
+                              onChange={(elements: any, appState: any) => {
+                                setExcalidrawElements(elements);
+                                setExcalidrawAppState(appState);
+                              }}
+                            />
+                          </div>
                         </div>
-                      </div>
+                      )}
 
                       {/* Calculator Section - Bottom */}
-                      <div className="flex-shrink-0 border-t border-gray-200 bg-gray-50">
-                    <div className="p-4">
-                      {/* Calculator Display */}
-                      <div className="bg-white border border-gray-200 rounded-lg mb-3 p-4 shadow-sm">
-                        <div className="text-right text-3xl font-semibold text-gray-900 overflow-hidden min-h-[48px] flex items-center justify-end">
-                          {calculatorDisplay}
+                      {(!isCustomAssignment || activeTool === 'calculator') && (
+                        <div className="flex-shrink-0 border-t border-gray-200 bg-gray-50">
+                          <div className="p-4">
+                            {/* Calculator Display */}
+                            <div className="bg-white border border-gray-200 rounded-lg mb-3 p-4 shadow-sm">
+                              <div className="text-right text-3xl font-semibold text-gray-900 overflow-hidden min-h-[48px] flex items-center justify-end">
+                                {calculatorDisplay}
+                              </div>
+                            </div>
+
+                            {/* Calculator Buttons */}
+                            <div className="grid grid-cols-4 gap-2.5">
+                              {/* Row 1 */}
+                              <button
+                                onClick={handleCalculatorClear}
+                                className="col-span-2 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 font-semibold py-3 rounded-lg transition-colors text-sm"
+                              >
+                                Clear
+                              </button>
+                              <button
+                                onClick={() => handleCalculatorOperation('÷')}
+                                className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
+                              >
+                                ÷
+                              </button>
+                              <button
+                                onClick={() => handleCalculatorOperation('×')}
+                                className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
+                              >
+                                ×
+                              </button>
+
+                              {/* Row 2 */}
+                              <button
+                                onClick={() => handleCalculatorNumber('7')}
+                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                              >
+                                7
+                              </button>
+                              <button
+                                onClick={() => handleCalculatorNumber('8')}
+                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                              >
+                                8
+                              </button>
+                              <button
+                                onClick={() => handleCalculatorNumber('9')}
+                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                              >
+                                9
+                              </button>
+                              <button
+                                onClick={() => handleCalculatorOperation('-')}
+                                className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
+                              >
+                                −
+                              </button>
+
+                              {/* Row 3 */}
+                              <button
+                                onClick={() => handleCalculatorNumber('4')}
+                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                              >
+                                4
+                              </button>
+                              <button
+                                onClick={() => handleCalculatorNumber('5')}
+                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                              >
+                                5
+                              </button>
+                              <button
+                                onClick={() => handleCalculatorNumber('6')}
+                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                              >
+                                6
+                              </button>
+                              <button
+                                onClick={() => handleCalculatorOperation('+')}
+                                className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
+                              >
+                                +
+                              </button>
+
+                              {/* Row 4 */}
+                              <button
+                                onClick={() => handleCalculatorNumber('1')}
+                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                              >
+                                1
+                              </button>
+                              <button
+                                onClick={() => handleCalculatorNumber('2')}
+                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                              >
+                                2
+                              </button>
+                              <button
+                                onClick={() => handleCalculatorNumber('3')}
+                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                              >
+                                3
+                              </button>
+                              <button
+                                onClick={handleCalculatorEquals}
+                                className={`row-span-2 ${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-xl`}
+                              >
+                                =
+                              </button>
+
+                              {/* Row 5 */}
+                              <button
+                                onClick={() => handleCalculatorNumber('0')}
+                                className="col-span-2 bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                              >
+                                0
+                              </button>
+                              <button
+                                onClick={handleCalculatorDecimal}
+                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
+                              >
+                                .
+                              </button>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-
-                      {/* Calculator Buttons */}
-                      <div className="grid grid-cols-4 gap-2.5">
-                        {/* Row 1 */}
-                        <button
-                          onClick={handleCalculatorClear}
-                          className="col-span-2 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 font-semibold py-3 rounded-lg transition-colors text-sm"
-                        >
-                          Clear
-                        </button>
-                        <button
-                          onClick={() => handleCalculatorOperation('÷')}
-                          className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
-                        >
-                          ÷
-                        </button>
-                        <button
-                          onClick={() => handleCalculatorOperation('×')}
-                          className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
-                        >
-                          ×
-                        </button>
-
-                        {/* Row 2 */}
-                        <button
-                          onClick={() => handleCalculatorNumber('7')}
-                          className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                        >
-                          7
-                        </button>
-                        <button
-                          onClick={() => handleCalculatorNumber('8')}
-                          className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                        >
-                          8
-                        </button>
-                        <button
-                          onClick={() => handleCalculatorNumber('9')}
-                          className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                        >
-                          9
-                        </button>
-                        <button
-                          onClick={() => handleCalculatorOperation('-')}
-                          className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
-                        >
-                          −
-                        </button>
-
-                        {/* Row 3 */}
-                        <button
-                          onClick={() => handleCalculatorNumber('4')}
-                          className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                        >
-                          4
-                        </button>
-                        <button
-                          onClick={() => handleCalculatorNumber('5')}
-                          className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                        >
-                          5
-                        </button>
-                        <button
-                          onClick={() => handleCalculatorNumber('6')}
-                          className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                        >
-                          6
-                        </button>
-                        <button
-                          onClick={() => handleCalculatorOperation('+')}
-                          className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
-                        >
-                          +
-                        </button>
-
-                        {/* Row 4 */}
-                        <button
-                          onClick={() => handleCalculatorNumber('1')}
-                          className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                        >
-                          1
-                        </button>
-                        <button
-                          onClick={() => handleCalculatorNumber('2')}
-                          className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                        >
-                          2
-                        </button>
-                        <button
-                          onClick={() => handleCalculatorNumber('3')}
-                          className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                        >
-                          3
-                        </button>
-                        <button
-                          onClick={handleCalculatorEquals}
-                          className={`row-span-2 ${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-xl`}
-                        >
-                          =
-                        </button>
-
-                        {/* Row 5 */}
-                        <button
-                          onClick={() => handleCalculatorNumber('0')}
-                          className="col-span-2 bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                        >
-                          0
-                        </button>
-                        <button
-                          onClick={handleCalculatorDecimal}
-                          className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                        >
-                          .
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                      )}
                       </>
                     ) : (
                       <>
@@ -2678,7 +2725,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                   currentItemStrokeWidth: excalidrawAppState?.currentItemStrokeWidth ?? 1,
                                 },
                               }}
-                              onChange={(elements, appState) => {
+                              onChange={(elements: any, appState: any) => {
                                 setExcalidrawElements(elements);
                                 setExcalidrawAppState(appState);
                               }}
