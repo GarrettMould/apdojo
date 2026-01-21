@@ -53,7 +53,7 @@ const COURSE_CONFIG: Record<'macro' | 'micro', CourseConfig> = {
 };
 
 export function PurchasePage({ courseType }: PurchasePageProps) {
-  const { user } = useAuthContext();
+  const { user, setShowSignupModal, setRedirectOnLogin } = useAuthContext();
   const [isLoading, setIsLoading] = useState(false);
   const [showStickyButton, setShowStickyButton] = useState(false);
   const config = COURSE_CONFIG[courseType];
@@ -75,8 +75,13 @@ export function PurchasePage({ courseType }: PurchasePageProps) {
 
   const handlePurchase = async () => {
     if (!user) {
-      // Handle login redirect or modal
-      window.location.href = '/?login=true';
+      // If not logged in, remember this page and open signup so we can return here after account creation
+      const currentPath =
+        typeof window !== 'undefined'
+          ? window.location.pathname + window.location.search
+          : `/purchase/season-pass?courseType=${courseType}`;
+      setRedirectOnLogin(currentPath);
+      setShowSignupModal(true);
       return;
     }
 

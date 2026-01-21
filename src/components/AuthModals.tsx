@@ -138,7 +138,6 @@ export function SignupModal({ isOpen, onClose, switchToLogin, onAuthSuccess }: A
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { signup } = useAuthContext();
-  const router = useRouter();
   
   // Check for teacher access code in URL (secret code: 9759)
   const [isTeacher, setIsTeacher] = useState(false);
@@ -196,7 +195,6 @@ export function SignupModal({ isOpen, onClose, switchToLogin, onAuthSuccess }: A
       await signup(email, password, isSubscribed, isTeacher);
       onClose();
       onAuthSuccess?.();
-      router.push('/');
     } catch (err: any) {
       // User-friendly error messages
       if (err.code) {

@@ -8,13 +8,18 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import { reviews } from '@/data/reviews';
 
 export function BundlePurchasePage() {
-  const { user } = useAuthContext();
+  const { user, setShowSignupModal, setRedirectOnLogin } = useAuthContext();
   const [isLoading, setIsLoading] = useState(false);
 
   const handlePurchase = async () => {
     if (!user) {
-      // Handle login redirect or modal
-      window.location.href = '/?login=true';
+      // If not logged in, remember this page and open signup so we can return here after account creation
+      const currentPath =
+        typeof window !== 'undefined'
+          ? window.location.pathname + window.location.search
+          : '/purchase/bundle';
+      setRedirectOnLogin(currentPath);
+      setShowSignupModal(true);
       return;
     }
 

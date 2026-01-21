@@ -128,8 +128,21 @@ function SeasonPassCard({ courseType }: { courseType: 'macro' | 'micro' }) {
 export function SeasonPassShowcase() {
   const savings = Math.max(0, COURSE_CONFIG.macro.price + COURSE_CONFIG.micro.price - BUNDLE.price);
   return (
-    <div className="w-full pt-16 sm:pt-24 pb-8 sm:pb-12">
+    <div className="w-full pt-24 sm:pt-32 pb-8 sm:pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Headline */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.45 }}
+          className="text-center mb-12"
+        >
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900">
+            Your All‑In‑One AP Econ Season Pass
+          </h2>
+        </motion.div>
+
         {/* Bundle banner */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}

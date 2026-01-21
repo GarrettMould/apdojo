@@ -647,6 +647,12 @@ export function useAuth() {
         
         setUser(newUser);
         console.log("[useAuth] New user document created with initial totalXP 150."); // Updated log message
+
+        // --- Handle redirect after signup if a target was set ---
+        if (redirectOnLogin) {
+          window.location.href = redirectOnLogin;
+          setRedirectOnLogin(null);
+        }
       } else {
          throw new Error("User creation failed in Firebase Auth.");
       }
