@@ -16,6 +16,7 @@ import q2103 from "../../../public/images/unitMCQs/q2103.svg"
 import q2126 from "../../../public/images/unitMCQs/q2126.svg"
 import q2122 from "../../../public/images/unitMCQs/q2122.svg"
 import q3024 from "../../../public/images/unitMCQs/q3024.svg"
+
 // Create arrays for each unit
 const unit1Questions = macroSetTwoQuestions.questions.filter(q => q.unit === 1);
 const unit2Questions = macroSetTwoQuestions.questions.filter(q => q.unit === 2);
@@ -5360,7 +5361,7 @@ const microUnit6Questions = [
     "explanation": "The graph shows that the marginal social cost (MSC) is greater than the marginal private cost (MPC), while marginal social benefit (MSB) equals marginal private benefit (MPB). This indicates a negative externality in production. Option A, factory pollution, is a classic example where the production process imposes external costs on society (pollution) that are not reflected in the firm's private costs.",
     "videoExplanation": null
   }, 
-  {
+  { 
     "id": 141,
     "subject": "ap_microeconomics",
     "unit": 6,
@@ -5377,6 +5378,194 @@ const microUnit6Questions = [
     ],
     "correctAnswer": "B",
     "explanation": "The graph shows that the marginal social benefit (MSB) is greater than the marginal private benefit (MPB), indicating a positive externality in consumption. The market equilibrium (where MPB intersects MPC) results in a quantity below the socially optimal level (where MSB intersects MSC/MPC). To correct this under-consumption, the government can provide a per-unit subsidy to consumers, effectively increasing the marginal private benefit and shifting the demand curve towards the MSB curve, thus encouraging consumption towards the optimal quantity.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3036,
+    "unit": 6,
+    "lessonIDS": ["6.1", "6.4"],
+    "unitName": "Market Failure and the Role of Government",
+    "question": "Which of the following characteristics best distinguishes a natural monopoly from a typical monopoly?",
+    "image": null,
+    "options": [
+      "It faces a perfectly elastic demand curve.",
+      "It has a marginal cost curve that is always above its average total cost curve.",
+      "Its average total cost curve declines over the entire range of market demand.",
+      "It is the only firm that produces a public good.",
+      "It produces a good with a positive consumption externality."
+    ],
+    "correctAnswer": "C",
+    "explanation": "A natural monopoly exists when a single firm can supply the entire market at a lower average total cost than two or more firms could. This occurs because of substantial economies of scale, meaning the Average Total Cost (ATC) curve is downward-sloping throughout the relevant range of production.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3037,
+    "unit": 6,
+    "lessonIDS": ["6.1", "6.4"],
+    "unitName": "Market Failure and the Role of Government",
+    "question": "If regulators want to set a 'fair-return' price for a natural monopoly, they should set the maximum price equal to:",
+    "image": null,
+    "options": [
+      "Marginal Cost (MC)",
+      "Average Total Cost (ATC)",
+      "Average Variable Cost (AVC)",
+      "Marginal Revenue (MR)",
+      "The price where MR equals MC"
+    ],
+    "correctAnswer": "B",
+    "explanation": "Fair-return pricing aims to allow the firm to break even (earn zero economic profit) so it can stay in business without a subsidy. This is achieved by setting the price equal to the Average Total Cost (P = ATC). Setting P = MC (socially optimal) would typically result in a loss for a natural monopoly.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3038,
+    "unit": 6,
+    "lessonIDS": ["6.1", "6.4"],
+    "unitName": "Market Failure and the Role of Government",
+    "question": "Why does setting the price at the socially optimal level (P = MC) often require the government to subsidize a natural monopoly?",
+    "image": null,
+    "options": [
+      "Because the firm's marginal cost is higher than its average total cost.",
+      "Because the price is set below the firm's average total cost, causing an economic loss.",
+      "Because the firm produces less than the allocatively efficient quantity.",
+      "Because the firm's demand curve is upward sloping.",
+      "Because consumers are unwilling to pay the marginal cost."
+    ],
+    "correctAnswer": "B",
+    "explanation": "For a natural monopoly, the Marginal Cost (MC) curve is below the Average Total Cost (ATC) curve. Therefore, if regulators set the price equal to MC (Allocative Efficiency), the price will be less than ATC, causing the firm to incur an economic loss. A subsidy is needed to cover this loss and keep the firm operating.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3039,
+    "unit": 6,
+    "lessonIDS": ["6.5"],
+    "unitName": "Market Failure and the Role of Government",
+    "question": "Country A has a Gini coefficient of 0.25, while Country B has a Gini coefficient of 0.55. Based on this information, which of the following is true?",
+    "image": null,
+    "options": [
+      "Country B has a more equal distribution of income than Country A.",
+      "Country A has a more equal distribution of income than Country B.",
+      "The average income in Country B is higher than in Country A.",
+      "Country A has a regressive tax system, while Country B has a progressive one.",
+      "The Lorenz curve for Country B is closer to the line of equality than Country A's."
+    ],
+    "correctAnswer": "B",
+    "explanation": "The Gini coefficient ranges from 0 (perfect equality) to 1 (perfect inequality). A lower Gini coefficient indicates a more equal distribution of income. Therefore, Country A (0.25) is more equal than Country B (0.55).",
+    "videoExplanation": null
+  },
+  {
+    "id": 3040,
+    "unit": 6,
+    "lessonIDS": ["6.5"],
+    "unitName": "Market Failure and the Role of Government",
+    "question": "The table below shows the Gini coefficients for three different nations. Which list correctly orders the nations from most equal income distribution to least equal?",
+    "image": null,
+    "tableData": {
+      "headers": ["Nation", "Gini Coefficient"],
+      "rows": [
+        ["Nation X", "0.42"],
+        ["Nation Y", "0.31"],
+        ["Nation Z", "0.58"]
+      ]
+    },
+    "options": [
+      "Nation X, Nation Y, Nation Z",
+      "Nation Z, Nation X, Nation Y",
+      "Nation Y, Nation X, Nation Z",
+      "Nation Z, Nation Y, Nation X",
+      "Nation Y, Nation Z, Nation X"
+    ],
+    "correctAnswer": "C",
+    "explanation": "To order from most equal to least equal, look for the lowest Gini coefficient to the highest. Nation Y (0.31) is the lowest, followed by Nation X (0.42), and then Nation Z (0.58).",
+    "videoExplanation": null
+  },
+  {
+    "id": 3041,
+    "unit": 6,
+    "lessonIDS": ["6.5"],
+    "unitName": "Market Failure and the Role of Government",
+    "question": "Imagine a scenario where a government levies a sales tax of 10% on all consumer goods. A low-income family spends 90% of their income on these goods, while a high-income family spends only 40% of their income on these goods. This tax is best described as:",
+    "image": null,
+    "options": [
+      "Progressive",
+      "Proportional",
+      "Regressive",
+      "A value-added tax",
+      "A lump-sum tax"
+    ],
+    "correctAnswer": "C",
+    "explanation": "A regressive tax takes a larger percentage of income from low-income earners than from high-income earners. Even though the rate is flat (10%), the low-income family pays tax on a larger portion of their total income compared to the high-income family, meaning their effective tax rate relative to total income is higher.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3042,
+    "unit": 6,
+    "lessonIDS": ["6.5"],
+    "unitName": "Market Failure and the Role of Government",
+    "question": "Country Omega imposes an income tax where every citizen, regardless of their earnings, must pay exactly 15% of their income to the government. This tax structure is classified as:",
+    "image": null,
+    "options": [
+      "Progressive",
+      "Regressive",
+      "Proportional",
+      "Marginal",
+      "Discriminatory"
+    ],
+    "correctAnswer": "C",
+    "explanation": "A proportional tax (often called a flat tax) takes the same percentage of income from all taxpayers, regardless of their income level. Since everyone pays 15%, the average tax rate is constant.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3043,
+    "unit": 6,
+    "lessonIDS": ["6.5"],
+    "unitName": "Market Failure and the Role of Government",
+    "question": "The government is considering three different tax proposals. Which of the following scenarios describes a progressive tax?",
+    "image": null,
+    "options": [
+      "A tax of $500 charged to every citizen annually.",
+      "A sales tax of 7% on groceries.",
+      "A tax system where individuals earning $20,000 pay 10%, while those earning $200,000 pay 35%.",
+      "A property tax where everyone pays 1% of the value of their home.",
+      "A payroll tax where everyone pays 6% of their wages up to a cap of $100,000."
+    ],
+    "correctAnswer": "C",
+    "explanation": "A progressive tax implies that as an individual's income increases, the percentage of income paid in taxes also increases. In option C, higher earners pay a higher tax rate (35%) compared to lower earners (10%).",
+    "videoExplanation": null
+  },
+  {
+    "id": 3044,
+    "unit": 6,
+    "lessonIDS": ["6.5"],
+    "unitName": "Market Failure and the Role of Government",
+    "question": "If a country's Lorenz curve shifts inward, closer to the line of perfect equality, what does this imply about the country's Gini coefficient and income distribution?",
+    "image": null,
+    "options": [
+      "The Gini coefficient has increased, indicating more inequality.",
+      "The Gini coefficient has decreased, indicating less inequality.",
+      "The Gini coefficient has increased, indicating less inequality.",
+      "The Gini coefficient has decreased, indicating more inequality.",
+      "The Gini coefficient has remained unchanged."
+    ],
+    "correctAnswer": "B",
+    "explanation": "The Lorenz curve graphically represents income distribution. The closer the curve is to the 45-degree diagonal line (line of perfect equality), the more equal the income distribution. A shift inward reduces the area between the curve and the line, resulting in a lower Gini coefficient.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3045,
+    "unit": 6,
+    "lessonIDS": ["6.1", "6.4"],
+    "unitName": "Market Failure and the Role of Government",
+    "question": "A regulated natural monopoly is currently producing where Price = Average Total Cost. Which of the following statements is true about this outcome?",
+    "image": null,
+    "options": [
+      "The firm is earning positive economic profit.",
+      "The firm is allocatively efficient.",
+      "The firm is earning zero economic profit.",
+      "The firm is producing at the minimum of its ATC curve.",
+      "The firm requires a government subsidy to operate."
+    ],
+    "correctAnswer": "C",
+    "explanation": "At the Fair Return price (P=ATC), the firm's total revenue equals its total costs, meaning it earns zero economic profit (normal profit). However, it is not allocatively efficient because Price is still greater than Marginal Cost.",
     "videoExplanation": null
   }
 ];
@@ -11788,4 +11977,28 @@ export const allQuestions: QuestionType[] = [
   ...microUnit5Questions.map(q => ({ ...q, subject: "ap_microeconomics" as const })),
   ...microUnit6Questions.map(q => ({ ...q, subject: "ap_microeconomics" as const }))
 ];
+
+/**
+ * Utility function to get the next available question ID.
+ * 
+ * This function finds the maximum ID from all questions in the allQuestions array
+ * and returns the next available ID.
+ * 
+ * Usage when adding new questions:
+ * 1. Call this function: const nextId = getNextQuestionId();
+ * 2. Use the returned ID for your new question: { id: nextId, ... }
+ * 
+ * Example:
+ * const newQuestion = {
+ *   id: getNextQuestionId(),
+ *   unit: 6,
+ *   // ... rest of question properties
+ * };
+ * 
+ * @returns The next available question ID (max existing ID + 1)
+ */
+export function getNextQuestionId(): number {
+  const maxId = allQuestions.reduce((max, q) => Math.max(max, q.id), 0);
+  return maxId + 1;
+}
   

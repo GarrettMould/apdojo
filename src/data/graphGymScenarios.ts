@@ -996,6 +996,22 @@ export const graphGymScenarios: GraphGymScenario[] = [
       { id: 3, text: "The new curve is outside the old curve (showing growth for X)" },
       { id: 4, text: "Arrows clearly show a rotation/pivot, not a parallel shift" }
     ]
+  },
+  {
+    id: 53,
+    subject: 'micro',
+    lessonId: "6.1",
+    topics: ["Natural Monopoly", "Price Regulation", "Fair Return", "Allocative Efficiency"],
+    difficulty: 'hard',
+    title: "Regulating a Natural Monopoly (Constant MC)",
+    description: "Draw a Natural Monopoly that faces constant marginal costs. Label the profit-maximizing quantity (Qm) and price (Pm), and the Fair-Return price (Pfr) and quantity (Qfr).",
+    correctImage: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/wb53.jpg",
+    checklist: [
+      { id: 1, text: "MC is a horizontal line (Constant Marginal Cost)" },
+      { id: 2, text: "ATC is downward sloping and located above the MC curve" },
+      { id: 3, text: "Profit-Max (Qm, Pm) is where MR = MC, price set on Demand" },
+      { id: 4, text: "Fair-Return (Qfr, Pfr) is labeled where Demand intersects ATC (Zero Profit)" }
+    ]
   }
 ];
 

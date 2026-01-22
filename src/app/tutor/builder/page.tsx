@@ -107,7 +107,7 @@ export default function TutorBuilderPage() {
       // Handle both single subject and array of subjects
       const scenarioSubjects = Array.isArray(scenario.subject) ? scenario.subject : [scenario.subject];
       const matchesSubject = scenarioSubjects.includes(graphGymSubject);
-      // Show IDs: 1, 2-5, 13-17, 41-45, 46, 47, 48, 50, 51, 52
+      // Show IDs: 1, 2-5, 13-17, 41-45, 46, 47, 48, 50, 51, 52, 53
       const matchesIdRange = scenario.id === 1 ||
              (scenario.id >= 2 && scenario.id <= 5) ||
              (scenario.id >= 13 && scenario.id <= 17) ||
@@ -117,7 +117,8 @@ export default function TutorBuilderPage() {
              scenario.id === 48 ||
              scenario.id === 50 ||
              scenario.id === 51 ||
-             scenario.id === 52;
+             scenario.id === 52 ||
+             scenario.id === 53;
       
       const matchesSearch = searchTerm === '' || 
         scenario.title.toLowerCase().includes(searchTerm.toLowerCase()) ||

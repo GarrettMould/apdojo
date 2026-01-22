@@ -137,7 +137,7 @@ export function GraphGym({ assignmentScenarios, isAssignment = false, assignment
       // Handle both single subject and array of subjects
       const scenarioSubjects = Array.isArray(scenario.subject) ? scenario.subject : [scenario.subject];
       if (!scenarioSubjects.includes(currentCourse)) return false;
-      // Show IDs: 1, 13-17, 41-45, 46, 47, 48, 50, 51, 52
+      // Show IDs: 1, 13-17, 41-45, 46, 47, 48, 50, 51, 52, 53
       return scenario.id === 1 || 
              (scenario.id >= 13 && scenario.id <= 17) ||
              (scenario.id >= 41 && scenario.id <= 45) ||
@@ -146,7 +146,8 @@ export function GraphGym({ assignmentScenarios, isAssignment = false, assignment
              scenario.id === 48 ||
              scenario.id === 50 ||
              scenario.id === 51 ||
-             scenario.id === 52;
+             scenario.id === 52 ||
+             scenario.id === 53;
     });
     
     // Filter by unit if selected

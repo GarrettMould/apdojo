@@ -12,6 +12,7 @@ import { getBeltProgress } from '@/lib/beltSystem';
 import { motion } from 'framer-motion';
 import { SubjectToggle } from '@/components/dashboard/SubjectToggle';
 import { useTeacherViewMode } from '@/hooks/useTeacherViewMode';
+import { hasValidSeasonPass } from '@/lib/utils';
 
 export function Header() {
   const { user, logout, selectedSubject, setSelectedSubject, totalXP, guestXp, isCharacterClosetOpen, setIsCharacterClosetOpen, userData } = useAuthContext();
@@ -51,6 +52,9 @@ export function Header() {
         ? searchParams.get('subject') as 'macro' | 'micro'
         : (mounted ? selectedSubject : 'macro'))
     : (mounted ? selectedSubject : 'macro');
+
+  // Check if user is premium (has valid season pass) - must be after displaySubject is defined
+  const isPremium = user && userData ? hasValidSeasonPass(userData, displaySubject) : false;
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -211,13 +215,15 @@ export function Header() {
                 Cheat Sheets
               </Link>
 
-              {/* Season Pass */}
-              <Link
-                href={`/purchase/season-pass?courseType=${displaySubject}`}
-                className="text-lg text-gray-700 hover:text-blue-600 transition-colors font-bold"
-              >
-                Season Pass
-              </Link>
+              {/* Season Pass - Only show if user is not logged in or not premium */}
+              {(!user || !isPremium) && (
+                <Link
+                  href={`/purchase/season-pass?courseType=${displaySubject}`}
+                  className="text-lg text-gray-700 hover:text-blue-600 transition-colors font-bold"
+                >
+                  Season Pass
+                </Link>
+              )}
 
               {/* Tutoring Dropdown - HIDDEN */}
               {/* <div 
@@ -523,13 +529,15 @@ export function Header() {
                 >
                   Cheat Sheets
                 </Link>
-                <Link
-                  href={`/purchase/season-pass?courseType=${displaySubject}`}
-                  onClick={closeMobileMenu}
-                  className="px-4 py-3 text-lg text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
-                >
-                  Season Pass
-                </Link>
+                {(!user || !isPremium) && (
+                  <Link
+                    href={`/purchase/season-pass?courseType=${displaySubject}`}
+                    onClick={closeMobileMenu}
+                    className="px-4 py-3 text-lg text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
+                  >
+                    Season Pass
+                  </Link>
+                )}
               </div>
 
                 {/* Tutoring Dropdown (Mobile) - HIDDEN */}
