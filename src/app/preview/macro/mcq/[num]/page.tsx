@@ -1,18 +1,16 @@
 'use client';
 
-import { use, useState, useEffect, useMemo } from 'react';
+import { use, useEffect, useMemo } from 'react';
 import { notFound, useRouter } from 'next/navigation';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { FullExam } from '@/components/FullExam';
 import { hasValidSeasonPass } from '@/lib/utils';
 import { macroSetOneQuestions } from '@/data/questionBanks/macro/mcqs/macroSetOne';
-import { Clock } from 'lucide-react';
 
 export default function MacroMCQPreview({ params }: { params: Promise<{ num: string }> }) {
   const { num } = use(params);
   const { loadingUserData, user, userData } = useAuthContext();
   const router = useRouter();
-  const [timeRemaining, setTimeRemaining] = useState(60 * 60); // 60 minutes in seconds
 
   // Check if user is a pro customer (has season pass)
   const isProCustomer = useMemo(() => {
@@ -27,19 +25,10 @@ export default function MacroMCQPreview({ params }: { params: Promise<{ num: str
     }
   }, [loadingUserData, isProCustomer, router]);
 
-  // Format time as MM:SS
-  const formatTime = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
-
   // Only show exam 1 for now
   if (num !== '1') {
     notFound();
   }
-
-  const totalQuestions = macroSetOneQuestions.questions.length;
 
   // Show loading state while checking auth or redirecting
   if (loadingUserData || !isProCustomer) {
@@ -61,7 +50,8 @@ export default function MacroMCQPreview({ params }: { params: Promise<{ num: str
         examType="macro"
         questionType="mcq"
         examNumber={`preview/macro/mcq/${num}`}
-        onTimeUpdate={setTimeRemaining}
+        isFreeUser={false}
+        isUnitTest={true}
       />
     </div>
   );

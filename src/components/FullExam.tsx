@@ -164,16 +164,10 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   const shouldShowToolsByDefault = isUnitTest || isPreviewExam || isFullExam || isCustomAssignment;
   const [showToolsPanel, setShowToolsPanel] = useState(shouldShowToolsByDefault);
   const [leftPanelWidth, setLeftPanelWidth] = useState(shouldShowToolsByDefault ? 65 : 100); // Percentage width for left panel when tools panel is open
-  // For custom assignments, only show one tool at a time.
+  // For all exam types, only show one tool at a time (calculator OR whiteboard)
   const [activeTool, setActiveTool] = useState<'calculator' | 'whiteboard'>('calculator');
 
-  const handleCustomToolToggle = (tool: 'calculator' | 'whiteboard') => {
-    // Only custom assignments need mutually-exclusive tools.
-    if (!isCustomAssignment) {
-      setShowToolsPanel(prev => !prev);
-      return;
-    }
-
+  const handleToolToggle = (tool: 'calculator' | 'whiteboard') => {
     // If panel is closed, open it and set the requested tool.
     if (!showToolsPanel) {
       setActiveTool(tool);
@@ -951,36 +945,32 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                             </button>
                           </div>
                           <div className="flex-1 flex items-center justify-end gap-3">
-                            {/* Calculator Toggle Button - Hidden for unit tests */}
-                            {!isUnitTest && (
-                              <button
-                                onClick={() => setShowToolsPanel(!showToolsPanel)}
-                                className={`p-2 rounded-lg transition-colors ${
-                                  showToolsPanel 
-                                    ? 'bg-gray-300 hover:bg-gray-400' 
-                                    : 'hover:bg-gray-300'
-                                }`}
-                                aria-label="Toggle calculator and drawing pad"
-                                title="Toggle calculator and drawing pad"
-                              >
-                                <Calculator className="w-5 h-5 text-gray-900" />
-                              </button>
-                            )}
-                            {/* Drawing Pad Toggle Button - Hidden for unit tests */}
-                            {!isUnitTest && (
-                              <button
-                                onClick={() => setShowToolsPanel(!showToolsPanel)}
-                                className={`p-2 rounded-lg transition-colors ${
-                                  showToolsPanel 
-                                    ? 'bg-gray-300 hover:bg-gray-400' 
-                                    : 'hover:bg-gray-300'
-                                }`}
-                                aria-label="Toggle calculator and drawing pad"
-                                title="Toggle calculator and drawing pad"
-                              >
-                                <Pen className="w-5 h-5 text-gray-900" />
-                              </button>
-                            )}
+                            {/* Calculator Toggle Button */}
+                            <button
+                              onClick={() => handleToolToggle('calculator')}
+                              className={`p-2 rounded-lg transition-colors ${
+                                showToolsPanel 
+                                  ? 'bg-gray-300 hover:bg-gray-400' 
+                                  : 'hover:bg-gray-300'
+                              }`}
+                              aria-label="Toggle calculator and drawing pad"
+                              title="Toggle calculator and drawing pad"
+                            >
+                              <Calculator className="w-5 h-5 text-gray-900" />
+                            </button>
+                            {/* Drawing Pad Toggle Button */}
+                            <button
+                              onClick={() => handleToolToggle('calculator')}
+                              className={`p-2 rounded-lg transition-colors ${
+                                showToolsPanel 
+                                  ? 'bg-gray-300 hover:bg-gray-400' 
+                                  : 'hover:bg-gray-300'
+                              }`}
+                              aria-label="Toggle calculator and drawing pad"
+                              title="Toggle calculator and drawing pad"
+                            >
+                              <Pen className="w-5 h-5 text-gray-900" />
+                            </button>
                           </div>
                         </>
                       ) : (
@@ -1016,36 +1006,32 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                             </button>
                           </div>
                           <div className="flex items-center gap-3">
-                            {/* Calculator Toggle Button - Hidden for unit tests */}
-                            {!isUnitTest && (
-                              <button
-                                onClick={() => setShowToolsPanel(!showToolsPanel)}
-                                className={`p-2 rounded-lg transition-colors ${
-                                  showToolsPanel 
-                                    ? 'bg-gray-300 hover:bg-gray-400' 
-                                    : 'hover:bg-gray-300'
-                                }`}
-                                aria-label="Toggle calculator and drawing pad"
-                                title="Toggle calculator and drawing pad"
-                              >
-                                <Calculator className="w-5 h-5 text-gray-900" />
-                              </button>
-                            )}
-                            {/* Drawing Pad Toggle Button - Hidden for unit tests */}
-                            {!isUnitTest && (
-                              <button
-                                onClick={() => setShowToolsPanel(!showToolsPanel)}
-                                className={`p-2 rounded-lg transition-colors ${
-                                  showToolsPanel 
-                                    ? 'bg-gray-300 hover:bg-gray-400' 
-                                    : 'hover:bg-gray-300'
-                                }`}
-                                aria-label="Toggle calculator and drawing pad"
-                                title="Toggle calculator and drawing pad"
-                              >
-                                <Pen className="w-5 h-5 text-gray-900" />
-                              </button>
-                            )}
+                            {/* Calculator Toggle Button */}
+                            <button
+                              onClick={() => handleToolToggle('calculator')}
+                              className={`p-2 rounded-lg transition-colors ${
+                                showToolsPanel 
+                                  ? 'bg-gray-300 hover:bg-gray-400' 
+                                  : 'hover:bg-gray-300'
+                              }`}
+                              aria-label="Toggle calculator and drawing pad"
+                              title="Toggle calculator and drawing pad"
+                            >
+                              <Calculator className="w-5 h-5 text-gray-900" />
+                            </button>
+                            {/* Drawing Pad Toggle Button */}
+                            <button
+                              onClick={() => handleToolToggle('calculator')}
+                              className={`p-2 rounded-lg transition-colors ${
+                                showToolsPanel 
+                                  ? 'bg-gray-300 hover:bg-gray-400' 
+                                  : 'hover:bg-gray-300'
+                              }`}
+                              aria-label="Toggle calculator and drawing pad"
+                              title="Toggle calculator and drawing pad"
+                            >
+                              <Pen className="w-5 h-5 text-gray-900" />
+                            </button>
                           </div>
                         </>
                       )}
@@ -1070,7 +1056,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                           <div className="flex-1 flex items-center justify-end gap-3">
                             {/* Calculator Toggle Button */}
                             <button
-                              onClick={() => setShowToolsPanel(!showToolsPanel)}
+                              onClick={() => handleToolToggle('calculator')}
                               className={`p-2 rounded-lg transition-colors ${
                                 showToolsPanel 
                                   ? 'bg-gray-300 hover:bg-gray-400' 
@@ -1083,7 +1069,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                             </button>
                             {/* Drawing Pad Toggle Button */}
                             <button
-                              onClick={() => setShowToolsPanel(!showToolsPanel)}
+                              onClick={() => handleToolToggle('calculator')}
                               className={`p-2 rounded-lg transition-colors ${
                                 showToolsPanel 
                                   ? 'bg-gray-300 hover:bg-gray-400' 
@@ -1114,7 +1100,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                           <div className="flex items-center gap-3">
                             {/* Calculator Toggle Button */}
                             <button
-                              onClick={() => setShowToolsPanel(!showToolsPanel)}
+                              onClick={() => handleToolToggle('calculator')}
                               className={`p-2 rounded-lg transition-colors ${
                                 showToolsPanel 
                                   ? 'bg-gray-300 hover:bg-gray-400' 
@@ -1127,7 +1113,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                             </button>
                             {/* Drawing Pad Toggle Button */}
                             <button
-                              onClick={() => setShowToolsPanel(!showToolsPanel)}
+                              onClick={() => handleToolToggle('calculator')}
                               className={`p-2 rounded-lg transition-colors ${
                                 showToolsPanel 
                                   ? 'bg-gray-300 hover:bg-gray-400' 
@@ -1150,9 +1136,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                 <div className="flex items-center gap-3 ml-auto">
                   {/* Calculator Toggle Button */}
                   <button
-                    onClick={() => handleCustomToolToggle('calculator')}
+                    onClick={() => handleToolToggle('calculator')}
                     className={`p-2 rounded-lg transition-colors ${
-                      showToolsPanel 
+                      showToolsPanel && activeTool === 'calculator'
                         ? 'bg-gray-300 hover:bg-gray-400' 
                         : 'hover:bg-gray-300'
                     }`}
@@ -1163,9 +1149,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                   </button>
                   {/* Drawing Pad Toggle Button */}
                   <button
-                    onClick={() => handleCustomToolToggle('whiteboard')}
+                    onClick={() => handleToolToggle('whiteboard')}
                     className={`p-2 rounded-lg transition-colors ${
-                      showToolsPanel 
+                      showToolsPanel && activeTool === 'whiteboard'
                         ? 'bg-gray-300 hover:bg-gray-400' 
                         : 'hover:bg-gray-300'
                     }`}
@@ -1994,9 +1980,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                     {/* Header */}
                     <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between flex-shrink-0">
                       <span className="text-sm font-semibold text-gray-900">
-                        {isCustomAssignment ? (activeTool === 'calculator' ? 'Calculator' : 'Drawing Pad') : 'Calculator & Drawing Pad'}
+                        {activeTool === 'calculator' ? 'Calculator' : 'Drawing Pad'}
                       </span>
-                      {isCustomAssignment && (
+                      {shouldShowToolsByDefault && (
                         <button
                           onClick={() => setShowToolsPanel(false)}
                           className="text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded p-1.5 transition-colors"
@@ -2008,10 +1994,10 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                       )}
                     </div>
 
-                    {/* For unit tests, preview exams, and full exams: Whiteboard on top, Calculator on bottom */}
+                    {/* For all exam types: Show only the active tool */}
                     <>
                       {/* Excalidraw Section */}
-                      {(!isCustomAssignment || activeTool === 'whiteboard') && (
+                      {activeTool === 'whiteboard' && (
                         <div className="flex-1 flex flex-col overflow-hidden bg-white" style={{ minHeight: '400px', flex: '1 1 auto' }}>
                           <div className="w-full relative" style={{ height: '100%', minHeight: '400px', width: '100%', position: 'relative' }}>
                             <Excalidraw
@@ -2047,8 +2033,8 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                       )}
 
                       {/* Calculator Section */}
-                      {(!isCustomAssignment || activeTool === 'calculator') && (
-                        <div className={isCustomAssignment ? "flex-1 overflow-y-auto bg-gray-50" : "flex-shrink-0 border-t border-gray-200 bg-gray-50"}>
+                      {activeTool === 'calculator' && (
+                        <div className="flex-1 overflow-y-auto bg-gray-50">
                           <div className="p-4">
                             {/* Calculator Display */}
                             <div className="bg-white border border-gray-200 rounded-lg mb-3 p-4 shadow-sm">
@@ -2213,10 +2199,11 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                         )}
                       </div>
 
-                      {/* For non-unit tests: Calculator on top, Excalidraw on bottom */}
+                      {/* For all exam types: Show only the active tool */}
                       <>
-                        {/* Calculator Section - Top */}
-                        <div className="flex-shrink-0 border-b border-gray-200 bg-gray-50">
+                        {/* Calculator Section */}
+                        {activeTool === 'calculator' && (
+                        <div className="flex-1 overflow-y-auto bg-gray-50">
                           <div className="p-4">
                             {/* Calculator Display */}
                             <div className="bg-white border border-gray-200 rounded-lg mb-3 p-4 shadow-sm">
@@ -2341,8 +2328,10 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                             </div>
                           </div>
                         </div>
+                        )}
 
-                        {/* Excalidraw Section - Bottom */}
+                        {/* Excalidraw Section */}
+                        {activeTool === 'whiteboard' && (
                         <div className="flex-1 flex flex-col overflow-hidden bg-white">
                           <div className="h-full w-full relative">
                             <Excalidraw
@@ -2375,6 +2364,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                             />
                           </div>
                         </div>
+                        )}
                       </>
                     </motion.div>
                   </motion.div>
@@ -2388,9 +2378,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                   {/* Header */}
                   <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between flex-shrink-0">
                     <span className="text-sm font-semibold text-gray-900">
-                      {isCustomAssignment ? (activeTool === 'calculator' ? 'Calculator' : 'Drawing Pad') : 'Calculator & Drawing Pad'}
+                      {activeTool === 'calculator' ? 'Calculator' : 'Drawing Pad'}
                     </span>
-                    {(isCustomAssignment || !shouldShowToolsByDefault) && (
+                    {!shouldShowToolsByDefault && (
                       <button
                         onClick={() => setShowToolsPanel(false)}
                         className="text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded p-1.5 transition-colors"
@@ -2401,11 +2391,11 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                     )}
                   </div>
 
-                  {/* For unit tests, preview exams, and full exams: Whiteboard on top, Calculator on bottom */}
+                  {/* For all exam types: Show only the active tool */}
                   {shouldShowToolsByDefault ? (
                     <>
-                      {/* Excalidraw Section - Top */}
-                      {(!isCustomAssignment || activeTool === 'whiteboard') && (
+                      {/* Excalidraw Section */}
+                      {activeTool === 'whiteboard' && (
                         <div className="flex flex-col bg-white" style={{ height: '400px' }}>
                           <div className="h-full w-full relative">
                             <Excalidraw
@@ -2440,9 +2430,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                         </div>
                       )}
 
-                      {/* Calculator Section - Bottom */}
-                      {(!isCustomAssignment || activeTool === 'calculator') && (
-                        <div className="flex-shrink-0 border-t border-gray-200 bg-gray-50">
+                      {/* Calculator Section */}
+                      {activeTool === 'calculator' && (
+                        <div className="flex-1 overflow-y-auto bg-gray-50">
                           <div className="p-4">
                             {/* Calculator Display */}
                             <div className="bg-white border border-gray-200 rounded-lg mb-3 p-4 shadow-sm">
@@ -2571,9 +2561,10 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                       </>
                     ) : (
                       <>
-                        {/* For non-unit tests: Calculator on top, Excalidraw on bottom */}
-                        {/* Calculator Section - Top */}
-                        <div className="flex-shrink-0 border-b border-gray-200 bg-gray-50">
+                        {/* For all exam types: Show only the active tool */}
+                        {/* Calculator Section */}
+                        {activeTool === 'calculator' && (
+                        <div className="flex-1 overflow-y-auto bg-gray-50">
                           <div className="p-4">
                             {/* Calculator Display */}
                             <div className="bg-white border border-gray-200 rounded-lg mb-3 p-4 shadow-sm">
@@ -2698,8 +2689,10 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                             </div>
                           </div>
                         </div>
+                        )}
 
-                        {/* Excalidraw Section - Bottom */}
+                        {/* Excalidraw Section */}
+                        {activeTool === 'whiteboard' && (
                         <div className="flex flex-col bg-white" style={{ height: '400px' }}>
                           <div className="h-full w-full relative">
                             <Excalidraw
@@ -2732,6 +2725,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                             />
                           </div>
                         </div>
+                        )}
                       </>
                     )}
                 </div>
@@ -2857,9 +2851,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
         {/* Calculator Toggle Button */}
         {!showToolsPanel && (
           <button
-            onClick={() => setShowToolsPanel(true)}
+            onClick={() => handleToolToggle('calculator')}
             className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-3 hover:bg-gray-50 transition-all active:scale-95"
-            aria-label="Open calculator and drawing pad"
+            aria-label="Open calculator"
           >
             <Calculator className="w-6 h-6 text-black" />
           </button>
@@ -2868,9 +2862,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
         {/* Whiteboard Toggle Button */}
         {!showToolsPanel && (
           <button
-            onClick={() => setShowToolsPanel(true)}
+            onClick={() => handleToolToggle('whiteboard')}
             className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-3 hover:bg-gray-50 transition-all active:scale-95"
-            aria-label="Open calculator and drawing pad"
+            aria-label="Open drawing pad"
           >
             <Pen className="w-6 h-6 text-black" />
           </button>
