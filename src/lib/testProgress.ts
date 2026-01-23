@@ -85,7 +85,11 @@ export const loadTestProgress = async (userId: string, testId: string): Promise<
 export const saveTestResult = async (result: TestResult) => {
   try {
     const userDocRef = doc(db, 'userTestResults', result.userId);
-    const testDocRef = doc(userDocRef, 'results', result.testId);
+    // Use a unique document ID that includes timestamp to allow multiple attempts
+    // Format: {testId}_{timestamp} (e.g., "unit_4_micro_1234567890")
+    const timestamp = Date.now();
+    const uniqueDocId = `${result.testId}_${timestamp}`;
+    const testDocRef = doc(userDocRef, 'results', uniqueDocId);
     
     const dataToSave = {
       ...result,
@@ -96,6 +100,7 @@ export const saveTestResult = async (result: TestResult) => {
       userId: result.userId,
       testType: result.testType,
       testId: result.testId,
+      uniqueDocId,
       score: result.score,
       totalQuestions: result.totalQuestions,
       path: testDocRef.path
@@ -104,6 +109,7 @@ export const saveTestResult = async (result: TestResult) => {
     await setDoc(testDocRef, dataToSave);
     
     console.log('[saveTestResult] Test result saved successfully to:', testDocRef.path);
+    return uniqueDocId;
   } catch (error) {
     console.error('[saveTestResult] Error saving test result:', error);
     throw error; // Re-throw to see the error in the component

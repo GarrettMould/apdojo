@@ -476,17 +476,21 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
         try {
           let testType: 'unit_mcq' | 'full_exam' | 'full_frq' = 'full_exam';
           let testId = 'full_mcq_exam';
+          let testTitle = 'Full MCQ Exam';
           
           if (isUnitTest && examNumber) {
             testType = 'unit_mcq';
             testId = `unit_${examNumber}_${examType}`;
+            testTitle = `Unit ${examNumber} MCQ Test`;
           } else if (isFullExam) {
             testType = questionType === 'frq' ? 'full_frq' : 'full_exam';
             testId = questionType === 'frq' ? 'full_frq_exam' : 'full_mcq_exam';
+            testTitle = questionType === 'frq' ? 'Full FRQ Exam' : 'Full MCQ Exam';
           } else if (isPreviewExam && examNumber) {
             // Preview exams are treated as full exams
             testType = questionType === 'frq' ? 'full_frq' : 'full_exam';
             testId = questionType === 'frq' ? `preview_frq_${examNumber}` : `preview_mcq_${examNumber}`;
+            testTitle = questionType === 'frq' ? `Preview FRQ Exam ${examNumber}` : `Preview MCQ Exam ${examNumber}`;
           }
 
           console.log('[FullExam] Saving test result with:', {
@@ -497,6 +501,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
             totalQuestions: questions.length
           });
 
+          // Save to testResults collection (for my-assignment-history page)
           await saveTestResult({
             userId: user.uid,
             testType,
@@ -506,6 +511,24 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
             completedAt: new Date()
           });
           console.log(`[FullExam] Successfully saved test result: ${testType} - ${testId} - Score: ${score}%`);
+
+          // Also save to quizHistory for Recent Activity on dashboard
+          try {
+            await saveQuizResult({
+              userId: user.uid,
+              type: 'custom-link', // Using existing type since we don't have 'unit-test' type yet
+              title: testTitle,
+              score,
+              correctCount,
+              totalQuestions: questions.length,
+              questions: questions,
+              userAnswers: answers as unknown as Record<string, string>,
+            });
+            console.log(`[FullExam] Successfully saved quiz history: ${testTitle}`);
+          } catch (quizHistoryError) {
+            console.error('[FullExam] Error saving quiz history:', quizHistoryError);
+            // Don't throw - quizHistory is secondary, testResults is primary
+          }
         } catch (testResultError) {
           console.error('[FullExam] Error saving test result:', testResultError);
         }
@@ -550,19 +573,24 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
       try {
         let testType: 'unit_mcq' | 'full_exam' | 'full_frq' = 'full_exam';
         let testId = 'full_mcq_exam';
+        let testTitle = 'Full MCQ Exam';
         
         if (isUnitTest && examNumber) {
           testType = 'unit_mcq';
           testId = `unit_${examNumber}_${examType}`;
+          testTitle = `Unit ${examNumber} MCQ Test`;
         } else if (isFullExam) {
           testType = questionType === 'frq' ? 'full_frq' : 'full_exam';
           testId = questionType === 'frq' ? 'full_frq_exam' : 'full_mcq_exam';
+          testTitle = questionType === 'frq' ? 'Full FRQ Exam' : 'Full MCQ Exam';
         } else if (isPreviewExam && examNumber) {
           // Preview exams are treated as full exams
           testType = questionType === 'frq' ? 'full_frq' : 'full_exam';
           testId = questionType === 'frq' ? `preview_frq_${examNumber}` : `preview_mcq_${examNumber}`;
+          testTitle = questionType === 'frq' ? `Preview FRQ Exam ${examNumber}` : `Preview MCQ Exam ${examNumber}`;
         }
 
+        // Save to testResults collection (for my-assignment-history page)
         await saveTestResult({
           userId: user.uid,
           testType,
@@ -572,6 +600,24 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
           completedAt: new Date()
         });
         console.log(`[FullExam] Saved test result: ${testType} - ${testId} - Score: ${score}%`);
+
+        // Also save to quizHistory for Recent Activity on dashboard
+        try {
+          await saveQuizResult({
+            userId: user.uid,
+            type: 'custom-link', // Using existing type since we don't have 'unit-test' type yet
+            title: testTitle,
+            score,
+            correctCount,
+            totalQuestions: questions.length,
+            questions: questions,
+            userAnswers: answers as unknown as Record<string, string>,
+          });
+          console.log(`[FullExam] Successfully saved quiz history: ${testTitle}`);
+        } catch (quizHistoryError) {
+          console.error('[FullExam] Error saving quiz history:', quizHistoryError);
+          // Don't throw - quizHistory is secondary, testResults is primary
+        }
       } catch (testResultError) {
         console.error('[FullExam] Error saving test result:', testResultError);
       }
