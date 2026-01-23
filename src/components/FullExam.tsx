@@ -10,6 +10,8 @@ import { redirectToCheckout } from '@/lib/stripe';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { LoginModal, SignupModal } from './AuthModals';
 import { MCQFeedbackModal } from './MCQFeedbackModal';
+import { SeasonPassModal } from './SeasonPassModal';
+import { hasValidSeasonPass } from '@/lib/utils';
 import { videos } from '@/data/videos';
 import { createPortal } from 'react-dom';
 import { HighlightableText } from './HighlightableText';
@@ -115,6 +117,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   const [showNameInputModal, setShowNameInputModal] = useState(false);
   const [studentName, setStudentName] = useState('');
   const [xpAwarded, setXpAwarded] = useState(false);
+  const [showSeasonPassModal, setShowSeasonPassModal] = useState(false);
   
   // Remove the shuffling logic and just use the pre-shuffled questions
   const questions = questionBank.questions;
@@ -164,6 +167,22 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   const isFullExam = examNumber === 'full';
   // Show top bar and bottom navigation for unit tests, preview exams, and full exams
   const shouldShowTestUI = isUnitTest || isPreviewExam || isFullExam || isCustomAssignment;
+  
+  // Determine if this exam requires season pass (unit tests and full exams, but not custom assignments)
+  const requiresSeasonPass = (isUnitTest || isFullExam || isPreviewExam) && !isCustomAssignment;
+  
+  // Get user context (needed for access checks)
+  const { user, userData, awardXp, selectedSubject } = useAuthContext();
+  
+  // Check if user has season pass access for this exam type
+  // For unit tests and full exams, check season pass. For custom assignments, always allow.
+  const hasSeasonPassAccess = useMemo(() => {
+    if (isCustomAssignment) return true; // Custom assignments don't require season pass
+    if (!user || !userData) return false;
+    const subjectKey = examType === 'macro' ? 'macro' : 'micro';
+    return hasValidSeasonPass(userData, subjectKey);
+  }, [user, userData, examType, isCustomAssignment]);
+  
   const shouldShowToolsByDefault = false; // Tools panel starts closed - users can open manually
   const [showToolsPanel, setShowToolsPanel] = useState(shouldShowToolsByDefault);
   const [leftPanelWidth, setLeftPanelWidth] = useState(shouldShowToolsByDefault ? 65 : 100); // Percentage width for left panel when tools panel is open
@@ -238,7 +257,6 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
     };
   }, [showQuestionNavigator]);
 
-  const { user, awardXp, selectedSubject } = useAuthContext();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
   const [showExitConfirmModal, setShowExitConfirmModal] = useState(false);
@@ -760,12 +778,54 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
     });
   };
 
+  // Helper function to check if user can navigate to a specific question
+  // Unit tests: first 2 questions (indices 0-1) are accessible
+  // Full exams: first 5 questions (indices 0-4) are accessible
+  // Beyond that, requires season pass
+  const canNavigateToQuestion = (questionIndex: number): boolean => {
+    // Custom assignments don't require season pass
+    if (isCustomAssignment) return true;
+    
+    // For unit tests: allow first 2 questions (indices 0-1)
+    if (isUnitTest && questionIndex <= 1) {
+      return true;
+    }
+    
+    // For full exams: allow first 5 questions (indices 0-4)
+    if (isFullExam && questionIndex <= 4) {
+      return true;
+    }
+    
+    // For preview exams: allow first 5 questions (indices 0-4)
+    if (isPreviewExam && questionIndex <= 4) {
+      return true;
+    }
+    
+    // For unit tests and full exams, questions beyond the free tier require season pass
+    if (requiresSeasonPass) {
+      return hasSeasonPassAccess;
+    }
+    
+    return true;
+  };
+
+  // Helper function to handle navigation with access check
+  const handleNavigateToQuestion = (questionIndex: number) => {
+    // Check access for the requested question
+    if (!canNavigateToQuestion(questionIndex)) {
+      setShowSeasonPassModal(true);
+      return;
+    }
+    
+    setCurrentPage(questionIndex);
+  };
+
   // Function to scroll to a question (used by sidecar)
   const scrollToQuestion = (questionId: number) => {
     const questionIndex = questions.findIndex(q => q.id === questionId);
     if (questionIndex === -1) return;
     
-    setCurrentPage(questionIndex);
+    handleNavigateToQuestion(questionIndex);
     setShowSidecar(false); // Close sidecar after navigating
     
     // Small delay to ensure page change happens first
@@ -961,6 +1021,14 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
           // The results are already displayed, so the user can see them
         }}
       />
+
+      {/* Season Pass Modal - shown when non-premium users try to access question 2+ */}
+      {showSeasonPassModal && (
+        <SeasonPassModal
+          subject={examType}
+          onClose={() => setShowSeasonPassModal(false)}
+        />
+      )}
 
       {/* Image Modal */}
       {showImageModal && selectedImage && (
@@ -1333,19 +1401,18 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                         <button
                           key={q.id}
                           onClick={() => {
-                            if (isFreeUser && index > 1) {
-                              // Prevent free users from navigating to questions beyond question 2 (index 1)
-                              return;
+                            if (canNavigateToQuestion(index)) {
+                              setCurrentPage(index);
+                              setTimeout(() => {
+                                const element = document.getElementById(`question-${q.id}`);
+                                element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                              }, 100);
+                            } else {
+                              setShowSeasonPassModal(true);
                             }
-                            setCurrentPage(index);
-                            setTimeout(() => {
-                              const element = document.getElementById(`question-${q.id}`);
-                              element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            }, 100);
                           }}
-                          disabled={isFreeUser && index > 1}
-                          className={`${buttonClasses} ${isFreeUser && index > 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                          title={isFreeUser && index > 1 ? 'Join the Dojo to unlock' : `Question ${index + 1}`}
+                          className={buttonClasses}
+                          title={`Question ${index + 1}`}
                         >
                           <span className={textClasses}>{index + 1}</span>
                         </button>
@@ -1364,8 +1431,6 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                 const selectedAnswer = answers[question.id];
                 const selectedIndex = selectedAnswer ? selectedAnswer.charCodeAt(0) - 65 : null;
                 const hasVisualContent = question.image || question.tableData;
-                // For free users, blur question 2 and beyond (index >= 1)
-                const isQuestionLocked = isFreeUser && currentPage >= 1;
                 
                 return (
                   <div className="w-full relative">
@@ -1375,9 +1440,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                         isCustomAssignment 
                           ? 'border-2 border-black rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' 
                           : 'rounded-lg shadow-md border border-gray-200'
-                      } ${isQuestionLocked ? 'blur-sm' : ''}`}>
+                      }`}>
                         {/* Main Question Content */}
-                        <div className={`space-y-6 ${isQuestionLocked ? 'pointer-events-none' : ''}`}>
+                        <div className="space-y-6">
                           {/* Question Number, Bookmark, and Question Text */}
                           <div className="w-full">
                             <div className="flex items-start gap-3">
@@ -1842,24 +1907,6 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                           </div>
                         </div>
 
-                        {/* Free User Upgrade Overlay - Centered in question card */}
-                        {isQuestionLocked && (
-                          <div className="absolute inset-0 flex items-center justify-center z-50 pointer-events-none">
-                            <div className="text-center p-8 max-w-md bg-white border-4 border-black rounded-xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] pointer-events-auto">
-                              <Lock className="w-16 h-16 mx-auto text-blue-500 mb-4" />
-                              <h3 className="text-2xl font-bold text-gray-900 mb-2">Unlock Full Access</h3>
-                              <p className="text-gray-600 mb-6">
-                                Join the Dojo to access all questions and unlock unlimited practice tests, drills, and FRQ practice.
-                              </p>
-                              <Link
-                                href={`/purchase/season-pass?courseType=${examType}`}
-                                className="inline-block px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors"
-                              >
-                                Join the Dojo
-                              </Link>
-                            </div>
-                          </div>
-                        )}
 
                         {/* Submit button for last question - only show if not using fixed bottom bar */}
                         {!(showVideoModal && videoUrl) && !shouldShowTestUI && currentPage === questions.length - 1 && (
@@ -2949,8 +2996,14 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                         <button
                           key={q.id}
                           onClick={() => {
-                            if (!isTimerPaused || isCustomAssignment) {
+                            if (isTimerPaused && !isCustomAssignment) {
+                              return;
+                            }
+                            if (canNavigateToQuestion(index)) {
                               setCurrentPage(index);
+                              setShowQuestionNavigator(false);
+                            } else {
+                              setShowSeasonPassModal(true);
                               setShowQuestionNavigator(false);
                             }
                           }}
@@ -2996,18 +3049,23 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
               {/* Next Button */}
               <button
                 onClick={() => {
-                  if ((isTimerPaused && !isCustomAssignment) || (isFreeUser && currentPage >= 1)) {
+                  if (isTimerPaused && !isCustomAssignment) {
                     return;
                   }
                   if (currentPage === questions.length - 1) {
                     handleSubmitClick();
                   } else {
-                    setCurrentPage(prev => Math.min(questions.length - 1, prev + 1));
+                    const nextPage = currentPage + 1;
+                    if (canNavigateToQuestion(nextPage)) {
+                      setCurrentPage(nextPage);
+                    } else {
+                      setShowSeasonPassModal(true);
+                    }
                   }
                 }}
-                disabled={(isFreeUser && currentPage >= 1) || (isTimerPaused && !isCustomAssignment)}
+                disabled={isTimerPaused && !isCustomAssignment}
                 className={`px-6 py-2.5 rounded-lg font-semibold transition-colors flex items-center gap-2 ${
-                  (isFreeUser && currentPage >= 1) || (isTimerPaused && !isCustomAssignment)
+                  isTimerPaused && !isCustomAssignment
                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                     : currentPage === questions.length - 1
                     ? 'bg-black hover:bg-gray-800 text-white'

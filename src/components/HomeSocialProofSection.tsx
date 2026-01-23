@@ -18,7 +18,7 @@ export function HomeSocialProofSection() {
           className="text-center mb-12"
         >
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-gray-900">
-            Real students. Real <span className="text-blue-500">results</span>.
+            From Panic to a <span className="text-blue-500">5</span>.
           </h2>
           <p className="mt-4 text-lg sm:text-xl text-gray-700 font-medium max-w-3xl mx-auto">
             Built from thousands of tutoring hours and real AP exam patterns.

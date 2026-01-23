@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, Suspense } from 'react';
 import Link from 'next/link';
-import { ArrowRight, PlayCircle, Lock, Clock } from 'lucide-react';
+import { ArrowRight, PlayCircle, Clock } from 'lucide-react';
 import { macroUnits as allMacroUnitsData, microUnits as allMicroUnitsData } from '@/data/cheatSheets';
 import { Button } from '@/components/ui/button';
 import { useAuthContext } from '@/contexts/AuthContext';
@@ -109,30 +109,12 @@ function UnitFinalPracticeTestsContent() {
                 </p>
               </div>
               <div className="flex flex-col items-end gap-4 min-w-[200px]">
-                {(() => {
-                  // Link to appropriate exam based on subject
-                  const examHref = getFullMCQTestUrl(effectiveSubject, 1);
-                  
-                  if (!hasSeasonPass) {
-                    return (
-                      <Link href={`/purchase/season-pass?courseType=${effectiveSubject}`} passHref>
-                        <Button className={`${isMicro ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600'} text-white font-semibold`}>
-                          <Lock className="w-5 h-5 mr-2" />
-                          Unlock with Season Pass
-                        </Button>
-                      </Link>
-                    );
-                  }
-                  
-                  return (
-                    <Link href={examHref} passHref>
-                      <Button className={`${isMicro ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600'} text-white font-semibold`}>
-                        Start Test
-                        <PlayCircle className="w-5 h-5 ml-2" />
-                      </Button>
-                    </Link>
-                  );
-                })()}
+                <Link href={getFullMCQTestUrl(effectiveSubject, 1)} passHref>
+                  <Button className={`${isMicro ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600'} text-white font-semibold`}>
+                    Start Test
+                    <PlayCircle className="w-5 h-5 ml-2" />
+                  </Button>
+                </Link>
               </div>
             </div>
 
@@ -152,30 +134,12 @@ function UnitFinalPracticeTestsContent() {
                 </p>
               </div>
               <div className="flex flex-col items-end gap-4 min-w-[200px]">
-                {(() => {
-                  // Link to appropriate exam based on subject
-                  const examHref = getFullFRQTestUrl(effectiveSubject);
-                  
-                  if (!hasSeasonPass) {
-                    return (
-                      <Link href={`/purchase/season-pass?courseType=${effectiveSubject}`} passHref>
-                        <Button className={`${isMicro ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600'} text-white font-semibold`}>
-                          <Lock className="w-5 h-5 mr-2" />
-                          Unlock with Season Pass
-                        </Button>
-                      </Link>
-                    );
-                  }
-                  
-                  return (
-                    <Link href={examHref} passHref>
-                      <Button className={`${isMicro ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600'} text-white font-semibold`}>
-                        Start Test
-                        <PlayCircle className="w-5 h-5 ml-2" />
-                      </Button>
-                    </Link>
-                  );
-                })()}
+                <Link href={getFullFRQTestUrl(effectiveSubject)} passHref>
+                  <Button className={`${isMicro ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600'} text-white font-semibold`}>
+                    Start Test
+                    <PlayCircle className="w-5 h-5 ml-2" />
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>
@@ -189,7 +153,6 @@ function UnitFinalPracticeTestsContent() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {units.map((unit) => {
               const isAvailable = isUnitAvailable(unit.number);
-              const isLocked = !hasSeasonPass;
               
               return (
                 <div 
@@ -221,17 +184,6 @@ function UnitFinalPracticeTestsContent() {
                         <Clock className="w-5 h-5 mr-2" />
                         Coming Soon
                       </Button>
-                    ) : isLocked ? (
-                      <Link 
-                        href={`/purchase/season-pass?courseType=${effectiveSubject}`}
-                        passHref
-                        className="w-full"
-                      >
-                        <Button className={`w-full ${isMicro ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600'} text-white font-semibold`}>
-                          <Lock className="w-5 h-5 mr-2" />
-                          Unlock with Season Pass
-                        </Button>
-                      </Link>
                     ) : (
                       <Link 
                         href={getUnitMCQTestUrl(unit.number, effectiveSubject)}

@@ -148,18 +148,8 @@ export default function UnitMCQTestPage() {
   const availableMicroUnits = [2, 3, 4];
   const isMicroUnitAvailable = effectiveSubject !== 'micro' || availableMicroUnits.includes(unitNumber);
   
-  // Check if user is free and unit is locked (Unit 1 is free, others require season pass)
-  const isUnitLockedForFreeUser = !isProCustomer && unitNumber !== 1;
-  
   // Check if micro unit is not available (even for premium users)
   const isMicroUnitNotAvailable = effectiveSubject === 'micro' && !isMicroUnitAvailable;
-
-  // Redirect free users to season pass purchase instead of showing lock screen
-  useEffect(() => {
-    if (isUnitLockedForFreeUser) {
-      window.location.href = `/purchase/season-pass?courseType=${examType}`;
-    }
-  }, [isUnitLockedForFreeUser, examType]);
 
   // Show "Coming Soon" for unavailable micro units
   if (isMicroUnitNotAvailable) {
@@ -180,10 +170,6 @@ export default function UnitMCQTestPage() {
     );
   }
 
-  if (isUnitLockedForFreeUser) {
-    return null; // Will redirect, so return nothing
-  }
-
   return (
     <div className="min-h-screen">
       <FullExam
@@ -191,7 +177,6 @@ export default function UnitMCQTestPage() {
         examType={examType}
         questionType="mcq"
         examNumber={unitId as string}
-        isFreeUser={false} // Only show if user has access
         isUnitTest={true} // Enable test-like layout with always-visible tools
       />
     </div>
