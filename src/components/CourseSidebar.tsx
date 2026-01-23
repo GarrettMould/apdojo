@@ -7,6 +7,8 @@ import { videos as allVideos } from '@/data/videos';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react'; // Added for useEffect
+import { useAuthContext } from '@/contexts/AuthContext';
+import { getUnitMCQTestUrl } from '@/lib/utils';
 
 interface CourseSidebarProps {
   selectedUnit?: string;
@@ -17,9 +19,10 @@ interface CourseSidebarProps {
 
 export function CourseSidebar({ selectedUnit = '1', onUnitChange, isFixed = false, currentLessonId }: CourseSidebarProps) {
   const pathname = usePathname();
+  const { selectedSubject } = useAuthContext();
   const isOnCoursePage = pathname === '/ap-macro-course';
   const isOnLessonPage = pathname.includes('/videos/') || pathname.includes('/video-comprehension-checks/');
-  const isOnUnitTestPage = pathname.includes('/unit-mcq-test/') || pathname.includes('/unit-frq-test/');
+  const isOnUnitTestPage = pathname.includes('/unit-mcq-test/') || pathname.includes('/ap-macro-unit-') || pathname.includes('/ap-micro-unit-') || pathname.includes('/unit-frq-test/');
   const [expandedLessons, setExpandedLessons] = useState<Set<string>>(new Set()); // Track expanded lessons
   
   const handleUnitClick = (unitNumber: string) => {
@@ -304,9 +307,9 @@ export function CourseSidebar({ selectedUnit = '1', onUnitChange, isFixed = fals
                         <div className="bg-gray-50 border-t border-gray-200">
                           <div className="p-2 space-y-1">
                             <Link
-                              href={`/unit-mcq-test/${selectedUnit}`}
+                              href={getUnitMCQTestUrl(parseInt(selectedUnit), selectedSubject)}
                               className={`block px-3 py-2 text-sm rounded-md transition-colors ${
-                                pathname.includes(`/unit-mcq-test/${selectedUnit}`)
+                                pathname.includes(`/unit-mcq-test/${selectedUnit}`) || pathname.includes(`/ap-${selectedSubject}-unit-${selectedUnit}-mcq-test`)
                                   ? 'bg-green-100 text-green-700 font-medium' 
                                   : 'text-gray-600 hover:bg-white hover:text-gray-900'
                               }`}

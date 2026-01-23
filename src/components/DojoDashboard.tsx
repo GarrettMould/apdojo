@@ -17,7 +17,7 @@ import { getSubjectXP } from '@/hooks/useUserProgress';
 import { collection, query, where, orderBy, limit, getDocs, getDoc, doc, collectionGroup } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { QuizHistoryEntry, restoreTableData } from '@/lib/quizHistory';
-import { hasValidSeasonPass } from '@/lib/utils';
+import { hasValidSeasonPass, getUnitMCQTestUrl } from '@/lib/utils';
 
 // Container animation variants (LITE - very subtle)
 const containerVariants = {
@@ -393,7 +393,7 @@ export function DojoDashboard() {
       title: `Unit ${unit.number} Test`,
       description: unit.title,
       unitNumber: unit.number,
-      href: `/unit-mcq-test/${unit.number}`,
+      href: getUnitMCQTestUrl(unit.number, currentCourse as 'macro' | 'micro'),
       isLocked: isUnitLocked(unit.number),
     }));
   }, [currentCourse, hasCourseAccess]);
@@ -773,7 +773,7 @@ export function DojoDashboard() {
                     thumbnailType = 'exam';
                     Icon = BookOpen;
                     const unitMatch = activity.title.match(/Unit (\d+)/);
-                    href = unitMatch ? `/unit-mcq-test/${unitMatch[1]}` : '#';
+                    href = unitMatch ? getUnitMCQTestUrl(parseInt(unitMatch[1]), currentCourse as 'macro' | 'micro') : '#';
                   } else if (activity.type === 'frq-exam') {
                     thumbnailType = 'exam';
                     Icon = FileText;
@@ -1146,7 +1146,7 @@ export function DojoDashboard() {
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-gray-900">Unit Exams</h2>
                 <Link
-                  href={`/unit-mcq-test/1`}
+                  href={getUnitMCQTestUrl(1, currentCourse as 'macro' | 'micro')}
                   className="text-sm font-medium text-gray-600 hover:text-gray-900 flex items-center gap-1 transition-colors"
                 >
                   See all

@@ -1,22 +1,37 @@
 'use client';
 
-import { use } from 'react';
-import { notFound } from 'next/navigation';
+import { use, useEffect, useMemo } from 'react';
+import { notFound, useRouter } from 'next/navigation';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { FullExamFRQ } from '@/components/FullExamFRQ';
+import { hasValidSeasonPass } from '@/lib/utils';
 import { frqSetOneQuestions } from '@/data/questionBanks/micro/frqs/setOne';
 
 export default function MicroFRQPreview({ params }: { params: Promise<{ num: string }> }) {
   const { num } = use(params);
-  const { loadingUserData } = useAuthContext();
+  const { loadingUserData, user, userData } = useAuthContext();
+  const router = useRouter();
+
+  // Check if user is a pro customer (has season pass)
+  const isProCustomer = useMemo(() => {
+    if (!user || !userData) return false;
+    return hasValidSeasonPass(userData, 'micro');
+  }, [user, userData]);
+
+  // Redirect free users to purchase page
+  useEffect(() => {
+    if (!loadingUserData && !isProCustomer) {
+      router.push('/purchase/season-pass?courseType=micro');
+    }
+  }, [loadingUserData, isProCustomer, router]);
 
   // Only show exam 1 for now
   if (num !== '1') {
     notFound();
   }
 
-  // Show loading state while checking auth
-  if (loadingUserData) {
+  // Show loading state while checking auth or redirecting
+  if (loadingUserData || !isProCustomer) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -27,7 +42,7 @@ export default function MicroFRQPreview({ params }: { params: Promise<{ num: str
     );
   }
 
-  // Show the exam - accessible to everyone
+  // Show the exam - only accessible to pro customers
   return (
     <div className="py-8">
       <div className="max-w-4xl mx-auto px-4">

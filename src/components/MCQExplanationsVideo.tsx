@@ -222,7 +222,7 @@ export function MCQExplanationsVideo() {
               {/* Previous Button */}
               <div className="flex-1">
                 <Link
-                  href="/unit-mcq-test/1"
+                  href="/ap-macro-unit-1-mcq-test"
                   className="block w-full h-24 p-4 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 group"
                 >
                   <div className="flex items-center gap-2 text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-2">

@@ -12,7 +12,7 @@ import { getBeltProgress } from '@/lib/beltSystem';
 import { motion } from 'framer-motion';
 import { SubjectToggle } from '@/components/dashboard/SubjectToggle';
 import { useTeacherViewMode } from '@/hooks/useTeacherViewMode';
-import { hasValidSeasonPass } from '@/lib/utils';
+import { hasValidSeasonPass, getPracticeTestsUrl } from '@/lib/utils';
 
 export function Header() {
   const { user, logout, selectedSubject, setSelectedSubject, totalXP, guestXp, isCharacterClosetOpen, setIsCharacterClosetOpen, userData } = useAuthContext();
@@ -160,7 +160,7 @@ export function Header() {
                     <div className="h-2 -mt-2 w-full pointer-events-auto"></div>
                     <div className="bg-white rounded-lg shadow-lg border border-gray-200 py-2 pointer-events-auto">
                       <Link
-                        href="/unit-final-practice-tests"
+                        href={getPracticeTestsUrl(selectedSubject)}
                         className="block px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
                         onClick={() => setIsPracticeDropdownOpen(false)}
                       >
@@ -478,7 +478,7 @@ export function Header() {
                 Practice
               </div>
               <Link
-                href="/unit-final-practice-tests"
+                href={getPracticeTestsUrl(selectedSubject)}
                 onClick={closeMobileMenu}
                 className="px-6 py-3 text-lg text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
               >

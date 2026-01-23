@@ -55,3 +55,45 @@ export const getUnitColor = (unitId: number): string => {
   ]
   return colors[unitId % colors.length]
 }
+
+/**
+ * Generate SEO-friendly URL for unit MCQ tests
+ * @param unitId - Unit number (1-6)
+ * @param subject - Subject ('macro' | 'micro')
+ * @returns Descriptive URL like '/ap-micro-unit-3-mcq-test'
+ */
+export function getUnitMCQTestUrl(unitId: number, subject: 'macro' | 'micro'): string {
+  return `/ap-${subject}-unit-${unitId}-mcq-test`;
+}
+
+/**
+ * Generate SEO-friendly URL for full MCQ practice tests
+ * @param subject - Subject ('macro' | 'micro')
+ * @param testNumber - Test number (default: 1)
+ * @returns Descriptive URL like '/ap-micro-mcq-practice-test-1'
+ */
+export function getFullMCQTestUrl(subject: 'macro' | 'micro', testNumber: number = 1): string {
+  return `/ap-${subject}-mcq-practice-test-${testNumber}`;
+}
+
+/**
+ * Generate SEO-friendly URL for full FRQ practice tests
+ * @param subject - Subject ('macro' | 'micro')
+ * @param testNumber - Test number (default: 2 for micro, 1 for macro)
+ * @returns Descriptive URL like '/ap-micro-frq-practice-test-2'
+ */
+export function getFullFRQTestUrl(subject: 'macro' | 'micro', testNumber?: number): string {
+  // Default to test-2 for micro, test-1 for macro (as per user spec)
+  const defaultTestNumber = subject === 'micro' ? 2 : 1;
+  const testNum = testNumber ?? defaultTestNumber;
+  return `/ap-${subject}-frq-practice-test-${testNum}`;
+}
+
+/**
+ * Generate SEO-friendly URL for practice tests page
+ * @param subject - Subject ('macro' | 'micro')
+ * @returns Descriptive URL like '/ap-micro-practice-tests'
+ */
+export function getPracticeTestsUrl(subject: 'macro' | 'micro'): string {
+  return `/ap-${subject}-practice-tests`;
+}

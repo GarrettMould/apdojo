@@ -445,7 +445,7 @@ function UnitMCQPracticeContent() {
     }
 
     // User has access → go to test page
-    router.push(`/unit-mcq-test/${currentUnit}`);
+    router.push(`/ap-${subject}-unit-${currentUnit}-mcq-test`);
   };
 
   const handleAnswer = async (questionId: number, answerLetter: string, isCorrect: boolean, lessonIDS: string[]) => {

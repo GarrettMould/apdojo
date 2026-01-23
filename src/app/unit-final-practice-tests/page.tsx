@@ -1,17 +1,43 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { ArrowRight, PlayCircle } from 'lucide-react';
+import { ArrowRight, PlayCircle, Lock, Clock } from 'lucide-react';
 import { macroUnits as allMacroUnitsData, microUnits as allMicroUnitsData } from '@/data/cheatSheets';
 import { Button } from '@/components/ui/button';
 import { useAuthContext } from '@/contexts/AuthContext';
+import { useSearchParams } from 'next/navigation';
+import { getUnitMCQTestUrl, getFullMCQTestUrl, getFullFRQTestUrl, hasValidSeasonPass } from '@/lib/utils';
 
 export default function UnitFinalPracticeTestsPage() {
-  const { selectedSubject } = useAuthContext();
-  const units = selectedSubject === 'micro' ? allMicroUnitsData : allMacroUnitsData;
-  const isMicro = selectedSubject === 'micro';
-  const subjectName = selectedSubject === 'macro' ? 'Macroeconomics' : 'Microeconomics';
+  const { selectedSubject, user, userData } = useAuthContext();
+  const searchParams = useSearchParams();
+  
+  // Get subject from query param (from rewrite) or fall back to context
+  const subjectParam = searchParams.get('subject');
+  const effectiveSubject = (subjectParam === 'macro' || subjectParam === 'micro') 
+    ? subjectParam 
+    : selectedSubject;
+  
+  const units = effectiveSubject === 'micro' ? allMicroUnitsData : allMacroUnitsData;
+  const isMicro = effectiveSubject === 'micro';
+  const subjectName = effectiveSubject === 'macro' ? 'Macroeconomics' : 'Microeconomics';
+  
+  // Check if user has season pass for this subject
+  const hasSeasonPass = useMemo(() => {
+    if (!user || !userData) return false;
+    return hasValidSeasonPass(userData, effectiveSubject);
+  }, [user, userData, effectiveSubject]);
+  
+  // Define available units for micro (only 2 and 3)
+  const availableMicroUnits = [2, 3];
+  const isUnitAvailable = (unitNumber: number) => {
+    if (effectiveSubject === 'micro') {
+      return availableMicroUnits.includes(unitNumber);
+    }
+    // All macro units are available
+    return true;
+  };
 
   // Add structured data for SEO
   useEffect(() => {
@@ -20,7 +46,7 @@ export default function UnitFinalPracticeTestsPage() {
       '@type': 'ItemList',
       name: `AP ${subjectName} Unit Practice Tests`,
       description: `Full-length practice tests for each unit of AP ${subjectName}`,
-      itemListElement: units.map((unit, index) => ({
+      itemListElement: units.map((unit: any, index: number) => ({
         '@type': 'ListItem',
         position: index + 1,
         item: {
@@ -85,9 +111,18 @@ export default function UnitFinalPracticeTestsPage() {
               <div className="flex flex-col items-end gap-4 min-w-[200px]">
                 {(() => {
                   // Link to appropriate exam based on subject
-                  const examHref = isMicro 
-                    ? '/preview/micro/mcq/1'  // Link to micro setOne.ts
-                    : '/preview/macro/mcq/1';
+                  const examHref = getFullMCQTestUrl(effectiveSubject, 1);
+                  
+                  if (!hasSeasonPass) {
+                    return (
+                      <Link href={`/purchase/season-pass?courseType=${effectiveSubject}`} passHref>
+                        <Button className={`${isMicro ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600'} text-white font-semibold`}>
+                          <Lock className="w-5 h-5 mr-2" />
+                          Unlock with Season Pass
+                        </Button>
+                      </Link>
+                    );
+                  }
                   
                   return (
                     <Link href={examHref} passHref>
@@ -119,9 +154,18 @@ export default function UnitFinalPracticeTestsPage() {
               <div className="flex flex-col items-end gap-4 min-w-[200px]">
                 {(() => {
                   // Link to appropriate exam based on subject
-                  const examHref = isMicro 
-                    ? '/preview/micro/frq/1'
-                    : '/preview/macro/frq/1';
+                  const examHref = getFullFRQTestUrl(effectiveSubject);
+                  
+                  if (!hasSeasonPass) {
+                    return (
+                      <Link href={`/purchase/season-pass?courseType=${effectiveSubject}`} passHref>
+                        <Button className={`${isMicro ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600'} text-white font-semibold`}>
+                          <Lock className="w-5 h-5 mr-2" />
+                          Unlock with Season Pass
+                        </Button>
+                      </Link>
+                    );
+                  }
                   
                   return (
                     <Link href={examHref} passHref>
@@ -144,10 +188,15 @@ export default function UnitFinalPracticeTestsPage() {
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {units.map((unit) => {
+              const isAvailable = isUnitAvailable(unit.number);
+              const isLocked = !hasSeasonPass;
+              
               return (
                 <div 
                   key={unit.number}
-                  className="group bg-white rounded-xl shadow-lg border border-gray-200 p-8 flex flex-col h-full"
+                  className={`group bg-white rounded-xl shadow-lg border border-gray-200 p-8 flex flex-col h-full ${
+                    !isAvailable ? 'opacity-75' : ''
+                  }`}
                 >
                   
                   <div className="flex-grow">
@@ -164,16 +213,37 @@ export default function UnitFinalPracticeTestsPage() {
                     </p>
                   </div>
                   <div className="mt-8 flex items-center justify-end">
-                    <Link 
-                      href={`/unit-mcq-test/${unit.number}`}
-                      passHref
-                      className="w-full"
-                    >
-                      <Button className={`w-full ${isMicro ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600'} text-white font-semibold`}>
-                        Start Test
-                        <PlayCircle className="w-5 h-5 ml-2" />
+                    {!isAvailable ? (
+                      <Button 
+                        disabled
+                        className="w-full bg-gray-300 text-gray-600 font-semibold cursor-not-allowed"
+                      >
+                        <Clock className="w-5 h-5 mr-2" />
+                        Coming Soon
                       </Button>
-                    </Link>
+                    ) : isLocked ? (
+                      <Link 
+                        href={`/purchase/season-pass?courseType=${effectiveSubject}`}
+                        passHref
+                        className="w-full"
+                      >
+                        <Button className={`w-full ${isMicro ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600'} text-white font-semibold`}>
+                          <Lock className="w-5 h-5 mr-2" />
+                          Unlock with Season Pass
+                        </Button>
+                      </Link>
+                    ) : (
+                      <Link 
+                        href={getUnitMCQTestUrl(unit.number, effectiveSubject)}
+                        passHref
+                        className="w-full"
+                      >
+                        <Button className={`w-full ${isMicro ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600'} text-white font-semibold`}>
+                          Start Test
+                          <PlayCircle className="w-5 h-5 ml-2" />
+                        </Button>
+                      </Link>
+                    )}
                   </div>
                 </div>
               );

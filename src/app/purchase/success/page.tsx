@@ -5,9 +5,12 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { CheckCircle, ArrowRight, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAuthContext } from '@/contexts/AuthContext';
+import { getPracticeTestsUrl } from '@/lib/utils';
 
 function SuccessContent() {
   const searchParams = useSearchParams();
+  const { selectedSubject } = useAuthContext();
 
   // Simplified success message for logged-in users
   return (
@@ -18,7 +21,7 @@ function SuccessContent() {
         The practice test has been added to your account.
       </p>
       <div className="mt-8">
-        <Link href="/unit-final-practice-tests" passHref>
+        <Link href={getPracticeTestsUrl(selectedSubject)} passHref>
           <Button className="w-full">
             Go to Practice Tests
             <ArrowRight className="w-4 h-4 ml-2" />

@@ -7,9 +7,10 @@ import { useAuthContext } from '@/contexts/AuthContext'
 import heroBG from "../../public/images/heroBG.png"
 import { ChevronDown } from 'lucide-react'
 import Image from 'next/image';
+import { getPracticeTestsUrl } from '@/lib/utils';
 
 export function Hero() {
-  const { user } = useAuthContext();
+  const { user, selectedSubject } = useAuthContext();
 
   // Uncommented handleScrollDown for original layout
   const handleScrollDown = () => {
@@ -46,7 +47,7 @@ export function Hero() {
             size="lg"
             className="w-full shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5 py-6 sm:py-7 md:py-8 text-lg sm:text-xl font-bold text-white bg-blue-500 hover:bg-blue-600"
           >
-            <Link href="/unit-final-practice-tests">
+            <Link href={getPracticeTestsUrl(selectedSubject)}>
               Get Started
             </Link>
           </Button>

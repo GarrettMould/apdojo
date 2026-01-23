@@ -1283,7 +1283,7 @@ export const unitTestQuestions: QuestionType[] = [
         ["Cost of Ingredients (Flour, Sugar, etc.)", "$40,000"],
         ["Wages paid to employees", "$30,000"],
         ["Rent for bakery space", "$20,000"],
-        ["Forgone Salary (Opportunity Cost)", "$50,000"]
+        ["Forgone Salary", "$50,000"]
       ]
     },
     options: [

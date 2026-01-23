@@ -141,7 +141,79 @@ const nextConfig = {
       });
     }
 
+    // Redirect old practice tests URL to new subject-specific URLs
+    // Default to macro for backward compatibility
+    redirects.push({
+      source: '/unit-final-practice-tests',
+      destination: '/ap-macro-practice-tests',
+      permanent: true,
+    });
+
     return redirects;
+  },
+  async rewrites() {
+    const rewrites = [];
+
+    // Rewrite descriptive URLs for unit MCQ tests to internal route structure
+    // Macro unit MCQ tests: /ap-macro-unit-{1-6}-mcq-test → /unit-mcq-test/{1-6}?subject=macro
+    for (let unit = 1; unit <= 6; unit++) {
+      rewrites.push({
+        source: `/ap-macro-unit-${unit}-mcq-test`,
+        destination: `/unit-mcq-test/${unit}?subject=macro`,
+      });
+    }
+
+    // Micro unit MCQ tests: /ap-micro-unit-{1-6}-mcq-test → /unit-mcq-test/{1-6}?subject=micro
+    for (let unit = 1; unit <= 6; unit++) {
+      rewrites.push({
+        source: `/ap-micro-unit-${unit}-mcq-test`,
+        destination: `/unit-mcq-test/${unit}?subject=micro`,
+      });
+    }
+
+    // Full MCQ practice tests
+    // Macro: /ap-macro-mcq-practice-test-1 → /preview/macro/mcq/1
+    rewrites.push({
+      source: '/ap-macro-mcq-practice-test-1',
+      destination: '/preview/macro/mcq/1',
+    });
+
+    // Micro: /ap-micro-mcq-practice-test-1 → /preview/micro/mcq/1
+    rewrites.push({
+      source: '/ap-micro-mcq-practice-test-1',
+      destination: '/preview/micro/mcq/1',
+    });
+
+    // Full FRQ practice tests
+    // Macro: /ap-macro-frq-practice-test-1 → /preview/macro/frq/1
+    rewrites.push({
+      source: '/ap-macro-frq-practice-test-1',
+      destination: '/preview/macro/frq/1',
+    });
+
+    // Micro: /ap-micro-frq-practice-test-2 → /preview/micro/frq/1 (mapping test-2 URL to test-1 page)
+    rewrites.push({
+      source: '/ap-micro-frq-practice-test-2',
+      destination: '/preview/micro/frq/1',
+    });
+
+    // Also support test-1 for micro FRQ if needed
+    rewrites.push({
+      source: '/ap-micro-frq-practice-test-1',
+      destination: '/preview/micro/frq/1',
+    });
+
+    // Practice tests page rewrites
+    rewrites.push({
+      source: '/ap-macro-practice-tests',
+      destination: '/unit-final-practice-tests?subject=macro',
+    });
+    rewrites.push({
+      source: '/ap-micro-practice-tests',
+      destination: '/unit-final-practice-tests?subject=micro',
+    });
+
+    return rewrites;
   },
 } as NextConfig;
 
