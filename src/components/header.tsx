@@ -359,7 +359,7 @@ export function Header() {
                         };
                         
                         return (
-                          <div className="absolute top-full right-0 mt-2 w-[320px] z-50">
+                          <div className="absolute top-full right-0 mt-2 w-[320px] z-[100]">
                             <div className="bg-white border-2 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4">
                               {/* Belt Badge with Image */}
                               <div className="mb-4 flex flex-col items-center">

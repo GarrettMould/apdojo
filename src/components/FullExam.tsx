@@ -4,13 +4,12 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Question, QuestionBank } from '@/data/questionBanks/types';
 import { Button } from "@/components/ui/button";
 import { Bookmark, BookmarkX, X, Clock, Maximize2, Minimize2, Calculator, Pen, Eraser, Expand, Trash2, Circle, CircleDot, Check, Lock, Brain, FileText, ChevronLeft, ChevronRight, ChevronsRight, Triangle, Strikethrough, Eye, EyeOff, Play, ChevronDown, ChevronUp, List, Pause, Play as PlayIcon } from 'lucide-react';
-import { StaticImageData } from 'next/image';
+import Image, { StaticImageData } from 'next/image';
 import Link from 'next/link';
 import { redirectToCheckout } from '@/lib/stripe';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { LoginModal, SignupModal } from './AuthModals';
 import { MCQFeedbackModal } from './MCQFeedbackModal';
-import { AssessmentResultsPanel } from './AssessmentResultsPanel';
 import { videos } from '@/data/videos';
 import { createPortal } from 'react-dom';
 import { HighlightableText } from './HighlightableText';
@@ -22,6 +21,7 @@ import { ExamTutorialModal } from './ExamTutorialModal';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 import { saveQuizResult } from '@/lib/quizHistory';
+import { saveTestResult } from '@/lib/testProgress';
 import { motion, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import '@excalidraw/excalidraw/index.css';
@@ -114,6 +114,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   const [showBookmarkConfirmModal, setShowBookmarkConfirmModal] = useState(false);
   const [showNameInputModal, setShowNameInputModal] = useState(false);
   const [studentName, setStudentName] = useState('');
+  const [xpAwarded, setXpAwarded] = useState(false);
   
   // Remove the shuffling logic and just use the pre-shuffled questions
   const questions = questionBank.questions;
@@ -161,7 +162,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   // Tools panel is closed by default on all exam types - users can open it if needed
   const isPreviewExam = examNumber && (examNumber.includes('preview') || examNumber.startsWith('preview'));
   const isFullExam = examNumber === 'full';
-  const shouldShowToolsByDefault = false; // Always start closed - users can open manually
+  // Show top bar and bottom navigation for unit tests, preview exams, and full exams
+  const shouldShowTestUI = isUnitTest || isPreviewExam || isFullExam || isCustomAssignment;
+  const shouldShowToolsByDefault = false; // Tools panel starts closed - users can open manually
   const [showToolsPanel, setShowToolsPanel] = useState(shouldShowToolsByDefault);
   const [leftPanelWidth, setLeftPanelWidth] = useState(shouldShowToolsByDefault ? 65 : 100); // Percentage width for left panel when tools panel is open
   // For all exam types, only show one tool at a time (calculator OR whiteboard)
@@ -440,25 +443,148 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
     if (bookmarkedQuestions.size > 0) {
       setShowBookmarkConfirmModal(true);
     } else {
+      const correctCount = questions.filter(q => answers[q.id] === q.correctAnswer).length;
+      const score = Math.round((correctCount / questions.length) * 100);
+      
+      // Award XP for unit tests and regular exams (not custom assignments - those handle it separately)
+      if (!isCustomAssignment && awardXp && user && !xpAwarded) {
+        if (correctCount > 0) {
+          // Calculate XP: 20 for completion + 10 per correct answer (same as AssessmentResultsPanel)
+          const totalXP = 20 + (correctCount * 10);
+          try {
+            await awardXp(totalXP, examType);
+            setXpAwarded(true);
+            console.log(`[FullExam] Awarded ${totalXP} XP (20 completion + ${correctCount} correct × 10 XP)`);
+          } catch (xpError) {
+            console.error('[FullExam] Error awarding XP:', xpError);
+          }
+        }
+      }
+
+      // Save test result for unit tests and full exams
+      console.log('[FullExam] Checking if should save test result:', {
+        isCustomAssignment,
+        hasUser: !!user,
+        isUnitTest,
+        isFullExam,
+        isPreviewExam,
+        examNumber,
+        examType
+      });
+      
+      if (!isCustomAssignment && user && (isUnitTest || isFullExam || isPreviewExam)) {
+        try {
+          let testType: 'unit_mcq' | 'full_exam' | 'full_frq' = 'full_exam';
+          let testId = 'full_mcq_exam';
+          
+          if (isUnitTest && examNumber) {
+            testType = 'unit_mcq';
+            testId = `unit_${examNumber}_${examType}`;
+          } else if (isFullExam) {
+            testType = questionType === 'frq' ? 'full_frq' : 'full_exam';
+            testId = questionType === 'frq' ? 'full_frq_exam' : 'full_mcq_exam';
+          } else if (isPreviewExam && examNumber) {
+            // Preview exams are treated as full exams
+            testType = questionType === 'frq' ? 'full_frq' : 'full_exam';
+            testId = questionType === 'frq' ? `preview_frq_${examNumber}` : `preview_mcq_${examNumber}`;
+          }
+
+          console.log('[FullExam] Saving test result with:', {
+            userId: user.uid,
+            testType,
+            testId,
+            score,
+            totalQuestions: questions.length
+          });
+
+          await saveTestResult({
+            userId: user.uid,
+            testType,
+            testId,
+            score,
+            totalQuestions: questions.length,
+            completedAt: new Date()
+          });
+          console.log(`[FullExam] Successfully saved test result: ${testType} - ${testId} - Score: ${score}%`);
+        } catch (testResultError) {
+          console.error('[FullExam] Error saving test result:', testResultError);
+        }
+      } else {
+        console.log('[FullExam] Skipping test result save - conditions not met');
+      }
+
       // For assignments, show results but blurred until name is entered
       if (isCustomAssignment) {
         setShowResults(true);
         setShowNameInputModal(true); // Show name input overlay
       } else {
+        // Go straight to full results view (skip AssessmentResultsPanel)
         setShowResults(true);
+        setShowFullResults(true);
       }
     }
   };
 
   const handleConfirmSubmit = async () => {
     setShowBookmarkConfirmModal(false);
+    const correctCount = questions.filter(q => answers[q.id] === q.correctAnswer).length;
+    const score = Math.round((correctCount / questions.length) * 100);
+    
+    // Award XP for unit tests and regular exams (not custom assignments - those handle it separately)
+    if (!isCustomAssignment && awardXp && user && !xpAwarded) {
+      if (correctCount > 0) {
+        // Calculate XP: 20 for completion + 10 per correct answer (same as AssessmentResultsPanel)
+        const totalXP = 20 + (correctCount * 10);
+        try {
+          await awardXp(totalXP, examType);
+          setXpAwarded(true);
+          console.log(`[FullExam] Awarded ${totalXP} XP (20 completion + ${correctCount} correct × 10 XP)`);
+        } catch (xpError) {
+          console.error('[FullExam] Error awarding XP:', xpError);
+        }
+      }
+    }
+
+    // Save test result for unit tests and full exams
+    if (!isCustomAssignment && user && (isUnitTest || isFullExam || isPreviewExam)) {
+      try {
+        let testType: 'unit_mcq' | 'full_exam' | 'full_frq' = 'full_exam';
+        let testId = 'full_mcq_exam';
+        
+        if (isUnitTest && examNumber) {
+          testType = 'unit_mcq';
+          testId = `unit_${examNumber}_${examType}`;
+        } else if (isFullExam) {
+          testType = questionType === 'frq' ? 'full_frq' : 'full_exam';
+          testId = questionType === 'frq' ? 'full_frq_exam' : 'full_mcq_exam';
+        } else if (isPreviewExam && examNumber) {
+          // Preview exams are treated as full exams
+          testType = questionType === 'frq' ? 'full_frq' : 'full_exam';
+          testId = questionType === 'frq' ? `preview_frq_${examNumber}` : `preview_mcq_${examNumber}`;
+        }
+
+        await saveTestResult({
+          userId: user.uid,
+          testType,
+          testId,
+          score,
+          totalQuestions: questions.length,
+          completedAt: new Date()
+        });
+        console.log(`[FullExam] Saved test result: ${testType} - ${testId} - Score: ${score}%`);
+      } catch (testResultError) {
+        console.error('[FullExam] Error saving test result:', testResultError);
+      }
+    }
+
     // For assignments, show results but blurred until name is entered
     if (isCustomAssignment) {
       setShowResults(true);
       setShowNameInputModal(true); // Show name input overlay
     } else {
+      // Go straight to full results view (skip AssessmentResultsPanel)
       setShowResults(true);
-      setShowFullResults(false);
+      setShowFullResults(true);
     }
   };
 
@@ -713,95 +839,43 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
 
   return (
     <>
-      {/* Assessment Results Panel - Rendered outside exam container via portal */}
-      {typeof window !== 'undefined' && showResults && !showFullResults && feedbackContainer && createPortal(
-        <div className="fixed inset-0 bg-gray-50 z-50 overflow-y-auto" style={{ top: '64px' }}>
-          <div className="min-h-[calc(100vh-64px)] flex items-center justify-center py-12 px-4 relative">
-            {/* Results Content - Blurred when name input is showing */}
-            <div className={`w-full max-w-4xl transition-all duration-300 ${showNameInputModal && isCustomAssignment ? 'blur-sm pointer-events-none' : ''}`}>
-              {isCustomAssignment && !user ? (
-                // Guest Result Card for Custom Assignments
-                <div className="bg-white rounded-lg shadow-xl p-8">
-                  <div className="text-center mb-6">
-                    <h1 className="text-3xl font-black text-gray-900 mb-2">
-                      {customTitle ? customTitle : 'Your Results'}
-                    </h1>
-                    <div className="text-6xl font-black text-blue-600 mb-4">
-                      {Math.round((questions.filter((q) => answers[q.id] === q.correctAnswer).length / questions.length) * 100)}%
-                    </div>
-                    <p className="text-gray-600 font-semibold">
-                      {questions.filter((q) => answers[q.id] === q.correctAnswer).length} correct out of {questions.length}
-                    </p>
-                  </div>
-                  
-                  {/* Dojo Readiness Band */}
-                  <div className="mb-8">
-                    <DojoReadinessBand 
-                      score={Math.round((questions.filter((q) => answers[q.id] === q.correctAnswer).length / questions.length) * 100)} 
-                    />
-                  </div>
-                  
-                  {/* Call to Action Button */}
-                  <button
-                    onClick={() => setShowSignupModal(true)}
-                    className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white text-lg font-black rounded-xl transition-colors duration-200 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-                  >
-                    Claim Your Dojo Belt & Save Progress
-                  </button>
-                </div>
-              ) : (
-                <AssessmentResultsPanel 
-                  totalQuestions={questions.length}
-                  correctAnswers={questions.filter((q) => answers[q.id] === q.correctAnswer).length}
-                  questions={questions}
-                  answers={answers}
-                  examType={examType}
-                  onSeeFullResults={() => setShowFullResults(true)}
-                  customTitle={customTitle}
-                />
-              )}
+      {/* Name Input Modal for Custom Assignments Only */}
+      {showNameInputModal && isCustomAssignment && typeof window !== 'undefined' && feedbackContainer && createPortal(
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-lg max-w-md w-full p-6 border-4 border-black">
+            <div className="flex items-center gap-3 mb-4">
+              <FileText className="w-6 h-6 text-blue-600" />
+              <h3 className="text-xl font-black text-gray-900">
+                Enter Your Name
+              </h3>
             </div>
-            
-            {/* Name Input Overlay for Assignments - Shows on top of blurred results (NOT blurred) */}
-            {showNameInputModal && isCustomAssignment && (
-              <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-auto">
-                <div className="bg-white rounded-xl shadow-lg max-w-md w-full p-6 border-4 border-black">
-                  <div className="flex items-center gap-3 mb-4">
-                    <FileText className="w-6 h-6 text-blue-600" />
-                    <h3 className="text-xl font-black text-gray-900">
-                      Enter Your Name
-                    </h3>
-                  </div>
-                  <p className="text-gray-700 mb-6 font-semibold">
-                    Please enter your name so your teacher can identify your submission.
-                  </p>
-                  <div className="mb-6">
-                    <input
-                      type="text"
-                      value={studentName}
-                      onChange={(e) => setStudentName(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && studentName.trim()) {
-                          handleNameSubmit();
-                        }
-                      }}
-                      placeholder="Your name"
-                      className="w-full px-4 py-3 border-2 border-black rounded-lg font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      autoFocus
-                    />
-                  </div>
-                  <div className="flex gap-3 justify-end">
-                    <button
-                      onClick={handleNameSubmit}
-                      disabled={!studentName.trim()}
-                      className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold rounded-lg transition-colors duration-200 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-                    >
-                      Reveal Results
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
+            <p className="text-gray-700 mb-6 font-semibold">
+              Please enter your name so your teacher can identify your submission.
+            </p>
+            <div className="mb-6">
+              <input
+                type="text"
+                value={studentName}
+                onChange={(e) => setStudentName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && studentName.trim()) {
+                    handleNameSubmit();
+                  }
+                }}
+                placeholder="Your name"
+                className="w-full px-4 py-3 border-2 border-black rounded-lg font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                autoFocus
+              />
+            </div>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={handleNameSubmit}
+                disabled={!studentName.trim()}
+                className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold rounded-lg transition-colors duration-200 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+              >
+                Reveal Results
+              </button>
+            </div>
           </div>
         </div>,
         feedbackContainer
@@ -920,9 +994,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
 
       {/* Only show exam content if not showing results, or if showing full results */}
       {(!showResults || showFullResults) && (
-        <div className={`flex w-full flex-col relative ${shouldShowToolsByDefault ? 'min-h-screen' : isCustomAssignment ? '' : 'lg:h-[calc(100vh-5rem)]'} ${shouldShowToolsByDefault ? '' : 'overflow-hidden'}`}>
+        <div className={`flex w-full flex-col relative ${shouldShowTestUI ? 'min-h-screen' : isCustomAssignment ? '' : 'lg:h-[calc(100vh-5rem)]'} ${shouldShowTestUI ? '' : 'overflow-hidden'}`}>
           {/* Top Bar - At the very top for unit tests, preview exams, full exams, and custom assignments */}
-          {shouldShowToolsByDefault && (
+          {shouldShowTestUI && !(showResults && isUnitTest) && (
             <div className="w-full bg-gray-200 px-6 py-4 flex items-center justify-between border-b-4 border-black shadow-lg flex-shrink-0 fixed top-20 left-0 right-0 z-40">
               {/* Timer Section - Only show for non-custom assignments */}
               {!isCustomAssignment && (
@@ -1158,9 +1232,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
               )}
             </div>
           )}
-          <div className={`flex w-full flex-1 overflow-hidden relative ${!showToolsPanel ? 'flex-col' : 'lg:flex-row flex-col'}`} style={shouldShowToolsByDefault ? { height: 'calc(100vh - 64px - 80px)', marginTop: '80px' } : {}}>
+          <div className={`flex w-full flex-1 overflow-hidden relative ${!showToolsPanel ? 'flex-col' : 'lg:flex-row flex-col'}`} style={shouldShowTestUI && !(showResults && isUnitTest) ? { height: 'calc(100vh - 64px - 80px)', marginTop: '80px' } : shouldShowTestUI && showResults && isUnitTest ? { marginTop: '64px' } : {}}>
           {/* Blur Overlay when timer is paused - covers content but not top/bottom bars */}
-          {isTimerPaused && shouldShowToolsByDefault && (
+          {isTimerPaused && shouldShowTestUI && (
             <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-40"></div>
           )}
           {/* Question Container (Left Side / Top on Mobile) */}
@@ -1173,7 +1247,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
               stiffness: 300,
               damping: 30,
             }}
-            className={`flex-shrink-0 overflow-y-auto min-w-0 w-full lg:w-auto ${shouldShowToolsByDefault ? 'pb-24' : ''}`}
+            className={`flex-shrink-0 overflow-y-auto min-w-0 w-full lg:w-auto ${shouldShowTestUI ? 'pb-24' : ''}`}
           >
             <div className={`w-full ${
               isCustomAssignment 
@@ -1183,7 +1257,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                   : showToolsPanel
                     ? 'p-8'
                     : 'p-8 max-w-5xl mx-auto'
-             } ${shouldShowToolsByDefault ? 'pb-24' : ''}`}>
+             } ${shouldShowTestUI ? 'pb-24' : ''}`}>
             {!showResults ? (
               <>
               {/* Progress Bar - Mobile Only */}
@@ -1554,68 +1628,95 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
 
                             {/* Answer Options */}
                             {question.optionTableHeaders ? (
-                              <div className="overflow-x-auto">
-                                <table className="w-full border-collapse">
-                                  <thead>
-                                    <tr>
-                                      <th className="w-12 p-2"></th>
-                                      {question.optionTableHeaders.map((header, idx) => (
-                                        <th key={idx} className="px-3 py-2 text-center font-semibold text-sm text-gray-700 border-b-2 border-gray-300">
-                                          {header}
-                                        </th>
-                                      ))}
-                                      {!showResults && <th className="w-12 p-2"></th>}
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    {question.options.map((option, index) => {
-                                      const isStruckThrough = strikethroughState[question.id]?.includes(index);
-                                      // Only show as selected if NOT struck through (strikethrough takes priority)
-                                      const isSelected = !isStruckThrough && selectedIndex === index;
-                                      const optionValues = option.split(' | ');
-                                      return (
-                                        <tr
-                                          key={index}
-                                          onClick={() => handleAnswer(question.id, index)}
-                                          className={`transition-all duration-200 group ${
-                                            isStruckThrough
-                                                ? 'bg-gray-100 cursor-default'
-                                              : isSelected 
-                                                ? 'bg-blue-100 hover:bg-blue-100 cursor-pointer border-l-4 border-blue-500' 
-                                                : 'bg-white hover:bg-slate-50 cursor-pointer'
+                              <div className="space-y-3">
+                                {/* Column Headers */}
+                                <div className="grid grid-cols-[auto_1fr_1fr_auto] gap-3 px-3 pb-2 border-b-2 border-gray-300">
+                                  <div className="w-8"></div>
+                                  {question.optionTableHeaders.map((header, idx) => (
+                                    <div key={idx} className="text-center font-semibold text-sm text-gray-700">
+                                      {header}
+                                    </div>
+                                  ))}
+                                  <div className="w-8"></div>
+                                </div>
+                                {question.options.map((option, index) => {
+                                  const isStruckThrough = strikethroughState[question.id]?.includes(index);
+                                  // Only show as selected if NOT struck through (strikethrough takes priority)
+                                  const isSelected = !isStruckThrough && selectedIndex === index;
+                                  const optionValues = option.split(' | ');
+                                  const correctAnswerIndex = question.correctAnswer ? question.correctAnswer.charCodeAt(0) - 65 : -1;
+                                  const isCorrect = index === correctAnswerIndex;
+                                  return (
+                                    <button
+                                      key={index}
+                                      onClick={() => handleAnswer(question.id, index)}
+                                      disabled={showResults}
+                                      className={`w-full text-left p-3 text-sm font-medium transition-all duration-150 flex items-center gap-3 ${
+                                        isCustomAssignment 
+                                          ? 'border-2 border-black rounded-lg shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]' 
+                                          : 'rounded-lg border'
+                                      } ${
+                                        showResults ? 
+                                          (isCorrect ? 'bg-green-50 text-gray-900 shadow-sm border-green-200 cursor-default' : 
+                                          isSelected ? 'bg-red-50 text-gray-900 shadow-sm border-red-200 cursor-default' : 
+                                          'bg-transparent text-gray-900 border-gray-200 cursor-default') 
+                                        : isStruckThrough ?
+                                          isCustomAssignment 
+                                            ? 'bg-gray-100 border-black opacity-60 cursor-pointer' 
+                                            : 'bg-gray-100 border-gray-300 opacity-60 cursor-pointer'
+                                        : isSelected ? 
+                                          isCustomAssignment
+                                            ? 'bg-blue-100 border-2 border-blue-500 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                                            : 'bg-blue-100 border-2 border-blue-500 shadow-md'
+                                        : 
+                                          isCustomAssignment
+                                            ? 'bg-white hover:bg-gray-50 border-black hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                                            : 'bg-transparent hover:bg-gray-50 border-gray-200 hover:border-gray-300 hover:shadow-sm'
+                                      }`}
+                                    >
+                                      {/* Letter bubble */}
+                                      <span className={`w-6 h-6 flex items-center justify-center rounded-full text-xs font-medium flex-shrink-0 ${
+                                        isCustomAssignment ? 'border-2 border-black' : 'border'
+                                      } ${
+                                        showResults ? (isCorrect ? 'bg-green-100 border-green-300 text-green-700' : isSelected ? 'bg-red-100 border-red-300 text-red-700' : 'bg-white border-gray-300 text-gray-500') : isStruckThrough ? 'bg-gray-200 border-gray-300 text-gray-400' : isSelected ? 'bg-blue-500 border-blue-600 text-white font-semibold' : 'bg-white border-gray-300 text-gray-600'
+                                      }`}> 
+                                        {String.fromCharCode(65 + index)}
+                                      </span>
+                                      {/* Two-column content */}
+                                      <div className="flex-1 grid grid-cols-2 gap-4">
+                                        {optionValues.map((value, valIdx) => (
+                                          <span key={valIdx} className={`text-sm text-center ${isStruckThrough ? 'line-through text-gray-400' : ''} ${showResults ? 'text-gray-800' : isSelected ? 'text-gray-900' : 'text-gray-900'}`}>
+                                            {value.trim()}
+                                          </span>
+                                        ))}
+                                      </div>
+                                      {/* Strikethrough Button - Only show when not submitted */}
+                                      {!showResults && (
+                                        <div
+                                          role="button"
+                                          onClick={(e) => { e.stopPropagation(); handleStrikethroughToggle(question.id, index); }}
+                                          className={`flex-shrink-0 p-2 rounded-lg transition-colors cursor-pointer ${
+                                            isStruckThrough ? 'bg-slate-200 text-slate-600' : 'bg-white hover:bg-slate-100 text-slate-400 hover:text-slate-600'
                                           }`}
+                                          aria-label={isStruckThrough ? "Remove strikethrough" : "Strikethrough option"}
                                         >
-                                          <td className="p-2">
-                                            <div className={`w-8 h-8 flex items-center justify-center rounded-lg border-2 font-semibold text-sm transition-all duration-200 ${
-                                              isStruckThrough ? 'bg-gray-200 border-gray-300 text-gray-400' : isSelected ? 'bg-blue-600 border-blue-700 text-white shadow-md' : 'bg-white border-slate-300 text-slate-600'
-                                            }`}>
-                                              {String.fromCharCode(65 + index)}
-                                            </div>
-                                          </td>
-                                          {optionValues.map((value, valIdx) => (
-                                            <td key={valIdx} className={`px-3 py-2 text-center text-sm border-b border-gray-200 ${isStruckThrough ? 'text-gray-500 line-through' : isSelected ? 'text-slate-900' : 'text-slate-700'}`}>
-                                              {value.trim()}
-                                            </td>
-                                          ))}
-                                          {!showResults && (
-                                            <td className="p-2">
-                                              <div
-                                                role="button"
-                                                onClick={(e) => { e.stopPropagation(); handleStrikethroughToggle(question.id, index); }}
-                                                className={`p-2 rounded-lg transition-colors cursor-pointer ${
-                                                  isStruckThrough ? 'bg-slate-200 text-slate-600' : 'bg-white hover:bg-slate-100 text-slate-400 hover:text-slate-600'
-                                                }`}
-                                                aria-label={isStruckThrough ? "Remove strikethrough" : "Strikethrough option"}
-                                              >
-                                                <Strikethrough className="w-5 h-5" />
-                                              </div>
-                                            </td>
-                                          )}
-                                        </tr>
-                                      );
-                                    })}
-                                  </tbody>
-                                </table>
+                                          <Strikethrough className="w-5 h-5" />
+                                        </div>
+                                      )}
+                                      {/* Feedback Icon */}
+                                      {showResults && (
+                                        <div className="flex-shrink-0">
+                                          {isCorrect
+                                            ? <Check className="w-5 h-5 text-green-500" />
+                                            : isSelected
+                                              ? <X className="w-5 h-5 text-red-500" />
+                                              : null
+                                          }
+                                        </div>
+                                      )}
+                                    </button>
+                                  );
+                                })}
                               </div>
                             ) : (
                               <div className="space-y-3">
@@ -1715,11 +1816,11 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                         )}
 
                         {/* Submit button for last question - only show if not using fixed bottom bar */}
-                        {!(showVideoModal && videoUrl) && !shouldShowToolsByDefault && currentPage === questions.length - 1 && (
+                        {!(showVideoModal && videoUrl) && !shouldShowTestUI && currentPage === questions.length - 1 && (
                           <div className={`pt-4 mt-4 border-t border-gray-200`}>
                             <button
                               onClick={handleSubmitClick}
-                              className="w-full px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white text-base font-semibold rounded-lg transition-colors duration-200"
+                              className="w-full px-6 py-3 bg-black hover:bg-gray-800 text-white text-base font-semibold rounded-lg transition-colors duration-200"
                             >
                               Submit Exam
                             </button>
@@ -1732,6 +1833,36 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
               </>
             ) : (
               <div className="space-y-8 max-w-4xl mx-auto w-full">
+            {/* Compact Results Summary - Only Assessment Results Section */}
+            {showResults && showFullResults && (
+              <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden mb-8">
+                <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
+                  <h2 className="font-semibold text-gray-900">Assessment Results</h2>
+                </div>
+                <div className="p-4 bg-white">
+                  <div className="flex items-center gap-6 flex-wrap">
+                    <div className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold text-lg shadow-sm">
+                      Score: {Math.round((questions.filter((q) => answers[q.id] === q.correctAnswer).length / questions.length) * 100)}%
+                    </div>
+                    <div className="text-gray-900 font-semibold">
+                      {questions.filter((q) => answers[q.id] === q.correctAnswer).length} correct out of {questions.length}
+                    </div>
+                    <div className="bg-green-500 text-white px-4 py-2 rounded-lg font-semibold text-lg flex items-center gap-2 shadow-sm">
+                      <span className="inline-flex items-center">
+                        <Image
+                          src="/images/flame100.png"
+                          alt="XP Flame"
+                          width={20}
+                          height={20}
+                          className="w-5 h-5"
+                        />
+                      </span>
+                      <span>{20 + (questions.filter((q) => answers[q.id] === q.correctAnswer).length * 10)} XP</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
             {/* Questions Review */}
                 {questions.map((question) => {
                   const isCorrect = answers[question.id] === question.correctAnswer;
@@ -1852,57 +1983,61 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                     {/* Answer Options */}
                     <div className="p-4 space-y-3">
                     {question.optionTableHeaders ? (
-                      <div className="overflow-x-auto">
-                        <table className="w-full border-collapse">
-                          <thead>
-                            <tr>
-                              <th className="w-12 p-2"></th>
-                              {question.optionTableHeaders.map((header, idx) => (
-                                <th key={idx} className="px-4 py-3 text-center font-semibold text-sm text-gray-700 border-b-2 border-gray-300">
-                                  {header}
-                                </th>
-                              ))}
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {question.options.map((option, idx) => {
-                              const letter = String.fromCharCode(65 + idx);
-                              const isSelected = selectedAnswer === letter;
-                              const isCorrectAnswer = question.correctAnswer === letter;
-                              const optionValues = option.split(' | ');
-                              
-                              return (
-                                <tr
-                                  key={idx}
-                                  className={`cursor-default transition-all duration-200 ${
-                                    isCorrectAnswer ? 'bg-green-50' :
-                                    (isSelected && !isCorrectAnswer) ? 'bg-red-50' :
-                                    'bg-white'
-                                  }`}
-                                >
-                                  <td className="p-3">
-                                    <div className={`w-8 h-8 flex items-center justify-center rounded-lg border-2 font-semibold text-sm ${
-                                      isCorrectAnswer ? 'bg-green-600 border-green-600 text-white' :
-                                      (isSelected && !isCorrectAnswer) ? 'bg-red-600 border-red-600 text-white' :
-                                      'bg-white border-gray-300 text-gray-600'
-                                    }`}>
-                                      {letter}
-                                    </div>
-                                  </td>
-                                  {optionValues.map((value, valIdx) => (
-                                    <td key={valIdx} className={`px-4 py-3 text-center text-sm border-b border-gray-200 ${
-                                      isCorrectAnswer ? 'text-green-900' :
-                                      (isSelected && !isCorrectAnswer) ? 'text-red-900' :
-                                      'text-gray-700'
-                                    }`}>
-                                      {value.trim()}
-                                    </td>
-                                  ))}
-                                </tr>
-                              );
-                            })}
-                          </tbody>
-                        </table>
+                      <div className="space-y-3">
+                        {/* Column Headers */}
+                        <div className="grid grid-cols-[auto_1fr_1fr_auto] gap-3 px-3 pb-2 border-b-2 border-gray-300">
+                          <div className="w-8"></div>
+                          {question.optionTableHeaders.map((header, idx) => (
+                            <div key={idx} className="text-center font-semibold text-sm text-gray-700">
+                              {header}
+                            </div>
+                          ))}
+                          <div className="w-8"></div>
+                        </div>
+                        {question.options.map((option, idx) => {
+                          const letter = String.fromCharCode(65 + idx);
+                          const isSelected = selectedAnswer === letter;
+                          const isCorrectAnswer = question.correctAnswer === letter;
+                          const optionValues = option.split(' | ');
+                          
+                          return (
+                            <div
+                              key={idx}
+                              className={`w-full text-left p-3 rounded-lg text-sm font-medium border flex items-center gap-3 cursor-default ${
+                                isCorrectAnswer ? 'bg-green-50 text-gray-900 shadow-sm border-green-200' :
+                                (isSelected && !isCorrectAnswer) ? 'bg-red-50 text-gray-900 shadow-sm border-red-200' :
+                                'bg-transparent text-gray-900 border-gray-200'
+                              }`}
+                            >
+                              {/* Letter bubble */}
+                              <span className={`w-6 h-6 flex items-center justify-center rounded-full border text-xs font-medium flex-shrink-0 ${
+                                isCorrectAnswer ? 'bg-green-100 border-green-300 text-green-700' :
+                                (isSelected && !isCorrectAnswer) ? 'bg-red-100 border-red-300 text-red-700' :
+                                'bg-white border-gray-300 text-gray-500'
+                              }`}>
+                                {letter}
+                              </span>
+                              {/* Two-column content */}
+                              <div className="flex-1 grid grid-cols-2 gap-4">
+                                {optionValues.map((value, valIdx) => (
+                                  <span key={valIdx} className="text-sm text-center text-gray-800">
+                                    {value.trim()}
+                                  </span>
+                                ))}
+                              </div>
+                              {/* Feedback Icon */}
+                              {(isCorrectAnswer || (isSelected && !isCorrectAnswer)) && (
+                                <div className="flex-shrink-0">
+                                  {isCorrectAnswer ? (
+                                    <Check className="w-5 h-5 text-green-500" />
+                                  ) : (
+                                    <X className="w-5 h-5 text-red-500" />
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
                       </div>
                     ) : (
                       question.options.map((option, idx) => {
@@ -2730,7 +2865,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
       )}
 
       {/* Fixed Bottom Bar - Navigation and Question Selector for custom assignments and tests */}
-      {!showResults && shouldShowToolsByDefault && (
+      {!showResults && shouldShowTestUI && (
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t-4 border-black shadow-lg z-50">
           <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
             {/* Question Navigator Button */}
@@ -2828,6 +2963,8 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                 className={`px-6 py-2.5 rounded-lg font-semibold transition-colors flex items-center gap-2 ${
                   (isFreeUser && currentPage >= 1) || (isTimerPaused && !isCustomAssignment)
                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : currentPage === questions.length - 1
+                    ? 'bg-black hover:bg-gray-800 text-white'
                     : `${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-green-600 hover:bg-green-700'} text-white`
                 }`}
               >
@@ -2840,7 +2977,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
       )}
 
       {/* Tool Buttons */}
-      {!showResults && !shouldShowToolsByDefault && (
+      {!showResults && !shouldShowTestUI && (
       <div className="fixed bottom-8 right-8 z-40 flex flex-col gap-3">
         {/* Calculator Toggle Button */}
         {!showToolsPanel && (

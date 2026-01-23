@@ -70,7 +70,6 @@ export function DojoDashboard() {
   const [loadingQuizHistory, setLoadingQuizHistory] = useState(true);
   const [recentActivities, setRecentActivities] = useState<any[]>([]);
   const [loadingActivities, setLoadingActivities] = useState(true);
-  const [showAllActivities, setShowAllActivities] = useState(false);
 
   // Helper to check if user has access to a course
   const hasCourseAccess = useMemo(() => {
@@ -252,23 +251,79 @@ export function DojoDashboard() {
           try {
             const testResultsRef = doc(db, 'userTestResults', user.uid);
             const testResultsDoc = await getDoc(testResultsRef);
+            console.log('[DojoDashboard] Test results doc exists:', testResultsDoc.exists());
             if (testResultsDoc.exists()) {
               const resultsRef = collection(testResultsRef, 'results');
-              const resultsSnapshot = await getDocs(query(resultsRef, orderBy('completedAt', 'desc'), limit(10)));
-              resultsSnapshot.forEach(resultDoc => {
-                const resultData = resultDoc.data();
-                activities.push({
-                  id: resultDoc.id,
-                  type: resultData.testType === 'full_exam' ? 'full-exam' : resultData.testType === 'unit_mcq' ? 'unit-exam' : 'frq-exam',
-                  title: resultData.testType === 'full_exam' ? 'Full MCQ Exam' : 
-                         resultData.testType === 'unit_mcq' ? `Unit ${resultData.testId} MCQ Test` :
-                         'Full FRQ Exam',
-                  timestamp: resultData.completedAt,
-                  score: resultData.score,
-                  totalQuestions: resultData.totalQuestions,
-                  source: 'testResults'
+              try {
+                const resultsSnapshot = await getDocs(query(resultsRef, orderBy('completedAt', 'desc'), limit(10)));
+                console.log('[DojoDashboard] Found', resultsSnapshot.size, 'test results');
+                resultsSnapshot.forEach(resultDoc => {
+                  const resultData = resultDoc.data();
+                  console.log('[DojoDashboard] Processing test result:', {
+                    id: resultDoc.id,
+                    testType: resultData.testType,
+                    testId: resultData.testId,
+                    score: resultData.score
+                  });
+                  // Extract unit number from testId if it's a unit test
+                  let title = 'Full MCQ Exam';
+                  if (resultData.testType === 'unit_mcq') {
+                    // testId format: unit_{unitNumber}_{subject} (e.g., "unit_3_macro")
+                    const unitMatch = resultData.testId.match(/unit_(\d+)_/);
+                    const unitNumber = unitMatch ? unitMatch[1] : resultData.testId.replace('unit_', '');
+                    title = `Unit ${unitNumber} MCQ Test`;
+                  } else if (resultData.testType === 'full_frq') {
+                    title = 'Full FRQ Exam';
+                  }
+
+                  activities.push({
+                    id: resultDoc.id,
+                    type: resultData.testType === 'full_exam' ? 'full-exam' : resultData.testType === 'unit_mcq' ? 'unit-exam' : 'frq-exam',
+                    title,
+                    timestamp: resultData.completedAt,
+                    score: resultData.score,
+                    totalQuestions: resultData.totalQuestions,
+                    source: 'testResults'
+                  });
                 });
-              });
+              } catch (queryError: any) {
+                console.error('[DojoDashboard] Error querying test results:', queryError);
+                // If orderBy fails (e.g., missing index), try without orderBy
+                if (queryError.code === 'failed-precondition') {
+                  console.warn('[DojoDashboard] Index may be missing, trying without orderBy');
+                  const resultsSnapshot = await getDocs(query(resultsRef, limit(10)));
+                  console.log('[DojoDashboard] Found', resultsSnapshot.size, 'test results (without orderBy)');
+                  resultsSnapshot.forEach(resultDoc => {
+                    const resultData = resultDoc.data();
+                    let title = 'Full MCQ Exam';
+                    if (resultData.testType === 'unit_mcq') {
+                      const unitMatch = resultData.testId.match(/unit_(\d+)_/);
+                      const unitNumber = unitMatch ? unitMatch[1] : resultData.testId.replace('unit_', '');
+                      title = `Unit ${unitNumber} MCQ Test`;
+                    } else if (resultData.testType === 'full_frq') {
+                      title = 'Full FRQ Exam';
+                    }
+
+                    activities.push({
+                      id: resultDoc.id,
+                      type: resultData.testType === 'full_exam' ? 'full-exam' : resultData.testType === 'unit_mcq' ? 'unit-exam' : 'frq-exam',
+                      title,
+                      timestamp: resultData.completedAt,
+                      score: resultData.score,
+                      totalQuestions: resultData.totalQuestions,
+                      source: 'testResults'
+                    });
+                  });
+                  // Sort manually by timestamp
+                  activities.sort((a, b) => {
+                    const timeA = a.timestamp?.toDate ? a.timestamp.toDate().getTime() : (a.timestamp ? new Date(a.timestamp).getTime() : 0);
+                    const timeB = b.timestamp?.toDate ? b.timestamp.toDate().getTime() : (b.timestamp ? new Date(b.timestamp).getTime() : 0);
+                    return timeB - timeA;
+                  });
+                } else {
+                  throw queryError;
+                }
+              }
             }
           } catch (error) {
             console.error('[DojoDashboard] Error loading test results:', error);
@@ -740,18 +795,16 @@ export function DojoDashboard() {
             <section style={{ opacity: 1, visibility: 'visible', position: 'relative', zIndex: 10 }}>
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-gray-900">Recent Activity</h2>
-                {recentActivities.length > 4 && (
-                  <button
-                    onClick={() => setShowAllActivities(!showAllActivities)}
-                    className="text-sm font-medium text-gray-600 hover:text-gray-900 flex items-center gap-1 transition-colors"
-                  >
-                    {showAllActivities ? 'Show less' : 'See all'}
-                    <ChevronRight className={`w-4 h-4 transition-transform ${showAllActivities ? 'rotate-90' : ''}`} />
-                  </button>
-                )}
+                <Link
+                  href="/my-assignment-history"
+                  className="text-sm font-medium text-gray-600 hover:text-gray-900 flex items-center gap-1 transition-colors"
+                >
+                  See All Activity
+                  <ChevronRight className="w-4 h-4" />
+                </Link>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {(showAllActivities ? recentActivities : recentActivities.slice(0, 4)).map((activity) => {
+                {recentActivities.slice(0, 4).map((activity) => {
                   // Determine thumbnail type and icon
                   let thumbnailType: 'micro' | 'macro' | 'drill' | 'exam' | 'resource' = 'exam';
                   let Icon = FileText;
@@ -1215,131 +1268,6 @@ export function DojoDashboard() {
             </motion.section>
           )}
 
-          {/* Custom Quiz Results Row */}
-          {!loadingQuizHistory && quizHistory.length > 0 && (
-            <section style={{ opacity: 1, visibility: 'visible', position: 'relative', zIndex: 10 }}>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">Custom Quiz Results</h2>
-                <Link
-                  href="/dashboard/history"
-                  className="text-sm font-medium text-gray-600 hover:text-gray-900 flex items-center gap-1 transition-colors"
-                >
-                  See all
-                  <ChevronRight className="w-4 h-4" />
-                </Link>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {quizHistory.map((entry) => {
-                  // Map quiz type to DojoThumbnail type
-                  const thumbnailType = entry.type === 'cheat-sheet' 
-                    ? (currentCourse === 'macro' ? 'macro' : 'micro')
-                    : entry.type === 'infinite-drill'
-                    ? 'drill'
-                    : 'exam';
-                  
-                  // Get icon based on type
-                  const Icon = entry.type === 'cheat-sheet' 
-                    ? Zap 
-                    : entry.type === 'infinite-drill'
-                    ? Sparkles
-                    : FileText;
-
-                  // Extract unit number from title if available
-                  const unitMatch = entry.title.match(/Unit (\d+)/i);
-                  const unitNumber = unitMatch ? unitMatch[1] : undefined;
-
-                  return (
-                    <motion.div
-                      key={entry.id}
-                      variants={cardHoverVariants}
-                      initial="rest"
-                      whileHover="hover"
-                      className="group"
-                      style={{ opacity: 1, visibility: 'visible' }}
-                    >
-                      <Link href={`/dashboard/history/${entry.id}`}>
-                        <motion.div
-                          variants={cardHoverVariants}
-                          initial="rest"
-                          whileHover="hover"
-                          className="bg-white border border-gray-300 rounded-lg p-6 text-left transition-all flex flex-col h-full relative overflow-hidden"
-                          style={{ 
-                            backgroundColor: '#ffffff',
-                            opacity: 1,
-                            visibility: 'visible',
-                            zIndex: 1
-                          }}
-                        >
-                          {/* Header: Icon, XP, Activity Type */}
-                          <div className="flex items-start justify-between mb-4">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-md bg-gray-100 flex items-center justify-center flex-shrink-0">
-                                {entry.type === 'infinite-drill' ? (
-                                  <Image
-                                    src="/images/dojoIconBold.png"
-                                    alt="Drill"
-                                    width={20}
-                                    height={20}
-                                    className="w-5 h-5"
-                                  />
-                                ) : (
-                                  <Image
-                                    src="/images/boltIcon.svg"
-                                    alt="Quiz"
-                                    width={20}
-                                    height={20}
-                                    className="w-5 h-5"
-                                  />
-                                )}
-                              </div>
-                              <div className="flex flex-col gap-1">
-                                {unitNumber && (
-                                  <span className="text-xs font-medium text-gray-500">Unit {unitNumber}</span>
-                                )}
-                                <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                                  {entry.type === 'cheat-sheet' ? 'Quiz' : entry.type === 'infinite-drill' ? 'Drill' : 'Quiz'}
-                                </span>
-                              </div>
-                            </div>
-                            {entry.xpEarned !== undefined && (
-                              <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
-                                <span>{entry.xpEarned.toLocaleString()}</span>
-                                <Image
-                                  src="/images/flame100.png"
-                                  alt="XP"
-                                  width={16}
-                                  height={16}
-                                  className="w-4 h-4"
-                                />
-                              </div>
-                            )}
-                          </div>
-                          
-                          {/* Title */}
-                          <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
-                            {entry.title}
-                          </h3>
-                          
-                          {/* Meta */}
-                          <div className="mt-auto space-y-2">
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm font-semibold text-gray-900">{entry.score}%</span>
-                              <span className="text-sm text-gray-500">({entry.correctCount} / {entry.totalQuestions} correct)</span>
-                            </div>
-                            {entry.timestamp && (
-                              <p className="text-xs text-gray-400">
-                                {entry.timestamp.toDate ? new Date(entry.timestamp.toDate()).toLocaleDateString() : 'Recently'}
-                              </p>
-                            )}
-                          </div>
-                        </motion.div>
-                      </Link>
-                </motion.div>
-              );
-            })}
-          </div>
-        </section>
-          )}
 
           </motion.div>
         </AnimatePresence>

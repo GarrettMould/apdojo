@@ -756,7 +756,7 @@ export const unitTestQuestions: QuestionType[] = [
     subject: "ap_microeconomics",
     lessonIDS: ["2.8"],
     unitName: "Supply and Demand",
-    question: "The graph above illustrates the impact of a per-unit tax on a market. By how much does consumer surplus decrease as a result of the tax?",
+    question: "The graph below illustrates the impact of a per-unit tax on a market. By how much does consumer surplus decrease as a result of the tax?",
     image: { src: "/images/unitTestImages/Q2011.svg", alt: "Graph showing tax impact on consumer surplus" },
     options: [
       "$100",
@@ -829,7 +829,7 @@ export const unitTestQuestions: QuestionType[] = [
     subject: "ap_microeconomics",
     lessonIDS: ["2.9"],
     unitName: "Supply and Demand",
-    question: "The graph above depicts a domestic market after a tariff has been imposed, raising the world price (Pw) to the tariff price (Pt). Which areas on the graph represent the deadweight loss caused by this tariff?",
+    question: "The graph below depicts a domestic market after a tariff has been imposed, raising the world price (Pw) to the tariff price (Pt). Which areas on the graph represent the deadweight loss caused by this tariff?",
     image: { src: "/images/unitTestImages/Q2015.svg", alt: "Graph showing tariff impact with deadweight loss" },
     options: [
       "MNRQ",
@@ -2139,6 +2139,303 @@ options: [
       "Financial capital will flow into South Korea, appreciating the yen relative to the won."
     ],
     correctAnswer: "C"
+  },
+
+  // Unit 4 Micro: Imperfect Competition
+  {
+    id: 4001,
+    unit: 4,
+    subject: "ap_microeconomics",
+    lessonIDS: ["4.1"],
+    unitName: "Imperfect Competition",
+    question: "For a single-price monopolist facing a downward-sloping demand curve, why is marginal revenue always less than price?",
+    image: null,
+    options: [
+      "Because the monopolist must lower the price on all previous units to sell an additional unit.",
+      "Because the monopolist has no control over the market price.",
+      "Because the monopolist experiences diseconomies of scale.",
+      "Because the demand curve is perfectly elastic.",
+      "Because the monopolist taxes the consumers."
+    ],
+    correctAnswer: "A",
+    explanation: "To sell one more unit, a monopoly must lower the price. However, they cannot just lower the price for that one new buyer; they must lower the price for all units sold (assuming they cannot price discriminate). This loss of revenue on the previous units pulls the marginal revenue below the price of the new unit.",
+  },
+  {
+    id: 4002,
+    unit: 4,
+    subject: "ap_microeconomics",
+    lessonIDS: ["4.1"],
+    unitName: "Imperfect Competition",
+    question: "What is the primary source of market power for a monopoly?",
+    image: null,
+    options: [
+      "The ability to produce at the minimum efficient scale.",
+      "High barriers to entry that prevent competition.",
+      "A perfectly elastic demand curve.",
+      "Government regulation that enforces a price ceiling.",
+      "The existence of many close substitutes."
+    ],
+    correctAnswer: "B",
+    explanation: "Market power is the ability to set price above marginal cost. In a monopoly, this power is sustained by high barriers to entry (such as patents, control of resources, or economies of scale) that prevent other firms from entering the market and driving profits down.",
+  },
+  {
+    id: 4003,
+    unit: 4,
+    subject: "ap_microeconomics",
+    lessonIDS: ["4.2"],
+    unitName: "Imperfect Competition",
+    question: "The graph below depicts a profit-maximizing single-price monopoly. Which of the following combinations correctly identifies the area of Consumer Surplus and Deadweight Loss?",
+    image: { src: "/images/unitTestImages/Q4003.svg", alt: "Monopoly graph with labels" },
+    optionTableHeaders: ["Consumer Surplus", "Deadweight Loss"],
+    options: [
+      "Area P5-P4-C | Area C-I-E",
+      "Area P5-P4-C | Area C-E-H",
+      "Area P5-P1-I | Area C-I-E",
+      "Area P4-P1-I-C | Area D-I-F",
+      "Area P5-P3-D | Area C-E-H"
+    ],
+    correctAnswer: "A",
+    explanation: "Consumer Surplus is the area below the Demand curve and above the market price (P4). This corresponds to the triangle P5-P4-C. Deadweight Loss is the loss of total surplus resulting from producing less than the socially optimal quantity (where P=MC at point E). The DWL is the triangle between the Demand curve and the Marginal Cost curve from the monopoly quantity (Q1) to the socially optimal quantity (Q2), which is the area C-I-E.",
+  },
+  {
+    id: 4004,
+    unit: 4,
+    subject: "ap_microeconomics",
+    lessonIDS: ["4.2"],
+    unitName: "Imperfect Competition",
+    question: "Compared to a perfectly competitive industry with the same costs, a single-price monopoly will result in:",
+    image: null,
+    options: [
+      "Higher price and higher quantity.",
+      "Lower price and lower quantity.",
+      "Higher price and lower quantity.",
+      "Lower price and higher quantity.",
+      "The same price and quantity."
+    ],
+    correctAnswer: "C",
+    explanation: "A monopoly restricts output to where MR = MC (which is less than the competitive Q where P = MC) and charges a higher price based on what the market will bear. This results in a higher price and lower quantity than the competitive equilibrium.",
+  },
+  {
+    id: 4005,
+    unit: 4,
+    subject: "ap_microeconomics",
+    lessonIDS: ["4.2"],
+    unitName: "Imperfect Competition",
+    question: "If a government regulator forces a natural monopoly to set its price equal to its Average Total Cost, what will be the result?",
+    image: null,
+    options: [
+      "The firm will earn zero economic profit.",
+      "The firm will incur an economic loss and require a subsidy.",
+      "The firm will achieve allocative efficiency.",
+      "The firm will maximize its total revenue.",
+      "The firm will produce less than the unregulated monopoly quantity."
+    ],
+    correctAnswer: "A",
+    explanation: "Fair-return pricing sets P = ATC. At this point, Total Revenue equals Total Cost, meaning the firm earns a normal profit (zero economic profit). This allows the firm to stay in business without a subsidy, though it is still not allocatively efficient (P > MC).",
+  },
+  {
+    id: 4006,
+    unit: 4,
+    subject: "ap_microeconomics",
+    lessonIDS: ["4.3"],
+    unitName: "Imperfect Competition",
+    question: "Refer to the graph below. Suppose the monopoly begins to practice perfect price discrimination. To maximize profit, what quantity will the firm produce?",
+    image: { src: "/images/unitTestImages/Q4006.svg", alt: "Monopoly graph with labels" },
+    options: [
+      "Q1",
+      "Q2",
+      "Q3",
+      "Between Q1 and Q2",
+      "Zero"
+    ],
+    correctAnswer: "B",
+    explanation: "If a monopolist can perfectly price discriminate, their Marginal Revenue (MR) curve becomes identical to the Demand curve (D). They will continue to sell units as long as the price (willingness to pay) is greater than or equal to the Marginal Cost. This means they will produce until Demand intersects Marginal Cost at point E, resulting in quantity Q2.",
+  },
+  {
+    id: 4007,
+    unit: 4,
+    subject: "ap_microeconomics",
+    lessonIDS: ["4.3"],
+    unitName: "Imperfect Competition",
+    question: "Which of the following is a key similarity between a perfectly competitive firm in long-run equilibrium and a perfectly price-discriminating monopolist?",
+    image: null,
+    options: [
+      "Both earn zero economic profit in the long run.",
+      "Both charge a single price to all consumers.",
+      "Both have a marginal revenue curve that is below the demand curve.",
+      "Both produce at the minimum of their Average Total Cost curve.",
+      "Both produce the allocatively efficient quantity of output."
+    ],
+    correctAnswer: "E",
+    explanation: "Allocative efficiency occurs where Price equals Marginal Cost (P = MC). In perfect competition, this happens naturally. A perfectly price-discriminating monopolist charges every consumer their maximum willingness to pay, meaning the marginal revenue curve becomes the demand curve. They produce until Price (Demand) equals MC, achieving the same socially optimal quantity as perfect competition.",
+  },
+  {
+    id: 4008,
+    unit: 4,
+    subject: "ap_microeconomics",
+    lessonIDS: ["4.3"],
+    unitName: "Imperfect Competition",
+    question: "Which of the following conditions is necessary for a firm to successfully practice price discrimination?",
+    image: null,
+    options: [
+      "The firm must be a price taker.",
+      "The firm must have constant marginal costs.",
+      "The firm must be able to prevent the resale of its product.",
+      "All consumers must have the exact same price elasticity of demand.",
+      "The firm must be regulated by the government."
+    ],
+    correctAnswer: "C",
+    explanation: "If resale is possible (arbitrage), customers who buy the product at a low price could simply resell it to customers with a high willingness to pay, undercutting the firm. Therefore, preventing resale is essential for maintaining different prices for different groups.",
+  },
+  {
+    id: 4009,
+    unit: 4,
+    subject: "ap_microeconomics",
+    lessonIDS: ["4.4"],
+    unitName: "Imperfect Competition",
+    question: "The graph below shows the short-run cost and revenue curves for a profit-maximizing monopolistically competitive firm. Which of the following statements is true regarding the firm's current status and long-run adjustment?",
+    image: { src: "/images/unitTestImages/Q4009.svg", alt: "Monopolistically competitive firm graph" },
+    options: [
+      "The firm is currently in long-run equilibrium.",
+      "The firm is earning an economic loss, firms will exit, and the demand curve will shift right.",
+      "The firm is earning an economic profit, new firms will enter, and the demand curve will shift left.",
+      "The firm is earning an economic profit, new firms will enter, and the firm's cost curves will shift down.",
+      "The firm is productively efficient but allocatively inefficient."
+    ],
+    correctAnswer: "C",
+    explanation: "The graph shows that at the profit-maximizing quantity (where MR=MC), the Price (on the Demand curve) is greater than the Average Total Cost (ATC). This indicates positive economic profit. In monopolistic competition, barriers to entry are low. Therefore, this profit will attract new firms selling close substitutes. As new firms enter, the demand for this specific firm's product will decrease, shifting the Demand curve to the left until normal profit is restored.",
+  },
+  {
+    id: 4010,
+    unit: 4,
+    subject: "ap_microeconomics",
+    lessonIDS: ["4.4"],
+    unitName: "Imperfect Competition",
+    question: "Monopolistically competitive markets are considered allocatively inefficient because in equilibrium:",
+    image: null,
+    options: [
+      "Firms produce less than the quantity where average total cost is minimized.",
+      "The product is homogeneous.",
+      "Firms earn zero economic profit.",
+      "There are too many firms in the industry.",
+      "Price is greater than marginal cost."
+    ],
+    correctAnswer: "E",
+    explanation: "Allocative efficiency requires that Price equals Marginal Cost (P = MC). Because monopolistically competitive firms sell differentiated products, they face a downward-sloping demand curve and charge a markup. Consequently, Price is greater than Marginal Cost, leading to a deadweight loss.",
+  },
+  {
+    id: 4011,
+    unit: 4,
+    subject: "ap_microeconomics",
+    lessonIDS: ["4.4"],
+    unitName: "Imperfect Competition",
+    question: "In the long run, a monopolistically competitive firm will have 'excess capacity.' This means that the firm:",
+    image: null,
+    options: [
+      "Produces a quantity where Price equals Marginal Cost.",
+      "Produces a quantity less than the output that minimizes Average Total Cost.",
+      "Produces more than the market demands.",
+      "Could increase profits by raising its price.",
+      "Has a vertical supply curve."
+    ],
+    correctAnswer: "B",
+    explanation: "Excess capacity refers to the difference between the actual output produced and the output that would minimize average total cost (productive efficiency). Monopolistically competitive firms produce on the downward-sloping portion of their ATC curve, meaning they could produce more at a lower average cost, but choose not to because marginal revenue would be negative.",
+  },
+  {
+    id: 4012,
+    unit: 4,
+    subject: "ap_microeconomics",
+    lessonIDS: ["4.5"],
+    unitName: "Imperfect Competition",
+    question: "Two competing soft drink companies, FizzCo and PopInc, are deciding whether to maintain their current prices or lower them to gain market share. The payoff matrix below shows the daily profits for each firm. Based on the matrix, which of the following is true?",
+    image: null,
+    tableData: {
+      playerNames: {
+        row: "FizzCo",
+        column: "PopInc"
+      },
+      rowHeaders: true,
+      headers: ["", "Maintain Price", "Lower Price"],
+      rows: [
+        ["Maintain Price", "($1,000, $1,000)", "($400, $1,500)"],
+        ["Lower Price", "($1,500, $400)", "($600, $600)"]
+      ]
+    },
+    options: [
+      "FizzCo has a dominant strategy to Maintain Price.",
+      "PopInc has a dominant strategy to Maintain Price.",
+      "Both firms have a dominant strategy to Lower Price.",
+      "Neither firm has a dominant strategy.",
+      "FizzCo has a dominant strategy to Lower Price, but PopInc does not."
+    ],
+    correctAnswer: "C",
+    explanation: "To find the dominant strategy, look at the choices for each firm independently. \nFor FizzCo: If PopInc maintains, FizzCo compares $1,000 (Maintain) vs $1,500 (Lower). Lower is better. If PopInc lowers, FizzCo compares $400 (Maintain) vs $600 (Lower). Lower is better. FizzCo has a dominant strategy to Lower.\nFor PopInc: If FizzCo maintains, PopInc compares $1,000 (Maintain) vs $1,500 (Lower). Lower is better. If FizzCo lowers, PopInc compares $400 (Maintain) vs $600 (Lower). Lower is better. PopInc also has a dominant strategy to Lower.",
+  },
+  {
+    id: 4013,
+    unit: 4,
+    subject: "ap_microeconomics",
+    lessonIDS: ["4.5"],
+    unitName: "Imperfect Competition",
+    question: "Two electronics firms, TechA and TechB, are deciding whether to release a Standard model or a Premium model of their new tablet. The payoffs represent millions of dollars in profit. Assuming the firms play simultaneously and act rationally, what is the Nash Equilibrium?",
+    image: null,
+    tableData: {
+      playerNames: {
+        row: "TechA",
+        column: "TechB"
+      },
+      rowHeaders: true,
+      headers: ["", "Standard", "Premium"],
+      rows: [
+        ["Standard", "(50, 40)", "(60, 30)"],
+        ["Premium", "(40, 80)", "(70, 70)"]
+      ]
+    },
+    options: [
+      "TechA: Standard, TechB: Standard",
+      "TechA: Standard, TechB: Premium",
+      "TechA: Premium, TechB: Standard",
+      "TechA: Premium, TechB: Premium",
+      "There is no Nash Equilibrium in this game."
+    ],
+    correctAnswer: "A",
+    explanation: "A Nash Equilibrium occurs when neither player has an incentive to switch strategies given the other player's choice.\n1. Check TechA: If B plays Standard, A chooses Standard (50 > 40). If B plays Premium, A chooses Premium (70 > 60). (No dominant strategy).\n2. Check TechB: If A plays Standard, B chooses Standard (40 > 30). If A plays Premium, B chooses Standard (80 > 70). TechB has a dominant strategy to play Standard.\n3. Outcome: Since TechB will always play Standard, TechA will respond to that by playing Standard (50 > 40). \n- TechA (Standard, Standard) = 50 vs 40 -> Standard.\n- TechB (Standard, Standard) = 40 vs 30 -> Standard.\nSo (Standard, Standard) is a Nash Equilibrium.",
+  },
+  {
+    id: 4014,
+    unit: 4,
+    subject: "ap_microeconomics",
+    lessonIDS: ["4.5"],
+    unitName: "Imperfect Competition",
+    question: "Which of the following characteristics is unique to an oligopoly market structure?",
+    image: null,
+    options: [
+      "Allocative efficiency in the long run.",
+      "Mutual interdependence among firms.",
+      "A single seller with no close substitutes.",
+      "Easy entry and exit.",
+      "A horizontal demand curve for the individual firm."
+    ],
+    correctAnswer: "B",
+    explanation: "Oligopolies are characterized by a few large firms. Because there are so few of them, the actions of one firm (changing price or output) directly affect the profits of the others. This strategic dependence is called mutual interdependence.",
+  },
+  {
+    id: 4015,
+    unit: 4,
+    subject: "ap_microeconomics",
+    lessonIDS: ["4.5"],
+    unitName: "Imperfect Competition",
+    question: "Cartels are often unstable in the long run because:",
+    image: null,
+    options: [
+      "It is illegal to raise prices.",
+      "Individual members have an incentive to cheat by increasing output to capture more profit.",
+      "The market demand curve becomes perfectly inelastic.",
+      "New firms cannot enter the market.",
+      "They automatically achieve allocative efficiency."
+    ],
+    correctAnswer: "B",
+    explanation: "While the cartel as a group maximizes profit by restricting output, an individual member can earn even more profit by secretly increasing their own production while the others hold back. If every member acts on this incentive to cheat, the cartel collapses.",
   }
 ];
 

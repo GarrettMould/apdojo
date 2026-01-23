@@ -87,14 +87,26 @@ export const saveTestResult = async (result: TestResult) => {
     const userDocRef = doc(db, 'userTestResults', result.userId);
     const testDocRef = doc(userDocRef, 'results', result.testId);
     
-    await setDoc(testDocRef, {
+    const dataToSave = {
       ...result,
       completedAt: serverTimestamp()
+    };
+    
+    console.log('[saveTestResult] Saving test result:', {
+      userId: result.userId,
+      testType: result.testType,
+      testId: result.testId,
+      score: result.score,
+      totalQuestions: result.totalQuestions,
+      path: testDocRef.path
     });
     
-    console.log('Test result saved successfully');
+    await setDoc(testDocRef, dataToSave);
+    
+    console.log('[saveTestResult] Test result saved successfully to:', testDocRef.path);
   } catch (error) {
-    console.error('Error saving test result:', error);
+    console.error('[saveTestResult] Error saving test result:', error);
+    throw error; // Re-throw to see the error in the component
   }
 };
 

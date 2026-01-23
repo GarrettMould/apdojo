@@ -29,8 +29,8 @@ function UnitFinalPracticeTestsContent() {
     return hasValidSeasonPass(userData, effectiveSubject);
   }, [user, userData, effectiveSubject]);
   
-  // Define available units for micro (only 2 and 3)
-  const availableMicroUnits = [2, 3];
+  // Define available units for micro (2, 3, and 4)
+  const availableMicroUnits = [2, 3, 4];
   const isUnitAvailable = (unitNumber: number) => {
     if (effectiveSubject === 'micro') {
       return availableMicroUnits.includes(unitNumber);

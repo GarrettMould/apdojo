@@ -144,8 +144,8 @@ export default function UnitMCQTestPage() {
     );
   }
 
-  // For micro, only units 2 and 3 are available
-  const availableMicroUnits = [2, 3];
+  // For micro, units 2, 3, and 4 are available (unit 1, 5, 6 are coming soon)
+  const availableMicroUnits = [2, 3, 4];
   const isMicroUnitAvailable = effectiveSubject !== 'micro' || availableMicroUnits.includes(unitNumber);
   
   // Check if user is free and unit is locked (Unit 1 is free, others require season pass)
