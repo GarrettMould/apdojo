@@ -930,21 +930,18 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                   {showTimer ? (
                     <>
                       {isTimerPaused ? (
-                        /* When paused: Center the Resume Test link, keep buttons on right */
+                        /* When paused: Show Resume Test button where timer was, keep buttons on right */
                         <>
-                          <div className="flex-1"></div>
-                          <div className="flex-1 flex items-center justify-center">
+                          <div className="flex items-center gap-3">
                             <button
                               onClick={() => setIsTimerPaused(false)}
-                              className={`text-lg font-bold underline transition-colors ${
-                                examType === 'macro' ? 'text-blue-600 hover:text-blue-700' : 'text-green-600 hover:text-green-700'
-                              }`}
+                              className="text-2xl font-black tracking-wider text-gray-900 font-mono transition-colors hover:text-gray-700"
                               aria-label="Resume test"
                             >
                               Resume Test
                             </button>
                           </div>
-                          <div className="flex-1 flex items-center justify-end gap-3">
+                          <div className="flex items-center gap-3">
                             {/* Calculator Toggle Button */}
                             <button
                               onClick={() => handleToolToggle('calculator')}
@@ -1039,21 +1036,18 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                   ) : (
                     <>
                       {isTimerPaused ? (
-                        /* When paused and timer hidden: Center the Resume Test link, keep buttons on right */
+                        /* When paused and timer hidden: Show Resume Test button where timer would be, keep buttons on right */
                         <>
-                          <div className="flex-1"></div>
-                          <div className="flex-1 flex items-center justify-center">
+                          <div className="flex items-center gap-3">
                             <button
                               onClick={() => setIsTimerPaused(false)}
-                              className={`text-lg font-bold underline transition-colors ${
-                                examType === 'macro' ? 'text-blue-600 hover:text-blue-700' : 'text-green-600 hover:text-green-700'
-                              }`}
+                              className="text-2xl font-black tracking-wider text-gray-900 font-mono transition-colors hover:text-gray-700"
                               aria-label="Resume test"
                             >
                               Resume Test
                             </button>
                           </div>
-                          <div className="flex-1 flex items-center justify-end gap-3">
+                          <div className="flex items-center gap-3">
                             {/* Calculator Toggle Button */}
                             <button
                               onClick={() => handleToolToggle('calculator')}

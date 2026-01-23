@@ -39,7 +39,9 @@ export default function UnitMCQTestPage() {
   const { selectedSubject, user, userData } = useAuthContext();
   
   const unitNumber = parseInt(unitId as string);
-  const questions = getUnitMCQTest(unitNumber);
+  // Filter questions by subject to ensure macro and micro don't mix
+  const subjectFilter = selectedSubject === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics';
+  const questions = getUnitMCQTest(unitNumber, subjectFilter);
   const unitInfo = apMacroCourseInfo.units.find(unit => 
     unit.unit.split(':')[0].split(' ')[1] === (unitId as string)
   );

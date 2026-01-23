@@ -3,8 +3,11 @@ import { getUnitTestQuestions } from './unitTestQuestions';
 
 // Function to get unit test questions for each unit
 // Using dedicated unit test questions to ensure uniqueness
-const getUnitTestQuestionsForUnit = (unitNumber: number): QuestionType[] => {
-  return getUnitTestQuestions(unitNumber);
+const getUnitTestQuestionsForUnit = (
+  unitNumber: number,
+  subject?: 'ap_macroeconomics' | 'ap_microeconomics'
+): QuestionType[] => {
+  return getUnitTestQuestions(unitNumber, subject);
 };
 
 // Unit 1: Basic Economic Concepts
@@ -26,7 +29,17 @@ export const unit5MCQTest: QuestionType[] = getUnitTestQuestionsForUnit(5);
 export const unit6MCQTest: QuestionType[] = getUnitTestQuestionsForUnit(6);
 
 // Helper function to get test for any unit
-export const getUnitMCQTest = (unitNumber: number): QuestionType[] => {
+// Optionally filter by subject to ensure macro and micro questions don't mix
+export const getUnitMCQTest = (
+  unitNumber: number,
+  subject?: 'ap_macroeconomics' | 'ap_microeconomics'
+): QuestionType[] => {
+  // If subject is provided, filter directly from the source
+  if (subject) {
+    return getUnitTestQuestions(unitNumber, subject);
+  }
+  
+  // Otherwise, return the pre-computed arrays (for backward compatibility)
   switch (unitNumber) {
     case 1:
       return unit1MCQTest;

@@ -568,6 +568,280 @@ export const unitTestQuestions: QuestionType[] = [
     correctAnswer: "A"
   }, 
 
+  // Unit 2 Micro: Supply and Demand
+  {
+    id: 2001,
+    unit: 2,
+    subject: "ap_microeconomics",
+    lessonIDS: ["2.1"],
+    unitName: "Supply and Demand",
+    question: "Which of the following changes would most likely result in a decrease in the demand for printed books?",
+    image: null,
+    options: [
+      "A significant decrease in the price of e-books, a substitute good.",
+      "A decrease in the price of paper used to make books.",
+      "An increase in consumer income, assuming books are a normal good.",
+      "An increase in the price of bookmarks, a complementary good.",
+      "An expectation that the price of printed books will rise next month."
+    ],
+    correctAnswer: "A",
+    explanation: "Demand shifts when a determinant changes. E-books are a substitute for printed books. If the price of a substitute decreases, consumers will switch to the cheaper alternative, decreasing the demand for the original good (printed books)."
+  },
+  {
+    id: 2002,
+    unit: 2,
+    subject: "ap_microeconomics",
+    lessonIDS: ["2.2"],
+    unitName: "Supply and Demand",
+    question: "If the government provides a subsidy to corn farmers, what will be the immediate impact on the supply curve for corn?",
+    image: null,
+    options: [
+      "Movement up along the supply curve.",
+      "The supply curve will shift to the left.",
+      "The supply curve will remain unchanged, but demand will increase.",
+      "The supply curve will shift to the right.",
+      "Movement down along the supply curve."
+    ],
+    correctAnswer: "D",
+    explanation: "A subsidy effectively lowers the cost of production for farmers. This incentivizes them to produce more at every price level, causing the supply curve to shift to the right."
+  },
+  {
+    id: 2003,
+    unit: 2,
+    subject: "ap_microeconomics",
+    lessonIDS: ["2.3"],
+    unitName: "Supply and Demand",
+    question: "A 10% increase in the price of a specific brand of cereal leads to a 25% decrease in the quantity demanded. The price elasticity of demand for this cereal is:",
+    image: null,
+    options: [
+      "Inelastic",
+      "Elastic",
+      "Unit elastic",
+      "Perfectly elastic",
+      "Perfectly inelastic"
+    ],
+    correctAnswer: "B",
+    explanation: "Price Elasticity of Demand (PED) is calculated as % Change in Quantity Demanded / % Change in Price. Here, 25% / 10% = 2.5. Since the coefficient (2.5) is greater than 1, demand is elastic."
+  },
+  {
+    id: 2004,
+    unit: 2,
+    subject: "ap_microeconomics",
+    lessonIDS: ["2.5"],
+    unitName: "Supply and Demand",
+    question: "If the cross-price elasticity of demand between Good A and Good B is negative, then Good A and Good B are:",
+    image: null,
+    options: [
+      "Complements",
+      "Substitutes",
+      "Normal goods",
+      "Inferior goods",
+      "Unrelated goods"
+    ],
+    correctAnswer: "A",
+    explanation: "A negative cross-price elasticity means that an increase in the price of Good B causes a decrease in the demand for Good A. This inverse relationship defines complementary goods (e.g., hot dogs and buns)."
+  },
+  {
+    id: 2005,
+    unit: 2,
+    subject: "ap_microeconomics",
+    lessonIDS: ["2.6"],
+    unitName: "Supply and Demand",
+    question: "In a competitive market for coffee, the equilibrium price is $3.00. If the market price is currently set at $5.00, which of the following will occur?",
+    image: null,
+    options: [
+      "A shortage will develop, driving the price up.",
+      "The supply curve will shift right to restore equilibrium.",
+      "A surplus will develop, driving the price down.",
+      "The demand curve will shift left to restore equilibrium.",
+      "The market will remain in equilibrium at the higher price."
+    ],
+    correctAnswer: "C",
+    explanation: "When the current price ($5.00) is above the equilibrium price ($3.00), the quantity supplied exceeds the quantity demanded. This excess supply is called a surplus, which puts downward pressure on the price until it returns to equilibrium."
+  },
+  {
+    id: 2006,
+    unit: 2,
+    subject: "ap_microeconomics",
+    lessonIDS: ["2.7"],
+    unitName: "Supply and Demand",
+    question: "Assume that for a particular good, the demand increases while the supply decreases simultaneously. What is the certain impact on the equilibrium price and quantity?",
+    image: null,
+    "optionTableHeaders": ["Equilibrium Price", "Equilibrium Quantity"],
+    "options": [
+      "Increase | Increase",
+      "Decrease | Decrease",
+      "Indeterminate | Decrease",
+      "Indeterminate | Increase",
+      "Increase | Indeterminate"
+    ],
+    correctAnswer: "E",
+    explanation: "An increase in demand pushes price up and quantity up. A decrease in supply pushes price up and quantity down. Since both shifts push price up, the price definitely increases. However, the effect on quantity opposes each other, making the change in quantity indeterminate without knowing the magnitude of the shifts."
+  },
+  {
+    id: 2007,
+    unit: 2,
+    subject: "ap_microeconomics",
+    lessonIDS: ["2.7"],
+    unitName: "Supply and Demand",
+    question: "Which of the following combinations of events could have caused the shifts seen on the graph below?",
+    image: { src: "/images/unitTestImages/Q2007.svg", alt: "Graph showing both demand and supply curves shifting left" },
+    options: [
+      "Consumer income increases (assuming a normal good) and technology improves.",
+      "The price of a substitute decreases and the cost of raw materials decreases.",
+      "The price of a complementary good increases and the government increases taxes on producers.",
+      "An effective marketing campaign helps the product and the number of sellers decreases.",
+      "Consumer income decreases (assuming an inferior good) and wages for workers increase."
+    ],
+    correctAnswer: "C",
+    explanation: "The graph shows both the Demand curve and the Supply curve shifting to the left (decreasing). An increase in the price of a complementary good would cause Demand to decrease (shift left). An increase in taxes acts as an increased cost of production, causing Supply to decrease (shift left)."
+  },
+  {
+    id: 2008,
+    unit: 2,
+    subject: "ap_microeconomics",
+    lessonIDS: ["2.8"],
+    unitName: "Supply and Demand",
+    question: "Which of the following scenarios would result in the smallest decrease in total economic surplus if a new per-unit tax were imposed?",
+    image: null,
+    options: [
+      "Supply is perfectly elastic, and demand is elastic.",
+      "Supply and demand are both perfectly elastic.",
+      "Supply is unit elastic, and demand is unit elastic.",
+      "Supply and demand are both highly inelastic.",
+      "Supply is elastic, and demand is perfectly elastic."
+    ],
+    correctAnswer: "D",
+    explanation: "Deadweight loss occurs because taxes reduce the quantity traded below the equilibrium level. When supply and demand are highly inelastic, consumers and producers are very unresponsive to price changes. This means the quantity traded drops very little after the tax is applied, resulting in a very small deadweight loss triangle."
+  },
+  {
+    id: 2009,
+    unit: 2,
+    subject: "ap_microeconomics",
+    lessonIDS: ["2.8"],
+    unitName: "Supply and Demand",
+    question: "If the government imposes a binding price ceiling on the rental housing market (rent control), which of the following is the most likely long-run consequence?",
+    image: null,
+    options: [
+      "A surplus of available apartments.",
+      "A shortage of available apartments.",
+      "An increase in the quality of rental units.",
+      "An increase in producer surplus for landlords.",
+      "Allocative efficiency in the housing market."
+    ],
+    correctAnswer: "B",
+    explanation: "A binding price ceiling is set below the equilibrium price. At this artificially low price, the quantity demanded by renters exceeds the quantity supplied by landlords, resulting in a persistent shortage."
+  },
+  {
+    id: 2010,
+    unit: 2,
+    subject: "ap_microeconomics",
+    lessonIDS: ["2.8"],
+    unitName: "Supply and Demand",
+    question: "Suppose the price elasticity of demand for a good is 0.4 and the price elasticity of supply is 0.8. If the government imposes a per-unit tax on producers, which of the following describes the distribution of the tax burden?",
+    image: null,
+    options: [
+      "Producers will pay the majority of the tax.",
+      "Consumers will pay the majority of the tax.",
+      "The tax burden will be split equally.",
+      "Producers will pay the entire tax.",
+      "The government will absorb the cost of the tax."
+    ],
+    correctAnswer: "B",
+    explanation: "The burden of a tax falls more heavily on the side of the market that is more inelastic (less responsive to price changes). Here, demand (0.4) is more inelastic than supply (0.8). Therefore, consumers are less able to leave the market and will bear the majority of the tax burden."
+  },
+  {
+    id: 2011,
+    unit: 2,
+    subject: "ap_microeconomics",
+    lessonIDS: ["2.8"],
+    unitName: "Supply and Demand",
+    question: "The graph above illustrates the impact of a per-unit tax on a market. By how much does consumer surplus decrease as a result of the tax?",
+    image: { src: "/images/unitTestImages/Q2011.svg", alt: "Graph showing tax impact on consumer surplus" },
+    options: [
+      "$100",
+      "$200",
+      "$250",
+      "$400",
+      "$450"
+    ],
+    correctAnswer: "C",
+    explanation: "Consumer surplus is the area below the demand curve and above the price consumers pay. Before the tax, the price is $40 and quantity is 30, so CS is the triangle 0.5 * (70-40) * 30 = $450. After the tax, consumers pay $50 and buy 20 units, so new CS is 0.5 * (70-50) * 20 = $200. The decrease is $450 - $200 = $250. Alternatively, you can calculate the area of the trapezoid between the prices of $40 and $50: (($30 + $20)/2) * $10 = $250."
+  },
+  {
+    id: 2012,
+    unit: 2,
+    subject: "ap_microeconomics",
+    lessonIDS: ["2.8"],
+    unitName: "Supply and Demand",
+    question: "Using the same graph, calculate the total tax revenue generated by this policy and the resulting deadweight loss.",
+    image: { src: "/images/unitTestImages/Q2012.svg", alt: "Graph showing tax revenue and deadweight loss" },
+    optionTableHeaders: ["Tax Revenue", "Deadweight Loss"],
+    options: [
+      "$200 | $50",
+      "$400 | $100",
+      "$400 | $200",
+      "$600 | $100",
+      "$1000 | $50"
+    ],
+    correctAnswer: "B",
+    explanation: "Tax Revenue is calculated as the Tax Per Unit × New Quantity. The vertical distance between the curves at Q=20 is $20 ($50 - $30), and the quantity sold is 20. Thus, Revenue = $20 * 20 = $400. Deadweight Loss is the area of the triangle formed by the reduction in quantity (from 30 to 20) and the tax wedge ($20). Area = 0.5 * (30-20) * ($50-$30) = 0.5 * 10 * 20 = $100."
+  },
+  {
+    id: 2013,
+    unit: 2,
+    subject: "ap_microeconomics",
+    lessonIDS: ["2.8"],
+    unitName: "Supply and Demand",
+    question: "Assume the market is currently in equilibrium at P2 and Q2. If the government implements a binding price floor at P3, which of the following correctly describes the market outcome?",
+    image: { src: "/images/unitTestImages/Q2013.svg", alt: "Graph showing price floor at P3" },
+    options: [
+      "A shortage equal to Q3 - Q1.",
+      "A surplus equal to Q3 - Q1.",
+      "A surplus equal to Q3 - Q2.",
+      "The market remains in equilibrium at Q2.",
+      "A shortage equal to Q2 - Q1."
+    ],
+    correctAnswer: "B",
+    explanation: "A price floor set above the equilibrium price (at P3) is binding. At this higher price, producers are willing to supply Q3, but consumers only demand Q1. This creates an excess supply, or surplus, equal to the difference between quantity supplied and quantity demanded (Q3 - Q1)."
+  },
+  {
+    id: 2014,
+    unit: 2,
+    subject: "ap_microeconomics",
+    lessonIDS: ["2.9"],
+    unitName: "Supply and Demand",
+    question: "A country opens its domestic market for steel to international trade. The world price for steel is lower than the domestic equilibrium price. Which of the following will occur?",
+    image: null,
+    options: [
+      "The country will export steel.",
+      "The quantity of steel produced domestically will increase.",
+      "Domestic producer surplus will decrease.",
+      "Domestic consumer surplus will decrease.",
+      "The total economic surplus in the domestic market will decrease."
+    ],
+    correctAnswer: "C",
+    explanation: "Since the world price is lower, the country will import steel. Domestic consumers benefit from lower prices (CS increases), but domestic producers lose because they must sell at the lower world price, reducing their surplus."
+  },
+  {
+    id: 2015,
+    unit: 2,
+    subject: "ap_microeconomics",
+    lessonIDS: ["2.9"],
+    unitName: "Supply and Demand",
+    question: "The graph above depicts a domestic market after a tariff has been imposed, raising the world price (Pw) to the tariff price (Pt). Which areas on the graph represent the deadweight loss caused by this tariff?",
+    image: { src: "/images/unitTestImages/Q2015.svg", alt: "Graph showing tariff impact with deadweight loss" },
+    options: [
+      "MNRQ",
+      "MLN",
+      "MLN + OMQ",
+      "OMQ + RNP",
+      "MNRQ + RNP"
+    ],
+    correctAnswer: "D",
+    explanation: "The deadweight loss from a tariff is composed of two distinct efficiency losses. Triangle OMQ represents the production inefficiency (resources used to produce goods domestically at a higher cost than the world price). Triangle RNP represents the consumption inefficiency (lost consumer surplus from consumers who value the good more than the world price but less than the tariff price)."
+  },
+
   // Unit 3: National Income and Price Determination
   {
     id: 1031,
@@ -837,6 +1111,300 @@ export const unitTestQuestions: QuestionType[] = [
   ],
     correctAnswer: "B"
   }, 
+
+  // Unit 3 Micro: Production, Cost, and the Perfect Competition Model
+  {
+    id: 3001,
+    unit: 3,
+    subject: "ap_microeconomics",
+    lessonIDS: ["3.1"],
+    unitName: "Production, Cost, and the Perfect Competition Model",
+    question: "The graph below shows the Total Product (TP) curve for a firm in the short run. Which of the following is true about the firm's production at output quantity Q3?",
+    image: { src: "/images/unitTestImages/Q3001.svg", alt: "Total Product curve graph" },
+    options: [
+      "Marginal Product is zero.",
+      "Marginal Product is at its maximum.",
+      "Average Product is negative.",
+      "Diminishing marginal returns have not yet set in.",
+      "Total Product is increasing at an increasing rate."
+    ],
+    correctAnswer: "A",
+    explanation: "The slope of the Total Product (TP) curve represents the Marginal Product (MP). At quantity Q3, the TP curve reaches its peak (the slope is flat). Therefore, the Marginal Product at this point is zero."
+  },
+  {
+    id: 3006,
+    unit: 3,
+    subject: "ap_microeconomics",
+    lessonIDS: ["3.1"],
+    unitName: "Production, Cost, and the Perfect Competition Model",
+    question: "The table below shows the total production of widgets for a firm as it adds workers. Based on the data, with the addition of which worker does the firm first experience diminishing marginal returns?",
+    image: null,
+    tableData: {
+      headers: ["Workers", "Total Output"],
+      rows: [
+        ["0", "0"],
+        ["1", "10"],
+        ["2", "25"],
+        ["3", "35"],
+        ["4", "42"],
+        ["5", "45"]
+      ]
+    },
+    options: [
+      "The 5th worker",
+      "The 4th worker",
+      "The 2nd worker",
+      "The 1st worker",
+      "The 3rd worker"
+    ],
+    correctAnswer: "E",
+    explanation: "Calculate the Marginal Product (MP) for each worker. Worker 1: 10-0=10. Worker 2: 25-10=15. Worker 3: 35-25=10. Worker 4: 42-35=7. The MP increases from worker 1 to 2 (10 to 15), but decreases when the 3rd worker is added (15 down to 10). Therefore, diminishing marginal returns set in with the 3rd worker."
+  },
+  {
+    id: 3007,
+    unit: 3,
+    subject: "ap_microeconomics",
+    lessonIDS: ["3.1"],
+    unitName: "Production, Cost, and the Perfect Competition Model",
+    question: "Which of the following describes the relationship between the Marginal Product (MP) and Average Product (AP) curves?",
+    image: null,
+    options: [
+      "The MP curve intersects the AP curve at the maximum of the AP curve.",
+      "The MP curve intersects the AP curve at the maximum of the MP curve.",
+      "When MP is greater than AP, AP is falling.",
+      "When MP is less than AP, AP is rising.",
+      "MP and AP are always parallel to each other."
+    ],
+    correctAnswer: "A",
+    explanation: "Mathematically, the marginal value pulls the average. If the marginal is above the average, it pulls the average up. If the marginal is below the average, it pulls it down. Therefore, the only time the average is neither rising nor falling (at its peak) is when the marginal equals the average."
+  },
+  {
+    id: 3002,
+    unit: 3,
+    subject: "ap_microeconomics",
+    lessonIDS: ["3.2"],
+    unitName: "Production, Cost, and the Perfect Competition Model",
+    question: "The graph below displays the short-run cost curves for a firm. Which of the labeled points are NOT part of the firm's short-run supply curve?",
+    image: { src: "/images/unitTestImages/Q3002.svg", alt: "Short-run cost curves graph" },
+    options: [
+      "F and K",
+      "I and J",
+      "J and K",
+      "H and I",
+      "I, J, and K"
+    ],
+    correctAnswer: "A",
+    explanation: "The firm's short-run supply curve is the portion of the Marginal Cost (MC) curve that lies above the minimum Average Variable Cost (AVC) curve (the shutdown point). Point F is on the MC curve but below the shutdown point (I), so the firm would produce zero output rather than produce at F. Point K lies on the AVC curve, not the MC curve, so it does not represent a profit-maximizing supply point."
+  },
+  {
+    id: 3008,
+    unit: 3,
+    subject: "ap_microeconomics",
+    lessonIDS: ["3.2"],
+    unitName: "Production, Cost, and the Perfect Competition Model",
+    question: "Which of the following statements about short-run cost curves is true?",
+    image: null,
+    options: [
+      "The distance between ATC and Average Variable Cost (AVC) increases as output increases.",
+      "Total Fixed Costs increase as output increases.",
+      "The Average Fixed Cost (AFC) curve is U-shaped.",
+      "Marginal Cost is always greater than Average Total Cost.",
+      "The Marginal Cost (MC) curve intersects the Average Total Cost (ATC) curve at its minimum."
+    ],
+    correctAnswer: "E",
+    explanation: "Just like with MP and AP, the Marginal Cost curve intersects the average cost curves (ATC and AVC) at their minimum points. If MC is below ATC, ATC falls; if MC is above ATC, ATC rises."
+  },
+  {
+    id: 3009,
+    unit: 3,
+    subject: "ap_microeconomics",
+    lessonIDS: ["3.2"],
+    unitName: "Production, Cost, and the Perfect Competition Model",
+    question: "As a firm increases its output in the short run, what happens to the vertical distance between the Average Total Cost (ATC) and Average Variable Cost (AVC) curves?",
+    image: null,
+    options: [
+      "It decreases because Average Fixed Cost (AFC) declines as output rises.",
+      "It stays constant because fixed costs do not change.",
+      "It increases because of diminishing marginal returns.",
+      "It is zero because ATC equals AVC in the long run.",
+      "It fluctuates randomly."
+    ],
+    correctAnswer: "A",
+    explanation: "ATC = AVC + AFC. Therefore, the vertical gap between ATC and AVC is exactly equal to the Average Fixed Cost. Since Total Fixed Cost is constant, dividing it by an increasing quantity (Q) results in a continuously decreasing AFC."
+  },
+  {
+    id: 3003,
+    unit: 3,
+    subject: "ap_microeconomics",
+    lessonIDS: ["3.3"],
+    unitName: "Production, Cost, and the Perfect Competition Model",
+    question: "The graph below illustrates the Long-Run Average Cost (LRAC) curve. If the firm is currently producing at a quantity greater than Q2 and decides to double its inputs, which of the following outcomes will occur?",
+    image: { src: "/images/unitTestImages/Q3003.svg", alt: "Long-Run Average Cost curve graph" },
+    options: [
+      "Output will double.",
+      "Output will less than double.",
+      "Output will more than double.",
+      "Average total cost will decrease.",
+      "The firm will experience increasing returns to scale."
+    ],
+    correctAnswer: "B",
+    explanation: "To the right of Q2, the Long-Run Average Cost (LRAC) curve is sloping upward, indicating Diseconomies of Scale. This means that as the firm scales up, costs rise faster than output. Therefore, if inputs are doubled (cost doubles), output must increase by less than double for the average cost per unit to rise."
+  },
+  {
+    id: 3010,
+    unit: 3,
+    subject: "ap_microeconomics",
+    lessonIDS: ["3.3"],
+    unitName: "Production, Cost, and the Perfect Competition Model",
+    question: "If a firm doubles its inputs and finds that its output increases by more than double, the firm is experiencing:",
+    image: null,
+    options: [
+      "Diminishing marginal returns.",
+      "Constant returns to scale.",
+      "Diseconomies of scale.",
+      "Economies of scale.",
+      "Decreasing returns to scale."
+    ],
+    correctAnswer: "D",
+    explanation: "Economies of scale (or increasing returns to scale) occur when output increases by a larger proportion than the increase in inputs. This typically leads to a downward-sloping Long-Run Average Cost (LRAC) curve."
+  },
+  {
+    id: 3011,
+    unit: 3,
+    subject: "ap_microeconomics",
+    lessonIDS: ["3.4"],
+    unitName: "Production, Cost, and the Perfect Competition Model",
+    question: "Sarah quits her job where she earned $50,000 a year to start a bakery. The table below lists her first year's financial data. What is Sarah's Accounting Profit for the first year?",
+    image: null,
+    tableData: {
+      headers: ["Item", "Amount"],
+      rows: [
+        ["Total Revenue from Sales", "$150,000"],
+        ["Cost of Ingredients (Flour, Sugar, etc.)", "$40,000"],
+        ["Wages paid to employees", "$30,000"],
+        ["Rent for bakery space", "$20,000"],
+        ["Forgone Salary (Opportunity Cost)", "$50,000"]
+      ]
+    },
+    options: [
+      "$10,000",
+      "$150,000",
+      "$60,000",
+      "$110,000",
+      "$90,000"
+    ],
+    correctAnswer: "C",
+    explanation: "Accounting Profit only considers explicit costs (money actually paid out). Accounting Profit = Total Revenue - Explicit Costs. \nExplicit Costs = Ingredients ($40k) + Wages ($30k) + Rent ($20k) = $90,000. \n$150,000 (Revenue) - $90,000 (Explicit Costs) = $60,000. \n(Note: Economic profit would subtract the forgone salary, resulting in $10,000)."
+  },
+  {
+    id: 3012,
+    unit: 3,
+    subject: "ap_microeconomics",
+    lessonIDS: ["3.5"],
+    unitName: "Production, Cost, and the Perfect Competition Model",
+    question: "A profit-maximizing firm should always produce the quantity where:",
+    image: null,
+    options: [
+      "Total Revenue is maximized.",
+      "Marginal Revenue equals Marginal Cost.",
+      "Average Total Cost is minimized.",
+      "Price equals Average Variable Cost.",
+      "Marginal Revenue is greater than Marginal Cost."
+    ],
+    correctAnswer: "B",
+    explanation: "The profit-maximizing rule is MR = MC. As long as the revenue from selling one more unit (MR) is greater than the cost of producing it (MC), the firm adds to its profit. It stops exactly where they are equal."
+  },
+  {
+    id: 3005,
+    unit: 3,
+    subject: "ap_microeconomics",
+    lessonIDS: ["3.6"],
+    unitName: "Production, Cost, and the Perfect Competition Model",
+    question: "The graph below shows the short run production costs for a perfectly competitive firm. Which of the following events could have caused the shift seen on the graph?",
+    image: { src: "/images/unitTestImages/Q3005.svg", alt: "Perfect competition cost curve shift graph" },
+    options: [
+      "An increase in the price of a substitute good.",
+      "A decrease in consumer income (assuming the good is normal).",
+      "A technological breakdown that reduces industry supply.",
+      "The entry of new firms into the market.",
+      "A decrease in the marginal product of labor."
+    ],
+    correctAnswer: "A",
+    explanation: "For a perfectly competitive firm, Marginal Revenue is equal to the market price. The upward shift indicates that the market price has increased. An increase in the price of a substitute good would increase the market demand for this good, shifting the market demand curve to the right and raising the equilibrium price."
+  },
+  {
+    id: 3013,
+    unit: 3,
+    subject: "ap_microeconomics",
+    lessonIDS: ["3.6"],
+    unitName: "Production, Cost, and the Perfect Competition Model",
+    question: "A perfectly competitive firm sells its product at a market price of $10 per unit. At its current profit-maximizing quantity, the Average Variable Cost is $8 and the Average Total Cost is $12. In the short run, this firm should:",
+    image: null,
+    options: [
+      "Shut down immediately because it is making an economic loss.",
+      "Raise its price to $12 to cover all costs.",
+      "Continue producing because the price exceeds the Average Variable Cost.",
+      "Exit the market immediately to eliminate fixed costs.",
+      "Decrease output to zero to stop paying variable costs."
+    ],
+    correctAnswer: "C",
+    explanation: "Even though the firm is making a loss (Price $10 < ATC $12), it should continue to produce because the Price ($10) is higher than the Average Variable Cost ($8). By producing, the firm covers all its variable costs and contributes $2 per unit towards its fixed costs. If it shuts down, it would lose the entire amount of its fixed costs, which would be a greater loss."
+  },
+  {
+    id: 3004,
+    unit: 3,
+    subject: "ap_microeconomics",
+    lessonIDS: ["3.7"],
+    unitName: "Production, Cost, and the Perfect Competition Model",
+    question: "The graph below shows a perfectly competitive firm currently operating at price P2 in the short run. How will this market adjust to long-run equilibrium?",
+    image: { src: "/images/unitTestImages/Q3004.svg", alt: "Perfect competition loss graph" },
+    options: [
+      "Firms will exit the market, shifting the market supply curve to the left, raising the price.",
+      "Firms will enter the market, shifting the market supply curve to the right, lowering the price.",
+      "Firms will increase production to lower their Average Total Cost.",
+      "Demand for the product will decrease as consumers switch to cheaper substitutes.",
+      "The firm will shut down immediately because Price is below ATC."
+    ],
+    correctAnswer: "A",
+    explanation: "At price P2, the price line (MR) is below the Average Total Cost (ATC) curve, indicating that the firm is incurring an economic loss. In the long run, firms will exit the industry to avoid these losses. As firms exit, the market supply decreases (shifts left), which drives the equilibrium price up until normal profits are restored."
+  },
+  {
+    id: 3014,
+    unit: 3,
+    subject: "ap_microeconomics",
+    lessonIDS: ["3.7"],
+    unitName: "Production, Cost, and the Perfect Competition Model",
+    question: "Which of the following is a key characteristic of a perfectly competitive market?",
+    image: null,
+    options: [
+      "Firms sell differentiated products.",
+      "There are many buyers and sellers producing identical products.",
+      "There are high barriers to entry and exit.",
+      "Individual firms are price makers.",
+      "Firms earn positive economic profits in the long run."
+    ],
+    correctAnswer: "B",
+    explanation: "Perfect competition is defined by having many small firms, identical (homogeneous) products, perfect information, and no barriers to entry or exit. This makes firms \"price takers.\""
+  },
+  {
+    id: 3015,
+    unit: 3,
+    subject: "ap_microeconomics",
+    lessonIDS: ["3.7"],
+    unitName: "Production, Cost, and the Perfect Competition Model",
+    question: "If perfectly competitive firms are earning positive economic profits in the short run, what will happen in the long run?",
+    image: null,
+    options: [
+      "The government will impose taxes to reduce the profits.",
+      "The market demand will decrease as consumers lose interest.",
+      "Firms will increase their advertising to maintain profits.",
+      "Firms will enter the industry, shifting supply right and lowering the price.",
+      "Firms will exit the industry, shifting supply left and raising the price."
+    ],
+    correctAnswer: "D",
+    explanation: "Positive economic profits act as a signal for new firms to enter the market (since there are no barriers). As new firms enter, the market supply curve shifts to the right. This drives the equilibrium price down until economic profits return to zero."
+  },
+
   {
     id: 1046,
     subject: "ap_macroeconomics",
@@ -1575,8 +2143,15 @@ options: [
 ];
 
 // Helper function to get unit test questions for a specific unit
-export const getUnitTestQuestions = (unitNumber: number): QuestionType[] => {
-  return unitTestQuestions.filter(q => q.unit === unitNumber);
+// Optionally filter by subject to ensure macro and micro questions don't mix
+export const getUnitTestQuestions = (
+  unitNumber: number,
+  subject?: 'ap_macroeconomics' | 'ap_microeconomics'
+): QuestionType[] => {
+  return unitTestQuestions.filter(q => 
+    q.unit === unitNumber && 
+    (!subject || q.subject === subject)
+  );
 };
 
 // Export individual unit tests
