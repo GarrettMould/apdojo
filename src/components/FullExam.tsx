@@ -158,10 +158,10 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   }, [isCustomAssignment]);
 
   // Add tools panel state (slide-out panel for calculator and drawing pad)
-  // For unit tests, preview exams, full exams, and custom assignments, always show the tools panel
+  // Tools panel is closed by default on all exam types - users can open it if needed
   const isPreviewExam = examNumber && (examNumber.includes('preview') || examNumber.startsWith('preview'));
   const isFullExam = examNumber === 'full';
-  const shouldShowToolsByDefault = isUnitTest || isPreviewExam || isFullExam || isCustomAssignment;
+  const shouldShowToolsByDefault = false; // Always start closed - users can open manually
   const [showToolsPanel, setShowToolsPanel] = useState(shouldShowToolsByDefault);
   const [leftPanelWidth, setLeftPanelWidth] = useState(shouldShowToolsByDefault ? 65 : 100); // Percentage width for left panel when tools panel is open
   // For all exam types, only show one tool at a time (calculator OR whiteboard)
