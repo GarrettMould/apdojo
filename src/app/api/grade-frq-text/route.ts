@@ -3,14 +3,31 @@ import { NextRequest, NextResponse } from 'next/server';
 import { generateGradingPrompt } from '@/lib/grading-logic';
 
 export const maxDuration = 30; // Set a 30-second timeout
+export const runtime = 'nodejs'; // Ensure Node.js runtime for Vercel
 
 export async function POST(req: NextRequest) {
   // 1. Check for API key
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     console.error("CRITICAL: GEMINI_API_KEY environment variable is not set.");
-    return NextResponse.json({ message: "Server configuration error: Missing API key." }, { status: 500 });
+    console.error("Available env vars:", Object.keys(process.env).filter(k => k.includes('GEMINI') || k.includes('API')));
+    return NextResponse.json({ 
+      message: "Server configuration error: Missing API key.",
+      debug: process.env.NODE_ENV === 'development' ? {
+        hasKey: !!apiKey,
+        keyLength: apiKey?.length || 0,
+        envVars: Object.keys(process.env).filter(k => k.includes('GEMINI') || k.includes('API'))
+      } : undefined
+    }, { status: 500 });
   }
+  
+  // Log API key status (without exposing the key itself)
+  console.log('API Key status:', {
+    hasKey: true,
+    keyLength: apiKey.length,
+    keyPrefix: apiKey.substring(0, 10) + '...',
+    environment: process.env.NODE_ENV
+  });
 
   // 2. Initialize Gemini client
   const genAI = new GoogleGenerativeAI(apiKey);

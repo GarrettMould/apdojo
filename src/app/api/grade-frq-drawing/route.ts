@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { VISION_COMPARISON_PROTOCOL } from '@/lib/grading-logic';
 
+export const runtime = 'nodejs'; // Ensure Node.js runtime for Vercel
+
 // Coordinate-based grading function for sticker system
 function gradeWithStickers(structuredData: any, expectedGap: string | undefined, partLabel: string) {
   const { stickers, lines } = structuredData;
@@ -136,11 +138,28 @@ export async function POST(request: NextRequest) {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       console.error('GEMINI_API_KEY environment variable is not set.');
+      console.error('Available env vars:', Object.keys(process.env).filter(k => k.includes('GEMINI') || k.includes('API')));
       return NextResponse.json(
-        { error: 'Server configuration error: Missing API key.' },
+        { 
+          error: 'Server configuration error: Missing API key.',
+          debug: process.env.NODE_ENV === 'development' ? {
+            hasKey: !!apiKey,
+            keyLength: apiKey?.length || 0,
+            envVars: Object.keys(process.env).filter(k => k.includes('GEMINI') || k.includes('API'))
+          } : undefined
+        },
         { status: 500 }
       );
     }
+    
+    // Log API key status (without exposing the key itself)
+    console.log('API Key status:', {
+      hasKey: true,
+      keyLength: apiKey.length,
+      keyPrefix: apiKey.substring(0, 10) + '...',
+      environment: process.env.NODE_ENV
+    });
+    
     const genAI = new GoogleGenerativeAI(apiKey);
 
     console.log('Grade FRQ drawing API called');

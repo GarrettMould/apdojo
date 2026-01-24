@@ -427,13 +427,13 @@ function UnitFRQPracticePageComponent() {
     });
   }, [frqQuestion, gradingFeedback, submittedDrawings]);
 
-  // Show completion modal when all questions are completed
-  useEffect(() => {
-    if (isAllQuestionsCompleted && !showCompletionModal) {
-      setTotalXpEarned(calculatedTotalXp);
-      setShowCompletionModal(true);
-    }
-  }, [isAllQuestionsCompleted, showCompletionModal, calculatedTotalXp]);
+  // Completion modal disabled - no longer showing on completion
+  // useEffect(() => {
+  //   if (isAllQuestionsCompleted && !showCompletionModal) {
+  //     setTotalXpEarned(calculatedTotalXp);
+  //     setShowCompletionModal(true);
+  //   }
+  // }, [isAllQuestionsCompleted, showCompletionModal, calculatedTotalXp]);
 
   // Generate completion message based on score
   const getCompletionMessage = (score: number, total: number): string => {
@@ -668,14 +668,15 @@ function UnitFRQPracticePageComponent() {
         videoUrl={videoModalState?.url || ''}
         aspectRatio={videoModalState?.aspectRatio}
       />
-      <FRQCompletionModal
+      {/* Completion modal disabled - no longer showing */}
+      {/* <FRQCompletionModal
         isOpen={showCompletionModal}
         onClose={() => setShowCompletionModal(false)}
         xpEarned={totalXpEarned}
         score={currentPoints}
         totalPoints={totalPoints}
         message={getCompletionMessage(currentPoints, totalPoints)}
-      />
+      /> */}
 
       {/* Sidebar Toggle Button */}
       {!isSidebarOpen && (
