@@ -1060,6 +1060,7 @@ export const macroUnit2Set4: FRQExam = {
           text: "Draw a correctly labeled graph of the production possibilities curve (PPC) for Meridia, with Consumer Goods on the horizontal axis and Capital Goods on the vertical axis. Indicate a point on your graph, labeled 'X', that reflects the current state of the economy.",
           answerType: "draw",
           answer: "The graph should show a standard concave PPC. Point X must be plotted INSIDE the curve. Explanation: Because there is positive Cyclical Unemployment (5,000 people), the economy is not utilizing all of its resources efficiently.",
+          referenceImageUrl: "/images/frqPracticePage/macroUnit2Set4C.jpg",
         },
         {
           label: "D",
@@ -1067,6 +1068,8 @@ export const macroUnit2Set4: FRQExam = {
           text: "Assume the government of Meridia implements a new national education program that significantly improves the technical skills of the workforce. Show the effect of this policy on your graph in part (C).",
           answerType: "draw",
           answer: "The entire PPC shifts outward (to the right). Explanation: Improving the quality of labor (human capital) increases the productive capacity of the economy, allowing Meridia to produce more of both Capital and Consumer goods.",
+          referenceImageUrl: "/images/frqPracticePage/macroUnit2Set4D.jpg",
+
         }
       ]
     }

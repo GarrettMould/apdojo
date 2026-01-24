@@ -8,19 +8,11 @@ import macroSetOneQ41 from '../../../../../public/images/macroSetOneQ41.png';
 import macroSetOneQ48 from '../../../../../public/images/macroSetOneQ48.png';
 import macroSetOneQ53 from '../../../../../public/images/macroSetOneQ53.png';
 import macroSetOneQ57 from '../../../../../public/images/macroSetOneQ57.png';
-// Fisher-Yates shuffle function
-function shuffleArray<T>(array: T[]): T[] {
-  const shuffled = [...array];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled;
-}
-
+// Sort questions by ID to ensure consistent order (no shuffling)
+// This ensures that when users return to the exam, questions are in the same order
 export const macroSetOneQuestions: QuestionBank = {
   name: "AP Macroeconomics",
-  questions: shuffleArray([
+  questions: [
     {
       "id": 1,
       "unit": 1,
@@ -1041,5 +1033,5 @@ export const macroSetOneQuestions: QuestionBank = {
         "correctAnswer": "C",
         "explanation": "A key limitation of GDP as a measure of economic well-being is that it excludes non-market activities like household work, childcare, and volunteer services. This means GDP underestimates total economic activity and does not fully capture societal welfare."
       }
-  ])
+  ].sort((a, b) => a.id - b.id) // Sort by ID to ensure consistent order
 };

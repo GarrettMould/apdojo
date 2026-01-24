@@ -23,7 +23,8 @@ import { ExamTutorialModal } from './ExamTutorialModal';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 import { saveQuizResult } from '@/lib/quizHistory';
-import { saveTestResult } from '@/lib/testProgress';
+import { saveTestResult, saveTestProgress, loadTestProgress, TestProgress } from '@/lib/testProgress';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import '@excalidraw/excalidraw/index.css';
@@ -150,10 +151,117 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   // State to pause/resume timer
   const [isTimerPaused, setIsTimerPaused] = useState(false);
 
-  // Update timeRemaining when initialTimeLimit changes
+  // Get user context (needed for access checks and guest progress)
+  const { user, userData, awardXp, selectedSubject } = useAuthContext();
+
+  // Restore guest progress on mount (including timer)
+  // This works for both guests AND logged-in users who were guests when they started the exam
+  // (e.g., started as guest, signed up during purchase, then returned)
   useEffect(() => {
-    setTimeRemaining(initialTimeLimit);
-  }, [initialTimeLimit]);
+    if (typeof window !== 'undefined') {
+      const savedProgress = localStorage.getItem('guest_quiz_progress');
+      if (savedProgress) {
+        try {
+          const progress = JSON.parse(savedProgress);
+          // Only restore if it matches the current exam
+          if (progress.examNumber === examNumber && progress.examType === examType) {
+            // Restore answers
+            if (progress.answers) {
+              setAnswers(progress.answers);
+            }
+            // Restore current question index
+            if (typeof progress.currentQuestionIndex === 'number') {
+              setCurrentPage(progress.currentQuestionIndex);
+            }
+            // Restore timer - initialize with saved timeRemaining
+            if (typeof progress.timeRemaining === 'number' && progress.timeRemaining > 0) {
+              setTimeRemaining(progress.timeRemaining);
+            }
+            console.log('[FullExam] Restored guest progress:', {
+              answers: Object.keys(progress.answers || {}).length,
+              currentQuestionIndex: progress.currentQuestionIndex,
+              timeRemaining: progress.timeRemaining,
+              userWasGuest: !user,
+              nowLoggedIn: !!user
+            });
+            
+            // Clear the saved progress after restoring (so it doesn't restore again on next visit)
+            localStorage.removeItem('guest_quiz_progress');
+          }
+        } catch (error) {
+          console.error('[FullExam] Error restoring guest progress:', error);
+        }
+      }
+    }
+  }, []); // Only run on mount - note: we check user in the condition but restore regardless
+
+  // Check if this is a full MCQ exam that should have save progress functionality
+  const isFullMCQExam = examNumber === 'full' && questionType === 'mcq' && !isCustomAssignment;
+
+  // Restore saved progress for logged-in users on full MCQ exams
+  useEffect(() => {
+    const restoreSavedProgress = async () => {
+      if (!user || !isFullMCQExam || showResults) return;
+      
+      try {
+        const testId = `full_${examType}_mcq`;
+        const savedProgress = await loadTestProgress(user.uid, testId);
+        
+        if (savedProgress && !savedProgress.isSubmitted) {
+          // Restore answers
+          if (savedProgress.answeredQuestions) {
+            const restoredAnswers: Answers = {};
+            Object.entries(savedProgress.answeredQuestions).forEach(([qIndex, answerData]: [string, any]) => {
+              // Convert selectedAnswer (0, 1, 2, 3) back to letter format ('A', 'B', 'C', 'D')
+              if (typeof answerData.selectedAnswer === 'number') {
+                restoredAnswers[parseInt(qIndex)] = String.fromCharCode(65 + answerData.selectedAnswer);
+              }
+            });
+            setAnswers(restoredAnswers);
+          }
+          
+          // Restore current question index
+          if (typeof savedProgress.currentQuestionIndex === 'number') {
+            setCurrentPage(savedProgress.currentQuestionIndex);
+          }
+          
+          // Restore timer if available (calculate from startedAt and lastUpdated)
+          if (savedProgress.startedAt && savedProgress.lastUpdated) {
+            const started = savedProgress.startedAt.toDate ? savedProgress.startedAt.toDate() : new Date(savedProgress.startedAt);
+            const lastUpdated = savedProgress.lastUpdated.toDate ? savedProgress.lastUpdated.toDate() : new Date(savedProgress.lastUpdated);
+            const elapsed = Math.floor((lastUpdated.getTime() - started.getTime()) / 1000);
+            const remaining = initialTimeLimit - elapsed;
+            if (remaining > 0) {
+              setTimeRemaining(remaining);
+            }
+          }
+          
+          console.log('[FullExam] Restored saved progress for logged-in user:', {
+            answers: Object.keys(savedProgress.answeredQuestions || {}).length,
+            currentQuestionIndex: savedProgress.currentQuestionIndex
+          });
+        }
+      } catch (error) {
+        console.error('[FullExam] Error restoring saved progress:', error);
+      }
+    };
+    
+    restoreSavedProgress();
+  }, [user, isFullMCQExam, showResults, examType, initialTimeLimit]);
+
+  // Update timeRemaining when initialTimeLimit changes (only if no saved progress)
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !user) {
+      const savedProgress = localStorage.getItem('guest_quiz_progress');
+      if (!savedProgress) {
+        // Only set initial time if no saved progress exists
+        setTimeRemaining(initialTimeLimit);
+      }
+    } else if (user) {
+      // For logged-in users, always use initial time limit
+      setTimeRemaining(initialTimeLimit);
+    }
+  }, [initialTimeLimit, user]);
 
   // Generate Dojo name for custom assignments only
   const customTitle = useMemo(() => {
@@ -170,9 +278,6 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   
   // Determine if this exam requires season pass (unit tests and full exams, but not custom assignments)
   const requiresSeasonPass = (isUnitTest || isFullExam || isPreviewExam) && !isCustomAssignment;
-  
-  // Get user context (needed for access checks)
-  const { user, userData, awardXp, selectedSubject } = useAuthContext();
   
   // Check if user has season pass access for this exam type
   // For unit tests and full exams, check season pass. For custom assignments, always allow.
@@ -260,7 +365,18 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
   const [showExitConfirmModal, setShowExitConfirmModal] = useState(false);
+  const [showSaveProgressModal, setShowSaveProgressModal] = useState(false);
+  const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
+  const [isSavingProgress, setIsSavingProgress] = useState(false);
+  const allowNavigationRef = useRef(false); // Use ref for synchronous access in beforeunload
   const [showTutorial, setShowTutorial] = useState(false);
+  const [isMounted, setIsMounted] = useState(false); // For client-side only rendering
+  const router = useRouter();
+
+  // Set mounted flag for client-side only rendering
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Scroll to top when page changes
   // Check if user has seen tutorial on mount
@@ -279,7 +395,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
 
   // Timer countdown effect
   useEffect(() => {
-    if (showResults || timeRemaining <= 0 || isTimerPaused) return;
+    if (showResults || timeRemaining <= 0 || isTimerPaused || showSeasonPassModal || showSaveProgressModal) return;
 
     const interval = setInterval(() => {
       setTimeRemaining(prev => {
@@ -291,7 +407,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [showResults, timeRemaining, isTimerPaused]);
+  }, [showResults, timeRemaining, isTimerPaused, showSeasonPassModal, showSaveProgressModal]);
 
   // Notify parent of time updates
   useEffect(() => {
@@ -299,6 +415,121 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
       onTimeUpdate(timeRemaining);
     }
   }, [timeRemaining, onTimeUpdate]);
+
+  // Pause timer when save progress modal appears
+  useEffect(() => {
+    if (showSaveProgressModal) {
+      setIsTimerPaused(true);
+    } else if (!showSaveProgressModal && !showResults && timeRemaining > 0) {
+      // Resume timer when modal closes (if user stays on page)
+      // Note: If user navigates away, this won't matter
+      setIsTimerPaused(false);
+    }
+  }, [showSaveProgressModal, showResults, timeRemaining]);
+
+  // Handle navigation away for logged-in users on full MCQ exams
+  useEffect(() => {
+    console.log('[FullExam] Navigation guard check:', { 
+      user: !!user, 
+      isFullMCQExam, 
+      showResults,
+      examNumber,
+      questionType,
+      isCustomAssignment
+    });
+    
+    if (!user || !isFullMCQExam || showResults) {
+      console.log('[FullExam] Navigation guard not active:', { user: !!user, isFullMCQExam, showResults });
+      return;
+    }
+    
+    // Check if user has made any progress (answered at least one question)
+    const hasProgress = Object.keys(answers).length > 0;
+    console.log('[FullExam] Checking navigation guard:', { hasProgress, answerCount: Object.keys(answers).length });
+    if (!hasProgress) return; // Don't show modal if no progress made
+    
+    // Handle beforeunload (browser close/refresh)
+    // Note: beforeunload can only show browser's default dialog, not our custom modal
+    // Only show if we haven't already handled the save via our modal
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      // Don't show browser dialog if we've already saved or are allowing navigation
+      // Use ref for synchronous access (state updates are async)
+      if (allowNavigationRef.current) {
+        return;
+      }
+      console.log('[FullExam] beforeunload triggered');
+      e.preventDefault();
+      e.returnValue = 'You have unsaved progress. Are you sure you want to leave?';
+      return e.returnValue;
+    };
+    
+    // Intercept link clicks (including Next.js Link components)
+    const handleLinkClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      // Check if clicked element or parent is a link
+      const link = target.closest('a[href]');
+      if (link) {
+        const href = link.getAttribute('href');
+        if (href && href.startsWith('/') && !href.startsWith('#')) {
+          // It's an internal link
+          const url = new URL(href, window.location.origin);
+          // Don't intercept if it's the same page
+          if (url.pathname !== window.location.pathname) {
+            console.log('[FullExam] Link click intercepted:', url.pathname);
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            setIsTimerPaused(true); // Pause timer when modal appears
+            setIsTimerPaused(true); // Pause timer when modal appears
+            setPendingNavigation(url.pathname + url.search);
+            setShowSaveProgressModal(true);
+            return false;
+          }
+        }
+      }
+    };
+    
+    // Intercept router.push calls by wrapping the router
+    const originalPush = router.push.bind(router);
+    const wrappedPush = ((url: any, options?: any) => {
+      const path = typeof url === 'string' ? url : (url?.pathname || String(url));
+      if (path && path !== window.location.pathname) {
+        console.log('[FullExam] Router.push intercepted:', path);
+        setIsTimerPaused(true); // Pause timer when modal appears
+        setPendingNavigation(path);
+        setShowSaveProgressModal(true);
+        return Promise.resolve(false);
+      }
+      return originalPush(url as any, options);
+    }) as any;
+    
+    // Replace router.push temporarily
+    (router as any).push = wrappedPush;
+    
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    document.addEventListener('click', handleLinkClick, true); // Use capture phase
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      document.removeEventListener('click', handleLinkClick, true);
+      (router as any).push = originalPush; // Restore original
+    };
+  }, [user, isFullMCQExam, showResults, answers, router]);
+  
+  // Function to handle navigation attempts (called from outside, e.g., Link components)
+  const handleNavigationAttempt = (url: string) => {
+    if (!user || !isFullMCQExam || showResults) return true; // Allow navigation
+    
+    const hasProgress = Object.keys(answers).length > 0;
+    if (!hasProgress) return true; // Allow navigation if no progress
+    
+    setPendingNavigation(url);
+    setShowSaveProgressModal(true);
+    return false; // Prevent navigation
+  };
+  
+  // Expose handleNavigationAttempt for use in Link components if needed
+  // For now, we'll rely on beforeunload for browser navigation
 
   // Format time as MM:SS
   const formatTime = (seconds: number): string => {
@@ -405,6 +636,101 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
       document.body.style.overflow = '';
     };
   }, [showVideoModal]);
+
+  // Save progress function for logged-in users on full MCQ exams
+  const saveProgress = async (): Promise<boolean> => {
+    if (!user || !isFullMCQExam || showResults) {
+      console.log('[FullExam] saveProgress: Conditions not met', { user: !!user, isFullMCQExam, showResults });
+      return false;
+    }
+    
+    try {
+      const testId = `full_${examType}_mcq`;
+      const answeredQuestions: Record<string, { selectedAnswer: number; isCorrect: boolean }> = {};
+      
+      // Convert answers to the format expected by TestProgress
+      Object.entries(answers).forEach(([questionId, answer]) => {
+        const question = questions.find(q => q.id === parseInt(questionId));
+        if (question && answer) {
+          const answerIndex = answer.charCodeAt(0) - 65; // Convert 'A' to 0, 'B' to 1, etc.
+          answeredQuestions[questionId] = {
+            selectedAnswer: answerIndex,
+            isCorrect: answer === question.correctAnswer
+          };
+        }
+      });
+      
+      console.log('[FullExam] Saving progress:', { 
+        testId, 
+        answeredCount: Object.keys(answeredQuestions).length,
+        currentPage,
+        totalQuestions: questions.length
+      });
+      
+      // Load existing progress to preserve startedAt timestamp
+      let existingProgress = null;
+      try {
+        existingProgress = await loadTestProgress(user.uid, testId);
+        console.log('[FullExam] Found existing progress:', !!existingProgress);
+      } catch (e) {
+        console.log('[FullExam] No existing progress found');
+        // If no existing progress, that's fine
+      }
+      
+      const progress: TestProgress = {
+        userId: user.uid,
+        testType: 'full_exam',
+        testId: testId,
+        progress: {
+          answeredQuestions,
+          currentQuestionIndex: currentPage,
+          isSubmitted: false,
+          totalQuestions: questions.length,
+          startedAt: existingProgress?.startedAt || (serverTimestamp() as any),
+          lastUpdated: serverTimestamp() as any
+        }
+      };
+      
+      const answeredCount = progress.progress.answeredQuestions 
+        ? Object.keys(progress.progress.answeredQuestions).length 
+        : 0;
+      console.log('[FullExam] Calling saveTestProgress with:', {
+        userId: progress.userId,
+        testType: progress.testType,
+        testId: progress.testId,
+        answeredCount,
+        currentQuestionIndex: progress.progress.currentQuestionIndex,
+        totalQuestions: progress.progress.totalQuestions,
+        isSubmitted: progress.progress.isSubmitted
+      });
+      
+      await saveTestProgress(progress);
+      console.log('[FullExam] Progress saved successfully to Firestore at path: userTestProgress/' + user.uid + '/tests/' + testId);
+      
+      // Verify the save by trying to load it back
+      try {
+        const verifyProgress = await loadTestProgress(user.uid, testId);
+        if (verifyProgress) {
+          const answeredCount = verifyProgress.answeredQuestions 
+            ? Object.keys(verifyProgress.answeredQuestions).length 
+            : 0;
+          console.log('[FullExam] Verified: Progress exists in Firestore', {
+            answeredCount,
+            currentQuestionIndex: verifyProgress.currentQuestionIndex
+          });
+        } else {
+          console.warn('[FullExam] Warning: Could not verify saved progress');
+        }
+      } catch (verifyError) {
+        console.error('[FullExam] Error verifying saved progress:', verifyError);
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('[FullExam] Error saving progress:', error);
+      return false;
+    }
+  };
 
   const handleAnswer = (questionId: number, answerIndex: number) => {
     // If option is struck through, just remove strikethrough and don't select
@@ -809,10 +1135,44 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
     return true;
   };
 
+  // Helper function to save guest progress before showing purchase modal
+  const saveProgressBeforePurchase = () => {
+    if (typeof window !== 'undefined') {
+      // Ensure timer is paused before saving
+      if (!isTimerPaused) {
+        setIsTimerPaused(true);
+      }
+      
+      const currentUrl = window.location.href;
+      const guestProgress = {
+        answers,
+        currentQuestionIndex: currentPage,
+        timeRemaining, // Timer is paused, so this value is frozen
+        examNumber,
+        examType,
+        questionType,
+        unitId: isUnitTest ? examNumber : undefined
+      };
+      
+      localStorage.setItem('guest_quiz_progress', JSON.stringify(guestProgress));
+      localStorage.setItem('redirect_after_purchase', currentUrl);
+      
+      console.log('[FullExam] Saved progress before purchase:', {
+        answers: Object.keys(answers).length,
+        currentQuestionIndex: currentPage,
+        timeRemaining,
+        examNumber
+      });
+    }
+  };
+
   // Helper function to handle navigation with access check
   const handleNavigateToQuestion = (questionIndex: number) => {
     // Check access for the requested question
     if (!canNavigateToQuestion(questionIndex)) {
+      // Pause timer and save progress before showing modal
+      setIsTimerPaused(true);
+      saveProgressBeforePurchase();
       setShowSeasonPassModal(true);
       return;
     }
@@ -921,6 +1281,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
       return;
     }
 
+    // Save guest progress before redirecting (for guest users who just signed up)
+    saveProgressBeforePurchase();
+
     console.log('User is logged in, proceeding to checkout');
     try {
       await redirectToCheckout(examType, questionType, examNumber, user.uid);
@@ -1026,8 +1389,52 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
       {showSeasonPassModal && (
         <SeasonPassModal
           subject={examType}
-          onClose={() => setShowSeasonPassModal(false)}
+          onClose={() => {
+            setShowSeasonPassModal(false);
+            // Resume timer when modal is closed (if user stays on page)
+            if (!showResults && timeRemaining > 0) {
+              setIsTimerPaused(false);
+            }
+          }}
         />
+      )}
+
+      {/* Debug Button - Only in Development */}
+      {!showResults && isMounted && (
+        (typeof window !== 'undefined' && (
+          window.location.hostname === 'localhost' || 
+          window.location.hostname === '127.0.0.1' || 
+          localStorage.getItem('showDebugButton') === 'true' ||
+          process.env.NODE_ENV === 'development'
+        )) && (
+          <>
+            <button
+              onClick={() => {
+                saveProgressBeforePurchase();
+                window.location.href = '/purchase/success';
+              }}
+              className="fixed bottom-4 right-4 bg-yellow-500 hover:bg-yellow-600 text-black font-bold px-4 py-2 rounded-lg shadow-lg z-[9999] border-2 border-black"
+              title="Test Payment Flow - Saves progress and redirects to success page"
+              style={{ zIndex: 9999 }}
+            >
+              🧪 Test Payment Flow
+            </button>
+            {/* Test Save Progress Modal Button */}
+            {isFullMCQExam && user && Object.keys(answers).length > 0 && (
+              <button
+                onClick={() => {
+                  console.log('[FullExam] Test button clicked - showing save progress modal');
+                  setShowSaveProgressModal(true);
+                }}
+                className="fixed bottom-20 right-4 bg-green-500 hover:bg-green-600 text-white font-bold px-4 py-2 rounded-lg shadow-lg z-[9999] border-2 border-black"
+                title="Test Save Progress Modal"
+                style={{ zIndex: 9999 }}
+              >
+                🧪 Test Save Modal
+              </button>
+            )}
+          </>
+        )
       )}
 
       {/* Image Modal */}
@@ -1408,6 +1815,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                 element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
                               }, 100);
                             } else {
+                              // Pause timer and save progress before showing modal
+                              setIsTimerPaused(true);
+                              saveProgressBeforePurchase();
                               setShowSeasonPassModal(true);
                             }
                           }}
@@ -3003,6 +3413,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                               setCurrentPage(index);
                               setShowQuestionNavigator(false);
                             } else {
+                              // Pause timer and save progress before showing modal
+                              setIsTimerPaused(true);
+                              saveProgressBeforePurchase();
                               setShowSeasonPassModal(true);
                               setShowQuestionNavigator(false);
                             }
@@ -3059,6 +3472,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                     if (canNavigateToQuestion(nextPage)) {
                       setCurrentPage(nextPage);
                     } else {
+                      // Pause timer and save progress before showing modal
+                      setIsTimerPaused(true);
+                      saveProgressBeforePurchase();
                       setShowSeasonPassModal(true);
                     }
                   }
@@ -3171,6 +3587,90 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                 className="px-6 py-2.5 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg transition-colors duration-200"
               >
                 Exit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Save Progress Modal for Full MCQ Exams */}
+      {showSaveProgressModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-lg max-w-md w-full p-8 border-4 border-black">
+            <div className="flex items-center gap-3 mb-4">
+              <FileText className="w-6 h-6 text-blue-600" />
+              <h3 className="text-xl font-black text-gray-900">
+                Don't lose your hard work!
+              </h3>
+            </div>
+            <p className="text-gray-700 mb-8 font-semibold">
+              You have {Object.keys(answers).length} question{Object.keys(answers).length !== 1 ? 's' : ''} answered. Save your progress before leaving?
+            </p>
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={async () => {
+                  setIsSavingProgress(true);
+                  try {
+                    console.log('[FullExam] Starting save progress...');
+                    const saved = await saveProgress();
+                    console.log('[FullExam] Save progress result:', saved);
+                    
+                    if (saved) {
+                      // Set ref to allow navigation and disable beforeunload
+                      // Use ref for synchronous access in beforeunload handler
+                      allowNavigationRef.current = true;
+                      setShowSaveProgressModal(false);
+                      setIsTimerPaused(false);
+                      
+                      console.log('[FullExam] Progress saved, navigating...');
+                      
+                      // Small delay to ensure save completes
+                      await new Promise(resolve => setTimeout(resolve, 200));
+                      
+                      // Now navigate - beforeunload won't show dialog because ref is true
+                      // Use window.location.href for reliable navigation
+                      const targetUrl = pendingNavigation || '/';
+                      console.log('[FullExam] Navigating to:', targetUrl);
+                      setPendingNavigation(null);
+                      
+                      // Use setTimeout to ensure state updates complete before navigation
+                      setTimeout(() => {
+                        window.location.href = targetUrl;
+                      }, 100);
+                    } else {
+                      console.error('[FullExam] Save progress returned false');
+                      alert('Failed to save progress. Please try again.');
+                      setIsSavingProgress(false);
+                    }
+                  } catch (error) {
+                    console.error('[FullExam] Error saving progress:', error);
+                    alert('Failed to save progress. Please try again.');
+                    setIsSavingProgress(false);
+                  }
+                }}
+                disabled={isSavingProgress}
+                className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSavingProgress ? 'Saving...' : 'Save Progress'}
+              </button>
+              <button
+                onClick={() => {
+                  // Allow navigation without save
+                  allowNavigationRef.current = true;
+                  setShowSaveProgressModal(false);
+                  setIsTimerPaused(false);
+                  const targetUrl = pendingNavigation || '/';
+                  setPendingNavigation(null);
+                  
+                  // Use setTimeout to ensure state updates complete before navigation
+                  setTimeout(() => {
+                    window.location.href = targetUrl;
+                  }, 100);
+                }}
+                disabled={isSavingProgress}
+                className="w-full px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Leave Without Saving
               </button>
             </div>
           </div>

@@ -18,6 +18,7 @@ import { collection, query, where, orderBy, limit, getDocs, getDoc, doc, collect
 import { db } from '@/lib/firebase';
 import { QuizHistoryEntry, restoreTableData } from '@/lib/quizHistory';
 import { hasValidSeasonPass, getUnitMCQTestUrl } from '@/lib/utils';
+import { loadTestProgress } from '@/lib/testProgress';
 
 // Container animation variants (LITE - very subtle)
 const containerVariants = {
@@ -70,6 +71,7 @@ export function DojoDashboard() {
   const [loadingQuizHistory, setLoadingQuizHistory] = useState(true);
   const [recentActivities, setRecentActivities] = useState<any[]>([]);
   const [loadingActivities, setLoadingActivities] = useState(true);
+  const [fullExamProgress, setFullExamProgress] = useState<any>(null); // Track full exam progress
 
   // Helper to check if user has access to a course
   const hasCourseAccess = useMemo(() => {
@@ -169,6 +171,40 @@ export function DojoDashboard() {
     fetchQuizHistory();
   }, [user]);
 
+  // Load full exam progress separately for Continue button
+  useEffect(() => {
+    const fetchFullExamProgress = async () => {
+      if (!user) {
+        setFullExamProgress(null);
+        return;
+      }
+      
+      try {
+        const subjectKey = currentCourse === 'macro' ? 'macro' : 'micro';
+        const testId = `full_${subjectKey}_mcq`;
+        const progress = await loadTestProgress(user.uid, testId);
+        
+        if (progress && !progress.isSubmitted && 
+            progress.answeredQuestions && 
+            Object.keys(progress.answeredQuestions).length > 0) {
+          setFullExamProgress({
+            testId: testId,
+            answeredCount: Object.keys(progress.answeredQuestions).length,
+            totalQuestions: progress.totalQuestions,
+            currentQuestionIndex: progress.currentQuestionIndex
+          });
+        } else {
+          setFullExamProgress(null);
+        }
+      } catch (error) {
+        console.error('[DojoDashboard] Error loading full exam progress:', error);
+        setFullExamProgress(null);
+      }
+    };
+    
+    fetchFullExamProgress();
+  }, [user, currentCourse]);
+
   // Load recent activities from multiple sources
   useEffect(() => {
     const fetchRecentActivities = async () => {
@@ -213,12 +249,23 @@ export function DojoDashboard() {
           try {
             const testProgressRef = doc(db, 'userTestProgress', user.uid);
             const testProgressDoc = await getDoc(testProgressRef);
+            console.log('[DojoDashboard] Test progress doc exists:', testProgressDoc.exists());
             if (testProgressDoc.exists()) {
               const testsRef = collection(testProgressRef, 'tests');
               const testsSnapshot = await getDocs(testsRef);
+              console.log('[DojoDashboard] Found', testsSnapshot.size, 'test progress documents');
               testsSnapshot.forEach(testDoc => {
                 const testData = testDoc.data();
                 const progress = testData.progress;
+                console.log('[DojoDashboard] Processing test progress:', {
+                  id: testDoc.id,
+                  testType: testData.testType,
+                  testId: testData.testId,
+                  hasProgress: !!progress,
+                  answeredCount: progress?.answeredQuestions ? Object.keys(progress.answeredQuestions).length : 0,
+                  isSubmitted: progress?.isSubmitted
+                });
+                
                 if (progress && (
                   (progress.answeredQuestions && Object.keys(progress.answeredQuestions).length > 0) ||
                   (progress.textAnswers && Object.keys(progress.textAnswers).length > 0)
@@ -227,7 +274,7 @@ export function DojoDashboard() {
                     ? Object.keys(progress.answeredQuestions).length 
                     : (progress.textAnswers ? Object.keys(progress.textAnswers).length : 0);
                   
-                  activities.push({
+                  const activity = {
                     id: testDoc.id,
                     type: testData.testType === 'full_exam' ? 'full-exam' : testData.testType === 'unit_mcq' ? 'unit-exam' : 'frq-exam',
                     title: testData.testType === 'full_exam' ? 'Full MCQ Exam' : 
@@ -239,7 +286,10 @@ export function DojoDashboard() {
                     isSubmitted: progress.isSubmitted,
                     score: progress.score,
                     source: 'testProgress'
-                  });
+                  };
+                  
+                  console.log('[DojoDashboard] Adding activity:', activity);
+                  activities.push(activity);
                 }
               });
             }
@@ -832,6 +882,9 @@ export function DojoDashboard() {
                     Icon = FileText;
                     href = '/full-frq-exam';
                   }
+                  
+                  // Check if this is an in-progress exam (not submitted)
+                  const isInProgress = activity.source === 'testProgress' && activity.type === 'full-exam' && !activity.isSubmitted;
 
                   const unitMatch = activity.title.match(/Unit (\d+)/i);
                   const unitNumber = unitMatch ? unitMatch[1] : undefined;
@@ -943,6 +996,28 @@ export function DojoDashboard() {
                                 {activity.timestamp.toDate ? new Date(activity.timestamp.toDate()).toLocaleDateString() : 
                                  activity.timestamp ? new Date(activity.timestamp).toLocaleDateString() : 'Recently'}
                               </p>
+                            )}
+                            {/* Show Continue indicator for in-progress exams */}
+                            {isInProgress && (
+                              <div className="flex items-center justify-between pt-2">
+                                <span className="text-xs text-blue-600 font-medium">Continue</span>
+                                {activity.answeredCount && activity.totalQuestions && (
+                                  <span className="text-xs text-gray-500">
+                                    {activity.answeredCount}/{activity.totalQuestions} answered
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                            {isInProgress && (
+                              <Link
+                                href={href}
+                                className="mt-2 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors text-center block"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                }}
+                              >
+                                Resume Test
+                              </Link>
                             )}
                           </div>
                         </motion.div>
@@ -1135,60 +1210,75 @@ export function DojoDashboard() {
                 </Link>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {displayedFullExams.map((exam) => (
-                  <motion.div
-                    key={exam.id}
-                    variants={cardHoverVariants}
-                    initial="rest"
-                    whileHover="hover"
-                    className="group"
-                  >
-                    <Link href={exam.href}>
-                      <motion.div
-                        variants={cardHoverVariants}
-                        initial="rest"
-                        whileHover="hover"
-                        className="bg-white border border-gray-300 rounded-lg p-6 text-left transition-all flex flex-col h-full overflow-hidden"
-                      >
-                        {/* Header: Icon, XP, Activity Type */}
-                        <div className="flex items-start justify-between mb-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-md bg-gray-100 flex items-center justify-center flex-shrink-0">
+                {displayedFullExams.map((exam) => {
+                  // Check if this is the Full MCQ Exam and has progress
+                  const hasProgress = exam.id === 'full-mcq-exam' && fullExamProgress && fullExamProgress.answeredCount > 0;
+                  
+                  return (
+                    <motion.div
+                      key={exam.id}
+                      variants={cardHoverVariants}
+                      initial="rest"
+                      whileHover="hover"
+                      className="group"
+                    >
+                      <Link href={exam.href}>
+                        <motion.div
+                          variants={cardHoverVariants}
+                          initial="rest"
+                          whileHover="hover"
+                          className="bg-white border border-gray-300 rounded-lg p-6 text-left transition-all flex flex-col h-full overflow-hidden"
+                        >
+                          {/* Header: Icon, XP, Activity Type */}
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-md bg-gray-100 flex items-center justify-center flex-shrink-0">
+                                <Image
+                                  src="/images/exam.svg"
+                                  alt="Exam"
+                                  width={20}
+                                  height={20}
+                                  className="w-5 h-5"
+                                />
+                              </div>
+                              <div className="flex flex-col gap-1">
+                                <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Exam</span>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
+                              <span>6,000</span>
                               <Image
-                                src="/images/exam.svg"
-                                alt="Exam"
-                                width={20}
-                                height={20}
-                                className="w-5 h-5"
+                                src="/images/flame100.png"
+                                alt="XP"
+                                width={16}
+                                height={16}
+                                className="w-4 h-4"
                               />
                             </div>
-                            <div className="flex flex-col gap-1">
-                              <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Exam</span>
-                            </div>
                           </div>
-                          <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
-                            <span>6,000</span>
-                            <Image
-                              src="/images/flame100.png"
-                              alt="XP"
-                              width={16}
-                              height={16}
-                              className="w-4 h-4"
-                            />
+                          
+                          {/* Title */}
+                          <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
+                            {exam.title}
+                          </h3>
+                          
+                          {/* Meta */}
+                          <div className="mt-auto space-y-2">
+                            <p className="text-sm text-gray-500">{exam.description}</p>
+                            {hasProgress && (
+                              <div className="flex items-center justify-between pt-2">
+                                <span className="text-xs text-blue-600 font-medium">Continue</span>
+                                <span className="text-xs text-gray-500">
+                                  {fullExamProgress.answeredCount}/{fullExamProgress.totalQuestions} answered
+                                </span>
+                              </div>
+                            )}
                           </div>
-                        </div>
-                        
-                        {/* Title */}
-                        <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
-                          {exam.title}
-                        </h3>
-                        
-                        {/* Meta */}
-                        <p className="text-sm text-gray-500 mt-auto">{exam.description}</p>
-                      </motion.div>
-                    </Link>
-                  </motion.div>
-                ))}
+                        </motion.div>
+                      </Link>
+                    </motion.div>
+                  );
+                })}
               </div>
             </motion.section>
           )}

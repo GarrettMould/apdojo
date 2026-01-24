@@ -107,12 +107,23 @@ function MyAssignmentHistoryContent() {
         try {
           const testProgressRef = doc(db, 'userTestProgress', user.uid);
           const testProgressDoc = await getDoc(testProgressRef);
+          console.log('[MyAssignmentHistory] Test progress doc exists:', testProgressDoc.exists());
           if (testProgressDoc.exists()) {
             const testsRef = collection(testProgressRef, 'tests');
             const testsSnapshot = await getDocs(testsRef);
+            console.log('[MyAssignmentHistory] Found', testsSnapshot.size, 'test progress documents');
             testsSnapshot.forEach(testDoc => {
               const testData = testDoc.data();
               const progress = testData.progress;
+              console.log('[MyAssignmentHistory] Processing test progress:', {
+                id: testDoc.id,
+                testType: testData.testType,
+                testId: testData.testId,
+                hasProgress: !!progress,
+                answeredCount: progress?.answeredQuestions ? Object.keys(progress.answeredQuestions).length : 0,
+                isSubmitted: progress?.isSubmitted
+              });
+              
               if (progress && (
                 (progress.answeredQuestions && Object.keys(progress.answeredQuestions).length > 0) ||
                 (progress.textAnswers && Object.keys(progress.textAnswers).length > 0)
@@ -121,7 +132,7 @@ function MyAssignmentHistoryContent() {
                   ? Object.keys(progress.answeredQuestions).length 
                   : (progress.textAnswers ? Object.keys(progress.textAnswers).length : 0);
                 
-                allActivities.push({
+                const activity = {
                   id: testDoc.id,
                   type: testData.testType === 'full_exam' ? 'full-exam' : testData.testType === 'unit_mcq' ? 'unit-exam' : 'frq-exam',
                   title: testData.testType === 'full_exam' ? 'Full MCQ Exam' : 
@@ -133,7 +144,10 @@ function MyAssignmentHistoryContent() {
                   isSubmitted: progress.isSubmitted,
                   score: progress.score,
                   source: 'testProgress'
-                });
+                };
+                
+                console.log('[MyAssignmentHistory] Adding activity:', activity);
+                allActivities.push(activity);
               }
             });
           }
@@ -342,11 +356,11 @@ function MyAssignmentHistoryContent() {
             {activities.map((activity) => {
               const unitMatch = activity.title.match(/Unit (\d+)/i);
               const unitNumber = unitMatch ? unitMatch[1] : undefined;
+              const isInProgress = activity.source === 'testProgress' && activity.type === 'full-exam' && !activity.isSubmitted;
 
               return (
-                <Link
+                <div
                   key={activity.id}
-                  href={getActivityHref(activity)}
                   className="block bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
                 >
                   <div className="flex items-start gap-4">
@@ -394,6 +408,25 @@ function MyAssignmentHistoryContent() {
                               </span>
                             )}
                           </div>
+                          {/* Show Continue indicator for in-progress exams */}
+                          {isInProgress && (
+                            <div className="flex items-center gap-2 mt-2">
+                              <span className="text-xs text-blue-600 font-medium">Continue</span>
+                              {activity.answeredCount && activity.totalQuestions && (
+                                <span className="text-xs text-gray-500">
+                                  {activity.answeredCount}/{activity.totalQuestions} answered
+                                </span>
+                              )}
+                            </div>
+                          )}
+                          {isInProgress && (
+                            <Link
+                              href={getActivityHref(activity)}
+                              className="mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-6 rounded-lg transition-colors"
+                            >
+                              Resume Test
+                            </Link>
+                          )}
                         </div>
                         <div className="flex flex-col items-end gap-2">
                           {activity.xpEarned !== undefined && (
@@ -411,12 +444,16 @@ function MyAssignmentHistoryContent() {
                           <p className="text-xs text-gray-400">
                             {formatDate(activity.timestamp)}
                           </p>
-                          <ChevronRight className="w-5 h-5 text-gray-400" />
+                          {!isInProgress && (
+                            <Link href={getActivityHref(activity)}>
+                              <ChevronRight className="w-5 h-5 text-gray-400" />
+                            </Link>
+                          )}
                         </div>
                       </div>
                     </div>
                   </div>
-                </Link>
+                </div>
               );
             })}
           </div>

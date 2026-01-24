@@ -1257,7 +1257,9 @@ export const microSetOneQuestions: QuestionBank = {
     }
     ];
     
-    return shuffleWithGroups(allQuestions);
+    // Sort by ID to ensure consistent order (no shuffling)
+    // This ensures that when users return to the exam, questions are in the same order
+    return allQuestions.sort((a, b) => a.id - b.id);
   })()
 };
 

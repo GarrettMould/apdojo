@@ -13,19 +13,11 @@ import macroSetTwoQ46 from '../../../../../public/images/macroSetTwoQ46.png';
 
 
 
-// Fisher-Yates shuffle function
-function shuffleArray<T>(array: T[]): T[] {
-  const shuffled = [...array];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled;
-}
-
+// Sort questions by ID to ensure consistent order (no shuffling)
+// This ensures that when users return to the exam, questions are in the same order
 export const macroSetTwoQuestions: QuestionBank = {
   name: "AP Macroeconomics",
-  questions: shuffleArray([
+  questions: [
     {
         "id": 1,
         "unit": 1,
@@ -986,5 +978,5 @@ export const macroSetTwoQuestions: QuestionBank = {
     "correctAnswer": "C",
     "explanation": "Expansionary monetary policy increase output and decrease unemployment in the short-run. However, in the long-run, the economy will return to the natural rate of unemployment and output will remain unchanged."
   }
-  ])
+  ].sort((a, b) => a.id - b.id) // Sort by ID to ensure consistent order
 };

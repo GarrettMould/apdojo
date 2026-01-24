@@ -4,19 +4,11 @@ import { QuestionBank } from '../../types';
 
 
 
-// Fisher-Yates shuffle function
-function shuffleArray<T>(array: T[]): T[] {
-  const shuffled = [...array];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled;
-}
-
+// Sort questions by ID to ensure consistent order (no shuffling)
+// This ensures that when users return to the exam, questions are in the same order
 export const macroSetThreeQuestions: QuestionBank = {
   name: "AP Macroeconomics",
-  questions: shuffleArray([
+  questions: [
     {
       "id": 1,
       "unit": 1,
@@ -656,6 +648,6 @@ export const macroSetThreeQuestions: QuestionBank = {
       ],
       "correctAnswer": "A",
       "explanation": "If market forces are putting upward pressure on a country's currency in a fixed exchange rate system, the central bank must sell domestic currency and buy foreign currency to increase the supply of domestic currency and prevent it from appreciating beyond the fixed rate."
-    },
-  ])
+    }
+  ].sort((a, b) => a.id - b.id) // Sort by ID to ensure consistent order
 };
