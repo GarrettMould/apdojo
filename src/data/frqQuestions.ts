@@ -1069,7 +1069,6 @@ export const macroUnit2Set4: FRQExam = {
           answerType: "draw",
           answer: "The entire PPC shifts outward (to the right). Explanation: Improving the quality of labor (human capital) increases the productive capacity of the economy, allowing Meridia to produce more of both Capital and Consumer goods.",
           referenceImageUrl: "/images/frqPracticePage/macroUnit2Set4D.jpg",
-
         }
       ]
     }

@@ -28,8 +28,6 @@ import { dojoDrills, drillAppliesToSubject, getDrillUnitForSubject } from '@/dat
 import { saveQuizResult } from '@/lib/quizHistory';
 import { hasValidSeasonPass, getUnitMCQTestUrl } from '@/lib/utils';
 import { Footer } from '@/components/Footer';
-import { useCheatSheetTutorial } from '@/hooks/useCheatSheetTutorial';
-import { TutorialTooltip } from '@/components/ui/TutorialTooltip';
 
 // Helper to combine and structure whiteboard data for Macro
 const getUnitWhiteboards = (unitNumber: number): WhiteboardImage[] => {
@@ -552,7 +550,6 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
   const params = useParams();
   const router = useRouter(); // Initialize useRouter
   const { user, userData, selectedSubject: contextSubject, awardXp } = useAuthContext(); // Correctly destructure userData and selectedSubject
-  const { showTutorial, completeTutorial } = useCheatSheetTutorial();
   
   // Use props if provided, otherwise use params/context
   const selectedSubject = propSubject || contextSubject;
@@ -1646,15 +1643,6 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
               })
               .slice(0, 2); // Take first 2 available
 
-            // Find the first term ID across all lessons for tutorial
-            let firstTermId: string | null = null;
-            for (const lesson of sortedLessons) {
-              if (lesson.keyTerms.length > 0) {
-                firstTermId = lesson.keyTerms[0].id;
-                break;
-              }
-            }
-            
             return (
               <>
                 {sortedLessons.map(({ lessonId, whiteboards, keyTerms }, index) => {
@@ -1776,17 +1764,10 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                   <div className="space-y-4">
                     {keyTerms.map((term, termIndex) => {
                       const isSelected = selectedTerms.has(term.id);
-                      // Determine if this is the first term across all lessons
-                      const isFirstTerm = term.id === firstTermId;
                       // Create unique key combining lessonId and term.id to avoid duplicates when term appears in multiple lessons
                       const uniqueKey = `${lessonId}-${term.id}`;
                       
                       const handleTermClick = () => {
-                        // Complete tutorial if this is the first term and tutorial is showing
-                        if (isFirstTerm && showTutorial) {
-                          completeTutorial();
-                        }
-                        
                         // Toggle term selection
                         setSelectedTerms(prev => {
                           const newSet = new Set(prev);
@@ -1799,7 +1780,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                         });
                       };
                       
-                      const termContent = (
+                      return (
                         <div 
                           key={uniqueKey} 
                           id={`term-${term.id}`} 
@@ -1833,19 +1814,6 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                           </div>
                         )}
                         </div>
-                      );
-                      
-                      // Wrap the entire container with TutorialTooltip if it's the first term
-                      return isFirstTerm ? (
-                        <TutorialTooltip
-                          key={uniqueKey}
-                          show={showTutorial}
-                          onClick={handleTermClick}
-                        >
-                          {termContent}
-                        </TutorialTooltip>
-                      ) : (
-                        termContent
                       );
                     })}
                   </div>
