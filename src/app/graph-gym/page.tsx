@@ -10,7 +10,7 @@ export default function GraphGymPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Redirect to first scenario
+    // Redirect to first scenario with new URL format
     const firstScenario = graphGymScenarios[0];
     if (firstScenario) {
       const slug = getSlugForScenario(firstScenario);

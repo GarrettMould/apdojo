@@ -828,8 +828,8 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
             testTitle = `Unit ${examNumber} MCQ Test`;
           } else if (isFullExam) {
             testType = questionType === 'frq' ? 'full_frq' : 'full_exam';
-            testId = questionType === 'frq' ? 'full_frq_exam' : 'full_mcq_exam';
-            testTitle = questionType === 'frq' ? 'Full FRQ Exam' : 'Full MCQ Exam';
+            testId = questionType === 'frq' ? 'full_frq_exam' : `full_${examType}_mcq`;
+            testTitle = questionType === 'frq' ? 'Full FRQ Exam' : `Full MCQ Exam (${examType === 'macro' ? 'Macro' : 'Micro'})`;
           } else if (isPreviewExam && examNumber) {
             // Preview exams are treated as full exams
             testType = questionType === 'frq' ? 'full_frq' : 'full_exam';
@@ -925,8 +925,8 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
           testTitle = `Unit ${examNumber} MCQ Test`;
         } else if (isFullExam) {
           testType = questionType === 'frq' ? 'full_frq' : 'full_exam';
-          testId = questionType === 'frq' ? 'full_frq_exam' : 'full_mcq_exam';
-          testTitle = questionType === 'frq' ? 'Full FRQ Exam' : 'Full MCQ Exam';
+          testId = questionType === 'frq' ? 'full_frq_exam' : `full_${examType}_mcq`;
+          testTitle = questionType === 'frq' ? 'Full FRQ Exam' : `Full MCQ Exam (${examType === 'macro' ? 'Macro' : 'Micro'})`;
         } else if (isPreviewExam && examNumber) {
           // Preview exams are treated as full exams
           testType = questionType === 'frq' ? 'full_frq' : 'full_exam';
@@ -1574,9 +1574,6 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                             </span>
                             {timeRemaining <= 300 && timeRemaining > 0 && (
                               <span className="text-lg font-bold animate-pulse text-gray-900">⚠️ Less than 5 minutes remaining!</span>
-                            )}
-                            {timeRemaining === 0 && (
-                              <span className="text-lg font-bold text-gray-900">⏰ Time's Up!</span>
                             )}
                             {/* Hide Timer Button */}
                             <button

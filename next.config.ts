@@ -150,23 +150,21 @@ const nextConfig = {
     });
 
     // Redirect old /graph-gym to first scenario with new URL format
+    // First scenario is ID 1: "Long Run Equilibrium in a Pure Monopoly" (micro)
     redirects.push({
       source: '/graph-gym',
-      destination: '/monopoly-graphing-practice', // First scenario slug
+      destination: '/graph-gym/ap-micro-monopoly-graphing-practice', // First scenario in new format
       permanent: true, // 301 redirect for SEO
     });
-    
-    // Redirect old /graph-gym/[slug] format to new [slug] format
-    // This will catch any old URLs and redirect them (if they match a scenario)
-    // Note: We can't dynamically generate all redirects here, but the page will handle it
+
+    // Redirect old graph gym URLs (monopoly-graphing-practice) to new format
+    // This is handled dynamically in the [slug]/page.tsx for better flexibility
 
     // Redirect old unitMCQPracticePage URLs to new practice route structure
-    // Note: Query parameter-based redirects are complex in Next.js
-    // We'll handle single-unit redirects here, and custom/weakest/topic modes
-    // will continue to use the old route for now (or can be handled client-side)
-    // For single unit mode (when units param is a single number):
-    // This will be handled by a client-side redirect in the old page if needed
-    // For now, we'll add a general redirect that the old page can use
+    // Note: Next.js redirects don't support query parameters directly, so redirects
+    // for URLs with query params (like ?subject=macro&mode=singleUnit&unit=1) are handled
+    // client-side in the unitMCQPracticePage component itself.
+    // The component will automatically redirect single-unit mode to the new route structure.
 
     return redirects;
   },

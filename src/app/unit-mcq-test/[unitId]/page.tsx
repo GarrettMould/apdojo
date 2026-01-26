@@ -144,8 +144,8 @@ export default function UnitMCQTestPage() {
     );
   }
 
-  // For micro, units 2, 3, and 4 are available (unit 1, 5, 6 are coming soon)
-  const availableMicroUnits = [2, 3, 4];
+  // For micro, units 2, 3, 4, and 5 are available (unit 1, 6 are coming soon)
+  const availableMicroUnits = [2, 3, 4, 5];
   const isMicroUnitAvailable = effectiveSubject !== 'micro' || availableMicroUnits.includes(unitNumber);
   
   // Check if micro unit is not available (even for premium users)

@@ -2436,6 +2436,312 @@ options: [
     ],
     correctAnswer: "B",
     explanation: "While the cartel as a group maximizes profit by restricting output, an individual member can earn even more profit by secretly increasing their own production while the others hold back. If every member acts on this incentive to cheat, the cartel collapses.",
+  },
+
+  // Unit 5 Micro: Factor Markets
+  // Lesson 5.1: Introduction to Factor Markets
+  {
+    id: 5001,
+    unit: 5,
+    subject: "ap_microeconomics",
+    lessonIDS: ["5.1"],
+    unitName: "Factor Markets",
+    question: "Assume that advancements in fertilizer technology allow farm laborers to be more productive. Which of the following graphs illustrates the effect of this change on a single firm hiring farm labor in a perfectly competitive market?",
+    image: { src: "/images/unitTestImages/unit5/unit5_labor_shifts_stacked.png", alt: "Stacked graphs showing different labor market scenarios" },
+    options: [
+      "Graph 1 (Top)",
+      "Graph 2 (Second down)",
+      "Graph 3 (Third down)",
+      "Graph 4 (Fourth down)",
+      "Graph 5 (Bottom)"
+    ],
+    optionImages: [
+      { src: "/images/unitTestImages/unit5/labor_graph_1.png", alt: "Graph 1 option" },
+      { src: "/images/unitTestImages/unit5/labor_graph_2.png", alt: "Graph 2 option" },
+      { src: "/images/unitTestImages/unit5/labor_graph_3.png", alt: "Graph 3 option" },
+      { src: "/images/unitTestImages/unit5/labor_graph_4.png", alt: "Graph 4 option" },
+      { src: "/images/unitTestImages/unit5/labor_graph_5.png", alt: "Graph 5 option" }
+    ],
+    correctAnswer: "B",
+    explanation: "Technological advancements increase the productivity of workers (Marginal Product). The demand for labor is derived from the Marginal Revenue Product (MRP), which is calculated as Marginal Product (MP) × Product Price (P). An increase in productivity shifts the MRP curve to the right (as shown in the second graph), leading the firm to hire more workers at the current wage rate.",
+    videoExplanation: null
+  },
+  {
+    id: 5002,
+    unit: 5,
+    subject: "ap_microeconomics",
+    lessonIDS: ["5.1"],
+    unitName: "Factor Markets",
+    question: "A firm sells its product in a perfectly competitive market for a price of $10 per unit and hires labor in a perfectly competitive labor market. The daily wage rate for a worker is $50. Based on the production data in the table below, how many workers should the firm hire to maximize its profit?",
+    image: null,
+    tableData: {
+      headers: ["Number of Workers", "Total Product"],
+      rows: [
+        ["0", "0"],
+        ["1", "10"],
+        ["2", "18"],
+        ["3", "24"],
+        ["4", "28"],
+        ["5", "30"]
+      ]
+    },
+    options: [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5"
+    ],
+    correctAnswer: "C",
+    explanation: "To maximize profit, a firm hires workers up to the point where the Marginal Revenue Product (MRP) equals the Marginal Resource Cost (MRC/Wage). \n1. Calculate Marginal Product (MP): \n   - Worker 1: 10 - 0 = 10\n   - Worker 2: 18 - 10 = 8\n   - Worker 3: 24 - 18 = 6\n   - Worker 4: 28 - 24 = 4\n2. Calculate MRP (MP × Price $10):\n   - Worker 1: 10 × $10 = $100\n   - Worker 2: 8 × $10 = $80\n   - Worker 3: 6 × $10 = $60\n   - Worker 4: 4 × $10 = $40\n3. Compare to Wage ($50):\n   - Worker 1: $100 > $50 (Hire)\n   - Worker 2: $80 > $50 (Hire)\n   - Worker 3: $60 > $50 (Hire)\n   - Worker 4: $40 < $50 (Do not hire)\nThe firm stops hiring at the 3rd worker.",
+    videoExplanation: null
+  },
+  {
+    id: 5003,
+    unit: 5,
+    subject: "ap_microeconomics",
+    lessonIDS: ["5.1"],
+    unitName: "Factor Markets",
+    question: "Refer to the table in the previous question. Assume an increase in consumer demand for the product raises the market price to $15 per unit. If the market wage rate remains constant at $50, what is the new profit-maximizing number of workers?",
+    image: null,
+    tableData: {
+      headers: ["Number of Workers", "Total Product"],
+      rows: [
+        ["0", "0"],
+        ["1", "10"],
+        ["2", "18"],
+        ["3", "24"],
+        ["4", "28"],
+        ["5", "30"]
+      ]
+    },
+    options: [
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    correctAnswer: "C",
+    explanation: "With the price increase to $15, the Marginal Revenue Product (MRP) for each worker increases. \n- 3rd Worker: MP is 6. New MRP = 6 × $15 = $90. ($90 > $50 Wage -> Hire).\n- 4th Worker: MP is 4. New MRP = 4 × $15 = $60. ($60 > $50 Wage -> Hire).\n- 5th Worker: MP is 2. New MRP = 2 × $15 = $30. ($30 < $50 Wage -> Do Not Hire).\nThe firm should now hire 4 workers.",
+    videoExplanation: null
+  },
+  {
+    id: 5004,
+    unit: 5,
+    subject: "ap_microeconomics",
+    lessonIDS: ["5.1"],
+    unitName: "Factor Markets",
+    question: "Which of the following scenarios best illustrates the concept of 'derived demand'?",
+    image: null,
+    options: [
+      "Consumers buy more smartphones because the price has decreased.",
+      "An automobile manufacturer hires more assembly line workers because the demand for its cars has increased.",
+      "A worker chooses to work more hours because the wage rate has risen.",
+      "A software company buys faster computers to increase the productivity of its programmers.",
+      "The government increases the minimum wage to help low-income families."
+    ],
+    correctAnswer: "B",
+    explanation: "Derived demand means that the demand for a resource (labor, capital, land) depends entirely on the demand for the good or service that resource helps produce. Firms do not want workers for the sake of having workers; they want them because they produce the cars that customers are buying.",
+    videoExplanation: null
+  },
+  {
+    id: 5005,
+    unit: 5,
+    subject: "ap_microeconomics",
+    lessonIDS: ["5.1"],
+    unitName: "Factor Markets",
+    question: "Which of the following events would cause the Marginal Revenue Product (MRP) curve for labor to shift to the right?",
+    image: null,
+    options: [
+      "A decrease in the price of the final good produced by the labor.",
+      "A decrease in the wage rate.",
+      "An increase in the productivity of labor due to better training.",
+      "An increase in the cost of raw materials.",
+      "A decrease in the demand for the final product."
+    ],
+    correctAnswer: "C",
+    explanation: "MRP is calculated as Marginal Product (MP) × Product Price (P). Therefore, an increase in either the productivity of the worker (MP) or the price of the good (P) will increase the MRP, shifting the curve to the right.",
+    videoExplanation: null
+  },
+  // Lesson 5.2: Changes in Factor Demand and Factor Supply
+  {
+    id: 5006,
+    unit: 5,
+    subject: "ap_microeconomics",
+    lessonIDS: ["5.2"],
+    unitName: "Factor Markets",
+    question: "Assume the supply of available certified welders decreases due to stricter licensing requirements. How will this change affect the number of welders hired and the Marginal Revenue Product (MRP) of the last welder hired in the new equilibrium?",
+    image: null,
+    optionTableHeaders: ["Number of Welders Hired", "MRP of Last Welder"],
+    options: [
+      "Increase | Decrease",
+      "Decrease | Increase",
+      "Decrease | Decrease",
+      "Increase | Increase",
+      "No Change | Increase"
+    ],
+    correctAnswer: "B",
+    explanation: "A decrease in the supply of labor shifts the supply curve left, driving the equilibrium wage up and the quantity of workers hired down. As the firm moves up the labor demand curve (which is the MRP curve) to a lower quantity, the marginal revenue product of the last worker hired is higher (due to the law of diminishing marginal returns—fewer workers means higher marginal product).",
+    videoExplanation: null
+  },
+  {
+    id: 5007,
+    unit: 5,
+    subject: "ap_microeconomics",
+    lessonIDS: ["5.2"],
+    unitName: "Factor Markets",
+    question: "Which of the following would cause the market supply curve for accountants to shift to the left?",
+    image: null,
+    options: [
+      "An increase in the salaries paid to accountants.",
+      "An increase in the salaries paid to financial analysts (a substitute job).",
+      "A decrease in the cost of obtaining an accounting degree.",
+      "An increase in the demand for accounting services.",
+      "An increase in the number of students graduating with accounting degrees."
+    ],
+    correctAnswer: "B",
+    explanation: "Labor supply shifts when the willingness or ability of workers to enter the profession changes. If a substitute profession (financial analyst) offers higher wages, potential accountants will switch careers to become analysts. This decreases the supply of accountants, shifting the curve to the left.",
+    videoExplanation: null
+  },
+  // Lesson 5.3: Profit-Maximizing Amount of Labor
+  {
+    id: 5008,
+    unit: 5,
+    subject: "ap_microeconomics",
+    lessonIDS: ["5.3"],
+    unitName: "Factor Markets",
+    question: "In a competitive labor market, if the government imposes a binding minimum wage, what is the expected impact on the quantity of labor demanded and supplied?",
+    image: null,
+    options: [
+      "A shortage of labor will occur.",
+      "The market will reach a new equilibrium with higher employment.",
+      "The quantity of labor demanded will increase.",
+      "The supply of labor will decrease.",
+      "A surplus of labor will result."
+    ],
+    correctAnswer: "E",
+    explanation: "A binding price floor is set above the equilibrium wage. At this higher wage, more workers are willing to work (quantity supplied increases), but firms are willing to hire fewer workers (quantity demanded decreases). The result is that Quantity Supplied > Quantity Demanded, creating a surplus of labor, also known as unemployment.",
+    videoExplanation: null
+  },
+  {
+    id: 5009,
+    unit: 5,
+    subject: "ap_microeconomics",
+    lessonIDS: ["5.3"],
+    unitName: "Factor Markets",
+    question: "Which of the following correctly describes the labor supply curve faced by an individual firm in a perfectly competitive labor market versus the labor supply curve for the market as a whole?",
+    image: null,
+    optionTableHeaders: ["Individual Firm's Labor Supply", "Market Labor Supply"],
+    options: [
+      "Perfectly Elastic | Upward Sloping",
+      "Upward Sloping | Perfectly Elastic",
+      "Perfectly Inelastic | Downward Sloping",
+      "Downward Sloping | Upward Sloping",
+      "Upward Sloping | Upward Sloping"
+    ],
+    correctAnswer: "A",
+    explanation: "In a perfectly competitive labor market, the market supply curve is upward sloping (higher wages attract more workers). However, the individual firm is a 'wage taker.' It can hire as many workers as it wants at the market equilibrium wage, but none at a lower wage. Therefore, the supply curve faced by the individual firm is perfectly elastic (horizontal) at the market wage.",
+    videoExplanation: null
+  },
+  {
+    id: 5010,
+    unit: 5,
+    subject: "ap_microeconomics",
+    lessonIDS: ["5.3"],
+    unitName: "Factor Markets",
+    question: "Why is the firm's demand curve for labor downward sloping?",
+    image: null,
+    options: [
+      "Because the wage rate decreases as the firm hires more workers.",
+      "Because the price of the product must be lowered to sell more output.",
+      "Because of the Law of Diminishing Marginal Returns.",
+      "Because the firm is a monopsony.",
+      "Because capital is a perfect substitute for labor."
+    ],
+    correctAnswer: "C",
+    explanation: "The labor demand curve is the Marginal Revenue Product (MRP) curve. MRP = Marginal Product (MP) × Price. As a firm hires more workers in the short run, the Marginal Product of each additional worker eventually decreases (Law of Diminishing Marginal Returns). This causes the MRP to fall, resulting in a downward-sloping demand curve.",
+    videoExplanation: null
+  },
+  // Lesson 5.4: Monopsonistic Markets
+  {
+    id: 5011,
+    unit: 5,
+    subject: "ap_microeconomics",
+    lessonIDS: ["5.4"],
+    unitName: "Factor Markets",
+    question: "The graph above shows the cost and revenue curves for a firm in a labor market. Which of the following correctly identifies the profit-maximizing wage rate and quantity of labor if the firm acts as a monopsony, compared to the wage and quantity if the market were perfectly competitive?",
+    image: { src: "/images/unitTestImages/unit5/unit5_monopsony_graph.png", alt: "Monopsony labor market graph" },
+    optionTableHeaders: ["Monopsony Outcome", "Competitive Outcome"],
+    options: [
+      "Wage P2, Quantity Q2 | Wage P3, Quantity Q3",
+      "Wage P4, Quantity Q2 | Wage P3, Quantity Q3",
+      "Wage P1, Quantity Q1 | Wage P2, Quantity Q2",
+      "Wage P5, Quantity Q2 | Wage P4, Quantity Q4",
+      "Wage P3, Quantity Q3 | Wage P2, Quantity Q2"
+    ],
+    correctAnswer: "A",
+    explanation: "A profit-maximizing monopsony hires labor where the Marginal Resource Cost (MRC) equals the Marginal Revenue Product (Demand). On the graph, MRC intersects Demand at quantity **Q2**. The firm then pays the wage indicated by the Supply curve at that quantity, which is **P2**. In a perfectly competitive labor market, equilibrium is determined where Market Supply intersects Market Demand, resulting in quantity **Q3** and wage **P3**.",
+    videoExplanation: null
+  },
+  {
+    id: 5012,
+    unit: 5,
+    subject: "ap_microeconomics",
+    lessonIDS: ["5.4"],
+    unitName: "Factor Markets",
+    question: "Refer to the graph above. Suppose the government imposes a price floor at P2. Compared to the unregulated monopsony outcome, how will the wage rate and the number of workers hired change?",
+    image: { src: "/images/unitTestImages/unit5/unit5_monopsony_graph.png", alt: "Monopsony labor market graph" },
+    options: [
+      "Wage Rate: Increases | Quantity Hired: Increases",
+      "Wage Rate: Increases | Quantity Hired: Decreases",
+      "Wage Rate: Decreases | Quantity Hired: Increases",
+      "Wage Rate: Unchanged | Quantity Hired: Unchanged",
+      "Wage Rate: Increases | Quantity Hired: Unchanged"
+    ],
+    correctAnswer: "A",
+    explanation: "The unregulated monopsony pays wage P2 and hires Q2 workers. If a price floor is set at P3 (the competitive equilibrium price), the firm becomes a price taker at that wage rate. The firm's new Marginal Resource Cost (MRC) is equal to the minimum wage (P3) up to the supply limit. The firm will hire workers until the new MRC (P3) equals the Marginal Revenue Product (Demand). This intersection occurs at Q3. Therefore, both the wage rate (P2 to P3) and the quantity of workers hired (Q2 to Q3) will increase.",
+    videoExplanation: null
+  },
+  {
+    id: 5013,
+    unit: 5,
+    subject: "ap_microeconomics",
+    lessonIDS: ["5.4"],
+    unitName: "Factor Markets",
+    question: "Why does the Marginal Resource Cost (MRC) curve lie above the labor supply curve for a monopsonist?",
+    image: null,
+    options: [
+      "Because the firm can price discriminate and pay different wages to different workers.",
+      "Because the supply of labor is perfectly elastic.",
+      "Because the firm hires labor in a perfectly competitive market.",
+      "Because to hire an additional worker, the firm must raise the wage for that worker and all currently employed workers.",
+      "Because the marginal product of labor is diminishing."
+    ],
+    correctAnswer: "D",
+    explanation: "A monopsony is the sole buyer of labor and faces the upward-sloping market supply curve. To attract one more worker, it must offer a higher wage. However, it cannot pay the new worker more than the existing workers (assuming no discrimination), so it must raise the wage for *everyone*. This extra cost makes the marginal cost of hiring the next worker higher than the wage paid to that worker.",
+    videoExplanation: null
+  },
+  // Lesson 5.5: Least-Cost Rule
+  {
+    id: 5014,
+    unit: 5,
+    subject: "ap_microeconomics",
+    lessonIDS: ["5.5"],
+    unitName: "Factor Markets",
+    question: "A firm sells its output in a perfectly competitive market and hires two inputs, capital and labor, in perfectly competitive factor markets. The product price is $10 per unit, the wage is $200 per day, and the marginal product of capital is 8 units per day. If the firm is choosing the least-cost combination of labor and capital, the firm's marginal product of labor and the price of capital must be equal to which of the following?",
+    image: null,
+    optionTableHeaders: ["Marginal Product of Labor", "Price of Capital"],
+    options: [
+      "20 | $80",
+      "20 | $8",
+      "5 | $80",
+      "5 | $40",
+      "25 | $100"
+    ],
+    correctAnswer: "A",
+    explanation: "To minimize costs (and maximize profit in a perfectly competitive market), the firm employs inputs where the Marginal Revenue Product (MRP) equals the factor price. \n1. Find Marginal Product of Labor ($MP_L$): We know Wage ($P_L$) = $MRP_L = P_{product} \times MP_L$. \n   $200 = $10 \times MP_L \rightarrow MP_L = 20$.\n2. Find Price of Capital ($P_K$): We know $P_K = MRP_K = P_{product} \times MP_K$.\n   $P_K = $10 \times 8 = $80.\nAlternatively, you can check the least-cost rule: $MP_L/P_L = MP_K/P_K \rightarrow 20/200 = 8/80 = 0.1$.",
+    videoExplanation: null
   }
 ];
 

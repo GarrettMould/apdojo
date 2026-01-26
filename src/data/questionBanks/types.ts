@@ -29,6 +29,7 @@ export interface Question {
   optionTableHeaders?: string[]; // Column headers for displaying options as a table
   questionGroup?: string | number; // Optional group identifier to keep questions together (e.g., questions sharing the same graph)
   sliderExplainer?: string; // URL to video explanation slider
+  optionImages?: Array<{ src: string; alt: string }>; // Array of images for answer options (one per option)
 }
 
 export interface QuestionBank {

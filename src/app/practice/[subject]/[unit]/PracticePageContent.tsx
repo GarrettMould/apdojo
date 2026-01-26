@@ -477,14 +477,30 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
     // Filter out correctly answered questions (unless showAllQuestions is true)
     if (!showAllQuestions && (!user || (user && mcqAnswersData && !loadingMcqData))) {
       if (user && mcqAnswersData) {
+        // Create a set of question IDs that have been answered correctly
+        // Handle both string and number questionIds (Firestore may store as string)
         const correctlyAnsweredQuestionIds = new Set<number>();
         mcqAnswersData.forEach((answer: McqAnswer) => {
-          if (answer.isCorrect && typeof answer.questionId === 'number') {
-            correctlyAnsweredQuestionIds.add(answer.questionId);
+          if (answer.isCorrect) {
+            // Convert questionId to number if it's a string, or use it directly if it's already a number
+            const questionIdNum = typeof answer.questionId === 'string' 
+              ? parseInt(answer.questionId, 10) 
+              : answer.questionId;
+            
+            // Only add if it's a valid number
+            if (!isNaN(questionIdNum) && typeof questionIdNum === 'number') {
+              correctlyAnsweredQuestionIds.add(questionIdNum);
+            }
           }
         });
 
+        // Filter out questions that have been answered correctly
         questions = questions.filter(q => !correctlyAnsweredQuestionIds.has(q.id));
+        
+        console.log('[PracticePageContent] Filtered out correctly answered questions', {
+          totalCorrectlyAnswered: correctlyAnsweredQuestionIds.size,
+          remainingQuestions: questions.length
+        });
       }
     }
 
