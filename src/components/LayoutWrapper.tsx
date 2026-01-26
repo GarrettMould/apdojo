@@ -15,7 +15,8 @@ function HeaderWithSuspense() {
 
 export function LayoutWrapper({ children }: LayoutWrapperProps) {
   const pathname = usePathname();
-  const isGraphGymPage = pathname === '/graph-gym';
+  // Check if it's a graphing practice page (new format) or old graph-gym format
+  const isGraphGymPage = pathname?.endsWith('-graphing-practice') || pathname?.startsWith('/graph-gym');
   const isUnitCheatSheetPage =
     pathname.startsWith('/unit/') ||
     pathname.includes('-cheat-sheet');

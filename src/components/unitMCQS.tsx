@@ -1130,6 +1130,56 @@ const QuestionArena = ({ question, onAnswerSelect, initialSelectedLetter, isAnsw
     }
   };
 
+  // Keyboard navigation: Up/Down arrows to cycle through answer options
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't handle if question is already submitted
+      if (isSubmitted) return;
+      
+      // Don't handle if answer selection is disabled
+      if (isAnswerDisabled) return;
+      
+      // Don't handle if user is typing in an input, textarea, or contenteditable
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable
+      ) {
+        return;
+      }
+
+      const numOptions = question.options.length;
+      
+      // Down arrow key - move to next option (or wrap to first)
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setSelectedAnswerIndex(prev => {
+          if (prev === null) return 0;
+          return (prev + 1) % numOptions;
+        });
+      }
+      // Up arrow key - move to previous option (or wrap to last)
+      else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setSelectedAnswerIndex(prev => {
+          if (prev === null) return numOptions - 1;
+          return (prev - 1 + numOptions) % numOptions;
+        });
+      }
+      // Enter or Space - submit the currently selected answer
+      else if ((e.key === 'Enter' || e.key === ' ') && selectedAnswerIndex !== null) {
+        e.preventDefault();
+        handleAnswerSelect(selectedAnswerIndex);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isSubmitted, isAnswerDisabled, question.options.length, selectedAnswerIndex, question.id, question.lessonIDS, handleAnswerSelect]);
+
   // Parse markdown table if present
   const { tableData: parsedTableData, textWithoutTable } = parseMarkdownTable(question.question);
   const displayTableData = question.tableData || parsedTableData;

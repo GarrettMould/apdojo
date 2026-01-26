@@ -201,10 +201,10 @@ export function Header() {
 
               {/* Graph Gym - Distinct styling */}
               <Link
-                href="/graph-gym"
+                href="/monopoly-graphing-practice"
                 className="text-lg text-gray-700 hover:text-blue-600 transition-colors font-bold"
               >
-                Graph Gym
+                Graphing Practice
               </Link>
 
               {/* Cheat Sheets */}
@@ -516,11 +516,11 @@ export function Header() {
               {/* Other Links */}
               <div className="border-t border-gray-200 mt-2 pt-2">
                 <Link
-                  href="/graph-gym"
+                  href="/monopoly-graphing-practice"
                   onClick={closeMobileMenu}
                   className="px-4 py-3 text-lg text-blue-500 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
                 >
-                  Graph Gym
+                  Graphing Practice
                 </Link>
                 <Link
                   href={displaySubject === 'macro' ? '/ap-macro-unit-1-cheat-sheet' : '/ap-micro-unit-1-cheat-sheet'}

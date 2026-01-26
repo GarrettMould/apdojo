@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
-import { ArrowRight, Lock, CheckCircle2, Circle, LockKeyhole, Shuffle, ChevronDown, Monitor, Smartphone, Play, X, FileText } from 'lucide-react';
+import { ArrowRight, Lock, CheckCircle2, Circle, LockKeyhole, Shuffle, ChevronDown, Monitor, Smartphone, Play, X, FileText, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCourseTheme, useCourseContext } from '@/contexts/CourseContext';
 import { useAuthContext } from '@/contexts/AuthContext';
@@ -10,9 +10,11 @@ import { graphGymScenarios, GraphGymScenario } from '@/data/graphGymScenarios';
 import { hasValidSeasonPass } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { useRouter, usePathname } from 'next/navigation';
 import { db, storage } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp, query, where, getDocs, doc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { getSlugForScenario, getScenarioBySlug } from '@/lib/graphGymSlugs';
 import '@excalidraw/excalidraw/index.css';
 
 const Excalidraw = dynamic(
@@ -96,12 +98,15 @@ interface GraphGymProps {
   assignmentScenarios?: GraphGymScenario[]; // Scenarios from assignment link
   isAssignment?: boolean; // Whether this is an assignment (no shuffle, show next)
   assignmentLinkId?: string; // The encoded param from the assignment link
+  initialScenarioSlug?: string; // Optional initial scenario slug from URL
 }
 
-export function GraphGym({ assignmentScenarios, isAssignment = false, assignmentLinkId }: GraphGymProps) {
+export function GraphGym({ assignmentScenarios, isAssignment = false, assignmentLinkId, initialScenarioSlug }: GraphGymProps) {
   const theme = useCourseTheme();
   const { currentCourse } = useCourseContext();
   const { user, userData } = useAuthContext();
+  const router = useRouter();
+  const pathname = usePathname();
   const [currentScenarioIndex, setCurrentScenarioIndex] = useState(0);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [checkedItems, setCheckedItems] = useState<Set<number>>(new Set());
@@ -118,6 +123,7 @@ export function GraphGym({ assignmentScenarios, isAssignment = false, assignment
   const [studentName, setStudentName] = useState('');
   const [currentElements, setCurrentElements] = useState<any[]>([]); // Track current Excalidraw elements
   const [currentAppState, setCurrentAppState] = useState<any>(null); // Track current Excalidraw app state
+  const [showTip, setShowTip] = useState(false); // Track whether tip is shown
 
   // Check if user has access (logged in + season pass)
   const hasAccess = useMemo(() => {
@@ -173,13 +179,81 @@ export function GraphGym({ assignmentScenarios, isAssignment = false, assignment
     return Array.from(units).sort((a, b) => a - b);
   }, [currentCourse]);
 
+  // Track if we've initialized from URL to prevent re-initialization after user actions
+  const hasInitializedFromUrl = useRef(false);
+  const lastCourseRef = useRef(currentCourse);
+  const initialSlugRef = useRef<string | undefined>(undefined);
+
+  // Initialize scenario from URL slug if provided (only once on mount or when course changes)
+  useEffect(() => {
+    // Check if course changed - if so, reset initialization flag
+    if (lastCourseRef.current !== currentCourse) {
+      hasInitializedFromUrl.current = false;
+      lastCourseRef.current = currentCourse;
+      initialSlugRef.current = undefined;
+    }
+
+    // Only initialize if:
+    // 1. We have a slug from the URL
+    // 2. We haven't already initialized for this slug
+    // 3. The slug is different from what we last initialized with
+    // 4. We have scenarios loaded
+    const slugChanged = initialScenarioSlug !== initialSlugRef.current;
+    const shouldInitialize = initialScenarioSlug && 
+                            !isAssignment && 
+                            filteredScenarios.length > 0 &&
+                            slugChanged &&
+                            (!hasInitializedFromUrl.current || initialSlugRef.current === undefined);
+    
+    if (shouldInitialize) {
+      const scenario = getScenarioBySlug(initialScenarioSlug, currentCourse);
+      if (scenario) {
+        const index = filteredScenarios.findIndex(s => s.id === scenario.id);
+        if (index !== -1 && index !== currentScenarioIndex) {
+          // Only set if it's different from current to avoid unnecessary updates
+          setCurrentScenarioIndex(index);
+          hasInitializedFromUrl.current = true;
+          initialSlugRef.current = initialScenarioSlug;
+        } else if (index === currentScenarioIndex) {
+          // Already on the correct scenario, just mark as initialized
+          hasInitializedFromUrl.current = true;
+          initialSlugRef.current = initialScenarioSlug;
+        }
+      }
+    }
+  }, [initialScenarioSlug, currentCourse, isAssignment, filteredScenarios, currentScenarioIndex]);
+
+  // Update URL when scenario changes (only for non-assignment mode)
+  useEffect(() => {
+    if (!isAssignment && 
+        filteredScenarios.length > 0 && 
+        pathname && 
+        !pathname.startsWith('/graph-gym/custom')) {
+      const currentScenario = filteredScenarios[currentScenarioIndex];
+      if (currentScenario) {
+        const slug = getSlugForScenario(currentScenario);
+        const newPath = `/${slug}`;
+        // Only update if the path is different to avoid infinite loops
+        const currentSlug = pathname.replace(/^\//, '');
+        if (currentSlug !== slug && !currentSlug.startsWith('graph-gym')) {
+          // Update the initial slug ref to match what we're navigating to
+          // This prevents re-initialization when the URL updates
+          initialSlugRef.current = slug;
+          router.replace(newPath, { scroll: false });
+        }
+      }
+    }
+  }, [currentScenarioIndex, filteredScenarios, isAssignment, pathname, router]);
+
   // Reset to first scenario when subject or unit changes
   useEffect(() => {
-    setCurrentScenarioIndex(0);
+    if (!initialScenarioSlug) {
+      setCurrentScenarioIndex(0);
+    }
     setIsSubmitted(false);
     setCheckedItems(new Set());
     setExcalidrawKey(prev => prev + 1); // Clear Excalidraw board when subject/unit changes
-  }, [currentCourse, selectedUnit]);
+  }, [currentCourse, selectedUnit, initialScenarioSlug]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -202,6 +276,8 @@ export function GraphGym({ assignmentScenarios, isAssignment = false, assignment
     appState: {
       theme: "light",
       currentItemStrokeWidth: 1,
+      gridSize: null, // Disable grid
+      showGrid: false, // Hide grid
     },
   }), []);
 
@@ -557,38 +633,73 @@ export function GraphGym({ assignmentScenarios, isAssignment = false, assignment
     setShowUnitDropdown(!showUnitDropdown);
   };
 
+  // Reset tip visibility when scenario changes
+  useEffect(() => {
+    setShowTip(false);
+  }, [currentScenarioIndex]);
+
   return (
     <div className="h-screen w-screen flex overflow-hidden bg-gray-50">
-      {/* View Toggle Button - Hidden for production */}
-      {/* <div className="fixed top-4 right-4 z-50 flex gap-2 bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-1">
-        <button
-          onClick={() => setViewMode('desktop')}
-          className={`p-2 rounded transition-colors ${
-            viewMode === 'desktop'
-              ? 'bg-black text-white'
-              : 'bg-white text-black hover:bg-gray-100'
-          }`}
-          aria-label="Desktop view"
-        >
-          <Monitor className="w-5 h-5" />
-        </button>
-        <button
-          onClick={() => setViewMode('mobile')}
-          className={`p-2 rounded transition-colors ${
-            viewMode === 'mobile'
-              ? 'bg-black text-white'
-              : 'bg-white text-black hover:bg-gray-100'
-          }`}
-          aria-label="Mobile view"
-        >
-          <Smartphone className="w-5 h-5" />
-        </button>
-      </div> */}
-
       {viewMode === 'desktop' ? (
         <>
-          {/* Main Drawing Area - Excalidraw Container */}
-          <div className="flex-1 relative" style={{ minWidth: 0 }}>
+          {/* Left Column - Title Section + Drawing Pad */}
+          <div className="flex-1 flex flex-col overflow-hidden" style={{ minWidth: 0 }}>
+            {/* Title Section */}
+            <div className="flex-shrink-0 bg-white px-6 py-4">
+              {/* Breadcrumb */}
+              <nav className="flex items-center gap-2 text-sm mb-4">
+                <span className="font-semibold text-gray-700 capitalize">
+                  {currentCourse === 'macro' ? 'Macroeconomics' : 'Microeconomics'}
+                </span>
+                <ChevronRight className="w-4 h-4 text-gray-400" />
+                <span className="font-semibold text-gray-700">
+                  Unit {parseInt(activeScenario.lessonId.split('.')[0])}
+                </span>
+              </nav>
+              
+              {/* Title */}
+              <h1 className="text-2xl font-black text-black mb-3">
+                {activeScenario.title} (H{activeScenario.id})
+              </h1>
+              
+              {/* Shuffle Button - Only show in scenario section (not in assignment mode) */}
+              {!isAssignment && (
+                <div className="mb-3">
+                  <button
+                    onClick={handleShuffleScenario}
+                    className="inline-flex items-center gap-2 bg-white rounded-lg border-2 border-black px-4 py-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-0.5 font-bold text-black text-sm"
+                  >
+                    <Shuffle className="w-4 h-4" />
+                    <span>Shuffle Scenario</span>
+                  </button>
+                </div>
+              )}
+              
+              {/* Graphing Tip */}
+              {(activeScenario as any).tip && (
+                <div className="mt-3">
+                  <button
+                    onClick={() => setShowTip(!showTip)}
+                    className="text-sm font-semibold text-blue-600 hover:text-blue-700 underline flex items-center gap-1"
+                  >
+                    Graphing Tip
+                    {showTip ? (
+                      <ChevronDown className="w-4 h-4 rotate-180 transition-transform" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4 transition-transform" />
+                    )}
+                  </button>
+                  {showTip && (
+                    <div className="mt-2 p-3 bg-blue-50 border-2 border-blue-200 rounded-lg">
+                      <p className="text-sm text-gray-700">{(activeScenario as any).tip}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Drawing Area - Excalidraw Container */}
+            <div className="flex-1 relative bg-gray-200" style={{ minWidth: 0 }}>
             <Excalidraw
               ref={excalidrawRef}
               key={excalidrawKey}
@@ -612,102 +723,17 @@ export function GraphGym({ assignmentScenarios, isAssignment = false, assignment
             />
             
             
-            {/* Lock Icon - Show when submitted */}
-            {isSubmitted && (
-              <div className="absolute top-6 left-6 z-50 bg-white rounded-full p-3 shadow-lg border-2 border-gray-300">
-                <Lock className="w-6 h-6 text-gray-600" />
-              </div>
-            )}
-          </div>
-
-          {/* Right Column - Redesigned Sidebar */}
-          <div className="w-[420px] flex-shrink-0 flex flex-col bg-white border-l-4 border-black h-screen overflow-hidden">
-            {/* Header Section - Always Visible */}
-            <div className="flex-shrink-0 border-b-4 border-black p-6 bg-white">
-              <div className="flex items-center justify-between gap-3 mb-4">
-                <h2 className="text-2xl font-black text-black">
-                  {activeScenario.title}
-                </h2>
-                
-                {/* Unit Dropdown - Hide in assignment mode */}
-                {!isAssignment && (
-                  <div className="relative unit-dropdown-container flex-shrink-0">
-                    <button
-                      onClick={handleUnitDropdownClick}
-                      className="bg-white rounded-lg border-2 border-black px-3 py-1.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all flex items-center justify-between gap-2 font-bold text-black text-xs"
-                    >
-                      <span>
-                        {selectedUnit !== null ? `Unit ${selectedUnit}` : 'All Units'}
-                      </span>
-                      <ChevronDown className={`w-4 h-4 transition-transform ${showUnitDropdown ? 'rotate-180' : ''}`} />
-                    </button>
-                  
-                  {/* Dropdown Menu */}
-                  {showUnitDropdown && hasAccess && (
-                    <div className="absolute top-full right-0 mt-2 bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-50 overflow-hidden min-w-[120px]">
-                      <button
-                        onClick={() => {
-                          setSelectedUnit(null);
-                          setShowUnitDropdown(false);
-                        }}
-                        className={`w-full text-left px-4 py-3 font-bold text-black hover:bg-gray-100 transition-colors text-xs ${
-                          selectedUnit === null ? 'bg-gray-100' : ''
-                        }`}
-                      >
-                        All Units
-                      </button>
-                      {availableUnits.map(unit => (
-                        <button
-                          key={unit}
-                          onClick={() => handleUnitSelect(unit)}
-                          className={`w-full text-left px-4 py-3 font-bold text-black hover:bg-gray-100 transition-colors border-t-2 border-black text-xs ${
-                            selectedUnit === unit ? 'bg-gray-100' : ''
-                          }`}
-                        >
-                          Unit {unit}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                  </div>
-                )}
-              </div>
-              
-              {/* Unit Tag and Difficulty */}
-              <div className="flex items-center gap-3 flex-wrap mb-4">
-                <span className="inline-flex items-center bg-white text-black px-3 py-1 rounded-lg font-bold text-xs border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] h-7">
-                  Unit {parseInt(activeScenario.lessonId.split('.')[0])}
-                </span>
-                
-                {/* Difficulty Belt Tag */}
-                <span className="inline-flex items-center bg-white text-black px-3 py-1 rounded-lg font-bold text-xs border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] gap-2 h-7">
-                  <img
-                    src={
-                      activeScenario.difficulty === 'easy'
-                        ? '/images/beltNewWhite.svg'
-                        : activeScenario.difficulty === 'medium'
-                        ? '/images/beltNewYellow.svg'
-                        : '/images/beltNewBlack.svg'
-                    }
-                    alt={`${activeScenario.difficulty} difficulty`}
-                    className="w-5 h-5"
-                  />
-                  <span className="uppercase">{activeScenario.difficulty}</span>
-                </span>
-              </div>
-
-              {/* Shuffle Button - Always show in scenario section (not in assignment mode) */}
-              {!isAssignment && (
-                <button
-                  onClick={handleShuffleScenario}
-                  className="w-full bg-white rounded-lg border-2 border-black p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-0.5 flex items-center justify-between font-bold text-black"
-                >
-                  <span>Shuffle Scenario</span>
-                  <Shuffle className="w-5 h-5" />
-                </button>
+              {/* Lock Icon - Show when submitted */}
+              {isSubmitted && (
+                <div className="absolute top-6 left-6 z-50 bg-white rounded-full p-3 shadow-lg border-2 border-gray-300">
+                  <Lock className="w-6 h-6 text-gray-600" />
+                </div>
               )}
             </div>
+          </div>
 
+          {/* Right Column - Instructions, Resources, Submit Button */}
+          <div className="w-[420px] flex-shrink-0 flex flex-col bg-white h-full overflow-hidden">
             {/* Scrollable Content Area */}
             <div className="flex-1 overflow-y-auto p-6">
               {!isSubmitted ? (
@@ -1192,6 +1218,54 @@ export function GraphGym({ assignmentScenarios, isAssignment = false, assignment
             )}
           </div>
         </>
+      )}
+
+      {/* Join Dojo Modal */}
+      <JoinDojoModal
+        isOpen={showJoinDojoModal}
+        onClose={() => setShowJoinDojoModal(false)}
+        selectedSubject={currentCourse}
+      />
+
+      {/* Name Input Modal for Assignments */}
+      {showNameInputModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4">
+          <div className="bg-white rounded-xl shadow-lg max-w-md w-full p-6 border-4 border-black">
+            <div className="flex items-center gap-3 mb-4">
+              <FileText className="w-6 h-6 text-blue-600" />
+              <h3 className="text-xl font-black text-gray-900">
+                Enter Your Name
+              </h3>
+            </div>
+            <p className="text-gray-700 mb-6 font-semibold">
+              Please enter your name so your teacher can identify your submission.
+            </p>
+            <div className="mb-6">
+              <input
+                type="text"
+                value={studentName}
+                onChange={(e) => setStudentName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && studentName.trim()) {
+                    handleNameSubmit();
+                  }
+                }}
+                placeholder="Your name"
+                className="w-full px-4 py-3 border-2 border-black rounded-lg font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                autoFocus
+              />
+            </div>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={handleNameSubmit}
+                disabled={!studentName.trim()}
+                className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold rounded-lg transition-colors duration-200 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Join Dojo Modal */}

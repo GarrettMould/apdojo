@@ -9,6 +9,7 @@ import { macroUnits as allMacroCheatSheets, microUnits as allMicroCheatSheets, U
 import { useAuthContext } from '@/contexts/AuthContext';
 import { getBeltProgress } from '@/lib/beltSystem';
 import { getSubjectXP } from '@/hooks/useUserProgress';
+import { getSubjectSlug, getUnitSlug } from '@/lib/practiceSlugs';
 import Image from 'next/image';
 
 function SelectPracticeUnitsContent() {
@@ -91,8 +92,16 @@ function SelectPracticeUnitsContent() {
         if (selectedUnits.length > 0 && subject) {
             setLastSelectedPracticeUnits(subject as 'macro' | 'micro', selectedUnits);
             
-            const unitsQueryParam = selectedUnits.join(',');
-            router.push(`/unitMCQPracticePage?subject=${subject}&mode=custom&units=${unitsQueryParam}`);
+            // If only one unit selected, use new route structure for better SEO
+            if (selectedUnits.length === 1) {
+                const subjectSlug = getSubjectSlug(subject as 'macro' | 'micro');
+                const unitSlug = getUnitSlug(selectedUnits[0], subject as 'macro' | 'micro');
+                router.push(`/mcq-practice/${subjectSlug}/${unitSlug}`);
+            } else {
+                // Multiple units - use old route with query params
+                const unitsQueryParam = selectedUnits.join(',');
+                router.push(`/unitMCQPracticePage?subject=${subject}&mode=custom&units=${unitsQueryParam}`);
+            }
         }
     };
 

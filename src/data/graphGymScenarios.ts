@@ -15,6 +15,8 @@ export interface GraphGymScenario {
   difficulty: 'easy' | 'medium' | 'hard'; // Difficulty level of the scenario
   title: string;
   description: string;
+  instruction?: string; // Optional instruction text displayed in the title section
+  tip?: string; // Optional tip text that can be revealed
   toDoList?: string[]; // Optional array of to-do items to display as bullet points
   correctImage: string;
   videoExplanation?: string; // Optional video explanation URL
@@ -30,6 +32,8 @@ export const graphGymScenarios: GraphGymScenario[] = [
     difficulty: 'medium',
     title: "Long Run Equilibrium in a Pure Monopoly",
     description: "Draw the Demand, MR, MC, and ATC curves for a pure monopoly in long-run equilibrium.",
+    instruction: "Use the graphing tool below to identify the profit-maximizing quantity.",
+    tip: "Remember: In a monopoly, the profit-maximizing quantity is where MR = MC, but the price is set on the demand curve above that quantity. The allocatively efficient quantity is where MC = Demand.",
     toDoList: [
       "Label the profit-maximizing price and quantity",
       "Show the allocatively efficient quantity",

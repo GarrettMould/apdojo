@@ -87,11 +87,22 @@ export default function SelfAssessmentPage() {
     setError('');
     setIsSubmitting(true);
 
-    const unitIdsString = Array.from(selectedUnits).join(',');
-    const practiceUrl = `/unitMCQPracticePage?subject=${subject}&mode=custom&units=${unitIdsString}`;
-
-    console.log(`Navigating to custom practice: ${practiceUrl}`);
-    router.push(practiceUrl);
+    const unitIds = Array.from(selectedUnits);
+    
+    // If only one unit selected, use new route structure for better SEO
+    if (unitIds.length === 1) {
+      const subjectSlug = getSubjectSlug(subject as 'macro' | 'micro');
+      const unitSlug = getUnitSlug(unitIds[0], subject as 'macro' | 'micro');
+      const practiceUrl = `/mcq-practice/${subjectSlug}/${unitSlug}`;
+      console.log(`Navigating to practice: ${practiceUrl}`);
+      router.push(practiceUrl);
+    } else {
+      // Multiple units - use old route with query params
+      const unitIdsString = unitIds.join(',');
+      const practiceUrl = `/unitMCQPracticePage?subject=${subject}&mode=custom&units=${unitIdsString}`;
+      console.log(`Navigating to custom practice: ${practiceUrl}`);
+      router.push(practiceUrl);
+    }
   };
 
   if (pageLoading || authLoading) {

@@ -11860,12 +11860,12 @@ export const allQuestions: QuestionType[] = [
                       "unit": 3,
                       "lessonIDS": ["3.9"],
                       "unitName": "National Income and Price Determination",
-                      "question": "During an economic expansion with rising incomes, a progressive income tax system acts as an automatic stabilizer by:",
+                      "question": "During an economic expansion with rising incomes, an increase in income taxes acts as an automatic stabilizer by:",
                       "image": null,
                       "options": [
                         "Automatically increasing government spending.",
                         "Automatically decreasing the national debt.",
-                        "Automatically increasing tax revenues and dampening aggregate demand.", // Correct
+                        "Automatically increasing tax revenues and reducing aggregate demand.", // Correct
                         "Automatically decreasing tax revenues and boosting aggregate demand.",
                         "Requiring legislative action to change tax rates." // Shorter distractor
                       ],

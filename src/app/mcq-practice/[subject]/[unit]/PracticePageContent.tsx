@@ -1,25 +1,22 @@
 'use client';
 
 import { useState, useEffect, useRef, Suspense } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { X, Loader2, Lock, ArrowRight, CheckCircle2, Star, ShieldCheck } from 'lucide-react';
+import { X, Loader2, Lock, ArrowRight, CheckCircle2, Star, ShieldCheck, ChevronRight, Home } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useCreditSystem } from '@/hooks/useCreditSystem';
 import { UnitMCQs } from '@/components/unitMCQS';
-import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems'; // Reverted import
+import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question as QuestionType } from '@/data/questionBanks/types';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp, doc, updateDoc, increment, getDoc } from 'firebase/firestore';
-import dojoIcon from "../../../public/images/dojoIcon.png"
 import { Button } from "@/components/ui/button";
-import { videos as allVideos, Video } from '@/data/videos';
 import { macroUnits as allMacroUnitsData, microUnits as allMicroUnitsData } from '@/data/cheatSheets';
-import { macroLessons, microLessons } from '@/data/lessons'; // Import lessons
 import { LoginModal, SignupModal } from '@/components/AuthModals';
 import { logger } from '@/utils/logger';
-import { getSubjectSlug, getUnitSlug } from '@/lib/practiceSlugs';
+import { getFullUnitName, getSubjectDisplayName, getSubjectSlug, getUnitSlug } from '@/lib/practiceSlugs';
 
 // Assuming this matches the structure in useAuth.ts and Firestore
 interface McqAnswer {
@@ -53,16 +50,13 @@ function calculateWeakestUnits(answers: McqAnswer[]): WeakUnitInfo[] {
   const unitStats: { [key: number]: UnitStats } = {};
   let processedCount = 0;
 
-  // 1. Aggregate stats per unit ID
   answers.forEach((answer, index) => {
-    // Debug log uses answer.unitId now
     if (index < 5) {
        logger.debug(`[Calc] Answer ${index} unitId value:`, answer.unitId, typeof answer.unitId);
     }
 
-    // Check answer.unitId instead of answer.unit
     if (typeof answer.unitId === 'number') {
-      const unitId = answer.unitId; // Use the correct field
+      const unitId = answer.unitId;
       if (!unitStats[unitId]) {
         unitStats[unitId] = { correct: 0, total: 0 };
       }
@@ -72,7 +66,6 @@ function calculateWeakestUnits(answers: McqAnswer[]): WeakUnitInfo[] {
       }
       processedCount++;
     } else {
-        // Debug log uses answer.unitId now
         if (index < 10) {
              logger.warn(`[Calc] Answer ${index} has invalid unitId:`, answer.unitId);
         }
@@ -82,7 +75,6 @@ function calculateWeakestUnits(answers: McqAnswer[]): WeakUnitInfo[] {
   logger.debug("[Calc] Aggregated unitStats:", unitStats);
   logger.debug(`[Calc] Processed ${processedCount} answers with valid numeric unit IDs.`);
 
-  // 2. Calculate percentage (no change needed here)
   const unitsWithStats = Object.entries(unitStats)
     .map(([unitIdStr, stats]): WeakUnitInfo => {
       const unitId = parseInt(unitIdStr, 10);
@@ -95,12 +87,10 @@ function calculateWeakestUnits(answers: McqAnswer[]): WeakUnitInfo[] {
       };
     });
 
-  // 3. Sort by Unit ID instead of performance
   unitsWithStats.sort((a, b) => a.unitId - b.unitId);
 
   logger.debug("[Calc] Final unitsWithStats (sorted by Unit ID):", unitsWithStats);
 
-  // 4. Return
   return unitsWithStats;
 }
 
@@ -117,10 +107,9 @@ function shuffleArray<T>(array: T[]): T[] {
   return shuffled;
 }
 
-// Season Pass Modal Component - Shows purchase page info
+// Season Pass Modal Component
 function SeasonPassModal({ subject, onClose }: { subject: 'macro' | 'micro'; onClose: () => void }) {
   useEffect(() => {
-    // Allow Escape key to close the modal
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         onClose();
@@ -153,7 +142,6 @@ function SeasonPassModal({ subject, onClose }: { subject: 'macro' | 'micro'; onC
         exit={{ opacity: 0 }}
         className="fixed inset-0 bg-black bg-opacity-75 z-[100] flex items-center justify-center p-4 overflow-y-auto"
         onClick={(e) => {
-          // Close when clicking outside the modal content
           if (e.target === e.currentTarget) {
             onClose();
           }
@@ -164,10 +152,9 @@ function SeasonPassModal({ subject, onClose }: { subject: 'macro' | 'micro'; onC
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.8, opacity: 0 }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          className="bg-white border-4 border-black rounded-3xl shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] p-8 max-w-xl w-full relative my-8"
+          className="bg-white border-4 border-black rounded-3xl shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] p-8 max-w-xl w-full text-center relative"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Close Button */}
           <button
             onClick={onClose}
             className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -177,15 +164,13 @@ function SeasonPassModal({ subject, onClose }: { subject: 'macro' | 'micro'; onC
           </button>
 
           <div className="space-y-4">
-            {/* Badge */}
             <div>
-              <h3 className="text-3xl font-black text-black uppercase tracking-wide">
+              <h3 className="text-3xl font-black text-gray-900 uppercase tracking-wide">
                 {subject === 'macro' ? 'AP MACRO ' : 'AP MICRO '}
                 <span className={isGreen ? 'text-green-600' : 'text-blue-600'}>SEASON PASS</span>
               </h3>
             </div>
 
-            {/* Price Section */}
             <div className="space-y-1">
               <p className="text-base font-semibold text-gray-700">
                 One-time payment of
@@ -203,7 +188,6 @@ function SeasonPassModal({ subject, onClose }: { subject: 'macro' | 'micro'; onC
               </p>
             </div>
 
-            {/* Star Rating */}
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-0.5">
                 {[...Array(5)].map((_, i) => (
@@ -215,9 +199,8 @@ function SeasonPassModal({ subject, onClose }: { subject: 'macro' | 'micro'; onC
               </span>
             </div>
 
-            {/* What's Included */}
             <div className="space-y-3">
-              <h2 className="text-xl font-bold text-black">
+              <h2 className="text-xl font-bold text-gray-900">
                 What's Included:
               </h2>
               <ul className="space-y-2">
@@ -243,7 +226,6 @@ function SeasonPassModal({ subject, onClose }: { subject: 'macro' | 'micro'; onC
               </ul>
             </div>
 
-            {/* CTA Button */}
             <div className="pt-2">
               <Link
                 href={`/purchase/season-pass?courseType=${subject}`}
@@ -257,7 +239,6 @@ function SeasonPassModal({ subject, onClose }: { subject: 'macro' | 'micro'; onC
                 UNLOCK INSTANT ACCESS
               </Link>
 
-              {/* Trust Elements */}
               <p className="text-xs text-gray-500 text-center mt-3 flex items-center justify-center gap-1.5">
                 <ShieldCheck className="w-3 h-3 text-gray-400" />
                 100% Money-Back Guarantee
@@ -311,10 +292,48 @@ function AccessDenied({ unitId, subject, isCreditLimit = false }: { unitId: stri
   );
 }
 
+// Breadcrumb Component
+function Breadcrumb({ subject, unitNumber }: { subject: 'macro' | 'micro'; unitNumber: number }) {
+  const subjectName = getSubjectDisplayName(subject);
+  const unitName = getFullUnitName(subject, unitNumber);
+  const subjectSlug = getSubjectSlug(subject);
+  
+  return (
+    <nav className="flex items-center gap-2 text-sm mb-6" aria-label="Breadcrumb">
+      <Link 
+        href="/" 
+        className="text-gray-600 hover:text-gray-900 transition-colors flex items-center gap-1"
+      >
+        <Home className="w-4 h-4" />
+        <span>Home</span>
+      </Link>
+      <ChevronRight className="w-4 h-4 text-gray-400" />
+      <Link 
+        href="/select-practice-units" 
+        className="text-gray-600 hover:text-gray-900 transition-colors"
+      >
+        Practice
+      </Link>
+      <ChevronRight className="w-4 h-4 text-gray-400" />
+      <Link 
+        href={`/mcq-practice/${subjectSlug}/${getUnitSlug(unitNumber, subject)}`}
+        className="text-gray-600 hover:text-gray-900 transition-colors"
+      >
+        {subjectName}
+      </Link>
+      <ChevronRight className="w-4 h-4 text-gray-400" />
+      <span className="text-gray-900 font-semibold">Unit {unitNumber}</span>
+    </nav>
+  );
+}
 
-function UnitMCQPracticeContent() {
+interface PracticePageContentProps {
+  subject: 'macro' | 'micro';
+  unitNumber: number;
+}
+
+export function PracticePageContent({ subject, unitNumber }: PracticePageContentProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { 
     user, 
     userData,
@@ -328,7 +347,7 @@ function UnitMCQPracticeContent() {
   } = useAuthContext();
   const { isPremium } = useCreditSystem();
   
-  // --- Access Control State ---
+  // Access Control State
   const [hasAccess, setHasAccess] = useState(false);
   const [isVerifying, setIsVerifying] = useState(true);
   const DAILY_FREE_ANSWERS = 3;
@@ -371,7 +390,7 @@ function UnitMCQPracticeContent() {
     localStorage.setItem(key, JSON.stringify({ date: today, count }));
   };
 
-  // Load daily answered count from localStorage (per-user or guest), reset daily
+  // Load daily answered count from localStorage
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -409,202 +428,55 @@ function UnitMCQPracticeContent() {
     }
   }, [user, isPremiumEffective, hasDismissedSeasonPassModal]);
 
-  // Determine Subject and Mode from params
-  const subjectParam = searchParams.get('subject');
-  const subject = (subjectParam === 'macro' || subjectParam === 'micro') ? subjectParam : 'macro';
-  const unitsParam = searchParams.get('units');
-  const currentUnitForAccessCheck = unitsParam ? unitsParam.split(',')[0] : '1';
-  const lessonIdParam = searchParams.get('lessonId');
-  const modeParam = searchParams.get('mode');
-  const testMode = searchParams.get('test') === 'true'; // Enable test questions when ?test=true
   const unitsData = subject === 'micro' ? allMicroUnitsData : allMacroUnitsData;
-
-  const initialCustomUnitIds = unitsParam 
-      ? unitsParam.split(',').map(id => parseInt(id.trim(), 10)).filter(id => !isNaN(id))
-      : [];
-
-  // Set practice mode based on params
-  type PracticeMode = 'singleUnit' | 'weakest' | 'custom' | 'topic';
-  const initialPracticeMode: PracticeMode = 
-      modeParam === 'weakest' ? 'weakest' :
-      modeParam === 'custom' ? 'custom' :
-      modeParam === 'topic' ? 'topic' :
-      'singleUnit';
-
-  // Redirect single unit mode to new route structure for better SEO
-  useEffect(() => {
-    // Only redirect if:
-    // 1. Single unit (units param contains only one unit number)
-    // 2. Not in test mode
-    // 3. Not topic mode (lessonIdParam)
-    // 4. Not weakest mode (weakest mode needs special handling)
-    if (
-      !testMode && 
-      !lessonIdParam &&
-      initialPracticeMode !== 'weakest' &&
-      initialCustomUnitIds.length === 1 &&
-      initialCustomUnitIds[0] >= 1 &&
-      initialCustomUnitIds[0] <= 6
-    ) {
-      const unitNumber = initialCustomUnitIds[0];
-      const subjectSlug = getSubjectSlug(subject);
-      const unitSlug = getUnitSlug(unitNumber, subject);
-      const newUrl = `/mcq-practice/${subjectSlug}/${unitSlug}`;
-      
-      // Only redirect if we're not already on the new URL
-      if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/mcq-practice/')) {
-        router.replace(newUrl);
-        return; // Exit early to prevent rendering old page
-      }
-    }
-  }, [initialPracticeMode, testMode, lessonIdParam, initialCustomUnitIds, subject, router]);
-
-  const [practiceMode, setPracticeMode] = useState<PracticeMode>(initialPracticeMode);
-  const [currentUnit, setCurrentUnit] = useState<number>(initialCustomUnitIds[0] || 1);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answeredQuestions, setAnsweredQuestions] = useState<Record<number, any>>({});
   const [questionsForPractice, setQuestionsForPractice] = useState<QuestionType[]>([]);
-  
-  // Log currentQuestionIndex changes
-  useEffect(() => {
-    console.log('[Parent] currentQuestionIndex changed to:', currentQuestionIndex, {
-      questionId: questionsForPractice[currentQuestionIndex]?.id,
-      totalQuestions: questionsForPractice.length
-    });
-  }, [currentQuestionIndex, questionsForPractice]);
   const [isLoadingQuestionSet, setIsLoadingQuestionSet] = useState(true);
-  const [customUnitIds, setCustomUnitIds] = useState<number[]>(initialCustomUnitIds);
-  const [weakestUnitIds, setWeakestUnitIds] = useState<number[]>([]);
   const [dojoProgress, setDojoProgress] = useState(0);
   const [hasConsumedDailyCredit, setHasConsumedDailyCredit] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
   const [totalQuestionsInSet, setTotalQuestionsInSet] = useState(0);
   const [currentUnitName, setCurrentUnitName] = useState('');
-  const [showAllQuestions, setShowAllQuestions] = useState(false); // Bypass filter to show all questions
+  const [showAllQuestions, setShowAllQuestions] = useState(false);
   const purchasedTests = (userData?.purchasedTests || []) as string[];
 
-  // Developer tool: Test specific question by ID
-  const [testQuestionId, setTestQuestionId] = useState<string>("");
-  const isDeveloper = user?.email === 'garrett@apdojo.com' || user?.email === 'garrettmould@gmail.com' || (typeof window !== 'undefined' && window.location.hostname === 'localhost');
-  
   // Track previous filter criteria to prevent unnecessary reloads
   const prevFilterCriteriaRef = useRef<string>('');
 
-  const hasTestModeAccess =
-    !!user &&
-    practiceMode === 'singleUnit' &&
-    currentUnit > 0 &&
-    purchasedTests.includes(String(currentUnit));
-
-  // Calculate weakest units from MCQ answers
+  // Load questions for single unit mode
   useEffect(() => {
-    if (practiceMode === 'weakest' && mcqAnswersData && !loadingMcqData) {
-      const weakest = calculateWeakestUnits(mcqAnswersData);
-      const sortedByWeakest = [...weakest].sort((a, b) => a.percentage - b.percentage);
-      const weakestIds = sortedByWeakest.slice(0, 3).map(u => u.unitId);
-      setWeakestUnitIds(weakestIds);
-      logger.debug('[UnitMCQPractice] Weakest units calculated:', weakestIds);
-    }
-  }, [mcqAnswersData, loadingMcqData, practiceMode]);
-
-  // Load questions based on practice mode
-  useEffect(() => {
-    // Create a unique key for the current filter criteria
     const filterKey = JSON.stringify({
-      practiceMode,
-      currentUnit,
-      customUnitIds: customUnitIds.sort().join(','),
-      weakestUnitIds: weakestUnitIds.sort().join(','),
-      lessonIdParam,
       subject,
-      testQuestionId,
+      unitNumber,
       showAllQuestions,
       loadingMcqData: loadingMcqData ? 'loading' : 'loaded'
     });
     
-    // Only reload if filter criteria actually changed
     if (filterKey === prevFilterCriteriaRef.current) {
-      console.log('[Parent] Filter criteria unchanged, skipping reload', {
-        currentIndex: currentQuestionIndex
-      });
       return;
     }
     
-    console.log('[Parent] useEffect (load questions) triggered', {
-      practiceMode,
-      currentUnit,
-      customUnitIds,
-      weakestUnitIds,
-      lessonIdParam,
-      subject,
-      testQuestionId,
-      isDeveloper,
-      user: !!user,
-      loadingMcqData,
-      showAllQuestions,
-      currentQuestionIndex,
-      filterKeyChanged: filterKey !== prevFilterCriteriaRef.current
-    });
-    
-    // Update the ref with the new filter criteria
     prevFilterCriteriaRef.current = filterKey;
     
-    // Skip normal loading if we're in test mode (testQuestionId is set)
-    if (isDeveloper && testQuestionId) {
-      console.log('[Parent] Skipping question load - test mode');
-      return;
-    }
-
-    // Wait for MCQ data to load if user is logged in (to avoid filtering issues)
     if (user && loadingMcqData) {
-      console.log('[Parent] Waiting for MCQ data to load');
       setIsLoadingQuestionSet(true);
       return;
     }
 
-    // Normal question loading
-    console.log('[Parent] Starting question loading...');
     setIsLoadingQuestionSet(true);
-    let questions: QuestionType[] = [];
     const subjectFilter = subject === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics';
-
-    if (practiceMode === 'topic' && lessonIdParam) {
-      // Topic mode: filter by lessonId
-      questions = allQuestions.filter(q => 
-        q.subject === subjectFilter && 
-        q.lessonIDS && 
-        q.lessonIDS.includes(lessonIdParam) &&
-        (testMode || !q.isTest) // Exclude test questions unless test mode is enabled
-      );
-    } else if (practiceMode === 'singleUnit') {
-      // Single unit mode
-      questions = allQuestions.filter(q => 
-        q.subject === subjectFilter && 
-        q.unit === currentUnit &&
-        (testMode || !q.isTest) // Exclude test questions unless test mode is enabled
-      );
-    } else if (practiceMode === 'custom' && customUnitIds.length > 0) {
-      // Custom units mode
-      questions = allQuestions.filter(q => 
-        q.subject === subjectFilter && 
-        customUnitIds.includes(q.unit) &&
-        (testMode || !q.isTest) // Exclude test questions unless test mode is enabled
-      );
-    } else if (practiceMode === 'weakest' && weakestUnitIds.length > 0) {
-      // Weakest units mode
-      questions = allQuestions.filter(q => 
-        q.subject === subjectFilter && 
-        weakestUnitIds.includes(q.unit) &&
-        (testMode || !q.isTest) // Exclude test questions unless test mode is enabled
-      );
-    }
+    
+    let questions: QuestionType[] = allQuestions.filter(q => 
+      q.subject === subjectFilter && 
+      q.unit === unitNumber &&
+      !q.isTest // Exclude test questions for practice mode
+    );
 
     // Filter out correctly answered questions (unless showAllQuestions is true)
-    // Only filter if user is logged in and data is loaded (or user is not logged in)
     if (!showAllQuestions && (!user || (user && mcqAnswersData && !loadingMcqData))) {
       if (user && mcqAnswersData) {
-        // Create a set of question IDs that have been answered correctly
         const correctlyAnsweredQuestionIds = new Set<number>();
         mcqAnswersData.forEach((answer: McqAnswer) => {
           if (answer.isCorrect && typeof answer.questionId === 'number') {
@@ -612,102 +484,53 @@ function UnitMCQPracticeContent() {
           }
         });
 
-        // Filter out questions that have been answered correctly
         questions = questions.filter(q => !correctlyAnsweredQuestionIds.has(q.id));
       }
     }
 
     // Shuffle questions
     const shuffled = shuffleArray(questions);
-    console.log('[Parent] Questions loaded and shuffled', {
-      questionCount: shuffled.length,
-      previousIndex: currentQuestionIndex,
-      resettingIndexTo: 0
-    });
     setQuestionsForPractice(shuffled);
     setTotalQuestionsInSet(shuffled.length);
-    setCurrentQuestionIndex(0); // ⚠️ This resets the index - could cause jumping!
+    setCurrentQuestionIndex(0);
     setAnsweredQuestions({});
     
     // Set unit name for display
-    if (practiceMode === 'singleUnit') {
-      const unit = unitsData.find(u => u.number === currentUnit);
-      setCurrentUnitName(unit ? `Unit ${currentUnit}: ${unit.title}` : `Unit ${currentUnit}`);
-    } else if (practiceMode === 'custom' && customUnitIds.length > 0) {
-      setCurrentUnitName(`Custom Practice (${customUnitIds.length} units)`);
-    } else if (practiceMode === 'weakest' && weakestUnitIds.length > 0) {
-      setCurrentUnitName(`Weakest Units Practice`);
-    } else if (practiceMode === 'topic' && lessonIdParam) {
-      setCurrentUnitName(`Topic Practice`);
-    } else {
-      setCurrentUnitName('Practice');
-    }
+    const unit = unitsData.find(u => u.number === unitNumber);
+    setCurrentUnitName(unit ? `Unit ${unitNumber}: ${unit.title}` : `Unit ${unitNumber}`);
 
     setIsLoadingQuestionSet(false);
-  }, [practiceMode, currentUnit, customUnitIds, weakestUnitIds, lessonIdParam, subject, testQuestionId, isDeveloper, showAllQuestions, user, loadingMcqData]);
+  }, [subject, unitNumber, showAllQuestions, user, loadingMcqData, mcqAnswersData]);
 
-  // Access control check and credit status
+  // Access control check
   useEffect(() => {
     setHasAccess(true);
     setIsVerifying(false);
-  }, [user, userData, isPremium, currentUnitForAccessCheck, practiceMode]);
-
-  const handleEnterTestMode = () => {
-    // Only Macro has unit MCQ tests wired up currently
-    if (subject !== 'macro') {
-      return;
-    }
-
-    if (!user) {
-      // Show season pass modal for guest users trying to access test mode
-      if (!hasDismissedSeasonPassModal) {
-        setShowSeasonPassModal(true);
-      }
-      return;
-    }
-
-    const price =
-      unitsData.find(u => u.number === currentUnit)?.price || 4.99;
-
-    if (!purchasedTests.includes(String(currentUnit))) {
-      // Redirect to purchase page for this unit test
-      router.push(
-        `/purchase/mcq-practice?units=${currentUnit}&total=${price}&subject=${subject}`
-      );
-      return;
-    }
-
-    // User has access → go to test page
-    router.push(`/ap-${subject}-unit-${currentUnit}-mcq-test`);
-  };
+  }, [user, userData, isPremium, unitNumber]);
 
   const handleAnswer = async (questionId: number, answerLetter: string, isCorrect: boolean, lessonIDS: string[]) => {
     logger.debug('[UnitMCQ] handleAnswer called:', { questionId, answerLetter, isCorrect, hasAwardXp: !!awardXp });
     
-    // Check if this is a new question (not already answered)
     const isNewQuestion = !answeredQuestions[questionId];
     
-    // Daily free-answer limit for ALL non-premium users (guest or logged-in)
+    // Daily free-answer limit for ALL non-premium users
     if (!isPremiumEffective && isNewQuestion) {
       const currentCount = readDailyCount();
       if (currentCount >= DAILY_FREE_ANSWERS) {
         if (!hasDismissedSeasonPassModal) {
           setShowSeasonPassModal(true);
         }
-        return; // Don't process the answer
+        return;
       }
       const nextCount = currentCount + 1;
       writeDailyCount(nextCount);
       setDailyQuestionsAnswered(nextCount);
 
-      // Show Season Pass modal after the 3rd answer (delayed),
-      // so the student sees their feedback first.
       if (
         nextCount === DAILY_FREE_ANSWERS &&
         !hasDismissedSeasonPassModal
       ) {
         window.setTimeout(() => {
-          // Re-check on timeout in case they upgraded/dismissed
           if (!hasDismissedSeasonPassModal) {
             setShowSeasonPassModal(true);
           }
@@ -735,7 +558,6 @@ function UnitMCQPracticeContent() {
 
           await addDoc(collection(db, 'users', user.uid, 'mcqAnswers'), answerData);
           
-          // Update streak
           if (isCorrect) {
             setCorrectStreak(prev => prev + 1);
           } else {
@@ -746,82 +568,51 @@ function UnitMCQPracticeContent() {
         console.error('Error saving answer:', error);
       }
     }
-
-    // Note: XP is awarded in unitMCQS.tsx handleAnswerSelection, not here
-    // to avoid double-awarding
   };
 
   const handleNextQuestion = () => {
-    console.log('[Parent] handleNextQuestion called', {
-      currentIndex: currentQuestionIndex,
-      totalQuestions: questionsForPractice.length,
-      canGoNext: currentQuestionIndex < questionsForPractice.length - 1
-    });
     if (currentQuestionIndex < questionsForPractice.length - 1) {
-      setCurrentQuestionIndex(prev => {
-        const nextIndex = prev + 1;
-        console.log('[Parent] setCurrentQuestionIndex: prev =', prev, 'next =', nextIndex);
-        return nextIndex;
-      });
-    } else {
-      console.log('[Parent] handleNextQuestion: Cannot go next, already at last question');
+      setCurrentQuestionIndex(prev => prev + 1);
     }
   };
 
   const handlePreviousQuestion = () => {
-    console.log('[Parent] handlePreviousQuestion called', {
-      currentIndex: currentQuestionIndex,
-      canGoPrev: currentQuestionIndex > 0
-    });
     if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(prev => {
-        const nextIndex = prev - 1;
-        console.log('[Parent] setCurrentQuestionIndex (prev): prev =', prev, 'next =', nextIndex);
-        return nextIndex;
-      });
+      setCurrentQuestionIndex(prev => prev - 1);
     }
   };
 
   const handleQuestionSelect = (index: number) => {
-    console.log('[Parent] handleQuestionSelect called', {
-      requestedIndex: index,
-      currentIndex: currentQuestionIndex,
-      totalQuestions: questionsForPractice.length
-    });
     setCurrentQuestionIndex(index);
   };
 
   const handleUnitChange = (unitNumber: number) => {
-    setCurrentUnit(unitNumber);
-    setCurrentQuestionIndex(0);
+    // Navigate to new unit using the new route structure
+    const subjectSlug = getSubjectSlug(subject);
+    const unitSlug = getUnitSlug(unitNumber, subject);
+    router.push(`/mcq-practice/${subjectSlug}/${unitSlug}`);
   };
 
   // Keyboard navigation: Left/Right arrow keys
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't handle if user is typing in an input, textarea, or contenteditable
       const target = e.target as HTMLElement;
       if (
         target.tagName === 'INPUT' ||
         target.tagName === 'TEXTAREA' ||
         target.isContentEditable ||
-        // Don't handle if a modal is open
         showLoginModal ||
         showSignupModal ||
         showSeasonPassModal ||
-        // Don't handle if navigation is disabled
         (!isPremiumEffective && dailyQuestionsAnswered >= DAILY_FREE_ANSWERS)
       ) {
         return;
       }
 
-      // Left arrow key - previous question
       if (e.key === 'ArrowLeft') {
         e.preventDefault();
         handlePreviousQuestion();
-      }
-      // Right arrow key - next question
-      else if (e.key === 'ArrowRight') {
+      } else if (e.key === 'ArrowRight') {
         e.preventDefault();
         handleNextQuestion();
       }
@@ -831,13 +622,7 @@ function UnitMCQPracticeContent() {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [handleNextQuestion, handlePreviousQuestion, showLoginModal, showSignupModal, showSeasonPassModal, isPremiumEffective, dailyQuestionsAnswered]);
-
-  const relevantUnitIdsForDisplay = 
-      practiceMode === 'weakest' ? weakestUnitIds : 
-      practiceMode === 'custom' ? customUnitIds : 
-      practiceMode === 'singleUnit' ? [currentUnit] : 
-      [];
+  }, [currentQuestionIndex, questionsForPractice.length, showLoginModal, showSignupModal, showSeasonPassModal, isPremiumEffective, dailyQuestionsAnswered]);
 
   const handleAuthSuccess = () => {
     setShowLoginModal(false);
@@ -853,10 +638,10 @@ function UnitMCQPracticeContent() {
   }
 
   if (!hasAccess) {
-    // AccessDenied is only for purchase-required scenarios
-    // Credit limit is handled by the modal overlay, not this component
-    return <AccessDenied unitId={currentUnitForAccessCheck} subject={subject} isCreditLimit={false} />;
+    return <AccessDenied unitId={String(unitNumber)} subject={subject} isCreditLimit={false} />;
   }
+
+  const fullUnitName = getFullUnitName(subject, unitNumber);
 
   return (
     <>
@@ -878,7 +663,6 @@ function UnitMCQPracticeContent() {
         }}
         onAuthSuccess={handleAuthSuccess}
       />
-      {/* Season Pass Modal (daily limit for non-premium users) */}
       {showSeasonPassModal && (
         <SeasonPassModal
           subject={subject}
@@ -890,11 +674,19 @@ function UnitMCQPracticeContent() {
       )}
       <div className="min-h-screen bg-gray-50 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 py-8 pt-8">
+          {/* Breadcrumb */}
+          <Breadcrumb subject={subject} unitNumber={unitNumber} />
+          
+          {/* Page Title */}
+          <h1 className="text-4xl font-black text-gray-900 mb-8">
+            {fullUnitName}
+          </h1>
+
           {isLoadingQuestionSet ? (
             <div className="flex items-center justify-center min-h-[400px]">
               <Loader2 className={`h-12 w-12 animate-spin ${subject === 'macro' ? 'text-blue-500' : 'text-green-500'}`} />
             </div>
-          ) : questionsForPractice.length === 0 && !showAllQuestions && practiceMode === 'singleUnit' ? (
+          ) : questionsForPractice.length === 0 && !showAllQuestions ? (
             // Congratulations panel - user has mastered the unit
             <div className="max-w-2xl mx-auto">
               <div className="bg-white rounded-xl shadow-lg border-2 border-gray-200 p-8 md:p-12 text-center">
@@ -933,11 +725,11 @@ function UnitMCQPracticeContent() {
             </div>
           ) : questionsForPractice.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-600 text-lg">No questions available for the selected mode.</p>
+              <p className="text-gray-600 text-lg">No questions available for this unit.</p>
             </div>
           ) : (
             <UnitMCQs
-              currentUnit={practiceMode === 'singleUnit' ? currentUnit : 0} 
+              currentUnit={unitNumber}
               currentQuestionIndex={currentQuestionIndex}
               isLoggedIn={!!user}
               onAnswer={handleAnswer}
@@ -950,15 +742,22 @@ function UnitMCQPracticeContent() {
               units={unitsData}
               dojoProgress={dojoProgress}
               correctStreak={correctStreak}
-              isWeakestUnitsMode={practiceMode === 'weakest' || practiceMode === 'custom'} 
-              isTopicMode={practiceMode === 'topic'}
+              isWeakestUnitsMode={false}
+              isTopicMode={false}
               totalQuestions={totalQuestionsInSet}
               unitName={currentUnitName}
               subject={subject} 
-              practiceUnitIds={relevantUnitIdsForDisplay}
+              practiceUnitIds={[unitNumber]}
               isParentModalOpen={showLoginModal || showSignupModal}
-              hasTestModeAccess={hasTestModeAccess}
-              onEnterTestMode={handleEnterTestMode}
+              hasTestModeAccess={!!user && purchasedTests.includes(String(unitNumber))}
+              onEnterTestMode={() => {
+                const price = unitsData.find(u => u.number === unitNumber)?.price || 4.99;
+                if (!purchasedTests.includes(String(unitNumber))) {
+                  router.push(`/purchase/mcq-practice?units=${unitNumber}&total=${price}&subject=${subject}`);
+                } else {
+                  router.push(`/ap-${subject}-unit-${unitNumber}-mcq-test`);
+                }
+              }}
               isAnswerDisabled={
                 (!isPremiumEffective && dailyQuestionsAnswered >= DAILY_FREE_ANSWERS)
               }
@@ -979,22 +778,3 @@ function UnitMCQPracticeContent() {
     </>
   );
 }
-
-function PageLoadingFallback() {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
-    </div>
-  );
-}
-
-export default function UnitMCQPracticePage() {
-  return (
-    <Suspense fallback={<PageLoadingFallback />}>
-      <UnitMCQPracticeContent />
-    </Suspense>
-  );
-}
-
-
-

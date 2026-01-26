@@ -231,3 +231,15 @@ html {
   opacity: 1 !important;
   visibility: visible !important;
 }
+
+/* Hide grid lines in Excalidraw */
+.excalidraw .grid-container,
+.excalidraw .grid,
+.excalidraw canvas[style*="grid"],
+.excalidraw .canvas-container canvas[style*="background-image"] {
+  background-image: none !important;
+}
+
+.excalidraw .canvas-container {
+  background-image: none !important;
+}
