@@ -1,76 +1,25 @@
 import { graphGymScenarios, GraphGymScenario } from '@/data/graphGymScenarios';
 
 /**
- * Mapping of scenario titles to their shorter, topic-based slugs
- * Format: {topic}-graphing-practice
- */
-const scenarioSlugMap: Record<number, string> = {
-  1: 'monopoly-graphing-practice',
-  2: 'surplus-graphing-practice',
-  3: 'excise-tax-graphing-practice',
-  4: 'perfect-competition-profit-graphing-practice',
-  5: 'monopolistic-competition-graphing-practice',
-  6: 'labor-market-graphing-practice',
-  7: 'monopsony-graphing-practice',
-  8: 'negative-externality-graphing-practice',
-  9: 'positive-externality-graphing-practice',
-  10: 'natural-monopoly-graphing-practice',
-  11: 'full-employment-graphing-practice',
-  12: 'recessionary-gap-graphing-practice',
-  13: 'inflationary-gap-graphing-practice',
-  14: 'money-market-graphing-practice',
-  15: 'loanable-funds-graphing-practice',
-  16: 'phillips-curve-graphing-practice',
-  17: 'stagflation-graphing-practice',
-  18: 'forex-market-graphing-practice',
-  19: 'economic-growth-graphing-practice',
-  20: 'contractionary-monetary-policy-graphing-practice',
-  21: 'tariff-graphing-practice',
-  22: 'subsidy-graphing-practice',
-  23: 'positive-production-externality-graphing-practice',
-  24: 'price-ceiling-graphing-practice',
-  25: 'price-discrimination-graphing-practice',
-  26: 'perfect-competition-long-run-graphing-practice',
-  27: 'monopolistic-competition-loss-graphing-practice',
-  28: 'product-curves-graphing-practice',
-  29: 'negative-consumption-externality-graphing-practice',
-  30: 'labor-supply-shift-graphing-practice',
-  31: 'reserves-market-graphing-practice',
-  32: 'crowding-out-graphing-practice',
-  33: 'capital-inflow-graphing-practice',
-  34: 'self-correction-inflationary-gap-graphing-practice',
-  35: 'opportunity-cost-graphing-practice',
-  36: 'investment-demand-graphing-practice',
-  37: 'cost-push-inflation-graphing-practice',
-  38: 'forex-interest-rate-graphing-practice',
-  39: 'phillips-curve-shift-graphing-practice',
-  40: 'excise-tax-consumers-graphing-practice',
-  41: 'price-floor-graphing-practice',
-  42: 'tariff-welfare-graphing-practice',
-  43: 'negative-externality-correction-graphing-practice',
-  44: 'positive-consumption-externality-graphing-practice',
-  45: 'perfect-competition-short-run-graphing-practice',
-  46: 'crowding-out-capital-flows-graphing-practice',
-  47: 'monetary-policy-net-exports-graphing-practice',
-  48: 'phillips-curve-adjustment-graphing-practice',
-  49: 'self-correction-stagflation-graphing-practice',
-  50: 'ample-reserves-market-graphing-practice',
-  51: 'technological-growth-graphing-practice',
-  52: 'natural-monopoly-regulation-graphing-practice',
-  53: 'expansionary-monetary-policy-graphing-practice',
-};
-
-/**
- * Get the slug for a specific scenario by ID
+ * Get the full URL slug for a specific scenario
+ * Format: /graph-gym/ap-{subject}-{keywords}-graphing-practice
  */
 export function getSlugForScenario(scenario: GraphGymScenario): string {
-  return scenarioSlugMap[scenario.id] || generateFallbackSlug(scenario.title);
+  // Use the slug field from the scenario object (1-2 word keywords)
+  const keywords = scenario.slug || generateFallbackKeywords(scenario.title);
+  
+  // Determine subject - if array, use first one (or could be smarter)
+  const subject = Array.isArray(scenario.subject) ? scenario.subject[0] : scenario.subject;
+  const subjectPrefix = subject === 'macro' ? 'ap-macro' : 'ap-micro';
+  
+  // Return full URL path: /graph-gym/ap-{subject}-{keywords}-graphing-practice
+  return `graph-gym/${subjectPrefix}-${keywords}-graphing-practice`;
 }
 
 /**
- * Generate a fallback slug from title if not in map
+ * Generate fallback keywords from title if slug not provided
  */
-function generateFallbackSlug(title: string): string {
+function generateFallbackKeywords(title: string): string {
   // Remove common prefixes and make URL-friendly
   let slug = title
     .toLowerCase()
@@ -78,27 +27,47 @@ function generateFallbackSlug(title: string): string {
     .replace(/[^a-z0-9]+/g, '-') // Replace non-alphanumeric with hyphens
     .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
   
-  return `${slug}-graphing-practice`;
+  return slug;
 }
 
 /**
  * Get a scenario by its slug
+ * Accepts both old format (monopoly-graphing-practice) and new format (graph-gym/ap-micro-monopoly-graphing-practice)
  */
 export function getScenarioBySlug(slug: string, subject?: 'macro' | 'micro'): GraphGymScenario | undefined {
-  // Remove -graphing-practice suffix if present
-  const baseSlug = slug.replace(/-graphing-practice$/, '');
+  // Handle new format: graph-gym/ap-micro-monopoly-graphing-practice
+  // Or old format: monopoly-graphing-practice
+  let keywords: string | null = null;
+  let detectedSubject: 'macro' | 'micro' | null = null;
   
-  // Find scenario by matching slug
+  if (slug.startsWith('graph-gym/')) {
+    // New format: graph-gym/ap-micro-monopoly-graphing-practice
+    const withoutPrefix = slug.replace(/^graph-gym\//, '');
+    const match = withoutPrefix.match(/^ap-(macro|micro)-(.+)-graphing-practice$/);
+    if (match) {
+      detectedSubject = match[1] as 'macro' | 'micro';
+      keywords = match[2];
+    }
+  } else {
+    // Old format: monopoly-graphing-practice (for backwards compatibility)
+    keywords = slug.replace(/-graphing-practice$/, '');
+  }
+  
+  if (!keywords) {
+    return undefined;
+  }
+  
+  // Find scenario by matching keywords
   return graphGymScenarios.find(scenario => {
-    const scenarioSlug = getSlugForScenario(scenario);
-    const scenarioBaseSlug = scenarioSlug.replace(/-graphing-practice$/, '');
+    const scenarioKeywords = scenario.slug || generateFallbackKeywords(scenario.title);
     
-    if (scenarioBaseSlug !== baseSlug) return false;
+    if (scenarioKeywords !== keywords) return false;
     
-    // If subject is provided, filter by subject
-    if (subject) {
+    // If subject was detected from URL or provided, filter by subject
+    const filterSubject = detectedSubject || subject;
+    if (filterSubject) {
       const scenarioSubjects = Array.isArray(scenario.subject) ? scenario.subject : [scenario.subject];
-      return scenarioSubjects.includes(subject);
+      return scenarioSubjects.includes(filterSubject);
     }
     
     return true;

@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { GraphGym } from '@/components/GraphGym';
 import { CourseProvider } from '@/contexts/CourseContext';
 import { Loader2 } from 'lucide-react';
-import { getScenarioBySlug, getSlugForScenario } from '@/lib/graphGymSlugs';
+import { getScenarioBySlug } from '@/lib/graphGymSlugs';
 
 function GraphGymSlugContent() {
   const params = useParams();
@@ -13,30 +13,34 @@ function GraphGymSlugContent() {
   const slug = params?.slug as string;
 
   useEffect(() => {
-    // Handle old format URLs (monopoly-graphing-practice) - redirect to new format
-    if (slug && slug.endsWith('-graphing-practice') && !slug.startsWith('graph-gym/')) {
-      // Check if this is an old format graph gym URL
-      const scenario = getScenarioBySlug(slug);
-      if (scenario) {
-        // Redirect to new format
-        const newSlug = getSlugForScenario(scenario);
-        router.replace(`/${newSlug}`);
-        return;
-      }
+    // Handle URLs in format: ap-micro-monopoly-graphing-practice or ap-macro-money-market-graphing-practice
+    if (!slug || !slug.endsWith('-graphing-practice')) {
+      router.replace('/404');
+      return;
     }
 
-    // If it's not a graph gym URL, show 404
-    if (!slug || !slug.endsWith('-graphing-practice')) {
+    // Verify the scenario exists
+    const fullSlug = `graph-gym/${slug}`;
+    const scenario = getScenarioBySlug(fullSlug);
+    if (!scenario) {
       router.replace('/404');
       return;
     }
   }, [slug, router]);
 
-  // Show loading while redirecting
+  // If not a valid graphing practice slug, show loading (will redirect)
+  if (!slug || !slug.endsWith('-graphing-practice')) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center bg-gray-50">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      </div>
+    );
+  }
+
   return (
-    <div className="h-screen w-screen flex items-center justify-center bg-gray-50">
-      <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-    </div>
+    <CourseProvider>
+      <GraphGym initialScenarioSlug={`graph-gym/${slug}`} />
+    </CourseProvider>
   );
 }
 
@@ -53,3 +57,4 @@ export default function GraphGymSlugPage() {
     </Suspense>
   );
 }
+

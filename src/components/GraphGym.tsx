@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
-import { ArrowRight, Lock, CheckCircle2, Circle, LockKeyhole, Shuffle, ChevronDown, Monitor, Smartphone, Play, X, FileText, ChevronRight } from 'lucide-react';
+import { ArrowRight, Lock, CheckCircle2, Circle, LockKeyhole, ChevronDown, Monitor, Smartphone, Play, X, FileText, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCourseTheme, useCourseContext } from '@/contexts/CourseContext';
 import { useAuthContext } from '@/contexts/AuthContext';
@@ -179,81 +179,61 @@ export function GraphGym({ assignmentScenarios, isAssignment = false, assignment
     return Array.from(units).sort((a, b) => a - b);
   }, [currentCourse]);
 
-  // Track if we've initialized from URL to prevent re-initialization after user actions
-  const hasInitializedFromUrl = useRef(false);
-  const lastCourseRef = useRef(currentCourse);
-  const initialSlugRef = useRef<string | undefined>(undefined);
-
-  // Initialize scenario from URL slug if provided (only once on mount or when course changes)
+  // URL as Source of Truth: Single effect that loads scenario from URL slug
   useEffect(() => {
-    // Check if course changed - if so, reset initialization flag
-    if (lastCourseRef.current !== currentCourse) {
-      hasInitializedFromUrl.current = false;
-      lastCourseRef.current = currentCourse;
-      initialSlugRef.current = undefined;
+    // Only run for non-assignment mode (assignments don't use URL routing)
+    if (isAssignment || !initialScenarioSlug || filteredScenarios.length === 0) {
+      return;
     }
 
-    // Only initialize if:
-    // 1. We have a slug from the URL
-    // 2. We haven't already initialized for this slug
-    // 3. The slug is different from what we last initialized with
-    // 4. We have scenarios loaded
-    const slugChanged = initialScenarioSlug !== initialSlugRef.current;
-    const shouldInitialize = initialScenarioSlug && 
-                            !isAssignment && 
-                            filteredScenarios.length > 0 &&
-                            slugChanged &&
-                            (!hasInitializedFromUrl.current || initialSlugRef.current === undefined);
-    
-    if (shouldInitialize) {
-      const scenario = getScenarioBySlug(initialScenarioSlug, currentCourse);
-      if (scenario) {
-        const index = filteredScenarios.findIndex(s => s.id === scenario.id);
-        if (index !== -1 && index !== currentScenarioIndex) {
-          // Only set if it's different from current to avoid unnecessary updates
-          setCurrentScenarioIndex(index);
-          hasInitializedFromUrl.current = true;
-          initialSlugRef.current = initialScenarioSlug;
-        } else if (index === currentScenarioIndex) {
-          // Already on the correct scenario, just mark as initialized
-          hasInitializedFromUrl.current = true;
-          initialSlugRef.current = initialScenarioSlug;
-        }
-      }
+    // Find the scenario by slug
+    const scenario = getScenarioBySlug(initialScenarioSlug, currentCourse);
+    if (!scenario) {
+      console.warn('[GraphGym] Scenario not found for slug:', initialScenarioSlug);
+      return;
+    }
+
+    // Find the index of this scenario in the filtered list
+    const index = filteredScenarios.findIndex(s => s.id === scenario.id);
+    if (index === -1) {
+      console.warn('[GraphGym] Scenario not in filtered list:', scenario.id);
+      return;
+    }
+
+    // Only update if we're not already on this scenario
+    if (index !== currentScenarioIndex) {
+      console.log('[GraphGym] Loading scenario from URL:', initialScenarioSlug, 'index:', index);
+      setCurrentScenarioIndex(index);
+      // Reset submission state when scenario changes
+      setIsSubmitted(false);
+      setCheckedItems(new Set());
+      setExcalidrawKey(prev => prev + 1); // Clear Excalidraw board
     }
   }, [initialScenarioSlug, currentCourse, isAssignment, filteredScenarios, currentScenarioIndex]);
 
-  // Update URL when scenario changes (only for non-assignment mode)
+  // Reset to first scenario when subject or unit changes (for non-assignment mode, navigate to URL)
   useEffect(() => {
-    if (!isAssignment && 
-        filteredScenarios.length > 0 && 
-        pathname && 
-        !pathname.startsWith('/graph-gym/custom')) {
-      const currentScenario = filteredScenarios[currentScenarioIndex];
-      if (currentScenario) {
-        const slug = getSlugForScenario(currentScenario);
-        const newPath = `/${slug}`;
-        // Only update if the path is different to avoid infinite loops
-        const currentSlug = pathname.replace(/^\//, '');
-        if (currentSlug !== slug && !currentSlug.startsWith('graph-gym')) {
-          // Update the initial slug ref to match what we're navigating to
-          // This prevents re-initialization when the URL updates
-          initialSlugRef.current = slug;
-          router.replace(newPath, { scroll: false });
-        }
-      }
-    }
-  }, [currentScenarioIndex, filteredScenarios, isAssignment, pathname, router]);
-
-  // Reset to first scenario when subject or unit changes
-  useEffect(() => {
-    if (!initialScenarioSlug) {
+    if (isAssignment) {
+      // For assignments, just reset to first
       setCurrentScenarioIndex(0);
+      setIsSubmitted(false);
+      setCheckedItems(new Set());
+      setExcalidrawKey(prev => prev + 1);
+      return;
     }
-    setIsSubmitted(false);
-    setCheckedItems(new Set());
-    setExcalidrawKey(prev => prev + 1); // Clear Excalidraw board when subject/unit changes
-  }, [currentCourse, selectedUnit, initialScenarioSlug]);
+
+    // For non-assignment mode: navigate to first scenario's URL
+    if (filteredScenarios.length > 0 && !initialScenarioSlug) {
+      const firstScenario = filteredScenarios[0];
+      const firstSlug = getSlugForScenario(firstScenario);
+      router.push(`/${firstSlug}`);
+    } else {
+      // Just reset state, URL effect will handle loading the scenario
+      setIsSubmitted(false);
+      setCheckedItems(new Set());
+      setExcalidrawKey(prev => prev + 1);
+    }
+  }, [currentCourse, selectedUnit, isAssignment, filteredScenarios, initialScenarioSlug, router]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -312,27 +292,6 @@ export function GraphGym({ assignmentScenarios, isAssignment = false, assignment
     });
   };
 
-  const handleShuffleScenario = () => {
-    // Reset submission state and checked items
-    setIsSubmitted(false);
-    setCheckedItems(new Set());
-    
-    // Clear Excalidraw by forcing a remount with new key
-    setExcalidrawKey(prev => prev + 1);
-    
-    // Shuffle to a random scenario (different from current) from filtered scenarios
-    const availableIndices = filteredScenarios
-      .map((_, index) => index)
-      .filter(index => index !== currentScenarioIndex);
-    
-    if (availableIndices.length > 0) {
-      const randomIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
-      setCurrentScenarioIndex(randomIndex);
-    } else {
-      // If only one scenario, just reset to it
-      setCurrentScenarioIndex(0);
-    }
-  };
 
   // Capture and upload Excalidraw board snapshot
   const captureAndUploadBoard = async (scenarioId: number): Promise<string | null> => {
@@ -514,9 +473,30 @@ export function GraphGym({ assignmentScenarios, isAssignment = false, assignment
     // Clear Excalidraw by forcing a remount with new key
     setExcalidrawKey(prev => prev + 1);
     
-    // Move to next scenario in order
-    if (currentScenarioIndex < filteredScenarios.length - 1) {
-      setCurrentScenarioIndex(prev => prev + 1);
+    // Move to next scenario in order (wrap around to first if at the end for non-assignment mode)
+    if (isAssignment) {
+      // For assignments, only move forward if not at the end
+      if (currentScenarioIndex < filteredScenarios.length - 1) {
+        const nextIndex = currentScenarioIndex + 1;
+        const nextScenario = filteredScenarios[nextIndex];
+        if (nextScenario) {
+          const nextSlug = getSlugForScenario(nextScenario);
+          initialSlugRef.current = nextSlug;
+          hasInitializedFromUrl.current = true;
+          setCurrentScenarioIndex(nextIndex);
+        }
+      }
+    } else {
+      // For non-assignment mode: URL as Source of Truth
+      // Simply calculate next scenario and navigate to its URL
+      const nextIndex = (currentScenarioIndex + 1) % filteredScenarios.length;
+      const nextScenario = filteredScenarios[nextIndex];
+      if (nextScenario) {
+        const nextSlug = getSlugForScenario(nextScenario);
+        console.log('[GraphGym] Navigating to next scenario:', nextSlug);
+        // Simply navigate to the new URL - the useEffect will handle loading the scenario
+        router.push(`/${nextSlug}`);
+      }
     }
   };
 
@@ -659,18 +639,18 @@ export function GraphGym({ assignmentScenarios, isAssignment = false, assignment
               
               {/* Title */}
               <h1 className="text-2xl font-black text-black mb-3">
-                {activeScenario.title} (H{activeScenario.id})
+                {activeScenario.title}
               </h1>
               
-              {/* Shuffle Button - Only show in scenario section (not in assignment mode) */}
+              {/* Next Scenario Button - Only show in scenario section (not in assignment mode) */}
               {!isAssignment && (
                 <div className="mb-3">
                   <button
-                    onClick={handleShuffleScenario}
+                    onClick={handleNextScenario}
                     className="inline-flex items-center gap-2 bg-white rounded-lg border-2 border-black px-4 py-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-0.5 font-bold text-black text-sm"
                   >
-                    <Shuffle className="w-4 h-4" />
-                    <span>Shuffle Scenario</span>
+                    <ArrowRight className="w-4 h-4" />
+                    <span>Next Scenario</span>
                   </button>
                 </div>
               )}

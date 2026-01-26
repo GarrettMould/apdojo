@@ -248,7 +248,7 @@ export function EmbeddedGraphGym({ scenarioId, prompt, subject }: EmbeddedGraphG
                 {/* Try More Graph Challenges Button */}
                 <div className="mt-4 pt-4 border-t-2 border-black">
                   <Link
-                    href="/monopoly-graphing-practice"
+                    href="/graph-gym/ap-micro-monopoly-graphing-practice"
                     className="block w-full bg-white rounded-lg border-2 border-black p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-0.5 flex items-center justify-between font-bold text-black text-sm"
                   >
                     <span>Try More Graph Challenges</span>

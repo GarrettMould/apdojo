@@ -201,7 +201,7 @@ export function Header() {
 
               {/* Graph Gym - Distinct styling */}
               <Link
-                href="/monopoly-graphing-practice"
+                href="/graph-gym/ap-micro-monopoly-graphing-practice"
                 className="text-lg text-gray-700 hover:text-blue-600 transition-colors font-bold"
               >
                 Graphing Practice
@@ -516,7 +516,7 @@ export function Header() {
               {/* Other Links */}
               <div className="border-t border-gray-200 mt-2 pt-2">
                 <Link
-                  href="/monopoly-graphing-practice"
+                  href="/graph-gym/ap-micro-monopoly-graphing-practice"
                   onClick={closeMobileMenu}
                   className="px-4 py-3 text-lg text-blue-500 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
                 >

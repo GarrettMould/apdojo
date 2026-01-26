@@ -21,6 +21,7 @@ export interface GraphGymScenario {
   correctImage: string;
   videoExplanation?: string; // Optional video explanation URL
   checklist: ChecklistItem[];
+  slug: string; // URL keywords (1-2 words) for the scenario, e.g., "monopoly" or "money-market"
 }
 
 export const graphGymScenarios: GraphGymScenario[] = [
@@ -31,6 +32,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Monopoly", "Long Run Equilibrium", "Profit Maximization", "Market Structure"],
     difficulty: 'medium',
     title: "Long Run Equilibrium in a Pure Monopoly",
+    slug: "monopoly",
     description: "Draw the Demand, MR, MC, and ATC curves for a pure monopoly in long-run equilibrium.",
     instruction: "Use the graphing tool below to identify the profit-maximizing quantity.",
     tip: "Remember: In a monopoly, the profit-maximizing quantity is where MR = MC, but the price is set on the demand curve above that quantity. The allocatively efficient quantity is where MC = Demand.",
@@ -54,6 +56,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Market Equilibrium", "Surplus", "Allocative Efficiency"],
     difficulty: 'easy',
     title: "Consumer and Producer Surplus",
+    slug: "surplus",
     description: "Draw a standard supply and demand graph showing market equilibrium.",
     toDoList: [
       "Label the areas of consumer surplus",
@@ -75,6 +78,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Tax Incidence", "Excise Tax", "Deadweight Loss"],
     difficulty: 'medium',
     title: "Effect of an Excise Tax",
+    slug: "excise-tax",
     description: "Show a market where an excise tax is placed on producers.",
     toDoList: [
       "Label the new supply curve",
@@ -97,6 +101,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Perfect Competition", "Short Run Profit", "Side-by-Side Graph"],
     difficulty: 'medium',
     title: "Perfectly Competitive Firm earning Profit",
+    slug: "perfect-competition",
     description: "Draw a side-by-side graph of a perfectly competitive market and a single firm earning short-run economic profit.",
     toDoList: [
       "Show the market graph on the left",
@@ -119,6 +124,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Monopolistic Competition", "Long Run Equilibrium", "Excess Capacity"],
     difficulty: 'medium',
     title: "Monopolistic Competition in the Long Run",
+    slug: "monopolistic-competition",
     description: "Draw a monopolistically competitive firm in long-run equilibrium.",
     toDoList: [
       "Show that the firm is earning zero economic profit",
@@ -140,6 +146,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Labor Market", "Perfectly Competitive Factor Market", "MRP", "MRC"],
     difficulty: 'hard',
     title: "Competitive Labor Market and Firm",
+    slug: "labor-market",
     description: "Draw a side-by-side graph for a perfectly competitive labor market and an individual firm hiring labor.",
     toDoList: [
       "Show the market graph on the left",
@@ -162,6 +169,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Monopsony", "Wage Maker", "Factor Market Failure"],
     difficulty: 'hard',
     title: "Monopsony in the Labor Market",
+    slug: "monopsony",
     description: "Draw the MFC (MRC), Supply, and MRP curves for a monopsonist.",
     toDoList: [
       "Label the quantity of labor hired (Qm)",
@@ -183,6 +191,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Negative Externality", "Marginal Social Cost", "Market Failure"],
     difficulty: 'medium',
     title: "Negative Production Externality",
+    slug: "negative-externality",
     description: "Draw a market with a negative production externality (like pollution).",
     toDoList: [
       "Label the market quantity (Qm)",
@@ -205,6 +214,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Positive Externality", "Marginal Social Benefit", "Underconsumption"],
     difficulty: 'medium',
     title: "Positive Consumption Externality",
+    slug: "positive-externality",
     description: "Draw a market with a positive consumption externality.",
     toDoList: [
       "Label the market equilibrium quantity",
@@ -227,6 +237,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Natural Monopoly", "Price Regulation", "Fair Return"],
     difficulty: 'hard',
     title: "Natural Monopoly Regulation",
+    slug: "natural-monopoly",
     description: "Draw a natural monopoly with declining ATC.",
     toDoList: [
       "Label the socially optimal price (P=MC)",
@@ -249,6 +260,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["AD-AS Model", "Equilibrium", "Full Employment"],
     difficulty: 'easy',
     title: "Long Run Equilibrium (Full Employment)",
+    slug: "ad-as",
     description: "Draw the AD, SRAS, and LRAS curves showing an economy in long-run equilibrium.",
     toDoList: [
       "Show all three curves intersecting at the same point",
@@ -271,6 +283,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Recessionary Gap", "Short Run Equilibrium", "AD-AS"],
     difficulty: 'medium',
     title: "Economy in a Recessionary Gap",
+    slug: "recessionary-gap",
     description: "Draw an AD-AS graph showing an economy currently producing at an output level below full employment.",
     toDoList: [
       "Label the full employment output (Yf)",
@@ -293,6 +306,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Inflationary Gap", "Short Run Equilibrium", "AD-AS"],
     difficulty: 'medium',
     title: "Economy in an Inflationary Gap",
+    slug: "inflationary-gap",
     description: "Draw an AD-AS graph showing an economy currently producing at an output level above full employment.",
     toDoList: [
       "Label the full employment output (Yf)",
@@ -315,6 +329,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Money Market", "Interest Rates", "Monetary Policy"],
     difficulty: 'medium',
     title: "The Money Market",
+    slug: "money-market",
     description: "Draw the Money Supply and Money Demand curves. Show the effect of an expansionary monetary policy (Open Market Purchase).",
     toDoList: [
       "Show the initial equilibrium",
@@ -337,6 +352,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Loanable Funds", "Real Interest Rates", "Crowding Out"],
     difficulty: 'hard',
     title: "The Loanable Funds Market",
+    slug: "loanable-funds",
     description: "Draw the Supply and Demand for Loanable Funds. Show the effect of increased government deficit spending.",
     toDoList: [
       "Show the initial equilibrium",
@@ -359,6 +375,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Phillips Curve", "Inflation", "Unemployment"],
     difficulty: 'hard',
     title: "Short Run and Long Run Phillips Curves",
+    slug: "phillips-curve",
     description: "Draw the SRPC and LRPC.",
     toDoList: [
       "Label the point showing an economy in long-run equilibrium",
@@ -381,6 +398,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Phillips Curve", "Stagflation", "Supply Shock"],
     difficulty: 'hard',
     title: "SRPC Shift (Stagflation)",
+    slug: "stagflation",
     description: "Show the effect of a negative supply shock (e.g., oil prices) on the Short-Run Phillips Curve.",
     toDoList: [
       "Show the initial SRPC",
@@ -403,6 +421,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Foreign Exchange", "Currency Appreciation", "Forex Market"],
     difficulty: 'hard',
     title: "Foreign Exchange Market (USD)",
+    slug: "forex-market",
     description: "Draw the Supply and Demand for US Dollars. Show the effect of increased European demand for US goods.",
     toDoList: [
       "Show the initial equilibrium",
@@ -425,6 +444,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Production Possibilities Curve", "Economic Growth", "Opportunity Cost"],
     difficulty: 'easy',
     title: "Economic Growth on the PPC",
+    slug: "economic-growth",
     description: "Draw a PPC for two goods. Show how an improvement in technology shifts the curve to represent economic growth.",
     toDoList: [
       "Show the original PPC",
@@ -447,6 +467,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Money Market", "Contractionary Policy", "Interest Rates"],
     difficulty: 'medium',
     title: "Contractionary Monetary Policy",
+    slug: "contractionary-monetary-policy",
     description: "Show how an Open Market Sale of bonds affects the Money Market graph.",
     toDoList: [
       "Show the initial equilibrium",
@@ -471,6 +492,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["International Trade", "Tariffs", "Deadweight Loss"],
     difficulty: 'hard',
     title: "Effect of a Tariff on Trade",
+    slug: "tariff",
     description: "Draw a domestic supply and demand graph for an imported good. Show the World Price (Pw) and a Tariff Price (Pt). Label domestic production, imports, and the area of deadweight loss.",
     correctImage: "/images/graphs/micro/tariff-trade.svg",
     checklist: [
@@ -487,6 +509,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Subsidies", "Market Efficiency", "Consumer/Producer Benefit"],
     difficulty: 'medium',
     title: "Per-Unit Subsidy Impact",
+    slug: "subsidy",
     description: "Draw a market in equilibrium. Show the shift caused by a per-unit subsidy given to producers. Label the price consumers pay, the price producers receive, and the cost to the government.",
     correctImage: "/images/graphs/micro/subsidy.svg",
     checklist: [
@@ -503,6 +526,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Externalities", "Market Failure", "Deadweight Loss"],
     difficulty: 'hard',
     title: "Positive Production Externality",
+    slug: "positive-production-externality",
     description: "Draw a market where production creates a spillover benefit (e.g., honeybees). Draw the MPC, MSC, MPB, and MSB curves. Identify the market Q and socially optimal Q.",
     correctImage: "/images/graphs/micro/positive-prod-externality.svg",
     checklist: [
@@ -519,6 +543,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Price Controls", "Shortage", "Market Intervention"],
     difficulty: 'easy',
     title: "Binding Price Ceiling",
+    slug: "price-ceiling",
     description: "Draw a market for rental apartments with a binding price ceiling. Label the quantity demanded, quantity supplied, and the resulting shortage.",
     correctImage: "/images/graphs/micro/price-ceiling.svg",
     checklist: [
@@ -535,6 +560,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Price Discrimination", "Monopoly", "Efficiency"],
     difficulty: 'hard',
     title: "Perfect Price Discrimination",
+    slug: "price-discrimination",
     description: "Draw a monopoly practicing perfect (first-degree) price discrimination. Label the profit-maximizing quantity and the area of economic profit.",
     correctImage: "/images/graphs/micro/perfect-price-discrim.svg",
     checklist: [
@@ -551,6 +577,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Perfect Competition", "Long Run Equilibrium", "Efficiency"],
     difficulty: 'medium',
     title: "Long-Run Equilibrium in Perfect Competition",
+    slug: "perfect-competition-long-run",
     description: "Draw side-by-side graphs for the Market and a Representative Firm in long-run equilibrium.",
     correctImage: "/images/graphs/micro/pc-long-run.svg",
     checklist: [
@@ -567,6 +594,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Monopolistic Competition", "Short Run Loss"],
     difficulty: 'medium',
     title: "Monopolistic Competition (Loss)",
+    slug: "monopolistic-competition-loss",
     description: "Draw a monopolistically competitive firm suffering a short-run loss. Label the loss area.",
     correctImage: "/images/graphs/micro/monop-comp-loss.svg",
     checklist: [
@@ -583,6 +611,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Production Function", "Marginal Product", "Diminishing Returns"],
     difficulty: 'medium',
     title: "Total and Marginal Product",
+    slug: "product-curves",
     description: "Draw two stacked graphs: one for Total Product (TP) and one for Marginal Product (MP). Align the stages of production.",
     correctImage: "/images/graphs/micro/product-curves.svg",
     checklist: [
@@ -599,6 +628,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Externalities", "Negative Consumption", "Taxation"],
     difficulty: 'medium',
     title: "Negative Consumption Externality",
+    slug: "negative-consumption-externality",
     description: "Draw a market for cigarettes (negative consumption externality). Show the MPB, MSB, and MPC curves. Identify the deadweight loss.",
     correctImage: "/images/graphs/micro/neg-cons-externality.svg",
     checklist: [
@@ -615,6 +645,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Factor Markets", "Labor Supply", "Wages"],
     difficulty: 'easy',
     title: "Shift in Market Labor Supply",
+    slug: "labor-supply-shift",
     description: "Draw a competitive labor market. Show the effect of increased immigration on the equilibrium wage and employment level.",
     correctImage: "/images/graphs/micro/labor-supply-shift.svg",
     checklist: [
@@ -633,6 +664,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Monetary Policy", "Ample Reserves", "Interest Rates"],
     difficulty: 'hard',
     title: "Market for Reserves (Ample)",
+    slug: "reserves-market",
     description: "Draw the market for reserves in an ample reserves regime. Show the effect of the Fed administering a rate hike.",
     correctImage: "/images/graphs/macro/ample-reserves-hike.svg",
     checklist: [
@@ -649,6 +681,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Loanable Funds", "Deficit Spending", "Crowding Out"],
     difficulty: 'medium',
     title: "Loanable Funds: Crowding Out",
+    slug: "crowding-out",
     description: "Draw the Loanable Funds market. Show the impact of increased government deficit spending.",
     correctImage: "/images/graphs/macro/loanable-funds-deficit.svg",
     checklist: [
@@ -665,6 +698,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Capital Flow", "Loanable Funds", "Interest Rates"],
     difficulty: 'hard',
     title: "Financial Capital Inflow",
+    slug: "capital-inflow",
     description: "Draw the Loanable Funds market for Country A. Show the effect of investors from Country B moving their savings into Country A.",
     correctImage: "/images/graphs/macro/lf-capital-inflow.svg",
     checklist: [
@@ -681,6 +715,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["AD-AS", "Self-Correction", "Long Run"],
     difficulty: 'hard',
     title: "Self-Correction of an Inflationary Gap",
+    slug: "self-correction-inflationary-gap",
     description: "Draw an economy in an inflationary gap. Show the long-run self-adjustment mechanism without government intervention.",
     correctImage: "/images/graphs/macro/self-correct-inflation.svg",
     checklist: [
@@ -697,6 +732,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["PPC", "Opportunity Cost", "Efficiency"],
     difficulty: 'easy',
     title: "Constant vs. Increasing Opportunity Cost",
+    slug: "opportunity-cost",
     description: "Draw two small PPC graphs. Graph A should show Constant Opportunity Cost. Graph B should show Increasing Opportunity Cost.",
     correctImage: "/images/graphs/macro/ppc-shapes.svg",
     checklist: [
@@ -713,6 +749,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Investment", "Interest Rates", "Aggregate Demand"],
     difficulty: 'easy',
     title: "Investment Demand Curve",
+    slug: "investment-demand",
     description: "Draw the Investment Demand curve. Identify what happens to the quantity of investment if the interest rate drops.",
     correctImage: "/images/graphs/macro/investment-demand.svg",
     checklist: [
@@ -729,6 +766,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["AD-AS", "Inflation", "Cost-Push"],
     difficulty: 'medium',
     title: "Cost-Push Inflation (Stagflation)",
+    slug: "cost-push-inflation",
     description: "Draw an AD-AS graph showing the impact of a negative supply shock (e.g., oil prices rise).",
     correctImage: "/images/graphs/macro/stagflation.svg",
     checklist: [
@@ -745,6 +783,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Foreign Exchange", "Interest Rates", "Appreciation"],
     difficulty: 'hard',
     title: "Forex: Interest Rate Differential",
+    slug: "forex-interest-rate",
     description: "Draw the market for the U.S. Dollar. Show the impact if U.S. interest rates become higher than those in Europe.",
     correctImage: "/images/graphs/macro/forex-interest-rates.svg",
     checklist: [
@@ -761,6 +800,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Phillips Curve", "Inflation Expectations", "Short Run"],
     difficulty: 'medium',
     title: "Shift in the Phillips Curve",
+    slug: "phillips-curve-shift",
     description: "Draw the Short-Run Phillips Curve (SRPC). Show what happens if inflation expectations increase.",
     correctImage: "/images/graphs/macro/srpc-shift.svg",
     checklist: [
@@ -777,6 +817,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Taxes", "Tax Incidence", "Demand Shift"],
     difficulty: 'medium',
     title: "Excise Tax on Consumers",
+    slug: "excise-tax-2",
     description: "Draw a competitive market in equilibrium. Show the impact of a per-unit excise tax levied on producers.",
     toDoList: [
       "Label the new quantity exchanged (Qt)",
@@ -800,6 +841,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Price Controls", "Surplus", "Deadweight Loss"],
     difficulty: 'medium',
     title: "Welfare Analysis of a Price Floor",
+    slug: "price-floor-welfare",
     description: "Draw a market with a binding price floor. Visually identify the Consumer Surplus (CS), Producer Surplus (PS), and Deadweight Loss (DWL) resulting from this intervention.",
     correctImage: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/wb42.jpg",
     videoExplanation: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/explanation42.mp4",
@@ -817,6 +859,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["International Trade", "Tariffs", "Welfare"],
     difficulty: 'hard',
     title: "Welfare Effects of a Tariff",
+    slug: "tariff-welfare",
     description: "Draw a domestic market importing goods at the World Price (Pw). Show a Tariff (Pt) imposed above the world price. Label the new domestic quantity supplied (Qs) and domestic quantity demanded (Qd) at the tariff price. Shade the rectangular area representing the government's tariff revenue and the two separate areas representing deadweight loss.",
     correctImage: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/wb43.jpg",
     videoExplanation: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/explanation43.mp4",
@@ -834,6 +877,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Externalities", "Negative Production", "Corrective Tax"],
     difficulty: 'medium',
     title: "Correcting a Negative Production Externality",
+    slug: "negative-externality-2",
     description: "Draw a market where production causes pollution. Show the specific Per-Unit Tax required to fix this market failure and achieve the socially optimal quantity.",
     correctImage: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/wb44.jpg",
     videoExplanation: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/explanation44.mp4",
@@ -851,6 +895,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Externalities", "Positive Consumption", "Subsidies"],
     difficulty: 'medium',
     title: "Positive Consumption Externality",
+    slug: "positive-consumption-externality",
     description: "Draw a market for flu shots, which generates a marginal external benefit on consumption. Label the Market Quantity, Socially Optimal Quantity, and the area of Deadweight Loss if left unregulated.",
     correctImage: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/wb45.jpg",
     videoExplanation: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/explanation45.mp4",
@@ -868,6 +913,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Perfect Competition", "Long Run Equilibrium", "Efficiency"],
     difficulty: 'medium',
     title: "Short-Run Equilibrium in Perfect Competition",
+    slug: "perfect-competition-2",
     description: "Draw side-by-side graphs for the market and a representative firm earning economic losses in the short run. Show how the firm returns to long-run equilibrium.",
     correctImage: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/wb46.jpg",
     checklist: [
@@ -883,6 +929,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
       topics: ["Loanable Funds", "Fiscal Policy", "Crowding Out", "Capital Flows"],
       difficulty: 'hard',
       title: "Crowding Out with International Capital Flows",
+      slug: "crowding-out-2",
       description: "Draw the Loanable Funds Market. Show the impact of expansionary fiscal policy. Then, show the secondary effect of international capital inflows seeking higher returns.",
       toDoList: [
         "Shift the Demand for Loanable Funds to the right (Deficit Spending)",
@@ -905,6 +952,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
       topics: ["Foreign Exchange", "Interest Rates", "Net Exports", "AD-AS"],
       difficulty: 'hard',
       title: "Monetary Policy Transmission to Net Exports",
+      slug: "monetary-policy",
       description: "This is a two-part graph scenario. First, draw the Money Market showing contractionary monetary policy. Second, draw the Foreign Exchange Market for the USD showing the result of their monetary policy.",
       toDoList: [
         "Money Market: Shift Supply Left, Nominal Interest Rate Up",
@@ -927,6 +975,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
       topics: ["Phillips Curve", "Long Run Adjustment", "Inflation Expectations"],
       difficulty: 'hard',
       title: "Long-Run Adjustment on the Phillips Curve",
+      slug: "phillips-curve-2",
       description: "Draw an economy in a short-run equilibrium with high inflation. Show the movement to the long-run equilibrium as inflation expectations adjust.",
       toDoList: [
         "Plot initial point on SRPC1 to the left of LRPC (Inflationary Gap)",
@@ -949,6 +998,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
       topics: ["AD-AS Model", "Stagflation", "Self-Correction"],
       difficulty: 'hard',
       title: "Self-Correction from Stagflation",
+      slug: "self-correction-stagflation",
       description: "Draw an economy experiencing stagflation. Show the long-run self-correction mechanism assuming no government intervention.",
       toDoList: [
         "Draw initial SRAS shift to the left (Stagflation)",
@@ -971,6 +1021,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
       topics: ["Ample Reserves", "Administered Rates", "Monetary Policy"],
       difficulty: 'hard',
       title: "Ample Reserves Market: Ceiling and Floor",
+      slug: "ample-reserves-market",
       description: "Draw the Market for Reserves in an ample regime. Show the equilibrium Federal Funds Rate (FFR). Suppose the actual output in the economy is greater than the natural rate of output.",
       toDoList: [
         "Identify the monetary policy tool that the central bank is using to close the output gap.",
@@ -992,6 +1043,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["PPC", "Economic Growth", "Technology Shocks"],
     difficulty: 'medium',
     title: "Specific Technological Growth",
+    slug: "technological-growth",
     description: "Draw a Production Possibilities Curve for Good X and Good Y. Show the effect of a new technology that improves the efficiency of producing Good X ONLY.",
     correctImage: "/images/graphs/macro/ppc-rotation-x.svg",
     checklist: [
@@ -1008,6 +1060,7 @@ export const graphGymScenarios: GraphGymScenario[] = [
     topics: ["Natural Monopoly", "Price Regulation", "Fair Return", "Allocative Efficiency"],
     difficulty: 'hard',
     title: "Regulating a Natural Monopoly (Constant MC)",
+    slug: "natural-monopoly-regulation",
     description: "Draw a Natural Monopoly that faces constant marginal costs. Label the profit-maximizing quantity (Qm) and price (Pm), and the Fair-Return price (Pfr) and quantity (Qfr).",
     correctImage: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/wb53.jpg",
     checklist: [
