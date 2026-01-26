@@ -40,7 +40,7 @@ export const keyTerms: KeyTerm[] = [
       definition: 'The next best alternative that must be given up when making a choice.',
       subject: 'ap_microeconomics',
       unit: 1,
-      lessonIDs: ['1.1', '1.2'],
+      lessonIDs: ['1.3'], // Moved to 1.3 (PPC lesson)
       subNotes: [
         'The value of the next best alternative forgone',
         'Not just monetary cost, but all sacrificed alternatives',
@@ -68,7 +68,7 @@ export const keyTerms: KeyTerm[] = [
       definition: 'A model that shows alternative ways an economy can use its scarce resources.',
       subject: 'ap_microeconomics',
       unit: 1,
-      lessonIDs: ['1.2'],
+      lessonIDs: ['1.3'], // Micro lesson 1.3 is PPC
       subNotes: [
         'Shows maximum possible combinations of two goods',
         'Points on the curve represent efficient production',
@@ -86,7 +86,7 @@ export const keyTerms: KeyTerm[] = [
       definition: 'When a country can produce a good at a lower opportunity cost than another country.',
       subject: 'ap_microeconomics',
       unit: 1,
-      lessonIDs: ['1.3'],
+      lessonIDs: ['1.4'], // Micro lesson 1.4 is Comparative Advantage, not 1.3
       subNotes: [
         'Based on opportunity cost, not absolute advantage',
         'Determines what countries should specialize in',
@@ -100,7 +100,7 @@ export const keyTerms: KeyTerm[] = [
       definition: 'When a country can produce more of a good with the same resources as another country.',
       subject: 'ap_microeconomics',
       unit: 1,
-      lessonIDs: ['1.3'],
+      lessonIDs: ['1.4'], // Micro lesson 1.4 is Comparative Advantage, not 1.3
       subNotes: [
         'Based on productivity, not opportunity cost',
         'Less important than comparative advantage for trade',
@@ -114,7 +114,7 @@ export const keyTerms: KeyTerm[] = [
       definition: 'When individuals, businesses, or nations focus on producing a narrow range of products to maximize efficiency.',
       subject: 'ap_microeconomics',
       unit: 1,
-      lessonIDs: ['1.3'],
+      lessonIDs: ['1.4'], // Micro lesson 1.4 is Comparative Advantage, not 1.3
       subNotes: [
         'Focusing on what you do best',
         'Increases productivity and efficiency',
@@ -128,7 +128,7 @@ export const keyTerms: KeyTerm[] = [
       definition: 'A type of opportunity cost problem where you are given the amount of resources (inputs) needed to produce each good.',
       subject: 'ap_microeconomics',
       unit: 1,
-      lessonIDs: ['1.3'],
+      lessonIDs: ['1.4'], // Micro lesson 1.4 is Comparative Advantage, not 1.3
       subNotes: [
         'How to find opportunity cost: Itself / Other',
         'Example: If it takes 2 hours to produce Good A and 4 hours to produce Good B, the opportunity cost of 1 Good A is 2/4 = 0.5 Good B. The opportunity cost of 1 Good B is 4/2 = 2 Good A.'
@@ -140,7 +140,7 @@ export const keyTerms: KeyTerm[] = [
       definition: 'A type of opportunity cost problem where you are given the amount of output that can be produced with the same resources.',
       subject: 'ap_microeconomics',
       unit: 1,
-      lessonIDs: ['1.3'],
+      lessonIDs: ['1.4'], // Micro lesson 1.4 is Comparative Advantage, not 1.3
       subNotes: [
         'How to find opportunity cost: Other / Itself',
         'Example: If a country can produce 10 units of Good A or 5 units of Good B with the same resources, the opportunity cost of 1 Good A is 5/10 = 0.5 Good B. The opportunity cost of 1 Good B is 10/5 = 2 Good A.'
@@ -152,7 +152,7 @@ export const keyTerms: KeyTerm[] = [
       definition: 'The method used by a society to produce and distribute goods and services.',
       subject: 'ap_microeconomics',
       unit: 1,
-      lessonIDs: ['1.1'],
+      lessonIDs: ['1.2'], // Moved to 1.2 (Resource Allocation and Economic Systems)
       subNotes: [
         'Traditional: based on customs and traditions',
         'Command: government controls production',
@@ -166,7 +166,7 @@ export const keyTerms: KeyTerm[] = [
       definition: 'An economic system where individuals own resources and make economic decisions with minimal government involvement.',
       subject: 'ap_microeconomics',
       unit: 1,
-      lessonIDs: ['1.1'],
+      lessonIDs: ['1.2'], // Moved to 1.2 (Resource Allocation and Economic Systems)
       subNotes: [
         'Private ownership of resources',
         'Decisions made by individuals and firms',
@@ -180,12 +180,88 @@ export const keyTerms: KeyTerm[] = [
       definition: 'The concept that self-interest and competition guide free markets to efficiently allocate resources (coined by Adam Smith).',
       subject: 'ap_microeconomics',
       unit: 1,
-      lessonIDs: ['1.1'],
+      lessonIDs: ['1.2'], // Moved to 1.2 (Resource Allocation and Economic Systems)
       subNotes: [
         'Self-interest promotes social welfare',
         'Competition ensures efficiency',
         'No central planning needed',
         'Foundation of market economics'
+      ]
+    },
+    {
+      id: 'command-economy',
+      term: 'Command Economy',
+      definition: 'An economic system where the government makes all economic decisions about production, distribution, and resource allocation.',
+      subject: 'ap_microeconomics',
+      unit: 1,
+      lessonIDs: ['1.2'],
+      subNotes: [
+        'Government owns and controls resources',
+        'Central planning determines what and how much to produce',
+        'Prices are set by the government',
+        'Also known as a planned economy or communism',
+        'Examples: North Korea, former Soviet Union'
+      ]
+    },
+    {
+      id: 'mixed-economy',
+      term: 'Mixed Economy',
+      definition: 'An economic system that combines elements of both market and command economies, with both private and public ownership of resources.',
+      subject: 'ap_microeconomics',
+      unit: 1,
+      lessonIDs: ['1.2'],
+      subNotes: [
+        'Combines market forces with government intervention',
+        'Private sector produces most goods and services',
+        'Government provides public goods and regulates markets',
+        'Most modern economies are mixed economies',
+        'Examples: United States, Canada, most European countries'
+      ]
+    },
+    {
+      id: 'traditional-economy',
+      term: 'Traditional Economy',
+      definition: 'An economic system based on customs, traditions, and historical practices, where economic decisions are made based on what has been done in the past.',
+      subject: 'ap_microeconomics',
+      unit: 1,
+      lessonIDs: ['1.2'],
+      subNotes: [
+        'Economic decisions based on customs and traditions',
+        'Often found in rural, agricultural societies',
+        'Barter and trade are common',
+        'Little economic growth or change',
+        'Examples: Some indigenous communities, rural agricultural societies'
+      ]
+    },
+    {
+      id: 'market-economy',
+      term: 'Market Economy',
+      definition: 'An economic system where economic decisions are made by individuals and businesses based on supply and demand, with minimal government intervention.',
+      subject: 'ap_microeconomics',
+      unit: 1,
+      lessonIDs: ['1.2'],
+      subNotes: [
+        'Decisions made by individuals and businesses',
+        'Prices determined by supply and demand',
+        'Private ownership of resources',
+        'Competition drives efficiency',
+        'Also called capitalism or free market economy'
+      ]
+    },
+    {
+      id: 'property-rights',
+      term: 'Property Rights',
+      definition: 'Legal rights to own, use, and dispose of resources, goods, and services. Essential for market economies to function effectively.',
+      subject: 'ap_microeconomics',
+      unit: 1,
+      lessonIDs: ['1.2'],
+      subNotes: [
+        'Right to own property (land, buildings, resources)',
+        'Right to use property as one sees fit',
+        'Right to transfer or sell property',
+        'Protected by law and government',
+        'Essential for incentives to invest and innovate',
+        'Foundation of market economies'
       ]
     },
   
@@ -1737,18 +1813,6 @@ export const keyTerms: KeyTerm[] = [
       lessonIDs: ['6.5'],
       subNotes: [
         'Example: A flat 20% tax on everyone.'
-      ]
-    }, 
-    {
-      id: 'absolute-advantage',
-      term: 'Absolute Advantage',
-      definition: 'The ability to produce more of a good than another producer, given the same resources.',
-      subject: 'ap_microeconomics',
-      unit: 1,
-      lessonIDs: ['1.4'],
-      subNotes: [
-        'Focuses on productivity.',
-        'A country can have an absolute advantage in both goods.'
       ]
     },
     {

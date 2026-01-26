@@ -28,6 +28,8 @@ import { dojoDrills, drillAppliesToSubject, getDrillUnitForSubject } from '@/dat
 import { saveQuizResult } from '@/lib/quizHistory';
 import { hasValidSeasonPass, getUnitMCQTestUrl } from '@/lib/utils';
 import { Footer } from '@/components/Footer';
+import { useCheatSheetTutorial } from '@/hooks/useCheatSheetTutorial';
+import { TutorialTooltip } from '@/components/ui/TutorialTooltip';
 
 // Helper to combine and structure whiteboard data for Macro
 const getUnitWhiteboards = (unitNumber: number): WhiteboardImage[] => {
@@ -550,6 +552,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
   const params = useParams();
   const router = useRouter(); // Initialize useRouter
   const { user, userData, selectedSubject: contextSubject, awardXp } = useAuthContext(); // Correctly destructure userData and selectedSubject
+  const { showTutorial, completeTutorial } = useCheatSheetTutorial();
   
   // Use props if provided, otherwise use params/context
   const selectedSubject = propSubject || contextSubject;
@@ -1643,6 +1646,15 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
               })
               .slice(0, 2); // Take first 2 available
 
+            // Find the first term ID across all lessons for tutorial
+            let firstTermId: string | null = null;
+            for (const lesson of sortedLessons) {
+              if (lesson.keyTerms.length > 0) {
+                firstTermId = lesson.keyTerms[0].id;
+                break;
+              }
+            }
+            
             return (
               <>
                 {sortedLessons.map(({ lessonId, whiteboards, keyTerms }, index) => {
@@ -1663,9 +1675,30 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                 const lessonVideos = getVideosForLessonId(lessonId);
                 // Filter by subject
                 const subjectFilter = selectedSubject === 'macro' ? 'AP Macroeconomics' : 'AP Microeconomics';
-                const relevantVideos = lessonVideos.filter(video => 
-                  video.subjects.includes(subjectFilter)
-                );
+                const relevantVideos = lessonVideos.filter(video => {
+                  // First check if video is for this subject
+                  if (!video.subjects.includes(subjectFilter)) return false;
+                  
+                  // Special case: For micro lesson 1.3 (PPC), exclude Comparative Advantage videos
+                  // These videos have lessonIDS: ["1.3", "1.4"] but should only show in micro 1.4
+                  if (selectedSubject === 'micro' && lessonId === '1.3') {
+                    const isComparativeAdvantageVideo = 
+                      video.title.toLowerCase().includes('comparative advantage') ||
+                      video.tags.some(tag => tag.toLowerCase().includes('comparative advantage'));
+                    if (isComparativeAdvantageVideo) return false;
+                  }
+                  
+                  // Special case: For macro lesson 1.4 (Demand), exclude Comparative Advantage videos
+                  // These videos have lessonIDS: ["1.3", "1.4"] but should only show in macro 1.3
+                  if (selectedSubject === 'macro' && lessonId === '1.4') {
+                    const isComparativeAdvantageVideo = 
+                      video.title.toLowerCase().includes('comparative advantage') ||
+                      video.tags.some(tag => tag.toLowerCase().includes('comparative advantage'));
+                    if (isComparativeAdvantageVideo) return false;
+                  }
+                  
+                  return true;
+                });
 
                 if (relevantVideos.length === 0) return null;
 
@@ -1741,23 +1774,36 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                 <div>
                   <h3 className="text-xl font-semibold text-gray-700 mb-4">Key Terms & Definitions</h3>
                   <div className="space-y-4">
-                    {keyTerms.map(term => {
+                    {keyTerms.map((term, termIndex) => {
                       const isSelected = selectedTerms.has(term.id);
-                      return (
+                      // Determine if this is the first term across all lessons
+                      const isFirstTerm = term.id === firstTermId;
+                      // Create unique key combining lessonId and term.id to avoid duplicates when term appears in multiple lessons
+                      const uniqueKey = `${lessonId}-${term.id}`;
+                      
+                      const handleTermClick = () => {
+                        // Complete tutorial if this is the first term and tutorial is showing
+                        if (isFirstTerm && showTutorial) {
+                          completeTutorial();
+                        }
+                        
+                        // Toggle term selection
+                        setSelectedTerms(prev => {
+                          const newSet = new Set(prev);
+                          if (newSet.has(term.id)) {
+                            newSet.delete(term.id);
+                          } else {
+                            newSet.add(term.id);
+                          }
+                          return newSet;
+                        });
+                      };
+                      
+                      const termContent = (
                         <div 
-                          key={term.id} 
+                          key={uniqueKey} 
                           id={`term-${term.id}`} 
-                          onClick={() => {
-                            setSelectedTerms(prev => {
-                              const newSet = new Set(prev);
-                              if (newSet.has(term.id)) {
-                                newSet.delete(term.id);
-                              } else {
-                                newSet.add(term.id);
-                              }
-                              return newSet;
-                            });
-                          }}
+                          onClick={handleTermClick}
                           className={`p-4 border rounded-lg scroll-mt-20 cursor-pointer transition-all duration-200 relative ${
                             isSelected 
                               ? 'border-gray-300 bg-gray-50 shadow-inner transform scale-[0.98]' 
@@ -1770,7 +1816,9 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                               <Check className="w-4 h-4 text-gray-500" />
                             </div>
                           )}
-                          <h3 className="font-bold text-gray-800 pr-8">{term.term}</h3>
+                          <h3 className="font-bold text-gray-800 pr-8">
+                            {term.term}
+                          </h3>
                         <p className="mt-1 text-gray-600">{term.definition}</p>
                         {term.subNotes && term.subNotes.length > 0 && (
                           <div className="mt-3 pt-3 border-t border-gray-100">
@@ -1784,7 +1832,20 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                             </ul>
                           </div>
                         )}
-                      </div>
+                        </div>
+                      );
+                      
+                      // Wrap the entire container with TutorialTooltip if it's the first term
+                      return isFirstTerm ? (
+                        <TutorialTooltip
+                          key={uniqueKey}
+                          show={showTutorial}
+                          onClick={handleTermClick}
+                        >
+                          {termContent}
+                        </TutorialTooltip>
+                      ) : (
+                        termContent
                       );
                     })}
                   </div>

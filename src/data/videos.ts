@@ -312,7 +312,7 @@ export const videos: Video[] = [
         description: "Learn how to identify and solve output comparative advantage questions",
         videoSlug: "comparative-advantage-output-questions",
         subjects: ["AP Macroeconomics", "AP Microeconomics"],
-        lessonIDS: ["1.3"],
+        lessonIDS: ["1.3", "1.4"], // 1.3 for macro, 1.4 for micro (since micro's 1.3 is PPC, not Comparative Advantage)
         unit: "1",
         tags: ["Comparative Advantage", "Opportunity Cost"],
         videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/comp+adv+output.mp4",
@@ -351,7 +351,7 @@ export const videos: Video[] = [
         videoSlug: "comparative-advantage-input-questions",
         subjects: ["AP Macroeconomics", "AP Microeconomics"],
         unit: "1",
-        lessonIDS: ["1.3"],
+        lessonIDS: ["1.3", "1.4"], // 1.3 for macro, 1.4 for micro (since micro's 1.3 is PPC, not Comparative Advantage)
         tags: ["Comparative Advantage", "Opportunity Cost"],
         videoUrl: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/comp+adv+inpt.mp4",
         thumbnail: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/comp+adv+input+thumbnail.jpg",

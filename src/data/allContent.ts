@@ -207,12 +207,64 @@ export const whiteboardImages: WhiteboardImage[] = [
     imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.1_scarcity 7.jpg',
     title: 'Scarcity 7'
   },
-  // Lesson 1.3: Comparative Advantage
+  // Lesson 1.3: Production Possibilities Curve (PPC)
+  // Note: Micro lesson 1.3 is PPC, not Comparative Advantage
+  {
+    id: 'micro-1.3-ppc-1',
+    subject: 'ap_microeconomics',
+    unit: 1,
+    lessonIDs: ['1.3'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/1.3_PPC_1.jpg',
+    title: 'PPC 1'
+  },
+  {
+    id: 'micro-1.3-ppc-2',
+    subject: 'ap_microeconomics',
+    unit: 1,
+    lessonIDs: ['1.3'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/1.3_PPC_2.jpg',
+    title: 'PPC 2'
+  },
+  {
+    id: 'micro-1.3-ppc-3',
+    subject: 'ap_microeconomics',
+    unit: 1,
+    lessonIDs: ['1.3'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/1.3_PPC_3.jpg',
+    title: 'PPC 3'
+  },
+  {
+    id: 'micro-1.3-ppc-4',
+    subject: 'ap_microeconomics',
+    unit: 1,
+    lessonIDs: ['1.3'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/1.3_PPC_4.jpg',
+    title: 'PPC 4'
+  },
+  {
+    id: 'micro-1.3-ppc-5',
+    subject: 'ap_microeconomics',
+    unit: 1,
+    lessonIDs: ['1.3'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/1.3_PPC_5.jpg',
+    title: 'PPC 5'
+  },
+  {
+    id: 'micro-1.3-ppc-6',
+    subject: 'ap_microeconomics',
+    unit: 1,
+    lessonIDs: ['1.3'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/1.3_PPC_6.jpg',
+    title: 'PPC 6'
+  },
+  
+  // Lesson 1.4: Comparative Advantage and Trade
+  // Moved from 1.3 - Comparative Advantage is micro's lesson 1.4, not 1.3
   {
     id: '24',
     subject: 'ap_microeconomics',
     unit: 1,
-    lessonIDs: ['1.3'],
+    lessonIDs: ['1.4'],
     imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.3_ComparativeA 15.jpg',
     title: 'Comparative Advantage 15'
   },
@@ -220,7 +272,7 @@ export const whiteboardImages: WhiteboardImage[] = [
     id: '25',
     subject: 'ap_microeconomics',
     unit: 1,
-    lessonIDs: ['1.3'],
+    lessonIDs: ['1.4'],
     imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.3_ComparativeA 20.jpg',
     title: 'Comparative Advantage 20'
   },
@@ -228,7 +280,7 @@ export const whiteboardImages: WhiteboardImage[] = [
     id: '26',
     subject: 'ap_microeconomics',
     unit: 1,
-    lessonIDs: ['1.3'],
+    lessonIDs: ['1.4'],
     imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.3_ComparativeA 24.jpg',
     title: 'Comparative Advantage 24'
   },
@@ -236,7 +288,7 @@ export const whiteboardImages: WhiteboardImage[] = [
     id: '27',
     subject: 'ap_microeconomics',
     unit: 1,
-    lessonIDs: ['1.3'],
+    lessonIDs: ['1.4'],
     imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.3_ComparativeA 25.jpg',
     title: 'Comparative Advantage 25'
   },
@@ -244,7 +296,7 @@ export const whiteboardImages: WhiteboardImage[] = [
     id: '28',
     subject: 'ap_microeconomics',
     unit: 1,
-    lessonIDs: ['1.3'],
+    lessonIDs: ['1.4'],
     imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.3_ComparativeA 31.jpg',
     title: 'Comparative Advantage 31'
   },
@@ -252,7 +304,7 @@ export const whiteboardImages: WhiteboardImage[] = [
     id: '29',
     subject: 'ap_microeconomics',
     unit: 1,
-    lessonIDs: ['1.3'],
+    lessonIDs: ['1.4'],
     imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.3_ComparativeA 38.jpg',
     title: 'Comparative Advantage 38'
   },
@@ -260,7 +312,7 @@ export const whiteboardImages: WhiteboardImage[] = [
     id: '30',
     subject: 'ap_microeconomics',
     unit: 1,
-    lessonIDs: ['1.3'],
+    lessonIDs: ['1.4'],
     imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.3_ComparativeA 6.jpg',
     title: 'Comparative Advantage 6'
   },

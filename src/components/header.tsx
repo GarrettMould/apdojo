@@ -64,8 +64,25 @@ export function Header() {
     setIsMobileMenuOpen(false);
   };
 
-  const handleSubjectChange = (newSubject: 'macro' | 'micro') => {
-    setSelectedSubject(newSubject);
+  const handleSubjectChange = async (newSubject: 'macro' | 'micro') => {
+    // Update the subject in context (this will update localStorage for guests)
+    await setSelectedSubject(newSubject);
+    
+    // For logged-out users, ensure the change is reflected immediately
+    // The state update should trigger a re-render, but we can also force navigation
+    // if we're on a subject-specific page
+    if (!user) {
+      // If on a subject-specific route, navigate to the equivalent page for the new subject
+      if (pathname.includes('macro') || pathname.includes('micro')) {
+        const newPath = pathname.replace(/macro|micro/g, newSubject);
+        if (newPath !== pathname) {
+          router.push(newPath);
+          return;
+        }
+      }
+      // For other pages, just refresh to ensure all components pick up the change
+      router.refresh();
+    }
   };
 
   const handleLogout = async () => {
@@ -275,7 +292,7 @@ export function Header() {
                   <button
                     onClick={() => handleSubjectChange('macro')}
                     className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all duration-200 ${
-                      displaySubject === 'macro'
+                      (mounted ? selectedSubject : 'macro') === 'macro'
                         ? 'bg-blue-500 text-white'
                         : 'bg-gray-100 text-gray-700 hover:text-gray-900'
                     }`}
@@ -285,8 +302,8 @@ export function Header() {
                   <button
                     onClick={() => handleSubjectChange('micro')}
                     className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all duration-200 ${
-                      displaySubject === 'micro'
-                        ? 'bg-blue-500 text-white'
+                      (mounted ? selectedSubject : 'macro') === 'micro'
+                        ? 'bg-green-600 text-white'
                         : 'bg-gray-100 text-gray-700 hover:text-gray-900'
                     }`}
                   >
