@@ -1575,9 +1575,6 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                             {timeRemaining <= 300 && timeRemaining > 0 && (
                               <span className="text-lg font-bold animate-pulse text-gray-900">⚠️ Less than 5 minutes remaining!</span>
                             )}
-                            {timeRemaining === 0 && (
-                              <span className="text-lg font-bold text-gray-900">⏰ Time's Up!</span>
-                            )}
                             {/* Hide Timer Button */}
                             <button
                               onClick={() => setShowTimer(false)}
