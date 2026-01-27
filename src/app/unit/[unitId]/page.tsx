@@ -576,6 +576,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
   const containerRef = React.useRef<HTMLDivElement>(null);
   const cheatSheetContentRef = React.useRef<HTMLDivElement>(null);
   const [showImageSlides, setShowImageSlides] = useState(false);
+  const [brokenImageUrls, setBrokenImageUrls] = useState<Set<string>>(new Set());
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showFullscreen, setShowFullscreen] = useState(false);
   const [hasSeenExplainer, setHasSeenExplainer] = useState(false);
@@ -1823,7 +1824,9 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                   <h3 className="text-xl font-semibold text-gray-700 mb-4">Whiteboards</h3>
                               <div className="border border-gray-300 rounded-lg p-6 bg-white">
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                                  {whiteboardsToShow.map((image, index) => {
+                                  {whiteboardsToShow
+                                    .filter(image => !brokenImageUrls.has(image.imageUrl)) // Filter out broken images
+                                    .map((image, index) => {
                                     const isSelected = selectedWhiteboards.has(image.id);
                                     return (
                       <div 
@@ -1842,6 +1845,22 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                             fill
                             className="object-cover"
                             sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
+                            onError={(e) => {
+                              // Hide broken images and log details to help identify which entry to remove
+                              const target = e.target as HTMLImageElement;
+                              const brokenUrl = target.src;
+                              console.error('❌ [Whiteboard] BROKEN IMAGE DETECTED - Remove this entry:', {
+                                url: brokenUrl,
+                                title: image.title,
+                                topic: image.topic,
+                                lessonId: lessonId,
+                                id: image.id,
+                                subject: selectedSubject,
+                                unit: activeUnitNum
+                              });
+                              console.error('📍 Search for this URL in whiteboards.ts or allContent.ts:', brokenUrl);
+                              setBrokenImageUrls(prev => new Set(prev).add(brokenUrl));
+                            }}
                           />
                         </div>
 

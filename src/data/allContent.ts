@@ -261,6 +261,30 @@ export const whiteboardImages: WhiteboardImage[] = [
   // Lesson 1.4: Comparative Advantage and Trade
   // Moved from 1.3 - Comparative Advantage is micro's lesson 1.4, not 1.3
   {
+    id: 'micro-1.4-comp-adv-1',
+    subject: 'ap_microeconomics',
+    unit: 1,
+    lessonIDs: ['1.4'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.3_ComparativeA+1.jpg',
+    title: 'Comparative Advantage 1'
+  },
+  {
+    id: 'micro-1.4-comp-adv-2',
+    subject: 'ap_microeconomics',
+    unit: 1,
+    lessonIDs: ['1.4'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.3_ComparativeA+2.jpg',
+    title: 'Comparative Advantage 2'
+  },
+  {
+    id: 'micro-1.4-comp-adv-3',
+    subject: 'ap_microeconomics',
+    unit: 1,
+    lessonIDs: ['1.4'],
+    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.3_ComparativeA+3.jpg',
+    title: 'Comparative Advantage 3'
+  },
+  {
     id: '24',
     subject: 'ap_microeconomics',
     unit: 1,
@@ -299,22 +323,6 @@ export const whiteboardImages: WhiteboardImage[] = [
     lessonIDs: ['1.4'],
     imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.3_ComparativeA 31.jpg',
     title: 'Comparative Advantage 31'
-  },
-  {
-    id: '29',
-    subject: 'ap_microeconomics',
-    unit: 1,
-    lessonIDs: ['1.4'],
-    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.3_ComparativeA 38.jpg',
-    title: 'Comparative Advantage 38'
-  },
-  {
-    id: '30',
-    subject: 'ap_microeconomics',
-    unit: 1,
-    lessonIDs: ['1.4'],
-    imageUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_1/1.3_ComparativeA 6.jpg',
-    title: 'Comparative Advantage 6'
   },
 
   // AP Microeconomics Unit 2 Whiteboards (from Macro Unit 1)
