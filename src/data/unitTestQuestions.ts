@@ -2716,7 +2716,7 @@ options: [
     subject: "ap_microeconomics",
     lessonIDS: ["5.4"],
     unitName: "Factor Markets",
-    question: "The graph above shows the cost and revenue curves for a firm in a labor market. Which of the following correctly identifies the profit-maximizing wage rate and quantity of labor if the firm acts as a monopsony, compared to the wage and quantity if the market were perfectly competitive?",
+    question: "The graph below shows the cost and revenue curves for a firm in a labor market. Which of the following correctly identifies the profit-maximizing wage rate and quantity of labor if the firm acts as a monopsony, compared to the wage and quantity if the market were perfectly competitive?",
     image: { src: "/images/unitTestImages/Q5011.svg", alt: "Monopsony labor market graph" },
     optionTableHeaders: ["Monopsony Outcome", "Competitive Outcome"],
     options: [
@@ -2736,7 +2736,7 @@ options: [
     subject: "ap_microeconomics",
     lessonIDS: ["5.4"],
     unitName: "Factor Markets",
-    question: "Refer to the graph above. Suppose the government imposes a price floor at P2. Compared to the unregulated monopsony outcome, how will the wage rate and the number of workers hired change?",
+    question: "Refer to the graph below. Suppose the government imposes a price floor at P2. Compared to the unregulated monopsony outcome, how will the wage rate and the number of workers hired change?",
     image: { src: "/images/unitTestImages/Q5012.svg", alt: "Monopsony labor market graph" },
     options: [
       "Wage Rate: Increases | Quantity Hired: Increases",
@@ -2829,8 +2829,8 @@ options: [
     subject: "ap_microeconomics",
     lessonIDS: ["6.2"],
     unitName: "Market Failure and the Role of Government",
-    question: "The graph above illustrates a market failure. Which of the following scenarios is most likely depicted by this graph?",
-    image: { src: "/images/unitTestImages/unit6/unit6_negative_consumption_ext.png", alt: "Graph showing negative consumption externality" },
+    question: "The graph below illustrates a market failure. Which of the following scenarios is most likely depicted by this graph?",
+    image: { src: "/images/unitTestImages/Q6001.svg", alt: "market failure graph" },
     options: [
       "A factory polluting a nearby river while producing steel.",
       "A homeowner planting a beautiful garden that neighbors enjoy.",
@@ -2848,8 +2848,8 @@ options: [
     subject: "ap_microeconomics",
     lessonIDS: ["6.2"],
     unitName: "Market Failure and the Role of Government",
-    question: "Refer to the same graph above. Which of the following statements correctly describes the market outcome and the appropriate government policy to improve efficiency?",
-    image: { src: "/images/unitTestImages/unit6/unit6_negative_consumption_ext.png", alt: "Graph showing negative consumption externality" },
+    question: "Refer to the graph below Which of the following statements correctly describes the market outcome and the appropriate government policy to improve efficiency?",
+    image: { src: "/images/unitTestImages/Q6002.svg", alt: "market failure graph" },
     options: [
       "The market under-consumes the good; the government should provide a subsidy.",
       "The market produces the socially optimal quantity; no intervention is needed.",
@@ -2867,8 +2867,8 @@ options: [
     subject: "ap_microeconomics",
     lessonIDS: ["6.2", "6.4"],
     unitName: "Market Failure and the Role of Government",
-    question: "The graph above depicts a market with an externality. What specific government intervention would correct this market failure and achieve the socially optimal quantity?",
-    image: { src: "/images/unitTestImages/unit6/unit6_positive_externality_subsidy.png", alt: "Graph showing positive externality with subsidy" },
+    question: "The graph below depicts a market with an externality. What specific government intervention would correct this market failure and achieve the socially optimal quantity?",
+    image: { src: "/images/unitTestImages/Q6003.svg", alt: "graph showing exernality" },
     options: [
       "A per-unit tax of $4.",
       "A per-unit subsidy of $4.",
@@ -3003,8 +3003,8 @@ options: [
     subject: "ap_microeconomics",
     lessonIDS: ["6.4"],
     unitName: "Market Failure and the Role of Government",
-    question: "The graph above shows a natural monopoly. If the government regulates the firm by requiring it to charge the 'Fair-Return Price,' which of the following describes the outcome?",
-    image: { src: "/images/unitTestImages/unit6/unit6_natural_monopoly_regulation.png", alt: "Graph showing natural monopoly regulation" },
+    question: "The graph below shows a natural monopoly. If the government regulates the firm by requiring it to charge the 'Fair-Return Price,' which of the following describes the outcome?",
+    image: { src: "/images/unitTestImages/Q6004.svg", alt: "graph showing natural monopoly regulation" },
     options: [
       "Price P1 and positive economic profit.",
       "Price P2 and zero economic profit.",
