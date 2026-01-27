@@ -126,7 +126,9 @@ export default function UnitMCQTestPage() {
   // }, [answeredQuestions, isSubmitted, user, unitId, totalQuestions, isLoadingProgress]);
   
   // If unit not found, show error
-  if (!unitInfo || questions.length === 0) {
+  // For micro units, we don't require unitInfo (it's only in apMacroCourseInfo)
+  // For macro units, we require both unitInfo and questions
+  if (effectiveSubject === 'macro' && !unitInfo) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -144,20 +146,13 @@ export default function UnitMCQTestPage() {
     );
   }
 
-  // For micro, units 2, 3, 4, and 5 are available (unit 1, 6 are coming soon)
-  const availableMicroUnits = [2, 3, 4, 5];
-  const isMicroUnitAvailable = effectiveSubject !== 'micro' || availableMicroUnits.includes(unitNumber);
-  
-  // Check if micro unit is not available (even for premium users)
-  const isMicroUnitNotAvailable = effectiveSubject === 'micro' && !isMicroUnitAvailable;
-
-  // Show "Coming Soon" for unavailable micro units
-  if (isMicroUnitNotAvailable) {
+  // If no questions found, show error
+  if (questions.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">Coming Soon</h1>
-          <p className="text-gray-600 mb-6">This unit test is not yet available. Check back soon!</p>
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">Unit Test Not Found</h1>
+          <p className="text-gray-600 mb-6">No questions available for this unit test.</p>
           <Link 
             href={`/ap-${effectiveSubject}-practice-tests`}
             className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"

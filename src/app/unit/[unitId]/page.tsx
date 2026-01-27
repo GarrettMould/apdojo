@@ -1516,27 +1516,18 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                   Take the Unit {activeUnitNum} practice test and see how you stack up.
                 </p>
               </div>
-              {isMicro ? (
-                <Button
-                  disabled
-                  className="bg-gray-400 text-white font-black py-3 px-5 rounded-xl border-4 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] cursor-not-allowed"
-                >
-                  Coming Soon
-                </Button>
-              ) : (
-                <Button
-                  asChild
-                  className={`font-black py-3 px-5 rounded-xl border-4 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1 ${
-                    themeColor === 'blue'
-                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                      : 'bg-green-600 hover:bg-green-700 text-white'
-                  }`}
-                >
-                  <Link href={ctaLink}>
-                    Take the Unit {activeUnitNum} Test <ArrowRight className="w-5 h-5 ml-2" />
-                  </Link>
-                </Button>
-              )}
+              <Button
+                asChild
+                className={`font-black py-3 px-5 rounded-xl border-4 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1 ${
+                  themeColor === 'blue'
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                    : 'bg-green-600 hover:bg-green-700 text-white'
+                }`}
+              >
+                <Link href={ctaLink}>
+                  Take the Unit {activeUnitNum} Test <ArrowRight className="w-5 h-5 ml-2" />
+                </Link>
+              </Button>
             </div>
           );
         })()}

@@ -7,7 +7,7 @@ export const unitTestQuestions: QuestionType[] = [
   // Unit 1: Basic Economic Concepts
   {
     id: 1014,
-    subject: "ap_macroeconomics",
+    subject: ["ap_macroeconomics", "ap_microeconomics"],
     unit: 1,
     lessonIDS: ["1.5"],
     unitName: "Basic Economic Concepts",
@@ -26,7 +26,7 @@ export const unitTestQuestions: QuestionType[] = [
   }, 
   {
     "id": 1001,
-    "subject": "ap_macroeconomics",
+    "subject": ["ap_macroeconomics", "ap_microeconomics"],
     "unit": 1,
     "lessonIDS": ["1.2"],
     "unitName": "Basic Economic Concepts",
@@ -45,7 +45,7 @@ export const unitTestQuestions: QuestionType[] = [
   },
   {
     "id": 1002,
-    "subject": "ap_macroeconomics",
+    "subject": ["ap_macroeconomics", "ap_microeconomics"],
     "unit": 1,
     "lessonIDS": ["1.1"],
     "unitName": "Basic Economic Concepts",
@@ -64,7 +64,7 @@ export const unitTestQuestions: QuestionType[] = [
   },
   {
     "id": 1003,
-    "subject": "ap_macroeconomics",
+    "subject": ["ap_macroeconomics", "ap_microeconomics"],
     "unit": 1,
     "lessonIDS": ["1.3"],
     "unitName": "Basic Economic Concepts",
@@ -83,7 +83,7 @@ export const unitTestQuestions: QuestionType[] = [
   },
   {
     "id": 1004,
-    "subject": "ap_macroeconomics",
+    "subject": ["ap_macroeconomics", "ap_microeconomics"],
     "unit": 1,
     "lessonIDS": ["1.4"],
     "unitName": "Basic Economic Concepts",
@@ -102,7 +102,7 @@ export const unitTestQuestions: QuestionType[] = [
   },
   {
     "id": 1005,
-    "subject": "ap_macroeconomics",
+    "subject": ["ap_macroeconomics", "ap_microeconomics"],
     "unit": 1,
     "lessonIDS": ["1.5"],
     "unitName": "Basic Economic Concepts",
@@ -159,7 +159,7 @@ export const unitTestQuestions: QuestionType[] = [
   },
   {
     id: 1008,
-    subject: "ap_macroeconomics",
+    subject: ["ap_macroeconomics", "ap_microeconomics"],
     unit: 1,
     lessonIDS: ["1.5"],
     unitName: "Basic Economic Concepts",
@@ -178,7 +178,7 @@ export const unitTestQuestions: QuestionType[] = [
   },
   {
     id: 1009,
-    subject: "ap_macroeconomics",
+    subject: ["ap_macroeconomics", "ap_microeconomics"],
     unit: 1,
     lessonIDS: ["1.6"],
     unitName: "Basic Economic Concepts",
@@ -216,7 +216,7 @@ export const unitTestQuestions: QuestionType[] = [
   }, 
   {
     id: 1011,
-    subject: "ap_macroeconomics",
+    subject: ["ap_macroeconomics", "ap_microeconomics"],
     unit: 1,
     lessonIDS: ["1.3"],
     unitName: "Basic Economic Concepts",
@@ -235,7 +235,7 @@ export const unitTestQuestions: QuestionType[] = [
   }, 
   {
     id: 1012,
-    subject: "ap_macroeconomics",
+    subject: ["ap_macroeconomics", "ap_microeconomics"],
     unit: 1,
     lessonIDS: ["1.6"],
     unitName: "Basic Economic Concepts",
@@ -254,7 +254,7 @@ export const unitTestQuestions: QuestionType[] = [
   }, 
   {
     id: 1013,
-    subject: "ap_macroeconomics",
+    subject: ["ap_macroeconomics", "ap_microeconomics"],
     unit: 1,
     lessonIDS: ["1.4"],
     unitName: "Basic Economic Concepts",
@@ -273,7 +273,7 @@ export const unitTestQuestions: QuestionType[] = [
   }, 
   {
     id: 1015,
-    subject: "ap_macroeconomics",
+    subject: ["ap_macroeconomics", "ap_microeconomics"],
     unit: 1,
     lessonIDS: ["1.4"],
     unitName: "Basic Economic Concepts",
@@ -290,6 +290,52 @@ export const unitTestQuestions: QuestionType[] = [
     explanation: "Absolute advantage occurs when a country can produce more of a good than another country using the same quantity of resources. In this case, Country A produces 10 tons of wheat with 5 workers, more than Country B's 8 tons with the same number of workers.",
     explanationVideo: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/Unit_MCQ_Explanations/U1Q15.mp4"
   },
+    {
+      "id": 1016,
+      "subject": "ap_microeconomics",
+      "unit": 1,
+      "lessonIDS": ["1.2"],
+      "unitName": "Basic Economic Concepts",
+      "question": "Which of the following characteristics distinguishes a command economy from a market economy?",
+      "image": null,
+      "options": [
+        "Resources are allocated by private individuals based on price signals.",
+        "The government owns most productive resources and determines resource allocation.",
+        "Competition among firms encourages innovation and efficiency.",
+        "Consumers determine what goods and services are produced through their purchasing choices.",
+        "Property rights are clearly defined and enforced by the legal system."
+      ],
+      "correctAnswer": "B",
+      "explanation": "In a command economy, the government or a central authority owns the means of production and makes decisions regarding the allocation of resources. In contrast, market economies rely on private ownership and the interaction of supply and demand (price signals) to allocate resources.",
+    },
+    {
+      "id": 1017,
+      "subject": "ap_microeconomics",
+      "unit": 1,
+      "lessonIDS": ["1.6"],
+      "unitName": "Basic Economic Concepts",
+      "question": "A consumer has a budget of $7 to spend on Coffee and Donuts. The price of Coffee is $2 per cup, and the price of a Donut is $1. Based on the Marginal Utility (MU) data in the table below, what combination of Coffee and Donuts will maximize the consumer's total utility?",
+      "image": null,
+      "tableData": {
+        "headers": ["Quantity", "MU of Coffee (utils)", "MU of Donuts (utils)"],
+        "rows": [
+          ["1", "20", "12"],
+          ["2", "16", "10"],
+          ["3", "12", "8"],
+          ["4", "8", "6"]
+        ]
+      },
+      "options": [
+        "1 Coffee and 5 Donuts",
+        "3 Coffees and 1 Donut",
+        "2 Coffees and 3 Donuts",
+        "2 Coffees and 2 Donuts",
+        "3 Coffees and 3 Donuts"
+      ],
+      "correctAnswer": "C",
+      "explanation": "To maximize utility, the consumer should spend their next dollar on the good that provides the highest Marginal Utility per dollar (MU/P). \n1. MU/P for Coffee: 10, 8, 6, 4. \n2. MU/P for Donuts: 12, 10, 8, 6. \nStep 1: Buy 1st Donut (12 > 10). Cost $1. Remaining Budget $6. \nStep 2: Buy 1st Coffee (10) and 2nd Donut (10). Cost $3. Remaining Budget $3. \nStep 3: Buy 2nd Coffee (8) and 3rd Donut (8). Cost $3. Remaining Budget $0. \nOptimal bundle: 2 Coffees and 3 Donuts. At this point, MU/P is equal for both (8 utils per dollar).",
+    },
+  
   
   // Unit 2: Economic Indicators and the Business Cycle
   {
@@ -2447,20 +2493,20 @@ options: [
     lessonIDS: ["5.1"],
     unitName: "Factor Markets",
     question: "Assume that advancements in fertilizer technology allow farm laborers to be more productive. Which of the following graphs illustrates the effect of this change on a single firm hiring farm labor in a perfectly competitive market?",
-    image: { src: "/images/unitTestImages/unit5/unit5_labor_shifts_stacked.png", alt: "Stacked graphs showing different labor market scenarios" },
+    image: null,
     options: [
-      "Graph 1 (Top)",
-      "Graph 2 (Second down)",
-      "Graph 3 (Third down)",
-      "Graph 4 (Fourth down)",
-      "Graph 5 (Bottom)"
+      "",
+      "",
+      "",
+      "",
+      ""
     ],
     optionImages: [
-      { src: "/images/unitTestImages/unit5/labor_graph_1.png", alt: "Graph 1 option" },
-      { src: "/images/unitTestImages/unit5/labor_graph_2.png", alt: "Graph 2 option" },
-      { src: "/images/unitTestImages/unit5/labor_graph_3.png", alt: "Graph 3 option" },
-      { src: "/images/unitTestImages/unit5/labor_graph_4.png", alt: "Graph 4 option" },
-      { src: "/images/unitTestImages/unit5/labor_graph_5.png", alt: "Graph 5 option" }
+      { src: "/images/unitTestImages/Q5001a.svg", alt: "Graph 1 option" },
+      { src: "/images/unitTestImages/Q5001b.svg", alt: "Graph 2 option" },
+      { src: "/images/unitTestImages/Q5001c.svg", alt: "Graph 3 option" },
+      { src: "/images/unitTestImages/Q5001d.svg", alt: "Graph 4 option" },
+      { src: "/images/unitTestImages/Q5001e.svg", alt: "Graph 5 option" }
     ],
     correctAnswer: "B",
     explanation: "Technological advancements increase the productivity of workers (Marginal Product). The demand for labor is derived from the Marginal Revenue Product (MRP), which is calculated as Marginal Product (MP) × Product Price (P). An increase in productivity shifts the MRP curve to the right (as shown in the second graph), leading the firm to hire more workers at the current wage rate.",
@@ -2671,7 +2717,7 @@ options: [
     lessonIDS: ["5.4"],
     unitName: "Factor Markets",
     question: "The graph above shows the cost and revenue curves for a firm in a labor market. Which of the following correctly identifies the profit-maximizing wage rate and quantity of labor if the firm acts as a monopsony, compared to the wage and quantity if the market were perfectly competitive?",
-    image: { src: "/images/unitTestImages/unit5/unit5_monopsony_graph.png", alt: "Monopsony labor market graph" },
+    image: { src: "/images/unitTestImages/Q5011.svg", alt: "Monopsony labor market graph" },
     optionTableHeaders: ["Monopsony Outcome", "Competitive Outcome"],
     options: [
       "Wage P2, Quantity Q2 | Wage P3, Quantity Q3",
@@ -2691,7 +2737,7 @@ options: [
     lessonIDS: ["5.4"],
     unitName: "Factor Markets",
     question: "Refer to the graph above. Suppose the government imposes a price floor at P2. Compared to the unregulated monopsony outcome, how will the wage rate and the number of workers hired change?",
-    image: { src: "/images/unitTestImages/unit5/unit5_monopsony_graph.png", alt: "Monopsony labor market graph" },
+    image: { src: "/images/unitTestImages/Q5012.svg", alt: "Monopsony labor market graph" },
     options: [
       "Wage Rate: Increases | Quantity Hired: Increases",
       "Wage Rate: Increases | Quantity Hired: Decreases",
@@ -2740,10 +2786,334 @@ options: [
       "25 | $100"
     ],
     correctAnswer: "A",
-    explanation: "To minimize costs (and maximize profit in a perfectly competitive market), the firm employs inputs where the Marginal Revenue Product (MRP) equals the factor price. \n1. Find Marginal Product of Labor ($MP_L$): We know Wage ($P_L$) = $MRP_L = P_{product} \times MP_L$. \n   $200 = $10 \times MP_L \rightarrow MP_L = 20$.\n2. Find Price of Capital ($P_K$): We know $P_K = MRP_K = P_{product} \times MP_K$.\n   $P_K = $10 \times 8 = $80.\nAlternatively, you can check the least-cost rule: $MP_L/P_L = MP_K/P_K \rightarrow 20/200 = 8/80 = 0.1$.",
+    explanation: "To minimize costs (and maximize profit in a perfectly competitive market), the firm employs inputs where the Marginal Revenue Product (MRP) equals the factor price. \n1. Find Marginal Product of Labor ($MP_L$): We know Wage ($P_L$) = $MRP_L = P_{product} \times MP_L$. \n   $200 = $10 \times MP_L \rightarrow MP_L = 20$.\n2. Find Price of Capital ($P_K$): We know $P_K = MRP_K = P_{product} \times MP_K$.\n   $P_K = $10 \times 8 = $80.\nAlternatively, you can check the least-cost rule: $MP_L/P_L = MP_K/P_K \rightarrow 20/200 = 8/80 = 0.1$.", 
+    videoExplanation: null
+  },
+  // Unit 6 Micro: Market Failure and the Role of Government
+  // Lesson 6.1: Socially Optimal Quantity
+  {
+    id: 6005,
+    unit: 6,
+    subject: "ap_microeconomics",
+    lessonIDS: ["6.1"],
+    unitName: "Market Failure and the Role of Government",
+    question: "The table below shows the Total Social Benefit (TSB) and Total Social Cost (TSC) associated with issuing hunting permits in a state park. Using marginal analysis, what is the socially optimal number of permits to issue?",
+    image: null,
+    tableData: {
+      headers: ["Quantity of Permits", "Total Social Benefit", "Total Social Cost"],
+      rows: [
+        ["0", "$0", "$0"],
+        ["1", "$100", "$20"],
+        ["2", "$190", "$50"],
+        ["3", "$270", "$90"],
+        ["4", "$340", "$150"],
+        ["5", "$400", "$230"],
+        ["6", "$450", "$330"]
+      ]
+    },
+    options: [
+      "3",
+      "4",
+      "5",
+      "6",
+      "2"
+    ],
+    correctAnswer: "B",
+    explanation: "To find the socially optimal quantity, we must calculate the Marginal Social Benefit (MSB) and Marginal Social Cost (MSC) for each additional permit and choose the last quantity where MSB ≥ MSC.\n- Permit 3: MSB = $270 - $190 = $80; MSC = $90 - $50 = $40. ($80 > $40) -> Issue.\n- Permit 4: MSB = $340 - $270 = $70; MSC = $150 - $90 = $60. ($70 > $60) -> Issue.\n- Permit 5: MSB = $400 - $340 = $60; MSC = $230 - $150 = $80. ($60 < $80) -> Do Not Issue.\nThe optimal quantity is 4.",
+    videoExplanation: null
+  },
+  // Lesson 6.2: Externalities
+  {
+    id: 6001,
+    unit: 6,
+    subject: "ap_microeconomics",
+    lessonIDS: ["6.2"],
+    unitName: "Market Failure and the Role of Government",
+    question: "The graph above illustrates a market failure. Which of the following scenarios is most likely depicted by this graph?",
+    image: { src: "/images/unitTestImages/unit6/unit6_negative_consumption_ext.png", alt: "Graph showing negative consumption externality" },
+    options: [
+      "A factory polluting a nearby river while producing steel.",
+      "A homeowner planting a beautiful garden that neighbors enjoy.",
+      "A person smoking cigarettes in a crowded public park.",
+      "A student receiving a flu vaccination.",
+      "A firm conducting research that benefits the entire industry."
+    ],
+    correctAnswer: "C",
+    explanation: "The graph shows that the Marginal Social Benefit (MSB) is lower than the Marginal Private Benefit (MPB). This indicates a negative consumption externality, where the consumption of a good imposes an external cost on others (lowering the social benefit). Smoking in public is a classic example: the smoker enjoys the cigarette (private benefit), but the smoke harms nearby people (negative external effect), making the social benefit less than the private benefit.",
+    videoExplanation: null
+  },
+  {
+    id: 6002,
+    unit: 6,
+    subject: "ap_microeconomics",
+    lessonIDS: ["6.2"],
+    unitName: "Market Failure and the Role of Government",
+    question: "Refer to the same graph above. Which of the following statements correctly describes the market outcome and the appropriate government policy to improve efficiency?",
+    image: { src: "/images/unitTestImages/unit6/unit6_negative_consumption_ext.png", alt: "Graph showing negative consumption externality" },
+    options: [
+      "The market under-consumes the good; the government should provide a subsidy.",
+      "The market produces the socially optimal quantity; no intervention is needed.",
+      "The market over-consumes the good; the government should impose a per-unit tax.",
+      "The market over-consumes the good; the government should provide a per-unit subsidy.",
+      "The market under-consumes the good; the government should impose a price ceiling."
+    ],
+    correctAnswer: "C",
+    explanation: "Because individuals make decisions based on their higher private benefit (MPB) rather than the lower social benefit (MSB), they consume more than the socially optimal amount (where MSB = MSC). To correct this over-consumption and reduce deadweight loss, the government should impose a per-unit tax, which effectively raises the private cost or lowers the private benefit to align with the social optimum.",
+    videoExplanation: null
+  },
+  {
+    id: 6003,
+    unit: 6,
+    subject: "ap_microeconomics",
+    lessonIDS: ["6.2", "6.4"],
+    unitName: "Market Failure and the Role of Government",
+    question: "The graph above depicts a market with an externality. What specific government intervention would correct this market failure and achieve the socially optimal quantity?",
+    image: { src: "/images/unitTestImages/unit6/unit6_positive_externality_subsidy.png", alt: "Graph showing positive externality with subsidy" },
+    options: [
+      "A per-unit tax of $4.",
+      "A per-unit subsidy of $4.",
+      "A per-unit tax of $6.",
+      "A per-unit subsidy of $6.",
+      "A price ceiling set at $12."
+    ],
+    correctAnswer: "D",
+    explanation: "The graph shows a positive externality (likely production or consumption) where the Marginal Social Benefit (MSB) is greater than the Marginal Private Benefit (MPB) or the cost curves are aligned for a positive consumption externality. Specifically, at Q2 (social optimum), the vertical distance between the curves represents the external benefit. To shift the private outcome (Q1) to the social optimum (Q3), the government needs to bridge the gap. Looking at the vertical distance between the two parallel lines (e.g., at Q2, the gap is between $18 and $12, or generally measuring the vertical shift needed), a subsidy equal to the marginal external benefit is required. In this specific graph, the vertical distance between the supply curves (or benefit curves depending on interpretation of the specific labels provided in standard AP graphs of this type) is often the value of the externality. Here, the text prompt suggests the answer is a $6 subsidy, which corresponds to the vertical distance (e.g., $18 - $12 = $6).",
+    videoExplanation: null
+  },
+  {
+    id: 6012,
+    unit: 6,
+    subject: "ap_microeconomics",
+    lessonIDS: ["6.2", "6.4"],
+    unitName: "Market Failure and the Role of Government",
+    question: "A market is characterized by a positive consumption externality. If the government imposes a binding price ceiling in this market, what is the likely impact on deadweight loss?",
+    image: null,
+    options: [
+      "Deadweight loss will be eliminated because the price is lower.",
+      "Deadweight loss will decrease because consumers can afford more.",
+      "Deadweight loss will increase or persist because the quantity supplied will decrease.",
+      "The market will reach allocative efficiency.",
+      "The external benefit will increase."
+    ],
+    correctAnswer: "C",
+    explanation: "A positive consumption externality means the market is already under-producing the good (Socially Optimal Q > Market Q). A binding price ceiling holds the price below equilibrium, which causes producers to reduce the quantity supplied even further. This widens the gap between the quantity actually traded and the socially optimal quantity, thereby increasing (or at least failing to fix) the deadweight loss.",
+    videoExplanation: null
+  },
+  {
+    id: 6014,
+    unit: 6,
+    subject: "ap_microeconomics",
+    lessonIDS: ["6.2"],
+    unitName: "Market Failure and the Role of Government",
+    question: "If the production of a good creates a negative externality (such as pollution), which of the following statements is true regarding the unregulated market outcome?",
+    image: null,
+    options: [
+      "The market price is higher than the socially optimal price.",
+      "The Marginal Social Cost is less than the Marginal Private Cost.",
+      "The market produces where Marginal Social Benefit equals Marginal Social Cost.",
+      "The market quantity produced is greater than the socially optimal quantity.",
+      "The government should provide a subsidy to correct the inefficiency."
+    ],
+    correctAnswer: "D",
+    explanation: "When a firm produces a good with a negative externality, it bases its production decisions only on its Marginal Private Cost (MPC). It ignores the external costs imposed on society, meaning the Marginal Social Cost (MSC) is higher than the MPC. Consequently, the firm produces too much of the good compared to what is socially optimal (allocative efficiency), and the market price is too low to reflect the true cost.",
+    videoExplanation: null
+  },
+  // Lesson 6.3: Public Goods and Common Resources
+  {
+    id: 6007,
+    unit: 6,
+    subject: "ap_microeconomics",
+    lessonIDS: ["6.3"],
+    unitName: "Market Failure and the Role of Government",
+    question: "Which of the following scenarios best demonstrates the characteristic of 'non-rivalry' in consumption?",
+    image: null,
+    options: [
+      "Eating an apple from a communal basket.",
+      "Listening to a digital music broadcast.",
+      "Fishing in a public lake.",
+      "Driving on a congested highway.",
+      "Buying a ticket to a sold-out concert."
+    ],
+    correctAnswer: "B",
+    explanation: "Non-rivalry means that one person's consumption of a good does not diminish the ability of others to consume it. If one person listens to a digital broadcast, it does not prevent millions of others from listening to the same broadcast simultaneously. Fishing, eating an apple, and occupying a seat at a concert are all rival activities.",
+    videoExplanation: null
+  },
+  {
+    id: 6008,
+    unit: 6,
+    subject: "ap_microeconomics",
+    lessonIDS: ["6.3"],
+    unitName: "Market Failure and the Role of Government",
+    question: "The 'Tragedy of the Commons' occurs when a good is:",
+    image: null,
+    options: [
+      "Rival and Excludable.",
+      "Non-rival and Non-excludable.",
+      "Rival and Non-excludable.",
+      "Non-rival and Excludable.",
+      "Provided by the government."
+    ],
+    correctAnswer: "C",
+    explanation: "The Tragedy of the Commons arises with common resources (like fish in the ocean or public pasture land). These goods are non-excludable (anyone can use them) but rival (one person's use reduces what is available for others). This leads to overuse and depletion because individuals have no incentive to conserve the resource.",
+    videoExplanation: null
+  },
+  {
+    id: 6013,
+    unit: 6,
+    subject: "ap_microeconomics",
+    lessonIDS: ["6.3"],
+    unitName: "Market Failure and the Role of Government",
+    question: "Why do private markets typically fail to provide the efficient quantity of public goods?",
+    image: null,
+    options: [
+      "Because public goods are rival in consumption.",
+      "Because the government prevents private firms from producing them.",
+      "Because public goods have negative externalities.",
+      "Because of the free-rider problem caused by non-excludability.",
+      "Because the marginal cost of producing public goods is infinite."
+    ],
+    correctAnswer: "D",
+    explanation: "Public goods are non-excludable, meaning firms cannot prevent people from using the good even if they don't pay for it. This creates the 'free-rider problem,' where individuals wait for others to pay so they can use the good for free. Since firms cannot ensure payment, they will not produce the good, or will under-produce it, leading to market failure.",
+    videoExplanation: null
+  },
+  // Lesson 6.4: Government Regulation
+  {
+    id: 6011,
+    unit: 6,
+    subject: "ap_microeconomics",
+    lessonIDS: ["6.4"],
+    unitName: "Market Failure and the Role of Government",
+    question: "If the government imposes a new lump-sum tax on a profit-maximizing firm, how will the firm's profit-maximizing quantity and total profit change in the short run?",
+    image: null,
+    optionTableHeaders: ["Quantity Produced", "Total Profit"],
+    options: [
+      "Decrease | Decrease",
+      "Decrease | No Change",
+      "Increase | Decrease",
+      "No Change | No Change",
+      "No Change | Decrease"
+    ],
+    correctAnswer: "E",
+    explanation: "A lump-sum tax is a fixed cost; it does not change based on how many units are produced. Therefore, it shifts the Average Total Cost (ATC) curve upward but leaves the Marginal Cost (MC) curve unchanged. Since the profit-maximizing quantity is determined where MR = MC, the quantity remains the same. However, total costs rise, so total profit decreases.",
+    videoExplanation: null
+  },
+  {
+    id: 6004,
+    unit: 6,
+    subject: "ap_microeconomics",
+    lessonIDS: ["6.4"],
+    unitName: "Market Failure and the Role of Government",
+    question: "The graph above shows a natural monopoly. If the government regulates the firm by requiring it to charge the 'Fair-Return Price,' which of the following describes the outcome?",
+    image: { src: "/images/unitTestImages/unit6/unit6_natural_monopoly_regulation.png", alt: "Graph showing natural monopoly regulation" },
+    options: [
+      "Price P1 and positive economic profit.",
+      "Price P2 and zero economic profit.",
+      "Price P3 and negative economic profit.",
+      "Price P4 and zero economic profit.",
+      "Price P2 and positive economic profit."
+    ],
+    correctAnswer: "B",
+    explanation: "The Fair-Return Price is a regulatory price ceiling set where the Demand curve intersects the Average Total Cost (ATC) curve. At this point (Price P2 in typical labeling for this curve intersection), the price covers the average cost per unit exactly. Therefore, Total Revenue equals Total Cost, resulting in zero economic profit (a normal profit). This allows the firm to stay in business without a subsidy while lowering prices for consumers compared to the unregulated monopoly price.",
+    videoExplanation: null
+  },
+  // Lesson 6.5: Income Distribution
+  {
+    id: 6006,
+    unit: 6,
+    subject: "ap_microeconomics",
+    lessonIDS: ["6.5"],
+    unitName: "Market Failure and the Role of Government",
+    question: "The table below illustrates a tax policy applied to three individuals with different income levels. Based on the data, how would this tax structure be classified?",
+    image: null,
+    tableData: {
+      headers: ["Taxpayer", "Annual Income", "Tax Rate", "Total Tax Paid"],
+      rows: [
+        ["Person A", "$20,000", "15%", "$3,000"],
+        ["Person B", "$50,000", "15%", "$7,500"],
+        ["Person C", "$100,000", "15%", "$15,000"]
+      ]
+    },
+    options: [
+      "Progressive",
+      "Regressive",
+      "Proportional (Flat)",
+      "Lump-sum",
+      "Marginal"
+    ],
+    correctAnswer: "C",
+    explanation: "A proportional tax (often called a flat tax) takes the same percentage of income from all taxpayers, regardless of their income level. In this table, every person pays exactly 15% of their income, meaning the tax rate is constant. (Note: A progressive tax would have higher rates for higher incomes, and a regressive tax would take a smaller percentage as income rises).",
+    videoExplanation: null
+  },
+  {
+    id: 6009,
+    unit: 6,
+    subject: "ap_microeconomics",
+    lessonIDS: ["6.5"],
+    unitName: "Market Failure and the Role of Government",
+    question: "The Gini coefficient is used to measure income inequality. Country A has a Gini coefficient of 0.25, while Country B has a Gini coefficient of 0.60. Which of the following conclusions is correct?",
+    image: null,
+    options: [
+      "Country A has a higher average income per capita.",
+      "Country B has a larger population.",
+      "Country A has a more unequal distribution of income than Country B.",
+      "Country B has a more unequal distribution of income than Country A.",
+      "Income is perfectly distributed in both countries."
+    ],
+    correctAnswer: "D",
+    explanation: "The Gini coefficient ranges from 0 (perfect equality) to 1 (perfect inequality). A higher Gini coefficient indicates greater income inequality. Therefore, Country B (0.60) has a much more unequal distribution of income compared to Country A (0.25).",
+    videoExplanation: null
+  },
+  {
+    id: 6010,
+    unit: 6,
+    subject: "ap_microeconomics",
+    lessonIDS: ["6.5"],
+    unitName: "Market Failure and the Role of Government",
+    question: "Which of the following government policies would be most effective at reducing income inequality in a society?",
+    image: null,
+    options: [
+      "Establishing a progressive income tax system.",
+      "Eliminating the estate tax on inherited wealth.",
+      "Implementing a regressive sales tax.",
+      "Reducing transfer payments to low-income households.",
+      "Imposing a lump-sum tax on all citizens."
+    ],
+    correctAnswer: "A",
+    explanation: "A progressive tax system imposes a higher tax rate on individuals with higher incomes. This redistributes wealth by taking a larger share from the rich, which can then be used to fund transfer payments or public services for lower-income groups, thereby reducing the income gap.",
+    videoExplanation: null
+  },
+  {
+    id: 6015,
+    unit: 6,
+    subject: "ap_microeconomics",
+    lessonIDS: ["6.5"],
+    unitName: "Market Failure and the Role of Government",
+    question: "Which of the following describes the shape of the Lorenz Curve for a society with perfect income equality?",
+    image: null,
+    options: [
+      "A horizontal line at 0%.",
+      "A 45-degree diagonal line.",
+      "A vertical line at 100%.",
+      "A backward-bending curve.",
+      "A U-shaped curve."
+    ],
+    correctAnswer: "B",
+    explanation: "The Lorenz Curve plots the cumulative percentage of the population against the cumulative percentage of income. If income is perfectly distributed (e.g., the bottom 20% earns 20% of the income), the curve is a straight 45-degree diagonal line (the Line of Equality). The more the curve bows away from this line, the greater the inequality.",
     videoExplanation: null
   }
 ];
+
+// Helper function to check if a question matches a subject
+// Handles both string and array subjects
+export const questionMatchesSubject = (
+  question: QuestionType,
+  subject: 'ap_macroeconomics' | 'ap_microeconomics'
+): boolean => {
+  if (Array.isArray(question.subject)) {
+    return question.subject.includes(subject);
+  }
+  return question.subject === subject;
+};
 
 // Helper function to get unit test questions for a specific unit
 // Optionally filter by subject to ensure macro and micro questions don't mix
@@ -2751,10 +3121,11 @@ export const getUnitTestQuestions = (
   unitNumber: number,
   subject?: 'ap_macroeconomics' | 'ap_microeconomics'
 ): QuestionType[] => {
-  return unitTestQuestions.filter(q => 
-    q.unit === unitNumber && 
-    (!subject || q.subject === subject)
-  );
+  return unitTestQuestions.filter(q => {
+    if (q.unit !== unitNumber) return false;
+    if (!subject) return true;
+    return questionMatchesSubject(q, subject);
+  });
 };
 
 // Export individual unit tests

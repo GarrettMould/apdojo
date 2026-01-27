@@ -884,7 +884,17 @@ const QuestionCard = ({
                             className="w-5 h-5 text-blue-600 flex-shrink-0"
                             onClick={(e) => e.stopPropagation()}
                           />
-                          <span className={`flex-1 text-gray-900 ${isStruckThrough ? 'line-through text-gray-400' : ''}`}>{option}</span>
+                          {question.optionImages && question.optionImages[optIndex] ? (
+                            <div className="flex-1 flex items-center justify-center">
+                              <img 
+                                src={question.optionImages[optIndex].src}
+                                alt={question.optionImages[optIndex].alt || `Option ${letter}`}
+                                className={`max-w-[200px] max-h-[150px] object-contain ${isStruckThrough ? 'opacity-40' : ''}`}
+                              />
+                            </div>
+                          ) : (
+                            <span className={`flex-1 text-gray-900 ${isStruckThrough ? 'line-through text-gray-400' : ''}`}>{option}</span>
+                          )}
                           {/* Strikethrough Button */}
                           <div
                             role="button"
@@ -910,7 +920,17 @@ const QuestionCard = ({
                           >
                             {letter}
                           </span>
-                          <span className="flex-1 text-gray-900">{option}</span>
+                          {question.optionImages && question.optionImages[optIndex] ? (
+                            <div className="flex-1 flex items-center justify-center">
+                              <img 
+                                src={question.optionImages[optIndex].src}
+                                alt={question.optionImages[optIndex].alt || `Option ${letter}`}
+                                className="max-w-[200px] max-h-[150px] object-contain"
+                              />
+                            </div>
+                          ) : (
+                            <span className="flex-1 text-gray-900">{option}</span>
+                          )}
                           {isCorrectAnswer && (
                             <CheckCircle2 className="w-6 h-6 text-green-600 flex-shrink-0" />
                           )}

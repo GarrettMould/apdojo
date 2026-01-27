@@ -2280,8 +2280,18 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                       }`}> 
                                         {String.fromCharCode(65 + index)}
                                       </span>
-                                      {/* Option Text */}
-                                      <span className={`flex-1 text-sm ${isStruckThrough ? 'line-through text-gray-400' : ''} ${showResults ? 'text-gray-800' : isSelected ? 'text-gray-900' : 'text-gray-900'}`}>{option}</span>
+                                      {/* Option Image or Text */}
+                                      {question.optionImages && question.optionImages[index] ? (
+                                        <div className="flex-1 flex items-center justify-center">
+                                          <img 
+                                            src={question.optionImages[index].src}
+                                            alt={question.optionImages[index].alt || `Option ${String.fromCharCode(65 + index)}`}
+                                            className={`max-w-[200px] max-h-[150px] object-contain ${isStruckThrough ? 'opacity-40' : ''}`}
+                                          />
+                                        </div>
+                                      ) : (
+                                        <span className={`flex-1 text-sm ${isStruckThrough ? 'line-through text-gray-400' : ''} ${showResults ? 'text-gray-800' : isSelected ? 'text-gray-900' : 'text-gray-900'}`}>{option}</span>
+                                      )}
                                       {/* Strikethrough Button - Only show when not submitted */}
                                       {!showResults && (
                                         <div
@@ -2562,8 +2572,18 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                             }`}>
                               {letter}
                             </span>
-                            {/* Option Text */}
-                            <span className="flex-1 text-sm text-gray-800">{option}</span>
+                            {/* Option Image or Text */}
+                            {question.optionImages && question.optionImages[idx] ? (
+                              <div className="flex-1 flex items-center justify-center">
+                                <img 
+                                  src={question.optionImages[idx].src}
+                                  alt={question.optionImages[idx].alt || `Option ${letter}`}
+                                  className="max-w-[200px] max-h-[150px] object-contain"
+                                />
+                              </div>
+                            ) : (
+                              <span className="flex-1 text-sm text-gray-800">{option}</span>
+                            )}
                             {/* Feedback Icon */}
                             {(isCorrectAnswer || (isSelected && !isCorrectAnswer)) && (
                               <div className="flex-shrink-0">
