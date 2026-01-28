@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, Suspense } from 'react';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question } from '@/data/questionBanks/types';
 import { Copy, CheckCircle2, Search, Filter, Eye, Loader2 } from 'lucide-react';
@@ -29,7 +29,7 @@ interface AssignmentResult {
   assignmentType: 'mcq' | 'graphGym' | 'dojoDrill';
 }
 
-export default function TutorBuilderPage() {
+function TutorBuilderContent() {
   const { user } = useAuthContext();
   const searchParams = useSearchParams();
   const [viewMode, setViewMode] = useState<ViewMode>('builder');
@@ -814,6 +814,18 @@ export default function TutorBuilderPage() {
       )}
 
     </div>
+  );
+}
+
+export default function TutorBuilderPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      </div>
+    }>
+      <TutorBuilderContent />
+    </Suspense>
   );
 }
 
