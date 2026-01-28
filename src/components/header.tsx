@@ -11,7 +11,6 @@ import { getSubjectXP } from '@/hooks/useUserProgress';
 import { getBeltProgress } from '@/lib/beltSystem';
 import { motion } from 'framer-motion';
 import { SubjectToggle } from '@/components/dashboard/SubjectToggle';
-import { useTeacherViewMode } from '@/hooks/useTeacherViewMode';
 import { hasValidSeasonPass, getPracticeTestsUrl } from '@/lib/utils';
 
 export function Header() {
@@ -25,20 +24,7 @@ export function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { viewMode, toggleViewMode, setIsTeacher } = useTeacherViewMode();
-  
-  // Update teacher status in the hook
-  useEffect(() => {
-    setIsTeacher(!!(user && userData?.teacher === true));
-  }, [user, userData, setIsTeacher]);
-  
   const isTeacher = !!(user && userData?.teacher === true);
-  
-  const handleViewModeToggle = () => {
-    toggleViewMode();
-    // Navigate to home page to apply the view mode change
-    router.push('/');
-  };
 
   // Ensure component is mounted before using selectedSubject to prevent hydration mismatch
   useEffect(() => {
@@ -421,20 +407,6 @@ export function Header() {
                                 )}
                               </div>
 
-                              {/* Tutor View Toggle and Logout (inside dropdown) */}
-                              {isTeacher && (
-                                <div className="border-t border-gray-200 pt-3 mt-3">
-                                  <button
-                                    onClick={() => {
-                                      handleViewModeToggle();
-                                      setIsBeltDropdownOpen(false);
-                                    }}
-                                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors rounded-md"
-                                  >
-                                    {viewMode === 'tutor' ? 'Student View' : 'Tutor View'}
-                                  </button>
-                                </div>
-                              )}
 
                               {user && (
                                 <div className="border-t border-gray-200 pt-3 mt-3">
@@ -700,20 +672,6 @@ export function Header() {
                     </div>
                   </div>
                   
-                  {/* Tutor View Toggle and Logout (inside XP section on mobile) */}
-                  {isTeacher && (
-                    <div className="px-4 pt-2 border-t border-gray-200 mt-3">
-                      <button
-                        onClick={() => {
-                          handleViewModeToggle();
-                          closeMobileMenu();
-                        }}
-                        className="w-full text-left px-4 py-2 text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold rounded-md"
-                      >
-                        {viewMode === 'tutor' ? 'Student View' : 'Tutor View'}
-                      </button>
-                    </div>
-                  )}
 
                   {user && (
                     <div className="px-4 pt-2 border-t border-gray-200 mt-3">

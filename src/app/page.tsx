@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useTeacherViewMode } from '@/hooks/useTeacherViewMode';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -259,26 +258,13 @@ function HomePageLoadingFallback() {
 
 function Home() {
   const { user, loading, userData, loadingUserData } = useAuthContext();
-  const { viewMode, setIsTeacher } = useTeacherViewMode();
-
-  // Update teacher status in the hook
-  useEffect(() => {
-    setIsTeacher(user && userData?.teacher === true);
-  }, [user, userData, setIsTeacher]);
 
   if (loading || loadingUserData) {
     return <HomePageLoadingFallback />;
   }
   
-  // For teachers: show tutor view by default, but allow switching to student view
+  // For teachers: ALWAYS show tutor/builder page (no student view option)
   if (user && userData?.teacher === true) {
-    if (viewMode === 'student') {
-      return (
-        <CourseProvider>
-          <DojoDashboard />
-        </CourseProvider>
-      );
-    }
     return <TutorBuilderPage />;
   }
   
