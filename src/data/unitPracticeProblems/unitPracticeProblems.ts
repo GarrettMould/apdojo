@@ -1962,6 +1962,44 @@ const macroUnit4Questions = [
     "videoExplanation": null
   },
   {
+    "id": 460,
+    "unit": 4,
+    "lessonIDS": ["4.6"],
+    "unitName": "Financial Sector",
+    "question": "If the Federal Reserve raises the Interest on Reserve Balances (IORB) rate from 2.0% to 2.5%, what is the likely impact on the money supply and aggregate demand?",
+    "image": null,
+    "optionTableHeaders": ["Money Supply", "Aggregate Demand"],
+    "options": [
+      "Increase | Increase",
+      "Decrease | Decrease",
+      "Increase | Decrease",
+      "Decrease | Increase",
+      "No Change | Decrease"
+    ],
+    "correctAnswer": "B",
+    "explanation": "Raising the IORB increases the incentive for banks to keep reserves at the Fed rather than lending them out. As banks reduce lending to households and businesses, the growth of the money supply slows (decreases relative to trend). Simultaneously, higher interest rates discourage investment and consumption, causing Aggregate Demand to decrease.",
+    "videoExplanation": null
+  },
+  {
+    "id": 461,
+    "unit": 4,
+    "lessonIDS": ["4.6"],
+    "unitName": "Financial Sector",
+    "question": "If the Federal Reserve lowers the Interest on Reserve Balances (IORB) rate, what is the likely impact on the money supply and aggregate demand?",
+    "image": null,
+    "optionTableHeaders": ["Money Supply", "Aggregate Demand"],
+    "options": [
+      "Increase | Increase",
+      "Decrease | Decrease",
+      "Increase | Decrease",
+      "Decrease | Increase",
+      "No Change | Increase"
+    ],
+    "correctAnswer": "A",
+    "explanation": "Lowering the IORB reduces the incentive for banks to hold excess reserves at the Fed. This encourages banks to increase lending to households and firms. Increased lending expands the money supply. Furthermore, lower interest rates stimulate investment and consumption spending, leading to an increase in Aggregate Demand.",
+    "videoExplanation": null
+  },
+  {
     "id": 49,
     "unit": 4,
     "lessonIDS": ["4.7", "5.5"],
@@ -3785,8 +3823,17 @@ const microUnit3Questions = [
     "unit": 3,
     "lessonIDS": ["3.2"],
     "unitName": "Production, Cost, and the Perfect Competition Model",
-    "question": "The table below lists a firm's total costs at various output levels. What is the marginal cost of producing the 4th unit?\n\n| Output | Total Cost |\n| :---: | :---: |\n| 2 | $150 |\n| 3 | $190 |\n| 4 | $240 |\n| 5 | $300 |",
+    "question": "The table below lists a firm's total costs at various output levels. What is the marginal cost of producing the 4th unit?",
     "image": null,
+    "tableData": {
+      "headers": ["Output", "Total Cost"],
+      "rows": [
+        ["2", "$150"],
+        ["3", "$190"],
+        ["4", "$240"],
+        ["5", "$300"]
+      ]
+    },
     "options": [
       "$40",
       "$50",
@@ -3796,14 +3843,23 @@ const microUnit3Questions = [
     "correctAnswer": "B",
     "explanation": "The marginal cost is the additional cost incurred by producing one more unit of output. It is calculated as the change in total cost divided by the change in quantity. As output increases from 3 to 4 units, the total cost rises from $190 to $240. Therefore, the marginal cost of the 4th unit is $240 - $190 = $50.",
     "videoExplanation": null
-    },
-    {
+  },
+  {
     "id": 3013,
     "unit": 3,
     "lessonIDS": ["3.2"],
     "unitName": "Production, Cost, and the Perfect Competition Model",
-    "question": "Based on the cost schedule below, what is the average fixed cost (AFC) of producing 5 units?\n\n| Output | Total Cost |\n| :---: | :---: |\n| 0 | $100 |\n| 1 | $150 |\n| 3 | $230 |\n| 5 | $350 |",
+    "question": "Based on the cost schedule below, what is the average fixed cost (AFC) of producing 5 units?",
     "image": null,
+    "tableData": {
+      "headers": ["Output", "Total Cost"],
+      "rows": [
+        ["0", "$100"],
+        ["1", "$150"],
+        ["3", "$230"],
+        ["5", "$350"]
+      ]
+    },
     "options": [
       "$20",
       "$50",
@@ -3813,7 +3869,7 @@ const microUnit3Questions = [
     "correctAnswer": "A",
     "explanation": "First, identify the total fixed cost (TFC), which is the total cost when output is zero. In this table, the TFC is $100. The average fixed cost (AFC) is calculated by dividing the total fixed cost by the quantity of output. At 5 units of output, the calculation is $100 / 5 = $20.",
     "videoExplanation": null
-    },
+  },
     {
     "id": 2042,
     "unit": 3,

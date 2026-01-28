@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect, Suspense } from 'react';
+import { useState, useMemo, useEffect, Suspense, useRef } from 'react';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question } from '@/data/questionBanks/types';
 import { Copy, CheckCircle2, Search, Filter, Eye, Loader2, GraduationCap, ArrowRight } from 'lucide-react';
@@ -235,6 +235,61 @@ function TutorBuilderContent() {
   const truncateText = (text: string, maxLength: number) => {
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength) + '...';
+  };
+
+  // Tooltip component for showing full question text
+  const QuestionTooltip = ({ question, children }: { question: string; children: React.ReactNode }) => {
+    const [showTooltip, setShowTooltip] = useState(false);
+    const [position, setPosition] = useState({ top: 0, left: 0 });
+    const triggerRef = useRef<HTMLDivElement>(null);
+
+    const handleMouseEnter = () => {
+      if (question.length <= 150) return; // Don't show tooltip if text isn't truncated
+      
+      if (triggerRef.current) {
+        const rect = triggerRef.current.getBoundingClientRect();
+        setPosition({
+          top: rect.bottom + window.scrollY + 10,
+          left: rect.left + window.scrollX + rect.width / 2,
+        });
+        setShowTooltip(true);
+      }
+    };
+
+    const handleMouseLeave = () => {
+      setShowTooltip(false);
+    };
+
+    return (
+      <>
+        <div
+          ref={triggerRef}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          className="relative inline-block w-full"
+        >
+          {children}
+        </div>
+        {showTooltip && (
+          <div
+            className="fixed z-[9999] bg-gray-900 text-white text-sm rounded-lg shadow-xl p-4 max-w-md pointer-events-none"
+            style={{
+              top: `${position.top}px`,
+              left: `${position.left}px`,
+              transform: 'translateX(-50%)',
+            }}
+            onMouseEnter={() => setShowTooltip(true)}
+            onMouseLeave={() => setShowTooltip(false)}
+          >
+            <div className="whitespace-pre-wrap break-words">{question}</div>
+            {/* Arrow pointing up */}
+            <div
+              className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-gray-900"
+            />
+          </div>
+        )}
+      </>
+    );
   };
 
   // Fetch assignment results
@@ -699,7 +754,9 @@ function TutorBuilderContent() {
                         <td className="px-4 py-3 font-bold text-gray-900">{question.id}</td>
                         <td className="px-4 py-3 font-semibold text-gray-700">Unit {question.unit}</td>
                         <td className="px-4 py-3 text-gray-700 max-w-md">
-                          {truncateText(question.question, 150)}
+                          <QuestionTooltip question={question.question}>
+                            <span className="cursor-help">{truncateText(question.question, 150)}</span>
+                          </QuestionTooltip>
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex flex-wrap gap-2">
