@@ -379,15 +379,15 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   }, []);
 
   // Scroll to top when page changes
-  // Check if user has seen tutorial on mount
+  // Check if user has seen tutorial on mount (skip for custom assignments)
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && !isCustomAssignment) {
       const hasSeenTutorial = localStorage.getItem('hasSeenExamTutorial');
       if (!hasSeenTutorial) {
         setShowTutorial(true);
       }
     }
-  }, []);
+  }, [isCustomAssignment]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });

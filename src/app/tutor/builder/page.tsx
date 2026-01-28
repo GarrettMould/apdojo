@@ -104,7 +104,7 @@ function TutorBuilderContent() {
   // Filter questions based on search and filters (MCQs only)
   const filteredQuestions = useMemo(() => {
     if (assignmentType === 'graphGym' || assignmentType === 'dojoDrill') return [];
-    return allQuestions.filter(q => {
+    const filtered = allQuestions.filter(q => {
       const matchesSearch = searchTerm === '' || 
         q.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
         q.id.toString().includes(searchTerm) ||
@@ -115,6 +115,16 @@ function TutorBuilderContent() {
       const matchesSubject = q.subject === subjectFilter;
       
       return matchesSearch && matchesUnit && matchesSubject;
+    });
+    
+    // Remove duplicates by ID - keep only the first occurrence of each ID
+    const seenIds = new Set<number>();
+    return filtered.filter(q => {
+      if (seenIds.has(q.id)) {
+        return false;
+      }
+      seenIds.add(q.id);
+      return true;
     });
   }, [searchTerm, unitFilter, subjectFilter, assignmentType]);
 
