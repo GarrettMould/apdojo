@@ -3,10 +3,10 @@
 import { useState, useMemo, useEffect, Suspense } from 'react';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question } from '@/data/questionBanks/types';
-import { Copy, CheckCircle2, Search, Filter, Eye, Loader2 } from 'lucide-react';
+import { Copy, CheckCircle2, Search, Filter, Eye, Loader2, GraduationCap, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp, query, where, getDocs, getDoc, doc, orderBy } from 'firebase/firestore';
 import { graphGymScenarios, GraphGymScenario } from '@/data/graphGymScenarios';
@@ -30,9 +30,11 @@ interface AssignmentResult {
 }
 
 function TutorBuilderContent() {
-  const { user } = useAuthContext();
+  const { user, userData, loadingUserData, setUserData } = useAuthContext();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [viewMode, setViewMode] = useState<ViewMode>('builder');
+  const [isUpgrading, setIsUpgrading] = useState(false);
   
   // Check URL hash or localStorage for view mode preference
   useEffect(() => {
@@ -316,10 +318,118 @@ function TutorBuilderContent() {
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
+  // Check if user is a teacher
+  const isTeacher = user && userData?.teacher === true;
+  const showUpgradeBanner = !isTeacher && !loadingUserData;
+
+  // Handle upgrade to teacher mode
+  const handleUpgradeToTeacher = async () => {
+    if (!user) {
+      // Not logged in - redirect to signup with teacher code
+      router.push('/signup?code=9759');
+      return;
+    }
+
+    // Logged in - upgrade account
+    setIsUpgrading(true);
+    try {
+      const response = await fetch('/api/upgrade-to-teacher', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: user.uid }),
+      });
+
+      // Check if response is OK before parsing JSON
+      if (!response.ok) {
+        // Try to parse error response, but handle HTML error pages
+        let errorMessage = 'Failed to upgrade account';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+          if (errorData.details) {
+            console.error('Upgrade error details:', errorData.details);
+          }
+        } catch (parseError) {
+          // Response might be HTML error page
+          console.error('Failed to parse error response:', parseError);
+          errorMessage = `Server error (${response.status}). Check server logs.`;
+        }
+        alert(errorMessage);
+        return;
+      }
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Update local userData to reflect teacher status
+        if (userData) {
+          setUserData({ ...userData, teacher: true });
+        }
+        // Refresh the page to show teacher features
+        router.refresh();
+      } else {
+        console.error('Failed to upgrade to teacher:', data.error);
+        alert(data.error || 'Failed to upgrade account. Please try again.');
+      }
+    } catch (error: any) {
+      console.error('Error upgrading to teacher:', error);
+      // Handle JSON parse errors specifically
+      if (error.message?.includes('JSON')) {
+        alert('Server returned an invalid response. Check that environment variables are set correctly in production.');
+      } else {
+        alert('An error occurred. Please try again.');
+      }
+    } finally {
+      setIsUpgrading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 pt-12 pb-6">
+        {/* Upgrade Banner for Non-Teachers */}
+        {showUpgradeBanner && (
+          <div className="mb-6 bg-white border-4 border-black rounded-lg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6">
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-blue-50 rounded-full">
+                  <GraduationCap className="w-8 h-8 text-blue-600" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-black text-gray-900 mb-1">
+                    Unlock Teacher Mode
+                  </h2>
+                  <p className="text-gray-700 font-semibold">
+                    Create custom assignments, track student progress, and access all tutor features - completely free!
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={handleUpgradeToTeacher}
+                disabled={isUpgrading}
+                className={`flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-black rounded-lg border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-blue-700 active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all ${
+                  isUpgrading ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
+              >
+                {isUpgrading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Upgrading...
+                  </>
+                ) : (
+                  <>
+                    Free Teacher Access
+                    <ArrowRight className="w-5 h-5" />
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Title and Tabs */}
         <div className="mb-6">
           <h1 className="text-3xl font-black text-black mb-4">Tutor Dashboard</h1>

@@ -7,14 +7,17 @@ let db: admin.firestore.Firestore | null = null; // Initialize as null
 if (!admin.apps.length) {
   try {
     const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
-    // 🔴 FIX: Changed from NEXT_PUBLIC_FIREBASE_PROJECT_ID to FIREBASE_PROJECT_ID
-    const projectId = process.env.FIREBASE_PROJECT_ID; 
+    // Support both FIREBASE_PROJECT_ID and NEXT_PUBLIC_FIREBASE_PROJECT_ID for compatibility
+    const projectId = process.env.FIREBASE_PROJECT_ID || process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID; 
     const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
 
     // Validate required environment variables
     if (!projectId || !clientEmail || !privateKey) {
-      // Throw error to make it visible in logs immediately
-      throw new Error(`Missing Vars: ${!projectId ? 'ProjectID' : ''} ${!clientEmail ? 'Email' : ''} ${!privateKey ? 'Key' : ''}`);
+      // Log error but don't throw - allow module to load so routes can handle the error gracefully
+      console.error('❌ Firebase Admin initialization failed - Missing environment variables:');
+      console.error(`   ${!projectId ? 'FIREBASE_PROJECT_ID or NEXT_PUBLIC_FIREBASE_PROJECT_ID' : ''}`);
+      console.error(`   ${!clientEmail ? 'FIREBASE_CLIENT_EMAIL' : ''}`);
+      console.error(`   ${!privateKey ? 'FIREBASE_PRIVATE_KEY' : ''}`);
     } else {
       admin.initializeApp({
         credential: admin.credential.cert({
@@ -26,9 +29,8 @@ if (!admin.apps.length) {
       console.log('✅ Firebase Admin initialized successfully');
     }
   } catch (error: any) {
+    // Log error but don't throw - allow module to load so routes can handle the error gracefully
     console.error('❌ Firebase Admin initialization error:', error.message || error);
-    // Re-throw so the webhook fails fast if DB is broken
-    throw error;
   }
 }
 
