@@ -6,6 +6,7 @@ import { Question } from '@/data/questionBanks/types';
 import { Copy, CheckCircle2, Search, Filter, Eye, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
+import { useSearchParams } from 'next/navigation';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp, query, where, getDocs, getDoc, doc, orderBy } from 'firebase/firestore';
 import { graphGymScenarios, GraphGymScenario } from '@/data/graphGymScenarios';
@@ -30,6 +31,7 @@ interface AssignmentResult {
 
 export default function TutorBuilderPage() {
   const { user } = useAuthContext();
+  const searchParams = useSearchParams();
   const [viewMode, setViewMode] = useState<ViewMode>('builder');
   
   // Check URL hash or localStorage for view mode preference
@@ -41,9 +43,25 @@ export default function TutorBuilderPage() {
       }
     }
   }, []);
+  
+  // Initialize search term from URL parameter
+  const initialSearchTerm = useMemo(() => {
+    const searchParam = searchParams.get('search');
+    if (searchParam) {
+      // Decode URL-encoded spaces (%20 or +)
+      return decodeURIComponent(searchParam.replace(/\+/g, ' '));
+    }
+    return '';
+  }, [searchParams]);
+  
   const [assignmentType, setAssignmentType] = useState<AssignmentType>('mcq');
   const [selectedIds, setSelectedIds] = useState<Set<number | string>>(new Set());
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
+  
+  // Update search term when URL parameter changes
+  useEffect(() => {
+    setSearchTerm(initialSearchTerm);
+  }, [initialSearchTerm]);
   const [unitFilter, setUnitFilter] = useState<number | null>(null);
   const [subjectFilter, setSubjectFilter] = useState<'ap_macroeconomics' | 'ap_microeconomics'>('ap_macroeconomics');
   const [linkCopied, setLinkCopied] = useState(false);
