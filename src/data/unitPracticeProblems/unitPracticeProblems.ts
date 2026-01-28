@@ -1358,6 +1358,186 @@ const macroUnit2Questions = [
     "correctAnswer": "B",
     "explanation": "This is known as substitution bias. The CPI measures the cost of a fixed basket of goods. If consumers substitute a cheaper good (chicken) for a more expensive one (beef), the CPI does not capture this change in behavior. Instead, it calculates inflation as if consumers were still buying the expensive beef, leading to an overstatement of the true increase in the cost of living.",
     "videoExplanation": null
+  },
+  {
+    "id": 3046,
+    "unit": 2,
+    "lessonIDS": ["2.6"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "In a given year, a country's Nominal GDP is $600 billion and the GDP Deflator is 120. What is the country's Real GDP?",
+    "image": null,
+    "options": [
+      "$480 billion",
+      "$500 billion",
+      "$600 billion",
+      "$720 billion",
+      "$580 billion"
+    ],
+    "correctAnswer": "B",
+    "explanation": "Real GDP is calculated using the formula: Real GDP = (Nominal GDP / GDP Deflator) * 100. \nCalculation: ($600 / 120) * 100 = 5 * 100 = $500 billion.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3047,
+    "unit": 2,
+    "lessonIDS": ["2.6"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "If a nation's Real GDP is 400 million units of output and the Nominal GDP is $600 million, what is the value of the GDP Deflator?",
+    "image": null,
+    "options": [
+      "125",
+      "150",
+      "67",
+      "200",
+      "140"
+    ],
+    "correctAnswer": "B",
+    "explanation": "The GDP Deflator is calculated as (Nominal GDP / Real GDP) * 100. \nCalculation: ($600 / 400) * 100 = 1.5 * 100 = 150.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3048,
+    "unit": 2,
+    "lessonIDS": ["2.4"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "A consumer market basket costs $200 in the base year (Year 1) and $250 in Year 2. What is the Consumer Price Index (CPI) for Year 2?",
+    "image": null,
+    "options": [
+      "120",
+      "125",
+      "80",
+      "150",
+      "50"
+    ],
+    "correctAnswer": "B",
+    "explanation": "CPI = (Cost of Market Basket in Current Year / Cost of Market Basket in Base Year) * 100. \nCalculation: ($250 / $200) * 100 = 1.25 * 100 = 125.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3049,
+    "unit": 2,
+    "lessonIDS": ["2.4"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "If the Consumer Price Index (CPI) rises from 120 in Year 1 to 150 in Year 2, what is the inflation rate for Year 2?",
+    "image": null,
+    "options": [
+      "20%",
+      "25%",
+      "30%",
+      "15%",
+      "10%"
+    ],
+    "correctAnswer": "B",
+    "explanation": "The inflation rate is the percentage change in the CPI. \nFormula: ((New CPI - Old CPI) / Old CPI) * 100. \nCalculation: ((150 - 120) / 120) * 100 = (30 / 120) * 100 = 0.25 * 100 = 25%.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3050,
+    "unit": 2,
+    "lessonIDS": ["2.6"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "An economy produces only pizza. In Year 1, 1,000 pizzas were produced and sold at $10 each. In Year 2, 1,200 pizzas were produced and sold at $12 each. What is the Nominal GDP for Year 2?",
+    "image": null,
+    "options": [
+      "$10,000",
+      "$12,000",
+      "$14,400",
+      "$15,000",
+      "$12,400"
+    ],
+    "correctAnswer": "C",
+    "explanation": "Nominal GDP is the total market value of goods produced, calculated using current prices. \nCalculation: 1,200 pizzas * $12/pizza = $14,400.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3051,
+    "unit": 2,
+    "lessonIDS": ["2.3"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "A country has a civilian non-institutional population of 200 million. Of these, 135 million are employed and 15 million are unemployed. What is the Unemployment Rate?",
+    "image": null,
+    "options": [
+      "7%",
+      "10%",
+      "11%",
+      "15%",
+      "5%"
+    ],
+    "correctAnswer": "B",
+    "explanation": "First, calculate the Labor Force: Employed + Unemployed = 135 + 15 = 150 million. \nUnemployment Rate = (Unemployed / Labor Force) * 100. \nCalculation: (15 / 150) * 100 = 0.10 * 100 = 10%.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3052,
+    "unit": 2,
+    "lessonIDS": ["2.3"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "A small island nation has a civilian non-institutional population of 500,000. If 400,000 of these individuals are currently in the labor force, what is the Labor Force Participation Rate?",
+    "image": null,
+    "options": [
+      "60%",
+      "70%",
+      "75%",
+      "80%",
+      "90%"
+    ],
+    "correctAnswer": "D",
+    "explanation": "The Labor Force Participation Rate is calculated as (Labor Force / Civilian Non-Institutional Population) * 100. \nCalculation: (400,000 / 500,000) * 100 = 0.80 * 100 = 80%.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3053,
+    "unit": 2,
+    "lessonIDS": ["2.3"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "In a hypothetical economy, the structural unemployment rate is 3% and the frictional unemployment rate is 2%. If the actual unemployment rate is 9%, what is the cyclical unemployment rate?",
+    "image": null,
+    "options": [
+      "2%",
+      "4%",
+      "5%",
+      "6%",
+      "9%"
+    ],
+    "correctAnswer": "B",
+    "explanation": "Actual Unemployment = Frictional + Structural + Cyclical. \nWe know: 9% = 2% + 3% + Cyclical. \n9% = 5% + Cyclical. \nCyclical = 9% - 5% = 4%.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3054,
+    "unit": 2,
+    "lessonIDS": ["2.3"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "A city has a labor force of 5,000 people. If the unemployment rate is currently 6%, how many people are unemployed?",
+    "image": null,
+    "options": [
+      "200",
+      "250",
+      "300",
+      "350",
+      "400"
+    ],
+    "correctAnswer": "C",
+    "explanation": "Unemployment Rate = (Number Unemployed / Labor Force) * 100. \nRearranging for Number Unemployed: (Unemployment Rate / 100) * Labor Force. \nCalculation: 0.06 * 5,000 = 300 people.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3055,
+    "unit": 2,
+    "lessonIDS": ["2.3"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "If 900 people are employed and the Labor Force Participation Rate is 100% (meaning the Labor Force equals the Population of 1,000), what is the Unemployment Rate?",
+    "image": null,
+    "options": [
+      "5%",
+      "9%",
+      "10%",
+      "15%",
+      "20%"
+    ],
+    "correctAnswer": "C",
+    "explanation": "If the Labor Force is 1,000 and 900 are employed, then the number of unemployed is 1,000 - 900 = 100. \nUnemployment Rate = (100 / 1,000) * 100 = 10%.",
+    "videoExplanation": null
   }
 ]
 
@@ -2125,6 +2305,78 @@ const macroUnit5Questions = [
     ],
     "correctAnswer": "C",
     "explanation": "While potentially having short-run demand effects, the main goal of supply-side fiscal policies is to encourage investment, innovation, and productivity improvements. These actions aim to increase the economy's productive capacity, shifting the long-run aggregate supply (LRAS) curve to the right and fostering long-term economic growth.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3056,
+    "unit": 5,
+    "lessonIDS": ["5.3"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "According to the Quantity Theory of Money (MV = PY), if the Money Supply (M) is $200 billion, the Velocity of Money (V) is 5, and Real Output (Y) is 500 units, what is the Price Level (P)?",
+    "image": null,
+    "options": [
+      "2",
+      "4",
+      "5",
+      "10",
+      "2.5"
+    ],
+    "correctAnswer": "A",
+    "explanation": "The equation of exchange is M * V = P * Y. \nSubstitute the values: 200 * 5 = P * 500. \n1,000 = 500P. \nP = 1,000 / 500 = 2.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3057,
+    "unit": 5,
+    "lessonIDS": ["5.3"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "In an economy, the Money Supply is $100 billion and the Velocity of Money is 4. What is the Nominal GDP?",
+    "image": null,
+    "options": [
+      "$200 billion",
+      "$250 billion",
+      "$400 billion",
+      "$500 billion",
+      "$100 billion"
+    ],
+    "correctAnswer": "C",
+    "explanation": "According to the Quantity Theory of Money, Nominal GDP is equal to P * Y, which is also equal to M * V. \nCalculation: Nominal GDP = $100 * 4 = $400 billion.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3058,
+    "unit": 5,
+    "lessonIDS": ["5.3"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "If Nominal GDP is $800 billion and the Money Supply is $200 billion, what is the Velocity of Money (V)?",
+    "image": null,
+    "options": [
+      "2",
+      "3",
+      "4",
+      "5",
+      "6"
+    ],
+    "correctAnswer": "C",
+    "explanation": "Using M * V = Nominal GDP. \n200 * V = 800. \nV = 800 / 200 = 4.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3059,
+    "unit": 5,
+    "lessonIDS": ["5.3"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "Suppose the Price Level (P) is 3 and the Real Output (Y) is 400. If the Velocity of Money (V) is 6, what must be the Money Supply (M)?",
+    "image": null,
+    "options": [
+      "$100",
+      "$200",
+      "$300",
+      "$600",
+      "$1200"
+    ],
+    "correctAnswer": "B",
+    "explanation": "Equation: M * V = P * Y. \nSubstitute: M * 6 = 3 * 400. \n6M = 1200. \nM = 1200 / 6 = $200.",
     "videoExplanation": null
   }
 ]
@@ -3873,7 +4125,7 @@ const microUnit3Questions = [
     "unit": 3,
     "lessonIDS": ["3.6"],
     "unitName": "Production, Cost, and the Perfect Competition Model",
-    "question": "On the cost curve diagram below, the points P, Q, R, and S lie on the marginal cost curve. Point Q is at the minimum of the average variable cost curve, and Point R is at the minimum of the average total cost curve. Which segment identifies the firm's supply curve? ",
+    "question": "The graph below shows the short run production cost curves for a profit-maximizing firm. Which segment identifies the firm's short-run supply curve? ",
     "image": { "src": "/images/allQS2059.svg", "alt": "Cost curve diagram showing Marginal Cost, Average Variable Cost, and Average Total Cost curves" },
     "options": [
     "Segment QRS (points at or above AVC)",

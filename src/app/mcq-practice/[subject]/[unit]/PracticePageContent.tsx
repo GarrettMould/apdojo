@@ -152,7 +152,7 @@ function SeasonPassModal({ subject, onClose }: { subject: 'macro' | 'micro'; onC
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.8, opacity: 0 }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          className="bg-white border-4 border-black rounded-3xl shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] p-8 max-w-xl w-full text-center relative"
+          className="bg-white border-4 border-black rounded-3xl shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] p-8 max-w-xl w-full text-left relative"
           onClick={(e) => e.stopPropagation()}
         >
           <button
@@ -165,7 +165,7 @@ function SeasonPassModal({ subject, onClose }: { subject: 'macro' | 'micro'; onC
 
           <div className="space-y-4">
             <div>
-              <h3 className="text-3xl font-black text-gray-900 uppercase tracking-wide">
+              <h3 className="text-3xl font-black text-gray-900 uppercase tracking-wide text-center">
                 {subject === 'macro' ? 'AP MACRO ' : 'AP MICRO '}
                 <span className={isGreen ? 'text-green-600' : 'text-blue-600'}>SEASON PASS</span>
               </h3>
@@ -239,7 +239,7 @@ function SeasonPassModal({ subject, onClose }: { subject: 'macro' | 'micro'; onC
                 UNLOCK INSTANT ACCESS
               </Link>
 
-              <p className="text-xs text-gray-500 text-center mt-3 flex items-center justify-center gap-1.5">
+              <p className="text-xs text-gray-500 mt-3 flex items-center justify-start gap-1.5">
                 <ShieldCheck className="w-3 h-3 text-gray-400" />
                 100% Money-Back Guarantee
               </p>
@@ -588,6 +588,12 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
 
   const handleNextQuestion = () => {
     if (currentQuestionIndex < questionsForPractice.length - 1) {
+      // If the user has used any arrow key on this question,
+      // hide the keyboard hint starting from the NEXT question.
+      if (usedArrowOnCurrentQuestion && !hasUsedKeyboardNav) {
+        setHasUsedKeyboardNav(true);
+      }
+      setUsedArrowOnCurrentQuestion(false);
       setCurrentQuestionIndex(prev => prev + 1);
     }
   };
@@ -690,6 +696,7 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
       )}
       <div className="min-h-screen bg-gray-50 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 py-8 pt-8">
+
           {/* Breadcrumb */}
           <Breadcrumb subject={subject} unitNumber={unitNumber} />
           

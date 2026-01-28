@@ -28,6 +28,7 @@ import { dojoDrills, drillAppliesToSubject, getDrillUnitForSubject } from '@/dat
 import { saveQuizResult } from '@/lib/quizHistory';
 import { hasValidSeasonPass, getUnitMCQTestUrl } from '@/lib/utils';
 import { Footer } from '@/components/Footer';
+import { pdfCheatSheets } from '@/data/pdfCheatSheets';
 
 // Helper to combine and structure whiteboard data for Macro
 const getUnitWhiteboards = (unitNumber: number): WhiteboardImage[] => {
@@ -1492,6 +1493,70 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
             Turn this Cheat Sheet into a PDF
           </button>
         </div>
+
+        {/* PDF Cheat Sheet Display - Only for AP Macro Unit 1 (temporarily disabled) */}
+        {false && selectedSubject === 'macro' && activeUnitNum === 1 && (() => {
+          const unit1Pdf = pdfCheatSheets.find(pdf => pdf.id === 4);
+          if (!unit1Pdf) return null;
+          
+          const handleDownload = async () => {
+            try {
+              const res = await fetch(unit1Pdf.link);
+              if (!res.ok) throw new Error('Download failed');
+              const blob = await res.blob();
+              const url = URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.href = url;
+              link.download = `${unit1Pdf.title}.pdf`;
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              URL.revokeObjectURL(url);
+            } catch {
+              // Fallback: open in new tab if fetch fails (e.g. CORS)
+              window.open(unit1Pdf.link, '_blank');
+            }
+          };
+          
+          return (
+            <div className="mb-8 flex items-center gap-4 print:hidden">
+              {/* Stacked PDF preview */}
+              {unit1Pdf.thumbnails && (
+                <div className="relative">
+                  {/* Second page (back) - landscape */}
+                  <div className="w-44 h-32 bg-white border-4 border-black rounded shadow-lg transform rotate-[-3deg] overflow-hidden">
+                    <Image
+                      src={unit1Pdf.thumbnails.page2}
+                      alt="PDF Page 2"
+                      width={176}
+                      height={128}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  {/* First page (front, offset) - landscape */}
+                  <div className="absolute top-2 left-2 w-44 h-32 bg-white border-4 border-black rounded shadow-lg transform rotate-[2deg] overflow-hidden">
+                    <Image
+                      src={unit1Pdf.thumbnails.page1}
+                      alt="PDF Page 1"
+                      width={176}
+                      height={128}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+              )}
+              
+              {/* Download button */}
+              <Button
+                onClick={handleDownload}
+                className="font-black py-3 px-5 rounded-xl border-4 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1 bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                <Download className="w-5 h-5 mr-2" />
+                Download Cheat Sheet
+              </Button>
+            </div>
+          );
+        })()}
 
         {/* Unit Practice Test Banner */}
         {(() => {
