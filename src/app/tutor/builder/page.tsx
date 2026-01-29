@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect, Suspense, useRef } from 'react';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question } from '@/data/questionBanks/types';
-import { Copy, CheckCircle2, Search, Filter, Eye, Loader2, GraduationCap, ArrowRight } from 'lucide-react';
+import { Copy, CheckCircle2, Search, Filter, Eye, Loader2, GraduationCap, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -14,6 +14,7 @@ import { dojoDrills, DojoDrill, drillAppliesToSubject, getDrillUnitForSubject } 
 
 type AssignmentType = 'mcq' | 'graphGym' | 'dojoDrill';
 type ViewMode = 'builder' | 'results';
+type AssignmentModeChoice = 'live' | 'homework' | null; // null = haven't chosen yet (show choice screen)
 
 interface AssignmentResult {
   id: string;
@@ -33,6 +34,8 @@ function TutorBuilderContent() {
   const { user, userData, loadingUserData, setUserData } = useAuthContext();
   const searchParams = useSearchParams();
   const router = useRouter();
+  const [assignmentModeChoice, setAssignmentModeChoice] = useState<AssignmentModeChoice>(null);
+  const [quickPicksPage, setQuickPicksPage] = useState(0);
   const [viewMode, setViewMode] = useState<ViewMode>('builder');
   const [isUpgrading, setIsUpgrading] = useState(false);
   
@@ -172,6 +175,84 @@ function TutorBuilderContent() {
     });
   };
 
+  // Build the same URL students would see (for preview in new tab)
+  const getPreviewUrl = (): string | null => {
+    if (selectedIds.size === 0) return null;
+    let idsArray: (number | string)[];
+    let idsString: string;
+    if (assignmentType === 'dojoDrill') {
+      idsArray = Array.from(selectedIds).sort((a, b) => String(a).localeCompare(String(b)));
+      idsString = idsArray.length === 1 ? String(idsArray[0]) : idsArray.join(',');
+    } else {
+      idsArray = Array.from(selectedIds).sort((a, b) => Number(a) - Number(b));
+      idsString = idsArray.map(id => String(id)).join(',');
+    }
+    const encoded = btoa(idsString);
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const previewSuffix = '&preview=1';
+    if (assignmentType === 'mcq') {
+      return `${origin}/exam/custom?q=${encoded}${previewSuffix}`;
+    }
+    if (assignmentType === 'graphGym') {
+      return `${origin}/graph-gym/custom?q=${encoded}${previewSuffix}`;
+    }
+    return `${origin}/dojo-drills/custom?q=${encoded}${previewSuffix}`;
+  };
+
+  const openPreview = () => {
+    const url = getPreviewUrl();
+    if (url) window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
+  // Encoded assignment ID for live presenter URL (same encoding as getPreviewUrl)
+  const getEncodedAssignmentId = (): string | null => {
+    if (selectedIds.size === 0) return null;
+    let idsString: string;
+    if (assignmentType === 'dojoDrill') {
+      const idsArray = Array.from(selectedIds).sort((a, b) => String(a).localeCompare(String(b)));
+      idsString = idsArray.length === 1 ? String(idsArray[0]) : idsArray.join(',');
+    } else {
+      const idsArray = Array.from(selectedIds).sort((a, b) => Number(a) - Number(b));
+      idsString = idsArray.map(id => String(id)).join(',');
+    }
+    return btoa(idsString);
+  };
+
+  // Generate a unique 5-character alphanumeric join code (A-Z, 0-9)
+  const generateJoinCode = async (): Promise<string> => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    for (let attempt = 0; attempt < 10; attempt++) {
+      let code = '';
+      for (let i = 0; i < 5; i++) {
+        code += chars[Math.floor(Math.random() * chars.length)];
+      }
+      const existing = await getDocs(query(collection(db, 'sessions'), where('code', '==', code)));
+      if (existing.empty) return code;
+    }
+    // Fallback with timestamp to avoid collision
+    return chars[Math.floor(Math.random() * 26)] + Date.now().toString(36).slice(-4).toUpperCase();
+  };
+
+  const openShareScreen = async () => {
+    const encoded = getEncodedAssignmentId();
+    if (!encoded || !user || assignmentType !== 'mcq') return;
+    try {
+      const code = await generateJoinCode();
+      const sessionRef = await addDoc(collection(db, 'sessions'), {
+        status: 'WAITING',
+        assignmentId: encoded,
+        assignmentType: assignmentType,
+        tutorId: user.uid,
+        tutorEmail: user.email || null,
+        code,
+        createdAt: serverTimestamp(),
+      });
+      router.push(`/live/present/${sessionRef.id}`);
+    } catch (err) {
+      console.error('Error creating live session:', err);
+      alert('Could not create session. Please try again.');
+    }
+  };
 
   const generateLink = async () => {
     if (selectedIds.size === 0) return;
@@ -440,6 +521,145 @@ function TutorBuilderContent() {
       setIsUpgrading(false);
     }
   };
+
+  // Assignment mode choice screen (shown first when visiting /tutor/builder)
+  if (assignmentModeChoice === null) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-4xl mx-auto px-6 pt-12 pb-12">
+          <div className="text-center mb-10">
+            <h1 className="text-3xl font-black text-black mb-3">
+              How would you like to assign this?
+            </h1>
+            <p className="text-lg text-gray-700 font-semibold">
+              Run a live session now or generate a link for later.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-20">
+            <button
+              type="button"
+              onClick={() => setAssignmentModeChoice('live')}
+              className="group flex flex-col items-center justify-center text-left p-8 md:p-10 bg-white border-4 border-black rounded-xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 active:translate-y-0 active:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all min-h-[200px]"
+            >
+              <h2 className="text-xl font-black text-black mb-2 group-hover:text-blue-600 transition-colors">
+                Launch a Live Session
+              </h2>
+              <p className="text-sm text-gray-600 font-semibold">
+                Best for bell-ringers and synchronous activities
+              </p>
+            </button>
+            <button
+              type="button"
+              onClick={() => setAssignmentModeChoice('homework')}
+              className="group flex flex-col items-center justify-center text-left p-8 md:p-10 bg-white border-4 border-black rounded-xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 active:translate-y-0 active:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all min-h-[200px]"
+            >
+              <h2 className="text-xl font-black text-black mb-2 group-hover:text-green-600 transition-colors">
+                Assign as Homework
+              </h2>
+              <p className="text-sm text-gray-600 font-semibold">
+                Best for take home activities or individual class work
+              </p>
+            </button>
+          </div>
+
+          {/* Quick Picks - pre-made drills carousel (3 at a time, left/right arrows) */}
+          {(() => {
+            const DRILLS_PER_PAGE = 3;
+            const quickPicksDrills: { id: string; title: string; subject: 'macro' | 'micro' | 'both'; questionCount: number }[] = [
+              { id: '1', title: 'Unit 1 Basics', subject: 'both', questionCount: 12 },
+              { id: '2', title: 'Unit 2 Supply', subject: 'macro', questionCount: 8 },
+              { id: '3', title: 'Unit 3 Costs', subject: 'micro', questionCount: 10 },
+              { id: '4', title: 'Unit 4 Market Structures', subject: 'both', questionCount: 15 },
+              { id: '5', title: 'Unit 5 Factor Markets', subject: 'macro', questionCount: 9 },
+              { id: '6', title: 'Unit 6 International', subject: 'micro', questionCount: 11 },
+            ];
+            const totalPages = Math.ceil(quickPicksDrills.length / DRILLS_PER_PAGE);
+            const start = quickPicksPage * DRILLS_PER_PAGE;
+            const visibleDrills = quickPicksDrills.slice(start, start + DRILLS_PER_PAGE);
+            return (
+              <div className="mb-20">
+                <h2 className="text-xl font-black text-black text-center mb-6">
+                  Short on time? Grab a pre-made drill:
+                </h2>
+                <div className="flex items-stretch justify-center gap-4 max-w-5xl mx-auto">
+                  <button
+                    type="button"
+                    onClick={() => setQuickPicksPage((p) => Math.max(0, p - 1))}
+                    disabled={quickPicksPage === 0}
+                    className="flex-shrink-0 w-14 h-14 self-center rounded-full border-4 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 hover:scale-105 transition-all"
+                    aria-label="Previous drills"
+                  >
+                    <ChevronLeft className="w-7 h-7 text-black" />
+                  </button>
+                  <div className="flex flex-1 justify-center gap-6">
+                    {visibleDrills.map((drill) => (
+                      <button
+                        key={drill.id}
+                        type="button"
+                        className="flex-1 min-w-0 max-w-[280px] flex flex-col items-start text-left p-7 bg-white border-4 border-black rounded-xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] font-black text-black hover:bg-gray-50 transition-all min-h-[200px]"
+                      >
+                        <span className="text-xl leading-tight block mb-3">{drill.title}</span>
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          {drill.subject === 'both' ? (
+                            <>
+                              <span className="inline-block px-3 py-1.5 rounded-md text-xs font-bold bg-blue-100 text-blue-800 border border-blue-300">Macro</span>
+                              <span className="inline-block px-3 py-1.5 rounded-md text-xs font-bold bg-green-100 text-green-800 border border-green-300">Micro</span>
+                            </>
+                          ) : (
+                            <span className={`inline-block px-3 py-1.5 rounded-md text-xs font-bold ${
+                              drill.subject === 'macro' ? 'bg-blue-100 text-blue-800 border border-blue-300' : 'bg-green-100 text-green-800 border border-green-300'
+                            }`}>
+                              {drill.subject === 'macro' ? 'Macro' : 'Micro'}
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-base font-semibold text-gray-600">{drill.questionCount} questions</span>
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setQuickPicksPage((p) => Math.min(totalPages - 1, p + 1))}
+                    disabled={quickPicksPage >= totalPages - 1}
+                    className="flex-shrink-0 w-14 h-14 self-center rounded-full border-4 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 hover:scale-105 transition-all"
+                    aria-label="Next drills"
+                  >
+                    <ChevronRight className="w-7 h-7 text-black" />
+                  </button>
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* Three steps: circle numbers with one connecting line */}
+          <div className="max-w-3xl mx-auto pt-6">
+            <div className="flex items-center justify-center gap-0">
+              <span className="flex-shrink-0 w-10 h-10 rounded-full bg-black text-white font-black text-lg flex items-center justify-center z-10">1</span>
+              <span className="flex-1 max-w-[120px] h-0.5 bg-black" aria-hidden="true" />
+              <span className="flex-shrink-0 w-10 h-10 rounded-full bg-black text-white font-black text-lg flex items-center justify-center z-10">2</span>
+              <span className="flex-1 max-w-[120px] h-0.5 bg-black" aria-hidden="true" />
+              <span className="flex-shrink-0 w-10 h-10 rounded-full bg-black text-white font-black text-lg flex items-center justify-center z-10">3</span>
+            </div>
+            <div className="grid grid-cols-3 gap-4 mt-4 text-center">
+              <div>
+                <h3 className="text-base font-black text-black mb-1">Choose your mode</h3>
+                <p className="text-sm text-gray-600 font-semibold">Live activities or asynchronous assignments</p>
+              </div>
+              <div>
+                <h3 className="text-base font-black text-black mb-1">Create and Share</h3>
+                <p className="text-sm text-gray-600 font-semibold">Choose from our library of MCQs, Graphing Exercises, or interactive activities</p>
+              </div>
+              <div>
+                <h3 className="text-base font-black text-black mb-1">Track Results</h3>
+                <p className="text-sm text-gray-600 font-semibold">Detailed progress tracking for every student</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -946,7 +1166,7 @@ function TutorBuilderContent() {
       {viewMode === 'builder' && (
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t-4 border-black shadow-[0_-4px_8px_rgba(0,0,0,0.1)] z-50">
         <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-4">
               <span className="text-lg font-black text-black">
                 {selectedIds.size} {
@@ -958,33 +1178,59 @@ function TutorBuilderContent() {
                 }{selectedIds.size !== 1 ? 's' : ''} selected
               </span>
             </div>
-            <button
-              onClick={generateLink}
-              disabled={selectedIds.size === 0}
-              className={`px-6 py-3 font-black text-white rounded-lg border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all ${
-                selectedIds.size === 0
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : linkCopied
-                  ? 'bg-green-600 hover:bg-green-700 active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
-                  : assignmentType === 'mcq'
-                  ? 'bg-blue-600 hover:bg-blue-700 active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
-                  : assignmentType === 'graphGym'
-                  ? 'bg-green-600 hover:bg-green-700 active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
-                  : 'bg-purple-600 hover:bg-purple-700 active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
-              }`}
-            >
-              {linkCopied ? (
-                <span className="flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5" />
-                  Copied to Clipboard
-                </span>
+            <div className="flex items-center gap-3">
+              {assignmentModeChoice === 'live' ? (
+                assignmentType === 'mcq' && selectedIds.size > 0 && (
+                  <button
+                    type="button"
+                    onClick={openShareScreen}
+                    className="inline-flex items-center gap-2 px-6 py-3 font-black text-white rounded-lg border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all bg-blue-600 hover:bg-blue-700 active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                  >
+                    Generate a Share Screen
+                  </button>
+                )
               ) : (
-                <span className="flex items-center gap-2">
-                  <Copy className="w-5 h-5" />
-                  Create Assignment Link
-                </span>
+                <>
+                  {selectedIds.size > 0 && (
+                    <button
+                      type="button"
+                      onClick={openPreview}
+                      className="inline-flex items-center gap-2 px-5 py-3 font-black rounded-lg border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all bg-white text-black hover:bg-gray-50 active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                    >
+                      <Eye className="w-5 h-5" />
+                      Preview assignment
+                    </button>
+                  )}
+                  <button
+                    onClick={generateLink}
+                    disabled={selectedIds.size === 0}
+                    className={`px-6 py-3 font-black text-white rounded-lg border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all ${
+                      selectedIds.size === 0
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : linkCopied
+                        ? 'bg-green-600 hover:bg-green-700 active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                        : assignmentType === 'mcq'
+                        ? 'bg-blue-600 hover:bg-blue-700 active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                        : assignmentType === 'graphGym'
+                        ? 'bg-green-600 hover:bg-green-700 active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                        : 'bg-purple-600 hover:bg-purple-700 active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                    }`}
+                  >
+                    {linkCopied ? (
+                      <span className="flex items-center gap-2">
+                        <CheckCircle2 className="w-5 h-5" />
+                        Copied to Clipboard
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-2">
+                        <Copy className="w-5 h-5" />
+                        Create Assignment Link
+                      </span>
+                    )}
+                  </button>
+                </>
               )}
-            </button>
+            </div>
           </div>
         </div>
         </div>

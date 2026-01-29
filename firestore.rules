@@ -127,6 +127,28 @@ service cloud.firestore {
     }
     // --- End assignmentResults Collection Rules ---
 
+    // --- RULES FOR sessions COLLECTION (live sessions) ---
+    match /sessions/{sessionId} {
+      // Teacher creates a session (tutorId must match auth)
+      allow create: if request.auth != null && request.resource.data.tutorId == request.auth.uid;
+      // Anyone with the session link can read (students check WAITING/ACTIVE; teacher sees session)
+      allow read: if true;
+      // Only tutor can update session (e.g. set status to ACTIVE)
+      allow update: if request.auth != null && resource.data.tutorId == request.auth.uid;
+
+      match /students/{studentId} {
+        // Anyone with the join link can add themselves (student joins lobby)
+        allow create: if true;
+        // Teacher reads for results board; student doc updates need to be readable
+        allow read: if true;
+        // Student (or app on their behalf) updates their doc when they submit (completed, score)
+        allow update: if true;
+        // Only the session tutor can remove a student from the lobby
+        allow delete: if request.auth != null && get(/databases/$(database)/documents/sessions/$(sessionId)).data.tutorId == request.auth.uid;
+      }
+    }
+    // --- End sessions Collection Rules ---
+
     // --- RULES FOR userQuizHistory COLLECTION ---
     match /userQuizHistory/{quizId} {
       // Allow users to create quiz history entries for themselves

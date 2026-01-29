@@ -139,8 +139,9 @@ function CustomExamContent() {
     );
   }
 
-  // Get the encoded parameter to pass to FullExam
+  // Get the encoded parameter and preview mode to pass to FullExam
   const encodedParam = searchParams.get('q');
+  const isPreviewMode = searchParams.get('preview') === '1' || searchParams.get('preview') === 'true';
 
   return (
     <FullExam
@@ -150,6 +151,7 @@ function CustomExamContent() {
       examNumber="custom"
       isCustomAssignment={true}
       assignmentLinkId={encodedParam || undefined}
+      isPreviewMode={isPreviewMode}
     />
   );
 }

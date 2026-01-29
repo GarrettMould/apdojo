@@ -21,7 +21,7 @@ import { Scroll } from 'lucide-react';
 import { QuestionWithKeyTerms } from './QuestionWithKeyTerms';
 import { ExamTutorialModal } from './ExamTutorialModal';
 import { db } from '@/lib/firebase';
-import { collection, addDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, doc, updateDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 import { saveQuizResult } from '@/lib/quizHistory';
 import { saveTestResult, saveTestProgress, loadTestProgress, TestProgress } from '@/lib/testProgress';
 import { useRouter } from 'next/navigation';
@@ -46,6 +46,10 @@ interface FullExamProps {
   assignmentLinkId?: string; // Encoded parameter for custom assignments
   isFreeUser?: boolean; // If true, blur and restrict questions beyond question 1
   isUnitTest?: boolean; // If true, always show tools panel with test-like layout
+  isPreviewMode?: boolean; // If true, disable submit and show tooltip (teacher preview)
+  liveSessionId?: string; // Live session: update session student doc on submit
+  liveStudentId?: string;
+  liveStudentName?: string;
 }
 
 interface Answers {
@@ -107,7 +111,7 @@ const FeedbackProgressBar = ({ status }: { status: 'incorrect' | 'partial' | 'co
   );
 };
 
-export function FullExam({ questionBank, examType, questionType, examNumber, onTimeUpdate, isCustomAssignment = false, assignmentLinkId, isFreeUser = false, isUnitTest = false }: FullExamProps) {
+export function FullExam({ questionBank, examType, questionType, examNumber, onTimeUpdate, isCustomAssignment = false, assignmentLinkId, isFreeUser = false, isUnitTest = false, isPreviewMode = false, liveSessionId, liveStudentId, liveStudentName }: FullExamProps) {
   const [answers, setAnswers] = useState<Answers>({});
   const [showResults, setShowResults] = useState(false);
   const [showFullResults, setShowFullResults] = useState(false);
@@ -880,9 +884,10 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
         console.log('[FullExam] Skipping test result save - conditions not met');
       }
 
-      // For assignments, show results but blurred until name is entered
+      // For assignments, show results underneath (blurred) with name modal on top
       if (isCustomAssignment) {
         setShowResults(true);
+        setShowFullResults(true); // Must be true so results are in the DOM and visible (blurred) behind the modal
         setShowNameInputModal(true); // Show name input overlay
       } else {
         // Go straight to full results view (skip AssessmentResultsPanel)
@@ -967,10 +972,18 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
       }
     }
 
-    // For assignments, show results but blurred until name is entered
+    // For assignments, show results but blurred until name is entered (skip name for live session)
     if (isCustomAssignment) {
-      setShowResults(true);
-      setShowNameInputModal(true); // Show name input overlay
+      if (liveSessionId && liveStudentId && liveStudentName) {
+        setStudentName(liveStudentName);
+        setShowResults(true);
+        setShowNameInputModal(false);
+        saveAssignmentResults(liveStudentName);
+      } else {
+        setShowResults(true);
+        setShowFullResults(true); // Show results underneath so they're visible (blurred) behind the modal
+        setShowNameInputModal(true); // Show name input overlay
+      }
     } else {
       // Go straight to full results view (skip AssessmentResultsPanel)
       setShowResults(true);
@@ -984,7 +997,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
       return;
     }
     setShowNameInputModal(false); // Hide name input, reveal results
-    setShowFullResults(false);
+    setShowFullResults(true); // Show full results panel (score + questions with correct answer & explanation)
     
     // Save results to Firebase with student name
     if (isCustomAssignment) {
@@ -993,8 +1006,31 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   };
 
   const saveAssignmentResults = async (studentNameInput?: string) => {
-    if (!isCustomAssignment || !assignmentLinkId) return;
-    
+    if (!isCustomAssignment) return;
+
+    // Live session: update session student doc only
+    if (liveSessionId && liveStudentId) {
+      try {
+        const totalQuestions = questions.length;
+        const correctCount = questions.filter(q => answers[q.id] === q.correctAnswer).length;
+        const score = Math.round((correctCount / totalQuestions) * 100);
+        await updateDoc(doc(db, 'sessions', liveSessionId, 'students', liveStudentId), {
+          completed: true,
+          score,
+          correctCount,
+          totalQuestions,
+          submittedAt: serverTimestamp(),
+        });
+      } catch (err) {
+        console.error('[FullExam] Error updating live session student:', err);
+      }
+      setShowNameInputModal(false);
+      setShowFullResults(true); // Show full results panel (score + questions with correct answer & explanation)
+      return;
+    }
+
+    if (!assignmentLinkId) return;
+
     try {
 
       // Get assignment link document
@@ -1310,8 +1346,8 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
     <>
       {/* Name Input Modal for Custom Assignments Only */}
       {showNameInputModal && isCustomAssignment && typeof window !== 'undefined' && feedbackContainer && createPortal(
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-lg max-w-md w-full p-6 border-4 border-black">
+        <div className="fixed inset-0 bg-white/40 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl shadow-lg max-w-md w-full p-6 border-4 border-black z-10">
             <div className="flex items-center gap-3 mb-4">
               <FileText className="w-6 h-6 text-blue-600" />
               <h3 className="text-xl font-black text-gray-900">
@@ -2328,12 +2364,24 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                         {/* Submit button for last question - only show if not using fixed bottom bar */}
                         {!(showVideoModal && videoUrl) && !shouldShowTestUI && currentPage === questions.length - 1 && (
                           <div className={`pt-4 mt-4 border-t border-gray-200`}>
-                            <button
-                              onClick={handleSubmitClick}
-                              className="w-full px-6 py-3 bg-black hover:bg-gray-800 text-white text-base font-semibold rounded-lg transition-colors duration-200"
-                            >
-                              Submit Exam
-                            </button>
+                            <div className="relative group inline-block w-full">
+                              <button
+                                onClick={isPreviewMode ? undefined : handleSubmitClick}
+                                disabled={isPreviewMode}
+                                className={`w-full px-6 py-3 text-base font-semibold rounded-lg transition-colors duration-200 ${
+                                  isPreviewMode
+                                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    : 'bg-black hover:bg-gray-800 text-white'
+                                }`}
+                              >
+                                Submit Exam
+                              </button>
+                              {isPreviewMode && (
+                                <div className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1 text-xs font-semibold bg-black text-white rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                                  Not available in Preview Mode
+                                </div>
+                              )}
+                            </div>
                           </div>
                         )}
                       </div>
@@ -3476,38 +3524,46 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                 Back
               </button>
 
-              {/* Next Button */}
-              <button
-                onClick={() => {
-                  if (isTimerPaused && !isCustomAssignment) {
-                    return;
-                  }
-                  if (currentPage === questions.length - 1) {
-                    handleSubmitClick();
-                  } else {
-                    const nextPage = currentPage + 1;
-                    if (canNavigateToQuestion(nextPage)) {
-                      setCurrentPage(nextPage);
-                    } else {
-                      // Pause timer and save progress before showing modal
-                      setIsTimerPaused(true);
-                      saveProgressBeforePurchase();
-                      setShowSeasonPassModal(true);
+              {/* Next / Submit Button */}
+              <div className="relative group inline-block">
+                <button
+                  onClick={() => {
+                    if (isPreviewMode && currentPage === questions.length - 1) return;
+                    if (isTimerPaused && !isCustomAssignment) {
+                      return;
                     }
-                  }
-                }}
-                disabled={isTimerPaused && !isCustomAssignment}
-                className={`px-6 py-2.5 rounded-lg font-semibold transition-colors flex items-center gap-2 ${
-                  isTimerPaused && !isCustomAssignment
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : currentPage === questions.length - 1
-                    ? 'bg-black hover:bg-gray-800 text-white'
-                    : `${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-green-600 hover:bg-green-700'} text-white`
-                }`}
-              >
-                {currentPage === questions.length - 1 ? 'Submit' : 'Next'}
-                {currentPage < questions.length - 1 && <ChevronRight className="w-5 h-5" />}
-              </button>
+                    if (currentPage === questions.length - 1) {
+                      handleSubmitClick();
+                    } else {
+                      const nextPage = currentPage + 1;
+                      if (canNavigateToQuestion(nextPage)) {
+                        setCurrentPage(nextPage);
+                      } else {
+                        // Pause timer and save progress before showing modal
+                        setIsTimerPaused(true);
+                        saveProgressBeforePurchase();
+                        setShowSeasonPassModal(true);
+                      }
+                    }
+                  }}
+                  disabled={(isTimerPaused && !isCustomAssignment) || (isPreviewMode && currentPage === questions.length - 1)}
+                  className={`px-6 py-2.5 rounded-lg font-semibold transition-colors flex items-center gap-2 ${
+                    (isTimerPaused && !isCustomAssignment) || (isPreviewMode && currentPage === questions.length - 1)
+                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      : currentPage === questions.length - 1
+                      ? 'bg-black hover:bg-gray-800 text-white'
+                      : `${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-green-600 hover:bg-green-700'} text-white`
+                  }`}
+                >
+                  {currentPage === questions.length - 1 ? 'Submit' : 'Next'}
+                  {currentPage < questions.length - 1 && <ChevronRight className="w-5 h-5" />}
+                </button>
+                {isPreviewMode && currentPage === questions.length - 1 && (
+                  <div className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1 text-xs font-semibold bg-black text-white rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                    Not available in Preview Mode
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
