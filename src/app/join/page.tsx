@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Loader2, AlertCircle } from 'lucide-react';
 
-export default function JoinPage() {
+function JoinPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [code, setCode] = useState('');
@@ -127,5 +127,20 @@ export default function JoinPage() {
         AP DOJO
       </p>
     </div>
+  );
+}
+
+export default function JoinPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-8">
+          <Loader2 className="w-12 h-12 animate-spin text-slate-400 mb-4" />
+          <p className="text-slate-500">Loading…</p>
+        </div>
+      }
+    >
+      <JoinPageContent />
+    </Suspense>
   );
 }
