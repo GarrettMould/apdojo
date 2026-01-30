@@ -1,15 +1,15 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { doc, onSnapshot, getDoc, collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, onSnapshot, collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Loader2 } from 'lucide-react';
 
 const LIVE_STUDENT_KEY = (sessionId: string) => `live_student_${sessionId}`;
 const LIVE_STUDENT_NAME_KEY = (sessionId: string) => `live_student_name_${sessionId}`;
 
-export default function StudentJoinPage() {
+function StudentJoinPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const sessionId = searchParams.get('id') ?? '';
@@ -195,5 +195,20 @@ export default function StudentJoinPage() {
         AP DOJO
       </p>
     </div>
+  );
+}
+
+export default function StudentJoinPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-8">
+          <Loader2 className="w-12 h-12 animate-spin text-slate-400 mb-4" />
+          <p className="text-slate-500">Loading…</p>
+        </div>
+      }
+    >
+      <StudentJoinPageContent />
+    </Suspense>
   );
 }
