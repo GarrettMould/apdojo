@@ -233,6 +233,14 @@ function TutorBuilderContent() {
     return chars[Math.floor(Math.random() * 26)] + Date.now().toString(36).slice(-4).toUpperCase();
   };
 
+  const openGraphGymPresenter = () => {
+    if (assignmentType !== 'graphGym' || selectedIds.size === 0) return;
+    const idsArray = Array.from(selectedIds).sort((a, b) => Number(a) - Number(b));
+    const idsString = idsArray.map((id) => String(id)).join(',');
+    const encoded = btoa(idsString);
+    router.push(`/live/graph-gym-present?q=${encodeURIComponent(encoded)}`);
+  };
+
   const openShareScreen = async () => {
     const encoded = getEncodedAssignmentId();
     if (!encoded || !user || assignmentType !== 'mcq') return;
@@ -1180,15 +1188,26 @@ function TutorBuilderContent() {
             </div>
             <div className="flex items-center gap-3">
               {assignmentModeChoice === 'live' ? (
-                assignmentType === 'mcq' && selectedIds.size > 0 && (
-                  <button
-                    type="button"
-                    onClick={openShareScreen}
-                    className="inline-flex items-center gap-2 px-6 py-3 font-black text-white rounded-lg border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all bg-blue-600 hover:bg-blue-700 active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-                  >
-                    Generate a Share Screen
-                  </button>
-                )
+                <>
+                  {assignmentType === 'mcq' && selectedIds.size > 0 && (
+                    <button
+                      type="button"
+                      onClick={openShareScreen}
+                      className="inline-flex items-center gap-2 px-6 py-3 font-black text-white rounded-lg border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all bg-blue-600 hover:bg-blue-700 active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                    >
+                      Generate a Share Screen
+                    </button>
+                  )}
+                  {assignmentType === 'graphGym' && selectedIds.size > 0 && (
+                    <button
+                      type="button"
+                      onClick={openGraphGymPresenter}
+                      className="inline-flex items-center gap-2 px-6 py-3 font-black text-white rounded-lg border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all bg-green-600 hover:bg-green-700 active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                    >
+                      Start Activity
+                    </button>
+                  )}
+                </>
               ) : (
                 <>
                   {selectedIds.size > 0 && (

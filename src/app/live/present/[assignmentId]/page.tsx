@@ -102,9 +102,18 @@ export default function PresenterPage() {
     }
   };
 
+  const displayCode = session?.code ?? (joinUrl ? (() => {
+    try {
+      const u = new URL(joinUrl);
+      return u.searchParams.get('code') ?? u.searchParams.get('id') ?? '';
+    } catch {
+      return '';
+    }
+  })() : '');
+
   const handleCopy = () => {
-    if (!joinUrl) return;
-    navigator.clipboard.writeText(joinUrl);
+    if (!displayCode) return;
+    navigator.clipboard.writeText(displayCode);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -185,16 +194,7 @@ export default function PresenterPage() {
                     className="w-full flex items-center justify-between gap-3 px-4 py-4 md:px-5 md:py-5 rounded-xl border-2 border-slate-200 hover:bg-blue-50 hover:border-blue-200 transition-colors text-left group"
                   >
                     <span className="text-3xl md:text-4xl font-black text-blue-500 tracking-[0.2em] flex-1">
-                      {session?.code ?? (joinUrl ? (() => {
-                        try {
-                          const u = new URL(joinUrl);
-                          const code = u.searchParams.get('code');
-                          const id = u.searchParams.get('id');
-                          return code ?? id ?? '—';
-                        } catch {
-                          return '—';
-                        }
-                      })() : '—')}
+                      {displayCode || '—'}
                     </span>
                     <span className="flex-shrink-0 text-slate-500 group-hover:text-blue-600">
                       {copied ? (
@@ -274,52 +274,54 @@ export default function PresenterPage() {
           </div>
         </div>
       ) : (
-        <>
-          <div className="text-center mb-10">
-            <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-white mb-2">
-              Live Results
-            </h1>
-            <p className="text-xl text-slate-400">
-              Student progress
-            </p>
-          </div>
+        <div className="w-full max-w-2xl mx-auto">
+          <div className="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
+            <div className="p-6 md:p-8 border-b border-slate-200 bg-slate-50/50">
+              <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-slate-900 mb-2 text-center">
+                Live Results
+              </h1>
+              <p className="text-xl text-slate-500 text-center">
+                Student progress
+              </p>
+            </div>
 
-          <div className="w-full max-w-2xl mb-8">
-            <div className="bg-slate-800 rounded-2xl border border-slate-700 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-lg font-semibold text-white">Completed</span>
-                <span className="text-2xl font-bold text-blue-400">
-                  {completedCount} / {totalCount}
-                </span>
+            <div className="p-6 md:p-8">
+              <div className="rounded-2xl border border-slate-200 bg-slate-50/50 p-6 mb-6">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-lg font-semibold text-slate-900">Completed</span>
+                  <span className="text-2xl font-bold text-blue-600">
+                    {completedCount} / {totalCount}
+                  </span>
+                </div>
+                <div className="h-4 bg-slate-200 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-blue-500 transition-all duration-500"
+                    style={{ width: totalCount ? `${(completedCount / totalCount) * 100}%` : '0%' }}
+                  />
+                </div>
               </div>
-              <div className="h-4 bg-slate-700 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-blue-500 transition-all duration-500"
-                  style={{ width: totalCount ? `${(completedCount / totalCount) * 100}%` : '0%' }}
-                />
+
+              <div className="space-y-3">
+                {students.map((s) => (
+                  <div
+                    key={s.id}
+                    className="rounded-xl border border-slate-200 bg-slate-50/50 px-6 py-4 flex items-center justify-between"
+                  >
+                    <span className="font-semibold text-slate-900">{s.name || 'Student'}</span>
+                    {s.completed ? (
+                      <span className="flex items-center gap-2 text-green-600 font-semibold">
+                        <CheckCircle2 className="w-5 h-5" />
+                        {s.score}%
+                      </span>
+                    ) : (
+                      <span className="text-slate-500">In progress…</span>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
-
-          <div className="w-full max-w-2xl space-y-3">
-            {students.map((s) => (
-              <div
-                key={s.id}
-                className="bg-slate-800 rounded-xl border border-slate-700 px-6 py-4 flex items-center justify-between"
-              >
-                <span className="font-semibold text-white">{s.name || 'Student'}</span>
-                {s.completed ? (
-                  <span className="flex items-center gap-2 text-green-400 font-semibold">
-                    <CheckCircle2 className="w-5 h-5" />
-                    {s.score}%
-                  </span>
-                ) : (
-                  <span className="text-slate-500">In progress…</span>
-                )}
-              </div>
-            ))}
-          </div>
-        </>
+        </div>
       )}
     </div>
   );

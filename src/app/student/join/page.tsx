@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { doc, onSnapshot, getDoc, collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -21,12 +21,14 @@ export default function StudentJoinPage() {
   const [sessionName, setSessionName] = useState<string>('Session');
   const [error, setError] = useState<string | null>(null);
   const [removedFromLobby, setRemovedFromLobby] = useState(false);
+  const hasNavigatedToPlayRef = useRef(false);
 
   useEffect(() => {
     if (!sessionId) {
       setSessionExists(false);
       return;
     }
+    hasNavigatedToPlayRef.current = false;
     const sessionRef = doc(db, 'sessions', sessionId);
     const unsubscribe = onSnapshot(
       sessionRef,
@@ -38,7 +40,9 @@ export default function StudentJoinPage() {
         setSessionExists(true);
         const data = snap.data();
         if (data?.name) setSessionName(data.name as string);
-        if (data?.status === 'ACTIVE') {
+        // Only navigate once when status first becomes ACTIVE (avoid repeated router.push on every snapshot)
+        if (data?.status === 'ACTIVE' && !hasNavigatedToPlayRef.current) {
+          hasNavigatedToPlayRef.current = true;
           const sid = typeof window !== 'undefined' ? sessionStorage.getItem(LIVE_STUDENT_KEY(sessionId)) : null;
           router.push(`/student/play/${sessionId}${sid ? `?studentId=${encodeURIComponent(sid)}` : ''}`);
         }
@@ -127,8 +131,9 @@ export default function StudentJoinPage() {
       <div className="w-full max-w-md bg-white rounded-3xl shadow-xl overflow-hidden">
         {/* Context banner */}
         <div className="bg-blue-50 rounded-t-3xl p-6 text-center">
-          <p className="text-slate-600 text-sm mb-1">Joining Session...</p>
-          <p className="text-blue-900 font-bold text-lg">{sessionName}</p>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 tracking-tight">
+            {joined ? 'Any second now...' : 'Almost There...'}
+          </h1>
         </div>
 
         <div className="p-8">
@@ -149,7 +154,7 @@ export default function StudentJoinPage() {
             </>
           ) : joined ? (
             <>
-              <p className="text-xl font-bold text-slate-900 mb-2 text-center">You're in!</p>
+              <p className="text-xl font-bold text-slate-900 mb-2 text-center">Get ready!</p>
               <p className="text-slate-500 text-center mb-6">Waiting for your teacher to start the assignment…</p>
               <div className="flex justify-center">
                 <Loader2 className="w-10 h-10 animate-spin text-slate-400" />
