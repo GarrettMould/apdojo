@@ -884,11 +884,19 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
         console.log('[FullExam] Skipping test result save - conditions not met');
       }
 
-      // For assignments, show results underneath (blurred) with name modal on top
+      // For assignments: live session already has name from lobby — skip name modal; link-only still asks for name
       if (isCustomAssignment) {
-        setShowResults(true);
-        setShowFullResults(true); // Must be true so results are in the DOM and visible (blurred) behind the modal
-        setShowNameInputModal(true); // Show name input overlay
+        if (liveSessionId && liveStudentId && liveStudentName) {
+          setStudentName(liveStudentName);
+          setShowResults(true);
+          setShowFullResults(true);
+          setShowNameInputModal(false);
+          saveAssignmentResults(liveStudentName);
+        } else {
+          setShowResults(true);
+          setShowFullResults(true); // Must be true so results are in the DOM and visible (blurred) behind the modal
+          setShowNameInputModal(true); // Show name input overlay
+        }
       } else {
         // Go straight to full results view (skip AssessmentResultsPanel)
         setShowResults(true);

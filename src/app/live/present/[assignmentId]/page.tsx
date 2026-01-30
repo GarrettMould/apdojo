@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { doc, onSnapshot, updateDoc, collection, deleteDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { Loader2, Users, CheckCircle2, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Loader2, Users, CheckCircle2, Trash2, ChevronDown, ChevronUp, Copy, Play } from 'lucide-react';
 
 interface SessionDoc {
   status: 'WAITING' | 'ACTIVE';
@@ -38,6 +38,25 @@ export default function PresenterPage() {
   const [joinUrl, setJoinUrl] = useState('');
   const [studentListExpanded, setStudentListExpanded] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
+  const [headlinePhase, setHeadlinePhase] = useState<'enter' | 'typing'>('enter');
+  const [typedLength, setTypedLength] = useState(0);
+
+  const typewriterText = 'apdojo.com/join';
+
+  // After "Enter the Dojo" is shown, switch to typing phase
+  useEffect(() => {
+    const t = setTimeout(() => setHeadlinePhase('typing'), 2500);
+    return () => clearTimeout(t);
+  }, []);
+
+  // Type out "apdojo.com/join" character by character
+  useEffect(() => {
+    if (headlinePhase !== 'typing' || typedLength >= typewriterText.length) return;
+    const interval = setInterval(() => {
+      setTypedLength((n) => Math.min(n + 1, typewriterText.length));
+    }, 120);
+    return () => clearInterval(interval);
+  }, [headlinePhase, typedLength]);
 
   useEffect(() => {
     if (!sessionId || typeof window === 'undefined') return;
@@ -115,113 +134,145 @@ export default function PresenterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-950 via-blue-900 to-slate-900 flex flex-col items-center justify-center p-8 text-white">
+    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 md:p-8">
       {!session ? (
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-12 h-12 animate-spin text-slate-400" />
-          <p className="text-slate-400">Loading session…</p>
+          <p className="text-slate-500 text-lg">Loading session…</p>
         </div>
       ) : !isActive ? (
-        <>
-          <div className="text-center mb-8">
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-white mb-4">
-              Join the Session
-            </h1>
-            <p className="text-xl text-slate-400">
-              Scan the QR code or enter the code at apdojo.com/join
-            </p>
-          </div>
-
-          {/* Join code - prominent 5-character display (or fallback for legacy sessions) */}
-          {session.code ? (
-            <div className="mb-10">
-              <p className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">Join code</p>
-              <div className="bg-white py-6 px-10 rounded-2xl border-4 border-slate-700 shadow-xl">
-                <span className="text-5xl md:text-6xl font-black font-mono tracking-[0.3em] text-slate-900">
-                  {session.code}
-                </span>
+        <div className="w-full max-w-4xl">
+          <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
+            <div className="flex flex-col md:flex-row">
+              {/* Left: QR Code */}
+              <div className="p-6 md:p-8 flex items-center justify-center border-b md:border-b-0 md:border-r border-slate-200">
+                <div className="p-4 border border-slate-200 rounded-2xl bg-slate-50/50">
+                  <div className="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64">
+                    <QRCode
+                      size={256}
+                      style={{ height: '100%', width: '100%' }}
+                      value={joinUrl}
+                      viewBox="0 0 256 256"
+                      fgColor="#0f172a"
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
-          ) : (
-            <p className="text-slate-500 text-sm mb-6">Share the join link below (this session was created before codes).</p>
-          )}
 
-          <div className="bg-white p-8 rounded-3xl shadow-2xl mb-10">
-            <div className="w-64 h-64 md:w-96 md:h-96">
-              <QRCode
-                size={256}
-                style={{ height: 'auto', maxWidth: '100%', width: '100%' }}
-                value={joinUrl}
-                viewBox="0 0 256 256"
-              />
-            </div>
-          </div>
-
-          {/* Tally: click to expand student list; each student has trash to remove */}
-          <div className="bg-slate-800 rounded-2xl border border-slate-700 px-8 py-6 mb-10 w-full max-w-md">
-            <button
-              type="button"
-              onClick={() => setStudentListExpanded((e) => !e)}
-              className="w-full flex items-center justify-center gap-4 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-slate-800 rounded-xl py-1"
-            >
-              <Users className="w-10 h-10 text-blue-400 flex-shrink-0" />
-              <div className="text-center">
-                <span className="text-4xl font-black text-white">{totalCount}</span>
-                <span className="text-xl font-semibold text-slate-400 ml-2">
-                  student{totalCount !== 1 ? 's' : ''} joined
-                </span>
-              </div>
-              {studentListExpanded ? (
-                <ChevronUp className="w-6 h-6 text-slate-400 flex-shrink-0" />
-              ) : (
-                <ChevronDown className="w-6 h-6 text-slate-400 flex-shrink-0" />
-              )}
-            </button>
-            {studentListExpanded && (
-              <div className="mt-4 pt-4 border-t border-slate-700 space-y-2">
-                {students.length === 0 ? (
-                  <p className="text-slate-500 text-sm text-center py-2">No students in lobby yet.</p>
-                ) : (
-                  students.map((s) => (
-                    <div
-                      key={s.id}
-                      className="flex items-center justify-between gap-3 bg-slate-700/50 rounded-lg px-4 py-3"
-                    >
-                      <span className="font-semibold text-white truncate">{s.name || 'Student'}</span>
-                      <button
-                        type="button"
-                        onClick={(e) => { e.stopPropagation(); handleRemoveStudent(s.id); }}
-                        disabled={removingId === s.id}
-                        className="flex-shrink-0 p-2 text-red-400 hover:bg-red-500/20 rounded-lg transition-colors disabled:opacity-50"
-                        aria-label={`Remove ${s.name || 'student'}`}
-                      >
-                        {removingId === s.id ? (
-                          <Loader2 className="w-5 h-5 animate-spin" />
-                        ) : (
-                          <Trash2 className="w-5 h-5" />
+              {/* Right: Header, URL box, Footer */}
+              <div className="flex-1 flex flex-col p-6 md:p-8">
+                <div className="flex-1">
+                  <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tight mb-2 min-h-[1.2em]">
+                    {headlinePhase === 'enter' ? (
+                      'Enter the Dojo'
+                    ) : (
+                      <span>
+                        {typewriterText.slice(0, typedLength)}
+                        {typedLength < typewriterText.length && (
+                          <span className="animate-pulse">|</span>
                         )}
-                      </button>
-                    </div>
-                  ))
+                      </span>
+                    )}
+                  </h1>
+                  <p className="text-lg md:text-xl text-slate-500 mb-6">
+                    Scan the QR code or enter the code below
+                  </p>
+
+                  {/* URL copy box */}
+                  <button
+                    type="button"
+                    onClick={handleCopy}
+                    className="w-full flex items-center justify-between gap-3 px-4 py-4 md:px-5 md:py-5 rounded-xl border-2 border-slate-200 hover:bg-blue-50 hover:border-blue-200 transition-colors text-left group"
+                  >
+                    <span className="text-3xl md:text-4xl font-black text-blue-500 tracking-[0.2em] flex-1">
+                      {session?.code ?? (joinUrl ? (() => {
+                        try {
+                          const u = new URL(joinUrl);
+                          const code = u.searchParams.get('code');
+                          const id = u.searchParams.get('id');
+                          return code ?? id ?? '—';
+                        } catch {
+                          return '—';
+                        }
+                      })() : '—')}
+                    </span>
+                    <span className="flex-shrink-0 text-slate-500 group-hover:text-blue-600">
+                      {copied ? (
+                        <CheckCircle2 className="w-5 h-5 md:w-6 md:h-6 text-green-600" />
+                      ) : (
+                        <Copy className="w-5 h-5 md:w-6 md:h-6" />
+                      )}
+                    </span>
+                  </button>
+                </div>
+
+                {/* Footer: Student count + Start Session */}
+                <div className="mt-8 pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+                  <button
+                    type="button"
+                    onClick={() => setStudentListExpanded((e) => !e)}
+                    className="flex items-center justify-center gap-3 text-slate-700 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-300 rounded-xl py-2"
+                  >
+                    <Users className="w-8 h-8 md:w-10 md:h-10 text-slate-600 flex-shrink-0" />
+                    <span className="text-2xl md:text-3xl font-black text-slate-900">{totalCount}</span>
+                    <span className="text-lg md:text-xl font-semibold text-slate-500">
+                      student{totalCount !== 1 ? 's' : ''} joined
+                    </span>
+                    {studentListExpanded ? (
+                      <ChevronUp className="w-6 h-6 text-slate-400 flex-shrink-0" />
+                    ) : (
+                      <ChevronDown className="w-6 h-6 text-slate-400 flex-shrink-0" />
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleStartSession}
+                    disabled={starting}
+                    className="bg-slate-900 hover:bg-slate-800 disabled:bg-slate-400 text-white text-xl md:text-2xl font-black py-4 px-8 rounded-xl shadow-lg transition flex items-center justify-center gap-2"
+                  >
+                    {starting ? (
+                      <Loader2 className="w-6 h-6 animate-spin" />
+                    ) : (
+                      <Play className="w-6 h-6 flex-shrink-0" />
+                    )}
+                    Start Session
+                  </button>
+                </div>
+
+                {/* Expandable student list */}
+                {studentListExpanded && (
+                  <div className="mt-4 pt-4 border-t border-slate-200 space-y-2">
+                    {students.length === 0 ? (
+                      <p className="text-slate-500 text-base text-center py-2">No students in lobby yet.</p>
+                    ) : (
+                      students.map((s) => (
+                        <div
+                          key={s.id}
+                          className="flex items-center justify-between gap-3 bg-slate-50 rounded-lg px-4 py-3 border border-slate-200"
+                        >
+                          <span className="font-semibold text-slate-900 truncate">{s.name || 'Student'}</span>
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); handleRemoveStudent(s.id); }}
+                            disabled={removingId === s.id}
+                            className="flex-shrink-0 p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                            aria-label={`Remove ${s.name || 'student'}`}
+                          >
+                            {removingId === s.id ? (
+                              <Loader2 className="w-5 h-5 animate-spin" />
+                            ) : (
+                              <Trash2 className="w-5 h-5" />
+                            )}
+                          </button>
+                        </div>
+                      ))
+                    )}
+                  </div>
                 )}
               </div>
-            )}
+            </div>
           </div>
-
-          
-
-          <div className="fixed bottom-8 right-8">
-            <button
-              type="button"
-              onClick={handleStartSession}
-              disabled={starting}
-              className="bg-blue-600 hover:bg-blue-500 disabled:bg-slate-600 text-white text-xl font-bold py-4 px-8 rounded-lg shadow-lg transition transform hover:scale-105 flex items-center gap-2"
-            >
-              {starting ? <Loader2 className="w-6 h-6 animate-spin" /> : null}
-              Start Session →
-            </button>
-          </div>
-        </>
+        </div>
       ) : (
         <>
           <div className="text-center mb-10">

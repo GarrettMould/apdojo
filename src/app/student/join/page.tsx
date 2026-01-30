@@ -18,6 +18,7 @@ export default function StudentJoinPage() {
   const [joined, setJoined] = useState(false);
   const [joining, setJoining] = useState(false);
   const [sessionExists, setSessionExists] = useState<boolean | null>(null);
+  const [sessionName, setSessionName] = useState<string>('Session');
   const [error, setError] = useState<string | null>(null);
   const [removedFromLobby, setRemovedFromLobby] = useState(false);
 
@@ -36,6 +37,7 @@ export default function StudentJoinPage() {
         }
         setSessionExists(true);
         const data = snap.data();
+        if (data?.name) setSessionName(data.name as string);
         if (data?.status === 'ACTIVE') {
           const sid = typeof window !== 'undefined' ? sessionStorage.getItem(LIVE_STUDENT_KEY(sessionId)) : null;
           router.push(`/student/play/${sessionId}${sid ? `?studentId=${encodeURIComponent(sid)}` : ''}`);
@@ -49,7 +51,6 @@ export default function StudentJoinPage() {
     return () => unsubscribe();
   }, [sessionId, router]);
 
-  // When joined, listen to own student doc; if deleted, teacher removed us from lobby
   useEffect(() => {
     if (!sessionId || !joined || removedFromLobby) return;
     const studentId = typeof window !== 'undefined' ? sessionStorage.getItem(LIVE_STUDENT_KEY(sessionId)) : null;
@@ -87,95 +88,107 @@ export default function StudentJoinPage() {
     }
   };
 
-  const containerClass = 'w-full max-w-sm min-h-[28rem] flex flex-col items-center justify-center rounded-2xl bg-slate-800/50 border border-slate-700/80 p-8 shadow-xl text-center';
-
   if (!sessionId) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-950 via-blue-900 to-slate-900 flex flex-col items-center justify-center p-8 text-white">
-        <div className={containerClass}>
-          <p className="text-xl text-slate-400">No session ID. Use the link or QR code from your teacher.</p>
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-8">
+        <div className="w-full max-w-md bg-white rounded-3xl shadow-xl p-8">
+          <p className="text-lg text-slate-600 text-center">No session ID. Use the link or QR code from your teacher.</p>
         </div>
+        <p className="mt-12 text-slate-300 text-sm font-semibold tracking-wider">AP DOJO</p>
       </div>
     );
   }
 
   if (sessionExists === null) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-950 via-blue-900 to-slate-900 flex flex-col items-center justify-center p-8 text-white">
-        <div className={containerClass}>
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-8">
+        <div className="w-full max-w-md bg-white rounded-3xl shadow-xl p-8 flex flex-col items-center">
           <Loader2 className="w-12 h-12 animate-spin text-slate-400 mb-4" />
-          <p className="text-slate-400">Loading…</p>
+          <p className="text-slate-500">Loading…</p>
         </div>
+        <p className="mt-12 text-slate-300 text-sm font-semibold tracking-wider">AP DOJO</p>
       </div>
     );
   }
 
   if (sessionExists === false) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-950 via-blue-900 to-slate-900 flex flex-col items-center justify-center p-8 text-white">
-        <div className={containerClass}>
-          <p className="text-xl text-slate-400">Session not found or has ended.</p>
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-8">
+        <div className="w-full max-w-md bg-white rounded-3xl shadow-xl p-8">
+          <p className="text-lg text-slate-600 text-center">Session not found or has ended.</p>
         </div>
+        <p className="mt-12 text-slate-300 text-sm font-semibold tracking-wider">AP DOJO</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-950 via-blue-900 to-slate-900 flex flex-col items-center justify-center p-8 text-white">
-      <div className={containerClass}>
-        <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white mb-2">
-          Join the session
-        </h1>
-        <p className="text-slate-400 mb-8">
-          Enter your name. Wait for your teacher to start the assignment.
-        </p>
+    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6">
+      <div className="w-full max-w-md bg-white rounded-3xl shadow-xl overflow-hidden">
+        {/* Context banner */}
+        <div className="bg-blue-50 rounded-t-3xl p-6 text-center">
+          <p className="text-slate-600 text-sm mb-1">Joining Session...</p>
+          <p className="text-blue-900 font-bold text-lg">{sessionName}</p>
+        </div>
 
-        {removedFromLobby ? (
-          <>
-            <p className="text-xl font-semibold text-white mb-4">You have been removed from the lobby.</p>
-            <button
-              type="button"
-              onClick={() => {
-                if (typeof window !== 'undefined') {
-                  window.location.href = `${window.location.origin}/join`;
-                }
-              }}
-              className="w-full py-3 px-6 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition"
-            >
-              Join again
-            </button>
-          </>
-        ) : joined ? (
-          <>
-            <p className="text-xl font-semibold text-white mb-2">You’re in!</p>
-            <p className="text-slate-400 mb-6">Waiting for your teacher to start the assignment…</p>
-            <div className="flex justify-center">
-              <Loader2 className="w-8 h-8 animate-spin text-blue-400" />
-            </div>
-          </>
-        ) : (
-          <>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Your name"
-              className="w-full px-4 py-3 rounded-xl border-2 border-slate-600 bg-slate-800 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 mb-4"
-              onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
-            />
-            {error && <p className="text-red-400 text-sm mb-4">{error}</p>}
-            <button
-              type="button"
-              onClick={handleJoin}
-              disabled={!name.trim() || joining}
-              className="w-full py-3 px-6 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-bold rounded-xl transition flex items-center justify-center gap-2"
-            >
-              {joining ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
-              Join
-            </button>
-          </>
-        )}
+        <div className="p-8">
+          {removedFromLobby ? (
+            <>
+              <p className="text-lg font-semibold text-slate-900 mb-4 text-center">You have been removed from the lobby.</p>
+              <button
+                type="button"
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    window.location.href = `${window.location.origin}/join`;
+                  }
+                }}
+                className="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl transition"
+              >
+                Join again
+              </button>
+            </>
+          ) : joined ? (
+            <>
+              <p className="text-xl font-bold text-slate-900 mb-2 text-center">You're in!</p>
+              <p className="text-slate-500 text-center mb-6">Waiting for your teacher to start the assignment…</p>
+              <div className="flex justify-center">
+                <Loader2 className="w-10 h-10 animate-spin text-slate-400" />
+              </div>
+            </>
+          ) : (
+            <>
+              <label className="block text-slate-500 text-sm font-medium mb-3">
+                What should we call you?
+              </label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Your name"
+                className="w-full p-4 text-xl border-0 border-b-2 border-slate-200 focus:outline-none focus:border-black focus:ring-0 rounded-none bg-transparent mb-6"
+                onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
+              />
+              {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+              <button
+                type="button"
+                onClick={handleJoin}
+                disabled={!name.trim() || joining}
+                className="w-full py-4 bg-green-600 hover:bg-green-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-green-600 text-white text-xl font-bold rounded-xl shadow-lg transition flex items-center justify-center gap-2"
+              >
+                {joining ? <Loader2 className="w-6 h-6 animate-spin" /> : null}
+                Enter Class
+              </button>
+              <p className="mt-4 text-slate-400 text-sm text-center">
+                Waiting for host to start...
+              </p>
+            </>
+          )}
+        </div>
       </div>
+
+      <p className="mt-12 text-slate-300 text-sm font-semibold tracking-wider">
+        AP DOJO
+      </p>
     </div>
   );
 }
