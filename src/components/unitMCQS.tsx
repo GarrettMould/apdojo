@@ -1628,56 +1628,58 @@ export function UnitMCQs({
     onNextQuestion(); 
   };
 
-  // --- Updated useEffect for Keyboard Navigation --- 
+  // Keyboard navigation: ArrowLeft/Right for prev/next question, ArrowUp/Down for options, Enter to submit
   useEffect(() => {
-    /* // --- START COMMENT OUT - Keyboard Navigation --- 
     const handleKeyDown = (event: KeyboardEvent) => {
-      // Ignore if focused on input/button or if an overlay/offer is active
       const target = event.target as HTMLElement;
-      if (displayDoubleXpOffer || target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON') {
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'BUTTON' || target.isContentEditable) {
+        return;
+      }
+      if (isNavigationDisabled) return;
+
+      const numOptions = currentQuestion?.options?.length ?? 0;
+
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        handlePreviousQuestion();
+        return;
+      }
+      if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        handleNextQuestion();
         return;
       }
 
-      const numOptions = currentQuestion?.options?.length ?? 0;
-      if (numOptions === 0) return; // No options to navigate
+      if (numOptions === 0) return;
 
-      if (event.key === 'ArrowLeft') {
-        handlePreviousQuestion();
-      } else if (event.key === 'ArrowRight') {
-        handleNextQuestion();
-      } else if (event.key === 'ArrowUp') {
+      if (event.key === 'ArrowUp') {
         event.preventDefault();
         setHighlightedIndex(prevIndex => {
-          if (prevIndex === null) return numOptions - 1; // Highlight D first
-          if (prevIndex === 0) return numOptions - 1;    // Wrap from A to D
-          return prevIndex - 1;                   // Go up
+          if (prevIndex === null) return numOptions - 1;
+          if (prevIndex === 0) return numOptions - 1;
+          return prevIndex - 1;
         });
       } else if (event.key === 'ArrowDown') {
         event.preventDefault();
         setHighlightedIndex(prevIndex => {
-          if (prevIndex === null) return 0; // Highlight A first
-          if (prevIndex === numOptions - 1) return 0; // Wrap from D to A
-          return prevIndex + 1;                   // Go down
+          if (prevIndex === null) return 0;
+          if (prevIndex === numOptions - 1) return 0;
+          return prevIndex + 1;
         });
       } else if (event.key === 'Enter') {
-        if (highlightedIndex !== null && !currentAnswerState) { // Only submit if highlighted and not already answered
-           event.preventDefault();
-           console.log("Enter pressed, submitting option:", highlightedIndex); // Debug
-           // Find the actual answer details for the highlighted index
-           const letter = String.fromCharCode(65 + highlightedIndex);
-           const text = currentQuestion.options[highlightedIndex];
-           const lessonIds = currentQuestion.lessonIDS;
-           handleAnswerSelection(currentQuestion.id, letter, text, lessonIds);
+        if (highlightedIndex !== null && !currentAnswerState && currentQuestion) {
+          event.preventDefault();
+          const letter = String.fromCharCode(65 + highlightedIndex);
+          const text = currentQuestion.options[highlightedIndex];
+          const lessonIds = currentQuestion.lessonIDS;
+          handleAnswerSelection(currentQuestion.id, letter, text, lessonIds);
         }
       }
     };
 
     document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-    // --- END COMMENT OUT - Keyboard Navigation --- */ 
-  }, [handlePreviousQuestion, handleNextQuestion, currentQuestion, highlightedIndex, currentAnswerState, handleAnswerSelection]); // Added dependencies
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [handlePreviousQuestion, handleNextQuestion, currentQuestion, highlightedIndex, currentAnswerState, handleAnswerSelection, isNavigationDisabled]);
 
   // --- NEW useEffect to Disable Body Scroll --- 
   useEffect(() => {

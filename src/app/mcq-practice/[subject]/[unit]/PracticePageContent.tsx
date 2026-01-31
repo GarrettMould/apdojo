@@ -588,12 +588,6 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
 
   const handleNextQuestion = () => {
     if (currentQuestionIndex < questionsForPractice.length - 1) {
-      // If the user has used any arrow key on this question,
-      // hide the keyboard hint starting from the NEXT question.
-      if (usedArrowOnCurrentQuestion && !hasUsedKeyboardNav) {
-        setHasUsedKeyboardNav(true);
-      }
-      setUsedArrowOnCurrentQuestion(false);
       setCurrentQuestionIndex(prev => prev + 1);
     }
   };
