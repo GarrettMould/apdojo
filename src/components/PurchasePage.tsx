@@ -183,11 +183,11 @@ export function PurchasePage({ courseType }: PurchasePageProps) {
           </div>
 
           {/* Two columns: Price + CTA (left) | What's Included (right) */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
             {/* Left: Price + Star rating + Button */}
             <div className="space-y-6" id="main-purchase-button">
               {/* Price Section */}
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <p className="text-lg font-semibold text-gray-700">
                   One-time payment of
                 </p>
@@ -217,7 +217,7 @@ export function PurchasePage({ courseType }: PurchasePageProps) {
               </div>
 
               {/* CTA Button */}
-              <div className="pt-2">
+              <div className="pt-4">
                 <motion.button
                   onClick={handlePurchase}
                   disabled={isLoading}
@@ -233,7 +233,7 @@ export function PurchasePage({ courseType }: PurchasePageProps) {
                 </motion.button>
 
                 {/* Trust Elements */}
-                <p className="text-xs text-gray-500 text-center mt-4 flex items-center justify-center gap-1.5">
+                <p className="text-xs text-gray-500 text-center mt-6 flex items-center justify-center gap-1.5">
                   <ShieldCheck className="w-4 h-4 text-gray-400" />
                   100% Money-Back Guarantee
                 </p>
@@ -253,7 +253,7 @@ export function PurchasePage({ courseType }: PurchasePageProps) {
                     }
                     setShowParentPaymentModal(true);
                   }}
-                  className="mt-4 w-full flex items-center justify-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors group"
+                  className="mt-6 w-full flex items-center justify-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors group"
                 >
                   <span>Don&apos;t have a credit card?</span>
                   <span className="underline decoration-dotted underline-offset-4 group-hover:text-blue-600 font-medium">
@@ -264,11 +264,11 @@ export function PurchasePage({ courseType }: PurchasePageProps) {
             </div>
 
             {/* Right: What's Included */}
-            <div className="space-y-4">
-              <h2 className="text-2xl font-bold text-black mb-4">
+            <div className="space-y-6">
+              <h2 className="text-2xl font-bold text-black mb-6">
                 What&apos;s Included:
               </h2>
-              <ul className="space-y-3">
+              <ul className="space-y-5">
                 {config.features.map((benefit, index) => {
                   const parts = benefit.text.split(benefit.key);
                   return (
