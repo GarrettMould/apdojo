@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, Play, FileText, Monitor, Star, ShieldCheck, Sparkles, Quote } from 'lucide-react';
+import { ParentPaymentModal } from '@/components/ParentPaymentModal';
 import { loadStripe } from '@stripe/stripe-js';
 import { useAuthContext } from '@/contexts/AuthContext';
 import Image from 'next/image';
@@ -56,6 +57,7 @@ export function PurchasePage({ courseType }: PurchasePageProps) {
   const { user, setShowSignupModal, setRedirectOnLogin } = useAuthContext();
   const [isLoading, setIsLoading] = useState(false);
   const [showStickyButton, setShowStickyButton] = useState(false);
+  const [showParentPaymentModal, setShowParentPaymentModal] = useState(false);
   const config = COURSE_CONFIG[courseType];
   const isGreen = config.themeColor === 'green';
 
@@ -180,87 +182,125 @@ export function PurchasePage({ courseType }: PurchasePageProps) {
             </Link>
           </div>
 
-          {/* Price Section */}
-          <div className="space-y-2">
-            <p className="text-lg font-semibold text-gray-700">
-              One-time payment of
-            </p>
-            <div className="flex items-baseline gap-3">
-              <span className={`text-6xl font-extrabold ${isGreen ? 'text-green-600' : 'text-blue-600'}`}>
-                ${config.price}
-              </span>
-              <span className="text-lg text-gray-400 line-through ml-2">
-                $39
-              </span>
+          {/* Two columns: Price + CTA (left) | What's Included (right) */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
+            {/* Left: Price + Star rating + Button */}
+            <div className="space-y-6" id="main-purchase-button">
+              {/* Price Section */}
+              <div className="space-y-2">
+                <p className="text-lg font-semibold text-gray-700">
+                  One-time payment of
+                </p>
+                <div className="flex items-baseline gap-3">
+                  <span className={`text-6xl font-extrabold ${isGreen ? 'text-green-600' : 'text-blue-600'}`}>
+                    ${config.price}
+                  </span>
+                  <span className="text-lg text-gray-400 line-through ml-2">
+                    $39
+                  </span>
+                </div>
+                <p className="text-sm text-gray-600 mt-2">
+                  Valid until June 30th, 2026
+                </p>
+              </div>
+
+              {/* Star Rating */}
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-0.5">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                  ))}
+                </div>
+                <span className="text-sm font-medium text-gray-600">
+                  500+ Students Trained
+                </span>
+              </div>
+
+              {/* CTA Button */}
+              <div className="pt-2">
+                <motion.button
+                  onClick={handlePurchase}
+                  disabled={isLoading}
+                  whileHover={{ y: -4 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`w-full text-white font-extrabold text-base sm:text-lg py-4 px-8 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 uppercase tracking-wide disabled:opacity-50 disabled:cursor-not-allowed ${
+                    isGreen 
+                      ? 'bg-green-600 hover:bg-green-700' 
+                      : 'bg-blue-600 hover:bg-blue-700'
+                  }`}
+                >
+                  {isLoading ? 'Processing...' : 'UNLOCK INSTANT ACCESS'}
+                </motion.button>
+
+                {/* Trust Elements */}
+                <p className="text-xs text-gray-500 text-center mt-4 flex items-center justify-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-gray-400" />
+                  100% Money-Back Guarantee
+                </p>
+
+                {/* Parent Payment CTA */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!user) {
+                      const currentPath =
+                        typeof window !== 'undefined'
+                          ? window.location.pathname + window.location.search
+                          : `/purchase/season-pass?courseType=${courseType}`;
+                      setRedirectOnLogin(currentPath);
+                      setShowSignupModal(true);
+                      return;
+                    }
+                    setShowParentPaymentModal(true);
+                  }}
+                  className="mt-4 w-full flex items-center justify-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors group"
+                >
+                  <span>Don&apos;t have a credit card?</span>
+                  <span className="underline decoration-dotted underline-offset-4 group-hover:text-blue-600 font-medium">
+                    Email cart to parent
+                  </span>
+                </button>
+              </div>
             </div>
-            <p className="text-sm text-gray-600 mt-2">
-              Valid until June 30th, 2026
-            </p>
-          </div>
 
-          {/* Star Rating */}
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-0.5">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-              ))}
+            {/* Right: What's Included */}
+            <div className="space-y-4">
+              <h2 className="text-2xl font-bold text-black mb-4">
+                What&apos;s Included:
+              </h2>
+              <ul className="space-y-3">
+                {config.features.map((benefit, index) => {
+                  const parts = benefit.text.split(benefit.key);
+                  return (
+                    <motion.li
+                      key={index}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="flex items-start gap-3"
+                    >
+                      <CheckCircle2 className={`w-6 h-6 flex-shrink-0 mt-0.5 ${isGreen ? 'text-green-600' : 'text-blue-600'}`} />
+                      <span className="text-lg font-semibold text-gray-900">
+                        {parts[0]}
+                        <strong>{benefit.key}</strong>
+                        {parts[1]}
+                      </span>
+                    </motion.li>
+                  );
+                })}
+              </ul>
             </div>
-            <span className="text-sm font-medium text-gray-600">
-              500+ Students Trained
-            </span>
+          </div>
           </div>
 
-          {/* Benefits Stack */}
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold text-black mb-4">
-              What's Included:
-            </h2>
-            <ul className="space-y-3">
-              {config.features.map((benefit, index) => {
-                const parts = benefit.text.split(benefit.key);
-                return (
-                  <motion.li
-                    key={index}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="flex items-start gap-3"
-                  >
-                    <CheckCircle2 className={`w-6 h-6 flex-shrink-0 mt-0.5 ${isGreen ? 'text-green-600' : 'text-blue-600'}`} />
-                    <span className="text-lg font-semibold text-gray-900">
-                      {parts[0]}
-                      <strong>{benefit.key}</strong>
-                      {parts[1]}
-                    </span>
-                  </motion.li>
-                );
-              })}
-            </ul>
-          </div>
-
-          {/* CTA Button */}
-          <div className="pt-8" id="main-purchase-button">
-            <motion.button
-              onClick={handlePurchase}
-              disabled={isLoading}
-              whileHover={{ y: -4 }}
-              whileTap={{ scale: 0.98 }}
-              className={`w-full text-white font-extrabold text-xl py-6 px-8 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 uppercase tracking-wide disabled:opacity-50 disabled:cursor-not-allowed ${
-                isGreen 
-                  ? 'bg-green-600 hover:bg-green-700' 
-                  : 'bg-blue-600 hover:bg-blue-700'
-              }`}
-            >
-              {isLoading ? 'Processing...' : 'UNLOCK INSTANT ACCESS'}
-            </motion.button>
-
-            {/* Trust Elements */}
-            <p className="text-xs text-gray-500 text-center mt-4 flex items-center justify-center gap-1.5">
-              <ShieldCheck className="w-4 h-4 text-gray-400" />
-              100% Money-Back Guarantee
-            </p>
-          </div>
-          </div>
+          {user && (
+            <ParentPaymentModal
+              open={showParentPaymentModal}
+              onOpenChange={setShowParentPaymentModal}
+              studentName={user.displayName || user.email?.split('@')[0] || 'Student'}
+              studentId={user.uid}
+            />
+          )}
 
           {/* Right Column - Reviews */}
           <div className="lg:col-span-1 pl-0 lg:pl-12">
@@ -325,7 +365,7 @@ export function PurchasePage({ courseType }: PurchasePageProps) {
             exit={{ y: 100, opacity: 0 }}
             className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t-4 border-black shadow-[0_-4px_0px_0px_rgba(0,0,0,1)] p-4 lg:px-8"
           >
-          <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="hidden sm:block">
               <p className="text-sm font-semibold text-gray-900">
                 Ready to unlock instant access?
@@ -334,18 +374,40 @@ export function PurchasePage({ courseType }: PurchasePageProps) {
                 ${config.price} • Valid until June 30th, 2026
               </p>
             </div>
-            <motion.button
-              onClick={handlePurchase}
-              disabled={isLoading}
-              whileTap={{ scale: 0.98 }}
-              className={`flex-shrink-0 text-white font-extrabold text-lg py-4 px-8 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 uppercase tracking-wide disabled:opacity-50 disabled:cursor-not-allowed ${
-                isGreen 
-                  ? 'bg-green-600 hover:bg-green-700' 
-                  : 'bg-blue-600 hover:bg-blue-700'
-              }`}
-            >
-              {isLoading ? 'Processing...' : 'UNLOCK INSTANT ACCESS'}
-            </motion.button>
+            <div className="flex flex-col items-center gap-2 w-full sm:w-auto">
+              <motion.button
+                onClick={handlePurchase}
+                disabled={isLoading}
+                whileTap={{ scale: 0.98 }}
+                className={`flex-shrink-0 text-white font-extrabold text-lg py-4 px-8 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 uppercase tracking-wide disabled:opacity-50 disabled:cursor-not-allowed ${
+                  isGreen 
+                    ? 'bg-green-600 hover:bg-green-700' 
+                    : 'bg-blue-600 hover:bg-blue-700'
+                }`}
+              >
+                {isLoading ? 'Processing...' : 'UNLOCK INSTANT ACCESS'}
+              </motion.button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!user) {
+                    const currentPath =
+                      typeof window !== 'undefined'
+                        ? window.location.pathname + window.location.search
+                        : `/purchase/season-pass?courseType=${courseType}`;
+                    setRedirectOnLogin(currentPath);
+                    setShowSignupModal(true);
+                    return;
+                  }
+                  setShowParentPaymentModal(true);
+                }}
+                className="text-xs text-gray-500 hover:text-gray-900 transition-colors group"
+              >
+                <span className="underline decoration-dotted underline-offset-4 group-hover:text-blue-600 font-medium">
+                  Email cart to parent
+                </span>
+              </button>
+            </div>
           </div>
         </motion.div>
         )}

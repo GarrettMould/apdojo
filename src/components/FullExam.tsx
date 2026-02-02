@@ -123,6 +123,8 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   const [studentName, setStudentName] = useState('');
   const [xpAwarded, setXpAwarded] = useState(false);
   const [showSeasonPassModal, setShowSeasonPassModal] = useState(false);
+  /** Live session only: when true, show Score Summary card first; "See full results" sets to false. */
+  const [liveSessionScoreSummaryOnly, setLiveSessionScoreSummaryOnly] = useState(true);
   
   // Remove the shuffling logic and just use the pre-shuffled questions
   const questions = questionBank.questions;
@@ -279,7 +281,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   const isFullExam = examNumber === 'full';
   // Show top bar and bottom navigation for unit tests, preview exams, and full exams
   const shouldShowTestUI = isUnitTest || isPreviewExam || isFullExam || isCustomAssignment;
-  
+  /** Live session only: apply tutor/builder-style UI (rounded cards, shadow-xl, indigo/slate). Do not use for logic. */
+  const isLiveSession = !!(liveSessionId && liveStudentId);
+
   // Determine if this exam requires season pass (unit tests and full exams, but not custom assignments)
   const requiresSeasonPass = (isUnitTest || isFullExam || isPreviewExam) && !isCustomAssignment;
   
@@ -348,6 +352,14 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   // Add state for expandable question navigation
   const [showQuestionNavigator, setShowQuestionNavigator] = useState(false);
   const questionNavigatorRef = useRef<HTMLDivElement>(null);
+  const liveSessionScoreCardRef = useRef<HTMLDivElement>(null);
+
+  // Scroll live session score card into view when it appears after submit
+  useEffect(() => {
+    if (showResults && showFullResults && liveSessionId && liveSessionScoreSummaryOnly && liveSessionScoreCardRef.current) {
+      liveSessionScoreCardRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [showResults, showFullResults, liveSessionId, liveSessionScoreSummaryOnly]);
 
   // Close question navigator when clicking outside
   useEffect(() => {
@@ -1033,7 +1045,8 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
         console.error('[FullExam] Error updating live session student:', err);
       }
       setShowNameInputModal(false);
-      setShowFullResults(true); // Show full results panel (score + questions with correct answer & explanation)
+      setShowFullResults(true);
+      setLiveSessionScoreSummaryOnly(true); // Show score summary gate first; "See full results" reveals breakdown
       return;
     }
 
@@ -1560,8 +1573,8 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
       {/* Only show exam content if not showing results, or if showing full results */}
       {(!showResults || showFullResults) && (
         <div className={`flex w-full flex-col relative ${shouldShowTestUI ? 'min-h-screen' : isCustomAssignment ? '' : 'lg:h-[calc(100vh-5rem)]'} ${shouldShowTestUI ? '' : 'overflow-hidden'}`}>
-          {/* Top Bar - At the very top for unit tests, preview exams, full exams, and custom assignments */}
-          {shouldShowTestUI && !(showResults && isUnitTest) && (
+          {/* Top Bar - Hidden when showing assessment results (calculator/drawing pad unnecessary) */}
+          {shouldShowTestUI && !showResults && (
             <div className="w-full bg-gray-200 px-6 py-4 flex items-center justify-between border-b-4 border-black shadow-lg flex-shrink-0 fixed top-20 left-0 right-0 z-40">
               {/* Timer Section - Only show for non-custom assignments */}
               {!isCustomAssignment && (
@@ -1812,13 +1825,15 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
             className={`flex-shrink-0 overflow-y-auto min-w-0 w-full lg:w-auto ${shouldShowTestUI ? 'pb-24' : ''}`}
           >
             <div className={`w-full ${
-              isCustomAssignment 
-                ? 'p-8 max-w-4xl mx-auto' 
-                : showVideoModal && videoUrl 
-                  ? 'p-8' 
-                  : showToolsPanel
+              isLiveSession
+                ? 'p-6 md:p-8 max-w-4xl mx-auto'
+                : isCustomAssignment
+                  ? 'p-8 max-w-4xl mx-auto'
+                  : showVideoModal && videoUrl
                     ? 'p-8'
-                    : 'p-8 max-w-5xl mx-auto'
+                    : showToolsPanel
+                      ? 'p-8'
+                      : 'p-8 max-w-5xl mx-auto'
              } ${shouldShowTestUI ? 'pb-24' : ''}`}>
             {!showResults ? (
               <>
@@ -1888,9 +1903,11 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                     {/* Question Container */}
                   <div className="w-full">
                       <div id={`question-${question.id}`} className={`bg-white p-6 md:p-8 relative ${
-                        isCustomAssignment 
-                          ? 'border-2 border-black rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' 
-                          : 'rounded-lg shadow-md border border-gray-200'
+                        isLiveSession
+                          ? 'rounded-3xl shadow-xl border border-slate-200'
+                          : isCustomAssignment
+                            ? 'border-2 border-black rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                            : 'rounded-lg shadow-md border border-gray-200'
                       }`}>
                         {/* Main Question Content */}
                         <div className="space-y-6">
@@ -2214,34 +2231,42 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                       onClick={() => handleAnswer(question.id, index)}
                                       disabled={showResults}
                                       className={`w-full text-left p-3 text-sm font-medium transition-all duration-150 flex items-center gap-3 ${
-                                        isCustomAssignment 
-                                          ? 'border-2 border-black rounded-lg shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]' 
-                                          : 'rounded-lg border'
+                                        isLiveSession
+                                          ? 'rounded-xl shadow-lg border border-slate-200'
+                                          : isCustomAssignment
+                                            ? 'border-2 border-black rounded-lg shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]'
+                                            : 'rounded-lg border'
                                       } ${
-                                        showResults ? 
-                                          (isCorrect ? 'bg-green-50 text-gray-900 shadow-sm border-green-200 cursor-default' : 
-                                          isSelected ? 'bg-red-50 text-gray-900 shadow-sm border-red-200 cursor-default' : 
-                                          'bg-transparent text-gray-900 border-gray-200 cursor-default') 
+                                        showResults ?
+                                          (isCorrect ? 'bg-green-50 text-gray-900 shadow-sm border-green-200 cursor-default' :
+                                          isSelected ? 'bg-red-50 text-gray-900 shadow-sm border-red-200 cursor-default' :
+                                          'bg-transparent text-gray-900 border-gray-200 cursor-default')
                                         : isStruckThrough ?
-                                          isCustomAssignment 
-                                            ? 'bg-gray-100 border-black opacity-60 cursor-pointer' 
-                                            : 'bg-gray-100 border-gray-300 opacity-60 cursor-pointer'
-                                        : isSelected ? 
-                                          isCustomAssignment
-                                            ? 'bg-blue-100 border-2 border-blue-500 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
-                                            : 'bg-blue-100 border-2 border-blue-500 shadow-md'
-                                        : 
-                                          isCustomAssignment
-                                            ? 'bg-white hover:bg-gray-50 border-black hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
-                                            : 'bg-transparent hover:bg-gray-50 border-gray-200 hover:border-gray-300 hover:shadow-sm'
+                                          isLiveSession
+                                            ? 'bg-slate-100 border-slate-200 opacity-60 cursor-pointer'
+                                            : isCustomAssignment
+                                              ? 'bg-gray-100 border-black opacity-60 cursor-pointer'
+                                              : 'bg-gray-100 border-gray-300 opacity-60 cursor-pointer'
+                                        : isSelected ?
+                                          isLiveSession
+                                            ? 'bg-blue-50 border-2 border-blue-300 shadow-md'
+                                            : isCustomAssignment
+                                              ? 'bg-blue-100 border-2 border-blue-500 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                                              : 'bg-blue-100 border-2 border-blue-500 shadow-md'
+                                        :
+                                          isLiveSession
+                                            ? 'bg-white hover:bg-slate-50 border-slate-200 hover:shadow-md'
+                                            : isCustomAssignment
+                                              ? 'bg-white hover:bg-gray-50 border-black hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                                              : 'bg-transparent hover:bg-gray-50 border-gray-200 hover:border-gray-300 hover:shadow-sm'
                                       }`}
                                     >
                                       {/* Letter bubble */}
-                                      <span className={`w-6 h-6 flex items-center justify-center rounded-full text-xs font-medium flex-shrink-0 ${
-                                        isCustomAssignment ? 'border-2 border-black' : 'border'
+                                      <span className={`w-6 h-6 flex items-center justify-center rounded-full text-xs flex-shrink-0 ${
+                                        isLiveSession ? 'font-bold text-blue-500 border border-slate-200 bg-white' : isCustomAssignment ? 'border-2 border-black font-medium' : 'border font-medium'
                                       } ${
-                                        showResults ? (isCorrect ? 'bg-green-100 border-green-300 text-green-700' : isSelected ? 'bg-red-100 border-red-300 text-red-700' : 'bg-white border-gray-300 text-gray-500') : isStruckThrough ? 'bg-gray-200 border-gray-300 text-gray-400' : isSelected ? 'bg-blue-500 border-blue-600 text-white font-semibold' : 'bg-white border-gray-300 text-gray-600'
-                                      }`}> 
+                                        !isLiveSession && (showResults ? (isCorrect ? 'bg-green-100 border-green-300 text-green-700' : isSelected ? 'bg-red-100 border-red-300 text-red-700' : 'bg-white border-gray-300 text-gray-500') : isStruckThrough ? 'bg-gray-200 border-gray-300 text-gray-400' : isSelected ? 'bg-blue-500 border-blue-600 text-white font-semibold' : 'bg-white border-gray-300 text-gray-600')
+                                      } ${isLiveSession && isStruckThrough ? 'opacity-60' : ''}`}>
                                         {String.fromCharCode(65 + index)}
                                       </span>
                                       {/* Two-column content */}
@@ -2294,34 +2319,42 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                       onClick={() => handleAnswer(question.id, index)}
                                       disabled={showResults}
                                       className={`w-full text-left p-3 text-sm font-medium transition-all duration-150 flex items-center gap-3 ${
-                                        isCustomAssignment 
-                                          ? 'border-2 border-black rounded-lg shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]' 
-                                          : 'rounded-lg border'
+                                        isLiveSession
+                                          ? 'rounded-xl shadow-lg border border-slate-200'
+                                          : isCustomAssignment
+                                            ? 'border-2 border-black rounded-lg shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]'
+                                            : 'rounded-lg border'
                                       } ${
-                                        showResults ? 
-                                          (isCorrect ? 'bg-green-50 text-gray-900 shadow-sm border-green-200 cursor-default' : 
-                                          isSelected ? 'bg-red-50 text-gray-900 shadow-sm border-red-200 cursor-default' : 
-                                          'bg-transparent text-gray-900 border-gray-200 cursor-default') 
+                                        showResults ?
+                                          (isCorrect ? 'bg-green-50 text-gray-900 shadow-sm border-green-200 cursor-default' :
+                                          isSelected ? 'bg-red-50 text-gray-900 shadow-sm border-red-200 cursor-default' :
+                                          'bg-transparent text-gray-900 border-gray-200 cursor-default')
                                         : isStruckThrough ?
-                                          isCustomAssignment 
-                                            ? 'bg-gray-100 border-black opacity-60 cursor-pointer' 
-                                            : 'bg-gray-100 border-gray-300 opacity-60 cursor-pointer'
-                                        : isSelected ? 
-                                          isCustomAssignment
-                                            ? 'bg-blue-100 border-2 border-blue-500 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
-                                            : 'bg-blue-100 border-2 border-blue-500 shadow-md'
-                                        : 
-                                          isCustomAssignment
-                                            ? 'bg-white hover:bg-gray-50 border-black hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
-                                            : 'bg-transparent hover:bg-gray-50 border-gray-200 hover:border-gray-300 hover:shadow-sm'
+                                          isLiveSession
+                                            ? 'bg-slate-100 border-slate-200 opacity-60 cursor-pointer'
+                                            : isCustomAssignment
+                                              ? 'bg-gray-100 border-black opacity-60 cursor-pointer'
+                                              : 'bg-gray-100 border-gray-300 opacity-60 cursor-pointer'
+                                        : isSelected ?
+                                          isLiveSession
+                                            ? 'bg-blue-50 border-2 border-blue-300 shadow-md'
+                                            : isCustomAssignment
+                                              ? 'bg-blue-100 border-2 border-blue-500 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                                              : 'bg-blue-100 border-2 border-blue-500 shadow-md'
+                                        :
+                                          isLiveSession
+                                            ? 'bg-white hover:bg-slate-50 border-slate-200 hover:shadow-md'
+                                            : isCustomAssignment
+                                              ? 'bg-white hover:bg-gray-50 border-black hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                                              : 'bg-transparent hover:bg-gray-50 border-gray-200 hover:border-gray-300 hover:shadow-sm'
                                       }`}
                                     >
                                       {/* Letter bubble */}
-                                      <span className={`w-6 h-6 flex items-center justify-center rounded-full text-xs font-medium flex-shrink-0 ${
-                                        isCustomAssignment ? 'border-2 border-black' : 'border'
+                                      <span className={`w-6 h-6 flex items-center justify-center rounded-full text-xs flex-shrink-0 ${
+                                        isLiveSession ? 'font-bold text-blue-500 border border-slate-200 bg-white' : isCustomAssignment ? 'border-2 border-black font-medium' : 'border font-medium'
                                       } ${
-                                        showResults ? (isCorrect ? 'bg-green-100 border-green-300 text-green-700' : isSelected ? 'bg-red-100 border-red-300 text-red-700' : 'bg-white border-gray-300 text-gray-500') : isStruckThrough ? 'bg-gray-200 border-gray-300 text-gray-400' : isSelected ? 'bg-blue-500 border-blue-600 text-white font-semibold' : 'bg-white border-gray-300 text-gray-600'
-                                      }`}> 
+                                        !isLiveSession && (showResults ? (isCorrect ? 'bg-green-100 border-green-300 text-green-700' : isSelected ? 'bg-red-100 border-red-300 text-red-700' : 'bg-white border-gray-300 text-gray-500') : isStruckThrough ? 'bg-gray-200 border-gray-300 text-gray-400' : isSelected ? 'bg-blue-500 border-blue-600 text-white font-semibold' : 'bg-white border-gray-300 text-gray-600')
+                                      } ${isLiveSession && isStruckThrough ? 'opacity-60' : ''}`}>
                                         {String.fromCharCode(65 + index)}
                                       </span>
                                       {/* Option Image or Text */}
@@ -2397,6 +2430,35 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                 );
               })()}
               </>
+            ) : showResults && showFullResults && liveSessionId && liveSessionScoreSummaryOnly ? (
+              /* Live session: Score Summary gate (Digital Whiteboard style) before full results */
+              <div ref={liveSessionScoreCardRef} className="min-h-screen flex flex-col items-center justify-center p-6">
+                <div className="w-full max-w-lg bg-white rounded-3xl shadow-xl border-2 border-slate-300 p-10 text-center">
+                  <div className="text-6xl font-black text-slate-900 mb-2">
+                    {Math.round((questions.filter((q) => answers[q.id] === q.correctAnswer).length / questions.length) * 100)}%
+                  </div>
+                  <p className="text-slate-600 font-medium mb-8">
+                    {(() => {
+                      const pct = Math.round((questions.filter((q) => answers[q.id] === q.correctAnswer).length / questions.length) * 100);
+                      return pct >= 70 ? 'Nice work!' : 'Keep pushing!';
+                    })()}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => router.push(examType === 'macro' ? '/ap-macro-unit-1-cheat-sheet' : '/ap-micro-unit-1-cheat-sheet')}
+                    className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xl font-bold transition-colors"
+                  >
+                    AP {examType === 'macro' ? 'Macro' : 'Micro'} Cheat Sheets
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setLiveSessionScoreSummaryOnly(false)}
+                    className="mt-4 block w-full text-slate-400 underline hover:text-slate-600 transition-colors"
+                  >
+                    See full results
+                  </button>
+                </div>
+              </div>
             ) : (
               <div className="space-y-8 max-w-4xl mx-auto w-full">
             {/* Compact Results Summary - Only Assessment Results Section */}

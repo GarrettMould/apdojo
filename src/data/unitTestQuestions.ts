@@ -886,7 +886,7 @@ export const unitTestQuestions: QuestionType[] = [
     ],
     correctAnswer: "D",
     explanation: "The deadweight loss from a tariff is composed of two distinct efficiency losses. Triangle OMQ represents the production inefficiency (resources used to produce goods domestically at a higher cost than the world price). Triangle RNP represents the consumption inefficiency (lost consumer surplus from consumers who value the good more than the world price but less than the tariff price)."
-  },
+  }, 
 
   // Unit 3: National Income and Price Determination
   {

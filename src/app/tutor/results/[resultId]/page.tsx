@@ -145,7 +145,7 @@ export default function AssignmentResultPage() {
             className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to Dashboard
+            Back to Home
           </Link>
         </div>
       </div>
@@ -162,7 +162,7 @@ export default function AssignmentResultPage() {
             className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold mb-4"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to Dashboard
+            Back to Home
           </Link>
           <h1 className="text-3xl font-black text-black mb-2">Assignment Results</h1>
           <p className="text-gray-600">{assignmentName}</p>

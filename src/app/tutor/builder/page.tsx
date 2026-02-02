@@ -3,16 +3,16 @@
 import { useState, useMemo, useEffect, Suspense, useRef } from 'react';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question } from '@/data/questionBanks/types';
-import { Copy, CheckCircle2, Search, Filter, Eye, Loader2, GraduationCap, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Copy, CheckCircle2, Search, Filter, Eye, Loader2, GraduationCap, ArrowRight, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { db } from '@/lib/firebase';
+import { getPublicAssignmentTemplates, type PublicAssignmentTemplate } from '@/lib/assignments';
 import { collection, addDoc, serverTimestamp, query, where, getDocs, getDoc, doc, orderBy } from 'firebase/firestore';
 import { graphGymScenarios, GraphGymScenario } from '@/data/graphGymScenarios';
-import { dojoDrills, DojoDrill, drillAppliesToSubject, getDrillUnitForSubject } from '@/data/dojoDrills';
 
-type AssignmentType = 'mcq' | 'graphGym' | 'dojoDrill';
+type AssignmentType = 'mcq' | 'graphGym';
 type ViewMode = 'builder' | 'results';
 type AssignmentModeChoice = 'live' | 'homework' | null; // null = haven't chosen yet (show choice screen)
 
@@ -27,7 +27,7 @@ interface AssignmentResult {
   totalQuestions: number;
   correctCount: number;
   submittedAt: any;
-  assignmentType: 'mcq' | 'graphGym' | 'dojoDrill';
+  assignmentType: 'mcq' | 'graphGym';
 }
 
 function TutorBuilderContent() {
@@ -35,7 +35,6 @@ function TutorBuilderContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [assignmentModeChoice, setAssignmentModeChoice] = useState<AssignmentModeChoice>(null);
-  const [quickPicksPage, setQuickPicksPage] = useState(0);
   const [viewMode, setViewMode] = useState<ViewMode>('builder');
   const [isUpgrading, setIsUpgrading] = useState(false);
   
@@ -70,6 +69,27 @@ function TutorBuilderContent() {
   const [unitFilter, setUnitFilter] = useState<number | null>(null);
   const [subjectFilter, setSubjectFilter] = useState<'ap_macroeconomics' | 'ap_microeconomics'>('ap_macroeconomics');
   const [linkCopied, setLinkCopied] = useState(false);
+  const [searchExpanded, setSearchExpanded] = useState(false);
+  const [selectedTopicTags, setSelectedTopicTags] = useState<Set<string>>(new Set());
+  const [isGeneratingShareScreen, setIsGeneratingShareScreen] = useState(false);
+  const [publicTemplates, setPublicTemplates] = useState<PublicAssignmentTemplate[]>([]);
+  const [loadingTemplates, setLoadingTemplates] = useState(false);
+  const [templatesPage, setTemplatesPage] = useState(0);
+  const [templateModalTemplate, setTemplateModalTemplate] = useState<PublicAssignmentTemplate | null>(null);
+  
+  // Fetch public assignment templates when on choice screen
+  useEffect(() => {
+    if (assignmentModeChoice !== null) return;
+    setLoadingTemplates(true);
+    setTemplatesPage(0);
+    getPublicAssignmentTemplates()
+      .then(setPublicTemplates)
+      .catch((err) => {
+        console.error('Error fetching public templates:', err);
+        setPublicTemplates([]);
+      })
+      .finally(() => setLoadingTemplates(false));
+  }, [assignmentModeChoice]);
   
   // Assignment results state
   const [assignmentResults, setAssignmentResults] = useState<AssignmentResult[]>([]);
@@ -80,24 +100,12 @@ function TutorBuilderContent() {
     return subjectFilter === 'ap_macroeconomics' ? 'macro' : 'micro';
   }, [subjectFilter]);
 
-  // Filter Dojo Drills based on search and filters
-  const filteredDrills = useMemo(() => {
-    if (assignmentType !== 'dojoDrill') return [];
-    const allDrillsArray = Object.values(dojoDrills);
-    return allDrillsArray.filter((drill) => {
-      const matchesSubject = drillAppliesToSubject(drill, subjectFilter);
-      const matchesSearch = searchTerm === '' || 
-        drill.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        drill.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        drill.description.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      return matchesSubject && matchesSearch;
-    });
-  }, [searchTerm, subjectFilter, assignmentType]);
+  // Normalize tag for matching (e.g. "Supply & Demand" -> "supply and demand")
+  const normalizeTag = (tag: string) => tag.toLowerCase().replace(/\s*&\s*/g, ' and ').trim();
 
   // Get unique units for the selected subject (MCQs only)
   const uniqueUnits = useMemo(() => {
-    if (assignmentType === 'graphGym' || assignmentType === 'dojoDrill') return [];
+    if (assignmentType === 'graphGym') return [];
     const units = new Set(
       allQuestions
         .filter(q => q.subject === subjectFilter)
@@ -106,9 +114,9 @@ function TutorBuilderContent() {
     return Array.from(units).sort((a, b) => a - b);
   }, [subjectFilter, assignmentType]);
 
-  // Filter questions based on search and filters (MCQs only)
+  // Filter questions based on search, unit, subject, and topic tags (MCQs only)
   const filteredQuestions = useMemo(() => {
-    if (assignmentType === 'graphGym' || assignmentType === 'dojoDrill') return [];
+    if (assignmentType === 'graphGym') return [];
     const filtered = allQuestions.filter(q => {
       const matchesSearch = searchTerm === '' || 
         q.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -119,7 +127,11 @@ function TutorBuilderContent() {
       
       const matchesSubject = q.subject === subjectFilter;
       
-      return matchesSearch && matchesUnit && matchesSubject;
+      const searchableText = `${q.unitName} ${q.question}`.toLowerCase();
+      const matchesTopics = selectedTopicTags.size === 0 || 
+        Array.from(selectedTopicTags).some(tag => searchableText.includes(normalizeTag(tag)));
+      
+      return matchesSearch && matchesUnit && matchesSubject && matchesTopics;
     });
     
     // Remove duplicates by ID - keep only the first occurrence of each ID
@@ -131,16 +143,14 @@ function TutorBuilderContent() {
       seenIds.add(q.id);
       return true;
     });
-  }, [searchTerm, unitFilter, subjectFilter, assignmentType]);
+  }, [searchTerm, unitFilter, subjectFilter, assignmentType, selectedTopicTags]);
 
-  // Filter Graph Gym scenarios based on search and filters - only show IDs 1, 13-17, 41-45, and 46
+  // Filter Graph Gym scenarios based on search, topic tags, and filters
   const filteredScenarios = useMemo(() => {
-    if (assignmentType === 'mcq' || assignmentType === 'dojoDrill') return [];
+    if (assignmentType === 'mcq') return [];
     return graphGymScenarios.filter(scenario => {
-      // Handle both single subject and array of subjects
       const scenarioSubjects = Array.isArray(scenario.subject) ? scenario.subject : [scenario.subject];
       const matchesSubject = scenarioSubjects.includes(graphGymSubject);
-      // Show IDs: 1, 2-5, 13-17, 41-45, 46, 47, 48, 50, 51, 52, 53
       const matchesIdRange = scenario.id === 1 ||
              (scenario.id >= 2 && scenario.id <= 5) ||
              (scenario.id >= 13 && scenario.id <= 17) ||
@@ -159,9 +169,26 @@ function TutorBuilderContent() {
         scenario.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
         scenario.topics.some(topic => topic.toLowerCase().includes(searchTerm.toLowerCase()));
       
-      return matchesSubject && matchesIdRange && matchesSearch;
+      const scenarioTopicText = scenario.topics.join(' ').toLowerCase();
+      const matchesTopics = selectedTopicTags.size === 0 || 
+        Array.from(selectedTopicTags).some(tag => {
+          const norm = normalizeTag(tag);
+          return scenarioTopicText.includes(norm) || scenario.title.toLowerCase().includes(norm) || scenario.description.toLowerCase().includes(norm);
+        });
+      
+      return matchesSubject && matchesIdRange && matchesSearch && matchesTopics;
     });
-  }, [searchTerm, graphGymSubject, assignmentType]);
+  }, [searchTerm, graphGymSubject, assignmentType, selectedTopicTags]);
+
+  // Resolve selected IDs to full question objects for MCQ preview (order preserved)
+  const selectedMcqQuestions = useMemo(() => {
+    if (assignmentType !== 'mcq') return [];
+    const ids = Array.from(selectedIds)
+      .filter((id): id is number => typeof id === 'number')
+      .sort((a, b) => a - b);
+    const map = new Map(allQuestions.map((q) => [q.id, q]));
+    return ids.map((id) => map.get(id)).filter(Boolean) as Question[];
+  }, [assignmentType, selectedIds]);
 
   const toggleSelection = (id: number | string) => {
     setSelectedIds(prev => {
@@ -178,25 +205,15 @@ function TutorBuilderContent() {
   // Build the same URL students would see (for preview in new tab)
   const getPreviewUrl = (): string | null => {
     if (selectedIds.size === 0) return null;
-    let idsArray: (number | string)[];
-    let idsString: string;
-    if (assignmentType === 'dojoDrill') {
-      idsArray = Array.from(selectedIds).sort((a, b) => String(a).localeCompare(String(b)));
-      idsString = idsArray.length === 1 ? String(idsArray[0]) : idsArray.join(',');
-    } else {
-      idsArray = Array.from(selectedIds).sort((a, b) => Number(a) - Number(b));
-      idsString = idsArray.map(id => String(id)).join(',');
-    }
+    const idsArray = Array.from(selectedIds).sort((a, b) => Number(a) - Number(b));
+    const idsString = idsArray.map(id => String(id)).join(',');
     const encoded = btoa(idsString);
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
     const previewSuffix = '&preview=1';
     if (assignmentType === 'mcq') {
       return `${origin}/exam/custom?q=${encoded}${previewSuffix}`;
     }
-    if (assignmentType === 'graphGym') {
-      return `${origin}/graph-gym/custom?q=${encoded}${previewSuffix}`;
-    }
-    return `${origin}/dojo-drills/custom?q=${encoded}${previewSuffix}`;
+    return `${origin}/graph-gym/custom?q=${encoded}${previewSuffix}`;
   };
 
   const openPreview = () => {
@@ -207,14 +224,8 @@ function TutorBuilderContent() {
   // Encoded assignment ID for live presenter URL (same encoding as getPreviewUrl)
   const getEncodedAssignmentId = (): string | null => {
     if (selectedIds.size === 0) return null;
-    let idsString: string;
-    if (assignmentType === 'dojoDrill') {
-      const idsArray = Array.from(selectedIds).sort((a, b) => String(a).localeCompare(String(b)));
-      idsString = idsArray.length === 1 ? String(idsArray[0]) : idsArray.join(',');
-    } else {
-      const idsArray = Array.from(selectedIds).sort((a, b) => Number(a) - Number(b));
-      idsString = idsArray.map(id => String(id)).join(',');
-    }
+    const idsArray = Array.from(selectedIds).sort((a, b) => Number(a) - Number(b));
+    const idsString = idsArray.map(id => String(id)).join(',');
     return btoa(idsString);
   };
 
@@ -244,6 +255,7 @@ function TutorBuilderContent() {
   const openShareScreen = async () => {
     const encoded = getEncodedAssignmentId();
     if (!encoded || !user || assignmentType !== 'mcq') return;
+    setIsGeneratingShareScreen(true);
     try {
       const code = await generateJoinCode();
       const sessionRef = await addDoc(collection(db, 'sessions'), {
@@ -259,40 +271,21 @@ function TutorBuilderContent() {
     } catch (err) {
       console.error('Error creating live session:', err);
       alert('Could not create session. Please try again.');
+    } finally {
+      setIsGeneratingShareScreen(false);
     }
   };
 
   const generateLink = async () => {
     if (selectedIds.size === 0) return;
     
-    let idsArray: (number | string)[];
-    let idsString: string;
-    
-    // For dojo drills, IDs are strings, so we need to handle them differently
-    if (assignmentType === 'dojoDrill') {
-      idsArray = Array.from(selectedIds).sort((a, b) => String(a).localeCompare(String(b)));
-      // For dojo drills, we only allow selecting one drill at a time
-      if (idsArray.length === 1) {
-        idsString = String(idsArray[0]);
-      } else {
-        idsString = idsArray.join(',');
-      }
-    } else {
-      idsArray = Array.from(selectedIds).sort((a, b) => Number(a) - Number(b));
-      idsString = idsArray.map(id => String(id)).join(',');
-    }
-    
+    const idsArray = Array.from(selectedIds).sort((a, b) => Number(a) - Number(b));
+    const idsString = idsArray.map(id => String(id)).join(',');
     const encoded = btoa(idsString);
     
-    // Generate URL based on assignment type
-    let url: string;
-    if (assignmentType === 'mcq') {
-      url = `${window.location.origin}/exam/custom?q=${encoded}`;
-    } else if (assignmentType === 'graphGym') {
-      url = `${window.location.origin}/graph-gym/custom?q=${encoded}`;
-    } else {
-      url = `${window.location.origin}/dojo-drills/custom?q=${encoded}`;
-    }
+    const url = assignmentType === 'mcq'
+      ? `${window.location.origin}/exam/custom?q=${encoded}`
+      : `${window.location.origin}/graph-gym/custom?q=${encoded}`;
     
     // Save to Firebase if user is logged in
     if (user) {
@@ -304,7 +297,7 @@ function TutorBuilderContent() {
           encodedParam: encoded,
           url: url,
           subject: subjectFilter,
-          assignmentType: assignmentType, // 'mcq', 'graphGym', or 'dojoDrill'
+          assignmentType: assignmentType,
           createdAt: serverTimestamp(),
           totalQuestions: idsArray.length
         });
@@ -324,6 +317,15 @@ function TutorBuilderContent() {
   const truncateText = (text: string, maxLength: number) => {
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength) + '...';
+  };
+
+  /** Apply a public template: pre-fill builder and open assignment flow in the chosen mode (live or homework). */
+  const applyPublicTemplate = (template: PublicAssignmentTemplate, mode: 'live' | 'homework') => {
+    if (template.assignmentType !== 'mcq' && template.assignmentType !== 'graphGym') return;
+    setAssignmentType(template.assignmentType);
+    setSelectedIds(new Set(template.questionIds));
+    setSubjectFilter(template.subject);
+    setAssignmentModeChoice(mode);
   };
 
   // Tooltip component for showing full question text
@@ -533,159 +535,278 @@ function TutorBuilderContent() {
   // Assignment mode choice screen (shown first when visiting /tutor/builder)
   if (assignmentModeChoice === null) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-4xl mx-auto px-6 pt-12 pb-12">
-          <div className="text-center mb-10">
-            <h1 className="text-3xl font-black text-black mb-3">
-              How would you like to assign this?
-            </h1>
-            <p className="text-lg text-gray-700 font-semibold">
-              Run a live session now or generate a link for later.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-20">
-            <button
-              type="button"
-              onClick={() => setAssignmentModeChoice('live')}
-              className="group flex flex-col items-center justify-center text-left p-8 md:p-10 bg-white border-4 border-black rounded-xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 active:translate-y-0 active:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all min-h-[200px]"
-            >
-              <h2 className="text-xl font-black text-black mb-2 group-hover:text-blue-600 transition-colors">
-                Launch a Live Session
-              </h2>
-              <p className="text-sm text-gray-600 font-semibold">
-                Best for bell-ringers and synchronous activities
+      <div className="min-h-screen bg-slate-100">
+        {/* Student Results link only on this home/choice screen */}
+        <div className="w-full flex justify-end px-6 pt-4 pb-2">
+          <Link
+            href="/tutor/results"
+            className="text-indigo-700 font-black text-lg tracking-tight hover:text-indigo-800 hover:underline transition-colors uppercase"
+          >
+            Student Results
+          </Link>
+        </div>
+        <div className="max-w-4xl mx-auto px-6">
+        <div id="choice">
+          {/* Main choice: fills viewport so you scroll to see pre-made drills */}
+          <section className="min-h-screen flex flex-col justify-center py-16">
+            <div className="text-center mb-10">
+              <h1 className="text-3xl font-black text-black mb-3">
+                How would you like to assign this?
+              </h1>
+              <p className="text-lg text-gray-700 font-semibold">
+                Run a live session now or generate a link for later.
               </p>
-            </button>
-            <button
-              type="button"
-              onClick={() => setAssignmentModeChoice('homework')}
-              className="group flex flex-col items-center justify-center text-left p-8 md:p-10 bg-white border-4 border-black rounded-xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 active:translate-y-0 active:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all min-h-[200px]"
-            >
-              <h2 className="text-xl font-black text-black mb-2 group-hover:text-green-600 transition-colors">
-                Assign as Homework
-              </h2>
-              <p className="text-sm text-gray-600 font-semibold">
-                Best for take home activities or individual class work
-              </p>
-            </button>
-          </div>
+            </div>
 
-          {/* Quick Picks - pre-made drills carousel (3 at a time, left/right arrows) */}
-          {(() => {
-            const DRILLS_PER_PAGE = 3;
-            const quickPicksDrills: { id: string; title: string; subject: 'macro' | 'micro' | 'both'; questionCount: number }[] = [
-              { id: '1', title: 'Unit 1 Basics', subject: 'both', questionCount: 12 },
-              { id: '2', title: 'Unit 2 Supply', subject: 'macro', questionCount: 8 },
-              { id: '3', title: 'Unit 3 Costs', subject: 'micro', questionCount: 10 },
-              { id: '4', title: 'Unit 4 Market Structures', subject: 'both', questionCount: 15 },
-              { id: '5', title: 'Unit 5 Factor Markets', subject: 'macro', questionCount: 9 },
-              { id: '6', title: 'Unit 6 International', subject: 'micro', questionCount: 11 },
-            ];
-            const totalPages = Math.ceil(quickPicksDrills.length / DRILLS_PER_PAGE);
-            const start = quickPicksPage * DRILLS_PER_PAGE;
-            const visibleDrills = quickPicksDrills.slice(start, start + DRILLS_PER_PAGE);
-            return (
-              <div className="mb-20">
-                <h2 className="text-xl font-black text-black text-center mb-6">
-                  Short on time? Grab a pre-made drill:
-                </h2>
-                <div className="flex items-stretch justify-center gap-4 max-w-5xl mx-auto">
-                  <button
-                    type="button"
-                    onClick={() => setQuickPicksPage((p) => Math.max(0, p - 1))}
-                    disabled={quickPicksPage === 0}
-                    className="flex-shrink-0 w-14 h-14 self-center rounded-full border-4 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 hover:scale-105 transition-all"
-                    aria-label="Previous drills"
-                  >
-                    <ChevronLeft className="w-7 h-7 text-black" />
-                  </button>
-                  <div className="flex flex-1 justify-center gap-6">
-                    {visibleDrills.map((drill) => (
-                      <button
-                        key={drill.id}
-                        type="button"
-                        className="flex-1 min-w-0 max-w-[280px] flex flex-col items-start text-left p-7 bg-white border-4 border-black rounded-xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] font-black text-black hover:bg-gray-50 transition-all min-h-[200px]"
-                      >
-                        <span className="text-xl leading-tight block mb-3">{drill.title}</span>
-                        <div className="flex flex-wrap gap-2 mb-3">
-                          {drill.subject === 'both' ? (
-                            <>
-                              <span className="inline-block px-3 py-1.5 rounded-md text-xs font-bold bg-blue-100 text-blue-800 border border-blue-300">Macro</span>
-                              <span className="inline-block px-3 py-1.5 rounded-md text-xs font-bold bg-green-100 text-green-800 border border-green-300">Micro</span>
-                            </>
-                          ) : (
-                            <span className={`inline-block px-3 py-1.5 rounded-md text-xs font-bold ${
-                              drill.subject === 'macro' ? 'bg-blue-100 text-blue-800 border border-blue-300' : 'bg-green-100 text-green-800 border border-green-300'
-                            }`}>
-                              {drill.subject === 'macro' ? 'Macro' : 'Micro'}
-                            </span>
-                          )}
-                        </div>
-                        <span className="text-base font-semibold text-gray-600">{drill.questionCount} questions</span>
-                      </button>
-                    ))}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setQuickPicksPage((p) => Math.min(totalPages - 1, p + 1))}
-                    disabled={quickPicksPage >= totalPages - 1}
-                    className="flex-shrink-0 w-14 h-14 self-center rounded-full border-4 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 hover:scale-105 transition-all"
-                    aria-label="Next drills"
-                  >
-                    <ChevronRight className="w-7 h-7 text-black" />
-                  </button>
+            <div className="flex flex-wrap justify-center gap-8 flex-1 items-stretch">
+              <button
+                type="button"
+                onClick={() => setAssignmentModeChoice('live')}
+                className="group flex flex-col items-start justify-center text-left p-10 bg-white rounded-3xl shadow-xl hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 transition-all min-h-[320px] flex-1 w-full max-w-[320px]"
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="w-5 h-5 rounded-full bg-amber-400 flex-shrink-0" aria-hidden />
+                  <h2 className="text-2xl font-bold text-indigo-700 group-hover:text-indigo-800 transition-colors">
+                    Launch a Live Session
+                  </h2>
                 </div>
+                <p className="text-base text-slate-600 font-semibold pl-8">
+                  Best for bell-ringers and synchronous activities
+                </p>
+              </button>
+              <button
+                type="button"
+                onClick={() => setAssignmentModeChoice('homework')}
+                className="group flex flex-col items-start justify-center text-left p-10 bg-white rounded-3xl shadow-xl hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 transition-all min-h-[320px] flex-1 w-full max-w-[320px]"
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="w-5 h-5 rounded-full bg-red-500 flex-shrink-0" aria-hidden />
+                  <h2 className="text-2xl font-bold text-indigo-700 group-hover:text-indigo-800 transition-colors">
+                    Assign as Homework
+                  </h2>
+                </div>
+                <p className="text-base text-slate-600 font-semibold pl-8">
+                  Best for take home activities or individual class work
+                </p>
+              </button>
+            </div>
+          </section>
+
+          {/* Short on time? – free-floating headline */}
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-indigo-700 mb-8 md:mb-10 text-center">
+            Short on time? Grab a pre-made drill:
+          </h2>
+          {/* Custom assignment templates: full-width row, large rectangles, minimal rounding */}
+          {loadingTemplates ? (
+            <div className="flex items-center justify-center py-16 gap-4 w-full">
+              <Loader2 className="w-10 h-10 animate-spin text-indigo-600" />
+              <span className="font-semibold text-slate-600 text-lg">Loading...</span>
+            </div>
+          ) : publicTemplates.length === 0 ? (
+            <div className="py-16 text-center text-slate-600 font-semibold text-lg w-full">
+              No custom assignments yet.
+            </div>
+          ) : (() => {
+            const mcqAndGraphGymTemplates = publicTemplates.filter((t) => t.assignmentType === 'mcq' || t.assignmentType === 'graphGym');
+            if (mcqAndGraphGymTemplates.length === 0) {
+              return (
+                <div className="py-16 text-center text-slate-600 font-semibold text-lg w-full mb-20">
+                  No custom assignments yet.
+                </div>
+              );
+            }
+            const TEMPLATES_PER_PAGE = 3;
+            const totalPages = Math.ceil(mcqAndGraphGymTemplates.length / TEMPLATES_PER_PAGE);
+            const start = templatesPage * TEMPLATES_PER_PAGE;
+            const visibleTemplates = mcqAndGraphGymTemplates.slice(start, start + TEMPLATES_PER_PAGE);
+            return (
+              <div className="w-full mb-20 space-y-4">
+                {visibleTemplates.map((template) => {
+                  const title = template.assignmentName ?? template.templateTitle ?? `${template.subject === 'ap_macroeconomics' ? 'Macro' : 'Micro'} – ${template.assignmentType === 'mcq' ? 'MCQ' : 'Graph Gym'}`;
+                  const topic = template.templateTopic ?? (template.subject === 'ap_macroeconomics' ? 'Macro' : 'Micro');
+                  return (
+                    <button
+                      key={template.id}
+                      type="button"
+                      onClick={() => setTemplateModalTemplate(template)}
+                      className="w-full flex flex-row items-center justify-between text-left p-6 sm:p-8 bg-white border-2 border-slate-200 rounded-lg shadow-md hover:shadow-lg hover:border-indigo-300 transition-all min-h-[120px]"
+                    >
+                      <div className="min-w-0 flex-1 pr-4">
+                        <span className="text-xl md:text-2xl font-bold text-indigo-700 leading-tight block mb-1 line-clamp-1">{title}</span>
+                        <p className="text-base font-semibold text-slate-600">{topic} · {template.totalQuestions} question{template.totalQuestions !== 1 ? 's' : ''}</p>
+                      </div>
+                      <span className="flex-shrink-0 text-indigo-600 font-bold text-base whitespace-nowrap">Use This →</span>
+                    </button>
+                  );
+                })}
+                {totalPages > 1 && (
+                  <div className="flex justify-center gap-4 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setTemplatesPage((p) => Math.max(0, p - 1))}
+                      disabled={templatesPage === 0}
+                      className="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-300 transition-all text-slate-700"
+                      aria-label="Previous templates"
+                    >
+                      <ChevronLeft className="w-6 h-6" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTemplatesPage((p) => Math.min(totalPages - 1, p + 1))}
+                      disabled={templatesPage >= totalPages - 1}
+                      className="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-300 transition-all text-slate-700"
+                      aria-label="Next templates"
+                    >
+                      <ChevronRight className="w-6 h-6" />
+                    </button>
+                  </div>
+                )}
               </div>
             );
           })()}
 
-          {/* Three steps: circle numbers with one connecting line */}
-          <div className="max-w-3xl mx-auto pt-6">
-            <div className="flex items-center justify-center gap-0">
-              <span className="flex-shrink-0 w-10 h-10 rounded-full bg-black text-white font-black text-lg flex items-center justify-center z-10">1</span>
-              <span className="flex-1 max-w-[120px] h-0.5 bg-black" aria-hidden="true" />
-              <span className="flex-shrink-0 w-10 h-10 rounded-full bg-black text-white font-black text-lg flex items-center justify-center z-10">2</span>
-              <span className="flex-1 max-w-[120px] h-0.5 bg-black" aria-hidden="true" />
-              <span className="flex-shrink-0 w-10 h-10 rounded-full bg-black text-white font-black text-lg flex items-center justify-center z-10">3</span>
-            </div>
-            <div className="grid grid-cols-3 gap-4 mt-4 text-center">
-              <div>
-                <h3 className="text-base font-black text-black mb-1">Choose your mode</h3>
-                <p className="text-sm text-gray-600 font-semibold">Live activities or asynchronous assignments</p>
+          {/* How to use: headline + 3 step cards */}
+          <div className="max-w-5xl mx-auto pt-12 pb-12">
+            <h2 className="text-4xl md:text-5xl font-black text-blue-500 text-center mb-12">
+              How to use the Tutor Builder
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Step 1: Choose your mode */}
+              <div className="bg-white rounded-3xl shadow-xl p-8 flex flex-col min-h-[280px]">
+                <h3 className="text-xl font-bold text-emerald-600 mb-2 flex items-center gap-3">
+                  <span className="inline-flex items-center justify-center w-10 h-10 rounded-full border-2 border-emerald-600 text-emerald-600 font-bold text-lg flex-shrink-0">1</span>
+                  Choose your mode
+                </h3>
+                <p className="text-base font-bold text-black mb-4">Explore</p>
+                <p className="text-base text-slate-600 flex-1 leading-relaxed">
+                  Pick <span className="font-bold text-emerald-600">live activities</span> or <span className="font-bold text-emerald-600">asynchronous assignments</span> to match how you want to run class—bell-ringers, homework, or both.
+                </p>
               </div>
-              <div>
-                <h3 className="text-base font-black text-black mb-1">Create and Share</h3>
-                <p className="text-sm text-gray-600 font-semibold">Choose from our library of MCQs, Graphing Exercises, or interactive activities</p>
+              {/* Step 2: Create and Share */}
+              <div className="bg-white rounded-3xl shadow-xl p-8 flex flex-col min-h-[280px]">
+                <h3 className="text-xl font-bold text-blue-500 mb-2 flex items-center gap-3">
+                  <span className="inline-flex items-center justify-center w-10 h-10 rounded-full border-2 border-blue-500 text-blue-500 font-bold text-lg flex-shrink-0">2</span>
+                  Create and Share
+                </h3>
+                <p className="text-base font-bold text-black mb-4">Build</p>
+                <p className="text-base text-slate-600 flex-1 leading-relaxed">
+                  Choose from our library of <span className="font-bold text-blue-500">MCQs</span>, <span className="font-bold text-blue-500">Graphing Exercises</span>, or interactive activities. Share a link or launch a live session.
+                </p>
               </div>
-              <div>
-                <h3 className="text-base font-black text-black mb-1">Track Results</h3>
-                <p className="text-sm text-gray-600 font-semibold">Detailed progress tracking for every student</p>
+              {/* Step 3: Track Results */}
+              <div className="bg-white rounded-3xl shadow-xl p-8 flex flex-col min-h-[280px]">
+                <h3 className="text-xl font-bold text-violet-600 mb-2 flex items-center gap-3">
+                  <span className="inline-flex items-center justify-center w-10 h-10 rounded-full border-2 border-violet-600 text-violet-600 font-bold text-lg flex-shrink-0">3</span>
+                  Track Results
+                </h3>
+    
+                <p className="text-base text-slate-600 flex-1 leading-relaxed">
+                  See <span className="font-bold text-violet-600">detailed progress</span> for every student. Review scores, completion, and question-level data in one place.
+                </p>
               </div>
             </div>
           </div>
+
+          {/* Modal: choose Live or Homework when using a pre-made template */}
+          {templateModalTemplate && (
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+              onClick={() => setTemplateModalTemplate(null)}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="template-modal-title"
+            >
+              <div
+                className="bg-slate-100 rounded-3xl shadow-2xl max-w-2xl w-full p-8"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="relative mb-8">
+                  <h2 id="template-modal-title" className="text-2xl font-black text-black text-center">
+                    How would you like to assign this?
+                  </h2>
+                  <button
+                    type="button"
+                    onClick={() => setTemplateModalTemplate(null)}
+                    className="absolute top-1/2 right-0 -translate-y-1/2 p-2 rounded-full hover:bg-slate-200 text-slate-600 transition-colors"
+                    aria-label="Close"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-6">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      applyPublicTemplate(templateModalTemplate, 'live');
+                      setTemplateModalTemplate(null);
+                    }}
+                    className="group flex flex-col items-start justify-center text-left p-8 bg-white rounded-3xl shadow-xl hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 transition-all min-h-[240px] flex-1 min-w-[240px]"
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="w-5 h-5 rounded-full bg-amber-400 flex-shrink-0" aria-hidden />
+                      <h3 className="text-xl font-bold text-indigo-700 group-hover:text-indigo-800 transition-colors">
+                        Launch a Live Session
+                      </h3>
+                    </div>
+                    <p className="text-base text-slate-600 font-semibold pl-8">
+                      Best for bell-ringers and synchronous activities
+                    </p>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      applyPublicTemplate(templateModalTemplate, 'homework');
+                      setTemplateModalTemplate(null);
+                    }}
+                    className="group flex flex-col items-start justify-center text-left p-8 bg-white rounded-3xl shadow-xl hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 transition-all min-h-[240px] flex-1 min-w-[240px]"
+                  >
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="w-5 h-5 rounded-full bg-red-500 flex-shrink-0" aria-hidden />
+                      <h3 className="text-xl font-bold text-indigo-700 group-hover:text-indigo-800 transition-colors">
+                        Assign as Homework
+                      </h3>
+                    </div>
+                    <p className="text-base text-slate-600 font-semibold pl-8">
+                      Best for take home activities or individual class work
+                    </p>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-100">
+      {/* Back to Home only (choice screen); no Student Results on builder/list or results view */}
+      <div className="w-full flex justify-end px-6 pt-4 pb-2">
+        <button
+          type="button"
+          onClick={() => setAssignmentModeChoice(null)}
+          className="text-indigo-700 font-black text-lg tracking-tight hover:text-indigo-800 hover:underline transition-colors uppercase"
+        >
+          Back to Home
+        </button>
+      </div>
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 pt-12 pb-6">
+      <div className="max-w-7xl mx-auto px-6 pt-8 pb-6">
         {/* Upgrade Banner for Non-Teachers */}
         {showUpgradeBanner && (
-          <div className="mb-6 bg-white border-4 border-black rounded-lg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6">
+          <div className="mb-6 bg-white rounded-3xl shadow-xl border border-slate-200 p-6">
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center gap-4">
                 <div className="p-3 bg-blue-50 rounded-full">
                   <GraduationCap className="w-8 h-8 text-blue-600" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-black text-gray-900 mb-1">
+                  <h2 className="text-xl font-bold text-slate-900 mb-1">
                     Unlock Teacher Mode
                   </h2>
-                  <p className="text-gray-700 font-semibold">
+                  <p className="text-slate-600 font-semibold">
                     Create custom assignments, track student progress, and access all tutor features - completely free!
                   </p>
                 </div>
@@ -693,7 +814,7 @@ function TutorBuilderContent() {
               <button
                 onClick={handleUpgradeToTeacher}
                 disabled={isUpgrading}
-                className={`flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-black rounded-lg border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-blue-700 active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all ${
+                className={`flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-bold rounded-xl shadow-lg hover:bg-blue-700 transition-all ${
                   isUpgrading ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
               >
@@ -713,69 +834,45 @@ function TutorBuilderContent() {
           </div>
         )}
 
-        {/* Title and Tabs */}
+        {/* Title */}
         <div className="mb-6">
-          <h1 className="text-3xl font-black text-black mb-4">Tutor Dashboard</h1>
-          
-          {/* Tabs */}
-          <div className="flex border-2 border-black rounded-lg overflow-hidden w-fit">
-            <button
-              onClick={() => setViewMode('builder')}
-              className={`px-6 py-2 font-black transition-colors ${
-                viewMode === 'builder'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              Assignment Builder
-            </button>
-            <button
-              onClick={() => setViewMode('results')}
-              className={`px-6 py-2 font-black transition-colors border-l-2 border-black ${
-                viewMode === 'results'
-                  ? 'bg-green-600 text-white'
-                  : 'bg-white text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              Assignment Results
-            </button>
-          </div>
+          <h1 className="text-3xl font-bold text-slate-900">Tutor Dashboard</h1>
         </div>
 
         {/* Assignment Results View */}
         {viewMode === 'results' && (
-          <div className="bg-white border-4 border-black rounded-lg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+          <div className="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
             {loadingResults ? (
               <div className="p-12 text-center">
                 <Loader2 className="h-8 w-8 animate-spin text-blue-500 mx-auto mb-4" />
-                <p className="text-gray-500 font-semibold">Loading results...</p>
+                <p className="text-slate-500 font-semibold">Loading results...</p>
               </div>
             ) : assignmentResults.length === 0 ? (
               <div className="p-12 text-center">
-                <p className="text-gray-500 font-semibold">No assignment results yet. Share your assignment links with students to see their submissions here.</p>
+                <p className="text-slate-500 font-semibold">No assignment results yet. Share your assignment links with students to see their submissions here.</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gray-100 border-b-4 border-black">
+                  <thead className="bg-slate-50 border-b border-slate-200">
                     <tr>
-                      <th className="px-4 py-3 text-left font-black text-black">Assignment</th>
-                      <th className="px-4 py-3 text-left font-black text-black">Student Name</th>
-                      <th className="px-4 py-3 text-left font-black text-black">Score</th>
-                      <th className="px-4 py-3 text-left font-black text-black">Submitted</th>
-                      <th className="px-4 py-3 text-left font-black text-black">Actions</th>
+                      <th className="px-4 py-3 text-left font-bold text-slate-900">Assignment</th>
+                      <th className="px-4 py-3 text-left font-bold text-slate-900">Student Name</th>
+                      <th className="px-4 py-3 text-left font-bold text-slate-900">Score</th>
+                      <th className="px-4 py-3 text-left font-bold text-slate-900">Submitted</th>
+                      <th className="px-4 py-3 text-left font-bold text-slate-900">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {assignmentResults.map((result) => (
                       <tr
                         key={result.id}
-                        className="border-b-2 border-gray-200 hover:bg-gray-50 transition-colors"
+                        className="border-b border-slate-100 hover:bg-slate-50 transition-colors"
                       >
-                        <td className="px-4 py-3 font-semibold text-gray-900">
+                        <td className="px-4 py-3 font-semibold text-slate-900">
                           {result.assignmentName}
                         </td>
-                        <td className="px-4 py-3 text-gray-700">
+                        <td className="px-4 py-3 text-slate-700">
                           {result.studentName || result.studentEmail || 'Guest'}
                         </td>
                         <td className="px-4 py-3">
@@ -789,13 +886,13 @@ function TutorBuilderContent() {
                             {result.score}% ({result.correctCount}/{result.totalQuestions})
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-gray-600 text-sm">
+                        <td className="px-4 py-3 text-slate-600 text-sm">
                           {formatDate(result.submittedAt)}
                         </td>
                         <td className="px-4 py-3">
                           <Link
                             href={`/tutor/results/${result.id}`}
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-lg"
                           >
                             <Eye className="w-4 h-4" />
                             View Results
@@ -814,116 +911,63 @@ function TutorBuilderContent() {
         {viewMode === 'builder' && (
           <>
             <div className="mb-6">
-              <p className="text-sm text-gray-600">Select questions to create a custom assignment link</p>
+              <p className="text-base text-slate-600">Select questions to create a custom assignment link</p>
             </div>
 
-        {/* Assignment Type Selection */}
-        <div className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4 mb-6">
-          <div className="flex items-center gap-4">
-            <span className="text-sm font-semibold text-gray-700">Assignment Type:</span>
-            <div className="flex border-2 border-black rounded-lg overflow-hidden">
-              <button
-                onClick={() => {
-                  setAssignmentType('mcq');
-                  setSelectedIds(new Set());
-                  setSearchTerm('');
-                  setUnitFilter(null);
-                }}
-                className={`px-6 py-2 font-black transition-colors ${
-                  assignmentType === 'mcq'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                MCQs
-              </button>
-              <button
-                onClick={() => {
-                  setAssignmentType('graphGym');
-                  setSelectedIds(new Set());
-                  setSearchTerm('');
-                  setUnitFilter(null);
-                }}
-                className={`px-6 py-2 font-black transition-colors border-l-2 border-black ${
-                  assignmentType === 'graphGym'
-                    ? 'bg-green-600 text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                Graph Gym FRQs
-              </button>
-              <button
-                onClick={() => {
-                  setAssignmentType('dojoDrill');
-                  setSelectedIds(new Set());
-                  setSearchTerm('');
-                  setUnitFilter(null);
-                }}
-                className={`px-6 py-2 font-black transition-colors border-l-2 border-black ${
-                  assignmentType === 'dojoDrill'
-                    ? 'bg-purple-600 text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                Dojo Drills
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Filters */}
-        <div className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Search */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder={
-                  assignmentType === 'mcq' 
-                    ? "Search by ID, question text, or unit..." 
-                    : assignmentType === 'graphGym'
-                    ? "Search by ID, title, description, or topics..."
-                    : "Search by title, description, or drill ID..."
-                }
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border-2 border-black rounded-lg font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            {/* Unit Filter - Only show for MCQs */}
-            {assignmentType === 'mcq' ? (
-              <div className="relative">
-                <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <select
-                  value={unitFilter || ''}
-                  onChange={(e) => setUnitFilter(e.target.value ? parseInt(e.target.value) : null)}
-                  className="w-full pl-10 pr-4 py-2 border-2 border-black rounded-lg font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
+            <div className="flex gap-6 flex-1 min-h-0">
+              {/* Left: Assignment Type + Filters + Table */}
+              <div className="flex-1 min-w-0">
+        {/* Connected card: Assignment Type + Filters + Table */}
+        <div className="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
+          {/* Row 1: Assignment Type (left) + Subject (right) */}
+          <div className="p-6 border-b border-slate-200 flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <span className="text-sm font-semibold text-slate-600">Assignment Type:</span>
+              <div className="flex rounded-xl shadow-lg border border-slate-200 overflow-hidden bg-white">
+                <button
+                  onClick={() => {
+                    setAssignmentType('mcq');
+                    setSelectedIds(new Set());
+                    setSearchTerm('');
+                    setUnitFilter(null);
+                  }}
+                  className={`px-6 py-2.5 font-bold transition-colors ${
+                    assignmentType === 'mcq'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-white text-slate-700 hover:bg-slate-50'
+                  }`}
                 >
-                  <option value="">All Units</option>
-                  {uniqueUnits.map(unit => (
-                    <option key={unit} value={unit}>Unit {unit}</option>
-                  ))}
-                </select>
+                  MCQs
+                </button>
+                <button
+                  onClick={() => {
+                    setAssignmentType('graphGym');
+                    setSelectedIds(new Set());
+                    setSearchTerm('');
+                    setUnitFilter(null);
+                  }}
+                  className={`px-6 py-2.5 font-bold transition-colors border-l border-slate-200 ${
+                    assignmentType === 'graphGym'
+                      ? 'bg-green-600 text-white border-l-transparent'
+                      : 'bg-white text-slate-700 hover:bg-slate-50'
+                  }`}
+                >
+                  Graph Gym FRQs
+                </button>
               </div>
-            ) : assignmentType === 'graphGym' || assignmentType === 'dojoDrill' ? (
-              <div />
-            ) : null}
-
-            {/* Subject Toggle */}
+            </div>
             <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold text-gray-700">Subject:</span>
-              <div className="flex border-2 border-black rounded-lg overflow-hidden">
+              <span className="text-sm font-semibold text-slate-600">Subject:</span>
+              <div className="flex rounded-xl shadow-lg border border-slate-200 overflow-hidden bg-white">
                 <button
                   onClick={() => {
                     setSubjectFilter('ap_macroeconomics');
-                    setUnitFilter(null); // Reset unit filter when switching subjects
+                    setUnitFilter(null);
                   }}
-                  className={`px-4 py-2 font-black transition-colors ${
+                  className={`px-4 py-2.5 font-bold transition-colors ${
                     subjectFilter === 'ap_macroeconomics'
                       ? 'bg-blue-600 text-white'
-                      : 'bg-white text-gray-700 hover:bg-gray-100'
+                      : 'bg-white text-slate-700 hover:bg-slate-50'
                   }`}
                 >
                   Macro
@@ -931,12 +975,13 @@ function TutorBuilderContent() {
                 <button
                   onClick={() => {
                     setSubjectFilter('ap_microeconomics');
-                    setUnitFilter(null); // Reset unit filter when switching subjects
+                    setUnitFilter(null);
+                    setSelectedTopicTags(new Set());
                   }}
-                  className={`px-4 py-2 font-black transition-colors border-l-2 border-black ${
+                  className={`px-4 py-2.5 font-bold transition-colors border-l border-slate-200 ${
                     subjectFilter === 'ap_microeconomics'
-                      ? 'bg-green-600 text-white'
-                      : 'bg-white text-gray-700 hover:bg-gray-100'
+                      ? 'bg-green-600 text-white border-l-transparent'
+                      : 'bg-white text-slate-700 hover:bg-slate-50'
                   }`}
                 >
                   Micro
@@ -944,19 +989,96 @@ function TutorBuilderContent() {
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Questions Table - MCQs */}
-        {assignmentType === 'mcq' && (
-          <div className="bg-white border-4 border-black rounded-lg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+          {/* Row 2: Topic/tag filter chips (5 per subject, multi-select; filter by any selected tag) */}
+          <div className="px-6 py-4 border-b border-slate-200">
+            <div className="flex flex-wrap gap-2">
+              {(subjectFilter === 'ap_macroeconomics'
+                ? ['Supply & Demand', 'Fiscal Policy', 'LF Market', 'Monetary Policy', 'AD-AS']
+                : ['Supply & Demand', 'Costs of Production', 'Market Structures', 'Factor Markets', 'International Trade']
+              ).map((tag) => {
+                const isSelected = selectedTopicTags.has(tag);
+                return (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => {
+                      setSelectedTopicTags((prev) => {
+                        const next = new Set(prev);
+                        if (next.has(tag)) next.delete(tag);
+                        else next.add(tag);
+                        return next;
+                      });
+                    }}
+                    className={`px-4 py-2 rounded-xl font-semibold text-sm transition-all border-2 ${
+                      isSelected
+                        ? 'border-indigo-600 bg-indigo-50 text-indigo-800 shadow-sm ring-2 ring-indigo-200 ring-offset-1 hover:bg-indigo-100'
+                        : 'border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-300 hover:bg-slate-100'
+                    }`}
+                  >
+                    {tag}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Row 3: Search icon (expandable) + Unit dropdown */}
+          <div className="p-6 border-b border-slate-200 flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setSearchExpanded((v) => !v)}
+                className="flex items-center justify-center w-11 h-11 rounded-xl border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-700 transition-colors"
+                aria-label="Toggle search"
+              >
+                <Search className="w-5 h-5" />
+              </button>
+              {searchExpanded && (
+                <input
+                  type="text"
+                  placeholder={
+                    assignmentType === 'mcq'
+                      ? "Search by ID, question text, or unit..."
+                      : assignmentType === 'graphGym'
+                        ? "Search by ID, title, description, or topics..."
+                        : "Search by title, description, or drill ID..."
+                  }
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-64 sm:w-72 pl-4 pr-4 py-2.5 border border-slate-200 rounded-xl font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                  autoFocus
+                />
+              )}
+            </div>
+            {assignmentType === 'mcq' && (
+              <div className="relative flex items-center gap-2">
+                <Filter className="absolute left-3 text-slate-400 w-5 h-5 pointer-events-none" />
+                <select
+                  value={unitFilter || ''}
+                  onChange={(e) => setUnitFilter(e.target.value ? parseInt(e.target.value) : null)}
+                  className="pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-white"
+                >
+                  <option value="">All Units</option>
+                  {uniqueUnits.map(unit => (
+                    <option key={unit} value={unit}>Unit {unit}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+
+          {/* Questions Table - MCQs */}
+          {assignmentType === 'mcq' && (
+          <div className="overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-100 border-b-4 border-black">
+                <thead className="bg-slate-50 border-b border-slate-200">
                   <tr>
-                    <th className="px-4 py-3 text-left font-black text-black">ID</th>
-                    <th className="px-4 py-3 text-left font-black text-black">Unit</th>
-                    <th className="px-4 py-3 text-left font-black text-black">Question Text</th>
-                    <th className="px-4 py-3 text-left font-black text-black">Tags</th>
+                    <th className="px-4 py-3 text-left font-bold text-slate-900 w-12">Select</th>
+                    <th className="px-4 py-3 text-left font-bold text-slate-900 w-16">ID</th>
+                    <th className="px-4 py-3 text-left font-bold text-slate-900">Question Text</th>
+                    <th className="px-4 py-3 text-left font-bold text-slate-900">Tags</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -965,7 +1087,7 @@ function TutorBuilderContent() {
                     return (
                       <tr
                         key={`${question.id}-${index}`}
-                        className={`border-b-2 border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer ${
+                        className={`border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer ${
                           isSelected ? 'bg-blue-50' : ''
                         }`}
                         onClick={() => toggleSelection(question.id)}
@@ -975,13 +1097,12 @@ function TutorBuilderContent() {
                             {isSelected ? (
                               <CheckCircle2 className="w-6 h-6 text-blue-600" />
                             ) : (
-                              <div className="w-6 h-6 border-2 border-gray-400 rounded" />
+                              <div className="w-6 h-6 border-2 border-slate-300 rounded-lg" />
                             )}
                           </div>
                         </td>
-                        <td className="px-4 py-3 font-bold text-gray-900">{question.id}</td>
-                        <td className="px-4 py-3 font-semibold text-gray-700">Unit {question.unit}</td>
-                        <td className="px-4 py-3 text-gray-700 max-w-md">
+                        <td className="px-4 py-3 font-bold text-slate-900">{question.id}</td>
+                        <td className="px-4 py-3 text-slate-700 max-w-md">
                           <QuestionTooltip question={question.question}>
                             <span className="cursor-help">{truncateText(question.question, 150)}</span>
                           </QuestionTooltip>
@@ -1010,25 +1131,25 @@ function TutorBuilderContent() {
 
             {filteredQuestions.length === 0 && (
               <div className="p-12 text-center">
-                <p className="text-gray-500 font-semibold">No questions found matching your filters.</p>
+                <p className="text-slate-500 font-semibold">No questions found matching your filters.</p>
               </div>
             )}
           </div>
         )}
 
-        {/* Graph Gym Scenarios Table */}
-        {assignmentType === 'graphGym' && (
-          <div className="bg-white border-4 border-black rounded-lg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+          {/* Graph Gym Scenarios Table */}
+          {assignmentType === 'graphGym' && (
+          <div className="overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-100 border-b-4 border-black">
+                <thead className="bg-slate-50 border-b border-slate-200">
                   <tr>
-                    <th className="px-4 py-3 text-left font-black text-black">ID</th>
-                    <th className="px-4 py-3 text-left font-black text-black">Title</th>
-                    <th className="px-4 py-3 text-left font-black text-black">Description</th>
-                    <th className="px-4 py-3 text-left font-black text-black">Lesson</th>
-                    <th className="px-4 py-3 text-left font-black text-black">Difficulty</th>
-                    <th className="px-4 py-3 text-left font-black text-black">Topics</th>
+                    <th className="px-4 py-3 text-left font-bold text-slate-900">ID</th>
+                    <th className="px-4 py-3 text-left font-bold text-slate-900">Title</th>
+                    <th className="px-4 py-3 text-left font-bold text-slate-900">Description</th>
+                    <th className="px-4 py-3 text-left font-bold text-slate-900">Lesson</th>
+                    <th className="px-4 py-3 text-left font-bold text-slate-900">Difficulty</th>
+                    <th className="px-4 py-3 text-left font-bold text-slate-900">Topics</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1037,7 +1158,7 @@ function TutorBuilderContent() {
                     return (
                       <tr
                         key={`${scenario.id}-${index}`}
-                        className={`border-b-2 border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer ${
+                        className={`border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer ${
                           isSelected ? 'bg-green-50' : ''
                         }`}
                         onClick={() => toggleSelection(scenario.id)}
@@ -1047,13 +1168,13 @@ function TutorBuilderContent() {
                             {isSelected ? (
                               <CheckCircle2 className="w-6 h-6 text-green-600" />
                             ) : (
-                              <div className="w-6 h-6 border-2 border-gray-400 rounded" />
+                              <div className="w-6 h-6 border-2 border-slate-300 rounded-lg" />
                             )}
                           </div>
                         </td>
-                        <td className="px-4 py-3 font-bold text-gray-900">{scenario.id}</td>
-                        <td className="px-4 py-3 font-semibold text-gray-900">{scenario.title}</td>
-                        <td className="px-4 py-3 text-gray-700 max-w-md">
+                        <td className="px-4 py-3 font-bold text-slate-900">{scenario.id}</td>
+                        <td className="px-4 py-3 font-semibold text-slate-900">{scenario.title}</td>
+                        <td className="px-4 py-3 text-slate-700 max-w-md">
                           {truncateText(scenario.description, 150)}
                         </td>
                         <td className="px-4 py-3 font-semibold text-gray-700">{scenario.lessonId}</td>
@@ -1094,95 +1215,117 @@ function TutorBuilderContent() {
 
             {filteredScenarios.length === 0 && (
               <div className="p-12 text-center">
-                <p className="text-gray-500 font-semibold">No scenarios found matching your filters.</p>
+                <p className="text-slate-500 font-semibold">No scenarios found matching your filters.</p>
               </div>
             )}
           </div>
-        )}
+          )}
 
-        {/* Dojo Drills Table */}
-        {assignmentType === 'dojoDrill' && (
-          <div className="bg-white border-4 border-black rounded-lg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-100 border-b-4 border-black">
-                  <tr>
-                    <th className="px-4 py-3 text-left font-black text-black">Select</th>
-                    <th className="px-4 py-3 text-left font-black text-black">Title</th>
-                    <th className="px-4 py-3 text-left font-black text-black">Description</th>
-                    <th className="px-4 py-3 text-left font-black text-black">Subject</th>
-                    <th className="px-4 py-3 text-left font-black text-black">Unit</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredDrills.map((drill) => {
-                    const isSelected = selectedIds.has(drill.id);
-                    const drillUnit = getDrillUnitForSubject(drill, subjectFilter);
-                    const subjectLabel = drillAppliesToSubject(drill, 'ap_macroeconomics') ? 'Macro' : 'Micro';
-                    return (
-                      <tr
-                        key={drill.id}
-                        className={`border-b-2 border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer ${
-                          isSelected ? 'bg-purple-50' : ''
-                        }`}
-                        onClick={() => toggleSelection(drill.id)}
-                      >
-                        <td className="px-4 py-3">
-                          <div className="flex items-center justify-center">
-                            {isSelected ? (
-                              <CheckCircle2 className="w-6 h-6 text-purple-600" />
-                            ) : (
-                              <div className="w-6 h-6 border-2 border-gray-400 rounded" />
+        </div>
+              </div>
+
+              {/* Right: Live preview – scrolls with the page (hidden on small screens) */}
+              <aside className="hidden lg:flex w-full lg:w-[420px] flex-shrink-0 flex-col">
+                <div className="bg-slate-50 border-2 border-slate-200 rounded-2xl overflow-hidden flex flex-col">
+                  <div className="p-4 border-b border-slate-200 bg-white">
+                    <h3 className="text-lg font-bold text-slate-800">Assignment Preview</h3>
+                    <p className="text-sm text-slate-600">What students will see</p>
+                  </div>
+                  <div className="p-4 space-y-6">
+                    {assignmentType === 'mcq' && (
+                      selectedMcqQuestions.length === 0 ? (
+                        <p className="text-slate-500 text-sm font-medium">Select questions from the list to preview them here.</p>
+                      ) : (
+                        selectedMcqQuestions.map((q, idx) => (
+                          <div
+                            key={q.id}
+                            className="group relative bg-white rounded-xl border-2 border-slate-200 shadow-sm p-5"
+                          >
+                            <button
+                              type="button"
+                              onClick={(e) => { e.stopPropagation(); toggleSelection(q.id); }}
+                              className="absolute top-3 right-3 p-1.5 rounded-full bg-slate-100 text-slate-500 hover:bg-red-100 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                              aria-label="Remove question from assignment"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                            <div className="flex items-center justify-between mb-3 pr-8">
+                              <span className="text-xs font-bold text-slate-500">Question {idx + 1}</span>
+                              <span className="text-xs font-mono text-slate-400">ID {q.id}</span>
+                            </div>
+                            <p className="text-base font-medium text-slate-900 mb-4 leading-relaxed">{q.question}</p>
+                            {q.image && (
+                              <div className="my-3 rounded-lg overflow-hidden border border-slate-200">
+                                <img
+                                  src={typeof q.image === 'string' ? q.image : (q.image as { src: string }).src}
+                                  alt="Question"
+                                  className="max-h-40 w-auto object-contain"
+                                />
+                              </div>
                             )}
+                            <div className="space-y-2">
+                              {q.options.map((opt, oi) => (
+                                <div
+                                  key={oi}
+                                  className="flex items-start gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-slate-50 text-slate-700 text-sm"
+                                >
+                                  <span className="font-bold text-slate-500 flex-shrink-0">{String.fromCharCode(65 + oi)}.</span>
+                                  <span>{opt}</span>
+                                </div>
+                              ))}
+                            </div>
                           </div>
-                        </td>
-                        <td className="px-4 py-3 font-semibold text-gray-900">{drill.title}</td>
-                        <td className="px-4 py-3 text-gray-700 max-w-md">
-                          {truncateText(drill.description, 150)}
-                        </td>
-                        <td className="px-4 py-3">
-                          <span className={`px-2 py-1 text-xs font-semibold rounded border ${
-                            subjectLabel === 'Macro'
-                              ? 'bg-blue-100 text-blue-800 border-blue-300'
-                              : 'bg-green-100 text-green-800 border-green-300'
-                          }`}>
-                            {subjectLabel}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 font-semibold text-gray-700">
-                          {drillUnit !== null ? `Unit ${drillUnit}` : 'N/A'}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                        ))
+                      )
+                    )}
+                    {assignmentType === 'graphGym' && (
+                      selectedIds.size === 0 ? (
+                        <p className="text-slate-500 text-sm font-medium">Select Graph Gym scenarios to see them listed here.</p>
+                      ) : (
+                        <div className="space-y-3">
+                          {Array.from(selectedIds)
+                            .filter((id): id is number => typeof id === 'number')
+                            .sort((a, b) => a - b)
+                            .map((id) => {
+                              const scenario = graphGymScenarios.find((s) => s.id === id);
+                              return scenario ? (
+                                <div
+                                  key={scenario.id}
+                                  className="group relative bg-white rounded-xl border-2 border-slate-200 shadow-sm p-4"
+                                >
+                                  <button
+                                    type="button"
+                                    onClick={(e) => { e.stopPropagation(); toggleSelection(scenario.id); }}
+                                    className="absolute top-2 right-2 p-1.5 rounded-full bg-slate-100 text-slate-500 hover:bg-red-100 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    aria-label="Remove scenario from assignment"
+                                  >
+                                    <X className="w-4 h-4" />
+                                  </button>
+                                  <p className="font-bold text-slate-900 pr-8">{scenario.title}</p>
+                                  <p className="text-sm text-slate-600 mt-1 line-clamp-2">{scenario.description}</p>
+                                </div>
+                              ) : null;
+                            })}
+                        </div>
+                      )
+                    )}
+                  </div>
+                </div>
+              </aside>
             </div>
-
-            {filteredDrills.length === 0 && (
-              <div className="p-12 text-center">
-                <p className="text-gray-500 font-semibold">No dojo drills found matching your filters.</p>
-              </div>
-            )}
-          </div>
-        )}
           </>
         )}
       </div>
 
       {/* Sticky Footer - Only show for builder view */}
       {viewMode === 'builder' && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t-4 border-black shadow-[0_-4px_8px_rgba(0,0,0,0.1)] z-50">
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-xl z-50">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-4">
-              <span className="text-lg font-black text-black">
+              <span className="text-lg font-bold text-slate-900">
                 {selectedIds.size} {
-                  assignmentType === 'mcq' 
-                    ? 'question' 
-                    : assignmentType === 'graphGym'
-                    ? 'scenario'
-                    : 'drill'
+                  assignmentType === 'mcq' ? 'question' : 'scenario'
                 }{selectedIds.size !== 1 ? 's' : ''} selected
               </span>
             </div>
@@ -1193,16 +1336,24 @@ function TutorBuilderContent() {
                     <button
                       type="button"
                       onClick={openShareScreen}
-                      className="inline-flex items-center gap-2 px-6 py-3 font-black text-white rounded-lg border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all bg-blue-600 hover:bg-blue-700 active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                      disabled={isGeneratingShareScreen}
+                      className="inline-flex items-center gap-2 px-6 py-3 font-bold text-white rounded-xl shadow-lg transition-all bg-blue-600 hover:bg-blue-700 disabled:opacity-70 disabled:cursor-not-allowed"
                     >
-                      Generate a Share Screen
+                      {isGeneratingShareScreen ? (
+                        <>
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                          Generating...
+                        </>
+                      ) : (
+                        'Generate a Share Screen'
+                      )}
                     </button>
                   )}
                   {assignmentType === 'graphGym' && selectedIds.size > 0 && (
                     <button
                       type="button"
                       onClick={openGraphGymPresenter}
-                      className="inline-flex items-center gap-2 px-6 py-3 font-black text-white rounded-lg border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all bg-green-600 hover:bg-green-700 active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                      className="inline-flex items-center gap-2 px-6 py-3 font-bold text-white rounded-xl shadow-lg transition-all bg-green-600 hover:bg-green-700"
                     >
                       Start Activity
                     </button>
@@ -1210,29 +1361,17 @@ function TutorBuilderContent() {
                 </>
               ) : (
                 <>
-                  {selectedIds.size > 0 && (
-                    <button
-                      type="button"
-                      onClick={openPreview}
-                      className="inline-flex items-center gap-2 px-5 py-3 font-black rounded-lg border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all bg-white text-black hover:bg-gray-50 active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-                    >
-                      <Eye className="w-5 h-5" />
-                      Preview assignment
-                    </button>
-                  )}
                   <button
                     onClick={generateLink}
                     disabled={selectedIds.size === 0}
-                    className={`px-6 py-3 font-black text-white rounded-lg border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all ${
+                    className={`px-6 py-3 font-bold text-white rounded-xl shadow-lg transition-all ${
                       selectedIds.size === 0
-                        ? 'bg-gray-400 cursor-not-allowed'
+                        ? 'bg-slate-400 cursor-not-allowed'
                         : linkCopied
-                        ? 'bg-green-600 hover:bg-green-700 active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                        ? 'bg-green-600 hover:bg-green-700'
                         : assignmentType === 'mcq'
-                        ? 'bg-blue-600 hover:bg-blue-700 active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
-                        : assignmentType === 'graphGym'
-                        ? 'bg-green-600 hover:bg-green-700 active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
-                        : 'bg-purple-600 hover:bg-purple-700 active:translate-y-1 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                        ? 'bg-blue-600 hover:bg-blue-700'
+                        : 'bg-green-600 hover:bg-green-700'
                     }`}
                   >
                     {linkCopied ? (
