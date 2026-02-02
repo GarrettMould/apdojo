@@ -16,9 +16,10 @@ export async function POST(req: Request) {
     const url = new URL(req.url);
     const baseUrl = `${url.protocol}//${url.host}`;
     
-    const { purchaseType, userId } = await req.json() as { 
+    const { purchaseType, userId, isParentGift } = await req.json() as { 
       purchaseType: PurchaseType;
       userId?: string;
+      isParentGift?: boolean;
     };
     
     if (!purchaseType || (purchaseType !== 'macro' && purchaseType !== 'micro' && purchaseType !== 'bundle')) {
@@ -79,10 +80,12 @@ export async function POST(req: Request) {
         },
       ],
       mode: 'payment',
+      client_reference_id: userId,
       metadata: {
         purchaseType: 'season-pass',
         courseType: courseType, // 'macro', 'micro', or 'bundle'
         userId: userId,
+        source: isParentGift ? 'parent_gift' : 'student_purchase',
       },
       success_url: `${baseUrl}/success?purchaseType=season-pass&courseType=${courseType}`,
       cancel_url: `${baseUrl}/purchase/season-pass?courseType=${purchaseType === 'bundle' ? 'macro' : purchaseType}`,

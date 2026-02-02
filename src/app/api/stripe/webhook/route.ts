@@ -73,7 +73,8 @@ export async function POST(req: Request) {
       const checkoutSession = event.data.object as Stripe.Checkout.Session;
       console.log(`✅ Checkout session completed: ${checkoutSession.id}`);
       
-      const { purchaseType, courseType, examId: checkoutExamId, userId: checkoutUserId } = checkoutSession.metadata || {};
+      const { purchaseType, courseType, examId: checkoutExamId, userId: metadataUserId } = checkoutSession.metadata || {};
+      const checkoutUserId = metadataUserId || checkoutSession.client_reference_id;
       
       if (!checkoutUserId) {
         console.error(`Webhook Error: Missing userId for checkout session ${checkoutSession.id}`);

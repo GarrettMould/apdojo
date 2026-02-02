@@ -3,11 +3,15 @@
 import { useState } from 'react';
 import { X, ArrowRight, Lock, Loader2 } from 'lucide-react';
 
+export type ParentPayProduct = 'macro' | 'micro' | 'bundle';
+
 interface ParentPaymentModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   studentName: string;
   studentId: string;
+  /** When provided, email/link use this product (e.g. bundle = $49, parent-pay?product=bundle) */
+  product?: ParentPayProduct;
 }
 
 export function ParentPaymentModal({
@@ -15,6 +19,7 @@ export function ParentPaymentModal({
   onOpenChange,
   studentName,
   studentId,
+  product,
 }: ParentPaymentModalProps) {
   const [parentName, setParentName] = useState('');
   const [parentEmail, setParentEmail] = useState('');
@@ -46,6 +51,7 @@ export function ParentPaymentModal({
           studentId,
           parentName: name,
           parentEmail: email,
+          product: product ?? undefined,
         }),
       });
       const data = await res.json();

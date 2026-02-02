@@ -5,11 +5,13 @@ import { motion } from 'framer-motion';
 import { CheckCircle2, Star, ShieldCheck } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
 import { useAuthContext } from '@/contexts/AuthContext';
+import { ParentPaymentModal } from '@/components/ParentPaymentModal';
 import { reviews } from '@/data/reviews';
 
 export function BundlePurchasePage() {
   const { user, setShowSignupModal, setRedirectOnLogin } = useAuthContext();
   const [isLoading, setIsLoading] = useState(false);
+  const [showParentPaymentModal, setShowParentPaymentModal] = useState(false);
 
   const handlePurchase = async () => {
     if (!user) {
@@ -170,8 +172,37 @@ export function BundlePurchasePage() {
                 <ShieldCheck className="w-4 h-4 text-gray-400" />
                 100% Money-Back Guarantee
               </p>
+
+              {/* Parent Payment CTA */}
+              <button
+                type="button"
+                onClick={() => {
+                  if (!user) {
+                    setRedirectOnLogin('/purchase/bundle');
+                    setShowSignupModal(true);
+                    return;
+                  }
+                  setShowParentPaymentModal(true);
+                }}
+                className="mt-4 w-full flex items-center justify-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors group"
+              >
+                <span>Don&apos;t have a credit card?</span>
+                <span className="underline decoration-dotted underline-offset-4 group-hover:text-blue-600 font-medium">
+                  Email cart to parent
+                </span>
+              </button>
             </div>
           </div>
+
+          {user && (
+            <ParentPaymentModal
+              open={showParentPaymentModal}
+              onOpenChange={setShowParentPaymentModal}
+              studentName={user.displayName || user.email?.split('@')[0] || 'Student'}
+              studentId={user.uid}
+              product="bundle"
+            />
+          )}
 
           {/* Right Column - Reviews */}
           <div className="lg:col-span-1 pl-0 lg:pl-12">
