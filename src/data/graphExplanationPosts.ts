@@ -9,6 +9,7 @@ export const graphExplanationPosts: Record<string, GraphExplanationPost> = {
     intro: 'Consumer Surplus is the difference between what consumers would have paid for a product and what they actually pay. Producer Surplus is the difference between what producers would have sold for and what they actually receive, and Deadweight Loss represents the lost surplus when market efficiency is disrupted by taxes or other interventions.',
     seoSnippet: 'Consumer surplus is the difference between what consumers are willing to pay and what they actually pay, while producer surplus is the difference between the minimum price sellers would accept and the price they receive. When taxes or other market interventions occur, deadweight loss represents the reduction in total surplus from transactions that no longer happen.',
     content: `
+      <div data-audio-player="/images/audio/consumer_surplus.mp3" class="mb-6"></div>
       <p class="mb-6">You walk into a dealership. You are willing to pay <strong>$50,000</strong> for a new car, but you negotiate the dealer down to <strong>$45,000</strong>.</p>
       <p class="mb-6">You get the car <em>and</em> you keep $5,000 in your pocket.</p>
       <p class="mb-6">That $5,000 is your <strong>Consumer Surplus</strong>.</p>

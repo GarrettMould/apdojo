@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { createRoot } from 'react-dom/client';
 import Image from 'next/image';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
@@ -10,6 +11,7 @@ import { GraphExplanationPost as GraphExplanationPostType } from '@/types/blogPo
 import { EmbeddedGraphGym } from '@/components/EmbeddedGraphGym';
 import { Button } from '@/components/ui/button';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
+import { AudioPlayer } from '@/components/AudioPlayer';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 
@@ -119,6 +121,21 @@ export function GraphExplanationPost({ post }: GraphExplanationPostProps) {
       // Process and set the HTML content
       const processedContent = processMathInHTML(content.trim());
       containerRef.current.innerHTML = processedContent;
+
+      // Find and replace audio player placeholders with React components
+      const audioPlayers = containerRef.current.querySelectorAll('[data-audio-player]');
+      audioPlayers.forEach((element) => {
+        const src = element.getAttribute('data-audio-player');
+        if (src) {
+          const className = element.getAttribute('class') || '';
+          const placeholder = document.createElement('div');
+          placeholder.className = className;
+          element.parentNode?.replaceChild(placeholder, element);
+          
+          const root = createRoot(placeholder);
+          root.render(<AudioPlayer src={src} className={className} />);
+        }
+      });
     }, [content]);
 
     return <div ref={containerRef} />;
