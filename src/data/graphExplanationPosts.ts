@@ -96,6 +96,7 @@ export const graphExplanationPosts: Record<string, GraphExplanationPost> = {
     intro: 'In AP Macroeconomics, drawing individual graphs is easy. The hard part is connecting them. The most common chain reaction you need to master is the Monetary Transmission Mechanism—how a shift in the Money Market influences Aggregate Demand.',
     seoSnippet: 'Monetary policy refers to actions taken by central banks to influence the money supply and interest rates. These policies affect aggregate demand through changes in investment and consumption spending, creating a chain reaction from money market shifts to AD-AS graph movements.',
     content: `
+      <div data-audio-player="/images/audio/Monetary_Policy.mp3" class="mb-6"></div>
       <h2 class="mt-12 mb-4 text-3xl font-bold text-gray-800">1. The Starting Point: The Recessionary Gap</h2>
       <div class="my-8 p-4 border rounded-lg bg-gray-50">
         <img src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/image0.jpg" alt="Recessionary Gap: Economy operating below full employment" class="w-full h-auto rounded-md shadow-sm" />
