@@ -12,6 +12,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, CheckCircle2, XCircle, CheckCircle, X } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { AudioPlayer } from '@/components/AudioPlayer';
 
 interface BlogPostClientProps {
   content: React.ReactNode;
@@ -20,6 +21,7 @@ interface BlogPostClientProps {
   practiceUrl?: string;
   images?: string[];
   videoUrl?: string | null;
+  audioUrl?: string | null;
   graphGymScenarioId?: number;
   graphGymPrompt?: string;
   practiceQuestionIds?: number[];
@@ -36,6 +38,7 @@ export function BlogPostClient({
   practiceUrl = '/unitFRQpracticePage',
   images = [],
   videoUrl = null,
+  audioUrl = null,
   graphGymScenarioId,
   graphGymPrompt,
   practiceQuestionIds = []
@@ -96,6 +99,13 @@ export function BlogPostClient({
             <video src={videoUrl} controls className="w-full aspect-video rounded-lg shadow-lg" playsInline>
               Your browser does not support the video tag.
             </video>
+          </div>
+        )}
+
+        {/* Audio at the start of the blog if available */}
+        {audioUrl && (
+          <div className="mb-6">
+            <AudioPlayer src={audioUrl} className="w-full" />
           </div>
         )}
 

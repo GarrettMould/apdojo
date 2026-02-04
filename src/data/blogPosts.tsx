@@ -22,6 +22,7 @@ export type BlogPost = {
   graphGymScenarioId?: number; // Graph Gym scenario ID to embed on the post page
   graphGymPrompt?: string; // Prompt shown on EmbeddedGraphGym header
   videoUrl?: string | null; // URL to a video file (e.g., from dojoDrills folder)
+  audioUrl?: string | null; // URL to an audio file (e.g., from public/images/audio)
 };
 
 export const blogPosts: Record<string, BlogPost> = {
@@ -529,6 +530,7 @@ export const blogPosts: Record<string, BlogPost> = {
     practiceQuestionIds: [3, 4],
     images: [],
     videoUrl: null,
+    audioUrl: '/images/audio/PPC.mp3',
     content: (
       <>
         <h2 className="mt-12 mb-4 text-3xl font-bold text-gray-800">The “Model of Choice”</h2>

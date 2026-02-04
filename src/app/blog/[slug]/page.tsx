@@ -324,6 +324,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 practiceUrl="/unitFRQpracticePage"
                 images={post.images || []}
                 videoUrl={post.videoUrl || null}
+                audioUrl={post.audioUrl ?? null}
                 graphGymScenarioId={post.graphGymScenarioId}
                 graphGymPrompt={post.graphGymPrompt}
                 practiceQuestionIds={post.practiceQuestionIds}
