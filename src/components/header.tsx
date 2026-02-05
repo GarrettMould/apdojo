@@ -197,6 +197,13 @@ export function Header() {
                       >
                         Dojo Drills
                       </Link>
+                      <Link
+                        href="/ap-blog-home"
+                        className="block px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                        onClick={() => setIsPracticeDropdownOpen(false)}
+                      >
+                        Blog
+                      </Link>
                     </div>
                   </div>
                 )}
@@ -500,6 +507,13 @@ export function Header() {
                 className="px-6 py-3 text-lg text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
               >
                 Dojo Drills
+              </Link>
+              <Link
+                href="/ap-blog-home"
+                onClick={closeMobileMenu}
+                className="px-6 py-3 text-lg text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
+              >
+                Blog
               </Link>
 
               {/* Other Links */}

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo, useEffect, Suspense, useRef } from 'react';
+import { useState, useMemo, useEffect, Suspense, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question } from '@/data/questionBanks/types';
 import { Copy, CheckCircle2, Search, Filter, Eye, Loader2, GraduationCap, ArrowRight, ChevronLeft, ChevronRight, X, Play, Clock, Zap, BookOpen, Users, BarChart3 } from 'lucide-react';
@@ -15,6 +16,93 @@ import { graphGymScenarios, GraphGymScenario } from '@/data/graphGymScenarios';
 type AssignmentType = 'mcq' | 'graphGym';
 type ViewMode = 'builder' | 'results';
 type AssignmentModeChoice = 'live' | 'homework' | null; // null = haven't chosen yet (show choice screen)
+
+function truncateText(text: string, max: number) {
+  return text.length <= max ? text : text.slice(0, max) + '…';
+}
+
+/** Reorder icon: up/down arrows (common "reorder" symbol). */
+function ReorderIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M7 15l5 5 5-5" />
+      <path d="M7 9l5-5 5 5" />
+    </svg>
+  );
+}
+
+/** Draggable MCQ card: click reorder button to start drag; move mouse to reorder; release to drop. */
+function McqPreviewCard({
+  question: q,
+  index: idx,
+  total,
+  isDragging,
+  onRemove,
+  onDragStart,
+}: {
+  question: Question;
+  index: number;
+  total: number;
+  isDragging: boolean;
+  onRemove: () => void;
+  onDragStart: (questionId: number, clientX: number, clientY: number) => void;
+}) {
+  const onReorderMouseDown = (e: React.MouseEvent) => {
+    if (e.button !== 0) return;
+    e.preventDefault();
+    onDragStart(q.id, e.clientX, e.clientY);
+  };
+
+  return (
+    <div
+      data-mcq-card-index={idx}
+      className={`group relative bg-white rounded-xl border-2 border-slate-200 shadow-sm p-5 transition-all ${isDragging ? 'opacity-40 scale-[0.98]' : ''}`}
+    >
+      <button
+        type="button"
+        onMouseDown={onReorderMouseDown}
+        className="absolute top-3 right-12 p-1.5 rounded-full bg-slate-100 text-slate-500 hover:bg-blue-100 hover:text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity"
+        aria-label="Drag to reorder question"
+        title="Drag to reorder"
+      >
+        <ReorderIcon className="w-4 h-4" />
+      </button>
+      <button
+        type="button"
+        onClick={(e) => { e.stopPropagation(); onRemove(); }}
+        className="absolute top-3 right-3 p-1.5 rounded-full bg-slate-100 text-slate-500 hover:bg-red-100 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+        aria-label="Remove question from assignment"
+      >
+        <X className="w-4 h-4" />
+      </button>
+      <div className="flex items-center justify-between mb-3 pl-4 pr-8 group-hover:pr-20 transition-[padding] duration-200 ease-out">
+        <span className="text-xs font-bold text-slate-500">Question {idx + 1} of {total}</span>
+        <span className="text-xs font-mono text-slate-400">ID {q.id}</span>
+      </div>
+      <p className="text-base font-medium text-slate-900 mb-4 leading-relaxed">{q.question}</p>
+      {q.image && (
+        <div className="my-3 rounded-lg overflow-hidden border border-slate-200">
+          <img
+            src={typeof q.image === 'string' ? q.image : (q.image as { src: string }).src}
+            alt="Question"
+            className="max-h-40 w-auto object-contain"
+          />
+        </div>
+      )}
+      <div className="space-y-2">
+        {q.options.map((opt, oi) => (
+          <div
+            key={oi}
+            className="flex items-start gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-slate-50 text-slate-700 text-sm"
+          >
+            <span className="font-bold text-slate-500 flex-shrink-0">{String.fromCharCode(65 + oi)}.</span>
+            <span>{opt}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 interface AssignmentResult {
   id: string;
@@ -59,7 +147,8 @@ function TutorBuilderContent() {
   }, [searchParams]);
   
   const [assignmentType, setAssignmentType] = useState<AssignmentType>('mcq');
-  const [selectedIds, setSelectedIds] = useState<Set<number | string>>(new Set());
+  /** Ordered list of selected IDs (MCQ order is preserved for assignment; Graph Gym still sorted when encoding). */
+  const [selectedIdsOrder, setSelectedIdsOrder] = useState<(number | string)[]>([]);
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
   
   // Update search term when URL parameter changes
@@ -76,7 +165,10 @@ function TutorBuilderContent() {
   const [loadingTemplates, setLoadingTemplates] = useState(false);
   const [templatesPage, setTemplatesPage] = useState(0);
   const [templateModalTemplate, setTemplateModalTemplate] = useState<PublicAssignmentTemplate | null>(null);
-  
+  const [draggedMcqId, setDraggedMcqId] = useState<number | null>(null);
+  const [ghostPosition, setGhostPosition] = useState<{ x: number; y: number } | null>(null);
+  const [ghostQuestion, setGhostQuestion] = useState<Question | null>(null);
+
   // Fetch public assignment templates when on choice screen
   useEffect(() => {
     if (assignmentModeChoice !== null) return;
@@ -180,32 +272,65 @@ function TutorBuilderContent() {
     });
   }, [searchTerm, graphGymSubject, assignmentType, selectedTopicTags]);
 
-  // Resolve selected IDs to full question objects for MCQ preview (order preserved)
+  // Resolve selected IDs to full question objects for MCQ preview (order preserved for drag-to-reorder)
   const selectedMcqQuestions = useMemo(() => {
     if (assignmentType !== 'mcq') return [];
-    const ids = Array.from(selectedIds)
-      .filter((id): id is number => typeof id === 'number')
-      .sort((a, b) => a - b);
+    const ids = selectedIdsOrder.filter((id): id is number => typeof id === 'number');
     const map = new Map(allQuestions.map((q) => [q.id, q]));
     return ids.map((id) => map.get(id)).filter(Boolean) as Question[];
-  }, [assignmentType, selectedIds]);
+  }, [assignmentType, selectedIdsOrder]);
 
   const toggleSelection = (id: number | string) => {
-    setSelectedIds(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(id)) {
-        newSet.delete(id);
-      } else {
-        newSet.add(id);
-      }
-      return newSet;
+    setSelectedIdsOrder(prev => {
+      if (prev.includes(id)) return prev.filter((x) => x !== id);
+      return [...prev, id];
     });
   };
 
-  // Build the same URL students would see (for preview in new tab)
+  /** Reorder MCQ questions in the assignment (used by drag-and-drop in sidebar). */
+  const moveSelectedMcq = useCallback((fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex) return;
+    setSelectedIdsOrder(prev => {
+      const onlyNumbers = prev.filter((id): id is number => typeof id === 'number');
+      const [removed] = onlyNumbers.splice(fromIndex, 1);
+      onlyNumbers.splice(toIndex, 0, removed);
+      return onlyNumbers;
+    });
+  }, []);
+
+  const selectedMcqQuestionsRef = useRef<Question[]>([]);
+  selectedMcqQuestionsRef.current = selectedMcqQuestions;
+
+  useEffect(() => {
+    if (draggedMcqId === null) return;
+    const onMove = (e: MouseEvent) => {
+      setGhostPosition({ x: e.clientX, y: e.clientY });
+      const el = document.elementFromPoint(e.clientX, e.clientY);
+      const card = el?.closest?.('[data-mcq-card-index]');
+      const targetIndex = card != null ? parseInt((card as HTMLElement).getAttribute('data-mcq-card-index') ?? '-1', 10) : -1;
+      if (targetIndex < 0) return;
+      const list = selectedMcqQuestionsRef.current;
+      const fromIndex = list.findIndex((q) => q.id === draggedMcqId);
+      if (fromIndex !== -1 && fromIndex !== targetIndex) moveSelectedMcq(fromIndex, targetIndex);
+    };
+    const onUp = () => {
+      setDraggedMcqId(null);
+      setGhostPosition(null);
+      setGhostQuestion(null);
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    return onUp;
+  }, [draggedMcqId, moveSelectedMcq]);
+
+  // Build the same URL students would see (for preview in new tab). MCQ uses selection order; Graph Gym sorts by id.
   const getPreviewUrl = (): string | null => {
-    if (selectedIds.size === 0) return null;
-    const idsArray = Array.from(selectedIds).sort((a, b) => Number(a) - Number(b));
+    if (selectedIdsOrder.length === 0) return null;
+    const idsArray = assignmentType === 'mcq'
+      ? selectedIdsOrder.filter((id): id is number => typeof id === 'number')
+      : [...selectedIdsOrder].sort((a, b) => Number(a) - Number(b));
     const idsString = idsArray.map(id => String(id)).join(',');
     const encoded = btoa(idsString);
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
@@ -223,8 +348,10 @@ function TutorBuilderContent() {
 
   // Encoded assignment ID for live presenter URL (same encoding as getPreviewUrl)
   const getEncodedAssignmentId = (): string | null => {
-    if (selectedIds.size === 0) return null;
-    const idsArray = Array.from(selectedIds).sort((a, b) => Number(a) - Number(b));
+    if (selectedIdsOrder.length === 0) return null;
+    const idsArray = assignmentType === 'mcq'
+      ? selectedIdsOrder.filter((id): id is number => typeof id === 'number')
+      : [...selectedIdsOrder].sort((a, b) => Number(a) - Number(b));
     const idsString = idsArray.map(id => String(id)).join(',');
     return btoa(idsString);
   };
@@ -245,8 +372,8 @@ function TutorBuilderContent() {
   };
 
   const openGraphGymPresenter = () => {
-    if (assignmentType !== 'graphGym' || selectedIds.size === 0) return;
-    const idsArray = Array.from(selectedIds).sort((a, b) => Number(a) - Number(b));
+    if (assignmentType !== 'graphGym' || selectedIdsOrder.length === 0) return;
+    const idsArray = [...selectedIdsOrder].sort((a, b) => Number(a) - Number(b));
     const idsString = idsArray.map((id) => String(id)).join(',');
     const encoded = btoa(idsString);
     router.push(`/live/graph-gym-present?q=${encodeURIComponent(encoded)}`);
@@ -277,9 +404,10 @@ function TutorBuilderContent() {
   };
 
   const generateLink = async () => {
-    if (selectedIds.size === 0) return;
-    
-    const idsArray = Array.from(selectedIds).sort((a, b) => Number(a) - Number(b));
+    if (selectedIdsOrder.length === 0) return;
+    const idsArray = assignmentType === 'mcq'
+      ? selectedIdsOrder.filter((id): id is number => typeof id === 'number')
+      : [...selectedIdsOrder].sort((a, b) => Number(a) - Number(b));
     const idsString = idsArray.map(id => String(id)).join(',');
     const encoded = btoa(idsString);
     
@@ -323,7 +451,7 @@ function TutorBuilderContent() {
   const applyPublicTemplate = (template: PublicAssignmentTemplate, mode: 'live' | 'homework') => {
     if (template.assignmentType !== 'mcq' && template.assignmentType !== 'graphGym') return;
     setAssignmentType(template.assignmentType);
-    setSelectedIds(new Set(template.questionIds));
+    setSelectedIdsOrder(Array.isArray(template.questionIds) ? [...template.questionIds] : []);
     setSubjectFilter(template.subject);
     setAssignmentModeChoice(mode);
   };
@@ -809,6 +937,26 @@ function TutorBuilderContent() {
 
   return (
     <div className="min-h-screen bg-slate-100">
+      {/* Drag ghost: smaller card that follows cursor when reordering MCQ */}
+      {typeof document !== 'undefined' && ghostQuestion && ghostPosition && createPortal(
+        <div
+          className="max-w-[280px] w-[280px] bg-white rounded-xl border-2 border-slate-300 shadow-xl p-4 pointer-events-none select-none"
+          style={{
+            position: 'fixed',
+            left: ghostPosition.x,
+            top: ghostPosition.y,
+            transform: 'translate(-50%, -50%)',
+            zIndex: 9999,
+          }}
+        >
+          <p className="text-xs font-bold text-slate-500 mb-1">Question</p>
+          <p className="text-sm font-medium text-slate-900 leading-snug line-clamp-3">{truncateText(ghostQuestion.question, 120)}</p>
+          {ghostQuestion.options[0] != null && (
+            <p className="text-xs text-slate-600 mt-2 line-clamp-1">A. {truncateText(ghostQuestion.options[0], 60)}</p>
+          )}
+        </div>,
+        document.body
+      )}
       {/* Back to Home only (choice screen); no Student Results on builder/list or results view */}
       <div className="w-full flex justify-end px-6 pt-4 pb-2">
         <button
@@ -954,7 +1102,7 @@ function TutorBuilderContent() {
                 <button
                   onClick={() => {
                     setAssignmentType('mcq');
-                    setSelectedIds(new Set());
+                    setSelectedIdsOrder([]);
                     setSearchTerm('');
                     setUnitFilter(null);
                   }}
@@ -969,7 +1117,7 @@ function TutorBuilderContent() {
                 <button
                   onClick={() => {
                     setAssignmentType('graphGym');
-                    setSelectedIds(new Set());
+                    setSelectedIdsOrder([]);
                     setSearchTerm('');
                     setUnitFilter(null);
                   }}
@@ -1110,7 +1258,7 @@ function TutorBuilderContent() {
                 </thead>
                 <tbody>
                   {filteredQuestions.map((question, index) => {
-                    const isSelected = selectedIds.has(question.id);
+                    const isSelected = selectedIdsOrder.includes(question.id);
                     return (
                       <tr
                         key={`${question.id}-${index}`}
@@ -1181,7 +1329,7 @@ function TutorBuilderContent() {
                 </thead>
                 <tbody>
                   {filteredScenarios.map((scenario, index) => {
-                    const isSelected = selectedIds.has(scenario.id);
+                    const isSelected = selectedIdsOrder.includes(scenario.id);
                     return (
                       <tr
                         key={`${scenario.id}-${index}`}
@@ -1264,53 +1412,28 @@ function TutorBuilderContent() {
                         <p className="text-slate-500 text-sm font-medium">Select questions from the list to preview them here.</p>
                       ) : (
                         selectedMcqQuestions.map((q, idx) => (
-                          <div
+                          <McqPreviewCard
                             key={q.id}
-                            className="group relative bg-white rounded-xl border-2 border-slate-200 shadow-sm p-5"
-                          >
-                            <button
-                              type="button"
-                              onClick={(e) => { e.stopPropagation(); toggleSelection(q.id); }}
-                              className="absolute top-3 right-3 p-1.5 rounded-full bg-slate-100 text-slate-500 hover:bg-red-100 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
-                              aria-label="Remove question from assignment"
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
-                            <div className="flex items-center justify-between mb-3 pr-8">
-                              <span className="text-xs font-bold text-slate-500">Question {idx + 1}</span>
-                              <span className="text-xs font-mono text-slate-400">ID {q.id}</span>
-                            </div>
-                            <p className="text-base font-medium text-slate-900 mb-4 leading-relaxed">{q.question}</p>
-                            {q.image && (
-                              <div className="my-3 rounded-lg overflow-hidden border border-slate-200">
-                                <img
-                                  src={typeof q.image === 'string' ? q.image : (q.image as { src: string }).src}
-                                  alt="Question"
-                                  className="max-h-40 w-auto object-contain"
-                                />
-                              </div>
-                            )}
-                            <div className="space-y-2">
-                              {q.options.map((opt, oi) => (
-                                <div
-                                  key={oi}
-                                  className="flex items-start gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-slate-50 text-slate-700 text-sm"
-                                >
-                                  <span className="font-bold text-slate-500 flex-shrink-0">{String.fromCharCode(65 + oi)}.</span>
-                                  <span>{opt}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
+                            question={q}
+                            index={idx}
+                            total={selectedMcqQuestions.length}
+                            isDragging={draggedMcqId === q.id}
+                            onRemove={() => toggleSelection(q.id)}
+                            onDragStart={(questionId, clientX, clientY) => {
+                              setDraggedMcqId(questionId);
+                              setGhostPosition({ x: clientX, y: clientY });
+                              setGhostQuestion(selectedMcqQuestions.find((qq) => qq.id === questionId) ?? null);
+                            }}
+                          />
                         ))
                       )
                     )}
                     {assignmentType === 'graphGym' && (
-                      selectedIds.size === 0 ? (
+                      selectedIdsOrder.length === 0 ? (
                         <p className="text-slate-500 text-sm font-medium">Select Graph Gym scenarios to see them listed here.</p>
                       ) : (
                         <div className="space-y-3">
-                          {Array.from(selectedIds)
+                          {[...selectedIdsOrder]
                             .filter((id): id is number => typeof id === 'number')
                             .sort((a, b) => a - b)
                             .map((id) => {
@@ -1351,15 +1474,15 @@ function TutorBuilderContent() {
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-4">
               <span className="text-lg font-bold text-slate-900">
-                {selectedIds.size} {
+                {selectedIdsOrder.length} {
                   assignmentType === 'mcq' ? 'question' : 'scenario'
-                }{selectedIds.size !== 1 ? 's' : ''} selected
+                }{selectedIdsOrder.length !== 1 ? 's' : ''} selected
               </span>
             </div>
             <div className="flex items-center gap-3">
               {assignmentModeChoice === 'live' ? (
                 <>
-                  {assignmentType === 'mcq' && selectedIds.size > 0 && (
+                  {assignmentType === 'mcq' && selectedIdsOrder.length > 0 && (
                     <button
                       type="button"
                       onClick={openShareScreen}
@@ -1376,7 +1499,7 @@ function TutorBuilderContent() {
                       )}
                     </button>
                   )}
-                  {assignmentType === 'graphGym' && selectedIds.size > 0 && (
+                  {assignmentType === 'graphGym' && selectedIdsOrder.length > 0 && (
                     <button
                       type="button"
                       onClick={openGraphGymPresenter}
@@ -1390,9 +1513,9 @@ function TutorBuilderContent() {
                 <>
                   <button
                     onClick={generateLink}
-                    disabled={selectedIds.size === 0}
+                    disabled={selectedIdsOrder.length === 0}
                     className={`px-6 py-3 font-bold text-white rounded-xl shadow-lg transition-all ${
-                      selectedIds.size === 0
+                      selectedIdsOrder.length === 0
                         ? 'bg-slate-400 cursor-not-allowed'
                         : linkCopied
                         ? 'bg-green-600 hover:bg-green-700'
