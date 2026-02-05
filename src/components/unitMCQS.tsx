@@ -1500,9 +1500,19 @@ export function UnitMCQs({
       console.warn(`[handleAnswerSelection] Answer is correct but awardXp function is not available`);
     }
 
+    // Check if this is a new answer (not reviewing an already-answered question)
+    const wasAlreadyAnswered = answeredQuestions[questionId] !== undefined;
+
     // Update local state for immediate UI feedback
     onAnswer(questionId, answerLetter, isCorrect, lessonIDS);
     setHighlightedIndex(null);
+
+    // Auto-advance to next question after a delay (only for new answers, not reviews)
+    if (!wasAlreadyAnswered && currentQuestionIndex < questions.length - 1) {
+      setTimeout(() => {
+        onNextQuestion();
+      }, 1500); // 1.5 second delay
+    }
 
     // --- Backend Updates (Only if logged in) --- 
     if (user) { 

@@ -1600,7 +1600,32 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
 
         {/* Dojo Drills Row - Below Strengthen your mastery button */}
         {(() => {
-          // Filter drills by current unit and subject
+          // For Unit 1 Macro, show PPC and Comparative Advantage deep dive cards
+          if (activeUnitNum === 1 && subjectFilter === 'ap_macroeconomics') {
+            return (
+              <div className="mb-8">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Dojo Drills</h2>
+                <div className="flex md:flex-row md:flex-wrap gap-4 overflow-x-auto md:overflow-x-visible pb-2 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0">
+                  <Link
+                    href="/unit-1/ppc-deep-dive"
+                    className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-6 text-center flex flex-col items-center justify-center hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 flex-shrink-0 w-full md:flex-1 min-h-[180px] group"
+                  >
+                    <span className="text-6xl font-black text-indigo-700 leading-tight block group-hover:text-indigo-800 transition-colors">PPC</span>
+                    <p className="text-base font-semibold text-slate-600 mt-2">Production Possibilities Curve Deep Dive</p>
+                  </Link>
+                  <Link
+                    href="/unit-1/comparative-advantage-deep-dive"
+                    className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-6 text-center flex flex-col items-center justify-center hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 flex-shrink-0 w-full md:flex-1 min-h-[180px] group"
+                  >
+                    <span className="text-6xl font-black text-indigo-700 leading-tight block group-hover:text-indigo-800 transition-colors">CA</span>
+                    <p className="text-base font-semibold text-slate-600 mt-2">Absolute and Comparative Advantage Deep Dive</p>
+                  </Link>
+                </div>
+              </div>
+            );
+          }
+
+          // For other units, show regular drills
           const relevantDrills = Object.values(dojoDrills).filter(
             drill => {
               const drillUnit = getDrillUnitForSubject(drill, subjectFilter);

@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect, Suspense, useRef } from 'react';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question } from '@/data/questionBanks/types';
-import { Copy, CheckCircle2, Search, Filter, Eye, Loader2, GraduationCap, ArrowRight, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { Copy, CheckCircle2, Search, Filter, Eye, Loader2, GraduationCap, ArrowRight, ChevronLeft, ChevronRight, X, Play, Clock, Zap, BookOpen, Users, BarChart3 } from 'lucide-react';
 import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -535,59 +535,74 @@ function TutorBuilderContent() {
   // Assignment mode choice screen (shown first when visiting /tutor/builder)
   if (assignmentModeChoice === null) {
     return (
-      <div className="min-h-screen bg-slate-100">
-        {/* Student Results link only on this home/choice screen */}
-        <div className="w-full flex justify-end px-6 pt-4 pb-2">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+        {/* Student Results link */}
+        <div className="w-full flex justify-end px-6 pt-6 pb-4">
           <Link
             href="/tutor/results"
-            className="text-indigo-700 font-black text-lg tracking-tight hover:text-indigo-800 hover:underline transition-colors uppercase"
+            className="flex items-center gap-2 text-indigo-700 font-bold hover:text-indigo-800 transition-colors"
           >
+            <BarChart3 className="w-5 h-5" />
             Student Results
           </Link>
         </div>
-        <div className="max-w-4xl mx-auto px-6">
+        
+        <div className="max-w-6xl mx-auto px-6">
         <div id="choice">
-          {/* Main choice: fills viewport so you scroll to see pre-made drills */}
-          <section className="min-h-screen flex flex-col justify-center py-16">
-            <div className="text-center mb-10">
-              <h1 className="text-3xl font-black text-black mb-3">
-                How would you like to assign this?
+          {/* Hero Section with Main Choice Cards */}
+          <section className="py-12">
+            <div className="text-center mb-12">
+              <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">
+                Create Your Assignment
               </h1>
-              <p className="text-lg text-gray-700 font-semibold">
-                Run a live session now or generate a link for later.
+              <p className="text-xl text-slate-600 font-semibold max-w-2xl mx-auto">
+                Choose how you want to deliver your assignment—live in class or asynchronously for homework
               </p>
             </div>
 
-            <div className="flex flex-wrap justify-center gap-8 flex-1 items-stretch">
+            <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-16">
               <button
                 type="button"
                 onClick={() => setAssignmentModeChoice('live')}
-                className="group flex flex-col items-start justify-center text-left p-10 bg-white rounded-3xl shadow-xl hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 transition-all min-h-[320px] flex-1 w-full max-w-[320px]"
+                className="group relative flex flex-col p-8 bg-white rounded-3xl shadow-xl hover:shadow-2xl border-2 border-green-600 transition-all transform hover:-translate-y-1"
               >
-                <div className="flex items-center gap-3 mb-2">
-                  <span className="w-5 h-5 rounded-full bg-amber-400 flex-shrink-0" aria-hidden />
-                  <h2 className="text-2xl font-bold text-indigo-700 group-hover:text-indigo-800 transition-colors">
-                    Launch a Live Session
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-16 h-16 rounded-2xl bg-green-600 flex items-center justify-center shadow-lg">
+                    <Play className="w-8 h-8 text-white" fill="white" />
+                  </div>
+                  <h2 className="text-2xl font-black text-slate-900 group-hover:text-green-600 transition-colors">
+                    Live Session
                   </h2>
                 </div>
-                <p className="text-base text-slate-600 font-semibold pl-8">
-                  Best for bell-ringers and synchronous activities
+                <p className="text-base text-slate-700 font-semibold mb-4 leading-relaxed">
+                  Launch a real-time session for synchronous class activities. Perfect for bell-ringers, warm-ups, and interactive lessons.
                 </p>
+                <div className="flex items-center gap-2 text-sm font-bold text-green-600 mt-auto">
+                  <Users className="w-4 h-4" />
+                  <span>Real-time participation</span>
+                </div>
               </button>
+              
               <button
                 type="button"
                 onClick={() => setAssignmentModeChoice('homework')}
-                className="group flex flex-col items-start justify-center text-left p-10 bg-white rounded-3xl shadow-xl hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 transition-all min-h-[320px] flex-1 w-full max-w-[320px]"
+                className="group relative flex flex-col p-8 bg-white rounded-3xl shadow-xl hover:shadow-2xl border-2 border-blue-600 transition-all transform hover:-translate-y-1"
               >
-                <div className="flex items-center gap-3 mb-2">
-                  <span className="w-5 h-5 rounded-full bg-red-500 flex-shrink-0" aria-hidden />
-                  <h2 className="text-2xl font-bold text-indigo-700 group-hover:text-indigo-800 transition-colors">
-                    Assign as Homework
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg">
+                    <Clock className="w-8 h-8 text-white" fill="white" />
+                  </div>
+                  <h2 className="text-2xl font-black text-slate-900 group-hover:text-blue-600 transition-colors">
+                    Homework
                   </h2>
                 </div>
-                <p className="text-base text-slate-600 font-semibold pl-8">
-                  Best for take home activities or individual class work
+                <p className="text-base text-slate-700 font-semibold mb-4 leading-relaxed">
+                  Generate a shareable link for asynchronous assignments. Students complete at their own pace, anytime, anywhere.
                 </p>
+                <div className="flex items-center gap-2 text-sm font-bold text-blue-600 mt-auto">
+                  <BookOpen className="w-4 h-4" />
+                  <span>Self-paced learning</span>
+                </div>
               </button>
             </div>
           </section>
@@ -633,7 +648,7 @@ function TutorBuilderContent() {
                     >
                       <div className="min-w-0 flex-1 pr-4">
                         <span className="text-xl md:text-2xl font-bold text-indigo-700 leading-tight block mb-1 line-clamp-1">{title}</span>
-                        <p className="text-base font-semibold text-slate-600">{topic} · {template.totalQuestions} question{template.totalQuestions !== 1 ? 's' : ''}</p>
+                        <p className="text-base font-semibold text-indigo-700">{topic} · {template.totalQuestions} question{template.totalQuestions !== 1 ? 's' : ''}</p>
                       </div>
                       <span className="flex-shrink-0 text-indigo-600 font-bold text-base whitespace-nowrap">Use This →</span>
                     </button>
@@ -666,7 +681,7 @@ function TutorBuilderContent() {
           })()}
 
           {/* How to use: headline + 3 step cards */}
-          <div className="max-w-5xl mx-auto pt-12 pb-12">
+          <div className="max-w-5xl mx-auto py-12 mb-12">
             <h2 className="text-4xl md:text-5xl font-black text-blue-500 text-center mb-12">
               How to use the Tutor Builder
             </h2>
@@ -733,24 +748,30 @@ function TutorBuilderContent() {
                     <X className="w-5 h-5" />
                   </button>
                 </div>
-                <div className="flex flex-wrap gap-6">
+                <div className="grid md:grid-cols-2 gap-6">
                   <button
                     type="button"
                     onClick={() => {
                       applyPublicTemplate(templateModalTemplate, 'live');
                       setTemplateModalTemplate(null);
                     }}
-                    className="group flex flex-col items-start justify-center text-left p-8 bg-white rounded-3xl shadow-xl hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 transition-all min-h-[240px] flex-1 min-w-[240px]"
+                    className="group relative flex flex-col p-8 bg-white rounded-3xl shadow-xl hover:shadow-2xl border-2 border-green-600 transition-all transform hover:-translate-y-1"
                   >
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="w-5 h-5 rounded-full bg-amber-400 flex-shrink-0" aria-hidden />
-                      <h3 className="text-xl font-bold text-indigo-700 group-hover:text-indigo-800 transition-colors">
-                        Launch a Live Session
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-16 h-16 rounded-2xl bg-green-600 flex items-center justify-center shadow-lg">
+                        <Play className="w-8 h-8 text-white" fill="white" />
+                      </div>
+                      <h3 className="text-2xl font-black text-slate-900 group-hover:text-green-600 transition-colors">
+                        Live Session
                       </h3>
                     </div>
-                    <p className="text-base text-slate-600 font-semibold pl-8">
-                      Best for bell-ringers and synchronous activities
+                    <p className="text-base text-slate-700 font-semibold mb-4 leading-relaxed">
+                      Launch a real-time session for synchronous class activities. Perfect for bell-ringers, warm-ups, and interactive lessons.
                     </p>
+                    <div className="flex items-center gap-2 text-sm font-bold text-green-600 mt-auto">
+                      <Users className="w-4 h-4" />
+                      <span>Real-time participation</span>
+                    </div>
                   </button>
                   <button
                     type="button"
@@ -758,17 +779,23 @@ function TutorBuilderContent() {
                       applyPublicTemplate(templateModalTemplate, 'homework');
                       setTemplateModalTemplate(null);
                     }}
-                    className="group flex flex-col items-start justify-center text-left p-8 bg-white rounded-3xl shadow-xl hover:shadow-2xl hover:-translate-y-0.5 active:translate-y-0 transition-all min-h-[240px] flex-1 min-w-[240px]"
+                    className="group relative flex flex-col p-8 bg-white rounded-3xl shadow-xl hover:shadow-2xl border-2 border-blue-600 transition-all transform hover:-translate-y-1"
                   >
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="w-5 h-5 rounded-full bg-red-500 flex-shrink-0" aria-hidden />
-                      <h3 className="text-xl font-bold text-indigo-700 group-hover:text-indigo-800 transition-colors">
-                        Assign as Homework
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg">
+                        <Clock className="w-8 h-8 text-white" fill="white" />
+                      </div>
+                      <h3 className="text-2xl font-black text-slate-900 group-hover:text-blue-600 transition-colors">
+                        Homework
                       </h3>
                     </div>
-                    <p className="text-base text-slate-600 font-semibold pl-8">
-                      Best for take home activities or individual class work
+                    <p className="text-base text-slate-700 font-semibold mb-4 leading-relaxed">
+                      Generate a shareable link for asynchronous assignments. Students complete at their own pace, anytime, anywhere.
                     </p>
+                    <div className="flex items-center gap-2 text-sm font-bold text-blue-600 mt-auto">
+                      <BookOpen className="w-4 h-4" />
+                      <span>Self-paced learning</span>
+                    </div>
                   </button>
                 </div>
               </div>
