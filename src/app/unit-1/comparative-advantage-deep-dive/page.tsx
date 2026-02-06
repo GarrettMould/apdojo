@@ -1,8 +1,17 @@
 'use client';
 
 import { DrillDeepDive } from '@/components/DrillDeepDive';
+import { getFlashcardsForLesson } from '@/data/unitFlashcards';
 
 export default function ComparativeAdvantageDeepDivePage() {
+  // Comparative Advantage is Unit 1, Lesson 1.3 in Macro (per dojoDrills)
+  const lessonPills = [
+    { label: 'AP Macro - 1.3' },
+  ];
+
+  // Unit 1 Macro lesson 1.3: terms + rapid-fire from unit flashcard array
+  const flashcards = getFlashcardsForLesson('macro', 1, '1.3');
+
   const stage2Content = (
     <div className="space-y-12"> {/* Adds massive spacing between major sections */}
       
@@ -81,6 +90,8 @@ export default function ComparativeAdvantageDeepDivePage() {
       drillId="absolute-and-comparative-advantage-macro"
       backLink="/ap-macro-unit-1-cheat-sheet"
       backLinkText="Back to Unit 1 Cheat Sheet"
+      lessonPills={lessonPills}
+      flashcards={flashcards}
       stage2Content={stage2Content}
     />
   );

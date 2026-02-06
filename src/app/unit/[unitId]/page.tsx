@@ -25,6 +25,7 @@ import jsPDF from 'jspdf';
 import { dojoIcon } from '@/data/imagePaths';
 import { motion, AnimatePresence } from 'framer-motion';
 import { dojoDrills, drillAppliesToSubject, getDrillUnitForSubject } from '@/data/dojoDrills';
+import { getFlashcardsForLesson, UnitFlashcardData } from '@/data/unitFlashcards';
 import { saveQuizResult } from '@/lib/quizHistory';
 import { hasValidSeasonPass, getUnitMCQTestUrl } from '@/lib/utils';
 import { Footer } from '@/components/Footer';
@@ -1598,88 +1599,61 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           );
         })()}
 
-        {/* Dojo Drills Row - Below Strengthen your mastery button */}
+        {/* Ultimate Unit Shuffle Card */}
         {(() => {
-          // For Unit 1 Macro, show PPC and Comparative Advantage deep dive cards
-          if (activeUnitNum === 1 && subjectFilter === 'ap_macroeconomics') {
-            return (
-              <div className="mb-8">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Dojo Drills</h2>
-                <div className="flex md:flex-row md:flex-wrap gap-4 overflow-x-auto md:overflow-x-visible pb-2 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0">
-                  <Link
-                    href="/unit-1/ppc-deep-dive"
-                    className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-6 text-center flex flex-col items-center justify-center hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 flex-shrink-0 w-full md:flex-1 min-h-[180px] group"
-                  >
-                    <span className="text-6xl font-black text-indigo-700 leading-tight block group-hover:text-indigo-800 transition-colors">PPC</span>
-                    <p className="text-base font-semibold text-slate-600 mt-2">Production Possibilities Curve Deep Dive</p>
-                  </Link>
-                  <Link
-                    href="/unit-1/comparative-advantage-deep-dive"
-                    className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-6 text-center flex flex-col items-center justify-center hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 flex-shrink-0 w-full md:flex-1 min-h-[180px] group"
-                  >
-                    <span className="text-6xl font-black text-indigo-700 leading-tight block group-hover:text-indigo-800 transition-colors">CA</span>
-                    <p className="text-base font-semibold text-slate-600 mt-2">Absolute and Comparative Advantage Deep Dive</p>
-                  </Link>
-                </div>
-              </div>
-            );
-          }
-
-          // For other units, show regular drills
-          const relevantDrills = Object.values(dojoDrills).filter(
-            drill => {
-              const drillUnit = getDrillUnitForSubject(drill, subjectFilter);
-              return drillUnit === activeUnitNum && drillAppliesToSubject(drill, subjectFilter);
+          // Get all flashcards for this unit
+          const getAllUnitFlashcards = (): UnitFlashcardData[] => {
+            if (selectedSubject === 'macro' && activeUnitNum === 1) {
+              // Combine all lessons for Unit 1 Macro
+              const allCards: UnitFlashcardData[] = [];
+              sortedLessons.forEach(({ lessonId }) => {
+                const lessonCards = getFlashcardsForLesson('macro', 1, lessonId);
+                allCards.push(...lessonCards);
+              });
+              return allCards;
             }
-          );
+            // Add other units/subjects as needed
+            return [];
+          };
 
-          if (relevantDrills.length === 0) return null;
+          const allUnitFlashcards = getAllUnitFlashcards();
+          if (allUnitFlashcards.length === 0) return null;
+
+          // Shuffle the cards
+          const shuffledCards = [...allUnitFlashcards].sort(() => Math.random() - 0.5);
+
+          // Count by type
+          const listCount = shuffledCards.filter(c => c.type === 'list').length;
+          const rapidFireCount = shuffledCards.filter(c => c.type === 'rapid-fire').length;
+          const graphCount = shuffledCards.filter(c => c.tag === 'GRAPH').length;
 
           return (
             <div className="mb-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Dojo Drills</h2>
-              <div className="flex md:flex-row md:flex-wrap gap-4 overflow-x-auto md:overflow-x-visible pb-2 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0">
-                {relevantDrills.map((drill) => (
-                  <button
-                    key={drill.id}
-                    onClick={() => router.push(`/dojo-drills/preview/${drill.id}`)}
-                    className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4 text-left hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 flex-shrink-0 w-[45%] md:flex-1 md:min-w-[240px] md:max-w-[320px] flex flex-col group aspect-[5/6] md:aspect-auto"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div
-                        className={`inline-block text-xs font-semibold px-2 py-1 rounded ${
-                          subjectFilter === 'ap_macroeconomics'
-                            ? 'bg-blue-100 text-blue-800'
-                            : 'bg-green-100 text-green-800'
-                        }`}
-                      >
-                        Unit {getDrillUnitForSubject(drill, subjectFilter) || drill.unit}
-                      </div>
-                      <div className="flex items-center gap-1 text-sm font-semibold text-gray-800">
-                        <span>{drill.xpReward.total}</span>
-                        <span className="inline-flex items-center">
-                          <Image
-                            src="/images/flame100.png"
-                            alt="XP Flame"
-                            width={16}
-                            height={16}
-                            className="w-4 h-4"
-                          />
-                        </span>
-                      </div>
-                    </div>
-                    <h3 className="text-base font-bold text-gray-900 mb-1.5 line-clamp-2 group-hover:text-blue-600 transition-colors flex-1">
-                      {drill.title}
-                    </h3>
-                    <p className="hidden md:block text-xs text-gray-600 line-clamp-2 mb-2">
-                      {drill.description}
+              <Link
+                href={`/unit/${activeUnitNum}/flashcards?subject=${selectedSubject}`}
+                className="block bg-gradient-to-br from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white border-4 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 p-8"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-3xl font-black mb-2">🎯 Ultimate Unit Shuffle</h2>
+                    <p className="text-lg font-semibold text-indigo-100 mb-4">
+                      All {shuffledCards.length} flashcards from Unit {activeUnitNum} shuffled together
                     </p>
-                    <div className="text-xs font-semibold text-blue-600 mt-auto flex items-center gap-1">
-                      Start →
+                    <div className="flex gap-4 text-sm">
+                      <span className="bg-white/20 px-3 py-1 rounded-full font-semibold">
+                        {listCount} List
+                      </span>
+                      <span className="bg-white/20 px-3 py-1 rounded-full font-semibold">
+                        {rapidFireCount} Rapid Fire
+                      </span>
+                      <span className="bg-white/20 px-3 py-1 rounded-full font-semibold">
+                        {graphCount} Graph
+                      </span>
                     </div>
-                  </button>
-                ))}
-              </div>
+                  </div>
+                  <ArrowRight className="w-8 h-8 flex-shrink-0" />
+                </div>
+              </Link>
             </div>
           );
         })()}
@@ -1981,6 +1955,26 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                           );
                         })()}
                       </div>
+
+                      {/* Deep Dive Button - After lesson content */}
+                      {activeUnitNum === 1 && subjectFilter === 'ap_macroeconomics' && lessonId === '1.2' && (
+                        <Link
+                          href="/unit-1/ppc-deep-dive"
+                          className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
+                        >
+                          Deep Dive into Production Possibilities Curve
+                          <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {activeUnitNum === 1 && subjectFilter === 'ap_macroeconomics' && lessonId === '1.3' && (
+                        <Link
+                          href="/unit-1/comparative-advantage-deep-dive"
+                          className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
+                        >
+                          Deep Dive into Absolute and Comparative Advantage
+                          <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
 
                       {/* First Checkpoint - After midpoint lesson */}
                       {isMidpoint && firstHalfCheckpoints.length > 0 && (
