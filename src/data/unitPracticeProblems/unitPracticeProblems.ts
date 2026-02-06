@@ -1538,6 +1538,266 @@ const macroUnit2Questions = [
     "correctAnswer": "C",
     "explanation": "If the Labor Force is 1,000 and 900 are employed, then the number of unemployed is 1,000 - 900 = 100. \nUnemployment Rate = (100 / 1,000) * 100 = 10%.",
     "videoExplanation": null
+  },
+  {
+    "id": 3060,
+    "unit": 2,
+    "lessonIDS": ["2.1"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "Based on the data in the table below, what is the Gross Domestic Product (GDP) for the economy?",
+    "image": null,
+    "tableData": {
+      "headers": ["Component", "Value (in billions)"],
+      "rows": [
+        ["Consumption", "$3,000"],
+        ["Government Spending", "$1,000"],
+        ["Wages", "$2,500"],
+        ["Gross Private Investment", "$700"],
+        ["Exports", "$500"],
+        ["Imports", "$700"]
+      ]
+    },
+    "options": [
+      "$4,500 billion",
+      "$5,000 billion",
+      "$5,900 billion",
+      "$6,500 billion",
+      "$7,000 billion"
+    ],
+    "correctAnswer": "A",
+    "explanation": "Using the Expenditure Approach (GDP = C + I + G + (X - M)): GDP = $3,000 (C) + $700 (I) + $1,000 (G) + ($500 - $700) (Net Exports). GDP = $4,700 - $200 = $4,500 billion. Wages are part of the Income Approach and are not added here.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3061,
+    "unit": 2,
+    "lessonIDS": ["2.6"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "The table below shows the production and prices for an economy that only produces cheese and wine. What is the Nominal GDP in Year 2?",
+    "image": null,
+    "tableData": {
+      "headers": ["Product", "Year 1 Quantity", "Year 1 Price", "Year 2 Quantity", "Year 2 Price"],
+      "rows": [
+        ["Cheese", "100", "$4.00", "120", "$5.00"],
+        ["Wine", "50", "$10.00", "60", "$12.00"]
+      ]
+    },
+    "options": [
+      "$900",
+      "$1,100",
+      "$1,320",
+      "$1,440",
+      "$1,080"
+    ],
+    "correctAnswer": "C",
+    "explanation": "Nominal GDP is calculated using current year quantities and current year prices. Nominal GDP (Year 2) = (120 cheese * $5.00) + (60 wine * $12.00) = $600 + $720 = $1,320.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3062,
+    "unit": 2,
+    "lessonIDS": ["2.6"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "Using the same table below, assuming Year 1 is the base year, what is the Real GDP in Year 2?",
+    "image": null,
+    "tableData": {
+      "headers": ["Product", "Year 1 Quantity", "Year 1 Price", "Year 2 Quantity", "Year 2 Price"],
+      "rows": [
+        ["Cheese", "100", "$4.00", "120", "$5.00"],
+        ["Wine", "50", "$10.00", "60", "$12.00"]
+      ]
+    },
+    "options": [
+      "$900",
+      "$1,080",
+      "$1,320",
+      "$1,100",
+      "$1,200"
+    ],
+    "correctAnswer": "B",
+    "explanation": "Real GDP is calculated using current year quantities and Base Year prices. Real GDP (Year 2) = (120 cheese * $4.00) + (60 wine * $10.00) = $480 + $600 = $1,080.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3063,
+    "unit": 2,
+    "lessonIDS": ["2.3"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "Based on the labor market data below, what is the unemployment rate?",
+    "image": null,
+    "tableData": {
+      "headers": ["Category", "Number of People (in millions)"],
+      "rows": [
+        ["Total Population", "200"],
+        ["Employed", "114"],
+        ["Unemployed", "6"],
+        ["Not in Labor Force", "80"]
+      ]
+    },
+    "options": [
+      "3.0%",
+      "5.0%",
+      "5.26%",
+      "30.0%",
+      "40.0%"
+    ],
+    "correctAnswer": "B",
+    "explanation": "First, calculate the Labor Force: Employed + Unemployed = 114 + 6 = 120 million. Unemployment Rate = (Unemployed / Labor Force) * 100. Rate = (6 / 120) * 100 = 0.05 * 100 = 5.0%.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3064,
+    "unit": 2,
+    "lessonIDS": ["2.3"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "Using the table below, what is the Labor Force Participation Rate?",
+    "image": null,
+    "tableData": {
+      "headers": ["Category", "Number of People (in millions)"],
+      "rows": [
+        ["Civilian Adult Population", "250"],
+        ["Employed", "145"],
+        ["Unemployed", "5"],
+        ["Discouraged Workers", "2"]
+      ]
+    },
+    "options": [
+      "58.0%",
+      "60.0%",
+      "60.8%",
+      "2.0%",
+      "96.6%"
+    ],
+    "correctAnswer": "B",
+    "explanation": "Labor Force = Employed (145) + Unemployed (5) = 150 million. (Discouraged workers are not in the labor force). Participation Rate = (Labor Force / Adult Population) * 100. Rate = (150 / 250) * 100 = 0.6 * 100 = 60.0%.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3065,
+    "unit": 2,
+    "lessonIDS": ["2.4"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "A specific market basket contains 10 units of Good A and 5 units of Good B. Based on the price data below, what is the cost of the market basket in Year 2?",
+    "image": null,
+    "tableData": {
+      "headers": ["Product", "Year 1 Price (Base)", "Year 2 Price"],
+      "rows": [
+        ["Good A", "$2.00", "$2.50"],
+        ["Good B", "$4.00", "$5.00"]
+      ]
+    },
+    "options": [
+      "$40",
+      "$45",
+      "$50",
+      "$55",
+      "$60"
+    ],
+    "correctAnswer": "C",
+    "explanation": "Cost = (Quantity A * Price A) + (Quantity B * Price B). Year 2 Cost = (10 * $2.50) + (5 * $5.00) = $25 + $25 = $50.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3066,
+    "unit": 2,
+    "lessonIDS": ["2.4"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "Using the table below, if Year 1 is the base year, what is the Consumer Price Index (CPI) for Year 2?",
+    "image": null,
+    "tableData": {
+      "headers": ["Year", "Cost of Market Basket"],
+      "rows": [
+        ["Year 1", "$400"],
+        ["Year 2", "$500"],
+        ["Year 3", "$550"]
+      ]
+    },
+    "options": [
+      "80",
+      "100",
+      "120",
+      "125",
+      "150"
+    ],
+    "correctAnswer": "D",
+    "explanation": "CPI = (Cost of Basket in Current Year / Cost of Basket in Base Year) * 100. CPI = ($500 / $400) * 100 = 1.25 * 100 = 125.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3067,
+    "unit": 2,
+    "lessonIDS": ["2.4"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "Based on the CPI data in the table, what was the inflation rate between Year 2 and Year 3?",
+    "image": null,
+    "tableData": {
+      "headers": ["Year", "CPI"],
+      "rows": [
+        ["Year 1", "100"],
+        ["Year 2", "120"],
+        ["Year 3", "150"]
+      ]
+    },
+    "options": [
+      "20%",
+      "25%",
+      "30%",
+      "50%",
+      "150%"
+    ],
+    "correctAnswer": "B",
+    "explanation": "Inflation Rate = ((CPI Year 3 - CPI Year 2) / CPI Year 2) * 100. Rate = ((150 - 120) / 120) * 100 = (30 / 120) * 100 = 0.25 * 100 = 25%.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3068,
+    "unit": 2,
+    "lessonIDS": ["2.6"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "Using the GDP data below, what is the GDP Deflator for Year 2?",
+    "image": null,
+    "tableData": {
+      "headers": ["Year", "Nominal GDP", "Real GDP"],
+      "rows": [
+        ["Year 1", "$100 billion", "$100 billion"],
+        ["Year 2", "$150 billion", "$120 billion"]
+      ]
+    },
+    "options": [
+      "80",
+      "120",
+      "125",
+      "130",
+      "150"
+    ],
+    "correctAnswer": "C",
+    "explanation": "GDP Deflator = (Nominal GDP / Real GDP) * 100. Deflator = ($150 / $120) * 100 = 1.25 * 100 = 125.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3069,
+    "unit": 2,
+    "lessonIDS": ["2.5"],
+    "unitName": "Economic Indicators and the Business Cycle",
+    "question": "Based on the wage and price data below, what happened to the real wage between Year 1 and Year 2?",
+    "image": null,
+    "tableData": {
+      "headers": ["Year", "Nominal Hourly Wage", "CPI"],
+      "rows": [
+        ["Year 1", "$20.00", "100"],
+        ["Year 2", "$22.00", "110"]
+      ]
+    },
+    "options": [
+      "It increased by $2.00.",
+      "It increased by 10%.",
+      "It decreased by 10%.",
+      "It remained constant.",
+      "It cannot be determined."
+    ],
+    "correctAnswer": "D",
+    "explanation": "To compare purchasing power, calculate the Real Wage for Year 2 in Year 1 dollars: Real Wage = (Nominal Wage / CPI) * 100. Year 2 Real Wage = ($22 / 110) * 100 = 0.2 * 100 = $20.00. Since the real wage was $20.00 in Year 1 and is $20.00 in Year 2, purchasing power remained constant.",
+    "videoExplanation": null
   }
 ]
 

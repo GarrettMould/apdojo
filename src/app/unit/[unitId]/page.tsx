@@ -26,10 +26,15 @@ import { dojoIcon } from '@/data/imagePaths';
 import { motion, AnimatePresence } from 'framer-motion';
 import { dojoDrills, drillAppliesToSubject, getDrillUnitForSubject } from '@/data/dojoDrills';
 import { getFlashcardsForLesson, UnitFlashcardData } from '@/data/unitFlashcards';
+import { StudyModeModal } from '@/components/StudyModeModal';
+import { getDeepDiveUrl } from '@/lib/routes';
 import { saveQuizResult } from '@/lib/quizHistory';
 import { hasValidSeasonPass, getUnitMCQTestUrl } from '@/lib/utils';
 import { Footer } from '@/components/Footer';
 import { pdfCheatSheets } from '@/data/pdfCheatSheets';
+
+// Set to true to show Deep Dive buttons and Ultimate Unit Shuffle on unit cheat sheet
+const SHOW_DEEP_DIVE_AND_SHUFFLE = false;
 
 // Helper to combine and structure whiteboard data for Macro
 const getUnitWhiteboards = (unitNumber: number): WhiteboardImage[] => {
@@ -587,6 +592,8 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
   const [quizError, setQuizError] = useState<string | null>(null);
   const [showExplanations, setShowExplanations] = useState<Set<number>>(new Set());
   const [showJoinDojoModal, setShowJoinDojoModal] = useState(false);
+  const [shuffleModalOpen, setShuffleModalOpen] = useState(false);
+  const [shuffledDeck, setShuffledDeck] = useState<UnitFlashcardData[]>([]);
 
   // Check if user is a pro customer (has season pass)
   const isProCustomer = useMemo(() => {
@@ -1600,7 +1607,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
         })()}
 
         {/* Ultimate Unit Shuffle Card */}
-        {(() => {
+        {SHOW_DEEP_DIVE_AND_SHUFFLE && (() => {
           // Get all flashcards for this unit
           const getAllUnitFlashcards = (): UnitFlashcardData[] => {
             if (selectedSubject === 'macro' && activeUnitNum === 1) {
@@ -1619,25 +1626,29 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           const allUnitFlashcards = getAllUnitFlashcards();
           if (allUnitFlashcards.length === 0) return null;
 
-          // Shuffle the cards
-          const shuffledCards = [...allUnitFlashcards].sort(() => Math.random() - 0.5);
+          // Count by type (for display only; shuffle happens on click)
+          const listCount = allUnitFlashcards.filter(c => c.type === 'list').length;
+          const rapidFireCount = allUnitFlashcards.filter(c => c.type === 'rapid-fire').length;
+          const graphCount = allUnitFlashcards.filter(c => c.tag === 'GRAPH').length;
 
-          // Count by type
-          const listCount = shuffledCards.filter(c => c.type === 'list').length;
-          const rapidFireCount = shuffledCards.filter(c => c.type === 'rapid-fire').length;
-          const graphCount = shuffledCards.filter(c => c.tag === 'GRAPH').length;
+          const openShuffleModal = () => {
+            const shuffled = [...allUnitFlashcards].sort(() => Math.random() - 0.5);
+            setShuffledDeck(shuffled);
+            setShuffleModalOpen(true);
+          };
 
           return (
             <div className="mb-8">
-              <Link
-                href={`/unit/${activeUnitNum}/flashcards?subject=${selectedSubject}`}
-                className="block bg-gradient-to-br from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white border-4 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 p-8"
+              <button
+                type="button"
+                onClick={openShuffleModal}
+                className="w-full block text-left bg-gradient-to-br from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white border-4 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 p-8 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600"
               >
                 <div className="flex items-center justify-between">
                   <div>
                     <h2 className="text-3xl font-black mb-2">🎯 Ultimate Unit Shuffle</h2>
                     <p className="text-lg font-semibold text-indigo-100 mb-4">
-                      All {shuffledCards.length} flashcards from Unit {activeUnitNum} shuffled together
+                      All {allUnitFlashcards.length} flashcards from Unit {activeUnitNum} shuffled together
                     </p>
                     <div className="flex gap-4 text-sm">
                       <span className="bg-white/20 px-3 py-1 rounded-full font-semibold">
@@ -1653,7 +1664,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                   </div>
                   <ArrowRight className="w-8 h-8 flex-shrink-0" />
                 </div>
-              </Link>
+              </button>
             </div>
           );
         })()}
@@ -1956,22 +1967,31 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                         })()}
                       </div>
 
-                      {/* Deep Dive Button - After lesson content */}
-                      {activeUnitNum === 1 && subjectFilter === 'ap_macroeconomics' && lessonId === '1.2' && (
+                      {/* Deep Dive Button - After lesson content (dynamic route) */}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 1 && subjectFilter === 'ap_macroeconomics' && lessonId === '1.2' && (
                         <Link
-                          href="/unit-1/ppc-deep-dive"
+                          href={getDeepDiveUrl('ap-macro', '1', 'production-possibilities-curve')}
                           className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
                         >
                           Deep Dive into Production Possibilities Curve
                           <ArrowRight className="w-5 h-5" />
                         </Link>
                       )}
-                      {activeUnitNum === 1 && subjectFilter === 'ap_macroeconomics' && lessonId === '1.3' && (
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 1 && subjectFilter === 'ap_macroeconomics' && lessonId === '1.3' && (
                         <Link
-                          href="/unit-1/comparative-advantage-deep-dive"
+                          href={getDeepDiveUrl('ap-macro', '1', 'comparative-advantage')}
                           className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
                         >
                           Deep Dive into Absolute and Comparative Advantage
+                          <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 1 && subjectFilter === 'ap_macroeconomics' && lessonId === '1.6' && (
+                        <Link
+                          href={getDeepDiveUrl('ap-macro', '1', 'market-equilibrium')}
+                          className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
+                        >
+                          Deep Dive into Supply &amp; Demand (Market Equilibrium)
                           <ArrowRight className="w-5 h-5" />
                         </Link>
                       )}
@@ -3389,6 +3409,13 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           />
         )}
       </AnimatePresence>
+
+      {/* Ultimate Shuffle: same Study Mode modal as deep dive pages, mixed deck randomized */}
+      <StudyModeModal
+        open={shuffleModalOpen}
+        onClose={() => setShuffleModalOpen(false)}
+        deck={shuffledDeck}
+      />
     </>
   );
 } 

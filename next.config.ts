@@ -157,6 +157,18 @@ const nextConfig = {
       permanent: true, // 301 redirect for SEO
     });
 
+    // Redirect old unit-1 deep dive pages to new dynamic URLs (when you enable deep dives)
+    redirects.push({
+      source: '/unit-1/ppc-deep-dive',
+      destination: '/ap-macro/unit-1/production-possibilities-curve',
+      permanent: true,
+    });
+    redirects.push({
+      source: '/unit-1/comparative-advantage-deep-dive',
+      destination: '/ap-macro/unit-1/comparative-advantage',
+      permanent: true,
+    });
+
     // Redirect old graph gym URLs (monopoly-graphing-practice) to new format
     // This is handled dynamically in the [slug]/page.tsx for better flexibility
 

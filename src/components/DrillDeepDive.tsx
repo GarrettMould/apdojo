@@ -5,7 +5,7 @@ import { dojoDrills, DojoDrill } from '@/data/dojoDrills';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, CheckCircle2, XCircle, CheckCircle, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, XCircle, CheckCircle, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import DraggableGraph from './DraggableGraph';
 import { DojoTable } from './DojoTable';
@@ -16,6 +16,7 @@ import { PPCDrill } from './PPCDrill';
 import { DemandChangeDrill, DemandChangeScenario } from './DemandChangeDrill';
 import { ElasticityRevenueDrill, ElasticityScenario } from './ElasticityRevenueDrill';
 import { ConsumerProducerSurplusDrill } from './ConsumerProducerSurplusDrill';
+import { StudyModeModal } from './StudyModeModal';
 
 export interface InstantAnswerKeyTerm {
   term: string;
@@ -116,41 +117,6 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonPills, in
     setWarmUpIndex(idx >= 0 ? idx : 0);
     setWarmUpModalOpen(true);
   };
-  const currentWarmUpCard = warmUpDeck[warmUpIndex];
-  const canPrevWarmUp = warmUpIndex > 0;
-  const canNextWarmUp = warmUpIndex < warmUpDeck.length - 1;
-  const goPrevWarmUp = () => setWarmUpIndex((i) => Math.max(0, i - 1));
-  const goNextWarmUp = () => {
-    if (warmUpIndex < warmUpDeck.length - 1) setWarmUpIndex((i) => i + 1);
-    else setWarmUpModalOpen(false);
-  };
-
-  // Flip state for the active card in study modal; reset when changing cards
-  const [warmUpCardFlipped, setWarmUpCardFlipped] = useState(false);
-  useEffect(() => {
-    if (warmUpModalOpen) setWarmUpCardFlipped(false);
-  }, [warmUpModalOpen, warmUpIndex]);
-
-  // Keyboard: Space = flip, ArrowRight = next, ArrowLeft = prev, Escape = close
-  useEffect(() => {
-    if (!warmUpModalOpen) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setWarmUpModalOpen(false);
-      else if (e.key === ' ') {
-        e.preventDefault();
-        setWarmUpCardFlipped((f) => !f);
-      } else if (e.key === 'ArrowRight') {
-        e.preventDefault();
-        if (warmUpIndex >= warmUpDeck.length - 1) setWarmUpModalOpen(false);
-        else setWarmUpIndex((i) => i + 1);
-      } else if (e.key === 'ArrowLeft') {
-        e.preventDefault();
-        setWarmUpIndex((i) => Math.max(0, i - 1));
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [warmUpModalOpen, warmUpIndex, warmUpDeck.length]);
 
   // State for interactive drill completion
   const [ppcLevel, setPpcLevel] = useState<1 | 2>(1);
@@ -348,137 +314,13 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonPills, in
           </section>
         )}
 
-        {/* Study Mode overlay: immersive flashcard modal */}
-        <AnimatePresence>
-          {warmUpModalOpen && currentWarmUpCard && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 bg-slate-950/95 backdrop-blur-md"
-              onClick={() => setWarmUpModalOpen(false)}
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="warmup-modal-title"
-            >
-              {/* Progress bar at top */}
-              <div className="absolute top-0 left-0 right-0 h-1 bg-slate-800">
-                <motion.div
-                  className="h-full bg-white"
-                  initial={false}
-                  animate={{ width: `${((warmUpIndex + 1) / warmUpDeck.length) * 100}%` }}
-                  transition={{ duration: 0.25 }}
-                />
-              </div>
-              <div className="absolute top-4 left-4 text-sm font-medium text-slate-400">
-                Card {warmUpIndex + 1} of {warmUpDeck.length}
-              </div>
-
-              {/* Close (X) top right */}
-              <button
-                type="button"
-                onClick={() => setWarmUpModalOpen(false)}
-                className="absolute top-4 right-4 p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/50 transition-colors z-10"
-                aria-label="Close"
-              >
-                <X className="w-6 h-6" />
-              </button>
-
-              {/* Center: card + side arrows (clickable area stops propagation) */}
-              <div
-                className="flex items-center justify-center gap-4 w-full max-w-5xl"
-                onClick={(e) => e.stopPropagation()}
-              >
-                {/* Left arrow */}
-                <button
-                  type="button"
-                  onClick={goPrevWarmUp}
-                  disabled={!canPrevWarmUp}
-                  className="flex-shrink-0 p-4 rounded-full text-slate-400 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent focus:outline-none focus:ring-2 focus:ring-white/50 transition-colors"
-                  aria-label="Previous card"
-                >
-                  <ChevronLeft className="w-10 h-10" />
-                </button>
-
-                {/* Card container: max-w-2xl, aspect-[3/2], 3D flip */}
-                <div className="w-full max-w-2xl flex-1 min-w-0">
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={warmUpIndex}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -20 }}
-                      transition={{ duration: 0.2 }}
-                      className="w-full aspect-[3/2] cursor-pointer"
-                      style={{ perspective: '1200px' }}
-                      onClick={() => setWarmUpCardFlipped((f) => !f)}
-                    >
-                      <div
-                        className="relative w-full h-full transition-transform duration-500 ease-in-out"
-                        style={{
-                          transformStyle: 'preserve-3d',
-                          transform: warmUpCardFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
-                        }}
-                      >
-                        {/* Front: white, huge text, tag badge top-right */}
-                        <div
-                          className="absolute inset-0 rounded-2xl bg-white border-2 border-slate-200 shadow-2xl flex flex-col items-center justify-center p-8"
-                          style={{
-                            backfaceVisibility: 'hidden',
-                            WebkitBackfaceVisibility: 'hidden',
-                          }}
-                        >
-                          <span
-                            className={`absolute top-4 right-4 px-3 py-1 rounded-lg text-xs font-bold ${getFlashcardTagClass(currentWarmUpCard.tag)}`}
-                          >
-                            {currentWarmUpCard.tag}
-                          </span>
-                          <p
-                            id="warmup-modal-title"
-                            className="text-3xl font-bold text-center text-slate-900 leading-snug px-4"
-                          >
-                            {currentWarmUpCard.front}
-                          </p>
-                          <span className="mt-6 text-sm text-slate-500">Space or click to flip</span>
-                        </div>
-                        {/* Back: slate-50 */}
-                        <div
-                          className="absolute inset-0 rounded-2xl bg-slate-50 border-2 border-slate-200 shadow-2xl flex flex-col p-8 overflow-y-auto"
-                          style={{
-                            backfaceVisibility: 'hidden',
-                            WebkitBackfaceVisibility: 'hidden',
-                            transform: 'rotateY(180deg)',
-                          }}
-                        >
-                          <span
-                            className={`self-end mb-4 px-3 py-1 rounded-lg text-xs font-bold ${getFlashcardTagClass(currentWarmUpCard.tag)}`}
-                          >
-                            {currentWarmUpCard.tag}
-                          </span>
-                          <div className="text-lg text-slate-800 leading-relaxed flex-1">
-                            {currentWarmUpCard.back}
-                          </div>
-                          <span className="mt-4 text-sm text-slate-500">Space or click to flip back</span>
-                        </div>
-                      </div>
-                    </motion.div>
-                  </AnimatePresence>
-                </div>
-
-                {/* Right arrow */}
-                <button
-                  type="button"
-                  onClick={goNextWarmUp}
-                  className="flex-shrink-0 p-4 rounded-full text-slate-400 hover:text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/50 transition-colors"
-                  aria-label={canNextWarmUp ? 'Next card' : 'Done'}
-                >
-                  <ChevronRight className="w-10 h-10" />
-                </button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Study Mode overlay: shared modal */}
+        <StudyModeModal
+          open={warmUpModalOpen && warmUpDeck.length > 0}
+          onClose={() => setWarmUpModalOpen(false)}
+          deck={warmUpDeck}
+          initialIndex={warmUpIndex}
+        />
 
         {/* Stage 1: Video + Comprehension Check */}
         <section className="mb-16">
@@ -683,6 +525,58 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonPills, in
                       </div>
                     </div>
                     <p className="text-lg text-black mb-6 font-medium leading-relaxed">{question.question}</p>
+                    {question.tableData && (
+                      <div className="my-6 overflow-x-auto">
+                        <div className="flex items-center gap-4">
+                          {question.tableData.playerNames && (
+                            <div className="flex items-center justify-center h-full w-16 flex-shrink-0">
+                              <p className="transform -rotate-90 whitespace-nowrap text-center font-bold text-lg text-gray-900 leading-tight">
+                                {question.tableData.playerNames.row.split(' ')[0]}
+                                <br />
+                                {question.tableData.playerNames.row.split(' ').slice(1).join(' ')}
+                              </p>
+                            </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <table className="min-w-full border-collapse border-2 border-black">
+                              <thead className="bg-gray-100">
+                                <tr>
+                                  {question.tableData.headers.map((header: string) => (
+                                    <th key={header} className="border border-black px-4 py-3 text-center text-base font-bold text-gray-900">
+                                      {header}
+                                    </th>
+                                  ))}
+                                </tr>
+                              </thead>
+                              <tbody className="bg-white">
+                                {question.tableData.rows.map((row: string[], rowIndex: number) => (
+                                  <tr key={rowIndex}>
+                                    {row.map((cell: string, cellIndex: number) => {
+                                      const isRowHeader = question.tableData?.rowHeaders && cellIndex === 0;
+                                      return (
+                                        <td
+                                          key={cellIndex}
+                                          className={`border border-black px-4 py-3 text-center text-base ${isRowHeader ? 'font-bold bg-gray-50' : ''}`}
+                                        >
+                                          {cell}
+                                        </td>
+                                      );
+                                    })}
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                          {question.tableData.playerNames && (
+                            <div className="flex items-center justify-center h-full w-16 flex-shrink-0">
+                              <p className="transform -rotate-90 whitespace-nowrap text-center font-bold text-lg text-gray-900 leading-tight">
+                                {question.tableData.playerNames.column}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
                     {question.image && (
                       <div className="my-6">
                         <Image
