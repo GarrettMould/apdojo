@@ -6,6 +6,8 @@ import { GraphGym } from '@/components/GraphGym';
 import { Loader2 } from 'lucide-react';
 import { getScenarioBySlug, getSlugForScenario } from '@/lib/graphGymSlugs';
 import { getLessonData } from '@/data/lessonRegistry';
+import { getVideosForLessonId } from '@/data/videosByLessonId';
+import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { DrillDeepDive } from '@/components/DrillDeepDive';
 
 /** Key Takeaways for PPC deep dive (same as old page). */
@@ -94,15 +96,72 @@ function SlugPageContent() {
     return getLessonData(slug, unitId, lessonSlug!);
   }, [isDeepDive, rest, slug]);
 
+  // Cheat sheet video for this lesson (same source as unit hub); show on deep dive when lesson has no drill video
+  const fallbackVideo = useMemo(() => {
+    if (!lesson) return null;
+    const subjectForVideos = slug === 'ap-macro' ? 'AP Macroeconomics' : 'AP Microeconomics';
+    const lessonVideos = getVideosForLessonId(lesson.id).filter((video) => {
+      if (!video.subjects.includes(subjectForVideos)) return false;
+      if (slug === 'ap-micro' && lesson.id === '1.3') {
+        const isCompAdv = video.title.toLowerCase().includes('comparative advantage') || video.tags.some(t => t.toLowerCase().includes('comparative advantage'));
+        if (isCompAdv) return false;
+      }
+      if (slug === 'ap-macro' && lesson.id === '1.4') {
+        const isCompAdv = video.title.toLowerCase().includes('comparative advantage') || video.tags.some(t => t.toLowerCase().includes('comparative advantage'));
+        if (isCompAdv) return false;
+      }
+      return true;
+    });
+    const first = lessonVideos[0];
+    return first
+      ? {
+          videoUrl: first.videoUrl,
+          title: first.title,
+          questions: first.questions?.length
+            ? first.questions.map((q) => ({
+                id: q.id,
+                text: q.text,
+                options: q.options,
+                correctAnswer: q.correctAnswer,
+                explanation: q.explanation,
+              }))
+            : undefined,
+        }
+      : null;
+  }, [lesson, slug]);
+
+  // 3 MCQs per lesson from unitPracticeProblems for Unit 1 & 2 macro deep dives
+  const lessonMcqQuestions = useMemo(() => {
+    if (!lesson || slug !== 'ap-macro') return undefined;
+    const unitId = rest?.[0]?.replace(/^unit-/, '');
+    const unitNum = unitId === '1' ? 1 : unitId === '2' ? 2 : null;
+    if (unitNum == null) return undefined;
+    const matching = allQuestions.filter(
+      (q) =>
+        q.unit === unitNum &&
+        q.subject === 'ap_macroeconomics' &&
+        q.lessonIDS?.includes(lesson.id)
+    );
+    return matching.slice(0, 3).map((q) => ({
+      id: q.id,
+      question: q.question,
+      options: q.options,
+      correctAnswer: q.correctAnswer,
+      explanation: q.explanation,
+      image: q.image ?? null,
+      tableData: q.tableData,
+    }));
+  }, [lesson, slug, rest]);
+
   useEffect(() => {
     if (!isDeepDive) return;
-    if (lesson == null || lesson.drillId == null) {
+    if (lesson == null) {
       router.replace('/404');
     }
   }, [isDeepDive, lesson, router]);
 
   if (isDeepDive) {
-    if (lesson == null || lesson.drillId == null) {
+    if (lesson == null) {
       return (
         <div className="h-screen w-screen flex items-center justify-center bg-gray-50">
           <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
@@ -121,9 +180,13 @@ function SlugPageContent() {
         drillId={lesson.drillId}
         backLink={backLink}
         backLinkText={backLinkText}
+        lessonTitle={lesson.title}
         lessonPills={lessonPills}
         flashcards={lesson.flashcards}
+        instantAnswer={lesson.instantAnswer}
         keyTakeaways={lesson.content ?? <PPCKeyTakeaways />}
+        fallbackVideo={fallbackVideo}
+        lessonMcqQuestions={lessonMcqQuestions}
       />
     );
   }

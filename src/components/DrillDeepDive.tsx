@@ -29,12 +29,17 @@ export interface FlashcardData {
   tag: string; // e.g. "GRAPH", "RULE"
   front: string;
   back: React.ReactNode;
+  /** Optional image URL shown on the back of the card (e.g. for GRAPH cards). */
+  backImage?: string;
 }
 
 interface DrillDeepDiveProps {
-  drillId: string;
+  /** Dojo drill id; null for review-only lessons (no video, interactive, or MCQ). */
+  drillId: string | null;
   backLink: string;
   backLinkText: string;
+  /** When drillId is null, used as the page title. */
+  lessonTitle?: string;
   /** Pills showing subject and lesson ID (e.g. "AP Macro - 1.2"). When set, replaces the description paragraph. */
   lessonPills?: { label: string }[];
   /** Optional instant answer at top: short blurb + key term cards */
@@ -46,6 +51,22 @@ interface DrillDeepDiveProps {
   flashcards?: FlashcardData[];
   stage2Content?: React.ReactNode; // Optional custom content for stage 2 (above interactive drill)
   keyTakeaways?: React.ReactNode; // Optional custom key takeaways section
+  /** When lesson has no drill video (e.g. review-only), show this video from the unit cheat sheet directory. */
+  fallbackVideo?: {
+    videoUrl: string;
+    title: string;
+    questions?: Array<{ id: string; text: string; options: string[]; correctAnswer: number; explanation?: string }>;
+  } | null;
+  /** Optional 3 MCQs per lesson from unitPracticeProblems (used for Unit 1 deep dives). */
+  lessonMcqQuestions?: Array<{
+    id: number;
+    question: string;
+    options: string[];
+    correctAnswer: string;
+    explanation?: string;
+    image?: { src: string; alt: string } | null;
+    tableData?: { headers: string[]; rows: string[][] };
+  }>;
 }
 
 /** Tag badge colors for flashcard front */
@@ -84,26 +105,21 @@ function WarmUpEntryCard({ card, onOpen }: { card: FlashcardData; onOpen: () => 
   );
 }
 
-export function DrillDeepDive({ drillId, backLink, backLinkText, lessonPills, instantAnswer, flashcards, stage2Content, keyTakeaways }: DrillDeepDiveProps) {
+export function DrillDeepDive({ drillId, backLink, backLinkText, lessonTitle, lessonPills, instantAnswer, flashcards, stage2Content, keyTakeaways, fallbackVideo, lessonMcqQuestions }: DrillDeepDiveProps) {
   // State for comprehension questions (one at a time below video)
   const [compAnswers, setCompAnswers] = useState<Record<string, number | null>>({});
   const [compSubmitted, setCompSubmitted] = useState<Record<string, boolean>>({});
   const [currentCompQuestionIndex, setCurrentCompQuestionIndex] = useState(0);
 
+  // State for fallback video comprehension questions
+  const [fallbackCompAnswers, setFallbackCompAnswers] = useState<Record<string, number | null>>({});
+  const [fallbackCompSubmitted, setFallbackCompSubmitted] = useState<Record<string, boolean>>({});
+  const [currentFallbackCompIndex, setCurrentFallbackCompIndex] = useState(0);
+
   // State for MCQ questions (one at a time)
   const [mcqAnswers, setMcqAnswers] = useState<Record<number, number | null>>({});
   const [mcqSubmitted, setMcqSubmitted] = useState<Record<number, boolean>>({});
   const [currentMcqQuestionIndex, setCurrentMcqQuestionIndex] = useState(0);
-
-  const [flippedKeyTermIndices, setFlippedKeyTermIndices] = useState<Set<number>>(new Set());
-  const toggleKeyTermFlip = (idx: number) => {
-    setFlippedKeyTermIndices((prev) => {
-      const next = new Set(prev);
-      if (next.has(idx)) next.delete(idx);
-      else next.add(idx);
-      return next;
-    });
-  };
 
   // Warm-up modal: show back of one card at a time; navigate through deck of same type
   const [warmUpModalOpen, setWarmUpModalOpen] = useState(false);
@@ -122,27 +138,40 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonPills, in
   const [ppcLevel, setPpcLevel] = useState<1 | 2>(1);
   const [level1Ready, setLevel1Ready] = useState(false);
 
-  const drill = dojoDrills[drillId];
+  const drill = drillId ? dojoDrills[drillId] : null;
+  const isReviewOnly = !drillId || !drill;
 
-  if (!drill) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>Drill not found</p>
-      </div>
-    );
-  }
-
-  // Get MCQ questions for stage 3
-  const subjectFilter = drill.subject === 'ap_macroeconomics' ? 'ap_macroeconomics' : 'ap_microeconomics';
-  const mcqQuestions = drill.stage3.mcqIds
-    .map(id => allQuestions.find(q => q.id === id && q.subject === subjectFilter))
-    .filter((q): q is typeof allQuestions[0] => q !== undefined);
+  // Get MCQ questions for stage 3: use lessonMcqQuestions when provided (e.g. 3 per lesson from unitPracticeProblems), else from drill
+  const subjectFilter = drill ? (drill.subject === 'ap_macroeconomics' ? 'ap_macroeconomics' : 'ap_microeconomics') : 'ap_macroeconomics';
+  const drillMcqQuestions = drill
+    ? drill.stage3.mcqIds
+        .map(id => allQuestions.find(q => q.id === id && q.subject === subjectFilter))
+        .filter((q): q is typeof allQuestions[0] => q !== undefined)
+    : [];
+  const mcqQuestions = lessonMcqQuestions?.length
+    ? lessonMcqQuestions.map(q => ({
+        id: q.id,
+        question: q.question,
+        options: q.options,
+        correctAnswer: q.correctAnswer,
+        explanation: q.explanation,
+        image: q.image ?? null,
+        tableData: q.tableData,
+      }))
+    : drillMcqQuestions;
 
   const handleCompAnswer = (questionId: string, answerIndex: number) => {
     if (compSubmitted[questionId]) return;
     setCompAnswers(prev => ({ ...prev, [questionId]: answerIndex }));
     setCompSubmitted(prev => ({ ...prev, [questionId]: true }));
     setCurrentCompQuestionIndex(prev => prev + 1);
+  };
+
+  const handleFallbackCompAnswer = (questionId: string, answerIndex: number) => {
+    if (fallbackCompSubmitted[questionId]) return;
+    setFallbackCompAnswers(prev => ({ ...prev, [questionId]: answerIndex }));
+    setFallbackCompSubmitted(prev => ({ ...prev, [questionId]: true }));
+    setCurrentFallbackCompIndex(prev => prev + 1);
   };
 
   const handleMcqAnswer = (questionId: number, answerIndex: number) => {
@@ -160,6 +189,11 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonPills, in
   };
 
   const getLetter = (index: number) => String.fromCharCode(65 + index);
+
+  const isCorrectMcqAnswer = (question: { correctAnswer: string | number }, optIndex: number) =>
+    typeof question.correctAnswer === 'string'
+      ? getLetter(optIndex) === question.correctAnswer
+      : optIndex === question.correctAnswer;
 
   // Handler for interactive drill completion (no-op for deep-dive pages)
   const handleDrillComplete = () => {
@@ -225,7 +259,7 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonPills, in
           </Link>
           
           <h1 className="text-5xl sm:text-6xl md:text-7xl font-black text-black mb-6 leading-tight">
-            {drill.title}
+            {isReviewOnly ? (lessonTitle ?? 'Lesson Review') : drill!.title}
           </h1>
           {lessonPills && lessonPills.length > 0 ? (
             <div className="flex flex-wrap gap-2">
@@ -238,64 +272,20 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonPills, in
                 </span>
               ))}
             </div>
-          ) : (
+          ) : !isReviewOnly && drill ? (
             <p className="text-xl text-gray-600 max-w-2xl">
               {drill.description}
             </p>
-          )}
+          ) : null}
         </div>
 
-        {/* Instant Answer Section (optional): blog-style blurb + key term flip cards, no container */}
-        {instantAnswer && (
+        {/* Instant Answer blurb (optional): short summary at top, no key terms */}
+        {instantAnswer?.blurb && (
           <section className="mb-16">
-            <div className="bg-gray-50 border-l-4 border-yellow-400 rounded-r-lg px-6 py-4 mb-6">
+            <div className="bg-gray-50 border-l-4 border-yellow-400 rounded-r-lg px-6 py-4">
               <p className="text-lg text-gray-700 leading-relaxed font-bold">
                 {instantAnswer.blurb}
               </p>
-            </div>
-            <h3 className="text-lg font-bold text-black mb-4">Key Terms</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" style={{ perspective: '1000px' }}>
-              {instantAnswer.keyTerms.map((item, idx) => {
-                const isFlipped = flippedKeyTermIndices.has(idx);
-                return (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => toggleKeyTermFlip(idx)}
-                    className="relative h-28 sm:h-32 w-full rounded-lg border-2 border-gray-300 bg-white shadow-sm text-left overflow-hidden hover:border-yellow-400 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2"
-                    style={{ transformStyle: 'preserve-3d' }}
-                    aria-label={isFlipped ? `Definition: ${item.definition}` : `Term: ${item.term}. Click to reveal definition.`}
-                  >
-                    <div
-                      className="relative w-full h-full transition-transform duration-300 ease-in-out"
-                      style={{
-                        transformStyle: 'preserve-3d',
-                        transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
-                      }}
-                    >
-                      {/* Front: term only */}
-                      <div
-                        className="absolute inset-0 flex flex-col items-center justify-center p-4 bg-white rounded-lg"
-                        style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }}
-                      >
-                        <p className="font-bold text-black text-sm sm:text-base line-clamp-3 text-center">{item.term}</p>
-                        <span className="text-xs text-gray-500 mt-2">Click to reveal definition</span>
-                      </div>
-                      {/* Back: definition (visible after flip) */}
-                      <div
-                        className="absolute inset-0 flex items-center justify-center p-4 bg-gray-50 rounded-lg"
-                        style={{
-                          backfaceVisibility: 'hidden',
-                          WebkitBackfaceVisibility: 'hidden',
-                          transform: 'rotateY(180deg)',
-                        }}
-                      >
-                        <p className="text-sm text-gray-700 leading-snug line-clamp-4">{item.definition}</p>
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
             </div>
           </section>
         )}
@@ -322,16 +312,162 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonPills, in
           initialIndex={warmUpIndex}
         />
 
-        {/* Stage 1: Video + Comprehension Check */}
-        <section className="mb-16">
-          <div className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-8 mb-8">
-            <h2 className="text-3xl font-bold text-black mb-4">
-              Understanding {drill.title}
-            </h2>
+        {/* Fallback video from unit cheat sheet (when lesson has no drill video, e.g. review-only) */}
+        {isReviewOnly && fallbackVideo && (
+          <section className="mb-16">
+            <h2 className="text-3xl font-bold text-black mb-2">Video</h2>
             <p className="text-lg text-gray-700 mb-6 leading-relaxed">
-              {drill.description}
+              {fallbackVideo.title}
             </p>
-            
+            <div className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-8 mb-8">
+              <div className="my-8">
+                <video
+                  src={fallbackVideo.videoUrl}
+                  controls
+                  className="w-full aspect-video rounded-lg shadow-md"
+                  preload="metadata"
+                >
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+              {/* Comprehension questions for fallback video (same as unit cheat sheet modal) */}
+              {fallbackVideo.questions && fallbackVideo.questions.length > 0 && (
+                <>
+                  <h3 className="text-3xl font-black text-black mb-4 mt-8">Key Concepts to Understand</h3>
+                  <div className="mt-4">
+                  {currentFallbackCompIndex < fallbackVideo.questions.length ? (
+                    (() => {
+                      const compQuestions = fallbackVideo.questions;
+                      const question = compQuestions[currentFallbackCompIndex];
+                      const selectedAnswer = fallbackCompAnswers[question.id] ?? null;
+                      const showFeedback = fallbackCompSubmitted[question.id] ?? false;
+                      const isCorrect = selectedAnswer === question.correctAnswer;
+                      const isSelected = selectedAnswer !== null;
+                      return (
+                        <div className="bg-white border-4 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-6">
+                          <div className="flex items-center justify-between mb-6 pb-4 border-b-4 border-black">
+                            <h4 className="text-xl font-black text-black">
+                              Question {currentFallbackCompIndex + 1} of {compQuestions.length}
+                            </h4>
+                            <div className="flex items-center gap-2">
+                              {compQuestions.map((q, idx) => (
+                                <div
+                                  key={q.id}
+                                  className={`w-3 h-3 rounded-full border-2 border-black ${
+                                    idx === currentFallbackCompIndex ? 'bg-black' : fallbackCompSubmitted[q.id] ? 'bg-green-400' : 'bg-white'
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                          <p className="text-lg text-black mb-6 font-medium leading-relaxed">{question.text}</p>
+                          <div className="space-y-2 mb-6">
+                            {question.options.map((option, optIndex) => {
+                              const optionLetter = getLetter(optIndex);
+                              const isCorrectAnswer = optIndex === question.correctAnswer;
+                              const isThisSelected = selectedAnswer === optIndex;
+                              let optionStyle = 'bg-white border-gray-300';
+                              if (showFeedback) {
+                                if (isCorrectAnswer) optionStyle = 'bg-green-50 border-green-500';
+                                else if (isThisSelected && !isCorrectAnswer) optionStyle = 'bg-red-50 border-red-500';
+                              } else if (isThisSelected) optionStyle = 'bg-blue-50 border-blue-500';
+                              return (
+                                <motion.div
+                                  key={optIndex}
+                                  initial={false}
+                                  animate={showFeedback && isCorrectAnswer ? { scale: [1, 1.05, 1] } : {}}
+                                  transition={{ duration: 0.3 }}
+                                  className={`p-3 rounded-lg border-2 transition-colors ${optionStyle} ${
+                                    !showFeedback ? 'cursor-pointer hover:bg-blue-50 hover:border-blue-300' : ''
+                                  }`}
+                                  onClick={!showFeedback ? () => handleFallbackCompAnswer(question.id, optIndex) : undefined}
+                                >
+                                  <div className="flex items-center gap-3">
+                                    {!showFeedback ? (
+                                      <>
+                                        <input
+                                          type="radio"
+                                          name={`fallback-comp-${question.id}`}
+                                          value={optionLetter}
+                                          checked={isThisSelected}
+                                          onChange={() => handleFallbackCompAnswer(question.id, optIndex)}
+                                          className="w-5 h-5 text-blue-600 flex-shrink-0"
+                                          onClick={(e) => e.stopPropagation()}
+                                        />
+                                        <span className="flex-1 text-gray-900">{option}</span>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <span
+                                          className={`w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0 ${
+                                            isCorrectAnswer ? 'bg-green-500 text-white' : isThisSelected && !isCorrectAnswer ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-700'
+                                          }`}
+                                        >
+                                          {optionLetter}
+                                        </span>
+                                        <span className="flex-1 text-gray-900">{option}</span>
+                                        {isCorrectAnswer && <CheckCircle2 className="w-6 h-6 text-green-600 flex-shrink-0" />}
+                                        {isThisSelected && !isCorrectAnswer && <XCircle className="w-6 h-6 text-red-600 flex-shrink-0" />}
+                                      </>
+                                    )}
+                                  </div>
+                                </motion.div>
+                              );
+                            })}
+                          </div>
+                          {showFeedback && isSelected && question.explanation && (
+                            <div className="relative mt-6 mb-6">
+                              <div
+                                className={`bg-white border-4 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-6 relative ${isCorrect ? 'border-green-400' : 'border-red-400'}`}
+                              >
+                                <div className="flex items-start gap-3 mb-3">
+                                  {isCorrect ? (
+                                    <>
+                                      <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
+                                      <span className="font-black text-green-900 text-lg">Correct!</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <X className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
+                                      <span className="font-black text-red-900 text-lg">Incorrect</span>
+                                    </>
+                                  )}
+                                </div>
+                                <p className="text-base text-black font-medium leading-relaxed">{question.explanation}</p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()
+                  ) : (
+                    <div className="bg-white border-4 border-green-500 rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-6">
+                      <p className="text-lg font-semibold text-green-800 flex items-center gap-2">
+                        <CheckCircle2 className="w-6 h-6 flex-shrink-0" />
+                        Comprehension check complete
+                      </p>
+                      <p className="text-gray-700 mt-1">
+                        You&apos;ve answered all {fallbackVideo.questions.length} questions. Scroll down to continue.
+                      </p>
+                    </div>
+                  )}
+                  </div>
+                </>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* Stage 1: Video + Comprehension Check (only when drill exists) */}
+        {!isReviewOnly && drill && (
+        <section className="mb-16">
+          <h2 className="text-3xl font-bold text-black mb-2">
+            Understanding {drill.title}
+          </h2>
+          <p className="text-lg text-gray-700 mb-6 leading-relaxed">
+            {drill.description}
+          </p>
+          <div className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-8 mb-8">
             {/* Video */}
             <div className="my-8">
               <video 
@@ -345,10 +481,10 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonPills, in
             </div>
 
             {/* Comprehension Questions — one at a time, blog-style UI */}
-            <div className="mt-8">
-              <h3 className="text-3xl font-black text-black mb-6">
-                Key Concepts to Understand
-              </h3>
+            <h3 className="text-3xl font-black text-black mb-4 mt-8">
+              Key Concepts to Understand
+            </h3>
+            <div className="mt-4">
               {currentCompQuestionIndex < drill.stage1.comprehensionQuestions.length ? (
                 (() => {
                   const compQuestions = drill.stage1.comprehensionQuestions;
@@ -469,13 +605,15 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonPills, in
             </div>
           </div>
         </section>
+        )}
 
-        {/* Stage 2: Interactive Activity */}
+        {/* Stage 2: Interactive Activity (only when drill exists) */}
+        {!isReviewOnly && drill && (
         <section className="mb-16">
+          <h2 className="text-3xl font-bold text-black mb-4">
+            Interactive Practice
+          </h2>
           <div className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-8 mb-8">
-            <h2 className="text-3xl font-bold text-black mb-4">
-              Interactive Practice
-            </h2>
             {stage2Content && (
               <div className="mb-6">
                 {stage2Content}
@@ -488,23 +626,24 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonPills, in
             </div>
           </div>
         </section>
+        )}
 
-        {/* Stage 3: MCQ Practice Questions */}
+        {/* Stage 3: MCQ Practice Questions (from drill or lessonMcqQuestions e.g. 3 per lesson from unitPracticeProblems) */}
+        {mcqQuestions.length > 0 && (
         <section className="mb-16">
+          <h2 className="text-3xl font-bold text-black mb-2">
+            Practice Questions: Test Your Understanding
+          </h2>
+          <p className="text-lg text-gray-700 mb-6 leading-relaxed">
+            Apply what you&apos;ve learned with these practice questions. These questions test your understanding of the key concepts.
+          </p>
           <div className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-8 mb-8">
-            <h2 className="text-3xl font-bold text-black mb-4">
-              Practice Questions: Test Your Understanding
-            </h2>
-            <p className="text-lg text-gray-700 mb-8 leading-relaxed">
-              Apply what you've learned with these practice questions. These questions test your understanding of the key concepts.
-            </p>
-
             {currentMcqQuestionIndex < mcqQuestions.length ? (
               (() => {
                 const question = mcqQuestions[currentMcqQuestionIndex];
                 const selectedAnswer = mcqAnswers[question.id] ?? null;
                 const showFeedback = mcqSubmitted[question.id] ?? false;
-                const isCorrect = selectedAnswer === question.correctAnswer;
+                const isCorrect = selectedAnswer !== null && isCorrectMcqAnswer(question, selectedAnswer);
                 const isSelected = selectedAnswer !== null;
 
                 return (
@@ -591,7 +730,7 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonPills, in
                     <div className="space-y-2 mb-6">
                       {question.options.map((option, optIndex) => {
                         const optionLetter = getLetter(optIndex);
-                        const isCorrectAnswer = optIndex === question.correctAnswer;
+                        const isCorrectAnswer = isCorrectMcqAnswer(question, optIndex);
                         const isThisSelected = selectedAnswer === optIndex;
                         let optionStyle = 'bg-white border-gray-300';
                         if (showFeedback) {
@@ -702,6 +841,7 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonPills, in
             )}
           </div>
         </section>
+        )}
 
         {/* Summary Section */}
         {keyTakeaways ? (

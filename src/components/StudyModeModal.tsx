@@ -10,6 +10,8 @@ export interface StudyModeCard {
   tag: string;
   front: string;
   back: React.ReactNode;
+  /** Optional image URL shown on the back of the card (e.g. for GRAPH cards). */
+  backImage?: string;
 }
 
 function getFlashcardTagClass(tag: string): string {
@@ -192,8 +194,15 @@ export function StudyModeModal({
                       >
                         {currentCard.tag}
                       </span>
-                      <div className="text-lg text-slate-800 leading-relaxed flex-1">
-                        {currentCard.back}
+                      <div className="text-lg text-slate-800 leading-relaxed flex-1 flex flex-col gap-4">
+                        {currentCard.backImage && (
+                          <img
+                            src={currentCard.backImage}
+                            alt="Graph or diagram"
+                            className="w-full max-w-md mx-auto rounded-lg border border-slate-200 shadow-sm object-contain"
+                          />
+                        )}
+                        <div>{currentCard.back}</div>
                       </div>
                       <span className="mt-4 text-sm text-slate-500">Space or click to flip back</span>
                     </div>

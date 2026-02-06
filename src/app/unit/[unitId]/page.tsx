@@ -34,7 +34,7 @@ import { Footer } from '@/components/Footer';
 import { pdfCheatSheets } from '@/data/pdfCheatSheets';
 
 // Set to true to show Deep Dive buttons and Ultimate Unit Shuffle on unit cheat sheet
-const SHOW_DEEP_DIVE_AND_SHUFFLE = false;
+const SHOW_DEEP_DIVE_AND_SHUFFLE = true;
 
 // Helper to combine and structure whiteboard data for Macro
 const getUnitWhiteboards = (unitNumber: number): WhiteboardImage[] => {
@@ -1725,105 +1725,6 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                 {lessonId}{lessonName ? ` - ${lessonName}` : ''}
               </h2>
               
-              {/* Videos Section */}
-              {(() => {
-                const lessonVideos = getVideosForLessonId(lessonId);
-                // Filter by subject
-                const subjectFilter = selectedSubject === 'macro' ? 'AP Macroeconomics' : 'AP Microeconomics';
-                const relevantVideos = lessonVideos.filter(video => {
-                  // First check if video is for this subject
-                  if (!video.subjects.includes(subjectFilter)) return false;
-                  
-                  // Special case: For micro lesson 1.3 (PPC), exclude Comparative Advantage videos
-                  // These videos have lessonIDS: ["1.3", "1.4"] but should only show in micro 1.4
-                  if (selectedSubject === 'micro' && lessonId === '1.3') {
-                    const isComparativeAdvantageVideo = 
-                      video.title.toLowerCase().includes('comparative advantage') ||
-                      video.tags.some(tag => tag.toLowerCase().includes('comparative advantage'));
-                    if (isComparativeAdvantageVideo) return false;
-                  }
-                  
-                  // Special case: For macro lesson 1.4 (Demand), exclude Comparative Advantage videos
-                  // These videos have lessonIDS: ["1.3", "1.4"] but should only show in macro 1.3
-                  if (selectedSubject === 'macro' && lessonId === '1.4') {
-                    const isComparativeAdvantageVideo = 
-                      video.title.toLowerCase().includes('comparative advantage') ||
-                      video.tags.some(tag => tag.toLowerCase().includes('comparative advantage'));
-                    if (isComparativeAdvantageVideo) return false;
-                  }
-                  
-                  return true;
-                });
-
-                if (relevantVideos.length === 0) return null;
-
-                return (
-                  <div className="mb-6" data-section="videos">
-                    <h3 className="text-lg font-semibold text-gray-700 mb-3">Videos</h3>
-                    <div className="flex gap-4 overflow-x-auto pb-2">
-                      {relevantVideos.map((video) => (
-                        <button
-                          key={video.id}
-                          onClick={() => {
-                            setSelectedVideo(video);
-                            setShowVideoModal(true);
-                            // Reset answers when opening a new video
-                            setVideoQuestionAnswers({});
-                          }}
-                          className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4 text-left hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 flex-shrink-0 w-[45%] md:flex-1 md:min-w-[240px] md:max-w-[320px] flex flex-col group aspect-[5/6] md:aspect-auto"
-                        >
-                          {/* Thumbnail Image */}
-                          {video.thumbnail && (
-                            <div className="relative w-full aspect-video mb-3 rounded-lg overflow-hidden bg-gray-100">
-                              <Image
-                                src={video.thumbnail}
-                                alt={video.title}
-                                fill
-                                className="object-cover group-hover:scale-105 transition-transform duration-200"
-                                sizes="(max-width: 640px) 45vw, (max-width: 1024px) 33vw, 320px"
-                              />
-                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200 flex items-center justify-center">
-                                <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/90 rounded-full p-2">
-                                  <Play className="w-5 h-5 text-blue-600 fill-blue-600" />
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                          <div className="flex items-center justify-between mb-2">
-                            <div
-                              className={`inline-block text-xs font-semibold px-2 py-1 rounded ${
-                                subjectFilter === 'AP Macroeconomics'
-                                  ? 'bg-blue-100 text-blue-800'
-                                  : 'bg-green-100 text-green-800'
-                              }`}
-                            >
-                              Video
-                            </div>
-                            {video.questions && video.questions.length > 0 && (
-                              <div className="flex items-center gap-1 text-sm font-semibold text-gray-800">
-                                <span>{video.questions.length}</span>
-                                <span className="text-xs text-gray-600">questions</span>
-                              </div>
-                            )}
-                          </div>
-                          <h3 className="text-base font-bold text-gray-900 mb-1.5 line-clamp-2 group-hover:text-blue-600 transition-colors flex-1">
-                            {video.title}
-                          </h3>
-                          {video.description && (
-                            <p className="hidden md:block text-xs text-gray-600 line-clamp-2 mb-2">
-                              {video.description}
-                            </p>
-                          )}
-                          <div className="text-xs font-semibold text-blue-600 mt-auto flex items-center gap-1">
-                            Watch →
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })()}
-              
               {/* Key Terms Section */}
               {keyTerms.length > 0 && (
                 <div>
@@ -1968,6 +1869,15 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                       </div>
 
                       {/* Deep Dive Button - After lesson content (dynamic route) */}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 1 && subjectFilter === 'ap_macroeconomics' && lessonId === '1.1' && (
+                        <Link
+                          href={getDeepDiveUrl('ap-macro', '1', 'scarcity')}
+                          className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
+                        >
+                          Deep Dive into Scarcity
+                          <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
                       {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 1 && subjectFilter === 'ap_macroeconomics' && lessonId === '1.2' && (
                         <Link
                           href={getDeepDiveUrl('ap-macro', '1', 'production-possibilities-curve')}
@@ -1986,6 +1896,24 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                           <ArrowRight className="w-5 h-5" />
                         </Link>
                       )}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 1 && subjectFilter === 'ap_macroeconomics' && lessonId === '1.4' && (
+                        <Link
+                          href={getDeepDiveUrl('ap-macro', '1', 'demand')}
+                          className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
+                        >
+                          Deep Dive into Demand
+                          <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 1 && subjectFilter === 'ap_macroeconomics' && lessonId === '1.5' && (
+                        <Link
+                          href={getDeepDiveUrl('ap-macro', '1', 'supply')}
+                          className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
+                        >
+                          Deep Dive into Supply
+                          <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
                       {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 1 && subjectFilter === 'ap_macroeconomics' && lessonId === '1.6' && (
                         <Link
                           href={getDeepDiveUrl('ap-macro', '1', 'market-equilibrium')}
@@ -1993,6 +1921,42 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                         >
                           Deep Dive into Supply &amp; Demand (Market Equilibrium)
                           <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {/* Unit 2 Macro deep dives */}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 2 && subjectFilter === 'ap_macroeconomics' && lessonId === '2.1' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '2', 'circular-flow-gdp')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into The Circular Flow and GDP <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 2 && subjectFilter === 'ap_macroeconomics' && lessonId === '2.2' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '2', 'limitations-gdp')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into Limitations of GDP <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 2 && subjectFilter === 'ap_macroeconomics' && lessonId === '2.3' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '2', 'unemployment')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into Unemployment <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 2 && subjectFilter === 'ap_macroeconomics' && lessonId === '2.4' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '2', 'price-indices-inflation')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into Price Indices and Inflation <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 2 && subjectFilter === 'ap_macroeconomics' && lessonId === '2.5' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '2', 'costs-inflation')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into Costs of Inflation <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 2 && subjectFilter === 'ap_macroeconomics' && lessonId === '2.6' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '2', 'real-nominal-gdp')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into Real vs. Nominal GDP <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 2 && subjectFilter === 'ap_macroeconomics' && lessonId === '2.7' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '2', 'business-cycles')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into Business Cycles <ArrowRight className="w-5 h-5" />
                         </Link>
                       )}
 
