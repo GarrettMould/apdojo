@@ -38,42 +38,72 @@ export function StudyModeModal({
 }: StudyModeModalProps) {
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
+  const [filterType, setFilterType] = useState<'all' | 'GRAPH' | 'RULE' | 'LIST'>('all');
+
+  // Filter deck based on selected type
+  const filteredDeck = filterType === 'all' 
+    ? deck 
+    : deck.filter(card => {
+        if (filterType === 'GRAPH') return card.tag === 'GRAPH';
+        if (filterType === 'RULE') return card.tag === 'RULE';
+        if (filterType === 'LIST') return card.type === 'list';
+        return true;
+      });
 
   // When modal opens or initialIndex changes, sync index and reset flip
   useEffect(() => {
     if (open) {
-      setIndex(Math.min(initialIndex, Math.max(0, deck.length - 1)));
+      const maxIndex = Math.max(0, filteredDeck.length - 1);
+      setIndex(Math.min(initialIndex, maxIndex));
+      setFlipped(false);
+      setFilterType('all'); // Reset filter when modal opens
+    }
+  }, [open, initialIndex, filteredDeck.length]);
+
+  // Reset index when filter changes
+  useEffect(() => {
+    if (filteredDeck.length > 0) {
+      setIndex(0);
       setFlipped(false);
     }
-  }, [open, initialIndex, deck.length]);
+  }, [filterType, filteredDeck.length]);
 
-  const currentCard = deck[index];
+  const currentCard = filteredDeck[index];
   const canPrev = index > 0;
-  const canNext = index < deck.length - 1;
+  const canNext = index < filteredDeck.length - 1;
+
+  // Cycle through filter types when tag is clicked
+  const handleTagClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card flip
+    const cycle: Array<'all' | 'GRAPH' | 'RULE' | 'LIST'> = ['all', 'GRAPH', 'RULE', 'LIST'];
+    const currentIndex = cycle.indexOf(filterType);
+    const nextIndex = (currentIndex + 1) % cycle.length;
+    setFilterType(cycle[nextIndex]);
+  };
 
   const goPrev = () => {
     setFlipped(false);
     setIndex((i) => Math.max(0, i - 1));
   };
   const goNext = () => {
-    if (index >= deck.length - 1) onClose();
+    if (index >= filteredDeck.length - 1) onClose();
     else {
       setFlipped(false);
       setIndex((i) => i + 1);
     }
   };
 
-  // Keyboard: Space = flip, ArrowRight = next, ArrowLeft = prev, Escape = close
+  // Keyboard: Space/ArrowUp/ArrowDown = flip, ArrowRight = next, ArrowLeft = prev, Escape = close
   useEffect(() => {
     if (!open) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
-      else if (e.key === ' ') {
+      else if (e.key === ' ' || e.key === 'ArrowUp' || e.key === 'ArrowDown') {
         e.preventDefault();
         setFlipped((f) => !f);
       } else if (e.key === 'ArrowRight') {
         e.preventDefault();
-        if (index >= deck.length - 1) onClose();
+        if (index >= filteredDeck.length - 1) onClose();
         else {
           setFlipped(false);
           setIndex((i) => i + 1);
@@ -86,9 +116,9 @@ export function StudyModeModal({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [open, index, deck.length, onClose]);
+  }, [open, index, filteredDeck.length, onClose]);
 
-  if (!open || deck.length === 0) return null;
+  if (!open || deck.length === 0 || filteredDeck.length === 0) return null;
 
   return (
     <AnimatePresence>
@@ -108,12 +138,28 @@ export function StudyModeModal({
           <motion.div
             className="h-full bg-white"
             initial={false}
-            animate={{ width: `${((index + 1) / deck.length) * 100}%` }}
+            animate={{ width: `${((index + 1) / filteredDeck.length) * 100}%` }}
             transition={{ duration: 0.25 }}
           />
         </div>
-        <div className="absolute top-4 left-4 text-sm font-medium text-slate-400">
-          Card {index + 1} of {deck.length}
+        <div className="absolute top-4 left-4 flex items-center gap-4">
+          <div className="text-sm font-medium text-slate-400">
+            Card {index + 1} of {filteredDeck.length}
+            {filterType !== 'all' && (
+              <span className="ml-2 text-slate-500">
+                ({deck.length} total)
+              </span>
+            )}
+          </div>
+          {filterType !== 'all' && (
+            <button
+              type="button"
+              onClick={() => setFilterType('all')}
+              className="text-xs text-slate-400 hover:text-white underline"
+            >
+              Show all
+            </button>
+          )}
         </div>
 
         {/* Close (X) top right */}
@@ -168,18 +214,21 @@ export function StudyModeModal({
                         WebkitBackfaceVisibility: 'hidden',
                       }}
                     >
-                      <span
-                        className={`absolute top-4 right-4 px-3 py-1 rounded-lg text-xs font-bold ${getFlashcardTagClass(currentCard.tag)}`}
+                      <button
+                        type="button"
+                        onClick={handleTagClick}
+                        className={`absolute top-4 right-4 px-3 py-1 rounded-lg text-xs font-bold cursor-pointer hover:opacity-80 transition-opacity ${getFlashcardTagClass(currentCard.tag)}`}
+                        title="Click to filter by type"
                       >
                         {currentCard.tag}
-                      </span>
+                      </button>
                       <p
                         id="study-modal-title"
                         className="text-3xl font-bold text-center text-slate-900 leading-snug px-4"
                       >
                         {currentCard.front}
                       </p>
-                      <span className="mt-6 text-sm text-slate-500">Space or click to flip</span>
+                      <span className="mt-6 text-sm text-slate-500">Space, ↑, or ↓ to flip</span>
                     </div>
                     <div
                       className="absolute inset-0 rounded-2xl bg-slate-50 border-2 border-slate-200 shadow-2xl flex flex-col p-8 overflow-y-auto"
@@ -189,11 +238,14 @@ export function StudyModeModal({
                         transform: 'rotateY(180deg)',
                       }}
                     >
-                      <span
-                        className={`self-end mb-4 px-3 py-1 rounded-lg text-xs font-bold ${getFlashcardTagClass(currentCard.tag)}`}
+                      <button
+                        type="button"
+                        onClick={handleTagClick}
+                        className={`self-end mb-4 px-3 py-1 rounded-lg text-xs font-bold cursor-pointer hover:opacity-80 transition-opacity ${getFlashcardTagClass(currentCard.tag)}`}
+                        title="Click to filter by type"
                       >
                         {currentCard.tag}
-                      </span>
+                      </button>
                       <div className="text-lg text-slate-800 leading-relaxed flex-1 flex flex-col gap-4">
                         {currentCard.backImage && (
                           <img
@@ -204,7 +256,7 @@ export function StudyModeModal({
                         )}
                         <div>{currentCard.back}</div>
                       </div>
-                      <span className="mt-4 text-sm text-slate-500">Space or click to flip back</span>
+                      <span className="mt-4 text-sm text-slate-500">Space, ↑, or ↓ to flip back</span>
                     </div>
                   </div>
                 </motion.div>

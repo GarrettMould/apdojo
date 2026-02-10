@@ -17,6 +17,8 @@ import { DemandChangeDrill, DemandChangeScenario } from './DemandChangeDrill';
 import { ElasticityRevenueDrill, ElasticityScenario } from './ElasticityRevenueDrill';
 import { ConsumerProducerSurplusDrill } from './ConsumerProducerSurplusDrill';
 import { StudyModeModal } from './StudyModeModal';
+import { useAuthContext } from '@/contexts/AuthContext';
+import { hasValidSeasonPass } from '@/lib/utils';
 
 export interface InstantAnswerKeyTerm {
   term: string;
@@ -87,13 +89,14 @@ function getWarmUpEntryCards(flashcards: FlashcardData[]): (FlashcardData | null
 }
 
 /** Entry card: shows only front (tag + text); click opens modal. */
-function WarmUpEntryCard({ card, onOpen }: { card: FlashcardData; onOpen: () => void }) {
+function WarmUpEntryCard({ card, onOpen, disabled = false }: { card: FlashcardData; onOpen: () => void; disabled?: boolean }) {
   const tagClass = getFlashcardTagClass(card.tag);
   return (
     <button
       type="button"
-      onClick={onOpen}
-      className="relative w-full min-h-[160px] rounded-xl bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-left overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 hover:bg-gray-50 transition-colors"
+      onClick={disabled ? undefined : onOpen}
+      disabled={disabled}
+      className={`relative w-full min-h-[160px] rounded-xl bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-left overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50'}`}
       aria-label="Open card"
     >
       <span className={`absolute top-2 right-2 px-2 py-0.5 rounded text-xs font-bold ${tagClass}`}>
@@ -106,6 +109,9 @@ function WarmUpEntryCard({ card, onOpen }: { card: FlashcardData; onOpen: () => 
 }
 
 export function DrillDeepDive({ drillId, backLink, backLinkText, lessonTitle, lessonPills, instantAnswer, flashcards, stage2Content, keyTakeaways, fallbackVideo, lessonMcqQuestions }: DrillDeepDiveProps) {
+  const { userData } = useAuthContext();
+  const isPremium = hasValidSeasonPass(userData);
+  
   // State for comprehension questions (one at a time below video)
   const [compAnswers, setCompAnswers] = useState<Record<string, number | null>>({});
   const [compSubmitted, setCompSubmitted] = useState<Record<string, boolean>>({});
@@ -164,14 +170,24 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonTitle, le
     if (compSubmitted[questionId]) return;
     setCompAnswers(prev => ({ ...prev, [questionId]: answerIndex }));
     setCompSubmitted(prev => ({ ...prev, [questionId]: true }));
-    setCurrentCompQuestionIndex(prev => prev + 1);
   };
 
   const handleFallbackCompAnswer = (questionId: string, answerIndex: number) => {
     if (fallbackCompSubmitted[questionId]) return;
     setFallbackCompAnswers(prev => ({ ...prev, [questionId]: answerIndex }));
     setFallbackCompSubmitted(prev => ({ ...prev, [questionId]: true }));
-    setCurrentFallbackCompIndex(prev => prev + 1);
+  };
+
+  const goToNextCompQuestion = () => {
+    if (currentCompQuestionIndex < drill.stage1.comprehensionQuestions.length - 1) {
+      setCurrentCompQuestionIndex(prev => prev + 1);
+    }
+  };
+
+  const goToNextFallbackQuestion = () => {
+    if (currentFallbackCompIndex < (fallbackVideo?.questions?.length || 0) - 1) {
+      setCurrentFallbackCompIndex(prev => prev + 1);
+    }
   };
 
   const handleMcqAnswer = (questionId: number, answerIndex: number) => {
@@ -247,7 +263,43 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonTitle, le
 
   return (
     <div className="bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 py-12 mt-12">
+      <div className="max-w-7xl mx-auto px-4 py-12 mt-12 relative">
+        {/* Yellow Diagonal Banner - Show for non-premium users; smaller, lower, tilted across top-left corner */}
+        {!isPremium && (
+          <div
+            className="absolute z-10 bg-yellow-400 shadow-md overflow-hidden"
+            style={{
+              width: '240px',
+              left: '-8px',
+              top: '8px',
+              padding: '10px 20px',
+              transform: 'rotate(-14deg)',
+              transformOrigin: 'top left',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+            }}
+          >
+            <div style={{ transform: 'rotate(14deg)', transformOrigin: 'top left' }}>
+              <p className="text-lg sm:text-xl text-black whitespace-nowrap" style={{
+                fontFamily: "'Permanent Marker', cursive",
+                textShadow: '1px 1px 0px rgba(0,0,0,0.1)',
+                letterSpacing: '0.02em',
+                lineHeight: '1.2',
+              }}>
+                Join the Dojo for Unlimited Access
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Wrap content in black border for non-premium users */}
+        <div className={`relative ${!isPremium ? "bg-white border-8 border-black rounded-lg shadow-2xl p-6 sm:p-8 md:p-12 pt-16 sm:pt-20 md:pt-24" : ""}`}>
+          {/* Overlay to block interactions for non-premium users */}
+          {!isPremium && (
+            <div className="absolute inset-0 z-50 rounded-lg pointer-events-auto" aria-hidden="true" />
+          )}
+          
+          {/* Content wrapper */}
+          <div className={!isPremium ? "opacity-90" : ""}>
         {/* Header */}
         <div className="mb-8">
           <Link 
@@ -293,12 +345,31 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonTitle, le
         {/* Flashcard Warm-up (optional): 3 entry cards → modal with same-type deck */}
         {flashcards && flashcards.length > 0 && (
           <section className="mb-16">
-            <h2 className="text-2xl font-black text-black mb-4">⚡ Warm Up: Rapid Fire Review</h2>
+            <div className="flex items-center gap-3 mb-4">
+              <h2 className="text-2xl font-black text-black">Ultimate Flashcard Review</h2>
+              <button
+                type="button"
+                onClick={() => {
+                  if (isPremium) {
+                    // Open modal with first card of the first available type
+                    const firstCard = getWarmUpEntryCards(flashcards).find((card): card is FlashcardData => card != null);
+                    if (firstCard) {
+                      openWarmUpModal(firstCard);
+                    }
+                  }
+                }}
+                disabled={!isPremium}
+                className={`text-blue-600 hover:text-blue-700 font-black flex items-center gap-1 transition-colors ${!isPremium ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                (Pick a Card)
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {getWarmUpEntryCards(flashcards)
                 .filter((card): card is FlashcardData => card != null)
                 .map((card) => (
-                  <WarmUpEntryCard key={card.id} card={card} onOpen={() => openWarmUpModal(card)} />
+                  <WarmUpEntryCard key={card.id} card={card} onOpen={() => openWarmUpModal(card)} disabled={!isPremium} />
                 ))}
             </div>
           </section>
@@ -323,9 +394,11 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonTitle, le
               <div className="my-8">
                 <video
                   src={fallbackVideo.videoUrl}
-                  controls
+                  controls={isPremium}
                   className="w-full aspect-video rounded-lg shadow-md"
                   preload="metadata"
+                  disablePictureInPicture
+                  controlsList={!isPremium ? "nodownload nofullscreen noremoteplayback" : undefined}
                 >
                   Your browser does not support the video tag.
                 </video>
@@ -378,9 +451,9 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonTitle, le
                                   animate={showFeedback && isCorrectAnswer ? { scale: [1, 1.05, 1] } : {}}
                                   transition={{ duration: 0.3 }}
                                   className={`p-3 rounded-lg border-2 transition-colors ${optionStyle} ${
-                                    !showFeedback ? 'cursor-pointer hover:bg-blue-50 hover:border-blue-300' : ''
+                                    !showFeedback && isPremium ? 'cursor-pointer hover:bg-blue-50 hover:border-blue-300' : !isPremium ? 'cursor-not-allowed opacity-50' : ''
                                   }`}
-                                  onClick={!showFeedback ? () => handleFallbackCompAnswer(question.id, optIndex) : undefined}
+                                  onClick={!showFeedback && isPremium ? () => handleFallbackCompAnswer(question.id, optIndex) : undefined}
                                 >
                                   <div className="flex items-center gap-3">
                                     {!showFeedback ? (
@@ -390,7 +463,8 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonTitle, le
                                           name={`fallback-comp-${question.id}`}
                                           value={optionLetter}
                                           checked={isThisSelected}
-                                          onChange={() => handleFallbackCompAnswer(question.id, optIndex)}
+                                          onChange={() => isPremium && handleFallbackCompAnswer(question.id, optIndex)}
+                                          disabled={!isPremium}
                                           className="w-5 h-5 text-blue-600 flex-shrink-0"
                                           onClick={(e) => e.stopPropagation()}
                                         />
@@ -405,7 +479,9 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonTitle, le
                                         >
                                           {optionLetter}
                                         </span>
-                                        <span className="flex-1 text-gray-900">{option}</span>
+                                        <span className={`flex-1 ${isCorrectAnswer ? 'text-green-900 font-semibold' : isThisSelected && !isCorrectAnswer ? 'text-red-900 font-semibold' : 'text-gray-900'}`}>
+                                          {option}
+                                        </span>
                                         {isCorrectAnswer && <CheckCircle2 className="w-6 h-6 text-green-600 flex-shrink-0" />}
                                         {isThisSelected && !isCorrectAnswer && <XCircle className="w-6 h-6 text-red-600 flex-shrink-0" />}
                                       </>
@@ -436,6 +512,16 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonTitle, le
                                 <p className="text-base text-black font-medium leading-relaxed">{question.explanation}</p>
                               </div>
                             </div>
+                          )}
+                          {showFeedback && currentFallbackCompIndex < (fallbackVideo?.questions?.length || 0) - 1 && (
+                            <button
+                              onClick={goToNextFallbackQuestion}
+                              disabled={!isPremium}
+                              className={`w-full mt-4 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 ${!isPremium ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            >
+                              Next Question
+                              <ArrowRight className="w-5 h-5" />
+                            </button>
                           )}
                         </div>
                       );
@@ -472,8 +558,10 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonTitle, le
             <div className="my-8">
               <video 
                 src={drill.stage1.videoUrl} 
-                controls 
+                controls={isPremium}
                 className="w-full aspect-video rounded-lg shadow-md"
+                disablePictureInPicture
+                controlsList={!isPremium ? "nodownload nofullscreen noremoteplayback" : undefined}
                 preload="metadata"
               >
                 Your browser does not support the video tag.
@@ -529,9 +617,9 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonTitle, le
                               animate={showFeedback && isCorrectAnswer ? { scale: [1, 1.05, 1] } : {}}
                               transition={{ duration: 0.3 }}
                               className={`p-3 rounded-lg border-2 transition-colors ${optionStyle} ${
-                                !showFeedback ? 'cursor-pointer hover:bg-blue-50 hover:border-blue-300' : ''
+                                !showFeedback && isPremium ? 'cursor-pointer hover:bg-blue-50 hover:border-blue-300' : !isPremium ? 'cursor-not-allowed opacity-50' : ''
                               }`}
-                              onClick={!showFeedback ? () => handleCompAnswer(question.id, optIndex) : undefined}
+                              onClick={!showFeedback && isPremium ? () => handleCompAnswer(question.id, optIndex) : undefined}
                             >
                               <div className="flex items-center gap-3">
                                 {!showFeedback ? (
@@ -541,7 +629,8 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonTitle, le
                                       name={`comp-${question.id}`}
                                       value={optionLetter}
                                       checked={isThisSelected}
-                                      onChange={() => handleCompAnswer(question.id, optIndex)}
+                                      onChange={() => isPremium && handleCompAnswer(question.id, optIndex)}
+                                      disabled={!isPremium}
                                       className="w-5 h-5 text-blue-600 flex-shrink-0"
                                       onClick={(e) => e.stopPropagation()}
                                     />
@@ -588,6 +677,16 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonTitle, le
                           </div>
                         </div>
                       )}
+                      {showFeedback && currentCompQuestionIndex < drill.stage1.comprehensionQuestions.length - 1 && (
+                        <button
+                          onClick={goToNextCompQuestion}
+                          disabled={!isPremium}
+                          className={`w-full mt-4 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 ${!isPremium ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
+                          Next Question
+                          <ArrowRight className="w-5 h-5" />
+                        </button>
+                      )}
                     </div>
                   );
                 })()
@@ -619,9 +718,12 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonTitle, le
                 {stage2Content}
               </div>
             )}
-            <div className="mt-8 min-h-[500px] flex items-center justify-center">
+            <div className={`mt-8 min-h-[500px] flex items-center justify-center relative ${!isPremium ? 'pointer-events-none opacity-50' : ''}`}>
               {getActivityComponent() || (
                 <p className="text-gray-500">Interactive activity not available for this drill.</p>
+              )}
+              {!isPremium && (
+                <div className="absolute inset-0 z-10 rounded-lg pointer-events-auto" aria-hidden="true" />
               )}
             </div>
           </div>
@@ -744,9 +846,9 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonTitle, le
                             animate={showFeedback && isCorrectAnswer ? { scale: [1, 1.05, 1] } : {}}
                             transition={{ duration: 0.3 }}
                             className={`p-3 rounded-lg border-2 transition-colors ${optionStyle} ${
-                              !showFeedback ? 'cursor-pointer hover:bg-blue-50 hover:border-blue-300' : ''
+                              !showFeedback && isPremium ? 'cursor-pointer hover:bg-blue-50 hover:border-blue-300' : !isPremium ? 'cursor-not-allowed opacity-50' : ''
                             }`}
-                            onClick={!showFeedback ? () => handleMcqAnswer(question.id, optIndex) : undefined}
+                            onClick={!showFeedback && isPremium ? () => handleMcqAnswer(question.id, optIndex) : undefined}
                           >
                             <div className="flex items-center gap-3">
                               {!showFeedback ? (
@@ -756,7 +858,8 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonTitle, le
                                     name={`mcq-${question.id}`}
                                     value={optionLetter}
                                     checked={isThisSelected}
-                                    onChange={() => handleMcqAnswer(question.id, optIndex)}
+                                    onChange={() => isPremium && handleMcqAnswer(question.id, optIndex)}
+                                    disabled={!isPremium}
                                     className="w-5 h-5 text-blue-600 flex-shrink-0"
                                     onClick={(e) => e.stopPropagation()}
                                   />
@@ -806,9 +909,9 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonTitle, le
                     <div className="flex items-center justify-between gap-4 pt-4 border-t-4 border-black">
                       <button
                         onClick={handlePreviousMcq}
-                        disabled={currentMcqQuestionIndex === 0}
+                        disabled={currentMcqQuestionIndex === 0 || !isPremium}
                         className={`px-6 py-3 rounded-xl border-4 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1 font-black text-base flex items-center gap-2 ${
-                          currentMcqQuestionIndex === 0 ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-white text-black'
+                          currentMcqQuestionIndex === 0 || !isPremium ? 'bg-gray-200 text-gray-500 cursor-not-allowed opacity-50' : 'bg-white text-black'
                         }`}
                       >
                         <ArrowRight className="w-5 h-5 rotate-180" />
@@ -816,9 +919,9 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonTitle, le
                       </button>
                       <button
                         onClick={handleNextMcq}
-                        disabled={currentMcqQuestionIndex >= mcqQuestions.length - 1}
+                        disabled={currentMcqQuestionIndex >= mcqQuestions.length - 1 || !isPremium}
                         className={`px-6 py-3 rounded-xl border-4 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1 font-black text-base flex items-center gap-2 ${
-                          currentMcqQuestionIndex >= mcqQuestions.length - 1 ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-white text-black'
+                          currentMcqQuestionIndex >= mcqQuestions.length - 1 || !isPremium ? 'bg-gray-200 text-gray-500 cursor-not-allowed opacity-50' : 'bg-white text-black'
                         }`}
                       >
                         Next
@@ -870,6 +973,8 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonTitle, le
           </section>
         )}
 
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -18,7 +18,7 @@ import { videos, Video } from '@/data/videos';
 import { getVideosForLessonId } from '@/data/videosByLessonId';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question as QuestionType } from '@/data/questionBanks/types';
-import { X, ArrowRight, Lock, ArrowLeft, CheckCircle2, XCircle, Download, Bookmark, BookmarkPlus, Check, Brain, Maximize2, Play, FileText, Zap, Lightbulb } from 'lucide-react';
+import { X, ArrowRight, Lock, ArrowLeft, CheckCircle2, XCircle, Download, Bookmark, BookmarkPlus, Check, Brain, Maximize2, Play, FileText, Zap, Lightbulb, ClipboardList, FileQuestion, Award, Layers, Unlock, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import jsPDF from 'jspdf';
@@ -1466,27 +1466,40 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           className="flex-shrink-0 overflow-y-auto min-w-0"
         >
       <div className="max-w-7xl mx-auto px-4 py-12 mt-12" ref={cheatSheetContentRef}>
-        {/* Page Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 tracking-tight">
-            <span className={themeColor === 'blue' ? 'text-blue-500' : 'text-green-500'}>AP {selectedSubject === 'macro' ? 'Macro' : 'Micro'}</span> Unit Cheat Sheets
+        {/* Unit header */}
+        <div className="mb-16 text-left">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight mb-2">
+            Unit {activeUnitNum}
+            {activeUnit && (
+              <>
+                {' - '}
+                {selectedSubject === 'macro'
+                  ? macroUnits.find(u => u.number === activeUnitNum)?.title || ''
+                  : microUnits.find(u => u.number === activeUnitNum)?.title || ''}
+              </>
+            )}
           </h1>
-          <p className="mt-4 text-xl text-gray-600 max-w-2xl mx-auto">Key terms, formulas, and graphs for every unit.</p>
+          <p className="text-lg sm:text-xl text-gray-600 font-black tracking-tight">
+            <span className="text-blue-500">AP {selectedSubject === 'macro' ? 'Macro' : 'Micro'}</span> Cheat Sheet
+          </p>
         </div>
 
         {/* Unit Navigation Tabs */}
-        <div className="mb-8 border-b border-gray-200 flex items-center justify-between">
-          <nav className="-mb-px flex space-x-6" aria-label="Tabs">
+        <div className="mb-8 border-b-2 border-gray-200 flex items-center justify-between">
+          <nav className="-mb-0.5 flex space-x-8" aria-label="Tabs">
             {unitsToDisplay.map((unit) => {
+              const isActive = activeUnit === String(unit.number);
               return (
                 <button
                   key={unit.number}
                   onClick={() => handleUnitChange(String(unit.number))}
-                  className={`${
-                    activeUnit === String(unit.number)
-                      ? `border-${themeColor}-500 text-${themeColor}-600`
+                  className={`whitespace-nowrap py-5 px-2 border-b-[3px] font-bold text-base sm:text-lg transition-colors flex items-center gap-2 ${
+                    isActive
+                      ? themeColor === 'blue'
+                        ? 'border-blue-500 text-blue-600'
+                        : 'border-green-500 text-green-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors flex items-center gap-2`}
+                  }`}
                 >
                   <span>Unit {unit.number}</span>
                 </button>
@@ -1566,79 +1579,99 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           );
         })()}
 
-        {/* Unit Practice Test Banner */}
-        {(() => {
-          const currentUnit = unitsToDisplay.find(u => u.number === activeUnitNum);
-          const unitPrice = currentUnit?.price || 4.99;
-          const isMicro = selectedSubject === 'micro';
-          
-          // Determine if user has premium access
-          const hasPremiumAccess = isProCustomer;
-          
-          // Set the link based on premium status
-          const ctaLink = hasPremiumAccess 
-            ? getUnitMCQTestUrl(activeUnitNum, selectedSubject)
-            : `/purchase/season-pass?courseType=${selectedSubject}`;
-          
-          return (
-            <div className="mb-8 bg-white border-4 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 print:hidden">
-              <div>
-                <p className="text-lg font-black text-black">
-                  Ready to test your knowledge?
-                </p>
-                <p className="text-sm text-gray-700 font-medium">
-                  Take the Unit {activeUnitNum} practice test and see how you stack up.
-                </p>
-              </div>
-              <Button
-                asChild
-                className={`font-black py-3 px-5 rounded-xl border-4 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1 ${
-                  themeColor === 'blue'
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                    : 'bg-green-600 hover:bg-green-700 text-white'
-                }`}
-              >
-                <Link href={ctaLink}>
-                  Take the Unit {activeUnitNum} Test <ArrowRight className="w-5 h-5 ml-2" />
-                </Link>
-              </Button>
+        {/* Table of Contents - two columns, links scroll to lesson sections */}
+        {sortedLessons.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Table of Contents</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2">
+              {sortedLessons.map(({ lessonId }) => {
+                const lessonName = getLessonName(lessonId);
+                const sectionId = `lesson-${lessonId.replace('.', '-')}`;
+                return (
+                  <a
+                    key={lessonId}
+                    href={`#${sectionId}`}
+                    className="text-gray-700 hover:text-gray-900 hover:underline font-medium py-1 block"
+                  >
+                    {lessonId} - {lessonName || 'Key concepts'}
+                  </a>
+                );
+              })}
             </div>
-          );
-        })()}
+          </div>
+        )}
 
-        {/* Ultimate Unit Shuffle Card */}
+        {/* Ultimate Unit Shuffle - purple button at top */}
         {SHOW_DEEP_DIVE_AND_SHUFFLE && (() => {
-          // Get all flashcards for this unit
           const getAllUnitFlashcards = (): UnitFlashcardData[] => {
-            if (selectedSubject === 'macro' && activeUnitNum === 1) {
-              // Combine all lessons for Unit 1 Macro
+            if (selectedSubject === 'macro' && (activeUnitNum === 1 || activeUnitNum === 2 || activeUnitNum === 3 || activeUnitNum === 4 || activeUnitNum === 5 || activeUnitNum === 6)) {
               const allCards: UnitFlashcardData[] = [];
               sortedLessons.forEach(({ lessonId }) => {
-                const lessonCards = getFlashcardsForLesson('macro', 1, lessonId);
+                const lessonCards = getFlashcardsForLesson('macro', activeUnitNum, lessonId);
                 allCards.push(...lessonCards);
               });
               return allCards;
             }
-            // Add other units/subjects as needed
             return [];
           };
-
           const allUnitFlashcards = getAllUnitFlashcards();
           if (allUnitFlashcards.length === 0) return null;
-
-          // Count by type (for display only; shuffle happens on click)
           const listCount = allUnitFlashcards.filter(c => c.type === 'list').length;
           const rapidFireCount = allUnitFlashcards.filter(c => c.type === 'rapid-fire').length;
           const graphCount = allUnitFlashcards.filter(c => c.tag === 'GRAPH').length;
-
+          const getCardType = (card: UnitFlashcardData): string => {
+            if (card.tag === 'GRAPH') return 'GRAPH';
+            if (card.tag === 'RULE') return 'RULE';
+            if (card.type === 'list') return 'LIST';
+            return 'OTHER';
+          };
+          const shuffleArray = <T,>(array: T[]): T[] => {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+              const j = Math.floor(Math.random() * (i + 1));
+              [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+          };
           const openShuffleModal = () => {
-            const shuffled = [...allUnitFlashcards].sort(() => Math.random() - 0.5);
+            const graphCards = allUnitFlashcards.filter(c => getCardType(c) === 'GRAPH');
+            const ruleCards = allUnitFlashcards.filter(c => getCardType(c) === 'RULE');
+            const listCards = allUnitFlashcards.filter(c => getCardType(c) === 'LIST');
+            const otherCards = allUnitFlashcards.filter(c => getCardType(c) === 'OTHER');
+            const queues = {
+              GRAPH: [...shuffleArray(graphCards)],
+              RULE: [...shuffleArray(ruleCards)],
+              LIST: [...shuffleArray(listCards)],
+              OTHER: [...shuffleArray(otherCards)],
+            };
+            const shuffled: UnitFlashcardData[] = [];
+            let lastType: string | null = null;
+            let consecutiveCount = 0;
+            const maxConsecutive = 2;
+            while (queues.GRAPH.length > 0 || queues.RULE.length > 0 || queues.LIST.length > 0 || queues.OTHER.length > 0) {
+              const availableTypes = Object.entries(queues)
+                .filter(([_, q]) => q.length > 0)
+                .map(([type]) => type);
+              if (availableTypes.length === 0) break;
+              let selectedType: string;
+              if (lastType && consecutiveCount >= maxConsecutive && availableTypes.includes(lastType) && availableTypes.length > 1) {
+                const otherTypes = availableTypes.filter(t => t !== lastType);
+                selectedType = otherTypes[Math.floor(Math.random() * otherTypes.length)];
+              } else {
+                selectedType = availableTypes[Math.floor(Math.random() * availableTypes.length)];
+              }
+              const card = queues[selectedType as keyof typeof queues].shift();
+              if (card) {
+                shuffled.push(card);
+                if (selectedType === lastType) consecutiveCount++;
+                else { lastType = selectedType; consecutiveCount = 1; }
+              }
+            }
             setShuffledDeck(shuffled);
             setShuffleModalOpen(true);
           };
-
           return (
-            <div className="mb-8">
+            <div id="unit-shuffle" className="mb-8">
               <button
                 type="button"
                 onClick={openShuffleModal}
@@ -1651,15 +1684,9 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                       All {allUnitFlashcards.length} flashcards from Unit {activeUnitNum} shuffled together
                     </p>
                     <div className="flex gap-4 text-sm">
-                      <span className="bg-white/20 px-3 py-1 rounded-full font-semibold">
-                        {listCount} List
-                      </span>
-                      <span className="bg-white/20 px-3 py-1 rounded-full font-semibold">
-                        {rapidFireCount} Rapid Fire
-                      </span>
-                      <span className="bg-white/20 px-3 py-1 rounded-full font-semibold">
-                        {graphCount} Graph
-                      </span>
+                      <span className="bg-white/20 px-3 py-1 rounded-full font-semibold">{listCount} List</span>
+                      <span className="bg-white/20 px-3 py-1 rounded-full font-semibold">{rapidFireCount} Rapid Fire</span>
+                      <span className="bg-white/20 px-3 py-1 rounded-full font-semibold">{graphCount} Graph</span>
                     </div>
                   </div>
                   <ArrowRight className="w-8 h-8 flex-shrink-0" />
@@ -1719,7 +1746,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                   
             return (
                     <React.Fragment key={lessonId}>
-                      <div className="space-y-8">
+                      <div id={`lesson-${lessonId.replace('.', '-')}`} className="space-y-8 scroll-mt-24">
               {/* Lesson Header */}
               <h2 className="text-2xl font-bold text-gray-800 pb-2 border-b border-gray-200">
                 {lessonId}{lessonName ? ` - ${lessonName}` : ''}
@@ -1958,6 +1985,267 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                         <Link href={getDeepDiveUrl('ap-macro', '2', 'business-cycles')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
                           Deep Dive into Business Cycles <ArrowRight className="w-5 h-5" />
                         </Link>
+                      )}
+                      {/* Unit 3 Macro deep dives */}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 3 && subjectFilter === 'ap_macroeconomics' && lessonId === '3.1' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '3', 'aggregate-demand')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into Aggregate Demand (AD) <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 3 && subjectFilter === 'ap_macroeconomics' && lessonId === '3.2' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '3', 'multipliers')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into Multipliers <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 3 && subjectFilter === 'ap_macroeconomics' && lessonId === '3.3' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '3', 'short-run-aggregate-supply')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into Short-Run Aggregate Supply (SRAS) <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 3 && subjectFilter === 'ap_macroeconomics' && lessonId === '3.4' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '3', 'long-run-aggregate-supply')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into Long-Run Aggregate Supply (LRAS) <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 3 && subjectFilter === 'ap_macroeconomics' && lessonId === '3.5' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '3', 'ad-as-equilibrium')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into Equilibrium in the AD-AS Model <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 3 && subjectFilter === 'ap_macroeconomics' && lessonId === '3.6' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '3', 'changes-ad-as-short-run')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into Changes in the AD-AS Model in the Short Run <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 3 && subjectFilter === 'ap_macroeconomics' && lessonId === '3.7' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '3', 'long-run-self-adjustment')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into Long-Run Self-Adjustment <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 3 && subjectFilter === 'ap_macroeconomics' && lessonId === '3.8' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '3', 'fiscal-policy')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into Fiscal Policy <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 3 && subjectFilter === 'ap_macroeconomics' && lessonId === '3.9' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '3', 'automatic-stabilizers')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into Automatic Stabilizers <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {/* Unit 4 Macro deep dives */}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 4 && subjectFilter === 'ap_macroeconomics' && lessonId === '4.1' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '4', 'financial-assets')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into Financial Assets <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 4 && subjectFilter === 'ap_macroeconomics' && lessonId === '4.2' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '4', 'nominal-real-interest-rates')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into Nominal v. Real Interest Rates <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 4 && subjectFilter === 'ap_macroeconomics' && lessonId === '4.3' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '4', 'definition-measurement-functions-money')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into Definition, Measurement, and Functions of Money <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 4 && subjectFilter === 'ap_macroeconomics' && lessonId === '4.4' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '4', 'banking-expansion-money-supply')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into Banking and the Expansion of the Money Supply <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 4 && subjectFilter === 'ap_macroeconomics' && lessonId === '4.5' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '4', 'money-market')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into The Money Market <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 4 && subjectFilter === 'ap_macroeconomics' && lessonId === '4.6' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '4', 'monetary-policy')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into Monetary Policy <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 4 && subjectFilter === 'ap_macroeconomics' && lessonId === '4.7' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '4', 'loanable-funds-market')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into The Loanable Funds Market <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {/* Unit 5 Macro deep dives */}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 5 && subjectFilter === 'ap_macroeconomics' && lessonId === '5.1' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '5', 'fiscal-monetary-policy-short-run')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into Fiscal and Monetary Policy Actions in the Short Run <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 5 && subjectFilter === 'ap_macroeconomics' && lessonId === '5.2' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '5', 'phillips-curve')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into The Phillips Curve <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 5 && subjectFilter === 'ap_macroeconomics' && lessonId === '5.3' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '5', 'money-growth-inflation')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into Money Growth and Inflation <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 5 && subjectFilter === 'ap_macroeconomics' && lessonId === '5.4' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '5', 'government-deficits-national-debt')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into Government Deficits and the National Debt <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 5 && subjectFilter === 'ap_macroeconomics' && lessonId === '5.5' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '5', 'crowding-out')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into Crowding Out <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 5 && subjectFilter === 'ap_macroeconomics' && lessonId === '5.6' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '5', 'economic-growth')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into Economic Growth <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 5 && subjectFilter === 'ap_macroeconomics' && lessonId === '5.7' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '5', 'public-policy-economic-growth')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into Public Policy and Economic Growth <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {/* Unit 6 Macro deep dives */}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 6 && subjectFilter === 'ap_macroeconomics' && lessonId === '6.1' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '6', 'balance-of-payments-accounts')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into Balance of Payments Accounts <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 6 && subjectFilter === 'ap_macroeconomics' && lessonId === '6.2' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '6', 'exchange-rates')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into Exchange Rates <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 6 && subjectFilter === 'ap_macroeconomics' && lessonId === '6.3' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '6', 'foreign-exchange-market')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into The Foreign Exchange Market <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 6 && subjectFilter === 'ap_macroeconomics' && lessonId === '6.4' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '6', 'changes-policies-forex-market')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into Effect of Changes in Policies and Economic Conditions on the Foreign Exchange Market <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 6 && subjectFilter === 'ap_macroeconomics' && lessonId === '6.5' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '6', 'changes-forex-market-net-exports')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into Changes in the Foreign Exchange Market and Net Exports <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+                      {SHOW_DEEP_DIVE_AND_SHUFFLE && activeUnitNum === 6 && subjectFilter === 'ap_macroeconomics' && lessonId === '6.6' && (
+                        <Link href={getDeepDiveUrl('ap-macro', '6', 'real-interest-rates-international-capital-flows')} className="w-full mt-8 mb-4 px-6 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-lg rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
+                          Deep Dive into Real Interest Rates and International Capital Flows <ArrowRight className="w-5 h-5" />
+                        </Link>
+                      )}
+
+                      {/* Unit Practice & Assessment - after first lesson (e.g. 1.1) of every unit */}
+                      {index === 0 && (
+                        <div className="mt-16 pt-10 border-t-2 border-gray-200 print:hidden">
+                          <div className="rounded-2xl border-4 border-black bg-gray-50 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] p-6 sm:p-8">
+                            <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+                              <div className="flex items-center gap-3">
+                                <div className={`p-2 rounded-lg border-2 border-black ${themeColor === 'blue' ? 'bg-blue-100' : 'bg-green-100'}`}>
+                                  <Sparkles className="w-6 h-6 text-black" />
+                                </div>
+                                <h2 className="text-3xl font-black text-gray-900 tracking-tight">
+                                  Unit {activeUnitNum} Practice & Assessment
+                                </h2>
+                              </div>
+                              <Link
+                                href={`/purchase/season-pass?courseType=${selectedSubject}`}
+                                className="font-bold text-blue-600 hover:text-blue-700 hover:underline underline-offset-2 whitespace-nowrap"
+                              >
+                                Get Premium Access for $29
+                              </Link>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                              <Link
+                                href={`/unitMCQPracticePage?subject=${selectedSubject}&mode=singleUnit&unit=${activeUnitNum}`}
+                                className="group relative col-span-1 sm:col-span-2 row-span-2 flex flex-col justify-between p-6 sm:p-8 rounded-xl border-4 border-black bg-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 transition-all duration-200"
+                              >
+                                <div className="absolute top-4 right-4 bg-gray-100 border-2 border-black px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
+                                  Core Practice
+                                </div>
+                                <div className={`w-14 h-14 rounded-full border-2 border-black flex items-center justify-center mb-4 ${themeColor === 'blue' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}`}>
+                                  <ClipboardList className="w-8 h-8" />
+                                </div>
+                                <div>
+                                  <h3 className="text-2xl font-black text-gray-900 group-hover:underline decoration-4 decoration-black/20 underline-offset-4">
+                                    Unit {activeUnitNum} MCQs
+                                  </h3>
+                                  <p className="text-gray-600 mt-2 font-medium leading-relaxed">
+                                    Master the concepts with AP-style multiple choice questions tailored for this unit.
+                                  </p>
+                                </div>
+                              </Link>
+                              <Link
+                                href={isProCustomer ? `/unitFRQpracticePage?subject=${selectedSubject}` : `/purchase/season-pass?courseType=${selectedSubject}`}
+                                className={`group relative flex flex-col justify-between p-5 rounded-xl border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 transition-all overflow-hidden ${isProCustomer ? 'bg-white' : 'bg-gray-50'}`}
+                              >
+                                <div className="flex justify-between items-start z-10">
+                                  <FileQuestion className={`w-8 h-8 ${isProCustomer ? (themeColor === 'blue' ? 'text-blue-600' : 'text-green-600') : 'text-gray-400'}`} />
+                                  {isProCustomer ? (
+                                    <ArrowRight className="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity -rotate-45 group-hover:rotate-0" />
+                                  ) : (
+                                    <span className="bg-gray-200 border-2 border-gray-400 text-gray-500 px-2 py-0.5 rounded text-xs font-bold flex items-center gap-1">
+                                      PRO ONLY <Lock className="w-3 h-3" />
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="mt-4 z-10">
+                                  <span className={`block font-black text-lg ${isProCustomer ? 'text-gray-900' : 'text-gray-500'}`}>Unit FRQs</span>
+                                  <span className={`text-sm font-medium ${isProCustomer ? 'text-gray-500' : 'text-gray-400'}`}>
+                                    {isProCustomer ? 'Free Response Skills' : 'Unlock FRQ practice'}
+                                  </span>
+                                </div>
+                              </Link>
+                              <Link
+                                href={isProCustomer ? getUnitMCQTestUrl(activeUnitNum, selectedSubject) : `/purchase/season-pass?courseType=${selectedSubject}`}
+                                className={`group relative flex flex-col justify-between p-5 rounded-xl border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 transition-all overflow-hidden ${isProCustomer ? 'bg-yellow-50' : 'bg-gray-50'}`}
+                              >
+                                <div className="flex justify-between items-start z-10">
+                                  <Award className={`w-8 h-8 ${isProCustomer ? 'text-yellow-600' : 'text-gray-400'}`} />
+                                  {isProCustomer ? (
+                                    <span className="bg-yellow-300 border-2 border-black px-2 py-0.5 rounded text-xs font-bold flex items-center gap-1">
+                                      UNLOCKED <Unlock className="w-3 h-3" />
+                                    </span>
+                                  ) : (
+                                    <span className="bg-gray-200 border-2 border-gray-400 text-gray-500 px-2 py-0.5 rounded text-xs font-bold flex items-center gap-1">
+                                      PRO ONLY <Lock className="w-3 h-3" />
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="mt-4 z-10">
+                                  <span className={`block font-black text-lg ${isProCustomer ? 'text-gray-900' : 'text-gray-500'}`}>Unit Test</span>
+                                  <span className={`text-sm font-medium ${isProCustomer ? 'text-gray-600' : 'text-gray-400'}`}>
+                                    {isProCustomer ? 'Start timed exam' : 'Unlock full mock exam'}
+                                  </span>
+                                </div>
+                              </Link>
+                              <Link
+                                href={isProCustomer ? '#unit-shuffle' : `/purchase/season-pass?courseType=${selectedSubject}`}
+                                className={`group col-span-1 sm:col-span-2 flex items-center justify-between p-5 rounded-xl border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 transition-all overflow-hidden ${isProCustomer ? 'bg-white' : 'bg-gray-50'}`}
+                              >
+                                <div className="flex items-center gap-4 z-10 flex-1">
+                                  <div className={`p-2 rounded-lg border-2 border-black ${isProCustomer ? (themeColor === 'blue' ? 'bg-blue-100' : 'bg-green-100') : 'bg-gray-200'}`}>
+                                    <Layers className={`w-6 h-6 ${isProCustomer ? 'text-black' : 'text-gray-400'}`} />
+                                  </div>
+                                  <div>
+                                    <span className={`block font-black text-lg ${isProCustomer ? 'text-gray-900 group-hover:underline' : 'text-gray-500'}`}>Ultimate Unit Shuffle</span>
+                                    <span className={`text-sm font-medium ${isProCustomer ? 'text-gray-600' : 'text-gray-400'}`}>
+                                      {isProCustomer ? 'Quick-fire flashcard review' : 'Unlock flashcard review'}
+                                    </span>
+                                  </div>
+                                </div>
+                                {isProCustomer ? (
+                                  <ArrowRight className="w-6 h-6 text-gray-400 group-hover:text-black transition-colors flex-shrink-0 z-10" />
+                                ) : (
+                                  <span className="bg-gray-200 border-2 border-gray-400 text-gray-500 px-2 py-0.5 rounded text-xs font-bold flex items-center gap-1 flex-shrink-0 z-10">
+                                    PRO ONLY <Lock className="w-3 h-3" />
+                                  </span>
+                                )}
+                              </Link>
+                            </div>
+                          </div>
+                        </div>
                       )}
 
                       {/* First Checkpoint - After midpoint lesson */}
@@ -3328,17 +3616,21 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                                         ? isSelected
                                           ? "bg-gray-200 border-[3px] border-black text-gray-900"
                                           : "bg-white border-2 border-gray-300 hover:border-black hover:bg-gray-50 cursor-pointer"
-                                        : isSelected && isCorrectOption
-                                        ? "bg-green-100 border-[3px] border-black text-green-900"
-                                        : isSelected && !isCorrectOption
-                                        ? "bg-red-100 border-[3px] border-black text-red-900"
-                                        : isCorrectOption && showResult
-                                        ? "bg-green-100 border-[3px] border-black text-green-900"
+                                        : isCorrectOption
+                                        ? "bg-green-100 border-[3px] border-green-500 text-green-900 font-semibold"
+                                        : isSelected
+                                        ? "bg-red-100 border-[3px] border-red-500 text-red-900 font-semibold"
                                         : "bg-gray-50 border-2 border-gray-300 text-gray-600"
                                     } ${showResult ? "cursor-default" : ""}`}
                                   >
                                     <span className="font-semibold">{String.fromCharCode(65 + index)}.</span>{" "}
                                     {option}
+                                    {showResult && isCorrectOption && (
+                                      <span className="ml-2 text-green-700">✓</span>
+                                    )}
+                                    {showResult && isSelected && !isCorrectOption && (
+                                      <span className="ml-2 text-red-700">✗</span>
+                                    )}
                                   </button>
                                 );
                               })}

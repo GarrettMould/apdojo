@@ -25,7 +25,7 @@ export function HeroSection() {
       y: 0,
       transition: {
         duration: 0.6,
-        ease: [0.22, 1, 0.36, 1],
+        ease: [0.22, 1, 0.36, 1] as const,
       },
     },
   };
@@ -37,7 +37,7 @@ export function HeroSection() {
       y: 0,
       transition: {
         duration: 0.6,
-        ease: [0.22, 1, 0.36, 1],
+        ease: [0.22, 1, 0.36, 1] as const,
       },
     },
   };
@@ -64,7 +64,7 @@ export function HeroSection() {
             variants={itemVariants}
             className="text-2xl sm:text-3xl text-gray-700 mb-14 max-w-4xl mx-auto font-medium leading-relaxed"
           >
-            Unlock acceess to full AP practice tests, unlimited MCQ practice, AI-graded FRQs, interactive cheat sheets, and more. All for $29.
+            Unlock access to full AP practice tests, unlimited MCQ practice, AI-graded FRQs, interactive cheat sheets, and more. All for $29.
           </motion.p>
 
           {/* Main CTA */}
@@ -127,4 +127,3 @@ export function HeroSection() {
     </section>
   );
 }
-
