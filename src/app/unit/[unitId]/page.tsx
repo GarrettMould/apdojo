@@ -27,6 +27,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { dojoDrills, drillAppliesToSubject, getDrillUnitForSubject } from '@/data/dojoDrills';
 import { getFlashcardsForLesson, UnitFlashcardData } from '@/data/unitFlashcards';
 import { StudyModeModal } from '@/components/StudyModeModal';
+import { SeasonPassModal } from '@/components/SeasonPassModal';
 import { getDeepDiveUrl } from '@/lib/routes';
 import { saveQuizResult } from '@/lib/quizHistory';
 import { hasValidSeasonPass, getUnitMCQTestUrl } from '@/lib/utils';
@@ -594,6 +595,63 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
   const [showJoinDojoModal, setShowJoinDojoModal] = useState(false);
   const [shuffleModalOpen, setShuffleModalOpen] = useState(false);
   const [shuffledDeck, setShuffledDeck] = useState<UnitFlashcardData[]>([]);
+  const [showShuffleLimitModal, setShowShuffleLimitModal] = useState(false);
+
+  // Daily limit for free users: Ultimate Unit Shuffle (3 cards per day, same pattern as MCQ)
+  const DAILY_FREE_SHUFFLE_VIEWS = 3;
+  const [dailyShuffleViewed, setDailyShuffleViewed] = useState(0);
+  const getLocalDateKey = (d: Date) => {
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  };
+  const getDailyShuffleStorageKey = (uid: string | null | undefined) =>
+    `dailyShuffleViewed:${uid ?? 'guest'}`;
+  const readDailyShuffleCount = useCallback(() => {
+    if (typeof window === 'undefined') return 0;
+    const key = getDailyShuffleStorageKey(user?.uid);
+    const raw = localStorage.getItem(key);
+    const today = getLocalDateKey(new Date());
+    if (!raw) return 0;
+    try {
+      const parsed = JSON.parse(raw) as { date?: string; count?: number };
+      if (parsed?.date !== today) return 0;
+      const count = typeof parsed?.count === 'number' && Number.isFinite(parsed.count) ? parsed.count : 0;
+      return Math.max(0, Math.min(DAILY_FREE_SHUFFLE_VIEWS, count));
+    } catch {
+      return 0;
+    }
+  }, [user?.uid]);
+  const writeDailyShuffleCount = useCallback((count: number) => {
+    if (typeof window === 'undefined') return;
+    const key = getDailyShuffleStorageKey(user?.uid);
+    const today = getLocalDateKey(new Date());
+    localStorage.setItem(key, JSON.stringify({ date: today, count }));
+  }, [user?.uid]);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const key = getDailyShuffleStorageKey(user?.uid);
+    const raw = localStorage.getItem(key);
+    const today = getLocalDateKey(new Date());
+    if (!raw) {
+      setDailyShuffleViewed(0);
+      return;
+    }
+    try {
+      const parsed = JSON.parse(raw) as { date?: string; count?: number };
+      if (parsed?.date !== today) {
+        localStorage.setItem(key, JSON.stringify({ date: today, count: 0 }));
+        setDailyShuffleViewed(0);
+        return;
+      }
+      const count = typeof parsed?.count === 'number' && Number.isFinite(parsed.count) ? parsed.count : 0;
+      setDailyShuffleViewed(Math.max(0, Math.min(DAILY_FREE_SHUFFLE_VIEWS, count)));
+    } catch {
+      localStorage.setItem(key, JSON.stringify({ date: today, count: 0 }));
+      setDailyShuffleViewed(0);
+    }
+  }, [user?.uid]);
 
   // Check if user is a pro customer (has season pass)
   const isProCustomer = useMemo(() => {
@@ -602,6 +660,23 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
     const subjectKey = selectedSubject === 'macro' ? 'macro' : 'micro';
     return hasValidSeasonPass(userData, subjectKey);
   }, [user, userData, selectedSubject]);
+
+  const handleShuffleCardView = useCallback((index: number) => {
+    if (isProCustomer) return;
+    const cardsViewed = index + 1;
+    if (cardsViewed <= dailyShuffleViewed) return;
+    const nextCount = Math.min(cardsViewed, DAILY_FREE_SHUFFLE_VIEWS);
+    writeDailyShuffleCount(nextCount);
+    setDailyShuffleViewed(nextCount);
+  }, [isProCustomer, dailyShuffleViewed, writeDailyShuffleCount]);
+
+  // When free user hits daily limit while in shuffle modal, close it and show limit modal
+  useEffect(() => {
+    if (shuffleModalOpen && !isProCustomer && dailyShuffleViewed >= DAILY_FREE_SHUFFLE_VIEWS) {
+      setShuffleModalOpen(false);
+      setShowShuffleLimitModal(true);
+    }
+  }, [shuffleModalOpen, isProCustomer, dailyShuffleViewed]);
 
   // --- FAQ Schema Data ---
   const faqSchema = {
@@ -1634,6 +1709,10 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
             return shuffled;
           };
           const openShuffleModal = () => {
+            if (!isProCustomer && dailyShuffleViewed >= DAILY_FREE_SHUFFLE_VIEWS) {
+              setShowShuffleLimitModal(true);
+              return;
+            }
             const graphCards = allUnitFlashcards.filter(c => getCardType(c) === 'GRAPH');
             const ruleCards = allUnitFlashcards.filter(c => getCardType(c) === 'RULE');
             const listCards = allUnitFlashcards.filter(c => getCardType(c) === 'LIST');
@@ -3666,11 +3745,22 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
         )}
       </AnimatePresence>
 
+      {/* Shuffle daily limit: show premium Season Pass modal when free user has viewed 3 cards or hits limit in-modal */}
+      {showShuffleLimitModal && (
+        <SeasonPassModal
+          subject={selectedSubject}
+          onClose={() => setShowShuffleLimitModal(false)}
+        />
+      )}
+
       {/* Ultimate Shuffle: same Study Mode modal as deep dive pages, mixed deck randomized */}
       <StudyModeModal
         open={shuffleModalOpen}
         onClose={() => setShuffleModalOpen(false)}
         deck={shuffledDeck}
+        freeUserShuffleLimitReached={!isProCustomer && dailyShuffleViewed >= DAILY_FREE_SHUFFLE_VIEWS}
+        onCardView={handleShuffleCardView}
+        seasonPassCourseType={selectedSubject === 'macro' ? 'macro' : 'micro'}
       />
     </>
   );

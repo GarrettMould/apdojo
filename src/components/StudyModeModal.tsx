@@ -28,6 +28,12 @@ interface StudyModeModalProps {
   deck: StudyModeCard[];
   /** Index of the card to show when the modal opens (e.g. the card that was clicked). */
   initialIndex?: number;
+  /** When true (free user hit daily shuffle limit), disable next/prev (parent typically closes modal and shows limit modal). */
+  freeUserShuffleLimitReached?: boolean;
+  /** Called when user views a card (on open and when index changes). Used for daily limit counting. */
+  onCardView?: (index: number) => void;
+  /** For unit page only; unused when no overlay. */
+  seasonPassCourseType?: 'macro' | 'micro';
 }
 
 export function StudyModeModal({
@@ -35,6 +41,9 @@ export function StudyModeModal({
   onClose,
   deck,
   initialIndex = 0,
+  freeUserShuffleLimitReached = false,
+  onCardView,
+  seasonPassCourseType = 'macro',
 }: StudyModeModalProps) {
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
@@ -60,32 +69,35 @@ export function StudyModeModal({
     }
   }, [open, initialIndex, filteredDeck.length]);
 
-  // Reset index when filter changes
+  // Notify parent when user views a card (for daily limit counting)
   useEffect(() => {
-    if (filteredDeck.length > 0) {
-      setIndex(0);
-      setFlipped(false);
+    if (open && filteredDeck.length > 0 && onCardView != null) {
+      onCardView(index);
     }
-  }, [filterType, filteredDeck.length]);
+  }, [open, index, filteredDeck.length, onCardView]);
 
   const currentCard = filteredDeck[index];
-  const canPrev = index > 0;
-  const canNext = index < filteredDeck.length - 1;
+  const canPrev = !freeUserShuffleLimitReached && index > 0;
+  const canNext = !freeUserShuffleLimitReached && index < filteredDeck.length - 1;
 
-  // Cycle through filter types when tag is clicked
+  // Cycle through filter types when tag is clicked; reset to first card of that type
   const handleTagClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent card flip
     const cycle: Array<'all' | 'GRAPH' | 'RULE' | 'LIST'> = ['all', 'GRAPH', 'RULE', 'LIST'];
     const currentIndex = cycle.indexOf(filterType);
     const nextIndex = (currentIndex + 1) % cycle.length;
     setFilterType(cycle[nextIndex]);
+    setIndex(0);
+    setFlipped(false);
   };
 
   const goPrev = () => {
+    if (freeUserShuffleLimitReached) return;
     setFlipped(false);
     setIndex((i) => Math.max(0, i - 1));
   };
   const goNext = () => {
+    if (freeUserShuffleLimitReached) return;
     if (index >= filteredDeck.length - 1) onClose();
     else {
       setFlipped(false);
@@ -98,7 +110,10 @@ export function StudyModeModal({
     if (!open) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
-      else if (e.key === ' ' || e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+      else if (freeUserShuffleLimitReached) {
+        // Block next/prev when daily limit reached
+        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') e.preventDefault();
+      } else if (e.key === ' ' || e.key === 'ArrowUp' || e.key === 'ArrowDown') {
         e.preventDefault();
         setFlipped((f) => !f);
       } else if (e.key === 'ArrowRight') {
@@ -116,7 +131,7 @@ export function StudyModeModal({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [open, index, filteredDeck.length, onClose]);
+  }, [open, index, filteredDeck.length, onClose, freeUserShuffleLimitReached]);
 
   if (!open || deck.length === 0 || filteredDeck.length === 0) return null;
 
@@ -162,11 +177,11 @@ export function StudyModeModal({
           )}
         </div>
 
-        {/* Close (X) top right */}
+        {/* Close (X) top right - above overlay so user can always close */}
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/50 transition-colors z-10"
+          className="absolute top-4 right-4 p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/50 transition-colors z-30"
           aria-label="Close"
         >
           <X className="w-6 h-6" />
@@ -247,14 +262,15 @@ export function StudyModeModal({
                         {currentCard.tag}
                       </button>
                       <div className="text-lg text-slate-800 leading-relaxed flex-1 flex flex-col gap-4">
-                        {currentCard.backImage && (
+                        {currentCard.backImage ? (
                           <img
                             src={currentCard.backImage}
                             alt="Graph or diagram"
                             className="w-full max-w-md mx-auto rounded-lg border border-slate-200 shadow-sm object-contain"
                           />
+                        ) : (
+                          <div>{currentCard.back}</div>
                         )}
-                        <div>{currentCard.back}</div>
                       </div>
                       <span className="mt-4 text-sm text-slate-500">Space, ↑, or ↓ to flip back</span>
                     </div>
@@ -267,7 +283,8 @@ export function StudyModeModal({
           <button
             type="button"
             onClick={goNext}
-            className="flex-shrink-0 p-4 rounded-full text-slate-400 hover:text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/50 transition-colors"
+            disabled={freeUserShuffleLimitReached}
+            className="flex-shrink-0 p-4 rounded-full text-slate-400 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent focus:outline-none focus:ring-2 focus:ring-white/50 transition-colors"
             aria-label={canNext ? 'Next card' : 'Done'}
           >
             <ChevronRight className="w-10 h-10" />

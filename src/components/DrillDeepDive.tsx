@@ -262,24 +262,24 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonTitle, le
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 py-12 mt-12 relative">
+    <div className="bg-gray-50 min-h-screen pt-6">
+      <div className="max-w-7xl mx-auto px-4 py-16 mt-20 relative">
         {/* Yellow Diagonal Banner - Show for non-premium users; smaller, lower, tilted across top-left corner */}
         {!isPremium && (
           <div
             className="absolute z-10 bg-yellow-400 shadow-md overflow-hidden"
             style={{
-              width: '240px',
+              width: '440px',
               left: '-8px',
-              top: '8px',
-              padding: '10px 20px',
+              top: '128px',
+              padding: '12px 24px',
               transform: 'rotate(-14deg)',
               transformOrigin: 'top left',
               boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
             }}
           >
-            <div style={{ transform: 'rotate(14deg)', transformOrigin: 'top left' }}>
-              <p className="text-lg sm:text-xl text-black whitespace-nowrap" style={{
+            <div>
+              <p className="text-xl sm:text-2xl text-black whitespace-nowrap" style={{
                 fontFamily: "'Permanent Marker', cursive",
                 textShadow: '1px 1px 0px rgba(0,0,0,0.1)',
                 letterSpacing: '0.02em',
@@ -292,7 +292,7 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonTitle, le
         )}
 
         {/* Wrap content in black border for non-premium users */}
-        <div className={`relative ${!isPremium ? "bg-white border-8 border-black rounded-lg shadow-2xl p-6 sm:p-8 md:p-12 pt-16 sm:pt-20 md:pt-24" : ""}`}>
+        <div className={`relative ${!isPremium ? "bg-gray-50 border-8 border-black rounded-lg shadow-2xl p-6 sm:p-8 md:p-12 pt-16 sm:pt-20 md:pt-24" : ""}`}>
           {/* Overlay to block interactions for non-premium users */}
           {!isPremium && (
             <div className="absolute inset-0 z-50 rounded-lg pointer-events-auto" aria-hidden="true" />

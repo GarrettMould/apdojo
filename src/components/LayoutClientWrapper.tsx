@@ -15,6 +15,8 @@ import { Analytics } from "@vercel/analytics/react";
 export function LayoutClientWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const characterRef = useRef<HTMLDivElement>(null);
+  const isDeepDivePage = (pathname?.includes('deep-dive') ?? false)
+    || (!!pathname?.match(/ap-(macro|micro)\/unit-\d+\//) && !pathname?.includes('cheat-sheet'));
   const { 
     showLoginModal, 
     setShowLoginModal, 
@@ -104,7 +106,7 @@ export function LayoutClientWrapper({ children }: { children: React.ReactNode })
       )}
       
       {/* Layout without sidebar */}
-      <main className="flex-1 w-full overflow-y-auto bg-white">
+      <main className={`flex-1 w-full overflow-y-auto ${isDeepDivePage ? 'bg-gray-50' : 'bg-white'}`}>
         {/* Email verification banner disabled for now */}
         {/* <EmailVerificationBanner /> */}
         {children}
