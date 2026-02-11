@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 
 export interface StudyModeCard {
   id: string;
@@ -20,6 +20,15 @@ function getFlashcardTagClass(tag: string): string {
   if (t === 'RULE') return 'bg-blue-100 text-blue-700';
   if (t === 'LIST') return 'bg-orange-100 text-orange-700';
   return 'bg-gray-100 text-gray-700';
+}
+
+/** Dark-mode friendly classes for the filter dropdown trigger in the modal header. */
+function getFilterTriggerClass(filterType: 'all' | 'GRAPH' | 'RULE' | 'LIST'): string {
+  if (filterType === 'all') return 'bg-slate-700 text-slate-200 border-slate-600';
+  if (filterType === 'GRAPH') return 'bg-purple-600/90 text-white border-purple-500';
+  if (filterType === 'RULE') return 'bg-blue-600/90 text-white border-blue-500';
+  if (filterType === 'LIST') return 'bg-orange-600/90 text-white border-orange-500';
+  return 'bg-slate-700 text-slate-200 border-slate-600';
 }
 
 interface StudyModeModalProps {
@@ -48,10 +57,12 @@ export function StudyModeModal({
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [filterType, setFilterType] = useState<'all' | 'GRAPH' | 'RULE' | 'LIST'>('all');
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Filter deck based on selected type
-  const filteredDeck = filterType === 'all' 
-    ? deck 
+  const filteredDeck = filterType === 'all'
+    ? deck
     : deck.filter(card => {
         if (filterType === 'GRAPH') return card.tag === 'GRAPH';
         if (filterType === 'RULE') return card.tag === 'RULE';
@@ -59,13 +70,22 @@ export function StudyModeModal({
         return true;
       });
 
+  // Counts per type (for dropdown options)
+  const typeCounts = {
+    all: deck.length,
+    GRAPH: deck.filter(c => c.tag === 'GRAPH').length,
+    RULE: deck.filter(c => c.tag === 'RULE').length,
+    LIST: deck.filter(c => c.type === 'list').length,
+  };
+
   // When modal opens or initialIndex changes, sync index and reset flip
   useEffect(() => {
     if (open) {
       const maxIndex = Math.max(0, filteredDeck.length - 1);
       setIndex(Math.min(initialIndex, maxIndex));
       setFlipped(false);
-      setFilterType('all'); // Reset filter when modal opens
+      setFilterType('all');
+      setDropdownOpen(false);
     }
   }, [open, initialIndex, filteredDeck.length]);
 
@@ -74,7 +94,7 @@ export function StudyModeModal({
     if (open && filteredDeck.length > 0 && onCardView != null) {
       onCardView(index);
     }
-  }, [open, index, filteredDeck.length, onCardView]);
+  }, [filterType, filteredDeck.length]);
 
   const currentCard = filteredDeck[index];
   const canPrev = !freeUserShuffleLimitReached && index > 0;
@@ -89,6 +109,11 @@ export function StudyModeModal({
     setFilterType(cycle[nextIndex]);
     setIndex(0);
     setFlipped(false);
+  };
+
+  const selectFilterType = (type: 'all' | 'GRAPH' | 'RULE' | 'LIST') => {
+    setFilterType(type);
+    setDropdownOpen(false);
   };
 
   const goPrev = () => {
@@ -157,7 +182,7 @@ export function StudyModeModal({
             transition={{ duration: 0.25 }}
           />
         </div>
-        <div className="absolute top-4 left-4 flex items-center gap-4">
+        <div className="absolute top-4 left-4 flex items-center gap-4 flex-wrap" onClick={(e) => e.stopPropagation()}>
           <div className="text-sm font-medium text-slate-400">
             Card {index + 1} of {filteredDeck.length}
             {filterType !== 'all' && (
@@ -166,15 +191,83 @@ export function StudyModeModal({
               </span>
             )}
           </div>
-          {filterType !== 'all' && (
+          {/* Type filter dropdown */}
+          <div className="relative" ref={dropdownRef}>
             <button
               type="button"
-              onClick={() => setFilterType('all')}
-              className="text-xs text-slate-400 hover:text-white underline"
+              onClick={(e) => { e.stopPropagation(); setDropdownOpen((o) => !o); }}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer transition-opacity hover:opacity-90 border ${getFilterTriggerClass(filterType)}`}
+              aria-haspopup="listbox"
+              aria-expanded={dropdownOpen}
+              aria-label="Filter by card type"
             >
-              Show all
+              {filterType === 'all' ? 'All types' : filterType}
+              <ChevronDown className={`w-3.5 h-3.5 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
             </button>
-          )}
+            <AnimatePresence>
+              {dropdownOpen && (
+                <motion.ul
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.15 }}
+                  role="listbox"
+                  className="absolute left-0 top-full mt-1 min-w-[120px] py-1 rounded-lg bg-slate-800 border border-slate-600 shadow-xl z-50"
+                >
+                  <li>
+                    <button
+                      type="button"
+                      role="option"
+                      aria-selected={filterType === 'all'}
+                      onClick={() => selectFilterType('all')}
+                      className={`w-full text-left px-3 py-2 text-sm font-medium hover:bg-white/10 ${filterType === 'all' ? 'bg-white/10 text-white' : 'text-slate-300'}`}
+                    >
+                      All types <span className="text-slate-500">({typeCounts.all})</span>
+                    </button>
+                  </li>
+                  {typeCounts.GRAPH > 0 && (
+                    <li>
+                      <button
+                        type="button"
+                        role="option"
+                        aria-selected={filterType === 'GRAPH'}
+                        onClick={() => selectFilterType('GRAPH')}
+                        className={`w-full text-left px-3 py-2 text-sm font-medium hover:bg-white/10 flex items-center gap-2 ${filterType === 'GRAPH' ? 'bg-white/10' : ''} ${getFlashcardTagClass('GRAPH')}`}
+                      >
+                        Graph <span className="opacity-80">({typeCounts.GRAPH})</span>
+                      </button>
+                    </li>
+                  )}
+                  {typeCounts.RULE > 0 && (
+                    <li>
+                      <button
+                        type="button"
+                        role="option"
+                        aria-selected={filterType === 'RULE'}
+                        onClick={() => selectFilterType('RULE')}
+                        className={`w-full text-left px-3 py-2 text-sm font-medium hover:bg-white/10 flex items-center gap-2 ${filterType === 'RULE' ? 'bg-white/10' : ''} ${getFlashcardTagClass('RULE')}`}
+                      >
+                        Rule <span className="opacity-80">({typeCounts.RULE})</span>
+                      </button>
+                    </li>
+                  )}
+                  {typeCounts.LIST > 0 && (
+                    <li>
+                      <button
+                        type="button"
+                        role="option"
+                        aria-selected={filterType === 'LIST'}
+                        onClick={() => selectFilterType('LIST')}
+                        className={`w-full text-left px-3 py-2 text-sm font-medium hover:bg-white/10 flex items-center gap-2 ${filterType === 'LIST' ? 'bg-white/10' : ''} ${getFlashcardTagClass('LIST')}`}
+                      >
+                        List <span className="opacity-80">({typeCounts.LIST})</span>
+                      </button>
+                    </li>
+                  )}
+                </motion.ul>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
 
         {/* Close (X) top right - above overlay so user can always close */}
@@ -231,7 +324,7 @@ export function StudyModeModal({
                     >
                       <button
                         type="button"
-                        onClick={handleTagClick}
+                        onClick={(e) => { e.stopPropagation(); setDropdownOpen((o) => !o); }}
                         className={`absolute top-4 right-4 px-3 py-1 rounded-lg text-xs font-bold cursor-pointer hover:opacity-80 transition-opacity ${getFlashcardTagClass(currentCard.tag)}`}
                         title="Click to filter by type"
                       >
@@ -255,7 +348,7 @@ export function StudyModeModal({
                     >
                       <button
                         type="button"
-                        onClick={handleTagClick}
+                        onClick={(e) => { e.stopPropagation(); setDropdownOpen((o) => !o); }}
                         className={`self-end mb-4 px-3 py-1 rounded-lg text-xs font-bold cursor-pointer hover:opacity-80 transition-opacity ${getFlashcardTagClass(currentCard.tag)}`}
                         title="Click to filter by type"
                       >

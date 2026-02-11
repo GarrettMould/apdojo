@@ -133,7 +133,14 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonTitle, le
   const [warmUpIndex, setWarmUpIndex] = useState(0);
   const openWarmUpModal = (card: FlashcardData) => {
     if (!flashcards) return;
-    const deck = flashcards.filter((c) => c.type === card.type);
+    // Build deck by the entry "kind": graph (tag GRAPH), list (type list), or rapid-fire rule (type rapid-fire + tag RULE).
+    // Graph cards in data are often type 'rapid-fire' + tag 'GRAPH', so filtering by type would mix in RULE cards.
+    const deck =
+      card.tag === 'GRAPH'
+        ? flashcards.filter((c) => c.tag === 'GRAPH')
+        : card.type === 'list'
+          ? flashcards.filter((c) => c.type === 'list')
+          : flashcards.filter((c) => c.type === 'rapid-fire' && c.tag === 'RULE');
     const idx = deck.findIndex((c) => c.id === card.id);
     setWarmUpDeck(deck);
     setWarmUpIndex(idx >= 0 ? idx : 0);
