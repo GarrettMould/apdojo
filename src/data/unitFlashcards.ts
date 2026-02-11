@@ -167,7 +167,7 @@ const lesson1_2: UnitFlashcardData[] = [
     tag: 'GRAPH',
     front: 'How do you show the effect of improved technology on a country\'s production possibilities?',
     back: 'Shift the PPC outward. Better technology increases productive capacity, so the economy can produce more of at least one good at every level of the other—previously unattainable combinations become attainable.',
-    backImage: `${FLIPPABLE_BASE_URL}ppc_technology_increase.jpg`,
+    backImage: `${FLIPPABLE_BASE_URL}ppc_outward_shift.jpg`,
   },
   {
     id: 'u1m-1.2-g2',
@@ -175,7 +175,7 @@ const lesson1_2: UnitFlashcardData[] = [
     tag: 'GRAPH',
     front: 'How do you show the effects of a large-scale natural disaster on the PPC?',
     back: 'Shift the PPC inward. The disaster destroys or idles resources (labor, capital, land), reducing productive capacity. The economy can no longer produce as much; previously attainable combinations become unattainable.',
-    backImage: `${FLIPPABLE_BASE_URL}ppc_disaster.jpg`,
+    backImage: `${FLIPPABLE_BASE_URL}ppc_inward_shift.jpg`,
   },
   {
     id: 'u1m-1.2-g3',
@@ -183,7 +183,7 @@ const lesson1_2: UnitFlashcardData[] = [
     tag: 'GRAPH',
     front: 'How do you draw a PPC for two goods that use nearly identical factors of production?',
     back: 'Draw a PPC that is nearly a straight line (or only slightly bowed). When resources are equally good at producing both goods, opportunity cost is roughly constant—you give up the same amount of one good for each additional unit of the other.',
-    backImage: `${FLIPPABLE_BASE_URL}ppc_straight_line.jpg`,
+    backImage: `${FLIPPABLE_BASE_URL}ppc_constant_opp_cost.jpg`,
   },
   {
     id: 'u1m-1.2-g4',
@@ -191,7 +191,7 @@ const lesson1_2: UnitFlashcardData[] = [
     tag: 'GRAPH',
     front: 'How do you show the effect of a decrease in the labor force on the PPC?',
     back: 'Shift the PPC inward. Fewer workers mean less productive capacity; the economy cannot produce as much of either good at every level of the other.',
-    backImage: `${FLIPPABLE_BASE_URL}ppc_labor_decrease.jpg`,
+    backImage: `${FLIPPABLE_BASE_URL}ppc_inward_shift.jpg`,
   },
   {
     id: 'u1m-1.2-g5',
@@ -207,7 +207,7 @@ const lesson1_2: UnitFlashcardData[] = [
     tag: 'GRAPH',
     front: 'Scenario: A country gains more natural resources. How do you show this on the PPC?',
     back: 'Shift the PPC outward. More resources (e.g. land, raw materials) increase productive capacity, so the economy can produce more of at least one good at every level of the other.',
-    backImage: `${FLIPPABLE_BASE_URL}ppc_resources_increase.jpg`,
+    backImage: `${FLIPPABLE_BASE_URL}ppc_outward_shift.jpg`,
   },
   {
     id: 'u1m-1.2-rf1',
@@ -296,7 +296,7 @@ const lesson1_4: UnitFlashcardData[] = [
     tag: 'GRAPH',
     front: 'How do you show the effect of a rise in the price of a substitute good on demand for the original good?',
     back: 'Shift the demand curve for the original good to the right. When the substitute becomes more expensive, consumers buy more of the original good at each price.',
-    backImage: `${FLIPPABLE_BASE_URL}demand_substitute_increase.jpg`,
+    backImage: `${FLIPPABLE_BASE_URL}demand_increase.jpg`,
   },
   {
     id: 'u1m-1.4-g3',
@@ -354,7 +354,7 @@ const lesson1_5: UnitFlashcardData[] = [
     tag: 'GRAPH',
     front: 'How do you show the effect of a subsidy to producers on the supply curve?',
     back: 'Shift the supply curve to the right. Subsidies lower production costs, so at every price producers supply more.',
-    backImage: `${FLIPPABLE_BASE_URL}supply_subsidy.jpg`,
+    backImage: `${FLIPPABLE_BASE_URL}supply_increase.jpg`,
   },
   {
     id: 'u1m-1.5-rf1',
@@ -388,7 +388,7 @@ const lesson1_6: UnitFlashcardData[] = [
     tag: 'GRAPH',
     front: 'How do you show a surplus on a supply and demand graph?',
     back: 'Set a price above the equilibrium price. At that price, quantity supplied exceeds quantity demanded (Qs > Qd). The vertical gap between the supply and demand curves at that price shows the surplus.',
-    backImage: `${FLIPPABLE_BASE_URL}equilibrium_surplus.jpg`,
+    backImage: `${FLIPPABLE_BASE_URL}surplus.jpg`,
   },
   {
     id: 'u1m-1.6-g2',
@@ -396,7 +396,7 @@ const lesson1_6: UnitFlashcardData[] = [
     tag: 'GRAPH',
     front: 'How do you show a shortage on a supply and demand graph?',
     back: 'Set a price below the equilibrium price. At that price, quantity demanded exceeds quantity supplied (Qd > Qs). The vertical gap between the demand and supply curves at that price shows the shortage.',
-    backImage: `${FLIPPABLE_BASE_URL}equilibrium_shortage.jpg`,
+    backImage: `${FLIPPABLE_BASE_URL}shortage.jpg`,
   },
   {
     id: 'u1m-1.6-g3',
