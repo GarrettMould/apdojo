@@ -199,7 +199,7 @@ const lesson1_2: UnitFlashcardData[] = [
     tag: 'GRAPH',
     front: 'How do you show on a PPC that a country is producing inefficiently (underutilizing resources)?',
     back: 'Show a point inside the curve. Any point inside the PPC represents inefficient production—the economy could produce more of both goods without giving up anything; resources are not fully used.',
-    backImage: `${FLIPPABLE_BASE_URL}ppc_point_inside.jpg`,
+    backImage: `${FLIPPABLE_BASE_URL}underutilization.jpg`,
   },
   {
     id: 'u1m-1.2-g6',
@@ -402,9 +402,9 @@ const lesson1_6: UnitFlashcardData[] = [
     id: 'u1m-1.6-g3',
     type: 'rapid-fire',
     tag: 'GRAPH',
-    front: 'Scenario: Demand increases (shifts right). How do you show the new equilibrium price and quantity?',
+    front: 'Scenario: Demand increases due to a change in tastes and preferences. How do you show the new equilibrium price and quantity?',
     back: 'Draw the demand curve shifting right. The new intersection with supply is at a higher price and higher quantity. Both equilibrium price and quantity increase when demand increases and supply is unchanged.',
-    backImage: `${FLIPPABLE_BASE_URL}equilibrium_demand_increase.jpg`,
+    backImage: `${FLIPPABLE_BASE_URL}sd_demand_increase.jpg`,
   },
   {
     id: 'u1m-1.6-rf1',
