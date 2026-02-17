@@ -1679,10 +1679,13 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
         {/* Ultimate Unit Shuffle - purple button at top */}
         {SHOW_DEEP_DIVE_AND_SHUFFLE && (() => {
           const getAllUnitFlashcards = (): UnitFlashcardData[] => {
-            if (selectedSubject === 'macro' && (activeUnitNum === 1 || activeUnitNum === 2 || activeUnitNum === 3 || activeUnitNum === 4 || activeUnitNum === 5 || activeUnitNum === 6)) {
+            const isMacro = selectedSubject === 'macro' && (activeUnitNum >= 1 && activeUnitNum <= 6);
+            const isMicro = selectedSubject === 'micro' && (activeUnitNum >= 1 && activeUnitNum <= 6);
+            if (isMacro || isMicro) {
               const allCards: UnitFlashcardData[] = [];
+              const subject = selectedSubject as 'macro' | 'micro';
               sortedLessons.forEach(({ lessonId }) => {
-                const lessonCards = getFlashcardsForLesson('macro', activeUnitNum, lessonId);
+                const lessonCards = getFlashcardsForLesson(subject, activeUnitNum, lessonId);
                 allCards.push(...lessonCards);
               });
               return allCards;

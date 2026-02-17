@@ -253,7 +253,8 @@ function TutorBuilderContent() {
              scenario.id === 50 ||
              scenario.id === 51 ||
              scenario.id === 52 ||
-             scenario.id === 53;
+             scenario.id === 53 ||
+             (scenario.id >= 54 && scenario.id <= 72);
       
       const matchesSearch = searchTerm === '' || 
         scenario.title.toLowerCase().includes(searchTerm.toLowerCase()) ||

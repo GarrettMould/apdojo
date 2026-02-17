@@ -2,6 +2,9 @@
 // Each scenario contains a question prompt, checklist items, and a sample answer image
 // Scenarios are linked to lessons in the syllabus via lessonId and can track relevant topics
 
+const MICRO_IMAGE_BASE = "https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/flippables/micro/";
+const MACRO_IMAGE_BASE = "https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/flippables/";
+
 export interface ChecklistItem {
   id: number;
   text: string;
@@ -1068,6 +1071,696 @@ export const graphGymScenarios: GraphGymScenario[] = [
       { id: 2, text: "ATC is downward sloping and located above the MC curve" },
       { id: 3, text: "Profit-Max (Qm, Pm) is where MR = MC, price set on Demand" },
       { id: 4, text: "Fair-Return (Qfr, Pfr) is labeled where Demand intersects ATC (Zero Profit)" }
+    ]
+  },
+
+  // --- AP MICRO: Additional graphing scenarios (54–72) ---
+  {
+    id: 54,
+    subject: 'micro',
+    lessonId: "2.2",
+    topics: ["Elasticity", "Supply and Demand", "Inelastic Demand", "Elastic Supply"],
+    difficulty: 'easy',
+    title: "Inelastic Demand and Elastic Supply",
+    slug: "inelastic-demand-elastic-supply",
+    description: "Draw a supply and demand curve for a good that has relatively inelastic demand and relatively elastic supply.",
+    // Mapped to inelastic_demand_elastic_supply.jpg
+    correctImage: `${MICRO_IMAGE_BASE}inelastic_demand_elastic_supply.jpg`,
+    checklist: [
+      { id: 1, text: "Demand curve is steep (relatively inelastic)" },
+      { id: 2, text: "Supply curve is flat (relatively elastic)" },
+      { id: 3, text: "Axes labeled Price and Quantity" },
+      { id: 4, text: "Equilibrium is clearly shown at the intersection" }
+    ]
+  },
+  {
+    id: 55,
+    subject: 'micro',
+    lessonId: "2.2",
+    topics: ["Elasticity", "Perfectly Inelastic Demand"],
+    difficulty: 'easy',
+    title: "Perfectly Inelastic Demand",
+    slug: "perfectly-inelastic-demand",
+    description: "Draw the demand curve for a product with perfectly inelastic demand.",
+    // Mapped to perfectly_inelastic_demand.jpg
+    correctImage: `${MICRO_IMAGE_BASE}perfectly_inelastic_demand.jpg`,
+    checklist: [
+      { id: 1, text: "Demand curve is a vertical line" },
+      { id: 2, text: "Quantity does not change when price changes" },
+      { id: 3, text: "Axes labeled Price and Quantity" },
+      { id: 4, text: "Curve is clearly labeled as Demand" }
+    ]
+  },
+  {
+    id: 56,
+    subject: 'micro',
+    lessonId: "2.8",
+    topics: ["Per-Unit Tax", "Tax Revenue", "Deadweight Loss"],
+    difficulty: 'medium',
+    title: "Per-Unit Tax: Tax Revenue and DWL",
+    slug: "per-unit-tax-revenue-dwl",
+    description: "Draw a supply and demand curve and show the impact of a per unit tax on the product. Label total tax revenue and deadweight loss.",
+    // Mapped to tax_revenue_dwl.jpg
+    correctImage: `${MICRO_IMAGE_BASE}tax_revenue_dwl.jpg`,
+    checklist: [
+      { id: 1, text: "Supply curve shifts vertically upward by the tax amount" },
+      { id: 2, text: "Total tax revenue rectangle is labeled (tax × quantity exchanged)" },
+      { id: 3, text: "Deadweight loss triangle is labeled" },
+      { id: 4, text: "New equilibrium quantity is less than original" }
+    ]
+  },
+  {
+    id: 57,
+    subject: 'micro',
+    lessonId: "2.6",
+    topics: ["Market Equilibrium", "Consumer Surplus", "Producer Surplus"],
+    difficulty: 'easy',
+    title: "Equilibrium with CS and PS",
+    slug: "equilibrium-cs-ps",
+    description: "Draw a supply and demand graph showing a market in equilibrium. Label total consumer surplus and total producer surplus.",
+    // Mapped to consumer_producer_surplus.jpg
+    correctImage: `${MICRO_IMAGE_BASE}consumer_producer_surplus.jpg`,
+    checklist: [
+      { id: 1, text: "Equilibrium price and quantity are at the intersection of S and D" },
+      { id: 2, text: "Total consumer surplus is labeled (area below demand, above price)" },
+      { id: 3, text: "Total producer surplus is labeled (area above supply, below price)" },
+      { id: 4, text: "Supply and demand curves are correctly drawn" }
+    ]
+  },
+  {
+    id: 58,
+    subject: 'micro',
+    lessonId: "2.8",
+    topics: ["Per-Unit Tax", "Consumer Surplus", "Producer Surplus", "Tax Revenue", "DWL"],
+    difficulty: 'medium',
+    title: "Per-Unit Tax: Welfare After Tax",
+    slug: "per-unit-tax-welfare",
+    description: "Draw a supply and demand curve and show the impact of a per unit tax on the product. Label consumer surplus, producer surplus, total tax revenue and DWL after the tax.",
+    // Mapped to tax_fully_labelled.jpg (Matches 'Welfare After Tax' scope)
+    correctImage: `${MICRO_IMAGE_BASE}tax_fully_labelled.jpg`,
+    checklist: [
+      { id: 1, text: "Supply shifts up by the tax; new equilibrium is shown" },
+      { id: 2, text: "Consumer surplus after tax is labeled" },
+      { id: 3, text: "Producer surplus after tax is labeled" },
+      { id: 4, text: "Total tax revenue and DWL are labeled" }
+    ]
+  },
+  {
+    id: 59,
+    subject: 'micro',
+    lessonId: "2.5",
+    topics: ["Tariff", "International Trade", "CS", "PS", "Tax Revenue", "DWL", "Imports"],
+    difficulty: 'hard',
+    title: "Domestic Market with Tariff",
+    slug: "tariff-domestic-market",
+    description: "Draw the supply and demand curves for a domestic market after a tariff has been placed on imported goods. Label CS, PS, total tax revenue, DWL, and show the quantity imported.",
+    // Mapped to tariff_fully_labelled.jpg
+    correctImage: `${MICRO_IMAGE_BASE}tariff_fully_labelled.jpg`,
+    checklist: [
+      { id: 1, text: "World price and tariff-inclusive price (or domestic equilibrium) are shown" },
+      { id: 2, text: "CS, PS, total tax (tariff) revenue, and DWL are labeled" },
+      { id: 3, text: "Quantity imported is clearly indicated" },
+      { id: 4, text: "Domestic supply and demand curves are drawn correctly" }
+    ]
+  },
+  {
+    id: 60,
+    subject: 'micro',
+    lessonId: "2.8",
+    topics: ["Price Floor", "Binding", "Qd", "Qs", "Surplus"],
+    difficulty: 'easy',
+    title: "Binding Price Floor",
+    slug: "binding-price-floor",
+    description: "Add a binding price floor to a supply and demand graph. Show the impact on Qd and Qs.",
+    // Mapped to price_floor.jpg
+    correctImage: `${MICRO_IMAGE_BASE}price_floor.jpg`,
+    checklist: [
+      { id: 1, text: "Price floor is a horizontal line above equilibrium price" },
+      { id: 2, text: "Quantity demanded (Qd) is labeled at the floor price" },
+      { id: 3, text: "Quantity supplied (Qs) is labeled at the floor price" },
+      { id: 4, text: "Qs > Qd (surplus) is clearly shown" }
+    ]
+  },
+  {
+    id: 61,
+    subject: 'micro',
+    lessonId: "2.8",
+    topics: ["Price Ceiling", "Binding", "Qd", "Qs", "Shortage"],
+    difficulty: 'easy',
+    title: "Binding Price Ceiling (Qd and Qs)",
+    slug: "binding-price-ceiling-qd-qs",
+    description: "Add a binding price ceiling to a supply and demand graph. Show the impact on Qd and Qs.",
+    // Mapped to price_ceiling.jpg
+    correctImage: `${MICRO_IMAGE_BASE}price_ceiling.jpg`,
+    checklist: [
+      { id: 1, text: "Price ceiling is a horizontal line below equilibrium price" },
+      { id: 2, text: "Quantity demanded (Qd) is labeled at the ceiling price" },
+      { id: 3, text: "Quantity supplied (Qs) is labeled at the ceiling price" },
+      { id: 4, text: "Qd > Qs (shortage) is clearly shown" }
+    ]
+  },
+  {
+    id: 62,
+    subject: 'micro',
+    lessonId: "2.8",
+    topics: ["Price Ceiling", "Consumer Surplus", "Producer Surplus", "DWL"],
+    difficulty: 'medium',
+    title: "Binding Price Ceiling: CS, PS, and DWL",
+    slug: "binding-price-ceiling-welfare",
+    description: "Add a binding price ceiling to a supply and demand graph. Label the new CS, PS, and DWL.",
+    // Mapped to price_ceiling_surplus_dwl.jpg
+    correctImage: `${MICRO_IMAGE_BASE}price_ceiling_surplus_dwl.jpg`,
+    checklist: [
+      { id: 1, text: "Binding price ceiling is drawn below equilibrium" },
+      { id: 2, text: "New consumer surplus (CS) is labeled" },
+      { id: 3, text: "New producer surplus (PS) is labeled" },
+      { id: 4, text: "Deadweight loss (DWL) is labeled" }
+    ]
+  },
+  {
+    id: 63,
+    subject: 'micro',
+    lessonId: "3.7",
+    topics: ["Perfect Competition", "Increasing-Cost Industry", "Market and Firm", "Supply and Demand Shift"],
+    difficulty: 'hard',
+    title: "PC Firm in Increasing-Cost Industry",
+    slug: "pc-increasing-cost-industry",
+    description: "Draw the market and firm graphs for a perfectly competitive firm in an increasing-cost industry. Show the impact on the product price as both market supply and demand increase.",
+    // Mapped to increasing_cost_industry.jpg
+    correctImage: `${MICRO_IMAGE_BASE}increasing_cost_industry.jpg`,
+    checklist: [
+      { id: 1, text: "Market graph shows both supply and demand shifting" },
+      { id: 2, text: "Firm graph is consistent with the new market price" },
+      { id: 3, text: "Impact on product price is clearly shown (indeterminate or as appropriate)" },
+      { id: 4, text: "Market and firm graphs are drawn side by side" }
+    ]
+  },
+  {
+    id: 64,
+    subject: 'micro',
+    lessonId: "5.3",
+    topics: ["Labor Market", "Perfect Competition", "Market and Firm"],
+    difficulty: 'medium',
+    title: "Perfectly Competitive Labor Market",
+    slug: "pc-labor-market",
+    description: "Draw the market and firm graphs for a perfectly competitive labor market.",
+    // Mapped to perfectly_comp_labor_market.jpg
+    correctImage: `${MICRO_IMAGE_BASE}perfectly_comp_labor_market.jpg`,
+    checklist: [
+      { id: 1, text: "Market graph shows labor supply and labor demand with equilibrium wage" },
+      { id: 2, text: "Firm graph shows MRC (horizontal) and MRP (downward sloping)" },
+      { id: 3, text: "Quantity of labor hired by firm is where MRP = MRC" },
+      { id: 4, text: "Axes are labeled (Wage, Quantity of Labor)" }
+    ]
+  },
+  {
+    id: 65,
+    subject: 'micro',
+    lessonId: "4.2",
+    topics: ["Monopoly", "Long-Run Equilibrium", "Economic Profit"],
+    difficulty: 'medium',
+    title: "Single-Price Monopoly Long-Run Equilibrium",
+    slug: "monopoly-lr-profit",
+    description: "Draw the short-run production cost curves for a single-price monopoly in long-run equilibrium. Shade in the area that represents the firm's total economic profit.",
+    // Mapped to monopoly_econ_profit.jpg
+    correctImage: `${MICRO_IMAGE_BASE}monopoly_econ_profit.jpg`,
+    checklist: [
+      { id: 1, text: "D, MR, MC, and ATC are drawn" },
+      { id: 2, text: "Profit-maximizing quantity is where MR = MC" },
+      { id: 3, text: "Price is on the demand curve above that quantity" },
+      { id: 4, text: "Area of total economic profit is shaded" }
+    ]
+  },
+  {
+    id: 66,
+    subject: 'micro',
+    lessonId: "4.2",
+    topics: ["Monopoly", "Labor Costs", "Profit Maximization"],
+    difficulty: 'medium',
+    title: "Monopoly: Increase in Labor Costs",
+    slug: "monopoly-labor-cost-increase",
+    description: "Show the impact of an increase in labor costs on a single-price monopoly. Label the original profit-maximizing price and quantity, as well as the new profit-maximizing price and quantity.",
+    // Mapped to mc_curve_increase.jpg
+    correctImage: `${MICRO_IMAGE_BASE}mc_curve_increase.jpg`,
+    checklist: [
+      { id: 1, text: "Original profit-maximizing price and quantity are labeled" },
+      { id: 2, text: "MC and/or ATC shift to reflect higher labor costs" },
+      { id: 3, text: "New profit-maximizing price and quantity are labeled" },
+      { id: 4, text: "New quantity is lower; new price is higher (typical result)" }
+    ]
+  },
+  {
+    id: 67,
+    subject: 'micro',
+    lessonId: "4.4",
+    topics: ["Monopolistic Competition", "Long-Run Equilibrium", "Allocative Efficiency"],
+    difficulty: 'medium',
+    title: "Monopolistically Competitive Firm Long-Run Equilibrium",
+    slug: "monop-comp-lr-equilibrium",
+    description: "Draw the short-run production cost curves for a monopolistically competitive firm in long-run equilibrium. Label the profit-maximizing price and quantity, as well as the allocatively efficient quantity.",
+    // Mapped to monopolistic_comp_lre.jpg
+    correctImage: `${MICRO_IMAGE_BASE}monopolistic_comp_lre.jpg`,
+    checklist: [
+      { id: 1, text: "D, MR, MC, and ATC are drawn" },
+      { id: 2, text: "Profit-maximizing P and Q are where MR = MC, price on D" },
+      { id: 3, text: "Allocatively efficient quantity is where MC = D" },
+      { id: 4, text: "Zero economic profit (P = ATC at profit-max quantity)" }
+    ]
+  },
+  {
+    id: 68,
+    subject: 'micro',
+    lessonId: "3.7",
+    topics: ["Perfect Competition", "Short-Run", "Positive Economic Profit"],
+    difficulty: 'medium',
+    title: "PC Firm Earning Positive Economic Profit",
+    slug: "pc-positive-profit",
+    description: "Draw the short-run production cost curves for a perfectly competitive firm that is earning positive economic profit in the short-run.",
+    // Mapped to perfect_comp_profit.jpg
+    correctImage: `${MICRO_IMAGE_BASE}perfect_comp_profit.jpg`,
+    checklist: [
+      { id: 1, text: "Horizontal demand (P = MR = AR) at market price" },
+      { id: 2, text: "MC, ATC, and AVC are drawn" },
+      { id: 3, text: "Profit-maximizing quantity is where MC = MR" },
+      { id: 4, text: "P > ATC at that quantity; economic profit area is shown" }
+    ]
+  },
+  {
+    id: 69,
+    subject: 'micro',
+    lessonId: "3.7",
+    topics: ["Perfect Competition", "Short-Run", "Economic Losses"],
+    difficulty: 'medium',
+    title: "PC Firm Earning Economic Losses",
+    slug: "pc-economic-losses",
+    description: "Draw the short-run production cost curves for a perfectly competitive firm that is earning economic losses in the short-run.",
+    // Mapped to perfect_comp_losses.jpg
+    correctImage: `${MICRO_IMAGE_BASE}perfect_comp_losses.jpg`,
+    checklist: [
+      { id: 1, text: "Horizontal demand (P = MR) at market price" },
+      { id: 2, text: "MC, ATC, and AVC are drawn" },
+      { id: 3, text: "Profit-maximizing quantity is where MC = MR" },
+      { id: 4, text: "P < ATC at that quantity; loss area is shown" }
+    ]
+  },
+  {
+    id: 70,
+    subject: 'micro',
+    lessonId: "3.7",
+    topics: ["Perfect Competition", "Number of Sellers", "Market and Firm"],
+    difficulty: 'medium',
+    title: "PC Industry: Reduction in Number of Sellers",
+    slug: "pc-fewer-sellers",
+    description: "Draw the market and firm graphs for a perfectly competitive industry. Show the impact of reduction in the number of sellers in the market.",
+    // Mapped to perfect_comp_supply_decrease.jpg
+    correctImage: `${MICRO_IMAGE_BASE}perfect_comp_supply_decrease.jpg`,
+    checklist: [
+      { id: 1, text: "Market supply curve shifts left (fewer sellers)" },
+      { id: 2, text: "New equilibrium price increases, quantity decreases" },
+      { id: 3, text: "Firm graph shows the new higher price (horizontal D)" },
+      { id: 4, text: "Market and firm graphs are consistent" }
+    ]
+  },
+  {
+    id: 71,
+    subject: 'micro',
+    lessonId: "6.2",
+    topics: ["Positive Externality", "Flu Shots", "MPB", "MPC", "MSB", "MSC", "DWL"],
+    difficulty: 'medium',
+    title: "Flu Shots: Marginal External Benefit",
+    slug: "flu-shots-external-benefit",
+    description: "Suppose that getting the flu shot generates marginal external benefit for society. Draw a graph that shows the marginal private benefit (MPB), marginal private cost (MPC), marginal social benefit (MSB), and marginal social cost (MSC) in the market for flu shots. Label deadweight loss.",
+    // Mapped to positive_consumption_externality.jpg
+    correctImage: `${MICRO_IMAGE_BASE}positive_consumption_externality.jpg`,
+    checklist: [
+      { id: 1, text: "MPB and MPC (supply) are drawn" },
+      { id: 2, text: "MSB is above MPB; MSC equals MPC (or is drawn appropriately)" },
+      { id: 3, text: "Market quantity and socially optimal quantity are identifiable" },
+      { id: 4, text: "Deadweight loss is labeled" }
+    ]
+  },
+  {
+    id: 72,
+    subject: 'micro',
+    lessonId: "6.2",
+    topics: ["Negative Externality", "Production", "Qpm", "Qso", "Ppm", "Pso"],
+    difficulty: 'medium',
+    title: "Negative Production Externality (Qpm, Qso, Ppm, Pso)",
+    slug: "negative-production-externality-labels",
+    description: "Draw the market graph for a product that generates a negative externality during production. Label the private market quantity (Qpm), the socially optimal quantity (Qso), the private market price (Ppm) and the socially optimal price (Pso).",
+    // Mapped to negative_production_externality.jpg
+    correctImage: `${MICRO_IMAGE_BASE}negative_production_externality.jpg`,
+    checklist: [
+      { id: 1, text: "MSC is above MPC (supply)" },
+      { id: 2, text: "Private market quantity (Qpm) and price (Ppm) are labeled" },
+      { id: 3, text: "Socially optimal quantity (Qso) and price (Pso) are labeled" },
+      { id: 4, text: "Qpm > Qso; market overproduces without intervention" }
+    ]
+  }, 
+  {
+    id: 73,
+    subject: 'macro',
+    lessonId: "1.2",
+    topics: ["PPC", "Economic Growth", "Technology"],
+    difficulty: 'easy',
+    title: "PPC: Improved Technology",
+    slug: "ppc-improved-technology",
+    description: "How do you show the effect of improved technology on a country's production possibilities?",
+    correctImage: `${MACRO_IMAGE_BASE}ppc_outward_shift.jpg`,
+    checklist: [
+      { id: 1, text: "PPC shifts outward (to the right)" },
+      { id: 2, text: "Axes labeled with two different goods" },
+      { id: 3, text: "Show that previously unattainable points are now attainable" }
+    ]
+  },
+  {
+    id: 74,
+    subject: 'macro',
+    lessonId: "1.2",
+    topics: ["PPC", "Recession", "Disaster"],
+    difficulty: 'easy',
+    title: "PPC: Natural Disaster",
+    slug: "ppc-natural-disaster",
+    description: "How do you show the effects of a large-scale natural disaster on the PPC?",
+    correctImage: `${MACRO_IMAGE_BASE}ppc_inward_shift.jpg`,
+    checklist: [
+      { id: 1, text: "PPC shifts inward (to the left)" },
+      { id: 2, text: "Represents a destruction of resources (Land/Capital)" },
+      { id: 3, text: "Productive capacity decreases" }
+    ]
+  },
+  {
+    id: 75,
+    subject: 'macro',
+    lessonId: "1.2",
+    topics: ["PPC", "Inefficiency", "Unemployment"],
+    difficulty: 'easy',
+    title: "PPC: Inefficiency",
+    slug: "ppc-inefficiency",
+    description: "How do you show on a PPC that a country is producing inefficiently (underutilizing resources)?",
+    correctImage: `${MACRO_IMAGE_BASE}underutilization.jpg`,
+    checklist: [
+      { id: 1, text: "Draw a point inside the PPC curve" },
+      { id: 2, text: "Label the point (e.g., Point A)" },
+      { id: 3, text: "Curve remains stationary (resources are not destroyed, just unused)" }
+    ]
+  },
+  {
+    id: 76,
+    subject: 'macro',
+    lessonId: "1.4",
+    topics: ["Supply and Demand", "Demand Shift", "Substitutes"],
+    difficulty: 'easy',
+    title: "Demand Increase (Substitutes)",
+    slug: "demand-increase-substitutes",
+    description: "How do you show the effect of a rise in the price of a substitute good on demand for the original good?",
+    correctImage: `${MACRO_IMAGE_BASE}demand_increase.jpg`,
+    checklist: [
+      { id: 1, text: "Demand curve shifts to the right" },
+      { id: 2, text: "Equilibrium price increases" },
+      { id: 3, text: "Equilibrium quantity increases" }
+    ]
+  },
+  {
+    id: 77,
+    subject: 'macro',
+    lessonId: "1.6",
+    topics: ["Market Equilibrium", "Surplus", "Price Controls"],
+    difficulty: 'medium',
+    title: "Market Surplus",
+    slug: "market-surplus",
+    description: "How do you show a surplus on a supply and demand graph?",
+    correctImage: `${MACRO_IMAGE_BASE}surplus.jpg`,
+    checklist: [
+      { id: 1, text: "Draw a price line ABOVE the equilibrium price" },
+      { id: 2, text: "Label Quantity Supplied (Qs) on the Supply curve" },
+      { id: 3, text: "Label Quantity Demanded (Qd) on the Demand curve" },
+      { id: 4, text: "Identify the horizontal gap where Qs > Qd" }
+    ]
+  },
+
+  // ——— Unit 3: AD/AS Model ———
+  {
+    id: 78,
+    subject: 'macro',
+    lessonId: "3.1",
+    topics: ["AD-AS", "Aggregate Demand", "Consumer Confidence"],
+    difficulty: 'medium',
+    title: "Increase in Aggregate Demand",
+    slug: "ad-increase",
+    description: "How do you show an increase in aggregate demand on an AD-AS graph?",
+    correctImage: `${MACRO_IMAGE_BASE}ad_increase.jpg`,
+    checklist: [
+      { id: 1, text: "AD curve shifts to the right" },
+      { id: 2, text: "Price Level (PL) increases" },
+      { id: 3, text: "Real GDP (Y) increases" }
+    ]
+  },
+  {
+    id: 79,
+    subject: 'macro',
+    lessonId: "3.3",
+    topics: ["AD-AS", "SRAS", "Input Costs"],
+    difficulty: 'medium',
+    title: "Decrease in SRAS (Supply Shock)",
+    slug: "sras-decrease",
+    description: "How do you show a decrease in short-run aggregate supply on an AD-AS graph?",
+    correctImage: `${MACRO_IMAGE_BASE}sras_decrease.jpg`,
+    checklist: [
+      { id: 1, text: "SRAS curve shifts to the left" },
+      { id: 2, text: "Price Level increases (Inflation)" },
+      { id: 3, text: "Real GDP decreases (Recession)" }
+    ]
+  },
+  {
+    id: 80,
+    subject: 'macro',
+    lessonId: "3.5",
+    topics: ["AD-AS", "Recessionary Gap", "Output Gap"],
+    difficulty: 'hard',
+    title: "Recessionary Gap",
+    slug: "recessionary-gap",
+    description: "How do you show a recessionary gap on an AD-AS graph?",
+    correctImage: `${MACRO_IMAGE_BASE}recessionary_gap.jpg`,
+    checklist: [
+      { id: 1, text: "Draw LRAS (Vertical) at Full Employment (Yf)" },
+      { id: 2, text: "Draw AD and SRAS intersecting to the LEFT of LRAS" },
+      { id: 3, text: "Label current output (Y1) below potential output (Yf)" }
+    ]
+  },
+  {
+    id: 81,
+    subject: 'macro',
+    lessonId: "3.5",
+    topics: ["AD-AS", "Inflationary Gap", "Overheating"],
+    difficulty: 'hard',
+    title: "Inflationary Gap",
+    slug: "inflationary-gap",
+    description: "Draw the AD-AS graph of a country with actual output greater than potential output.",
+    correctImage: `${MACRO_IMAGE_BASE}adas_inflationary.jpg`,
+    checklist: [
+      { id: 1, text: "Draw LRAS (Vertical) at Full Employment (Yf)" },
+      { id: 2, text: "Draw AD and SRAS intersecting to the RIGHT of LRAS" },
+      { id: 3, text: "Label current output (Y1) above potential output (Yf)" }
+    ]
+  },
+  {
+    id: 82,
+    subject: 'macro',
+    lessonId: "3.6",
+    topics: ["AD-AS", "Stagflation", "Cost-Push Inflation"],
+    difficulty: 'hard',
+    title: "Stagflation",
+    slug: "stagflation",
+    description: "How do you show stagflation on an AD-AS graph?",
+    correctImage: `${MACRO_IMAGE_BASE}stagflation.jpg`,
+    checklist: [
+      { id: 1, text: "SRAS shifts left (negative supply shock)" },
+      { id: 2, text: "Price Level rises (Inflation)" },
+      { id: 3, text: "Real GDP falls (Stagnation/Recession)" }
+    ]
+  },
+  {
+    id: 83,
+    subject: 'macro',
+    lessonId: "3.7",
+    topics: ["AD-AS", "Long Run Adjustment", "Self-Correction"],
+    difficulty: 'hard',
+    title: "Long-Run Self-Adjustment (Recession)",
+    slug: "lr-adjustment-recession",
+    description: "How do you show long-run self-adjustment from a recessionary gap?",
+    correctImage: `${MACRO_IMAGE_BASE}long_run_adjustment_recessionary.jpg`,
+    checklist: [
+      { id: 1, text: "Start with intersection to the left of LRAS" },
+      { id: 2, text: "Shift SRAS to the RIGHT" },
+      { id: 3, text: "New intersection is at LRAS (Full Employment)" },
+      { id: 4, text: "Price Level decreases" }
+    ]
+  },
+
+  // ——— Unit 4: Financial Sector ———
+  {
+    id: 84,
+    subject: 'macro',
+    lessonId: "4.5",
+    topics: ["Money Market", "Money Supply", "Monetary Policy"],
+    difficulty: 'medium',
+    title: "Money Market: Increased Money Supply",
+    slug: "money-supply-increase",
+    description: "How do you show an increase in the money supply on a money market graph?",
+    correctImage: `${MACRO_IMAGE_BASE}money_supply_increase.jpg`,
+    checklist: [
+      { id: 1, text: "Vertical Money Supply (MS) curve shifts right" },
+      { id: 2, text: "Nominal Interest Rate decreases" },
+      { id: 3, text: "Money Demand (MD) remains unchanged" }
+    ]
+  },
+  {
+    id: 85,
+    subject: 'macro',
+    lessonId: "4.5",
+    topics: ["Money Market", "Money Demand", "Price Level"],
+    difficulty: 'medium',
+    title: "Money Market: Increased Price Level",
+    slug: "money-demand-price-level",
+    description: "Show how an increase in the general price level impacts money demand.",
+    correctImage: `${MACRO_IMAGE_BASE}money_demand_increase.jpg`,
+    checklist: [
+      { id: 1, text: "Money Demand (MD) curve shifts right" },
+      { id: 2, text: "Nominal Interest Rate increases" },
+      { id: 3, text: "People need more cash to buy same goods" }
+    ]
+  },
+  {
+    id: 86,
+    subject: 'macro',
+    lessonId: "4.7",
+    topics: ["Loanable Funds", "Deficit Spending", "Crowding Out"],
+    difficulty: 'hard',
+    title: "Loanable Funds: Deficit Spending",
+    slug: "lf-deficit-spending",
+    description: "How do you show the impact of government deficit spending on a loanable funds graph?",
+    correctImage: `${MACRO_IMAGE_BASE}lf_demand_increase.jpg`,
+    checklist: [
+      { id: 1, text: "Demand for Loanable Funds shifts right" },
+      { id: 2, text: "Real Interest Rate increases" },
+      { id: 3, text: "Quantity of funds loaned increases" }
+    ]
+  },
+  {
+    id: 87,
+    subject: 'macro',
+    lessonId: "4.7",
+    topics: ["Loanable Funds", "Political Instability", "Capital Flight"],
+    difficulty: 'medium',
+    title: "Loanable Funds: Political Instability",
+    slug: "lf-political-instability",
+    description: "Show the impact of political instability on the loanable funds graph.",
+    correctImage: `${MACRO_IMAGE_BASE}lf_supply_decrease.jpg`,
+    checklist: [
+      { id: 1, text: "Supply of Loanable Funds shifts left" },
+      { id: 2, text: "Real Interest Rate increases" },
+      { id: 3, text: "Investment decreases" }
+    ]
+  },
+
+  // ——— Unit 5: Stabilization Policies ———
+  {
+    id: 88,
+    subject: 'macro',
+    lessonId: "5.2",
+    topics: ["Phillips Curve", "Fiscal Policy", "Short Run"],
+    difficulty: 'hard',
+    title: "SRPC: Expansionary Policy",
+    slug: "srpc-expansionary-policy",
+    description: "Show the impact of expansionary fiscal policy on the short run Phillips curve.",
+    correctImage: `${MACRO_IMAGE_BASE}srpc_downward_move.jpg`,
+    checklist: [
+      { id: 1, text: "Move along the SRPC curve UP and to the LEFT" },
+      { id: 2, text: "Unemployment decreases" },
+      { id: 3, text: "Inflation increases" }
+    ]
+  },
+  {
+    id: 89,
+    subject: 'macro',
+    lessonId: "5.2",
+    topics: ["Phillips Curve", "Inflation Expectations", "Shifts"],
+    difficulty: 'hard',
+    title: "SRPC: Inflationary Expectations",
+    slug: "srpc-inflation-expectations",
+    description: "Show the impact of an increase in inflationary expectations on the SRPC.",
+    correctImage: `${MACRO_IMAGE_BASE}srpc_right_shift.jpg`,
+    checklist: [
+      { id: 1, text: "SRPC shifts UP (or Right)" },
+      { id: 2, text: "Inflation is higher at every unemployment rate" },
+      { id: 3, text: "LRPC remains vertical" }
+    ]
+  },
+  {
+    id: 90,
+    subject: 'macro',
+    lessonId: "5.2",
+    topics: ["Phillips Curve", "Long Run Equilibrium"],
+    difficulty: 'medium',
+    title: "Phillips Curve Equilibrium",
+    slug: "phillips-equilibrium",
+    description: "Draw the LRPC and SRPC for a country currently in long-run equilibrium.",
+    correctImage: `${MACRO_IMAGE_BASE}phillips_equilibrium.jpg`,
+    checklist: [
+      { id: 1, text: "Draw vertical LRPC at Natural Rate of Unemployment" },
+      { id: 2, text: "Draw downward sloping SRPC" },
+      { id: 3, text: "Intersection occurs exactly on the LRPC" }
+    ]
+  },
+
+  // ——— Unit 6: International Trade ———
+  {
+    id: 91,
+    subject: 'macro',
+    lessonId: "6.2",
+    topics: ["Forex", "Exchange Rates", "Market Equilibrium"],
+    difficulty: 'medium',
+    title: "Forex Market Equilibrium",
+    slug: "forex-market",
+    description: "Draw the forex market for USD and CAD.",
+    correctImage: `${MACRO_IMAGE_BASE}forex_market.jpg`,
+    checklist: [
+      { id: 1, text: "Vertical Axis: CAD/USD (Price of USD)" },
+      { id: 2, text: "Horizontal Axis: Quantity of USD" },
+      { id: 3, text: "Supply slopes up; Demand slopes down" }
+    ]
+  },
+  {
+    id: 92,
+    subject: 'macro',
+    lessonId: "6.4",
+    topics: ["Forex", "Monetary Policy", "Depreciation"],
+    difficulty: 'hard',
+    title: "Forex: Expansionary Monetary Policy",
+    slug: "forex-monetary-expansion",
+    description: "Show expansionary monetary policy on a forex market graph (domestic currency).",
+    correctImage: `${MACRO_IMAGE_BASE}forex_demand_decrease.jpg`,
+    checklist: [
+      { id: 1, text: "Lower interest rates cause capital outflow" },
+      { id: 2, text: "Demand for currency shifts Left (Decreases)" },
+      { id: 3, text: "Currency Depreciates (Value falls)" }
+    ]
+  },
+  {
+    id: 93,
+    subject: 'macro',
+    lessonId: "6.6",
+    topics: ["Forex", "Interest Rates", "Capital Flows"],
+    difficulty: 'hard',
+    title: "Forex: Interest Rate Differential",
+    slug: "forex-interest-rates",
+    description: "Show the impact of an increase in interest rates on the value of the YEN relative to the EURO.",
+    correctImage: `${MACRO_IMAGE_BASE}forex_market_shifts.jpg`,
+    checklist: [
+      { id: 1, text: "Higher rates attract capital inflow" },
+      { id: 2, text: "Demand for Yen shifts Right (Increases)" },
+      { id: 3, text: "Yen Appreciates (Value rises)" }
     ]
   }
 ];
