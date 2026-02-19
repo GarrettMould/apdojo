@@ -12,6 +12,7 @@ export interface WhiteboardImage {
   lessonIDs: string[];
   imageUrl: string; // The URL pointing to the image in S3
   title?: string; // Optional title/description
+  topic?: string; // Optional topic (from Whiteboard mapping)
   // Potentially add upload date, creator, etc.
 }
 

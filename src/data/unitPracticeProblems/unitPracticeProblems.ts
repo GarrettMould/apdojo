@@ -16,6 +16,21 @@ import q2103 from "../../../public/images/unitMCQs/q2103.svg"
 import q2126 from "../../../public/images/unitMCQs/q2126.svg"
 import q2122 from "../../../public/images/unitMCQs/q2122.svg"
 import q3024 from "../../../public/images/unitMCQs/q3024.svg"
+import q3070 from "../../../public/images/unitMCQs/q3070.svg"
+import q3071 from "../../../public/images/unitMCQs/q3071.svg"
+import q3072 from "../../../public/images/unitMCQs/q3072.svg"
+import q3073 from "../../../public/images/unitMCQs/q3073.svg"
+import q3074 from "../../../public/images/unitMCQs/q3074.svg"
+import q3090 from "../../../public/images/unitMCQs/q3090.svg"
+import q3091 from "../../../public/images/unitMCQs/q3091.svg"
+import q3092 from "../../../public/images/unitMCQs/q3092.svg"
+import q3093 from "../../../public/images/unitMCQs/q3093.svg"
+import q3094 from "../../../public/images/unitMCQs/q3094.svg"
+import q3110 from "../../../public/images/unitMCQs/q3110.svg"
+import q3111 from "../../../public/images/unitMCQs/q3111.svg"
+import q3112 from "../../../public/images/unitMCQs/q3112.svg"
+import q3113 from "../../../public/images/unitMCQs/q3113.svg"
+import q3114 from "../../../public/images/unitMCQs/q3114.svg"
 
 // Create arrays for each unit
 const unit1Questions = macroSetTwoQuestions.questions.filter(q => q.unit === 1);
@@ -1982,6 +1997,368 @@ const macroUnit3Questions = [
     "correctAnswer": "C",
     "explanation": "Sticky nominal wages mean that wages do not fall easily even when aggregate demand decreases (reducing the demand for labor). Firms facing lower demand and unable to cut nominal wages may instead reduce employment significantly, leading to higher and potentially more persistent cyclical unemployment (actual unemployment above the natural rate) than if wages were flexible downwards.",
     "videoExplanation": null
+  }, 
+  {
+    "id": 3070,
+    "unit": 3,
+    "lessonIDS": ["3.5"],
+    "unitName": "National Income and Price Determination",
+    "question": "Refer to the standard AD-AS graph below. If the current equilibrium output is at Y1 and full employment output is at Yf, which of the following accurately describes the economic conditions?",
+    "image": q3070,
+    "options": [
+      "The economy is in a recessionary gap with cyclical unemployment.",
+      "The economy is in an inflationary gap with high unemployment.",
+      "The economy is at full employment with structural unemployment.",
+      "The economy is experiencing stagflation.",
+      "The economy is overheating and wages will soon rise."
+    ],
+    "correctAnswer": "A",
+    "explanation": "When current real GDP (Y1) is less than potential GDP (Yf), the economy is producing below its capacity. This gap is called a recessionary gap, characterized by higher-than-natural unemployment, specifically cyclical unemployment.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3071,
+    "unit": 3,
+    "lessonIDS": ["3.7"],
+    "unitName": "National Income and Price Determination",
+    "question": "Refer to the graph below, showing an economy in short-run equilibrium. If the government takes no policy action, how will the economy adjust to the long run?",
+    "image": q3071,
+    "options": [
+      "Aggregate Demand will increase, restoring full employment.",
+      "Short-Run Aggregate Supply will increase, lowering the price level.",
+      "Aggregate Demand will decrease as consumer confidence falls.",
+      "Short-Run Aggregate Supply will decrease as nominal wages rise.",
+      "Long-Run Aggregate Supply will shift to the right."
+    ],
+    "correctAnswer": "D",
+    "explanation": "In an inflationary gap, output is above potential and unemployment is below the natural rate. This tightness in the labor market eventually puts upward pressure on nominal wages. As wages rise, firms' production costs increase, causing the SRAS curve to shift to the left until output returns to the full-employment level.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3072,
+    "unit": 3,
+    "lessonIDS": ["3.3", "3.6"],
+    "unitName": "National Income and Price Determination",
+    "question": "Refer to the AD-AS graph below. A movement from equilibrium A to equilibrium B, characterized by a higher price level and lower real GDP, represents which phenomenon?",
+    "image": q3072,
+    "options": [
+      "Demand-pull inflation",
+      "Long-run economic growth",
+      "Deflationary spiral",
+      "Expansionary fiscal policy effect",
+      "Stagflation caused by a negative supply shock"
+    ],
+    "correctAnswer": "E",
+    "explanation": "A leftward shift of the SRAS curve results in higher prices (inflation) and lower output (stagnation). This combination is known as stagflation and is typically caused by a negative supply shock, such as a spike in oil prices.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3073,
+    "unit": 3,
+    "lessonIDS": ["3.8"],
+    "unitName": "National Income and Price Determination",
+    "question": "Refer to the graph below. Which fiscal policy action would be most appropriate to shift the aggregate demand curve from AD1 to AD2?",
+    "image": q3073,
+    "options": [
+      "Decreasing government spending",
+      "Increasing government transfer payments",
+      "Increasing personal income taxes",
+      "Selling government bonds",
+      "Decreasing the money supply"
+    ],
+    "correctAnswer": "B",
+    "explanation": "The shift from AD1 to AD2 represents an increase in Aggregate Demand to close a recessionary gap. Increasing transfer payments (like unemployment benefits) raises households' disposable income and consumption, shifting AD to the right. Options A and C are contractionary. Options D and E are monetary policy.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3074,
+    "unit": 3,
+    "lessonIDS": ["3.4", "5.6"],
+    "unitName": "National Income and Price Determination",
+    "question": "Refer to the graph below. A rightward shift of the Long-Run Aggregate Supply (LRAS) curve from LRAS1 to LRAS2 is best explained by:",
+    "image": q3074,
+    "options": [
+      "An increase in the quantity or quality of productive resources.",
+      "A decrease in the price level.",
+      "An increase in aggregate demand.",
+      "A decrease in the natural rate of unemployment.",
+      "Expansionary monetary policy."
+    ],
+    "correctAnswer": "A",
+    "explanation": "The LRAS curve represents potential output. It shifts to the right (economic growth) only when there is an increase in the factors of production (land, labor, capital) or an improvement in technology/productivity.",
+    "videoExplanation": null
+  },
+
+  // --- Text Based Questions (15) ---
+  {
+    "id": 3075,
+    "unit": 3,
+    "lessonIDS": ["3.2"],
+    "unitName": "National Income and Price Determination",
+    "question": "If the marginal propensity to consume (MPC) is 0.9, what is the value of the tax multiplier?",
+    "image": null,
+    "options": [
+      "10",
+      "9",
+      "-9",
+      "-10",
+      "0.1"
+    ],
+    "correctAnswer": "C",
+    "explanation": "The tax multiplier is calculated as -MPC / MPS. Since MPC is 0.9, MPS is 0.1 (because MPC + MPS = 1). Tax Multiplier = -0.9 / 0.1 = -9. Note that the tax multiplier is always negative and one less in absolute value than the spending multiplier.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3076,
+    "unit": 3,
+    "lessonIDS": ["3.1"],
+    "unitName": "National Income and Price Determination",
+    "question": "Which of the following changes would cause a decrease in Aggregate Demand?",
+    "image": null,
+    "options": [
+      "A decrease in real interest rates",
+      "An increase in government spending",
+      "An increase in consumer wealth",
+      "A decrease in personal income taxes",
+      "An appreciation of the domestic currency"
+    ],
+    "correctAnswer": "E",
+    "explanation": "When the domestic currency appreciates, domestic goods become more expensive to foreigners (exports fall) and foreign goods become cheaper to domestic consumers (imports rise). This decreases Net Exports (Xn), causing Aggregate Demand to shift left.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3077,
+    "unit": 3,
+    "lessonIDS": ["3.3"],
+    "unitName": "National Income and Price Determination",
+    "question": "Nominal wages are often described as 'sticky' in the short run. This means that:",
+    "image": null,
+    "options": [
+      "Wages do not fall easily, even when the economy is in a recession.",
+      "Wages adjust immediately to changes in the price level.",
+      "Real wages always equal nominal wages.",
+      "Wages are determined solely by government regulation.",
+      "Unemployment cannot exist in the short run."
+    ],
+    "correctAnswer": "A",
+    "explanation": "Sticky wages refer to the resistance of nominal wages to downward adjustment (due to labor contracts, minimum wage laws, and morale). This stickiness is why the SRAS curve slopes upward: firms can't cut wages instantly when prices fall, so they cut output instead.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3078,
+    "unit": 3,
+    "lessonIDS": ["3.2"],
+    "unitName": "National Income and Price Determination",
+    "question": "Assume the government increases spending by $50 billion and finances it by increasing lump-sum taxes by $50 billion. If the MPC is 0.8, what is the net effect on Real GDP?",
+    "image": null,
+    "options": [
+      "Real GDP increases by $250 billion.",
+      "Real GDP increases by $50 billion.",
+      "Real GDP decreases by $200 billion.",
+      "Real GDP remains unchanged.",
+      "Real GDP increases by $10 billion."
+    ],
+    "correctAnswer": "B",
+    "explanation": "This demonstrates the Balanced Budget Multiplier, which is always equal to 1. The spending increase adds $250b (5 * 50) to GDP. The tax increase removes $200b (-4 * 50) from GDP. The net effect is an increase of $50 billion, equal to the initial change in government spending.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3079,
+    "unit": 3,
+    "lessonIDS": ["3.9"],
+    "unitName": "National Income and Price Determination",
+    "question": "Which of the following is considered an automatic stabilizer?",
+    "image": null,
+    "options": [
+      "Military spending",
+      "Sales taxes",
+      "Progressive income taxes",
+      "Investment tax credits",
+      "New infrastructure legislation"
+    ],
+    "correctAnswer": "C",
+    "explanation": "Progressive income taxes are automatic stabilizers because the average tax rate rises as income rises (during expansion, cooling the economy) and falls as income falls (during recession, supporting consumption), without any new laws being passed.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3080,
+    "unit": 3,
+    "lessonIDS": ["3.1"],
+    "unitName": "National Income and Price Determination",
+    "question": "If the stock market crashes, significantly reducing household wealth, which of the following will likely occur in the short run?",
+    "image": null,
+    "options": [
+      "AD will increase due to lower stock prices.",
+      "SRAS will decrease due to higher capital costs.",
+      "SRAS will increase due to lower wages.",
+      "AD will decrease due to the wealth effect.",
+      "LRAS will shift left due to loss of capital."
+    ],
+    "correctAnswer": "D",
+    "explanation": "The wealth effect states that when the value of assets (like stocks or homes) falls, households feel poorer and reduce their consumption spending. This causes the Aggregate Demand curve to shift to the left.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3081,
+    "unit": 3,
+    "lessonIDS": ["3.3"],
+    "unitName": "National Income and Price Determination",
+    "question": "Which of the following would cause the Short-Run Aggregate Supply (SRAS) curve to shift to the right?",
+    "image": null,
+    "options": [
+      "An increase in the expected price level",
+      "A decrease in labor productivity",
+      "An increase in corporate taxes",
+      "An increase in nominal wages",
+      "A decrease in the price of raw materials"
+    ],
+    "correctAnswer": "E",
+    "explanation": "SRAS shifts right when production costs fall. A decrease in the price of key inputs (like raw materials or energy) lowers per-unit production costs, encouraging firms to produce more output at any given price level.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3082,
+    "unit": 3,
+    "lessonIDS": ["3.2"],
+    "unitName": "National Income and Price Determination",
+    "question": "If an initial increase in investment spending of $20 billion leads to a total increase in Real GDP of $100 billion, what is the Marginal Propensity to Save (MPS)?",
+    "image": null,
+    "options": [
+      "0.2",
+      "0.1",
+      "0.4",
+      "0.5",
+      "0.8"
+    ],
+    "correctAnswer": "A",
+    "explanation": "The multiplier is equal to Total Change in GDP / Initial Change in Spending = 100 / 20 = 5. Since the multiplier = 1/MPS, then 5 = 1/MPS. Solving for MPS gives 1/5 = 0.2.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3083,
+    "unit": 3,
+    "lessonIDS": ["3.8"],
+    "unitName": "National Income and Price Determination",
+    "question": "Discretionary fiscal policy refers to:",
+    "image": null,
+    "options": [
+      "Changes in the money supply by the central bank.",
+      "Deliberate changes in government spending or taxes by the legislature.",
+      "Automatic changes in tax receipts due to the business cycle.",
+      "International trade agreements aimed at reducing tariffs.",
+      "Regulations on banking reserves."
+    ],
+    "correctAnswer": "B",
+    "explanation": "Discretionary fiscal policy involves intentional, legislative actions by the government (Congress/Parliament) to change spending or tax codes to stabilize the economy, as opposed to automatic stabilizers or monetary policy.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3084,
+    "unit": 3,
+    "lessonIDS": ["3.1"],
+    "unitName": "National Income and Price Determination",
+    "question": "Why is the Aggregate Demand curve downward sloping?",
+    "image": null,
+    "options": [
+      "Because as price level rises, consumers substitute towards cheaper domestic goods.",
+      "Because marginal utility diminishes as consumption increases.",
+      "Because of the wealth effect, interest rate effect, and exchange rate effect.",
+      "Because production costs rise as output increases.",
+      "Because nominal wages are sticky in the short run."
+    ],
+    "correctAnswer": "C",
+    "explanation": "The downward slope is not due to substitution between goods (micro concept). It is due to the Wealth Effect (purchasing power), Interest Rate Effect (cost of borrowing), and Exchange Rate Effect (relative price of exports/imports) as the aggregate price level changes.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3085,
+    "unit": 3,
+    "lessonIDS": ["3.4"],
+    "unitName": "National Income and Price Determination",
+    "question": "Which of the following is NOT a determinant of Long-Run Aggregate Supply (LRAS)?",
+    "image": null,
+    "options": [
+      "Quantity of labor",
+      "Quantity of capital",
+      "Level of technology",
+      "Price level",
+      "Quality of resources (e.g., education)"
+    ],
+    "correctAnswer": "D",
+    "explanation": "The LRAS curve is vertical, meaning it is independent of the price level. It is determined solely by the economy's real productive capacity (resources and technology). A change in the price level moves the economy along the SRAS curve but does not shift LRAS.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3086,
+    "unit": 3,
+    "lessonIDS": ["3.5"],
+    "unitName": "National Income and Price Determination",
+    "question": "If the economy is currently producing at a level of output that exceeds potential GDP, which of the following is true?",
+    "image": null,
+    "options": [
+      "The unemployment rate is above the natural rate.",
+      "There is a recessionary gap.",
+      "The price level is likely falling.",
+      "Resources are being utilized at unsustainable rates.",
+      "The economy is on its Long-Run Aggregate Supply curve."
+    ],
+    "correctAnswer": "D",
+    "explanation": "Producing beyond potential GDP (inflationary gap) implies that factories are running overtime and workers are working extra shifts. This level of production is unsustainable in the long run and puts upward pressure on wages and prices.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3087,
+    "unit": 3,
+    "lessonIDS": ["3.7"],
+    "unitName": "National Income and Price Determination",
+    "question": "According to classical economic theory (and the AD-AS model self-correction), if the economy is in a recession, what will eventually happen to wages and the SRAS curve?",
+    "image": null,
+    "options": [
+      "Wages will fall, shifting SRAS right.",
+      "Wages will rise, shifting SRAS left.",
+      "Wages will fall, shifting SRAS left.",
+      "Wages will rise, shifting SRAS right.",
+      "Wages are sticky, so SRAS will never shift."
+    ],
+    "correctAnswer": "A",
+    "explanation": "In a recession, high unemployment creates a surplus of labor. Eventually, nominal wages will fall (or grow slower). Lower wages reduce production costs for firms, causing the SRAS curve to shift to the right, restoring full employment at a lower price level.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3088,
+    "unit": 3,
+    "lessonIDS": ["3.2"],
+    "unitName": "National Income and Price Determination",
+    "question": "If investment demand becomes very sensitive to changes in the interest rate, how does this affect the slope of the Aggregate Demand curve?",
+    "image": null,
+    "options": [
+      "It makes AD steeper.",
+      "It makes AD vertical.",
+      "It makes AD flatter.",
+      "It makes AD horizontal.",
+      "It has no effect on the slope of AD."
+    ],
+    "correctAnswer": "C",
+    "explanation": "The Interest Rate Effect is one reason AD slopes down. If investment is highly sensitive to interest rates, a small change in Price Level (which changes interest rates) leads to a LARGE change in Investment and thus Output. This high responsiveness means quantity changes a lot for a price change, resulting in a flatter AD curve.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3089,
+    "unit": 3,
+    "lessonIDS": ["3.8"],
+    "unitName": "National Income and Price Determination",
+    "question": "Which of the following describes a 'lag' associated with fiscal policy?",
+    "image": null,
+    "options": [
+      "The time it takes for the money multiplier to work.",
+      "The time it takes for interest rates to adjust to money supply changes.",
+      "The time it takes for prices to adjust to a new equilibrium.",
+      "The time it takes for exports to react to exchange rates.",
+      "The time it takes for policymakers to recognize a recession and pass legislation."
+    ],
+    "correctAnswer": "E",
+    "explanation": "Fiscal policy suffers from recognition lags (realizing there is a problem), administrative/legislative lags (passing the bill), and implementation lags (spending the money). These delays can sometimes result in policy taking effect after the economy has already self-corrected.",
+    "videoExplanation": null
   }
 ]
 
@@ -2294,7 +2671,349 @@ const macroUnit4Questions = [
     "correctAnswer": "B",
     "explanation": "Increased business optimism about future profits makes firms more willing to undertake investment projects. To finance these projects, they increase their borrowing, which shifts the demand curve for loanable funds to the right. This leads to a higher equilibrium real interest rate, ceteris paribus.",
     "videoExplanation": null
-  }
+  }, 
+  {
+    "id": 3090,
+    "unit": 4,
+    "lessonIDS": ["4.5"],
+    "unitName": "Financial Sector",
+    "question": "Refer to the money market graph below. If the central bank buys government bonds on the open market, which of the following correctly describes the shift and the effect on the nominal interest rate?",
+    "image": q3090,
+    "options": [
+      "Money supply shifts left; nominal interest rate rises.",
+      "Money demand shifts right; nominal interest rate rises.",
+      "Money supply shifts right; nominal interest rate falls.",
+      "Money demand shifts left; nominal interest rate falls.",
+      "Money supply shifts right; nominal interest rate rises."
+    ],
+    "correctAnswer": "C",
+    "explanation": "Buying bonds injects reserves into the banking system, increasing the money supply. On the graph, the vertical money supply (MS) curve shifts to the right. As money becomes more plentiful relative to demand, the 'price' of money (the nominal interest rate) decreases.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3091,
+    "unit": 4,
+    "lessonIDS": ["4.7"],
+    "unitName": "Financial Sector",
+    "question": "Refer to the loanable funds market graph below. If the government increases deficit spending to fund infrastructure projects, which curve shifts and what is the impact on the real interest rate?",
+    "image": q3091,
+    "options": [
+      "Supply of loanable funds shifts right; real interest rate falls.",
+      "Demand for loanable funds shifts right; real interest rate rises.",
+      "Supply of loanable funds shifts left; real interest rate rises.",
+      "Demand for loanable funds shifts left; real interest rate falls.",
+      "Both supply and demand shift right; real interest rate is indeterminate."
+    ],
+    "correctAnswer": "B",
+    "explanation": "Government borrowing increases the demand for loanable funds (since the government needs loans to cover the deficit). This shifts the demand curve to the right, driving up the equilibrium real interest rate. This phenomenon is often associated with 'crowding out' private investment.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3092,
+    "unit": 4,
+    "lessonIDS": ["4.6"],
+    "unitName": "Financial Sector",
+    "question": "Refer to the ample reserves market graph below. If the central bank wants to lower the federal funds rate, which policy action should it take?",
+    "image": q3092,
+    "options": [
+      "Increase the reserve requirement.",
+      "Sell government securities.",
+      "Lower the interest on reserve balances (IORB) rate.",
+      "Increase the discount rate.",
+      "Shift the demand for reserves to the right."
+    ],
+    "correctAnswer": "C",
+    "explanation": "In an ample reserves regime (the current US system), open market operations do not effectively change the rate because the supply curve intersects the flat portion of the demand curve. To change rates, the Fed adjusts 'administered rates.' Lowering the interest on reserve balances (IORB) lowers the floor for the federal funds rate.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3093,
+    "unit": 4,
+    "lessonIDS": ["4.5"],
+    "unitName": "Financial Sector",
+    "question": "Refer to the money market graph below. An increase in the aggregate price level would cause which of the following changes?",
+    "image": q3093,
+    "options": [
+      "A movement down along the money demand curve.",
+      "A rightward shift of the money supply curve.",
+      "A leftward shift of the money demand curve.",
+      "A rightward shift of the money demand curve.",
+      "A movement up along the money supply curve."
+    ],
+    "correctAnswer": "D",
+    "explanation": "Money demand is driven by the transaction motive. If prices rise (inflation), households and firms need to hold more cash to buy the same amount of goods and services. This increases the demand for money at every interest rate, shifting the MD curve to the right.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3094,
+    "unit": 4,
+    "lessonIDS": ["4.7"],
+    "unitName": "Financial Sector",
+    "question": "Refer to the loanable funds graph below. If foreign investors become more confident in the stability of the domestic economy and increase financial capital inflows, what will happen?",
+    "image": q3094,
+    "options": [
+      "The supply of loanable funds will shift right, decreasing interest rates.",
+      "The demand for loanable funds will shift right, increasing interest rates.",
+      "The supply of loanable funds will shift left, increasing interest rates.",
+      "The demand for loanable funds will shift left, decreasing interest rates.",
+      "The economy will enter a recession due to foreign interference."
+    ],
+    "correctAnswer": "A",
+    "explanation": "Capital inflows represent money entering the country to purchase assets. This money enters the financial system and becomes available for lending. Therefore, the supply of loanable funds shifts to the right, lowering the equilibrium real interest rate.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3095,
+    "unit": 4,
+    "lessonIDS": ["4.3"],
+    "unitName": "Financial Sector",
+    "question": "Which of the following best describes the 'unit of account' function of money?",
+    "image": null,
+    "options": [
+    "Money can be saved and used for future purchases.",
+    "Money is accepted by all parties in a transaction.",
+    "Money is backed by gold or silver.",
+    "Money has intrinsic value.",
+    "Money provides a common measure of the value of goods and services."
+    ],
+    "correctAnswer": "E",
+    "explanation": "The 'unit of account' function means money acts as a yardstick for posting prices and recording debts. It allows us to compare the value of a pizza ($20) vs. a car ($20,000). Option A is store of value; Option B is medium of exchange.",
+    "videoExplanation": null
+    },
+    {
+    "id": 3096,
+    "unit": 4,
+    "lessonIDS": ["4.4"],
+    "unitName": "Financial Sector",
+    "question": "A commercial bank receives a new cash deposit of $10,000. If the required reserve ratio is 20%, what is the maximum amount by which this single bank can increase its loans?",
+    "image": null,
+    "options": [
+    "$2,000",
+    "$10,000",
+    "$40,000",
+    "$8,000",
+    "$50,000"
+    ],
+    "correctAnswer": "D",
+    "explanation": "The bank must hold 20% of the $10,000 as required reserves ($2,000). It can lend out the excess reserves. Excess reserves = Total Deposit - Required Reserves = $10,000 - $2,000 = $8,000. (Note: The banking system could expand money by more, but this single bank can only lend $8,000).",
+    "videoExplanation": null
+    },
+    {
+    "id": 3097,
+    "unit": 4,
+    "lessonIDS": ["4.1"],
+    "unitName": "Financial Sector",
+    "question": "There is an inverse relationship between market interest rates and:",
+    "image": null,
+    "options": [
+    "The price of existing bonds.",
+    "The demand for money.",
+    "The inflation rate.",
+    "The supply of loanable funds.",
+    "The required reserve ratio."
+    ],
+    "correctAnswer": "A",
+    "explanation": "When market interest rates rise, newly issued bonds offer higher payouts. This makes existing bonds with lower fixed interest rates less attractive, causing their price to fall. Conversely, when rates fall, existing bonds with higher rates become valuable, and their price rises.",
+    "videoExplanation": null
+    },
+    {
+    "id": 3098,
+    "unit": 4,
+    "lessonIDS": ["4.2"],
+    "unitName": "Financial Sector",
+    "question": "If the nominal interest rate is 7% and the expected inflation rate is 3%, what is the real interest rate?",
+    "image": null,
+    "options": [
+    "10%",
+    "4%",
+    "7%",
+    "2.3%",
+    "-4%"
+    ],
+    "correctAnswer": "B",
+    "explanation": "The Fisher equation states: Real Interest Rate = Nominal Interest Rate - Expected Inflation Rate. 7% - 3% = 4%. This represents the true increase in purchasing power for the lender.",
+    "videoExplanation": null
+    },
+    {
+    "id": 3099,
+    "unit": 4,
+    "lessonIDS": ["4.6"],
+    "unitName": "Financial Sector",
+    "question": "Which of the following is NOT a tool the central bank uses to conduct monetary policy?",
+    "image": null,
+    "options": [
+    "Open market operations",
+    "Changing the discount rate",
+    "Interest on reserve balances (IORB)",
+    "Changing the reserve requirement",
+    "Changing personal income tax rates"
+    ],
+    "correctAnswer": "E",
+    "explanation": "Changing tax rates is a tool of fiscal policy, which is conducted by the legislative/executive branch (Congress/President), not the central bank. The other options are all monetary policy tools.",
+    "videoExplanation": null
+    },
+    {
+    "id": 3100,
+    "unit": 4,
+    "lessonIDS": ["4.5"],
+    "unitName": "Financial Sector",
+    "question": "Why is the money demand curve downward sloping?",
+    "image": null,
+    "options": [
+    "As interest rates rise, the opportunity cost of holding cash increases.",
+    "As interest rates rise, people want to hold more cash for transactions.",
+    "As interest rates fall, the value of the dollar increases.",
+    "As prices rise, people need less money.",
+    "Banks lend less money when interest rates are high."
+    ],
+    "correctAnswer": "A",
+    "explanation": "Holding cash (or non-interest bearing checking accounts) means you are giving up the interest you could have earned by buying a bond or putting it in a savings account. As interest rates rise, this 'opportunity cost' gets higher, so people choose to hold less cash.",
+    "videoExplanation": null
+    },
+    {
+    "id": 3101,
+    "unit": 4,
+    "lessonIDS": ["4.3"],
+    "unitName": "Financial Sector",
+    "question": "Which of the following is included in M2 but NOT in M1?",
+    "image": null,
+    "options": [
+    "Currency in circulation",
+    "Demand deposits (checking accounts)",
+    "Traveler's checks",
+    "Savings deposits",
+    "Coins in the pockets of consumers"
+    ],
+    "correctAnswer": "D",
+    "explanation": "M1 is the narrowest definition of money (most liquid: cash, checking). M2 includes everything in M1 PLUS 'near-monies' like savings accounts, money market accounts, and small time deposits (CDs).",
+    "videoExplanation": null
+    },
+    {
+    "id": 3103,
+    "unit": 4,
+    "lessonIDS": ["4.6"],
+    "unitName": "Financial Sector",
+    "question": "If the central bank sells government bonds on the open market, what is the immediate effect on bank reserves and the money supply?",
+    "image": null,
+    "options": [
+    "Reserves increase; money supply increases.",
+    "Reserves increase; money supply decreases.",
+    "Reserves decrease; money supply decreases.",
+    "Reserves decrease; money supply increases.",
+    "Reserves remain unchanged; money supply decreases."
+    ],
+    "correctAnswer": "C",
+    "explanation": "When the central bank sells bonds, banks pay for them. This payment is taken out of the banks' reserves at the central bank. With fewer reserves, banks have less money to lend, causing the overall money supply to contract.",
+    "videoExplanation": null
+    },
+    {
+    "id": 3104,
+    "unit": 4,
+    "lessonIDS": ["4.5"],
+    "unitName": "Financial Sector",
+    "question": "According to the quantity theory of money, if the velocity of money (V) and real output (Y) are constant, an increase in the money supply (M) will lead to:",
+    "image": null,
+    "options": [
+    "A proportional increase in the price level (P).",
+    "A proportional decrease in the price level (P).",
+    "An increase in real output (Y).",
+    "A decrease in velocity (V).",
+    "No change in the economy."
+    ],
+    "correctAnswer": "A",
+    "explanation": "The equation MV = PY must balance. If V and Y are fixed, then M and P are directly proportional. Doubling the money supply would simply double the price level (inflation) without changing real output.",
+    "videoExplanation": null
+    },
+    {
+    "id": 3105,
+    "unit": 4,
+    "lessonIDS": ["4.6"],
+    "unitName": "Financial Sector",
+    "question": "The federal funds rate is:",
+    "image": null,
+    "options": [
+    "The interest rate the central bank charges banks for overnight loans.",
+    "The interest rate banks charge their most creditworthy customers.",
+    "The interest rate on 10-year Treasury bonds.",
+    "The interest rate banks charge each other for overnight loans of reserves.",
+    "The interest rate paid on savings accounts."
+    ],
+    "correctAnswer": "D",
+    "explanation": "The federal funds rate is the market-determined rate at which banks lend reserves to one another overnight. It is the primary target of open market operations.",
+    "videoExplanation": null
+    },
+    {
+    "id": 3106,
+    "unit": 4,
+    "lessonIDS": ["4.4"],
+    "unitName": "Financial Sector",
+    "question": "Which of the following would limit the effectiveness of the money multiplier process?",
+    "image": null,
+    "options": [
+    "Individuals depositing all their cash into banks.",
+    "A decrease in the required reserve ratio.",
+    "An increase in the demand for loans.",
+    "Banks reducing their holdings of government bonds.",
+    "Banks holding excess reserves instead of lending them out."
+    ],
+    "correctAnswer": "E",
+    "explanation": "The money multiplier assumes banks lend out ALL available excess reserves. If banks choose to hold onto excess reserves (for safety or due to lack of good borrowers), the money creation process slows down, and the actual multiplier is smaller than the theoretical maximum.",
+    "videoExplanation": null
+    },
+    {
+    "id": 3107,
+    "unit": 4,
+    "lessonIDS": ["4.6"],
+    "unitName": "Financial Sector",
+    "question": "In the ample reserves framework, the 'ceiling' of the policy rate corridor is determined by:",
+    "image": null,
+    "options": [
+    "The federal funds rate.",
+    "The interest on reserve balances (IORB) rate.",
+    "The discount rate.",
+    "The overnight reverse repurchase agreement (ON RRP) rate.",
+    "The prime rate."
+    ],
+    "correctAnswer": "C",
+    "explanation": "The discount rate (the rate the central bank charges banks to borrow directly from it) acts as the ceiling. Banks would never pay another bank MORE than the discount rate to borrow reserves, since they could just borrow from the central bank at that price.",
+    "videoExplanation": null
+    },
+    {
+    "id": 3108,
+    "unit": 4,
+    "lessonIDS": ["4.7"],
+    "unitName": "Financial Sector",
+    "question": "National savings is composed of:",
+    "image": null,
+    "options": [
+    "Private savings only.",
+    "Private savings + Public savings.",
+    "Public savings (budget surplus) only.",
+    "Investment spending - Consumption.",
+    "Foreign capital inflows."
+    ],
+    "correctAnswer": "B",
+    "explanation": "The supply of loanable funds comes from national savings, which is the sum of private savings (household income - consumption) and public savings (tax revenue - government spending).",
+    "videoExplanation": null
+    },
+    {
+    "id": 3109,
+    "unit": 4,
+    "lessonIDS": ["4.5"],
+    "unitName": "Financial Sector",
+    "question": "Which of the following events would cause a movement along the money demand curve, rather than a shift?",
+    "image": null,
+    "options": [
+    "An increase in real GDP.",
+    "A change in the price level.",
+    "The widespread adoption of credit cards.",
+    "A change in institutional banking laws.",
+    "A change in the interest rate."
+    ],
+    "correctAnswer": "E",
+    "explanation": "The interest rate is the 'price' on the vertical axis of the money market graph. A change in the price of the good (interest rate) causes a movement along the curve (change in quantity demanded). Any other factor (GDP, price level, technology) shifts the entire curve.",
+    "videoExplanation": null
+    }
 ]
 
 
@@ -2676,7 +3395,369 @@ const macroUnit5Questions = [
     "correctAnswer": "B",
     "explanation": "Equation: M * V = P * Y. \nSubstitute: M * 6 = 3 * 400. \n6M = 1200. \nM = 1200 / 6 = $200.",
     "videoExplanation": null
-  }
+  }, 
+{
+"id": 3110,
+"unit": 5,
+"lessonIDS": ["5.2"],
+"unitName": "Long-Run Consequences of Stabilization Policies",
+"question": "Refer to the Phillips curve graph below. The economy is currently operating at point A. Which of the following shocks would most likely cause a movement to point B?",
+"image": q3110,
+"options": [
+"A decrease in consumer confidence.",
+"An increase in government spending.",
+"An increase in the price of oil.",
+"A decrease in the money supply.",
+"A decrease in inflationary expectations."
+],
+"correctAnswer": "B",
+"explanation": "A movement up and to the left along a stable short-run Phillips curve (SRPC) represents an increase in the inflation rate and a decrease in the unemployment rate. This corresponds to an increase in aggregate demand (AD). An increase in government spending increases AD.",
+"videoExplanation": null
+},
+{
+"id": 3111,
+"unit": 5,
+"lessonIDS": ["5.2"],
+"unitName": "Long-Run Consequences of Stabilization Policies",
+"question": "Refer to the graph below. A shift of the short-run Phillips curve from SRPC1 to SRPC2 is most likely caused by:",
+"image": q3111,
+"options": [
+"An increase in aggregate demand.",
+"A decrease in aggregate demand.",
+"A negative supply shock.",
+"An increase in labor productivity.",
+"A decrease in the expected rate of inflation."
+],
+"correctAnswer": "C",
+"explanation": "A rightward (or upward) shift of the SRPC indicates that for every level of unemployment, the inflation rate is higher. This is known as stagflation and is typically caused by a negative supply shock (which shifts the SRAS curve to the left).",
+"videoExplanation": null
+},
+{
+"id": 3112,
+"unit": 5,
+"lessonIDS": ["5.2"],
+"unitName": "Long-Run Consequences of Stabilization Policies",
+"question": "Refer to the graph below. How would a reduction in inflationary expectations be represented on the Phillips curve?",
+"image": q3112,
+"options": [
+"A movement from point A to point B along SRPC1.",
+"A shift from SRPC1 to SRPC2.",
+"A shift from SRPC1 to SRPC3.",
+"A movement along the long-run Phillips curve from point A to point D.",
+"A movement from point A to point C along SRPC1."
+],
+"correctAnswer": "B",
+"explanation": "Inflation expectations are a key determinant of the position of the SRPC. If firms and workers expect lower inflation, they negotiate lower nominal wage increases, which lowers production costs and shifts the SRPC to the right. This corresponds to a leftward shift of the SRPC.",
+"videoExplanation": null
+},
+{
+"id": 3113,
+"unit": 5,
+"lessonIDS": ["5.2"],
+"unitName": "Long-Run Consequences of Stabilization Policies",
+"question": "Refer to the graph below. Which point(s) show an economy that has an actual unemployment rate equal to its natural rate of unemployment?",
+"image": q3113,
+"options": [
+"point A only",
+"point A and D",
+"point C only",
+"point A, C, and D",
+"point E only"
+],
+"correctAnswer": "D",
+"explanation": "The natural rate of unemployment is represented by the LRPC. Therefore, an economy producing at points A, C, and D, or anywhere else along the LRPC, has an actual unemployment rate equal to its natural rate of unemployment.",
+"videoExplanation": null
+},
+{
+"id": 3114,
+"unit": 5,
+"lessonIDS": ["5.2", "5.6"],
+"unitName": "Long-Run Consequences of Stabilization Policies",
+"question": "Refer to the graph below showing the long-run Phillips curve (LRPC). Which of the following government policies would most likely shift the LRPC from LRPC1 to LRPC2?",
+"image": q3114,
+"options": [
+"Increasing unemployment benefits.",
+"Expansionary monetary policy.",
+"Increased government borrowing.",
+"A decrease in income taxes.", 
+
+"Job training programs that reduce structural unemployment.",
+],
+"correctAnswer": "E",
+"explanation": "The LRPC is vertical at the natural rate of unemployment (NRU). To shift the LRPC to the left, the NRU must decrease. Improving job training reduces structural unemployment, which lowers the overall natural rate.",
+"videoExplanation": null
+}, 
+
+{
+"id": 3115,
+"unit": 5,
+"lessonIDS": ["5.3"],
+"unitName": "Long-Run Consequences of Stabilization Policies",
+"question": "According to the quantity theory of money equation, if the velocity of money (V) is constant and real GDP (Y) is growing at 3% per year, a 5% annual increase in the money supply (M) will result in:",
+"image": null,
+"options": [
+"A 2% increase in the price level.",
+"A 2% decrease in the price level.",
+"A 5% increase in the price level.",
+"A 3% increase in the price level.",
+"An 8% increase in the price level."
+],
+"correctAnswer": "A",
+"explanation": "Using percentage changes: $\%\\Delta M + %\\Delta V = %\\Delta P + %\\Delta Y$. Given $\%\\Delta V = 0$, we have $5\\% + 0 = %\\Delta P + 3\\%$. Solving for inflation ($%\\Delta P$), we get $5\\% - 3\\% = 2\\%$.",
+"videoExplanation": null
+},
+{
+"id": 3116,
+"unit": 5,
+"lessonIDS": ["5.4"],
+"unitName": "Long-Run Consequences of Stabilization Policies",
+"question": "Which of the following best describes the difference between the national debt and the government budget deficit?",
+"image": null,
+"options": [
+"The debt is a flow variable, while the deficit is a stock variable.",
+"The debt is the accumulation of all past deficits minus surpluses.",
+"The deficit is the accumulation of all past debts.",
+"The deficit only includes money owed to foreign countries.",
+"The debt resets to zero at the start of each fiscal year."
+],
+"correctAnswer": "B",
+"explanation": "The budget deficit is the shortfall in a single year (flow). The national debt is the total amount the government owes, representing the sum of all past years' deficits and surpluses (stock).",
+"videoExplanation": null
+},
+{
+"id": 3117,
+"unit": 5,
+"lessonIDS": ["5.5"],
+"unitName": "Long-Run Consequences of Stabilization Policies",
+"question": "Crowding out occurs when government borrowing leads to:",
+"image": null,
+"options": [
+"Lower interest rates and increased private investment.",
+"Lower interest rates and decreased consumption.",
+"Higher interest rates and decreased private investment.",
+"Higher interest rates and increased net exports.",
+"Stable interest rates and stable investment."
+],
+"correctAnswer": "C",
+"explanation": "When the government borrows to fund a deficit, it increases the demand for loanable funds. This drives up the real interest rate, which increases the cost of borrowing for private firms, causing them to reduce investment spending.",
+"videoExplanation": null
+},
+{
+"id": 3118,
+"unit": 5,
+"lessonIDS": ["5.6"],
+"unitName": "Long-Run Consequences of Stabilization Policies",
+"question": "Which of the following changes would most directly result in long-run economic growth?",
+"image": null,
+"options": [
+"An increase in aggregate demand.",
+"A decrease in interest rates.",
+"An increase in the labor force participation rate.",
+"An improvement in technology and productivity.",
+"A depreciation of the domestic currency."
+],
+"correctAnswer": "D",
+"explanation": "Long-run growth is defined by an increase in potential GDP (a rightward shift of LRAS). This is driven by improvements in the quality/quantity of resources or technology. Productivity gains allow the economy to produce more with the same inputs.",
+"videoExplanation": null
+},
+{
+"id": 3119,
+"unit": 5,
+"lessonIDS": ["5.2"],
+"unitName": "Long-Run Consequences of Stabilization Policies",
+"question": "In the long run, the Phillips curve is vertical because:",
+"image": null,
+"options": [
+"Inflation is always constant in the long run.",
+"Unemployment falls to zero in the long run.",
+"Prices are sticky in the long run.",
+"Aggregate demand does not affect the price level in the long run.",
+"There is no trade-off between inflation and unemployment when expectations adjust."
+],
+"correctAnswer": "E",
+"explanation": "In the long run, workers and firms fully anticipate inflation. Nominal wages adjust completely to price level changes, returning the economy to the natural rate of unemployment (NRU) regardless of the inflation rate.",
+"videoExplanation": null
+},
+{
+"id": 3120,
+"unit": 5,
+"lessonIDS": ["5.7"],
+"unitName": "Long-Run Consequences of Stabilization Policies",
+"question": "Supply-side fiscal policies aimed at stimulating economic growth would most likely include:",
+"image": null,
+"options": [
+"Reductions in corporate income tax rates to encourage investment.",
+"Increased transfer payments to households.",
+"Increased government spending on social welfare programs.",
+"Higher taxes on capital gains.",
+"Open market purchases of government bonds."
+],
+"correctAnswer": "A",
+"explanation": "Supply-side policies focus on increasing the economy's productive capacity (LRAS). Lowering corporate taxes increases the after-tax return on investment, encouraging firms to buy more capital, which boosts productivity and potential output.",
+"videoExplanation": null
+},
+{
+"id": 3121,
+"unit": 5,
+"lessonIDS": ["5.1"],
+"unitName": "Long-Run Consequences of Stabilization Policies",
+"question": "Assume the economy is at full employment. If the government increases spending while the central bank keeps the money supply constant, what will likely happen to the price level and real interest rates?",
+"image": null,
+"options": [
+"price level: increase | real interest rate: decrease",
+"price level: increase | real interest rate: increase",
+"price level: decrease | real interest rate: decrease",
+"price level: decrease | real interest rate: increase",
+"price level: no change | real interest rate: increase"
+],
+"correctAnswer": "B",
+"explanation": "Increased government spending raises aggregate demand, driving up the price level. It also increases the demand for loanable funds (deficit spending), driving up the real interest rate. (Alternatively, higher P raises money demand, increasing rates).",
+"videoExplanation": null
+},
+{
+"id": 3122,
+"unit": 5,
+"lessonIDS": ["5.6"],
+"unitName": "Long-Run Consequences of Stabilization Policies",
+"question": "Real GDP per capita is often used as a measure of standard of living. Real GDP per capita is calculated as:",
+"image": null,
+"options": [
+"Real GDP divided by the price level.",
+"Nominal GDP divided by the population.",
+"Real GDP divided by the total population.",
+"Real GDP divided by the size of the labor force.",
+"The growth rate of real GDP minus the growth rate of population."
+],
+"correctAnswer": "C",
+"explanation": "Real GDP per capita adjusts total output for population size, providing a measure of the average output (and income) per person in the economy.",
+"videoExplanation": null
+},
+{
+"id": 3123,
+"unit": 5,
+"lessonIDS": ["5.3"],
+"unitName": "Long-Run Consequences of Stabilization Policies",
+"question": "If the velocity of money increases significantly while the money supply remains constant, what is the likely short-run impact on nominal GDP?",
+"image": null,
+"options": [
+"Nominal GDP will decrease.",
+"Nominal GDP will remain unchanged.",
+"Real GDP will decrease, but price level will rise.",
+"Nominal GDP will increase.",
+"The effect cannot be determined."
+],
+"correctAnswer": "D",
+"explanation": "According to the equation of exchange, $MV = \\text{Nominal GDP}$. If $M$ is constant and $V$ increases, the product $MV$ increases, which means nominal GDP must increase.",
+"videoExplanation": null
+},
+{
+"id": 3124,
+"unit": 5,
+"lessonIDS": ["5.5"],
+"unitName": "Long-Run Consequences of Stabilization Policies",
+"question": "Which of the following is most likely to reduce the crowding-out effect associated with an increase in government spending?",
+"image": null,
+"options": [
+"The central bank sells bonds on the open market.",
+"The government finances the spending by raising taxes on investment.",
+"Consumer confidence decreases significantly.",
+"Foreign investors sell their holdings of domestic government bonds.",
+"The central bank accommodates the fiscal expansion by increasing the money supply."
+],
+"correctAnswer": "E",
+"explanation": "Crowding out happens because government borrowing raises interest rates. If the central bank increases the money supply (accommodative monetary policy), it can keep interest rates low, preventing the decline in private investment.",
+"videoExplanation": null
+},
+{
+"id": 3125,
+"unit": 5,
+"lessonIDS": ["5.6"],
+"unitName": "Long-Run Consequences of Stabilization Policies",
+"question": "Human capital refers to:",
+"image": null,
+"options": [
+"The education, training, skills, and health of workers.",
+"The physical tools and machinery workers use.",
+"The financial assets owned by households.",
+"The total number of workers in the labor force.",
+"The entrepreneurial ability of business owners."
+],
+"correctAnswer": "A",
+"explanation": "Human capital is the intangible asset representing the economic value of a worker's experience and skills. Improving human capital increases labor productivity.",
+"videoExplanation": null
+},
+{
+"id": 3126,
+"unit": 5,
+"lessonIDS": ["5.2"],
+"unitName": "Long-Run Consequences of Stabilization Policies",
+"question": "If an economy is in long-run equilibrium and aggregate demand increases, what happens to the short-run Phillips curve (SRPC) and the long-run Phillips curve (LRPC) immediately?",
+"image": null,
+"options": [
+"SRPC shifts right; LRPC stays the same.",
+"Movement up the SRPC; LRPC stays the same.",
+"SRPC stays the same; LRPC shifts left.",
+"Movement down the SRPC; LRPC shifts right.",
+"Both curves shift to the right."
+],
+"correctAnswer": "B",
+"explanation": "An increase in AD causes a movement along the SRPC to a point with higher inflation and lower unemployment. The curves themselves do not shift immediately. (The SRPC would eventually shift up as expectations adjust, but the question asks for the immediate effect).",
+"videoExplanation": null
+},
+{
+"id": 3127,
+"unit": 5,
+"lessonIDS": ["5.4"],
+"unitName": "Long-Run Consequences of Stabilization Policies",
+"question": "A persistent government budget deficit is most likely to lead to which long-run consequence?",
+"image": null,
+"options": [
+"A decrease in the national debt.",
+"Hyperinflation, even if the central bank does not monetize the debt.",
+"A lower stock of private capital due to reduced investment.",
+"A permanent decrease in interest rates.",
+"An increase in the standard of living for future generations."
+],
+"correctAnswer": "C",
+"explanation": "Persistent deficits lead to crowding out of investment. Over the long run, lower investment means a smaller capital stock, which reduces potential output and future standard of living.",
+"videoExplanation": null
+},
+{
+"id": 3128,
+"unit": 5,
+"lessonIDS": ["5.1"],
+"unitName": "Long-Run Consequences of Stabilization Policies",
+"question": "If the economy is in a recession, which policy combination would be most effective at increasing aggregate demand without increasing interest rates?",
+"image": null,
+"options": [
+"Expansionary fiscal policy and contractionary monetary policy.",
+"Contractionary fiscal policy and expansionary monetary policy.",
+"Contractionary fiscal policy and contractionary monetary policy.",
+"Expansionary fiscal policy and expansionary monetary policy.",
+"No policy intervention."
+],
+"correctAnswer": "D",
+"explanation": "Expansionary fiscal policy increases AD (but pushes rates up). Expansionary monetary policy increases AD (and pushes rates down). Using both stimulates the economy powerfully while the monetary expansion counteracts the interest rate rise from the fiscal expansion.",
+"videoExplanation": null
+},
+{
+"id": 3129,
+"unit": 5,
+"lessonIDS": ["5.6"],
+"unitName": "Long-Run Consequences of Stabilization Policies",
+"question": "Which of the following is NOT considered a determinant of economic growth?",
+"image": null,
+"options": [
+"Improvements in technology.",
+"Increases in the quantity of capital.",
+"Increases in the quantity of labor.",
+"Improvements in education and training.",
+"Increases in the price level."
+],
+"correctAnswer": "E",
+"explanation": "Economic growth is an increase in real potential output. Changes in the price level (inflation/deflation) are nominal variables and do not affect the economy's productive capacity in the long run.",
+"videoExplanation": null
+}
 ]
 
 
@@ -4489,7 +5570,7 @@ const microUnit3Questions = [
     "correctAnswer": "B",
     "explanation": "The Marginal Cost curve shifts only when the price of a variable input changes. Wages are a variable cost. Rent and property taxes are fixed costs (which shift ATC but not MC), and technology improvements usually shift MC down, not up.",
     "videoExplanation": null
-    }
+    }, 
 ]
 
 

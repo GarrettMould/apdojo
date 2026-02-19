@@ -214,11 +214,8 @@ export function GraphGym({ assignmentScenarios, isAssignment = false, assignment
   // Reset to first scenario when subject or unit changes (for non-assignment mode, navigate to URL)
   useEffect(() => {
     if (isAssignment) {
-      // For assignments, just reset to first
-      setCurrentScenarioIndex(0);
-      setIsSubmitted(false);
-      setCheckedItems(new Set());
-      setExcalidrawKey(prev => prev + 1);
+      // Assignments manage currentScenarioIndex via handleNextScenario; do NOT reset here
+      // (resetting would overwrite the user's progress when deps like currentCourse/filteredScenarios change)
       return;
     }
 
@@ -480,9 +477,6 @@ export function GraphGym({ assignmentScenarios, isAssignment = false, assignment
         const nextIndex = currentScenarioIndex + 1;
         const nextScenario = filteredScenarios[nextIndex];
         if (nextScenario) {
-          const nextSlug = getSlugForScenario(nextScenario);
-          initialSlugRef.current = nextSlug;
-          hasInitializedFromUrl.current = true;
           setCurrentScenarioIndex(nextIndex);
         }
       }

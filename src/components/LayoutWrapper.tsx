@@ -20,16 +20,20 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
   const isUnitCheatSheetPage =
     pathname.startsWith('/unit/') ||
     pathname.includes('-cheat-sheet');
+  // Packet print page: no header, no footer — only the "Ready to Print" bar and content
+  const isPacketPrintPage = pathname?.includes('/packet');
   
   return (
     <div className="flex flex-col">
-      <Suspense fallback={<div className="h-20 bg-white" />}>
-        <HeaderWithSuspense />
-      </Suspense>
+      {!isPacketPrintPage && (
+        <Suspense fallback={<div className="h-20 bg-white" />}>
+          <HeaderWithSuspense />
+        </Suspense>
+      )}
       <main>
         {children}
       </main>
-      {!isGraphGymPage && !isUnitCheatSheetPage && <Footer />}
+      {!isGraphGymPage && !isUnitCheatSheetPage && !isPacketPrintPage && <Footer />}
     </div>
   );
 } 

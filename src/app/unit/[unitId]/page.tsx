@@ -18,7 +18,7 @@ import { videos, Video } from '@/data/videos';
 import { getVideosForLessonId } from '@/data/videosByLessonId';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question as QuestionType } from '@/data/questionBanks/types';
-import { X, ArrowRight, Lock, ArrowLeft, CheckCircle2, XCircle, Download, Bookmark, BookmarkPlus, Check, Brain, Maximize2, Play, FileText, Zap, Lightbulb, ClipboardList, FileQuestion, Award, Layers, Unlock, Sparkles } from 'lucide-react';
+import { X, ArrowRight, Lock, ArrowLeft, CheckCircle2, XCircle, Download, Bookmark, BookmarkPlus, Check, Brain, Maximize2, Play, FileText, Zap, Lightbulb, ClipboardList, FileQuestion, Award, Layers, Unlock, Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import jsPDF from 'jspdf';
@@ -33,6 +33,9 @@ import { saveQuizResult } from '@/lib/quizHistory';
 import { hasValidSeasonPass, getUnitMCQTestUrl } from '@/lib/utils';
 import { Footer } from '@/components/Footer';
 import { pdfCheatSheets } from '@/data/pdfCheatSheets';
+import dynamic from 'next/dynamic'; // Add this if not present
+// Add this dynamic import definition near your other imports
+
 
 // Set to true to show Deep Dive buttons and Ultimate Unit Shuffle on unit cheat sheet
 const SHOW_DEEP_DIVE_AND_SHUFFLE = true;
@@ -596,6 +599,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
   const [shuffleModalOpen, setShuffleModalOpen] = useState(false);
   const [shuffledDeck, setShuffledDeck] = useState<UnitFlashcardData[]>([]);
   const [showShuffleLimitModal, setShowShuffleLimitModal] = useState(false);
+  const [showPacketSeasonPassModal, setShowPacketSeasonPassModal] = useState(false);
 
   // Daily limit for free users: Ultimate Unit Shuffle (3 cards per day, same pattern as MCQ)
   const DAILY_FREE_SHUFFLE_VIEWS = 3;
@@ -1540,7 +1544,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           }}
           className="flex-shrink-0 overflow-y-auto min-w-0"
         >
-      <div className="max-w-7xl mx-auto px-4 py-12 mt-12" ref={cheatSheetContentRef}>
+          <div className="max-w-7xl mx-auto px-4 py-12 mt-12" ref={cheatSheetContentRef}>
         {/* Unit header */}
         <div className="mb-16 text-left">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight mb-2">
@@ -1554,9 +1558,34 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
               </>
             )}
           </h1>
-          <p className="text-lg sm:text-xl text-gray-600 font-black tracking-tight">
-            <span className="text-blue-500">AP {selectedSubject === 'macro' ? 'Macro' : 'Micro'}</span> Cheat Sheet
-          </p>
+          <div className="flex flex-col gap-4">
+            <span
+              className={`inline-block w-fit px-3 py-1.5 text-sm font-bold rounded-md border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] ${
+                selectedSubject === 'macro'
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-green-500 text-white'
+              }`}
+            >
+              AP {selectedSubject === 'macro' ? 'Macro' : 'Micro'}
+            </span>
+            <Link
+              href={isProCustomer ? `/unit/${activeUnitNum}/packet?subject=${selectedSubject}` : '#'}
+              className={`inline-flex items-center gap-2 text-sm font-semibold hover:underline w-fit cursor-pointer ${
+                selectedSubject === 'macro'
+                  ? 'text-blue-600'
+                  : 'text-green-600'
+              }`}
+              onClick={(e) => {
+                if (!isProCustomer) {
+                  e.preventDefault();
+                  setShowPacketSeasonPassModal(true);
+                }
+              }}
+            >
+              <Download className="w-4 h-4 flex-shrink-0" />
+              Download Cheat Sheet as PDF
+            </Link>
+          </div>
         </div>
 
         {/* Unit Navigation Tabs */}
@@ -1581,17 +1610,10 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
               );
             })}
           </nav>
-          <button
-            onClick={handleGeneratePDF}
-            className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-900 transition-colors underline-offset-2 hover:underline"
-          >
-            <Download className="w-3.5 h-3.5" />
-            Turn this Cheat Sheet into a PDF
-          </button>
-        </div>
-
-        {/* PDF Cheat Sheet Display - Only for AP Macro Unit 1 (temporarily disabled) */}
-        {false && selectedSubject === 'macro' && activeUnitNum === 1 && (() => {
+          {/* NEW PDF DOWNLOAD BUTTON */}
+          
+        {/* PDF Cheat Sheet Display - Temporarily Disabled
+        {selectedSubject === 'macro' && activeUnitNum === 1 && (() => {
           const unit1Pdf = pdfCheatSheets.find(pdf => pdf.id === 4);
           if (!unit1Pdf) return null;
           
@@ -1616,10 +1638,8 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           
           return (
             <div className="mb-8 flex items-center gap-4 print:hidden">
-              {/* Stacked PDF preview */}
               {unit1Pdf.thumbnails && (
                 <div className="relative">
-                  {/* Second page (back) - landscape */}
                   <div className="w-44 h-32 bg-white border-4 border-black rounded shadow-lg transform rotate-[-3deg] overflow-hidden">
                     <Image
                       src={unit1Pdf.thumbnails.page2}
@@ -1629,7 +1649,6 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  {/* First page (front, offset) - landscape */}
                   <div className="absolute top-2 left-2 w-44 h-32 bg-white border-4 border-black rounded shadow-lg transform rotate-[2deg] overflow-hidden">
                     <Image
                       src={unit1Pdf.thumbnails.page1}
@@ -1642,7 +1661,6 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                 </div>
               )}
               
-              {/* Download button */}
               <Button
                 onClick={handleDownload}
                 className="font-black py-3 px-5 rounded-xl border-4 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1 bg-blue-600 hover:bg-blue-700 text-white"
@@ -1652,7 +1670,9 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
               </Button>
             </div>
           );
-        })()}
+        })()} 
+        */}
+        </div>
 
         {/* Table of Contents - two columns, links scroll to lesson sections */}
         {sortedLessons.length > 0 && (
@@ -1958,19 +1978,24 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                                     );
                                   })}
                   </div>
-                                {hasMore && (
+                                {whiteboards.length > initialCount && (
                                   <div 
-                                    className="mt-6 pt-4 border-t border-gray-200 text-center cursor-pointer group"
+                                    className="mt-6 pt-4 border-t border-gray-200 flex justify-center cursor-pointer group"
                                     onClick={() => {
+                                      const isExpanded = visibleCount === whiteboards.length;
                                       setVisibleWhiteboardsCount(prev => ({
                                         ...prev,
-                                        [lessonId]: whiteboards.length // Show all
+                                        [lessonId]: isExpanded ? initialCount : whiteboards.length
                                       }));
                                     }}
                                   >
-                                    <span className="text-gray-500 text-base font-medium uppercase tracking-wider group-hover:text-gray-700 transition-colors">SEE MORE BOARDS</span>
-                </div>
-              )}
+                                    {hasMore ? (
+                                      <ChevronDown className="w-8 h-8 text-gray-500 group-hover:text-gray-700 transition-colors" strokeWidth={3} />
+                                    ) : (
+                                      <ChevronUp className="w-8 h-8 text-gray-500 group-hover:text-gray-700 transition-colors" strokeWidth={3} />
+                                    )}
+                                  </div>
+                                )}
                               </div>
                             </div>
                           );
@@ -2218,118 +2243,6 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                         </Link>
                       )}
 
-                      {/* Unit Practice & Assessment - after first lesson (e.g. 1.1) of every unit */}
-                      {index === 0 && (
-                        <div className="mt-16 pt-10 border-t-2 border-gray-200 print:hidden">
-                          <div className="rounded-2xl border-4 border-black bg-gray-50 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] p-6 sm:p-8">
-                            <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-                              <div className="flex items-center gap-3">
-                                <div className={`p-2 rounded-lg border-2 border-black ${themeColor === 'blue' ? 'bg-blue-100' : 'bg-green-100'}`}>
-                                  <Sparkles className="w-6 h-6 text-black" />
-                                </div>
-                                <h2 className="text-3xl font-black text-gray-900 tracking-tight">
-                                  Unit {activeUnitNum} Practice & Assessment
-                                </h2>
-                              </div>
-                              <Link
-                                href={`/purchase/season-pass?courseType=${selectedSubject}`}
-                                className="font-bold text-blue-600 hover:text-blue-700 hover:underline underline-offset-2 whitespace-nowrap"
-                              >
-                                Get Premium Access for $29
-                              </Link>
-                            </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                              <Link
-                                href={`/unitMCQPracticePage?subject=${selectedSubject}&mode=singleUnit&unit=${activeUnitNum}`}
-                                className="group relative col-span-1 sm:col-span-2 row-span-2 flex flex-col justify-between p-6 sm:p-8 rounded-xl border-4 border-black bg-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 transition-all duration-200"
-                              >
-                                <div className="absolute top-4 right-4 bg-gray-100 border-2 border-black px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
-                                  Core Practice
-                                </div>
-                                <div className={`w-14 h-14 rounded-full border-2 border-black flex items-center justify-center mb-4 ${themeColor === 'blue' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}`}>
-                                  <ClipboardList className="w-8 h-8" />
-                                </div>
-                                <div>
-                                  <h3 className="text-2xl font-black text-gray-900 group-hover:underline decoration-4 decoration-black/20 underline-offset-4">
-                                    Unit {activeUnitNum} MCQs
-                                  </h3>
-                                  <p className="text-gray-600 mt-2 font-medium leading-relaxed">
-                                    Master the concepts with AP-style multiple choice questions tailored for this unit.
-                                  </p>
-                                </div>
-                              </Link>
-                              <Link
-                                href={isProCustomer ? `/unitFRQpracticePage?subject=${selectedSubject}` : `/purchase/season-pass?courseType=${selectedSubject}`}
-                                className={`group relative flex flex-col justify-between p-5 rounded-xl border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 transition-all overflow-hidden ${isProCustomer ? 'bg-white' : 'bg-gray-50'}`}
-                              >
-                                <div className="flex justify-between items-start z-10">
-                                  <FileQuestion className={`w-8 h-8 ${isProCustomer ? (themeColor === 'blue' ? 'text-blue-600' : 'text-green-600') : 'text-gray-400'}`} />
-                                  {isProCustomer ? (
-                                    <ArrowRight className="w-5 h-5 opacity-0 group-hover:opacity-100 transition-opacity -rotate-45 group-hover:rotate-0" />
-                                  ) : (
-                                    <span className="bg-gray-200 border-2 border-gray-400 text-gray-500 px-2 py-0.5 rounded text-xs font-bold flex items-center gap-1">
-                                      PRO ONLY <Lock className="w-3 h-3" />
-                                    </span>
-                                  )}
-                                </div>
-                                <div className="mt-4 z-10">
-                                  <span className={`block font-black text-lg ${isProCustomer ? 'text-gray-900' : 'text-gray-500'}`}>Unit FRQs</span>
-                                  <span className={`text-sm font-medium ${isProCustomer ? 'text-gray-500' : 'text-gray-400'}`}>
-                                    {isProCustomer ? 'Free Response Skills' : 'Unlock FRQ practice'}
-                                  </span>
-                                </div>
-                              </Link>
-                              <Link
-                                href={isProCustomer ? getUnitMCQTestUrl(activeUnitNum, selectedSubject) : `/purchase/season-pass?courseType=${selectedSubject}`}
-                                className={`group relative flex flex-col justify-between p-5 rounded-xl border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 transition-all overflow-hidden ${isProCustomer ? 'bg-yellow-50' : 'bg-gray-50'}`}
-                              >
-                                <div className="flex justify-between items-start z-10">
-                                  <Award className={`w-8 h-8 ${isProCustomer ? 'text-yellow-600' : 'text-gray-400'}`} />
-                                  {isProCustomer ? (
-                                    <span className="bg-yellow-300 border-2 border-black px-2 py-0.5 rounded text-xs font-bold flex items-center gap-1">
-                                      UNLOCKED <Unlock className="w-3 h-3" />
-                                    </span>
-                                  ) : (
-                                    <span className="bg-gray-200 border-2 border-gray-400 text-gray-500 px-2 py-0.5 rounded text-xs font-bold flex items-center gap-1">
-                                      PRO ONLY <Lock className="w-3 h-3" />
-                                    </span>
-                                  )}
-                                </div>
-                                <div className="mt-4 z-10">
-                                  <span className={`block font-black text-lg ${isProCustomer ? 'text-gray-900' : 'text-gray-500'}`}>Unit Test</span>
-                                  <span className={`text-sm font-medium ${isProCustomer ? 'text-gray-600' : 'text-gray-400'}`}>
-                                    {isProCustomer ? 'Start timed exam' : 'Unlock full mock exam'}
-                                  </span>
-                                </div>
-                              </Link>
-                              <Link
-                                href={isProCustomer ? '#unit-shuffle' : `/purchase/season-pass?courseType=${selectedSubject}`}
-                                className={`group col-span-1 sm:col-span-2 flex items-center justify-between p-5 rounded-xl border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 transition-all overflow-hidden ${isProCustomer ? 'bg-white' : 'bg-gray-50'}`}
-                              >
-                                <div className="flex items-center gap-4 z-10 flex-1">
-                                  <div className={`p-2 rounded-lg border-2 border-black ${isProCustomer ? (themeColor === 'blue' ? 'bg-blue-100' : 'bg-green-100') : 'bg-gray-200'}`}>
-                                    <Layers className={`w-6 h-6 ${isProCustomer ? 'text-black' : 'text-gray-400'}`} />
-                                  </div>
-                                  <div>
-                                    <span className={`block font-black text-lg ${isProCustomer ? 'text-gray-900 group-hover:underline' : 'text-gray-500'}`}>Ultimate Unit Shuffle</span>
-                                    <span className={`text-sm font-medium ${isProCustomer ? 'text-gray-600' : 'text-gray-400'}`}>
-                                      {isProCustomer ? 'Quick-fire flashcard review' : 'Unlock flashcard review'}
-                                    </span>
-                                  </div>
-                                </div>
-                                {isProCustomer ? (
-                                  <ArrowRight className="w-6 h-6 text-gray-400 group-hover:text-black transition-colors flex-shrink-0 z-10" />
-                                ) : (
-                                  <span className="bg-gray-200 border-2 border-gray-400 text-gray-500 px-2 py-0.5 rounded text-xs font-bold flex items-center gap-1 flex-shrink-0 z-10">
-                                    PRO ONLY <Lock className="w-3 h-3" />
-                                  </span>
-                                )}
-                              </Link>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
                       {/* First Checkpoint - After midpoint lesson */}
                       {isMidpoint && firstHalfCheckpoints.length > 0 && (
                         <div data-section="checkpoint">
@@ -2408,7 +2321,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                     </div>
                   </Link>
                 ) : (
-                  <div className="flex-1" /> // Spacer when no previous unit
+                  <div className="flex-1" />
                 )}
 
                 {/* Next Unit Button */}
@@ -2428,7 +2341,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                     <ArrowRight className="w-5 h-5 flex-shrink-0" />
                   </Link>
                 ) : (
-                  <div className="flex-1" /> // Spacer when no next unit
+                  <div className="flex-1" />
                 )}
               </div>
             </div>
@@ -3753,6 +3666,14 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
         <SeasonPassModal
           subject={selectedSubject}
           onClose={() => setShowShuffleLimitModal(false)}
+        />
+      )}
+
+      {/* Packet/PDF download: show Season Pass modal when non-premium user clicks download link */}
+      {showPacketSeasonPassModal && (
+        <SeasonPassModal
+          subject={selectedSubject}
+          onClose={() => setShowPacketSeasonPassModal(false)}
         />
       )}
 
