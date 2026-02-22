@@ -2581,24 +2581,6 @@ const macroUnit4Questions = [
     "videoExplanation": null
   },
   {
-    "id": 48,
-    "unit": 4,
-    "lessonIDS": ["4.6"],
-    "unitName": "Financial Sector",
-    "question": "In an ample reserves system, how does the central bank typically use the overnight reverse repurchase agreement (ON RRP) facility rate?",
-    "image": null,
-    "options": [
-      "To directly control the M2 money supply.",
-      "To set a ceiling on the federal funds rate.",
-      "To act as a floor for the federal funds rate, influencing short-term market rates.",
-      "To determine the required reserve ratio for banks.",
-      "To finance government budget deficits."
-    ],
-    "correctAnswer": "C",
-    "explanation": "The ON RRP rate is offered to certain non-bank financial institutions. Since they can always earn this rate from the central bank risk-free overnight, they are unlikely to lend funds in the market (like the federal funds market) for less. This helps establish a floor under the policy rate (the federal funds rate).",
-    "videoExplanation": null
-  },
-  {
     "id": 460,
     "unit": 4,
     "lessonIDS": ["4.6"],

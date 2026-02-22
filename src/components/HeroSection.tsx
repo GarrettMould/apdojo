@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { FRQFeedbackDemo } from '@/components/FRQFeedbackDemo';
 import { MCQPracticePreview } from '@/components/MCQPracticePreview';
+import { CheatSheetPreview } from '@/components/CheatSheetPreview';
 
 export function HeroSection() {
   const containerVariants = {
@@ -56,7 +57,7 @@ export function HeroSection() {
             variants={itemVariants}
             className="text-6xl sm:text-7xl lg:text-8xl font-black text-gray-900 mb-10 leading-[1.05] tracking-tight"
           >
-            Start the Semester Off Right.
+            Study Smarter. Score Higher.
           </motion.h1>
 
           {/* Subheadline */}
@@ -85,12 +86,12 @@ export function HeroSection() {
             </div>
           </motion.div>
 
-          {/* Two Feature Containers Grid */}
+          {/* Three Feature Containers Grid */}
           <motion.div
             variants={containerVariants}
-            className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 w-full mx-auto items-stretch"
+            className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 w-full mx-auto items-stretch"
           >
-            {/* 1. Grade Your FRQs in Seconds */}
+            {/* 1. AI-Graded FRQs */}
             <motion.div
               variants={cardVariants}
               className="lg:col-span-1 flex"
@@ -119,6 +120,23 @@ export function HeroSection() {
                   </h3>
                 </div>
                 <MCQPracticePreview />
+              </div>
+            </motion.div>
+
+            {/* 3. Unit Cheat Sheets */}
+            <motion.div
+              variants={cardVariants}
+              className="lg:col-span-1 flex min-w-0"
+            >
+              <div className="w-full flex flex-col min-h-[400px]">
+                <div className="text-center mb-4">
+                  <h3 className="text-2xl sm:text-3xl font-black text-gray-900">
+                    Unit Cheat Sheets
+                  </h3>
+                </div>
+                <div className="flex-1 min-h-0 w-full flex scale-90 lg:scale-100 origin-center">
+                  <CheatSheetPreview />
+                </div>
               </div>
             </motion.div>
           </motion.div>

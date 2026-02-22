@@ -700,5 +700,86 @@ export const blogPosts: Record<string, BlogPost> = {
       </>
     ),
   },
+  'ample-reserves-market': {
+    slug: 'ample-reserves-market',
+    title: 'Master the Ample Reserves System: How the Fed Steers a Modern Economy',
+    description: 'Understanding why traditional monetary policy tools fail when banks hold excess reserves—and how the Fed uses the discount rate and interest on reserves instead.',
+    subject: 'Macro',
+    unit: 4,
+    thumbnailUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_4/ample2.jpg',
+    seoSnippet: 'An ample reserves market exists when banks hold excess reserves far above what they are legally required to hold. In this system, the Fed relies on administered rates—the discount rate (ceiling) and interest on reserve balances (floor)—to control lending and the money supply.',
+    keyTakeaway: 'In an ample reserves system, the discount rate sets the ceiling on the Federal Funds Rate, while interest on reserve balances sets the floor. Lowering both rates encourages banks to lend more to the public instead of parking money at the Fed.',
+    graphGymScenarioId: 51,
+    graphGymPrompt: 'Draw the Market for Reserves in an ample regime. Show the equilibrium Federal Funds Rate (FFR). Suppose the actual output in the economy is greater than the natural rate of output. Identify the monetary policy tool the central bank uses to close the output gap and show its impact on the policy rate.',
+    practiceQuestionIds: [46, 47, 3107],
+    images: [],
+    videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/ample+_reserves.mp4',
+    content: (
+      <>
+        <p className="mb-6">An ample reserves market fundamentally changes how we understand monetary policy. In this system, the banking sector is flooded with excess reserves. Banks are simply not lending out all the money they legally could be lending. Because of this massive cushion of cash, the traditional tools of the central bank no longer work the way they used to.</p>
+
+        <div className="my-8 p-4 border rounded-lg bg-gray-50">
+          <Image
+            src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_4/ample2.jpg"
+            alt="Ample reserves market overview"
+            width={600}
+            height={400}
+            className="w-full h-auto rounded-md shadow-sm"
+          />
+        </div>
+
+        <h2 className="mt-12 mb-4 text-3xl font-bold text-gray-800">The Curfew Analogy: Why the Reserve Requirement Fails</h2>
+        <p className="mb-6">To understand why the old tools fail, imagine your parents set a curfew for you at 11:00 p.m., but you already go to bed every night at 10:00 p.m. That new rule will have absolutely no effect on your sleeping habits.</p>
+        <p className="mb-6">The exact same logic applies to the required reserve ratio in an ample reserves system. The Federal Reserve might announce that banks can lend out 95% of their deposits. However, if banks are already voluntarily lending out far less than that amount, changing the required reserve ratio will not have the intended impact on the money supply. The central bank needs a completely different set of tools to modify bank lending behavior.</p>
+        <p className="mb-6">In an ample reserves system, the Fed relies on two primary administered rates to control the money supply: the discount rate and the interest on reserve balances.</p>
+
+        <h2 className="mt-12 mb-4 text-3xl font-bold text-gray-800">The Ceiling: The Discount Rate</h2>
+        <p className="mb-6">The discount rate tells commercial banks exactly what they must pay if they borrow money directly from the central bank.</p>
+        <p className="mb-6">Imagine you are a commercial bank that needs to borrow money to meet obligations. You have two options: borrow from the central bank or borrow from another commercial bank. If the central bank is willing to lend you money at a 6% interest rate, you would never choose to borrow from another commercial bank charging 7%. Why pay more when you can get the funds easily from the Fed for less?</p>
+        <p className="mb-6">Because of this, the discount rate acts as an upper limit on the interest rates banks charge each other. If Bank A needs cash, Bank B cannot charge them a 7% interest rate if the Discount Rate is 6%. Bank A will simply bypass Bank B and borrow directly from the Fed instead. Therefore, the Discount Rate places a ceiling on the Federal Funds Rate.</p>
+
+        <div className="my-8 p-4 border rounded-lg bg-gray-50">
+          <Image
+            src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_4/ample3.jpg"
+            alt="Interest on reserve balances"
+            width={600}
+            height={400}
+            className="w-full h-auto rounded-md shadow-sm"
+          />
+        </div>
+
+        <h2 className="mt-12 mb-4 text-3xl font-bold text-gray-800">The Floor: Interest on Reserve Balances</h2>
+        <p className="mb-6">On the opposite end of the graph, we have the interest on reserve balances. This is the interest rate the central bank pays commercial banks for keeping their excess reserves parked at the Fed. Just like everyday people can put money in a savings account to earn yield, commercial banks can save their money at the central bank and get paid for it.</p>
+        <p className="mb-6">Imagine a new scenario where you are a commercial bank deciding what to do with your excess cash. You can save your money at the Fed and earn a guaranteed 3% interest. Alternatively, a customer walks in wanting to borrow that money at a 2% interest rate. What makes the most sense?</p>
+        <p className="mb-6">Saving money at the Fed is virtually risk-free compared to lending it to a consumer, and in this scenario, it pays a higher return. You will obviously choose to save the money and earn the 3%. This dynamic means the interest on reserves sets the lower limit for borrowing and lending. No bank will ever lend money to the public for less than what they could make completely risk-free by leaving it at the Fed.</p>
+
+        <div className="my-8 p-4 border rounded-lg bg-gray-50">
+          <Image
+            src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_4/ample4.jpg"
+            alt="Putting the tools to work"
+            width={600}
+            height={400}
+            className="w-full h-auto rounded-md shadow-sm"
+          />
+        </div>
+
+        <h2 className="mt-12 mb-4 text-3xl font-bold text-gray-800">Putting the Tools to Work: Fighting a Recession</h2>
+        <p className="mb-6">We can put these pieces together to see how the central bank manipulates these rates to change lending behavior in the real world.</p>
+        <p className="mb-6">Let us assume the economy is falling into a recession. The central bank needs to encourage more lending so the money supply increases and the economy gets stimulated. To achieve this, the Fed will lower both the discount rate and the interest on reserves rate.</p>
+        <p className="mb-6">Before the change, banks were perfectly happy saving their money at the Fed to collect 3%. Now, the Fed drops that rate to 1%. If a bank wants to save money at the central bank, they are only going to earn a meager 1% return. Suddenly, that customer asking for a 2% loan looks like a much better deal. Banks will respond to this policy change by saving less at the Fed and lending more to the public.</p>
+        <p className="mb-6">That newly incentivized lending ripples through the economy, expanding the money supply and providing the exact stimulus needed to fight the recession.</p>
+
+        <div className="my-8 p-4 border rounded-lg bg-gray-50">
+          <Image
+            src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Macro_Unit_4/ample5.jpg"
+            alt="Ample reserves graph gym"
+            width={600}
+            height={400}
+            className="w-full h-auto rounded-md shadow-sm"
+          />
+        </div>
+      </>
+    ),
+  },
 };
 
