@@ -162,6 +162,15 @@ service cloud.firestore {
     }
     // --- End userQuizHistory Collection Rules ---
 
+    // --- RULES FOR worksheets COLLECTION (public worksheet links) ---
+    match /worksheets/{worksheetId} {
+      // Anyone can read (public view at /worksheets/[slug])
+      allow read: if true;
+      // Only authenticated users can create/update/delete (e.g. tutors publishing from builder)
+      allow create, update, delete: if request.auth != null;
+    }
+    // --- End worksheets Collection Rules ---
+
     // (Add rules for any other top-level collections)
 
   } // Closing brace for match /databases/{database}/documents

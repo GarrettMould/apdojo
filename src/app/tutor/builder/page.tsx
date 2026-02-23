@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect, Suspense, useRef, useCallback } from 'rea
 import { createPortal } from 'react-dom';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question } from '@/data/questionBanks/types';
-import { Copy, CheckCircle2, Search, Filter, Eye, Loader2, GraduationCap, ArrowRight, ChevronLeft, ChevronRight, X, Play, Clock, Zap, BookOpen, Users, BarChart3 } from 'lucide-react';
+import { Copy, CheckCircle2, Search, Filter, Eye, Loader2, GraduationCap, ArrowRight, ChevronLeft, ChevronRight, X, Play, Clock, Zap, BookOpen, Users, BarChart3, Share2 } from 'lucide-react';
 import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -12,10 +12,12 @@ import { db } from '@/lib/firebase';
 import { getPublicAssignmentTemplates, type PublicAssignmentTemplate } from '@/lib/assignments';
 import { collection, addDoc, serverTimestamp, query, where, getDocs, getDoc, doc, orderBy } from 'firebase/firestore';
 import { graphGymScenarios, GraphGymScenario } from '@/data/graphGymScenarios';
+import { frqExams } from '@/data/frqQuestions';
+import { Printer } from 'lucide-react';
 
-type AssignmentType = 'mcq' | 'graphGym';
+type AssignmentType = 'mcq' | 'graphGym' | 'mcqAndFrq';
 type ViewMode = 'builder' | 'results';
-type AssignmentModeChoice = 'live' | 'homework' | null; // null = haven't chosen yet (show choice screen)
+type AssignmentModeChoice = 'live' | 'homework' | 'printHomework' | null; // null = haven't chosen yet (show choice screen)
 
 function truncateText(text: string, max: number) {
   return text.length <= max ? text : text.slice(0, max) + '…';
@@ -115,7 +117,7 @@ interface AssignmentResult {
   totalQuestions: number;
   correctCount: number;
   submittedAt: any;
-  assignmentType: 'mcq' | 'graphGym';
+  assignmentType: 'mcq' | 'graphGym' | 'mcqAndFrq';
 }
 
 function TutorBuilderContent() {
@@ -168,6 +170,15 @@ function TutorBuilderContent() {
   const [draggedMcqId, setDraggedMcqId] = useState<number | null>(null);
   const [ghostPosition, setGhostPosition] = useState<{ x: number; y: number } | null>(null);
   const [ghostQuestion, setGhostQuestion] = useState<Question | null>(null);
+  /** For mcqAndFrq / print: indices into frqExams for selected FRQ exams. */
+  const [selectedFrqExamIndices, setSelectedFrqExamIndices] = useState<number[]>([]);
+  /** Unit filter for FRQ sets (when on FRQs tab). */
+  const [frqUnitFilter, setFrqUnitFilter] = useState<number | null>(null);
+  /** Worksheet link modal (publish to /worksheets/[slug]) */
+  const [showWorksheetModal, setShowWorksheetModal] = useState(false);
+  const [worksheetUrl, setWorksheetUrl] = useState<string | null>(null);
+  const [worksheetError, setWorksheetError] = useState<string | null>(null);
+  const [publishingWorksheet, setPublishingWorksheet] = useState(false);
 
   // Fetch public assignment templates when on choice screen
   useEffect(() => {
@@ -182,7 +193,12 @@ function TutorBuilderContent() {
       })
       .finally(() => setLoadingTemplates(false));
   }, [assignmentModeChoice]);
-  
+
+  // Reset FRQ unit filter when subject changes so the dropdown doesn't show an empty list
+  useEffect(() => {
+    setFrqUnitFilter(null);
+  }, [subjectFilter]);
+
   // Assignment results state
   const [assignmentResults, setAssignmentResults] = useState<AssignmentResult[]>([]);
   const [loadingResults, setLoadingResults] = useState(false);
@@ -191,6 +207,67 @@ function TutorBuilderContent() {
   const graphGymSubject = useMemo(() => {
     return subjectFilter === 'ap_macroeconomics' ? 'macro' : 'micro';
   }, [subjectFilter]);
+
+  // FRQ exams filtered by subject with global index (for mcqAndFrq / print)
+  const frqExamsBySubjectWithIndex = useMemo(() => {
+    const subjectKey = subjectFilter === 'ap_macroeconomics' ? 'macro' : 'micro';
+    return frqExams
+      .map((exam, globalIndex) => ({ exam, globalIndex }))
+      .filter(({ exam }) =>
+        exam.questions.some((q) =>
+          Array.isArray(q.subject) ? q.subject.includes(subjectKey) : q.subject === subjectKey
+        )
+      );
+  }, [subjectFilter]);
+
+  // Map theme tag -> unit numbers for FRQ filtering (same themes as MCQ row)
+  const frqThemeToUnits: Record<string, number[]> = useMemo(() => {
+    if (subjectFilter === 'ap_macroeconomics') {
+      return {
+        'Supply & Demand': [2],
+        'Fiscal Policy': [5],
+        'LF Market': [4],
+        'Monetary Policy': [4],
+        'AD-AS': [3],
+      };
+    }
+    return {
+      'Supply & Demand': [2],
+      'Costs of Production': [3],
+      'Market Structures': [4],
+      'Factor Markets': [5],
+      'International Trade': [6],
+    };
+  }, [subjectFilter]);
+
+  // Unique units from FRQ exams for the current subject (for Units dropdown on FRQs tab)
+  const uniqueFrqUnits = useMemo(() => {
+    const units = new Set(frqExamsBySubjectWithIndex.map(({ exam }) => exam.unit));
+    return Array.from(units).sort((a, b) => a - b);
+  }, [frqExamsBySubjectWithIndex]);
+
+  // FRQ exams filtered by subject, unit dropdown, theme chips, and search (same pattern as MCQs)
+  const filteredFrqExamsWithIndex = useMemo(() => {
+    let list = frqExamsBySubjectWithIndex;
+    if (frqUnitFilter != null) {
+      list = list.filter(({ exam }) => exam.unit === frqUnitFilter);
+    }
+    if (selectedTopicTags.size > 0) {
+      const themeUnits = new Set(
+        Array.from(selectedTopicTags).flatMap((tag) => frqThemeToUnits[tag] ?? [])
+      );
+      list = list.filter(({ exam }) => themeUnits.has(exam.unit));
+    }
+    if (searchTerm.trim() !== '') {
+      const term = searchTerm.toLowerCase().trim();
+      list = list.filter(
+        ({ exam }) =>
+          exam.examTitle.toLowerCase().includes(term) ||
+          exam.unit.toString().includes(term)
+      );
+    }
+    return list;
+  }, [frqExamsBySubjectWithIndex, frqUnitFilter, selectedTopicTags, searchTerm, frqThemeToUnits]);
 
   // Normalize tag for matching (e.g. "Supply & Demand" -> "supply and demand")
   const normalizeTag = (tag: string) => tag.toLowerCase().replace(/\s*&\s*/g, ' and ').trim();
@@ -275,7 +352,7 @@ function TutorBuilderContent() {
 
   // Resolve selected IDs to full question objects for MCQ preview (order preserved for drag-to-reorder)
   const selectedMcqQuestions = useMemo(() => {
-    if (assignmentType !== 'mcq') return [];
+    if (assignmentType !== 'mcq' && assignmentType !== 'mcqAndFrq') return [];
     const ids = selectedIdsOrder.filter((id): id is number => typeof id === 'number');
     const map = new Map(allQuestions.map((q) => [q.id, q]));
     return ids.map((id) => map.get(id)).filter(Boolean) as Question[];
@@ -328,6 +405,19 @@ function TutorBuilderContent() {
 
   // Build the same URL students would see (for preview in new tab). MCQ uses selection order; Graph Gym sorts by id.
   const getPreviewUrl = (): string | null => {
+    if (assignmentModeChoice === 'printHomework') {
+      if (selectedIdsOrder.length === 0 && selectedFrqExamIndices.length === 0) return null;
+      const origin = typeof window !== 'undefined' ? window.location.origin : '';
+      const params = new URLSearchParams();
+      if (selectedIdsOrder.length > 0) {
+        const mcqIds = selectedIdsOrder.filter((id): id is number => typeof id === 'number');
+        params.set('q', btoa(mcqIds.map(String).join(',')));
+      }
+      if (selectedFrqExamIndices.length > 0) {
+        params.set('f', btoa(selectedFrqExamIndices.join(',')));
+      }
+      return `${origin}/tutor/print-preview?${params.toString()}`;
+    }
     if (selectedIdsOrder.length === 0) return null;
     const idsArray = assignmentType === 'mcq'
       ? selectedIdsOrder.filter((id): id is number => typeof id === 'number')
@@ -405,6 +495,36 @@ function TutorBuilderContent() {
   };
 
   const generateLink = async () => {
+    if (assignmentType === 'mcqAndFrq') {
+      if (selectedIdsOrder.length === 0 || selectedFrqExamIndices.length === 0) return;
+      const mcqIds = selectedIdsOrder.filter((id): id is number => typeof id === 'number');
+      const qEncoded = btoa(mcqIds.map(String).join(','));
+      const fEncoded = btoa(selectedFrqExamIndices.join(','));
+      const url = `${window.location.origin}/exam/custom?q=${qEncoded}&f=${fEncoded}`;
+      if (user) {
+        try {
+          await addDoc(collection(db, 'assignmentLinks'), {
+            tutorId: user.uid,
+            tutorEmail: user.email,
+            questionIds: mcqIds,
+            encodedParam: qEncoded,
+            frqExamIndices: selectedFrqExamIndices,
+            url,
+            subject: subjectFilter,
+            assignmentType: 'mcqAndFrq',
+            createdAt: serverTimestamp(),
+            totalQuestions: mcqIds.length
+          });
+        } catch (error) {
+          console.error('Error saving assignment link to Firebase:', error);
+        }
+      }
+      navigator.clipboard.writeText(url).then(() => {
+        setLinkCopied(true);
+        setTimeout(() => setLinkCopied(false), 3000);
+      });
+      return;
+    }
     if (selectedIdsOrder.length === 0) return;
     const idsArray = assignmentType === 'mcq'
       ? selectedIdsOrder.filter((id): id is number => typeof id === 'number')
@@ -416,7 +536,6 @@ function TutorBuilderContent() {
       ? `${window.location.origin}/exam/custom?q=${encoded}`
       : `${window.location.origin}/graph-gym/custom?q=${encoded}`;
     
-    // Save to Firebase if user is logged in
     if (user) {
       try {
         await addDoc(collection(db, 'assignmentLinks'), {
@@ -432,15 +551,77 @@ function TutorBuilderContent() {
         });
       } catch (error) {
         console.error('Error saving assignment link to Firebase:', error);
-        // Continue even if Firebase save fails
       }
     }
     
-    // Copy to clipboard
     navigator.clipboard.writeText(url).then(() => {
       setLinkCopied(true);
       setTimeout(() => setLinkCopied(false), 3000);
     });
+  };
+
+  const openPrintPreview = () => {
+    if (assignmentModeChoice !== 'printHomework') return;
+    if (selectedIdsOrder.length === 0 && selectedFrqExamIndices.length === 0) return;
+    const params = new URLSearchParams();
+    if (selectedIdsOrder.length > 0) {
+      const mcqIds = selectedIdsOrder.filter((id): id is number => typeof id === 'number');
+      params.set('q', btoa(mcqIds.map(String).join(',')));
+    }
+    if (selectedFrqExamIndices.length > 0) {
+      params.set('f', btoa(selectedFrqExamIndices.join(',')));
+    }
+    const url = `${typeof window !== 'undefined' ? window.location.origin : ''}/tutor/print-preview?${params.toString()}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
+  const generateRandomSlug = () => {
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    const bytes = typeof crypto !== 'undefined' && crypto.getRandomValues
+      ? crypto.getRandomValues(new Uint8Array(10))
+      : Array.from({ length: 10 }, () => Math.floor(Math.random() * 256));
+    return Array.from(bytes).map((b) => chars[b % chars.length]).join('');
+  };
+
+  const openWorksheetModal = () => {
+    setWorksheetUrl(null);
+    setWorksheetError(null);
+    setShowWorksheetModal(true);
+    if (selectedIdsOrder.length === 0 && selectedFrqExamIndices.length === 0) {
+      setWorksheetError('Add at least one MCQ or FRQ set to the assignment.');
+      setPublishingWorksheet(false);
+      return;
+    }
+    if (!user) {
+      setWorksheetError('Sign in to create a worksheet link.');
+      setPublishingWorksheet(false);
+      return;
+    }
+    setWorksheetError(null);
+    setPublishingWorksheet(true);
+    const slug = generateRandomSlug();
+    const data: Record<string, unknown> = {
+      slug,
+      title: 'Worksheet',
+      createdAt: serverTimestamp(),
+    };
+    if (selectedIdsOrder.length > 0) {
+      const mcqIds = selectedIdsOrder.filter((id): id is number => typeof id === 'number');
+      data.q = btoa(mcqIds.map(String).join(','));
+    }
+    if (selectedFrqExamIndices.length > 0) {
+      data.f = btoa(selectedFrqExamIndices.join(','));
+    }
+    addDoc(collection(db, 'worksheets'), data)
+      .then(() => {
+        const origin = typeof window !== 'undefined' ? window.location.origin : '';
+        setWorksheetUrl(`${origin}/worksheets/${slug}`);
+      })
+      .catch((err) => {
+        console.error(err);
+        setWorksheetError('Could not create worksheet. Try again.');
+      })
+      .finally(() => setPublishingWorksheet(false));
   };
 
   const truncateText = (text: string, maxLength: number) => {
@@ -685,11 +866,11 @@ function TutorBuilderContent() {
                 Create Your Assignment
               </h1>
               <p className="text-xl text-slate-600 font-semibold max-w-2xl mx-auto">
-                Choose how you want to deliver your assignment—live in class or asynchronously for homework
+                Choose how you want to deliver your assignment—live in class, link for homework, or a printable PDF
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-16">
+            <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-16">
               <button
                 type="button"
                 onClick={() => setAssignmentModeChoice('live')}
@@ -731,6 +912,31 @@ function TutorBuilderContent() {
                 <div className="flex items-center gap-2 text-sm font-bold text-blue-600 mt-auto">
                   <BookOpen className="w-4 h-4" />
                   <span>Self-paced learning</span>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setAssignmentModeChoice('printHomework');
+                  setAssignmentType('mcqAndFrq');
+                }}
+                className="group relative flex flex-col p-8 bg-white rounded-3xl shadow-xl hover:shadow-2xl border-2 border-amber-600 transition-all transform hover:-translate-y-1"
+              >
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-16 h-16 rounded-2xl bg-amber-600 flex items-center justify-center shadow-lg">
+                    <Printer className="w-8 h-8 text-white" />
+                  </div>
+                  <h2 className="text-2xl font-black text-slate-900 group-hover:text-amber-600 transition-colors">
+                    Print Homework
+                  </h2>
+                </div>
+                <p className="text-base text-slate-700 font-semibold mb-4 leading-relaxed">
+                  Build a PDF assignment from MCQs and FRQs. MCQs appear first, then free-response with space to write and draw.
+                </p>
+                <div className="flex items-center gap-2 text-sm font-bold text-amber-600 mt-auto">
+                  <Printer className="w-4 h-4" />
+                  <span>Save as PDF</span>
                 </div>
               </button>
             </div>
@@ -1095,78 +1301,128 @@ function TutorBuilderContent() {
               <div className="flex-1 min-w-0">
         {/* Connected card: Assignment Type + Filters + Table */}
         <div className="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
-          {/* Row 1: Assignment Type (left) + Subject (right) */}
+          {/* Row 1: Subject (dropdown for print, pills for live/homework) + Assignment Type */}
           <div className="p-6 border-b border-slate-200 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <span className="text-sm font-semibold text-slate-600">Assignment Type:</span>
-              <div className="flex rounded-xl shadow-lg border border-slate-200 overflow-hidden bg-white">
-                <button
-                  onClick={() => {
-                    setAssignmentType('mcq');
-                    setSelectedIdsOrder([]);
-                    setSearchTerm('');
-                    setUnitFilter(null);
-                  }}
-                  className={`px-6 py-2.5 font-bold transition-colors ${
-                    assignmentType === 'mcq'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-white text-slate-700 hover:bg-slate-50'
-                  }`}
-                >
-                  MCQs
-                </button>
-                <button
-                  onClick={() => {
-                    setAssignmentType('graphGym');
-                    setSelectedIdsOrder([]);
-                    setSearchTerm('');
-                    setUnitFilter(null);
-                  }}
-                  className={`px-6 py-2.5 font-bold transition-colors border-l border-slate-200 ${
-                    assignmentType === 'graphGym'
-                      ? 'bg-green-600 text-white border-l-transparent'
-                      : 'bg-white text-slate-700 hover:bg-slate-50'
-                  }`}
-                >
-                  Graph Gym FRQs
-                </button>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
               <span className="text-sm font-semibold text-slate-600">Subject:</span>
-              <div className="flex rounded-xl shadow-lg border border-slate-200 overflow-hidden bg-white">
-                <button
-                  onClick={() => {
-                    setSubjectFilter('ap_macroeconomics');
+              {assignmentModeChoice === 'printHomework' ? (
+                <select
+                  value={subjectFilter}
+                  onChange={(e) => {
+                    const v = e.target.value as 'ap_macroeconomics' | 'ap_microeconomics';
+                    setSubjectFilter(v);
                     setUnitFilter(null);
+                    if (v === 'ap_microeconomics') setSelectedTopicTags(new Set());
                   }}
-                  className={`px-4 py-2.5 font-bold transition-colors ${
-                    subjectFilter === 'ap_macroeconomics'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-white text-slate-700 hover:bg-slate-50'
-                  }`}
+                  className="px-4 py-2.5 border border-slate-200 rounded-xl font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                 >
-                  Macro
-                </button>
-                <button
-                  onClick={() => {
-                    setSubjectFilter('ap_microeconomics');
-                    setUnitFilter(null);
-                    setSelectedTopicTags(new Set());
-                  }}
-                  className={`px-4 py-2.5 font-bold transition-colors border-l border-slate-200 ${
-                    subjectFilter === 'ap_microeconomics'
-                      ? 'bg-green-600 text-white border-l-transparent'
-                      : 'bg-white text-slate-700 hover:bg-slate-50'
-                  }`}
-                >
-                  Micro
-                </button>
-              </div>
+                  <option value="ap_macroeconomics">AP Macroeconomics</option>
+                  <option value="ap_microeconomics">AP Microeconomics</option>
+                </select>
+              ) : (
+                <div className="flex rounded-xl shadow-lg border border-slate-200 overflow-hidden bg-white">
+                  <button
+                    onClick={() => {
+                      setSubjectFilter('ap_macroeconomics');
+                      setUnitFilter(null);
+                    }}
+                    className={`px-4 py-2.5 font-bold transition-colors ${
+                      subjectFilter === 'ap_macroeconomics'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-white text-slate-700 hover:bg-slate-50'
+                    }`}
+                  >
+                    Macro
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSubjectFilter('ap_microeconomics');
+                      setUnitFilter(null);
+                      setSelectedTopicTags(new Set());
+                    }}
+                    className={`px-4 py-2.5 font-bold transition-colors border-l border-slate-200 ${
+                      subjectFilter === 'ap_microeconomics'
+                        ? 'bg-green-600 text-white border-l-transparent'
+                        : 'bg-white text-slate-700 hover:bg-slate-50'
+                    }`}
+                  >
+                    Micro
+                  </button>
+                </div>
+              )}
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="text-sm font-semibold text-slate-600">Assignment Type:</span>
+              {assignmentModeChoice === 'printHomework' ? (
+                <div className="flex rounded-xl shadow-lg border border-slate-200 overflow-hidden bg-white">
+                  <button
+                    onClick={() => {
+                      setAssignmentType('mcq');
+                      setSearchTerm('');
+                      setUnitFilter(null);
+                    }}
+                    className={`px-6 py-2.5 font-bold transition-colors ${
+                      assignmentType === 'mcq'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-white text-slate-700 hover:bg-slate-50'
+                    }`}
+                  >
+                    MCQs
+                  </button>
+                  <button
+                    onClick={() => {
+                      setAssignmentType('mcqAndFrq');
+                      setSearchTerm('');
+                      setUnitFilter(null);
+                    }}
+                    className={`px-6 py-2.5 font-bold transition-colors border-l border-slate-200 ${
+                      assignmentType === 'mcqAndFrq'
+                        ? 'bg-indigo-600 text-white border-l-transparent'
+                        : 'bg-white text-slate-700 hover:bg-slate-50'
+                    }`}
+                  >
+                    FRQs
+                  </button>
+                </div>
+              ) : (
+                <div className="flex rounded-xl shadow-lg border border-slate-200 overflow-hidden bg-white">
+                  <button
+                    onClick={() => {
+                      setAssignmentType('mcq');
+                      setSelectedIdsOrder([]);
+                      setSearchTerm('');
+                      setUnitFilter(null);
+                    }}
+                    className={`px-6 py-2.5 font-bold transition-colors ${
+                      assignmentType === 'mcq'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-white text-slate-700 hover:bg-slate-50'
+                    }`}
+                  >
+                    MCQs
+                  </button>
+                  <button
+                    onClick={() => {
+                      setAssignmentType('graphGym');
+                      setSelectedIdsOrder([]);
+                      setSearchTerm('');
+                      setUnitFilter(null);
+                    }}
+                    className={`px-6 py-2.5 font-bold transition-colors border-l border-slate-200 ${
+                      assignmentType === 'graphGym'
+                        ? 'bg-green-600 text-white border-l-transparent'
+                        : 'bg-white text-slate-700 hover:bg-slate-50'
+                    }`}
+                  >
+                    Graph Gym
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Row 2: Topic/tag filter chips (5 per subject, multi-select; filter by any selected tag) */}
+          {/* Row 2: Suggested themes (MCQs, FRQs, and Graph Gym) */}
+          {(assignmentType === 'mcq' || assignmentType === 'graphGym' || assignmentType === 'mcqAndFrq') && (
           <div className="px-6 py-4 border-b border-slate-200">
             <div className="flex flex-wrap gap-2">
               {(subjectFilter === 'ap_macroeconomics'
@@ -1198,6 +1454,7 @@ function TutorBuilderContent() {
               })}
             </div>
           </div>
+          )}
 
           {/* Row 3: Search icon (expandable) + Unit dropdown */}
           <div className="p-6 border-b border-slate-200 flex flex-wrap items-center gap-4">
@@ -1218,6 +1475,8 @@ function TutorBuilderContent() {
                       ? "Search by ID, question text, or unit..."
                       : assignmentType === 'graphGym'
                         ? "Search by ID, title, description, or topics..."
+                        : assignmentType === 'mcqAndFrq'
+                        ? "Search FRQ sets..."
                         : "Search by title, description, or drill ID..."
                   }
                   value={searchTerm}
@@ -1237,6 +1496,21 @@ function TutorBuilderContent() {
                 >
                   <option value="">All Units</option>
                   {uniqueUnits.map(unit => (
+                    <option key={unit} value={unit}>Unit {unit}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+            {assignmentType === 'mcqAndFrq' && (
+              <div className="relative flex items-center gap-2">
+                <Filter className="absolute left-3 text-slate-400 w-5 h-5 pointer-events-none" />
+                <select
+                  value={frqUnitFilter ?? ''}
+                  onChange={(e) => setFrqUnitFilter(e.target.value ? parseInt(e.target.value) : null)}
+                  className="pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-white"
+                >
+                  <option value="">All Units</option>
+                  {uniqueFrqUnits.map(unit => (
                     <option key={unit} value={unit}>Unit {unit}</option>
                   ))}
                 </select>
@@ -1312,6 +1586,65 @@ function TutorBuilderContent() {
             )}
           </div>
         )}
+
+          {/* FRQ exam selector (print: FRQs tab; legacy homework had MCQ+FRQ) */}
+          {assignmentType === 'mcqAndFrq' && (
+            <div className={assignmentModeChoice === 'printHomework' ? 'px-6 pb-6' : 'mt-8 border-t border-slate-200 pt-8 px-6 pb-6'}>
+              <h3 className="text-lg font-bold text-slate-800 mb-4">{assignmentModeChoice === 'printHomework' ? 'FRQ sets to include' : 'FRQ sets to include (shown after MCQs)'}</h3>
+              <div className="overflow-x-auto rounded-xl border-2 border-slate-200">
+                <table className="w-full">
+                  <thead className="bg-slate-50 border-b border-slate-200">
+                    <tr>
+                      <th className="px-4 py-3 text-left font-bold text-slate-900 w-12">Add</th>
+                      <th className="px-4 py-3 text-left font-bold text-slate-900">FRQ set</th>
+                      <th className="px-4 py-3 text-left font-bold text-slate-900">Unit</th>
+                      <th className="px-4 py-3 text-left font-bold text-slate-900">Questions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredFrqExamsWithIndex.map(({ exam, globalIndex }) => {
+                      const isSelected = selectedFrqExamIndices.includes(globalIndex);
+                      return (
+                        <tr
+                          key={globalIndex}
+                          className={`border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer ${
+                            isSelected ? 'bg-indigo-50' : ''
+                          }`}
+                          onClick={() => {
+                            setSelectedFrqExamIndices((prev) =>
+                              prev.includes(globalIndex)
+                                ? prev.filter((i) => i !== globalIndex)
+                                : [...prev, globalIndex]
+                            );
+                          }}
+                        >
+                          <td className="px-4 py-3">
+                            <div className="flex items-center justify-center">
+                              {isSelected ? (
+                                <CheckCircle2 className="w-6 h-6 text-indigo-600" />
+                              ) : (
+                                <div className="w-6 h-6 border-2 border-slate-300 rounded-lg" />
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 font-semibold text-slate-900">{exam.examTitle}</td>
+                          <td className="px-4 py-3 text-slate-600">Unit {exam.unit}</td>
+                          <td className="px-4 py-3 text-slate-600">{exam.questions.length} question{exam.questions.length !== 1 ? 's' : ''}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              {filteredFrqExamsWithIndex.length === 0 && (
+                <p className="p-4 text-slate-500 font-semibold">
+                  {frqExamsBySubjectWithIndex.length === 0
+                    ? 'No FRQ sets for this subject.'
+                    : 'No FRQ sets match the selected unit or themes.'}
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Graph Gym Scenarios Table */}
           {assignmentType === 'graphGym' && (
@@ -1408,26 +1741,53 @@ function TutorBuilderContent() {
                     <p className="text-sm text-slate-600">What students will see</p>
                   </div>
                   <div className="p-4 space-y-6">
-                    {assignmentType === 'mcq' && (
-                      selectedMcqQuestions.length === 0 ? (
-                        <p className="text-slate-500 text-sm font-medium">Select questions from the list to preview them here.</p>
+                    {(assignmentType === 'mcq' || (assignmentModeChoice === 'printHomework' && selectedIdsOrder.length > 0)) && (
+                      selectedMcqQuestions.length === 0 && !(assignmentModeChoice === 'printHomework' && selectedFrqExamIndices.length > 0) ? (
+                        <p className="text-slate-500 text-sm font-medium">{assignmentModeChoice === 'printHomework' ? 'Add MCQs and FRQ sets using the tabs below.' : 'Select questions from the list to preview them here.'}</p>
                       ) : (
-                        selectedMcqQuestions.map((q, idx) => (
-                          <McqPreviewCard
-                            key={q.id}
-                            question={q}
-                            index={idx}
-                            total={selectedMcqQuestions.length}
-                            isDragging={draggedMcqId === q.id}
-                            onRemove={() => toggleSelection(q.id)}
-                            onDragStart={(questionId, clientX, clientY) => {
-                              setDraggedMcqId(questionId);
-                              setGhostPosition({ x: clientX, y: clientY });
-                              setGhostQuestion(selectedMcqQuestions.find((qq) => qq.id === questionId) ?? null);
-                            }}
-                          />
-                        ))
+                        <>
+                          {selectedMcqQuestions.length > 0 && selectedMcqQuestions.map((q, idx) => (
+                            <McqPreviewCard
+                              key={q.id}
+                              question={q}
+                              index={idx}
+                              total={selectedMcqQuestions.length}
+                              isDragging={draggedMcqId === q.id}
+                              onRemove={() => toggleSelection(q.id)}
+                              onDragStart={(questionId, clientX, clientY) => {
+                                setDraggedMcqId(questionId);
+                                setGhostPosition({ x: clientX, y: clientY });
+                                setGhostQuestion(selectedMcqQuestions.find((qq) => qq.id === questionId) ?? null);
+                              }}
+                            />
+                          ))}
+                          {assignmentModeChoice === 'printHomework' && selectedFrqExamIndices.length > 0 && (
+                            <div className={selectedMcqQuestions.length > 0 ? 'pt-4 border-t border-slate-200' : ''}>
+                              <p className="text-xs font-bold text-slate-500 mb-2">FRQ sets ({selectedFrqExamIndices.length})</p>
+                              <ul className="space-y-1.5 text-sm text-slate-700">
+                                {selectedFrqExamIndices.map((idx) => {
+                                  const exam = frqExams[idx];
+                                  return exam ? <li key={idx} className="font-medium">• {exam.examTitle}</li> : null;
+                                })}
+                              </ul>
+                            </div>
+                          )}
+                        </>
                       )
+                    )}
+                    {assignmentModeChoice === 'printHomework' && selectedIdsOrder.length === 0 && selectedFrqExamIndices.length > 0 && (
+                      <div className="space-y-2">
+                        <p className="text-xs font-bold text-slate-500">FRQ sets ({selectedFrqExamIndices.length})</p>
+                        <ul className="space-y-1.5 text-sm text-slate-700">
+                          {selectedFrqExamIndices.map((idx) => {
+                            const exam = frqExams[idx];
+                            return exam ? <li key={idx} className="font-medium">• {exam.examTitle}</li> : null;
+                          })}
+                        </ul>
+                      </div>
+                    )}
+                    {assignmentModeChoice === 'printHomework' && selectedIdsOrder.length === 0 && selectedFrqExamIndices.length === 0 && (
+                      <p className="text-slate-500 text-sm font-medium">Add MCQs and FRQ sets using the tabs below.</p>
                     )}
                     {assignmentType === 'graphGym' && (
                       selectedIdsOrder.length === 0 ? (
@@ -1475,9 +1835,11 @@ function TutorBuilderContent() {
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-4">
               <span className="text-lg font-bold text-slate-900">
-                {selectedIdsOrder.length} {
-                  assignmentType === 'mcq' ? 'question' : 'scenario'
-                }{selectedIdsOrder.length !== 1 ? 's' : ''} selected
+                {assignmentModeChoice === 'printHomework' ? (
+                  <>{selectedIdsOrder.length} MCQ{selectedIdsOrder.length !== 1 ? 's' : ''}, {selectedFrqExamIndices.length} FRQ set{selectedFrqExamIndices.length !== 1 ? 's' : ''}</>
+                ) : (
+                  <>{selectedIdsOrder.length} {assignmentType === 'mcq' ? 'question' : 'scenario'}{selectedIdsOrder.length !== 1 ? 's' : ''} selected</>
+                )}
               </span>
             </div>
             <div className="flex items-center gap-3">
@@ -1509,6 +1871,27 @@ function TutorBuilderContent() {
                       Start Activity
                     </button>
                   )}
+                </>
+              ) : assignmentModeChoice === 'printHomework' ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={openPrintPreview}
+                    disabled={selectedIdsOrder.length === 0 && selectedFrqExamIndices.length === 0}
+                    className="inline-flex items-center gap-2 px-6 py-3 font-bold text-white rounded-xl shadow-lg transition-all bg-amber-600 hover:bg-amber-700 disabled:bg-slate-400 disabled:cursor-not-allowed"
+                  >
+                    <Printer className="w-5 h-5" />
+                    Open print view (PDF)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={openWorksheetModal}
+                    disabled={selectedIdsOrder.length === 0 && selectedFrqExamIndices.length === 0}
+                    className="inline-flex items-center gap-2 px-6 py-3 font-bold text-white rounded-xl shadow-lg transition-all bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-400 disabled:cursor-not-allowed border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
+                  >
+                    <Share2 className="w-5 h-5" />
+                    Get worksheet link
+                  </button>
                 </>
               ) : (
                 <>
@@ -1542,6 +1925,85 @@ function TutorBuilderContent() {
             </div>
           </div>
         </div>
+        </div>
+      )}
+
+      {/* Worksheet link modal: show generated URL with Copy */}
+      {showWorksheetModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+          onClick={() => !publishingWorksheet && setShowWorksheetModal(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="worksheet-modal-title"
+        >
+          <div
+            className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 border-2 border-slate-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h2 id="worksheet-modal-title" className="text-xl font-bold text-slate-900">
+                Worksheet link
+              </h2>
+              {!publishingWorksheet && (
+                <button
+                  type="button"
+                  onClick={() => setShowWorksheetModal(false)}
+                  className="p-2 rounded-full hover:bg-slate-100 text-slate-500"
+                  aria-label="Close"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              )}
+            </div>
+            {worksheetError ? (
+              <div className="space-y-4">
+                <p className="text-red-600 text-sm font-medium">{worksheetError}</p>
+                <button
+                  type="button"
+                  onClick={() => setShowWorksheetModal(false)}
+                  className="w-full py-2.5 font-semibold text-slate-600 hover:text-slate-900 border border-slate-200 rounded-lg"
+                >
+                  Close
+                </button>
+              </div>
+            ) : publishingWorksheet && !worksheetUrl ? (
+              <div className="py-6 flex flex-col items-center gap-3">
+                <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+                <p className="text-slate-600 font-medium">Creating link…</p>
+              </div>
+            ) : worksheetUrl ? (
+              <div className="space-y-4">
+                <p className="text-slate-600 text-sm">Anyone with this link can view the worksheet (no sign-in required):</p>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value={worksheetUrl}
+                    className="flex-1 px-3 py-2 border border-slate-200 rounded-lg bg-slate-50 text-sm font-mono"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard.writeText(worksheetUrl);
+                      setLinkCopied(true);
+                      setTimeout(() => setLinkCopied(false), 2000);
+                    }}
+                    className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 flex-shrink-0 border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
+                  >
+                    {linkCopied ? 'Copied!' : 'Copy'}
+                  </button>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowWorksheetModal(false)}
+                  className="w-full py-2.5 font-semibold text-slate-600 hover:text-slate-900 border border-slate-200 rounded-lg"
+                >
+                  Done
+                </button>
+              </div>
+            ) : null}
+          </div>
         </div>
       )}
 

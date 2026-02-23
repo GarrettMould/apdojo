@@ -22,10 +22,12 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
     pathname.includes('-cheat-sheet');
   // Packet print page: no header, no footer — only the "Ready to Print" bar and content
   const isPacketPrintPage = pathname?.includes('/packet');
-  
+  // Tutor print-preview: no site header/footer so the PDF is clean
+  const isTutorPrintPreviewPage = pathname?.startsWith('/tutor/print-preview');
+
   return (
     <div className="flex flex-col">
-      {!isPacketPrintPage && (
+      {!isPacketPrintPage && !isTutorPrintPreviewPage && (
         <Suspense fallback={<div className="h-20 bg-white" />}>
           <HeaderWithSuspense />
         </Suspense>
@@ -33,7 +35,7 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
       <main>
         {children}
       </main>
-      {!isGraphGymPage && !isUnitCheatSheetPage && !isPacketPrintPage && <Footer />}
+      {!isGraphGymPage && !isUnitCheatSheetPage && !isPacketPrintPage && !isTutorPrintPreviewPage && <Footer />}
     </div>
   );
 } 
