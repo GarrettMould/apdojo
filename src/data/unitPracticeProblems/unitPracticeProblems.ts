@@ -2359,7 +2359,376 @@ const macroUnit3Questions = [
     "correctAnswer": "E",
     "explanation": "Fiscal policy suffers from recognition lags (realizing there is a problem), administrative/legislative lags (passing the bill), and implementation lags (spending the money). These delays can sometimes result in policy taking effect after the economy has already self-corrected.",
     "videoExplanation": null
-  }
+  },
+  {
+    "id": 3130,
+    "unit": 3,
+    "lessonIDS": ["3.2"],
+    "unitName": "National Income and Price Determination",
+    "question": "The numerical value for the spending multiplier increases as the value of the:",
+    "image": null,
+    "options": [
+      "marginal propensity to save decreases.",
+      "average propensity to consume increases.",
+      "marginal propensity to consume decreases.",
+      "marginal propensity to save increases.",
+      "average propensity to consume decreases."
+    ],
+    "correctAnswer": "A",
+    "explanation": "The spending multiplier is calculated as 1 / MPS. Therefore, as the marginal propensity to save (MPS) gets smaller (decreases), the numerical value for the spending multiplier increases.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3131,
+    "unit": 3,
+    "lessonIDS": ["3.4"],
+    "unitName": "National Income and Price Determination",
+    "question": "An increase in the capital stock will cause the:",
+    "image": null,
+    "options": [
+      "aggregate demand curve to shift left.",
+      "aggregate demand curve to shift right.",
+      "long-run aggregate supply curve to shift right.",
+      "aggregate supply curve to shift left.",
+      "production possibilities curve to shift inward."
+    ],
+    "correctAnswer": "C",
+    "explanation": "An increase in the capital stock expands the economy's productive capacity, which will cause the long-run aggregate supply curve to shift right (and the production possibilities curve to shift outward).",
+    "videoExplanation": null
+  },
+  {
+    "id": 3132,
+    "unit": 3,
+    "lessonIDS": ["3.1"],
+    "unitName": "National Income and Price Determination",
+    "question": "Which effect describes the fact that when the price level increases, the interest rate increases and consumption decreases?",
+    "image": null,
+    "options": [
+      "The interest rate effect",
+      "The net export effect",
+      "The Pareto effect",
+      "The substitution effect",
+      "The real balance effect"
+    ],
+    "correctAnswer": "A",
+    "explanation": "The fact that a higher price level increases the demand for money, which pushes up interest rates and causes interest-sensitive spending (like consumption and investment) to decrease, is described by the interest rate effect.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3133,
+    "unit": 3,
+    "lessonIDS": ["3.1"],
+    "unitName": "National Income and Price Determination",
+    "question": "The change in real GDP that occurs when an increase in the price level leads to a change in the relative prices of imports and exports is a result of the:",
+    "image": null,
+    "options": [
+      "interest rate effect.",
+      "net export effect.",
+      "Pareto effect.",
+      "substitution effect.",
+      "real balance effect."
+    ],
+    "correctAnswer": "B",
+    "explanation": "When the domestic price level rises, domestic goods become more expensive relative to foreign goods. This decreases exports and increases imports, causing real GDP to fall. This is known as the net export effect.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3134,
+    "unit": 3,
+    "lessonIDS": ["3.1"],
+    "unitName": "National Income and Price Determination",
+    "question": "As the average price level decreases, the purchasing power of people's cash balances increases, resulting in an increase in spending. This effect is called:",
+    "image": null,
+    "options": [
+      "the net exports effect.",
+      "the Keynesian effect.",
+      "the real balance effect.",
+      "the interest rate effect.",
+      "the neutrality of money."
+    ],
+    "correctAnswer": "C",
+    "explanation": "The real balance effect (or wealth effect) occurs when a change in the price level alters the real value or purchasing power of accumulated financial assets (cash balances), which in turn changes consumption spending.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3135,
+    "unit": 3,
+    "lessonIDS": ["3.8"],
+    "unitName": "National Income and Price Determination",
+    "question": "Which of the following will increase aggregate demand?",
+    "image": null,
+    "options": [
+      "An increase in corporate income taxes",
+      "A decrease in government spending",
+      "A decrease in the capital stock",
+      "A decrease in personal income taxes",
+      "An increase in interest rates"
+    ],
+    "correctAnswer": "D",
+    "explanation": "A decrease in personal income taxes gives households more disposable income, which leads to an increase in consumption spending, thereby shifting aggregate demand to the right.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3136,
+    "unit": 3,
+    "lessonIDS": ["3.1"],
+    "unitName": "National Income and Price Determination",
+    "question": "Investment demand increases as the result of:",
+    "image": null,
+    "options": [
+      "excess productive capacity.",
+      "an increase in corporate business taxes.",
+      "recessions in foreign nations that trade with the United States.",
+      "an increase in the real interest rate.",
+      "businesses becoming more optimistic with respect to future business conditions."
+    ],
+    "correctAnswer": "E",
+    "explanation": "If businesses become more optimistic about future economic conditions and expected returns on capital, their demand for investment will increase, shifting the aggregate demand curve to the right.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3137,
+    "unit": 3,
+    "lessonIDS": ["3.6"],
+    "unitName": "National Income and Price Determination",
+    "question": "\"Too much money chasing too few goods\" describes which of the following?",
+    "image": null,
+    "options": [
+      "Demand-pull inflation",
+      "The income effect",
+      "Cost-push inflation",
+      "The wealth effect",
+      "The real balance effect"
+    ],
+    "correctAnswer": "A",
+    "explanation": "\"Too much money chasing too few goods\" is the classic description of demand-pull inflation, which occurs when aggregate demand shifts rightward faster than the economy's productive capacity can increase.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3138,
+    "unit": 3,
+    "lessonIDS": ["3.3"],
+    "unitName": "National Income and Price Determination",
+    "question": "The short-run aggregate supply curve slopes upward because of:",
+    "image": null,
+    "options": [
+      "the wealth effect.",
+      "sticky wages and prices.",
+      "the law of diminishing returns.",
+      "the natural rate of unemployment.",
+      "the multiplier."
+    ],
+    "correctAnswer": "B",
+    "explanation": "The short-run aggregate supply curve slopes upward because input prices (like wages) are often \"sticky\" or fixed in the short run. When the overall price level rises, firms make more profit per unit and are incentivized to increase output",
+    "videoExplanation": null
+  },
+  {
+    "id": 3139,
+    "unit": 3,
+    "lessonIDS": ["3.2"],
+    "unitName": "National Income and Price Determination",
+    "question": "If the spending multiplier is 4, the value of the tax multiplier must be:",
+    "image": null,
+    "options": [
+      "3.",
+      "-4.",
+      "-3.",
+      "4.",
+      "-5."
+    ],
+    "correctAnswer": "C",
+    "explanation": "The formula relating the two multipliers is: Tax Multiplier = -(Spending Multiplier - 1). If the spending multiplier is 4, the tax multiplier is -(4 - 1) = -3.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3140,
+    "unit": 3,
+    "lessonIDS": ["3.5"],
+    "unitName": "National Income and Price Determination",
+    "question": "Which of the following statements is true about actual employment?",
+    "image": null,
+    "options": [
+      "It must equal full employment.",
+      "It cannot exceed full employment.",
+      "It exceeds full employment in a recession.",
+      "It is below full employment in a recession.",
+      "It is the same as full employment."
+    ],
+    "correctAnswer": "D",
+    "explanation": "During a recession, an economy produces less than its potential output, meaning actual employment is below full employment (cyclical unemployment exists).",
+    "videoExplanation": null
+  }, 
+  {
+    "id": 3141,
+    "unit": 3,
+    "lessonIDS": ["3.6"],
+    "unitName": "National Income and Price Determination",
+    "question": "An outward shift of the aggregate demand curve will cause employment and the price level to change in which of the following ways in the short run?",
+    "image": null,
+    "optionTableHeaders": ["Employment", "Price Level"],
+    "options": [
+    "Increase | Decrease",
+    "Increase | Increase",
+    "Decrease | Increase",
+    "Decrease | Decrease",
+    "No change | Increase"
+    ],
+    "correctAnswer": "B",
+    "explanation": "A rightward shift in the aggregate demand curve will cause employment and the price level to increase in the short run. ",
+    "videoExplanation": null
+    },
+    {
+    "id": 3142,
+    "unit": 3,
+    "lessonIDS": ["3.6"],
+    "unitName": "National Income and Price Determination",
+    "question": "An improvement in labor productivity would most likely cause real gross domestic product and the price level to change in which of the following ways?",
+    "image": null,
+    "optionTableHeaders": ["Real GDP", "Price Level"],
+    "options": [
+    "Decrease | Decrease",
+    "Increase | Increase",
+    "Increase | Decrease",
+    "Decrease | Increase",
+    "No change | Decrease"
+    ],
+    "correctAnswer": "C",
+    "explanation": "An increase in labor productivity shifts the Short-Run Aggregate Supply (SRAS) curve to the right, which would most likely cause real gross domestic product to increase and the price level to decrease.",
+    "videoExplanation": null
+    },
+    {
+    "id": 3143,
+    "unit": 3,
+    "lessonIDS": ["3.6"],
+    "unitName": "National Income and Price Determination",
+    "question": "In which of the following ways will increases in short-run aggregate supply change the price level and unemployment?",
+    "image": null,
+    "optionTableHeaders": ["Price Level", "Unemployment"],
+    "options": [
+    "Increase | Increase",
+    "Decrease | Increase",
+    "Increase | Decrease",
+    "Decrease | Decrease",
+    "No change | Increase"
+    ],
+    "correctAnswer": "D",
+    "explanation": "Increases in short-run aggregate supply (a rightward shift) will change the price level by decreasing it and change unemployment by decreasing it as output expands.",
+    "videoExplanation": null
+    },
+    {
+    "id": 3144,
+    "unit": 3,
+    "lessonIDS": ["3.3", "3.4"],
+    "unitName": "National Income and Price Determination",
+    "question": "A sustained increase in oil prices would most likely cause short-run and long-run aggregate supply curves and the production possibilities curve to change in which of the following ways?",
+    "image": null,
+    "optionTableHeaders": ["SRAS Curve", "Production Possibilities Curve"],
+    "options": [
+    "Decrease | Shift outward",
+    "Increase | No change",
+    "Increase | Shift inward",
+    "No change | Shift outward",
+    "Decrease | Shift inward"
+    ],
+    "correctAnswer": "E",
+    "explanation": "A sustained increase in oil prices (a key resource) would most likely cause the short-run aggregate supply curve to decrease, the long-run aggregate supply curve to decrease, and the production possibilities curve to shift inward due to a loss of productive capacity.",
+    "videoExplanation": null
+    },
+    {
+    "id": 3145,
+    "unit": 3,
+    "lessonIDS": ["3.4"],
+    "unitName": "National Income and Price Determination",
+    "question": "A rapid increase in successful research and development projects for the nation will most likely result in which of the following changes in the short-run and the long-run aggregate supply curves and the production possibilities curve?",
+    "image": null,
+    "optionTableHeaders": ["LRAS Curve", "Production Possibilities Curve"],
+    "options": [
+    "Increase | Shift outward",
+    "Decrease | Shift inward",
+    "Increase | No change",
+    "No change | Shift outward",
+    "Decrease | No change"
+    ],
+    "correctAnswer": "A",
+    "explanation": "A rapid increase in successful research and development projects for the nation represents technological advancement. This will most likely result in an increase in the long-run aggregate supply curve and cause the production possibilities curve to shift outward.",
+    "videoExplanation": null
+    },
+    {
+    "id": 3146,
+    "unit": 3,
+    "lessonIDS": ["3.8"],
+    "unitName": "National Income and Price Determination",
+    "question": "An increase in personal income taxes will most likely result in which of the following changes in real GDP and the price level in the short run?",
+    "image": null,
+    "optionTableHeaders": ["Real GDP", "Price Level"],
+    "options": [
+    "Increase | Increase",
+    "Decrease | Decrease",
+    "Decrease | Increase",
+    "Increase | Decrease",
+    "No change | Decrease"
+    ],
+    "correctAnswer": "B",
+    "explanation": "An increase in personal income taxes reduces disposable income, shifting aggregate demand to the left. This will most likely result in a decrease in real GDP and a decrease in the price level in the short run.",
+    "videoExplanation": null
+    },
+    {
+    "id": 3147,
+    "unit": 3,
+    "lessonIDS": ["3.3"],
+    "unitName": "National Income and Price Determination",
+    "question": "Rising input price will shift which curve and create which type of inflation?",
+    "image": null,
+    "optionTableHeaders": ["Curve", "Type of Inflation"],
+    "options": [
+    "AD | Demand-pull",
+    "AS | Demand-pull",
+    "AS | Cost-push",
+    "AD | Cost-push",
+    "AS | Supply-pull"
+    ],
+    "correctAnswer": "C",
+    "explanation": "A rising input price will shift the aggregate supply (AS) curve to the left, decreasing output and raising the price level, which creates cost-push inflation.",
+    "videoExplanation": null
+    },
+    {
+    "id": 3148,
+    "unit": 3,
+    "lessonIDS": ["3.2"],
+    "unitName": "National Income and Price Determination",
+    "question": "If the marginal propensity to consume is 0.75, then an increase in personal income taxes of $200 will most likely result in which of the following changes?",
+    "image": null,
+    "optionTableHeaders": ["Change in Consumption", "Change in Savings"],
+    "options": [
+    "Increase of $150 | Increase of $50",
+    "Increase of $200 | No change",
+    "Decrease of $50 | Decrease of $150",
+    "Decrease of $150 | Decrease of $50",
+    "Decrease of $200 | Decrease of $50"
+    ],
+    "correctAnswer": "D",
+    "explanation": "When taxes increase by $200, disposable income drops by $200. With an MPC of 0.75, consumption decreases by 0.75 * $200 = $150. Because MPC + MPS = 1, the MPS is 0.25, so savings decrease by 0.25 * $200 = $50.",
+    "videoExplanation": null
+    },
+    {
+    "id": 3148,
+    "unit": 3,
+    "lessonIDS": ["3.2"],
+    "unitName": "National Income and Price Determination",
+    "question": "If David's disposable income increases from $1000 to $1100 and his level of personal-consumption expenditures increases from $800 to $880, what is his marginal propensity to consume?",
+    "image": null,
+    "optionTableHeaders": ["Marginal Propensity to Consume", "Marginal Propensity to Save"],
+    "options": [
+    "0.75 | 0.25",
+    "0.20 | 0.80",
+    "0.40 | 0.60",
+    "0.88 | 0.12",
+    "0.80 | 0.20"
+    ],
+    "correctAnswer": "E",
+    "explanation": "The marginal propensity to consume is calculated from the change in personal-consumption expenditures divided by the change in disposable income. When disposable income increases by $100 and consumption increases by $80, the marginal propensity to consume is 0.8. Because MPC + MPS = 1, the marginal propensity to save is 0.20.",
+    "videoExplanation": null
+    }
 ]
 
 

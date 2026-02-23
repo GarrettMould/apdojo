@@ -209,12 +209,20 @@ export function Header() {
                 )}
               </div>
 
-              {/* Graph Gym - Distinct styling */}
+              {/* Graph Gym - links to dashboard (prefetch=false to avoid redirect/prefetch loops) */}
               <Link
-                href="/graph-gym/ap-micro-monopoly-graphing-practice"
+                href="/graph-gym-dashboard"
+                prefetch={false}
                 className="text-lg text-gray-700 hover:text-blue-600 transition-colors font-bold"
               >
                 Graphing Practice
+              </Link>
+              <Link
+                href="/graph-gym-dashboard"
+                prefetch={false}
+                className="text-lg text-gray-700 hover:text-blue-600 transition-colors font-bold"
+              >
+                Test
               </Link>
 
               {/* Cheat Sheets */}
@@ -519,11 +527,20 @@ export function Header() {
               {/* Other Links */}
               <div className="border-t border-gray-200 mt-2 pt-2">
                 <Link
-                  href="/graph-gym/ap-micro-monopoly-graphing-practice"
+                  href="/graph-gym-dashboard"
+                  prefetch={false}
                   onClick={closeMobileMenu}
                   className="px-4 py-3 text-lg text-blue-500 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
                 >
                   Graphing Practice
+                </Link>
+                <Link
+                  href="/graph-gym-dashboard"
+                  prefetch={false}
+                  onClick={closeMobileMenu}
+                  className="px-4 py-3 text-lg text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
+                >
+                  Test
                 </Link>
                 <Link
                   href={displaySubject === 'macro' ? '/ap-macro-unit-1-cheat-sheet' : '/ap-micro-unit-1-cheat-sheet'}

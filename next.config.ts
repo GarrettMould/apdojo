@@ -149,13 +149,7 @@ const nextConfig = {
       permanent: true,
     });
 
-    // Redirect old /graph-gym to first scenario with new URL format
-    // First scenario is ID 1: "Long Run Equilibrium in a Pure Monopoly" (micro)
-    redirects.push({
-      source: '/graph-gym',
-      destination: '/graph-gym/ap-micro-monopoly-graphing-practice', // First scenario in new format
-      permanent: true, // 301 redirect for SEO
-    });
+    // /graph-gym now shows the Graph Gym dashboard; no redirect
 
     // Redirect old unit-1 deep dive pages to new dynamic URLs (when you enable deep dives)
     redirects.push({

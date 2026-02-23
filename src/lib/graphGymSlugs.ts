@@ -56,14 +56,49 @@ export function getScenarioBySlug(slug: string, subject?: 'macro' | 'micro'): Gr
   if (!keywords) {
     return undefined;
   }
+
+  // Legacy slugs (old URLs) -> scenario id, so old links still resolve after title/slug renames
+  const legacySlugToId: Record<string, number> = {
+    'demand-increase-substitutes': 76,
+    'recessionary-gap': 12,
+    'inflationary-gap': 13,
+    'contractionary-monetary-policy': 20,
+    'stagflation': 17,
+    'labor-supply-shift': 30,
+    'crowding-out': 32,
+    'capital-inflow': 33,
+    'self-correction-inflationary-gap': 34,
+    'cost-push-inflation': 37,
+    'forex-interest-rate': 38,
+    'phillips-curve-shift': 40,
+    'excise-tax-2': 41,
+    'negative-externality-2': 44,
+    'market-surplus': 77,
+    'monopolistic-competition-loss': 27,
+    'crowding-out-2': 47,
+    'self-correction-stagflation': 50,
+    'binding-price-floor': 60,
+    'binding-price-ceiling-qd-qs': 61,
+    'binding-price-ceiling-welfare': 62,
+  };
+
+  // Try legacy map first (one slug can only map to one id; recessionary-gap appears twice - map to 80 for "how do you show" scenario)
+  const legacyId = legacySlugToId[keywords];
+  if (legacyId != null) {
+    const byId = graphGymScenarios.find(s => s.id === legacyId);
+    if (byId) {
+      const scenarioSubjects = Array.isArray(byId.subject) ? byId.subject : [byId.subject];
+      const filterSubject = detectedSubject || subject;
+      if (!filterSubject || scenarioSubjects.includes(filterSubject)) return byId;
+    }
+  }
   
-  // Find scenario by matching keywords
+  // Find scenario by matching keywords (current slug)
   return graphGymScenarios.find(scenario => {
     const scenarioKeywords = scenario.slug || generateFallbackKeywords(scenario.title);
     
     if (scenarioKeywords !== keywords) return false;
     
-    // If subject was detected from URL or provided, filter by subject
     const filterSubject = detectedSubject || subject;
     if (filterSubject) {
       const scenarioSubjects = Array.isArray(scenario.subject) ? scenario.subject : [scenario.subject];
