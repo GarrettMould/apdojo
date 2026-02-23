@@ -177,6 +177,7 @@ function PrintPreviewContent() {
   }
 
   const isEmbed = searchParams.get('embed') === '1' || searchParams.get('embed') === 'true';
+  const isAnswerKey = searchParams.get('answerKey') === '1' || searchParams.get('answerKey') === 'true';
 
   return (
     <div className="min-h-screen bg-white">
@@ -200,7 +201,7 @@ function PrintPreviewContent() {
       <div className="max-w-3xl mx-auto px-6 py-8 print:py-4 print:px-4 print:pt-4">
         <AssignmentHeader />
         <h1 className="text-2xl font-black text-slate-900 mb-6 print:mb-4">
-          Assignment
+          {isAnswerKey ? 'Answer Key' : 'Assignment'}
         </h1>
 
         {/* Part 1: Multiple Choice */}
@@ -225,15 +226,24 @@ function PrintPreviewContent() {
                     </div>
                   )}
                   <ul className="list-none space-y-1 ml-2">
-                    {q.options.map((opt, oi) => (
-                      <li key={oi} className="flex gap-2">
-                        <span className="font-semibold text-slate-600 flex-shrink-0">
-                          {String.fromCharCode(65 + oi)}.
-                        </span>
-                        <span className="text-slate-800">{opt}</span>
-                      </li>
-                    ))}
+                    {q.options.map((opt, oi) => {
+                      const letter = String.fromCharCode(65 + oi);
+                      const isCorrect = isAnswerKey && q.correctAnswer === letter;
+                      return (
+                        <li key={oi} className="flex gap-2">
+                          <span className={`font-semibold flex-shrink-0 ${isCorrect ? 'text-green-700' : 'text-slate-600'}`}>
+                            {letter}.
+                          </span>
+                          <span className={isCorrect ? 'text-slate-900 font-semibold' : 'text-slate-800'}>{opt}</span>
+                        </li>
+                      );
+                    })}
                   </ul>
+                  {isAnswerKey && q.correctAnswer && (
+                    <p className="mt-2 text-sm font-bold text-green-700">
+                      Answer: {q.correctAnswer}
+                    </p>
+                  )}
                 </div>
               ))}
             </div>
@@ -246,6 +256,11 @@ function PrintPreviewContent() {
             <h2 className="text-lg font-bold text-slate-800 border-b-2 border-slate-300 pb-2 mb-4">
               Part 2: Free Response
             </h2>
+            {isAnswerKey && (
+              <p className="text-sm text-slate-600 mb-4">
+                Rubrics and sample responses available at apdojo.com
+              </p>
+            )}
             <div className="space-y-8">
               {frqExamsList.map((exam, examIdx) => (
                 <div key={examIdx} className="break-inside-avoid">
