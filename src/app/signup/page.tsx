@@ -36,16 +36,14 @@ export default function Signup() {
     return () => clearInterval(typingInterval)
   }, [])
   
-  // Check for teacher access code in URL (secret code: 9759)
-  const [isTeacher, setIsTeacher] = useState(false)
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search)
-      const accessCode = params.get('code')
-      // Secret teacher access code: 9759
-      setIsTeacher(accessCode === '9759')
-    }
-  }, [])
+  const [teacherCode, setTeacherCode] = useState('')
+
+  // Teacher code validation for visual feedback only (optional field - signup always allowed)
+  const teacherCodeStatus = teacherCode.trim() === ''
+    ? 'empty'
+    : teacherCode.trim() === '9759'
+    ? 'correct'
+    : 'incorrect'
 
   // Password validation states
   const [hasMinLength, setHasMinLength] = useState(false)
@@ -77,6 +75,7 @@ export default function Signup() {
     setLoading(true)
 
     try {
+      const isTeacher = teacherCode.trim() === '9759'
       await signup(email, password, isSubscribed, isTeacher)
       router.push('/')
     } catch (err: any) {
@@ -211,6 +210,34 @@ export default function Signup() {
                   <Label htmlFor="subscribe" className="text-sm font-medium leading-relaxed text-gray-700 cursor-pointer">
                     Send me helpful tips, course updates, and special offers.
                   </Label>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Teacher code (optional)
+                  </label>
+                  <input
+                    type="text"
+                    className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base transition-all ${
+                      teacherCodeStatus === 'correct'
+                        ? 'border-green-500 bg-green-50/50'
+                        : teacherCodeStatus === 'incorrect'
+                        ? 'border-red-500 bg-red-50/50'
+                        : 'border-gray-200'
+                    }`}
+                    placeholder="Enter teacher code for teacher access"
+                    value={teacherCode}
+                    onChange={(e) => setTeacherCode(e.target.value)}
+                    disabled={loading}
+                  />
+                  {teacherCodeStatus === 'incorrect' && (
+                    <p className="mt-1.5 text-sm text-red-600">Incorrect code. You can still create an account—teacher features require the correct code.</p>
+                  )}
+                  {teacherCodeStatus === 'correct' && (
+                    <p className="mt-1.5 text-sm text-green-600 flex items-center gap-1.5">
+                      <Check className="w-4 h-4" /> Teacher access will be enabled
+                    </p>
+                  )}
                 </div>
 
                 <button

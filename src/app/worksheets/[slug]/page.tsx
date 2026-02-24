@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { getWorksheetBySlug, type Worksheet } from '@/lib/worksheets';
 import { Printer, Loader2, AlertCircle, Key } from 'lucide-react';
+import { TeacherSignupModal } from '@/components/TeacherSignupModal';
 
 function WorksheetPageContent() {
   const params = useParams();
@@ -12,6 +13,7 @@ function WorksheetPageContent() {
   const [worksheet, setWorksheet] = useState<Worksheet | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showTeacherSignup, setShowTeacherSignup] = useState(false);
 
   useEffect(() => {
     if (!slug) {
@@ -73,17 +75,48 @@ function WorksheetPageContent() {
   }
 
   const handlePrint = () => {
-    window.print();
+    const url = buildPrintPreviewUrl(false);
+    if (url) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } else if (worksheet?.pdfUrl) {
+      window.open(worksheet.pdfUrl, '_blank', 'noopener,noreferrer');
+    }
   };
 
   return (
     <div className="min-h-screen bg-slate-50">
+      {/* Top banner: Created on AP Dojo + CTA (hidden when printing) */}
+      <div className="print:hidden bg-white border-b border-slate-200 px-4 py-4">
+        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-sm text-slate-600 text-center sm:text-left">
+            Created on{' '}
+            <Link
+              href="/"
+              className="font-semibold text-blue-600 hover:text-blue-700 hover:underline"
+            >
+              AP Dojo
+            </Link>
+            {' '}— free practice tests, MCQs & FRQs for AP Economics.
+          </p>
+          <button
+            type="button"
+            onClick={() => setShowTeacherSignup(true)}
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white rounded-lg border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-0.5 active:translate-y-0 font-bold text-black text-sm whitespace-nowrap"
+          >
+            Create free account
+          </button>
+        </div>
+        <p className="max-w-4xl mx-auto mt-2 text-xs text-slate-500 text-center sm:text-left">
+          Create your own worksheets, live quizzes, and more.
+        </p>
+      </div>
+
       <main className="w-full max-w-4xl mx-auto px-4 pt-8 pb-6">
-        <div className="flex flex-col gap-3 mb-8">
+        <div className="flex flex-col gap-3 mb-8 print:hidden">
           <button
             type="button"
             onClick={handlePrint}
-            className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-0.5 transition-all print:hidden"
+            className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-0.5 transition-all"
           >
             <Printer className="w-5 h-5" />
             Print / Save as PDF
@@ -91,6 +124,8 @@ function WorksheetPageContent() {
           {hasAnswerKey && (
             <Link
               href={`/worksheets/${slug}/answer-key`}
+              target="_blank"
+              rel="noopener noreferrer"
               className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold rounded-lg border-2 border-slate-300 transition-all print:hidden"
             >
               <Key className="w-5 h-5" />
@@ -117,8 +152,8 @@ function WorksheetPageContent() {
         )}
       </main>
 
-      {/* Footer: Created on AP Dojo */}
-      <footer className="bg-white border-t border-slate-200 px-4 py-4 safe-area-inset-bottom">
+      {/* Footer: Created on AP Dojo (hidden when printing) */}
+      <footer className="print:hidden bg-white border-t border-slate-200 px-4 py-4 safe-area-inset-bottom">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-sm text-slate-600">
             Created on{' '}
@@ -132,6 +167,11 @@ function WorksheetPageContent() {
           </p>
         </div>
       </footer>
+
+      <TeacherSignupModal
+        isOpen={showTeacherSignup}
+        onClose={() => setShowTeacherSignup(false)}
+      />
     </div>
   );
 }

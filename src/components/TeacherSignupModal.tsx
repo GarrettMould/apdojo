@@ -91,7 +91,7 @@ export function TeacherSignupModal({ isOpen, onClose }: TeacherSignupModalProps)
     <>
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100]" />
       <div className="fixed inset-0 flex items-center justify-center z-[101] p-4">
-        <div className="max-w-md w-full bg-white rounded-2xl shadow-xl border border-slate-200 relative overflow-y-auto max-h-[90vh]">
+        <div className="max-w-xl w-full bg-white rounded-2xl shadow-xl border border-slate-200 relative overflow-y-auto max-h-[90vh]">
           <button
             type="button"
             onClick={onClose}
@@ -100,37 +100,19 @@ export function TeacherSignupModal({ isOpen, onClose }: TeacherSignupModalProps)
           >
             <X className="w-5 h-5" />
           </button>
-          <div className="p-8">
+          <div className="p-6 sm:p-8">
             <h2 className="text-2xl font-black text-slate-900 mb-1 text-center pr-10">
               Create a Teacher Account
             </h2>
-            <p className="text-slate-600 text-center mb-6">
+            <p className="text-slate-600 text-center mb-5">
               Enter your teacher code to unlock the full tutor experience.
             </p>
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-4">
               {error && (
                 <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
                   {error}
                 </div>
               )}
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-                  Teacher code
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Enter your teacher code"
-                  value={teacherCode}
-                  onChange={(e) => setTeacherCode(e.target.value)}
-                  disabled={loading}
-                  className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    teacherCode && !isTeacherCodeValid
-                      ? 'border-red-500'
-                      : 'border-slate-200'
-                  }`}
-                />
-              </div>
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-1.5">
                   Email address
@@ -200,6 +182,24 @@ export function TeacherSignupModal({ isOpen, onClose }: TeacherSignupModalProps)
                 <Label htmlFor="teachers-subscribe" className="text-sm text-slate-700 cursor-pointer">
                   Send me helpful tips, course updates, and special offers.
                 </Label>
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                  Teacher code
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Enter your teacher code"
+                  value={teacherCode}
+                  onChange={(e) => setTeacherCode(e.target.value)}
+                  disabled={loading}
+                  className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    teacherCode && !isTeacherCodeValid
+                      ? 'border-red-500'
+                      : 'border-slate-200'
+                  }`}
+                />
               </div>
               <button
                 type="submit"

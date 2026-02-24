@@ -31,18 +31,18 @@ function AnswerKeyPageContent() {
       .finally(() => setLoading(false));
   }, [slug]);
 
-  const buildAnswerKeyUrl = () => {
+  const buildAnswerKeyUrl = (embed: boolean) => {
     if (!worksheet || (!worksheet.q && !worksheet.f)) return null;
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
     const search = new URLSearchParams();
     if (worksheet.q) search.set('q', worksheet.q);
     if (worksheet.f) search.set('f', worksheet.f);
-    search.set('embed', '1');
+    if (embed) search.set('embed', '1');
     search.set('answerKey', '1');
     return `${origin}/tutor/print-preview?${search.toString()}`;
   };
 
-  const iframeUrl = buildAnswerKeyUrl();
+  const iframeUrl = buildAnswerKeyUrl(true);
   const hasAnswerKey = !!(worksheet?.q || worksheet?.f);
 
   if (loading) {
@@ -95,7 +95,10 @@ function AnswerKeyPageContent() {
   }
 
   const handlePrint = () => {
-    window.print();
+    const url = buildAnswerKeyUrl(false);
+    if (url) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
   };
 
   return (

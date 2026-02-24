@@ -106,6 +106,60 @@ function McqPreviewCard({
   );
 }
 
+/** Draggable FRQ set card in assignment preview: reorder within FRQ section, remove with X. */
+function FrqPreviewCard({
+  exam,
+  index: idx,
+  total,
+  isDragging,
+  onRemove,
+  onDragStart,
+}: {
+  exam: { examTitle: string; unit: number; questions: unknown[] };
+  index: number;
+  total: number;
+  isDragging: boolean;
+  onRemove: () => void;
+  onDragStart: (index: number, clientX: number, clientY: number) => void;
+}) {
+  const onReorderMouseDown = (e: React.MouseEvent) => {
+    if (e.button !== 0) return;
+    e.preventDefault();
+    onDragStart(idx, e.clientX, e.clientY);
+  };
+
+  return (
+    <div
+      data-frq-card-index={idx}
+      className={`group relative bg-white rounded-xl border-2 border-slate-200 shadow-sm p-4 transition-all ${isDragging ? 'opacity-40 scale-[0.98]' : ''}`}
+    >
+      <button
+        type="button"
+        onMouseDown={onReorderMouseDown}
+        className="absolute top-3 right-12 p-1.5 rounded-full bg-slate-100 text-slate-500 hover:bg-blue-100 hover:text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity"
+        aria-label="Drag to reorder FRQ set"
+        title="Drag to reorder"
+      >
+        <ReorderIcon className="w-4 h-4" />
+      </button>
+      <button
+        type="button"
+        onClick={(e) => { e.stopPropagation(); onRemove(); }}
+        className="absolute top-3 right-3 p-1.5 rounded-full bg-slate-100 text-slate-500 hover:bg-red-100 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+        aria-label="Remove FRQ set from assignment"
+      >
+        <X className="w-4 h-4" />
+      </button>
+      <div className="flex items-center justify-between mb-2 pl-4 pr-8 group-hover:pr-20 transition-[padding] duration-200 ease-out">
+        <span className="text-xs font-bold text-slate-500">FRQ set {idx + 1} of {total}</span>
+        <span className="text-xs text-slate-400">Unit {exam.unit}</span>
+      </div>
+      <p className="text-base font-medium text-slate-900 pr-8">{exam.examTitle}</p>
+      <p className="text-sm text-slate-500 mt-1">{exam.questions.length} question{exam.questions.length !== 1 ? 's' : ''}</p>
+    </div>
+  );
+}
+
 interface AssignmentResult {
   id: string;
   assignmentLinkId: string;
@@ -170,6 +224,8 @@ function TutorBuilderContent() {
   const [draggedMcqId, setDraggedMcqId] = useState<number | null>(null);
   const [ghostPosition, setGhostPosition] = useState<{ x: number; y: number } | null>(null);
   const [ghostQuestion, setGhostQuestion] = useState<Question | null>(null);
+  const [draggedFrqIndex, setDraggedFrqIndex] = useState<number | null>(null);
+  const [ghostFrqExam, setGhostFrqExam] = useState<(typeof frqExams)[0] | null>(null);
   /** For mcqAndFrq / print: indices into frqExams for selected FRQ exams. */
   const [selectedFrqExamIndices, setSelectedFrqExamIndices] = useState<number[]>([]);
   /** Unit filter for FRQ sets (when on FRQs tab). */
@@ -198,6 +254,30 @@ function TutorBuilderContent() {
   useEffect(() => {
     setFrqUnitFilter(null);
   }, [subjectFilter]);
+
+  // Hydrate assignment from URL when returning from print preview (Back to Builder with q/f params)
+  useEffect(() => {
+    const qParam = searchParams.get('q');
+    const fParam = searchParams.get('f');
+    if (!qParam && !fParam) return;
+    try {
+      setAssignmentModeChoice('printHomework');
+      setAssignmentType(fParam ? 'mcqAndFrq' : 'mcq');
+      if (qParam) {
+        const decoded = atob(qParam);
+        const ids = decoded.split(',').map((s) => parseInt(s.trim(), 10)).filter((n) => !isNaN(n));
+        setSelectedIdsOrder(ids);
+      }
+      if (fParam) {
+        const decoded = atob(fParam);
+        const indices = decoded.split(',').map((s) => parseInt(s.trim(), 10)).filter((n) => !isNaN(n) && n >= 0 && n < frqExams.length);
+        setSelectedFrqExamIndices(indices);
+      }
+      router.replace('/tutor/builder', { scroll: false });
+    } catch {
+      // Invalid params - ignore
+    }
+  }, [searchParams, router]);
 
   // Assignment results state
   const [assignmentResults, setAssignmentResults] = useState<AssignmentResult[]>([]);
@@ -402,6 +482,47 @@ function TutorBuilderContent() {
     document.addEventListener('mouseup', onUp);
     return onUp;
   }, [draggedMcqId, moveSelectedMcq]);
+
+  /** Reorder FRQ sets in the assignment (used by drag-and-drop in sidebar). */
+  const moveSelectedFrq = useCallback((fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex) return;
+    setSelectedFrqExamIndices((prev) => {
+      const copy = [...prev];
+      const [removed] = copy.splice(fromIndex, 1);
+      copy.splice(toIndex, 0, removed);
+      return copy;
+    });
+  }, []);
+
+  const selectedFrqExamsRef = useRef<number[]>([]);
+  selectedFrqExamsRef.current = selectedFrqExamIndices;
+
+  useEffect(() => {
+    if (draggedFrqIndex === null) return;
+    const onMove = (e: MouseEvent) => {
+      setGhostPosition({ x: e.clientX, y: e.clientY });
+      const el = document.elementFromPoint(e.clientX, e.clientY);
+      const card = el?.closest?.('[data-frq-card-index]');
+      const targetIndex = card != null ? parseInt((card as HTMLElement).getAttribute('data-frq-card-index') ?? '-1', 10) : -1;
+      if (targetIndex < 0) return;
+      const list = selectedFrqExamsRef.current;
+      const fromIndex = draggedFrqIndex;
+      if (fromIndex >= 0 && fromIndex < list.length && fromIndex !== targetIndex) {
+        moveSelectedFrq(fromIndex, targetIndex);
+        setDraggedFrqIndex(targetIndex);
+      }
+    };
+    const onUp = () => {
+      setDraggedFrqIndex(null);
+      setGhostPosition(null);
+      setGhostFrqExam(null);
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    return onUp;
+  }, [draggedFrqIndex, moveSelectedFrq]);
 
   // Build the same URL students would see (for preview in new tab). MCQ uses selection order; Graph Gym sorts by id.
   const getPreviewUrl = (): string | null => {
@@ -782,7 +903,7 @@ function TutorBuilderContent() {
   const handleUpgradeToTeacher = async () => {
     if (!user) {
       // Not logged in - redirect to signup with teacher code
-      router.push('/signup?code=9759');
+      router.push('/signup');
       return;
     }
 
@@ -874,7 +995,7 @@ function TutorBuilderContent() {
               <button
                 type="button"
                 onClick={() => setAssignmentModeChoice('live')}
-                className="group relative flex flex-col p-8 bg-white rounded-3xl shadow-xl hover:shadow-2xl border-2 border-green-600 transition-all transform hover:-translate-y-1"
+                className="group relative flex flex-col p-8 bg-white rounded-3xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all transform hover:-translate-y-1"
               >
                 <div className="flex items-center gap-4 mb-4">
                   <div className="w-16 h-16 rounded-2xl bg-green-600 flex items-center justify-center shadow-lg">
@@ -896,7 +1017,7 @@ function TutorBuilderContent() {
               <button
                 type="button"
                 onClick={() => setAssignmentModeChoice('homework')}
-                className="group relative flex flex-col p-8 bg-white rounded-3xl shadow-xl hover:shadow-2xl border-2 border-blue-600 transition-all transform hover:-translate-y-1"
+                className="group relative flex flex-col p-8 bg-white rounded-3xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all transform hover:-translate-y-1"
               >
                 <div className="flex items-center gap-4 mb-4">
                   <div className="w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg">
@@ -921,7 +1042,7 @@ function TutorBuilderContent() {
                   setAssignmentModeChoice('printHomework');
                   setAssignmentType('mcqAndFrq');
                 }}
-                className="group relative flex flex-col p-8 bg-white rounded-3xl shadow-xl hover:shadow-2xl border-2 border-amber-600 transition-all transform hover:-translate-y-1"
+                className="group relative flex flex-col p-8 bg-white rounded-3xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all transform hover:-translate-y-1"
               >
                 <div className="flex items-center gap-4 mb-4">
                   <div className="w-16 h-16 rounded-2xl bg-amber-600 flex items-center justify-center shadow-lg">
@@ -979,7 +1100,7 @@ function TutorBuilderContent() {
                       key={template.id}
                       type="button"
                       onClick={() => setTemplateModalTemplate(template)}
-                      className="w-full flex flex-row items-center justify-between text-left p-6 sm:p-8 bg-white border-2 border-slate-200 rounded-lg shadow-md hover:shadow-lg hover:border-indigo-300 transition-all min-h-[120px]"
+                      className="w-full flex flex-row items-center justify-between text-left p-6 sm:p-8 bg-white border-2 border-black rounded-lg shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 transition-all min-h-[120px]"
                     >
                       <div className="min-w-0 flex-1 pr-4">
                         <span className="text-xl md:text-2xl font-bold text-indigo-700 leading-tight block mb-1 line-clamp-1">{title}</span>
@@ -1090,7 +1211,7 @@ function TutorBuilderContent() {
                       applyPublicTemplate(templateModalTemplate, 'live');
                       setTemplateModalTemplate(null);
                     }}
-                    className="group relative flex flex-col p-8 bg-white rounded-3xl shadow-xl hover:shadow-2xl border-2 border-green-600 transition-all transform hover:-translate-y-1"
+                    className="group relative flex flex-col p-8 bg-white rounded-3xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all transform hover:-translate-y-1"
                   >
                     <div className="flex items-center gap-4 mb-4">
                       <div className="w-16 h-16 rounded-2xl bg-green-600 flex items-center justify-center shadow-lg">
@@ -1114,7 +1235,7 @@ function TutorBuilderContent() {
                       applyPublicTemplate(templateModalTemplate, 'homework');
                       setTemplateModalTemplate(null);
                     }}
-                    className="group relative flex flex-col p-8 bg-white rounded-3xl shadow-xl hover:shadow-2xl border-2 border-blue-600 transition-all transform hover:-translate-y-1"
+                    className="group relative flex flex-col p-8 bg-white rounded-3xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all transform hover:-translate-y-1"
                   >
                     <div className="flex items-center gap-4 mb-4">
                       <div className="w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg">
@@ -1164,6 +1285,24 @@ function TutorBuilderContent() {
         </div>,
         document.body
       )}
+      {/* Drag ghost: smaller card that follows cursor when reordering FRQ */}
+      {typeof document !== 'undefined' && ghostFrqExam && ghostPosition && createPortal(
+        <div
+          className="max-w-[280px] w-[280px] bg-white rounded-xl border-2 border-slate-300 shadow-xl p-4 pointer-events-none select-none"
+          style={{
+            position: 'fixed',
+            left: ghostPosition.x,
+            top: ghostPosition.y,
+            transform: 'translate(-50%, -50%)',
+            zIndex: 9999,
+          }}
+        >
+          <p className="text-xs font-bold text-slate-500 mb-1">FRQ set</p>
+          <p className="text-sm font-medium text-slate-900 leading-snug">{truncateText(ghostFrqExam.examTitle, 80)}</p>
+          <p className="text-xs text-slate-600 mt-1">Unit {ghostFrqExam.unit} · {ghostFrqExam.questions.length} question{ghostFrqExam.questions.length !== 1 ? 's' : ''}</p>
+        </div>,
+        document.body
+      )}
       {/* Back to Home only (choice screen); no Student Results on builder/list or results view */}
       <div className="w-full flex justify-end px-6 pt-4 pb-2">
         <button
@@ -1196,7 +1335,7 @@ function TutorBuilderContent() {
               <button
                 onClick={handleUpgradeToTeacher}
                 disabled={isUpgrading}
-                className={`flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-bold rounded-xl shadow-lg hover:bg-blue-700 transition-all ${
+                className={`flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-bold rounded-xl transition-all border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-0.5 disabled:shadow-none disabled:translate-y-0 ${
                   isUpgrading ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
               >
@@ -1589,8 +1728,10 @@ function TutorBuilderContent() {
 
           {/* FRQ exam selector (print: FRQs tab; legacy homework had MCQ+FRQ) */}
           {assignmentType === 'mcqAndFrq' && (
-            <div className={assignmentModeChoice === 'printHomework' ? 'px-6 pb-6' : 'mt-8 border-t border-slate-200 pt-8 px-6 pb-6'}>
-              <h3 className="text-lg font-bold text-slate-800 mb-4">{assignmentModeChoice === 'printHomework' ? 'FRQ sets to include' : 'FRQ sets to include (shown after MCQs)'}</h3>
+            <div className={assignmentModeChoice === 'printHomework' ? 'pt-6 px-6 pb-6' : 'mt-8 border-t border-slate-200 pt-8 px-6 pb-6'}>
+              {assignmentModeChoice !== 'printHomework' && (
+                <h3 className="text-lg font-bold text-slate-800 mb-4">FRQ sets to include (shown after MCQs)</h3>
+              )}
               <div className="overflow-x-auto rounded-xl border-2 border-slate-200">
                 <table className="w-full">
                   <thead className="bg-slate-50 border-b border-slate-200">
@@ -1762,28 +1903,52 @@ function TutorBuilderContent() {
                             />
                           ))}
                           {assignmentModeChoice === 'printHomework' && selectedFrqExamIndices.length > 0 && (
-                            <div className={selectedMcqQuestions.length > 0 ? 'pt-4 border-t border-slate-200' : ''}>
-                              <p className="text-xs font-bold text-slate-500 mb-2">FRQ sets ({selectedFrqExamIndices.length})</p>
-                              <ul className="space-y-1.5 text-sm text-slate-700">
-                                {selectedFrqExamIndices.map((idx) => {
-                                  const exam = frqExams[idx];
-                                  return exam ? <li key={idx} className="font-medium">• {exam.examTitle}</li> : null;
-                                })}
-                              </ul>
+                            <div className={selectedMcqQuestions.length > 0 ? 'pt-4 border-t border-slate-200 space-y-3' : 'space-y-3'}>
+                              <p className="text-xs font-bold text-slate-500">FRQ sets ({selectedFrqExamIndices.length})</p>
+                              {selectedFrqExamIndices.map((globalIdx, listIdx) => {
+                                const exam = frqExams[globalIdx];
+                                return exam ? (
+                                  <FrqPreviewCard
+                                    key={globalIdx}
+                                    exam={exam}
+                                    index={listIdx}
+                                    total={selectedFrqExamIndices.length}
+                                    isDragging={draggedFrqIndex === listIdx}
+                                    onRemove={() => setSelectedFrqExamIndices((prev) => prev.filter((_, i) => i !== listIdx))}
+                                    onDragStart={(idx, clientX, clientY) => {
+                                      setDraggedFrqIndex(idx);
+                                      setGhostPosition({ x: clientX, y: clientY });
+                                      setGhostFrqExam(frqExams[selectedFrqExamIndices[idx]] ?? null);
+                                    }}
+                                  />
+                                ) : null;
+                              })}
                             </div>
                           )}
                         </>
                       )
                     )}
                     {assignmentModeChoice === 'printHomework' && selectedIdsOrder.length === 0 && selectedFrqExamIndices.length > 0 && (
-                      <div className="space-y-2">
+                      <div className="space-y-3">
                         <p className="text-xs font-bold text-slate-500">FRQ sets ({selectedFrqExamIndices.length})</p>
-                        <ul className="space-y-1.5 text-sm text-slate-700">
-                          {selectedFrqExamIndices.map((idx) => {
-                            const exam = frqExams[idx];
-                            return exam ? <li key={idx} className="font-medium">• {exam.examTitle}</li> : null;
-                          })}
-                        </ul>
+                        {selectedFrqExamIndices.map((globalIdx, listIdx) => {
+                          const exam = frqExams[globalIdx];
+                          return exam ? (
+                            <FrqPreviewCard
+                              key={globalIdx}
+                              exam={exam}
+                              index={listIdx}
+                              total={selectedFrqExamIndices.length}
+                              isDragging={draggedFrqIndex === listIdx}
+                              onRemove={() => setSelectedFrqExamIndices((prev) => prev.filter((_, i) => i !== listIdx))}
+                              onDragStart={(idx, clientX, clientY) => {
+                                setDraggedFrqIndex(idx);
+                                setGhostPosition({ x: clientX, y: clientY });
+                                setGhostFrqExam(frqExams[selectedFrqExamIndices[idx]] ?? null);
+                              }}
+                            />
+                          ) : null;
+                        })}
                       </div>
                     )}
                     {assignmentModeChoice === 'printHomework' && selectedIdsOrder.length === 0 && selectedFrqExamIndices.length === 0 && (
@@ -1878,7 +2043,7 @@ function TutorBuilderContent() {
                     type="button"
                     onClick={openPrintPreview}
                     disabled={selectedIdsOrder.length === 0 && selectedFrqExamIndices.length === 0}
-                    className="inline-flex items-center gap-2 px-6 py-3 font-bold text-white rounded-xl shadow-lg transition-all bg-amber-600 hover:bg-amber-700 disabled:bg-slate-400 disabled:cursor-not-allowed"
+                    className="inline-flex items-center gap-2 px-6 py-3 font-bold text-white rounded-xl transition-all bg-amber-600 hover:bg-amber-700 disabled:bg-slate-400 disabled:cursor-not-allowed border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-0.5 disabled:shadow-none disabled:translate-y-0"
                   >
                     <Printer className="w-5 h-5" />
                     Open print view (PDF)
@@ -1887,7 +2052,7 @@ function TutorBuilderContent() {
                     type="button"
                     onClick={openWorksheetModal}
                     disabled={selectedIdsOrder.length === 0 && selectedFrqExamIndices.length === 0}
-                    className="inline-flex items-center gap-2 px-6 py-3 font-bold text-white rounded-xl shadow-lg transition-all bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-400 disabled:cursor-not-allowed border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
+                    className="inline-flex items-center gap-2 px-6 py-3 font-bold text-white rounded-xl transition-all bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-400 disabled:cursor-not-allowed border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-0.5 disabled:shadow-none disabled:translate-y-0"
                   >
                     <Share2 className="w-5 h-5" />
                     Get worksheet link
@@ -1898,9 +2063,9 @@ function TutorBuilderContent() {
                   <button
                     onClick={generateLink}
                     disabled={selectedIdsOrder.length === 0}
-                    className={`px-6 py-3 font-bold text-white rounded-xl shadow-lg transition-all ${
+                    className={`px-6 py-3 font-bold text-white rounded-xl transition-all border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-0.5 ${
                       selectedIdsOrder.length === 0
-                        ? 'bg-slate-400 cursor-not-allowed'
+                        ? 'bg-slate-400 cursor-not-allowed shadow-none translate-y-0'
                         : linkCopied
                         ? 'bg-green-600 hover:bg-green-700'
                         : assignmentType === 'mcq'

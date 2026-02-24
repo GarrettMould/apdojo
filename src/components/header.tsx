@@ -217,13 +217,6 @@ export function Header() {
               >
                 Graphing Practice
               </Link>
-              <Link
-                href="/graph-gym-dashboard"
-                prefetch={false}
-                className="text-lg text-gray-700 hover:text-blue-600 transition-colors font-bold"
-              >
-                Test
-              </Link>
 
               {/* Cheat Sheets */}
               <Link
@@ -447,9 +440,9 @@ export function Header() {
 
               {!user && (
                 <div className="flex items-center gap-2">
-                  <Link href="/login" passHref>
+                  <Link href="/signup" passHref>
                     <Button variant="outline" size="sm">
-                      Login
+                      Sign up
                     </Button>
                   </Link>
                 </div>
@@ -533,14 +526,6 @@ export function Header() {
                   className="px-4 py-3 text-lg text-blue-500 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
                 >
                   Graphing Practice
-                </Link>
-                <Link
-                  href="/graph-gym-dashboard"
-                  prefetch={false}
-                  onClick={closeMobileMenu}
-                  className="px-4 py-3 text-lg text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
-                >
-                  Test
                 </Link>
                 <Link
                   href={displaySubject === 'macro' ? '/ap-macro-unit-1-cheat-sheet' : '/ap-micro-unit-1-cheat-sheet'}
@@ -720,8 +705,8 @@ export function Header() {
 
                   {!user && (
                     <div className="px-4 pt-4 space-y-2 border-t border-gray-200 mt-3">
-                      <Link href="/login" passHref>
-                        <Button onClick={closeMobileMenu} variant="outline" className="w-full">Login</Button>
+                      <Link href="/signup" passHref>
+                        <Button onClick={closeMobileMenu} variant="outline" className="w-full">Sign up</Button>
                       </Link>
                     </div>
                   )}
