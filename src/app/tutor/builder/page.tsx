@@ -1304,7 +1304,7 @@ function TutorBuilderContent() {
         document.body
       )}
       {/* Back to Home only (choice screen); no Student Results on builder/list or results view */}
-      <div className="w-full flex justify-end px-6 pt-4 pb-2">
+      <div className="w-full flex justify-start pl-8 pr-6 pt-6 pb-3">
         <button
           type="button"
           onClick={() => setAssignmentModeChoice(null)}

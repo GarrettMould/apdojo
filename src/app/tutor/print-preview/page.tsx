@@ -79,16 +79,16 @@ function FormattedExplanation({ text }: { text: string }) {
 }
 
 /** Assignment header: AP Dojo + logo left, Name/Date/Class right. */
-function AssignmentHeader() {
+function AssignmentHeader({ compactPrint }: { compactPrint?: boolean }) {
   return (
-    <header className="pb-6 mb-6 border-b-2 border-slate-300 print:pb-4 print:mb-4">
-      <div className="flex items-start justify-between gap-6">
+    <header className={`pb-6 mb-6 border-b-2 border-slate-300 print:pb-4 print:mb-4 ${compactPrint ? 'print:!pb-1 print:!mb-1' : ''}`}>
+      <div className={`flex items-start justify-between gap-6 ${compactPrint ? 'print:gap-3' : ''}`}>
         <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-3">
+          <div className={`flex items-center gap-3 ${compactPrint ? 'print:gap-2' : ''}`}>
             <img
               src="/images/dojoIconJan26.svg"
               alt=""
-              className="w-12 h-12 print:w-10 print:h-10"
+              className={`w-12 h-12 print:w-10 print:h-10 ${compactPrint ? 'print:!w-8 print:!h-8' : ''}`}
             />
             <span className="text-xl font-black text-slate-900 print:text-lg">
               AP <span className="text-blue-600">Dojo</span>
@@ -98,18 +98,18 @@ function AssignmentHeader() {
             Practice Tests, MCQ, FRQ Practice at apdojo.com
           </p>
         </div>
-        <div className="flex flex-col gap-2 min-w-[180px] print:min-w-[160px]">
+        <div className={`flex flex-col gap-2 min-w-[180px] print:min-w-[160px] ${compactPrint ? 'print:!min-w-[120px] print:!gap-1' : ''}`}>
         <div className="flex items-baseline gap-2">
-          <span className="text-sm font-bold text-slate-700 w-12 flex-shrink-0 print:text-xs">Name:</span>
-          <div className="flex-1 border-b-2 border-black min-h-[1.25rem]" />
+          <span className={`text-sm font-bold text-slate-700 w-12 flex-shrink-0 print:text-xs ${compactPrint ? 'print:!text-[10px]' : ''}`}>Name:</span>
+          <div className={`flex-1 border-b-2 border-black min-h-[1.25rem] ${compactPrint ? 'print:!min-h-[0.875rem]' : ''}`} />
         </div>
         <div className="flex items-baseline gap-2">
-          <span className="text-sm font-bold text-slate-700 w-12 flex-shrink-0 print:text-xs">Date:</span>
-          <div className="flex-1 border-b-2 border-black min-h-[1.25rem]" />
+          <span className={`text-sm font-bold text-slate-700 w-12 flex-shrink-0 print:text-xs ${compactPrint ? 'print:!text-[10px]' : ''}`}>Date:</span>
+          <div className={`flex-1 border-b-2 border-black min-h-[1.25rem] ${compactPrint ? 'print:!min-h-[0.875rem]' : ''}`} />
         </div>
         <div className="flex items-baseline gap-2">
-          <span className="text-sm font-bold text-slate-700 w-12 flex-shrink-0 print:text-xs">Class:</span>
-          <div className="flex-1 border-b-2 border-black min-h-[1.25rem]" />
+          <span className={`text-sm font-bold text-slate-700 w-12 flex-shrink-0 print:text-xs ${compactPrint ? 'print:!text-[10px]' : ''}`}>Class:</span>
+          <div className={`flex-1 border-b-2 border-black min-h-[1.25rem] ${compactPrint ? 'print:!min-h-[0.875rem]' : ''}`} />
         </div>
       </div>
       </div>
@@ -230,12 +230,13 @@ function PrintPreviewContent() {
 
   const isEmbed = searchParams.get('embed') === '1' || searchParams.get('embed') === 'true';
   const isAnswerKey = searchParams.get('answerKey') === '1' || searchParams.get('answerKey') === 'true';
+  const frqOnly = !hasMcq && hasFrq;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className={`min-h-screen bg-white ${frqOnly ? 'frq-only-print' : ''}`}>
       {/* Print toolbar - hidden when embedded (iframe) or when printing */}
       {!isEmbed && (
-      <div className="sticky top-0 z-10 bg-slate-100 border-b border-slate-200 px-4 py-3 flex items-center justify-between no-print">
+      <div className="sticky top-0 z-10 bg-slate-100 border-b border-slate-200 px-6 sm:px-8 py-3 flex items-center justify-between no-print">
         <Link
           href={`/tutor/builder${(() => {
             const q = searchParams.get('q');
@@ -275,9 +276,11 @@ function PrintPreviewContent() {
       </div>
       )}
 
-      <div className="max-w-3xl mx-auto px-6 py-8 print:py-4 print:px-4 print:pt-4">
-        <AssignmentHeader />
-        <h1 className="text-2xl font-black text-slate-900 mb-6 print:mb-4">
+      <div className={`max-w-3xl mx-auto px-6 py-8 print:py-4 print:px-4 print:pt-4 print-preview-content ${frqOnly ? 'print:pt-0' : ''}`}>
+        <div className={frqOnly ? 'print-preview-header-compact' : ''}>
+          <AssignmentHeader compactPrint={frqOnly} />
+        </div>
+        <h1 className={`text-2xl font-black text-slate-900 mb-6 print:mb-4 ${frqOnly ? 'print:mb-1' : ''}`}>
           {isAnswerKey ? 'Answer Key' : 'Assignment'}
         </h1>
 
@@ -333,15 +336,17 @@ function PrintPreviewContent() {
 
         {/* Part 2: Free Response */}
         {hasFrq && (
-          <section className="mb-10 print:mb-8">
-            <h2 className="text-lg font-bold text-slate-800 border-b-2 border-slate-300 pb-2 mb-4">
+          <section className={`mb-10 print:mb-8 ${frqOnly ? 'print:mb-4' : ''}`}>
+            <h2 className={`text-lg font-bold text-slate-800 border-b-2 border-slate-300 pb-2 mb-4 ${frqOnly ? 'print:pb-1 print:mb-1' : ''}`}>
               Part 2: Free Response
             </h2>
-            <div className="space-y-8">
+            <div className={`space-y-8 ${frqOnly ? 'print:space-y-6' : ''}`}>
               {frqExamsList.map((exam, examIdx) => (
-                <div key={examIdx} className="break-inside-avoid">
-                  <h3 className="text-base font-bold text-slate-800 mb-3">
-                    {exam.examTitle}
+                <div key={examIdx} className={`break-inside-avoid ${frqOnly && examIdx === 0 ? 'frq-first-exam-print' : ''}`}>
+                  <h3 className={`text-base font-bold text-slate-800 mb-3 ${frqOnly && examIdx === 0 ? 'print:!mb-1' : ''}`}>
+                    {exam.examTitle.includes(' FRQ:')
+                      ? exam.examTitle.split(' FRQ:')[0] + ' FRQ'
+                      : exam.examTitle}
                   </h3>
                   {exam.questions.map((fq: FRQQuestion, qIdx: number) =>
                     isAnswerKey ? (
@@ -515,6 +520,25 @@ function PrintPreviewContent() {
           @page {
             margin: 0.5in;
             size: auto;
+          }
+          /* FRQ-only: tighter top margin so first question starts on page 1 */
+          .frq-only-print .print-preview-content {
+            padding-top: 0 !important;
+          }
+          .frq-only-print .print-preview-header-compact header {
+            padding-bottom: 0.25rem !important;
+            margin-bottom: 0.25rem !important;
+          }
+          .frq-only-print .print-preview-header-compact .flex.items-center.gap-3 span {
+            font-size: 0.875rem !important;
+          }
+          .frq-only-print .print-preview-header-compact p.text-sm {
+            font-size: 0.65rem !important;
+            line-height: 1.2 !important;
+          }
+          .frq-only-print .frq-first-exam-print {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
           }
           body {
             -webkit-print-color-adjust: exact;

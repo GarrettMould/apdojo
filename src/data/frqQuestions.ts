@@ -454,6 +454,65 @@ export const macroUnit4Set4: FRQExam = {
   ]
 };
 
+/** Standalone FRQ set so "Exogenous Shocks and Contractionary Policy" appears as its own option in the tutor builder. */
+export const macroUnit4Set5: FRQExam = {
+  examTitle: "AP Macroeconomics Unit 4 FRQ: Exogenous Shocks and Contractionary Policy",
+  thumbnailUrl: "/images/frqPracticePage/unit4MacroFRQCover.jpg",
+  unit: 4,
+  questions: [
+    {
+      id: 102,
+      subject: 'macro',
+      title: 'FRQ 2 - Exogenous Shocks and Contractionary Policy',
+      questionNumber: 1,
+      prompt: "Assume that the economy of Oceana is currently in equilibrium at a level of real output equal to its potential output.",
+      expertTip: "When a trading partner's income rises, their demand for imports increases, which boosts the home country's exports. To offset a resulting inflationary gap in an ample reserves regime, the central bank must raise its administered rates.",
+      image: null,
+      parts: [
+        {
+          label: "A",
+          pointValue: 3,
+          text: "Draw a correctly labeled graph of aggregate demand, short-run aggregate supply, and long-run aggregate supply for Oceana, and show each of the following.",
+          answerType: "draw" as const,
+          answer: "The graph must show AD, SRAS, and LRAS all intersecting at a single point.",
+          referenceImageUrl: "https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/flippables/ad-as-lre.jpg",
+          subparts: [
+            { label: "i", text: "The current equilibrium real output, labeled Y1, and price level, labeled PL1." },
+            { label: "ii", text: "The full-employment output, labeled Yf." }
+          ]
+        },
+        {
+          label: "B",
+          pointValue: 4,
+          text: "Now assume that the economy of Terrania, a major trading partner of Oceana, experiences a rapid economic expansion and an increase in national income. On your graph from part (A), show the effect of Terrania's increase in national income on each of the following in Oceana in the short run.",
+          answerType: "draw" as const,
+          answer: "The graph should show AD shifting right; new equilibrium at Y2 and PL2 to the right of LRAS. Aggregate demand shifts right because Terrania's higher income increases its demand for Oceana's exports.",
+          referenceImageUrl: "https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/flippables/adas_inflationary.jpg",
+          subparts: [
+            { label: "i", text: "Aggregate demand." },
+            { label: "ii", text: "Real output and price level, labeled as Y2 and PL2." }
+          ]
+        },
+        {
+          label: "C",
+          pointValue: 1,
+          text: "The central bank of Oceana wishes to offset the effect of Terrania's increase in national income on Oceana's price level. Assume the banking system in Oceana has ample reserves. What monetary policy action should the central bank of Oceana take?",
+          answerType: "text" as const,
+          answer: "The central bank should increase its administered interest rates (specifically, the Interest on Reserve Balances)."
+        },
+        {
+          label: "D",
+          pointValue: 3,
+          text: "Draw a correctly labeled graph of the reserve market for Oceana, and show the effect of the monetary policy action you identified in part (C) on the policy rate in the short run.",
+          answerType: "draw" as const,
+          answer: "The graph should feature the Policy Rate on the vertical axis and Quantity of Reserves on the horizontal axis. It must show a downward-sloping demand curve with a horizontal segment, and a vertical supply curve intersecting the horizontal segment. The action is shown by shifting the horizontal portion of the demand curve upward, resulting in a higher equilibrium policy rate.",
+          referenceImageUrl: "https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/flippables/ample_contractionary.jpg"
+        }
+      ]
+    }
+  ]
+};
+
 export const macroUnit2Set1: FRQExam = {
   examTitle: "AP Macroeconomics Unit 2 FRQ: Economic Indicators",
   thumbnailUrl: "/images/frqPracticePage/unit4MacroFRQCover.jpg",
@@ -2389,6 +2448,7 @@ export const frqExams: FRQExam[] = [
   macroUnit1Set2,
   macroUnit4Set2,
   macroUnit4Set4,
+  macroUnit4Set5,
   macroUnit6Set2,
   macroUnit2Set2,
   macroUnit3Set3,
