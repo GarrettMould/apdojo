@@ -2988,6 +2988,114 @@ const macroUnit4Questions = [
     "videoExplanation": null
   },
   {
+    "id": 3149,
+    "unit": 4,
+    "lessonIDS": ["4.6"],
+    "unitName": "Financial Sector",
+    "question": "If a central bank operating with ample reserves decreases its administered interest rates, which of the following will most likely occur in the short run?",
+    "image": null,
+    "options": [
+      "The price of previously issued bonds will increase.",
+      "The money supply will decrease.",
+      "Total bank reserves will decrease significantly.",
+      "Gross private investment will decrease.",
+      "The aggregate supply curve will shift to the left."
+    ],
+    "correctAnswer": "A",
+    "explanation": "When the central bank decreases administered interest rates (like the Interest on Reserve Balances), the overall policy rate and market interest rates fall. Because bond prices and interest rates have an inverse relationship, lower interest rates cause the price of existing bonds to increase. Additionally, lower rates would stimulate investment rather than decrease it.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3150,
+    "unit": 4,
+    "lessonIDS": ["4.6"],
+    "unitName": "Financial Sector",
+    "question": "If the interest rate on short-term government bonds declined as a result of policy actions by a central bank operating in an ample reserves regime, the central bank must have:",
+    "image": null,
+    "options": [
+      "decreased the amount of currency in circulation.",
+      "sold government bonds to commercial banks.",
+      "increased the discount rate on loans to commercial banks.",
+      "increased the required reserve ratio.",
+      "decreased its administered interest rates."
+    ],
+    "correctAnswer": "E",
+    "explanation": "In an ample reserves framework, the central bank's primary tool for adjusting market interest rates (including yields on short-term government bonds) is changing its administered interest rates. To cause market interest rates to decline, the central bank must have decreased its administered rates, which lowers the floor for the federal funds rate and spreads to other short-term rates.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3151,
+    "unit": 4,
+    "lessonIDS": ["4.6"],
+    "unitName": "Financial Sector",
+    "question": "Under which of the following macroeconomic conditions would a central bank be most reluctant to decrease its administered interest rates?",
+    "image": null,
+    "options": [
+      "Unemployment is 8% and inflation is 1%.",
+      "Unemployment is 3% and inflation is 8%.",
+      "Real GDP is falling and the price level is stable.",
+      "The economy is experiencing a severe recession.",
+      "Both inflation and nominal interest rates are near zero."
+    ],
+    "correctAnswer": "B",
+    "explanation": "Decreasing administered interest rates is an expansionary monetary policy designed to stimulate aggregate demand. If unemployment is already very low (3%) and inflation is highly elevated (8%), stimulating the economy further would severely worsen the inflation problem. Therefore, the central bank would be highly reluctant to lower rates under these conditions.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3152,
+    "unit": 4,
+    "lessonIDS": ["4.6"],
+    "unitName": "Financial Sector",
+    "question": "To reduce inflation in a banking system with ample reserves, the central bank would be most likely to:",
+    "image": null,
+    "options": [
+      "decrease the reserve requirement.",
+      "decrease income tax rates.",
+      "buy government securities on the open market.",
+      "increase its administered interest rates.",
+      "increase the supply of money."
+    ],
+    "correctAnswer": "D",
+    "explanation": "To fight inflation, the central bank needs to implement a contractionary monetary policy. In an ample reserves regime, the primary method for doing this is to raise the policy rate by increasing administered interest rates (such as the Interest on Reserve Balances). This increases the cost of borrowing and cools down aggregate demand. ",
+    "videoExplanation": null
+  },
+  {
+    "id": 3153,
+    "unit": 4,
+    "lessonIDS": ["4.6"],
+    "unitName": "Financial Sector",
+    "question": "If a central bank increases its administered interest rates, it is most likely responding to which of the following?",
+    "image": null,
+    "options": [
+      "Slow economic growth.",
+      "An appreciating domestic currency.",
+      "Rising unemployment.",
+      "A higher-than-target inflation rate.",
+      "A decrease in consumer spending."
+    ],
+    "correctAnswer": "D",
+    "explanation": "Increasing administered interest rates is a contractionary policy action used to slow down the economy. A central bank would take this action to combat rising prices and a higher-than-target inflation rate. If the economy was facing slow growth, rising unemployment, or decreasing spending, the bank would want to decrease rates instead.",
+    "videoExplanation": null
+  },
+  {
+    "id": 3154,
+    "unit": 4,
+    "lessonIDS": ["4.6"],
+    "unitName": "Financial Sector",
+    "question": "In the short run, an increase in the central bank's policy rate will cause:",
+    "image": null,
+    "options": [
+      "a rightward shift in the aggregate demand curve.",
+      "a leftward shift in the aggregate demand curve.",
+      "a rightward shift in the short-run aggregate supply curve.",
+      "a leftward shift in the short-run aggregate supply curve.",
+      "an upward movement along the aggregate demand curve."
+    ],
+    "correctAnswer": "B",
+    "explanation": "An increase in the policy rate makes borrowing more expensive for consumers and businesses. This leads to a decrease in interest-sensitive consumption and gross private investment. Because consumption and investment are components of aggregate demand, the aggregate demand curve will shift to the left.",
+    "videoExplanation": null
+  },
+  {
     "id": 49,
     "unit": 4,
     "lessonIDS": ["4.7", "5.5"],

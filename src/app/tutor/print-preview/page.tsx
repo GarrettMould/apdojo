@@ -355,6 +355,8 @@ function PrintPreviewContent() {
                             const answerSrc = part.referenceImageUrl
                               || (typeof part.answer === 'string' ? part.answer : null)
                               || (typeof part.answer === 'object' && part.answer && 'src' in part.answer ? (part.answer as { src: string }).src : null);
+                            const hasPartLevelAnswer = part.answerType === 'draw' ? !!answerSrc : !!(typeof part.answer === 'string' && part.answer.trim());
+                            const subpartsWithAnswers = part.subparts?.filter((sp) => sp.answerType) ?? [];
                             return (
                               <div key={part.label} className="space-y-3">
                                 <p className="text-slate-800 font-bold">
@@ -369,22 +371,54 @@ function PrintPreviewContent() {
                                     ))}
                                   </ul>
                                 ) : null}
-                                <div>
-                                  {part.answerType === 'draw' && answerSrc ? (
-                                    <img
-                                      src={answerSrc}
-                                      alt="Answer"
-                                      className="max-w-[320px] max-h-64 object-contain border border-slate-200 rounded-lg"
-                                    />
-                                  ) : (
-                                    <FormattedAnswer text={typeof part.answer === 'string' ? part.answer : ''} />
-                                  )}
-                                </div>
+                                {hasPartLevelAnswer && (
+                                  <div>
+                                    {part.answerType === 'draw' && answerSrc ? (
+                                      <img
+                                        src={answerSrc}
+                                        alt="Answer"
+                                        className="max-w-[320px] max-h-64 object-contain border border-slate-200 rounded-lg"
+                                      />
+                                    ) : (
+                                      <FormattedAnswer text={typeof part.answer === 'string' ? part.answer : ''} />
+                                    )}
+                                  </div>
+                                )}
                                 {explanation && (
                                   <div className="mt-3">
                                     <FormattedExplanation text={explanation} />
                                   </div>
                                 )}
+                                {subpartsWithAnswers.map((sp: FRQSubPart) => {
+                                  const spExplanation = sp.studentExplanation || sp.gradingCriteria;
+                                  const spRef = sp as FRQSubPart & { referenceImageUrl?: string };
+                                  const spAnswerSrc = spRef.referenceImageUrl
+                                    || (typeof sp.answer === 'string' ? sp.answer : null)
+                                    || (typeof sp.answer === 'object' && sp.answer && 'src' in sp.answer ? (sp.answer as { src: string }).src : null);
+                                  return (
+                                    <div key={sp.label} className="space-y-3 mt-4 ml-2 pl-2 border-l-2 border-slate-100">
+                                      <p className="text-slate-800 font-bold">
+                                        <span>{part.label}{sp.label}.</span> {sp.text}
+                                      </p>
+                                      <div>
+                                        {sp.answerType === 'draw' && spAnswerSrc ? (
+                                          <img
+                                            src={spAnswerSrc}
+                                            alt="Answer"
+                                            className="max-w-[320px] max-h-64 object-contain border border-slate-200 rounded-lg"
+                                          />
+                                        ) : (
+                                          <FormattedAnswer text={typeof sp.answer === 'string' ? sp.answer : ''} />
+                                        )}
+                                      </div>
+                                      {spExplanation && (
+                                        <div className="mt-3">
+                                          <FormattedExplanation text={spExplanation} />
+                                        </div>
+                                      )}
+                                    </div>
+                                  );
+                                })}
                               </div>
                             );
                           }

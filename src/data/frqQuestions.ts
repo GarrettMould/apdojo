@@ -364,6 +364,96 @@ export const macroUnit4Set3: FRQExam = {
   ]
 };
 
+export const macroUnit4Set4: FRQExam = {
+  examTitle: "AP Macroeconomics Unit 4 FRQ: Inflationary Gaps and Ample Reserves",
+  thumbnailUrl: "/images/frqPracticePage/unit4MacroFRQCover.jpg",
+  unit: 4,
+  questions: [
+    {
+      id: 101,
+      subject: 'macro',
+      title: 'FRQ 1 - Inflationary Gaps and Ample Reserves',
+      questionNumber: 1,
+      prompt: "Assume that the economy of Zephyria is currently operating above full employment.",
+      expertTip: "In an ample reserves framework, the central bank relies on administered interest rates (like the Interest on Reserve Balances, or IORB) rather than open market operations to steer the policy rate.",
+      image: null,
+      parts: [
+        {
+          label: "A",
+          pointValue: 2,
+          text: "Draw a correctly labeled graph of long-run aggregate supply, short-run aggregate supply, and aggregate demand, and show each of the following.",
+          answerType: "draw" as const,
+          answer: "The graph should show a downward-sloping AD curve, an upward-sloping SRAS curve, and a vertical LRAS curve. The AD and SRAS curves must intersect to the right of the LRAS curve to illustrate the inflationary gap.",
+          referenceImageUrl: "https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/flippables/adas_inflationary.jpg",
+          subparts: [
+            { label: "i", text: "Current equilibrium output and price level, labeled as Y1 and PL1." },
+            { label: "ii", text: "Full-employment output, labeled as Yf." }
+          ]
+        },
+        {
+          label: "B",
+          pointValue: 1,
+          text: "Assume the banking system in Zephyria has ample reserves and that the central bank targets a new policy rate to reach full employment. Should the central bank increase or decrease its administered interest rates?",
+          answerType: "text" as const,
+          answer: "Increase. (Explanation: To close an inflationary gap, the central bank needs to implement contractionary monetary policy by raising the policy rate. In an ample reserves system, this is done by increasing administered rates like the Interest on Reserve Balances (IORB).)"
+        },
+        {
+          label: "C",
+          pointValue: 3,
+          text: "Given the central bank action you identified in part (B), draw a correctly labeled graph of the reserve market and show the effect on the policy rate.",
+          answerType: "draw" as const,
+          answer: "The graph should have the Policy Rate on the vertical axis and Quantity of Reserves on the horizontal axis. It must show a downward-sloping demand curve that becomes horizontal, and a vertical supply curve intersecting the horizontal portion of the demand curve. The horizontal portion of the demand curve must shift upward, showing an increase in the equilibrium policy rate.",
+          referenceImageUrl: "https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/flippables/ample_contractionary.jpg"
+        },
+        {
+          label: "D",
+          pointValue: 4,
+          text: "The policy makers pursue a fiscal policy rather than the monetary policy in part (B). Assume that the marginal propensity to consume is 0.75 and the value of the inflationary gap is $400 billion.",
+          answerType: "text" as const,
+          subparts: [
+            {
+              label: "i",
+              pointValue: 2,
+              text: "If the government changes its spending without changing taxes to eliminate the inflationary gap, calculate the minimum required change in government spending. Show your work.",
+              answerType: "text" as const,
+              answer: "The spending multiplier is 1 / (1 - 0.75) = 4. To close a $400 billion inflationary gap, aggregate demand must decrease by $400 billion. The required change in government spending is -$400 billion / 4 = -$100 billion. The government must decrease spending by $100 billion."
+            },
+            {
+              label: "ii",
+              pointValue: 2,
+              text: "If the government changes taxes without changing government spending to eliminate the inflationary gap, will the absolute value of the minimum required change in taxes be greater than, smaller than, or equal to the absolute value of the minimum required change in government spending in part (D)(i)? Explain.",
+              answerType: "text" as const,
+              answer: "Greater than. Explanation: The absolute value of the tax multiplier (-0.75 / 0.25 = -3) is smaller than the spending multiplier (4). Because a portion of any tax increase is paid out of household savings rather than coming entirely from reduced consumption, a larger initial tax increase is required to achieve the exact same total impact on aggregate demand."
+            }
+          ]
+        },
+        {
+          label: "E",
+          pointValue: 4,
+          text: "Assume the government raises income tax rates to eliminate the inflationary gap. Will each of the following increase, decrease, or stay the same?",
+          answerType: "text" as const,
+          subparts: [
+            {
+              label: "i",
+              pointValue: 2,
+              text: "Aggregate demand. Explain.",
+              answerType: "text" as const,
+              answer: "Decrease. Raising income tax rates decreases disposable income for households, which leads to a decrease in consumer spending, shifting aggregate demand to the left."
+            },
+            {
+              label: "ii",
+              pointValue: 2,
+              text: "Long-run aggregate supply. Explain.",
+              answerType: "text" as const,
+              answer: "Stay the same. A change in income taxes primarily affects aggregate demand in the standard short-run macroeconomic model and does not inherently change the quantity or quality of resources or technology that determine the long-run productive capacity of the economy."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+};
+
 export const macroUnit2Set1: FRQExam = {
   examTitle: "AP Macroeconomics Unit 2 FRQ: Economic Indicators",
   thumbnailUrl: "/images/frqPracticePage/unit4MacroFRQCover.jpg",
@@ -2298,6 +2388,7 @@ export const frqExams: FRQExam[] = [
   macroUnit5Set2,
   macroUnit1Set2,
   macroUnit4Set2,
+  macroUnit4Set4,
   macroUnit6Set2,
   macroUnit2Set2,
   macroUnit3Set3,
