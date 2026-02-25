@@ -5,6 +5,8 @@ import {
   UserCredential,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
   signOut,
   onAuthStateChanged,
   sendEmailVerification
@@ -146,6 +148,7 @@ export interface AuthContextValue {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<AuthContextValue>;
+  loginWithGoogle: () => Promise<AuthContextValue>;
   signup: (email: string, password: string, isSubscribed: boolean, isTeacher?: boolean) => Promise<AuthContextValue>;
   logout: () => Promise<void>;
   resendVerificationEmail: () => Promise<void>;
@@ -662,6 +665,7 @@ export function useAuth() {
         user: newUser, 
         loading: false, 
         login, 
+        loginWithGoogle, 
         signup, 
         logout, 
         resendVerificationEmail,
@@ -701,6 +705,106 @@ export function useAuth() {
     }
   }
 
+  const loginWithGoogle = async (): Promise<AuthContextValue> => {
+    setLoading(true);
+    try {
+      const provider = new GoogleAuthProvider();
+      const userCredential = await signInWithPopup(auth, provider);
+      const newUser = userCredential.user;
+      if (!newUser?.email) {
+        setLoading(false);
+        throw new Error('Google sign-in did not return an email.');
+      }
+      const userDocRef = doc(db, 'users', newUser.uid);
+      const userSnap = await getDoc(userDocRef);
+      if (!userSnap.exists()) {
+        const today = new Date();
+        const todayString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        await setDoc(userDocRef, {
+          uid: newUser.uid,
+          email: newUser.email,
+          displayName: newUser.displayName || newUser.email.split('@')[0],
+          createdAt: serverTimestamp(),
+          hasCompletedSubjectSelection: false,
+          hasCompletedInitialUnitSelection: false,
+          initialPracticeUnitIds: [],
+          hasCompletedQuizTutorial: false,
+          mcqAnswerStatus: {},
+          viewedMcqIds: [],
+          totalXP: 150,
+          isSubscribedToMarketing: true,
+          credits: {
+            dailyPractice: { remaining: 3, lastResetDate: todayString },
+            lifetimeAiGenerations: 1,
+          },
+          teacher: false,
+        });
+        if (newUser.email) {
+          try {
+            const subscribedEmailRef = doc(db, 'subscribedEmails', newUser.email);
+            await setDoc(subscribedEmailRef, {
+              email: newUser.email,
+              userId: newUser.uid,
+              subscribedAt: serverTimestamp(),
+              displayName: newUser.displayName || newUser.email.split('@')[0],
+            });
+          } catch (e) {
+            console.error('[useAuth] Failed to add Google user to subscribedEmails:', e);
+          }
+        }
+        console.log('[useAuth] New Google user document created for:', newUser.email);
+      }
+      setLoading(false);
+      if (redirectOnLogin) {
+        window.location.href = redirectOnLogin;
+        setRedirectOnLogin(null);
+      }
+      return {
+        user: auth.currentUser,
+        loading: false,
+        login,
+        loginWithGoogle,
+        signup,
+        logout,
+        resendVerificationEmail,
+        mcqAnswersData,
+        loadingMcqData,
+        userData,
+        loadingUserData,
+        setUserData,
+        lastSelectedPracticeUnits,
+        setLastSelectedPracticeUnits,
+        globalLevel,
+        globalProgress,
+        totalXP,
+        correctStreak,
+        setCorrectStreak,
+        isNextQuestionDoubleXp,
+        setIsNextQuestionDoubleXp,
+        unitPerformanceStats,
+        loadingUnitPerformance,
+        showLoginModal,
+        setShowLoginModal,
+        showSignupModal,
+        setShowSignupModal,
+        selectedSubject,
+        setSelectedSubject,
+        toggleSubject,
+        guestXp,
+        awardXp,
+        xpToast,
+        redirectOnLogin,
+        setRedirectOnLogin,
+        isCharacterClosetOpen: false,
+        setIsCharacterClosetOpen: () => {},
+      };
+    } catch (error) {
+      console.error('[useAuth] Google sign-in failed:', error);
+      setLoading(false);
+      throw error;
+    }
+  };
+
   const login = async (email: string, password: string): Promise<AuthContextValue> => {
     setLoading(true);
     try {
@@ -722,6 +826,7 @@ export function useAuth() {
           user: auth.currentUser, 
           loading: false, 
           login, 
+          loginWithGoogle,
           signup, 
           logout, 
           resendVerificationEmail,
@@ -788,6 +893,7 @@ export function useAuth() {
     user,
     loading,
     login,
+    loginWithGoogle,
     signup,
     logout,
     resendVerificationEmail,

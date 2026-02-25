@@ -20,6 +20,7 @@ export function useAuthContext(): AuthContextValue {
       loading: true,
       signup: async (email, password, isSubscribed, isTeacher) => { throw new Error('AuthProvider not found'); },
       login: async () => { throw new Error('AuthProvider not found'); },
+      loginWithGoogle: async () => { throw new Error('AuthProvider not found'); },
       logout: async () => { throw new Error('AuthProvider not found'); },
       resendVerificationEmail: async () => { throw new Error('AuthProvider not found'); },
       mcqAnswersData: null,
