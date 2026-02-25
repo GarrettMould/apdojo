@@ -1523,6 +1523,26 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
     }
   };
 
+  const ULTIMATE_ADAS_PDF_URL = 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/ultimate_adas.pdf';
+  const handleDownloadUltimateAdAsPdf = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    try {
+      const res = await fetch(ULTIMATE_ADAS_PDF_URL);
+      if (!res.ok) throw new Error('Download failed');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'AP-Dojo-Ultimate-AD-AS-Cheat-Sheet.pdf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch {
+      window.open(ULTIMATE_ADAS_PDF_URL, '_blank', 'noopener,noreferrer');
+    }
+  };
+
   return (
     <>
       <Head>
@@ -1559,32 +1579,59 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
             )}
           </h1>
           <div className="flex flex-col gap-4">
-            <span
-              className={`inline-block w-fit px-3 py-1.5 text-sm font-bold rounded-md border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] ${
-                selectedSubject === 'macro'
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-green-500 text-white'
-              }`}
-            >
-              AP {selectedSubject === 'macro' ? 'Macro' : 'Micro'}
-            </span>
-            <Link
-              href={isProCustomer ? `/unit/${activeUnitNum}/packet?subject=${selectedSubject}` : '#'}
-              className={`inline-flex items-center gap-2 text-sm font-semibold hover:underline w-fit cursor-pointer ${
-                selectedSubject === 'macro'
-                  ? 'text-blue-600'
-                  : 'text-green-600'
-              }`}
-              onClick={(e) => {
-                if (!isProCustomer) {
-                  e.preventDefault();
-                  setShowPacketSeasonPassModal(true);
-                }
-              }}
-            >
-              <Download className="w-4 h-4 flex-shrink-0" />
-              Download Cheat Sheet as PDF
-            </Link>
+            <div className="flex flex-wrap items-center gap-3">
+              <span
+                className={`inline-block w-fit px-3 py-1.5 text-sm font-bold rounded-md border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] ${
+                  selectedSubject === 'macro'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-green-500 text-white'
+                }`}
+              >
+                AP {selectedSubject === 'macro' ? 'Macro' : 'Micro'}
+              </span>
+              <Link
+                href={isProCustomer ? `/unit/${activeUnitNum}/packet?subject=${selectedSubject}` : '#'}
+                className={`inline-flex items-center gap-2 text-sm font-semibold hover:underline w-fit cursor-pointer ${
+                  selectedSubject === 'macro'
+                    ? 'text-blue-600'
+                    : 'text-green-600'
+                }`}
+                onClick={(e) => {
+                  if (!isProCustomer) {
+                    e.preventDefault();
+                    setShowPacketSeasonPassModal(true);
+                  }
+                }}
+              >
+                <Download className="w-4 h-4 flex-shrink-0" />
+                Download Cheat Sheet as PDF
+              </Link>
+            </div>
+            {selectedSubject === 'macro' && activeUnitNum === 3 && (
+              <div className="mt-4 w-[200px] flex-shrink-0 relative border-4 border-black bg-white overflow-hidden group" style={{ aspectRatio: '8.5/11' }}>
+                <iframe
+                  src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/ultimate_adas.pdf#toolbar=0&navpanes=0"
+                  title="Ultimate AD-AS cheat sheet preview"
+                  className="absolute top-0 left-0 pointer-events-none"
+                  style={{
+                    width: '833px',
+                    height: '1080px',
+                    transform: 'scale(0.24)',
+                    transformOrigin: 'top left',
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={handleDownloadUltimateAdAsPdf}
+                  className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/35 transition-colors cursor-pointer z-10"
+                  title="Download PDF"
+                >
+                  <span className="bg-white rounded-full p-2.5 shadow-lg border-2 border-gray-200">
+                    <Download className="w-6 h-6 text-gray-800" />
+                  </span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
 

@@ -958,10 +958,10 @@ export const graphGymScenarios: GraphGymScenario[] = [
       slug: "monetary-policy",
       description: "This is a two-part graph scenario. First, draw the Money Market showing contractionary monetary policy. Second, draw the Foreign Exchange Market for the USD showing the result of their monetary policy.",
       toDoList: [
-        "Money Market: Shift Supply Left, Nominal Interest Rate Up",
-        "Forex Market: Shift Demand for USD Right and Supply of USD Left",
-        "Show the appreciation of the US Dollar",
-        "Explain/Label the resulting decrease in Net Exports"
+        "Draw the Money Market and show the effect of contractionary monetary policy on the nominal interest rate",
+        "Draw the Forex market for USD and show how the policy affects demand for and supply of USD",
+        "Indicate what happens to the value of the US dollar",
+        
       ],
       correctImage: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/wb48.jpg",
       checklist: [
