@@ -1524,22 +1524,23 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
   };
 
   const ULTIMATE_ADAS_PDF_URL = 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/ultimate_adas.pdf';
-  const handleDownloadUltimateAdAsPdf = async (e: React.MouseEvent) => {
-    e.preventDefault();
+  const UNIT_2_MACRO_PDF_URL = 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/Unit+2+-+Macro+(3).pdf';
+
+  const handleDownloadPdf = async (pdfUrl: string, filename: string) => {
     try {
-      const res = await fetch(ULTIMATE_ADAS_PDF_URL);
+      const res = await fetch(pdfUrl);
       if (!res.ok) throw new Error('Download failed');
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = 'AP-Dojo-Ultimate-AD-AS-Cheat-Sheet.pdf';
+      link.download = filename;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
     } catch {
-      window.open(ULTIMATE_ADAS_PDF_URL, '_blank', 'noopener,noreferrer');
+      window.open(pdfUrl, '_blank', 'noopener,noreferrer');
     }
   };
 
@@ -1607,10 +1608,42 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                 Download Cheat Sheet as PDF
               </Link>
             </div>
+            {selectedSubject === 'macro' && activeUnitNum === 2 && (
+              <div className="mt-4 w-[200px] flex-shrink-0 relative border-4 border-black bg-white overflow-hidden group" style={{ aspectRatio: '8.5/11' }}>
+                <iframe
+                  src={`${UNIT_2_MACRO_PDF_URL}#toolbar=0&navpanes=0`}
+                  title="Unit 2 Macro cheat sheet preview"
+                  className="absolute top-0 left-0 pointer-events-none"
+                  style={{
+                    width: '833px',
+                    height: '1080px',
+                    transform: 'scale(0.24)',
+                    transformOrigin: 'top left',
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (!isProCustomer) {
+                      setShowPacketSeasonPassModal(true);
+                      return;
+                    }
+                    handleDownloadPdf(UNIT_2_MACRO_PDF_URL, 'AP-Dojo-Macro-Unit-2-Cheat-Sheet.pdf');
+                  }}
+                  className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/35 transition-colors cursor-pointer z-10"
+                  title="Download PDF"
+                >
+                  <span className="bg-white rounded-full p-2.5 shadow-lg border-2 border-gray-200">
+                    <Download className="w-6 h-6 text-gray-800" />
+                  </span>
+                </button>
+              </div>
+            )}
             {selectedSubject === 'macro' && activeUnitNum === 3 && (
               <div className="mt-4 w-[200px] flex-shrink-0 relative border-4 border-black bg-white overflow-hidden group" style={{ aspectRatio: '8.5/11' }}>
                 <iframe
-                  src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/ultimate_adas.pdf#toolbar=0&navpanes=0"
+                  src={`${ULTIMATE_ADAS_PDF_URL}#toolbar=0&navpanes=0`}
                   title="Ultimate AD-AS cheat sheet preview"
                   className="absolute top-0 left-0 pointer-events-none"
                   style={{
@@ -1622,7 +1655,14 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                 />
                 <button
                   type="button"
-                  onClick={handleDownloadUltimateAdAsPdf}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (!isProCustomer) {
+                      setShowPacketSeasonPassModal(true);
+                      return;
+                    }
+                    handleDownloadPdf(ULTIMATE_ADAS_PDF_URL, 'AP-Dojo-Ultimate-AD-AS-Cheat-Sheet.pdf');
+                  }}
                   className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/35 transition-colors cursor-pointer z-10"
                   title="Download PDF"
                 >
