@@ -586,6 +586,8 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
   const [isResizing, setIsResizing] = useState(false);
   const containerRef = React.useRef<HTMLDivElement>(null);
   const cheatSheetContentRef = React.useRef<HTMLDivElement>(null);
+  const leftPanelScrollRef = React.useRef<HTMLDivElement>(null);
+  const [showScrollPopup, setShowScrollPopup] = useState(false);
   const [showImageSlides, setShowImageSlides] = useState(false);
   const [brokenImageUrls, setBrokenImageUrls] = useState<Set<string>>(new Set());
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -657,6 +659,32 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
     }
   }, [user?.uid]);
 
+  // Show modal when user scrolls ~50% down the cheat sheet (once per session)
+  const SCROLL_POPUP_THRESHOLD = 0.5;
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const SESSION_FLAG_KEY = 'unitBundleModalShown_v2';
+    if (sessionStorage.getItem(SESSION_FLAG_KEY) === '1') return;
+
+    const el = leftPanelScrollRef.current;
+    if (!el) return;
+
+    const onScroll = () => {
+      const scrollTop = el.scrollTop;
+      const scrollHeight = el.scrollHeight - el.clientHeight;
+      if (scrollHeight <= 0) return;
+      const progress = scrollTop / scrollHeight;
+      if (progress >= SCROLL_POPUP_THRESHOLD) {
+        setShowScrollPopup(true);
+        sessionStorage.setItem(SESSION_FLAG_KEY, '1');
+        el.removeEventListener('scroll', onScroll);
+      }
+    };
+
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => el.removeEventListener('scroll', onScroll);
+  }, []);
+
   // Check if user is a pro customer (has season pass)
   const isProCustomer = useMemo(() => {
     if (!user || !userData) return false;
@@ -715,7 +743,10 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
   };
 
   const activeUnitNum = parseInt(activeUnit as string);
-  
+  const pdfPreviewUrl =
+    selectedSubject === 'macro'
+      ? `https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/AP+Macro+-+Unit+${activeUnitNum}.pdf`
+      : undefined;
   const subjectFilter = useMemo(() => selectedSubject === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics', [selectedSubject]);
 
   const unitKeyTerms: KeyTerm[] = useMemo(() => selectedSubject === 'macro' 
@@ -1555,6 +1586,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
       <div ref={containerRef} className="flex h-[calc(100vh-5rem)] overflow-hidden">
         {/* Left Side - Cheat Sheet Content */}
         <motion.div
+          ref={leftPanelScrollRef}
           animate={{
             width: showQuizPanel ? `${leftPanelWidth}%` : '100%',
           }}
@@ -3773,6 +3805,85 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
         onCardView={handleShuffleCardView}
         seasonPassCourseType={selectedSubject === 'macro' ? 'macro' : 'micro'}
       />
+
+      {/* Slide-up modal: appears once per session after ~50% scroll, centered at bottom */}
+      <AnimatePresence>
+        {showScrollPopup && (
+          <div className="fixed inset-0 z-50 flex items-end justify-center pointer-events-none">
+            <div className="absolute inset-0 bg-black/20" />
+            <motion.div
+              initial={{ y: '100%', opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: '100%', opacity: 0 }}
+              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              className="relative w-full h-[50vh] min-h-[280px] mb-0 pointer-events-auto flex items-stretch"
+            >
+              <div className="relative w-full h-full bg-white border-t-4 border-x-4 border-black rounded-t-3xl shadow-[0_-8px_0px_0px_rgba(0,0,0,1)] overflow-hidden flex flex-col">
+                {/* Close button */}
+                <button
+                  type="button"
+                  onClick={() => setShowScrollPopup(false)}
+                  aria-label="Close"
+                  className="absolute top-2 right-2 w-9 h-9 rounded-full bg-white/90 border border-black flex items-center justify-center text-slate-700 hover:bg-slate-100 active:scale-95 transition"
+                >
+                  <span className="text-xl leading-none">×</span>
+                </button>
+
+                <div className="p-4 sm:p-5 w-full h-full mx-auto flex flex-col space-y-3">
+                  {/* Copy + CTA above preview */}
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-slate-800">
+                      Stop guessing on this unit. Get the crystal‑clear breakdown.
+                    </p>
+                    <p className="text-xs text-slate-600">
+                      Peek from the ultimate cheat sheet and knowledge check—everything you need for the hardest graphs and free‑response traps.
+                    </p>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!isProCustomer) {
+                          setShowPacketSeasonPassModal(true);
+                          return;
+                        }
+                        // Default to current unit's packet download route
+                        router.push(`/unit/${activeUnitNum}/packet?subject=${selectedSubject}`);
+                      }}
+                      className="mt-2 inline-flex items-center justify-center gap-2 w-full sm:w-auto px-5 py-3 bg-yellow-300 hover:bg-yellow-400 text-black font-extrabold text-sm sm:text-base rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] active:translate-y-0.5 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
+                    >
+                      <Download className="w-4 h-4" />
+                      Download Full Unit Bundle
+                    </button>
+
+                    <p className="text-[11px] text-slate-500 mt-1">
+                      Joined by <span className="font-semibold">1,200+ AP students</span> this month.
+                    </p>
+                  </div>
+
+                  {/* Full-width PDF peek (top portion only) that runs to bottom of modal (no bottom border) */}
+                  <div className="w-full flex-1 overflow-hidden border-t-4 border-l-4 border-r-4 border-black rounded-t-2xl">
+                    {pdfPreviewUrl ? (
+                      <iframe
+                        src={`${pdfPreviewUrl}#toolbar=0&navpanes=0`}
+                        title={`Preview of AP Macro Unit ${activeUnitNum} Cheat Sheet`}
+                        className="w-full h-full border-none pointer-events-none"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-white overflow-hidden flex items-start justify-center">
+                        <img
+                          src="/images/unit-bundle-placeholder.png"
+                          alt="Preview of the Unit bundle cheat sheet"
+                          className="w-full object-cover"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </>
   );
 } 
