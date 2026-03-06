@@ -781,5 +781,86 @@ export const blogPosts: Record<string, BlogPost> = {
       </>
     ),
   },
+  'short-run-and-long-run-equilibrium': {
+    slug: 'short-run-and-long-run-equilibrium',
+    title: 'Short Run and Long Run Equilibrium',
+    description: 'Understanding short-run vs. long-run equilibrium in macroeconomics through the lens of a marathon runner\'s training cycle—SRAS, AD, LRAS, and economic growth.',
+    subject: 'Macro',
+    unit: 3,
+    thumbnailUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/lrsa/image4.jpg',
+    seoSnippet: 'Short-run equilibrium describes where the economy performs today relative to its potential (SRAS and AD). Long-run equilibrium is your sustainable capacity (LRAS). Economic growth shifts LRAS right; fluctuations are short-run performance relative to that capacity.',
+    keyTakeaway: 'Short Run = performance (good day or bad day). Long Run = capacity. Economic growth shifts LRAS; fluctuations are movements around your current fitness level.',
+    images: [],
+    videoUrl: null,
+    content: (
+      <>
+        <p className="mb-6">Macroeconomics is a Training Cycle, Not a Single Race. If you want to understand the difference between the Short Run and the Long Run, look at a marathon runner&apos;s training log.</p>
+
+        <h2 className="mt-12 mb-4 text-3xl font-bold text-gray-800">1. The Daily Run: Short-Run Equilibrium (SRAS &amp; AD)</h2>
+        <p className="mb-6">Every day you lace up, you have a specific performance. This is the Short-Run.</p>
+
+        <h3 className="mt-10 mb-4 text-2xl font-bold text-gray-800">The &quot;Pumped&quot; Run (Inflationary Gap)</h3>
+        <p className="mb-6">One day you feel incredible. You have a tailwind, a perfect playlist, and you&apos;ve had plenty of sleep. You run way faster than your average pace. You are &quot;over-performing.&quot;</p>
+        <p className="mb-6"><strong>Macro Link:</strong> This is Aggregate Demand (AD) shifting right. You&apos;ve pushed output ($Y$) beyond your sustainable capacity ($Y_f$).</p>
+
+        <h3 className="mt-10 mb-4 text-2xl font-bold text-gray-800">The &quot;Sick&quot; Run (Recessionary Gap)</h3>
+        <p className="mb-6">Another day, you&apos;re exhausted or getting over a cold. You&apos;re sluggish, and your pace is terrible.</p>
+        <p className="mb-6"><strong>Macro Link:</strong> This is a decrease in AD or a supply shock. You are under-performing your potential.</p>
+
+        <div className="my-8 p-4 border rounded-lg bg-gray-50">
+          <Image
+            src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/flippables/ad-as-short-run-equilibrium.jpg"
+            alt="AD-AS graph: short-run equilibrium"
+            width={600}
+            height={400}
+            className="w-full h-auto rounded-md shadow-sm"
+          />
+        </div>
+
+        <h2 className="mt-12 mb-4 text-3xl font-bold text-gray-800">2. The &quot;Mean&quot;: Your Current Fitness (LRAS)</h2>
+        <p className="mb-6">Your Current Fitness Level is the baseline—the sustainable output you can maintain. In the model, this is the Long-Run Aggregate Supply (LRAS): the level of real output the economy can produce at full employment.</p>
+        <p className="mb-6">In the short run, you can have a great day or a bad day relative to that baseline. In the long run, what matters is where that baseline sits. LRAS defines your capacity; short-run equilibrium is where AD and SRAS meet relative to that capacity.</p>
+
+        <div className="my-8 p-4 border rounded-lg bg-gray-50">
+          <Image
+            src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/flippables/lras.jpg"
+            alt="Long-run aggregate supply (LRAS)"
+            width={600}
+            height={400}
+            className="w-full h-auto rounded-md shadow-sm"
+          />
+        </div>
+
+        <h2 className="mt-12 mb-4 text-3xl font-bold text-gray-800">3. The Training Program: Long-Run Growth</h2>
+        <p className="mb-6">This is where the real magic happens. If you train consistently over six months, you aren&apos;t just having &quot;good days&quot;—you are changing your baseline.</p>
+        <p className="mb-6">Through better nutrition, more miles, and better shoes, your &quot;8-minute mile&quot; cruising speed becomes a &quot;7-minute mile.&quot;</p>
+
+        <h3 className="mt-10 mb-4 text-2xl font-bold text-gray-800">In the Economy</h3>
+        <p className="mb-6">This is Economic Growth. You aren&apos;t just shifting the AD curve; you are shifting the LRAS curve to the right.</p>
+
+        <h3 className="mt-10 mb-4 text-2xl font-bold text-gray-800">The Shifters</h3>
+        <p className="mb-6">You&apos;ve increased your Capital Stock (better gear/gym), your Human Capital (better running technique/knowledge), and your Technology (a more efficient training app).</p>
+
+        <div className="my-8 p-4 border rounded-lg bg-gray-50">
+          <Image
+            src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/flippables/lras-increase.jpg"
+            alt="LRAS shifting right: long-run growth"
+            width={600}
+            height={400}
+            className="w-full h-auto rounded-md shadow-sm"
+          />
+        </div>
+
+        <h2 className="mt-12 mb-4 text-3xl font-bold text-gray-800">The Dojo Distinction</h2>
+        <ul className="mb-6 list-disc list-inside space-y-2">
+          <li><strong>Short Run:</strong> Is about performance. Are you having a good day or a bad day relative to your current fitness?</li>
+          <li><strong>Long Run:</strong> Is about capacity. How has your training shifted the entire &quot;mean&quot; of what you are capable of doing?</li>
+        </ul>
+
+        <h2 className="mt-12 mb-4 text-3xl font-bold text-gray-800">AP Exam Tip</h2>
+        <p className="mb-6">When the College Board asks about &quot;Economic Growth,&quot; they are asking how the training went. When they ask about &quot;Fluctuations,&quot; they are asking how today&apos;s run went.</p>
+      </>
+    ),
+  },
 };
 

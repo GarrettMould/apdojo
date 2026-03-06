@@ -669,6 +669,7 @@ export const graphExplanationPosts: Record<string, GraphExplanationPost> = {
       }
     ],
     relatedTopics: [
+      { slug: 'short-run-and-long-run-equilibrium', title: 'Short Run and Long Run Equilibrium' },
       { slug: 'monetary-policy-and-aggregate-demand', title: 'Monetary Policy and Aggregate Demand' },
       { slug: 'foreign-exchange-cookies', title: 'The Foreign Exchange Market' }
     ]

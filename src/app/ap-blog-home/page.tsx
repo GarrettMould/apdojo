@@ -120,10 +120,11 @@ export default function BlogHomePage() {
   // Get slugs from graph posts to filter out duplicates
   const graphPostSlugs = new Set(graphPosts.map(post => post.slug));
   
-  // Filter out regular posts that have the same slug as graph posts
+  // Filter out regular posts that have the same slug as graph posts, then sort by unit then title
   const uniqueRegularPosts = regularPosts
     .filter(post => !graphPostSlugs.has(post.slug))
-    .filter(post => !hiddenSlugs.has(post.slug));
+    .filter(post => !hiddenSlugs.has(post.slug))
+    .sort((a, b) => a.unit - b.unit || a.title.localeCompare(b.title));
 
   return (
     <div className="min-h-screen bg-gray-50">
