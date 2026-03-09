@@ -790,6 +790,7 @@ export const blogPosts: Record<string, BlogPost> = {
     thumbnailUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/lrsa/image4.jpg',
     seoSnippet: 'Short-run equilibrium describes where the economy performs today relative to its potential (SRAS and AD). Long-run equilibrium is your sustainable capacity (LRAS). Economic growth shifts LRAS right; fluctuations are short-run performance relative to that capacity.',
     keyTakeaway: 'Short Run = performance (good day or bad day). Long Run = capacity. Economic growth shifts LRAS; fluctuations are movements around your current fitness level.',
+    practiceQuestionIds: [30, 32, 3070, 3071],
     images: [],
     videoUrl: null,
     content: (
@@ -807,29 +808,30 @@ export const blogPosts: Record<string, BlogPost> = {
         <p className="mb-6">Another day, you&apos;re exhausted or getting over a cold. You&apos;re sluggish, and your pace is terrible.</p>
         <p className="mb-6"><strong>Macro Link:</strong> This is a decrease in AD or a supply shock. You are under-performing your potential.</p>
 
-        <div className="my-8 p-4 border rounded-lg bg-gray-50">
-          <Image
-            src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/flippables/ad-as-short-run-equilibrium.jpg"
-            alt="AD-AS graph: short-run equilibrium"
-            width={600}
-            height={400}
-            className="w-full h-auto rounded-md shadow-sm"
-          />
+        <div className="my-8 grid grid-cols-2 gap-4">
+          <div className="p-4 border rounded-lg bg-gray-50">
+            <Image
+              src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/flippables/ad_as_recessionary_label.jpg"
+              alt="AD-AS recessionary gap"
+              width={600}
+              height={400}
+              className="w-full h-auto rounded-md shadow-sm"
+            />
+          </div>
+          <div className="p-4 border rounded-lg bg-gray-50">
+            <Image
+              src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/flippables/ad_as_inflationary_label.jpg"
+              alt="AD-AS inflationary gap"
+              width={600}
+              height={400}
+              className="w-full h-auto rounded-md shadow-sm"
+            />
+          </div>
         </div>
 
         <h2 className="mt-12 mb-4 text-3xl font-bold text-gray-800">2. The &quot;Mean&quot;: Your Current Fitness (LRAS)</h2>
         <p className="mb-6">Your Current Fitness Level is the baseline—the sustainable output you can maintain. In the model, this is the Long-Run Aggregate Supply (LRAS): the level of real output the economy can produce at full employment.</p>
         <p className="mb-6">In the short run, you can have a great day or a bad day relative to that baseline. In the long run, what matters is where that baseline sits. LRAS defines your capacity; short-run equilibrium is where AD and SRAS meet relative to that capacity.</p>
-
-        <div className="my-8 p-4 border rounded-lg bg-gray-50">
-          <Image
-            src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/flippables/lras.jpg"
-            alt="Long-run aggregate supply (LRAS)"
-            width={600}
-            height={400}
-            className="w-full h-auto rounded-md shadow-sm"
-          />
-        </div>
 
         <h2 className="mt-12 mb-4 text-3xl font-bold text-gray-800">3. The Training Program: Long-Run Growth</h2>
         <p className="mb-6">This is where the real magic happens. If you train consistently over six months, you aren&apos;t just having &quot;good days&quot;—you are changing your baseline.</p>

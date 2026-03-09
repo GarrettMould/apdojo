@@ -31,7 +31,9 @@ import { SeasonPassModal } from '@/components/SeasonPassModal';
 import { getDeepDiveUrl } from '@/lib/routes';
 import { saveQuizResult } from '@/lib/quizHistory';
 import { hasValidSeasonPass, getUnitMCQTestUrl } from '@/lib/utils';
+import { getSubjectSlug, getUnitSlug } from '@/lib/practiceSlugs';
 import { Footer } from '@/components/Footer';
+import SeasonPassScrollPopup from '@/app/SeasonPassScrollPopup';
 import { pdfCheatSheets } from '@/data/pdfCheatSheets';
 import dynamic from 'next/dynamic'; // Add this if not present
 // Add this dynamic import definition near your other imports
@@ -39,6 +41,9 @@ import dynamic from 'next/dynamic'; // Add this if not present
 
 // Set to true to show Deep Dive buttons and Ultimate Unit Shuffle on unit cheat sheet
 const SHOW_DEEP_DIVE_AND_SHUFFLE = true;
+
+// Set to true to show the Ultimate AD-AS (short run / long run equilibrium) PDF preview blob
+const SHOW_ADAS_BLOB = false;
 
 // Helper to combine and structure whiteboard data for Macro
 const getUnitWhiteboards = (unitNumber: number): WhiteboardImage[] => {
@@ -1352,9 +1357,9 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
     };
   }, [isResizing]);
 
-  // Lock body scroll when panel is open
+  // Lock body scroll when panel or slide-up modal is open
   useEffect(() => {
-    if (showQuizPanel) {
+    if (showQuizPanel || showScrollPopup) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'auto';
@@ -1363,7 +1368,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
     return () => {
       document.body.style.overflow = 'auto';
     };
-  }, [showQuizPanel]);
+  }, [showQuizPanel, showScrollPopup]);
 
   const unitsToDisplay = selectedSubject === 'macro' ? allMacroUnits : allMicroUnits;
   const pageTitleSubject = selectedSubject === 'macro' ? 'Macroeconomics' : 'Microeconomics';
@@ -1583,7 +1588,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
         />
       </Head>
-      <div ref={containerRef} className="flex h-[calc(100vh-5rem)] overflow-hidden">
+      <div ref={containerRef} className="flex h-[calc(100vh-5rem)] overflow-hidden bg-gray-50">
         {/* Left Side - Cheat Sheet Content */}
         <motion.div
           ref={leftPanelScrollRef}
@@ -1595,9 +1600,12 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
             stiffness: 300,
             damping: 30,
           }}
-          className="flex-shrink-0 overflow-y-auto min-w-0"
+          className={`flex-shrink-0 min-w-0 ${showScrollPopup ? 'overflow-hidden' : 'overflow-y-auto'}`}
         >
-          <div className="max-w-7xl mx-auto px-4 py-12 mt-12" ref={cheatSheetContentRef}>
+          <div
+            className="max-w-7xl mx-auto px-4 py-12 mt-12"
+            ref={cheatSheetContentRef}
+          >
         {/* Unit header */}
         <div className="mb-16 text-left">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 tracking-tight mb-2">
@@ -1672,7 +1680,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                 </button>
               </div>
             )}
-            {selectedSubject === 'macro' && activeUnitNum === 3 && (
+            {SHOW_ADAS_BLOB && selectedSubject === 'macro' && activeUnitNum === 3 && (
               <div className="mt-4 w-[200px] flex-shrink-0 relative border-4 border-black bg-white overflow-hidden group" style={{ aspectRatio: '8.5/11' }}>
                 <iframe
                   src={`${ULTIMATE_ADAS_PDF_URL}#toolbar=0&navpanes=0`}
@@ -1705,6 +1713,35 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
               </div>
             )}
           </div>
+        </div>
+
+        {/* Practice MCQs + Unit Test buttons */}
+        <div className="mb-8 flex flex-col sm:flex-row gap-3 sm:gap-4">
+          {/* Primary CTA - Practice MCQs */}
+          <Link
+            href={`/mcq-practice/${getSubjectSlug(selectedSubject === 'macro' ? 'macro' : 'micro')}/${getUnitSlug(activeUnitNum, selectedSubject === 'macro' ? 'macro' : 'micro')}`}
+            className={`w-full sm:flex-1 inline-flex items-center justify-center font-black py-3.5 px-6 rounded-xl border-2 shadow-[0_4px_0_0_rgba(0,0,0,1)] active:translate-y-0.5 active:shadow-[0_2px_0_0_rgba(0,0,0,1)] transition-all ${
+              selectedSubject === 'macro'
+                ? 'bg-blue-500 hover:bg-blue-600 text-white border-blue-700'
+                : 'bg-green-500 hover:bg-green-600 text-white border-green-700'
+            }`}
+          >
+            <span className="text-base sm:text-lg tracking-wide uppercase">Practice MCQs</span>
+          </Link>
+
+          {/* Secondary CTA - Unit Test */}
+          <Link
+            href={getUnitMCQTestUrl(activeUnitNum, selectedSubject === 'macro' ? 'macro' : 'micro')}
+            className="w-full sm:flex-1 inline-flex items-center justify-center font-black py-3.5 px-6 rounded-xl border-2 border-gray-300 bg-white hover:border-black hover:bg-gray-50 active:translate-y-0.5 active:shadow-[0_2px_0_0_rgba(0,0,0,1)] shadow-[0_3px_0_0_rgba(209,213,219,1)] transition-all"
+          >
+            <span
+              className={`text-base sm:text-lg tracking-wide uppercase ${
+                selectedSubject === 'macro' ? 'text-blue-600' : 'text-green-600'
+              }`}
+            >
+              Unit Test
+            </span>
+          </Link>
         </div>
 
         {/* Unit Navigation Tabs */}
@@ -1789,7 +1826,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
               </Button>
             </div>
           );
-        })()} 
+        })()}
         */}
         </div>
 
@@ -1896,18 +1933,22 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
               <button
                 type="button"
                 onClick={openShuffleModal}
-                className="w-full block text-left bg-gradient-to-br from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white border-4 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-y-1 p-8 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600"
+                className={`w-full block text-left rounded-2xl border-4 transition-all active:translate-y-1 p-8 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 ${
+                  selectedSubject === 'macro'
+                    ? 'bg-blue-50 hover:bg-blue-100 text-black border-blue-500 shadow-[4px_4px_0px_0px_rgba(37,99,235,1)] hover:shadow-[6px_6px_0px_0px_rgba(37,99,235,1)] focus:ring-offset-blue-400'
+                    : 'bg-green-50 hover:bg-green-100 text-black border-green-500 shadow-[4px_4px_0px_0px_rgba(22,163,74,1)] hover:shadow-[6px_6px_0px_0px_rgba(22,163,74,1)] focus:ring-offset-green-400'
+                }`}
               >
                 <div className="flex items-center justify-between">
                   <div>
                     <h2 className="text-3xl font-black mb-2">🎯 Ultimate Unit Shuffle</h2>
-                    <p className="text-lg font-semibold text-indigo-100 mb-4">
+                    <p className="text-lg font-semibold text-slate-800 mb-4">
                       All {allUnitFlashcards.length} flashcards from Unit {activeUnitNum} shuffled together
                     </p>
                     <div className="flex gap-4 text-sm">
-                      <span className="bg-white/20 px-3 py-1 rounded-full font-semibold">{listCount} List</span>
-                      <span className="bg-white/20 px-3 py-1 rounded-full font-semibold">{rapidFireCount} Rapid Fire</span>
-                      <span className="bg-white/20 px-3 py-1 rounded-full font-semibold">{graphCount} Graph</span>
+                      <span className={`px-3 py-1 rounded-full font-semibold ${selectedSubject === 'macro' ? 'bg-blue-200/70' : 'bg-green-200/70'}`}>{listCount} List</span>
+                      <span className={`px-3 py-1 rounded-full font-semibold ${selectedSubject === 'macro' ? 'bg-blue-200/70' : 'bg-green-200/70'}`}>{rapidFireCount} Rapid Fire</span>
+                      <span className={`px-3 py-1 rounded-full font-semibold ${selectedSubject === 'macro' ? 'bg-blue-200/70' : 'bg-green-200/70'}`}>{graphCount} Graph</span>
                     </div>
                   </div>
                   <ArrowRight className="w-8 h-8 flex-shrink-0" />
@@ -2113,8 +2154,8 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                                     ) : (
                                       <ChevronUp className="w-8 h-8 text-gray-500 group-hover:text-gray-700 transition-colors" strokeWidth={3} />
                                     )}
-                                  </div>
-                                )}
+                </div>
+              )}
                               </div>
                             </div>
                           );
@@ -3806,84 +3847,14 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
         seasonPassCourseType={selectedSubject === 'macro' ? 'macro' : 'micro'}
       />
 
-      {/* Slide-up modal: appears once per session after ~50% scroll, centered at bottom */}
-      <AnimatePresence>
-        {showScrollPopup && (
-          <div className="fixed inset-0 z-50 flex items-end justify-center pointer-events-none">
-            <div className="absolute inset-0 bg-black/20" />
-            <motion.div
-              initial={{ y: '100%', opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: '100%', opacity: 0 }}
-              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              className="relative w-full h-[50vh] min-h-[280px] mb-0 pointer-events-auto flex items-stretch"
-            >
-              <div className="relative w-full h-full bg-white border-t-4 border-x-4 border-black rounded-t-3xl shadow-[0_-8px_0px_0px_rgba(0,0,0,1)] overflow-hidden flex flex-col">
-                {/* Close button */}
-                <button
-                  type="button"
-                  onClick={() => setShowScrollPopup(false)}
-                  aria-label="Close"
-                  className="absolute top-2 right-2 w-9 h-9 rounded-full bg-white/90 border border-black flex items-center justify-center text-slate-700 hover:bg-slate-100 active:scale-95 transition"
-                >
-                  <span className="text-xl leading-none">×</span>
-                </button>
-
-                <div className="p-4 sm:p-5 w-full h-full mx-auto flex flex-col space-y-3">
-                  {/* Copy + CTA above preview */}
-                  <div className="space-y-2">
-                    <p className="text-sm font-semibold text-slate-800">
-                      Stop guessing on this unit. Get the crystal‑clear breakdown.
-                    </p>
-                    <p className="text-xs text-slate-600">
-                      Peek from the ultimate cheat sheet and knowledge check—everything you need for the hardest graphs and free‑response traps.
-                    </p>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (!isProCustomer) {
-                          setShowPacketSeasonPassModal(true);
-                          return;
-                        }
-                        // Default to current unit's packet download route
-                        router.push(`/unit/${activeUnitNum}/packet?subject=${selectedSubject}`);
-                      }}
-                      className="mt-2 inline-flex items-center justify-center gap-2 w-full sm:w-auto px-5 py-3 bg-yellow-300 hover:bg-yellow-400 text-black font-extrabold text-sm sm:text-base rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] active:translate-y-0.5 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
-                    >
-                      <Download className="w-4 h-4" />
-                      Download Full Unit Bundle
-                    </button>
-
-                    <p className="text-[11px] text-slate-500 mt-1">
-                      Joined by <span className="font-semibold">1,200+ AP students</span> this month.
-                    </p>
-                  </div>
-
-                  {/* Full-width PDF peek (top portion only) that runs to bottom of modal (no bottom border) */}
-                  <div className="w-full flex-1 overflow-hidden border-t-4 border-l-4 border-r-4 border-black rounded-t-2xl">
-                    {pdfPreviewUrl ? (
-                      <iframe
-                        src={`${pdfPreviewUrl}#toolbar=0&navpanes=0`}
-                        title={`Preview of AP Macro Unit ${activeUnitNum} Cheat Sheet`}
-                        className="w-full h-full border-none pointer-events-none"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-white overflow-hidden flex items-start justify-center">
-                        <img
-                          src="/images/unit-bundle-placeholder.png"
-                          alt="Preview of the Unit bundle cheat sheet"
-                          className="w-full object-cover"
-                        />
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+      {/* Slide-up modal: redesigned Season Pass scroll popup */}
+      {showScrollPopup && (
+        <SeasonPassScrollPopup
+          selectedSubject={selectedSubject}
+          onClose={() => setShowScrollPopup(false)}
+          onPurchase={(url: string) => router.push(url)}
+        />
+      )}
     </>
   );
 } 

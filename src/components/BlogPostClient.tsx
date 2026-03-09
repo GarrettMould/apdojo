@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import Image from 'next/image';
 import { BlogContentWithKeyTerms } from './BlogContentWithKeyTerms';
 import { SidebarScrollTriggeredBox } from './SidebarScrollTriggeredBox';
 import { processBlogContent } from '@/utils/processBlogContent';
@@ -194,6 +195,20 @@ export function BlogPostClient({
 
                 {/* Question Text */}
                 <p className="text-lg text-black mb-6 font-medium leading-relaxed">{currentQ.question}</p>
+
+                {/* Question graph/image when present */}
+                {currentQ.image && (
+                  <div className="my-6 flex justify-center">
+                    <Image
+                      src={typeof currentQ.image === 'string' ? currentQ.image : (currentQ.image as { src: string }).src}
+                      alt="Question diagram"
+                      width={560}
+                      height={360}
+                      className="rounded-lg border-2 border-black bg-white max-w-full w-full"
+                      style={{ objectFit: 'contain' }}
+                    />
+                  </div>
+                )}
 
                 {/* Answer Options */}
                 <div className="space-y-2 mb-6">
