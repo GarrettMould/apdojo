@@ -1523,6 +1523,21 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
               >
                 AP {selectedSubject === 'macro' ? 'Macro' : 'Micro'}
               </span>
+              {selectedSubject === 'micro' && (
+                <Link
+                  href={isProCustomer ? `/unit/${activeUnitNum}/packet?subject=${selectedSubject}` : '#'}
+                  className="inline-flex items-center gap-2 text-sm font-semibold hover:underline w-fit cursor-pointer text-green-600"
+                  onClick={(e) => {
+                    if (!isProCustomer) {
+                      e.preventDefault();
+                      setShowPacketSeasonPassModal(true);
+                    }
+                  }}
+                >
+                  <Download className="w-4 h-4 flex-shrink-0" />
+                  Download Cheat Sheet as PDF
+                </Link>
+              )}
             </div>
             {SHOW_ADAS_BLOB && selectedSubject === 'macro' && activeUnitNum === 3 && (
               <div className="mt-4 w-[200px] flex-shrink-0 relative border-4 border-black bg-white overflow-hidden group" style={{ aspectRatio: '8.5/11' }}>
@@ -1559,13 +1574,14 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           </div>
         </div>
 
-        {/* Everything you Need to Know - stacked PDF bundle + text */}
+        {/* Printable Cheat Sheets - macro only */}
+        {selectedSubject === 'macro' && (
         <div className="mb-8 flex flex-row items-center gap-6 sm:gap-8">
           {/* Stacked overlapping PDF previews - bundle style */}
           <div className="relative h-[130px] sm:h-[145px] w-[200px] sm:w-[210px] flex-shrink-0">
-            {(selectedSubject === 'macro' ? macroUnits : microUnits).map((unit, index) => {
-              const pdfUrl = `https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/AP+${selectedSubject === 'macro' ? 'Macro' : 'Micro'}+-+Unit+${unit.number}.pdf`;
-              const filename = `AP-Dojo-${selectedSubject === 'macro' ? 'Macro' : 'Micro'}-Unit-${unit.number}-Cheat-Sheet.pdf`;
+            {macroUnits.map((unit, index) => {
+              const pdfUrl = `https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/AP+Macro+-+Unit+${unit.number}.pdf`;
+              const filename = `AP-Dojo-Macro-Unit-${unit.number}-Cheat-Sheet.pdf`;
               return (
                 <div
                   key={unit.number}
@@ -1620,8 +1636,8 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                   setShowPacketSeasonPassModal(true);
                   return;
                 }
-                const currentUnitPdfUrl = `https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/AP+${selectedSubject === 'macro' ? 'Macro' : 'Micro'}+-+Unit+${activeUnitNum}.pdf`;
-                const filename = `AP-Dojo-${selectedSubject === 'macro' ? 'Macro' : 'Micro'}-Unit-${activeUnitNum}-Cheat-Sheet.pdf`;
+                const currentUnitPdfUrl = `https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/AP+Macro+-+Unit+${activeUnitNum}.pdf`;
+                const filename = `AP-Dojo-Macro-Unit-${activeUnitNum}-Cheat-Sheet.pdf`;
                 handleDownloadPdf(currentUnitPdfUrl, filename);
               }}
               className="inline-flex items-center justify-center gap-2 w-fit px-5 py-3 bg-yellow-300 text-black font-black text-base rounded-xl border-2 border-black transition-all hover:-translate-y-0.5 active:translate-y-0"
@@ -1632,6 +1648,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
             </button>
           </div>
         </div>
+        )}
 
         {/* Practice MCQs + Unit Test buttons */}
         <div className="mb-8 flex flex-col sm:flex-row gap-3 sm:gap-4">
