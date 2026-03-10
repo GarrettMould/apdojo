@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowLeft, Clock } from 'lucide-react';
+import { ArrowLeft, Clock, Download } from 'lucide-react';
 import { blogPosts } from '@/data/blogPosts';
 import { BlogPostClient } from '@/components/BlogPostClient';
 import { calculateReadingTime } from '@/utils/readingTime';
@@ -314,6 +314,64 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 </div>
               )}
             </section>
+
+            {/* Printable Cheat Sheets CTA (Macro only) - right after SEO snippet */}
+            {post.subject === 'Macro' && (
+              <section className="mb-12 border-2 border-black rounded-2xl bg-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] p-6 sm:p-8">
+                <div className="flex flex-row items-center gap-6 sm:gap-8 flex-wrap">
+                  {/* Horizontally stacked 6 PDF previews - bundle style */}
+                  <div className="relative h-[130px] sm:h-[145px] w-[200px] sm:w-[210px] flex-shrink-0">
+                    {[1, 2, 3, 4, 5, 6].map((unitNumber, index) => {
+                      const pdfUrl = `https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/AP+Macro+-+Unit+${unitNumber}.pdf`;
+                      return (
+                        <div
+                          key={unitNumber}
+                          className="absolute bottom-0 left-0 w-[100px] sm:w-[110px] border border-black bg-white overflow-hidden rounded-sm shadow-md"
+                          style={{
+                            aspectRatio: '8.5/11',
+                            transform: `translateX(${index * 20}px)`,
+                            zIndex: index,
+                          }}
+                        >
+                          <iframe
+                            src={`${pdfUrl}#toolbar=0&navpanes=0`}
+                            title={`Unit ${unitNumber} cheat sheet preview`}
+                            className="absolute top-0 left-0 pointer-events-none w-full h-full"
+                            style={{
+                              width: '833px',
+                              height: '1080px',
+                              transform: 'scale(0.12)',
+                              transformOrigin: 'top left',
+                            }}
+                          />
+                          <Link
+                            href="/cheat-sheets"
+                            className="absolute inset-0 z-10"
+                            aria-label={`View Unit ${unitNumber} cheat sheet`}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                  {/* Text and CTA to the right of the bundle */}
+                  <div className="flex-1 flex flex-col gap-2 sm:gap-3 min-w-0">
+                    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
+                      Printable Cheat Sheets for Every Unit
+                    </h2>
+                    <p className="text-gray-700 text-sm sm:text-base">
+                      Everything you need to ace your exam, all on a single page.
+                    </p>
+                    <Link
+                      href="/cheat-sheets"
+                      className="inline-flex items-center justify-center gap-2 w-fit px-5 py-3 bg-yellow-300 text-black font-black text-base rounded-xl border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)] hover:-translate-y-0.5 active:translate-y-0 transition-transform"
+                    >
+                      <Download className="w-4 h-4" />
+                      Download PDF Cheat Sheets
+                    </Link>
+                  </div>
+                </div>
+              </section>
+            )}
 
             {/* Post Content */}
             <section className="mb-12">

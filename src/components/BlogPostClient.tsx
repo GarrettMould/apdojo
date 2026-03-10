@@ -140,26 +140,7 @@ export function BlogPostClient({
               ? `/unitMCQPracticePage?subject=${subjectParam}&mode=custom&units=${unitLabel}`
               : `/select-practice-units?subject=${subjectParam}`;
 
-            return (
-              <div className="mb-8 bg-white border-4 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div>
-                  <p className="text-lg font-black text-black">
-                    Want to try more{unitLabel ? ` Unit ${unitLabel}` : ''} MCQs?
-                  </p>
-                  <p className="text-sm text-gray-700 font-medium">
-                    Check out the MCQ Practice Page.
-                  </p>
-                </div>
-                <Button
-                  asChild
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-black py-3 px-5 rounded-xl border-4 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1"
-                >
-                  <Link href={href}>
-                    Go to MCQ Practice <ArrowRight className="w-5 h-5 ml-2" />
-                  </Link>
-                </Button>
-              </div>
-            );
+            return null;
           })()}
 
           <h2 className="text-3xl font-black text-black mb-8">Check Your Understanding</h2>

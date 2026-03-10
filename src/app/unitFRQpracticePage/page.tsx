@@ -198,10 +198,27 @@ function UnitFRQPracticePageComponent() {
     )
   ), [selectedSubject]);
 
-  // Memoize the flattening and sorting of all questions
-  const allQuestions = React.useMemo(() => relevantExams.flatMap(exam => 
-    exam.questions.map(q => ({ ...q, unit: exam.unit, examTitle: exam.examTitle }))
-  ).sort((a, b) => (a.unit || 99) - (b.unit || 99) || a.title.localeCompare(b.title)), [relevantExams]);
+  // Memoize the flattening, subject-filtering, and sorting of all questions
+  const allQuestions = React.useMemo(
+    () =>
+      relevantExams
+        .flatMap(exam =>
+          exam.questions
+            // Ensure questions match the currently selected subject
+            .filter(q =>
+              Array.isArray(q.subject)
+                ? q.subject.includes(selectedSubject)
+                : q.subject === selectedSubject
+            )
+            .map(q => ({ ...q, unit: exam.unit, examTitle: exam.examTitle }))
+        )
+        .sort(
+          (a, b) =>
+            (a.unit || 99) - (b.unit || 99) ||
+            a.title.localeCompare(b.title)
+        ),
+    [relevantExams, selectedSubject]
+  );
 
   // Helper function to check if a question is locked
   const isQuestionLocked = React.useCallback((questionId: number | undefined, questionUnit?: number): boolean => {
@@ -1024,7 +1041,7 @@ function UnitFRQPracticePageComponent() {
                           <Button
                                   onClick={() => handleSubmitDrawing(`part-${part.label}`)}
                                   disabled={!drawingAnswers[`part-${part.label}`]}
-                            className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full sm:w-auto inline-flex items-center justify-center font-black py-3.5 px-6 rounded-xl border-2 border-green-700 bg-green-500 hover:bg-green-600 text-white shadow-[0_4px_0_0_rgba(0,0,0,1)] active:translate-y-0.5 active:shadow-[0_2px_0_0_rgba(0,0,0,1)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                                   <Sparkles className="w-4 h-4 mr-2" />
                                   Submit My Drawing

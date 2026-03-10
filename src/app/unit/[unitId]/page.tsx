@@ -1628,24 +1628,14 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
             <p className="text-gray-600 text-sm sm:text-base">
               Everything you need to ace your exam, all on a single page.
             </p>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                if (!isProCustomer) {
-                  setShowPacketSeasonPassModal(true);
-                  return;
-                }
-                const currentUnitPdfUrl = `https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/AP+Macro+-+Unit+${activeUnitNum}.pdf`;
-                const filename = `AP-Dojo-Macro-Unit-${activeUnitNum}-Cheat-Sheet.pdf`;
-                handleDownloadPdf(currentUnitPdfUrl, filename);
-              }}
+            <Link
+              href="/cheat-sheets"
               className="inline-flex items-center justify-center gap-2 w-fit px-5 py-3 bg-yellow-300 text-black font-black text-base rounded-xl border-2 border-black transition-all hover:-translate-y-0.5 active:translate-y-0"
               style={{ boxShadow: '4px 4px 0 0 #000' }}
             >
               <Download className="w-4 h-4" />
               Download PDF Cheat Sheets
-            </button>
+            </Link>
           </div>
         </div>
         )}

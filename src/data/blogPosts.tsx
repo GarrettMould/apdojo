@@ -795,23 +795,47 @@ export const blogPosts: Record<string, BlogPost> = {
     videoUrl: null,
     content: (
       <>
-        <p className="mb-6">Macroeconomics is a Training Cycle, Not a Single Race. If you want to understand the difference between the Short Run and the Long Run, look at a marathon runner&apos;s training log.</p>
+        <p className="mb-6">
+          In Unit 3 of AP Macroeconomics, you’re often asked questions about the short-run effect of this or that policy action,
+          or what will happen to something like price level in the long-run. But what is the difference between the short-run and
+          long-run in macroeconomics anyways? To explain, let’s imagine you are training for a marathon.
+        </p>
 
         <h2 className="mt-12 mb-4 text-3xl font-bold text-gray-800">1. The Daily Run: Short-Run Equilibrium (SRAS &amp; AD)</h2>
-        <p className="mb-6">Every day you lace up, you have a specific performance. This is the Short-Run.</p>
+        <p className="mb-6">
+          Every day you lace up, you have a specific performance. This is the Short-Run. Your short-run equilibrium is just whatever
+          distance you run on that given day. It could be a short run when you’re tired, or a long run when you’re feeling energized.
+        </p>
 
         <h3 className="mt-10 mb-4 text-2xl font-bold text-gray-800">The &quot;Pumped&quot; Run (Inflationary Gap)</h3>
-        <p className="mb-6">One day you feel incredible. You have a tailwind, a perfect playlist, and you&apos;ve had plenty of sleep. You run way faster than your average pace. You are &quot;over-performing.&quot;</p>
-        <p className="mb-6"><strong>Macro Link:</strong> This is Aggregate Demand (AD) shifting right. You&apos;ve pushed output ($Y$) beyond your sustainable capacity ($Y_f$).</p>
+        <p className="mb-6">
+          One day you feel incredible. You have a tailwind, a perfect playlist, and you've had plenty of sleep. You run way faster
+          than your average pace. You are &quot;over-performing.&quot;
+        </p>
+        <p className="mb-6">
+          <strong>Macro Link:</strong> This is <strong>Aggregate Demand (AD)</strong> shifting right. You've pushed output (RGDP)
+          beyond your sustainable capacity (<em>Yf</em>).
+        </p>
 
         <h3 className="mt-10 mb-4 text-2xl font-bold text-gray-800">The &quot;Sick&quot; Run (Recessionary Gap)</h3>
-        <p className="mb-6">Another day, you&apos;re exhausted or getting over a cold. You&apos;re sluggish, and your pace is terrible.</p>
-        <p className="mb-6"><strong>Macro Link:</strong> This is a decrease in AD or a supply shock. You are under-performing your potential.</p>
+        <p className="mb-6">
+          Another day, you're exhausted or getting over a cold. You're sluggish, and your pace is terrible. You're normally able to
+          run much further, but today you’re just <em>not all there</em>.
+        </p>
+        <p className="mb-6">
+          <strong>Macro Link:</strong> This is a decrease in AD or a <strong>supply</strong> shock. You are under-performing your potential.
+        </p>
 
-        <div className="my-8 grid grid-cols-2 gap-4">
+        <p className="mb-6">
+          Keep in mind that both the inflationary gap and the recessionary gap are examples of short-run equilibrium. Since
+          short-run equilibrium just represents where the economy is producing <em>at the moment</em>, an economy is always in
+          short-run equilibrium.
+        </p>
+
+        <div className="my-8 grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="p-4 border rounded-lg bg-gray-50">
             <Image
-              src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/flippables/ad_as_recessionary_label.jpg"
+              src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/flippables/ad_as_recessionary_label.jpg?w=1200"
               alt="AD-AS recessionary gap"
               width={600}
               height={400}
@@ -820,7 +844,7 @@ export const blogPosts: Record<string, BlogPost> = {
           </div>
           <div className="p-4 border rounded-lg bg-gray-50">
             <Image
-              src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/flippables/ad_as_inflationary_label.jpg"
+              src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/flippables/ad_as_inflationary_label.jpg?w=1200"
               alt="AD-AS inflationary gap"
               width={600}
               height={400}
@@ -830,22 +854,42 @@ export const blogPosts: Record<string, BlogPost> = {
         </div>
 
         <h2 className="mt-12 mb-4 text-3xl font-bold text-gray-800">2. The &quot;Mean&quot;: Your Current Fitness (LRAS)</h2>
-        <p className="mb-6">Your Current Fitness Level is the baseline—the sustainable output you can maintain. In the model, this is the Long-Run Aggregate Supply (LRAS): the level of real output the economy can produce at full employment.</p>
-        <p className="mb-6">In the short run, you can have a great day or a bad day relative to that baseline. In the long run, what matters is where that baseline sits. LRAS defines your capacity; short-run equilibrium is where AD and SRAS meet relative to that capacity.</p>
+        <p className="mb-6">
+          Your current fitness level is the baseline. It’s the distance you expect to run when things are going smoothly.
+          In the AD-AS model, this is the <strong>Long-Run Aggregate Supply (LRAS)</strong>: the level of real output the
+          economy can produce at full employment.
+        </p>
+        <p className="mb-6">
+          In the short run, you can have a great day or a bad day relative to that baseline. But eventually, you’re going to
+          come back to your baseline. The same is true for the economy. While we might find ourselves in a recessionary gap,
+          or dealing with a bout of inflation, the economy will wind up back at its natural rate of output eventually.
+        </p>
 
         <h2 className="mt-12 mb-4 text-3xl font-bold text-gray-800">3. The Training Program: Long-Run Growth</h2>
-        <p className="mb-6">This is where the real magic happens. If you train consistently over six months, you aren&apos;t just having &quot;good days&quot;—you are changing your baseline.</p>
-        <p className="mb-6">Through better nutrition, more miles, and better shoes, your &quot;8-minute mile&quot; cruising speed becomes a &quot;7-minute mile.&quot;</p>
-
-        <h3 className="mt-10 mb-4 text-2xl font-bold text-gray-800">In the Economy</h3>
-        <p className="mb-6">This is Economic Growth. You aren&apos;t just shifting the AD curve; you are shifting the LRAS curve to the right.</p>
+        <p className="mb-6">
+          If you’re consistent in your training, and you take care of your body, you’ll notice that you can run longer distances.
+          You aren't just having &quot;good days&quot;, you’re changing your baseline.
+        </p>
+        <p className="mb-6">
+          On the AD-AS model, this is <strong>Economic Growth</strong>. You aren't just shifting the AD curve or SRAS; you are
+          shifting the LRAS curve to the right.
+        </p>
 
         <h3 className="mt-10 mb-4 text-2xl font-bold text-gray-800">The Shifters</h3>
-        <p className="mb-6">You&apos;ve increased your Capital Stock (better gear/gym), your Human Capital (better running technique/knowledge), and your Technology (a more efficient training app).</p>
+        <p className="mb-6">
+          Over your training period, there are a number of things that could improve your capacity to run long distances. Maybe
+          you buy a better pair of shoes, or learn a new technique for pacing yourself. Of course, as you get into the habit of
+          running, your endurance improves considerably. An economy might grow for the following reasons:
+        </p>
+        <ul className="mb-6 list-disc list-inside space-y-2">
+          <li>More resources, like land, labor, or capital</li>
+          <li>Improved quality of resources, like better human capital</li>
+          <li>Technology</li>
+        </ul>
 
         <div className="my-8 p-4 border rounded-lg bg-gray-50">
           <Image
-            src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/flippables/lras-increase.jpg"
+            src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/flippables/lras-increase.jpg?w=1200"
             alt="LRAS shifting right: long-run growth"
             width={600}
             height={400}
@@ -855,12 +899,13 @@ export const blogPosts: Record<string, BlogPost> = {
 
         <h2 className="mt-12 mb-4 text-3xl font-bold text-gray-800">The Dojo Distinction</h2>
         <ul className="mb-6 list-disc list-inside space-y-2">
-          <li><strong>Short Run:</strong> Is about performance. Are you having a good day or a bad day relative to your current fitness?</li>
-          <li><strong>Long Run:</strong> Is about capacity. How has your training shifted the entire &quot;mean&quot; of what you are capable of doing?</li>
+          <li>
+            <strong>Short Run:</strong> Is about performance. Are you having a good day or a bad day relative to your current fitness?
+          </li>
+          <li>
+            <strong>Long Run:</strong> Is about capacity. How has your training shifted the entire &quot;mean&quot; of what you are capable of doing?
+          </li>
         </ul>
-
-        <h2 className="mt-12 mb-4 text-3xl font-bold text-gray-800">AP Exam Tip</h2>
-        <p className="mb-6">When the College Board asks about &quot;Economic Growth,&quot; they are asking how the training went. When they ask about &quot;Fluctuations,&quot; they are asking how today&apos;s run went.</p>
       </>
     ),
   },

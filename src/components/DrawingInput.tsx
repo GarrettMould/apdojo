@@ -97,6 +97,7 @@ export const DrawingInput: React.FC<DrawingInputProps> = ({
                 {inputMethod === 'draw' && (
                   <DrawingPad
                     isLarge={true}
+                    submitButtonVariant="greenMini"
                     onSave={(data) => onSave(drawingKey, data)}
                     initialData={imageData}
                     enableStickers={enableStickers}

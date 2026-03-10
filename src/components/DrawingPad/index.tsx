@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useState, useEffect } from 'react';
-import { Pen, Eraser, Trash2, Type, CheckCircle } from 'lucide-react';
+import { Pen, Eraser, Trash2, Type, CheckCircle, Undo2 } from 'lucide-react';
 
 interface Line {
   id: string;
@@ -27,6 +27,7 @@ interface DrawingPadProps {
   enableStickers?: boolean; // New prop to enable sticker mode
   stickerLabels?: string[]; // Labels available for stickers
   templateImageUrl?: string; // Template image to show as background
+  submitButtonVariant?: 'default' | 'greenMini';
 }
 
 export function DrawingPad({ 
@@ -36,7 +37,8 @@ export function DrawingPad({
   onSave,
   enableStickers = false,
   stickerLabels = ['LRAS', 'SRAS', 'AD', 'Price Level', 'Real GDP'],
-  templateImageUrl
+  templateImageUrl,
+  submitButtonVariant = 'default'
 }: DrawingPadProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -58,12 +60,35 @@ export function DrawingPad({
   const [draggedSticker, setDraggedSticker] = useState<string | null>(null);
   const [dragOffset, setDragOffset] = useState<{ x: number; y: number } | null>(null);
 
+  // Undo history for canvas states
+  const historyRef = useRef<ImageData[]>([]);
+  const MAX_HISTORY = 20;
+
+  const saveHistory = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    try {
+      const snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      historyRef.current.push(snapshot);
+      if (historyRef.current.length > MAX_HISTORY) {
+        historyRef.current.shift();
+      }
+    } catch {
+      // Ignore errors when capturing history (e.g. security/tainted canvas)
+    }
+  };
+
   const clearCanvas = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+
+    // Save state before clearing for undo
+    saveHistory();
 
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -79,6 +104,9 @@ export function DrawingPad({
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+
+    // Reset undo history when reinitializing
+    historyRef.current = [];
 
     // Clear the canvas first
     ctx.fillStyle = '#ffffff';
@@ -181,6 +209,9 @@ export function DrawingPad({
     const y = 'touches' in e 
       ? e.touches[0].clientY - rect.top 
       : (e as React.MouseEvent).clientY - rect.top;
+    
+    // Save state before starting a new stroke/line/text
+    saveHistory();
     
     if (tool === 'text') {
       isCreatingNewText.current = true;
@@ -382,6 +413,9 @@ export function DrawingPad({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    // Save state before committing text/stickers
+    saveHistory();
+
     // Before saving, commit any text that's currently being edited
     if (editingTextId) {
       const textEl = textElements.find(el => el.id === editingTextId);
@@ -545,11 +579,36 @@ export function DrawingPad({
         >
           <Trash2 className="w-4 h-4" />
         </button>
+        <button
+          onClick={() => {
+            const canvas = canvasRef.current;
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
+            const previous = historyRef.current.pop();
+            if (!previous) return;
+            ctx.putImageData(previous, 0, 0);
+            try {
+              const imageData = canvas.toDataURL();
+              onSave(imageData);
+            } catch {
+              // Ignore save errors on undo
+            }
+          }}
+          className="p-1 rounded hover:bg-gray-100"
+          title="Undo"
+        >
+          <Undo2 className="w-4 h-4" />
+        </button>
       </div>
       <div className="absolute top-2 right-2 z-10">
         <button
           onClick={handleSave}
-          className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors"
+          className={
+            submitButtonVariant === 'greenMini'
+              ? 'inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black text-white bg-green-500 hover:bg-green-600 rounded-lg border border-green-700 shadow-[0_2px_0_0_rgba(0,0,0,1)] active:translate-y-0.5 active:shadow-[0_1px_0_0_rgba(0,0,0,1)] transition-all'
+              : 'flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors'
+          }
         >
           <CheckCircle className="w-4 h-4" />
           Done
