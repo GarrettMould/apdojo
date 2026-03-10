@@ -3,43 +3,14 @@ import type { NextConfig } from "next";
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
+    loader: 'custom',
+    loaderFile: './src/utils/cloudinaryLoader.ts',
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'cdn.sanity.io',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'apdojowhiteboards.s3.amazonaws.com',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'apdojovideos.s3.ap-southeast-2.amazonaws.com',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'apdojowhiteboards.s3.ap-southeast-2.amazonaws.com',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'apdojowhiteboards.s3.amazonaws.com',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'thumbnailslarge.s3.ap-southeast-2.amazonaws.com',
-        port: '',
-        pathname: '/**',
-      },
+      { protocol: 'https', hostname: 'res.cloudinary.com', pathname: '/**' },
+      { protocol: 'https', hostname: 'cdn.sanity.io', pathname: '/**' },
+      { protocol: 'https', hostname: 'apdojowhiteboards.s3.ap-southeast-2.amazonaws.com', pathname: '/**' },
+      { protocol: 'https', hostname: 'apdojovideos.s3.ap-southeast-2.amazonaws.com', pathname: '/**' },
+      { protocol: 'https', hostname: 'thumbnailslarge.s3.ap-southeast-2.amazonaws.com', pathname: '/**' },
     ],
   },
   eslint: {
