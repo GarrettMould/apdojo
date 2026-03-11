@@ -558,31 +558,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
     }
   }, [user?.uid]);
 
-  // Show modal when user scrolls ~50% down the cheat sheet (once per session)
-  const SCROLL_POPUP_THRESHOLD = 0.5;
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const SESSION_FLAG_KEY = 'unitBundleModalShown_v2';
-    if (sessionStorage.getItem(SESSION_FLAG_KEY) === '1') return;
-
-    const el = leftPanelScrollRef.current;
-    if (!el) return;
-
-    const onScroll = () => {
-      const scrollTop = el.scrollTop;
-      const scrollHeight = el.scrollHeight - el.clientHeight;
-      if (scrollHeight <= 0) return;
-      const progress = scrollTop / scrollHeight;
-      if (progress >= SCROLL_POPUP_THRESHOLD) {
-        setShowScrollPopup(true);
-        sessionStorage.setItem(SESSION_FLAG_KEY, '1');
-        el.removeEventListener('scroll', onScroll);
-      }
-    };
-
-    el.addEventListener('scroll', onScroll, { passive: true });
-    return () => el.removeEventListener('scroll', onScroll);
-  }, []);
+  // Scroll-based Season Pass slide-up modal disabled
 
   // Check if user is a pro customer (has season pass)
   const isProCustomer = useMemo(() => {
