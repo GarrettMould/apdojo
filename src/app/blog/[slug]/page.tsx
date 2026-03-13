@@ -315,8 +315,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               )}
             </section>
 
-            {/* Printable Cheat Sheets CTA (Macro only) - right after SEO snippet */}
-            {post.subject === 'Macro' && (
+            {/* Printable Cheat Sheets CTA (Macro and selected Micro posts) - right after SEO snippet */}
+            {(post.subject === 'Macro' || post.slug === 'understanding-externalities') && (
               <section className="mb-12 border-2 border-black rounded-2xl bg-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] p-6 sm:p-8">
                 <div className="flex flex-row items-center gap-6 sm:gap-8 flex-wrap">
                   {/* Horizontally stacked 6 PDF previews - bundle style */}

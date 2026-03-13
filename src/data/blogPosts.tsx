@@ -221,6 +221,171 @@ export const blogPosts: Record<string, BlogPost> = {
       </>
     ),
   },
+  'understanding-externalities': {
+    slug: 'understanding-externalities',
+    title: 'Understanding Externalities',
+    description: 'Why markets with external costs or benefits misallocate resources—and how per-unit taxes can fix them.',
+    subject: 'Micro',
+    unit: 6,
+    thumbnailUrl:
+      'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/externalities/wb_1.jpg',
+    seoSnippet:
+      'An externality occurs when a cost or benefit of a transaction spills over onto third parties who were not directly involved. Negative externalities like pollution cause overproduction, but a properly set per-unit tax can align private and social costs and eliminate deadweight loss.',
+    graphGymScenarioId: 8,
+    graphGymPrompt:
+      'Draw a market with a negative production externality (like pollution). Label MPC, MSC, Qm, Qs, and shade the deadweight loss area. Show how a per-unit tax equal to the marginal external cost can restore the social optimum.',
+    practiceQuestionIds: [124, 125, 126],
+    content: (
+      <>
+        <p className="mb-6">
+          In Unit 2, we learned that when the government intervenes in a perfectly competitive market through taxes or
+          price controls, they usually create Deadweight Loss (DWL). They are essentially the villain of market
+          efficiency.
+        </p>
+        <p className="mb-6">
+          However, Unit 6 flips the script. Here, the government steps in as the hero to fix markets that have already
+          failed on their own. This is the world of <strong>Externalities</strong>.
+        </p>
+
+        <h2 className="mt-10 mb-4 text-3xl font-bold text-gray-800">What is an Externality?</h2>
+        <p className="mb-6">
+          An externality occurs when a cost or benefit impacts a third party who was not involved in the transaction.
+        </p>
+        <p className="mb-6">
+          Imagine a factory producing chemicals. To make those chemicals, the factory pays for electricity, raw
+          materials, and labor. These are <strong>Marginal Private Costs (MPC)</strong>. But suppose the factory also
+          dumps waste into a nearby stream.
+        </p>
+        <p className="mb-6">
+          <strong>The impact:</strong> Fishermen catch fewer fish, swimmers get sick, and the local ecosystem collapses.
+        </p>
+        <p className="mb-6">
+          <strong>The result:</strong> These people are bearing a cost for a product they didn&apos;t buy or produce.
+          This is a <strong>Marginal External Cost (MEC)</strong>.
+        </p>
+
+        <div className="my-8 p-4 border rounded-lg bg-gray-50">
+          <Image
+            src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/externalities/wb_1.jpg"
+            alt="Externality graph showing pollution impact on third parties"
+            width={900}
+            height={540}
+            className="w-full h-auto rounded-md shadow-sm"
+          />
+        </div>
+
+        <h2 className="mt-10 mb-4 text-3xl font-bold text-gray-800">The Math of Market Failure</h2>
+        <p className="mb-6">
+          When we add the factory&apos;s private costs to the external costs borne by the community, we get the{' '}
+          <strong>Marginal Social Cost (MSC)</strong>.
+        </p>
+        <p className="mb-4 text-center font-mono text-lg">
+          MSC = MPC + MEC
+        </p>
+        <p className="mb-6">
+          In a free market, the factory only cares about its own bank account (<span className="font-mono">MPC</span>).
+          Because they ignore the <span className="font-mono">MEC</span>, they produce at a quantity where{' '}
+          <span className="font-mono">MPC</span> intersects Demand (which represents <span className="font-mono">MSB</span>,
+          Marginal Social Benefit). This results in <strong>overproduction</strong>.
+        </p>
+        <p className="mb-6">
+          Society wants <span className="font-mono">Q<sub>s</sub></span> (where{' '}
+          <span className="font-mono">MSC = MSB</span>), but the market gives us{' '}
+          <span className="font-mono">Q<sub>m</sub></span>.
+        </p>
+
+        <div className="my-8 p-4 border rounded-lg bg-gray-50">
+          <Image
+            src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/externalities/wb_2.jpg"
+            alt="Negative externality graph highlighting deadweight loss"
+            width={900}
+            height={540}
+            className="w-full h-auto rounded-md shadow-sm"
+          />
+        </div>
+
+        <h2 className="mt-10 mb-4 text-3xl font-bold text-gray-800">How to Fix It: The Tax Debate</h2>
+        <p className="mb-6">
+          To fix this <strong>over-allocation</strong> of resources, the government must discourage production. They
+          have two main types of taxes in their toolkit, but only one actually works for this problem.
+        </p>
+
+        <div className="my-8 p-4 border rounded-lg bg-gray-50">
+          <Image
+            src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/externalities/wb_3.jpg"
+            alt="Per-unit corrective tax aligning private and social cost"
+            width={900}
+            height={540}
+            className="w-full h-auto rounded-md shadow-sm"
+          />
+        </div>
+        <h3 className="mt-8 mb-3 text-2xl font-bold text-gray-800">1. The Per-Unit Tax (The Corrective Tool)</h3>
+        <p className="mb-6">
+          A <strong>Per-Unit Tax</strong> is a tax charged on every single item produced (for example,{' '}
+          <span className="font-mono">$5</span> per gallon of chemical waste).
+        </p>
+        <p className="mb-6">
+          <strong>Why it works:</strong> Because the tax is tied to production levels, it increases the Marginal Cost
+          for the firm.
+        </p>
+        <p className="mb-6">
+          <strong>The graph:</strong> This shifts the <span className="font-mono">MPC</span> curve upward. If the tax
+          is set exactly equal to the <span className="font-mono">MEC</span>, the new{' '}
+          <span className="font-mono">MPC</span> will sit right on top of the <span className="font-mono">MSC</span>{' '}
+          curve.
+        </p>
+        <p className="mb-6">
+          <strong>The outcome:</strong> The firm&apos;s profit-maximizing point (
+          <span className="font-mono">MR = MC</span>) shifts left. They produce less, the price rises, and the
+          Deadweight Loss is eliminated.
+        </p>
+
+        <div className="my-8 p-4 border rounded-lg bg-gray-50">
+          <Image
+            src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/externalities/wb_4.jpg"
+            alt="Lump-sum tax that fails to change output"
+            width={900}
+            height={540}
+            className="w-full h-auto rounded-md shadow-sm"
+          />
+        </div>
+
+        <h3 className="mt-8 mb-3 text-2xl font-bold text-gray-800">2. The Lump-Sum Tax (The Ineffective Tool)</h3>
+        <p className="mb-6">
+          A <strong>Lump-Sum Tax</strong> is a one-time, fixed fee (for example, a{' '}
+          <span className="font-mono">$10{','}000</span> annual &quot;pollution permit&quot;).
+        </p>
+        <p className="mb-6">
+          <strong>Why it fails:</strong> In microeconomics, we know that Fixed Costs do not affect Marginal Cost (
+          <span className="font-mono">MC</span>).
+        </p>
+        <p className="mb-6">
+          <strong>The logic:</strong> Since <span className="font-mono">MC</span> doesn&apos;t change, the firm&apos;s
+          decision on how much to produce (<span className="font-mono">MR = MC</span>) doesn&apos;t change either.
+        </p>
+        <p className="mb-6">
+          <strong>The outcome:</strong> The firm writes a check to the government, but they keep dumping the exact same
+          amount of chemicals into the stream. The market failure remains.
+        </p>
+
+        <h2 className="mt-10 mb-4 text-3xl font-bold text-gray-800">The Dojo Summary</h2>
+        <ul className="mb-6 list-disc list-inside space-y-2">
+          <li>
+            <strong>Per-Unit Taxes</strong> change Marginal Cost, change Quantity, and fix Externalities.
+          </li>
+          <li>
+            <strong>Lump-Sum Taxes</strong> change Fixed Cost, change Profit, but do{' '}
+            <strong>not</strong> change Quantity or fix the market failure.
+          </li>
+        </ul>
+        <p className="mb-6">
+          Analogy: A Per-Unit Tax is like a &quot;pay-as-you-pollute&quot; meter—it changes your behavior every minute.
+          A Lump-Sum Tax is like a parking ticket you&apos;ve already decided to pay; it&apos;s annoying, but it won&apos;t
+          change how you drive today.
+        </p>
+      </>
+    ),
+  },
   'monopoly-marginal-revenue': {
     slug: 'monopoly-marginal-revenue',
     title: 'Why Marginal Revenue Falls Faster Than Demand',
