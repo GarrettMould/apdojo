@@ -2,8 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useSearchParams } from 'next/navigation';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { blogPosts } from '@/data/blogPosts';
 import { graphExplanationPosts } from '@/data/graphExplanationPosts';
@@ -103,17 +102,7 @@ function BlogRow({ item, index }: { item: BlogListItem; index: number }) {
 }
 
 export default function BlogHomePage() {
-  const searchParams = useSearchParams();
-  const { selectedSubject, setSelectedSubject } = useAuthContext();
-
-  // Sync subject from URL on mount (e.g. /ap-blog-home?subject=micro) so header toggle matches
-  useEffect(() => {
-    const param = searchParams.get('subject')?.toLowerCase();
-    if (param === 'macro' || param === 'micro') {
-      setSelectedSubject(param);
-    }
-  }, [searchParams, setSelectedSubject]);
-
+  const { selectedSubject } = useAuthContext();
   const sortedBlogItems = useMemo(() => {
     const regularPosts = Object.values(blogPosts);
     const graphPosts = Object.values(graphExplanationPosts);
