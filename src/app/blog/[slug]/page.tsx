@@ -331,6 +331,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                             aspectRatio: '8.5/11',
                             transform: `translateX(${index * 20}px)`,
                             zIndex: index,
+                            filter: 'blur(0.5px)',
                           }}
                         >
                           <iframe

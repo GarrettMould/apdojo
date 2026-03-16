@@ -67,8 +67,7 @@ function processStringForMath(text: string): React.ReactNode {
   // Updated to match across newlines and handle escaped characters
   // Using [\s\S] instead of . to match newlines, and *? for non-greedy matching
   const displayMathPattern = /\$\$([\s\S]*?)\$\$/g;
-  const inlineMathPattern = /\$([^$\n]+)\$/g;
-  
+
   const parts: React.ReactNode[] = [];
   let keyCounter = 0;
 
@@ -78,8 +77,7 @@ function processStringForMath(text: string): React.ReactNode {
   
   // Reset regex and find all matches
   displayMathPattern.lastIndex = 0;
-  const textCopy = text; // Keep a copy for substring operations
-  while ((match = displayMathPattern.exec(textCopy)) !== null) {
+  while ((match = displayMathPattern.exec(text)) !== null) {
     displayMatches.push({
       start: match.index,
       end: match.index + match[0].length,
@@ -94,7 +92,6 @@ function processStringForMath(text: string): React.ReactNode {
     if (mathMatch.start > currentIndex) {
       const textBefore = text.substring(currentIndex, mathMatch.start);
       if (textBefore) {
-        // Process inline math in the text before
         parts.push(...processInlineMathInText(textBefore, keyCounter));
         keyCounter += textBefore.length;
       }
@@ -133,7 +130,9 @@ function processStringForMath(text: string): React.ReactNode {
  * Processes text for inline math ($...$)
  */
 function processInlineMathInText(text: string, startKey: number): React.ReactNode[] {
-  const inlineMathPattern = /\$([^$\n]+)\$/g;
+  // Match $...$ where the $ is not doubled, and the first char after $ is NOT a digit
+  // This avoids treating currency amounts like $900 as math.
+  const inlineMathPattern = /(?<!\$)\$(?!\$)(?!\d)([^$\n]+?)\$(?!\$)/g;
   const parts: React.ReactNode[] = [];
   let lastIndex = 0;
   let keyCounter = startKey;
@@ -176,7 +175,7 @@ function processInlineMathInText(text: string, startKey: number): React.ReactNod
     }
   }
 
-  // If no math was found, return the original text
+  // If no math was found, return the original text (restored if currency was protected)
   if (parts.length === 0) {
     return [<React.Fragment key={startKey}>{text}</React.Fragment>];
   }

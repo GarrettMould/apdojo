@@ -146,13 +146,12 @@ export function Header() {
           <div className="hidden lg:flex items-center gap-x-8">
             <nav className="flex items-center space-x-10">
               {/* Practice Dropdown */}
-              <div 
-                className="relative"
-                ref={practiceDropdownRef}
-                onMouseEnter={() => setIsPracticeDropdownOpen(true)}
-                onMouseLeave={() => setIsPracticeDropdownOpen(false)}
-              >
-                <button className="flex items-center gap-1 text-lg text-gray-700 hover:text-blue-600 transition-colors font-bold">
+              <div className="relative" ref={practiceDropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setIsPracticeDropdownOpen(prev => !prev)}
+                  className="flex items-center gap-1 text-lg text-gray-700 hover:text-blue-600 transition-colors font-bold"
+                >
                   Practice
                   <ChevronDown className={`w-5 h-5 transition-transform ${isPracticeDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>

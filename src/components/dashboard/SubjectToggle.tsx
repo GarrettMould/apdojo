@@ -20,6 +20,12 @@ export function SubjectToggle() {
   const displaySubject = mounted ? selectedSubject : 'macro';
 
   const handleSubjectChange = (newSubject: 'macro' | 'micro') => {
+    // If we're on the blog home, update URL so the page stays in sync
+    if (pathname === '/ap-blog-home') {
+      setSelectedSubject(newSubject);
+      router.replace(`/ap-blog-home?subject=${newSubject}`, { scroll: false });
+      return;
+    }
     // If we're on the unit MCQ practice page, preserve the unit and reload with new subject
     if (pathname === '/unitMCQPracticePage') {
       const unitsParam = searchParams.get('units');

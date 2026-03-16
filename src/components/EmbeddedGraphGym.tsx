@@ -66,7 +66,6 @@ export function EmbeddedGraphGym({ scenarioId, prompt, subject }: EmbeddedGraphG
 
   const handleSubmit = () => {
     setIsSubmitted(true);
-    setShowSampleAnswer(true);
   };
 
   const handleChecklistToggle = (id: number) => {

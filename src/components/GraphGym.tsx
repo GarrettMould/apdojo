@@ -15,6 +15,7 @@ import { db, storage } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp, query, where, getDocs, doc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { getSlugForScenario, getScenarioBySlug } from '@/lib/graphGymSlugs';
+import { SeasonPassModal } from '@/components/SeasonPassModal';
 import '@excalidraw/excalidraw/index.css';
 
 const Excalidraw = dynamic(
@@ -124,12 +125,20 @@ export function GraphGym({ assignmentScenarios, isAssignment = false, assignment
   const [currentElements, setCurrentElements] = useState<any[]>([]); // Track current Excalidraw elements
   const [currentAppState, setCurrentAppState] = useState<any>(null); // Track current Excalidraw app state
   const [showTip, setShowTip] = useState(false); // Track whether tip is shown
+  const [hasUsedFreeGraphGym, setHasUsedFreeGraphGym] = useState(false); // One free submit for non-season-pass users
 
   // Check if user has access (logged in + season pass)
   const hasAccess = useMemo(() => {
     if (!user || !userData) return false;
     return hasValidSeasonPass(userData, currentCourse);
   }, [user, userData, currentCourse]);
+
+  // Read whether the user has already used their one free Graph Gym submit
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const stored = window.localStorage.getItem('graphGymFullFreeUsed');
+    setHasUsedFreeGraphGym(stored === 'true');
+  }, []);
 
   // Filter scenarios by current subject (or use assignment scenarios)
   const filteredScenarios = useMemo(() => {
@@ -261,6 +270,22 @@ export function GraphGym({ assignmentScenarios, isAssignment = false, assignment
   }
 
   const handleSubmit = () => {
+    // Paid users: always allow submit
+    if (!hasAccess) {
+      // Free users:
+      // If they've already used their one free submit, show the join modal instead of submitting
+      if (hasUsedFreeGraphGym) {
+        setShowJoinDojoModal(true);
+        return;
+      }
+
+      // First-ever free submit: allow it and mark as used
+      setHasUsedFreeGraphGym(true);
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem('graphGymFullFreeUsed', 'true');
+      }
+    }
+
     setIsSubmitted(true);
   };
 
@@ -1182,60 +1207,13 @@ export function GraphGym({ assignmentScenarios, isAssignment = false, assignment
         </>
       )}
 
-      {/* Join Dojo Modal */}
-      <JoinDojoModal
-        isOpen={showJoinDojoModal}
-        onClose={() => setShowJoinDojoModal(false)}
-        selectedSubject={currentCourse}
-      />
-
-      {/* Name Input Modal for Assignments */}
-      {showNameInputModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4">
-          <div className="bg-white rounded-xl shadow-lg max-w-md w-full p-6 border-4 border-black">
-            <div className="flex items-center gap-3 mb-4">
-              <FileText className="w-6 h-6 text-blue-600" />
-              <h3 className="text-xl font-black text-gray-900">
-                Enter Your Name
-              </h3>
-            </div>
-            <p className="text-gray-700 mb-6 font-semibold">
-              Please enter your name so your teacher can identify your submission.
-            </p>
-            <div className="mb-6">
-              <input
-                type="text"
-                value={studentName}
-                onChange={(e) => setStudentName(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && studentName.trim()) {
-                    handleNameSubmit();
-                  }
-                }}
-                placeholder="Your name"
-                className="w-full px-4 py-3 border-2 border-black rounded-lg font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                autoFocus
-              />
-            </div>
-            <div className="flex gap-3 justify-end">
-              <button
-                onClick={handleNameSubmit}
-                disabled={!studentName.trim()}
-                className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold rounded-lg transition-colors duration-200 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-              >
-                Submit
-              </button>
-            </div>
-          </div>
-        </div>
+      {/* Season Pass Modal (used when free users exceed their Graph Gym limit or try gated actions) */}
+      {showJoinDojoModal && (
+        <SeasonPassModal
+          subject={currentCourse}
+          onClose={() => setShowJoinDojoModal(false)}
+        />
       )}
-
-      {/* Join Dojo Modal */}
-      <JoinDojoModal
-        isOpen={showJoinDojoModal}
-        onClose={() => setShowJoinDojoModal(false)}
-        selectedSubject={currentCourse}
-      />
 
       {/* Name Input Modal for Assignments */}
       {showNameInputModal && (

@@ -83,7 +83,7 @@ export function BlogPostClient({
   return (
     <>
       <style dangerouslySetInnerHTML={{__html: `
-        .blog-content p:first-of-type::first-letter {
+        .blog-content > p:first-of-type::first-letter {
           font-size: 4rem;
           font-weight: bold;
           float: left;

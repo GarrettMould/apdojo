@@ -101,6 +101,7 @@ function CheatSheetRow({ unit, subject, isProCustomer, onLockedClick, index }: C
           overflow: 'hidden',
           position: 'relative',
           boxShadow: '3px 3px 0 0 #000',
+          filter: 'blur(0.5px)',
         }}
       >
         {pdfUrl ? (

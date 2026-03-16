@@ -4,6 +4,7 @@ import React, { useCallback, useMemo } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { graphGymScenarios, GraphGymScenario } from '@/data/graphGymScenarios';
 import { useCourseContext } from '@/contexts/CourseContext';
+import { macroUnits, microUnits } from '@/data/cheatSheets';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -17,10 +18,33 @@ export interface GraphGymScenarioCard {
   lessonId: string;
   title: string;
   difficulty: ScenarioDifficulty;
+  topics: string[];
 }
 
 function mapDifficulty(d: 'easy' | 'medium' | 'hard'): ScenarioDifficulty {
   return d === 'easy' ? 'Beginner' : d === 'medium' ? 'Intermediate' : 'Advanced';
+}
+
+const TOPIC_SHORT_NAMES: Record<string, string> = {
+  'Production Possibilities Curve': 'PPC',
+  'Foreign Exchange': 'Forex',
+  'AD-AS Model': 'AD-AS',
+  'International Trade': 'Trade',
+  'Price Controls': 'Price Controls',
+  'Market Equilibrium': 'Supply & Demand',
+  'Negative Externality': 'Externalities',
+  'Positive Externality': 'Externalities',
+  'Externalities': 'Externalities',
+  'Deficit Spending': 'Fiscal Policy',
+  'Crowding Out': 'Fiscal Policy',
+  'Monetary Policy': 'Money Market',
+  'Recessionary Gap': 'AD-AS',
+  'Inflationary Gap': 'AD-AS',
+  'Short Run Equilibrium': 'AD-AS',
+};
+
+function topicToShortName(topic: string): string {
+  return TOPIC_SHORT_NAMES[topic] ?? topic;
 }
 
 function scenariosToCards(scenarios: GraphGymScenario[]): GraphGymScenarioCard[] {
@@ -30,7 +54,25 @@ function scenariosToCards(scenarios: GraphGymScenario[]): GraphGymScenarioCard[]
     lessonId: s.lessonId,
     title: s.title,
     difficulty: mapDifficulty(s.difficulty),
+    topics: s.topics ?? [],
   }));
+}
+
+function buildDisplayNames(cards: GraphGymScenarioCard[]): Map<string, string> {
+  const byTopic = new Map<string, GraphGymScenarioCard[]>();
+  for (const card of cards) {
+    const topic = card.topics[0] ?? 'Graph';
+    const short = topicToShortName(topic);
+    const list = byTopic.get(short) ?? [];
+    list.push(card);
+    byTopic.set(short, list);
+  }
+  const out = new Map<string, string>();
+  for (const [shortName, list] of byTopic) {
+    list.sort((a, b) => parseInt(a.id, 10) - parseInt(b.id, 10));
+    list.forEach((card, i) => out.set(card.id, `${shortName} #${i + 1}`));
+  }
+  return out;
 }
 
 // ---------------------------------------------------------------------------
@@ -40,16 +82,16 @@ function scenariosToCards(scenarios: GraphGymScenario[]): GraphGymScenarioCard[]
 function DifficultyBadge({ difficulty }: { difficulty: ScenarioDifficulty }) {
   const styles: Record<ScenarioDifficulty, string> = {
     Beginner:
-      'bg-emerald-500/20 text-emerald-700 dark:bg-emerald-500/25 dark:text-emerald-400 border-emerald-500/40',
+      'bg-green-500 text-white border-green-600',
     Intermediate:
-      'bg-amber-500/20 text-amber-700 dark:bg-amber-500/25 dark:text-amber-400 border-amber-500/40',
+      'bg-blue-500 text-white border-blue-600',
     Advanced:
-      'bg-red-500/20 text-red-700 dark:bg-red-500/25 dark:text-red-400 border-red-500/40',
+      'bg-red-500 text-white border-red-600',
   };
 
   return (
     <span
-      className={`inline-flex w-fit items-center rounded border px-1.5 py-0.5 text-[10px] font-semibold leading-tight ${styles[difficulty]}`}
+      className={`inline-flex w-fit items-center rounded border-2 px-1.5 py-0.5 text-[10px] font-semibold leading-tight ${styles[difficulty]}`}
       aria-label={`Difficulty: ${difficulty}`}
     >
       {difficulty}
@@ -70,9 +112,11 @@ function LessonIdBadge({ lessonId }: { lessonId: string }) {
 
 function ScenarioCard({
   scenario,
+  displayName,
   onSelect,
 }: {
   scenario: GraphGymScenarioCard;
+  displayName: string;
   onSelect: (id: string) => void;
 }) {
   const handleClick = useCallback(
@@ -100,12 +144,12 @@ function ScenarioCard({
       data-scenario-id={scenario.id}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
-      className="group flex cursor-pointer items-center justify-between gap-5 rounded-xl border border-border bg-card p-6 text-left transition-shadow hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background min-h-[88px]"
+      className="group flex cursor-pointer items-center justify-between gap-5 rounded-xl border-4 border-black bg-white p-6 text-left shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 min-h-[88px]"
       aria-label={`Start scenario: ${scenario.title}`}
     >
       <div className="flex min-w-0 flex-1 flex-col gap-2">
-        <h3 className="font-bold text-foreground group-hover:text-primary text-lg">
-          {scenario.title}
+        <h3 className="font-black text-gray-900 group-hover:text-blue-600 text-lg transition-colors">
+          {displayName}
         </h3>
         <div className="flex flex-wrap items-center gap-1.5">
           <LessonIdBadge lessonId={scenario.lessonId} />
@@ -113,7 +157,7 @@ function ScenarioCard({
         </div>
       </div>
       <ArrowRight
-        className="h-6 w-6 flex-shrink-0 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all"
+        className="h-6 w-6 flex-shrink-0 text-gray-500 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all"
         aria-label="Start"
       />
     </article>
@@ -154,10 +198,20 @@ export function GraphGymDashboard({ onSelectScenario }: GraphGymDashboardProps) 
     [allScenarioCards]
   );
 
-  const units = useMemo(
+  const displayNames = useMemo(
+    () => buildDisplayNames(allScenarioCards),
+    [allScenarioCards]
+  );
+
+  const unitNumbers = useMemo(
     () => Array.from(scenariosByUnit.keys()).sort((a, b) => a - b),
     [scenariosByUnit]
   );
+
+  const unitsWithTitles = useMemo(() => {
+    const units = currentCourse === 'macro' ? macroUnits : microUnits;
+    return unitNumbers.map((num) => units.find((u) => u.number === num)).filter(Boolean) as Array<{ number: number; title: string }>;
+  }, [currentCourse, unitNumbers]);
 
   const handleSelectScenario = useCallback(
     (id: string) => {
@@ -167,34 +221,45 @@ export function GraphGymDashboard({ onSelectScenario }: GraphGymDashboardProps) 
   );
 
   return (
-    <div className="min-h-0 w-full overflow-auto">
-      <main className="p-4 lg:p-6">
-        <div className="mx-auto max-w-5xl">
-          <h1 className="mb-8 text-xl font-black text-foreground lg:text-2xl">
-            Graph Gym
-          </h1>
+    <div className="min-h-0 w-full overflow-auto bg-gray-50">
+      <main className="px-4 py-12">
+        <div className="mx-auto max-w-[720px]">
+          <header className="mb-12 text-center">
+            <h1 className="text-5xl sm:text-6xl font-black text-gray-900 mb-4 tracking-tight">
+              Graph Gym
+            </h1>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+              Draw the graphs. Master the exam.
+            </p>
+          </header>
 
-          <div className="space-y-8">
-            {units.map((unit) => (
-              <section key={unit}>
-                <h2 className="mb-4 text-sm font-bold uppercase tracking-wider text-muted-foreground">
-                  Unit {unit}
-                </h2>
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  {(scenariosByUnit.get(unit) ?? []).map((scenario) => (
-                    <ScenarioCard
-                      key={scenario.id}
-                      scenario={scenario}
-                      onSelect={handleSelectScenario}
-                    />
-                  ))}
-                </div>
-              </section>
-            ))}
+          <div className="space-y-12">
+            {unitsWithTitles.map((unit) => {
+              const cards = scenariosByUnit.get(unit.number) ?? [];
+              if (cards.length === 0) return null;
+              return (
+                <section key={unit.number}>
+                  <h2 className="text-2xl font-black text-gray-900 mb-6 pt-4 border-t border-gray-200 first:border-t-0 first:pt-0">
+                    Unit {unit.number}: {unit.title}
+                  </h2>
+                  <ul className="list-none p-0 m-0 flex flex-col gap-4">
+                    {cards.map((scenario) => (
+                      <li key={scenario.id}>
+                        <ScenarioCard
+                          scenario={scenario}
+                          displayName={displayNames.get(scenario.id) ?? scenario.title}
+                          onSelect={handleSelectScenario}
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              );
+            })}
           </div>
 
-          {units.length === 0 && (
-            <p className="py-12 text-center text-muted-foreground">
+          {unitNumbers.length === 0 && (
+            <p className="py-12 text-center text-gray-500 text-lg">
               No scenarios found for this subject.
             </p>
           )}

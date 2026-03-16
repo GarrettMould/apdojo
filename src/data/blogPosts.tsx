@@ -221,12 +221,133 @@ export const blogPosts: Record<string, BlogPost> = {
       </>
     ),
   },
+  'fractional-reserve-banking': {
+    slug: 'fractional-reserve-banking',
+    title: 'How Banks Create Money (No, Really)',
+    description: 'Every time you deposit $1,000, you could be helping create $10,000 or more throughout the economy. Learn how fractional reserve banking and the money multiplier work—and why the Fed has moved on.',
+    subject: 'Macro',
+    unit: 4,
+    thumbnailUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/image0.jpg',
+    seoSnippet: 'In a fractional reserve banking system, banks hold only a fraction of deposits in reserve and lend the rest. The money multiplier (1 ÷ RRR) shows how a single deposit can expand the money supply. The Fed can use the reserve requirement as a monetary policy tool.',
+    images: [],
+    videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/blogs/bank_balance_sheets.mp4',
+    practiceQuestionIds: [41, 43, 144],
+    content: (
+      <>
+        <p className="mb-6">
+          I have told you before, that you&apos;re already a part of the economy. But get this: every time you deposit $1,000 into your bank account, you could be helping create $10,000 or more throughout the economy. How is this possible? Let&apos;s learn about the fractional reserve banking, which acts as the lifeline of our economy and is an important topic on the AP exam.
+        </p>
+
+        <h2 className="mt-10 mb-4 text-3xl font-bold text-gray-800">What Happens After You Deposit?</h2>
+        <p className="mb-6">
+          When you hand your money to a bank, the bank doesn&apos;t just lock it in a vault and wait for you to come back. It puts that money to work.
+        </p>
+        <p className="mb-6">
+          Banks are (or at least <em>were…</em>{' '}
+          <Link href="/blog/ap-macro-unit-4-ample-reserves-market" className="text-blue-600 font-semibold underline hover:text-blue-800">
+            more on that here
+          </Link>
+          ) required by the Federal Reserve to hold a fraction of every deposit in reserve. This is the <strong>required reserve ratio</strong> (RRR). If the required reserve ratio is 10%, and you deposit $1,000, the bank must keep $100 on hand. That $100 is the <strong>required reserve</strong>.
+        </p>
+        <p className="mb-6">
+          The remaining $900 is called the <strong>excess reserve</strong> and the bank is free to lend it out.
+        </p>
+
+        <div className="my-8 p-4 border rounded-lg bg-gray-50">
+          <Image
+            src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/Bank+Balance+Sheets/wb_1.jpg"
+            alt="Bank balance sheet chain reaction whiteboard"
+            width={900}
+            height={540}
+            className="w-full h-auto rounded-md shadow-sm"
+          />
+        </div>
+
+        <h2 className="mt-10 mb-4 text-3xl font-bold text-gray-800">The Chain Reaction</h2>
+        <p className="mb-6">
+          Now here&apos;s where it gets interesting. A business borrows that $900 to buy a new piece of machinery. The equipment supplier receives that $900 as payment and deposits it at their bank — let&apos;s call it Bank B.
+        </p>
+        <p className="mb-6">
+          Bank B now holds $900 in deposits. It keeps 10% ($90) as required reserves and lends out the remaining $810.
+        </p>
+        <p className="mb-6">
+          That $810 gets spent, deposited at Bank C, and the cycle repeats. Bank C keeps $81 and lends out $729. Then it happens again. And again. Each round, the amount gets smaller, but the lending never stops until there&apos;s nothing left to lend.
+        </p>
+
+        <div className="my-8 p-4 border rounded-lg bg-gray-50">
+          <Image
+            src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/Bank+Balance+Sheets/wb_2.jpg"
+            alt="Money multiplier chain reaction whiteboard"
+            width={900}
+            height={540}
+            className="w-full h-auto rounded-md shadow-sm"
+          />
+        </div>
+
+        <h2 className="mt-10 mb-4 text-3xl font-bold text-gray-800">Enter: The Money Multiplier</h2>
+        <p className="mb-6">
+          Writing out every round of this chain would take forever. It&apos;s much easier for economists to use the <strong>money multiplier formula</strong> to calculate the total potential increase in the money supply from a single deposit:
+        </p>
+        <div className="my-8 p-4 border rounded-lg bg-gray-50">
+          <Image
+            src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/Bank+Balance+Sheets/wb_3.jpg"
+            alt="Money multiplier formula whiteboard"
+            width={900}
+            height={540}
+            className="w-full h-auto rounded-md shadow-sm"
+          />
+        </div>
+        <div className="my-6 pl-4 border-l-4 border-gray-300 bg-gray-50 py-3 pr-4">
+          <p className="font-semibold text-gray-900">Money Multiplier = 1 ÷ Reserve Requirement Ratio</p>
+        </div>
+        <p className="mb-6">
+          With a 10% reserve requirement:
+        </p>
+        <div className="my-6 pl-4 border-l-4 border-gray-300 bg-gray-50 py-3 pr-4">
+          <p className="font-semibold text-gray-900">1 ÷ 0.10 = 10</p>
+        </div>
+        <p className="mb-6">
+          To use the money multiplier to calculate the maximum potential change to the money supply as a result of your deposit, use this formula:
+        </p>
+        <div className="my-8 p-4 border rounded-lg bg-gray-50">
+          <Image
+            src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/Bank+Balance+Sheets/wb_4.jpg"
+            alt="Maximum potential change to money supply formula whiteboard"
+            width={900}
+            height={540}
+            className="w-full h-auto rounded-md shadow-sm"
+          />
+        </div>
+        <div className="my-6 pl-4 border-l-4 border-gray-300 bg-gray-50 py-3 pr-4">
+          <p className="font-semibold text-gray-900">Max Potential Change to MS = Change in Excess Reserves × Money Multiplier</p>
+        </div>
+        <p className="mb-4">A few things to keep in mind for the AP exam:</p>
+        <ul className="mb-6 list-disc list-inside space-y-2">
+          <li>The money multiplier gives you the <strong>maximum</strong> possible increase — in reality, the effect is smaller because people hold some cash, banks sometimes hold excess reserves voluntarily, and not every loan gets immediately redeposited.</li>
+          <li>If the reserve requirement is <strong>lower</strong>, the multiplier is <strong>higher.</strong> Banks lend out more of each deposit. If it&apos;s higher, the multiplier shrinks.</li>
+          <li>
+            The Fed can use the reserve requirement as a monetary policy tool: raising it contracts the money supply,
+            lowering it expands it. For a deep dive into how this works in today&apos;s system, check out the{' '}
+            <Link href="/blog/ap-macro-unit-4-ample-reserves-market" className="text-blue-600 font-semibold underline hover:text-blue-800">
+              <em>ample reserves market article</em>
+            </Link>
+            .
+          </li>
+        </ul>
+        <p className="mb-6">
+          Maybe most importantly, the Federal Reserve doesn&apos;t actually use the required reserve ratio anymore. It
+          has become obsolete, at least for the time being.
+        </p>
+      </>
+    ),
+  },
   'understanding-externalities': {
     slug: 'understanding-externalities',
     title: 'Understanding Externalities',
     description: 'Why markets with external costs or benefits misallocate resources—and how per-unit taxes can fix them.',
     subject: 'Micro',
     unit: 6,
+    videoUrl: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/6.2+-+Externalities.mp4',
     thumbnailUrl:
       'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/externalities/wb_1.jpg',
     seoSnippet:
