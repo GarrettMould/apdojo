@@ -1195,5 +1195,210 @@ export const blogPosts: Record<string, BlogPost> = {
       </>
     ),
   },
+  'sticky-wages-sras': {
+    slug: 'sticky-wages-sras',
+    title: "Sticky Wages: Why the Economy is \"Stuck\" in the Short Run",
+    description: "Nominal wages don't adjust instantly—and that one fact explains why the SRAS curve slopes upward and why recessions linger.",
+    subject: 'Macro',
+    unit: 3,
+    thumbnailUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/sticky_wages/wb1.jpg',
+    seoSnippet: "Sticky wages are nominal wages that do not adjust immediately to changes in the price level, due to contracts, morale, and menu costs. This stickiness causes the Short-Run Aggregate Supply curve to slope upward, because firms can temporarily profit from rising prices before wages catch up.",
+    keyTakeaway: "Price Level ↑ → (Wages stuck) → Profit per unit ↑ → Output ↑. But eventually wages rise, costs catch up, SRAS shifts left, and the economy returns to LRAS at a higher price level with the same output.",
+    practiceQuestionIds: [3077, 3138],
+    images: [],
+    videoUrl: null,
+    content: (
+      <>
+        <p className="mb-6">
+          Early on in Unit 3, we learn that the <strong>Short-Run Aggregate Supply (SRAS)</strong> curve is upward-sloping. But have you ever stopped to ask <em>why</em>?
+        </p>
+        <p className="mb-6">
+          The answer lies in a concept called <strong>Sticky Wages</strong>.
+        </p>
+
+        <h2 className="mt-12 mb-4 text-3xl font-bold text-gray-800">1. What are Sticky Wages?</h2>
+        <p className="mb-6">
+          In a perfect world, if the price of everything in the economy doubled overnight, your boss would immediately double your salary. But in the real world, that doesn&apos;t happen.
+        </p>
+        <ul className="mb-6 list-disc list-inside space-y-2">
+          <li><strong>Contracts:</strong> Many workers have labor contracts that lock in their pay for a year or more.</li>
+          <li><strong>Morale:</strong> Cutting nominal wages is a great way to make your employees quit or work less.</li>
+          <li><strong>Menu Costs:</strong> It costs time and money for firms to constantly renegotiate pay.</li>
+        </ul>
+        <p className="mb-6">
+          Because of these factors, <strong>nominal wages are &ldquo;sticky.&rdquo;</strong> They don&apos;t adjust immediately to changes in the price level.
+        </p>
+
+        <h2 className="mt-12 mb-4 text-3xl font-bold text-gray-800">2. The Upward-Sloping SRAS Curve</h2>
+        <p className="mb-6">
+          Because wages are stuck while prices are rising, businesses see a massive opportunity for profit.
+        </p>
+        <ul className="mb-6 list-disc list-inside space-y-2">
+          <li><strong>The Logic:</strong> If the price level (<em>PL</em>) increases, but a firm&apos;s labor costs (wages) stay the same, their <strong>profit per unit</strong> goes up.</li>
+          <li><strong>The Reaction:</strong> Seeing higher profits, firms hire more workers and ramp up production.</li>
+        </ul>
+        <p className="mb-6">
+          This is why the SRAS curve slopes upward: as the price level rises, the quantity of output supplied increases because firms are &ldquo;tricking&rdquo; the system with fixed labor costs.
+        </p>
+
+        <div className="my-8 p-4 border rounded-lg bg-gray-50">
+          <Image
+            src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/sticky_wages/wb1.jpg"
+            alt="Diagram showing sticky wages and the upward-sloping SRAS curve"
+            width={600}
+            height={400}
+            className="w-full h-auto rounded-md shadow-sm"
+          />
+        </div>
+        <h2 className="mt-12 mb-4 text-3xl font-bold text-gray-800">3. The &ldquo;Snap Back&rdquo; to Long-Run Equilibrium</h2>
+        <p className="mb-6">
+          Here is the catch: this increased production is a &ldquo;temporary high.&rdquo; It cannot last. Eventually, those labor contracts expire, and workers realize their $20/hour doesn&apos;t buy as much as it used to due to the higher price level.
+        </p>
+        <ul className="mb-6 list-disc list-inside space-y-2">
+          <li><strong>The Negotiation:</strong> Workers demand higher nominal wages to make up for the inflation.</li>
+          <li><strong>The Cost Push:</strong> As nominal wages finally rise, the firm&apos;s costs catch up to the price level. Those &ldquo;extra profits&rdquo; disappear.</li>
+          <li><strong>The Shift:</strong> Higher labor costs cause the <strong>SRAS curve to shift to the left</strong> (SRAS decreases).</li>
+        </ul>
+
+        <div className="my-8 p-4 border rounded-lg bg-gray-50">
+          <Image
+            src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/sticky_wages/wb2.jpg"
+            alt="SRAS curve shifting left as wages adjust upward toward long-run equilibrium"
+            width={600}
+            height={400}
+            className="w-full h-auto rounded-md shadow-sm"
+          />
+        </div>
+        <h2 className="mt-12 mb-4 text-3xl font-bold text-gray-800">4. The Result: Long-Run Reality</h2>
+        <p className="mb-6">
+          The economy returns to its <strong>Long-Run Aggregate Supply (LRAS)</strong>&mdash;the full-employment level of output (<em>Y<sub>f</sub></em>). In the Long Run, the only thing that changed was the Price Level. Output stayed the same.
+        </p>
+        <p className="mb-6">
+          This is the core insight the AP Exam tests repeatedly: <strong>sticky wages explain short-run output changes, but the long run is always anchored to LRAS.</strong>
+        </p>
+
+        <div className="my-8 p-4 border rounded-lg bg-gray-50">
+          <Image
+            src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/sticky_wages/wb3.jpg"
+            alt="AD/AS diagram showing the long-run snap back to LRAS after sticky wages adjustment"
+            width={600}
+            height={400}
+            className="w-full h-auto rounded-md shadow-sm"
+          />
+        </div>
+
+        <hr className="my-12" />
+
+        <div className="text-center bg-gray-100 p-8 rounded-lg">
+          <h3 className="text-2xl font-bold text-gray-900 mb-2">Can You Draw the Shift?</h3>
+          <p className="text-gray-700 mb-6">
+            The FRQ will ask you to show the short-run change <em>and</em> the long-run adjustment. Practice drawing both in under two minutes.
+          </p>
+          <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-6 px-8 text-lg rounded-md">
+            <Link href="/unitFRQpracticePage">
+              Practice the Unit 3 FRQ Walkthrough
+            </Link>
+          </Button>
+          <p className="text-xs text-gray-500 mt-4"><em>Our AI-guided tool will check your graph instantly.</em></p>
+        </div>
+      </>
+    ),
+  },
+  'crowding-out-fiscal-policy': {
+    slug: 'crowding-out-fiscal-policy',
+    title: "Crowding Out: Why it's Harder than It Looks to Stimulate the Economy",
+    description: "Government borrowing raises interest rates and squeezes private investment—making expansionary fiscal policy less powerful than it seems.",
+    subject: 'Macro',
+    unit: 5,
+    thumbnailUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/crowding_out/wb1.jpg',
+    seoSnippet: "Crowding out occurs when government borrowing raises real interest rates in the loanable funds market, reducing private investment. This offsets some of the stimulus from expansionary fiscal policy, making it less effective at closing a recessionary gap.",
+    keyTakeaway: "Budget Deficit → Demand for Loanable Funds ↑ → Real Interest Rate ↑ → Private Investment ↓ → AD shifts back left. The government crowds out the private investors who drive long-run growth.",
+    practiceQuestionIds: [52, 64],
+    images: [],
+    videoUrl: null,
+    content: (
+      <>
+        <p className="mb-6">
+          Earlier in Unit 3, we saw how the government uses expansionary fiscal policy to pull the economy out of a recession. They spend money (<em>G</em> ↑) or cut taxes (<em>T</em> ↓) to shift Aggregate Demand to the right.
+        </p>
+        <p className="mb-6">
+          But there is a catch. If the government doesn&apos;t have a surplus sitting in a vault, they have to <strong>borrow</strong> that money. This leads to a phenomenon called <strong>Crowding Out</strong>.
+        </p>
+
+        <h2 className="mt-12 mb-4 text-3xl font-bold text-gray-800">1. The Loanable Funds Connection</h2>
+        <p className="mb-6">
+          When the government runs a budget deficit, they enter the <strong>Loanable Funds Market</strong> as a borrower. This increases the total demand for loans in the economy.
+        </p>
+        <p className="mb-6">
+          As the Demand for Loanable Funds shifts to the right, the <strong>Real Interest Rate (<em>r</em>) increases</strong>. Think of it like any other market: when a massive new buyer (the government) enters the market for &quot;money,&quot; the price of that money goes up.
+        </p>
+
+        <div className="my-8 p-4 border rounded-lg bg-gray-50">
+          <Image
+            src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/crowding_out/wb3.jpg"
+            alt="Loanable funds market showing government borrowing raising real interest rates"
+            width={600}
+            height={400}
+            className="w-full h-auto rounded-md shadow-sm"
+          />
+        </div>
+        <h2 className="mt-12 mb-4 text-3xl font-bold text-gray-800">2. Private Investment vs. Government Debt</h2>
+        <p className="mb-6">
+          This is where the government&apos;s plan backfires. Remember that the entire reason the government is borrowing money in the first place is to help stimulate the economy&mdash;to get people and businesses spending again. Those households and private businesses also need loans to buy houses, cars, and new factory machinery.
+        </p>
+        <ul className="mb-6 list-disc list-inside space-y-2">
+          <li><strong>The Problem:</strong> When interest rates rise because of government borrowing, it becomes too expensive for private businesses to borrow.</li>
+          <li><strong>The Result:</strong> Private <strong>Investment (<em>I</em>)</strong> decreases.</li>
+        </ul>
+
+        <h2 className="mt-12 mb-4 text-3xl font-bold text-gray-800">3. The AD/AS Impact: The &ldquo;Nudge Back&rdquo;</h2>
+        <p className="mb-6">
+          Recall the components of Aggregate Demand: <em>AD = C + I + G + (X&minus;M)</em>.
+        </p>
+        <ol className="mb-6 list-decimal list-inside space-y-2">
+          <li>The government increases <em>G</em> to shift AD to the right.</li>
+          <li>But the resulting high interest rates cause <em>I</em> to drop.</li>
+          <li>This drop in <em>I</em> nudges the AD curve back to the left.</li>
+        </ol>
+        <p className="mb-6">
+          <strong>The Bottom Line:</strong> Crowding out makes fiscal policy <em>less effective</em>. The government is &ldquo;crowding out&rdquo; the private investors who are the real engine of long-term economic growth.
+        </p>
+
+        <div className="my-8 p-4 border rounded-lg bg-gray-50">
+          <Image
+            src="https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/crowding_out/wb4.jpg"
+            alt="AD/AS diagram showing the crowding out effect nudging aggregate demand back left"
+            width={600}
+            height={400}
+            className="w-full h-auto rounded-md shadow-sm"
+          />
+        </div>
+        <h2 className="mt-12 mb-4 text-3xl font-bold text-gray-800">4. Why it Matters for the Exam</h2>
+        <p className="mb-6">
+          On the FRQ, you will often be asked: <em>&ldquo;Identify the effect of the government&apos;s action on the real interest rate and private investment.&rdquo;</em>
+        </p>
+        <ul className="mb-6 list-disc list-inside space-y-2">
+          <li><strong>Real Interest Rate:</strong> Increases.</li>
+          <li><strong>Private Investment:</strong> Decreases.</li>
+          <li><strong>Long-Run Growth:</strong> Decreases (because less <em>I</em> today means less capital equipment tomorrow).</li>
+        </ul>
+
+        <hr className="my-12" />
+
+        <div className="text-center bg-gray-100 p-8 rounded-lg">
+          <h3 className="text-2xl font-bold text-gray-900 mb-2">Test Your Understanding</h3>
+          <p className="text-gray-700 mb-6">
+            Can you draw the loanable funds market shift and explain the crowding-out effect in under two minutes? That&apos;s exactly what the FRQ will ask.
+          </p>
+          <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-6 px-8 text-lg rounded-md">
+            <Link href="/unitFRQpracticePage">
+              Practice the Unit 5 FRQ Walkthrough
+            </Link>
+          </Button>
+          <p className="text-xs text-gray-500 mt-4"><em>Our AI-guided tool will check your graph instantly.</em></p>
+        </div>
+      </>
+    ),
+  },
 };
 

@@ -16,6 +16,7 @@ import { ShareFRQButton } from '@/components/ShareFRQButton';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CheckCircle2 } from 'lucide-react';
 import { LoginModal, SignupModal } from '@/components/AuthModals';
+import { SeasonPassModal } from '@/components/SeasonPassModal';
 import FRQLibrarySidebar, { FRQItem } from '@/components/FRQLibrarySidebar';
 import { hasValidSeasonPass } from '@/lib/utils';
 import { FRQCompletionModal } from '@/components/FRQCompletionModal';
@@ -180,6 +181,7 @@ function UnitFRQPracticePageComponent() {
   const { selectedSubject, awardXp, user, userData } = useAuthContext();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
+  const [showSeasonPassModal, setShowSeasonPassModal] = useState(false);
 
   // Check if user is a pro customer (has season pass)
   const isProCustomer = React.useMemo(() => {
@@ -657,6 +659,12 @@ function UnitFRQPracticePageComponent() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {showSeasonPassModal && (
+        <SeasonPassModal
+          subject={selectedSubject === 'macro' ? 'macro' : 'micro'}
+          onClose={() => setShowSeasonPassModal(false)}
+        />
+      )}
       <LoginModal
         isOpen={showLoginModal}
         onClose={() => setShowLoginModal(false)}
@@ -738,9 +746,9 @@ function UnitFRQPracticePageComponent() {
                 const questionIndex = allDisplayQuestions.findIndex(q => q.id.toString() === id);
                 const question = allDisplayQuestions[questionIndex];
                 if (questionIndex !== -1 && question) {
-                  // If question is locked, redirect to season pass purchase
+                  // If question is locked, open the season pass modal
                   if (isQuestionLocked(parseInt(id, 10), question.unit)) {
-                    window.location.href = `/purchase/season-pass?courseType=${selectedSubject}`;
+                    setShowSeasonPassModal(true);
                     return;
                   }
                   handleSelectQuestion(questionIndex);

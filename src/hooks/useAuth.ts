@@ -243,6 +243,18 @@ function calculateUnitPerformance(answers: McqAnswer[], subject: 'macro' | 'micr
 }
 // --- END: Helper Function ---
 
+async function applyPendingSeasonPass(email: string, uid: string): Promise<void> {
+  try {
+    await fetch('/api/apply-pending-season-pass', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, uid }),
+    });
+  } catch (err) {
+    console.error('[useAuth] Failed to apply pending season pass:', err);
+  }
+}
+
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
@@ -649,7 +661,12 @@ export function useAuth() {
         }
         
         setUser(newUser);
-        console.log("[useAuth] New user document created with initial totalXP 150."); // Updated log message
+        console.log("[useAuth] New user document created with initial totalXP 150.");
+
+        // Apply any pending season pass purchased before account creation
+        if (newUser.email) {
+          await applyPendingSeasonPass(newUser.email, newUser.uid);
+        }
 
         // --- Handle redirect after signup if a target was set ---
         if (redirectOnLogin) {
@@ -754,6 +771,12 @@ export function useAuth() {
         }
         console.log('[useAuth] New Google user document created for:', newUser.email);
       }
+
+      // Apply any pending season pass purchased before account creation
+      if (newUser.email) {
+        await applyPendingSeasonPass(newUser.email, newUser.uid);
+      }
+
       setLoading(false);
       if (redirectOnLogin) {
         window.location.href = redirectOnLogin;
@@ -811,6 +834,12 @@ export function useAuth() {
         // Only call Firebase auth here. Redirect is handled by the calling page.
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         console.log("[useAuth] Login successful trigger for:", userCredential.user?.email);
+
+        // Apply any pending season pass purchased before account creation
+        if (userCredential.user?.email) {
+          await applyPendingSeasonPass(userCredential.user.email, userCredential.user.uid);
+        }
+
         setLoading(false);
 
         // --- ADD: Handle redirect ---

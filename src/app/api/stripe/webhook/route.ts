@@ -75,10 +75,42 @@ export async function POST(req: Request) {
       
       const { purchaseType, courseType, examId: checkoutExamId, userId: metadataUserId } = checkoutSession.metadata || {};
       const checkoutUserId = metadataUserId || checkoutSession.client_reference_id;
-      
+
+      // Calculate expiration date: June 30th of current or next year
+      const now = new Date();
+      const currentYear = now.getUTCFullYear();
+      const currentMonth = now.getUTCMonth();
+      const currentDay = now.getUTCDate();
+      const expirationYear = (currentMonth > 5 || (currentMonth === 5 && currentDay > 30))
+        ? currentYear + 1
+        : currentYear;
+      const expirationDate = `${expirationYear}-06-30T23:59:59.999Z`;
+
+      // Guest checkout: no userId — store a pending pass keyed by email
       if (!checkoutUserId) {
-        console.error(`Webhook Error: Missing userId for checkout session ${checkoutSession.id}`);
-        return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
+        const customerEmail = checkoutSession.customer_details?.email?.toLowerCase();
+        if (customerEmail && purchaseType === 'season-pass' && courseType && adminDb) {
+          try {
+            const subjects = courseType === 'bundle' ? ['macro', 'micro'] : [courseType];
+            const expiration: Record<string, string> = {};
+            subjects.forEach(s => { expiration[s] = expirationDate; });
+
+            await adminDb.collection('pendingSeasonPasses').doc(customerEmail).set({
+              courseType,
+              subjects,
+              expirationDate: expiration,
+              purchasedAt: now.toISOString(),
+              sessionId: checkoutSession.id,
+            }, { merge: true });
+
+            console.log(`✅ Stored pending season pass for email ${customerEmail} (expires ${expirationDate})`);
+          } catch (error: any) {
+            console.error(`Error storing pending season pass for ${checkoutSession.id}: ${error.message}`);
+          }
+        } else {
+          console.error(`Webhook: guest checkout missing email or purchaseType for session ${checkoutSession.id}`);
+        }
+        break;
       }
 
       try {
@@ -90,23 +122,6 @@ export async function POST(req: Request) {
         
         // Handle season pass purchases
         if (purchaseType === 'season-pass' && courseType) {
-          // Calculate expiration date: June 30th UTC 11:59 PM
-          // Get current year, or next year if we're past June 30th
-          const now = new Date();
-          const currentYear = now.getUTCFullYear();
-          const currentMonth = now.getUTCMonth(); // 0-11, where 5 = June
-          const currentDay = now.getUTCDate();
-          
-          // If we're past June 30th, set expiration for next year
-          // Otherwise, set expiration for current year
-          const expirationYear = (currentMonth > 5 || (currentMonth === 5 && currentDay > 30)) 
-            ? currentYear + 1 
-            : currentYear;
-          
-          // June 30th UTC 11:59:59 PM = June 30th 23:59:59 UTC
-          // Store as ISO string for easy comparison
-          const expirationDate = `${expirationYear}-06-30T23:59:59.999Z`;
-          
           // Get current user data to merge expiration dates properly
           const userDoc = await userRef.get();
           const currentData = userDoc.exists ? (userDoc.data() || {}) : {};
@@ -149,11 +164,11 @@ export async function POST(req: Request) {
         } 
         // Handle exam purchases (existing logic)
         else if (checkoutExamId) {
-        await userRef.set({
-          purchases: FieldValue.arrayUnion(checkoutExamId),
-        }, { merge: true });
+          await userRef.set({
+            purchases: FieldValue.arrayUnion(checkoutExamId),
+          }, { merge: true });
         
-        console.log(`✅ Added exam ${checkoutExamId} to user ${checkoutUserId} purchases`);
+          console.log(`✅ Added exam ${checkoutExamId} to user ${checkoutUserId} purchases`);
         } else {
           console.error(`Webhook Error: Missing purchaseType or examId for checkout session ${checkoutSession.id}`);
           return NextResponse.json({ error: 'Missing purchase data' }, { status: 400 });

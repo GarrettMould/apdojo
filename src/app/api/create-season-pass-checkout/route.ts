@@ -16,22 +16,16 @@ export async function POST(req: Request) {
     const url = new URL(req.url);
     const baseUrl = `${url.protocol}//${url.host}`;
     
-    const { purchaseType, userId, isParentGift } = await req.json() as { 
+    const { purchaseType, userId, isParentGift, cancelUrl } = await req.json() as { 
       purchaseType: PurchaseType;
       userId?: string;
       isParentGift?: boolean;
+      cancelUrl?: string;
     };
     
     if (!purchaseType || (purchaseType !== 'macro' && purchaseType !== 'micro' && purchaseType !== 'bundle')) {
       return NextResponse.json(
         { error: 'Invalid purchaseType. Must be "macro", "micro", or "bundle"' },
-        { status: 400 }
-      );
-    }
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'userId is required' },
         { status: 400 }
       );
     }
@@ -80,15 +74,18 @@ export async function POST(req: Request) {
         },
       ],
       mode: 'payment',
+      // client_reference_id is optional; include when we know the app user
       client_reference_id: userId,
       metadata: {
         purchaseType: 'season-pass',
         courseType: courseType, // 'macro', 'micro', or 'bundle'
-        userId: userId,
-        source: isParentGift ? 'parent_gift' : 'student_purchase',
+        userId: userId ?? '',
+        source: isParentGift ? 'parent_gift' : userId ? 'student_purchase' : 'guest_checkout',
       },
-      success_url: `${baseUrl}/success?purchaseType=season-pass&courseType=${courseType}`,
-      cancel_url: `${baseUrl}/purchase/season-pass?courseType=${purchaseType === 'bundle' ? 'macro' : purchaseType}`,
+      // After payment, send users to a claim page that can attach the pass
+      // to an account using the Checkout session ID and email.
+      success_url: `${baseUrl}/season-pass/claim?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: cancelUrl || `${baseUrl}/`,
     });
 
     return NextResponse.json({ sessionId: session.id });
