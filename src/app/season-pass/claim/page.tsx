@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Loader2, CheckCircle, AlertTriangle, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
-export default function SeasonPassClaimPage() {
+function SeasonPassClaimContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
 
@@ -100,6 +100,21 @@ export default function SeasonPassClaimPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function SeasonPassClaimPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+        <div className="max-w-md w-full bg-white border-4 border-black rounded-3xl shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] p-10 text-center space-y-4">
+          <Loader2 className="h-12 w-12 mx-auto animate-spin text-blue-500" />
+          <p className="text-sm text-gray-600 font-medium">Verifying your Season Pass purchase…</p>
+        </div>
+      </div>
+    }>
+      <SeasonPassClaimContent />
+    </Suspense>
   );
 }
 

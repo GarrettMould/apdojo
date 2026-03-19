@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
 import { useAuthContext } from '@/contexts/AuthContext';
 
-export default function PurchaseSeasonPassPage() {
+function PurchaseSeasonPassContent() {
   const searchParams = useSearchParams();
   const courseType = (searchParams.get('courseType') as 'macro' | 'micro') || 'macro';
   const { user } = useAuthContext();
@@ -64,6 +64,18 @@ export default function PurchaseSeasonPassPage() {
         </p>
       )}
     </div>
+  );
+}
+
+export default function PurchaseSeasonPassPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+        <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
+      </div>
+    }>
+      <PurchaseSeasonPassContent />
+    </Suspense>
   );
 }
 
