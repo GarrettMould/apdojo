@@ -1,5 +1,7 @@
 import { MetadataRoute } from 'next';
 import { macroUnits, microUnits } from '@/data/cheatSheets';
+import { blogPosts } from '@/data/blogPosts';
+import { generateSeoUrl } from '@/utils/blogUrls';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://apdojo.com';
@@ -145,10 +147,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
+  // Blog post pages — dynamically generated from blogPosts data
+  const blogPostPages: MetadataRoute.Sitemap = Object.values(blogPosts).map(post => ({
+    url: `${baseUrl}/blog/${generateSeoUrl(post.slug, post.subject, post.unit)}`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly' as const,
+    priority: 0.8,
+  }));
+
   // IMPORTANT: Only return canonical URLs we actually want indexed.
   // Older /unit/{number} and /study-guides/... routes either duplicate or redirect
   // to these cheat sheet pages and should NOT be listed here to avoid redirect errors.
-  return [...staticPages, ...cheatSheetPages, ...deepDivePages];
+  return [...staticPages, ...cheatSheetPages, ...deepDivePages, ...blogPostPages];
 }
 
 
