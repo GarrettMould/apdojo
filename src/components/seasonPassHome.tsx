@@ -104,9 +104,7 @@ function QuestionListSection() {
   }, [searchTerm, unitFilter, subjectFilter]);
 
   const handleQuestionClick = (question: Question) => {
-    // Determine courseType from subjectFilter
     const courseType = subjectFilter === 'ap_macroeconomics' ? 'macro' : 'micro';
-    // Navigate to purchase page
     router.push(`/purchase/season-pass?courseType=${courseType}`);
   };
 
