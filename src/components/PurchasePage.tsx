@@ -76,28 +76,18 @@ export function PurchasePage({ courseType }: PurchasePageProps) {
   }, []);
 
   const handlePurchase = async () => {
-    if (!user) {
-      // If not logged in, remember this page and open signup so we can return here after account creation
-      const currentPath =
-        typeof window !== 'undefined'
-          ? window.location.pathname + window.location.search
-          : `/purchase/season-pass?courseType=${courseType}`;
-      setRedirectOnLogin(currentPath);
-      setShowSignupModal(true);
-      return;
-    }
-
     setIsLoading(true);
     try {
-      // Create season pass checkout session
+      // Create season pass checkout session (guest checkout supported — no login required)
       const response = await fetch('/api/create-season-pass-checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          purchaseType: courseType, // 'macro' or 'micro'
-          userId: user.uid,
+          purchaseType: courseType,
+          userId: user?.uid,
+          cancelUrl: window.location.href,
         }),
       });
 

@@ -66,7 +66,6 @@ export async function POST(req: Request) {
     
     // Create checkout session using the Stripe Price ID
     const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
       line_items: [
         {
           price: priceId, // Use the Price ID from your Stripe product
