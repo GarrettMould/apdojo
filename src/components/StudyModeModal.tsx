@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, ChevronDown, Lock, Zap } from 'lucide-react';
+import Link from 'next/link';
 
 export interface StudyModeCard {
   id: string;
@@ -43,6 +44,10 @@ interface StudyModeModalProps {
   onCardView?: (index: number) => void;
   /** For unit page only; unused when no overlay. */
   seasonPassCourseType?: 'macro' | 'micro';
+  /** When true, flipping a card fires onLockedFlip instead of revealing the back. */
+  isLocked?: boolean;
+  /** Called when a locked user attempts to flip a card. */
+  onLockedFlip?: () => void;
 }
 
 export function StudyModeModal({
@@ -53,6 +58,8 @@ export function StudyModeModal({
   freeUserShuffleLimitReached = false,
   onCardView,
   seasonPassCourseType = 'macro',
+  isLocked = false,
+  onLockedFlip,
 }: StudyModeModalProps) {
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
@@ -156,7 +163,7 @@ export function StudyModeModal({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [open, index, filteredDeck.length, onClose, freeUserShuffleLimitReached]);
+  }, [open, index, flipped, filteredDeck.length, onClose, freeUserShuffleLimitReached, isLocked, onLockedFlip]);
 
   if (!open || deck.length === 0 || filteredDeck.length === 0) return null;
 
@@ -336,36 +343,137 @@ export function StudyModeModal({
                       >
                         {currentCard.front}
                       </p>
-                      <span className="mt-6 text-sm text-slate-500">Space, ↑, or ↓ to flip</span>
+                      <span className="mt-6 text-sm text-slate-500">
+                        {isLocked ? 'Flip to reveal answer' : 'Space, ↑, or ↓ to flip'}
+                      </span>
                     </div>
                     <div
-                      className="absolute inset-0 rounded-2xl bg-slate-50 border-2 border-slate-200 shadow-2xl flex flex-col p-8 overflow-y-auto"
+                      className="absolute inset-0 rounded-2xl shadow-2xl flex flex-col overflow-hidden"
                       style={{
                         backfaceVisibility: 'hidden',
                         WebkitBackfaceVisibility: 'hidden',
                         transform: 'rotateY(180deg)',
                       }}
                     >
-                      <button
-                        type="button"
-                        onClick={(e) => { e.stopPropagation(); setDropdownOpen((o) => !o); }}
-                        className={`self-end mb-4 px-3 py-1 rounded-lg text-xs font-bold cursor-pointer hover:opacity-80 transition-opacity ${getFlashcardTagClass(currentCard.tag)}`}
-                        title="Click to filter by type"
-                      >
-                        {currentCard.tag}
-                      </button>
-                      <div className="text-lg text-slate-800 leading-relaxed flex-1 flex flex-col gap-4">
-                        {currentCard.backImage ? (
-                          <img
-                            src={currentCard.backImage}
-                            alt="Graph or diagram"
-                            className="w-full max-w-md mx-auto rounded-lg border border-slate-200 shadow-sm object-contain"
-                          />
-                        ) : (
-                          <div>{currentCard.back}</div>
-                        )}
-                      </div>
-                      <span className="mt-4 text-sm text-slate-500">Space, ↑, or ↓ to flip back</span>
+                      {isLocked ? (
+                        /* ── Paywall back face — matches SeasonPassModal style ── */
+                        (() => {
+                          const isMicro = seasonPassCourseType === 'micro';
+                          const accentColor = isMicro ? '#22C55E' : '#3B82F6';
+                          const accentDark  = isMicro ? '#15803D' : '#1D4ED8';
+                          const accentLight = isMicro ? '#F0FDF4' : '#EFF6FF';
+                          const subjectLabel = isMicro ? 'Micro' : 'Macro';
+                          return (
+                            <div className="w-full h-full bg-white rounded-2xl overflow-hidden border-2 border-slate-200 shadow-2xl flex">
+                              {/* ── Left: pitch ── */}
+                              <div className="flex flex-col justify-center gap-3 px-5 py-5 flex-1 min-w-0">
+                                {/* Badge */}
+                                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: accentLight, borderRadius: '100px', padding: '4px 12px', alignSelf: 'flex-start' }}>
+                                  <Zap size={12} color={accentColor} fill={accentColor} />
+                                  <span style={{ fontSize: '12px', fontWeight: 800, color: accentDark, letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+                                    AP {subjectLabel} Season Pass
+                                  </span>
+                                </div>
+
+                                {/* Headline */}
+                                <div>
+                                  <p style={{ fontSize: '24px', fontWeight: 800, color: '#111', lineHeight: 1.2, letterSpacing: '-0.3px' }}>
+                                    Unlock everything.
+                                  </p>
+                                  <p style={{ fontSize: '24px', fontWeight: 800, color: accentColor, lineHeight: 1.2 }}>
+                                    Score a 5.
+                                  </p>
+                                </div>
+
+                                {/* Price */}
+                                <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                                  <span style={{ fontSize: '34px', fontWeight: 800, color: accentColor, letterSpacing: '-1px', lineHeight: 1 }}>$29</span>
+                                  <span style={{ fontSize: '15px', color: '#D1D5DB', textDecoration: 'line-through', fontWeight: 600 }}>$39</span>
+                                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#fff', background: '#EF4444', borderRadius: '999px', padding: '2px 7px' }}>SAVE 26%</span>
+                                </div>
+                                <p style={{ fontSize: '12px', color: '#9CA3AF', fontWeight: 500, marginTop: '-6px' }}>One-time · Valid until June 30, 2026</p>
+
+                                {/* Stars */}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                                  <div style={{ display: 'flex', gap: '2px' }}>
+                                    {[...Array(5)].map((_, i) => (
+                                      <svg key={i} width="14" height="14" viewBox="0 0 24 24" fill="#FBBF24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                    ))}
+                                  </div>
+                                  <span style={{ fontSize: '12px', fontWeight: 600, color: '#6B7280' }}>1,000+ students helped</span>
+                                </div>
+
+                                {/* CTA */}
+                                <Link
+                                  href={`/purchase/season-pass?courseType=${seasonPassCourseType}`}
+                                  onClick={(e) => e.stopPropagation()}
+                                  style={{
+                                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center', alignSelf: 'flex-start',
+                                    background: accentColor, color: '#fff',
+                                    borderRadius: '12px', padding: '11px 18px',
+                                    fontSize: '14px', fontWeight: 800, textDecoration: 'none',
+                                    boxShadow: `0 4px 12px ${accentColor}55`,
+                                  }}
+                                >
+                                  🔓 Unlock AP {subjectLabel} — $29
+                                </Link>
+
+                                <button
+                                  type="button"
+                                  onClick={(e) => { e.stopPropagation(); setFlipped(false); }}
+                                  className="text-sm text-gray-400 hover:text-gray-600 transition-colors text-left"
+                                >
+                                  ← Flip back
+                                </button>
+                              </div>
+
+                              {/* ── Right: features list ── */}
+                              <div style={{ background: accentLight, borderLeft: `2px solid ${accentColor}22` }} className="flex flex-col justify-center gap-2 px-4 py-5 w-56 flex-shrink-0">
+                                <p style={{ fontSize: '12px', fontWeight: 800, color: accentDark, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>What&apos;s included</p>
+                                {[
+                                  'Full Practice Exams',
+                                  'Unlimited MCQ Bank',
+                                  'AI-Graded FRQs',
+                                  'Graphing Simulators',
+                                  'Unit Cheat Sheets',
+                                  'Note Upload Quizzes',
+                                ].map((f) => (
+                                  <div key={f} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <div style={{ width: '17px', height: '17px', borderRadius: '999px', background: accentColor, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                      <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                    </div>
+                                    <span style={{ fontSize: '13px', fontWeight: 600, color: '#374151' }}>{f}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })()
+                      ) : (
+                        /* ── Normal card back ── */
+                        <div className="w-full h-full bg-slate-50 border-2 border-slate-200 rounded-2xl flex flex-col p-8 overflow-y-auto">
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); setDropdownOpen((o) => !o); }}
+                            className={`self-end mb-4 px-3 py-1 rounded-lg text-xs font-bold cursor-pointer hover:opacity-80 transition-opacity ${getFlashcardTagClass(currentCard.tag)}`}
+                            title="Click to filter by type"
+                          >
+                            {currentCard.tag}
+                          </button>
+                          <div className="text-lg text-slate-800 leading-relaxed flex-1 flex flex-col gap-4">
+                            {currentCard.backImage ? (
+                              <img
+                                src={currentCard.backImage}
+                                alt="Graph or diagram"
+                                className="w-full max-w-md mx-auto rounded-lg border border-slate-200 shadow-sm object-contain"
+                              />
+                            ) : (
+                              <div>{currentCard.back}</div>
+                            )}
+                          </div>
+                          <span className="mt-4 text-sm text-slate-500">Space, ↑, or ↓ to flip back</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </motion.div>

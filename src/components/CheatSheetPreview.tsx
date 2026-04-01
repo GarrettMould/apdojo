@@ -96,6 +96,7 @@ export function CheatSheetPreview() {
                   src={url}
                   alt={`Whiteboard ${i + 1}`}
                   fill
+                  priority
                   className="object-cover"
                   sizes="80px"
                 />

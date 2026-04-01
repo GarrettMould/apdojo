@@ -205,7 +205,7 @@ export function EmbeddedCheckoutPage({ courseType }: EmbeddedCheckoutPageProps) 
                     <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                   ))}
                 </div>
-                <span className="text-sm font-semibold text-gray-600">500+ students trained</span>
+                <span className="text-sm font-semibold text-gray-600">1,000+ students helped</span>
               </div>
               {selectedReviews.map((review, i) => (
                 <motion.div

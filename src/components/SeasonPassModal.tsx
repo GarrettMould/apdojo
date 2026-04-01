@@ -228,7 +228,7 @@ export function SeasonPassModal({ subject, onClose }: SeasonPassModalProps) {
                 ))}
               </div>
                     <span style={{ fontSize: '12px', fontWeight: '600', color: '#6B7280' }}>
-                      500+ students trained
+                      1,000+ students helped
                     </span>
                     <span style={{
                       fontSize: '11px', fontWeight: '700',

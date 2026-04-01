@@ -3482,6 +3482,8 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
         freeUserShuffleLimitReached={!isProCustomer && dailyShuffleViewed >= DAILY_FREE_SHUFFLE_VIEWS}
         onCardView={handleShuffleCardView}
         seasonPassCourseType={selectedSubject === 'macro' ? 'macro' : 'micro'}
+        isLocked={!isProCustomer}
+        onLockedFlip={() => { setShuffleModalOpen(false); setShowShuffleLimitModal(true); }}
       />
 
       {/* Slide-up modal: redesigned Season Pass scroll popup */}
