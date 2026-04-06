@@ -1,258 +1,289 @@
 'use client';
 
-import React, { useCallback, useMemo } from 'react';
-import { ArrowRight } from 'lucide-react';
-import { graphGymScenarios, GraphGymScenario } from '@/data/graphGymScenarios';
+import React, { useMemo } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import { useCourseContext } from '@/contexts/CourseContext';
 import { macroUnits, microUnits } from '@/data/cheatSheets';
+import { getBundlesForSubject, BundleWithScenarios } from '@/data/graphGymBundles';
 
 // ---------------------------------------------------------------------------
-// Types
+// Accent colour → Tailwind classes
 // ---------------------------------------------------------------------------
 
-export type ScenarioDifficulty = 'Beginner' | 'Intermediate' | 'Advanced';
-
-export interface GraphGymScenarioCard {
-  id: string;
-  unit: number;
-  lessonId: string;
-  title: string;
-  difficulty: ScenarioDifficulty;
-  topics: string[];
-}
-
-function mapDifficulty(d: 'easy' | 'medium' | 'hard'): ScenarioDifficulty {
-  return d === 'easy' ? 'Beginner' : d === 'medium' ? 'Intermediate' : 'Advanced';
-}
-
-const TOPIC_SHORT_NAMES: Record<string, string> = {
-  'Production Possibilities Curve': 'PPC',
-  'Foreign Exchange': 'Forex',
-  'AD-AS Model': 'AD-AS',
-  'International Trade': 'Trade',
-  'Price Controls': 'Price Controls',
-  'Market Equilibrium': 'Supply & Demand',
-  'Negative Externality': 'Externalities',
-  'Positive Externality': 'Externalities',
-  'Externalities': 'Externalities',
-  'Deficit Spending': 'Fiscal Policy',
-  'Crowding Out': 'Fiscal Policy',
-  'Monetary Policy': 'Money Market',
-  'Recessionary Gap': 'AD-AS',
-  'Inflationary Gap': 'AD-AS',
-  'Short Run Equilibrium': 'AD-AS',
+const ACCENT_BG: Record<string, string> = {
+  blue:   'bg-blue-100 border-blue-400',
+  green:  'bg-green-100 border-green-400',
+  yellow: 'bg-yellow-100 border-yellow-400',
+  orange: 'bg-orange-100 border-orange-400',
+  red:    'bg-red-100 border-red-400',
+  purple: 'bg-purple-100 border-purple-400',
+  pink:   'bg-pink-100 border-pink-400',
+  teal:   'bg-teal-100 border-teal-400',
 };
 
-function topicToShortName(topic: string): string {
-  return TOPIC_SHORT_NAMES[topic] ?? topic;
-}
-
-function scenariosToCards(scenarios: GraphGymScenario[]): GraphGymScenarioCard[] {
-  return scenarios.map((s) => ({
-    id: String(s.id),
-    unit: parseInt(s.lessonId.split('.')[0], 10) || 1,
-    lessonId: s.lessonId,
-    title: s.title,
-    difficulty: mapDifficulty(s.difficulty),
-    topics: s.topics ?? [],
-  }));
-}
-
-function buildDisplayNames(cards: GraphGymScenarioCard[]): Map<string, string> {
-  const byTopic = new Map<string, GraphGymScenarioCard[]>();
-  for (const card of cards) {
-    const topic = card.topics[0] ?? 'Graph';
-    const short = topicToShortName(topic);
-    const list = byTopic.get(short) ?? [];
-    list.push(card);
-    byTopic.set(short, list);
-  }
-  const out = new Map<string, string>();
-  for (const [shortName, list] of byTopic) {
-    list.sort((a, b) => parseInt(a.id, 10) - parseInt(b.id, 10));
-    list.forEach((card, i) => out.set(card.id, `${shortName} #${i + 1}`));
-  }
-  return out;
-}
+const ACCENT_TEXT: Record<string, string> = {
+  blue:   'text-blue-700',
+  green:  'text-green-700',
+  yellow: 'text-yellow-700',
+  orange: 'text-orange-700',
+  red:    'text-red-700',
+  purple: 'text-purple-700',
+  pink:   'text-pink-700',
+  teal:   'text-teal-700',
+};
 
 // ---------------------------------------------------------------------------
-// Sub-components
+// BundleCard
 // ---------------------------------------------------------------------------
 
-function DifficultyBadge({ difficulty }: { difficulty: ScenarioDifficulty }) {
-  const styles: Record<ScenarioDifficulty, string> = {
-    Beginner:
-      'bg-green-500 text-white border-green-600',
-    Intermediate:
-      'bg-blue-500 text-white border-blue-600',
-    Advanced:
-      'bg-red-500 text-white border-red-600',
-  };
+function BundleCard({ item }: { item: BundleWithScenarios }) {
+  const { bundle, scenarios, thumbnailUrl } = item;
+  const accentBg = ACCENT_BG[bundle.accentColor] ?? 'bg-gray-100 border-gray-400';
+  const accentText = ACCENT_TEXT[bundle.accentColor] ?? 'text-gray-700';
 
   return (
-    <span
-      className={`inline-flex w-fit items-center rounded border-2 px-1.5 py-0.5 text-[10px] font-semibold leading-tight ${styles[difficulty]}`}
-      aria-label={`Difficulty: ${difficulty}`}
+    <Link
+      href={`/graph-gym/topic/${bundle.id}`}
+      className="group flex flex-col overflow-hidden rounded-2xl border-4 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
     >
-      {difficulty}
-    </span>
-  );
-}
+      {/* Thumbnail — image inset so it reads smaller inside the frame */}
+      <div className="relative w-full overflow-hidden bg-white border-b-4 border-black" style={{ aspectRatio: '7/5' }}>
+        {thumbnailUrl ? (
+          <div className="absolute inset-3 sm:inset-4">
+            <Image
+              src={thumbnailUrl}
+              alt={bundle.label}
+              fill
+              className="object-contain object-center transition-transform duration-300 group-hover:scale-105"
+              sizes="(max-width: 640px) 50vw, 33vw"
+            />
+          </div>
+        ) : (
+          <div className={`h-full w-full flex items-center justify-center ${accentBg}`}>
+            <span className={`text-4xl font-black ${accentText}`}>?</span>
+          </div>
+        )}
+      </div>
 
-function LessonIdBadge({ lessonId }: { lessonId: string }) {
-  return (
-    <span
-      className="inline-flex w-fit items-center rounded border border-muted-foreground/30 bg-muted/50 px-1.5 py-0.5 text-[10px] font-semibold leading-tight text-muted-foreground"
-      aria-label={`Lesson: ${lessonId}`}
-    >
-      {lessonId}
-    </span>
-  );
-}
-
-function ScenarioCard({
-  scenario,
-  displayName,
-  onSelect,
-}: {
-  scenario: GraphGymScenarioCard;
-  displayName: string;
-  onSelect: (id: string) => void;
-}) {
-  const handleClick = useCallback(
-    (e: React.MouseEvent<HTMLElement>) => {
-      const id = (e.currentTarget as HTMLElement).dataset.scenarioId;
-      if (id) onSelect(id);
-    },
-    [onSelect]
-  );
-
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        onSelect(scenario.id);
-      }
-    },
-    [scenario.id, onSelect]
-  );
-
-  return (
-    <article
-      role="button"
-      tabIndex={0}
-      data-scenario-id={scenario.id}
-      onClick={handleClick}
-      onKeyDown={handleKeyDown}
-      className="group flex cursor-pointer items-center justify-between gap-5 rounded-xl border-4 border-black bg-white p-6 text-left shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 min-h-[88px]"
-      aria-label={`Start scenario: ${scenario.title}`}
-    >
-      <div className="flex min-w-0 flex-1 flex-col gap-2">
-        <h3 className="font-black text-gray-900 group-hover:text-blue-600 text-lg transition-colors">
-          {displayName}
+      {/* Body */}
+      <div className="flex flex-1 flex-col gap-1.5 p-4">
+        <h3 className="font-black text-gray-900 text-base leading-tight group-hover:text-blue-600 transition-colors">
+          {bundle.label}
         </h3>
-        <div className="flex flex-wrap items-center gap-1.5">
-          <LessonIdBadge lessonId={scenario.lessonId} />
-          <DifficultyBadge difficulty={scenario.difficulty} />
+        <p className="text-xs text-gray-500 font-medium leading-snug line-clamp-2">
+          {bundle.description}
+        </p>
+        <div className="mt-auto pt-2 flex items-center justify-between">
+          <span className={`inline-flex items-center gap-1 rounded-lg border-2 px-2 py-0.5 text-[11px] font-black ${accentBg} ${accentText}`}>
+            {scenarios.length} {scenarios.length === 1 ? 'graph' : 'graphs'}
+          </span>
+          <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" />
         </div>
       </div>
-      <ArrowRight
-        className="h-6 w-6 flex-shrink-0 text-gray-500 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all"
-        aria-label="Start"
-      />
-    </article>
+    </Link>
   );
 }
 
 // ---------------------------------------------------------------------------
-// Main Component
+// Main Dashboard
 // ---------------------------------------------------------------------------
 
 interface GraphGymDashboardProps {
+  // kept for backwards compatibility — no longer used internally for navigation
   onSelectScenario?: (id: string) => void;
 }
 
-function groupByUnit(cards: GraphGymScenarioCard[]): Map<number, GraphGymScenarioCard[]> {
-  const map = new Map<number, GraphGymScenarioCard[]>();
-  for (const card of cards) {
-    const list = map.get(card.unit) ?? [];
-    list.push(card);
-    map.set(card.unit, list);
-  }
-  return map;
-}
-
-export function GraphGymDashboard({ onSelectScenario }: GraphGymDashboardProps) {
+export function GraphGymDashboard({ onSelectScenario: _onSelectScenario }: GraphGymDashboardProps) {
   const { currentCourse } = useCourseContext();
 
-  const allScenarioCards = useMemo(() => {
-    const bySubject = graphGymScenarios.filter((s) => {
-      const subjects = Array.isArray(s.subject) ? s.subject : [s.subject];
-      return subjects.includes(currentCourse);
-    });
-    return scenariosToCards(bySubject);
-  }, [currentCourse]);
-
-  const scenariosByUnit = useMemo(
-    () => groupByUnit(allScenarioCards),
-    [allScenarioCards]
+  const bundles = useMemo(
+    () => getBundlesForSubject(currentCourse),
+    [currentCourse],
   );
 
-  const displayNames = useMemo(
-    () => buildDisplayNames(allScenarioCards),
-    [allScenarioCards]
-  );
+  // Group bundles by unit
+  const byUnit = useMemo(() => {
+    const map = new Map<number, BundleWithScenarios[]>();
+    for (const item of bundles) {
+      const list = map.get(item.bundle.unit) ?? [];
+      list.push(item);
+      map.set(item.bundle.unit, list);
+    }
+    return map;
+  }, [bundles]);
 
   const unitNumbers = useMemo(
-    () => Array.from(scenariosByUnit.keys()).sort((a, b) => a - b),
-    [scenariosByUnit]
+    () => Array.from(byUnit.keys()).sort((a, b) => a - b),
+    [byUnit],
   );
 
   const unitsWithTitles = useMemo(() => {
     const units = currentCourse === 'macro' ? macroUnits : microUnits;
-    return unitNumbers.map((num) => units.find((u) => u.number === num)).filter(Boolean) as Array<{ number: number; title: string }>;
+    return unitNumbers
+      .map((num) => units.find((u) => u.number === num))
+      .filter(Boolean) as Array<{ number: number; title: string }>;
   }, [currentCourse, unitNumbers]);
 
-  const handleSelectScenario = useCallback(
-    (id: string) => {
-      onSelectScenario?.(id);
-    },
-    [onSelectScenario]
-  );
+  const FEATURED_IDS: Record<'macro' | 'micro', string[]> = {
+    macro: ['macro-ad-as', 'macro-phillips', 'macro-ample-reserves'],
+    micro: ['micro-monopoly', 'micro-perfect-competition', 'micro-externalities'],
+  };
+
+  const featuredBundles = useMemo(() => {
+    const ids = FEATURED_IDS[currentCourse];
+    return ids.map((id) => bundles.find((b) => b.bundle.id === id)).filter(Boolean) as BundleWithScenarios[];
+  }, [bundles, currentCourse]);
 
   return (
     <div className="min-h-0 w-full overflow-auto bg-gray-50">
       <main className="px-4 py-12">
-        <div className="mx-auto max-w-[720px]">
-          <header className="mb-12 text-center">
-            <h1 className="text-5xl sm:text-6xl font-black text-gray-900 mb-4 tracking-tight">
+        <div className="mx-auto max-w-[960px]">
+
+          {/* ── Feature Preview ─────────────────────────────────────── */}
+          <section className="mb-20 flex flex-col lg:flex-row lg:items-center gap-10 lg:gap-14">
+
+            {/* Left — copy */}
+            <div className="lg:w-[340px] flex-shrink-0">
+              <span className="inline-block text-[11px] font-black uppercase tracking-[0.18em] text-blue-600 border-2 border-blue-600 rounded-full px-3 py-1 mb-5">
+                How it works
+              </span>
+
+              <h1 className="text-4xl sm:text-5xl font-black text-gray-900 leading-tight mb-4 tracking-tight">
               Graph Gym
             </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Draw the graphs. Master the exam.
-            </p>
-          </header>
+              <p className="text-lg text-gray-600 font-medium leading-relaxed mb-8">
+                The only AP Econ tool that makes you <em>draw</em> the graphs — just like the real FRQ section. No multiple choice. No shortcuts.
+              </p>
 
-          <div className="space-y-12">
+              {/* Steps */}
+              <ol className="space-y-5">
+                {([
+                  {
+                    n: '1',
+                    title: 'Pick a graph scenario',
+                    desc: '90+ prompts covering every AP Macro and Micro graph the exam can throw at you.',
+                  },
+                  {
+                    n: '2',
+                    title: 'Draw it from scratch',
+                    desc: 'Use the whiteboard to sketch curves, labels, and shifts — exactly as you would on paper.',
+                  },
+                  {
+                    n: '3',
+                    title: 'Self-grade with the rubric',
+                    desc: 'Reveal the sample answer and check off each AP-style rubric item to find exactly what to fix.',
+                  },
+                ] as const).map((step) => (
+                  <li key={step.n} className="flex items-start gap-4">
+                    <span className="w-8 h-8 rounded-xl border-2 border-black bg-black text-white flex items-center justify-center font-black text-sm flex-shrink-0 shadow-[2px_2px_0px_0px_rgba(0,0,0,0.3)]">
+                      {step.n}
+                    </span>
+                    <div>
+                      <p className="font-black text-gray-900 text-sm leading-snug">{step.title}</p>
+                      <p className="text-gray-500 text-sm leading-relaxed mt-0.5">{step.desc}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </div>
+
+            {/* Right — overlapping visual (desktop) */}
+            <div className="flex-1 min-w-0">
+              {/* Desktop: overlapping video + sidebar */}
+              <div className="hidden sm:block relative h-[420px]">
+                {/* Video — bottom-left, ~78% width */}
+                <div className="absolute bottom-0 left-0 w-[78%] rounded-2xl border-4 border-black overflow-hidden shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+                  <video
+                    src="https://apdojovideos.s3.ap-southeast-2.amazonaws.com/prev_final.mov"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    className="w-full block"
+                  />
+                </div>
+
+                {/* Sidebar card — floats above, pushed left into the video */}
+                <div className="absolute top-0 right-[14%] w-[185px] bg-white rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden z-10">
+                  <div className="p-2 border-b-2 border-black">
+                    <p className="text-[8px] font-black uppercase tracking-widest text-black mb-1.5">Sample Answer</p>
+                    <img
+                      src="https://apdojovideos.s3.ap-southeast-2.amazonaws.com/graphGym/wb15.jpg"
+                      alt="Loanable funds sample answer"
+                      className="w-full rounded-md border-2 border-black"
+                    />
+                  </div>
+                  <div className="p-2">
+                    <p className="text-[8px] font-black uppercase tracking-widest text-black mb-1.5">Self-Correction Checklist</p>
+                    <div className="space-y-1">
+                      {[
+                        'Demand for loanable funds shifts right',
+                        'Real Interest Rate increases',
+                        'Quantity of loanable funds increases',
+                        'Axes are labeled correctly',
+                      ].map((text, i) => (
+                        <div key={i} className="flex items-start gap-1.5 p-1.5 rounded-md border-2 border-black bg-green-50">
+                          <CheckCircle2 className="w-3 h-3 text-green-600 flex-shrink-0 mt-0.5" />
+                          <span className="text-[10px] font-semibold text-black leading-snug">{text}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mobile: stacked */}
+              <div className="sm:hidden space-y-4">
+                <div className="rounded-2xl border-4 border-black overflow-hidden shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+                  <video
+                    src="https://apdojovideos.s3.ap-southeast-2.amazonaws.com/prev_final.mov"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    className="w-full block"
+                  />
+                </div>
+              </div>
+            </div>
+          </section>
+          {/* ── / Feature Preview ────────────────────────────────────── */}
+
+          {/* ── Featured bundles ────────────────────────────────────── */}
+          {featuredBundles.length > 0 && (
+            <section className="mb-14">
+              <div className="flex items-center gap-3 mb-5">
+                <h2 className="text-2xl font-black text-gray-900">Start Here</h2>
+                <span className="text-[10px] font-black uppercase tracking-[0.15em] text-blue-600 border-2 border-blue-600 rounded-full px-2.5 py-0.5">
+                  Most tested
+                </span>
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                {featuredBundles.map((item) => (
+                  <BundleCard key={item.bundle.id} item={item} />
+                ))}
+              </div>
+            </section>
+          )}
+          {/* ── / Featured bundles ───────────────────────────────────── */}
+
+          {/* Units */}
+          <div className="space-y-14">
             {unitsWithTitles.map((unit) => {
-              const cards = scenariosByUnit.get(unit.number) ?? [];
-              if (cards.length === 0) return null;
+              const items = byUnit.get(unit.number) ?? [];
+              if (items.length === 0) return null;
               return (
                 <section key={unit.number}>
-                  <h2 className="text-2xl font-black text-gray-900 mb-6 pt-4 border-t border-gray-200 first:border-t-0 first:pt-0">
+                  <h2 className="text-2xl font-black text-gray-900 mb-6 pt-4 border-t-4 border-black">
                     Unit {unit.number}: {unit.title}
                   </h2>
-                  <ul className="list-none p-0 m-0 flex flex-col gap-4">
-                    {cards.map((scenario) => (
-                      <li key={scenario.id}>
-                        <ScenarioCard
-                          scenario={scenario}
-                          displayName={displayNames.get(scenario.id) ?? scenario.title}
-                          onSelect={handleSelectScenario}
-                        />
-                      </li>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    {items.map((item) => (
+                      <BundleCard key={item.bundle.id} item={item} />
                     ))}
-                  </ul>
+                  </div>
                 </section>
               );
             })}

@@ -7,52 +7,44 @@ import { FirebaseError } from 'firebase/app'
 import { Check, X, ArrowRight } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
+import Image from 'next/image'
 
 export default function Signup() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [isSubscribed, setIsSubscribed] = useState(true) // State for the checkbox, default to true
+  const [isSubscribed, setIsSubscribed] = useState(true)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const { signup } = useAuthContext()
-  
-  // Typing animation for email placeholder
+
   const [emailPlaceholder, setEmailPlaceholder] = useState('')
   const fullPlaceholder = 'sensei@apdojo.com'
-  
+
   useEffect(() => {
-    let currentIndex = 0
-    const typingInterval = setInterval(() => {
-      if (currentIndex <= fullPlaceholder.length) {
-        setEmailPlaceholder(fullPlaceholder.slice(0, currentIndex))
-        currentIndex++
+    let i = 0
+    const id = setInterval(() => {
+      if (i <= fullPlaceholder.length) {
+        setEmailPlaceholder(fullPlaceholder.slice(0, i))
+        i++
       } else {
-        clearInterval(typingInterval)
+        clearInterval(id)
       }
-    }, 100) // Typing speed
-    
-    return () => clearInterval(typingInterval)
+    }, 100)
+    return () => clearInterval(id)
   }, [])
-  
+
   const [teacherCode, setTeacherCode] = useState('')
+  const teacherCodeStatus =
+    teacherCode.trim() === '' ? 'empty' : teacherCode.trim() === '9759' ? 'correct' : 'incorrect'
 
-  // Teacher code validation for visual feedback only (optional field - signup always allowed)
-  const teacherCodeStatus = teacherCode.trim() === ''
-    ? 'empty'
-    : teacherCode.trim() === '9759'
-    ? 'correct'
-    : 'incorrect'
-
-  // Password validation states
   const [hasMinLength, setHasMinLength] = useState(false)
   const [hasUpperCase, setHasUpperCase] = useState(false)
   const [hasLowerCase, setHasLowerCase] = useState(false)
   const [hasNumber, setHasNumber] = useState(false)
   const [passwordsMatch, setPasswordsMatch] = useState(false)
 
-  // Check password requirements
   useEffect(() => {
     setHasMinLength(password.length >= 8)
     setHasUpperCase(/[A-Z]/.test(password))
@@ -61,216 +53,210 @@ export default function Signup() {
     setPasswordsMatch(password === confirmPassword && password !== '')
   }, [password, confirmPassword])
 
-  const isValidPassword = hasMinLength && hasUpperCase && hasLowerCase && 
-    hasNumber && passwordsMatch
+  const isValidPassword = hasMinLength && hasUpperCase && hasLowerCase && hasNumber && passwordsMatch
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!isValidPassword) {
-      setError('Please ensure all password requirements are met.')
+      setError('Please meet all password requirements.')
       return
     }
-    
     setError('')
     setLoading(true)
-
     try {
       const isTeacher = teacherCode.trim() === '9759'
       await signup(email, password, isSubscribed, isTeacher)
       router.push('/')
-    } catch (err: any) {
-      // User-friendly error messages
+    } catch (err) {
       if (err instanceof FirebaseError) {
         switch (err.code) {
-          case 'auth/invalid-email':
-            setError('Please enter a valid email address');
-            break;
-          case 'auth/email-already-in-use':
-            setError('An account already exists with this email');
-            break;
-          case 'auth/weak-password':
-            setError('Please choose a stronger password');
-            break;
-          default:
-            setError('An error occurred. Please try again.');
+          case 'auth/invalid-email': setError('Please enter a valid email address'); break
+          case 'auth/email-already-in-use': setError('An account already exists with this email'); break
+          case 'auth/weak-password': setError('Please choose a stronger password'); break
+          default: setError('An error occurred. Please try again.')
         }
       } else {
-        setError('An error occurred. Please try again.');
+        setError('An error occurred. Please try again.')
       }
     } finally {
       setLoading(false)
     }
   }
 
+  const reqRow = (met: boolean, label: string) => (
+    <div className={`flex items-center gap-2 text-sm font-semibold ${met ? 'text-green-600' : 'text-gray-400'}`}>
+      <div className={`w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 border-2 ${met ? 'bg-green-500 border-green-500' : 'border-gray-300'}`}>
+        {met && <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />}
+      </div>
+      {label}
+    </div>
+  )
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
+      <div className="w-full max-w-lg">
 
-      <div className="max-w-2xl w-full relative z-10 mx-auto">
-        {/* Signup form - Centered */}
-        <div className="bg-white/90 backdrop-blur-lg rounded-2xl shadow-2xl border border-gray-200 p-8 md:p-10" style={{ boxShadow: '0 0 40px rgba(59, 130, 246, 0.3), 0 0 80px rgba(59, 130, 246, 0.15)' }}>
-              <div className="text-center mb-8">
-                <h2 className="text-3xl font-black text-gray-900 mb-2">
-                  Join the <span className="text-blue-500">Dojo</span>
-                </h2>
-                <p className="text-gray-600">
-                  Create your free account and unlock your potential
-                </p>
+        {/* Logo */}
+        <div className="flex items-center justify-center gap-3 mb-8">
+          <Image src="/images/dojoIconJan26.svg" alt="AP Dojo" width={40} height={40} className="w-10 h-10" unoptimized />
+          <span className="text-2xl font-black tracking-wide text-gray-900">
+            AP <span className="text-blue-500">Dojo</span>
+          </span>
+        </div>
+
+        {/* Card */}
+        <div className="bg-white border-4 border-black rounded-2xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8">
+          <h2 className="text-3xl font-black text-gray-900 mb-1">
+            Join the Dojo
+          </h2>
+          <p className="text-gray-600 font-medium mb-8">
+            Create your free account and start scoring 5s.
+          </p>
+
+          <form className="space-y-5" onSubmit={handleSubmit}>
+            {error && (
+              <div className="flex items-center gap-2 p-4 bg-red-50 border-2 border-red-500 rounded-xl text-red-700 text-sm font-semibold">
+                <X className="w-4 h-4 flex-shrink-0" />
+                {error}
               </div>
+            )}
 
-              <form className="space-y-6" onSubmit={handleSubmit}>
-                {error && (
-                  <div className="text-red-600 text-sm text-center bg-red-50 p-4 rounded-xl border border-red-200 flex items-center justify-center gap-2">
-                    <X className="w-5 h-5" />
-                    {error}
-                  </div>
-                )}
+            {/* Email */}
+            <div>
+              <label className="block text-xs font-black text-gray-900 uppercase tracking-widest mb-2">
+                Email address
+              </label>
+              <input
+                type="email"
+                required
+                className="w-full px-4 py-3 border-2 border-black rounded-xl text-base font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all placeholder:text-gray-400"
+                placeholder={emailPlaceholder || 'sensei@apdojo.com'}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={loading}
+              />
+            </div>
 
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Email address
-                    </label>
-                    <input
-                      type="email"
-                      required
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base transition-all"
-                      placeholder={emailPlaceholder || 'sensei@apdojo.com'}
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      disabled={loading}
-                    />
-                  </div>
+            {/* Password */}
+            <div>
+              <label className="block text-xs font-black text-gray-900 uppercase tracking-widest mb-2">
+                Password
+              </label>
+              <input
+                type="password"
+                required
+                className="w-full px-4 py-3 border-2 border-black rounded-xl text-base font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all placeholder:text-gray-400"
+                placeholder="Create a strong password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={loading}
+              />
+            </div>
 
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Password
-                    </label>
-                    <input
-                      type="password"
-                      required
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base transition-all"
-                      placeholder="Create a strong password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      disabled={loading}
-                    />
-                  </div>
+            {/* Confirm Password */}
+            <div>
+              <label className="block text-xs font-black text-gray-900 uppercase tracking-widest mb-2">
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                required
+                className="w-full px-4 py-3 border-2 border-black rounded-xl text-base font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all placeholder:text-gray-400"
+                placeholder="Confirm your password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                disabled={loading}
+              />
+            </div>
 
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Confirm Password
-                    </label>
-                    <input
-                      type="password"
-                      required
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base transition-all"
-                      placeholder="Confirm your password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      disabled={loading}
-                    />
-                  </div>
-                </div>
-
-                {/* Password requirements */}
-                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                  <p className="text-sm font-semibold text-gray-900 mb-3">Password requirements:</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className={`flex items-center gap-2 text-sm ${hasMinLength ? "text-green-600" : "text-gray-500"}`}>
-                      <Check className={`w-4 h-4 ${hasMinLength ? "" : "opacity-30"}`} />
-                      <span>8+ characters</span>
-                    </div>
-                    <div className={`flex items-center gap-2 text-sm ${hasUpperCase ? "text-green-600" : "text-gray-500"}`}>
-                      <Check className={`w-4 h-4 ${hasUpperCase ? "" : "opacity-30"}`} />
-                      <span>Uppercase letter</span>
-                    </div>
-                    <div className={`flex items-center gap-2 text-sm ${hasLowerCase ? "text-green-600" : "text-gray-500"}`}>
-                      <Check className={`w-4 h-4 ${hasLowerCase ? "" : "opacity-30"}`} />
-                      <span>Lowercase letter</span>
-                    </div>
-                    <div className={`flex items-center gap-2 text-sm ${hasNumber ? "text-green-600" : "text-gray-500"}`}>
-                      <Check className={`w-4 h-4 ${hasNumber ? "" : "opacity-30"}`} />
-                      <span>Number</span>
-                    </div>
-                  </div>
-                  <div className={`mt-2 flex items-center gap-2 text-sm ${passwordsMatch ? "text-green-600" : "text-gray-500"}`}>
-                    <Check className={`w-4 h-4 ${passwordsMatch ? "" : "opacity-30"}`} />
-                    <span>Passwords match</span>
-                  </div>
-                </div>
-
-                {/* Subscribe Checkbox */}
-                <div className="flex items-start space-x-3 p-4 bg-blue-50 rounded-xl border border-blue-100">
-                  <Checkbox 
-                    id="subscribe" 
-                    checked={isSubscribed} 
-                    onCheckedChange={(checked) => setIsSubscribed(checked as boolean)}
-                    className="h-5 w-5 mt-0.5"
-                  />
-                  <Label htmlFor="subscribe" className="text-sm font-medium leading-relaxed text-gray-700 cursor-pointer">
-                    Send me helpful tips, course updates, and special offers.
-                  </Label>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Teacher code (optional)
-                  </label>
-                  <input
-                    type="text"
-                    className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base transition-all ${
-                      teacherCodeStatus === 'correct'
-                        ? 'border-green-500 bg-green-50/50'
-                        : teacherCodeStatus === 'incorrect'
-                        ? 'border-red-500 bg-red-50/50'
-                        : 'border-gray-200'
-                    }`}
-                    placeholder="Enter teacher code for teacher access"
-                    value={teacherCode}
-                    onChange={(e) => setTeacherCode(e.target.value)}
-                    disabled={loading}
-                  />
-                  {teacherCodeStatus === 'incorrect' && (
-                    <p className="mt-1.5 text-sm text-red-600">Incorrect code. You can still create an account—teacher features require the correct code.</p>
-                  )}
-                  {teacherCodeStatus === 'correct' && (
-                    <p className="mt-1.5 text-sm text-green-600 flex items-center gap-1.5">
-                      <Check className="w-4 h-4" /> Teacher access will be enabled
-                    </p>
-                  )}
-                </div>
-
-                <button
-                  type="submit"
-                  className={`group relative w-full flex items-center justify-center gap-2 py-4 px-6 text-base font-bold rounded-xl text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-lg hover:shadow-xl transition-all transform hover:scale-[1.02] ${
-                    (loading || !isValidPassword) ? 'opacity-50 cursor-not-allowed transform-none' : ''
-                  }`}
-                  disabled={loading || !isValidPassword}
-                >
-                  {loading ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      <span>Creating account...</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Create Account</span>
-                      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                    </>
-                  )}
-                </button>
-              </form>
-
-              <div className="mt-6 text-center">
-                <p className="text-sm text-gray-600">
-                  Already have an account?{' '}
-                  <Link href="/login" className="font-semibold text-blue-600 hover:text-blue-700 transition-colors">
-                    Sign in
-                  </Link>
-                </p>
+            {/* Password requirements */}
+            <div className="bg-gray-50 border-2 border-black rounded-xl p-4">
+              <p className="text-xs font-black text-gray-900 uppercase tracking-widest mb-3">Password requirements</p>
+              <div className="grid grid-cols-2 gap-2">
+                {reqRow(hasMinLength, '8+ characters')}
+                {reqRow(hasUpperCase, 'Uppercase letter')}
+                {reqRow(hasLowerCase, 'Lowercase letter')}
+                {reqRow(hasNumber, 'Number')}
+              </div>
+              <div className="mt-2">
+                {reqRow(passwordsMatch, 'Passwords match')}
               </div>
             </div>
+
+            {/* Subscribe */}
+            <div className="flex items-start gap-3 p-4 bg-blue-50 border-2 border-blue-200 rounded-xl">
+              <Checkbox
+                id="subscribe"
+                checked={isSubscribed}
+                onCheckedChange={(v) => setIsSubscribed(v as boolean)}
+                className="h-5 w-5 mt-0.5 border-2 border-black"
+              />
+              <Label htmlFor="subscribe" className="text-sm font-semibold leading-relaxed text-gray-700 cursor-pointer">
+                Send me helpful tips, course updates, and special offers.
+              </Label>
+            </div>
+
+            {/* Teacher code */}
+            <div>
+              <label className="block text-xs font-black text-gray-900 uppercase tracking-widest mb-2">
+                Teacher code <span className="text-gray-400 normal-case font-semibold tracking-normal">(optional)</span>
+              </label>
+              <input
+                type="text"
+                className={`w-full px-4 py-3 border-2 rounded-xl text-base font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder:text-gray-400 ${
+                  teacherCodeStatus === 'correct'
+                    ? 'border-green-500 bg-green-50'
+                    : teacherCodeStatus === 'incorrect'
+                    ? 'border-red-500 bg-red-50'
+                    : 'border-black'
+                }`}
+                placeholder="Enter teacher code"
+                value={teacherCode}
+                onChange={(e) => setTeacherCode(e.target.value)}
+                disabled={loading}
+              />
+              {teacherCodeStatus === 'incorrect' && (
+                <p className="mt-1.5 text-sm font-semibold text-red-600">Incorrect code — you can still create an account.</p>
+              )}
+              {teacherCodeStatus === 'correct' && (
+                <p className="mt-1.5 text-sm font-semibold text-green-600 flex items-center gap-1.5">
+                  <Check className="w-4 h-4" /> Teacher access will be enabled
+                </p>
+              )}
+            </div>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={loading || !isValidPassword}
+              className={`w-full flex items-center justify-center gap-2 py-3.5 px-6 font-black text-base text-white bg-blue-500 hover:bg-blue-600 border-2 border-blue-700 rounded-xl shadow-[0_4px_0_0_rgba(0,0,0,1)] active:translate-y-0.5 active:shadow-[0_2px_0_0_rgba(0,0,0,1)] transition-all ${
+                (loading || !isValidPassword) ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+            >
+              {loading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Creating account…
+                </>
+              ) : (
+                <>
+                  Create Account <ArrowRight className="w-5 h-5" />
+                </>
+              )}
+            </button>
+          </form>
+
+          <div className="mt-6 pt-6 border-t-2 border-gray-100 text-center">
+            <p className="text-sm text-gray-600 font-medium">
+              Already have an account?{' '}
+              <Link href="/login" className="font-black text-blue-600 hover:text-blue-700 underline underline-offset-2">
+                Sign in
+              </Link>
+            </p>
           </div>
+        </div>
+
+      </div>
     </div>
   )
 }

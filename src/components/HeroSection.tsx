@@ -31,7 +31,7 @@ const SLIDES = [
   { label: 'Unit Cheat Sheets', component: <div className="w-full flex min-h-[400px]"><CheatSheetPreview /></div> },
 ];
 
-function MobileFeatureCarousel() {
+function MobileFeatureCarousel({ courseType }: { courseType: string }) {
   const [active, setActive] = useState(0);
   const [direction, setDirection] = useState(1);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -89,6 +89,12 @@ function MobileFeatureCarousel() {
             {SLIDES[active].component}
           </motion.div>
         </AnimatePresence>
+        {/* Transparent overlay — captures all clicks and routes to purchase */}
+        <Link
+          href={`/purchase/season-pass?courseType=${courseType}`}
+          className="absolute inset-0 z-10 cursor-pointer"
+          aria-label="Get the Season Pass"
+        />
       </div>
 
       {/* Dot indicators */}
@@ -257,9 +263,9 @@ export function HeroSection() {
           </motion.div>
 
           {/* ── MOBILE: auto-cycling carousel ── */}
-          <MobileFeatureCarousel />
+          <MobileFeatureCarousel courseType={selectedSubject} />
 
-          {/* ── DESKTOP: 3-column grid (unchanged) ── */}
+          {/* ── DESKTOP: 3-column grid ── */}
           <motion.div
             variants={containerVariants}
             className="hidden lg:grid grid-cols-3 gap-8 w-full mx-auto items-stretch"
@@ -269,8 +275,9 @@ export function HeroSection() {
                 <div className="text-center mb-4">
                   <h3 className="text-2xl sm:text-3xl font-black text-gray-900">AI-Graded FRQs</h3>
                 </div>
-                <div className="w-full flex">
+                <div className="w-full flex relative">
                   <FRQFeedbackDemo />
+                  <Link href={`/purchase/season-pass?courseType=${selectedSubject}`} className="absolute inset-0 z-10 cursor-pointer" aria-label="Get the Season Pass" />
                 </div>
               </div>
             </motion.div>
@@ -280,7 +287,10 @@ export function HeroSection() {
                 <div className="text-center mb-4">
                   <h3 className="text-2xl sm:text-3xl font-black text-gray-900">Unlimited MCQ Practice</h3>
                 </div>
-                <MCQPracticePreview />
+                <div className="w-full flex relative">
+                  <MCQPracticePreview />
+                  <Link href={`/purchase/season-pass?courseType=${selectedSubject}`} className="absolute inset-0 z-10 cursor-pointer" aria-label="Get the Season Pass" />
+                </div>
               </div>
             </motion.div>
 
@@ -289,8 +299,9 @@ export function HeroSection() {
                 <div className="text-center mb-4">
                   <h3 className="text-2xl sm:text-3xl font-black text-gray-900">Unit Cheat Sheets</h3>
                 </div>
-                <div className="flex-1 min-h-0 w-full flex">
+                <div className="flex-1 min-h-0 w-full flex relative">
                   <CheatSheetPreview />
+                  <Link href={`/purchase/season-pass?courseType=${selectedSubject}`} className="absolute inset-0 z-10 cursor-pointer" aria-label="Get the Season Pass" />
                 </div>
               </div>
             </motion.div>

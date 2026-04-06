@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
-import { Menu, X, ChevronDown } from 'lucide-react';
+import { Menu, X, ChevronDown, UserCircle } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { Button } from './ui/button';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
@@ -281,23 +281,23 @@ export function Header() {
             {/* Subject Toggle for Logged-Out Users */}
             {!user && (
               <div className="flex items-center">
-                <div className="inline-flex items-center bg-gray-100 rounded-lg p-1 border border-gray-300">
+                <div className="inline-flex items-center bg-gray-100 rounded-xl p-1 border-2 border-gray-300 shadow-[0_3px_0_0_rgba(209,213,219,1)]">
                   <button
                     onClick={() => handleSubjectChange('macro')}
-                    className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all duration-200 ${
+                    className={`px-4 py-1.5 text-sm font-black rounded-lg transition-all duration-200 ${
                       (mounted ? selectedSubject : 'macro') === 'macro'
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:text-gray-900'
+                        ? 'bg-blue-500 text-white border-2 border-blue-700 shadow-[0_2px_0_0_rgba(0,0,0,0.4)]'
+                        : 'bg-gray-100 text-gray-600 hover:text-gray-900'
                     }`}
                   >
                     Macro
                   </button>
                   <button
                     onClick={() => handleSubjectChange('micro')}
-                    className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all duration-200 ${
+                    className={`px-4 py-1.5 text-sm font-black rounded-lg transition-all duration-200 ${
                       (mounted ? selectedSubject : 'macro') === 'micro'
-                        ? 'bg-green-600 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:text-gray-900'
+                        ? 'bg-green-500 text-white border-2 border-green-700 shadow-[0_2px_0_0_rgba(0,0,0,0.4)]'
+                        : 'bg-gray-100 text-gray-600 hover:text-gray-900'
                     }`}
                   >
                     Micro
@@ -308,17 +308,10 @@ export function Header() {
 
             {/* User Icon & Auth Buttons */}
             <div className="flex items-center gap-3">
-              {/* XP bar with subtle red glow - Clickable to open belt dropdown */}
+              {/* Account icon — opens belt/XP dropdown */}
               <div className="flex items-center relative" ref={beltDropdownRef}>
                 {(() => {
                   const xp = user ? getSubjectXP(userData, displaySubject) : (guestXp ?? 0);
-                  const clamped = Math.max(0, Math.min(xp, 2000));
-                  const ratio = clamped / 2000; // 0 to 1
-                  // Very light opaque red glow that intensifies slightly with XP
-                  const baseAlpha = 0.08;
-                  const maxAlpha = 0.24;
-                  const alpha = baseAlpha + (maxAlpha - baseAlpha) * ratio;
-                  const background = `rgba(248, 113, 113, ${alpha})`; // red-400 with low opacity
                   return (
                     <>
                       <button
@@ -327,22 +320,11 @@ export function Header() {
                           e.preventDefault();
                           setIsBeltDropdownOpen(prev => !prev);
                         }}
-                        className="flex items-center gap-2 px-4 py-1.5 rounded-md border border-red-100 text-sm font-semibold text-gray-800 transition-colors duration-300 cursor-pointer hover:opacity-80"
-                        style={{ background }}
+                        className="flex items-center gap-1 p-1.5 rounded-lg text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-colors cursor-pointer"
                         data-xp-button="true"
+                        aria-label="Account & XP"
                       >
-                        <span className="uppercase tracking-tight text-[11px] text-gray-600">XP</span>
-                        <span>{xp}</span>
-                        <span className="inline-flex items-center">
-                          <Image
-                            src="/images/flame100.png"
-                            alt="XP Flame"
-                            width={20}
-                            height={20}
-                            className="w-5 h-5"
-                            unoptimized={true}
-                          />
-                        </span>
+                        <UserCircle className="w-7 h-7" />
                         <ChevronDown className={`w-4 h-4 transition-transform ${isBeltDropdownOpen ? 'rotate-180' : ''}`} />
                       </button>
 
@@ -438,13 +420,12 @@ export function Header() {
               </div>
 
               {!user && (
-                <div className="flex items-center gap-2">
-                  <Link href="/signup" passHref>
-                    <Button variant="outline" size="sm">
-                      Sign up
-                    </Button>
-                  </Link>
-                </div>
+                <Link
+                  href="/signup"
+                  className="inline-flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white font-black text-base px-6 py-2.5 rounded-xl border-2 border-blue-700 shadow-[0_4px_0_0_rgba(0,0,0,1)] active:translate-y-0.5 active:shadow-[0_2px_0_0_rgba(0,0,0,1)] transition-all"
+                >
+                  Sign up free →
+                </Link>
               )}
             </div>
           </div>

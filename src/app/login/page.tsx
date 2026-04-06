@@ -4,10 +4,10 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuthContext } from '@/contexts/AuthContext'
 import Link from 'next/link'
 import { sendPasswordResetEmail } from 'firebase/auth'
-import { FirebaseError } from 'firebase/app'
 import { auth } from '@/lib/firebase'
+import { ArrowRight, X } from 'lucide-react'
+import Image from 'next/image'
 
-// Define the component containing the logic that uses useSearchParams
 function LoginPageContent() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -19,20 +19,11 @@ function LoginPageContent() {
   const { login, user, loading: authLoading } = useAuthContext()
 
   useEffect(() => {
-    // Only redirect away from login page IF:
-    // 1. Auth is not loading
-    // 2. User is logged in
-    // 3. There is NO 'redirect' query parameter present
-    const redirectParam = searchParams.get('redirect');
+    const redirectParam = searchParams.get('redirect')
     if (!authLoading && user && !redirectParam) {
-      console.log('[Login Page Effect] User logged in and NO redirect param, pushing to /');
-      router.push('/'); // CHANGED
-    } else if (!authLoading && user && redirectParam) {
-        console.log('[Login Page Effect] User logged in WITH redirect param, letting handleSubmit handle navigation.');
-        // Do nothing here - handleSubmit already called router.replace()
+      router.push('/')
     }
-    // If !user or authLoading, do nothing (stay on login page)
-  }, [user, authLoading, router, searchParams]); // Added searchParams dependency
+  }, [user, authLoading, router, searchParams])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -42,13 +33,11 @@ function LoginPageContent() {
       await login(email, password)
       const redirectPath = searchParams.get('redirect')
       if (redirectPath) {
-        console.log('Login page redirecting to:', redirectPath)
         router.replace(redirectPath)
       } else {
-        console.log('Login page redirecting to default /');
-        router.push('/'); // CHANGED
+        router.push('/')
       }
-    } catch (error) {
+    } catch {
       setError('Failed to sign in. Please check your credentials.')
     } finally {
       setLoadingSubmit(false)
@@ -61,13 +50,12 @@ function LoginPageContent() {
       setError('Please enter your email address first')
       return
     }
-
     try {
       setError('')
       setLoadingSubmit(true)
       await sendPasswordResetEmail(auth, email)
       setResetSent(true)
-    } catch (error) {
+    } catch {
       setError('Failed to send reset email. Please check your email address.')
     } finally {
       setLoadingSubmit(false)
@@ -75,78 +63,102 @@ function LoginPageContent() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white p-8 border border-gray-300 rounded-lg shadow-md">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold tracking-tight text-gray-900">
-            Sign in to your <span className="text-blue-500">AP Dojo</span> account
-          </h2>
-        </div>
-        
-        {resetSent && (
-          <div className="text-base text-center p-3 bg-green-50 text-green-600 rounded-md">
-            Password reset email sent! Please check your inbox.
-          </div>
-        )}
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
+      <div className="w-full max-w-md">
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="text-red-600 text-base text-center bg-red-50 p-3 rounded">
-              {error}
+        {/* Logo */}
+        <div className="flex items-center justify-center gap-3 mb-8">
+          <Image src="/images/dojoIconJan26.svg" alt="AP Dojo" width={40} height={40} className="w-10 h-10" unoptimized />
+          <span className="text-2xl font-black tracking-wide text-gray-900">
+            AP <span className="text-blue-500">Dojo</span>
+          </span>
+        </div>
+
+        {/* Card */}
+        <div className="bg-white border-4 border-black rounded-2xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8">
+          <h2 className="text-3xl font-black text-gray-900 mb-1">
+            Sign In
+          </h2>
+          <p className="text-gray-600 font-medium mb-8">
+            Welcome back to the Dojo.
+          </p>
+
+          {resetSent && (
+            <div className="mb-6 p-4 bg-green-50 border-2 border-green-600 rounded-xl text-green-700 font-semibold text-sm">
+              Password reset email sent! Check your inbox.
             </div>
           )}
-          <div className="rounded-md shadow-sm -space-y-px">
+
+          <form className="space-y-5" onSubmit={handleSubmit}>
+            {error && (
+              <div className="flex items-center gap-2 p-4 bg-red-50 border-2 border-red-500 rounded-xl text-red-700 text-sm font-semibold">
+                <X className="w-4 h-4 flex-shrink-0" />
+                {error}
+              </div>
+            )}
+
             <div>
+              <label className="block text-xs font-black text-gray-900 uppercase tracking-widest mb-2">
+                Email address
+              </label>
               <input
                 type="email"
                 required
-                className="appearance-none rounded-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 text-base"
-                placeholder="Email address"
+                className="w-full px-4 py-3 border-2 border-black rounded-xl text-base font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all placeholder:text-gray-400"
+                placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={loadingSubmit}
               />
             </div>
+
             <div>
+              <label className="block text-xs font-black text-gray-900 uppercase tracking-widest mb-2">
+                Password
+              </label>
               <input
                 type="password"
                 required
-                className="appearance-none rounded-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 text-base"
-                placeholder="Password"
+                className="w-full px-4 py-3 border-2 border-black rounded-xl text-base font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all placeholder:text-gray-400"
+                placeholder="Your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={loadingSubmit}
               />
             </div>
-          </div>
 
-          <div>
             <button
               type="submit"
-              className={`group relative w-full flex justify-center py-3 px-4 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-                loadingSubmit ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
               disabled={loadingSubmit}
+              className={`w-full flex items-center justify-center gap-2 py-3.5 px-6 font-black text-base text-white bg-blue-500 hover:bg-blue-600 border-2 border-blue-700 rounded-xl shadow-[0_4px_0_0_rgba(0,0,0,1)] active:translate-y-0.5 active:shadow-[0_2px_0_0_rgba(0,0,0,1)] transition-all ${loadingSubmit ? 'opacity-60 cursor-not-allowed' : ''}`}
             >
-              {loadingSubmit ? 'Signing in...' : 'Sign in with email'}
+              {loadingSubmit ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Signing in…
+                </>
+              ) : (
+                <>
+                  Sign In <ArrowRight className="w-5 h-5" />
+                </>
+              )}
             </button>
-          </div>
-        </form>
+          </form>
 
-        <div className="space-y-2 text-base text-center">
-          <div>
-            <Link href="/signup" className="font-medium text-blue-600 hover:text-blue-500">
-              Don't have an account? Sign up
-            </Link>
-          </div>
-          <div>
+          <div className="mt-6 pt-6 border-t-2 border-gray-100 flex flex-col items-center gap-3">
             <button
               onClick={handleForgotPassword}
-              className="font-medium text-blue-600 hover:text-blue-500"
               disabled={loadingSubmit}
+              className="text-sm font-bold text-gray-500 hover:text-gray-800 transition-colors"
             >
               Forgot your password?
             </button>
+            <p className="text-sm text-gray-600 font-medium">
+              No account?{' '}
+              <Link href="/signup" className="font-black text-blue-600 hover:text-blue-700 underline underline-offset-2">
+                Sign up free
+              </Link>
+            </p>
           </div>
         </div>
       </div>
@@ -154,14 +166,10 @@ function LoginPageContent() {
   )
 }
 
-// The default export now wraps the actual content in Suspense
 export default function Login() {
-  // Simple fallback, you can replace with a loading spinner component if desired
-  const fallbackUI = <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-  
   return (
-    <Suspense fallback={fallbackUI}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gray-50">Loading…</div>}>
       <LoginPageContent />
     </Suspense>
-  );
-} 
+  )
+}

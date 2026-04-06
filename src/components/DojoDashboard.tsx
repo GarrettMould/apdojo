@@ -579,7 +579,7 @@ export function DojoDashboard() {
           transition={{ duration: 0.3 }}
           className="mb-8"
         >
-          <div className="bg-white rounded-md shadow-sm border border-gray-200 overflow-hidden">
+          <div className="bg-white border-4 border-black rounded-2xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
             {/* Main Header - Always Visible */}
             <div 
               className="p-4 cursor-pointer hover:bg-gray-50 transition-colors"
@@ -751,8 +751,8 @@ export function DojoDashboard() {
           transition={{ duration: 0.3 }}
           className="mb-8"
         >
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Your Library</h1>
-          <p className="text-gray-600">Continue learning with your saved content</p>
+          <h1 className="text-4xl sm:text-5xl font-black text-gray-900 mb-2">Your Library</h1>
+          <p className="text-lg text-gray-600 font-medium">Continue learning with your saved content</p>
         </motion.div>
 
         <AnimatePresence mode="wait">
@@ -767,76 +767,29 @@ export function DojoDashboard() {
           >
           {/* Quick Access Section - Moved to Top */}
           <motion.section variants={itemVariants}>
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Quick Access</h2>
+            <h2 className="text-2xl font-black text-gray-900 mb-6 uppercase tracking-wide">Quick Access</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <Link href="/unitMCQPracticePage">
-                <motion.div
-                  variants={cardHoverVariants}
-                  initial="rest"
-                  whileHover="hover"
-                  className={`bg-white rounded-lg p-6 cursor-pointer border border-gray-200 ${theme.hoverBorder} transition-all`}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-gray-100 rounded-md flex items-center justify-center">
-                      <Image
-                        src="/images/boltGrey.svg"
-                        alt="MCQ Practice"
-                        width={24}
-                        height={24}
-                        className="w-6 h-6"
-                      />
+              {[
+                { href: '/unitMCQPracticePage', label: 'MCQ Practice', sub: 'Practice questions by unit', img: '/images/boltGrey.svg', alt: 'MCQ Practice' },
+                { href: '/dojo/infinite', label: 'Generate Quiz', sub: 'AI-powered practice mode', img: null, alt: '' },
+                { href: '/diagnostic-test', label: 'Diagnostic Test', sub: 'Assess your knowledge', img: '/images/fiveGrey.svg', alt: 'Diagnostic' },
+              ].map(({ href, label, sub, img, alt }) => (
+                <Link key={href} href={href}>
+                  <div className="bg-white border-2 border-black rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 p-5 cursor-pointer transition-all flex items-center gap-4">
+                    <div className="w-12 h-12 bg-gray-100 border-2 border-black rounded-xl flex items-center justify-center flex-shrink-0">
+                      {img ? (
+                        <Image src={img} alt={alt} width={24} height={24} className="w-6 h-6" />
+                      ) : (
+                        <Brain className="w-6 h-6 text-gray-700" />
+                      )}
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">MCQ Practice</h3>
-                      <p className="text-sm text-gray-600">Practice questions by unit</p>
+                      <h3 className="font-black text-gray-900">{label}</h3>
+                      <p className="text-sm text-gray-600 font-medium">{sub}</p>
                     </div>
                   </div>
-                </motion.div>
-              </Link>
-
-              <Link href="/dojo/infinite">
-                <motion.div
-                  variants={cardHoverVariants}
-                  initial="rest"
-                  whileHover="hover"
-                  className={`bg-white rounded-lg p-6 cursor-pointer border border-gray-200 ${theme.hoverBorder} transition-all`}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-gray-100 rounded-md flex items-center justify-center">
-                      <Brain className="w-6 h-6 text-gray-700" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900">Generate Quiz</h3>
-                      <p className="text-sm text-gray-600">AI-powered practice mode</p>
-                    </div>
-                      </div>
-                </motion.div>
-              </Link>
-
-              <Link href="/diagnostic-test">
-                <motion.div
-                  variants={cardHoverVariants}
-                  initial="rest"
-                  whileHover="hover"
-                  className={`bg-white rounded-lg p-6 cursor-pointer border border-gray-200 ${theme.hoverBorder} transition-all`}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-gray-100 rounded-md flex items-center justify-center">
-                      <Image
-                        src="/images/fiveGrey.svg"
-                        alt="Diagnostic Test"
-                        width={24}
-                        height={24}
-                        className="w-6 h-6"
-                      />
-                      </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900">Diagnostic Test</h3>
-                      <p className="text-sm text-gray-600">Assess your knowledge</p>
-                    </div>
-                  </div>
-                </motion.div>
-              </Link>
+                </Link>
+              ))}
             </div>
           </motion.section>
 
@@ -844,10 +797,10 @@ export function DojoDashboard() {
           {!loadingActivities && recentActivities.length > 0 && (
             <section style={{ opacity: 1, visibility: 'visible', position: 'relative', zIndex: 10 }}>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">Recent Activity</h2>
+                <h2 className="text-2xl font-black text-gray-900 uppercase tracking-wide">Recent Activity</h2>
                 <Link
                   href="/my-assignment-history"
-                  className="text-sm font-medium text-gray-600 hover:text-gray-900 flex items-center gap-1 transition-colors"
+                  className="text-sm font-black text-gray-900 border-2 border-black rounded-lg px-3 py-1.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 transition-all flex items-center gap-1"
                 >
                   See All Activity
                   <ChevronRight className="w-4 h-4" />
@@ -903,18 +856,12 @@ export function DojoDashboard() {
                           variants={cardHoverVariants}
                           initial="rest"
                           whileHover="hover"
-                          className="bg-white border border-gray-300 rounded-lg p-6 text-left transition-all flex flex-col h-full relative overflow-hidden"
-                          style={{ 
-                            backgroundColor: '#ffffff',
-                            opacity: 1,
-                            visibility: 'visible',
-                            zIndex: 1
-                          }}
+                          className="bg-white border-2 border-black rounded-2xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 p-6 text-left transition-all flex flex-col h-full overflow-hidden"
                         >
                           {/* Header: Icon, XP, Activity Type */}
                           <div className="flex items-start justify-between mb-4">
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-md bg-gray-100 flex items-center justify-center flex-shrink-0">
+                              <div className="w-10 h-10 rounded-xl bg-gray-100 border-2 border-black flex items-center justify-center flex-shrink-0">
                                 {activity.type === 'dojo-drill' ? (
                                   <Image
                                     src="/images/dojoIconBold.png"
@@ -967,7 +914,7 @@ export function DojoDashboard() {
                           </div>
                           
                           {/* Title */}
-                          <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
+                          <h3 className="text-xl font-black text-gray-900 mb-3 line-clamp-2">
                             {activity.title}
                           </h3>
                           
@@ -1011,7 +958,7 @@ export function DojoDashboard() {
                             {isInProgress && (
                               <Link
                                 href={href}
-                                className="mt-2 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-lg transition-colors text-center block"
+                                className="mt-2 w-full bg-blue-500 hover:bg-blue-600 text-white font-black py-2.5 px-4 rounded-xl border-2 border-blue-700 shadow-[0_3px_0_0_rgba(0,0,0,1)] active:translate-y-0.5 active:shadow-[0_1px_0_0_rgba(0,0,0,1)] transition-all text-center block"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                 }}
@@ -1033,10 +980,10 @@ export function DojoDashboard() {
           {displayedDrills.length > 0 && (
             <motion.section variants={itemVariants}>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">Dojo Drills</h2>
+                <h2 className="text-2xl font-black text-gray-900 uppercase tracking-wide">Dojo Drills</h2>
                 <Link
                   href="/dojo-drills"
-                  className="text-sm font-medium text-gray-600 hover:text-gray-900 flex items-center gap-1 transition-colors"
+                  className="text-sm font-black text-gray-900 border-2 border-black rounded-lg px-3 py-1.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 transition-all flex items-center gap-1"
                 >
                   See all
                   <ChevronRight className="w-4 h-4" />
@@ -1060,12 +1007,12 @@ export function DojoDashboard() {
                           variants={cardHoverVariants}
                           initial="rest"
                           whileHover="hover"
-                          className="bg-white border border-gray-300 rounded-lg p-6 text-left transition-all flex flex-col h-full overflow-hidden"
+                          className="bg-white border-2 border-black rounded-2xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 p-6 text-left transition-all flex flex-col h-full overflow-hidden"
                         >
                           {/* Header: Icon, XP, Activity Type */}
                           <div className="flex items-start justify-between mb-4">
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-md bg-gray-100 flex items-center justify-center flex-shrink-0">
+                              <div className="w-10 h-10 rounded-xl bg-gray-100 border-2 border-black flex items-center justify-center flex-shrink-0">
                                 <Image
                                   src="/images/dojoIconBold.png"
                                   alt="Drill"
@@ -1094,7 +1041,7 @@ export function DojoDashboard() {
                           </div>
                           
                           {/* Title */}
-                          <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
+                          <h3 className="text-xl font-black text-gray-900 mb-3 line-clamp-2">
                             {drill.title}
                           </h3>
                           
@@ -1121,10 +1068,10 @@ export function DojoDashboard() {
           {displayedFRQs.length > 0 && (
             <motion.section variants={itemVariants}>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">FRQ Practice</h2>
+                <h2 className="text-2xl font-black text-gray-900 uppercase tracking-wide">FRQ Practice</h2>
                 <Link
                   href="/unitFRQpracticePage"
-                  className="text-sm font-medium text-gray-600 hover:text-gray-900 flex items-center gap-1 transition-colors"
+                  className="text-sm font-black text-gray-900 border-2 border-black rounded-lg px-3 py-1.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 transition-all flex items-center gap-1"
                 >
                   See all
                   <ChevronRight className="w-4 h-4" />
@@ -1149,7 +1096,7 @@ export function DojoDashboard() {
                         {/* Header: Icon, XP, Activity Type */}
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-md bg-gray-100 flex items-center justify-center flex-shrink-0">
+                            <div className="w-10 h-10 rounded-xl bg-gray-100 border-2 border-black flex items-center justify-center flex-shrink-0">
                               <Image
                                 src="/images/pencilFinal.svg"
                                 alt="FRQ"
@@ -1180,7 +1127,7 @@ export function DojoDashboard() {
                         </div>
                         
                         {/* Title */}
-                        <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
+                        <h3 className="text-xl font-black text-gray-900 mb-3 line-clamp-2">
                           {frq.title}
                         </h3>
                         
@@ -1200,10 +1147,10 @@ export function DojoDashboard() {
           {displayedFullExams.length > 0 && (
             <motion.section variants={itemVariants}>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">Full Exams</h2>
+                <h2 className="text-2xl font-black text-gray-900 uppercase tracking-wide">Full Exams</h2>
                 <Link
                   href="/full-mcq-exam"
-                  className="text-sm font-medium text-gray-600 hover:text-gray-900 flex items-center gap-1 transition-colors"
+                  className="text-sm font-black text-gray-900 border-2 border-black rounded-lg px-3 py-1.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 transition-all flex items-center gap-1"
                 >
                   See all
                   <ChevronRight className="w-4 h-4" />
@@ -1227,12 +1174,12 @@ export function DojoDashboard() {
                           variants={cardHoverVariants}
                           initial="rest"
                           whileHover="hover"
-                          className="bg-white border border-gray-300 rounded-lg p-6 text-left transition-all flex flex-col h-full overflow-hidden"
+                          className="bg-white border-2 border-black rounded-2xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 p-6 text-left transition-all flex flex-col h-full overflow-hidden"
                         >
                           {/* Header: Icon, XP, Activity Type */}
                           <div className="flex items-start justify-between mb-4">
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-md bg-gray-100 flex items-center justify-center flex-shrink-0">
+                              <div className="w-10 h-10 rounded-xl bg-gray-100 border-2 border-black flex items-center justify-center flex-shrink-0">
                                 <Image
                                   src="/images/exam.svg"
                                   alt="Exam"
@@ -1258,7 +1205,7 @@ export function DojoDashboard() {
                           </div>
                           
                           {/* Title */}
-                          <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
+                          <h3 className="text-xl font-black text-gray-900 mb-3 line-clamp-2">
                             {exam.title}
                           </h3>
                           
@@ -1287,10 +1234,10 @@ export function DojoDashboard() {
           {displayedUnitExams.length > 0 && (
             <motion.section variants={itemVariants}>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">Unit Exams</h2>
+                <h2 className="text-2xl font-black text-gray-900 uppercase tracking-wide">Unit Exams</h2>
                 <Link
                   href={getUnitMCQTestUrl(1, currentCourse as 'macro' | 'micro')}
-                  className="text-sm font-medium text-gray-600 hover:text-gray-900 flex items-center gap-1 transition-colors"
+                  className="text-sm font-black text-gray-900 border-2 border-black rounded-lg px-3 py-1.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 transition-all flex items-center gap-1"
                 >
                   See all
                   <ChevronRight className="w-4 h-4" />
@@ -1310,12 +1257,12 @@ export function DojoDashboard() {
                         variants={cardHoverVariants}
                         initial="rest"
                         whileHover="hover"
-                        className="bg-white border border-gray-300 rounded-lg p-6 text-left transition-all relative overflow-hidden flex flex-col h-full"
+                        className="bg-white border-2 border-black rounded-2xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 p-6 text-left transition-all flex flex-col h-full overflow-hidden"
                       >
                         {/* Header: Icon, XP, Activity Type */}
                         <div className="flex items-start justify-between mb-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-md bg-gray-100 flex items-center justify-center flex-shrink-0">
+                            <div className="w-10 h-10 rounded-xl bg-gray-100 border-2 border-black flex items-center justify-center flex-shrink-0">
                               <Image
                                 src="/images/exam.svg"
                                 alt="Exam"
@@ -1344,7 +1291,7 @@ export function DojoDashboard() {
                         </div>
                         
                         {/* Title */}
-                        <h3 className="text-xl font-bold line-clamp-2 mb-3 text-gray-900">
+                        <h3 className="text-xl font-black line-clamp-2 mb-3 text-gray-900">
                           {exam.title}
                         </h3>
                         
