@@ -2,23 +2,22 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, FileText, Target, ChevronRight, CheckCircle2, Clock, ClipboardList, BookOpen, ChevronDown, ChevronUp, Lock, Zap, Sparkles, Brain } from 'lucide-react';
+import { Play, FileText, ChevronRight, Clock, ClipboardList, BookOpen, Lock, Zap, Brain } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
-import { useCourseContext, useCourseTheme } from '@/contexts/CourseContext';
-import { SubjectToggle } from '@/components/dashboard/SubjectToggle';
+import { useCourseContext } from '@/contexts/CourseContext';
 import { CourseToggle } from '@/components/CourseToggle';
 import { dojoDrills, drillAppliesToSubject, getDrillUnitForSubject } from '@/data/dojoDrills';
 import { frqExams } from '@/data/frqQuestions';
-import { getBeltProgress } from '@/lib/beltSystem';
 import { loadDojoDrillProgress, getDrillProgress, DojoDrillProgress } from '@/lib/dojoDrillProgress';
-import { getSubjectXP } from '@/hooks/useUserProgress';
 import { collection, query, where, orderBy, limit, getDocs, getDoc, doc, collectionGroup } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { QuizHistoryEntry, restoreTableData } from '@/lib/quizHistory';
 import { hasValidSeasonPass, getUnitMCQTestUrl } from '@/lib/utils';
 import { loadTestProgress } from '@/lib/testProgress';
+import { blogPosts, type BlogPost } from '@/data/blogPosts';
+import { generateSeoUrl } from '@/utils/blogUrls';
 
 // Container animation variants (LITE - very subtle)
 const containerVariants = {
@@ -61,12 +60,10 @@ const cardHoverVariants = {
 };
 
 export function DojoDashboard() {
-  const { user, totalXP, guestXp, unitPerformanceStats, userData, selectedSubject, setSelectedSubject } = useAuthContext();
+  const { user, userData, selectedSubject, setSelectedSubject } = useAuthContext();
   const { currentCourse } = useCourseContext();
-  const theme = useCourseTheme();
   const [drillProgress, setDrillProgress] = useState<DojoDrillProgress | null>(null);
   const [loadingProgress, setLoadingProgress] = useState(true);
-  const [isProgressExpanded, setIsProgressExpanded] = useState(false);
   const [quizHistory, setQuizHistory] = useState<QuizHistoryEntry[]>([]);
   const [loadingQuizHistory, setLoadingQuizHistory] = useState(true);
   const [recentActivities, setRecentActivities] = useState<any[]>([]);
@@ -89,15 +86,6 @@ export function DojoDashboard() {
     if (unitNumber === 1) return false; // Unit 1 is always free
     return !hasCourseAccess; // Units 2-6 require access
   };
-
-  // Get XP from user or guest using the helper (with legacy fallback)
-  const xp = user ? getSubjectXP(userData, currentCourse) : (guestXp ?? 0);
-
-  // Calculate belt progress
-  const beltProgress = getBeltProgress(xp);
-  const { currentBelt, nextBelt, xpToNext, percent, nextBeltXP } = beltProgress;
-  const beltName = currentBelt.name.replace(' Belt', '');
-  const nextBeltName = nextBelt?.name.replace(' Belt', '') ?? '';
 
   // Load drill progress
   useEffect(() => {
@@ -507,49 +495,49 @@ export function DojoDashboard() {
   const displayedFullExams = fullExams.slice(0, 4);
   const displayedUnitExams = unitExams.slice(0, 4);
 
-  // Get unit performance stats for current course
-  const currentSubjectStats = useMemo(() => {
-    if (!unitPerformanceStats) return [];
-    return unitPerformanceStats.filter(stat => stat.subject === currentCourse);
-  }, [unitPerformanceStats, currentCourse]);
-
-  // Find weakest and strongest units
-  const weakestUnit = useMemo(() => {
-    if (currentSubjectStats.length === 0) return null;
-    return currentSubjectStats.reduce((prev, current) => 
-      current.percentage < prev.percentage ? current : prev
+  const displayedBlogPosts = useMemo(() => {
+    const course = currentCourse === 'macro' ? 'macro' : 'micro';
+    const excludedSlugs = new Set(['nominal-vs-real-gdp-explained']);
+    const pool = Object.values(blogPosts).filter(
+      (p) =>
+        p.subject.toLowerCase() === course &&
+        !excludedSlugs.has(p.slug) &&
+        !p.thumbnailUrl.toLowerCase().includes('placeholder')
     );
-  }, [currentSubjectStats]);
+    const bySlug = Object.fromEntries(pool.map((p) => [p.slug, p])) as Record<string, BlogPost>;
 
-  const strongestUnit = useMemo(() => {
-    if (currentSubjectStats.length === 0) return null;
-    return currentSubjectStats.reduce((prev, current) => 
-      current.percentage > prev.percentage ? current : prev
-    );
-  }, [currentSubjectStats]);
+    const macroOrder = [
+      'ppc-and-opportunity-cost',
+      'monetary-policy-and-aggregate-demand',
+      'foreign-exchange-cookies',
+      'fractional-reserve-banking',
+      'ample-reserves-market',
+      'crowding-out-fiscal-policy',
+      'sticky-wages-sras',
+      'the-economy-fixes-itself-long-run-self-adjustment',
+      'short-run-and-long-run-equilibrium',
+    ];
+    const microOrder = ['understanding-externalities', 'monopoly-marginal-revenue'];
+    const order = course === 'macro' ? macroOrder : microOrder;
 
-  // Get unit names
-  const getUnitName = (unitId: number): string => {
-    const units = currentCourse === 'macro' 
-      ? [
-          { number: 1, title: 'Basic Economic Concepts' },
-          { number: 2, title: 'Economic Indicators and the Business Cycle' },
-          { number: 3, title: 'National Income and Price Determination' },
-          { number: 4, title: 'Financial Sector' },
-          { number: 5, title: 'Long-Run Consequences of Stabilization Policies' },
-          { number: 6, title: 'Open Economy—International Trade and Finance' },
-        ]
-      : [
-          { number: 1, title: 'Basic Economic Concepts' },
-          { number: 2, title: 'Supply and Demand' },
-          { number: 3, title: 'Production, Cost, and the Perfect Competition Model' },
-          { number: 4, title: 'Imperfect Competition' },
-          { number: 5, title: 'Factor Markets' },
-          { number: 6, title: 'Market Failure and the Role of Government' },
-        ];
-    const unit = units.find(u => u.number === unitId);
-    return unit ? `Unit ${unitId}: ${unit.title}` : `Unit ${unitId}`;
-  };
+    const picked: BlogPost[] = [];
+    const seen = new Set<string>();
+    for (const slug of order) {
+      const post = bySlug[slug];
+      if (post && picked.length < 4) {
+        picked.push(post);
+        seen.add(slug);
+      }
+    }
+    const rest = pool
+      .filter((p) => !seen.has(p.slug))
+      .sort((a, b) => a.unit - b.unit || a.title.localeCompare(b.title));
+    for (const post of rest) {
+      if (picked.length >= 4) break;
+      picked.push(post);
+    }
+    return picked;
+  }, [currentCourse]);
 
   // Helper to check if drill is completed
   const isDrillCompleted = (drillId: string): boolean => {
@@ -572,187 +560,20 @@ export function DojoDashboard() {
         <div className="mb-4 md:hidden">
           <CourseToggle activeTab={selectedSubject} onToggle={setSelectedSubject} />
         </div>
-        {/* Compact Progress Header - Expandable */}
+        {/* Header + desktop subject toggle */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
-          className="mb-8"
+          className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between"
         >
-          <div className="bg-white border-4 border-black rounded-2xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
-            {/* Main Header - Always Visible */}
-            <div 
-              className="p-4 cursor-pointer hover:bg-gray-50 transition-colors"
-              onClick={() => setIsProgressExpanded(!isProgressExpanded)}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  {/* Belt Badge with Image */}
-                  {(() => {
-                    const getBeltImage = () => {
-                      if (currentBelt.name === 'White Belt') {
-                        return '/images/beltNewWhite.svg';
-                      } else if (currentBelt.name === 'Yellow Belt') {
-                        return '/images/beltNewYellow.svg';
-                      } else if (currentBelt.name === 'Green Belt') {
-                        return '/images/beltNewGreen.svg';
-                      } else if (currentBelt.name === 'Purple Belt') {
-                        return '/images/beltNewPurple.svg';
-                      } else if (currentBelt.name === 'Black Belt') {
-                        return '/images/beltNewBlack.svg';
-                      } else {
-                        return '/images/beltNewWhite.svg'; // Default to white
-                      }
-                    };
-                    
-                    return (
-                      <>
-                        <div className="flex-shrink-0">
-              <Image
-                            src={getBeltImage()}
-                            alt={currentBelt.name}
-                            width={96}
-                            height={96}
-                            className="w-24 h-auto"
-                          />
-                        </div>
-                        <div>
-                          <h2 className="text-lg font-semibold text-gray-900">{currentBelt.label}</h2>
-                          <p className="text-sm text-gray-600">
-                            {xp.toLocaleString()} XP
-                            {nextBelt && ` • ${xpToNext?.toLocaleString() || 0} to ${nextBeltName}`}
-                          </p>
-                        </div>
-                      </>
-                    );
-                  })()}
-                </div>
-                <div className="flex items-center gap-4">
-                  {/* Subject Toggle */}
-                  <div className="hidden md:block">
-                    <CourseToggle activeTab={selectedSubject} onToggle={setSelectedSubject} />
-                  </div>
-                  {/* XP Progress Bar */}
-                  {nextBelt && (
-                    <div className="hidden sm:flex items-center gap-3 flex-1 max-w-xs">
-                      <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <motion.div
-                          className={`h-full ${theme.primary} rounded-full`}
-                    initial={{ width: 0 }}
-                          animate={{ width: `${percent}%` }}
-                          transition={{ duration: 0.5, ease: 'easeOut' }}
-                        />
-                      </div>
-                      <span className="text-xs text-gray-500 font-medium">{Math.round(percent)}%</span>
-                    </div>
-                  )}
-                  {/* Expand/Collapse Button */}
-                  <button className="p-2 hover:bg-gray-100 rounded-md transition-colors">
-                    {isProgressExpanded ? (
-                      <ChevronUp className="w-5 h-5 text-gray-600" />
-                    ) : (
-                      <ChevronDown className="w-5 h-5 text-gray-600" />
-                    )}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Expanded Content */}
-            <AnimatePresence>
-              {isProgressExpanded && (
-            <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.3, ease: 'easeInOut' }}
-                  className="overflow-hidden"
-                >
-                  <div className="px-4 pb-4 pt-2 border-t border-gray-200">
-                    {/* Weakest and Strongest Units */}
-                    {(weakestUnit || strongestUnit) && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        {/* Strongest Unit */}
-                        {strongestUnit && (
-                          <div className="bg-green-100 border-4 border-black rounded-lg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-5">
-                            <div className="flex items-center gap-2 mb-3">
-                              <CheckCircle2 className="w-6 h-6 text-green-700" />
-                              <h3 className="text-sm font-black text-gray-900 uppercase tracking-wider">Strongest Unit</h3>
-                </div>
-                            <p className="text-lg font-black text-green-800 mb-1">{getUnitName(strongestUnit.unitId)}</p>
-                            <p className="text-base font-bold text-gray-700">{strongestUnit.percentage}% correct</p>
-                </div>
-                        )}
-                        {/* Weakest Unit */}
-                        {weakestUnit && (
-                          <div className="bg-red-100 border-4 border-black rounded-lg shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-5">
-                            <div className="flex items-center gap-2 mb-3">
-                              <Target className="w-6 h-6 text-red-700" />
-                              <h3 className="text-sm font-black text-gray-900 uppercase tracking-wider">Weakest Unit</h3>
-              </div>
-                            <p className="text-lg font-black text-red-800 mb-1">{getUnitName(weakestUnit.unitId)}</p>
-                            <p className="text-base font-bold text-gray-700">{weakestUnit.percentage}% correct</p>
-                </div>
-                        )}
+          <div>
+            <h1 className="text-4xl sm:text-5xl font-black text-gray-900 mb-2">Your Library</h1>
+            <p className="text-lg text-gray-600 font-medium">Continue learning with your saved content</p>
           </div>
-                    )}
-
-                    {/* All Units Performance */}
-                    {currentSubjectStats.length > 0 && (
-                      <div>
-                        <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-3">Unit Performance</h3>
-                        <div className="space-y-3">
-                          {currentSubjectStats.map((stat) => (
-                            <div key={stat.unitId} className="bg-white border-4 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4">
-                              <div className="flex items-center justify-between mb-2">
-                                <div className="flex items-center gap-3">
-                                  <span className="text-sm font-black text-gray-900">Unit {stat.unitId}</span>
-                                  <span className="text-sm font-semibold text-gray-700">{getUnitName(stat.unitId).split(': ')[1]}</span>
-                      </div>
-                                <span className="text-lg font-black text-gray-900">{stat.percentage}%</span>
-                        </div>
-                              <div className="h-6 w-full bg-gray-200 border-2 border-black rounded-full overflow-hidden">
-                                <motion.div
-                                  initial={{ width: 0 }}
-                                  animate={{ width: `${stat.percentage}%` }}
-                                  transition={{ duration: 0.5, ease: "easeOut" }}
-                            className={`h-full rounded-full ${
-                                    stat.percentage >= 80
-                                ? 'bg-green-500'
-                                      : stat.percentage >= 60
-                                      ? 'bg-yellow-500'
-                                      : 'bg-red-500'
-                                  }`}
-                                />
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* No Stats Available */}
-                    {currentSubjectStats.length === 0 && (
-                      <div className="text-center py-6">
-                        <p className="text-sm text-gray-500">Complete practice questions to see your unit performance</p>
-                      </div>
-                    )}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <div className="hidden md:block shrink-0">
+            <CourseToggle activeTab={selectedSubject} onToggle={setSelectedSubject} />
           </div>
-        </motion.div>
-
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
-          className="mb-8"
-        >
-          <h1 className="text-4xl sm:text-5xl font-black text-gray-900 mb-2">Your Library</h1>
-          <p className="text-lg text-gray-600 font-medium">Continue learning with your saved content</p>
         </motion.div>
 
         <AnimatePresence mode="wait">
@@ -763,9 +584,397 @@ export function DojoDashboard() {
             animate="visible"
             exit={{ opacity: 0, y: 20 }}
             transition={{ duration: 0.2 }}
-            className="space-y-12"
+            className="space-y-8"
           >
-          {/* Quick Access Section - Moved to Top */}
+          {/* Economics Explained — blog posts for current course */}
+          {displayedBlogPosts.length > 0 && (
+            <motion.section variants={itemVariants}>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-black text-gray-900 uppercase tracking-wide">Economics Explained</h2>
+                <Link
+                  href={`/ap-blog-home?subject=${currentCourse}`}
+                  className="text-sm font-black text-gray-900 border-2 border-gray-300 rounded-lg px-3 py-1.5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-1"
+                >
+                  See all
+                  <ChevronRight className="w-4 h-4" />
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {displayedBlogPosts.map((post) => (
+                  <motion.div
+                    key={post.slug}
+                    variants={cardHoverVariants}
+                    initial="rest"
+                    whileHover="hover"
+                    className="group"
+                  >
+                    <Link href={`/blog/${generateSeoUrl(post.slug, post.subject, post.unit)}`}>
+                      <motion.div
+                        variants={cardHoverVariants}
+                        initial="rest"
+                        whileHover="hover"
+                        className="bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-1 overflow-hidden text-left transition-all flex flex-col h-full"
+                      >
+                        <div className="relative w-full aspect-[16/10] border-b-2 border-gray-300 bg-gray-100">
+                          <Image
+                            src={post.thumbnailUrl}
+                            alt={post.title}
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 768px) 100vw, 25vw"
+                          />
+                        </div>
+                        <div className="p-6 flex flex-col flex-1">
+                          <div className="flex items-center gap-3 mb-4">
+                            <div className="w-10 h-10 rounded-xl bg-gray-100 border-2 border-gray-300 flex items-center justify-center flex-shrink-0">
+                              <BookOpen className="w-5 h-5 text-gray-700" />
+                            </div>
+                            <div className="flex flex-col gap-1">
+                              <span className="text-xs font-medium text-gray-500">Unit {post.unit.toString().padStart(2, '0')}</span>
+                              <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Article</span>
+                            </div>
+                          </div>
+                          <h3 className="text-xl font-black text-gray-900 mb-2 line-clamp-2">{post.title}</h3>
+                          <p className="text-sm text-gray-500 line-clamp-2 mt-auto">{post.description}</p>
+                        </div>
+                      </motion.div>
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.section>
+          )}
+
+          {/* FRQ Practice Row */}
+          {displayedFRQs.length > 0 && (
+            <motion.section variants={itemVariants}>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-black text-gray-900 uppercase tracking-wide">FRQ Practice</h2>
+                <Link
+                  href="/unitFRQpracticePage"
+                  className="text-sm font-black text-gray-900 border-2 border-gray-300 rounded-lg px-3 py-1.5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-1"
+                >
+                  See all
+                  <ChevronRight className="w-4 h-4" />
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {displayedFRQs.map((frq, index) => (
+                  <motion.div
+                    key={frq.id || index}
+                    variants={cardHoverVariants}
+                    initial="rest"
+                    whileHover="hover"
+                    className="group"
+                  >
+                    <Link href={`/unitFRQpracticePage?frqId=${frq.id}`}>
+                      <motion.div
+                        variants={cardHoverVariants}
+                        initial="rest"
+                        whileHover="hover"
+                        className="bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:shadow-md p-6 text-left transition-all flex flex-col h-full overflow-hidden"
+                      >
+                        {/* Header: Icon, XP, Activity Type */}
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-gray-100 border-2 border-gray-300 flex items-center justify-center flex-shrink-0">
+                              <Image
+                                src="/images/pencilFinal.svg"
+                                alt="FRQ"
+                                width={20}
+                                height={20}
+                                className="w-5 h-5"
+                              />
+                            </div>
+                            <div className="flex flex-col gap-1">
+                              {frq.unit && (
+                                <span className="text-xs font-medium text-gray-500">Unit {frq.unit.toString().padStart(2, '0')}</span>
+                              )}
+                              <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">FRQ</span>
+                            </div>
+                          </div>
+                          {frq.totalPoints && (
+                            <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
+                              <span>{(frq.totalPoints * 100).toLocaleString()}</span>
+                              <Image
+                                src="/images/flame100.png"
+                                alt="XP"
+                                width={16}
+                                height={16}
+                                className="w-4 h-4"
+                              />
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Title */}
+                        <h3 className="text-xl font-black text-gray-900 mb-3 line-clamp-2">
+                          {frq.title}
+                        </h3>
+                        
+                        {/* Meta */}
+                        {frq.unit && (
+                          <p className="text-sm text-gray-500 mt-auto">Unit {frq.unit}</p>
+                        )}
+                      </motion.div>
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.section>
+          )}
+
+          {/* Unit Exams Row */}
+          {displayedUnitExams.length > 0 && (
+            <motion.section variants={itemVariants}>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-black text-gray-900 uppercase tracking-wide">Unit Exams</h2>
+                <Link
+                  href={getUnitMCQTestUrl(1, currentCourse as 'macro' | 'micro')}
+                  className="text-sm font-black text-gray-900 border-2 border-gray-300 rounded-lg px-3 py-1.5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-1"
+                >
+                  See all
+                  <ChevronRight className="w-4 h-4" />
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {displayedUnitExams.map((exam) => (
+                  <motion.div
+                    key={exam.id}
+                    variants={cardHoverVariants}
+                    initial="rest"
+                    whileHover="hover"
+                    className="group"
+                  >
+                    <Link href={exam.isLocked ? `/purchase/season-pass?courseType=${currentCourse}` : exam.href}>
+                      <motion.div
+                        variants={cardHoverVariants}
+                        initial="rest"
+                        whileHover="hover"
+                        className="bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-1 p-6 text-left transition-all flex flex-col h-full overflow-hidden"
+                      >
+                        {/* Header: Icon, XP, Activity Type */}
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-gray-100 border-2 border-gray-300 flex items-center justify-center flex-shrink-0">
+                              <Image
+                                src="/images/exam.svg"
+                                alt="Exam"
+                                width={20}
+                                height={20}
+                                className="w-5 h-5"
+                              />
+                            </div>
+                            <div className="flex flex-col gap-1">
+                              {exam.unitNumber && (
+                                <span className="text-xs font-medium text-gray-500">Unit {exam.unitNumber.toString().padStart(2, '0')}</span>
+                              )}
+                              <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Test</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
+                            <span>1,000</span>
+                            <Image
+                              src="/images/flame100.png"
+                              alt="XP"
+                              width={16}
+                              height={16}
+                              className="w-4 h-4"
+                            />
+                          </div>
+                        </div>
+                        
+                        {/* Title */}
+                        <h3 className="text-xl font-black line-clamp-2 mb-3 text-gray-900">
+                          {exam.title}
+                        </h3>
+                        
+                        {/* Meta */}
+                        <p className="text-sm line-clamp-2 mt-auto text-gray-500">{exam.description}</p>
+                      </motion.div>
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.section>
+          )}
+
+          {/* Dojo Drills Row */}
+          {displayedDrills.length > 0 && (
+            <motion.section variants={itemVariants}>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-black text-gray-900 uppercase tracking-wide">Dojo Drills</h2>
+                <Link
+                  href="/dojo-drills"
+                  className="text-sm font-black text-gray-900 border-2 border-gray-300 rounded-lg px-3 py-1.5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-1"
+                >
+                  See all
+                  <ChevronRight className="w-4 h-4" />
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {displayedDrills.map((drill) => {
+                  const isCompleted = isDrillCompleted(drill.id);
+                  const inProgress = isDrillInProgress(drill.id);
+                  
+                  return (
+                    <motion.div
+                      key={drill.id}
+                      variants={cardHoverVariants}
+                      initial="rest"
+                      whileHover="hover"
+                      className="group relative"
+                    >
+                      <Link href={`/dojo-drills/preview/${drill.id}`}>
+                        <motion.div
+                          variants={cardHoverVariants}
+                          initial="rest"
+                          whileHover="hover"
+                          className="bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-1 p-6 text-left transition-all flex flex-col h-full overflow-hidden"
+                        >
+                          {/* Header: Icon, XP, Activity Type */}
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-xl bg-gray-100 border-2 border-gray-300 flex items-center justify-center flex-shrink-0">
+                                <Image
+                                  src="/images/dojoIconBold.png"
+                                  alt="Drill"
+                                  width={20}
+                                  height={20}
+                                  className="w-5 h-5"
+                                />
+                              </div>
+                              <div className="flex flex-col gap-1">
+                                <span className="text-xs font-medium text-gray-500">Unit {(getDrillUnitForSubject(drill, subjectFilter) || drill.unit).toString().padStart(2, '0')}</span>
+                                <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Drill</span>
+                              </div>
+                            </div>
+                            {drill.xpReward.total !== undefined && (
+                              <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
+                                <span>{drill.xpReward.total.toLocaleString()}</span>
+                                <Image
+                                  src="/images/flame100.png"
+                                  alt="XP"
+                                  width={16}
+                                  height={16}
+                                  className="w-4 h-4"
+                                />
+                              </div>
+                            )}
+                          </div>
+                          
+                          {/* Title */}
+                          <h3 className="text-xl font-black text-gray-900 mb-3 line-clamp-2">
+                            {drill.title}
+                          </h3>
+                          
+                          {/* Meta */}
+                          <div className="flex items-center justify-between mt-auto">
+                            {inProgress && (
+                              <span className="text-xs text-blue-600 font-medium">Continue</span>
+                            )}
+                            {isCompleted && (
+                              <span className="text-xs text-green-600 font-medium">Completed</span>
+                            )}
+                            {!inProgress && !isCompleted && <span></span>}
+                          </div>
+                        </motion.div>
+                      </Link>
+                </motion.div>
+              );
+            })}
+          </div>
+            </motion.section>
+          )}
+
+          {/* Full Exams Row */}
+          {displayedFullExams.length > 0 && (
+            <motion.section variants={itemVariants}>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-black text-gray-900 uppercase tracking-wide">Full Exams</h2>
+                <Link
+                  href="/full-mcq-exam"
+                  className="text-sm font-black text-gray-900 border-2 border-gray-300 rounded-lg px-3 py-1.5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-1"
+                >
+                  See all
+                  <ChevronRight className="w-4 h-4" />
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {displayedFullExams.map((exam) => {
+                  // Check if this is the Full MCQ Exam and has progress
+                  const hasProgress = exam.id === 'full-mcq-exam' && fullExamProgress && fullExamProgress.answeredCount > 0;
+                  
+                  return (
+                    <motion.div
+                      key={exam.id}
+                      variants={cardHoverVariants}
+                      initial="rest"
+                      whileHover="hover"
+                      className="group"
+                    >
+                      <Link href={exam.href}>
+                        <motion.div
+                          variants={cardHoverVariants}
+                          initial="rest"
+                          whileHover="hover"
+                          className="bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-1 p-6 text-left transition-all flex flex-col h-full overflow-hidden"
+                        >
+                          {/* Header: Icon, XP, Activity Type */}
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-xl bg-gray-100 border-2 border-gray-300 flex items-center justify-center flex-shrink-0">
+                                <Image
+                                  src="/images/exam.svg"
+                                  alt="Exam"
+                                  width={20}
+                                  height={20}
+                                  className="w-5 h-5"
+                                />
+                              </div>
+                              <div className="flex flex-col gap-1">
+                                <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Exam</span>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
+                              <span>6,000</span>
+                              <Image
+                                src="/images/flame100.png"
+                                alt="XP"
+                                width={16}
+                                height={16}
+                                className="w-4 h-4"
+                              />
+                            </div>
+                          </div>
+                          
+                          {/* Title */}
+                          <h3 className="text-xl font-black text-gray-900 mb-3 line-clamp-2">
+                            {exam.title}
+                          </h3>
+                          
+                          {/* Meta */}
+                          <div className="mt-auto space-y-2">
+                            <p className="text-sm text-gray-500">{exam.description}</p>
+                            {hasProgress && (
+                              <div className="flex items-center justify-between pt-2">
+                                <span className="text-xs text-blue-600 font-medium">Continue</span>
+                                <span className="text-xs text-gray-500">
+                                  {fullExamProgress.answeredCount}/{fullExamProgress.totalQuestions} answered
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </motion.div>
+                      </Link>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </motion.section>
+          )}
+
+          {/* Quick Access */}
           <motion.section variants={itemVariants}>
             <h2 className="text-2xl font-black text-gray-900 mb-6 uppercase tracking-wide">Quick Access</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -775,8 +984,8 @@ export function DojoDashboard() {
                 { href: '/diagnostic-test', label: 'Diagnostic Test', sub: 'Assess your knowledge', img: '/images/fiveGrey.svg', alt: 'Diagnostic' },
               ].map(({ href, label, sub, img, alt }) => (
                 <Link key={href} href={href}>
-                  <div className="bg-white border-2 border-black rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 p-5 cursor-pointer transition-all flex items-center gap-4">
-                    <div className="w-12 h-12 bg-gray-100 border-2 border-black rounded-xl flex items-center justify-center flex-shrink-0">
+                  <div className="bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-0.5 p-5 cursor-pointer transition-all flex items-center gap-4">
+                    <div className="w-12 h-12 bg-gray-100 border-2 border-gray-300 rounded-xl flex items-center justify-center flex-shrink-0">
                       {img ? (
                         <Image src={img} alt={alt} width={24} height={24} className="w-6 h-6" />
                       ) : (
@@ -800,7 +1009,7 @@ export function DojoDashboard() {
                 <h2 className="text-2xl font-black text-gray-900 uppercase tracking-wide">Recent Activity</h2>
                 <Link
                   href="/my-assignment-history"
-                  className="text-sm font-black text-gray-900 border-2 border-black rounded-lg px-3 py-1.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 transition-all flex items-center gap-1"
+                  className="text-sm font-black text-gray-900 border-2 border-gray-300 rounded-lg px-3 py-1.5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-1"
                 >
                   See All Activity
                   <ChevronRight className="w-4 h-4" />
@@ -856,12 +1065,12 @@ export function DojoDashboard() {
                           variants={cardHoverVariants}
                           initial="rest"
                           whileHover="hover"
-                          className="bg-white border-2 border-black rounded-2xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 p-6 text-left transition-all flex flex-col h-full overflow-hidden"
+                          className="bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-1 p-6 text-left transition-all flex flex-col h-full overflow-hidden"
                         >
                           {/* Header: Icon, XP, Activity Type */}
                           <div className="flex items-start justify-between mb-4">
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-xl bg-gray-100 border-2 border-black flex items-center justify-center flex-shrink-0">
+                              <div className="w-10 h-10 rounded-xl bg-gray-100 border-2 border-gray-300 flex items-center justify-center flex-shrink-0">
                                 {activity.type === 'dojo-drill' ? (
                                   <Image
                                     src="/images/dojoIconBold.png"
@@ -975,336 +1184,6 @@ export function DojoDashboard() {
               </div>
             </section>
           )}
-
-          {/* Dojo Drills Row */}
-          {displayedDrills.length > 0 && (
-            <motion.section variants={itemVariants}>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-black text-gray-900 uppercase tracking-wide">Dojo Drills</h2>
-                <Link
-                  href="/dojo-drills"
-                  className="text-sm font-black text-gray-900 border-2 border-black rounded-lg px-3 py-1.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 transition-all flex items-center gap-1"
-                >
-                  See all
-                  <ChevronRight className="w-4 h-4" />
-                </Link>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {displayedDrills.map((drill) => {
-                  const isCompleted = isDrillCompleted(drill.id);
-                  const inProgress = isDrillInProgress(drill.id);
-                  
-                  return (
-                    <motion.div
-                      key={drill.id}
-                      variants={cardHoverVariants}
-                      initial="rest"
-                      whileHover="hover"
-                      className="group relative"
-                    >
-                      <Link href={`/dojo-drills/preview/${drill.id}`}>
-                        <motion.div
-                          variants={cardHoverVariants}
-                          initial="rest"
-                          whileHover="hover"
-                          className="bg-white border-2 border-black rounded-2xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 p-6 text-left transition-all flex flex-col h-full overflow-hidden"
-                        >
-                          {/* Header: Icon, XP, Activity Type */}
-                          <div className="flex items-start justify-between mb-4">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-xl bg-gray-100 border-2 border-black flex items-center justify-center flex-shrink-0">
-                                <Image
-                                  src="/images/dojoIconBold.png"
-                                  alt="Drill"
-                                  width={20}
-                                  height={20}
-                                  className="w-5 h-5"
-                                />
-                              </div>
-                              <div className="flex flex-col gap-1">
-                                <span className="text-xs font-medium text-gray-500">Unit {(getDrillUnitForSubject(drill, subjectFilter) || drill.unit).toString().padStart(2, '0')}</span>
-                                <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Drill</span>
-                              </div>
-                            </div>
-                            {drill.xpReward.total !== undefined && (
-                              <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
-                                <span>{drill.xpReward.total.toLocaleString()}</span>
-                                <Image
-                                  src="/images/flame100.png"
-                                  alt="XP"
-                                  width={16}
-                                  height={16}
-                                  className="w-4 h-4"
-                                />
-                              </div>
-                            )}
-                          </div>
-                          
-                          {/* Title */}
-                          <h3 className="text-xl font-black text-gray-900 mb-3 line-clamp-2">
-                            {drill.title}
-                          </h3>
-                          
-                          {/* Meta */}
-                          <div className="flex items-center justify-between mt-auto">
-                            {inProgress && (
-                              <span className="text-xs text-blue-600 font-medium">Continue</span>
-                            )}
-                            {isCompleted && (
-                              <span className="text-xs text-green-600 font-medium">Completed</span>
-                            )}
-                            {!inProgress && !isCompleted && <span></span>}
-                          </div>
-                        </motion.div>
-                      </Link>
-                </motion.div>
-              );
-            })}
-          </div>
-            </motion.section>
-          )}
-
-          {/* FRQ Practice Row */}
-          {displayedFRQs.length > 0 && (
-            <motion.section variants={itemVariants}>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-black text-gray-900 uppercase tracking-wide">FRQ Practice</h2>
-                <Link
-                  href="/unitFRQpracticePage"
-                  className="text-sm font-black text-gray-900 border-2 border-black rounded-lg px-3 py-1.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 transition-all flex items-center gap-1"
-                >
-                  See all
-                  <ChevronRight className="w-4 h-4" />
-                </Link>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {displayedFRQs.map((frq, index) => (
-                  <motion.div
-                    key={frq.id || index}
-                    variants={cardHoverVariants}
-                    initial="rest"
-                    whileHover="hover"
-                    className="group"
-                  >
-                    <Link href={`/unitFRQpracticePage?frqId=${frq.id}`}>
-                      <motion.div
-                        variants={cardHoverVariants}
-                        initial="rest"
-                        whileHover="hover"
-                        className="bg-white border border-gray-300 rounded-lg p-6 text-left transition-all flex flex-col h-full overflow-hidden"
-                      >
-                        {/* Header: Icon, XP, Activity Type */}
-                        <div className="flex items-start justify-between mb-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-gray-100 border-2 border-black flex items-center justify-center flex-shrink-0">
-                              <Image
-                                src="/images/pencilFinal.svg"
-                                alt="FRQ"
-                                width={20}
-                                height={20}
-                                className="w-5 h-5"
-                              />
-                            </div>
-                            <div className="flex flex-col gap-1">
-                              {frq.unit && (
-                                <span className="text-xs font-medium text-gray-500">Unit {frq.unit.toString().padStart(2, '0')}</span>
-                              )}
-                              <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">FRQ</span>
-                            </div>
-                          </div>
-                          {frq.totalPoints && (
-                            <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
-                              <span>{(frq.totalPoints * 100).toLocaleString()}</span>
-                              <Image
-                                src="/images/flame100.png"
-                                alt="XP"
-                                width={16}
-                                height={16}
-                                className="w-4 h-4"
-                              />
-                            </div>
-                          )}
-                        </div>
-                        
-                        {/* Title */}
-                        <h3 className="text-xl font-black text-gray-900 mb-3 line-clamp-2">
-                          {frq.title}
-                        </h3>
-                        
-                        {/* Meta */}
-                        {frq.unit && (
-                          <p className="text-sm text-gray-500 mt-auto">Unit {frq.unit}</p>
-                        )}
-                      </motion.div>
-                    </Link>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.section>
-          )}
-
-          {/* Full Exams Row */}
-          {displayedFullExams.length > 0 && (
-            <motion.section variants={itemVariants}>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-black text-gray-900 uppercase tracking-wide">Full Exams</h2>
-                <Link
-                  href="/full-mcq-exam"
-                  className="text-sm font-black text-gray-900 border-2 border-black rounded-lg px-3 py-1.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 transition-all flex items-center gap-1"
-                >
-                  See all
-                  <ChevronRight className="w-4 h-4" />
-                </Link>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {displayedFullExams.map((exam) => {
-                  // Check if this is the Full MCQ Exam and has progress
-                  const hasProgress = exam.id === 'full-mcq-exam' && fullExamProgress && fullExamProgress.answeredCount > 0;
-                  
-                  return (
-                    <motion.div
-                      key={exam.id}
-                      variants={cardHoverVariants}
-                      initial="rest"
-                      whileHover="hover"
-                      className="group"
-                    >
-                      <Link href={exam.href}>
-                        <motion.div
-                          variants={cardHoverVariants}
-                          initial="rest"
-                          whileHover="hover"
-                          className="bg-white border-2 border-black rounded-2xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 p-6 text-left transition-all flex flex-col h-full overflow-hidden"
-                        >
-                          {/* Header: Icon, XP, Activity Type */}
-                          <div className="flex items-start justify-between mb-4">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-xl bg-gray-100 border-2 border-black flex items-center justify-center flex-shrink-0">
-                                <Image
-                                  src="/images/exam.svg"
-                                  alt="Exam"
-                                  width={20}
-                                  height={20}
-                                  className="w-5 h-5"
-                                />
-                              </div>
-                              <div className="flex flex-col gap-1">
-                                <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Exam</span>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
-                              <span>6,000</span>
-                              <Image
-                                src="/images/flame100.png"
-                                alt="XP"
-                                width={16}
-                                height={16}
-                                className="w-4 h-4"
-                              />
-                            </div>
-                          </div>
-                          
-                          {/* Title */}
-                          <h3 className="text-xl font-black text-gray-900 mb-3 line-clamp-2">
-                            {exam.title}
-                          </h3>
-                          
-                          {/* Meta */}
-                          <div className="mt-auto space-y-2">
-                            <p className="text-sm text-gray-500">{exam.description}</p>
-                            {hasProgress && (
-                              <div className="flex items-center justify-between pt-2">
-                                <span className="text-xs text-blue-600 font-medium">Continue</span>
-                                <span className="text-xs text-gray-500">
-                                  {fullExamProgress.answeredCount}/{fullExamProgress.totalQuestions} answered
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        </motion.div>
-                      </Link>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            </motion.section>
-          )}
-
-          {/* Unit Exams Row */}
-          {displayedUnitExams.length > 0 && (
-            <motion.section variants={itemVariants}>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-black text-gray-900 uppercase tracking-wide">Unit Exams</h2>
-                <Link
-                  href={getUnitMCQTestUrl(1, currentCourse as 'macro' | 'micro')}
-                  className="text-sm font-black text-gray-900 border-2 border-black rounded-lg px-3 py-1.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 transition-all flex items-center gap-1"
-                >
-                  See all
-                  <ChevronRight className="w-4 h-4" />
-                </Link>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {displayedUnitExams.map((exam) => (
-                  <motion.div
-                    key={exam.id}
-                    variants={cardHoverVariants}
-                    initial="rest"
-                    whileHover="hover"
-                    className="group"
-                  >
-                    <Link href={exam.isLocked ? `/purchase/season-pass?courseType=${currentCourse}` : exam.href}>
-                      <motion.div
-                        variants={cardHoverVariants}
-                        initial="rest"
-                        whileHover="hover"
-                        className="bg-white border-2 border-black rounded-2xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 p-6 text-left transition-all flex flex-col h-full overflow-hidden"
-                      >
-                        {/* Header: Icon, XP, Activity Type */}
-                        <div className="flex items-start justify-between mb-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-gray-100 border-2 border-black flex items-center justify-center flex-shrink-0">
-                              <Image
-                                src="/images/exam.svg"
-                                alt="Exam"
-                                width={20}
-                                height={20}
-                                className="w-5 h-5"
-                              />
-                            </div>
-                            <div className="flex flex-col gap-1">
-                              {exam.unitNumber && (
-                                <span className="text-xs font-medium text-gray-500">Unit {exam.unitNumber.toString().padStart(2, '0')}</span>
-                              )}
-                              <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Test</span>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
-                            <span>1,000</span>
-                            <Image
-                              src="/images/flame100.png"
-                              alt="XP"
-                              width={16}
-                              height={16}
-                              className="w-4 h-4"
-                            />
-                          </div>
-                        </div>
-                        
-                        {/* Title */}
-                        <h3 className="text-xl font-black line-clamp-2 mb-3 text-gray-900">
-                          {exam.title}
-                        </h3>
-                        
-                        {/* Meta */}
-                        <p className="text-sm line-clamp-2 mt-auto text-gray-500">{exam.description}</p>
-                      </motion.div>
-                    </Link>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.section>
-          )}
-
 
           </motion.div>
         </AnimatePresence>

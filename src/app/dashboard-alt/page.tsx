@@ -9,7 +9,7 @@ import { CourseToggle } from '@/components/CourseToggle';
 import { Button } from '@/components/ui/button';
 
 function AlternativeDashboardContent() {
-  const { user, userData } = useAuthContext();
+  const { user, userData, selectedSubject, setSelectedSubject } = useAuthContext();
   const { currentCourse } = useCourseContext();
   const theme = useCourseTheme();
   const subject = currentCourse === 'macro' ? 'macro' : 'micro';
@@ -38,7 +38,7 @@ function AlternativeDashboardContent() {
             <h1 className="text-3xl font-black text-gray-900">
               {subjectName} Dashboard
             </h1>
-            <CourseToggle />
+            <CourseToggle activeTab={selectedSubject} onToggle={setSelectedSubject} />
           </div>
         </div>
 

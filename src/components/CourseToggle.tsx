@@ -1,54 +1,38 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
 
 interface CourseToggleProps {
   activeTab: 'macro' | 'micro';
   onToggle: (tab: 'macro' | 'micro') => void;
 }
 
+/** Matches header subject toggle: rounded-xl rail, font-black, blue/green active pills with offset shadow. */
 export function CourseToggle({ activeTab, onToggle }: CourseToggleProps) {
   return (
-    <div className="relative inline-flex items-center bg-gray-100 rounded-full p-0.5 shadow-sm">
-      {/* Sliding Background Pill */}
-      <motion.div
-        layoutId="activeTab"
-        className="absolute bg-white rounded-full shadow-sm"
-        style={{
-          width: 'calc(50% - 2px)',
-          height: 'calc(100% - 4px)',
-          left: activeTab === 'macro' ? '2px' : 'calc(50% + 0px)',
-        }}
-        transition={{
-          type: 'spring',
-          stiffness: 400,
-          damping: 25,
-        }}
-      />
-
-      {/* Macro Button */}
+    <div className="inline-flex items-center bg-gray-100 rounded-xl p-1 border-2 border-gray-300 shadow-[0_3px_0_0_rgba(209,213,219,1)]">
       <button
+        type="button"
         onClick={() => onToggle('macro')}
-        className="relative z-10 flex-1 px-5 py-1.5 text-sm font-medium rounded-full transition-colors duration-200"
-        style={{
-          color: activeTab === 'macro' ? '#3B82F6' : '#6B7280',
-        }}
+        className={`px-4 py-1.5 text-sm font-black rounded-lg transition-all duration-200 ${
+          activeTab === 'macro'
+            ? 'bg-blue-500 text-white border-2 border-blue-700 shadow-[0_2px_0_0_rgba(0,0,0,0.4)]'
+            : 'bg-gray-100 text-gray-600 hover:text-gray-900'
+        }`}
       >
         Macro
       </button>
-
-      {/* Micro Button */}
       <button
+        type="button"
         onClick={() => onToggle('micro')}
-        className="relative z-10 flex-1 px-5 py-1.5 text-sm font-medium rounded-full transition-colors duration-200"
-        style={{
-          color: activeTab === 'micro' ? '#3B82F6' : '#6B7280',
-        }}
+        className={`px-4 py-1.5 text-sm font-black rounded-lg transition-all duration-200 ${
+          activeTab === 'micro'
+            ? 'bg-green-500 text-white border-2 border-green-700 shadow-[0_2px_0_0_rgba(0,0,0,0.4)]'
+            : 'bg-gray-100 text-gray-600 hover:text-gray-900'
+        }`}
       >
         Micro
       </button>
     </div>
   );
 }
-

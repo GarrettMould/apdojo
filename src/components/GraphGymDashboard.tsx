@@ -192,7 +192,7 @@ export function GraphGymDashboard({ onSelectScenario: _onSelectScenario }: Graph
             {/* Right — overlapping visual (desktop) */}
             <div className="flex-1 min-w-0">
               {/* Desktop: overlapping video + sidebar */}
-              <div className="hidden sm:block relative h-[420px]">
+              <div className="hidden sm:block relative h-[420px] overflow-visible">
                 {/* Video — bottom-left, ~78% width */}
                 <div className="absolute bottom-0 left-0 w-[78%] rounded-2xl border-4 border-black overflow-hidden shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
                   <video
@@ -206,7 +206,7 @@ export function GraphGymDashboard({ onSelectScenario: _onSelectScenario }: Graph
                 </div>
 
                 {/* Sidebar card — floats above, pushed left into the video */}
-                <div className="absolute top-0 right-[14%] w-[185px] bg-white rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden z-10">
+                <div className="absolute -top-2 right-[22%] sm:-top-3 sm:right-[24%] w-[185px] bg-white rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden z-10">
                   <div className="p-2 border-b-2 border-black">
                     <p className="text-[8px] font-black uppercase tracking-widest text-black mb-1.5">Sample Answer</p>
                     <img

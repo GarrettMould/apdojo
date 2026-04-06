@@ -141,7 +141,7 @@ export const blogPosts: Record<string, BlogPost> = {
     description: 'Mastering the hardest graph in AP Macro by treating currency like a normal good.',
     subject: 'Macro',
     unit: 6,
-    thumbnailUrl: '/images/placeholder.png', // Using the local placeholder for this one
+    thumbnailUrl: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/blogimages/forex/image0.jpg',
     seoSnippet: 'The foreign exchange market is where currencies are bought and sold, functioning like any other commodity market. When demand for one currency increases, it appreciates while the other currency must depreciate, following the rule of opposites.',
     keyTakeaway: 'A change in demand for one currency causes an opposite change in the supply of the other. If one appreciates, the other must depreciate.',
     linkedFRQ: 4, // Links to Unit 6 FRQ - Foreign Exchange Market
