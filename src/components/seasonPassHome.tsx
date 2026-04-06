@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useMemo, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Check, BookOpen, FileText, Target, PlayCircle, Sparkles, Brain, Award, Search, Filter, X, ChevronRight, Upload, Image as ImageIcon, Loader2, CheckCircle2, XCircle, RefreshCw, Lightbulb } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
@@ -61,6 +61,114 @@ export function SeasonPassHome() {
 
       {/* Question List Section */}
       <QuestionListSection />
+    </div>
+  );
+}
+
+// ── Mobile MCQ scroll: 3 questions visible at a time, auto-advances ──
+const MCQ_PAGE_SIZE = 3;
+const mcqSlideVariants = {
+  enter: (d: number) => ({ opacity: 0, y: d > 0 ? 32 : -32 }),
+  center: { opacity: 1, y: 0 },
+  exit: (d: number) => ({ opacity: 0, y: d > 0 ? -32 : 32 }),
+};
+
+function MobileMCQScroll({
+  questions,
+  subjectFilter,
+  onQuestionClick,
+}: {
+  questions: Question[];
+  subjectFilter: 'ap_macroeconomics' | 'ap_microeconomics';
+  onQuestionClick: (q: Question) => void;
+}) {
+  const [page, setPage] = useState(0);
+  const [direction, setDirection] = useState(1);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const totalPages = Math.max(1, Math.ceil(questions.length / MCQ_PAGE_SIZE));
+  const pageQuestions = questions.slice(page * MCQ_PAGE_SIZE, (page + 1) * MCQ_PAGE_SIZE);
+
+  const startTimer = () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setDirection(1);
+      setPage((p) => (p + 1) % totalPages);
+    }, 2800);
+  };
+
+  useEffect(() => {
+    startTimer();
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [totalPages]);
+
+  // Reset when questions change (filter change)
+  useEffect(() => {
+    setPage(0);
+    setDirection(1);
+  }, [questions]);
+
+  const goTo = (index: number) => {
+    setDirection(index > page ? 1 : -1);
+    setPage(index);
+    startTimer();
+  };
+
+  if (questions.length === 0) {
+    return (
+      <div className="bg-white border-4 border-black rounded-3xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] p-8 text-center">
+        <p className="text-gray-700 font-bold">No questions found matching your filters.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div className="relative overflow-hidden" style={{ minHeight: '268px' }}>
+        <AnimatePresence custom={direction} mode="wait">
+          <motion.div
+            key={page}
+            custom={direction}
+            variants={mcqSlideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+            className="space-y-3"
+          >
+            {pageQuestions.map((question) => (
+              <button
+                key={question.id}
+                onClick={() => onQuestionClick(question)}
+                className={`w-full bg-white border-4 border-black rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4 text-left flex items-start gap-3 group hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all`}
+              >
+                <span className={`flex-shrink-0 px-2.5 py-1 rounded-full text-xs font-black border-2 border-black leading-none mt-0.5 ${
+                  subjectFilter === 'ap_macroeconomics' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
+                }`}>
+                  U{question.unit}
+                </span>
+                <p className="text-sm font-semibold text-gray-900 line-clamp-2 flex-1 leading-snug">
+                  {question.question}
+                </p>
+                <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5 group-hover:text-gray-700 transition-colors" />
+              </button>
+            ))}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {/* Dot pagination */}
+      <div className="flex justify-center gap-1.5 mt-5">
+        {Array.from({ length: totalPages }).map((_, i) => (
+          <button
+            key={i}
+            onClick={() => goTo(i)}
+            className={`h-1.5 rounded-full transition-all duration-300 ${i === page ? 'w-5 bg-gray-900' : 'w-1.5 bg-gray-300'}`}
+            aria-label={`Page ${i + 1}`}
+          />
+        ))}
+      </div>
     </div>
   );
 }
@@ -200,8 +308,17 @@ function QuestionListSection() {
           </div>
         </motion.div>
 
-        {/* Questions Grid - Card Based */}
-        <div className="space-y-5">
+        {/* Mobile: 3-at-a-time auto-scrolling view */}
+        <div className="sm:hidden">
+          <MobileMCQScroll
+            questions={filteredQuestions}
+            subjectFilter={subjectFilter}
+            onQuestionClick={handleQuestionClick}
+          />
+        </div>
+
+        {/* Desktop: full question list */}
+        <div className="hidden sm:block space-y-5">
           {filteredQuestions.length === 0 ? (
             <motion.div
               initial={{ opacity: 0 }}
@@ -225,7 +342,6 @@ function QuestionListSection() {
                   className="w-full bg-white border-4 border-black rounded-3xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[9px_9px_0px_0px_rgba(0,0,0,1)] p-6 text-left transition-all duration-200 group"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                    {/* Left side - Question content */}
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-3">
                         <span className={`px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-wider border-2 border-black ${
@@ -243,8 +359,6 @@ function QuestionListSection() {
                         {truncateText(question.question, 200)}
                       </p>
                     </div>
-                    
-                    {/* Right side - Arrow indicator */}
                     <div className="flex-shrink-0 flex items-center">
                       <div className="w-10 h-10 rounded-full bg-white border-2 border-black flex items-center justify-center group-hover:bg-gray-50 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
                         <ChevronRight className="w-5 h-5 text-gray-900" />

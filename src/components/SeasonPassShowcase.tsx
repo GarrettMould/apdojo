@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, ArrowRight, Sparkles } from 'lucide-react';
 
 const COURSE_CONFIG: Record<
@@ -125,6 +125,70 @@ function SeasonPassCard({ courseType }: { courseType: 'macro' | 'micro' }) {
   );
 }
 
+const CARD_TYPES: ('macro' | 'micro')[] = ['macro', 'micro'];
+
+const slideVariants = {
+  enter: (d: number) => ({ opacity: 0, x: d > 0 ? 80 : -80 }),
+  center: { opacity: 1, x: 0 },
+  exit: (d: number) => ({ opacity: 0, x: d > 0 ? -80 : 80 }),
+};
+
+function MobileSeasonPassCarousel() {
+  const [active, setActive] = useState(0);
+  const [direction, setDirection] = useState(1);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const startTimer = (currentIndex: number) => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setDirection(1);
+      setActive((i) => (i + 1) % CARD_TYPES.length);
+    }, 4500);
+  };
+
+  useEffect(() => {
+    startTimer(active);
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const goTo = (index: number) => {
+    setDirection(index > active ? 1 : -1);
+    setActive(index);
+    startTimer(index);
+  };
+
+  return (
+    <div className="lg:hidden">
+      <div className="relative overflow-hidden">
+        <AnimatePresence custom={direction} mode="wait">
+          <motion.div
+            key={active}
+            custom={direction}
+            variants={slideVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <SeasonPassCard courseType={CARD_TYPES[active]} />
+          </motion.div>
+        </AnimatePresence>
+      </div>
+      <div className="flex justify-center gap-2 mt-6">
+        {CARD_TYPES.map((type, i) => (
+          <button
+            key={type}
+            onClick={() => goTo(i)}
+            className={`h-2 rounded-full transition-all duration-300 ${i === active ? 'w-6 bg-gray-900' : 'w-2 bg-gray-300'}`}
+            aria-label={`View ${type} pass`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function SeasonPassShowcase() {
   const savings = Math.max(0, COURSE_CONFIG.macro.price + COURSE_CONFIG.micro.price - BUNDLE.price);
   return (
@@ -170,8 +234,11 @@ export function SeasonPassShowcase() {
           </Link>
         </motion.div>
 
-        {/* Two cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+        {/* Mobile: auto-cycling carousel */}
+        <MobileSeasonPassCarousel />
+
+        {/* Desktop: two-column grid */}
+        <div className="hidden lg:grid grid-cols-2 gap-10">
           <SeasonPassCard courseType="macro" />
           <SeasonPassCard courseType="micro" />
         </div>

@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { FRQFeedbackDemo } from '@/components/FRQFeedbackDemo';
@@ -23,6 +23,89 @@ function getTimeLeft(target: Date) {
     minutes: Math.max(0, Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))),
     seconds: Math.max(0, Math.floor((diff % (1000 * 60)) / 1000)),
   };
+}
+
+const SLIDES = [
+  { label: 'AI-Graded FRQs', component: <FRQFeedbackDemo /> },
+  { label: 'Unlimited MCQ Practice', component: <MCQPracticePreview /> },
+  { label: 'Unit Cheat Sheets', component: <div className="w-full flex min-h-[400px]"><CheatSheetPreview /></div> },
+];
+
+function MobileFeatureCarousel() {
+  const [active, setActive] = useState(0);
+  const [direction, setDirection] = useState(1);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const goTo = (index: number) => {
+    setDirection(index > active ? 1 : -1);
+    setActive(index);
+  };
+
+  useEffect(() => {
+    timerRef.current = setInterval(() => {
+      setDirection(1);
+      setActive((i) => (i + 1) % SLIDES.length);
+    }, 3500);
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, []);
+
+  const variants = {
+    enter: (d: number) => ({ opacity: 0, x: d > 0 ? 60 : -60 }),
+    center: { opacity: 1, x: 0 },
+    exit: (d: number) => ({ opacity: 0, x: d > 0 ? -60 : 60 }),
+  };
+
+  return (
+    <div className="lg:hidden w-full">
+      {/* Slide label */}
+      <div className="text-center mb-4">
+        <AnimatePresence mode="wait">
+          <motion.h3
+            key={active}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.25 }}
+            className="text-2xl font-black text-gray-900"
+          >
+            {SLIDES[active].label}
+          </motion.h3>
+        </AnimatePresence>
+      </div>
+
+      {/* Card */}
+      <div className="relative overflow-hidden w-full min-h-[420px]">
+        <AnimatePresence custom={direction} mode="wait">
+          <motion.div
+            key={active}
+            custom={direction}
+            variants={variants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            className="w-full"
+          >
+            {SLIDES[active].component}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {/* Dot indicators */}
+      <div className="flex justify-center gap-2 mt-5">
+        {SLIDES.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => goTo(i)}
+            className={`h-2 rounded-full transition-all duration-300 ${
+              i === active ? 'w-6 bg-gray-900' : 'w-2 bg-gray-300'
+            }`}
+            aria-label={`Go to slide ${i + 1}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export function HeroSection() {
@@ -173,55 +256,40 @@ export function HeroSection() {
             </div>
           </motion.div>
 
-          {/* Three Feature Containers Grid */}
+          {/* ── MOBILE: auto-cycling carousel ── */}
+          <MobileFeatureCarousel />
+
+          {/* ── DESKTOP: 3-column grid (unchanged) ── */}
           <motion.div
             variants={containerVariants}
-            className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 w-full mx-auto items-stretch"
+            className="hidden lg:grid grid-cols-3 gap-8 w-full mx-auto items-stretch"
           >
-            {/* 1. AI-Graded FRQs */}
-            <motion.div
-              variants={cardVariants}
-              className="lg:col-span-1 flex"
-            >
+            <motion.div variants={cardVariants} className="col-span-1 flex">
               <div className="w-full flex flex-col">
                 <div className="text-center mb-4">
-                  <h3 className="text-2xl sm:text-3xl font-black text-gray-900">
-                    AI-Graded FRQs
-                  </h3>
+                  <h3 className="text-2xl sm:text-3xl font-black text-gray-900">AI-Graded FRQs</h3>
                 </div>
-                <div className="scale-90 lg:scale-100 origin-center w-full flex">
+                <div className="w-full flex">
                   <FRQFeedbackDemo />
                 </div>
               </div>
             </motion.div>
 
-            {/* 2. MCQ Practice Preview */}
-            <motion.div
-              variants={cardVariants}
-              className="lg:col-span-1 flex"
-            >
+            <motion.div variants={cardVariants} className="col-span-1 flex">
               <div className="w-full flex flex-col">
                 <div className="text-center mb-4">
-                  <h3 className="text-2xl sm:text-3xl font-black text-gray-900">
-                    Unlimited MCQ Practice
-                  </h3>
+                  <h3 className="text-2xl sm:text-3xl font-black text-gray-900">Unlimited MCQ Practice</h3>
                 </div>
                 <MCQPracticePreview />
               </div>
             </motion.div>
 
-            {/* 3. Unit Cheat Sheets */}
-            <motion.div
-              variants={cardVariants}
-              className="lg:col-span-1 flex min-w-0"
-            >
+            <motion.div variants={cardVariants} className="col-span-1 flex min-w-0">
               <div className="w-full flex flex-col min-h-[400px]">
                 <div className="text-center mb-4">
-                  <h3 className="text-2xl sm:text-3xl font-black text-gray-900">
-                    Unit Cheat Sheets
-                  </h3>
+                  <h3 className="text-2xl sm:text-3xl font-black text-gray-900">Unit Cheat Sheets</h3>
                 </div>
-                <div className="flex-1 min-h-0 w-full flex scale-90 lg:scale-100 origin-center">
+                <div className="flex-1 min-h-0 w-full flex">
                   <CheatSheetPreview />
                 </div>
               </div>

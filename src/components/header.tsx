@@ -456,260 +456,167 @@ export function Header() {
               className="p-2 text-gray-700 hover:text-blue-600 transition-colors"
               aria-label="Toggle mobile menu"
             >
-              {isMobileMenuOpen ? (
-                <X className="w-7 h-7" />
-              ) : (
-                <Menu className="w-7 h-7" />
-              )}
+              <Menu className="w-7 h-7" />
             </button>
           </div>
         </div>
 
-        {/* Mobile Navigation Dropdown */}
+        {/* Mobile Navigation — Full-screen overlay */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden border-t border-gray-200 bg-white">
-            <nav className="flex flex-col py-4">
-              {/* Practice Section Header */}
-              <div className="px-4 py-2 text-xs font-bold text-gray-500 uppercase tracking-wider">
-                Practice
-              </div>
-              <Link
-                href={getPracticeTestsUrl(selectedSubject)}
-                onClick={closeMobileMenu}
-                className="px-6 py-3 text-lg text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
-              >
-                Full Practice Tests
-              </Link>
-              <Link
-                href="/select-practice-units"
-                onClick={closeMobileMenu}
-                className="px-6 py-3 text-lg text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
-              >
-                MCQ Practice
-              </Link>
-              <Link
-                href={`/unitFRQpracticePage?subject=${displaySubject}&frqId=${displaySubject === 'macro' ? 1 : 2}`}
-                onClick={closeMobileMenu}
-                className="px-6 py-3 text-lg text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
-              >
-                FRQ Practice
-              </Link>
-              <Link
-                href="/dojo/infinite"
-                onClick={closeMobileMenu}
-                className="px-6 py-3 text-lg text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
-              >
-                Create a Quiz
-              </Link>
-              <Link
-                href="/dojo-drills"
-                onClick={closeMobileMenu}
-                className="px-6 py-3 text-lg text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
-              >
-                Dojo Drills
-              </Link>
-              <Link
-                href="/ap-blog-home"
-                onClick={closeMobileMenu}
-                className="px-6 py-3 text-lg text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
-              >
-                Blog
-              </Link>
+          <div className="lg:hidden fixed inset-0 z-[60] bg-white flex flex-col overflow-y-auto">
 
-              {/* Other Links */}
-              <div className="border-t border-gray-200 mt-2 pt-2">
-                <Link
-                  href="/graph-gym-dashboard"
-                  prefetch={false}
-                  onClick={closeMobileMenu}
-                  className="px-4 py-3 text-lg text-blue-500 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
-                >
-                  Graphing Practice
-                </Link>
-                <Link
-                  href={displaySubject === 'macro' ? '/ap-macro-unit-1-cheat-sheet' : '/ap-micro-unit-1-cheat-sheet'}
-                  onClick={closeMobileMenu}
-                  className="px-4 py-3 text-lg text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
-                >
-                  Cheat Sheets
-                </Link>
-                {(!user || !isPremium) && (
+            {/* Overlay header row */}
+            <div className="flex items-center justify-between px-5 h-20 border-b border-gray-100 flex-shrink-0">
+              <Link href="/" onClick={closeMobileMenu} className="flex items-center space-x-3">
+                <Image src="/images/dojoIconJan26.svg" alt="AP Dojo" width={36} height={36} className="w-9 h-9" unoptimized />
+                <span className="text-xl font-extrabold tracking-wide text-gray-900">
+                  AP <span className="text-blue-500">Dojo</span>
+                </span>
+              </Link>
+              <button onClick={closeMobileMenu} className="p-2 text-gray-500 hover:text-gray-900 transition-colors" aria-label="Close menu">
+                <X className="w-7 h-7" />
+              </button>
+            </div>
+
+            <nav className="flex flex-col flex-1 px-5 py-6 gap-1">
+
+              {/* Auth CTAs — only for logged-out users */}
+              {!user && (
+                <div className="flex flex-col gap-3 mb-6">
+                  <Link
+                    href="/signup"
+                    onClick={closeMobileMenu}
+                    className="w-full text-center py-4 bg-blue-600 hover:bg-blue-700 text-white text-lg font-black rounded-2xl transition-colors shadow-sm"
+                  >
+                    Create Account
+                  </Link>
+                  <Link
+                    href="/login"
+                    onClick={closeMobileMenu}
+                    className="w-full text-center py-4 border-2 border-gray-200 hover:border-gray-300 text-gray-900 text-lg font-black rounded-2xl transition-colors"
+                  >
+                    Sign In
+                  </Link>
+                </div>
+              )}
+
+              {/* Season Pass */}
+              {(!user || !isPremium) && (
+                <>
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1 mb-1">Season Pass</p>
                   <Link
                     href={`/purchase/season-pass?courseType=${displaySubject}`}
                     onClick={closeMobileMenu}
-                    className="px-4 py-3 text-lg text-gray-700 hover:text-blue-600 hover:bg-gray-50 transition-colors font-semibold"
+                    className="px-4 py-4 text-xl font-bold text-blue-600 hover:bg-blue-50 rounded-xl transition-colors flex items-center justify-between"
                   >
-                    Season Pass
+                    <span>Get the Season Pass</span>
+                    <span className="text-lg">✨</span>
                   </Link>
+                  <div className="my-3 border-t border-gray-100" />
+                </>
+              )}
+
+              {/* Test */}
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1 mb-1">Test</p>
+              <Link
+                href={getPracticeTestsUrl(selectedSubject)}
+                onClick={closeMobileMenu}
+                className="px-4 py-4 text-xl font-bold text-gray-800 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors"
+              >
+                Full Practice Tests
+              </Link>
+
+              <div className="my-3 border-t border-gray-100" />
+
+              {/* Practice */}
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1 mb-1">Practice</p>
+              {[
+                { label: 'MCQ Practice', href: '/select-practice-units' },
+                { label: 'FRQ Practice', href: `/unitFRQpracticePage?subject=${displaySubject}&frqId=${displaySubject === 'macro' ? 1 : 2}` },
+                { label: 'Create a Quiz', href: '/dojo/infinite' },
+                { label: 'Dojo Drills', href: '/dojo-drills' },
+                { label: 'Graphing Practice', href: '/graph-gym-dashboard' },
+                { label: 'Cheat Sheets', href: displaySubject === 'macro' ? '/ap-macro-unit-1-cheat-sheet' : '/ap-micro-unit-1-cheat-sheet' },
+                { label: 'Blog', href: '/ap-blog-home' },
+              ].map(({ label, href }) => (
+                <Link
+                  key={label}
+                  href={href}
+                  prefetch={label === 'Graphing Practice' ? false : undefined}
+                  onClick={closeMobileMenu}
+                  className="px-4 py-4 text-xl font-bold text-gray-800 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors"
+                >
+                  {label}
+                </Link>
+              ))}
+
+              {/* Bottom section — XP, subject toggle, logout */}
+              <div className="mt-auto pt-6 border-t border-gray-100 space-y-4">
+                {/* XP Bar */}
+                {(() => {
+                  const xp = user ? getSubjectXP(userData, displaySubject) : (guestXp ?? 0);
+                  const beltProgress = getBeltProgress(xp);
+                  const { percent, xpToNext, currentBelt } = beltProgress;
+                  const getBeltImage = () => {
+                    if (currentBelt.name === 'Yellow Belt') return '/images/beltNewYellow.svg';
+                    if (currentBelt.name === 'Green Belt') return '/images/beltNewGreen.svg';
+                    if (currentBelt.name === 'Purple Belt') return '/images/beltNewPurple.svg';
+                    if (currentBelt.name === 'Black Belt') return '/images/beltNewBlack.svg';
+                    return '/images/beltNewWhite.svg';
+                  };
+                  return (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Image src={getBeltImage()} alt={currentBelt.name} width={24} height={24} className="w-6 h-auto" unoptimized />
+                          <span className={`text-sm font-bold uppercase ${currentBelt.textColor}`}>{currentBelt.name}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-800">
+                          <span>{xp} XP</span>
+                          <Image src="/images/flame100.png" alt="XP" width={16} height={16} className="w-4 h-4" unoptimized />
+                        </div>
+                      </div>
+                      <div className="h-2.5 bg-gray-200 rounded-full overflow-hidden">
+                        <motion.div
+                          className={`h-full ${currentBelt.color === 'bg-yellow-400' ? 'bg-yellow-400' : currentBelt.color === 'bg-green-600' ? 'bg-green-600' : currentBelt.color === 'bg-purple-600' ? 'bg-purple-600' : currentBelt.color === 'bg-gray-900' ? 'bg-gray-900' : 'bg-gray-300'}`}
+                          initial={{ width: 0 }}
+                          animate={{ width: `${percent}%` }}
+                          transition={{ duration: 0.3 }}
+                        />
+                      </div>
+                      <p className="text-xs text-center text-gray-500">
+                        {xpToNext !== null ? `${xpToNext.toLocaleString()} XP to next belt` : 'Max Rank'}
+                      </p>
+                    </div>
+                  );
+                })()}
+
+                {/* Subject toggle */}
+                <div className="inline-flex w-full bg-gray-100 rounded-xl p-1 border border-gray-200">
+                  {(['macro', 'micro'] as const).map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => { handleSubjectChange(s); closeMobileMenu(); }}
+                      className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-200 capitalize ${
+                        displaySubject === s
+                          ? s === 'macro' ? 'bg-blue-600 text-white shadow-sm' : 'bg-green-600 text-white shadow-sm'
+                          : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                    >
+                      {s.charAt(0).toUpperCase() + s.slice(1)}
+                    </button>
+                  ))}
+                </div>
+
+                {user && (
+                  <button
+                    onClick={() => { handleLogout(); closeMobileMenu(); }}
+                    className="w-full py-3 text-red-600 hover:bg-red-50 transition-colors font-semibold rounded-xl text-sm"
+                  >
+                    Logout
+                  </button>
                 )}
               </div>
-
-                {/* Tutoring Dropdown (Mobile) - HIDDEN */}
-                {/* <div className="px-4 py-2">
-                  <button
-                    onClick={() => setIsTutoringDropdownOpen(!isTutoringDropdownOpen)}
-                    className="flex items-center justify-between w-full text-gray-700 hover:text-blue-600 transition-colors font-semibold"
-                  >
-                    Tutoring
-                    <ChevronDown className={`w-4 h-4 transition-transform ${isTutoringDropdownOpen ? 'rotate-180' : ''}`} />
-                  </button>
-                  {isTutoringDropdownOpen && (
-                    <div className="mt-2 ml-4 space-y-1">
-                      <Link
-                        href="/tutoring"
-                        onClick={closeMobileMenu}
-                        className="block px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition-colors rounded-md"
-                      >
-                        Book a Lesson
-                      </Link>
-                      <Link
-                        href="/async-tutoring"
-                        onClick={closeMobileMenu}
-                        className="block px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition-colors rounded-md"
-                      >
-                        Ask a Question
-                      </Link>
-                      <Link
-                        href="https://www.youtube.com/@apdojo"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={closeMobileMenu}
-                        className="block px-4 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-gray-50 transition-colors rounded-md"
-                      >
-                        Join a YouTube Live Session
-                      </Link>
-                    </div>
-                  )}
-                </div> */}
-
-                <div className="border-t border-gray-200 mt-4 pt-4">
-                  {/* XP Bar (Mobile) */}
-                  {(() => {
-                    const xp = user ? getSubjectXP(userData, displaySubject) : (guestXp ?? 0);
-                    const beltProgress = getBeltProgress(xp);
-                    const { percent, xpToNext, currentBelt } = beltProgress;
-                    
-                    const getBeltImage = () => {
-                      if (currentBelt.name === 'White Belt') {
-                        return '/images/beltNewWhite.svg';
-                      } else if (currentBelt.name === 'Yellow Belt') {
-                        return '/images/beltNewYellow.svg';
-                      } else if (currentBelt.name === 'Green Belt') {
-                        return '/images/beltNewGreen.svg';
-                      } else if (currentBelt.name === 'Purple Belt') {
-                        return '/images/beltNewPurple.svg';
-                      } else if (currentBelt.name === 'Black Belt') {
-                        return '/images/beltNewBlack.svg';
-                      } else {
-                        return '/images/beltNewWhite.svg';
-                      }
-                    };
-                    
-                    return (
-                      <div className="px-4 py-3 space-y-3">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Image
-                              src={getBeltImage()}
-                              alt={currentBelt.name}
-                              width={24}
-                              height={24}
-                              className="w-6 h-auto"
-                              unoptimized={true}
-                            />
-                            <span className={`text-xs font-bold uppercase ${currentBelt.textColor}`}>
-                              {currentBelt.name}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-800">
-                            <span className="uppercase tracking-tight text-[10px] text-gray-600">XP</span>
-                            <span>{xp}</span>
-                            <Image
-                              src="/images/flame100.png"
-                              alt="XP Flame"
-                              width={16}
-                              height={16}
-                              className="w-4 h-4"
-                              unoptimized={true}
-                            />
-                          </div>
-                        </div>
-                        <div className="h-3 bg-gray-200 border border-gray-300 rounded-full overflow-hidden">
-                          <motion.div
-                            className={`h-full ${currentBelt.color === 'bg-yellow-400' ? 'bg-yellow-400' : currentBelt.color === 'bg-green-600' ? 'bg-green-600' : currentBelt.color === 'bg-purple-600' ? 'bg-purple-600' : currentBelt.color === 'bg-gray-900' ? 'bg-gray-900' : 'bg-gray-100'}`}
-                            initial={{ width: 0 }}
-                            animate={{ width: `${percent}%` }}
-                            transition={{ duration: 0.3 }}
-                          />
-                        </div>
-                        {xpToNext !== null ? (
-                          <p className="text-xs text-center text-gray-600">
-                            {xpToNext.toLocaleString()} XP to next belt
-                          </p>
-                        ) : (
-                          <p className="text-xs text-center text-gray-600">
-                            Max Rank
-                          </p>
-                        )}
-                      </div>
-                    );
-                  })()}
-                  
-                  {/* Subject Segmented Control (Mobile) */}
-                  <div className="px-4 py-2">
-                    <div className="inline-flex items-center w-full bg-gray-100 rounded p-0.5 border border-gray-200">
-                      <button
-                        onClick={() => {
-                          handleSubjectChange('macro');
-                          closeMobileMenu();
-                        }}
-                        className={`flex-1 px-2.5 py-2 text-xs font-medium rounded transition-all duration-200 ${
-                          displaySubject === 'macro'
-                            ? 'bg-blue-600 text-white shadow-sm'
-                            : 'text-gray-600 hover:text-gray-900'
-                        }`}
-                      >
-                        Macro
-                      </button>
-                      <button
-                        onClick={() => {
-                          handleSubjectChange('micro');
-                          closeMobileMenu();
-                        }}
-                        className={`flex-1 px-2.5 py-2 text-xs font-medium rounded transition-all duration-200 ${
-                          displaySubject === 'micro'
-                            ? 'bg-green-600 text-white shadow-sm'
-                            : 'text-gray-600 hover:text-gray-900'
-                        }`}
-                      >
-                        Micro
-                      </button>
-                    </div>
-                  </div>
-                  
-
-                  {user && (
-                    <div className="px-4 pt-2 border-t border-gray-200 mt-3">
-                      <button
-                        onClick={() => {
-                          handleLogout();
-                          closeMobileMenu();
-                        }}
-                        className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 transition-colors font-semibold rounded-md"
-                      >
-                        Logout
-                      </button>
-                    </div>
-                  )}
-
-                  {!user && (
-                    <div className="px-4 pt-4 space-y-2 border-t border-gray-200 mt-3">
-                      <Link href="/signup" passHref>
-                        <Button onClick={closeMobileMenu} variant="outline" className="w-full">Sign up</Button>
-                      </Link>
-                    </div>
-                  )}
-                </div>
             </nav>
           </div>
         )}

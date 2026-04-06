@@ -44,6 +44,71 @@ function shuffleArray<T>(array: T[]): T[] {
   return shuffled;
 }
 
+type DrillItem = ReturnType<typeof Object.values<typeof dojoDrills>>[number];
+
+// Peek heights for the first two cards (px); third card is always full height
+const DRILL_PEEK_H = [52, 72] as const;
+
+function MobileDrillStack({
+  drills,
+  handleStart,
+  isProCustomer,
+}: {
+  drills: DrillItem[];
+  handleStart: (id: string) => void;
+  isProCustomer: boolean;
+}) {
+  const show = drills.slice(0, 3);
+
+  return (
+    <div className="sm:hidden flex flex-col gap-0.5">
+      {show.map((drill, i) => {
+        const isLast = i === show.length - 1;
+        return (
+          <div
+            key={drill.id}
+            style={
+              isLast
+                ? { position: 'relative', zIndex: 3 }
+                : {
+                    height: DRILL_PEEK_H[i],
+                    overflow: 'hidden',
+                    position: 'relative',
+                    zIndex: i + 1,
+                    opacity: 0.5 + i * 0.2,
+                    pointerEvents: 'none',
+                  }
+            }
+          >
+            <div
+              onClick={isLast ? () => handleStart(drill.id) : undefined}
+              className={isLast ? 'cursor-pointer' : ''}
+            >
+              <DojoDrillPreview
+                title={drill.title}
+                description={drill.description}
+                xpReward={drill.xpReward.total}
+                difficulty="Medium"
+                onStart={() => handleStart(drill.id)}
+                isLocked={!isProCustomer}
+                progress={null}
+                buttonText={isProCustomer ? undefined : 'Join the Dojo'}
+              />
+            </div>
+            {/* Fade at the cutoff edge of peek cards */}
+            {!isLast && (
+              <div
+                className="absolute bottom-0 left-0 right-0 pointer-events-none"
+                style={{ height: 28, background: 'linear-gradient(to bottom, transparent, rgba(255,255,255,0.92))' }}
+              />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export function HomeDojoDrills() {
   const router = useRouter();
   const { user, userData, selectedSubject } = useAuthContext();
@@ -116,9 +181,16 @@ export function HomeDojoDrills() {
         </p>
       </div>
 
-      {/* Grid Layout */}
+      {/* Mobile: 3-card peek stack */}
+      <MobileDrillStack
+        drills={featuredDrills}
+        handleStart={handleStart}
+        isProCustomer={isProCustomer}
+      />
+
+      {/* Desktop: 2-column grid */}
       <motion.div
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-x-6 gap-y-12"
+        className="hidden sm:grid grid-cols-2 gap-x-6 gap-y-12"
         variants={containerVariants}
         initial="hidden"
         whileInView="visible"
