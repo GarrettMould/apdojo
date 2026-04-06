@@ -152,26 +152,12 @@ export default function VideoComprehensionChecksPage({ params }: VideoComprehens
 
   // Reset state when video changes
   useEffect(() => {
-    console.log('VideoComprehensionChecks: Resetting state for video:', videoSlug);
     setAnsweredQuestions({});
     setCurrentQuestionIndex(0);
     setShowExplanation(false);
     setExplanationError(null);
   }, [videoSlug]);
 
-  // Debug logging for state changes
-  useEffect(() => {
-    if (video) {
-      const totalQuestions = video.questions.length;
-      const currentQuestion = video.questions[currentQuestionIndex];
-      const currentAnswer = answeredQuestions[currentQuestion?.id];
-      
-      console.log('VideoComprehensionChecks: Current question index:', currentQuestionIndex);
-      console.log('VideoComprehensionChecks: Current question:', currentQuestion);
-      console.log('VideoComprehensionChecks: Answered questions:', answeredQuestions);
-      console.log('VideoComprehensionChecks: Current answer for question:', currentAnswer);
-    }
-  }, [video, currentQuestionIndex, answeredQuestions]);
   
   // If video not found, show error
   if (!video) {
@@ -230,15 +216,31 @@ export default function VideoComprehensionChecksPage({ params }: VideoComprehens
 
   const totalQuestions = video.questions.length;
   const currentQuestion = video.questions[currentQuestionIndex];
-  const currentAnswer = answeredQuestions[currentQuestion.id];
+  const currentAnswer = currentQuestion ? answeredQuestions[currentQuestion.id] : undefined;
+
+  // No questions defined for this video
+  if (totalQuestions === 0 || !currentQuestion) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto px-4">
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">No Questions Available</h1>
+          <p className="text-gray-600 mb-6">
+            Comprehension check questions for this video haven&apos;t been added yet.
+          </p>
+          <Link
+            href={`/unit/${video.unit}`}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Unit {video.unit} Study Guide
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   const handleAnswerSelect = (answerIndex: number) => {
-    console.log('VideoComprehensionChecks: Answering question', currentQuestion.id, 'with answer index', answerIndex, 'isCorrect:', answerIndex === currentQuestion.correctAnswer);
-    
-    if (currentAnswer) {
-      console.log('VideoComprehensionChecks: Question already answered, returning early');
-      return; // Already answered
-    }
+    if (currentAnswer) return;
     
     const isCorrect = answerIndex === currentQuestion.correctAnswer;
     setAnsweredQuestions(prev => ({
