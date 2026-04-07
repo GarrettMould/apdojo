@@ -138,7 +138,7 @@ export function GraphGymDashboard({ onSelectScenario: _onSelectScenario }: Graph
 
   return (
     <div className="min-h-0 w-full overflow-auto bg-gray-50">
-      <main className="px-4 py-12">
+      <main className="px-4 pt-20 pb-12">
         <div className="mx-auto max-w-[960px]">
 
           {/* ── Feature Preview ─────────────────────────────────────── */}
@@ -205,8 +205,8 @@ export function GraphGymDashboard({ onSelectScenario: _onSelectScenario }: Graph
                   />
                 </div>
 
-                {/* Sidebar card — floats above, pushed left into the video */}
-                <div className="absolute -top-2 right-[22%] sm:-top-3 sm:right-[24%] w-[185px] bg-white rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden z-10">
+                {/* Sidebar card — starts over video edge, extends past right side, always on top */}
+                <div className="absolute -top-7 left-[70%] sm:-top-9 sm:left-[72%] w-[185px] bg-white rounded-xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden z-20">
                   <div className="p-2 border-b-2 border-black">
                     <p className="text-[8px] font-black uppercase tracking-widest text-black mb-1.5">Sample Answer</p>
                     <img
