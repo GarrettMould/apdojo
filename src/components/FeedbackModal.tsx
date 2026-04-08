@@ -159,5 +159,5 @@ const FeedbackProgressBar = ({ status }: { status: 'incorrect' | 'partial' | 'co
 
 // Add this function
 const getStudyGuideLink = (unit: number) => {
-      return `/unit-study-guides`;
+      return `/unit-cheat-sheets`;
 }; 

@@ -46,7 +46,7 @@ export function MCQFeedbackModal({
   }, [isOpen]);
 
   const getStudyGuideLink = () => {
-    return `/unit-study-guides`;
+    return `/unit-cheat-sheets`;
   };
 
   const toggleSubject = () => {
