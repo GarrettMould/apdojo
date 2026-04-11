@@ -719,12 +719,12 @@ export function GraphGym({ assignmentScenarios, isAssignment = false, assignment
             </div>
           </div>
 
-          {/* Right Column - Instructions, Resources, Submit Button */}
-          <div className="w-[420px] flex-shrink-0 flex flex-col bg-white h-full overflow-hidden">
-            {/* Scrollable Content Area */}
-            <div className="flex-1 overflow-y-auto p-6">
-              {!isSubmitted ? (
-                <>
+          {/* Right Column - standalone sidebar panel */}
+          <div className="w-[420px] flex-shrink-0 flex flex-col bg-white h-full overflow-hidden ml-4 rounded-2xl border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+            {!isSubmitted ? (
+              <>
+                {/* Scrollable Content Area */}
+                <div className="flex-1 overflow-y-auto p-6">
                   {/* Description Section */}
                   <div className="mb-6">
                     <h3 className="uppercase font-black tracking-widest text-xs text-black mb-3">Instructions</h3>
@@ -770,19 +770,22 @@ export function GraphGym({ assignmentScenarios, isAssignment = false, assignment
                     </div>
                   </div>
 
-                  {/* Submit Button */}
-                  <div className="mt-auto pt-6">
-                    <Button
-                      onClick={handleSubmit}
-                      size="lg"
-                      className="bg-blue-500 hover:bg-blue-600 text-white font-bold px-8 py-3 text-lg rounded-lg shadow-lg w-full flex items-center justify-center"
-                    >
-                      Submit Answer
-                      <ArrowRight className="w-5 h-5 ml-2" />
-                    </Button>
-                  </div>
-                </>
-              ) : (
+                </div>
+
+                {/* Footer Action Area — independent from scroll/content above */}
+                <div className="flex-shrink-0 border-t-2 border-black bg-white p-6">
+                  <Button
+                    onClick={handleSubmit}
+                    size="lg"
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-bold px-8 py-3 text-lg rounded-lg shadow-lg w-full flex items-center justify-center"
+                  >
+                    Submit Answer
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <div className="flex-1 overflow-y-auto p-6">
                 <div className="space-y-6 relative">
                   {/* Video Walkthrough - Expanded Overlay */}
                   <AnimatePresence>
@@ -912,8 +915,8 @@ export function GraphGym({ assignmentScenarios, isAssignment = false, assignment
                     </div>
                   )}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </>
       ) : (

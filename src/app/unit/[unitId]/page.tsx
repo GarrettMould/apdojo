@@ -27,11 +27,33 @@ import { dojoDrills, drillAppliesToSubject, getDrillUnitForSubject } from '@/dat
 import { getFlashcardsForLesson, UnitFlashcardData } from '@/data/unitFlashcards';
 import { StudyModeModal } from '@/components/StudyModeModal';
 import { SeasonPassModal } from '@/components/SeasonPassModal';
+import { SeasonPassEntryWideModal } from '@/components/SeasonPassEntryWideModal';
 import { saveQuizResult } from '@/lib/quizHistory';
 import { hasValidSeasonPass, getUnitMCQTestUrl } from '@/lib/utils';
 import { getSubjectSlug, getUnitSlug } from '@/lib/practiceSlugs';
 import { Footer } from '@/components/Footer';
 import SeasonPassScrollPopup from '@/app/SeasonPassScrollPopup';
+
+/** Once per tab per pretty cheat-sheet URL (subject + unit), so e.g. macro unit 1 does not block micro unit 1. */
+function prettyCheatSheetEntryModalSessionKey(subject: 'macro' | 'micro', unitNumber: number): string {
+  return `apdojo_pretty_cheat_sheet_entry_modal_v2:${subject}:u${unitNumber}`;
+}
+
+function prettyCheatSheetEntryModalSeenThisSession(subject: 'macro' | 'micro', unitNumber: number): boolean {
+  try {
+    return sessionStorage.getItem(prettyCheatSheetEntryModalSessionKey(subject, unitNumber)) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function markPrettyCheatSheetEntryModalSeenThisSession(subject: 'macro' | 'micro', unitNumber: number): void {
+  try {
+    sessionStorage.setItem(prettyCheatSheetEntryModalSessionKey(subject, unitNumber), '1');
+  } catch {
+    /* private mode / quota */
+  }
+}
 import { pdfCheatSheets } from '@/data/pdfCheatSheets';
 import dynamic from 'next/dynamic'; // Add this if not present
 // Add this dynamic import definition near your other imports
@@ -453,7 +475,7 @@ interface UnitPageProps {
 export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubject }: UnitPageProps = {}) {
   const params = useParams();
   const router = useRouter(); // Initialize useRouter
-  const { user, userData, selectedSubject: contextSubject, awardXp } = useAuthContext(); // Correctly destructure userData and selectedSubject
+  const { user, userData, loading, loadingUserData, selectedSubject: contextSubject, awardXp } = useAuthContext();
   
   // Use props if provided, otherwise use params/context
   const selectedSubject = propSubject || contextSubject;
@@ -495,7 +517,41 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
   const [shuffledDeck, setShuffledDeck] = useState<UnitFlashcardData[]>([]);
   const [showShuffleLimitModal, setShowShuffleLimitModal] = useState(false);
   const [showPacketSeasonPassModal, setShowPacketSeasonPassModal] = useState(false);
+  /** `/ap-macro-unit-N-cheat-sheet` and `/ap-micro-unit-N-cheat-sheet` entry promo (not `/unit/N`). */
+  const [entrySeasonPassPromoVisible, setEntrySeasonPassPromoVisible] = useState(false);
+  const [entrySeasonPassPromoDismissed, setEntrySeasonPassPromoDismissed] = useState(false);
   const [unitMcqAnsweredIds, setUnitMcqAnsweredIds] = useState<Set<number>>(new Set());
+
+  const isPrettyCheatSheetRoute = propSubject != null && propUnitNumber != null;
+  const showEntrySeasonPassPromo =
+    isPrettyCheatSheetRoute &&
+    entrySeasonPassPromoVisible &&
+    !entrySeasonPassPromoDismissed &&
+    !(userData && hasValidSeasonPass(userData));
+
+  // Season Pass entry modal: 5s delay on pretty cheat sheet URLs (once per tab per subject+unit; never for premium).
+  useEffect(() => {
+    if (!isPrettyCheatSheetRoute) {
+      setEntrySeasonPassPromoVisible(false);
+      return;
+    }
+    if (typeof window === 'undefined') return;
+    if (propSubject == null || propUnitNumber == null) return;
+    if (prettyCheatSheetEntryModalSeenThisSession(propSubject, propUnitNumber)) return;
+    if (loading) return;
+    if (user && loadingUserData) return;
+    if (userData && hasValidSeasonPass(userData)) return;
+
+    const delayMs = 5000;
+    const timer = window.setTimeout(() => {
+      if (prettyCheatSheetEntryModalSeenThisSession(propSubject, propUnitNumber)) return;
+      if (userData && hasValidSeasonPass(userData)) return;
+      markPrettyCheatSheetEntryModalSeenThisSession(propSubject, propUnitNumber);
+      setEntrySeasonPassPromoVisible(true);
+    }, delayMs);
+
+    return () => window.clearTimeout(timer);
+  }, [isPrettyCheatSheetRoute, propSubject, propUnitNumber, loading, loadingUserData, user, userData]);
 
   // Reset unit MCQ count when switching unit or subject
   useEffect(() => {
@@ -1645,14 +1701,45 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           </Link>
         </div>
 
-        {/* Unit Navigation Tabs */}
-        <div className="mb-8 border-b-2 border-gray-200 flex items-center justify-between">
-          <nav className="-mb-0.5 flex space-x-8" aria-label="Tabs">
+        {/* Unit navigation: dropdown on small screens, tab bar from md up */}
+        <div className="mb-8 border-b-2 border-gray-200 flex flex-col gap-3 pb-3 md:flex-row md:items-end md:justify-between md:gap-0 md:pb-0">
+          <div className="w-full md:hidden">
+            <label
+              htmlFor="unit-cheat-sheet-select"
+              className="mb-1.5 block text-xs font-bold uppercase tracking-wide text-gray-500"
+            >
+              Jump to unit
+            </label>
+            <select
+              id="unit-cheat-sheet-select"
+              value={activeUnit}
+              onChange={(e) => handleUnitChange(e.target.value)}
+              className={`w-full appearance-none rounded-xl border-2 border-black bg-white py-3.5 pl-4 pr-10 text-base font-bold shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:ring-2 focus:ring-offset-1 ${
+                themeColor === 'blue'
+                  ? 'text-blue-700 focus:ring-blue-500'
+                  : 'text-green-700 focus:ring-green-500'
+              }`}
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23111' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'right 0.75rem center',
+                backgroundSize: '1.25rem',
+              }}
+            >
+              {unitsToDisplay.map((unit) => (
+                <option key={unit.number} value={String(unit.number)}>
+                  Unit {unit.number}: {unit.title}
+                </option>
+              ))}
+            </select>
+          </div>
+          <nav className="-mb-0.5 hidden space-x-6 md:flex md:space-x-8" aria-label="Unit tabs">
             {unitsToDisplay.map((unit) => {
               const isActive = activeUnit === String(unit.number);
               return (
                 <button
                   key={unit.number}
+                  type="button"
                   onClick={() => handleUnitChange(String(unit.number))}
                   className={`whitespace-nowrap py-5 px-2 border-b-[3px] font-bold text-base sm:text-lg transition-colors flex items-center gap-2 ${
                     isActive
@@ -1834,25 +1921,25 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
               <button
                 type="button"
                 onClick={openShuffleModal}
-                className={`w-full block text-left rounded-2xl border-4 transition-all active:translate-y-1 p-8 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 ${
+                className={`w-full block text-left rounded-2xl border-4 transition-all active:translate-y-1 p-5 sm:p-8 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 ${
                   selectedSubject === 'macro'
                     ? 'bg-blue-50 hover:bg-blue-100 text-black border-blue-500 shadow-[4px_4px_0px_0px_rgba(37,99,235,1)] hover:shadow-[6px_6px_0px_0px_rgba(37,99,235,1)] focus:ring-offset-blue-400'
                     : 'bg-green-50 hover:bg-green-100 text-black border-green-500 shadow-[4px_4px_0px_0px_rgba(22,163,74,1)] hover:shadow-[6px_6px_0px_0px_rgba(22,163,74,1)] focus:ring-offset-green-400'
                 }`}
               >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-3xl font-black mb-2">🎯 Ultimate Unit Shuffle</h2>
-                    <p className="text-lg font-semibold text-slate-800 mb-4">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+                  <div className="min-w-0 flex-1">
+                    <h2 className="text-2xl font-black mb-2 sm:text-3xl">🎯 Ultimate Unit Shuffle</h2>
+                    <p className="text-base font-semibold text-slate-800 mb-4 sm:text-lg">
                       All {allUnitFlashcards.length} flashcards from Unit {activeUnitNum} shuffled together
                     </p>
-                    <div className="flex gap-4 text-sm">
-                      <span className={`px-3 py-1 rounded-full font-semibold ${selectedSubject === 'macro' ? 'bg-blue-200/70' : 'bg-green-200/70'}`}>{listCount} List</span>
-                      <span className={`px-3 py-1 rounded-full font-semibold ${selectedSubject === 'macro' ? 'bg-blue-200/70' : 'bg-green-200/70'}`}>{rapidFireCount} Rapid Fire</span>
-                      <span className={`px-3 py-1 rounded-full font-semibold ${selectedSubject === 'macro' ? 'bg-blue-200/70' : 'bg-green-200/70'}`}>{graphCount} Graph</span>
+                    <div className="flex flex-col items-start gap-2 text-sm sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
+                      <span className={`rounded-full px-3 py-2 font-semibold sm:py-1 ${selectedSubject === 'macro' ? 'bg-blue-200/70' : 'bg-green-200/70'}`}>{listCount} List</span>
+                      <span className={`rounded-full px-3 py-2 font-semibold sm:py-1 ${selectedSubject === 'macro' ? 'bg-blue-200/70' : 'bg-green-200/70'}`}>{rapidFireCount} Rapid Fire</span>
+                      <span className={`rounded-full px-3 py-2 font-semibold sm:py-1 ${selectedSubject === 'macro' ? 'bg-blue-200/70' : 'bg-green-200/70'}`}>{graphCount} Graph</span>
                     </div>
                   </div>
-                  <ArrowRight className="w-8 h-8 flex-shrink-0" />
+                  <ArrowRight className="h-8 w-8 shrink-0 self-end text-slate-700 sm:self-auto" aria-hidden />
                 </div>
               </button>
             </div>
@@ -3446,6 +3533,16 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           </motion.div>
         )}
       </AnimatePresence>
+
+      {showEntrySeasonPassPromo && propSubject && propUnitNumber != null && (
+        <SeasonPassEntryWideModal
+          subject={propSubject}
+          onClose={() => {
+            setEntrySeasonPassPromoDismissed(true);
+            markPrettyCheatSheetEntryModalSeenThisSession(propSubject, propUnitNumber);
+          }}
+        />
+      )}
 
       {/* Join the Dojo Modal */}
       <AnimatePresence>

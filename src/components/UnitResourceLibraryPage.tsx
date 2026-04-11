@@ -181,12 +181,18 @@ function UnitResourceRow({ unit, isProCustomer, index, copyMode }: UnitResourceR
 export function UnitResourceLibraryPage({ copyMode = 'cheat-sheets' }: { copyMode?: CopyMode }) {
   const { user, userData } = useAuthContext();
   const [showLockedModal, setShowLockedModal] = useState(false);
+  /** User closed the promo for this page visit; remounting the page shows it again. */
+  const [seasonPassPromoDismissed, setSeasonPassPromoDismissed] = useState(false);
   const copy = getCopy(copyMode);
 
   const isProCustomer = React.useMemo(() => {
     if (!user || !userData) return false;
     return hasValidSeasonPass(userData, 'macro');
   }, [user, userData]);
+
+  const showSeasonPassPromoModal = copyMode === 'cheat-sheets' && !seasonPassPromoDismissed;
+
+  const dismissSeasonPassPromoModal = () => setSeasonPassPromoDismissed(true);
 
   return (
     <>
@@ -227,8 +233,89 @@ export function UnitResourceLibraryPage({ copyMode = 'cheat-sheets' }: { copyMod
               </div>
             </div>
           )}
+
         </div>
       </div>
+
+      {showSeasonPassPromoModal ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="season-pass-promo-title"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.6)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px',
+            zIndex: 10050,
+          }}
+          onClick={dismissSeasonPassPromoModal}
+        >
+          <div
+            style={{
+              maxWidth: '420px',
+              width: '100%',
+              background: '#fff',
+              borderRadius: '16px',
+              border: '3px solid #000',
+              boxShadow: '6px 6px 0 0 #000',
+              padding: '24px 20px',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 id="season-pass-promo-title" style={{ fontSize: '20px', fontWeight: 900, marginBottom: '8px', color: '#111827' }}>
+              Get the Season Pass
+            </h2>
+            <p style={{ fontSize: '14px', color: '#4b5563', marginBottom: '16px' }}>
+              Unlock every printable unit cheat sheet plus the rest of AP Dojo for Macro (and more) with a Season Pass.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <button
+                type="button"
+                onClick={() => {
+                  window.location.href = '/purchase/season-pass?courseType=macro';
+                }}
+                style={{
+                  width: '100%',
+                  padding: '10px 16px',
+                  background: '#22c55e',
+                  color: '#fff',
+                  fontWeight: 900,
+                  fontSize: '15px',
+                  borderRadius: '10px',
+                  border: '2px solid #000',
+                  boxShadow: '3px 3px 0 0 #000',
+                  cursor: 'pointer',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.03em',
+                }}
+              >
+                View Season Pass Options
+              </button>
+              <button
+                type="button"
+                onClick={dismissSeasonPassPromoModal}
+                style={{
+                  width: '100%',
+                  padding: '8px 16px',
+                  background: '#f3f4f6',
+                  color: '#111827',
+                  fontWeight: 700,
+                  fontSize: '14px',
+                  borderRadius: '10px',
+                  border: '2px solid #000',
+                  cursor: 'pointer',
+                }}
+              >
+                Maybe later
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </>
   );
 }

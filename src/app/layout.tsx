@@ -7,12 +7,9 @@ import { AuthProvider } from '@/contexts/AuthContext'
 import { LayoutClientWrapper } from '@/components/LayoutClientWrapper'
 import { LayoutWrapper } from '@/components/LayoutWrapper'
 import Script from 'next/script'
+import { GoogleTagManager } from '@next/third-parties/google'
 
 const inter = Inter({ subsets: ['latin'] });
-
-/** Google Ads / conversion measurement — set in .env to disable in dev: leave unset uses this ID */
-const GOOGLE_ADS_ID =
-  process.env.NEXT_PUBLIC_GOOGLE_ADS_ID ?? 'AW-18008787960';
 
 // Default metadata for the site
 export const metadata: Metadata = {
@@ -88,23 +85,6 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet" />
-        {/* Google tag (gtag.js) — one tag sitewide; enables Ads conversion measurement */}
-        <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ADS_ID}`}
-          strategy="afterInteractive"
-        />
-        <Script
-          id="google-ads-gtag"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', '${GOOGLE_ADS_ID}');
-            `,
-          }}
-        />
         <Script
           id="ms-clarity"
           strategy="afterInteractive"
@@ -113,6 +93,7 @@ export default function RootLayout({
           }}
         />
       </head>
+      <GoogleTagManager gtmId="AW-18008787960" />
       <body className={inter.className}>
         <AuthProvider>
           <LayoutWrapper>
