@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronLeft, ChevronRight, ChevronDown, Lock, Zap } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, ChevronDown, Zap, CheckCircle2, Sparkles, Star } from 'lucide-react';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { COURSE_CONFIG } from '@/data/seasonPassCourseConfig';
 
 export interface StudyModeCard {
   id: string;
@@ -289,20 +291,20 @@ export function StudyModeModal({
 
         {/* Center: card + side arrows */}
         <div
-          className="flex items-center justify-center gap-4 w-full max-w-5xl"
+          className="flex w-full max-w-[min(100vw-1rem,1200px)] items-center justify-center gap-2 px-1 sm:gap-4 sm:px-2"
           onClick={(e) => e.stopPropagation()}
         >
           <button
             type="button"
             onClick={goPrev}
             disabled={!canPrev}
-            className="flex-shrink-0 p-4 rounded-full text-slate-400 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent focus:outline-none focus:ring-2 focus:ring-white/50 transition-colors"
+            className="flex-shrink-0 rounded-md border-2 border-white/25 p-3 text-slate-300 hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent sm:p-4"
             aria-label="Previous card"
           >
-            <ChevronLeft className="w-10 h-10" />
+            <ChevronLeft className="h-8 w-8 sm:h-10 sm:w-10" />
           </button>
 
-          <div className="w-full max-w-2xl flex-1 min-w-0">
+          <div className="min-h-0 w-full min-w-0 flex-1 max-w-[920px]">
             <AnimatePresence mode="wait">
               {currentCard && (
                 <motion.div
@@ -311,19 +313,19 @@ export function StudyModeModal({
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.2 }}
-                  className="w-full aspect-[3/2] cursor-pointer"
-                  style={{ perspective: '1200px' }}
+                  className="mx-auto w-full cursor-pointer"
+                  style={{ perspective: '1400px' }}
                   onClick={() => setFlipped((f) => !f)}
                 >
                   <div
-                    className="relative w-full h-full transition-transform duration-500 ease-in-out"
+                    className="relative w-full min-h-[min(58vh,520px)] max-h-[min(76vh,720px)] sm:min-h-[600px] sm:max-h-[760px]"
                     style={{
                       transformStyle: 'preserve-3d',
                       transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
                     }}
                   >
                     <div
-                      className="absolute inset-0 rounded-2xl bg-white border-2 border-slate-200 shadow-2xl flex flex-col items-center justify-center p-8"
+                      className="absolute inset-0 flex flex-col items-center justify-center rounded-md border-4 border-black bg-white p-6 shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] sm:p-10 md:p-12"
                       style={{
                         backfaceVisibility: 'hidden',
                         WebkitBackfaceVisibility: 'hidden',
@@ -332,23 +334,23 @@ export function StudyModeModal({
                       <button
                         type="button"
                         onClick={(e) => { e.stopPropagation(); setDropdownOpen((o) => !o); }}
-                        className={`absolute top-4 right-4 px-3 py-1 rounded-lg text-xs font-bold cursor-pointer hover:opacity-80 transition-opacity ${getFlashcardTagClass(currentCard.tag)}`}
+                        className={`absolute right-3 top-3 border-2 border-black px-3 py-1.5 text-xs font-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-transform hover:-translate-y-0.5 sm:right-4 sm:top-4 ${getFlashcardTagClass(currentCard.tag)}`}
                         title="Click to filter by type"
                       >
                         {currentCard.tag}
                       </button>
                       <p
                         id="study-modal-title"
-                        className="text-3xl font-bold text-center text-slate-900 leading-snug px-4"
+                        className="px-3 text-center text-3xl font-black leading-tight tracking-tight text-black sm:px-6 sm:text-4xl md:text-5xl"
                       >
                         {currentCard.front}
                       </p>
-                      <span className="mt-6 text-sm text-slate-500">
+                      <span className="mt-6 text-sm font-bold uppercase tracking-wide text-slate-600 sm:mt-8 sm:text-base">
                         {isLocked ? 'Flip to reveal answer' : 'Space, ↑, or ↓ to flip'}
                       </span>
                     </div>
                     <div
-                      className="absolute inset-0 rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+                      className="absolute inset-0 flex h-full w-full flex-col overflow-hidden rounded-md border-4 border-black bg-white shadow-[10px_10px_0px_0px_rgba(0,0,0,1)]"
                       style={{
                         backfaceVisibility: 'hidden',
                         WebkitBackfaceVisibility: 'hidden',
@@ -356,122 +358,115 @@ export function StudyModeModal({
                       }}
                     >
                       {isLocked ? (
-                        /* ── Paywall back face — matches SeasonPassModal style ── */
+                        /* Paywall: accent fixed; body scrolls as one column (list is not its own scroll area) */
                         (() => {
-                          const isMicro = seasonPassCourseType === 'micro';
-                          const accentColor = isMicro ? '#22C55E' : '#3B82F6';
-                          const accentDark  = isMicro ? '#15803D' : '#1D4ED8';
-                          const accentLight = isMicro ? '#F0FDF4' : '#EFF6FF';
-                          const subjectLabel = isMicro ? 'Micro' : 'Macro';
+                          const courseKey = seasonPassCourseType === 'micro' ? 'micro' : 'macro';
+                          const config = COURSE_CONFIG[courseKey];
+                          const saveAmount = config.originalPrice - config.price;
+                          const accentBtn =
+                            courseKey === 'micro'
+                              ? 'bg-green-600 hover:bg-green-700 border-green-800'
+                              : 'bg-blue-600 hover:bg-blue-700 border-blue-800';
                           return (
-                            <div className="w-full h-full bg-white rounded-2xl overflow-hidden border-2 border-slate-200 shadow-2xl flex">
-                              {/* ── Left: pitch ── */}
-                              <div className="flex flex-col justify-center gap-3 px-5 py-5 flex-1 min-w-0">
-                                {/* Badge */}
-                                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: accentLight, borderRadius: '100px', padding: '4px 12px', alignSelf: 'flex-start' }}>
-                                  <Zap size={12} color={accentColor} fill={accentColor} />
-                                  <span style={{ fontSize: '12px', fontWeight: 800, color: accentDark, letterSpacing: '0.5px', textTransform: 'uppercase' }}>
-                                    AP {subjectLabel} Season Pass
+                            <div className="flex h-full min-h-0 w-full flex-col bg-gradient-to-b from-white via-slate-50/90 to-slate-100">
+                              <div className={`h-1.5 w-full shrink-0 border-b-2 border-black ${config.accentBg}`} aria-hidden />
+                              <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto overflow-x-hidden px-5 pb-6 pt-6 sm:gap-6 sm:px-7 sm:pb-8 sm:pt-8">
+                                <header className="space-y-3">
+                                  <span
+                                    className={`inline-flex w-fit items-center gap-2 border-2 border-black px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-white shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] sm:text-xs ${config.accentBg}`}
+                                  >
+                                    <Zap className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
+                                    {config.badge}
                                   </span>
-                                </div>
+                                  <h3 className="text-2xl font-black leading-[1.1] tracking-tight text-black sm:text-3xl sm:leading-[1.12]">
+                                    {config.headline}
+                                  </h3>
+                                </header>
 
-                                {/* Headline */}
-                                <div>
-                                  <p style={{ fontSize: '24px', fontWeight: 800, color: '#111', lineHeight: 1.2, letterSpacing: '-0.3px' }}>
-                                    Unlock everything.
-                                  </p>
-                                  <p style={{ fontSize: '24px', fontWeight: 800, color: accentColor, lineHeight: 1.2 }}>
-                                    Score a 5.
-                                  </p>
-                                </div>
-
-                                {/* Price */}
-                                <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-                                  <span style={{ fontSize: '34px', fontWeight: 800, color: accentColor, letterSpacing: '-1px', lineHeight: 1 }}>$29</span>
-                                  <span style={{ fontSize: '15px', color: '#D1D5DB', textDecoration: 'line-through', fontWeight: 600 }}>$39</span>
-                                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#fff', background: '#EF4444', borderRadius: '999px', padding: '2px 7px' }}>SAVE 26%</span>
-                                </div>
-                                <p style={{ fontSize: '12px', color: '#9CA3AF', fontWeight: 500, marginTop: '-6px' }}>One-time · Valid until June 30, 2026</p>
-
-                                {/* Stars */}
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                                  <div style={{ display: 'flex', gap: '2px' }}>
-                                    {[...Array(5)].map((_, i) => (
-                                      <svg key={i} width="14" height="14" viewBox="0 0 24 24" fill="#FBBF24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                <div className="space-y-2.5">
+                                  <p className="text-xs font-black uppercase tracking-wide text-black sm:text-sm">What&apos;s included</p>
+                                  <ul className="space-y-2.5 border-2 border-black/10 bg-white/90 p-3.5 shadow-[3px_3px_0px_0px_rgba(0,0,0,0.12)] sm:space-y-3 sm:p-4">
+                                    {config.features.map((feature, i) => (
+                                      <li key={i} className="flex gap-2.5">
+                                        <CheckCircle2 className={`mt-0.5 h-4 w-4 shrink-0 sm:h-[18px] sm:w-[18px] ${config.accentColor}`} />
+                                        <span className="text-xs font-semibold leading-snug text-gray-900 sm:text-sm">{feature}</span>
+                                      </li>
                                     ))}
-                                  </div>
-                                  <span style={{ fontSize: '12px', fontWeight: 600, color: '#6B7280' }}>1,000+ students helped</span>
+                                  </ul>
                                 </div>
 
-                                {/* CTA */}
-                                <Link
-                                  href={`/purchase/season-pass?courseType=${seasonPassCourseType}`}
-                                  onClick={(e) => e.stopPropagation()}
-                                  style={{
-                                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center', alignSelf: 'flex-start',
-                                    background: accentColor, color: '#fff',
-                                    borderRadius: '12px', padding: '11px 18px',
-                                    fontSize: '14px', fontWeight: 800, textDecoration: 'none',
-                                    boxShadow: `0 4px 12px ${accentColor}55`,
-                                  }}
-                                >
-                                  🔓 Unlock AP {subjectLabel} — $29
-                                </Link>
-
-                                <button
-                                  type="button"
-                                  onClick={(e) => { e.stopPropagation(); setFlipped(false); }}
-                                  className="text-sm text-gray-400 hover:text-gray-600 transition-colors text-left"
-                                >
-                                  ← Flip back
-                                </button>
-                              </div>
-
-                              {/* ── Right: features list ── */}
-                              <div style={{ background: accentLight, borderLeft: `2px solid ${accentColor}22` }} className="flex flex-col justify-center gap-2 px-4 py-5 w-56 flex-shrink-0">
-                                <p style={{ fontSize: '12px', fontWeight: 800, color: accentDark, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>What&apos;s included</p>
-                                {[
-                                  'Full Practice Exams',
-                                  'Unlimited MCQ Bank',
-                                  'AI-Graded FRQs',
-                                  'Graphing Simulators',
-                                  'Unit Cheat Sheets',
-                                  'Note Upload Quizzes',
-                                ].map((f) => (
-                                  <div key={f} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                    <div style={{ width: '17px', height: '17px', borderRadius: '999px', background: accentColor, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                      <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                                    </div>
-                                    <span style={{ fontSize: '13px', fontWeight: 600, color: '#374151' }}>{f}</span>
+                                <div className="space-y-3 border-t-2 border-dashed border-black/20 pt-5">
+                                  <p className="text-sm font-medium leading-snug text-gray-600">{config.subheadline}</p>
+                                  <div className="flex flex-wrap items-baseline gap-2">
+                                    <span className={`text-4xl font-black leading-none sm:text-5xl ${config.accentColor}`}>${config.price}</span>
+                                    <span className="text-base font-semibold text-gray-400 line-through sm:text-lg">${config.originalPrice}</span>
+                                    <span className="rounded-sm border border-black/20 bg-red-500 px-2 py-0.5 text-[11px] font-black text-white">
+                                      SAVE ${saveAmount}
+                                    </span>
                                   </div>
-                                ))}
+                                  <p className="text-xs font-medium text-gray-500">One-time payment · Valid until June 30, 2026</p>
+
+                                  <div className="flex items-center gap-3 rounded-sm border-2 border-black bg-amber-100 p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:p-3.5">
+                                    <Sparkles className="h-5 w-5 shrink-0 text-amber-700" />
+                                    <div className="min-w-0 flex-1">
+                                      <p className="text-xs font-black text-gray-900 sm:text-sm">Taking both exams?</p>
+                                      <p className="text-[11px] font-semibold text-gray-700 sm:text-xs">Macro + Micro Bundle for $49</p>
+                                    </div>
+                                    <Link
+                                      href="/purchase/season-pass?courseType=bundle"
+                                      onClick={(e) => e.stopPropagation()}
+                                      className="shrink-0 border-2 border-black bg-white px-2.5 py-1.5 text-[11px] font-black hover:bg-gray-50 sm:text-xs"
+                                    >
+                                      View Bundle
+                                    </Link>
+                                  </div>
+
+                                  <Button
+                                    asChild
+                                    size="lg"
+                                    className={`w-full border-4 border-black py-4 text-base font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] sm:py-5 sm:text-lg ${accentBtn} text-white`}
+                                  >
+                                    <Link href={`/purchase/season-pass?courseType=${courseKey}`} onClick={(e) => e.stopPropagation()}>
+                                      Get the Season Pass
+                                    </Link>
+                                  </Button>
+
+                                  <div className="flex items-center justify-center gap-2 pt-1">
+                                    <div className="flex gap-0.5">
+                                      {[...Array(5)].map((_, i) => (
+                                        <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400 sm:h-[18px] sm:w-[18px]" />
+                                      ))}
+                                    </div>
+                                    <span className="text-xs font-bold text-gray-600 sm:text-sm">1,000+ students helped</span>
+                                  </div>
+                                </div>
                               </div>
                             </div>
                           );
                         })()
                       ) : (
                         /* ── Normal card back ── */
-                        <div className="w-full h-full bg-slate-50 border-2 border-slate-200 rounded-2xl flex flex-col p-8 overflow-y-auto">
+                        <div className="flex h-full min-h-0 w-full flex-col overflow-y-auto bg-gray-50 p-6 sm:p-10">
                           <button
                             type="button"
                             onClick={(e) => { e.stopPropagation(); setDropdownOpen((o) => !o); }}
-                            className={`self-end mb-4 px-3 py-1 rounded-lg text-xs font-bold cursor-pointer hover:opacity-80 transition-opacity ${getFlashcardTagClass(currentCard.tag)}`}
+                            className={`mb-4 self-end border-2 border-black px-3 py-1.5 text-xs font-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-transform hover:-translate-y-0.5 ${getFlashcardTagClass(currentCard.tag)}`}
                             title="Click to filter by type"
                           >
                             {currentCard.tag}
                           </button>
-                          <div className="text-lg text-slate-800 leading-relaxed flex-1 flex flex-col gap-4">
+                          <div className="flex flex-1 flex-col gap-4 text-lg font-semibold leading-relaxed text-slate-900">
                             {currentCard.backImage ? (
                               <img
                                 src={currentCard.backImage}
                                 alt="Graph or diagram"
-                                className="w-full max-w-md mx-auto rounded-lg border border-slate-200 shadow-sm object-contain"
+                                className="mx-auto w-full max-w-md rounded-sm border-2 border-black object-contain shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
                               />
                             ) : (
                               <div>{currentCard.back}</div>
                             )}
                           </div>
-                          <span className="mt-4 text-sm text-slate-500">Space, ↑, or ↓ to flip back</span>
+                          <span className="mt-4 text-sm font-bold uppercase tracking-wide text-slate-600">Space, ↑, or ↓ to flip back</span>
                         </div>
                       )}
                     </div>
@@ -485,10 +480,10 @@ export function StudyModeModal({
             type="button"
             onClick={goNext}
             disabled={freeUserShuffleLimitReached}
-            className="flex-shrink-0 p-4 rounded-full text-slate-400 hover:text-white hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent focus:outline-none focus:ring-2 focus:ring-white/50 transition-colors"
+            className="flex-shrink-0 rounded-md border-2 border-white/25 p-3 text-slate-300 hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent sm:p-4"
             aria-label={canNext ? 'Next card' : 'Done'}
           >
-            <ChevronRight className="w-10 h-10" />
+            <ChevronRight className="h-8 w-8 sm:h-10 sm:w-10" />
           </button>
         </div>
       </motion.div>
