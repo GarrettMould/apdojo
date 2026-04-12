@@ -34,22 +34,25 @@ import { getSubjectSlug, getUnitSlug } from '@/lib/practiceSlugs';
 import { Footer } from '@/components/Footer';
 import SeasonPassScrollPopup from '@/app/SeasonPassScrollPopup';
 
-/** Once per tab per pretty cheat-sheet URL (subject + unit), so e.g. macro unit 1 does not block micro unit 1. */
-function prettyCheatSheetEntryModalSessionKey(subject: 'macro' | 'micro', unitNumber: number): string {
-  return `apdojo_pretty_cheat_sheet_entry_modal_v2:${subject}:u${unitNumber}`;
-}
+/**
+ * One flag for all pretty `/ap-*-unit-N-cheat-sheet` URLs in this tab (any subject/unit).
+ * Persists across reloads and client navigations until the tab closes. Bump key for a new campaign.
+ */
+const PRETTY_CHEAT_SHEET_ENTRY_MODAL_SESSION_KEY = 'apdojo_pretty_cheat_sheet_season_pass_entry_any_v1';
 
-function prettyCheatSheetEntryModalSeenThisSession(subject: 'macro' | 'micro', unitNumber: number): boolean {
+function prettyCheatSheetEntryModalAlreadyShown(): boolean {
   try {
-    return sessionStorage.getItem(prettyCheatSheetEntryModalSessionKey(subject, unitNumber)) === '1';
+    if (typeof window === 'undefined') return false;
+    return window.sessionStorage.getItem(PRETTY_CHEAT_SHEET_ENTRY_MODAL_SESSION_KEY) === '1';
   } catch {
     return false;
   }
 }
 
-function markPrettyCheatSheetEntryModalSeenThisSession(subject: 'macro' | 'micro', unitNumber: number): void {
+function markPrettyCheatSheetEntryModalShown(): void {
   try {
-    sessionStorage.setItem(prettyCheatSheetEntryModalSessionKey(subject, unitNumber), '1');
+    if (typeof window === 'undefined') return;
+    window.sessionStorage.setItem(PRETTY_CHEAT_SHEET_ENTRY_MODAL_SESSION_KEY, '1');
   } catch {
     /* private mode / quota */
   }
@@ -529,29 +532,28 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
     !entrySeasonPassPromoDismissed &&
     !(userData && hasValidSeasonPass(userData));
 
-  // Season Pass entry modal: 5s delay on pretty cheat sheet URLs (once per tab per subject+unit; never for premium).
+  // Season Pass entry modal: 5s delay on pretty cheat sheet URLs (once per tab for any cheat sheet; never for premium).
   useEffect(() => {
     if (!isPrettyCheatSheetRoute) {
       setEntrySeasonPassPromoVisible(false);
       return;
     }
     if (typeof window === 'undefined') return;
-    if (propSubject == null || propUnitNumber == null) return;
-    if (prettyCheatSheetEntryModalSeenThisSession(propSubject, propUnitNumber)) return;
+    if (prettyCheatSheetEntryModalAlreadyShown()) return;
     if (loading) return;
     if (user && loadingUserData) return;
     if (userData && hasValidSeasonPass(userData)) return;
 
     const delayMs = 5000;
     const timer = window.setTimeout(() => {
-      if (prettyCheatSheetEntryModalSeenThisSession(propSubject, propUnitNumber)) return;
+      if (prettyCheatSheetEntryModalAlreadyShown()) return;
       if (userData && hasValidSeasonPass(userData)) return;
-      markPrettyCheatSheetEntryModalSeenThisSession(propSubject, propUnitNumber);
+      markPrettyCheatSheetEntryModalShown();
       setEntrySeasonPassPromoVisible(true);
     }, delayMs);
 
     return () => window.clearTimeout(timer);
-  }, [isPrettyCheatSheetRoute, propSubject, propUnitNumber, loading, loadingUserData, user, userData]);
+  }, [isPrettyCheatSheetRoute, loading, loadingUserData, user, userData]);
 
   // Reset unit MCQ count when switching unit or subject
   useEffect(() => {
@@ -674,10 +676,6 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
   };
 
   const activeUnitNum = parseInt(activeUnit as string);
-  const pdfPreviewUrl =
-    selectedSubject === 'macro'
-      ? `https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/AP+Macro+-+Unit+${activeUnitNum}.pdf`
-      : undefined;
   const subjectFilter = useMemo(() => selectedSubject === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics', [selectedSubject]);
 
   const unitKeyTerms: KeyTerm[] = useMemo(() => selectedSubject === 'macro' 
@@ -1555,7 +1553,8 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
               >
                 AP {selectedSubject === 'macro' ? 'Macro' : 'Micro'}
               </span>
-              {selectedSubject === 'micro' && (
+              {/* Micro U1–U3: printable S3 strip below — hide link. U4–U6: no strip — keep packet PDF link only. */}
+              {selectedSubject === 'micro' && activeUnitNum >= 4 && activeUnitNum <= 6 && (
                 <Link
                   href={isProCustomer ? `/unit/${activeUnitNum}/packet?subject=${selectedSubject}` : '#'}
                   className="inline-flex items-center gap-2 text-sm font-semibold hover:underline w-fit cursor-pointer text-green-600"
@@ -1606,14 +1605,20 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           </div>
         </div>
 
-        {/* Printable Cheat Sheets - macro only */}
-        {selectedSubject === 'macro' && (
+        {/* Printable cheat sheet PDFs: macro (all units); micro units 1–3 only — hidden on micro U4–U6 */}
+        {(selectedSubject === 'macro' ||
+          (selectedSubject === 'micro' && activeUnitNum >= 1 && activeUnitNum <= 3)) && (
         <div className="mb-8 flex flex-row items-center gap-6 sm:gap-8">
           {/* Stacked overlapping PDF previews - bundle style */}
-          <div className="relative h-[130px] sm:h-[145px] w-[200px] sm:w-[210px] flex-shrink-0">
-            {macroUnits.map((unit, index) => {
-              const pdfUrl = `https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/AP+Macro+-+Unit+${unit.number}.pdf`;
-              const filename = `AP-Dojo-Macro-Unit-${unit.number}-Cheat-Sheet.pdf`;
+          <div
+            className={`relative h-[130px] sm:h-[145px] flex-shrink-0 ${
+              selectedSubject === 'micro' ? 'w-[140px] sm:w-[150px]' : 'w-[200px] sm:w-[210px]'
+            }`}
+          >
+            {(selectedSubject === 'macro' ? macroUnits : microUnits.filter((u) => u.number <= 3)).map((unit, index) => {
+              const pdfSubject = selectedSubject === 'macro' ? 'Macro' : 'Micro';
+              const pdfUrl = `https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/AP+${pdfSubject}+-+Unit+${unit.number}.pdf`;
+              const filename = `AP-Dojo-${pdfSubject}-Unit-${unit.number}-Cheat-Sheet.pdf`;
               return (
                 <div
                   key={unit.number}
@@ -1655,10 +1660,14 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           {/* Text and CTA to the right of the bundle */}
           <div className="flex-1 flex flex-col gap-2 sm:gap-3">
             <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
-              Printable Cheat Sheets for Every Unit
+              {selectedSubject === 'macro'
+                ? 'Printable Cheat Sheets for Every Unit'
+                : 'Printable Cheat Sheets for Units 1–3'}
             </h2>
             <p className="text-gray-600 text-sm sm:text-base">
-              Everything you need to ace your exam, all on a single page.
+              {selectedSubject === 'macro'
+                ? 'Everything you need to ace your exam, all on a single page.'
+                : 'Single-page PDFs for the first three units. The full unit experience for Units 4–6 stays on this cheat sheet page.'}
             </p>
             <Link
               href="/cheat-sheets"
@@ -3534,12 +3543,12 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
         )}
       </AnimatePresence>
 
-      {showEntrySeasonPassPromo && propSubject && propUnitNumber != null && (
+      {showEntrySeasonPassPromo && propSubject && (
         <SeasonPassEntryWideModal
           subject={propSubject}
           onClose={() => {
             setEntrySeasonPassPromoDismissed(true);
-            markPrettyCheatSheetEntryModalSeenThisSession(propSubject, propUnitNumber);
+            markPrettyCheatSheetEntryModalShown();
           }}
         />
       )}

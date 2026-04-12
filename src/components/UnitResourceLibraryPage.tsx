@@ -4,17 +4,20 @@ import React, { useState } from 'react';
 import { Download, CheckCircle, Lock } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { hasValidSeasonPass } from '@/lib/utils';
+import { macroUnits as macroUnitsFromData, microUnits as microUnitsFromData } from '@/data/cheatSheets';
 
 type CopyMode = 'cheat-sheets' | 'study-guides';
 
-const macroUnits = [
-  { number: 1, title: 'Basic Economic Concepts' },
-  { number: 2, title: 'Economic Indicators and the Business Cycle' },
-  { number: 3, title: 'National Income and Price Determination' },
-  { number: 4, title: 'Financial Sector' },
-  { number: 5, title: 'Long-Run Consequences of Stabilization Policies' },
-  { number: 6, title: 'Open Economy—International Trade and Finance' },
-];
+type LibrarySubject = 'macro' | 'micro';
+
+const macroUnitsList = macroUnitsFromData.map(({ number, title }) => ({ number, title }));
+const microUnitsList = microUnitsFromData.map(({ number, title }) => ({ number, title }));
+
+/** S3 one-pagers exist for all macro units; micro only through unit 3 for now. */
+function isS3PdfAvailable(subject: LibrarySubject, unitNumber: number): boolean {
+  if (subject === 'macro') return true;
+  return unitNumber >= 1 && unitNumber <= 3;
+}
 
 function getCopy(copyMode: CopyMode) {
   if (copyMode === 'study-guides') {
@@ -47,22 +50,26 @@ interface UnitResourceRowProps {
   isProCustomer: boolean;
   index: number;
   copyMode: CopyMode;
+  subject: LibrarySubject;
+  pdfAvailable: boolean;
 }
 
-function UnitResourceRow({ unit, isProCustomer, index, copyMode }: UnitResourceRowProps) {
+function UnitResourceRow({ unit, isProCustomer, index, copyMode, subject, pdfAvailable }: UnitResourceRowProps) {
   const [downloaded, setDownloaded] = useState(false);
   const [loading, setLoading] = useState(false);
   const copy = getCopy(copyMode);
 
-  const pdfUrl = `https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/AP+Macro+-+Unit+${unit.number}.pdf`;
-  const filename = `AP-Dojo-Macro-Unit-${unit.number}-${copy.filenameLabel}.pdf`;
+  const pdfLabel = subject === 'macro' ? 'Macro' : 'Micro';
+  const pdfUrl = `https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/AP+${pdfLabel}+-+Unit+${unit.number}.pdf`;
+  const filename = `AP-Dojo-${pdfLabel}-Unit-${unit.number}-${copy.filenameLabel}.pdf`;
   const isEven = index % 2 === 0;
 
   const handleDownload = async () => {
     if (!isProCustomer) {
-      window.location.href = '/purchase/season-pass?courseType=macro';
+      window.location.href = `/purchase/season-pass?courseType=${subject}`;
       return;
     }
+    if (!pdfAvailable) return;
     setLoading(true);
     try {
       const res = await fetch(pdfUrl);
@@ -103,24 +110,46 @@ function UnitResourceRow({ unit, isProCustomer, index, copyMode }: UnitResourceR
           height: '220px',
           border: '2px solid #000',
           borderRadius: '12px',
-          background: '#fff',
+          background: pdfAvailable ? '#fff' : subject === 'micro' ? '#ecfdf5' : '#eff6ff',
           overflow: 'hidden',
           position: 'relative',
           boxShadow: '3px 3px 0 0 #000',
-          filter: 'blur(0.5px)',
+          filter: pdfAvailable ? 'blur(0.5px)' : 'none',
         }}
       >
-        <iframe
-          src={`${pdfUrl}#toolbar=0&navpanes=0`}
-          title={`Unit ${unit.number} ${copy.previewTitle}`}
-          style={{ position: 'absolute', top: 0, left: 0, width: '833px', height: '1080px', transform: 'scale(0.2)', transformOrigin: 'top left', pointerEvents: 'none' }}
-        />
-        <button
-          onClick={handleDownload}
-          disabled={loading}
-          style={{ position: 'absolute', inset: 0, background: 'transparent', cursor: loading ? 'wait' : 'pointer' }}
-          title={isProCustomer ? 'Download PDF' : 'Unlock with Season Pass'}
-        />
+        {pdfAvailable ? (
+          <>
+            <iframe
+              src={`${pdfUrl}#toolbar=0&navpanes=0`}
+              title={`Unit ${unit.number} ${copy.previewTitle}`}
+              style={{ position: 'absolute', top: 0, left: 0, width: '833px', height: '1080px', transform: 'scale(0.2)', transformOrigin: 'top left', pointerEvents: 'none' }}
+            />
+            <button
+              onClick={handleDownload}
+              disabled={loading}
+              style={{ position: 'absolute', inset: 0, background: 'transparent', cursor: loading ? 'wait' : 'pointer' }}
+              title={isProCustomer ? 'Download PDF' : 'Unlock with Season Pass'}
+            />
+          </>
+        ) : (
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '12px',
+              textAlign: 'center',
+              fontWeight: 800,
+              fontSize: '13px',
+              color: '#374151',
+              lineHeight: 1.35,
+            }}
+          >
+            {copy.unavailable}
+          </div>
+        )}
       </div>
 
       <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: isEven ? 'flex-start' : 'flex-end', textAlign: isEven ? 'left' : 'right' }}>
@@ -131,21 +160,21 @@ function UnitResourceRow({ unit, isProCustomer, index, copyMode }: UnitResourceR
 
         <button
           onClick={handleDownload}
-          disabled={loading}
+          disabled={loading || (isProCustomer && !pdfAvailable)}
           style={{
             marginTop: '14px',
             display: 'inline-flex',
             alignItems: 'center',
             gap: '8px',
             padding: '8px 16px',
-            background: '#fde047',
+            background: isProCustomer && !pdfAvailable ? '#e5e7eb' : '#fde047',
             color: '#000',
             fontWeight: 900,
             fontSize: '13px',
             border: '2px solid #000',
             borderRadius: '10px',
-            boxShadow: '2px 2px 0 0 #000',
-            cursor: loading ? 'wait' : 'pointer',
+            boxShadow: isProCustomer && !pdfAvailable ? 'none' : '2px 2px 0 0 #000',
+            cursor: loading ? 'wait' : isProCustomer && !pdfAvailable ? 'not-allowed' : 'pointer',
             opacity: loading ? 0.7 : 1,
             textTransform: 'uppercase',
             letterSpacing: '0.03em',
@@ -161,6 +190,8 @@ function UnitResourceRow({ unit, isProCustomer, index, copyMode }: UnitResourceR
               <span style={{ width: '12px', height: '12px', border: '2px solid #000', borderTopColor: 'transparent', borderRadius: '50%', display: 'inline-block', animation: 'spin 0.7s linear infinite' }} />
               Downloading...
             </>
+          ) : isProCustomer && !pdfAvailable ? (
+            <>Coming soon</>
           ) : isProCustomer ? (
             <>
               <Download size={14} />
@@ -179,20 +210,26 @@ function UnitResourceRow({ unit, isProCustomer, index, copyMode }: UnitResourceR
 }
 
 export function UnitResourceLibraryPage({ copyMode = 'cheat-sheets' }: { copyMode?: CopyMode }) {
-  const { user, userData } = useAuthContext();
+  const { user, userData, selectedSubject } = useAuthContext();
   const [showLockedModal, setShowLockedModal] = useState(false);
   /** User closed the promo for this page visit; remounting the page shows it again. */
   const [seasonPassPromoDismissed, setSeasonPassPromoDismissed] = useState(false);
   const copy = getCopy(copyMode);
 
+  const librarySubject: LibrarySubject = selectedSubject === 'micro' ? 'micro' : 'macro';
+  const unitsList = librarySubject === 'macro' ? macroUnitsList : microUnitsList;
+
   const isProCustomer = React.useMemo(() => {
     if (!user || !userData) return false;
-    return hasValidSeasonPass(userData, 'macro');
-  }, [user, userData]);
+    return hasValidSeasonPass(userData, librarySubject);
+  }, [user, userData, librarySubject]);
 
   const showSeasonPassPromoModal = copyMode === 'cheat-sheets' && !seasonPassPromoDismissed;
 
   const dismissSeasonPassPromoModal = () => setSeasonPassPromoDismissed(true);
+
+  const titleShadow =
+    librarySubject === 'micro' ? '2px 2px 0 rgba(22,163,74,0.25)' : '2px 2px 0 rgba(59,130,246,0.25)';
 
   return (
     <>
@@ -205,15 +242,33 @@ export function UnitResourceLibraryPage({ copyMode = 'cheat-sheets' }: { copyMod
       <div style={{ minHeight: '100vh', background: '#f9fafb', padding: '40px 16px 80px' }}>
         <div style={{ maxWidth: '720px', margin: '0 auto' }}>
           <div style={{ marginBottom: '36px', animation: 'fadeIn 0.4s ease both', textAlign: 'center' }}>
-            <h1 style={{ fontSize: 'clamp(34px, 7vw, 52px)', fontWeight: 900, color: '#111', lineHeight: 1.02, letterSpacing: '-0.02em', textTransform: 'uppercase', textShadow: '2px 2px 0 rgba(59,130,246,0.25)' }}>
+            <h1
+              style={{
+                fontSize: 'clamp(34px, 7vw, 52px)',
+                fontWeight: 900,
+                color: '#111',
+                lineHeight: 1.02,
+                letterSpacing: '-0.02em',
+                textTransform: 'uppercase',
+                textShadow: titleShadow,
+              }}
+            >
               {copy.pageTitle}
             </h1>
             <p style={{ color: '#6b7280', fontSize: '16px', fontWeight: 500, marginTop: '8px' }}>{copy.pageSubtitle}</p>
           </div>
 
           <ul style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-            {macroUnits.map((unit, index) => (
-              <UnitResourceRow key={`macro-${unit.number}`} unit={unit} isProCustomer={isProCustomer} index={index} copyMode={copyMode} />
+            {unitsList.map((unit, index) => (
+              <UnitResourceRow
+                key={`${librarySubject}-${unit.number}`}
+                unit={unit}
+                isProCustomer={isProCustomer}
+                index={index}
+                copyMode={copyMode}
+                subject={librarySubject}
+                pdfAvailable={isS3PdfAvailable(librarySubject, unit.number)}
+              />
             ))}
           </ul>
 
@@ -224,7 +279,7 @@ export function UnitResourceLibraryPage({ copyMode = 'cheat-sheets' }: { copyMod
                 <p style={{ fontSize: '14px', color: '#4b5563', marginBottom: '16px' }}>{copy.unlockBody}</p>
                 <button
                   onClick={() => {
-                    window.location.href = '/purchase/season-pass?courseType=macro';
+                    window.location.href = `/purchase/season-pass?courseType=${librarySubject}`;
                   }}
                   style={{ width: '100%', padding: '10px 16px', background: '#22c55e', color: '#fff', fontWeight: 900, fontSize: '15px', borderRadius: '10px', border: '2px solid #000', boxShadow: '3px 3px 0 0 #000', cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.03em' }}
                 >
@@ -270,13 +325,15 @@ export function UnitResourceLibraryPage({ copyMode = 'cheat-sheets' }: { copyMod
               Get the Season Pass
             </h2>
             <p style={{ fontSize: '14px', color: '#4b5563', marginBottom: '16px' }}>
-              Unlock every printable unit cheat sheet plus the rest of AP Dojo for Macro (and more) with a Season Pass.
+              {librarySubject === 'macro'
+                ? 'Unlock every printable unit cheat sheet plus the rest of AP Dojo for AP Macro (and more) with a Season Pass.'
+                : 'Unlock every printable unit cheat sheet plus the rest of AP Dojo for AP Micro (and more) with a Season Pass.'}
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <button
                 type="button"
                 onClick={() => {
-                  window.location.href = '/purchase/season-pass?courseType=macro';
+                  window.location.href = `/purchase/season-pass?courseType=${librarySubject}`;
                 }}
                 style={{
                   width: '100%',
