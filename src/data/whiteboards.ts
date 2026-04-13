@@ -288,8 +288,8 @@ export interface Whiteboard {
 
   export const apMicroUnit4Whiteboards: Whiteboard[] = [
     { lessonID: "4.2", unit: 4, topic: "Natural Monopoly", url: "https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Micro_Unit_4/4.2_wb.jpg" },
-    { lessonID: "4.6", unit: 4, topic: "Dominant Strategy", url: "https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Micro_Unit_4/4.6_wb 1.jpg" },
-    { lessonID: "4.6", unit: 4, topic: "Nash Equilibrium", url: "https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Micro_Unit_4/4.6_wb 2.jpg" },
+  { lessonID: "4.5", unit: 4, topic: "Dominant Strategy", url: "https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Micro_Unit_4/4.6_wb 1.jpg" },
+  { lessonID: "4.5", unit: 4, topic: "Nash Equilibrium", url: "https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Micro_Unit_4/4.6_wb 2.jpg" },
   ];
 
   export const apMicroUnit5Whiteboards: Whiteboard[] = [

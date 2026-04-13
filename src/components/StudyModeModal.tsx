@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronLeft, ChevronRight, ChevronDown, Zap, CheckCircle2, Sparkles, Star } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { COURSE_CONFIG } from '@/data/seasonPassCourseConfig';
@@ -358,115 +358,75 @@ export function StudyModeModal({
                       }}
                     >
                       {isLocked ? (
-                        /* Paywall: accent fixed; body scrolls as one column (list is not its own scroll area) */
                         (() => {
                           const courseKey = seasonPassCourseType === 'micro' ? 'micro' : 'macro';
                           const config = COURSE_CONFIG[courseKey];
-                          const saveAmount = config.originalPrice - config.price;
                           const accentBtn =
                             courseKey === 'micro'
                               ? 'bg-green-600 hover:bg-green-700 border-green-800'
                               : 'bg-blue-600 hover:bg-blue-700 border-blue-800';
+
                           return (
-                            <div className="flex h-full min-h-0 w-full flex-col bg-gradient-to-b from-white via-slate-50/90 to-slate-100">
-                              <div className={`h-1.5 w-full shrink-0 border-b-2 border-black ${config.accentBg}`} aria-hidden />
-                              <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto overflow-x-hidden px-5 pb-6 pt-6 sm:gap-6 sm:px-7 sm:pb-8 sm:pt-8">
-                                <header className="space-y-3">
-                                  <span
-                                    className={`inline-flex w-fit items-center gap-2 border-2 border-black px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-white shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] sm:text-xs ${config.accentBg}`}
-                                  >
-                                    <Zap className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
-                                    {config.badge}
+                            <div className="relative flex h-full w-full flex-col items-center justify-center bg-white p-6 sm:p-10 md:p-12">
+                              <div className={`absolute left-0 top-0 h-1.5 w-full border-b-2 border-black ${config.accentBg}`} aria-hidden />
+                              <div className="w-full max-w-4xl text-center">
+                                <p className="mb-3 text-xs font-black uppercase tracking-[0.2em] text-slate-600 sm:text-sm">
+                                  {config.badge}
+                                </p>
+                                <h3 className="px-3 text-center text-3xl font-black leading-tight tracking-tight text-black sm:px-6 sm:text-4xl md:text-5xl">
+                                  {config.headline}
+                                </h3>
+                                <p className="mx-auto mt-4 max-w-2xl text-base font-semibold text-slate-700 sm:text-lg">
+                                  {config.subheadline}
+                                </p>
+                                <p className="mt-5 text-2xl font-black text-black sm:text-3xl">
+                                  ${config.price}
+                                  <span className="ml-2 text-lg font-semibold text-gray-400 line-through sm:text-xl">
+                                    ${config.originalPrice}
                                   </span>
-                                  <h3 className="text-2xl font-black leading-[1.1] tracking-tight text-black sm:text-3xl sm:leading-[1.12]">
-                                    {config.headline}
-                                  </h3>
-                                </header>
+                                </p>
+                              </div>
 
-                                <div className="space-y-2.5">
-                                  <p className="text-xs font-black uppercase tracking-wide text-black sm:text-sm">What&apos;s included</p>
-                                  <ul className="space-y-2.5 border-2 border-black/10 bg-white/90 p-3.5 shadow-[3px_3px_0px_0px_rgba(0,0,0,0.12)] sm:space-y-3 sm:p-4">
-                                    {config.features.map((feature, i) => (
-                                      <li key={i} className="flex gap-2.5">
-                                        <CheckCircle2 className={`mt-0.5 h-4 w-4 shrink-0 sm:h-[18px] sm:w-[18px] ${config.accentColor}`} />
-                                        <span className="text-xs font-semibold leading-snug text-gray-900 sm:text-sm">{feature}</span>
-                                      </li>
-                                    ))}
-                                  </ul>
-                                </div>
-
-                                <div className="space-y-3 border-t-2 border-dashed border-black/20 pt-5">
-                                  <p className="text-sm font-medium leading-snug text-gray-600">{config.subheadline}</p>
-                                  <div className="flex flex-wrap items-baseline gap-2">
-                                    <span className={`text-4xl font-black leading-none sm:text-5xl ${config.accentColor}`}>${config.price}</span>
-                                    <span className="text-base font-semibold text-gray-400 line-through sm:text-lg">${config.originalPrice}</span>
-                                    <span className="rounded-sm border border-black/20 bg-red-500 px-2 py-0.5 text-[11px] font-black text-white">
-                                      SAVE ${saveAmount}
-                                    </span>
-                                  </div>
-                                  <p className="text-xs font-medium text-gray-500">One-time payment · Valid until June 30, 2026</p>
-
-                                  <div className="flex items-center gap-3 rounded-sm border-2 border-black bg-amber-100 p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:p-3.5">
-                                    <Sparkles className="h-5 w-5 shrink-0 text-amber-700" />
-                                    <div className="min-w-0 flex-1">
-                                      <p className="text-xs font-black text-gray-900 sm:text-sm">Taking both exams?</p>
-                                      <p className="text-[11px] font-semibold text-gray-700 sm:text-xs">Macro + Micro Bundle for $49</p>
-                                    </div>
-                                    <Link
-                                      href="/purchase/season-pass?courseType=bundle"
-                                      onClick={(e) => e.stopPropagation()}
-                                      className="shrink-0 border-2 border-black bg-white px-2.5 py-1.5 text-[11px] font-black hover:bg-gray-50 sm:text-xs"
-                                    >
-                                      View Bundle
-                                    </Link>
-                                  </div>
-
-                                  <Button
-                                    asChild
-                                    size="lg"
-                                    className={`w-full border-4 border-black py-4 text-base font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] sm:py-5 sm:text-lg ${accentBtn} text-white`}
-                                  >
-                                    <Link href={`/purchase/season-pass?courseType=${courseKey}`} onClick={(e) => e.stopPropagation()}>
-                                      Get the Season Pass
-                                    </Link>
-                                  </Button>
-
-                                  <div className="flex items-center justify-center gap-2 pt-1">
-                                    <div className="flex gap-0.5">
-                                      {[...Array(5)].map((_, i) => (
-                                        <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400 sm:h-[18px] sm:w-[18px]" />
-                                      ))}
-                                    </div>
-                                    <span className="text-xs font-bold text-gray-600 sm:text-sm">1,000+ students helped</span>
-                                  </div>
-                                </div>
+                              <div className="mt-8 w-full max-w-md">
+                                <Button
+                                  asChild
+                                  size="lg"
+                                  className={`w-full border-4 border-black py-4 text-base font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] sm:py-5 sm:text-lg ${accentBtn} text-white`}
+                                >
+                                  <Link href={`/purchase/season-pass?courseType=${courseKey}`} onClick={(e) => e.stopPropagation()}>
+                                    Get the Season Pass
+                                  </Link>
+                                </Button>
                               </div>
                             </div>
                           );
                         })()
                       ) : (
-                        /* ── Normal card back ── */
-                        <div className="flex h-full min-h-0 w-full flex-col overflow-y-auto bg-gray-50 p-6 sm:p-10">
+                        /* ── Normal card back (minimal, front-matched style) ── */
+                        <div className="relative flex h-full w-full flex-col items-center justify-center bg-white p-6 sm:p-10 md:p-12">
                           <button
                             type="button"
                             onClick={(e) => { e.stopPropagation(); setDropdownOpen((o) => !o); }}
-                            className={`mb-4 self-end border-2 border-black px-3 py-1.5 text-xs font-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-transform hover:-translate-y-0.5 ${getFlashcardTagClass(currentCard.tag)}`}
+                            className={`absolute right-3 top-3 border-2 border-black px-3 py-1.5 text-xs font-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-transform hover:-translate-y-0.5 sm:right-4 sm:top-4 ${getFlashcardTagClass(currentCard.tag)}`}
                             title="Click to filter by type"
                           >
                             {currentCard.tag}
                           </button>
-                          <div className="flex flex-1 flex-col gap-4 text-lg font-semibold leading-relaxed text-slate-900">
+                          <div className="w-full max-w-4xl text-center">
                             {currentCard.backImage ? (
                               <img
                                 src={currentCard.backImage}
                                 alt="Graph or diagram"
-                                className="mx-auto w-full max-w-md rounded-sm border-2 border-black object-contain shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                                className="mx-auto mb-6 w-full max-w-md rounded-sm border-2 border-black object-contain shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
                               />
-                            ) : (
-                              <div>{currentCard.back}</div>
-                            )}
+                            ) : null}
+                            <div className="px-3 text-center text-3xl font-black leading-tight tracking-tight text-black sm:px-6 sm:text-4xl md:text-5xl">
+                              {currentCard.back}
+                            </div>
                           </div>
-                          <span className="mt-4 text-sm font-bold uppercase tracking-wide text-slate-600">Space, ↑, or ↓ to flip back</span>
+                          <span className="mt-6 text-sm font-bold uppercase tracking-wide text-slate-600 sm:mt-8 sm:text-base">
+                            Space, ↑, or ↓ to flip back
+                          </span>
                         </div>
                       )}
                     </div>

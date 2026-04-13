@@ -1903,6 +1903,17 @@ export const keyTerms: KeyTerm[] = [
       'Slows down self-adjustment process',
       'Due to contracts, minimum wage, efficiency wages'
     ]
+  },
+  {
+    id: 'natural-monopoly',
+    term: 'Natural Monopoly',
+    definition: 'A market structure where a single firm can supply a good or service more efficiently than multiple competitors as a result of high start-up costs and general economies of scale.',
+    subject: 'ap_microeconomics',
+    unit: 4,
+    lessonIDs: ['4.2'],
+    subNotes: [
+      'ATC decreases across the entire range of the effective demand curve.'
+    ]
   }
   // Add terms for other units here...
 ];

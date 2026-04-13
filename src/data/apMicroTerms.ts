@@ -736,10 +736,15 @@ export const keyTerms: KeyTerm[] = [
     {
       id: 'income-elasticity-of-demand',
       term: 'Income Elasticity of Demand (YED)',
-      definition: 'A measure of how responsive the quantity demanded of a good is to a change in consumer income. Calculated as: YED = (% change in Qd) / (% change in Income). Positive for normal goods, negative for inferior goods.',
+      definition: 'A measure of how responsive the quantity demanded of a good is to a change in consumer income. Calculated as: YED = (% change in Qd) / (% change in Income).',
       subject: 'ap_microeconomics',
       unit: 2,
       lessonIDs: ['2.5'],
+      subNotes: [
+        'YED > 0 → normal good (demand rises when income rises)',
+        'YED < 0 → inferior good (demand falls when income rises)',
+        'YED = 0 → quantity demanded does not change with income',
+      ],
       image: {
         url: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/apmicro_unit2_incomeelasticity.jpg',
         alt: 'Income elasticity diagram showing normal vs inferior goods'
@@ -748,10 +753,15 @@ export const keyTerms: KeyTerm[] = [
     {
       id: 'cross-price-elasticity-of-demand',
       term: 'Cross-Price Elasticity of Demand (XED)',
-      definition: 'A measure of how responsive the quantity demanded of one good is to a change in the price of another good. Calculated as: XED = (% change in Qd of Good A) / (% change in P of Good B). Positive for substitutes, negative for complements, zero for unrelated goods.',
+      definition: 'A measure of how responsive the quantity demanded of one good is to a change in the price of another good. Calculated as: XED = (% change in Qd of Good A) / (% change in P of Good B).',
       subject: 'ap_microeconomics',
       unit: 2,
       lessonIDs: ['2.5'],
+      subNotes: [
+        'XED > 0 → substitutes (higher price of B increases demand for A)',
+        'XED < 0 → complements (higher price of B decreases demand for A)',
+        'XED = 0 → unrelated goods (demand for A does not depend on the price of B)'
+      ],
       image: {
         url: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/apmicro_unit2_crosspriceelasticity.jpg',
         alt: 'Cross price elasticity diagram showing relationship between goods'
@@ -2025,13 +2035,12 @@ export const keyTerms: KeyTerm[] = [
     {
       id: 'natural-monopoly',
       term: 'Natural Monopoly',
-      definition: 'A distinct type of monopoly where one firm can produce the socially optimal quantity at the lowest cost due to economies of scale.',
+      definition: 'A market structure where a single firm can supply a good or service more efficiently than multiple competitors as a result of high start-up costs and general economies of scale.',
       subject: 'ap_microeconomics',
       unit: 4,
       lessonIDs: ['4.2'],
       subNotes: [
-        'The ATC curve falls over the relevant range of production.',
-        'It is better to have one firm because two firms would have higher average costs.'
+        'ATC decreases across the entire range of the effective demand curve.'
       ]
     },
     {
