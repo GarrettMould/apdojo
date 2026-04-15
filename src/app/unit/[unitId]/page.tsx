@@ -1553,8 +1553,8 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
               >
                 AP {selectedSubject === 'macro' ? 'Macro' : 'Micro'}
               </span>
-              {/* Micro U1–U3: printable S3 strip below — hide link. U4–U6: no strip — keep packet PDF link only. */}
-              {selectedSubject === 'micro' && activeUnitNum >= 4 && activeUnitNum <= 6 && (
+              {/* Micro U1–U5: printable S3 strip below — hide link. U6: no strip — keep packet PDF link only. */}
+              {selectedSubject === 'micro' && activeUnitNum >= 6 && activeUnitNum <= 6 && (
                 <Link
                   href={isProCustomer ? `/unit/${activeUnitNum}/packet?subject=${selectedSubject}` : '#'}
                   className="inline-flex items-center gap-2 text-sm font-semibold hover:underline w-fit cursor-pointer text-green-600"
@@ -1605,17 +1605,24 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           </div>
         </div>
 
-        {/* Printable cheat sheet PDFs: macro (all units); micro units 1–3 only — hidden on micro U4–U6 */}
+        {/* Printable cheat sheet PDFs: macro (all units); micro units 1–5 only — hidden on micro U6 */}
         {(selectedSubject === 'macro' ||
-          (selectedSubject === 'micro' && activeUnitNum >= 1 && activeUnitNum <= 3)) && (
+          (selectedSubject === 'micro' && activeUnitNum >= 1 && activeUnitNum <= 5)) && (
         <div className="mb-8 flex flex-row items-center gap-6 sm:gap-8">
           {/* Stacked overlapping PDF previews - bundle style */}
+          {(() => {
+            const previewUnits = selectedSubject === 'macro' ? macroUnits : microUnits.filter((u) => u.number <= 5);
+            const baseCardWidth = 100;
+            const horizontalOffset = 20;
+            const stackWidth = baseCardWidth + (previewUnits.length - 1) * horizontalOffset + 12;
+            return (
           <div
             className={`relative h-[130px] sm:h-[145px] flex-shrink-0 ${
-              selectedSubject === 'micro' ? 'w-[140px] sm:w-[150px]' : 'w-[200px] sm:w-[210px]'
+              selectedSubject === 'micro' ? '' : ''
             }`}
+            style={{ width: `${stackWidth}px` }}
           >
-            {(selectedSubject === 'macro' ? macroUnits : microUnits.filter((u) => u.number <= 3)).map((unit, index) => {
+            {previewUnits.map((unit, index) => {
               const pdfSubject = selectedSubject === 'macro' ? 'Macro' : 'Micro';
               const pdfUrl = `https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/AP+${pdfSubject}+-+Unit+${unit.number}.pdf`;
               const filename = `AP-Dojo-${pdfSubject}-Unit-${unit.number}-Cheat-Sheet.pdf`;
@@ -1657,17 +1664,19 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
               );
             })}
           </div>
+            );
+          })()}
           {/* Text and CTA to the right of the bundle */}
           <div className="flex-1 flex flex-col gap-2 sm:gap-3">
             <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
               {selectedSubject === 'macro'
                 ? 'Printable Cheat Sheets for Every Unit'
-                : 'Printable Cheat Sheets for Units 1–3'}
+                : 'Printable Cheat Sheets for Units 1–5'}
             </h2>
             <p className="text-gray-600 text-sm sm:text-base">
               {selectedSubject === 'macro'
                 ? 'Everything you need to ace your exam, all on a single page.'
-                : 'Single-page PDFs for the first three units. The full unit experience for Units 4–6 stays on this cheat sheet page.'}
+                : 'Single-page PDFs for Units 1-5. The full unit experience for Unit 6 stays on this cheat sheet page.'}
             </p>
             <Link
               href="/cheat-sheets"
