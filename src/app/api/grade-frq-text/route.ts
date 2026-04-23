@@ -4,6 +4,39 @@ import { generateGradingPrompt } from '@/lib/grading-logic';
 
 export const maxDuration = 30; // Set a 30-second timeout
 export const runtime = 'nodejs'; // Ensure Node.js runtime for Vercel
+const MODEL_NAME = 'gemini-2.0-flash';
+const MODEL_TIMEOUT_MS = 12000;
+const MAX_ATTEMPTS = 2;
+
+function extractJsonObject(raw: string): string {
+  const text = raw.trim();
+  if (!text) return text;
+
+  let cleaned = text;
+  if (cleaned.startsWith('```json')) {
+    cleaned = cleaned.replace(/```json\n?/gi, '').replace(/```\n?/g, '');
+  } else if (cleaned.startsWith('```')) {
+    cleaned = cleaned.replace(/```\n?/g, '');
+  }
+  cleaned = cleaned.trim();
+
+  const firstBrace = cleaned.indexOf('{');
+  const lastBrace = cleaned.lastIndexOf('}');
+  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+    return cleaned.slice(firstBrace, lastBrace + 1);
+  }
+  return cleaned;
+}
+
+async function withTimeout<T>(promise: Promise<T>, timeoutMs: number, context: string): Promise<T> {
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    const timer = setTimeout(() => {
+      clearTimeout(timer);
+      reject(new Error(`${context} timed out after ${timeoutMs}ms`));
+    }, timeoutMs);
+  });
+  return Promise.race([promise, timeoutPromise]);
+}
 
 export async function POST(req: NextRequest) {
   // 1. Check for API key
@@ -32,13 +65,15 @@ export async function POST(req: NextRequest) {
   // 2. Initialize Gemini client
   const genAI = new GoogleGenerativeAI(apiKey);
   
-  // 3. Initialize model - start with gemini-pro (most stable)
-  // Note: getGenerativeModel doesn't throw errors until you use it, so we'll handle errors during API calls
-  console.log('Initializing Gemini model...');
-  // Updated to use the model confirmed to exist in your account
-// 'gemini-flash-latest' automatically points to the most stable, high-quota version
-let model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
-  console.log('Using model: gemini-2.0-flash');
+  // 3. Initialize model
+  const model = genAI.getGenerativeModel({
+    model: MODEL_NAME,
+    generationConfig: {
+      responseMimeType: 'application/json',
+      temperature: 0.2,
+    },
+  });
+  console.log(`Using model: ${MODEL_NAME}`);
 
   let body;
   try {
@@ -80,51 +115,44 @@ let model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
     });
 
     console.log('Calling Gemini API with generated prompt...');
-    
+    let responseText = '';
+    let lastError: any = null;
 
-const modelNames = ['gemini-flash-latest', 'gemini-2.0-flash-lite-preview-02-05', 'gemini-2.0-flash-exp'];
-    let result;
-    let responseText;
-    let success = false;
-    
-    for (const modelName of modelNames) {
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
       try {
-        const currentModel = genAI.getGenerativeModel({ model: modelName });
-        console.log(`Trying model: ${modelName}`);
-        result = await currentModel.generateContent(prompt);
-        responseText = result.response.text();
-        console.log(`Success with model ${modelName}, response length:`, responseText.length);
-        success = true;
+        const result = await withTimeout(
+          model.generateContent(prompt),
+          MODEL_TIMEOUT_MS,
+          `Gemini grading attempt ${attempt}`
+        );
+        responseText = result.response.text()?.trim() || '';
+        if (!responseText) {
+          throw new Error('Empty response from Gemini model');
+        }
+        console.log(`Gemini success on attempt ${attempt}, response length:`, responseText.length);
         break;
-      } catch (modelError: any) {
-        const errorMsg = modelError.message || '';
-        console.log(`Model ${modelName} failed:`, errorMsg.substring(0, 200));
-        
-        // If it's a quota error, throw it immediately
-        if (errorMsg.includes('429') || errorMsg.includes('quota') || errorMsg.includes('rate limit') || errorMsg.includes('RESOURCE_EXHAUSTED')) {
+      } catch (attemptError: any) {
+        lastError = attemptError;
+        const msg = attemptError?.message || '';
+        console.error(`Gemini attempt ${attempt} failed:`, msg.substring(0, 300));
+
+        // Fail fast on quota issues
+        if (
+          msg.includes('429') ||
+          msg.toLowerCase().includes('quota') ||
+          msg.toLowerCase().includes('rate limit') ||
+          msg.includes('RESOURCE_EXHAUSTED')
+        ) {
           throw new Error('API quota exceeded. Please wait a moment and try again, or check your Google AI Studio quota limits.');
         }
-        
-        // If it's the last model, throw the error
-        if (modelName === modelNames[modelNames.length - 1]) {
-          throw modelError;
-        }
-        
-        // Otherwise, try next model
-        continue;
       }
     }
-    
-    if (!success || !responseText) {
-      throw new Error('All Gemini models failed. Please check your API key and model availability.');
+
+    if (!responseText) {
+      throw new Error(lastError?.message || 'Gemini request failed after retries');
     }
 
-    let jsonText = responseText.trim();
-    if (jsonText.startsWith('```json')) {
-      jsonText = jsonText.replace(/```json\n?/g, '').replace(/```\n?/g, '');
-    } else if (jsonText.startsWith('```')) {
-      jsonText = jsonText.replace(/```\n?/g, '');
-    }
+    const jsonText = extractJsonObject(responseText);
 
     let feedback;
     try {
@@ -137,7 +165,22 @@ const modelNames = ['gemini-flash-latest', 'gemini-2.0-flash-lite-preview-02-05'
         score: 0,
         feedback: 'Unable to parse AI response. Please try submitting again for detailed feedback.',
         raw_response: jsonText.substring(0, 500) // Include first 500 chars for debugging
-      });
+      }, { status: 200 });
+    }
+
+    if (
+      typeof feedback !== 'object' ||
+      feedback === null ||
+      typeof feedback.score !== 'number' ||
+      typeof feedback.feedback !== 'string'
+    ) {
+      return NextResponse.json({
+        score: Number.isFinite(feedback?.score) ? feedback.score : 0,
+        feedback:
+          typeof feedback?.feedback === 'string'
+            ? feedback.feedback
+            : 'Grading completed, but response format was incomplete. Please try again for full details.'
+      }, { status: 200 });
     }
     
     return NextResponse.json(feedback);

@@ -22,6 +22,7 @@ import { macroLessons, microLessons } from '@/data/lessons'; // Import lessons
 import { LoginModal, SignupModal } from '@/components/AuthModals';
 import { logger } from '@/utils/logger';
 import { getSubjectSlug, getUnitSlug } from '@/lib/practiceSlugs';
+import { hasValidSeasonPass } from '@/lib/utils';
 
 // Assuming this matches the structure in useAuth.ts and Firestore
 interface McqAnswer {
@@ -344,7 +345,10 @@ function UnitMCQPracticeContent() {
     !!user &&
     practiceMode === 'singleUnit' &&
     currentUnit > 0 &&
-    purchasedTests.includes(String(currentUnit));
+    (
+      hasValidSeasonPass(userData, subject) ||
+      purchasedTests.includes(String(currentUnit))
+    );
 
   // Calculate weakest units from MCQ answers
   useEffect(() => {
@@ -516,11 +520,6 @@ function UnitMCQPracticeContent() {
   }, [user, userData, isPremium, currentUnitForAccessCheck, practiceMode]);
 
   const handleEnterTestMode = () => {
-    // Only Macro has unit MCQ tests wired up currently
-    if (subject !== 'macro') {
-      return;
-    }
-
     if (!user) {
       // Show season pass modal for guest users trying to access test mode
       if (!hasDismissedSeasonPassModal) {
@@ -532,7 +531,10 @@ function UnitMCQPracticeContent() {
     const price =
       unitsData.find(u => u.number === currentUnit)?.price || 4.99;
 
-    if (!purchasedTests.includes(String(currentUnit))) {
+    const hasSeasonPassAccess = hasValidSeasonPass(userData, subject);
+    const hasPurchasedUnitTest = purchasedTests.includes(String(currentUnit));
+
+    if (!hasSeasonPassAccess && !hasPurchasedUnitTest) {
       // Redirect to purchase page for this unit test
       router.push(
         `/purchase/mcq-practice?units=${currentUnit}&total=${price}&subject=${subject}`

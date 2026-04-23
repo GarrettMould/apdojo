@@ -71,17 +71,17 @@ const UNIT_META: Record<'macro' | 'micro', Record<number, { title: string; descr
 export async function generateMetadata({ params }: { params: Promise<{ unitId: string }> | { unitId: string } }): Promise<Metadata> {
   const resolvedParams = params instanceof Promise ? await params : params;
   const unitId = parseInt(resolvedParams.unitId, 10);
-
+  
   if (isNaN(unitId) || unitId < 1 || unitId > 6) {
     return {
       title: 'Unit Not Found | AP Dojo',
       description: 'The requested unit could not be found.',
     };
   }
-
+  
   // Default to macro (macro always resolves first on shared URL)
   const meta = UNIT_META.macro[unitId];
-
+  
   return {
     title: `${meta.title} | AP Dojo`,
     description: meta.description,

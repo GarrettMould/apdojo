@@ -18,6 +18,7 @@ import { LoginModal, SignupModal } from '@/components/AuthModals';
 import { logger } from '@/utils/logger';
 import { getFullUnitName, getSubjectDisplayName, getSubjectSlug, getUnitSlug } from '@/lib/practiceSlugs';
 import { SeasonPassModal } from '@/components/SeasonPassModal';
+import { hasValidSeasonPass } from '@/lib/utils';
 
 // Assuming this matches the structure in useAuth.ts and Firestore
 interface McqAnswer {
@@ -623,10 +624,12 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
               subject={subject} 
               practiceUnitIds={[unitNumber]}
               isParentModalOpen={showLoginModal || showSignupModal}
-              hasTestModeAccess={!!user && purchasedTests.includes(String(unitNumber))}
+              hasTestModeAccess={!!user && (hasValidSeasonPass(userData, subject) || purchasedTests.includes(String(unitNumber)))}
               onEnterTestMode={() => {
                 const price = unitsData.find(u => u.number === unitNumber)?.price || 4.99;
-                if (!purchasedTests.includes(String(unitNumber))) {
+                const hasSeasonPassAccess = hasValidSeasonPass(userData, subject);
+                const hasPurchasedUnitTest = purchasedTests.includes(String(unitNumber));
+                if (!hasSeasonPassAccess && !hasPurchasedUnitTest) {
                   router.push(`/purchase/mcq-practice?units=${unitNumber}&total=${price}&subject=${subject}`);
                 } else {
                   router.push(`/ap-${subject}-unit-${unitNumber}-mcq-test`);

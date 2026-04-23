@@ -874,12 +874,12 @@ export const microSetOneQuestions: QuestionBank = {
       "options": [
         "Q2 | P5",
         "Q3 | P3",
-        "Q2 | P1",
+        "Q1 | P1",
         "Q4 | P4",
         "Q1 | P2"
       ],
       "correctAnswer": "C",
-      "explanation": "A profit-maximizing monopsonist hires labor up to the point where the marginal resource cost (MRC) equals the marginal revenue product (MRP). In the graph, the MRC and Demand (MRP) curves intersect at quantity Q2. However, the firm does not pay the wage at that intersection (P5). Instead, it pays the lowest wage necessary to attract Q2 workers, which is found on the supply curve directly below the intersection. At Q2, the supply curve indicates a wage rate of P1.",
+      "explanation": "A profit-maximizing monopsonist hires labor up to the point where the marginal resource cost (MRC) equals the marginal revenue product (MRP). In the graph, the MRC and Demand (MRP) curves intersect at quantity Q1. However, the firm does not pay the wage at that intersection (P5). Instead, it pays the lowest wage necessary to attract Q1 workers, which is found on the supply curve directly below the intersection. At Q1, the supply curve indicates a wage rate of P1.",
       "questionGroup": "monopsony-labor-market-graph"
     },
     {
