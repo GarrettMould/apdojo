@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import { useCourseContext } from '@/contexts/CourseContext';
 import { macroUnits, microUnits } from '@/data/cheatSheets';
@@ -136,6 +137,29 @@ export function GraphGymDashboard({ onSelectScenario: _onSelectScenario }: Graph
     return ids.map((id) => bundles.find((b) => b.bundle.id === id)).filter(Boolean) as BundleWithScenarios[];
   }, [bundles, currentCourse]);
 
+  const [activeFeature, setActiveFeature] = useState(0);
+  const [featureDir, setFeatureDir] = useState(1);
+  const featureTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    if (featuredBundles.length === 0) return;
+    featureTimerRef.current = setInterval(() => {
+      setFeatureDir(1);
+      setActiveFeature(i => (i + 1) % featuredBundles.length);
+    }, 3000);
+    return () => { if (featureTimerRef.current) clearInterval(featureTimerRef.current); };
+  }, [featuredBundles.length]);
+
+  const goToFeature = (index: number) => {
+    setFeatureDir(index > activeFeature ? 1 : -1);
+    setActiveFeature(index);
+    if (featureTimerRef.current) clearInterval(featureTimerRef.current);
+    featureTimerRef.current = setInterval(() => {
+      setFeatureDir(1);
+      setActiveFeature(i => (i + 1) % featuredBundles.length);
+    }, 3000);
+  };
+
   return (
     <div className="min-h-0 w-full overflow-auto bg-gray-50">
       <main className="px-4 pt-20 pb-12">
@@ -260,10 +284,45 @@ export function GraphGymDashboard({ onSelectScenario: _onSelectScenario }: Graph
                   Most tested
                 </span>
               </div>
-              <div className="grid grid-cols-3 gap-4">
+
+              {/* Desktop: all 3 in a row */}
+              <div className="hidden sm:grid grid-cols-3 gap-4">
                 {featuredBundles.map((item) => (
                   <BundleCard key={item.bundle.id} item={item} />
                 ))}
+              </div>
+
+              {/* Mobile: 2-up auto-advancing carousel */}
+              <div className="sm:hidden">
+                <div className="relative overflow-hidden">
+                  <AnimatePresence custom={featureDir} mode="wait">
+                    <motion.div
+                      key={activeFeature}
+                      custom={featureDir}
+                      initial={{ opacity: 0, x: featureDir > 0 ? 50 : -50 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: featureDir > 0 ? -50 : 50 }}
+                      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                      className="grid grid-cols-2 gap-3"
+                    >
+                      <BundleCard item={featuredBundles[activeFeature]} />
+                      <BundleCard item={featuredBundles[(activeFeature + 1) % featuredBundles.length]} />
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+
+                {/* Dot navigation */}
+                <div className="flex justify-center gap-2 mt-4">
+                  {featuredBundles.map((_, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => goToFeature(i)}
+                      className={`h-2 rounded-full transition-all duration-300 ${i === activeFeature ? 'w-6 bg-gray-900' : 'w-2 bg-gray-300'}`}
+                      aria-label={`Go to slide ${i + 1}`}
+                    />
+                  ))}
+                </div>
               </div>
             </section>
           )}
