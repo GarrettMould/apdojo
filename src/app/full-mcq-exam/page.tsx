@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { Suspense, useMemo } from 'react';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { hasValidSeasonPass } from '@/lib/utils';
 import { FullExam } from '@/components/FullExam';
@@ -34,12 +34,20 @@ export default function FullMCQExamPage() {
 
   return (
     <div className="min-h-screen">
-      <FullExam
-        questionBank={questionBank}
-        examType={examType}
-        questionType="mcq"
-        examNumber="full"
-      />
+      <Suspense
+        fallback={
+          <div className="flex min-h-[50vh] items-center justify-center text-slate-500">
+            Loading exam…
+          </div>
+        }
+      >
+        <FullExam
+          questionBank={questionBank}
+          examType={examType}
+          questionType="mcq"
+          examNumber="full"
+        />
+      </Suspense>
     </div>
   );
 } 
