@@ -15,6 +15,8 @@ import { auth, db } from '@/lib/firebase'
 import { doc, setDoc, serverTimestamp, collection, query, getDocs, onSnapshot, getDoc, where, increment } from 'firebase/firestore'
 import { UnitDetails } from '@/components/UnitPerformanceDisplay'
 import { getSubjectXP } from './useUserProgress'
+import type { CourseSubject } from '@/lib/courseSubject'
+import { nextCourseSubject, normalizeCourseSubject } from '@/lib/courseSubject'
 
 // Define the structure of your MCQ answer data
 interface McqAnswer {
@@ -44,7 +46,7 @@ export interface UserData {
   displayName: string;
   email: string;
   // ... other user data fields ...
-  selectedSubject?: 'macro' | 'micro';
+  selectedSubject?: CourseSubject;
   hasCompletedInitialUnitSelection?: boolean;
   initialPracticeUnitIds?: number[];
   // Add level/XP fields if they are part of UserData
@@ -53,6 +55,7 @@ export interface UserData {
   // New subject-specific XP fields
   xp_macro?: number;
   xp_micro?: number;
+  xp_gov?: number;
   // Add the new map field for MCQ answer status
   mcqAnswerStatus?: { [key: string]: boolean }; 
   // Keep viewedMcqIds for now if needed elsewhere, remove later if redundant
@@ -61,7 +64,7 @@ export interface UserData {
   purchases?: string[];
   // Add purchasedTests field for unit MCQ tests
   purchasedTests?: string[];
-  // Add seasonPass field for pro customers (array of 'macro' | 'micro')
+  // Add seasonPass field for pro customers (array of course keys, e.g. macro | micro | gov)
   seasonPass?: string[];
   // Add seasonPassExpiration field (object with subject keys and ISO date strings)
   seasonPassExpiration?: Record<string, string>; // e.g., { macro: '2025-06-30T23:59:59.999Z', micro: '2025-06-30T23:59:59.999Z' }
@@ -140,15 +143,21 @@ export interface UnitPerformanceStat {
   percentage: number;
   correctAnswers: number;
   totalAnswers: number;
-  subject: 'macro' | 'micro'; // Store subject for easier filtering later
+  subject: CourseSubject; // Store subject for easier filtering later
 }
 // --- END: Interface ---
+
+/** Options applied only when a new Firestore user document is created (first Google sign-in). */
+export type LoginWithGoogleOptions = {
+  isSubscribedToMarketing?: boolean;
+  isTeacher?: boolean;
+};
 
 export interface AuthContextValue {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<AuthContextValue>;
-  loginWithGoogle: () => Promise<AuthContextValue>;
+  loginWithGoogle: (options?: LoginWithGoogleOptions) => Promise<AuthContextValue>;
   signup: (email: string, password: string, isSubscribed: boolean, isTeacher?: boolean) => Promise<AuthContextValue>;
   logout: () => Promise<void>;
   resendVerificationEmail: () => Promise<void>;
@@ -158,7 +167,7 @@ export interface AuthContextValue {
   loadingUserData: boolean;
   setUserData: React.Dispatch<React.SetStateAction<UserData | null>>;
   lastSelectedPracticeUnits: LastSelectedUnits | null;
-  setLastSelectedPracticeUnits: (subject: 'macro' | 'micro', unitIds: number[]) => void;
+  setLastSelectedPracticeUnits: (subject: CourseSubject, unitIds: number[]) => void;
   globalLevel: number;
   globalProgress: number;
   totalXP: number;
@@ -178,14 +187,14 @@ export interface AuthContextValue {
   setShowSignupModal: React.Dispatch<React.SetStateAction<boolean>>;
   // --- END: Modal State and Setters ---
   // --- ADD: Subject State and Setters ---
-  selectedSubject: 'macro' | 'micro';
-  setSelectedSubject: (subject: 'macro' | 'micro') => void;
+  selectedSubject: CourseSubject;
+  setSelectedSubject: (subject: CourseSubject) => void;
   toggleSubject: () => void;
   // --- END: Subject State and Setters ---
 
   // --- ADD: XP Helper + Guest XP + Toast ---
   guestXp: number;
-  awardXp: (amount: number, subject?: 'macro' | 'micro') => Promise<void>;
+  awardXp: (amount: number, subject?: CourseSubject) => Promise<void>;
   xpToast: { amount: number; total: number } | null;
   // --- END: XP Helper + Guest XP + Toast ---
 
@@ -200,7 +209,7 @@ export interface AuthContextValue {
 }
 
 // --- ADD: Helper Function to Calculate Unit Performance ---
-function calculateUnitPerformance(answers: McqAnswer[], subject: 'macro' | 'micro'): UnitPerformanceStat[] {
+function calculateUnitPerformance(answers: McqAnswer[], subject: CourseSubject): UnitPerformanceStat[] {
   console.log(`[Calc Unit Perf] Calculating for ${subject} with ${answers.length} answers.`);
   if (!answers || answers.length === 0) return [];
 
@@ -298,16 +307,16 @@ export function useAuth() {
   // --- END State ---
 
   // --- ADD State for Selected Subject (works for both logged-in and guests) ---
-  const [selectedSubject, setSelectedSubjectState] = useState<'macro' | 'micro'>('macro');
+  const [selectedSubject, setSelectedSubjectState] = useState<CourseSubject>('macro');
   
   // Initialize subject from userData or localStorage
   useEffect(() => {
     if (user && userData?.selectedSubject) {
-      setSelectedSubjectState(userData.selectedSubject);
+      setSelectedSubjectState(normalizeCourseSubject(userData.selectedSubject as string));
     } else if (!user && typeof window !== 'undefined') {
-      const storedSubject = localStorage.getItem('guestAPSubject') as 'macro' | 'micro' | null;
+      const storedSubject = localStorage.getItem('guestAPSubject');
       if (storedSubject) {
-        setSelectedSubjectState(storedSubject);
+        setSelectedSubjectState(normalizeCourseSubject(storedSubject));
       }
     }
   }, [user, userData?.selectedSubject]);
@@ -349,7 +358,7 @@ export function useAuth() {
   }, [user, userData, selectedSubject]);
 
   // Function to set selected subject (updates both state and storage)
-  const setSelectedSubject = async (subject: 'macro' | 'micro') => {
+  const setSelectedSubject = async (subject: CourseSubject) => {
     setSelectedSubjectState(subject);
     if (user) {
       // Update in Firestore for logged-in users
@@ -369,8 +378,7 @@ export function useAuth() {
 
   // Function to toggle between macro and micro
   const toggleSubject = () => {
-    const newSubject = selectedSubject === 'macro' ? 'micro' : 'macro';
-    setSelectedSubject(newSubject);
+    setSelectedSubject(nextCourseSubject(selectedSubject));
   };
   // --- END Subject State ---
 
@@ -379,7 +387,7 @@ export function useAuth() {
   const unsubscribeUserRef = useRef<(() => void) | null>(null); // Add ref for user doc listener
 
   // --- ADD Setter function for last selected practice units ---
-  const setLastSelectedPracticeUnits = (subject: 'macro' | 'micro', unitIds: number[]) => {
+  const setLastSelectedPracticeUnits = (subject: CourseSubject, unitIds: number[]) => {
       _setLastSelectedPracticeUnits(prev => ({
           ...(prev || {}),
           [subject]: unitIds
@@ -450,7 +458,7 @@ export function useAuth() {
 
                 // --- Calculate Total XP and Level/Progress from user data --- 
                 // Use the helper to get XP for the current subject (with legacy fallback)
-                const currentSubject = fetchedUserData?.selectedSubject ?? 'macro';
+                const currentSubject = normalizeCourseSubject(fetchedUserData?.selectedSubject as string | undefined);
                 const currentTotalXP = getSubjectXP(fetchedUserData, currentSubject);
                 setTotalXP(currentTotalXP);
                 const levelInfo = calculateLevelAndProgress(currentTotalXP);
@@ -560,7 +568,7 @@ export function useAuth() {
   }, []) // Empty dependency array ensures this runs only once on mount
 
   // --- ADD: awardXp helper ---
-  const awardXp = async (amount: number, subject: 'macro' | 'micro' = selectedSubject): Promise<void> => {
+  const awardXp = async (amount: number, subject: CourseSubject = selectedSubject): Promise<void> => {
     console.log('[XP] ===== awardXp FUNCTION CALLED =====', { amount, subject, hasUser: !!user, userId: user?.uid });
     try {
       console.log('[XP] Awarding XP:', { amount, subject, hasUser: !!user });
@@ -569,8 +577,8 @@ export function useAuth() {
         const currentXP = getSubjectXP(userData, subject);
         const newTotal = currentXP + amount;
         
-        // Determine which field to update
-        const fieldName = subject === 'macro' ? 'xp_macro' : 'xp_micro';
+        const fieldName =
+          subject === 'macro' ? 'xp_macro' : subject === 'micro' ? 'xp_micro' : 'xp_gov';
         
         // Logged-in: update subject-specific XP in Firestore
         const userDocRef = doc(db, 'users', user.uid);
@@ -722,7 +730,7 @@ export function useAuth() {
     }
   }
 
-  const loginWithGoogle = async (): Promise<AuthContextValue> => {
+  const loginWithGoogle = async (options?: LoginWithGoogleOptions): Promise<AuthContextValue> => {
     setLoading(true);
     try {
       const provider = new GoogleAuthProvider();
@@ -732,6 +740,8 @@ export function useAuth() {
         setLoading(false);
         throw new Error('Google sign-in did not return an email.');
       }
+      const marketingOptIn = options?.isSubscribedToMarketing ?? true;
+      const teacherFlag = options?.isTeacher ?? false;
       const userDocRef = doc(db, 'users', newUser.uid);
       const userSnap = await getDoc(userDocRef);
       if (!userSnap.exists()) {
@@ -749,14 +759,14 @@ export function useAuth() {
           mcqAnswerStatus: {},
           viewedMcqIds: [],
           totalXP: 150,
-          isSubscribedToMarketing: true,
+          isSubscribedToMarketing: marketingOptIn,
           credits: {
             dailyPractice: { remaining: 3, lastResetDate: todayString },
             lifetimeAiGenerations: 1,
           },
-          teacher: false,
+          teacher: teacherFlag,
         });
-        if (newUser.email) {
+        if (marketingOptIn && newUser.email) {
           try {
             const subscribedEmailRef = doc(db, 'subscribedEmails', newUser.email);
             await setDoc(subscribedEmailRef, {

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import type { CourseSubject } from '@/lib/courseSubject';
 
 export function SubjectToggle() {
   const { selectedSubject, setSelectedSubject } = useAuthContext();
@@ -19,7 +20,7 @@ export function SubjectToggle() {
   // Use 'macro' as default until mounted to match server render
   const displaySubject = mounted ? selectedSubject : 'macro';
 
-  const handleSubjectChange = (newSubject: 'macro' | 'micro') => {
+  const handleSubjectChange = (newSubject: CourseSubject) => {
     // If we're on the blog home, update URL so the page stays in sync
     if (pathname === '/ap-blog-home') {
       setSelectedSubject(newSubject);
@@ -48,10 +49,10 @@ export function SubjectToggle() {
   };
 
   return (
-    <div className="inline-flex items-center bg-stone-50 rounded-xl p-1 border-2 border-black">
+    <div className="inline-flex items-center bg-stone-50 rounded-xl p-1 border-2 border-black flex-wrap gap-0.5 justify-center">
       <button
         onClick={() => handleSubjectChange('macro')}
-        className={`flex-1 px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 border-2 ${
+        className={`flex-1 min-w-[4.5rem] px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 border-2 ${
           displaySubject === 'macro'
             ? 'bg-blue-500 text-white shadow-sm border-black'
             : 'bg-stone-50 text-gray-700 hover:text-gray-900 border-black'
@@ -61,15 +62,24 @@ export function SubjectToggle() {
       </button>
       <button
         onClick={() => handleSubjectChange('micro')}
-        className={`flex-1 px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 border-2 ${
+        className={`flex-1 min-w-[4.5rem] px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 border-2 ${
           displaySubject === 'micro'
-            ? 'bg-blue-500 text-white shadow-sm border-black'
+            ? 'bg-emerald-500 text-white shadow-sm border-black'
             : 'bg-stone-50 text-gray-700 hover:text-gray-900 border-black'
         }`}
       >
         Micro
       </button>
+      <button
+        onClick={() => handleSubjectChange('gov')}
+        className={`flex-1 min-w-[4.5rem] px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 border-2 ${
+          displaySubject === 'gov'
+            ? 'bg-violet-600 text-white shadow-sm border-black'
+            : 'bg-stone-50 text-gray-700 hover:text-gray-900 border-black'
+        }`}
+      >
+        Gov
+      </button>
     </div>
   );
 }
-

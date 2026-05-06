@@ -44,21 +44,10 @@ export default function MicroFRQPreview({ params }: { params: Promise<{ num: str
 
   // Show the exam - only accessible to pro customers
   return (
-    <div className="py-8">
-      <div className="max-w-4xl mx-auto px-4">
-        <div>
-          <div className="space-y-4 mt-8">
-            <h1 className="text-4xl font-extrabold tracking-tight">
-              <span className="text-green-500">AP Microeconomics</span>{" "}
-              FRQ {num}
-            </h1>
-            <p className="text-gray-600 leading-relaxed">
-              Complete all questions to submit and view your score. Explanations are available after you submit.
-            </p>
-          </div>
-        </div>
-        <FullExamFRQ questions={frqSetOneQuestions} />
-      </div>
-    </div>
+    <FullExamFRQ
+      questions={frqSetOneQuestions}
+      examType="micro"
+      backUrl="/unit-final-practice-tests?subject=ap_microeconomics"
+    />
   );
 }

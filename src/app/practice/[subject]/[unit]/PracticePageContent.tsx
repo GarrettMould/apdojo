@@ -212,6 +212,7 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
   const [dailyQuestionsAnswered, setDailyQuestionsAnswered] = useState(0);
   const [showSeasonPassModal, setShowSeasonPassModal] = useState(false);
   const [hasDismissedSeasonPassModal, setHasDismissedSeasonPassModal] = useState(false);
+  const [isTutorOpen, setIsTutorOpen] = useState(false);
 
   const getLocalDateKey = (d: Date) => {
     const yyyy = d.getFullYear();
@@ -548,13 +549,17 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
       )}
       <div className="min-h-screen bg-gray-50 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 py-8 pt-8">
-          {/* Breadcrumb */}
-          <Breadcrumb subject={subject} unitNumber={unitNumber} />
-          
-          {/* Page Title */}
-          <h1 className="text-4xl font-black text-gray-900 mb-8">
-            {fullUnitName}
-          </h1>
+          {!isTutorOpen && (
+            <>
+              {/* Breadcrumb */}
+              <Breadcrumb subject={subject} unitNumber={unitNumber} />
+              
+              {/* Page Title */}
+              <h1 className="text-4xl font-black text-gray-900 mb-8">
+                {fullUnitName}
+              </h1>
+            </>
+          )}
 
           {isLoadingQuestionSet ? (
             <div className="flex items-center justify-center min-h-[400px]">
@@ -647,6 +652,7 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
               isNavigationDisabled={
                 (!isPremiumEffective && dailyQuestionsAnswered >= DAILY_FREE_ANSWERS)
               }
+              onTutorOpenChange={setIsTutorOpen}
             />
           )}
         </div>

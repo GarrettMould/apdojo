@@ -1,4 +1,6 @@
 import { GraphGymScenario, graphGymScenarios } from './graphGymScenarios';
+import type { CourseSubject } from '@/lib/courseSubject';
+import { econCourseFromSubject } from '@/lib/courseSubject';
 
 export interface GraphGymBundle {
   id: string;
@@ -245,22 +247,25 @@ export interface BundleWithScenarios {
 }
 
 /** Return all bundles (for a given subject) with their matched scenarios and a thumbnail. */
-export function getBundlesForSubject(subject: 'macro' | 'micro'): BundleWithScenarios[] {
+export function getBundlesForSubject(subject: CourseSubject): BundleWithScenarios[] {
+  const econ = econCourseFromSubject(subject);
+  if (!econ) return [];
+
   const filtered = graphGymScenarios.filter((s) => {
     const subjects = Array.isArray(s.subject) ? s.subject : [s.subject];
-    return subjects.includes(subject);
+    return subjects.includes(econ);
   });
 
   const bundleMap = new Map<string, GraphGymScenario[]>();
   for (const s of filtered) {
-    const bundleId = getBundleIdForScenario(s, subject);
+    const bundleId = getBundleIdForScenario(s, econ);
     if (!bundleId) continue;
     const list = bundleMap.get(bundleId) ?? [];
     list.push(s);
     bundleMap.set(bundleId, list);
   }
 
-  return GRAPH_GYM_BUNDLES.filter((b) => b.subject === subject)
+  return GRAPH_GYM_BUNDLES.filter((b) => b.subject === econ)
     .map((bundle) => {
       const scenarios = bundleMap.get(bundle.id) ?? [];
       const thumbnailUrl =
@@ -273,9 +278,10 @@ export function getBundlesForSubject(subject: 'macro' | 'micro'): BundleWithScen
 /** Lookup a single bundle by id, with its scenarios and thumbnail. */
 export function getBundleById(
   bundleId: string,
-  subject?: 'macro' | 'micro',
+  subject?: CourseSubject,
 ): BundleWithScenarios | null {
-  const resolvedSubject = subject ?? (bundleId.startsWith('macro-') ? 'macro' : 'micro');
+  const resolvedSubject: CourseSubject =
+    subject ?? (bundleId.startsWith('macro-') ? 'macro' : 'micro');
   const bundles = getBundlesForSubject(resolvedSubject);
   return bundles.find((b) => b.bundle.id === bundleId) ?? null;
 }

@@ -6,11 +6,12 @@ import Image from 'next/image';
 import { getBeltProgress } from '@/lib/beltSystem';
 import { getSubjectXP } from '@/hooks/useUserProgress';
 import { UserData } from '@/hooks/useAuth';
+import type { CourseSubject } from '@/lib/courseSubject';
 
 interface DojoDrillResultsProps {
   xpEarned: number;
   userData: UserData | null;
-  selectedSubject: 'macro' | 'micro';
+  selectedSubject: CourseSubject;
   onExit: () => void;
 }
 

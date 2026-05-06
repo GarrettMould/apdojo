@@ -5,11 +5,12 @@ import { KeyTerm as MicroKeyTerm, keyTerms as microKeyTerms } from '@/data/apMic
 import { keyTerms as macroKeyTerms } from '@/data/apMacroTerms';
 import { KeyTermTooltip } from './KeyTermTooltip';
 import { unit5MicroScaffoldTerms } from '@/data/unitMcqScaffoldTerms';
+import { ApGovQuestionText } from './ApGovQuestionText';
 
 interface QuestionWithKeyTermsProps {
   questionText: string;
   unit: number;
-  subject: 'ap_microeconomics' | 'ap_macroeconomics';
+  subject: 'ap_microeconomics' | 'ap_macroeconomics' | 'ap_us_government';
 }
 
 interface TextSegment {
@@ -30,6 +31,10 @@ type UnifiedKeyTerm = {
 };
 
 export function QuestionWithKeyTerms({ questionText, unit, subject }: QuestionWithKeyTermsProps) {
+  if (subject === 'ap_us_government') {
+    return <ApGovQuestionText text={questionText} />;
+  }
+
   // Build unified term sets for micro and macro
   const microBase: UnifiedKeyTerm[] = microKeyTerms
     .filter((t) => t.subject === 'ap_microeconomics')

@@ -7,6 +7,7 @@ import { SubscriptionOfferPrompt } from './SubscriptionOfferPrompt';
 import { useRouter } from 'next/navigation';
 import { Checkbox } from "@/components/ui/checkbox" // Import the checkbox component
 import { Label } from "@/components/ui/label"     // Import the label component
+import { AuthDividerOr, GoogleSignInButton } from '@/components/GoogleSignInButton';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -21,7 +22,8 @@ export function LoginModal({ isOpen, onClose, switchToSignup, onAuthSuccess }: A
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuthContext();
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const { login, loginWithGoogle } = useAuthContext();
 
   useEffect(() => {
     if (isOpen) {
@@ -62,6 +64,25 @@ export function LoginModal({ isOpen, onClose, switchToSignup, onAuthSuccess }: A
     }
   };
 
+  const handleGoogleLogin = async () => {
+    setError('');
+    setGoogleLoading(true);
+    try {
+      await loginWithGoogle();
+      onClose();
+      onAuthSuccess?.();
+    } catch (err: unknown) {
+      const code = err && typeof err === 'object' && 'code' in err ? String((err as { code: string }).code) : '';
+      if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
+        setError('');
+      } else {
+        setError('Google sign-in did not complete. Please try again.');
+      }
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -77,7 +98,18 @@ export function LoginModal({ isOpen, onClose, switchToSignup, onAuthSuccess }: A
               Sign in to your <span className="text-blue-500">AP Dojo</span> account
             </h2>
           </div>
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <div className="mt-6 space-y-4">
+            <GoogleSignInButton
+              variant="modal"
+              loading={googleLoading}
+              disabled={loading}
+              onClick={handleGoogleLogin}
+            >
+              Continue with Google
+            </GoogleSignInButton>
+            <AuthDividerOr />
+          </div>
+          <form className="mt-2 space-y-6" onSubmit={handleSubmit}>
             {error && (
               <div className="text-red-600 text-base text-center bg-red-50 p-3 rounded">
                 {error}
@@ -92,7 +124,7 @@ export function LoginModal({ isOpen, onClose, switchToSignup, onAuthSuccess }: A
                   placeholder="Email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  disabled={loading}
+                  disabled={loading || googleLoading}
                 />
               </div>
               <div>
@@ -103,7 +135,7 @@ export function LoginModal({ isOpen, onClose, switchToSignup, onAuthSuccess }: A
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  disabled={loading}
+                  disabled={loading || googleLoading}
                 />
               </div>
             </div>
@@ -111,9 +143,9 @@ export function LoginModal({ isOpen, onClose, switchToSignup, onAuthSuccess }: A
               <button
                 type="submit"
                 className={`group relative w-full flex justify-center py-3 px-4 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-                  loading ? 'opacity-50 cursor-not-allowed' : ''
+                  loading || googleLoading ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
-                disabled={loading}
+                disabled={loading || googleLoading}
               >
                 {loading ? 'Signing in...' : 'Sign in'}
               </button>
@@ -137,18 +169,8 @@ export function SignupModal({ isOpen, onClose, switchToLogin, onAuthSuccess }: A
   const [isSubscribed, setIsSubscribed] = useState(true); // State for the checkbox, default to true
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signup } = useAuthContext();
-  
-  // Check for teacher access code in URL (secret code: 9759)
-  const [isTeacher, setIsTeacher] = useState(false);
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const accessCode = params.get('code');
-      // Secret teacher access code: 9759
-      setIsTeacher(accessCode === '9759');
-    }
-  }, []);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const { signup, loginWithGoogle } = useAuthContext();
 
   // Password validation states
   const [hasMinLength, setHasMinLength] = useState(false);
@@ -219,93 +241,115 @@ export function SignupModal({ isOpen, onClose, switchToLogin, onAuthSuccess }: A
     }
   };
 
+  const handleGoogleSignup = async () => {
+    setError('');
+    setGoogleLoading(true);
+    try {
+      await loginWithGoogle({ isSubscribedToMarketing: isSubscribed });
+      onClose();
+      onAuthSuccess?.();
+    } catch (err: unknown) {
+      const code = err && typeof err === 'object' && 'code' in err ? String((err as { code: string }).code) : '';
+      if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
+        setError('');
+      } else if (code === 'auth/account-exists-with-different-credential') {
+        setError('An account already exists with this email. Sign in with email and password instead.');
+      } else {
+        setError('Google sign-up did not complete. Please try again.');
+      }
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
     <>
       <div className="fixed -top-10 left-0 right-0 bottom-0 bg-black/50 backdrop-blur-sm z-[100]" />
       <div className="fixed inset-0 flex items-center justify-center z-[101] p-4">
-        <div className="max-w-md w-full space-y-8 bg-white p-8 border border-gray-300 rounded-lg shadow-md relative">
-          <button onClick={onClose} className="absolute right-4 top-4">
+        <div className="max-w-md w-full bg-gray-50 p-8 border-2 border-black rounded-md shadow-2xl relative">
+          <button onClick={onClose} className="absolute right-4 top-4 text-gray-500 hover:text-gray-900">
             <X className="w-5 h-5" />
           </button>
           <div>
-            <h2 className="mt-6 text-center text-3xl font-extrabold tracking-tight text-gray-900">
+            <h2 className="mt-4 text-center text-2xl font-black tracking-tight text-gray-900">
               Create an <span className="text-blue-500">AP Dojo</span> account
             </h2>
           </div>
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <div className="mt-6 space-y-5">
             {error && (
-              <div className="text-red-600 text-base text-center bg-red-50 p-3 rounded">
+              <div className="text-red-600 text-sm text-center bg-red-50 border border-red-200 p-3 rounded-md">
                 {error}
               </div>
             )}
-            <div className="rounded-md shadow-sm -space-y-px">
+            <GoogleSignInButton
+              variant="modal"
+              loading={googleLoading}
+              disabled={loading}
+              onClick={handleGoogleSignup}
+            >
+              Sign up with Google
+            </GoogleSignInButton>
+            <AuthDividerOr centerBgClassName="bg-gray-50" />
+          </div>
+          <form className="mt-2 space-y-5" onSubmit={handleSubmit}>
+            <div className="-space-y-px">
               <div>
                 <input
                   type="email"
                   required
-                  className="appearance-none rounded-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 text-base"
+                  className="appearance-none relative block w-full px-4 py-3 border-2 border-gray-300 placeholder-gray-400 text-gray-900 rounded-t-md focus:outline-none focus:border-blue-500 text-base bg-white"
                   placeholder="Email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  disabled={loading}
+                  disabled={loading || googleLoading}
                 />
               </div>
               <div>
                 <input
                   type="password"
                   required
-                  className="appearance-none rounded-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 text-base"
+                  className="appearance-none relative block w-full px-4 py-3 border-2 border-t-0 border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:border-blue-500 text-base bg-white"
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  disabled={loading}
+                  disabled={loading || googleLoading}
                 />
               </div>
               <div>
                 <input
                   type="password"
                   required
-                  className="appearance-none rounded-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 text-base"
+                  className="appearance-none relative block w-full px-4 py-3 border-2 border-t-0 border-gray-300 placeholder-gray-400 text-gray-900 rounded-b-md focus:outline-none focus:border-blue-500 text-base bg-white"
                   placeholder="Confirm Password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  disabled={loading}
+                  disabled={loading || googleLoading}
                 />
               </div>
             </div>
 
-            <div className="text-base space-y-2">
-              <p className="font-semibold text-gray-900">Password requirements:</p>
-              <ul className="space-y-1 text-gray-600">
-                <li className={hasMinLength ? "text-green-600" : ""}>
-                  ✓ At least 8 characters
-                </li>
-                <li className={hasUpperCase ? "text-green-600" : ""}>
-                  ✓ At least one uppercase letter
-                </li>
-                <li className={hasLowerCase ? "text-green-600" : ""}>
-                  ✓ At least one lowercase letter
-                </li>
-                <li className={hasNumber ? "text-green-600" : ""}>
-                  ✓ At least one number
-                </li>
-                <li className={passwordsMatch ? "text-green-600" : ""}>
-                  ✓ Passwords match
-                </li>
+            <div className="text-sm space-y-1.5">
+              <p className="font-bold text-gray-900 tracking-wide uppercase text-xs">Password requirements</p>
+              <ul className="space-y-1 text-gray-500">
+                <li className={hasMinLength ? "text-green-600 font-medium" : ""}>✓ At least 8 characters</li>
+                <li className={hasUpperCase ? "text-green-600 font-medium" : ""}>✓ At least one uppercase letter</li>
+                <li className={hasLowerCase ? "text-green-600 font-medium" : ""}>✓ At least one lowercase letter</li>
+                <li className={hasNumber ? "text-green-600 font-medium" : ""}>✓ At least one number</li>
+                <li className={passwordsMatch ? "text-green-600 font-medium" : ""}>✓ Passwords match</li>
               </ul>
             </div>
 
-            {/* Subscribe Checkbox */}
-            <div className="flex items-center space-x-3 pt-2">
-              <Checkbox 
-                id="subscribe-modal" 
-                checked={isSubscribed} 
+            <div className="flex items-center space-x-3 rounded-md border border-gray-200 bg-white p-3">
+              <Checkbox
+                id="subscribe-modal-email"
+                checked={isSubscribed}
                 onCheckedChange={(checked) => setIsSubscribed(checked as boolean)}
                 className="h-5 w-5"
+                disabled={loading || googleLoading}
               />
-              <Label htmlFor="subscribe-modal" className="text-base font-medium leading-normal text-gray-600 cursor-pointer">
+              <Label htmlFor="subscribe-modal-email" className="text-sm font-medium leading-normal text-gray-600 cursor-pointer">
                 Send me helpful tips, course updates, and special offers.
               </Label>
             </div>
@@ -313,17 +357,17 @@ export function SignupModal({ isOpen, onClose, switchToLogin, onAuthSuccess }: A
             <div>
               <button
                 type="submit"
-                className={`group relative w-full flex justify-center py-3 px-4 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-                  (loading || !isValidPassword) ? 'opacity-50 cursor-not-allowed' : ''
+                className={`w-full py-3 px-4 border-2 border-blue-800 text-base font-black rounded-md text-white bg-blue-600 hover:bg-blue-700 tracking-wide transition-colors ${
+                  loading || googleLoading || !isValidPassword ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
-                disabled={loading || !isValidPassword}
+                disabled={loading || googleLoading || !isValidPassword}
               >
-                {loading ? 'Creating account...' : 'Sign up'}
+                {loading ? 'Creating account...' : 'Sign up →'}
               </button>
             </div>
           </form>
-          <div className="text-base text-center">
-            <button onClick={switchToLogin} className="font-medium text-blue-600 hover:text-blue-500">
+          <div className="text-sm text-center mt-4">
+            <button onClick={switchToLogin} className="font-bold text-blue-600 hover:text-blue-500 tracking-wide">
               Already have an account? Sign in
             </button>
           </div>

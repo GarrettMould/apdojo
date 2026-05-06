@@ -12,6 +12,7 @@ import { loadDojoDrillProgress } from '@/lib/dojoDrillProgress';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FileText, ClipboardList, BookOpen, Zap, Sparkles, ChevronRight, Loader2 } from 'lucide-react';
+import { apEconomicsTagFromCourse } from '@/lib/courseSubject';
 
 interface Activity {
   id: string;
@@ -70,17 +71,16 @@ function MyAssignmentHistoryContent() {
               ...data,
             } as QuizHistoryEntry;
 
-            // Filter by subject: check if any question matches current course
-            const subjectMatch = entry.questions?.some(q => {
-              const questionSubject = q.subject;
-              if (Array.isArray(questionSubject)) {
-                return questionSubject.includes(currentCourse);
-              }
-              // Map 'ap_macroeconomics' to 'macro' and 'ap_microeconomics' to 'micro'
-              if (questionSubject === 'ap_macroeconomics' && currentCourse === 'macro') return true;
-              if (questionSubject === 'ap_microeconomics' && currentCourse === 'micro') return true;
-              return questionSubject === currentCourse;
-            });
+            const apTag = apEconomicsTagFromCourse(currentCourse);
+            const subjectMatch = apTag
+              ? entry.questions?.some(q => {
+                  const questionSubject = q.subject;
+                  if (Array.isArray(questionSubject)) {
+                    return questionSubject.includes(apTag);
+                  }
+                  return questionSubject === apTag;
+                })
+              : false;
 
             if (subjectMatch && entry.totalQuestions > 0) {
               allActivities.push({
@@ -235,8 +235,10 @@ function MyAssignmentHistoryContent() {
         try {
           const drillProgress = await loadDojoDrillProgress(user.uid);
           if (drillProgress) {
-            const expectedSubject = currentCourse === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics';
-            Object.entries(drillProgress).forEach(([drillId, progress]: [string, any]) => {
+            const expectedSubject = apEconomicsTagFromCourse(currentCourse);
+            if (!expectedSubject) {
+              // Gov (or unknown): no econ drill rows to match yet
+            } else Object.entries(drillProgress).forEach(([drillId, progress]: [string, any]) => {
               if (progress.stage1 || progress.stage2 || progress.stage3) {
                 const drill = Object.values(dojoDrills).find(d => d.id === drillId);
                 // Filter by subject: only include drills matching current course
@@ -287,7 +289,7 @@ function MyAssignmentHistoryContent() {
       return '/full-mcq-exam';
     } else if (activity.type === 'unit-exam') {
       const unitMatch = activity.title.match(/Unit (\d+)/);
-      return unitMatch ? getUnitMCQTestUrl(parseInt(unitMatch[1]), currentCourse as 'macro' | 'micro') : '#';
+      return unitMatch ? getUnitMCQTestUrl(parseInt(unitMatch[1]), currentCourse) : '#';
     } else if (activity.type === 'frq-exam') {
       return '/full-frq-exam';
     }

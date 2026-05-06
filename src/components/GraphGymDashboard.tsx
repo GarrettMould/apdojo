@@ -4,35 +4,58 @@ import React, { useMemo, useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, CheckCircle2, LineChart } from 'lucide-react';
 import { useCourseContext } from '@/contexts/CourseContext';
-import { macroUnits, microUnits } from '@/data/cheatSheets';
 import { getBundlesForSubject, BundleWithScenarios } from '@/data/graphGymBundles';
+import { unitsForCourseSubject, econCourseFromSubject } from '@/lib/courseSubject';
 
 // ---------------------------------------------------------------------------
 // Accent colour → Tailwind classes
 // ---------------------------------------------------------------------------
 
 const ACCENT_BG: Record<string, string> = {
-  blue:   'bg-blue-100 border-blue-400',
-  green:  'bg-green-100 border-green-400',
-  yellow: 'bg-yellow-100 border-yellow-400',
-  orange: 'bg-orange-100 border-orange-400',
-  red:    'bg-red-100 border-red-400',
-  purple: 'bg-purple-100 border-purple-400',
-  pink:   'bg-pink-100 border-pink-400',
-  teal:   'bg-teal-100 border-teal-400',
+  blue:   'bg-blue-50/80 border-blue-200/80',
+  green:  'bg-emerald-50/80 border-emerald-200/80',
+  yellow: 'bg-amber-50/80 border-amber-200/80',
+  orange: 'bg-orange-50/80 border-orange-200/80',
+  red:    'bg-rose-50/80 border-rose-200/80',
+  purple: 'bg-violet-50/80 border-violet-200/80',
+  pink:   'bg-rose-50/80 border-rose-200/80',
+  teal:   'bg-teal-50/80 border-teal-200/80',
 };
 
 const ACCENT_TEXT: Record<string, string> = {
-  blue:   'text-blue-700',
-  green:  'text-green-700',
-  yellow: 'text-yellow-700',
-  orange: 'text-orange-700',
-  red:    'text-red-700',
-  purple: 'text-purple-700',
-  pink:   'text-pink-700',
-  teal:   'text-teal-700',
+  blue:   'text-gray-800',
+  green:  'text-gray-800',
+  yellow: 'text-gray-800',
+  orange: 'text-gray-800',
+  red:    'text-gray-800',
+  purple: 'text-gray-800',
+  pink:   'text-gray-800',
+  teal:   'text-gray-800',
+};
+
+/** Full-area placeholder thumbnail (light tint + graph icon — no badge borders) */
+const ACCENT_THUMB_PLACEHOLDER_BG: Record<string, string> = {
+  blue:   'bg-sky-50',
+  green:  'bg-emerald-50',
+  yellow: 'bg-amber-50',
+  orange: 'bg-orange-50',
+  red:    'bg-rose-50',
+  purple: 'bg-violet-50',
+  pink:   'bg-fuchsia-50',
+  teal:   'bg-teal-50',
+};
+
+const ACCENT_THUMB_ICON: Record<string, string> = {
+  blue:   'text-sky-400/60',
+  green:  'text-emerald-400/58',
+  yellow: 'text-amber-400/65',
+  orange: 'text-orange-400/58',
+  red:    'text-rose-400/58',
+  purple: 'text-violet-400/55',
+  pink:   'text-fuchsia-400/55',
+  teal:   'text-teal-400/58',
 };
 
 // ---------------------------------------------------------------------------
@@ -41,8 +64,12 @@ const ACCENT_TEXT: Record<string, string> = {
 
 function BundleCard({ item }: { item: BundleWithScenarios }) {
   const { bundle, scenarios, thumbnailUrl } = item;
-  const accentBg = ACCENT_BG[bundle.accentColor] ?? 'bg-gray-100 border-gray-400';
-  const accentText = ACCENT_TEXT[bundle.accentColor] ?? 'text-gray-700';
+  const accentBg = ACCENT_BG[bundle.accentColor] ?? 'bg-muted border-border';
+  const accentText = ACCENT_TEXT[bundle.accentColor] ?? 'text-gray-800';
+  const thumbPlaceholderBg =
+    ACCENT_THUMB_PLACEHOLDER_BG[bundle.accentColor] ?? 'bg-slate-50';
+  const thumbPlaceholderIcon =
+    ACCENT_THUMB_ICON[bundle.accentColor] ?? 'text-slate-400/55';
 
   return (
     <Link
@@ -62,8 +89,15 @@ function BundleCard({ item }: { item: BundleWithScenarios }) {
             />
           </div>
         ) : (
-          <div className={`h-full w-full flex items-center justify-center ${accentBg}`}>
-            <span className={`text-4xl font-black ${accentText}`}>?</span>
+          <div
+            className={`h-full w-full flex items-center justify-center ${thumbPlaceholderBg}`}
+            aria-hidden
+          >
+            <LineChart
+              className={`h-[22%] w-[22%] min-h-[52px] min-w-[52px] max-h-[92px] max-w-[92px] ${thumbPlaceholderIcon} transition-transform duration-300 group-hover:scale-105`}
+              strokeWidth={1.5}
+              aria-hidden
+            />
           </div>
         )}
       </div>
@@ -121,7 +155,7 @@ export function GraphGymDashboard({ onSelectScenario: _onSelectScenario }: Graph
   );
 
   const unitsWithTitles = useMemo(() => {
-    const units = currentCourse === 'macro' ? macroUnits : microUnits;
+    const units = unitsForCourseSubject(currentCourse);
     return unitNumbers
       .map((num) => units.find((u) => u.number === num))
       .filter(Boolean) as Array<{ number: number; title: string }>;
@@ -133,7 +167,9 @@ export function GraphGymDashboard({ onSelectScenario: _onSelectScenario }: Graph
   };
 
   const featuredBundles = useMemo(() => {
-    const ids = FEATURED_IDS[currentCourse];
+    const econ = econCourseFromSubject(currentCourse);
+    if (!econ) return [];
+    const ids = FEATURED_IDS[econ];
     return ids.map((id) => bundles.find((b) => b.bundle.id === id)).filter(Boolean) as BundleWithScenarios[];
   }, [bundles, currentCourse]);
 
@@ -248,8 +284,8 @@ export function GraphGymDashboard({ onSelectScenario: _onSelectScenario }: Graph
                         'Quantity of loanable funds increases',
                         'Axes are labeled correctly',
                       ].map((text, i) => (
-                        <div key={i} className="flex items-start gap-1.5 p-1.5 rounded-md border-2 border-black bg-green-50">
-                          <CheckCircle2 className="w-3 h-3 text-green-600 flex-shrink-0 mt-0.5" />
+                        <div key={i} className="flex items-start gap-1.5 p-1.5 rounded-md border-2 border-black bg-muted">
+                          <CheckCircle2 className="w-3 h-3 text-gray-700 flex-shrink-0 mt-0.5" />
                           <span className="text-[10px] font-semibold text-black leading-snug">{text}</span>
                         </div>
                       ))}

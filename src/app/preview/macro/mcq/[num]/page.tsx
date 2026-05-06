@@ -20,7 +20,7 @@ export default function MacroMCQPreview({ params }: { params: Promise<{ num: str
         questionBank={macroSetOneQuestions}
         examType="macro"
         questionType="mcq"
-        examNumber={`preview/macro/mcq/${num}`}
+        examNumber={`full-macro-mcq-${num}`}
         isUnitTest={true}
       />
     </div>

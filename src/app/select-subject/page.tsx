@@ -6,12 +6,13 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import { doc, writeBatch, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Loader2, Check } from 'lucide-react';
-import { macroUnits, microUnits } from '@/data/cheatSheets';
+import type { CourseSubject } from '@/lib/courseSubject';
+import { unitXpDocumentId, unitsForCourseSubject } from '@/lib/courseSubject';
 
 export default function SelectSubjectPage() {
   const { user, loading: authLoading } = useAuthContext();
   const router = useRouter();
-  const [selectedSubjects, setSelectedSubjects] = useState<Set<'macro' | 'micro'>>(new Set());
+  const [selectedSubjects, setSelectedSubjects] = useState<Set<CourseSubject>>(new Set());
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [showVerificationMessage, setShowVerificationMessage] = useState(false);
@@ -30,7 +31,7 @@ export default function SelectSubjectPage() {
     }
   }, [user]);
 
-  const handleSubjectToggle = (subject: 'macro' | 'micro') => {
+  const handleSubjectToggle = (subject: CourseSubject) => {
     setSelectedSubjects(prev => {
       const newSet = new Set(prev);
       if (newSet.has(subject)) {
@@ -70,11 +71,10 @@ export default function SelectSubjectPage() {
       const initialBaseXP = 25; // Start everyone at 25 XP
 
       subjects.forEach(subject => {
-        const unitsToInitialize = subject === 'macro' ? macroUnits : microUnits;
+        const unitsToInitialize = unitsForCourseSubject(subject);
         unitsToInitialize.forEach(unit => {
           const unitIdStr = unit.number.toString();
-          // The path now needs to be unique for each subject's unit
-          const unitXPRef = doc(db, 'users', user.uid, 'unitXP', `${subject}_${unitIdStr}`);
+          const unitXPRef = doc(db, 'users', user.uid, 'unitXP', unitXpDocumentId(subject, unit.number));
           batch.set(unitXPRef, {
             subject: subject,
             unit: unit.number,
@@ -115,7 +115,7 @@ export default function SelectSubjectPage() {
             Choose Your Focus
           </h2>
           <p className="text-center text-gray-600">
-            Select the AP subject(s) you'll be studying. You can choose both!
+            Select the AP subject(s) you&apos;ll be studying. You can choose more than one.
           </p>
         </div>
 
@@ -129,7 +129,7 @@ export default function SelectSubjectPage() {
               </div>
               <div className="ml-3">
                 <p className="text-sm text-blue-700">
-                  <strong>Welcome!</strong> We've sent a verification email to <strong>{user.email}</strong>. 
+                  <strong>Welcome!</strong> We&apos;ve sent a verification email to <strong>{user.email}</strong>. 
                   Please check your inbox and verify your email address to ensure you receive important updates.
                 </p>
               </div>
@@ -186,6 +186,27 @@ export default function SelectSubjectPage() {
               <span className="block text-sm text-gray-500">Study of individual and firm decisions.</span>
             </div>
           </label>
+          <label 
+            htmlFor="gov-checkbox"
+            className={`flex items-center p-4 border rounded-md cursor-pointer transition-colors ${selectedSubjects.has('gov') ? 'border-violet-500 ring-2 ring-violet-200 bg-violet-50' : 'border-gray-300 hover:border-gray-400'}`}
+          >
+            <div className={`w-6 h-6 flex-shrink-0 border-2 rounded flex items-center justify-center mr-4 ${selectedSubjects.has('gov') ? 'bg-violet-600 border-violet-600' : 'border-gray-400 bg-white'}`}>
+              {selectedSubjects.has('gov') && <Check className="w-4 h-4 text-white stroke-[3]" />}
+            </div>
+            <input
+              type="checkbox"
+              id="gov-checkbox"
+              name="subject"
+              value="gov"
+              checked={selectedSubjects.has('gov')}
+              onChange={() => handleSubjectToggle('gov')}
+              className="absolute opacity-0 w-0 h-0"
+            />
+            <div className="ml-3">
+              <span className="block text-base font-semibold text-gray-900">AP United States Government and Politics</span>
+              <span className="block text-sm text-gray-500">Foundations, institutions, and political behavior.</span>
+            </div>
+          </label>
         </div>
 
         <div>
@@ -202,4 +223,4 @@ export default function SelectSubjectPage() {
       </div>
     </div>
   );
-} 
+}

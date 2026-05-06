@@ -12,6 +12,8 @@ import { getBeltProgress } from '@/lib/beltSystem';
 import { motion } from 'framer-motion';
 import { SubjectToggle } from '@/components/dashboard/SubjectToggle';
 import { hasValidSeasonPass, getPracticeTestsUrl } from '@/lib/utils';
+import type { CourseSubject } from '@/lib/courseSubject';
+import { isCourseSubject } from '@/lib/courseSubject';
 
 export function Header() {
   const { user, logout, selectedSubject, setSelectedSubject, totalXP, guestXp, isCharacterClosetOpen, setIsCharacterClosetOpen, userData } = useAuthContext();
@@ -33,9 +35,9 @@ export function Header() {
 
   // If on unit MCQ practice page, use subject from URL, otherwise use context
   // Use 'macro' as default until mounted to match server render
-  const displaySubject = pathname === '/unitMCQPracticePage' 
-    ? (searchParams.get('subject') === 'macro' || searchParams.get('subject') === 'micro' 
-        ? searchParams.get('subject') as 'macro' | 'micro'
+  const displaySubject: CourseSubject = pathname === '/unitMCQPracticePage' 
+    ? (isCourseSubject(searchParams.get('subject'))
+        ? (searchParams.get('subject') as CourseSubject)
         : (mounted ? selectedSubject : 'macro'))
     : (mounted ? selectedSubject : 'macro');
 
@@ -50,7 +52,7 @@ export function Header() {
     setIsMobileMenuOpen(false);
   };
 
-  const handleSubjectChange = async (newSubject: 'macro' | 'micro') => {
+  const handleSubjectChange = async (newSubject: CourseSubject) => {
     // Update the subject in context (this will update localStorage for guests)
     await setSelectedSubject(newSubject);
     
@@ -59,8 +61,8 @@ export function Header() {
     // if we're on a subject-specific page
     if (!user) {
       // If on a subject-specific route, navigate to the equivalent page for the new subject
-      if (pathname.includes('macro') || pathname.includes('micro')) {
-        const newPath = pathname.replace(/macro|micro/g, newSubject);
+      if (pathname.includes('macro') || pathname.includes('micro') || pathname.includes('gov')) {
+        const newPath = pathname.replace(/macro|micro|gov/g, newSubject);
         if (newPath !== pathname) {
           router.push(newPath);
           return;
@@ -215,6 +217,13 @@ export function Header() {
                 className="text-lg text-gray-700 hover:text-blue-600 transition-colors font-bold"
               >
                 Graphing Practice
+              </Link>
+
+              <Link
+                href={getPracticeTestsUrl('gov')}
+                className="text-lg text-gray-700 hover:text-violet-600 transition-colors font-bold"
+              >
+                AP Gov Practice
               </Link>
 
               {/* Cheat Sheets */}
@@ -505,6 +514,13 @@ export function Header() {
                 className="px-4 py-4 text-xl font-bold text-gray-800 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors"
               >
                 Full Practice Tests
+              </Link>
+              <Link
+                href={getPracticeTestsUrl('gov')}
+                onClick={closeMobileMenu}
+                className="px-4 py-4 text-xl font-bold text-gray-800 hover:text-violet-600 hover:bg-violet-50 rounded-xl transition-colors"
+              >
+                AP Gov Practice
               </Link>
 
               <div className="my-3 border-t border-gray-100" />

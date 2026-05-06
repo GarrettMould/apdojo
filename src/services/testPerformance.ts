@@ -1,9 +1,10 @@
 import { db } from '@/lib/firebase';
 import { doc, setDoc, getDoc, collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import type { CourseSubject } from '@/lib/courseSubject';
 
 export interface TestPerformance {
   userId: string;
-  examType: 'macro' | 'micro';
+  examType: CourseSubject;
   examNumber: string;
   timestamp: number;
   totalQuestions: number;
@@ -59,7 +60,7 @@ export const testPerformanceService = {
   },
 
   // Get user's performance for a specific exam type
-  async getUserExamTypePerformances(userId: string, examType: 'macro' | 'micro'): Promise<TestPerformance[]> {
+  async getUserExamTypePerformances(userId: string, examType: CourseSubject): Promise<TestPerformance[]> {
     try {
       const q = query(
         collection(db, 'testPerformances'),

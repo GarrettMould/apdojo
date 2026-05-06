@@ -204,7 +204,7 @@ export function EmbeddedGraphGym({ scenarioId, prompt, subject }: EmbeddedGraphG
                             onClick={() => handleChecklistToggle(item.id)}
                             className={`w-full text-left p-2 rounded-lg border-2 border-black transition-all ${
                               isChecked
-                                ? 'bg-green-100 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                                ? 'bg-muted shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
                                 : 'bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5'
                             }`}
                           >

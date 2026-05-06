@@ -2,17 +2,16 @@
 
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useAuthContext } from './AuthContext';
-
-type Course = 'macro' | 'micro';
+import type { CourseSubject } from '@/lib/courseSubject';
 
 interface CourseContextValue {
-  currentCourse: Course;
-  switchCourse: (course: Course) => void;
+  currentCourse: CourseSubject;
+  switchCourse: (course: CourseSubject) => void;
 }
 
 const CourseContext = createContext<CourseContextValue | null>(null);
 
-function CourseProvider({ children, initialSubject }: { children: ReactNode; initialSubject?: Course }) {
+function CourseProvider({ children, initialSubject }: { children: ReactNode; initialSubject?: CourseSubject }) {
   const { selectedSubject, setSelectedSubject } = useAuthContext();
 
   // Use initialSubject if provided, otherwise use selectedSubject from AuthContext
@@ -20,7 +19,7 @@ function CourseProvider({ children, initialSubject }: { children: ReactNode; ini
 
   // Sync CourseContext with useAuth's selectedSubject
   // This maintains backward compatibility for components using CourseContext
-  const switchCourse = (course: Course) => {
+  const switchCourse = (course: CourseSubject) => {
     setSelectedSubject(course);
   };
 
@@ -42,14 +41,34 @@ function useCourseContext(): CourseContextValue {
 // Theme helper hook
 function useCourseTheme() {
   const { currentCourse } = useCourseContext();
-  
+
+  if (currentCourse === 'macro') {
+    return {
+      theme: 'blue' as const,
+      primary: 'bg-blue-600',
+      text: 'text-blue-600',
+      border: 'border-blue-600',
+      lightBg: 'bg-blue-50',
+      hoverBorder: 'hover:border-blue-600',
+    };
+  }
+  if (currentCourse === 'micro') {
+    return {
+      theme: 'green' as const,
+      primary: 'bg-green-600',
+      text: 'text-green-600',
+      border: 'border-green-600',
+      lightBg: 'bg-green-50',
+      hoverBorder: 'hover:border-green-600',
+    };
+  }
   return {
-    theme: currentCourse === 'macro' ? 'blue' : 'green',
-    primary: currentCourse === 'macro' ? 'bg-blue-600' : 'bg-green-600',
-    text: currentCourse === 'macro' ? 'text-blue-600' : 'text-green-600',
-    border: currentCourse === 'macro' ? 'border-blue-600' : 'border-green-600',
-    lightBg: currentCourse === 'macro' ? 'bg-blue-50' : 'bg-green-50',
-    hoverBorder: currentCourse === 'macro' ? 'hover:border-blue-600' : 'hover:border-green-600',
+    theme: 'violet' as const,
+    primary: 'bg-violet-600',
+    text: 'text-violet-600',
+    border: 'border-violet-600',
+    lightBg: 'bg-violet-50',
+    hoverBorder: 'hover:border-violet-600',
   };
 }
 

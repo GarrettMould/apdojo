@@ -18,6 +18,7 @@ import { hasValidSeasonPass, getUnitMCQTestUrl } from '@/lib/utils';
 import { loadTestProgress } from '@/lib/testProgress';
 import { blogPosts, type BlogPost } from '@/data/blogPosts';
 import { generateSeoUrl } from '@/utils/blogUrls';
+import { apEconomicsTagFromCourse, econCourseFromSubject } from '@/lib/courseSubject';
 
 // Container animation variants (LITE - very subtle)
 const containerVariants = {
@@ -74,7 +75,7 @@ export function DojoDashboard() {
   const hasCourseAccess = useMemo(() => {
     if (!user || !userData) return false;
     // Check if user has valid season pass for the current course
-    if (hasValidSeasonPass(userData, currentCourse as 'macro' | 'micro')) return true;
+    if (hasValidSeasonPass(userData, currentCourse)) return true;
     // Check if user has purchased units (for now, assume any purchase = access)
     const purchasedTests = userData.purchasedTests as string[] | undefined;
     if (purchasedTests && purchasedTests.length > 0) return true;
@@ -203,19 +204,18 @@ export function DojoDashboard() {
 
           // 1. Get quiz history (already have this, but need to format for activity feed)
           if (quizHistory.length > 0) {
-            quizHistory.forEach(entry => {
+                quizHistory.forEach(entry => {
               if (entry.totalQuestions > 0) { // At least one question answered
-                // Filter by subject: check if any question matches current course
-                const subjectMatch = entry.questions?.some(q => {
-                  const questionSubject = q.subject;
-                  if (Array.isArray(questionSubject)) {
-                    return questionSubject.includes(currentCourse);
-                  }
-                  // Map 'ap_macroeconomics' to 'macro' and 'ap_microeconomics' to 'micro'
-                  if (questionSubject === 'ap_macroeconomics' && currentCourse === 'macro') return true;
-                  if (questionSubject === 'ap_microeconomics' && currentCourse === 'micro') return true;
-                  return questionSubject === currentCourse;
-                });
+                const apTag = apEconomicsTagFromCourse(currentCourse);
+                const subjectMatch = apTag
+                  ? entry.questions?.some(q => {
+                      const questionSubject = q.subject;
+                      if (Array.isArray(questionSubject)) {
+                        return questionSubject.includes(apTag);
+                      }
+                      return questionSubject === apTag;
+                    })
+                  : false;
                 
                 if (subjectMatch) {
                   activities.push({
@@ -417,17 +417,20 @@ export function DojoDashboard() {
   }, [user, quizHistory, drillProgress, loadingQuizHistory, loadingProgress, currentCourse]);
 
   // Filter dojo drills by course
-  const subjectFilter = currentCourse === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics';
-  const filteredDrills = Object.values(dojoDrills).filter(
-    (drill) => drillAppliesToSubject(drill, subjectFilter)
-  );
+  const subjectFilter = apEconomicsTagFromCourse(currentCourse);
+  const filteredDrills = subjectFilter
+    ? Object.values(dojoDrills).filter((drill) => drillAppliesToSubject(drill, subjectFilter))
+    : [];
 
   // Filter FRQ exams by course
-  const filteredFRQs = frqExams.filter((exam) =>
-    exam.questions.some((q) =>
-      Array.isArray(q.subject) ? q.subject.includes(currentCourse) : q.subject === currentCourse
-    )
-  );
+  const econCourse = econCourseFromSubject(currentCourse);
+  const filteredFRQs = econCourse
+    ? frqExams.filter((exam) =>
+        exam.questions.some((q) =>
+          Array.isArray(q.subject) ? q.subject.includes(econCourse) : q.subject === econCourse
+        )
+      )
+    : [];
 
   // Get unique FRQ questions (flattened from exams)
   const allFRQQuestions = filteredFRQs.flatMap((exam) =>
@@ -486,7 +489,7 @@ export function DojoDashboard() {
       title: `Unit ${unit.number} Test`,
       description: unit.title,
       unitNumber: unit.number,
-      href: getUnitMCQTestUrl(unit.number, currentCourse as 'macro' | 'micro'),
+      href: getUnitMCQTestUrl(unit.number, currentCourse),
       isLocked: isUnitLocked(unit.number),
     }));
   }, [currentCourse, hasCourseAccess]);
@@ -567,12 +570,12 @@ export function DojoDashboard() {
           transition={{ duration: 0.3 }}
           className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between"
         >
-          <div>
+                        <div>
             <h1 className="text-4xl sm:text-5xl font-black text-gray-900 mb-2">Your Library</h1>
             <p className="text-lg text-gray-600 font-medium">Continue learning with your saved content</p>
-          </div>
+                        </div>
           <div className="hidden md:block shrink-0">
-            <CourseToggle activeTab={selectedSubject} onToggle={setSelectedSubject} />
+                    <CourseToggle activeTab={selectedSubject} onToggle={setSelectedSubject} />
           </div>
         </motion.div>
 
@@ -588,7 +591,7 @@ export function DojoDashboard() {
           >
           {/* Economics Explained — blog posts for current course */}
           {displayedBlogPosts.length > 0 && (
-            <motion.section variants={itemVariants}>
+          <motion.section variants={itemVariants}>
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-black text-gray-900 uppercase tracking-wide">Economics Explained</h2>
                 <Link
@@ -597,38 +600,38 @@ export function DojoDashboard() {
                 >
                   See all
                   <ChevronRight className="w-4 h-4" />
-                </Link>
+              </Link>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {displayedBlogPosts.map((post) => (
-                  <motion.div
+                <motion.div
                     key={post.slug}
-                    variants={cardHoverVariants}
-                    initial="rest"
-                    whileHover="hover"
+                  variants={cardHoverVariants}
+                  initial="rest"
+                  whileHover="hover"
                     className="group"
                   >
                     <Link href={`/blog/${generateSeoUrl(post.slug, post.subject, post.unit)}`}>
-                      <motion.div
-                        variants={cardHoverVariants}
-                        initial="rest"
-                        whileHover="hover"
+                <motion.div
+                  variants={cardHoverVariants}
+                  initial="rest"
+                  whileHover="hover"
                         className="bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-1 overflow-hidden text-left transition-all flex flex-col h-full"
-                      >
+                >
                         <div className="relative w-full aspect-[16/10] border-b-2 border-gray-300 bg-gray-100">
-                          <Image
+                      <Image
                             src={post.thumbnailUrl}
                             alt={post.title}
                             fill
                             className="object-cover"
                             sizes="(max-width: 768px) 100vw, 25vw"
-                          />
-                        </div>
+                      />
+                      </div>
                         <div className="p-6 flex flex-col flex-1">
                           <div className="flex items-center gap-3 mb-4">
                             <div className="w-10 h-10 rounded-xl bg-gray-100 border-2 border-gray-300 flex items-center justify-center flex-shrink-0">
                               <BookOpen className="w-5 h-5 text-gray-700" />
-                            </div>
+                    </div>
                             <div className="flex flex-col gap-1">
                               <span className="text-xs font-medium text-gray-500">Unit {post.unit.toString().padStart(2, '0')}</span>
                               <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Article</span>
@@ -636,13 +639,13 @@ export function DojoDashboard() {
                           </div>
                           <h3 className="text-xl font-black text-gray-900 mb-2 line-clamp-2">{post.title}</h3>
                           <p className="text-sm text-gray-500 line-clamp-2 mt-auto">{post.description}</p>
-                        </div>
-                      </motion.div>
-                    </Link>
+                  </div>
+                </motion.div>
+              </Link>
                   </motion.div>
                 ))}
-              </div>
-            </motion.section>
+            </div>
+          </motion.section>
           )}
 
           {/* FRQ Practice Row */}
@@ -660,65 +663,65 @@ export function DojoDashboard() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {displayedFRQs.map((frq, index) => (
-                  <motion.div
+                    <motion.div
                     key={frq.id || index}
-                    variants={cardHoverVariants}
-                    initial="rest"
-                    whileHover="hover"
-                    className="group"
-                  >
+                      variants={cardHoverVariants}
+                      initial="rest"
+                      whileHover="hover"
+                      className="group"
+                    >
                     <Link href={`/unitFRQpracticePage?frqId=${frq.id}`}>
-                      <motion.div
-                        variants={cardHoverVariants}
-                        initial="rest"
-                        whileHover="hover"
+                        <motion.div
+                          variants={cardHoverVariants}
+                          initial="rest"
+                          whileHover="hover"
                         className="bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:shadow-md p-6 text-left transition-all flex flex-col h-full overflow-hidden"
-                      >
-                        {/* Header: Icon, XP, Activity Type */}
-                        <div className="flex items-start justify-between mb-4">
-                          <div className="flex items-center gap-3">
+                        >
+                          {/* Header: Icon, XP, Activity Type */}
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl bg-gray-100 border-2 border-gray-300 flex items-center justify-center flex-shrink-0">
-                              <Image
-                                src="/images/pencilFinal.svg"
-                                alt="FRQ"
-                                width={20}
-                                height={20}
-                                className="w-5 h-5"
-                              />
-                            </div>
-                            <div className="flex flex-col gap-1">
+                                  <Image
+                                    src="/images/pencilFinal.svg"
+                                    alt="FRQ"
+                                    width={20}
+                                    height={20}
+                                    className="w-5 h-5"
+                                  />
+                              </div>
+                              <div className="flex flex-col gap-1">
                               {frq.unit && (
                                 <span className="text-xs font-medium text-gray-500">Unit {frq.unit.toString().padStart(2, '0')}</span>
-                              )}
+                                )}
                               <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">FRQ</span>
+                              </div>
                             </div>
-                          </div>
                           {frq.totalPoints && (
-                            <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
+                              <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
                               <span>{(frq.totalPoints * 100).toLocaleString()}</span>
-                              <Image
-                                src="/images/flame100.png"
-                                alt="XP"
-                                width={16}
-                                height={16}
-                                className="w-4 h-4"
-                              />
-                            </div>
-                          )}
-                        </div>
-                        
-                        {/* Title */}
+                                <Image
+                                  src="/images/flame100.png"
+                                  alt="XP"
+                                  width={16}
+                                  height={16}
+                                  className="w-4 h-4"
+                                />
+                              </div>
+                            )}
+                          </div>
+                          
+                          {/* Title */}
                         <h3 className="text-xl font-black text-gray-900 mb-3 line-clamp-2">
                           {frq.title}
-                        </h3>
-                        
-                        {/* Meta */}
+                          </h3>
+                          
+                          {/* Meta */}
                         {frq.unit && (
                           <p className="text-sm text-gray-500 mt-auto">Unit {frq.unit}</p>
                         )}
-                      </motion.div>
-                    </Link>
-                  </motion.div>
+                        </motion.div>
+                      </Link>
+                    </motion.div>
                 ))}
               </div>
             </motion.section>
@@ -730,7 +733,7 @@ export function DojoDashboard() {
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-black text-gray-900 uppercase tracking-wide">Unit Exams</h2>
                 <Link
-                  href={getUnitMCQTestUrl(1, currentCourse as 'macro' | 'micro')}
+                  href={getUnitMCQTestUrl(1, currentCourse)}
                   className="text-sm font-black text-gray-900 border-2 border-gray-300 rounded-lg px-3 py-1.5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-1"
                 >
                   See all
@@ -739,63 +742,63 @@ export function DojoDashboard() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {displayedUnitExams.map((exam) => (
-                  <motion.div
+                    <motion.div
                     key={exam.id}
-                    variants={cardHoverVariants}
-                    initial="rest"
-                    whileHover="hover"
+                      variants={cardHoverVariants}
+                      initial="rest"
+                      whileHover="hover"
                     className="group"
-                  >
+                    >
                     <Link href={exam.isLocked ? `/purchase/season-pass?courseType=${currentCourse}` : exam.href}>
-                      <motion.div
-                        variants={cardHoverVariants}
-                        initial="rest"
-                        whileHover="hover"
+                        <motion.div
+                          variants={cardHoverVariants}
+                          initial="rest"
+                          whileHover="hover"
                         className="bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-1 p-6 text-left transition-all flex flex-col h-full overflow-hidden"
-                      >
-                        {/* Header: Icon, XP, Activity Type */}
-                        <div className="flex items-start justify-between mb-4">
-                          <div className="flex items-center gap-3">
+                        >
+                          {/* Header: Icon, XP, Activity Type */}
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl bg-gray-100 border-2 border-gray-300 flex items-center justify-center flex-shrink-0">
-                              <Image
+                                <Image
                                 src="/images/exam.svg"
                                 alt="Exam"
-                                width={20}
-                                height={20}
-                                className="w-5 h-5"
-                              />
-                            </div>
-                            <div className="flex flex-col gap-1">
+                                  width={20}
+                                  height={20}
+                                  className="w-5 h-5"
+                                />
+                              </div>
+                              <div className="flex flex-col gap-1">
                               {exam.unitNumber && (
                                 <span className="text-xs font-medium text-gray-500">Unit {exam.unitNumber.toString().padStart(2, '0')}</span>
                               )}
                               <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Test</span>
+                              </div>
                             </div>
-                          </div>
-                          <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
+                              <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
                             <span>1,000</span>
-                            <Image
-                              src="/images/flame100.png"
-                              alt="XP"
-                              width={16}
-                              height={16}
-                              className="w-4 h-4"
-                            />
+                                <Image
+                                  src="/images/flame100.png"
+                                  alt="XP"
+                                  width={16}
+                                  height={16}
+                                  className="w-4 h-4"
+                                />
+                              </div>
                           </div>
-                        </div>
-                        
-                        {/* Title */}
+                          
+                          {/* Title */}
                         <h3 className="text-xl font-black line-clamp-2 mb-3 text-gray-900">
                           {exam.title}
-                        </h3>
-                        
-                        {/* Meta */}
+                          </h3>
+                          
+                          {/* Meta */}
                         <p className="text-sm line-clamp-2 mt-auto text-gray-500">{exam.description}</p>
-                      </motion.div>
-                    </Link>
-                  </motion.div>
+                        </motion.div>
+                      </Link>
+                </motion.div>
                 ))}
-              </div>
+          </div>
             </motion.section>
           )}
 
@@ -818,72 +821,72 @@ export function DojoDashboard() {
                   const inProgress = isDrillInProgress(drill.id);
                   
                   return (
-                    <motion.div
+                  <motion.div
                       key={drill.id}
-                      variants={cardHoverVariants}
-                      initial="rest"
-                      whileHover="hover"
+                    variants={cardHoverVariants}
+                    initial="rest"
+                    whileHover="hover"
                       className="group relative"
-                    >
+                  >
                       <Link href={`/dojo-drills/preview/${drill.id}`}>
-                        <motion.div
-                          variants={cardHoverVariants}
-                          initial="rest"
-                          whileHover="hover"
+                      <motion.div
+                        variants={cardHoverVariants}
+                        initial="rest"
+                        whileHover="hover"
                           className="bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-1 p-6 text-left transition-all flex flex-col h-full overflow-hidden"
-                        >
-                          {/* Header: Icon, XP, Activity Type */}
-                          <div className="flex items-start justify-between mb-4">
-                            <div className="flex items-center gap-3">
+                      >
+                        {/* Header: Icon, XP, Activity Type */}
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-xl bg-gray-100 border-2 border-gray-300 flex items-center justify-center flex-shrink-0">
-                                <Image
+                              <Image
                                   src="/images/dojoIconBold.png"
                                   alt="Drill"
-                                  width={20}
-                                  height={20}
-                                  className="w-5 h-5"
-                                />
-                              </div>
-                              <div className="flex flex-col gap-1">
-                                <span className="text-xs font-medium text-gray-500">Unit {(getDrillUnitForSubject(drill, subjectFilter) || drill.unit).toString().padStart(2, '0')}</span>
-                                <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Drill</span>
-                              </div>
+                                width={20}
+                                height={20}
+                                className="w-5 h-5"
+                              />
                             </div>
-                            {drill.xpReward.total !== undefined && (
-                              <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
-                                <span>{drill.xpReward.total.toLocaleString()}</span>
-                                <Image
-                                  src="/images/flame100.png"
-                                  alt="XP"
-                                  width={16}
-                                  height={16}
-                                  className="w-4 h-4"
-                                />
-                              </div>
-                            )}
+                            <div className="flex flex-col gap-1">
+                                <span className="text-xs font-medium text-gray-500">Unit {((subjectFilter ? getDrillUnitForSubject(drill, subjectFilter) : null) || drill.unit).toString().padStart(2, '0')}</span>
+                                <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Drill</span>
+                            </div>
                           </div>
-                          
-                          {/* Title */}
+                            {drill.xpReward.total !== undefined && (
+                            <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
+                                <span>{drill.xpReward.total.toLocaleString()}</span>
+                              <Image
+                                src="/images/flame100.png"
+                                alt="XP"
+                                width={16}
+                                height={16}
+                                className="w-4 h-4"
+                              />
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Title */}
                           <h3 className="text-xl font-black text-gray-900 mb-3 line-clamp-2">
                             {drill.title}
-                          </h3>
-                          
-                          {/* Meta */}
+                        </h3>
+                        
+                        {/* Meta */}
                           <div className="flex items-center justify-between mt-auto">
                             {inProgress && (
                               <span className="text-xs text-blue-600 font-medium">Continue</span>
-                            )}
+                        )}
                             {isCompleted && (
                               <span className="text-xs text-green-600 font-medium">Completed</span>
                             )}
                             {!inProgress && !isCompleted && <span></span>}
                           </div>
-                        </motion.div>
-                      </Link>
-                </motion.div>
+                      </motion.div>
+                    </Link>
+                  </motion.div>
               );
             })}
-          </div>
+              </div>
             </motion.section>
           )}
 
@@ -975,7 +978,7 @@ export function DojoDashboard() {
           )}
 
           {/* Quick Access */}
-          <motion.section variants={itemVariants}>
+            <motion.section variants={itemVariants}>
             <h2 className="text-2xl font-black text-gray-900 mb-6 uppercase tracking-wide">Quick Access</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {[
@@ -1038,7 +1041,7 @@ export function DojoDashboard() {
                     thumbnailType = 'exam';
                     Icon = BookOpen;
                     const unitMatch = activity.title.match(/Unit (\d+)/);
-                    href = unitMatch ? getUnitMCQTestUrl(parseInt(unitMatch[1]), currentCourse as 'macro' | 'micro') : '#';
+                    href = unitMatch ? getUnitMCQTestUrl(parseInt(unitMatch[1]), currentCourse) : '#';
                   } else if (activity.type === 'frq-exam') {
                     thumbnailType = 'exam';
                     Icon = FileText;
@@ -1052,24 +1055,24 @@ export function DojoDashboard() {
                   const unitNumber = unitMatch ? unitMatch[1] : undefined;
 
                   return (
-                    <motion.div
+                  <motion.div
                       key={activity.id}
-                      variants={cardHoverVariants}
-                      initial="rest"
-                      whileHover="hover"
-                      className="group"
+                    variants={cardHoverVariants}
+                    initial="rest"
+                    whileHover="hover"
+                    className="group"
                       style={{ opacity: 1, visibility: 'visible' }}
-                    >
+                  >
                       <Link href={href}>
-                        <motion.div
-                          variants={cardHoverVariants}
-                          initial="rest"
-                          whileHover="hover"
+                      <motion.div
+                        variants={cardHoverVariants}
+                        initial="rest"
+                        whileHover="hover"
                           className="bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-1 p-6 text-left transition-all flex flex-col h-full overflow-hidden"
-                        >
-                          {/* Header: Icon, XP, Activity Type */}
-                          <div className="flex items-start justify-between mb-4">
-                            <div className="flex items-center gap-3">
+                      >
+                        {/* Header: Icon, XP, Activity Type */}
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-xl bg-gray-100 border-2 border-gray-300 flex items-center justify-center flex-shrink-0">
                                 {activity.type === 'dojo-drill' ? (
                                   <Image
@@ -1088,46 +1091,46 @@ export function DojoDashboard() {
                                     className="w-5 h-5"
                                   />
                                 ) : activity.type === 'unit-exam' || activity.type === 'full-exam' ? (
-                                  <Image
-                                    src="/images/exam.svg"
-                                    alt="Exam"
-                                    width={20}
-                                    height={20}
-                                    className="w-5 h-5"
-                                  />
+                              <Image
+                                src="/images/exam.svg"
+                                alt="Exam"
+                                width={20}
+                                height={20}
+                                className="w-5 h-5"
+                              />
                                 ) : (
                                   <Icon className="w-5 h-5 text-gray-700" />
                                 )}
-                              </div>
-                              <div className="flex flex-col gap-1">
+                            </div>
+                            <div className="flex flex-col gap-1">
                                 {unitNumber && (
                                   <span className="text-xs font-medium text-gray-500">Unit {unitNumber}</span>
-                                )}
+                              )}
                                 <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
                                   {activity.type === 'dojo-drill' ? 'Drill' : activity.type === 'full-exam' ? 'Exam' : activity.type === 'unit-exam' ? 'Test' : activity.type === 'frq-exam' ? 'FRQ' : 'Quiz'}
                                 </span>
-                              </div>
                             </div>
-                            {activity.xpReward !== undefined && (
-                              <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
-                                <span>{activity.xpReward.toLocaleString()}</span>
-                                <Image
-                                  src="/images/flame100.png"
-                                  alt="XP"
-                                  width={16}
-                                  height={16}
-                                  className="w-4 h-4"
-                                />
-                              </div>
-                            )}
                           </div>
-                          
-                          {/* Title */}
+                            {activity.xpReward !== undefined && (
+                          <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
+                                <span>{activity.xpReward.toLocaleString()}</span>
+                            <Image
+                              src="/images/flame100.png"
+                              alt="XP"
+                              width={16}
+                              height={16}
+                              className="w-4 h-4"
+                            />
+                          </div>
+                            )}
+                        </div>
+                        
+                        {/* Title */}
                           <h3 className="text-xl font-black text-gray-900 mb-3 line-clamp-2">
                             {activity.title}
-                          </h3>
-                          
-                          {/* Meta */}
+                        </h3>
+                        
+                        {/* Meta */}
                           <div className="mt-auto space-y-2">
                             {activity.score !== undefined && (
                               <div className="flex items-center gap-2">
@@ -1176,9 +1179,9 @@ export function DojoDashboard() {
                               </Link>
                             )}
                           </div>
-                        </motion.div>
-                      </Link>
-                    </motion.div>
+                      </motion.div>
+                    </Link>
+                  </motion.div>
                   );
                 })}
               </div>

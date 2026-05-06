@@ -6,18 +6,22 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Loader2, Check, ArrowLeft } from 'lucide-react';
-import { macroUnits, microUnits, Unit as UnitType } from '@/data/cheatSheets';
+import type { CourseSubject } from '@/lib/courseSubject';
+import { isCourseSubject, subjectOnboardingTitle, unitsForCourseSubject } from '@/lib/courseSubject';
+
+function parseSelectedSubjects(raw: unknown): CourseSubject[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.filter((s): s is CourseSubject => typeof s === 'string' && isCourseSubject(s));
+}
 
 export default function InitialUnitSelectionPage() {
   const { user, loading: authLoading } = useAuthContext();
   const router = useRouter();
   
-  // State for multi-subject flow
-  const [subjects, setSubjects] = useState<('macro' | 'micro')[]>([]);
+  const [subjects, setSubjects] = useState<CourseSubject[]>([]);
   const [currentStep, setCurrentStep] = useState(0);
 
-  // Store selected units per subject
-  const [selectedUnits, setSelectedUnits] = useState<{ [key in 'macro' | 'micro']?: Set<number> }>({});
+  const [selectedUnits, setSelectedUnits] = useState<Partial<Record<CourseSubject, Set<number>>>>({});
   
   const [pageLoading, setPageLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -43,11 +47,10 @@ export default function InitialUnitSelectionPage() {
           if (userData.hasCompletedInitialUnitSelection) {
             router.push('/');
           } else if (userData.selectedSubjects && userData.selectedSubjects.length > 0) {
-            const userSubjects = userData.selectedSubjects as ('macro' | 'micro')[];
+            const userSubjects = parseSelectedSubjects(userData.selectedSubjects);
             setSubjects(userSubjects);
 
-            // Initialize state for selected units for each subject
-            const initialSelections: { [key in 'macro' | 'micro']?: Set<number> } = {};
+            const initialSelections: Partial<Record<CourseSubject, Set<number>>> = {};
             userSubjects.forEach(s => {
               initialSelections[s] = new Set();
             });
@@ -72,13 +75,14 @@ export default function InitialUnitSelectionPage() {
   }, [user, authLoading, router]);
 
   const currentSubject = subjects[currentStep];
-  const unitsForCurrentSubject = currentSubject === 'macro' ? macroUnits : microUnits;
-  const selectedUnitsForCurrentSubject = selectedUnits[currentSubject] || new Set();
+  const unitsForCurrentSubject = currentSubject ? unitsForCourseSubject(currentSubject) : [];
+  const selectedUnitsForCurrentSubject = (currentSubject && selectedUnits[currentSubject]) || new Set<number>();
+  const minUnitsRequired = unitsForCurrentSubject.length >= 2 ? 2 : 0;
 
   const handleUnitToggle = (unitId: number) => {
     if (!currentSubject) return;
     setSelectedUnits(prev => {
-      const newSubjectUnits = new Set(prev[currentSubject]);
+      const newSubjectUnits = new Set(prev[currentSubject] ?? []);
       if (newSubjectUnits.has(unitId)) {
         newSubjectUnits.delete(unitId);
       } else {
@@ -89,8 +93,10 @@ export default function InitialUnitSelectionPage() {
   };
 
   const handleNextStep = () => {
-    if (selectedUnitsForCurrentSubject.size < 2) {
-      setError(`Please select at least two units for ${currentSubject === 'macro' ? 'AP Macroeconomics' : 'AP Microeconomics'}.`);
+    if (!currentSubject) return;
+
+    if (minUnitsRequired > 0 && selectedUnitsForCurrentSubject.size < minUnitsRequired) {
+      setError(`Please select at least two units for ${subjectOnboardingTitle(currentSubject)}.`);
       return;
     }
     setError('');
@@ -114,11 +120,11 @@ export default function InitialUnitSelectionPage() {
       setError('User not found. Please log in again.');
       return;
     }
-    // Final validation
     for (const subject of subjects) {
-        if (!selectedUnits[subject] || selectedUnits[subject]!.size < 2) {
-            setError(`Please select at least two units for each subject.`);
-            // Optionally, switch to the step with the error
+        const need = unitsForCourseSubject(subject).length >= 2 ? 2 : 0;
+        const count = selectedUnits[subject]?.size ?? 0;
+        if (need > 0 && count < need) {
+            setError(`Please select at least two units for each subject that has units available.`);
             const subjectIndex = subjects.indexOf(subject);
             if (subjectIndex !== -1) setCurrentStep(subjectIndex);
             return;
@@ -133,7 +139,7 @@ export default function InitialUnitSelectionPage() {
       
       const initialPracticeUnits: { [key: string]: number[] } = {};
       for (const subject of subjects) {
-        initialPracticeUnits[subject] = Array.from(selectedUnits[subject]!);
+        initialPracticeUnits[subject] = Array.from(selectedUnits[subject] ?? new Set());
       }
 
       await updateDoc(userDocRef, {
@@ -157,8 +163,10 @@ export default function InitialUnitSelectionPage() {
     );
   }
 
-  const subjectName = currentSubject === 'macro' ? 'AP Macroeconomics' : 'AP Microeconomics';
+  const subjectName = currentSubject ? subjectOnboardingTitle(currentSubject) : '';
   const isFinalStep = currentStep === subjects.length - 1;
+  const canProceed =
+    minUnitsRequired === 0 || selectedUnitsForCurrentSubject.size >= minUnitsRequired;
 
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -170,7 +178,9 @@ export default function InitialUnitSelectionPage() {
           <p className="text-center text-gray-600 max-w-md mx-auto">
             {subjects.length > 1 
               ? `Step ${currentStep + 1} of ${subjects.length}: Select initial units for ${subjectName}.`
-              : `Select at least two units you want to focus on for ${subjectName}.`}
+              : minUnitsRequired > 0
+                ? `Select at least two units you want to focus on for ${subjectName}.`
+                : `Continue for ${subjectName}. Unit pickers will appear here when that course&apos;s units are available.`}
           </p>
         </div>
 
@@ -180,6 +190,11 @@ export default function InitialUnitSelectionPage() {
           </div>
         )}
 
+        {unitsForCurrentSubject.length === 0 && currentSubject ? (
+          <div className="rounded-md border border-violet-200 bg-violet-50 p-4 text-center text-sm text-violet-900">
+            Unit breakdown for {subjectName} is not loaded yet. You can continue—practice units will be set up when content is available.
+          </div>
+        ) : (
         <div className="space-y-4">
           {unitsForCurrentSubject.map(unit => {
             const isSelected = selectedUnitsForCurrentSubject.has(unit.number);
@@ -206,6 +221,7 @@ export default function InitialUnitSelectionPage() {
             );
           })}
         </div>
+        )}
 
         <div className="flex gap-4 items-center">
           {currentStep > 0 && (
@@ -220,9 +236,9 @@ export default function InitialUnitSelectionPage() {
           <button
             onClick={handleNextStep}
             className={`w-full flex justify-center py-3 px-4 border border-transparent text-base font-medium rounded-md text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${ 
-              (isSubmitting || selectedUnitsForCurrentSubject.size < 2) ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
+              (isSubmitting || !canProceed) ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'
             }`}
-            disabled={isSubmitting || selectedUnitsForCurrentSubject.size < 2}
+            disabled={isSubmitting || !canProceed}
           >
             {isSubmitting ? <Loader2 className="h-5 w-5 animate-spin" /> : (isFinalStep ? 'Finish and Start Learning' : 'Next')} 
           </button>
@@ -230,4 +246,4 @@ export default function InitialUnitSelectionPage() {
       </div>
     </div>
   );
-} 
+}

@@ -28,8 +28,10 @@ export default function MacroFRQPreview({ params }: { params: Promise<{ num: str
 
   // Show the exam - accessible to everyone
   return (
-    <div className="py-8">
-      <FullExamFRQ questions={frqSetOneQuestions} />
-    </div>
+    <FullExamFRQ
+      questions={frqSetOneQuestions}
+      examType="macro"
+      backUrl="/unit-final-practice-tests?subject=ap_macroeconomics"
+    />
   );
 }

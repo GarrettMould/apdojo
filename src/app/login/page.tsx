@@ -7,6 +7,7 @@ import { sendPasswordResetEmail } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 import { ArrowRight, X } from 'lucide-react'
 import Image from 'next/image'
+import { AuthDividerOr, GoogleSignInButton } from '@/components/GoogleSignInButton'
 
 function LoginPageContent() {
   const [email, setEmail] = useState('')
@@ -16,7 +17,8 @@ function LoginPageContent() {
   const [loadingSubmit, setLoadingSubmit] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { login, user, loading: authLoading } = useAuthContext()
+  const { login, loginWithGoogle, user, loading: authLoading } = useAuthContext()
+  const [googleLoading, setGoogleLoading] = useState(false)
 
   useEffect(() => {
     const redirectParam = searchParams.get('redirect')
@@ -41,6 +43,29 @@ function LoginPageContent() {
       setError('Failed to sign in. Please check your credentials.')
     } finally {
       setLoadingSubmit(false)
+    }
+  }
+
+  const handleGoogleSignIn = async () => {
+    try {
+      setError('')
+      setGoogleLoading(true)
+      await loginWithGoogle()
+      const redirectPath = searchParams.get('redirect')
+      if (redirectPath) {
+        router.replace(redirectPath)
+      } else {
+        router.push('/')
+      }
+    } catch (err: unknown) {
+      const code = err && typeof err === 'object' && 'code' in err ? String((err as { code: string }).code) : ''
+      if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
+        setError('')
+      } else {
+        setError('Google sign-in did not complete. Please try again or use email.')
+      }
+    } finally {
+      setGoogleLoading(false)
     }
   }
 
@@ -79,9 +104,18 @@ function LoginPageContent() {
           <h2 className="text-3xl font-black text-gray-900 mb-1">
             Sign In
           </h2>
-          <p className="text-gray-600 font-medium mb-8">
+          <p className="text-gray-600 font-medium mb-6">
             Welcome back to the Dojo.
           </p>
+
+          <GoogleSignInButton
+            loading={googleLoading}
+            disabled={loadingSubmit}
+            onClick={handleGoogleSignIn}
+          >
+            Continue with Google
+          </GoogleSignInButton>
+          <AuthDividerOr className="my-6" />
 
           {resetSent && (
             <div className="mb-6 p-4 bg-green-50 border-2 border-green-600 rounded-xl text-green-700 font-semibold text-sm">
@@ -108,7 +142,7 @@ function LoginPageContent() {
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                disabled={loadingSubmit}
+                disabled={loadingSubmit || googleLoading}
               />
             </div>
 
@@ -123,14 +157,14 @@ function LoginPageContent() {
                 placeholder="Your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                disabled={loadingSubmit}
+                disabled={loadingSubmit || googleLoading}
               />
             </div>
 
             <button
               type="submit"
-              disabled={loadingSubmit}
-              className={`w-full flex items-center justify-center gap-2 py-3.5 px-6 font-black text-base text-white bg-blue-500 hover:bg-blue-600 border-2 border-blue-700 rounded-xl shadow-[0_4px_0_0_rgba(0,0,0,1)] active:translate-y-0.5 active:shadow-[0_2px_0_0_rgba(0,0,0,1)] transition-all ${loadingSubmit ? 'opacity-60 cursor-not-allowed' : ''}`}
+              disabled={loadingSubmit || googleLoading}
+              className={`w-full flex items-center justify-center gap-2 py-3.5 px-6 font-black text-base text-white bg-blue-500 hover:bg-blue-600 border-2 border-blue-700 rounded-xl shadow-[0_4px_0_0_rgba(0,0,0,1)] active:translate-y-0.5 active:shadow-[0_2px_0_0_rgba(0,0,0,1)] transition-all ${loadingSubmit || googleLoading ? 'opacity-60 cursor-not-allowed' : ''}`}
             >
               {loadingSubmit ? (
                 <>
@@ -148,7 +182,7 @@ function LoginPageContent() {
           <div className="mt-6 pt-6 border-t-2 border-gray-100 flex flex-col items-center gap-3">
             <button
               onClick={handleForgotPassword}
-              disabled={loadingSubmit}
+              disabled={loadingSubmit || googleLoading}
               className="text-sm font-bold text-gray-500 hover:text-gray-800 transition-colors"
             >
               Forgot your password?

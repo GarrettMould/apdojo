@@ -1,11 +1,21 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Button } from "@/components/ui/button";
+import React, { useState, useEffect, useRef } from 'react';
 import { DrawingPad } from '@/components/DrawingPad';
-import { Input } from "@/components/ui/input";
-import { X } from 'lucide-react';
-import { StaticImageData } from 'next/image';
+import {
+  X,
+  Pause,
+  Play,
+  Eye,
+  List,
+  ChevronUp,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import Image, { StaticImageData } from 'next/image';
+import { useRouter } from 'next/navigation';
 
 interface SubPart {
   label: string;
@@ -45,128 +55,160 @@ interface FullExamFRQProps {
     examTitle: string;
     questions: Question[];
   };
+  examType?: 'macro' | 'micro' | 'gov';
+  backUrl?: string;
 }
 
-interface ResultsViewProps {
-  questions: FullExamFRQProps['questions'];
-  textAnswers: Record<string, string>;
-  drawingAnswers: Record<string, string>;
-  onReturn: () => void;
-}
+const FRQ_TOTAL_SECONDS = 50 * 60;
 
-const isStaticImageData = (value: any): value is StaticImageData => {
-  return value && typeof value === 'object' && 'src' in value;
-};
+const FONT_SIZE_CLASSES = ['text-sm', 'text-base', 'text-lg', 'text-xl'];
+const FONT_SIZE_MAX = FONT_SIZE_CLASSES.length - 1;
 
-export function FullExamFRQ({ questions }: FullExamFRQProps) {
+export function FullExamFRQ({ questions, examType = 'macro', backUrl }: FullExamFRQProps) {
+  const router = useRouter();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [textAnswers, setTextAnswers] = useState<Record<string, string>>({});
   const [drawingAnswers, setDrawingAnswers] = useState<Record<string, string>>({});
-  const [mode, setMode] = useState<'study' | 'strict'>('study');
-  const currentQuestion = questions.questions[currentQuestionIndex];
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState<StaticImageData | null>(null);
   const [showResults, setShowResults] = useState(false);
+  const [isTimerPaused, setIsTimerPaused] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState(FRQ_TOTAL_SECONDS);
+  const [showTimer, setShowTimer] = useState(true);
+  const [questionFontSize, setQuestionFontSize] = useState(1);
+  const [savedDrawingKeys, setSavedDrawingKeys] = useState<Set<string>>(new Set());
+  const [showScratchPanel, setShowScratchPanel] = useState(false);
+  const [scratchTab, setScratchTab] = useState<'draw' | 'text'>('draw');
+  const [scratchNotes, setScratchNotes] = useState('');
+  const [scratchDrawKey, setScratchDrawKey] = useState(0);
 
-  const handleTextAnswer = (questionId: string, value: string) => {
-    setTextAnswers(prev => ({
-      ...prev,
-      [questionId]: value
-    }));
+  // Clear scratch pad on question change
+  useEffect(() => {
+    setScratchNotes('');
+    setScratchDrawKey(k => k + 1);
+  }, [currentQuestionIndex]);
+  const [showExitModal, setShowExitModal] = useState(false);
+  const [showQuestionNavigator, setShowQuestionNavigator] = useState(false);
+  const questionNavigatorRef = useRef<HTMLDivElement>(null);
+
+  const accentColor =
+    examType === 'macro' ? 'bg-blue-600' : examType === 'micro' ? 'bg-green-600' : 'bg-violet-600';
+
+  const openExitFlow = () => setShowExitModal(true);
+
+  useEffect(() => {
+    if (showResults || isTimerPaused) return;
+    const interval = setInterval(() => {
+      setTimeRemaining(prev => Math.max(0, prev - 1));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [showResults, isTimerPaused]);
+
+  useEffect(() => {
+    const handler = (event: MouseEvent) => {
+      if (
+        questionNavigatorRef.current &&
+        !questionNavigatorRef.current.contains(event.target as Node)
+      ) {
+        setShowQuestionNavigator(false);
+      }
+    };
+    if (showQuestionNavigator) {
+      document.addEventListener('mousedown', handler);
+    }
+    return () => document.removeEventListener('mousedown', handler);
+  }, [showQuestionNavigator]);
+
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
   };
 
-  const handleDrawingAnswer = (questionId: string, drawingData: string) => {
-    setDrawingAnswers(prev => ({
-      ...prev,
-      [questionId]: drawingData
-    }));
+  const handleTextAnswer = (key: string, value: string) => {
+    setTextAnswers(prev => ({ ...prev, [key]: value }));
   };
 
-  const goToNextQuestion = () => {
+  const handleDrawingAnswer = (key: string, data: string) => {
+    setDrawingAnswers(prev => ({ ...prev, [key]: data }));
+    setSavedDrawingKeys(prev => new Set(prev).add(key));
+  };
+
+  const unlockDrawing = (key: string) => {
+    setSavedDrawingKeys(prev => {
+      const next = new Set(prev);
+      next.delete(key);
+      return next;
+    });
+  };
+
+  const goToNext = () => {
     if (currentQuestionIndex < questions.questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
+      setCurrentQuestionIndex(i => i + 1);
+      window.scrollTo({ top: 0 });
     }
   };
 
-  const goToPreviousQuestion = () => {
+  const goToPrev = () => {
     if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(currentQuestionIndex - 1);
+      setCurrentQuestionIndex(i => i - 1);
+      window.scrollTo({ top: 0 });
     }
   };
 
   const handleSubmit = () => {
     setShowResults(true);
+    window.scrollTo({ top: 0 });
   };
 
-  const ResultsView = ({ questions, textAnswers, drawingAnswers, onReturn }: ResultsViewProps) => {
-    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const handleExit = () => {
+    if (backUrl) {
+      router.push(backUrl);
+    } else {
+      router.back();
+    }
+  };
+
     const currentQuestion = questions.questions[currentQuestionIndex];
+  const fontClass = FONT_SIZE_CLASSES[questionFontSize];
 
-    return (
-      <div className="w-full max-w-4xl mx-auto bg-white rounded-lg shadow-sm border">
-        <div className="p-6 border-b">
-          <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold">
-              Question {currentQuestionIndex + 1} of {questions.questions.length}
-            </h2>
-            <Button onClick={onReturn} variant="outline">
-              Return to Exam
-            </Button>
-          </div>
-        </div>
-
-        <div className="p-6">
-          {/* Question Prompt */}
-          <div className="mb-6">
-            <p className="text-lg font-medium text-gray-900">{currentQuestion.prompt}</p>
-            {currentQuestion.image && (
-              <div className="mt-4">
-                <img 
-                  src={currentQuestion.image.src}
-                  alt="Question"
-                  className="max-h-[300px] object-contain rounded-lg"
-                />
-              </div>
-            )}
-
-            {/* Table Data */}
-            {currentQuestion.tableData && (
-              <div className="my-8 flex justify-center">
+  const renderTable = (tableData: TableData) => (
+    <div className="my-6 flex justify-center">
                 <div className="flex items-center gap-4">
-                  {currentQuestion.tableData.playerNames && (
+        {tableData.playerNames && (
                     <div className="flex items-center justify-center h-full w-16">
-                      <p className="transform -rotate-90 whitespace-nowrap text-center font-bold text-lg text-gray-900 leading-tight">
-                        {currentQuestion.tableData.playerNames.row.split(' ')[0]}
+            <p className="transform -rotate-90 whitespace-nowrap text-center font-bold text-base text-gray-900 leading-tight">
+              {tableData.playerNames.row.split(' ')[0]}
                         <br />
-                        {currentQuestion.tableData.playerNames.row.split(' ').slice(1).join(' ')}
+              {tableData.playerNames.row.split(' ').slice(1).join(' ')}
                       </p>
                     </div>
                   )}
                   <div className="flex-1">
-                    {currentQuestion.tableData.playerNames && (
-                      <p className="text-center font-bold text-lg text-gray-900 mb-2">
-                        {currentQuestion.tableData.playerNames.column}
+          {tableData.playerNames && (
+            <p className="text-center font-bold text-base text-gray-900 mb-2">
+              {tableData.playerNames.column}
                       </p>
                     )}
                     <table className="min-w-full border-collapse border border-black">
                       <thead className="bg-white">
                         <tr>
-                          {currentQuestion.tableData.headers.map(header => (
-                            <th key={header} className="border border-black px-4 py-3 text-center text-base font-bold text-gray-900">
+                {tableData.headers.map(header => (
+                  <th key={header} className="border border-black px-4 py-3 text-center text-sm font-bold text-gray-900">
                               {header}
                             </th>
                           ))}
                         </tr>
                       </thead>
                       <tbody className="bg-white">
-                        {currentQuestion.tableData.rows.map((row, rowIndex) => (
+              {tableData.rows.map((row, rowIndex) => (
                           <tr key={rowIndex}>
                             {row.map((cell, cellIndex) => {
-                              const isRowHeader = currentQuestion.tableData?.rowHeaders && cellIndex === 0;
+                    const isRowHeader = tableData.rowHeaders && cellIndex === 0;
                               return (
                                 <td 
                                   key={cellIndex} 
-                                  className={`border border-black px-4 py-3 text-center text-base ${isRowHeader ? 'font-bold' : ''}`}
+                        className={`border border-black px-4 py-3 text-center text-sm ${isRowHeader ? 'font-bold' : ''}`}
                                 >
                                   {cell}
                                 </td>
@@ -179,142 +221,129 @@ export function FullExamFRQ({ questions }: FullExamFRQProps) {
                   </div>
                 </div>
               </div>
-            )}
+  );
+
+  const ResultsView = () => {
+    const [resultsIndex, setResultsIndex] = useState(0);
+    const rq = questions.questions[resultsIndex];
+    return (
+      <div className="p-8 max-w-4xl mx-auto pb-28">
+        <div className="mb-8">
+          <p className="text-xs font-black uppercase tracking-widest text-gray-400 mb-1">Results</p>
+          <h2 className={`font-bold text-gray-900 ${fontClass}`}>
+            Question {resultsIndex + 1} of {questions.questions.length}
+          </h2>
           </div>
 
-          {/* Parts and Answers */}
-          <div className="space-y-8">
-            {currentQuestion.parts.map((part, partIndex) => (
+        <p className={`font-semibold text-gray-900 mb-4 leading-relaxed whitespace-pre-line ${fontClass}`}>
+          {rq.prompt}
+        </p>
+        {rq.image && (
+          <img src={rq.image.src} alt="Question" className="max-h-[300px] object-contain mb-6 rounded" />
+        )}
+        {rq.tableData && renderTable(rq.tableData)}
+
+        <div className="space-y-8 mt-6">
+          {rq.parts.map((part, partIndex) => (
               <div key={partIndex} className="space-y-4">
                 <div className="flex gap-3">
-                  <span className="font-medium text-gray-700">{part.label})</span>
-                  <p className="text-gray-900">{part.text}</p>
+                <span className={`font-bold text-gray-700 shrink-0 ${fontClass}`}>{part.label})</span>
+                <p className={`text-gray-900 font-semibold leading-relaxed whitespace-pre-line ${fontClass}`}>
+                  {part.text}
+                </p>
+              </div>
+              {part.answerType === 'text' && (
+                <div className="ml-6">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1.5">Your response</p>
+                  <div className="p-3 bg-gray-50 rounded border border-gray-200 text-sm text-gray-800">
+                    {textAnswers[`${resultsIndex}-${part.label}`] || <span className="italic text-gray-400">No response</span>}
+                  </div>
+                  {part.answer && (
+                    <div className="mt-3">
+                      <p className="text-xs font-semibold uppercase tracking-widest text-green-600 mb-1.5">Correct answer</p>
+                      <div className="p-3 bg-green-50 rounded border border-green-200 text-sm text-gray-800">
+                        {typeof part.answer === 'string' ? part.answer : ''}
+                      </div>
+                    </div>
+                  )}
                 </div>
-
-                {/* User's Response */}
-                {part.answerType === 'text' ? (
-                  <div className="ml-8">
-                    <div className="mb-2 font-medium text-gray-600">Your Response:</div>
-                    <div className="p-3 bg-gray-50 rounded-md border border-gray-200">
-                      {textAnswers[`${currentQuestionIndex}-${part.label}`] || 'No response provided'}
+              )}
+              {part.answerType === 'draw' && (
+                <div className="ml-6 flex flex-col sm:flex-row gap-4">
+                  <div className="flex-1">
+                    <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1.5">Your response</p>
+                    <div className="h-[300px] bg-white rounded border border-gray-200">
+                      {drawingAnswers[`${resultsIndex}-${part.label}`] ? (
+                        <img src={drawingAnswers[`${resultsIndex}-${part.label}`]} alt="Your drawing" className="w-full h-full object-contain" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm italic">No drawing</div>
+                      )}
                     </div>
                   </div>
-                ) : part.answerType === 'draw' ? (
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    <div className="w-full sm:w-1/2">
-                      <div className="mb-2 font-medium text-gray-600">Your Response:</div>
-                      <div className="h-[400px] bg-white rounded-md border border-gray-200">
-                        {drawingAnswers[`${currentQuestionIndex}-${part.label}`] ? (
-                          <img 
-                            src={drawingAnswers[`${currentQuestionIndex}-${part.label}`]}
-                            alt="Your drawing"
-                            className="w-full h-full object-contain"
-                          />
+                  {part.answer && (
+                    <div className="flex-1">
+                      <p className="text-xs font-semibold uppercase tracking-widest text-green-600 mb-1.5">Correct response</p>
+                      <div className="h-[300px] bg-white rounded border border-gray-200">
+                        {typeof part.answer === 'object' ? (
+                          <img src={(part.answer as StaticImageData).src} alt="Correct" className="w-full h-full object-contain" />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-500">
-                            No drawing provided
-                          </div>
+                          <div className="p-3 text-sm">{part.answer}</div>
                         )}
                       </div>
                     </div>
-                    {part.answer && (
-                      <div className="w-full sm:w-1/2">
-                        <div className="mb-2 font-medium text-green-600">Correct Response:</div>
-                        <div className="h-[400px] bg-white rounded-md border border-gray-200">
-                          {typeof part.answer === 'object' ? (
-                            <img 
-                              src={part.answer.src}
-                              alt="Correct drawing"
-                              className="w-full h-full object-contain"
-                            />
-                          ) : (
-                            <div className="p-3">{part.answer}</div>
                           )}
                         </div>
+              )}
+              {part.subparts && (
+                <div className="ml-6 space-y-6">
+                  {part.subparts.map((subpart, si) => (
+                    <div key={si} className="space-y-3">
+                      <div className="flex gap-3">
+                        <span className={`font-bold text-gray-700 shrink-0 ${fontClass}`}>{subpart.label}.</span>
+                        <p className={`text-gray-900 font-semibold leading-relaxed whitespace-pre-line ${fontClass}`}>
+                          {subpart.text}
+                        </p>
                       </div>
-                    )}
+                      {subpart.answerType === 'text' && (
+                        <div className="ml-6">
+                          <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1.5">Your response</p>
+                          <div className="p-3 bg-gray-50 rounded border border-gray-200 text-sm text-gray-800">
+                            {textAnswers[`${resultsIndex}-${part.label}-${subpart.label}`] || <span className="italic text-gray-400">No response</span>}
                   </div>
-                ) : null}
-
-                {/* Remove the old Correct Answer section for drawing questions */}
-                {part.answerType === 'text' && part.answer && (
-                  <div className="ml-8">
-                    <div className="mb-2 font-medium text-green-600">Correct Answer:</div>
-                    <div className="p-3 bg-green-50 rounded-md border border-green-200">
-                      {typeof part.answer === 'string' ? part.answer : 'No response provided'}
+                          {subpart.answer && (
+                            <div className="mt-3">
+                              <p className="text-xs font-semibold uppercase tracking-widest text-green-600 mb-1.5">Correct answer</p>
+                              <div className="p-3 bg-green-50 rounded border border-green-200 text-sm">
+                                {typeof subpart.answer === 'string' ? subpart.answer : ''}
                     </div>
                   </div>
                 )}
-
-                {/* Subparts */}
-                {part.subparts && (
-                  <div className="ml-8 space-y-6">
-                    {part.subparts.map((subpart, subpartIndex) => (
-                      <div key={subpartIndex} className="space-y-4">
-                        <div className="flex gap-3">
-                          <span className="font-medium text-gray-700">{subpart.label}.</span>
-                          <p className="text-gray-900">{subpart.text}</p>
                         </div>
-
-                        {/* Only render response if there's an answerType */}
-                        {subpart.answerType && (
-                          <div className="ml-8">
-                            {subpart.answerType === 'text' ? (
-                              <>
-                                <div className="mb-2 font-medium text-gray-600">Your Response:</div>
-                                <div className="p-3 bg-gray-50 rounded-md border border-gray-200">
-                                  {textAnswers[`${currentQuestionIndex}-${part.label}-${subpart.label}`] || 'No response provided'}
-                                </div>
-                              </>
-                            ) : subpart.answerType === 'draw' ? (
-                              <div className="flex flex-col sm:flex-row gap-4">
-                                <div className={`w-full ${showResults ? 'sm:w-1/2' : ''}`}>
-                                  {showResults ? (
-                                    <>
-                                      <div className="mb-2 font-medium text-gray-600">Your Response:</div>
-                                      <div className="h-[400px] bg-white rounded-md border border-gray-200">
-                                        {drawingAnswers[`${currentQuestionIndex}-${part.label}-${subpart.label}`] ? (
-                                          <img 
-                                            src={drawingAnswers[`${currentQuestionIndex}-${part.label}-${subpart.label}`]}
-                                            alt="Your drawing"
-                                            className="w-full h-full object-contain"
-                                          />
-                                        ) : (
-                                          <div className="w-full h-full flex items-center justify-center text-gray-500">
-                                            No drawing provided
-                                          </div>
+                      )}
+                      {subpart.answerType === 'draw' && (
+                        <div className="ml-6 flex flex-col sm:flex-row gap-4">
+                          <div className="flex-1">
+                            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1.5">Your response</p>
+                            <div className="h-[300px] bg-white rounded border border-gray-200">
+                              {drawingAnswers[`${resultsIndex}-${part.label}-${subpart.label}`] ? (
+                                <img src={drawingAnswers[`${resultsIndex}-${part.label}-${subpart.label}`]} alt="Your drawing" className="w-full h-full object-contain" />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm italic">No drawing</div>
                                         )}
                                       </div>
-                                    </>
-                                  ) : (
-                                    <div className="h-[400px] relative border-2 border-black rounded-md overflow-hidden">
-                                      <DrawingPad
-                                        isLarge={true}
-                                        className="w-full relative"
-                                        onSave={(data) => handleDrawingAnswer(`${currentQuestionIndex}-${part.label}-${subpart.label}`, data)}
-                                        initialData={drawingAnswers[`${currentQuestionIndex}-${part.label}-${subpart.label}`]}
-                                      />
                                     </div>
-                                  )}
-                                </div>
-                                {showResults && subpart.answer && (
-                                  <div className="w-full sm:w-1/2">
-                                    <div className="mb-2 font-medium text-green-600">Correct Response:</div>
-                                    <div className="h-[400px] bg-white rounded-md border border-gray-200">
+                          {subpart.answer && (
+                            <div className="flex-1">
+                              <p className="text-xs font-semibold uppercase tracking-widest text-green-600 mb-1.5">Correct response</p>
+                              <div className="h-[300px] bg-white rounded border border-gray-200">
                                       {typeof subpart.answer === 'object' ? (
-                                        <img 
-                                          src={subpart.answer.src}
-                                          alt="Correct drawing"
-                                          className="w-full h-full object-contain"
-                                        />
-                                      ) : (
-                                        <div className="p-3">{subpart.answer}</div>
+                                  <img src={(subpart.answer as StaticImageData).src} alt="Correct" className="w-full h-full object-contain" />
+                                ) : (
+                                  <div className="p-3 text-sm">{subpart.answer}</div>
                                       )}
                                     </div>
                                   </div>
                                 )}
-                              </div>
-                            ) : null}
                           </div>
                         )}
                       </div>
@@ -323,30 +352,36 @@ export function FullExamFRQ({ questions }: FullExamFRQProps) {
                 )}
               </div>
             ))}
-          </div>
         </div>
 
-        {/* Navigation Buttons */}
-        <div className="p-6 border-t bg-white">
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-2">
-            <div className="flex flex-col sm:flex-row gap-4 sm:gap-2 w-full sm:w-auto">
-              <Button
-                onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
-                disabled={currentQuestionIndex === 0}
-                variant="outline"
-                className="w-full sm:w-28"
+        {/* Results navigation */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
+          <div className="max-w-4xl mx-auto px-6 py-3 flex items-center justify-between gap-4">
+            <button
+              onClick={() => { setResultsIndex(i => Math.max(0, i - 1)); window.scrollTo({ top: 0 }); }}
+              disabled={resultsIndex === 0}
+              className="flex items-center gap-1.5 px-4 py-2.5 rounded font-semibold text-sm border border-gray-300 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-gray-700"
+            >
+              <ChevronLeft className="w-4 h-4" /> Previous
+            </button>
+            <span className="text-sm font-medium text-gray-500">
+              Question {resultsIndex + 1} of {questions.questions.length}
+            </span>
+            {resultsIndex < questions.questions.length - 1 ? (
+              <button
+                onClick={() => { setResultsIndex(i => i + 1); window.scrollTo({ top: 0 }); }}
+                className="flex items-center gap-1.5 px-4 py-2.5 rounded font-semibold text-sm border border-gray-300 hover:bg-gray-50 transition-colors text-gray-700"
               >
-                Previous
-              </Button>
-              <Button
-                onClick={() => setCurrentQuestionIndex(prev => Math.min(questions.questions.length - 1, prev + 1))}
-                disabled={currentQuestionIndex === questions.questions.length - 1}
-                variant="outline"
-                className="w-full sm:w-28"
+                Next <ChevronRight className="w-4 h-4" />
+              </button>
+            ) : (
+              <button
+                onClick={() => { setShowResults(false); setCurrentQuestionIndex(0); window.scrollTo({ top: 0 }); }}
+                className={`flex items-center gap-1.5 px-4 py-2.5 rounded font-semibold text-sm text-white ${accentColor} hover:opacity-90 transition-opacity`}
               >
-                Next
-              </Button>
-            </div>
+                Return to Exam
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -354,64 +389,209 @@ export function FullExamFRQ({ questions }: FullExamFRQProps) {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-6">
-    
+    <div className="min-h-screen bg-white">
 
-      {showResults ? (
-        <ResultsView
-          questions={questions}
-          textAnswers={textAnswers}
-          drawingAnswers={drawingAnswers}
-          onReturn={() => {
-            setShowResults(false);
-            setCurrentQuestionIndex(0);
-            setDrawingAnswers({});
-          }}
-        />
-      ) : (
-        <div className="bg-white rounded-lg shadow-sm border">
-          {/* Question Header */}
-          <div className="p-6 border-b">
-            <div className="flex items-center justify-between">
-              <span className="font-bold text-gray-900">
-                Question {currentQuestionIndex + 1} of {questions.questions.length}
+      {/* ── Fixed Header (matches MCQ unit test top bar) ── */}
+      {!showResults && (
+        <header className="fixed top-0 left-0 right-0 z-50 h-14 px-6 py-0 flex items-center justify-between flex-shrink-0 bg-white border-b border-gray-200">
+          {/* Left: logo — same placement as MCQ unit test */}
+          <button
+            type="button"
+            onClick={openExitFlow}
+            className="flex items-center gap-2.5 p-0.5 -m-0.5 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 text-left"
+            aria-label="Save and exit"
+            title="Save & exit"
+          >
+            <Image src="/images/dojoIconJan26.svg" alt="" width={26} height={26} unoptimized />
+            <span className="text-sm font-black text-gray-900 tracking-wide">AP Dojo</span>
+          </button>
+
+          {/* Center: section label (MCQ-style) */}
+          <span className="text-sm font-medium text-gray-500 hidden sm:block">
+            Section II – Free Response
               </span>
-              {/*<div className="flex rounded-lg border border-gray-200 p-1">
+
+          {/* Right: Save & Exit + tools — order aligned with MCQ unit test */}
+          <div className="flex items-center gap-1.5">
                 <button
-                  onClick={() => setMode('study')}
-                  className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                    mode === 'study' 
-                      ? 'bg-blue-100 text-blue-700' 
-                      : 'text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  Study Mode
+              type="button"
+              onClick={openExitFlow}
+              className="px-3 py-1.5 text-xs font-semibold border border-gray-300 rounded hover:bg-gray-50 text-gray-700 transition-colors"
+            >
+              Save & Exit
                 </button>
                 <button
-                  onClick={() => setMode('strict')}
-                  className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                    mode === 'strict' 
-                      ? 'bg-blue-100 text-blue-700' 
-                      : 'text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  Strict Mode
+              type="button"
+              onClick={() => setShowScratchPanel(p => !p)}
+              className={`px-3 py-1.5 text-xs font-semibold border rounded transition-colors ${
+                showScratchPanel
+                  ? 'border-gray-400 bg-gray-100 text-gray-900'
+                  : 'border-gray-300 hover:bg-gray-50 text-gray-700'
+              }`}
+            >
+              Scratch Paper
+            </button>
+            <div className="flex items-center border border-gray-300 rounded overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setQuestionFontSize(s => Math.max(0, s - 1))}
+                disabled={questionFontSize === 0}
+                className="px-2 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors border-r border-gray-300"
+                title="Decrease text size"
+              >
+                −
+              </button>
+              <span className="px-2 text-xs font-semibold text-gray-700 select-none">Aa</span>
+              <button
+                type="button"
+                onClick={() => setQuestionFontSize(s => Math.min(FONT_SIZE_MAX, s + 1))}
+                disabled={questionFontSize === FONT_SIZE_MAX}
+                className="px-2 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors border-l border-gray-300"
+                title="Increase text size"
+              >
+                +
                 </button>
-              </div>*/}
             </div>
+            {!isTimerPaused ? (
+              <button
+                type="button"
+                onClick={() => setIsTimerPaused(true)}
+                className="px-3 py-1.5 text-xs font-semibold border border-gray-300 rounded hover:bg-gray-50 text-gray-700 transition-colors flex items-center gap-1"
+              >
+                <Pause className="w-3 h-3" /> Pause
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setIsTimerPaused(false)}
+                className="px-3 py-1.5 text-xs font-semibold border border-gray-300 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors flex items-center gap-1"
+              >
+                <Play className="w-3 h-3" /> Resume
+              </button>
+            )}
+            {showTimer ? (
+              <button
+                type="button"
+                onClick={() => setShowTimer(false)}
+                className={`px-3 py-1.5 text-xs font-mono font-bold rounded border min-w-[72px] text-center transition-colors ${
+                  timeRemaining <= 300 && timeRemaining > 0
+                    ? 'border-red-400 text-red-600 bg-red-50'
+                    : 'border-gray-300 text-gray-900 bg-white'
+                }`}
+                title="Hide timer"
+              >
+                {formatTime(timeRemaining)}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setShowTimer(true)}
+                className="px-3 py-1.5 text-xs font-semibold border border-gray-300 rounded hover:bg-gray-50 text-gray-700 transition-colors"
+                title="Show timer"
+              >
+                <Eye className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+        </header>
+      )}
+
+      {/* ── Scratch Paper Panel ── */}
+      {!showResults && showScratchPanel && (
+        <div
+          className="fixed top-14 right-0 bg-white border-l border-gray-200 flex flex-col z-[55]"
+          style={{ width: '380px', height: 'calc(100vh - 56px)' }}
+        >
+          {/* Tab links — same voice as type pad (mono, plain text) */}
+          <div className="flex items-baseline gap-8 px-4 pt-4 pb-3 border-b border-gray-100 shrink-0 font-mono">
+            <button
+              type="button"
+              onClick={() => setScratchTab('draw')}
+              className={`text-left text-lg font-semibold tracking-tight bg-transparent border-0 p-0 cursor-pointer transition-colors ${
+                scratchTab === 'draw'
+                  ? 'text-gray-900 underline decoration-2 underline-offset-4'
+                  : 'text-gray-400 hover:text-gray-700 hover:underline decoration-1 underline-offset-4'
+              }`}
+            >
+              drawing pad
+            </button>
+            <button
+              type="button"
+              onClick={() => setScratchTab('text')}
+              className={`text-left text-lg font-semibold tracking-tight bg-transparent border-0 p-0 cursor-pointer transition-colors ${
+                scratchTab === 'text'
+                  ? 'text-gray-900 underline decoration-2 underline-offset-4'
+                  : 'text-gray-400 hover:text-gray-700 hover:underline decoration-1 underline-offset-4'
+              }`}
+            >
+              type pad
+            </button>
           </div>
 
-          {/* Question Content */}
-          <div className="p-6">
-            {/* Main Prompt */}
-            <div className="mb-6">
-              <p className="text-lg font-medium text-gray-900">{currentQuestion.prompt}</p>
+          {/* Panel body */}
+          <div className="flex-1 overflow-hidden">
+            {scratchTab === 'draw' ? (
+              <div className="w-full h-full">
+                <DrawingPad
+                  key={scratchDrawKey}
+                  isLarge={true}
+                  className="w-full h-full"
+                  hideDoneButton
+                  onSave={() => {}}
+                />
+              </div>
+            ) : (
+              <textarea
+                value={scratchNotes}
+                onChange={e => setScratchNotes(e.target.value)}
+                placeholder="Type your scratch notes here..."
+                className="w-full h-full p-4 text-base text-gray-800 resize-none outline-none font-mono leading-relaxed"
+              />
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Blur overlay when paused */}
+      {isTimerPaused && !showResults && (
+        <div className="fixed inset-0 bg-white/50 backdrop-blur-sm z-40" style={{ top: '56px' }} />
+      )}
+
+      {/* ── Main content ── */}
+      <div
+        style={{
+          marginTop: showResults ? 0 : '56px',
+          marginRight: !showResults && showScratchPanel ? '380px' : 0,
+          transition: 'margin-right 0.2s ease',
+        }}
+        className={!showResults ? 'pb-28' : undefined}
+      >
+        {showResults ? (
+          <ResultsView />
+        ) : (
+          <div className="p-8 max-w-3xl mx-auto">
+            {/* Question label */}
+            <div className="mb-6 flex items-center gap-3">
+              <span className={`font-black text-gray-900 ${fontClass}`}>
+                Question {currentQuestionIndex + 1}
+              </span>
+              <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest">
+                of {questions.questions.length}
+              </span>
+            </div>
+
+            {/* Prompt */}
+            <p className={`font-semibold text-gray-900 mb-5 leading-relaxed whitespace-pre-line ${fontClass}`}>
+              {currentQuestion.prompt}
+            </p>
+
+            {/* Image */}
               {currentQuestion.image && (
-                <div className="mt-4">
+              <div className="mb-5">
                   <img 
                     src={currentQuestion.image.src}
                     alt="Question"
-                    className="max-h-[300px] object-contain rounded-lg"
+                  className="max-h-[320px] object-contain rounded cursor-pointer"
                     onClick={() => {
                       if (currentQuestion.image) {
                         setSelectedImage(currentQuestion.image);
@@ -422,156 +602,106 @@ export function FullExamFRQ({ questions }: FullExamFRQProps) {
                 </div>
               )}
 
-              {/* Table Data */}
-              {currentQuestion.tableData && (
-                <div className="my-8 flex justify-center">
-                  <div className="flex items-center gap-4">
-                    {currentQuestion.tableData.playerNames && (
-                      <div className="flex items-center justify-center h-full w-16">
-                        <p className="transform -rotate-90 whitespace-nowrap text-center font-bold text-lg text-gray-900 leading-tight">
-                          {currentQuestion.tableData.playerNames.row.split(' ')[0]}
-                          <br />
-                          {currentQuestion.tableData.playerNames.row.split(' ').slice(1).join(' ')}
-                        </p>
-                      </div>
-                    )}
-                    <div className="flex-1">
-                      {currentQuestion.tableData.playerNames && (
-                        <p className="text-center font-bold text-lg text-gray-900 mb-2">
-                          {currentQuestion.tableData.playerNames.column}
-                        </p>
-                      )}
-                      <table className="min-w-full border-collapse border border-black">
-                        <thead className="bg-white">
-                          <tr>
-                            {currentQuestion.tableData.headers.map(header => (
-                              <th key={header} className="border border-black px-4 py-3 text-center text-base font-bold text-gray-900">
-                                {header}
-                              </th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody className="bg-white">
-                          {currentQuestion.tableData.rows.map((row, rowIndex) => (
-                            <tr key={rowIndex}>
-                              {row.map((cell, cellIndex) => {
-                                const isRowHeader = currentQuestion.tableData?.rowHeaders && cellIndex === 0;
-                                return (
-                                  <td 
-                                    key={cellIndex} 
-                                    className={`border border-black px-4 py-3 text-center text-base ${isRowHeader ? 'font-bold' : ''}`}
-                                  >
-                                    {cell}
-                                  </td>
-                                );
-                              })}
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+            {/* Table */}
+            {currentQuestion.tableData && renderTable(currentQuestion.tableData)}
 
-            {/* Parts and Subparts */}
-            <div className="space-y-6">
+            {/* Parts */}
+            <div className="space-y-8 mt-2">
               {currentQuestion.parts.map((part, partIndex) => (
                 <div key={partIndex} className="space-y-4">
                   <div className="flex gap-3">
-                    <span className="font-medium text-gray-700">{part.label})</span>
-                    <p className="text-gray-900">{part.text}</p>
+                    <span className={`font-black text-gray-700 shrink-0 ${fontClass}`}>{part.label})</span>
+                    <p className={`text-gray-900 font-semibold leading-relaxed whitespace-pre-line ${fontClass}`}>
+                      {part.text}
+                    </p>
                   </div>
 
-                  {/* Answer Section */}
-                  <div className="ml-8">
+                  <div className="ml-6">
                     {part.answerType === 'text' ? (
-                      <Input
+                      <textarea
                         placeholder="Enter your answer here..."
                         value={textAnswers[`${currentQuestionIndex}-${part.label}`] || ''}
-                        onChange={(e) => handleTextAnswer(`${currentQuestionIndex}-${part.label}`, e.target.value)}
-                        className="w-full align-top"
-                        style={{ verticalAlign: 'top' }}
+                        onChange={e => handleTextAnswer(`${currentQuestionIndex}-${part.label}`, e.target.value)}
+                        rows={4}
+                        className="w-full px-3 py-2.5 rounded border border-gray-300 focus:border-blue-400 focus:ring-1 focus:ring-blue-400 outline-none text-sm text-gray-900 resize-y transition-colors"
                       />
                     ) : part.answerType === 'draw' ? (
-                      <div className="h-[400px] relative border-2 border-black rounded-md overflow-hidden">
+                      (() => {
+                        const drawKey = `${currentQuestionIndex}-${part.label}`;
+                        const isLocked = savedDrawingKeys.has(drawKey);
+                        return (
+                          <div className="h-[400px] relative border-2 border-gray-300 rounded overflow-hidden">
                         <DrawingPad
                           isLarge={true}
                           className="w-full relative"
-                          initialData={drawingAnswers[`${currentQuestionIndex}-${part.label}`]}
-                          onSave={(data) => handleDrawingAnswer(`${currentQuestionIndex}-${part.label}`, data)}
-                        />
+                              hideDoneButton
+                              initialData={drawingAnswers[drawKey]}
+                              onSave={data => handleDrawingAnswer(drawKey, data)}
+                            />
+                            {isLocked && (
+                              <div className="absolute inset-0 bg-white/70 backdrop-blur-[2px] flex flex-col items-center justify-center gap-3 z-20">
+                                <div className="flex items-center gap-2 bg-white border border-gray-200 shadow-sm rounded-full px-4 py-2">
+                                  <svg className="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                  <span className="text-sm font-bold text-gray-700">Drawing saved</span>
+                                </div>
+                                <button onClick={() => unlockDrawing(drawKey)} className="text-xs font-semibold text-gray-400 hover:text-gray-600 underline transition-colors">
+                                  Edit drawing
+                                </button>
+                              </div>
+                            )}
                       </div>
+                        );
+                      })()
                     ) : null}
                   </div>
 
                   {/* Subparts */}
                   {part.subparts && (
-                    <div className="ml-8 space-y-4">
-                      {part.subparts.map((subpart, subpartIndex) => (
-                        <div key={subpartIndex} className="space-y-3">
+                    <div className="ml-6 space-y-6">
+                      {part.subparts.map((subpart, si) => (
+                        <div key={si} className="space-y-3">
                           <div className="flex gap-3">
-                            <span className="font-medium text-gray-700">{subpart.label}.</span>
-                            <p className="text-gray-900">{subpart.text}</p>
+                            <span className={`font-black text-gray-700 shrink-0 ${fontClass}`}>{subpart.label}.</span>
+                            <p className={`text-gray-900 font-semibold leading-relaxed whitespace-pre-line ${fontClass}`}>
+                              {subpart.text}
+                            </p>
                           </div>
-                          
-                          <div className="ml-8">
+                          <div className="ml-6">
                             {subpart.answerType === 'text' ? (
-                              <Input
+                              <textarea
                                 placeholder="Enter your answer here..."
                                 value={textAnswers[`${currentQuestionIndex}-${part.label}-${subpart.label}`] || ''}
-                                onChange={(e) => handleTextAnswer(`${currentQuestionIndex}-${part.label}-${subpart.label}`, e.target.value)}
-                                className="w-full"
+                                onChange={e => handleTextAnswer(`${currentQuestionIndex}-${part.label}-${subpart.label}`, e.target.value)}
+                                rows={4}
+                                className="w-full px-3 py-2.5 rounded border border-gray-300 focus:border-blue-400 focus:ring-1 focus:ring-blue-400 outline-none text-sm text-gray-900 resize-y transition-colors"
                               />
                             ) : subpart.answerType === 'draw' ? (
-                              <div className="flex flex-col sm:flex-row gap-4">
-                                <div className={`w-full ${showResults ? 'sm:w-1/2' : ''}`}>
-                                  {showResults ? (
-                                    <>
-                                      <div className="mb-2 font-medium text-gray-600">Your Response:</div>
-                                      <div className="h-[400px] bg-white rounded-md border border-gray-200">
-                                        {drawingAnswers[`${currentQuestionIndex}-${part.label}-${subpart.label}`] ? (
-                                          <img 
-                                            src={drawingAnswers[`${currentQuestionIndex}-${part.label}-${subpart.label}`]}
-                                            alt="Your drawing"
-                                            className="w-full h-full object-contain"
-                                          />
-                                        ) : (
-                                          <div className="w-full h-full flex items-center justify-center text-gray-500">
-                                            No drawing provided
-                                          </div>
-                                        )}
-                                      </div>
-                                    </>
-                                  ) : (
-                                    <div className="h-[400px] relative border-2 border-black rounded-md overflow-hidden">
+                              (() => {
+                                const drawKey = `${currentQuestionIndex}-${part.label}-${subpart.label}`;
+                                const isLocked = savedDrawingKeys.has(drawKey);
+                                return (
+                                  <div className="h-[400px] relative border-2 border-gray-300 rounded overflow-hidden">
                                       <DrawingPad
                                         isLarge={true}
                                         className="w-full relative"
-                                        onSave={(data) => handleDrawingAnswer(`${currentQuestionIndex}-${part.label}-${subpart.label}`, data)}
-                                        initialData={drawingAnswers[`${currentQuestionIndex}-${part.label}-${subpart.label}`]}
-                                      />
+                                      hideDoneButton
+                                      onSave={data => handleDrawingAnswer(drawKey, data)}
+                                      initialData={drawingAnswers[drawKey]}
+                                    />
+                                    {isLocked && (
+                                      <div className="absolute inset-0 bg-white/70 backdrop-blur-[2px] flex flex-col items-center justify-center gap-3 z-20">
+                                        <div className="flex items-center gap-2 bg-white border border-gray-200 shadow-sm rounded-full px-4 py-2">
+                                          <svg className="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                          <span className="text-sm font-bold text-gray-700">Drawing saved</span>
+                                        </div>
+                                        <button onClick={() => unlockDrawing(drawKey)} className="text-xs font-semibold text-gray-400 hover:text-gray-600 underline transition-colors">
+                                          Edit drawing
+                                        </button>
                                     </div>
                                   )}
-                                </div>
-                                {showResults && subpart.answer && (
-                                  <div className="w-full sm:w-1/2">
-                                    <div className="mb-2 font-medium text-green-600">Correct Response:</div>
-                                    <div className="h-[400px] bg-white rounded-md border border-gray-200">
-                                      {typeof subpart.answer === 'object' ? (
-                                        <img 
-                                          src={subpart.answer.src}
-                                          alt="Correct drawing"
-                                          className="w-full h-full object-contain"
-                                        />
-                                      ) : (
-                                        <div className="p-3">{subpart.answer}</div>
-                                      )}
-                                    </div>
                                   </div>
-                                )}
-                              </div>
+                                );
+                              })()
                             ) : null}
                           </div>
                         </div>
@@ -582,59 +712,168 @@ export function FullExamFRQ({ questions }: FullExamFRQProps) {
               ))}
             </div>
           </div>
+        )}
+      </div>
 
-          {/* Navigation Buttons */}
-          <div className="p-6 border-t bg-white">
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-2">
-              <div className="flex flex-col sm:flex-row gap-4 sm:gap-2 w-full sm:w-auto">
-                <Button
-                  onClick={goToPreviousQuestion}
-                  disabled={currentQuestionIndex === 0}
-                  variant="outline"
-                  className="w-full sm:w-28"
+      {/* Bottom bar — matches MCQ unit test navigator + Prev / Next */}
+      {!showResults && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white z-50 border-t border-gray-200">
+          <AnimatePresence>
+            {showQuestionNavigator && (
+              <motion.div
+                key="question-navigator"
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 35 }}
+                className="overflow-hidden w-full border-b border-gray-200"
+              >
+                <div className="max-w-7xl mx-auto px-4 py-4">
+                  <div className="flex flex-wrap gap-2">
+                    {questions.questions.map((_, index) => {
+                      const isCurrent = index === currentQuestionIndex;
+                      return (
+                        <button
+                          key={index}
+                          type="button"
+                          onClick={() => {
+                            if (isTimerPaused) return;
+                            setCurrentQuestionIndex(index);
+                            setShowQuestionNavigator(false);
+                            window.scrollTo({ top: 0 });
+                          }}
+                          disabled={isTimerPaused}
+                          className={`w-10 h-10 rounded-lg font-semibold text-sm transition-all ${
+                            isTimerPaused
+                              ? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-300'
+                              : isCurrent
+                                ? `${
+                                    examType === 'macro' ? 'bg-blue-600' : 'bg-green-600'
+                                  } text-white ring-2 ring-offset-1 ring-gray-400`
+                                : 'bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200'
+                          }`}
+                          title={isTimerPaused ? 'Timer paused' : `Question ${index + 1}`}
+                        >
+                          {index + 1}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+            <span className="hidden sm:block text-xs text-gray-400 font-medium shrink-0">
+              Sec II &bull; {questions.questions.length} Questions
+            </span>
+            <div className="relative flex-1 max-w-md" ref={questionNavigatorRef}>
+              <button
+                type="button"
+                onClick={() => setShowQuestionNavigator(v => !v)}
+                disabled={isTimerPaused}
+                className={`w-full px-4 py-2.5 rounded-lg font-semibold flex items-center justify-between transition-colors ${
+                  isTimerPaused
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <List className="w-5 h-5" />
+                  <span>
+                    Question {currentQuestionIndex + 1} of {questions.questions.length}
+                  </span>
+                </div>
+                {showQuestionNavigator ? (
+                  <ChevronUp className="w-5 h-5" />
+                ) : (
+                  <ChevronDown className="w-5 h-5" />
+                )}
+              </button>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={goToPrev}
+                disabled={currentQuestionIndex === 0 || isTimerPaused}
+                className={`px-6 py-2.5 rounded font-semibold transition-colors flex items-center gap-2 ${
+                  currentQuestionIndex === 0 || isTimerPaused
+                    ? 'border border-gray-200 text-gray-300 cursor-not-allowed'
+                    : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
+                }`}
                 >
                   Previous
-                </Button>
-                <Button
-                  onClick={goToNextQuestion}
-                  disabled={currentQuestionIndex === questions.questions.length - 1}
-                  variant="outline"
-                  className="w-full sm:w-28"
-                >
-                  Next
-                </Button>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (isTimerPaused) return;
+                  if (currentQuestionIndex < questions.questions.length - 1) {
+                    goToNext();
+                  } else {
+                    handleSubmit();
+                  }
+                }}
+                disabled={isTimerPaused}
+                className={`px-6 py-2.5 rounded font-semibold transition-colors flex items-center gap-2 ${
+                  isTimerPaused
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : currentQuestionIndex === questions.questions.length - 1
+                      ? 'bg-black hover:bg-gray-800 text-white'
+                      : 'bg-gray-900 hover:bg-gray-700 text-white'
+                }`}
+              >
+                {currentQuestionIndex === questions.questions.length - 1 ? 'Submit' : 'Next'}
+              </button>
+            </div>
+          </div>
               </div>
-              {currentQuestionIndex === questions.questions.length - 1 && (
-                <Button
-                  onClick={handleSubmit}
-                  className="w-full sm:w-28 bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  Submit
-                </Button>
-              )}
+      )}
+
+      {/* Exit confirmation modal */}
+      {showExitModal && (
+        <div className="fixed inset-0 bg-black/50 z-[70] flex items-center justify-center p-4">
+          <div className="bg-gray-50 border-2 border-black rounded-md shadow-2xl w-full max-w-sm p-6">
+            <h2 className="text-base font-black text-gray-900 mb-1">Exit exam?</h2>
+            <p className="text-sm text-gray-500 mb-6">
+              Your progress will <span className="font-bold text-gray-700">not be saved</span>. Any answers or drawings you've entered will be lost.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowExitModal(false)}
+                className="flex-1 py-2.5 text-sm font-black border-2 border-gray-300 rounded text-gray-700 hover:border-gray-400 hover:bg-white transition-colors"
+              >
+                Stay
+              </button>
+              <button
+                onClick={handleExit}
+                className="flex-1 py-2.5 text-sm font-black border-2 border-red-600 bg-red-600 rounded text-white hover:bg-red-700 hover:border-red-700 transition-colors"
+              >
+                Exit anyway
+              </button>
             </div>
           </div>
         </div>
       )}
+
+      {/* Image modal */}
       {showImageModal && selectedImage && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4"
           onClick={() => setShowImageModal(false)}
         >
           <div className="relative max-w-4xl max-h-[90vh]">
             <img 
               src={selectedImage.src} 
               alt="Question" 
-              className="max-w-full max-h-[90vh] object-contain"
+              className="max-w-full max-h-[90vh] object-contain rounded"
             />
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowImageModal(false);
-              }}
+              onClick={e => { e.stopPropagation(); setShowImageModal(false); }}
               className="absolute top-2 right-2 bg-white rounded-full p-1.5 shadow-lg hover:bg-gray-100"
             >
-              <X className="w-6 h-6" />
+              <X className="w-5 h-5" />
             </button>
           </div>
         </div>

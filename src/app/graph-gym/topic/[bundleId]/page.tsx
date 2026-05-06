@@ -2,9 +2,8 @@
 
 import { Suspense, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, LineChart, Loader2 } from 'lucide-react';
 import { CourseProvider } from '@/contexts/CourseContext';
 import { getBundleById, GRAPH_GYM_BUNDLES } from '@/data/graphGymBundles';
 import { GraphGymScenario } from '@/data/graphGymScenarios';
@@ -15,9 +14,9 @@ import { getSlugForScenario } from '@/lib/graphGymSlugs';
 // ---------------------------------------------------------------------------
 
 const DIFFICULTY_STYLES: Record<string, string> = {
-  easy:   'bg-green-500 border-green-600 text-white',
-  medium: 'bg-blue-500 border-blue-600 text-white',
-  hard:   'bg-red-500 border-red-600 text-white',
+  easy:   'bg-emerald-50 border-emerald-200 text-emerald-900',
+  medium: 'bg-slate-50 border-slate-200 text-slate-800',
+  hard:   'bg-rose-50 border-rose-200 text-rose-900',
 };
 
 const DIFFICULTY_LABEL: Record<string, string> = {
@@ -27,7 +26,7 @@ const DIFFICULTY_LABEL: Record<string, string> = {
 };
 
 function DifficultyBadge({ difficulty }: { difficulty: string }) {
-  const cls = DIFFICULTY_STYLES[difficulty] ?? 'bg-gray-400 border-gray-500 text-white';
+  const cls = DIFFICULTY_STYLES[difficulty] ?? 'bg-muted border-border text-gray-800';
   const label = DIFFICULTY_LABEL[difficulty] ?? difficulty;
   return (
     <span className={`inline-flex items-center rounded border-2 px-1.5 py-0.5 text-[10px] font-black leading-tight ${cls}`}>
@@ -37,38 +36,51 @@ function DifficultyBadge({ difficulty }: { difficulty: string }) {
 }
 
 // ---------------------------------------------------------------------------
+// Thumbnail color palette — cycles per card index
+// ---------------------------------------------------------------------------
+
+/** Really light washes + matching soft icon tint (cycles per card) */
+const THUMB_PALETTES: { bg: string; icon: string }[] = [
+  { bg: 'bg-sky-50', icon: 'text-sky-400/65' },
+  { bg: 'bg-violet-50', icon: 'text-violet-400/60' },
+  { bg: 'bg-emerald-50', icon: 'text-emerald-400/60' },
+  { bg: 'bg-amber-50', icon: 'text-amber-400/70' },
+  { bg: 'bg-rose-50', icon: 'text-rose-400/55' },
+  { bg: 'bg-blue-50', icon: 'text-blue-400/55' },
+  { bg: 'bg-teal-50', icon: 'text-teal-400/60' },
+  { bg: 'bg-indigo-50', icon: 'text-indigo-400/55' },
+];
+
+// ---------------------------------------------------------------------------
 // Scenario card inside the collection
 // ---------------------------------------------------------------------------
 
 function ScenarioCard({
   scenario,
+  index,
   onSelect,
 }: {
   scenario: GraphGymScenario;
+  index: number;
   onSelect: (s: GraphGymScenario) => void;
 }) {
-  const hasImage = scenario.correctImage.startsWith('https://');
+  const thumb = THUMB_PALETTES[index % THUMB_PALETTES.length];
 
   return (
     <button
       onClick={() => onSelect(scenario)}
       className="group text-left w-full flex flex-col overflow-hidden rounded-2xl border-4 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
     >
-      {/* Thumbnail */}
-      <div className="relative h-32 w-full overflow-hidden bg-gray-100 border-b-4 border-black">
-        {hasImage ? (
-          <Image
-            src={scenario.correctImage}
-            alt={scenario.title}
-            fill
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
-            sizes="(max-width: 640px) 50vw, 25vw"
-          />
-        ) : (
-          <div className="h-full w-full flex items-center justify-center bg-gray-50">
-            <span className="text-3xl text-gray-300 font-black">—</span>
-          </div>
-        )}
+      {/* Thumbnail — light tint + centered graph icon */}
+      <div
+        className={`relative h-28 w-full border-b-4 border-black flex items-center justify-center ${thumb.bg}`}
+        aria-hidden
+      >
+        <LineChart
+          className={`h-10 w-10 ${thumb.icon} transition-transform duration-300 group-hover:scale-105`}
+          strokeWidth={1.5}
+          aria-hidden
+        />
       </div>
 
       {/* Body */}
@@ -97,25 +109,25 @@ function ScenarioCard({
 // ---------------------------------------------------------------------------
 
 const ACCENT_TEXT: Record<string, string> = {
-  blue:   'text-blue-600',
-  green:  'text-green-600',
-  yellow: 'text-yellow-600',
-  orange: 'text-orange-600',
-  red:    'text-red-600',
-  purple: 'text-purple-600',
-  pink:   'text-pink-600',
-  teal:   'text-teal-600',
+  blue:   'text-gray-900',
+  green:  'text-gray-900',
+  yellow: 'text-gray-900',
+  orange: 'text-gray-900',
+  red:    'text-gray-900',
+  purple: 'text-gray-900',
+  pink:   'text-gray-900',
+  teal:   'text-gray-900',
 };
 
 const ACCENT_BG: Record<string, string> = {
-  blue:   'bg-blue-100 border-blue-400 text-blue-700',
-  green:  'bg-green-100 border-green-400 text-green-700',
-  yellow: 'bg-yellow-100 border-yellow-400 text-yellow-700',
-  orange: 'bg-orange-100 border-orange-400 text-orange-700',
-  red:    'bg-red-100 border-red-400 text-red-700',
-  purple: 'bg-purple-100 border-purple-400 text-purple-700',
-  pink:   'bg-pink-100 border-pink-400 text-pink-700',
-  teal:   'bg-teal-100 border-teal-400 text-teal-700',
+  blue:   'bg-blue-50/90 border-blue-200/90 text-gray-800',
+  green:  'bg-emerald-50/90 border-emerald-200/90 text-gray-800',
+  yellow: 'bg-amber-50/90 border-amber-200/90 text-gray-800',
+  orange: 'bg-orange-50/90 border-orange-200/90 text-gray-800',
+  red:    'bg-rose-50/90 border-rose-200/90 text-gray-800',
+  purple: 'bg-violet-50/90 border-violet-200/90 text-gray-800',
+  pink:   'bg-rose-50/90 border-rose-200/90 text-gray-800',
+  teal:   'bg-teal-50/90 border-teal-200/90 text-gray-800',
 };
 
 function TopicCollectionContent() {
@@ -150,8 +162,8 @@ function TopicCollectionContent() {
   }
 
   const { bundle, scenarios } = bundleData;
-  const accentText = ACCENT_TEXT[bundle.accentColor] ?? 'text-gray-600';
-  const accentBadge = ACCENT_BG[bundle.accentColor] ?? 'bg-gray-100 border-gray-400 text-gray-700';
+  const accentText = ACCENT_TEXT[bundle.accentColor] ?? 'text-gray-900';
+  const accentBadge = ACCENT_BG[bundle.accentColor] ?? 'bg-muted border-border text-gray-800';
 
   const backHref = '/graph-gym-dashboard';
 
@@ -193,10 +205,11 @@ function TopicCollectionContent() {
 
           {/* Grid of scenario cards */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            {scenarios.map((scenario) => (
+            {scenarios.map((scenario, i) => (
               <ScenarioCard
                 key={scenario.id}
                 scenario={scenario}
+                index={i}
                 onSelect={handleSelect}
               />
             ))}

@@ -112,13 +112,17 @@ const nextConfig = {
       });
     }
 
-    // Redirect old practice tests URL to new subject-specific URLs
-    // Default to macro for backward compatibility
-    redirects.push({
-      source: '/unit-final-practice-tests',
-      destination: '/ap-macro-practice-tests',
-      permanent: true,
-    });
+    // Redirect bare practice-tests URL to macro pretty URL (legacy bookmarks).
+    // Do NOT redirect when ?subject= is present — those URLs must load Gov/Micro/etc.
+    redirects.push(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Next supports `missing`; inferred redirect array type does not.
+      {
+        source: '/unit-final-practice-tests',
+        missing: [{ type: 'query', key: 'subject' }],
+        destination: '/ap-macro-practice-tests',
+        permanent: true,
+      } as any
+    );
 
     // /graph-gym now shows the Graph Gym dashboard; no redirect
 
@@ -165,6 +169,14 @@ const nextConfig = {
       });
     }
 
+    // Gov unit MCQ tests (5 framework units — only Unit 1 has items; others show locked UI)
+    for (let unit = 1; unit <= 5; unit++) {
+      rewrites.push({
+        source: `/ap-gov-unit-${unit}-mcq-test`,
+        destination: `/unit-mcq-test/${unit}?subject=gov`,
+      });
+    }
+
     // Full MCQ practice tests
     // Macro: /ap-macro-mcq-practice-test-1 → /preview/macro/mcq/1
     rewrites.push({
@@ -205,6 +217,10 @@ const nextConfig = {
     rewrites.push({
       source: '/ap-micro-practice-tests',
       destination: '/unit-final-practice-tests?subject=micro',
+    });
+    rewrites.push({
+      source: '/ap-gov-practice-tests',
+      destination: '/unit-final-practice-tests?subject=gov',
     });
 
     return rewrites;

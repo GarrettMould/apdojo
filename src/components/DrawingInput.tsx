@@ -13,6 +13,8 @@ interface DrawingInputProps {
   enableStickers?: boolean;
   stickerLabels?: string[];
   templateImageUrl?: string;
+  /** FRQ pads: hide Done and auto-persist strokes (default true). */
+  hideDoneButton?: boolean;
 }
 
 export const DrawingInput: React.FC<DrawingInputProps> = ({ 
@@ -22,7 +24,8 @@ export const DrawingInput: React.FC<DrawingInputProps> = ({
   isGraded,
   enableStickers = false,
   stickerLabels = ['LRAS', 'SRAS', 'AD', 'Price Level', 'Real GDP'],
-  templateImageUrl
+  templateImageUrl,
+  hideDoneButton = true,
 }) => {
   const [inputMethod, setInputMethod] = useState<'draw' | 'upload'>('draw');
 
@@ -92,11 +95,17 @@ export const DrawingInput: React.FC<DrawingInputProps> = ({
             // Not JSON
           }
 
-          return !drawingData || isStructured ? (
+          // Keep the pad open while drawing; unstructured base64 from per-stroke saves
+          // would otherwise hide the pad and show only the static preview.
+          const showDrawingEditor =
+            !drawingData || isStructured || (inputMethod === 'draw' && !isGraded);
+
+          return showDrawingEditor ? (
             <>
                 {inputMethod === 'draw' && (
                   <DrawingPad
                     isLarge={true}
+                    hideDoneButton={hideDoneButton}
                     submitButtonVariant="greenMini"
                     onSave={(data) => onSave(drawingKey, data)}
                     initialData={imageData}
@@ -144,7 +153,9 @@ export const DrawingInput: React.FC<DrawingInputProps> = ({
           }
 
           if (isStructured) return null; // Structured data shows pad above
-          
+
+          if (inputMethod === 'draw' && !isGraded) return null;
+
           return (
             <div className="relative p-4">
               <img src={drawingData} alt="Drawing preview" className="w-full h-auto max-w-md mx-auto rounded-md border" />

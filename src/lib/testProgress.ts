@@ -1,5 +1,5 @@
 import { db } from './firebase';
-import { doc, setDoc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 
 export interface TestProgress {
   userId: string;
@@ -18,6 +18,7 @@ export interface TestProgress {
     isSubmitted: boolean;
     score?: number;
     totalQuestions: number;
+    timeRemaining?: number;
     startedAt: any;
     lastUpdated: any;
   };
@@ -113,6 +114,16 @@ export const saveTestResult = async (result: TestResult) => {
   } catch (error) {
     console.error('[saveTestResult] Error saving test result:', error);
     throw error; // Re-throw to see the error in the component
+  }
+};
+
+// Clear (delete) saved test progress so the user can start fresh
+export const clearTestProgress = async (userId: string, testId: string): Promise<void> => {
+  try {
+    const testDocRef = doc(db, 'userTestProgress', userId, 'tests', testId);
+    await deleteDoc(testDocRef);
+  } catch (error) {
+    console.error('Error clearing test progress:', error);
   }
 };
 

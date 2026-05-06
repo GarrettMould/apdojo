@@ -475,6 +475,7 @@ export default function FullFRQExamPage() {
                           <DrawingPad
                             isLarge={true}
                             className="w-full relative"
+                            hideDoneButton
                             initialData={drawingAnswers[`${currentQuestionIndex}-${part.label}`]}
                             onSave={(data) => handleDrawingAnswer(`${currentQuestionIndex}-${part.label}`, data)}
                           />
@@ -505,6 +506,7 @@ export default function FullFRQExamPage() {
                                   <DrawingPad
                                     isLarge={true}
                                     className="w-full relative"
+                                    hideDoneButton
                                     onSave={(data) => handleDrawingAnswer(`${currentQuestionIndex}-${part.label}-${subpart.label}`, data)}
                                     initialData={drawingAnswers[`${currentQuestionIndex}-${part.label}-${subpart.label}`]}
                                   />

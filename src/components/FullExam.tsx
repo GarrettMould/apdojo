@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Question, QuestionBank } from '@/data/questionBanks/types';
 import { Button } from "@/components/ui/button";
-import { Bookmark, BookmarkX, X, Clock, Maximize2, Minimize2, Calculator, Pen, Eraser, Expand, Trash2, Circle, CircleDot, Check, Lock, Brain, FileText, ChevronLeft, ChevronRight, ChevronsRight, Triangle, Strikethrough, Eye, EyeOff, Play, ChevronDown, ChevronUp, List, Pause, Play as PlayIcon } from 'lucide-react';
+import { Bookmark, BookmarkX, X, Clock, Maximize2, Minimize2, Calculator, Pen, Eraser, Expand, Trash2, Circle, CircleDot, Check, Lock, Brain, FileText, ChevronLeft, ChevronRight, ChevronsRight, Triangle, Strikethrough, Eye, EyeOff, Play, ChevronDown, ChevronUp, List, Pause, Play as PlayIcon, Highlighter } from 'lucide-react';
 import Image, { StaticImageData } from 'next/image';
 import Link from 'next/link';
 import { redirectToCheckout } from '@/lib/stripe';
@@ -19,15 +20,21 @@ import { MCQSidecar } from './MCQSidecar';
 import { DojoReadinessBand } from './DojoReadinessBand';
 import { Scroll } from 'lucide-react';
 import { QuestionWithKeyTerms } from './QuestionWithKeyTerms';
+import { ApGovQuestionText, isApGovQuestion } from './ApGovQuestionText';
+import { UnitTestQuestionBody, type QuestionTextHighlight } from './UnitTestQuestionBody';
 import { ExamTutorialModal } from './ExamTutorialModal';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, doc, updateDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 import { saveQuizResult } from '@/lib/quizHistory';
 import { saveTestResult, saveTestProgress, loadTestProgress, TestProgress } from '@/lib/testProgress';
+import { apQuestionSubjectTag, type CourseSubject } from '@/lib/courseSubject';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import '@excalidraw/excalidraw/index.css';
+
+/** Set when a guest uses Save & Exit so we persist to Firestore after they sign in (same tab or post-redirect). */
+const UNIT_TEST_GUEST_SAVE_PENDING_SESSION_KEY = 'apdojo_unit_mcq_pending_guest_save_exit';
 
 const Excalidraw = dynamic<any>(
   async () => (await import("@excalidraw/excalidraw")).Excalidraw,
@@ -38,7 +45,7 @@ const Excalidraw = dynamic<any>(
 
 interface FullExamProps {
   questionBank: QuestionBank;
-  examType: 'macro' | 'micro';
+  examType: CourseSubject;
   questionType: 'mcq' | 'frq';
   examNumber: string;
   onTimeUpdate?: (timeRemaining: number) => void;
@@ -117,6 +124,8 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   const [showFullResults, setShowFullResults] = useState(false);
   const [showExplanations, setShowExplanations] = useState<{[key: number]: boolean}>({});
   const [bookmarkedQuestions, setBookmarkedQuestions] = useState<Set<number>>(new Set());
+  const [questionHighlightModeById, setQuestionHighlightModeById] = useState<Record<number, boolean>>({});
+  const [questionTextHighlights, setQuestionTextHighlights] = useState<Record<number, QuestionTextHighlight[]>>({});
   const [strikethroughState, setStrikethroughState] = useState<Record<number, number[]>>({});
   const [showBookmarkConfirmModal, setShowBookmarkConfirmModal] = useState(false);
   const [showNameInputModal, setShowNameInputModal] = useState(false);
@@ -153,12 +162,33 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   
   // State to hide/show timer
   const [showTimer, setShowTimer] = useState(true);
+  const [questionFontSize, setQuestionFontSize] = useState(1); // 0=sm, 1=base, 2=lg, 3=xl
+  const FONT_SIZE_CLASSES = ['text-sm', 'text-base', 'text-lg', 'text-xl'];
+  const FONT_SIZE_MAX = 3;
   
   // State to pause/resume timer
   const [isTimerPaused, setIsTimerPaused] = useState(false);
 
   // Get user context (needed for access checks and guest progress)
-  const { user, userData, awardXp, selectedSubject } = useAuthContext();
+  const { user, userData, awardXp, selectedSubject, setRedirectOnLogin } = useAuthContext();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const isFreshStart = searchParams?.get('fresh') === '1';
+
+  const accentFull =
+    examType === 'macro'
+      ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800'
+      : examType === 'micro'
+        ? 'bg-green-600 hover:bg-green-700 active:bg-green-800'
+        : 'bg-violet-600 hover:bg-violet-700 active:bg-violet-800';
+  const accentHover =
+    examType === 'macro'
+      ? 'bg-blue-600 hover:bg-blue-700'
+      : examType === 'micro'
+        ? 'bg-green-600 hover:bg-green-700'
+        : 'bg-violet-600 hover:bg-violet-700';
+  const accentSolid =
+    examType === 'macro' ? 'bg-blue-600' : examType === 'micro' ? 'bg-green-600' : 'bg-violet-600';
 
   // Restore guest progress on mount (including timer)
   // This works for both guests AND logged-in users who were guests when they started the exam
@@ -203,6 +233,140 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
 
   // Check if this is a full MCQ exam that should have save progress functionality
   const isFullMCQExam = examNumber === 'full' && questionType === 'mcq' && !isCustomAssignment;
+
+  // Save unit test progress to Firestore
+  const saveUnitTestProgress = async (): Promise<boolean> => {
+    if (!user || !isUnitTest || showResults) return false;
+    try {
+      const testId = `unit_${examNumber}_${examType}`;
+      const answeredQuestions: Record<string, { selectedAnswer: number; isCorrect: boolean }> = {};
+      Object.entries(answers).forEach(([questionId, answer]) => {
+        const question = questions.find(q => q.id === parseInt(questionId));
+        if (question && answer) {
+          answeredQuestions[questionId] = {
+            selectedAnswer: answer.charCodeAt(0) - 65,
+            isCorrect: answer === question.correctAnswer,
+          };
+        }
+      });
+      let existingProgress = null;
+      try { existingProgress = await loadTestProgress(user.uid, testId); } catch {}
+      const progress: TestProgress = {
+        userId: user.uid,
+        testType: 'unit_mcq',
+        testId,
+        progress: {
+          answeredQuestions,
+          currentQuestionIndex: currentPage,
+          isSubmitted: false,
+          totalQuestions: questions.length,
+          timeRemaining,
+          startedAt: existingProgress?.startedAt || (serverTimestamp() as any),
+          lastUpdated: serverTimestamp() as any,
+        },
+      };
+      await saveTestProgress(progress);
+      return true;
+    } catch (error) {
+      console.error('[FullExam] Error saving unit test progress:', error);
+      return false;
+    }
+  };
+
+  const handleUnitTestSaveAndExit = async () => {
+    if (user) {
+      await saveUnitTestProgress();
+      router.push(`/unit-final-practice-tests?subject=${examType}`);
+    } else {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('guest_quiz_progress', JSON.stringify({
+          examNumber,
+          examType,
+          answers,
+          currentQuestionIndex: currentPage,
+          timeRemaining,
+        }));
+        try {
+          sessionStorage.setItem(UNIT_TEST_GUEST_SAVE_PENDING_SESSION_KEY, '1');
+        } catch {
+          /* private mode */
+        }
+      }
+      setShowGuestSaveModal(true);
+    }
+  };
+
+  // Restore saved progress for logged-in users on unit tests, or finish guest Save & Exit after auth
+  useEffect(() => {
+    if (!isUnitTest || showResults || isFreshStart) return;
+
+    let sessionPending = false;
+    try {
+      sessionPending =
+        typeof window !== 'undefined' &&
+        sessionStorage.getItem(UNIT_TEST_GUEST_SAVE_PENDING_SESSION_KEY) === '1';
+    } catch {
+      sessionPending = false;
+    }
+    const refPending = unitTestGuestSaveExitAfterAuthRef.current;
+    const pendingGuestAuthFinish = sessionPending || refPending;
+
+    if (!user) return;
+
+    if (pendingGuestAuthFinish) {
+      unitTestGuestSaveExitAfterAuthRef.current = false;
+      try {
+        sessionStorage.removeItem(UNIT_TEST_GUEST_SAVE_PENDING_SESSION_KEY);
+      } catch {
+        /* noop */
+      }
+      void (async () => {
+        try {
+          const ok = await saveUnitTestProgress();
+          if (!ok) {
+            console.warn('[FullExam] Guest post-auth save returned false (missing user or wrong mode).');
+          }
+        } catch (error) {
+          console.error('[FullExam] Error saving guest progress after login:', error);
+        }
+        try {
+          localStorage.removeItem('guest_quiz_progress');
+        } catch {
+          /* noop */
+        }
+        router.push(`/unit-final-practice-tests?subject=${examType}`);
+      })();
+      return;
+    }
+
+    const restoreUnitTestProgress = async () => {
+      try {
+        const testId = `unit_${examNumber}_${examType}`;
+        const savedProgress = await loadTestProgress(user.uid, testId);
+        if (savedProgress && !savedProgress.isSubmitted) {
+          if (savedProgress.answeredQuestions) {
+            const restoredAnswers: Answers = {};
+            Object.entries(savedProgress.answeredQuestions).forEach(([qIndex, answerData]: [string, any]) => {
+              if (typeof answerData.selectedAnswer === 'number') {
+                restoredAnswers[parseInt(qIndex)] = String.fromCharCode(65 + answerData.selectedAnswer);
+              }
+            });
+            setAnswers(restoredAnswers);
+          }
+          if (typeof savedProgress.currentQuestionIndex === 'number') {
+            setCurrentPage(savedProgress.currentQuestionIndex);
+          }
+          if (typeof savedProgress.timeRemaining === 'number' && savedProgress.timeRemaining > 0) {
+            setTimeRemaining(savedProgress.timeRemaining);
+          }
+        }
+      } catch (error) {
+        console.error('[FullExam] Error restoring unit test progress:', error);
+      }
+    };
+    void restoreUnitTestProgress();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- saveUnitTestProgress closes over latest exam state
+  }, [user, isUnitTest, showResults, examNumber, examType, isFreshStart, router]);
 
   // Restore saved progress for logged-in users on full MCQ exams
   useEffect(() => {
@@ -284,16 +448,19 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   /** Live session only: apply tutor/builder-style UI (rounded cards, shadow-xl, indigo/slate). Do not use for logic. */
   const isLiveSession = !!(liveSessionId && liveStudentId);
 
-  // Determine if this exam requires season pass (unit tests and full exams, but not custom assignments)
-  const requiresSeasonPass = (isUnitTest || isFullExam || isPreviewExam) && !isCustomAssignment;
-  
+  // Determine if this exam requires season pass (unit tests and full exams, but not custom assignments).
+  // AP Gov is fully open for now — no season pass gate.
+  const requiresSeasonPass =
+    (isUnitTest || isFullExam || isPreviewExam) &&
+    !isCustomAssignment &&
+    examType !== 'gov';
+
   // Check if user has season pass access for this exam type
   // For unit tests and full exams, check season pass. For custom assignments, always allow.
   const hasSeasonPassAccess = useMemo(() => {
-    if (isCustomAssignment) return true; // Custom assignments don't require season pass
+    if (isCustomAssignment || examType === 'gov') return true;
     if (!user || !userData) return false;
-    const subjectKey = examType === 'macro' ? 'macro' : 'micro';
-    return hasValidSeasonPass(userData, subjectKey);
+    return hasValidSeasonPass(userData, examType);
   }, [user, userData, examType, isCustomAssignment]);
   
   const shouldShowToolsByDefault = false; // Tools panel starts closed - users can open manually
@@ -301,6 +468,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   const [leftPanelWidth, setLeftPanelWidth] = useState(shouldShowToolsByDefault ? 65 : 100); // Percentage width for left panel when tools panel is open
   // For all exam types, only show one tool at a time (calculator OR whiteboard)
   const [activeTool, setActiveTool] = useState<'calculator' | 'whiteboard'>('calculator');
+  const [scratchPadTab, setScratchPadTab] = useState<'draw' | 'text'>('draw');
+  const [scratchNotes, setScratchNotes] = useState('');
+  const [excalidrawKey, setExcalidrawKey] = useState(0);
 
   const handleToolToggle = (tool: 'calculator' | 'whiteboard') => {
     // If panel is closed, open it and set the requested tool.
@@ -342,6 +512,14 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   const [currentPage, setCurrentPage] = useState(0);
   const questionsPerPage = 1;
 
+  // Clear scratch pad whenever the question changes
+  useEffect(() => {
+    setScratchNotes('');
+    setExcalidrawElements([]);
+    setExcalidrawAppState(null);
+    setExcalidrawKey(k => k + 1);
+  }, [currentPage]);
+
   // Add completed questions tracking
   const [completedQuestions, setCompletedQuestions] = useState<Set<number>>(new Set());
 
@@ -362,6 +540,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   }, [showResults, showFullResults, liveSessionId, liveSessionScoreSummaryOnly]);
 
   // Close question navigator when clicking outside
+  // NOTE: must use 'click' (not 'mousedown') so button onClick handlers fire first
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (questionNavigatorRef.current && !questionNavigatorRef.current.contains(event.target as Node)) {
@@ -370,14 +549,15 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
     };
 
     if (showQuestionNavigator) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('click', handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('click', handleClickOutside);
     };
   }, [showQuestionNavigator]);
 
+  const [showGuestSaveModal, setShowGuestSaveModal] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
   const [showExitConfirmModal, setShowExitConfirmModal] = useState(false);
@@ -385,9 +565,10 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
   const [isSavingProgress, setIsSavingProgress] = useState(false);
   const allowNavigationRef = useRef(false); // Use ref for synchronous access in beforeunload
+  /** True when user opened login from the guest “save progress” modal (belt-and-suspenders with sessionStorage). */
+  const unitTestGuestSaveExitAfterAuthRef = useRef(false);
   const [showTutorial, setShowTutorial] = useState(false);
   const [isMounted, setIsMounted] = useState(false); // For client-side only rendering
-  const router = useRouter();
 
   // Set mounted flag for client-side only rendering
   useEffect(() => {
@@ -845,7 +1026,10 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
           } else if (isFullExam) {
             testType = questionType === 'frq' ? 'full_frq' : 'full_exam';
             testId = questionType === 'frq' ? 'full_frq_exam' : `full_${examType}_mcq`;
-            testTitle = questionType === 'frq' ? 'Full FRQ Exam' : `Full MCQ Exam (${examType === 'macro' ? 'Macro' : 'Micro'})`;
+            testTitle =
+              questionType === 'frq'
+                ? 'Full FRQ Exam'
+                : `Full MCQ Exam (${examType === 'macro' ? 'Macro' : examType === 'micro' ? 'Micro' : 'Gov'})`;
           } else if (isPreviewExam && examNumber) {
             // Preview exams are treated as full exams
             testType = questionType === 'frq' ? 'full_frq' : 'full_exam';
@@ -951,7 +1135,10 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
         } else if (isFullExam) {
           testType = questionType === 'frq' ? 'full_frq' : 'full_exam';
           testId = questionType === 'frq' ? 'full_frq_exam' : `full_${examType}_mcq`;
-          testTitle = questionType === 'frq' ? 'Full FRQ Exam' : `Full MCQ Exam (${examType === 'macro' ? 'Macro' : 'Micro'})`;
+          testTitle =
+            questionType === 'frq'
+              ? 'Full FRQ Exam'
+              : `Full MCQ Exam (${examType === 'macro' ? 'Macro' : examType === 'micro' ? 'Micro' : 'Gov'})`;
         } else if (isPreviewExam && examNumber) {
           // Preview exams are treated as full exams
           testType = questionType === 'frq' ? 'full_frq' : 'full_exam';
@@ -1342,6 +1529,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
     saveProgressBeforePurchase();
 
     console.log('User is logged in, proceeding to checkout');
+    if (examType === 'gov') {
+      return;
+    }
     try {
       await redirectToCheckout(examType, questionType, examNumber, user.uid);
     } catch (error) {
@@ -1354,8 +1544,13 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
     // TODO: Implement per-question AI tutor if needed
   };
 
-  const getRelatedVideos = (lessonIds: string[], examType: 'macro' | 'micro') => {
-    const subjectName = examType === 'macro' ? 'AP Macroeconomics' : 'AP Microeconomics';
+  const getRelatedVideos = (lessonIds: string[]) => {
+    const subjectName =
+      examType === 'macro'
+        ? 'AP Macroeconomics'
+        : examType === 'micro'
+          ? 'AP Microeconomics'
+          : 'AP United States Government and Politics';
     return videos.filter(video => 
       video.lessonIDS.some(id => lessonIds.includes(id)) && video.subjects.includes(subjectName)
     );
@@ -1419,12 +1614,70 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
         />
       )}
 
+      {/* Guest save progress modal — shown when a non-logged-in user clicks Save & Exit on a unit test */}
+      {showGuestSaveModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[200] p-4">
+          <div className="bg-gray-50 rounded-md shadow-2xl max-w-sm w-full p-8 border-2 border-black">
+            <div className="flex items-center gap-3 mb-2">
+              <Image src="/images/dojoIconJan26.svg" alt="AP Dojo" width={32} height={32} className="w-8 h-8" unoptimized />
+              <h3 className="text-xl font-black text-gray-900">Save your progress</h3>
+            </div>
+            <p className="text-gray-600 font-medium mb-1">
+              You've answered <span className="font-normal text-gray-900">{Object.keys(answers).length}</span> question{Object.keys(answers).length !== 1 ? 's' : ''}.
+            </p>
+            <p className="text-gray-600 font-medium mb-6">
+              Create a free account to save your progress and pick up exactly where you left off.
+            </p>
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={() => {
+                  setShowGuestSaveModal(false);
+                  // After signup, redirect back to this exact test
+                  setRedirectOnLogin(window.location.href);
+                  setShowSignupModal(true);
+                }}
+                className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-md border-2 border-blue-800 transition-colors tracking-wide"
+              >
+                Sign up free →
+              </button>
+              <button
+                onClick={() => {
+                  setShowGuestSaveModal(false);
+                  setShowLoginModal(true);
+                }}
+                className="w-full py-3 border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-50 text-gray-700 font-bold rounded-md transition-colors tracking-wide"
+              >
+                Already have an account? Log in
+              </button>
+              <button
+                onClick={() => {
+                  setShowGuestSaveModal(false);
+                  try {
+                    sessionStorage.removeItem(UNIT_TEST_GUEST_SAVE_PENDING_SESSION_KEY);
+                    localStorage.removeItem('guest_quiz_progress');
+                  } catch {
+                    /* noop */
+                  }
+                  router.push(`/unit-final-practice-tests?subject=${examType}`);
+                }}
+                className="w-full py-2 text-sm text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                Exit without saving
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <LoginModal 
         isOpen={showLoginModal}
         onClose={() => setShowLoginModal(false)}
         switchToSignup={() => {
           setShowLoginModal(false);
           setShowSignupModal(true);
+        }}
+        onAuthSuccess={() => {
+          setShowLoginModal(false);
         }}
       />
 
@@ -1437,12 +1690,10 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
         }}
         onAuthSuccess={() => {
           setShowSignupModal(false);
-          // After signup, the user object will be available and results can be saved
-          // The results are already displayed, so the user can see them
         }}
       />
 
-      {/* Season Pass Modal - shown when non-premium users try to access question 2+ */}
+      {/* Season Pass Modal — AP Gov skips this (all questions free for now) */}
       {showSeasonPassModal && (
         <SeasonPassModal
           subject={examType}
@@ -1573,9 +1824,99 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
       {/* Only show exam content if not showing results, or if showing full results */}
       {(!showResults || showFullResults) && (
         <div className={`flex w-full flex-col relative ${shouldShowTestUI ? 'min-h-screen' : isCustomAssignment ? '' : 'lg:h-[calc(100vh-5rem)]'} ${shouldShowTestUI ? '' : 'overflow-hidden'}`}>
-          {/* Top Bar - Hidden when showing assessment results (calculator/drawing pad unnecessary) */}
+          {/* Top Bar - Hidden when showing assessment results */}
           {shouldShowTestUI && !showResults && (
-            <div className="w-full bg-gray-200 px-6 py-4 flex items-center justify-between border-b-4 border-black shadow-lg flex-shrink-0 fixed top-20 left-0 right-0 z-40">
+            <div className={`w-full flex items-center justify-between flex-shrink-0 fixed left-0 right-0 z-40 ${isUnitTest ? 'top-0 bg-white border-b border-gray-200 h-14 px-6 py-0' : 'top-20 bg-gray-200 px-6 py-4 border-b-4 border-black shadow-lg'}`}>
+            {/* ── UNIT TEST: Fiveable-style header ── */}
+            {isUnitTest && (
+              <>
+                {/* Left: Logo + title — one save & exit control */}
+                <button
+                  type="button"
+                  onClick={handleUnitTestSaveAndExit}
+                  className="flex items-center gap-2.5 p-0.5 -m-0.5 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 text-left"
+                  aria-label="Save and exit"
+                  title="Save & exit"
+                >
+                  <Image src="/images/dojoIconJan26.svg" alt="" width={26} height={26} unoptimized />
+                  {isCustomAssignment ? (
+                    <span className="text-sm font-black text-gray-900 tracking-wide">Custom Assignment</span>
+                  ) : (
+                    <span className="text-sm font-black text-gray-900 tracking-wide">AP Dojo</span>
+                  )}
+                </button>
+                {/* Center: section label */}
+                <span className="text-sm font-medium text-gray-500 hidden sm:block">
+                  {isCustomAssignment ? `${questions.length} Questions` : 'Section I – Multiple Choice'}
+                </span>
+                {/* Right: controls */}
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={handleUnitTestSaveAndExit}
+                    className="px-3 py-1.5 text-xs font-semibold border border-gray-300 rounded hover:bg-gray-50 text-gray-700 transition-colors"
+                  >
+                    Save & Exit
+                  </button>
+                  <button
+                    onClick={() => handleToolToggle('whiteboard')}
+                    className="px-3 py-1.5 text-xs font-semibold border border-gray-300 rounded hover:bg-gray-50 text-gray-700 transition-colors"
+                  >
+                    Scratch Paper
+                  </button>
+                  {/* Text size control */}
+                  <div className="flex items-center border border-gray-300 rounded overflow-hidden">
+                    <button
+                      onClick={() => setQuestionFontSize(s => Math.max(0, s - 1))}
+                      disabled={questionFontSize === 0}
+                      className="px-2 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors border-r border-gray-300"
+                      title="Decrease text size"
+                    >−</button>
+                    <span className="px-2 text-xs font-semibold text-gray-700 select-none">Aa</span>
+                    <button
+                      onClick={() => setQuestionFontSize(s => Math.min(FONT_SIZE_MAX, s + 1))}
+                      disabled={questionFontSize === FONT_SIZE_MAX}
+                      className="px-2 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors border-l border-gray-300"
+                      title="Increase text size"
+                    >+</button>
+                  </div>
+                  {!isTimerPaused ? (
+                    <button
+                      onClick={() => setIsTimerPaused(true)}
+                      className="px-3 py-1.5 text-xs font-semibold border border-gray-300 rounded hover:bg-gray-50 text-gray-700 transition-colors flex items-center gap-1"
+                    >
+                      <Pause className="w-3 h-3" /> Pause
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setIsTimerPaused(false)}
+                      className="px-3 py-1.5 text-xs font-semibold border border-gray-300 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors flex items-center gap-1"
+                    >
+                      <Play className="w-3 h-3" /> Resume
+                    </button>
+                  )}
+                  {showTimer ? (
+                    <button
+                      onClick={() => setShowTimer(false)}
+                      className={`px-3 py-1.5 text-xs font-mono font-bold rounded border ${timeRemaining <= 300 && timeRemaining > 0 ? 'border-red-400 text-red-600 bg-red-50' : 'border-gray-300 text-gray-900 bg-white'} min-w-[72px] text-center`}
+                      title="Hide timer"
+                    >
+                      {formatTime(timeRemaining)}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setShowTimer(true)}
+                      className="px-3 py-1.5 text-xs font-semibold border border-gray-300 rounded hover:bg-gray-50 text-gray-700 transition-colors"
+                      title="Show timer"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+              </>
+            )}
+            {/* ── EXISTING BAR (non-unit-test) ── */}
+            {!isUnitTest && (
+              <>
               {/* Timer Section - Only show for non-custom assignments */}
               {!isCustomAssignment && (
                 <>
@@ -1805,12 +2146,64 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                   </button>
                 </div>
               )}
+              </>
+            )}
             </div>
           )}
-          <div className={`flex w-full flex-1 overflow-hidden relative ${!showToolsPanel ? 'flex-col' : 'lg:flex-row flex-col'}`} style={shouldShowTestUI && !(showResults && isUnitTest) ? { height: 'calc(100vh - 64px - 80px)', marginTop: '80px' } : shouldShowTestUI && showResults && isUnitTest ? { marginTop: '64px' } : {}}>
+          <div className={`flex w-full flex-1 overflow-hidden relative ${!showToolsPanel ? 'flex-col' : 'lg:flex-row flex-col'}`} style={
+            isUnitTest && !(showResults && isUnitTest)
+              ? { height: 'calc(100vh - 56px)', marginTop: '56px' }
+              : isUnitTest && showResults
+              ? { marginTop: '56px' }
+              : shouldShowTestUI && !(showResults && isUnitTest)
+              ? { height: 'calc(100vh - 64px - 80px)', marginTop: '80px' }
+              : shouldShowTestUI && showResults && isUnitTest
+              ? { marginTop: '64px' }
+              : {}
+          }>
           {/* Blur Overlay when timer is paused - covers content but not top/bottom bars */}
           {isTimerPaused && shouldShowTestUI && (
             <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-40"></div>
+          )}
+
+          {/* Resources Panel - Custom Assignments only */}
+          {isCustomAssignment && (
+            <div className="fixed top-14 right-0 w-44 bg-white border-l border-gray-200 flex flex-col z-30" style={{ height: 'calc(100vh - 56px)' }}>
+              <div className="px-4 pt-5 pb-3 border-b border-gray-100">
+                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Resources</p>
+              </div>
+              <nav className="flex flex-col gap-0.5 p-3 flex-1">
+                {[
+                  { label: 'Practice Tests', href: '/unit-final-practice-tests', icon: '📋' },
+                  { label: 'Cheat Sheets', href: '/cheat-sheets', icon: '📄' },
+                  { label: 'Unit Reviews', href: '/unit-review', icon: '📚' },
+                  { label: 'Graph Gym', href: '/graph-gym', icon: '📈' },
+                  { label: 'AP Dojo Home', href: '/', icon: '🏠' },
+                ].map(({ label, href, icon }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2.5 px-3 py-2.5 rounded text-xs font-semibold text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                  >
+                    <span className="text-sm leading-none">{icon}</span>
+                    <span className="leading-tight">{label}</span>
+                  </a>
+                ))}
+              </nav>
+              <div className="p-3 border-t border-gray-100">
+                <a
+                  href="https://apdojo.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-3 py-2"
+                >
+                  <Image src="/images/dojoIconJan26.svg" alt="AP Dojo" width={18} height={18} unoptimized />
+                  <span className="text-[10px] font-black text-gray-400 tracking-wide">AP DOJO</span>
+                </a>
+              </div>
+            </div>
           )}
           {/* Question Container (Left Side / Top on Mobile) */}
           <motion.div 
@@ -1828,7 +2221,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
               isLiveSession
                 ? 'p-6 md:p-8 max-w-4xl mx-auto'
                 : isCustomAssignment
-                  ? 'p-8 max-w-4xl mx-auto'
+                  ? 'p-8 max-w-4xl mx-auto pr-52'
                   : showVideoModal && videoUrl
                     ? 'p-8'
                     : showToolsPanel
@@ -1842,13 +2235,13 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
               <div className="border-b border-gray-200 mb-6 lg:hidden">
                 <div className="p-6">
                   <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
-                    <span className="font-bold">Progress Bar</span>
+                    <span className="font-normal">Progress Bar</span>
                   </div>
                   <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(20, minmax(0, 1fr))' }}>
                     {questions.map((q, index) => {
                       const isAnswered = answers[q.id] !== undefined;
                       const isBookmarked = bookmarkedQuestions.has(q.id);
-                      let buttonClasses = 'w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs transition-colors';
+                      let buttonClasses = 'w-8 h-8 rounded-lg flex items-center justify-center font-normal text-xs transition-colors';
                       let textClasses = '';
                       if (isBookmarked) {
                         buttonClasses += ' bg-yellow-200';
@@ -1902,51 +2295,105 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                   <div className="w-full relative">
                     {/* Question Container */}
                   <div className="w-full">
-                      <div id={`question-${question.id}`} className={`bg-white p-6 md:p-8 relative ${
+                      <div id={`question-${question.id}`} className={`bg-white relative w-full ${
                         isLiveSession
-                          ? 'rounded-3xl shadow-xl border border-slate-200'
+                          ? 'rounded-3xl shadow-xl border border-slate-200 p-6 md:p-8'
                           : isCustomAssignment
-                            ? 'border-2 border-black rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
-                            : 'rounded-lg shadow-md border border-gray-200'
+                            ? 'border-2 border-black rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] p-6 md:p-8'
+                          : isUnitTest
+                            ? 'p-8'
+                            : 'rounded-lg shadow-md border border-gray-200 p-6 md:p-8'
                       }`}>
                         {/* Main Question Content */}
-                        <div className="space-y-6">
+                        <div className={isUnitTest ? 'grid grid-cols-2 gap-x-0 gap-y-4' : 'space-y-6'}>
                           {/* Question Number, Bookmark, and Question Text */}
-                          <div className="w-full">
+                          <div className={isUnitTest ? 'col-start-1 row-start-1 pr-8 border-r border-gray-100' : 'w-full'}>
                             <div className="flex items-start gap-3">
                               {/* Question Number */}
-                              <div className="flex-shrink-0 flex items-start justify-center w-10 h-10 bg-slate-100 border border-slate-200 rounded-lg pt-2">
-                          <span className="text-lg font-bold text-slate-700">{currentPage + 1}</span>
-                        </div>
-                              {/* Bookmark Button */}
-                        <button
-                          onClick={() => {
-                            const newBookmarks = new Set(bookmarkedQuestions);
-                            if (newBookmarks.has(question.id)) {
-                              newBookmarks.delete(question.id);
-                            } else {
-                              newBookmarks.add(question.id);
-                            }
-                            setBookmarkedQuestions(newBookmarks);
-                          }}
-                                className={`flex-shrink-0 p-2 rounded-lg transition-colors mt-0.5 ${
-                            bookmarkedQuestions.has(question.id)
-                              ? 'bg-yellow-100 text-yellow-500'
-                              : 'bg-slate-100 hover:bg-slate-200 text-slate-500'
-                          }`}
-                          aria-label={bookmarkedQuestions.has(question.id) ? "Remove bookmark" : "Bookmark question"}
-                        >
-                          <Bookmark className="w-5 h-5" />
-                        </button>
+                              {isUnitTest ? (
+                                <span className="flex-shrink-0 text-sm font-normal text-gray-400 mt-1">{currentPage + 1}.</span>
+                              ) : (
+                                <div className="flex-shrink-0 flex items-start justify-center w-10 h-10 bg-slate-100 border border-slate-200 rounded-lg pt-2">
+                                  <span className="text-lg font-normal text-slate-700">{currentPage + 1}</span>
+                                </div>
+                              )}
+                              {/* Bookmark + highlighter (unit test: compact toolbar) */}
+                              {isUnitTest ? (
+                                <div className="flex flex-shrink-0 items-start gap-0.5 mt-0.5">
+                                  <button
+                                    type="button"
+                                    onClick={() => toggleBookmark(question.id)}
+                                    className="flex-shrink-0 p-0.5 rounded hover:bg-gray-100/90 text-slate-500 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-blue-500"
+                                    aria-label={bookmarkedQuestions.has(question.id) ? 'Remove bookmark' : 'Bookmark question'}
+                                    title={bookmarkedQuestions.has(question.id) ? 'Remove bookmark' : 'Bookmark'}
+                                  >
+                                    <Bookmark
+                                      className={`w-4 h-4 ${bookmarkedQuestions.has(question.id) ? 'text-amber-500 fill-amber-400/30' : 'text-slate-400'}`}
+                                    />
+                                  </button>
+                                  {!isCustomAssignment && !isPreviewMode && (
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setQuestionHighlightModeById((prev) => ({
+                                          ...prev,
+                                          [question.id]: !prev[question.id],
+                                        }))
+                                      }
+                                      className={`flex-shrink-0 p-0.5 rounded hover:bg-gray-100/90 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-blue-500 ${
+                                        questionHighlightModeById[question.id] ? 'text-amber-500' : 'text-slate-400'
+                                      }`}
+                                      aria-pressed={!!questionHighlightModeById[question.id]}
+                                      aria-label="Highlight mode"
+                                      title="Highlight text in the question (not answers)"
+                                    >
+                                      <Highlighter className="w-4 h-4" strokeWidth={2} />
+                                    </button>
+                                  )}
+                                </div>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => toggleBookmark(question.id)}
+                                  className={`flex-shrink-0 p-2 rounded-lg transition-colors mt-0.5 ${
+                                    bookmarkedQuestions.has(question.id)
+                                      ? 'bg-yellow-100 text-yellow-500'
+                                      : 'bg-slate-100 hover:bg-slate-200 text-slate-500'
+                                  }`}
+                                  aria-label={
+                                    bookmarkedQuestions.has(question.id) ? 'Remove bookmark' : 'Bookmark question'
+                                  }
+                                >
+                                  <Bookmark className="w-5 h-5" />
+                                </button>
+                              )}
                               {/* Question Text */}
                               <div className="flex-1 min-w-0">
-                                <p className="text-base md:text-lg font-medium font-serif leading-relaxed text-gray-800 max-h-48 overflow-y-auto pr-2">
+                                <p
+                                  className={`leading-relaxed ${isUnitTest ? `font-normal text-gray-900 ${FONT_SIZE_CLASSES[questionFontSize]}` : 'text-base md:text-lg font-normal font-serif text-gray-800 max-h-48 overflow-y-auto pr-2'} ${
+                                    isUnitTest && questionHighlightModeById[question.id] && !isPreviewMode
+                                      ? 'cursor-text'
+                                      : ''
+                                  }`}
+                                >
                                   {isCustomAssignment ? (
                                     <QuestionWithKeyTerms 
                                       questionText={question.question} 
                                       unit={question.unit} 
-                                      subject={examType === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics'}
+                                      subject={apQuestionSubjectTag(examType)}
                                     />
+                                  ) : isUnitTest ? (
+                                    <UnitTestQuestionBody
+                                      question={question}
+                                      examType={examType}
+                                      highlightMode={!!questionHighlightModeById[question.id] && !isPreviewMode}
+                                      highlights={questionTextHighlights[question.id] ?? []}
+                                      onHighlightsChange={(next) =>
+                                        setQuestionTextHighlights((p) => ({ ...p, [question.id]: next }))
+                                      }
+                                    />
+                                  ) : isApGovQuestion(question) ? (
+                                    <ApGovQuestionText text={question.question} />
                                   ) : (
                                     question.question
                                   )}
@@ -1977,7 +2424,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                               setVideoUrl(question.sliderExplainer!);
                               setShowVideoModal(true);
                             }}
-                                      className="flex-shrink-0 flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+                                      className="flex-shrink-0 flex items-center gap-2 text-sm font-normal text-gray-700 hover:text-gray-900 transition-colors"
                             aria-label="View video explanation"
                           >
                             <Eye className="w-4 h-4" />
@@ -1990,7 +2437,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
 
                           {/* Visual Content - Directly Below Question Text */}
                           {hasVisualContent && !isCustomAssignment && !(showVideoModal && videoUrl) && (
-                            <div className="w-full">
+                            <div className={isUnitTest ? 'col-start-1 row-start-2 pr-8 border-r border-gray-100' : 'w-full'}>
                               {question.image && (
                                 <div className="bg-white rounded-lg border border-gray-200 p-4">
                                   <img 
@@ -2009,7 +2456,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                   <div className="flex items-center gap-4">
                                     {question.tableData.playerNames && (
                                       <div className="flex items-center justify-center h-full w-12">
-                                        <p className="transform -rotate-90 whitespace-nowrap text-center font-bold text-sm text-gray-900 leading-tight">
+                                        <p className="transform -rotate-90 whitespace-nowrap text-center font-normal text-sm text-gray-900 leading-tight">
                                           {question.tableData.playerNames.row.split(' ')[0]}
                                           <br />
                                           {question.tableData.playerNames.row.split(' ').slice(1).join(' ')}
@@ -2018,7 +2465,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                     )}
                                     <div className="flex-1">
                                       {question.tableData.playerNames && (
-                                        <p className="text-center font-bold text-sm text-gray-900 mb-2">
+                                        <p className="text-center font-normal text-sm text-gray-900 mb-2">
                                           {question.tableData.playerNames.column}
                                         </p>
                                       )}
@@ -2027,7 +2474,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                           <thead className="bg-white">
                                             <tr>
                                               {question.tableData.headers.map(header => (
-                                                <th key={header} className="border border-black px-2 py-2 text-center font-bold text-gray-900">
+                                                <th key={header} className="border border-black px-2 py-2 text-center font-normal text-gray-900">
                                                   {header}
                                                 </th>
                                               ))}
@@ -2037,11 +2484,10 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                             {question.tableData.rows.map((row, rowIndex) => (
                                               <tr key={rowIndex}>
                                                 {row.map((cell, cellIndex) => {
-                                                  const isRowHeader = question.tableData?.rowHeaders && cellIndex === 0;
                                                   return (
                                                     <td 
                                                       key={cellIndex} 
-                                                      className={`border border-black px-2 py-2 text-center ${isRowHeader ? 'font-bold' : ''}`}
+                                                      className={`border border-black px-2 py-2 text-center font-normal`}
                                                     >
                                                       {cell}
                                                     </td>
@@ -2080,7 +2526,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                   <div className="flex items-center gap-4">
                                     {question.tableData.playerNames && (
                                       <div className="flex items-center justify-center h-full w-16">
-                                        <p className="transform -rotate-90 whitespace-nowrap text-center font-bold text-lg text-gray-900 leading-tight">
+                                        <p className="transform -rotate-90 whitespace-nowrap text-center font-normal text-lg text-gray-900 leading-tight">
                                           {question.tableData.playerNames.row.split(' ')[0]}
                                           <br />
                                           {question.tableData.playerNames.row.split(' ').slice(1).join(' ')}
@@ -2089,7 +2535,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                     )}
                                     <div className="flex-1">
                                       {question.tableData.playerNames && (
-                                        <p className="text-center font-bold text-lg text-gray-900 mb-2">
+                                        <p className="text-center font-normal text-lg text-gray-900 mb-2">
                                           {question.tableData.playerNames.column}
                                         </p>
                                       )}
@@ -2097,7 +2543,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                         <thead className="bg-white">
                                           <tr>
                                             {question.tableData.headers.map(header => (
-                                              <th key={header} className="border border-black px-4 py-3 text-center text-base font-bold text-gray-900">
+                                              <th key={header} className="border border-black px-4 py-3 text-center text-base font-normal text-gray-900">
                                                 {header}
                                               </th>
                                             ))}
@@ -2107,11 +2553,10 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                           {question.tableData.rows.map((row, rowIndex) => (
                                             <tr key={rowIndex}>
                                               {row.map((cell, cellIndex) => {
-                                                const isRowHeader = question.tableData?.rowHeaders && cellIndex === 0;
                                                 return (
                                                   <td 
                                                     key={cellIndex} 
-                                                    className={`border border-black px-4 py-3 text-center text-base ${isRowHeader ? 'font-bold' : ''}`}
+                                                    className={`border border-black px-4 py-3 text-center text-base font-normal`}
                                                   >
                                                     {cell}
                                                   </td>
@@ -2159,7 +2604,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                               <div className="flex items-center gap-4">
                                 {question.tableData.playerNames && (
                                   <div className="flex items-center justify-center h-full w-16">
-                                    <p className="transform -rotate-90 whitespace-nowrap text-center font-bold text-lg text-gray-900 leading-tight">
+                                    <p className="transform -rotate-90 whitespace-nowrap text-center font-normal text-lg text-gray-900 leading-tight">
                                       {question.tableData.playerNames.row.split(' ')[0]}
                                       <br />
                                       {question.tableData.playerNames.row.split(' ').slice(1).join(' ')}
@@ -2168,7 +2613,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                 )}
                                 <div className="flex-1">
                                   {question.tableData.playerNames && (
-                                    <p className="text-center font-bold text-lg text-gray-900 mb-2">
+                                    <p className="text-center font-normal text-lg text-gray-900 mb-2">
                                       {question.tableData.playerNames.column}
                                     </p>
                                   )}
@@ -2176,7 +2621,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                     <thead className="bg-white">
                                       <tr>
                                         {question.tableData.headers.map(header => (
-                                          <th key={header} className="border border-black px-4 py-3 text-center text-base font-bold text-gray-900">
+                                          <th key={header} className="border border-black px-4 py-3 text-center text-base font-normal text-gray-900">
                                             {header}
                                           </th>
                                         ))}
@@ -2186,11 +2631,10 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                       {question.tableData.rows.map((row, rowIndex) => (
                                         <tr key={rowIndex}>
                                           {row.map((cell, cellIndex) => {
-                                            const isRowHeader = question.tableData?.rowHeaders && cellIndex === 0;
                                             return (
                                               <td 
                                                 key={cellIndex} 
-                                                className={`border border-black px-4 py-3 text-center text-base ${isRowHeader ? 'font-bold' : ''}`}
+                                                className={`border border-black px-4 py-3 text-center text-base font-normal`}
                                               >
                                                 {cell}
                                               </td>
@@ -2207,12 +2651,12 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
 
                             {/* Answer Options */}
                             {question.optionTableHeaders ? (
-                              <div className="space-y-3">
+                              <div className={`space-y-3 ${isUnitTest ? `[grid-column:2] ${hasVisualContent ? '[grid-row:1_/_span_2]' : '[grid-row:1]'} pl-8 overflow-y-auto self-start` : ''}`}>
                                 {/* Column Headers */}
                                 <div className="grid grid-cols-[auto_1fr_1fr_auto] gap-3 px-3 pb-2 border-b-2 border-gray-300">
                                   <div className="w-8"></div>
                                   {question.optionTableHeaders.map((header, idx) => (
-                                    <div key={idx} className="text-center font-semibold text-sm text-gray-700">
+                                    <div key={idx} className="text-center font-normal text-sm text-gray-700">
                                       {header}
                                     </div>
                                   ))}
@@ -2230,7 +2674,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                       key={index}
                                       onClick={() => handleAnswer(question.id, index)}
                                       disabled={showResults}
-                                      className={`w-full text-left p-3 text-sm font-medium transition-all duration-150 flex items-center gap-3 ${
+                                      className={`w-full text-left p-3 text-sm font-normal transition-all duration-150 flex items-center gap-3 ${
                                         isLiveSession
                                           ? 'rounded-xl shadow-lg border border-slate-200'
                                           : isCustomAssignment
@@ -2263,9 +2707,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                     >
                                       {/* Letter bubble */}
                                       <span className={`w-6 h-6 flex items-center justify-center rounded-full text-xs flex-shrink-0 ${
-                                        isLiveSession ? 'font-bold text-blue-500 border border-slate-200 bg-white' : isCustomAssignment ? 'border-2 border-black font-medium' : 'border font-medium'
+                                        isLiveSession ? 'font-normal text-blue-500 border border-slate-200 bg-white' : isCustomAssignment ? 'border-2 border-black font-normal' : 'border font-normal'
                                       } ${
-                                        !isLiveSession && (showResults ? (isCorrect ? 'bg-green-100 border-green-300 text-green-700' : isSelected ? 'bg-red-100 border-red-300 text-red-700' : 'bg-white border-gray-300 text-gray-500') : isStruckThrough ? 'bg-gray-200 border-gray-300 text-gray-400' : isSelected ? 'bg-blue-500 border-blue-600 text-white font-semibold' : 'bg-white border-gray-300 text-gray-600')
+                                        !isLiveSession && (showResults ? (isCorrect ? 'bg-green-100 border-green-300 text-green-700' : isSelected ? 'bg-red-100 border-red-300 text-red-700' : 'bg-white border-gray-300 text-gray-500') : isStruckThrough ? 'bg-gray-200 border-gray-300 text-gray-400' : isSelected ? 'bg-blue-500 border-blue-600 text-white font-normal' : 'bg-white border-gray-300 text-gray-600')
                                       } ${isLiveSession && isStruckThrough ? 'opacity-60' : ''}`}>
                                         {String.fromCharCode(65 + index)}
                                       </span>
@@ -2306,7 +2750,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                 })}
                               </div>
                             ) : (
-                              <div className="space-y-3">
+                              <div className={`space-y-3 ${isUnitTest ? `[grid-column:2] ${hasVisualContent ? '[grid-row:1_/_span_2]' : '[grid-row:1]'} pl-8 pt-1 overflow-y-auto self-start` : ''}`}>
                                 {question.options.map((option, index) => {
                                   const isStruckThrough = strikethroughState[question.id]?.includes(index);
                                   // Only show as selected if NOT struck through (strikethrough takes priority)
@@ -2318,7 +2762,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                       key={index}
                                       onClick={() => handleAnswer(question.id, index)}
                                       disabled={showResults}
-                                      className={`w-full text-left p-3 text-sm font-medium transition-all duration-150 flex items-center gap-3 ${
+                                      className={`w-full text-left p-3 text-sm font-normal transition-all duration-150 flex items-center gap-3 ${
                                         isLiveSession
                                           ? 'rounded-xl shadow-lg border border-slate-200'
                                           : isCustomAssignment
@@ -2351,9 +2795,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                     >
                                       {/* Letter bubble */}
                                       <span className={`w-6 h-6 flex items-center justify-center rounded-full text-xs flex-shrink-0 ${
-                                        isLiveSession ? 'font-bold text-blue-500 border border-slate-200 bg-white' : isCustomAssignment ? 'border-2 border-black font-medium' : 'border font-medium'
+                                        isLiveSession ? 'font-normal text-blue-500 border border-slate-200 bg-white' : isCustomAssignment ? 'border-2 border-black font-normal' : 'border font-normal'
                                       } ${
-                                        !isLiveSession && (showResults ? (isCorrect ? 'bg-green-100 border-green-300 text-green-700' : isSelected ? 'bg-red-100 border-red-300 text-red-700' : 'bg-white border-gray-300 text-gray-500') : isStruckThrough ? 'bg-gray-200 border-gray-300 text-gray-400' : isSelected ? 'bg-blue-500 border-blue-600 text-white font-semibold' : 'bg-white border-gray-300 text-gray-600')
+                                        !isLiveSession && (showResults ? (isCorrect ? 'bg-green-100 border-green-300 text-green-700' : isSelected ? 'bg-red-100 border-red-300 text-red-700' : 'bg-white border-gray-300 text-gray-500') : isStruckThrough ? 'bg-gray-200 border-gray-300 text-gray-400' : isSelected ? 'bg-blue-500 border-blue-600 text-white font-normal' : 'bg-white border-gray-300 text-gray-600')
                                       } ${isLiveSession && isStruckThrough ? 'opacity-60' : ''}`}>
                                         {String.fromCharCode(65 + index)}
                                       </span>
@@ -2367,7 +2811,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                           />
                                         </div>
                                       ) : (
-                                        <span className={`flex-1 text-sm ${isStruckThrough ? 'line-through text-gray-400' : ''} ${showResults ? 'text-gray-800' : isSelected ? 'text-gray-900' : 'text-gray-900'}`}>{option}</span>
+                                        <span className={`flex-1 ${isUnitTest ? `font-normal ${FONT_SIZE_CLASSES[questionFontSize]}` : 'text-sm'} ${isStruckThrough ? 'line-through text-gray-400' : ''} ${showResults ? 'text-gray-800' : isSelected ? 'text-gray-900' : 'text-gray-900'}`}>{option}</span>
                                       )}
                                       {/* Strikethrough Button - Only show when not submitted */}
                                       {!showResults && (
@@ -2445,10 +2889,18 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                   </p>
                   <button
                     type="button"
-                    onClick={() => router.push(examType === 'macro' ? '/ap-macro-unit-1-cheat-sheet' : '/ap-micro-unit-1-cheat-sheet')}
+                    onClick={() =>
+                      router.push(
+                        examType === 'gov'
+                          ? '/ap-gov-practice-tests'
+                          : examType === 'macro'
+                            ? '/ap-macro-unit-1-cheat-sheet'
+                            : '/ap-micro-unit-1-cheat-sheet'
+                      )
+                    }
                     className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xl font-bold transition-colors"
                   >
-                    AP {examType === 'macro' ? 'Macro' : 'Micro'} Cheat Sheets
+                    {examType === 'gov' ? 'AP Gov Practice Tests' : `AP ${examType === 'macro' ? 'Macro' : 'Micro'} Cheat Sheets`}
                   </button>
                   <button
                     type="button"
@@ -2504,21 +2956,35 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                     {/* Question Header */}
                     <div className="p-4 border-b border-gray-100">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="font-medium text-gray-500">Question {questions.indexOf(question) + 1}</span>
-                        <span className={`px-3 py-1 rounded-sm text-sm font-medium ${
+                        <span className="font-normal text-gray-500">Question {questions.indexOf(question) + 1}</span>
+                        <span className={`px-3 py-1 rounded-sm text-sm font-normal ${
                           isCorrect ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                         }`}>
                           {isCorrect ? 'Correct' : 'Incorrect'}
                         </span>
                       </div>
                       <div className="flex items-start gap-3">
-                        <p className="flex-1 text-base md:text-lg font-medium font-serif leading-relaxed text-gray-800">
+                        <p
+                          className={`flex-1 leading-relaxed text-gray-800 ${isUnitTest ? `font-normal ${FONT_SIZE_CLASSES[questionFontSize]}` : 'text-base md:text-lg font-normal font-serif'}`}
+                        >
                           {isCustomAssignment ? (
                           <QuestionWithKeyTerms 
                             questionText={question.question} 
                             unit={question.unit} 
-                            subject={examType === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics'}
+                            subject={apQuestionSubjectTag(examType)}
                           />
+                          ) : isUnitTest ? (
+                            <UnitTestQuestionBody
+                              question={question}
+                              examType={examType}
+                              highlightMode={false}
+                              highlights={questionTextHighlights[question.id] ?? []}
+                              onHighlightsChange={(next) =>
+                                setQuestionTextHighlights((p) => ({ ...p, [question.id]: next }))
+                              }
+                            />
+                          ) : isApGovQuestion(question) ? (
+                            <ApGovQuestionText text={question.question} />
                           ) : (
                             question.question
                           )}
@@ -2546,7 +3012,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                         <div className="flex items-center gap-4">
                           {question.tableData.playerNames && (
                             <div className="flex items-center justify-center h-full w-16">
-                              <p className="transform -rotate-90 whitespace-nowrap text-center font-bold text-lg text-gray-900 leading-tight">
+                              <p className="transform -rotate-90 whitespace-nowrap text-center font-normal text-lg text-gray-900 leading-tight">
                                 {question.tableData.playerNames.row.split(' ')[0]}
                                 <br />
                                 {question.tableData.playerNames.row.split(' ').slice(1).join(' ')}
@@ -2555,7 +3021,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                           )}
                           <div className="flex-1">
                             {question.tableData.playerNames && (
-                              <p className="text-center font-bold text-lg text-gray-900 mb-2">
+                              <p className="text-center font-normal text-lg text-gray-900 mb-2">
                                 {question.tableData.playerNames.column}
                               </p>
                             )}
@@ -2563,7 +3029,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                               <thead className="bg-white">
                                 <tr>
                                   {question.tableData.headers.map(header => (
-                                    <th key={header} className="border border-black px-4 py-3 text-center text-base font-bold text-gray-900">
+                                    <th key={header} className="border border-black px-4 py-3 text-center text-base font-normal text-gray-900">
                                       {header}
                                     </th>
                                   ))}
@@ -2573,11 +3039,10 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                 {question.tableData.rows.map((row, rowIndex) => (
                                   <tr key={rowIndex}>
                                     {row.map((cell, cellIndex) => {
-                                      const isRowHeader = question.tableData?.rowHeaders && cellIndex === 0;
                                       return (
                                         <td 
                                           key={cellIndex} 
-                                          className={`border border-black px-4 py-3 text-center text-base ${isRowHeader ? 'font-bold' : ''}`}
+                                          className={`border border-black px-4 py-3 text-center text-base font-normal`}
                                         >
                                           {cell}
                                         </td>
@@ -2616,7 +3081,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                         <div className="grid grid-cols-[auto_1fr_1fr_auto] gap-3 px-3 pb-2 border-b-2 border-gray-300">
                           <div className="w-8"></div>
                           {question.optionTableHeaders.map((header, idx) => (
-                            <div key={idx} className="text-center font-semibold text-sm text-gray-700">
+                            <div key={idx} className="text-center font-normal text-sm text-gray-700">
                               {header}
                             </div>
                           ))}
@@ -2631,14 +3096,14 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                           return (
                             <div
                               key={idx}
-                              className={`w-full text-left p-3 rounded-lg text-sm font-medium border flex items-center gap-3 cursor-default ${
+                              className={`w-full text-left p-3 rounded-lg text-sm font-normal border flex items-center gap-3 cursor-default ${
                                 isCorrectAnswer ? 'bg-green-50 text-gray-900 shadow-sm border-green-200' :
                                 (isSelected && !isCorrectAnswer) ? 'bg-red-50 text-gray-900 shadow-sm border-red-200' :
                                 'bg-transparent text-gray-900 border-gray-200'
                               }`}
                             >
                               {/* Letter bubble */}
-                              <span className={`w-6 h-6 flex items-center justify-center rounded-full border text-xs font-medium flex-shrink-0 ${
+                              <span className={`w-6 h-6 flex items-center justify-center rounded-full border text-xs font-normal flex-shrink-0 ${
                                 isCorrectAnswer ? 'bg-green-100 border-green-300 text-green-700' :
                                 (isSelected && !isCorrectAnswer) ? 'bg-red-100 border-red-300 text-red-700' :
                                 'bg-white border-gray-300 text-gray-500'
@@ -2676,14 +3141,14 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                         return (
                           <div
                             key={idx}
-                            className={`w-full text-left p-3 rounded-lg text-sm font-medium border flex items-center gap-3 cursor-default ${
+                            className={`w-full text-left p-3 rounded-lg text-sm font-normal border flex items-center gap-3 cursor-default ${
                               isCorrectAnswer ? 'bg-green-50 text-gray-900 shadow-sm border-green-200' :
                               (isSelected && !isCorrectAnswer) ? 'bg-red-50 text-gray-900 shadow-sm border-red-200' :
                               'bg-transparent text-gray-900 border-gray-200'
                             }`}
                           >
                             {/* Letter bubble */}
-                            <span className={`w-6 h-6 flex items-center justify-center rounded-full border text-xs font-medium flex-shrink-0 ${
+                            <span className={`w-6 h-6 flex items-center justify-center rounded-full border text-xs font-normal flex-shrink-0 ${
                               isCorrectAnswer ? 'bg-green-100 border-green-300 text-green-700' :
                               (isSelected && !isCorrectAnswer) ? 'bg-red-100 border-red-300 text-red-700' :
                               'bg-white border-gray-300 text-gray-500'
@@ -2723,7 +3188,8 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                       <div className="p-4 border-t border-gray-100">
                         <div className="mt-3 p-3 bg-blue-50 border-l-4 border-blue-400 rounded">
                           <p className="text-sm text-gray-800 leading-relaxed">
-                            <strong>Explanation:</strong> {question.explanation}
+                            <span className="text-gray-600">Explanation: </span>
+                            {question.explanation}
                           </p>
                         </div>
                       </div>
@@ -2742,7 +3208,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
             {/* For unit tests, preview exams, full exams, and custom assignments, always show panel without animation */}
             {shouldShowToolsByDefault ? (
                 showToolsPanel && (
-                  <div className="hidden lg:block flex-shrink-0 w-[35%] bg-white shadow-2xl z-40 border-l border-gray-200 overflow-hidden fixed right-0" style={{ top: '144px', height: 'calc(100vh - 144px)' }}>
+                  <div className="hidden lg:block flex-shrink-0 w-[35%] bg-white shadow-2xl z-40 border-l border-gray-200 overflow-hidden fixed right-0" style={{ top: isUnitTest ? '56px' : '144px', height: isUnitTest ? 'calc(100vh - 56px)' : 'calc(100vh - 144px)' }}>
                     <div className="w-full h-full flex flex-col overflow-hidden">
                     {/* Header */}
                     <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between flex-shrink-0">
@@ -2767,7 +3233,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                       {activeTool === 'whiteboard' && (
                         <div className="flex-1 flex flex-col overflow-hidden bg-white" style={{ minHeight: '400px', flex: '1 1 auto' }}>
                           <div className="w-full relative" style={{ height: '100%', minHeight: '400px', width: '100%', position: 'relative' }}>
-                            <Excalidraw
+                            <Excalidraw key={excalidrawKey}
                               zenModeEnabled={true}
                               viewModeEnabled={false}
                               gridModeEnabled={false}
@@ -2821,13 +3287,13 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                               </button>
                               <button
                                 onClick={() => handleCalculatorOperation('÷')}
-                                className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
+                                className={`${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
                               >
                                 ÷
                               </button>
                               <button
                                 onClick={() => handleCalculatorOperation('×')}
-                                className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
+                                className={`${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
                               >
                                 ×
                               </button>
@@ -2853,7 +3319,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                               </button>
                               <button
                                 onClick={() => handleCalculatorOperation('-')}
-                                className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
+                                className={`${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
                               >
                                 −
                               </button>
@@ -2879,7 +3345,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                               </button>
                               <button
                                 onClick={() => handleCalculatorOperation('+')}
-                                className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
+                                className={`${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
                               >
                                 +
                               </button>
@@ -2905,7 +3371,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                               </button>
                               <button
                                 onClick={handleCalculatorEquals}
-                                className={`row-span-2 ${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-xl`}
+                                className={`row-span-2 ${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-xl`}
                               >
                                 =
                               </button>
@@ -2939,7 +3405,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.2 }}
-                      className="hidden lg:block flex-shrink-0 w-[35%] bg-white shadow-2xl z-40 border-l border-gray-200 overflow-hidden fixed right-0" style={{ top: '144px', height: 'calc(100vh - 144px)' }}
+                      className="hidden lg:block flex-shrink-0 w-[35%] bg-white shadow-2xl z-40 border-l border-gray-200 overflow-hidden fixed right-0" style={{ top: isUnitTest ? '56px' : '144px', height: isUnitTest ? 'calc(100vh - 56px)' : 'calc(100vh - 144px)' }}
                     >
                     <motion.div
                       initial={{ x: '100%' }}
@@ -2953,12 +3419,39 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                       className="w-full h-full flex flex-col overflow-hidden"
                     >
                       {/* Header */}
-                      <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between flex-shrink-0">
-                        <span className="text-sm font-semibold text-gray-900">Calculator & Drawing Pad</span>
+                      <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between gap-3 flex-shrink-0">
+                        {isUnitTest ? (
+                          <div className="flex items-baseline gap-8 flex-1 min-w-0 font-mono">
+                            <button
+                              type="button"
+                              onClick={() => setScratchPadTab('draw')}
+                              className={`text-left text-lg font-semibold tracking-tight bg-transparent border-0 p-0 cursor-pointer shrink-0 transition-colors ${
+                                scratchPadTab === 'draw'
+                                  ? 'text-gray-900 underline decoration-2 underline-offset-4'
+                                  : 'text-gray-400 hover:text-gray-700 hover:underline decoration-1 underline-offset-4'
+                              }`}
+                            >
+                              drawing pad
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setScratchPadTab('text')}
+                              className={`text-left text-lg font-semibold tracking-tight bg-transparent border-0 p-0 cursor-pointer shrink-0 transition-colors ${
+                                scratchPadTab === 'text'
+                                  ? 'text-gray-900 underline decoration-2 underline-offset-4'
+                                  : 'text-gray-400 hover:text-gray-700 hover:underline decoration-1 underline-offset-4'
+                              }`}
+                            >
+                              type pad
+                            </button>
+                          </div>
+                        ) : (
+                          <span className="text-sm font-semibold text-gray-900">Drawing Pad & Scratch Paper</span>
+                        )}
                         {!shouldShowToolsByDefault && (
                           <button
                             onClick={() => setShowToolsPanel(false)}
-                            className="text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded p-1.5 transition-colors"
+                            className="text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded p-1.5 transition-colors shrink-0"
                             aria-label="Close tools panel"
                           >
                             <X className="w-5 h-5" />
@@ -2990,13 +3483,13 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                               </button>
                               <button
                                 onClick={() => handleCalculatorOperation('÷')}
-                                className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
+                                className={`${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
                               >
                                 ÷
                               </button>
                               <button
                                 onClick={() => handleCalculatorOperation('×')}
-                                className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
+                                className={`${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
                               >
                                 ×
                               </button>
@@ -3022,7 +3515,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                               </button>
                               <button
                                 onClick={() => handleCalculatorOperation('-')}
-                                className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
+                                className={`${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
                               >
                                 −
                               </button>
@@ -3048,7 +3541,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                               </button>
                               <button
                                 onClick={() => handleCalculatorOperation('+')}
-                                className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
+                                className={`${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
                               >
                                 +
                               </button>
@@ -3074,7 +3567,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                               </button>
                               <button
                                 onClick={handleCalculatorEquals}
-                                className={`row-span-2 ${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-xl`}
+                                className={`row-span-2 ${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-xl`}
                               >
                                 =
                               </button>
@@ -3097,40 +3590,49 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                         </div>
                         )}
 
-                        {/* Excalidraw Section */}
+                        {/* Excalidraw / Type Pad Section */}
                         {activeTool === 'whiteboard' && (
-                        <div className="flex-1 flex flex-col overflow-hidden bg-white">
-                          <div className="h-full w-full relative">
-                            <Excalidraw
-                              zenModeEnabled={true}
-                              viewModeEnabled={false}
-                              gridModeEnabled={false}
-                              UIOptions={{
-                                library: false,
-                                canvasActions: {
-                                  toggleTheme: false,
-                                  changeViewBackgroundColor: false,
-                                  loadScene: false,
-                                  saveToActiveFile: false,
-                                  export: false,
-                                },
-                              }}
-                              initialData={{
-                                elements: excalidrawElements,
-                                appState: {
-                                  ...excalidrawAppState,
-                                  zenModeEnabled: true,
-                                  theme: "light",
-                                  currentItemStrokeWidth: excalidrawAppState?.currentItemStrokeWidth ?? 1,
-                                },
-                              }}
-                              onChange={(elements: any, appState: any) => {
-                                setExcalidrawElements(elements);
-                                setExcalidrawAppState(appState);
-                              }}
+                          isUnitTest && scratchPadTab === 'text' ? (
+                            <textarea
+                              value={scratchNotes}
+                              onChange={e => setScratchNotes(e.target.value)}
+                              placeholder="Type your scratch notes here..."
+                              className="flex-1 w-full p-4 text-base text-gray-800 resize-none outline-none font-mono leading-relaxed bg-white"
                             />
-                          </div>
-                        </div>
+                          ) : (
+                            <div className="flex-1 flex flex-col overflow-hidden bg-white">
+                              <div className="h-full w-full relative">
+                                <Excalidraw key={excalidrawKey}
+                                  zenModeEnabled={true}
+                                  viewModeEnabled={false}
+                                  gridModeEnabled={false}
+                                  UIOptions={{
+                                    library: false,
+                                    canvasActions: {
+                                      toggleTheme: false,
+                                      changeViewBackgroundColor: false,
+                                      loadScene: false,
+                                      saveToActiveFile: false,
+                                      export: false,
+                                    },
+                                  }}
+                                  initialData={{
+                                    elements: excalidrawElements,
+                                    appState: {
+                                      ...excalidrawAppState,
+                                      zenModeEnabled: true,
+                                      theme: "light",
+                                      currentItemStrokeWidth: excalidrawAppState?.currentItemStrokeWidth ?? 1,
+                                    },
+                                  }}
+                                  onChange={(elements: any, appState: any) => {
+                                    setExcalidrawElements(elements);
+                                    setExcalidrawAppState(appState);
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          )
                         )}
                       </>
                     </motion.div>
@@ -3143,14 +3645,41 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
               {showToolsPanel && (
                 <div className="lg:hidden w-full bg-white shadow-lg border-t border-gray-200">
                   {/* Header */}
-                  <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between flex-shrink-0">
-                    <span className="text-sm font-semibold text-gray-900">
-                      {activeTool === 'calculator' ? 'Calculator' : 'Drawing Pad'}
-                    </span>
+                  <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between gap-3 flex-shrink-0">
+                    {isUnitTest && activeTool === 'whiteboard' ? (
+                      <div className="flex items-baseline gap-8 flex-1 min-w-0 font-mono">
+                        <button
+                          type="button"
+                          onClick={() => setScratchPadTab('draw')}
+                          className={`text-left text-lg font-semibold tracking-tight bg-transparent border-0 p-0 cursor-pointer shrink-0 transition-colors ${
+                            scratchPadTab === 'draw'
+                              ? 'text-gray-900 underline decoration-2 underline-offset-4'
+                              : 'text-gray-400 hover:text-gray-700 hover:underline decoration-1 underline-offset-4'
+                          }`}
+                        >
+                          drawing pad
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setScratchPadTab('text')}
+                          className={`text-left text-lg font-semibold tracking-tight bg-transparent border-0 p-0 cursor-pointer shrink-0 transition-colors ${
+                            scratchPadTab === 'text'
+                              ? 'text-gray-900 underline decoration-2 underline-offset-4'
+                              : 'text-gray-400 hover:text-gray-700 hover:underline decoration-1 underline-offset-4'
+                          }`}
+                        >
+                          type pad
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="text-sm font-semibold text-gray-900">
+                        {activeTool === 'calculator' ? 'Calculator' : 'Drawing Pad'}
+                      </span>
+                    )}
                     {!shouldShowToolsByDefault && (
                       <button
                         onClick={() => setShowToolsPanel(false)}
-                        className="text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded p-1.5 transition-colors"
+                        className="text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded p-1.5 transition-colors shrink-0"
                         aria-label="Close tools panel"
                       >
                         <X className="w-5 h-5" />
@@ -3161,40 +3690,50 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                   {/* For all exam types: Show only the active tool */}
                   {shouldShowToolsByDefault ? (
                     <>
-                      {/* Excalidraw Section */}
+                      {/* Excalidraw / Type Pad Section */}
                       {activeTool === 'whiteboard' && (
-                        <div className="flex flex-col bg-white" style={{ height: '400px' }}>
-                          <div className="h-full w-full relative">
-                            <Excalidraw
-                              zenModeEnabled={true}
-                              viewModeEnabled={false}
-                              gridModeEnabled={false}
-                              UIOptions={{
-                                library: false,
-                                canvasActions: {
-                                  toggleTheme: false,
-                                  changeViewBackgroundColor: false,
-                                  loadScene: false,
-                                  saveToActiveFile: false,
-                                  export: false,
-                                },
-                              }}
-                              initialData={{
-                                elements: excalidrawElements,
-                                appState: {
-                                  ...excalidrawAppState,
-                                  zenModeEnabled: true,
-                                  theme: "light",
-                                  currentItemStrokeWidth: excalidrawAppState?.currentItemStrokeWidth ?? 1,
-                                },
-                              }}
-                              onChange={(elements: any, appState: any) => {
-                                setExcalidrawElements(elements);
-                                setExcalidrawAppState(appState);
-                              }}
-                            />
+                        isUnitTest && scratchPadTab === 'text' ? (
+                          <textarea
+                            value={scratchNotes}
+                            onChange={e => setScratchNotes(e.target.value)}
+                            placeholder="Type your scratch notes here..."
+                            style={{ height: '400px' }}
+                            className="w-full p-4 text-base text-gray-800 resize-none outline-none font-mono leading-relaxed bg-white"
+                          />
+                        ) : (
+                          <div className="flex flex-col bg-white" style={{ height: '400px' }}>
+                            <div className="h-full w-full relative">
+                              <Excalidraw key={excalidrawKey}
+                                zenModeEnabled={true}
+                                viewModeEnabled={false}
+                                gridModeEnabled={false}
+                                UIOptions={{
+                                  library: false,
+                                  canvasActions: {
+                                    toggleTheme: false,
+                                    changeViewBackgroundColor: false,
+                                    loadScene: false,
+                                    saveToActiveFile: false,
+                                    export: false,
+                                  },
+                                }}
+                                initialData={{
+                                  elements: excalidrawElements,
+                                  appState: {
+                                    ...excalidrawAppState,
+                                    zenModeEnabled: true,
+                                    theme: "light",
+                                    currentItemStrokeWidth: excalidrawAppState?.currentItemStrokeWidth ?? 1,
+                                  },
+                                }}
+                                onChange={(elements: any, appState: any) => {
+                                  setExcalidrawElements(elements);
+                                  setExcalidrawAppState(appState);
+                                }}
+                              />
+                            </div>
                           </div>
-                        </div>
+                        )
                       )}
 
                       {/* Calculator Section */}
@@ -3219,13 +3758,13 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                               </button>
                               <button
                                 onClick={() => handleCalculatorOperation('÷')}
-                                className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
+                                className={`${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
                               >
                                 ÷
                               </button>
                               <button
                                 onClick={() => handleCalculatorOperation('×')}
-                                className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
+                                className={`${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
                               >
                                 ×
                               </button>
@@ -3251,7 +3790,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                               </button>
                               <button
                                 onClick={() => handleCalculatorOperation('-')}
-                                className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
+                                className={`${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
                               >
                                 −
                               </button>
@@ -3277,7 +3816,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                               </button>
                               <button
                                 onClick={() => handleCalculatorOperation('+')}
-                                className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
+                                className={`${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
                               >
                                 +
                               </button>
@@ -3303,7 +3842,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                               </button>
                               <button
                                 onClick={handleCalculatorEquals}
-                                className={`row-span-2 ${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-xl`}
+                                className={`row-span-2 ${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-xl`}
                               >
                                 =
                               </button>
@@ -3351,13 +3890,13 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                               </button>
                               <button
                                 onClick={() => handleCalculatorOperation('÷')}
-                                className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
+                                className={`${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
                               >
                                 ÷
                               </button>
                               <button
                                 onClick={() => handleCalculatorOperation('×')}
-                                className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
+                                className={`${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
                               >
                                 ×
                               </button>
@@ -3383,7 +3922,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                               </button>
                               <button
                                 onClick={() => handleCalculatorOperation('-')}
-                                className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
+                                className={`${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
                               >
                                 −
                               </button>
@@ -3409,7 +3948,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                               </button>
                               <button
                                 onClick={() => handleCalculatorOperation('+')}
-                                className={`${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
+                                className={`${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
                               >
                                 +
                               </button>
@@ -3435,7 +3974,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                               </button>
                               <button
                                 onClick={handleCalculatorEquals}
-                                className={`row-span-2 ${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800' : 'bg-green-600 hover:bg-green-700 active:bg-green-800'} text-white font-semibold py-3 rounded-lg transition-colors text-xl`}
+                                className={`row-span-2 ${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-xl`}
                               >
                                 =
                               </button>
@@ -3462,7 +4001,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                         {activeTool === 'whiteboard' && (
                         <div className="flex flex-col bg-white" style={{ height: '400px' }}>
                           <div className="h-full w-full relative">
-                            <Excalidraw
+                            <Excalidraw key={excalidrawKey}
                               zenModeEnabled={true}
                               viewModeEnabled={false}
                               gridModeEnabled={false}
@@ -3504,14 +4043,75 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
 
       {/* Fixed Bottom Bar - Navigation and Question Selector for custom assignments and tests */}
       {!showResults && shouldShowTestUI && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t-4 border-black shadow-lg z-50">
+        <div className={`fixed bottom-0 left-0 right-0 bg-white z-50 ${isUnitTest ? 'border-t border-gray-200' : 'border-t-4 border-black shadow-lg'}`}>
+          {/* Drawer — slides up out of the bottom bar */}
+          <AnimatePresence>
+            {showQuestionNavigator && (
+              <motion.div
+                key="question-navigator"
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 35 }}
+                className={`overflow-hidden w-full ${isUnitTest ? 'border-b border-gray-200' : 'border-b-4 border-black'}`}
+              >
+                <div className="max-w-7xl mx-auto px-4 py-4">
+                  <div className="flex flex-wrap gap-2">
+                    {questions.map((q, index) => {
+                      const isAnswered = answers[q.id] !== undefined;
+                      const isBookmarked = bookmarkedQuestions.has(q.id);
+                      const isCurrent = index === currentPage;
+                      return (
+                        <button
+                          key={q.id}
+                          onClick={() => {
+                            if (isTimerPaused && !isCustomAssignment) return;
+                            if (canNavigateToQuestion(index)) {
+                              setCurrentPage(index);
+                              setShowQuestionNavigator(false);
+                            } else {
+                              setIsTimerPaused(true);
+                              saveProgressBeforePurchase();
+                              setShowSeasonPassModal(true);
+                              setShowQuestionNavigator(false);
+                            }
+                          }}
+                          disabled={isTimerPaused && !isCustomAssignment}
+                          className={`w-10 h-10 rounded-lg font-normal text-sm transition-all ${
+                            isTimerPaused && !isCustomAssignment
+                              ? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-300'
+                              : isCurrent
+                              ? `${accentSolid} text-white ring-2 ${isUnitTest ? 'ring-offset-1 ring-gray-400' : 'ring-black'}`
+                              : isBookmarked
+                              ? 'bg-yellow-200 text-yellow-900 border-2 border-yellow-400'
+                              : isAnswered
+                              ? 'bg-blue-200 text-blue-900 border border-blue-300'
+                              : 'bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200'
+                          }`}
+                          title={`Question ${index + 1}${isBookmarked ? ' (Bookmarked)' : ''}${isTimerPaused && !isCustomAssignment ? ' (Test Paused)' : ''}`}
+                        >
+                          {index + 1}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
           <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+            {/* Sec label (unit test only) */}
+            {isUnitTest && (
+              <span className="hidden sm:block text-xs text-gray-400 font-normal shrink-0">
+                Sec I-A &bull; {questions.length} Questions
+              </span>
+            )}
             {/* Question Navigator Button */}
             <div className="relative flex-1 max-w-md" ref={questionNavigatorRef}>
               <button
                 onClick={() => setShowQuestionNavigator(!showQuestionNavigator)}
                 disabled={isTimerPaused && !isCustomAssignment}
-                className={`w-full px-4 py-2.5 rounded-lg font-semibold flex items-center justify-between transition-colors ${
+                className={`w-full px-4 py-2.5 rounded-lg font-normal flex items-center justify-between transition-colors ${
                   isTimerPaused && !isCustomAssignment
                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
                     : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
@@ -3528,54 +4128,6 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                 )}
               </button>
 
-              {/* Expandable Question Grid */}
-              {showQuestionNavigator && (
-                <div className="absolute bottom-full left-0 right-0 mb-2 bg-white border-2 border-black rounded-lg shadow-xl p-4 max-h-96 overflow-y-auto z-10">
-                  <div className="grid grid-cols-10 gap-2">
-                    {questions.map((q, index) => {
-                      const isAnswered = answers[q.id] !== undefined;
-                      const isBookmarked = bookmarkedQuestions.has(q.id);
-                      const isCurrent = index === currentPage;
-                      
-                      return (
-                        <button
-                          key={q.id}
-                          onClick={() => {
-                            if (isTimerPaused && !isCustomAssignment) {
-                              return;
-                            }
-                            if (canNavigateToQuestion(index)) {
-                              setCurrentPage(index);
-                              setShowQuestionNavigator(false);
-                            } else {
-                              // Pause timer and save progress before showing modal
-                              setIsTimerPaused(true);
-                              saveProgressBeforePurchase();
-                              setShowSeasonPassModal(true);
-                              setShowQuestionNavigator(false);
-                            }
-                          }}
-                          disabled={isTimerPaused && !isCustomAssignment}
-                          className={`w-10 h-10 rounded-lg font-semibold text-sm transition-all ${
-                            isTimerPaused && !isCustomAssignment
-                              ? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-300'
-                              : isCurrent
-                              ? `${examType === 'macro' ? 'bg-blue-600' : 'bg-green-600'} text-white ring-2 ring-black`
-                              : isBookmarked
-                              ? 'bg-yellow-200 text-yellow-900 border-2 border-yellow-400'
-                              : isAnswered
-                              ? 'bg-blue-200 text-blue-900 border border-blue-300'
-                              : 'bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200'
-                          }`}
-                          title={`Question ${index + 1}${isBookmarked ? ' (Bookmarked)' : ''}${isTimerPaused && !isCustomAssignment ? ' (Test Paused)' : ''}`}
-                        >
-                          {index + 1}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* Navigation Buttons */}
@@ -3584,14 +4136,15 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
               <button
                 onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
                 disabled={currentPage === 0 || (isTimerPaused && !isCustomAssignment)}
-                className={`px-6 py-2.5 rounded-lg font-semibold transition-colors flex items-center gap-2 ${
+                className={`px-6 py-2.5 rounded font-normal transition-colors flex items-center gap-2 ${
                   currentPage === 0 || (isTimerPaused && !isCustomAssignment)
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : `${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-green-600 hover:bg-green-700'} text-white`
+                    ? 'border border-gray-200 text-gray-300 cursor-not-allowed'
+                    : isUnitTest
+                    ? 'border border-gray-300 text-gray-700 hover:bg-gray-50'
+                    : `${accentHover} text-white`
                 }`}
               >
-                <ChevronLeft className="w-5 h-5" />
-                Back
+                Previous
               </button>
 
               {/* Next / Submit Button */}
@@ -3617,16 +4170,17 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                     }
                   }}
                   disabled={(isTimerPaused && !isCustomAssignment) || (isPreviewMode && currentPage === questions.length - 1)}
-                  className={`px-6 py-2.5 rounded-lg font-semibold transition-colors flex items-center gap-2 ${
+                  className={`px-6 py-2.5 rounded font-normal transition-colors flex items-center gap-2 ${
                     (isTimerPaused && !isCustomAssignment) || (isPreviewMode && currentPage === questions.length - 1)
                       ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                       : currentPage === questions.length - 1
                       ? 'bg-black hover:bg-gray-800 text-white'
-                      : `${examType === 'macro' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-green-600 hover:bg-green-700'} text-white`
+                      : isUnitTest
+                      ? 'bg-gray-900 hover:bg-gray-700 text-white'
+                      : `${accentHover} text-white`
                   }`}
                 >
                   {currentPage === questions.length - 1 ? 'Submit' : 'Next'}
-                  {currentPage < questions.length - 1 && <ChevronRight className="w-5 h-5" />}
                 </button>
                 {isPreviewMode && currentPage === questions.length - 1 && (
                   <div className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 px-3 py-1 text-xs font-semibold bg-black text-white rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">

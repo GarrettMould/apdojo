@@ -26,10 +26,16 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
   const isTutorPrintPreviewPage = pathname?.startsWith('/tutor/print-preview');
   // Worksheets (custom PDF assignments): no header/footer for clean printable layout
   const isWorksheetsPage = pathname?.startsWith('/worksheets');
+  const isUnitTestPreviewPage = pathname?.startsWith('/unit-test-preview');
+  const isUnitMCQTestPage =
+    pathname?.startsWith('/unit-mcq-test') ||
+    pathname?.match(/^\/ap-(macro|micro|gov)-unit-\d+-mcq-test/);
+  const isFullMCQExamPage = pathname?.startsWith('/preview/') || pathname?.match(/^\/ap-(macro|micro)-mcq-practice-test-\d+/) || pathname?.startsWith('/full-mcq-exam-preview') || pathname?.match(/^\/ap-(macro|micro)-frq-practice-test-\d+/);
+  const isCustomExamPage = pathname?.startsWith('/exam/custom');
 
   return (
     <div className="flex flex-col">
-      {!isPacketPrintPage && !isTutorPrintPreviewPage && !isWorksheetsPage && (
+      {!isPacketPrintPage && !isTutorPrintPreviewPage && !isWorksheetsPage && !isUnitTestPreviewPage && !isUnitMCQTestPage && !isFullMCQExamPage && !isCustomExamPage && (
         <Suspense fallback={<div className="h-20 bg-white" />}>
           <HeaderWithSuspense />
         </Suspense>
@@ -37,7 +43,7 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
       <main>
         {children}
       </main>
-      {!isGraphGymPage && !isUnitCheatSheetPage && !isPacketPrintPage && !isTutorPrintPreviewPage && !isWorksheetsPage && <Footer />}
+      {!isGraphGymPage && !isUnitCheatSheetPage && !isPacketPrintPage && !isTutorPrintPreviewPage && !isWorksheetsPage && !isUnitTestPreviewPage && !isUnitMCQTestPage && !isFullMCQExamPage && !isCustomExamPage && <Footer />}
     </div>
   );
 } 

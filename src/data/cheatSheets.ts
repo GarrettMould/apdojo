@@ -1,9 +1,11 @@
+import { govCurriculumOutline } from '@/data/courseCurriculumOutline';
+
 export type Unit = {
     number: number;
     title: string;
     description: string;
     pdfUrl: string;
-    subject: 'macro' | 'micro';
+    subject: 'macro' | 'micro' | 'gov';
     price: number; // Add price property
   }
 
@@ -16,6 +18,16 @@ export const macroUnits: Unit[] = [
     { number: 6, title: "Open Economy—International Trade and Finance", description: "How international trade, finance, and exchange rates affect an economy.", pdfUrl: "/cheat-sheets/macro/AP_Dojo_Macro_U6.pdf", subject: 'macro', price: 4.99 },
   ];
   
+/** AP U.S. Government — unit titles from `courseCurriculumOutline` (PDFs / cheat content TBD). */
+export const govUnits: Unit[] = govCurriculumOutline.units.map((u) => ({
+  number: u.unitNumber,
+  title: u.unitName,
+  description: `Unit ${u.unitNumber} of the AP U.S. Government and Politics course framework.`,
+  pdfUrl: '',
+  subject: 'gov' as const,
+  price: 4.99,
+}));
+
 export const microUnits: Unit[] = [
     { number: 1, title: "Basic Economic Concepts", description: "Core microeconomic principles including scarcity, trade-offs, and efficiency.", pdfUrl: "/cheat-sheets/micro/AP_Dojo_Micro_U1.pdf", subject: 'micro', price: 4.99 },
     { number: 2, title: "Supply and Demand", description: "The fundamental model of how prices and quantities are determined in a market.", pdfUrl: "/cheat-sheets/micro/AP_Dojo_Micro_U2.pdf", subject: 'micro', price: 4.99 },

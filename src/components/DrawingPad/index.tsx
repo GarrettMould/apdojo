@@ -28,6 +28,8 @@ interface DrawingPadProps {
   stickerLabels?: string[]; // Labels available for stickers
   templateImageUrl?: string; // Template image to show as background
   submitButtonVariant?: 'default' | 'greenMini';
+  /** Hide the Done control; persists to onSave automatically after strokes and text blur */
+  hideDoneButton?: boolean;
 }
 
 export function DrawingPad({ 
@@ -38,9 +40,11 @@ export function DrawingPad({
   enableStickers = false,
   stickerLabels = ['LRAS', 'SRAS', 'AD', 'Price Level', 'Real GDP'],
   templateImageUrl,
-  submitButtonVariant = 'default'
+  submitButtonVariant = 'default',
+  hideDoneButton = false,
 }: DrawingPadProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const flushDrawingRef = useRef(() => {});
   const [isDrawing, setIsDrawing] = useState(false);
   const [isEraser, setIsEraser] = useState(false);
   const [penColor, setPenColor] = useState('#000000');
@@ -244,6 +248,9 @@ export function DrawingPad({
       return;
     }
     setEditingTextId(null);
+    if (hideDoneButton) {
+      queueMicrotask(() => flushDrawingRef.current());
+    }
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -358,6 +365,10 @@ export function DrawingPad({
     }
 
     setIsDrawing(false);
+
+    if (hideDoneButton) {
+      queueMicrotask(() => flushDrawingRef.current());
+    }
   };
 
   const handleStickerDragStart = (e: React.MouseEvent, stickerId: string) => {
@@ -391,6 +402,9 @@ export function DrawingPad({
   const handleStickerDragEnd = () => {
     setDraggedSticker(null);
     setDragOffset(null);
+    if (hideDoneButton && enableStickers) {
+      queueMicrotask(() => flushDrawingRef.current());
+    }
   };
 
   const addSticker = (label: string) => {
@@ -460,6 +474,8 @@ export function DrawingPad({
       onSave(imageData);
     }
   };
+
+  flushDrawingRef.current = handleSave;
 
   const getPenCursor = () => {
     const size = 10;
@@ -601,19 +617,22 @@ export function DrawingPad({
           <Undo2 className="w-4 h-4" />
         </button>
       </div>
-      <div className="absolute top-2 right-2 z-10">
-        <button
-          onClick={handleSave}
-          className={
-            submitButtonVariant === 'greenMini'
-              ? 'inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black text-white bg-green-500 hover:bg-green-600 rounded-lg border border-green-700 shadow-[0_2px_0_0_rgba(0,0,0,1)] active:translate-y-0.5 active:shadow-[0_1px_0_0_rgba(0,0,0,1)] transition-all'
-              : 'flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors'
-          }
-        >
-          <CheckCircle className="w-4 h-4" />
-          Done
-        </button>
-      </div>
+      {!hideDoneButton && (
+        <div className="absolute top-2 right-2 z-10">
+          <button
+            type="button"
+            onClick={handleSave}
+            className={
+              submitButtonVariant === 'greenMini'
+                ? 'inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black text-white bg-green-500 hover:bg-green-600 rounded-lg border border-green-700 shadow-[0_2px_0_0_rgba(0,0,0,1)] active:translate-y-0.5 active:shadow-[0_1px_0_0_rgba(0,0,0,1)] transition-all'
+                : 'flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors'
+            }
+          >
+            <CheckCircle className="w-4 h-4" />
+            Done
+          </button>
+        </div>
+      )}
       <canvas
         ref={canvasRef}
         width={isLarge ? 600 : 300}

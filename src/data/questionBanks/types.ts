@@ -6,7 +6,11 @@ export interface Question {
   id: number;
   questionNumber?: number;
   unit: number;
-  subject: 'ap_macroeconomics' | 'ap_microeconomics' | ('ap_macroeconomics' | 'ap_microeconomics')[];
+  subject:
+    | 'ap_macroeconomics'
+    | 'ap_microeconomics'
+    | 'ap_us_government'
+    | ('ap_macroeconomics' | 'ap_microeconomics' | 'ap_us_government')[];
   unitName: string;
   question: string;
   image: StaticImageData | { src: string; alt: string } | null;

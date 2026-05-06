@@ -328,6 +328,7 @@ export default function UnitFRQTestPage({ params }: UnitFRQTestPageProps) {
                           <div className="border border-gray-200 rounded-lg p-4 bg-white">
                             <DrawingPad
                               isLarge={true}
+                              hideDoneButton
                               onSave={(data) => handleDrawingAnswer(answerId, data)}
                               initialData={drawingAnswer}
                             />
@@ -365,6 +366,7 @@ export default function UnitFRQTestPage({ params }: UnitFRQTestPageProps) {
                                     <div className="border border-gray-200 rounded-lg p-4 bg-white">
                                       <DrawingPad
                                         isLarge={true}
+                                        hideDoneButton
                                         onSave={(data) => handleDrawingAnswer(subAnswerId, data)}
                                         initialData={subDrawingAnswer}
                                       />

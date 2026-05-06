@@ -23,6 +23,8 @@ import { KeyTerm } from '@/data/allContent';
 import ReactMarkdown from 'react-markdown';
 import { ExamCalculator } from './ExamCalculator';
 import { ExamWhiteboard } from './ExamWhiteboard';
+import { McqQuestionTutorFab } from './McqQuestionTutorFab';
+import { courseSubjectFromQuestionSubject } from '@/lib/courseSubject';
 
 import dojoIcon from "../../public/images/dojoIcon.png";
 
@@ -130,6 +132,7 @@ interface UnitMCQSProps {
   isAnswerDisabled?: boolean; // New prop to disable answer selection
   onLoginPrompt?: () => void; // Callback when user tries to answer but is disabled
   isNavigationDisabled?: boolean; // New prop to disable Next/Previous buttons
+  onTutorOpenChange?: (open: boolean) => void;
 }
 
 // BeltHUD Component
@@ -1206,10 +1209,11 @@ const QuestionArena = ({ question, onAnswerSelect, initialSelectedLetter, isAnsw
   const displayQuestionText = parsedTableData ? textWithoutTable : question.question;
 
   return (
-    <div className="space-y-8">
+    <div className="flex h-full min-h-0 flex-col gap-4">
+      <div className="min-h-0 flex-1 overflow-y-auto pr-1">
       {/* Question Text - Large and Readable */}
-      <div className="space-y-6">
-        <div className="text-2xl font-black leading-tight text-gray-900 prose prose-lg max-w-none">
+      <div className="space-y-3">
+        <div className="prose prose-base max-w-none text-xl font-black leading-snug text-gray-900">
           <ReactMarkdown
             components={{
               p: ({ children }) => <p className="mb-4">{children}</p>,
@@ -1266,13 +1270,13 @@ const QuestionArena = ({ question, onAnswerSelect, initialSelectedLetter, isAnsw
       </div>
 
       {/* Answer Options - Vertical Stack */}
-      <div className="space-y-4">
+      <div className="space-y-3">
         {question.options.map((option, optIndex) => {
           const isHighlighted = !isSubmitted && highlightedIndex === optIndex;
           const isSelected = selectedAnswerIndex === optIndex;
           const isCorrect = optIndex === correctAnswerIndex;
           
-          let optionClass = 'w-full text-left p-6 border-4 rounded-xl cursor-pointer transition-all ';
+          let optionClass = 'w-full text-left p-4 border-4 rounded-xl cursor-pointer transition-all ';
           
           if (isSubmitted) {
             if (isCorrect) {
@@ -1311,7 +1315,7 @@ const QuestionArena = ({ question, onAnswerSelect, initialSelectedLetter, isAnsw
                 }`}>
                   {String.fromCharCode(65 + optIndex)}
                 </span>
-                <span className="flex-1 text-lg font-medium text-gray-900">{option}</span>
+                <span className="flex-1 text-base font-semibold text-gray-900">{option}</span>
                 {isSubmitted && (
                   <div className="flex-shrink-0">
                     {isCorrect ? (
@@ -1338,7 +1342,7 @@ const QuestionArena = ({ question, onAnswerSelect, initialSelectedLetter, isAnsw
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               transition={{ duration: 0.3 }}
-              className="mt-6 pt-6 border-t border-gray-200"
+              className="mt-3 border-t border-gray-200 pt-3"
             >
               {/* Explanation */}
               {isLoadingAI ? (
@@ -1361,7 +1365,7 @@ const QuestionArena = ({ question, onAnswerSelect, initialSelectedLetter, isAnsw
         // If correct, show explanation as a link
         if (isCorrect && onExplanationClick) {
           return (
-            <div className="mt-6 pt-6 border-t border-gray-200">
+            <div className="mt-3 border-t border-gray-200 pt-3">
               <button
                 onClick={onExplanationClick}
                 className="text-blue-600 hover:text-blue-800 font-semibold text-sm flex items-center gap-2 underline"
@@ -1400,6 +1404,7 @@ const QuestionArena = ({ question, onAnswerSelect, initialSelectedLetter, isAnsw
         
         return null;
       })()}
+      </div>
     </div>
   );
 };
@@ -1431,6 +1436,7 @@ export function UnitMCQs({
   isAnswerDisabled = false,
   onLoginPrompt,
   isNavigationDisabled = false,
+  onTutorOpenChange,
 }: UnitMCQSProps) {
   const { login, signup, userData, loadingUserData, user, awardXp, totalXP, guestXp } = useAuthContext();
   const [aiExplanations, setAiExplanations] = useState<Record<number, string>>({});
@@ -1769,6 +1775,11 @@ export function UnitMCQs({
   const [showCalculator, setShowCalculator] = useState(false);
   const [showWhiteboard, setShowWhiteboard] = useState(false);
   const [showExplanationForCorrect, setShowExplanationForCorrect] = useState(false);
+  const [isTutorOpen, setIsTutorOpen] = useState(false);
+
+  useEffect(() => {
+    onTutorOpenChange?.(isTutorOpen);
+  }, [isTutorOpen, onTutorOpenChange]);
   
   // Get belt progress
   const userXP = user ? getSubjectXP(userData, subject) : (guestXp ?? 0);
@@ -1820,6 +1831,18 @@ export function UnitMCQs({
             
                         return (
     <>
+      {currentQuestion && (
+        <McqQuestionTutorFab
+          subject={courseSubjectFromQuestionSubject(currentQuestion.subject)}
+          unitTitle={unitName}
+          question={currentQuestion}
+          selectedLetter={currentAnswerState?.selectedLetter}
+          answered={!!currentAnswerState}
+          splitScreenOnDesktop={true}
+          onOpenChange={setIsTutorOpen}
+        />
+      )}
+
       {/* Calculator */}
       {showCalculator && (
         <ExamCalculator onClose={() => setShowCalculator(false)} />
@@ -1831,37 +1854,44 @@ export function UnitMCQs({
       )}
 
       {/* Focus Mode Layout */}
-      <div className="min-h-screen bg-gray-50 pb-20 lg:pb-4">
-        <div className="max-w-3xl mx-auto px-4 pt-6 pb-12">
-          {/* Top Row: BeltHUD */}
-          <BeltHUD
-            currentXP={userXP}
-            nextBeltXP={beltProgress.nextBeltXP}
-            currentBelt={currentBelt}
-            percent={percent}
-          />
+      <div className="h-[100dvh] overflow-hidden bg-gray-50">
+        <div
+          className={`h-full px-4 pt-4 pb-4 transition-all duration-300 lg:transform ${
+            isTutorOpen
+              ? 'max-w-none lg:ml-auto lg:mr-4 lg:w-[75%] lg:translate-x-1'
+              : 'max-w-3xl mx-auto'
+          }`}
+        >
+          <div className="flex h-full min-h-0 flex-col">
+            {/* Top Row: BeltHUD */}
+            <BeltHUD
+              currentXP={userXP}
+              nextBeltXP={beltProgress.nextBeltXP}
+              currentBelt={currentBelt}
+              percent={percent}
+            />
 
-          {/* Center: QuestionArena */}
-          {currentQuestion && (
-            <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6 md:p-8 mb-8">
-              <QuestionArena
-                question={currentQuestion}
-                onAnswerSelect={handleAnswerSelection}
-                initialSelectedLetter={currentAnswerState?.selectedLetter}
-                isAnswered={!!currentAnswerState}
-                highlightedIndex={highlightedIndex}
-                aiExplanation={aiExplanations[currentQuestion.id]}
-                isLoadingAI={isLoadingExplanation}
-                onExplanationClick={handleExplanationClick}
-                showExplanationForCorrect={showExplanationForCorrect}
-                isAnswerDisabled={isAnswerDisabled}
-                onLoginPrompt={onLoginPrompt}
-              />
-                </div>
+            {/* Center: QuestionArena */}
+            {currentQuestion && (
+              <div className="min-h-0 flex-1 overflow-hidden rounded-lg border border-gray-200 bg-white p-4 shadow-md md:p-5">
+                <QuestionArena
+                  question={currentQuestion}
+                  onAnswerSelect={handleAnswerSelection}
+                  initialSelectedLetter={currentAnswerState?.selectedLetter}
+                  isAnswered={!!currentAnswerState}
+                  highlightedIndex={highlightedIndex}
+                  aiExplanation={aiExplanations[currentQuestion.id]}
+                  isLoadingAI={isLoadingExplanation}
+                  onExplanationClick={handleExplanationClick}
+                  showExplanationForCorrect={showExplanationForCorrect}
+                  isAnswerDisabled={isAnswerDisabled}
+                  onLoginPrompt={onLoginPrompt}
+                />
+              </div>
             )}
 
-          {/* Bottom: Navigation Buttons */}
-          <div className="flex gap-4">
+            {/* Bottom: Navigation Buttons */}
+            <div className="mt-3 flex shrink-0 gap-4">
               <button
               onClick={() => {
                 if (isNavigationDisabled) return;
@@ -1892,6 +1922,7 @@ export function UnitMCQs({
                 Next
               </button>
             </div>
+          </div>
           </div>
 
         {/* Right Side: TacticalToolbar */}

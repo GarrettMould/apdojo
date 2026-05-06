@@ -150,6 +150,7 @@ function CustomExamContent() {
       questionType="mcq"
       examNumber="custom"
       isCustomAssignment={true}
+      isUnitTest={true}
       assignmentLinkId={encodedParam || undefined}
       isPreviewMode={isPreviewMode}
     />

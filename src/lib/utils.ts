@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import type { CourseSubject } from "@/lib/courseSubject"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -8,12 +9,12 @@ export function cn(...inputs: ClassValue[]) {
 /**
  * Check if user has a valid (non-expired) season pass
  * @param userData - User data object from Firestore
- * @param subject - Optional subject to check ('macro' | 'micro'). If not provided, checks if user has any valid pass.
+ * @param subject - Optional course to check. If not provided, checks if user has any valid pass.
  * @returns true if user has a valid season pass
  */
 export function hasValidSeasonPass(
   userData: any,
-  subject?: 'macro' | 'micro'
+  subject?: CourseSubject
 ): boolean {
   if (!userData) return false;
   
@@ -62,7 +63,7 @@ export const getUnitColor = (unitId: number): string => {
  * @param subject - Subject ('macro' | 'micro')
  * @returns Descriptive URL like '/ap-micro-unit-3-mcq-test'
  */
-export function getUnitMCQTestUrl(unitId: number, subject: 'macro' | 'micro'): string {
+export function getUnitMCQTestUrl(unitId: number, subject: CourseSubject): string {
   return `/ap-${subject}-unit-${unitId}-mcq-test`;
 }
 
@@ -72,7 +73,7 @@ export function getUnitMCQTestUrl(unitId: number, subject: 'macro' | 'micro'): s
  * @param testNumber - Test number (default: 1)
  * @returns Descriptive URL like '/ap-micro-mcq-practice-test-1'
  */
-export function getFullMCQTestUrl(subject: 'macro' | 'micro', testNumber: number = 1): string {
+export function getFullMCQTestUrl(subject: CourseSubject, testNumber: number = 1): string {
   return `/ap-${subject}-mcq-practice-test-${testNumber}`;
 }
 
@@ -82,7 +83,7 @@ export function getFullMCQTestUrl(subject: 'macro' | 'micro', testNumber: number
  * @param testNumber - Test number (default: 2 for micro, 1 for macro)
  * @returns Descriptive URL like '/ap-micro-frq-practice-test-2'
  */
-export function getFullFRQTestUrl(subject: 'macro' | 'micro', testNumber?: number): string {
+export function getFullFRQTestUrl(subject: CourseSubject, testNumber?: number): string {
   // Default to test-2 for micro, test-1 for macro (as per user spec)
   const defaultTestNumber = subject === 'micro' ? 2 : 1;
   const testNum = testNumber ?? defaultTestNumber;
@@ -94,6 +95,6 @@ export function getFullFRQTestUrl(subject: 'macro' | 'micro', testNumber?: numbe
  * @param subject - Subject ('macro' | 'micro')
  * @returns Descriptive URL like '/ap-micro-practice-tests'
  */
-export function getPracticeTestsUrl(subject: 'macro' | 'micro'): string {
+export function getPracticeTestsUrl(subject: CourseSubject): string {
   return `/ap-${subject}-practice-tests`;
 }

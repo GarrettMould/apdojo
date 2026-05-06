@@ -11,6 +11,8 @@ import { LoginModal, SignupModal } from '@/components/AuthModals'
 // import { doc, setDoc, getDoc, collection, query, where, getDocs, orderBy } from 'firebase/firestore'
 import { testPerformanceService, TestPerformance } from '@/services/testPerformance'
 import React from 'react'
+import type { CourseSubject } from '@/lib/courseSubject'
+import { normalizeCourseSubject, econCourseFromSubject, displayCourseLabel } from '@/lib/courseSubject'
 
 // Add these types at the top of the file
 type Unit = {
@@ -195,18 +197,20 @@ const UnitFilter = ({
   units: Unit[];
   selectedUnits: number[];
   onUnitToggle: (unitId: number) => void;
-  userSubject: 'macro' | 'micro';
+  userSubject: CourseSubject;
   onClearFilters: () => void;
 }) => {
+  const titleColor =
+    userSubject === 'macro'
+      ? 'text-blue-500'
+      : userSubject === 'micro'
+        ? 'text-green-500'
+        : 'text-violet-600';
   return (
     <div className="mb-8">
       <h2 className="text-2xl md:text-4xl text-center font-extrabold tracking-wide mb-6 md:mb-10">
-        <span className={`text-4xl md:text-6xl block mb-2 ${
-          userSubject === 'macro' 
-            ? 'text-blue-500' 
-            : 'text-green-500'
-        }`}>
-          AP {userSubject === 'macro' ? 'Macro' : 'Micro'}
+        <span className={`text-4xl md:text-6xl block mb-2 ${titleColor}`}>
+          AP {displayCourseLabel(userSubject)}
         </span>
         <span className="block">
           Comprehension Checks
@@ -260,13 +264,18 @@ const getUnits = (subject: 'macro' | 'micro'): Unit[] => {
 export function QuestionsGrid({ onGuestActionAttempt }: { onGuestActionAttempt?: () => void }) {
   const { user, userData } = useAuthContext();
   
-  const subject = useMemo(() => userData?.selectedSubject || 'micro', [userData]);
+  const subject = useMemo(
+    () => normalizeCourseSubject(userData?.selectedSubject as string | undefined),
+    [userData],
+  );
+  const econOnly = econCourseFromSubject(subject);
 
   const getAllQuestions = useCallback(() => {
     const allQuestions: Question[] = [];
-    
-    const subjectData = subject === 'macro' 
-      ? conceptChecks.macroeconomics 
+    if (!econOnly) return allQuestions;
+
+    const subjectData = econOnly === 'macro'
+      ? conceptChecks.macroeconomics
       : conceptChecks.microeconomics;
     
     Object.entries(subjectData).forEach(([unitNumber, unitData]) => {
@@ -281,7 +290,7 @@ export function QuestionsGrid({ onGuestActionAttempt }: { onGuestActionAttempt?:
     });
     
     return allQuestions;
-  }, [subject]);
+  }, [econOnly]);
 
   const getRandomQuestions = useCallback((count: number) => {
     const allQuestions = getAllQuestions();
@@ -289,7 +298,7 @@ export function QuestionsGrid({ onGuestActionAttempt }: { onGuestActionAttempt?:
     return shuffled.slice(0, count);
   }, [getAllQuestions]);
 
-  const units = useMemo(() => getUnits(subject), [subject]);
+  const units = useMemo(() => (econOnly ? getUnits(econOnly) : []), [econOnly]);
 
   const [selectedUnits, setSelectedUnits] = useState<number[]>([]);
 

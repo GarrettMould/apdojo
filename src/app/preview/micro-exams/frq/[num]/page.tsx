@@ -28,8 +28,10 @@ export default function MicroFRQPreview({ params }: { params: Promise<{ num: str
 
   // Show the exam - accessible to everyone
   return (
-    <div className="py-8">
-      <FullExamFRQ questions={frqSetOneQuestions} />
-    </div>
+    <FullExamFRQ
+      questions={frqSetOneQuestions}
+      examType="micro"
+      backUrl="/unit-final-practice-tests?subject=ap_microeconomics"
+    />
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { DrawingPad } from '@/components/DrawingPad';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { VideoModal } from '@/components/VideoModal';
-import { frqExams, FRQPart, FRQSubPart } from '@/data/frqQuestions';
+import { frqExams, FRQPart, FRQSubPart, type FRQQuestion } from '@/data/frqQuestions';
 import { FeedbackBlock } from '@/components/FeedbackBlock';
 import { DrawingInput } from '@/components/DrawingInput';
 import { ShareFRQButton } from '@/components/ShareFRQButton';
@@ -19,6 +19,8 @@ import { LoginModal, SignupModal } from '@/components/AuthModals';
 import { SeasonPassModal } from '@/components/SeasonPassModal';
 import FRQLibrarySidebar, { FRQItem } from '@/components/FRQLibrarySidebar';
 import { hasValidSeasonPass } from '@/lib/utils';
+import type { CourseSubject } from '@/lib/courseSubject';
+import { econCourseFromSubject } from '@/lib/courseSubject';
 import { FRQCompletionModal } from '@/components/FRQCompletionModal';
 
 // Self-Review Component for Drawings
@@ -187,44 +189,52 @@ function UnitFRQPracticePageComponent() {
   const isProCustomer = React.useMemo(() => {
     if (!user || !userData) return false;
     // Check if user has valid season pass for current subject
-    const subjectKey = selectedSubject === 'macro' ? 'macro' : 'micro';
-    return hasValidSeasonPass(userData, subjectKey);
+    return hasValidSeasonPass(userData, selectedSubject);
   }, [user, userData, selectedSubject]);
 
+  const frqEconSubject = econCourseFromSubject(selectedSubject);
+
   // Memoize the filtering of relevant exams
-  const relevantExams = React.useMemo(() => frqExams.filter(exam =>
-    exam.questions.some(q =>
-      Array.isArray(q.subject)
-        ? q.subject.includes(selectedSubject)
-        : q.subject === selectedSubject
-    )
-  ), [selectedSubject]);
+  const relevantExams = React.useMemo(() => {
+    if (!frqEconSubject) return [];
+    return frqExams.filter(exam =>
+      exam.questions.some(q =>
+        Array.isArray(q.subject)
+          ? q.subject.includes(frqEconSubject)
+          : q.subject === frqEconSubject
+      )
+    );
+  }, [frqEconSubject]);
 
   // Memoize the flattening, subject-filtering, and sorting of all questions
-  const allQuestions = React.useMemo(
-    () =>
-      relevantExams
-        .flatMap(exam =>
-          exam.questions
-            // Ensure questions match the currently selected subject
-            .filter(q =>
-              Array.isArray(q.subject)
-                ? q.subject.includes(selectedSubject)
-                : q.subject === selectedSubject
-            )
-            .map(q => ({ ...q, unit: exam.unit, examTitle: exam.examTitle }))
-        )
-        .sort(
-          (a, b) =>
-            (a.unit || 99) - (b.unit || 99) ||
-            a.title.localeCompare(b.title)
-        ),
-    [relevantExams, selectedSubject]
-  );
+  type DisplayFrq = FRQQuestion & { unit: number; examTitle: string };
+
+  const allQuestions = React.useMemo((): DisplayFrq[] => {
+    if (!frqEconSubject) return [];
+    return relevantExams
+      .flatMap(exam =>
+        exam.questions
+          .filter(q =>
+            Array.isArray(q.subject)
+              ? q.subject.includes(frqEconSubject)
+              : q.subject === frqEconSubject
+          )
+          .map(q => ({ ...q, unit: exam.unit, examTitle: exam.examTitle }))
+      )
+      .sort(
+        (a, b) =>
+          (a.unit || 99) - (b.unit || 99) ||
+          a.title.localeCompare(b.title)
+      );
+  }, [relevantExams, frqEconSubject]);
 
   // Helper function to check if a question is locked
   const isQuestionLocked = React.useCallback((questionId: number | undefined, questionUnit?: number): boolean => {
     if (!questionId) return true;
+
+    if (selectedSubject === 'gov') {
+      return true;
+    }
     
     // Pro customers: All FRQs unlocked
     if (isProCustomer) {
@@ -272,7 +282,7 @@ function UnitFRQPracticePageComponent() {
         }
       }
     }
-  }, [searchParams, allQuestions]);
+  }, [searchParams, allQuestions, isQuestionLocked]);
 
   // Set initial question to first unlocked one if current is locked
   useEffect(() => {
@@ -319,7 +329,7 @@ function UnitFRQPracticePageComponent() {
         status,
       };
     });
-  }, [allDisplayQuestions]);
+  }, [allDisplayQuestions, isQuestionLocked, selectedSubject]);
 
   // Get the selected question, or fallback to first question if index is invalid
   const selectedQuestion = allDisplayQuestions[selectedQuestionIndex] || allDisplayQuestions[0];
@@ -343,6 +353,33 @@ function UnitFRQPracticePageComponent() {
   const [checklistPoints, setChecklistPoints] = useState<Record<string, number>>({});
   const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [totalXpEarned, setTotalXpEarned] = useState(0);
+
+  const previousSubjectRef = useRef<CourseSubject | null>(null);
+
+  // When learner switches Macro ↔ Micro, reset selections + answers so the library + main panel match Auth subject (not Framer-motion cache from prior list).
+  useEffect(() => {
+    if (previousSubjectRef.current === null) {
+      previousSubjectRef.current = selectedSubject;
+      return;
+    }
+    if (previousSubjectRef.current === selectedSubject) return;
+    previousSubjectRef.current = selectedSubject;
+
+    setSelectedQuestionIndex(0);
+    setExpandedParts({});
+    setExpandedSubparts({});
+    setShowAnswers({});
+    setTextAnswers({});
+    setDrawingAnswers({});
+    setGradingFeedback({});
+    setIsGrading({});
+    setSubmittedDrawings({});
+    setChecklistPoints({});
+    setVideoModalState(null);
+    setIsExpertTipVisible(false);
+    setShowCompletionModal(false);
+    setTotalXpEarned(0);
+  }, [selectedSubject]);
 
   const handlePrint = () => {
     window.print();
@@ -740,6 +777,7 @@ function UnitFRQPracticePageComponent() {
           </div>
           <div className="flex-1 overflow-hidden">
             <FRQLibrarySidebar
+              key={`frq-library-${selectedSubject}`}
               items={frqItems}
               selectedId={selectedQuestion?.id?.toString() || ''}
               onSelect={(id) => {
@@ -771,10 +809,10 @@ function UnitFRQPracticePageComponent() {
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1">
                 <h1 className="text-3xl font-bold text-gray-900 mb-1">
-                  {'title' in frqQuestion ? frqQuestion.title : `Question ${frqQuestion.questionNumber}`}
+                  {frqQuestion ? frqQuestion.title : 'No FRQs for this course yet'}
                 </h1>
                 <p className="text-md text-gray-600">
-                  From: {frqQuestion.examTitle}
+                  From: {frqQuestion?.examTitle ?? '—'}
                 </p>
                   </div>
                   {/* Points Display */}

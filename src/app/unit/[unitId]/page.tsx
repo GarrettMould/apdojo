@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Head from 'next/head';
 import { macroUnits, microUnits } from '@/data/cheatSheets';
 import { useParams, useRouter } from 'next/navigation'; // Import useRouter
@@ -17,7 +17,7 @@ import { videos, Video } from '@/data/videos';
 import { getVideosForLessonId } from '@/data/videosByLessonId';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question as QuestionType } from '@/data/questionBanks/types';
-import { X, ArrowRight, Lock, ArrowLeft, CheckCircle2, XCircle, Download, Bookmark, BookmarkPlus, Check, Brain, Maximize2, Play, FileText, Zap, Lightbulb, ClipboardList, FileQuestion, Award, Layers, Unlock, Sparkles, ChevronDown, ChevronUp, Pen } from 'lucide-react';
+import { X, ArrowRight, Lock, ArrowLeft, CheckCircle2, XCircle, Download, Bookmark, BookmarkPlus, Check, Brain, Maximize2, FileText, Zap, Lightbulb, FileQuestion, Award, Layers, Unlock, Sparkles, ChevronDown, ChevronUp, Pen } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import jsPDF from 'jspdf';
@@ -30,15 +30,20 @@ import { SeasonPassModal } from '@/components/SeasonPassModal';
 import { SeasonPassEntryWideModal } from '@/components/SeasonPassEntryWideModal';
 import { saveQuizResult } from '@/lib/quizHistory';
 import { hasValidSeasonPass, getUnitMCQTestUrl } from '@/lib/utils';
+import { COURSE_CONFIG } from '@/data/seasonPassCourseConfig';
 import { getSubjectSlug, getUnitSlug } from '@/lib/practiceSlugs';
 import { Footer } from '@/components/Footer';
 import SeasonPassScrollPopup from '@/app/SeasonPassScrollPopup';
+import { CheatSheetChatBox } from '@/components/CheatSheetChatBox';
+import type { CourseSubject } from '@/lib/courseSubject';
+import { econCourseFromSubject } from '@/lib/courseSubject';
 
 /**
  * One flag for all pretty `/ap-*-unit-N-cheat-sheet` URLs in this tab (any subject/unit).
  * Persists across reloads and client navigations until the tab closes. Bump key for a new campaign.
  */
 const PRETTY_CHEAT_SHEET_ENTRY_MODAL_SESSION_KEY = 'apdojo_pretty_cheat_sheet_season_pass_entry_any_v1';
+const FREE_LESSON_VIDEO_PREVIEW_SECONDS = 5;
 
 function prettyCheatSheetEntryModalAlreadyShown(): boolean {
   try {
@@ -217,70 +222,39 @@ function LessonMcqPractice({ lessonId, unit, subject, isProCustomer, unitAnswere
         <p className="text-sm text-gray-600 mb-4">Test your understanding of {lessonId}</p>
         <div className="space-y-4">
           {isLocked ? (
-            <div className="py-14 min-h-[200px] flex flex-col justify-center">
-              <p className="text-3xl font-bold text-gray-800 mb-3 text-center">You&apos;ve reached the free limit</p>
-              <p className="text-xl text-gray-600 mb-6 text-center">Unlock unlimited MCQs with a Season Pass to keep practicing.</p>
-              <div className="mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4 text-left">
-                {/* Practice MCQs - solid blue header, black text */}
-                <div className="rounded-xl border border-black overflow-hidden bg-white">
-                  <div className="flex items-center gap-2 px-3 py-2.5 bg-blue-400">
-                    <Pen className="w-5 h-5 text-gray-800 shrink-0" strokeWidth={2.5} />
-                    <span className="font-bold text-sm uppercase tracking-wide text-black">Practice MCQs</span>
-                </div>
-                  <div className="p-3 bg-white">
-                    {(subject === 'macro' ? macroUnits : microUnits).map((u) => (
-                      <div key={u.number} className="flex items-center gap-2 py-1.5">
-                        <span className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-600 shrink-0">{u.number}</span>
-                        <span className="text-xs text-gray-600 shrink-0 min-w-0 truncate" title={u.title}>{u.title}</span>
-                        <span className="flex-1 h-3 bg-gray-100 rounded-full min-w-0" />
-          </div>
-                    ))}
-                  </div>
-                </div>
-                {/* Practice FRQs - solid yellow header, black text */}
-                <div className="rounded-xl border border-black overflow-hidden bg-white">
-                  <div className="flex items-center gap-2 px-3 py-2.5 bg-yellow-400">
-                    <Pen className="w-5 h-5 text-gray-800 shrink-0" strokeWidth={2.5} />
-                    <span className="font-bold text-sm uppercase tracking-wide text-black">Practice FRQs</span>
-                  </div>
-                  <div className="p-3 bg-white">
-                    {(subject === 'macro' ? macroUnits : microUnits).map((u) => (
-                      <div key={u.number} className="flex items-center gap-2 py-1.5">
-                        <span className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-600 shrink-0">{u.number}</span>
-                        <span className="text-xs text-gray-600 shrink-0 min-w-0 truncate" title={u.title}>{u.title}</span>
-                        <span className="flex-1 h-3 bg-gray-100 rounded-full min-w-0" />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                {/* Full AP Exams - solid green header, black text */}
-                <div className="rounded-xl border border-black overflow-hidden bg-white">
-                  <div className="flex items-center gap-2 px-3 py-2.5 bg-green-400">
-                    <Award className="w-5 h-5 text-gray-800 shrink-0" strokeWidth={2.5} />
-                    <span className="font-bold text-sm uppercase tracking-wide text-black">Full AP Exams</span>
-                  </div>
-                  <div className="p-3 bg-white">
-                    {['Full AP MCQ Exam', 'Full AP FRQ Exam', 'Personalized Study Plan', 'Video Explanations', 'Unlimited Shuffle', 'All Cheat Sheets'].map((label) => (
-                      <div key={label} className="flex items-center gap-2 py-1.5">
-                        <span className="w-4 h-4 rounded-full bg-green-600 flex items-center justify-center shrink-0">
-                          <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />
-                        </span>
-                        <span className="text-sm text-gray-800">{label}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-              <div className="text-center">
-            <Link 
+            <div className="rounded-xl border border-gray-200 bg-gradient-to-b from-slate-50/90 to-white px-5 py-8 sm:px-6 sm:py-10">
+              <p className="text-left text-lg font-bold tracking-tight text-gray-900 sm:text-xl">
+                You&apos;ve reached the free limit for this lesson
+              </p>
+              <p className="mt-2 max-w-prose text-left text-sm leading-relaxed text-gray-600 sm:text-[0.9375rem]">
+                Free accounts can try two MCQs per unit here. A Season Pass unlocks the full bank, every lesson, and the rest of the toolkit—without walls like this in your way.
+              </p>
+              <ul className="mt-5 space-y-2.5 text-left text-sm text-gray-800">
+                {(
+                  [
+                    'Unlimited MCQs across all units & lessons',
+                    'FRQs, full exams, and video walkthroughs',
+                    'Cheat sheets, shuffle, and study tools in one pass',
+                  ] as const
+                ).map((line) => (
+                  <li key={line} className="flex gap-2.5">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" strokeWidth={2.5} aria-hidden />
+                    <span className="font-medium leading-snug">{line}</span>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-7">
+                <Link
                   href={`/purchase/season-pass?courseType=${subject}`}
-                  className="inline-flex items-center justify-center gap-2 px-5 py-3.5 bg-yellow-300 text-black font-black text-base rounded-xl border-2 border-black transition-all hover:-translate-y-0.5 active:translate-y-0"
-                  style={{ boxShadow: '4px 4px 0 0 #000' }}
-            >
-                  Unlock unlimited MCQs →
-            </Link>
-        </div>
-      </div>
+                  className={`inline-flex w-full items-center justify-center rounded-lg px-4 py-3 text-sm font-bold text-white shadow-sm transition hover:opacity-95 sm:w-auto sm:min-w-[14rem] ${
+                    subject === 'micro' ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'
+                  }`}
+                >
+                  Get the Season Pass
+                  <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
+                </Link>
+              </div>
+            </div>
           ) : (
           <>
           <div className={`flex flex-col sm:flex-row gap-4 ${currentQuestion.image ? 'sm:gap-6' : ''}`}>
@@ -405,7 +379,7 @@ function formatSubNote(note: string): React.ReactNode {
 interface JoinDojoModalProps {
   isOpen: boolean;
   onClose: () => void;
-  selectedSubject: 'macro' | 'micro';
+  selectedSubject: CourseSubject;
 }
 
 function JoinDojoModal({ isOpen, onClose, selectedSubject }: JoinDojoModalProps) {
@@ -454,11 +428,13 @@ function JoinDojoModal({ isOpen, onClose, selectedSubject }: JoinDojoModalProps)
             Unlock unlimited quiz generation, all Dojo Drills, FRQ practice, and full-length exams with a Season Pass.
           </p>
           <Link
-            href={`/purchase/season-pass?courseType=${selectedSubject}`}
+            href={`/purchase/season-pass?courseType=${selectedSubject === 'gov' ? 'bundle' : selectedSubject}`}
             className={`inline-flex items-center justify-center w-full px-6 py-3 text-white font-bold rounded-lg transition-colors shadow-md hover:shadow-lg ${
               selectedSubject === 'macro'
                 ? 'bg-blue-600 hover:bg-blue-700'
-                : 'bg-green-600 hover:bg-green-700'
+                : selectedSubject === 'micro'
+                  ? 'bg-green-600 hover:bg-green-700'
+                  : 'bg-violet-600 hover:bg-violet-700'
             }`}
             onClick={() => onClose()}
           >
@@ -467,6 +443,47 @@ function JoinDojoModal({ isOpen, onClose, selectedSubject }: JoinDojoModalProps)
         </motion.div>
       </motion.div>
     </AnimatePresence>
+  );
+}
+
+/** Same Season Pass pitch as StudyModeModal locked flip; used beside lesson video after free preview. */
+function InlineSeasonPassLessonPitch({ courseKey }: { courseKey: 'macro' | 'micro' }) {
+  const config = COURSE_CONFIG[courseKey];
+  const accentBtn =
+    courseKey === 'micro'
+      ? 'bg-green-600 hover:bg-green-700 border-green-800'
+      : 'bg-blue-600 hover:bg-blue-700 border-blue-800';
+  return (
+    <div className="relative flex w-full flex-col items-stretch bg-white py-6 sm:py-8">
+      <div className={`absolute left-0 top-0 h-1.5 w-full border-b-2 border-black ${config.accentBg}`} aria-hidden />
+      <div className="w-full px-2 text-left sm:px-0">
+        <p className="mb-2 text-[10px] font-black uppercase tracking-[0.18em] text-slate-600 sm:text-xs">{config.badge}</p>
+        <h3 className="text-xl font-black leading-tight tracking-tight text-black sm:text-2xl md:text-3xl">
+          {config.headline}
+        </h3>
+        <p className="mt-3 max-w-xl text-sm font-semibold leading-relaxed text-slate-700 sm:text-base">{config.subheadline}</p>
+        <p className="mt-4 text-xl font-black tabular-nums text-black sm:text-2xl">
+          ${config.price}
+          <span className="ml-2 text-base font-semibold text-gray-400 line-through sm:text-lg">${config.originalPrice}</span>
+        </p>
+      </div>
+      <ul className="mt-5 w-full list-disc space-y-2.5 pl-6 pr-2 text-left text-gray-800 marker:font-bold marker:text-gray-900 sm:pl-7 sm:pr-0">
+        {config.features.map((line) => (
+          <li key={line} className="pl-1 text-sm font-semibold leading-snug">
+            {line}
+          </li>
+        ))}
+      </ul>
+      <div className="mt-6 w-full px-0">
+        <Button
+          asChild
+          size="lg"
+          className={`w-full border-4 border-black py-3 text-sm font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] sm:py-4 sm:text-base ${accentBtn} text-white`}
+        >
+          <Link href={`/purchase/season-pass?courseType=${courseKey}`}>Get the Season Pass</Link>
+        </Button>
+      </div>
+    </div>
   );
 }
 
@@ -488,6 +505,15 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const [videoQuestionAnswers, setVideoQuestionAnswers] = useState<Record<string, number>>({});
+  const [inlineExpandedVideoKey, setInlineExpandedVideoKey] = useState<string | null>(null);
+  const [inlineComprehensionIndex, setInlineComprehensionIndex] = useState(0);
+  const [inlineComprehensionHidden, setInlineComprehensionHidden] = useState(false);
+  const inlineLessonVideoRefs = useRef<Map<string, HTMLVideoElement>>(new Map());
+  /** After expand-from-play, `<video>` remounts; resume playback on the new element. */
+  const pendingLessonVideoResumeKeyRef = useRef<string | null>(null);
+  /** Free preview: max `currentTime` seen per lesson video; lock when >= 5s. */
+  const lessonVideoMaxTimeSeenRef = useRef<Map<string, number>>(new Map());
+  const [lessonVideoHardLockKeys, setLessonVideoHardLockKeys] = useState<Set<string>>(() => new Set());
   const [selectedWhiteboards, setSelectedWhiteboards] = useState<Set<string>>(new Set());
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [visibleWhiteboardsCount, setVisibleWhiteboardsCount] = useState<Record<string, number>>({});
@@ -560,8 +586,34 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
     setUnitMcqAnsweredIds(new Set());
   }, [activeUnit, selectedSubject]);
 
-  // Daily limit for free users: Ultimate Unit Shuffle (3 cards per day, same pattern as MCQ)
-  const DAILY_FREE_SHUFFLE_VIEWS = 3;
+  useEffect(() => {
+    setInlineComprehensionIndex(0);
+    setInlineComprehensionHidden(false);
+  }, [inlineExpandedVideoKey]);
+
+  useEffect(() => {
+    if (inlineExpandedVideoKey == null) {
+      pendingLessonVideoResumeKeyRef.current = null;
+      return;
+    }
+    const pending = pendingLessonVideoResumeKeyRef.current;
+    if (pending == null || pending !== inlineExpandedVideoKey) return;
+    pendingLessonVideoResumeKeyRef.current = null;
+    const resume = () => {
+      const el = inlineLessonVideoRefs.current.get(pending);
+      if (el) void el.play().catch(() => {});
+    };
+    requestAnimationFrame(() => {
+      requestAnimationFrame(resume);
+    });
+  }, [inlineExpandedVideoKey]);
+
+  useEffect(() => {
+    if (shuffleModalOpen) setShowScrollPopup(false);
+  }, [shuffleModalOpen]);
+
+  // Free users: count up to 2 "new" card views per day (localStorage). Shuffle always opens; first two cards flip normally, then Next opens the Season Pass pitch (same every time they open shuffle that day).
+  const DAILY_FREE_SHUFFLE_VIEWS = 2;
   const [dailyShuffleViewed, setDailyShuffleViewed] = useState(0);
   const getLocalDateKey = (d: Date) => {
     const yyyy = d.getFullYear();
@@ -626,6 +678,33 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
     return hasValidSeasonPass(userData, subjectKey);
   }, [user, userData, selectedSubject]);
 
+  const bumpLessonVideoWatchProgress = useCallback((key: string, el: HTMLVideoElement) => {
+    if (isProCustomer) return;
+    const prev = lessonVideoMaxTimeSeenRef.current.get(key) ?? 0;
+    const next = Math.max(prev, el.currentTime);
+    lessonVideoMaxTimeSeenRef.current.set(key, next);
+    if (next < FREE_LESSON_VIDEO_PREVIEW_SECONDS) return;
+    el.pause();
+    setLessonVideoHardLockKeys((prevSet) => {
+      if (prevSet.has(key)) return prevSet;
+      const n = new Set(prevSet);
+      n.add(key);
+      return n;
+    });
+  }, [isProCustomer]);
+
+  useEffect(() => {
+    setLessonVideoHardLockKeys(new Set());
+    lessonVideoMaxTimeSeenRef.current.clear();
+  }, [activeUnit, selectedSubject]);
+
+  useEffect(() => {
+    if (isProCustomer) {
+      setLessonVideoHardLockKeys(new Set());
+      lessonVideoMaxTimeSeenRef.current.clear();
+    }
+  }, [isProCustomer]);
+
   const handleShuffleCardView = useCallback((index: number) => {
     if (isProCustomer) return;
     const cardsViewed = index + 1;
@@ -634,14 +713,6 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
     writeDailyShuffleCount(nextCount);
     setDailyShuffleViewed(nextCount);
   }, [isProCustomer, dailyShuffleViewed, writeDailyShuffleCount]);
-
-  // When free user hits daily limit while in shuffle modal, close it and show limit modal
-  useEffect(() => {
-    if (shuffleModalOpen && !isProCustomer && dailyShuffleViewed >= DAILY_FREE_SHUFFLE_VIEWS) {
-      setShuffleModalOpen(false);
-      setShowShuffleLimitModal(true);
-    }
-  }, [shuffleModalOpen, isProCustomer, dailyShuffleViewed]);
 
   // --- FAQ Schema Data ---
   const faqSchema = {
@@ -1281,9 +1352,9 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
     };
   }, [isResizing]);
 
-  // Lock body scroll when panel or slide-up modal is open
+  // Lock body scroll when panel, slide-up modal, or unit shuffle is open
   useEffect(() => {
-    if (showQuizPanel || showScrollPopup) {
+    if (showQuizPanel || showScrollPopup || shuffleModalOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'auto';
@@ -1292,7 +1363,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
     return () => {
       document.body.style.overflow = 'auto';
     };
-  }, [showQuizPanel, showScrollPopup]);
+  }, [showQuizPanel, showScrollPopup, shuffleModalOpen]);
 
   const unitsToDisplay = selectedSubject === 'macro' ? allMacroUnits : allMicroUnits;
   const pageTitleSubject = selectedSubject === 'macro' ? 'Macroeconomics' : 'Microeconomics';
@@ -1512,7 +1583,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
         />
       </Head>
       <div ref={containerRef} className="flex h-[calc(100vh-5rem)] overflow-hidden bg-gray-50">
-        {/* Left Side - Cheat Sheet Content */}
+        {/* Main cheat sheet column (left of quiz panel when open) */}
         <motion.div
           ref={leftPanelScrollRef}
           animate={{
@@ -1523,7 +1594,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
             stiffness: 300,
             damping: 30,
           }}
-          className={`flex-shrink-0 min-w-0 ${showScrollPopup ? 'overflow-hidden' : 'overflow-y-auto'}`}
+          className={`flex-shrink-0 min-w-0 ${showScrollPopup || shuffleModalOpen ? 'overflow-hidden' : 'overflow-y-auto'}`}
         >
           <div
             className="max-w-7xl mx-auto px-4 py-12 mt-12"
@@ -1858,7 +1929,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           </div>
         )}
 
-        {/* Ultimate Unit Shuffle - purple button at top */}
+        {/* Unit flashcards — feature preview + shuffle entry */}
         {SHOW_DEEP_DIVE_AND_SHUFFLE && (() => {
           const getAllUnitFlashcards = (): UnitFlashcardData[] => {
             const isMacro = selectedSubject === 'macro' && (activeUnitNum >= 1 && activeUnitNum <= 6);
@@ -1876,9 +1947,6 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           };
           const allUnitFlashcards = getAllUnitFlashcards();
           if (allUnitFlashcards.length === 0) return null;
-          const listCount = allUnitFlashcards.filter(c => c.type === 'list').length;
-          const rapidFireCount = allUnitFlashcards.filter(c => c.type === 'rapid-fire').length;
-          const graphCount = allUnitFlashcards.filter(c => c.tag === 'GRAPH').length;
           const getCardType = (card: UnitFlashcardData): string => {
             if (card.tag === 'GRAPH') return 'GRAPH';
             if (card.tag === 'RULE') return 'RULE';
@@ -1894,10 +1962,6 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
             return shuffled;
           };
           const openShuffleModal = () => {
-            if (!isProCustomer && dailyShuffleViewed >= DAILY_FREE_SHUFFLE_VIEWS) {
-              setShowShuffleLimitModal(true);
-              return;
-            }
             const graphCards = allUnitFlashcards.filter(c => getCardType(c) === 'GRAPH');
             const ruleCards = allUnitFlashcards.filter(c => getCardType(c) === 'RULE');
             const listCards = allUnitFlashcards.filter(c => getCardType(c) === 'LIST');
@@ -1934,32 +1998,78 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
             setShuffledDeck(shuffled);
             setShuffleModalOpen(true);
           };
+
+          /** One real GRAPH card: preview shows its front, then its actual back (graph + text). */
+          const sampleGraphCard =
+            allUnitFlashcards.find((c) => c.tag === 'GRAPH' && c.backImage) ??
+            allUnitFlashcards.find((c) => c.tag === 'GRAPH');
+
           return (
             <div id="unit-shuffle" className="mb-8">
-              <button
-                type="button"
-                onClick={openShuffleModal}
-                className={`w-full block text-left rounded-2xl border-4 transition-all active:translate-y-1 p-5 sm:p-8 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 ${
+              <div
+                className={`overflow-hidden rounded-xl border border-gray-200/90 bg-gradient-to-br shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_-8px_rgba(15,23,42,0.07)] ${
                   selectedSubject === 'macro'
-                    ? 'bg-blue-50 hover:bg-blue-100 text-black border-blue-500 shadow-[4px_4px_0px_0px_rgba(37,99,235,1)] hover:shadow-[6px_6px_0px_0px_rgba(37,99,235,1)] focus:ring-offset-blue-400'
-                    : 'bg-green-50 hover:bg-green-100 text-black border-green-500 shadow-[4px_4px_0px_0px_rgba(22,163,74,1)] hover:shadow-[6px_6px_0px_0px_rgba(22,163,74,1)] focus:ring-offset-green-400'
+                    ? 'from-white via-slate-50/90 to-blue-50/30'
+                    : 'from-white via-slate-50/90 to-emerald-50/25'
                 }`}
               >
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
-                  <div className="min-w-0 flex-1">
-                    <h2 className="text-2xl font-black mb-2 sm:text-3xl">🎯 Ultimate Unit Shuffle</h2>
-                    <p className="text-base font-semibold text-slate-800 mb-4 sm:text-lg">
-                      All {allUnitFlashcards.length} flashcards from Unit {activeUnitNum} shuffled together
+                <div className="flex flex-col gap-6 p-5 sm:flex-row sm:items-start sm:justify-between sm:gap-8 sm:p-6">
+                  <div className="min-w-0 max-w-xl flex-1">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-gray-500">Built into this unit</p>
+                    <h2 className="mt-1.5 text-2xl font-black tracking-tight text-gray-900 sm:text-3xl">Flashcards</h2>
+                    <p className="mt-2 text-sm leading-relaxed text-gray-600 sm:text-base">
+                      <span className="font-semibold text-gray-800">{allUnitFlashcards.length} cards</span> mix{' '}
+                      <span className="font-semibold text-gray-800">graphs</span>,{' '}
+                      <span className="font-semibold text-gray-800">formulas</span>, and{' '}
+                      <span className="font-semibold text-gray-800">key terms</span>. Shuffle blends every type so you
+                      drill the whole unit—not just one format.
                     </p>
-                    <div className="flex flex-col items-start gap-2 text-sm sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
-                      <span className={`rounded-full px-3 py-2 font-semibold sm:py-1 ${selectedSubject === 'macro' ? 'bg-blue-200/70' : 'bg-green-200/70'}`}>{listCount} List</span>
-                      <span className={`rounded-full px-3 py-2 font-semibold sm:py-1 ${selectedSubject === 'macro' ? 'bg-blue-200/70' : 'bg-green-200/70'}`}>{rapidFireCount} Rapid Fire</span>
-                      <span className={`rounded-full px-3 py-2 font-semibold sm:py-1 ${selectedSubject === 'macro' ? 'bg-blue-200/70' : 'bg-green-200/70'}`}>{graphCount} Graph</span>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={openShuffleModal}
+                      className="mt-5 inline-flex items-center gap-2 rounded-lg border-2 border-gray-900 bg-gray-900 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
+                    >
+                      Shuffle all flashcards
+                      <ArrowRight className="h-4 w-4 shrink-0" aria-hidden />
+                    </button>
                   </div>
-                  <ArrowRight className="h-8 w-8 shrink-0 self-end text-slate-700 sm:self-auto" aria-hidden />
+                  {sampleGraphCard ? (
+                    <div
+                      className="pointer-events-none relative mx-auto mt-1 h-[176px] w-[min(100%,320px)] shrink-0 -translate-x-6 select-none sm:mx-0 sm:mt-0 sm:h-[176px] sm:w-[340px] sm:-translate-x-10"
+                      aria-hidden
+                    >
+                      {/* Back (answer) — bottom right, lower z so it reads as behind */}
+                      <div className="absolute bottom-0 right-0 z-[1] w-[min(100%,188px)] sm:w-[188px]">
+                        <div className="flex h-[152px] flex-col overflow-hidden rounded-md border-[3px] border-black bg-white p-2 shadow-[6px_6px_0_0_rgba(0,0,0,0.88)]">
+                          <div className="min-h-0 flex-1 overflow-hidden rounded-sm bg-zinc-50 ring-1 ring-black/10">
+                            {sampleGraphCard.backImage ? (
+                              <img
+                                src={sampleGraphCard.backImage}
+                                alt=""
+                                className="h-full w-full object-contain object-center"
+                              />
+                            ) : null}
+                          </div>
+                          <span className="shrink-0 pt-1.5 text-[7px] font-bold uppercase tracking-wide text-gray-400">
+                            Back
+                          </span>
+                        </div>
+                      </div>
+                      {/* Front (question) — top left, on top */}
+                      <div className="absolute left-0 top-0 z-[2] w-[min(100%,188px)] sm:w-[188px]">
+                        <div className="flex h-[152px] flex-col overflow-hidden rounded-md border-[3px] border-black bg-white p-2 shadow-[6px_6px_0_0_rgba(0,0,0,0.88)]">
+                          <p className="min-h-0 flex-1 overflow-hidden text-left text-sm font-bold leading-snug tracking-tight text-gray-900 sm:text-[15px] sm:leading-snug line-clamp-[7]">
+                            {sampleGraphCard.front}
+                          </p>
+                          <span className="shrink-0 pt-1.5 text-[7px] font-bold uppercase tracking-wide text-gray-400">
+                            Front
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
-              </button>
+              </div>
             </div>
           );
         })()}
@@ -1968,8 +2078,9 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
         <div className="space-y-12">
           {(() => (
               <>
-                {sortedLessons.map(({ lessonId, whiteboards, keyTerms }) => {
+                {sortedLessons.map(({ lessonId, whiteboards, keyTerms }, lessonIndex) => {
             const lessonName = getLessonName(lessonId);
+            const videoOnRight = lessonIndex % 2 === 1;
             return (
                     <React.Fragment key={lessonId}>
                       <div id={`lesson-${lessonId.replace('.', '-')}`} className="space-y-8 scroll-mt-24">
@@ -1978,7 +2089,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                 {lessonId}{lessonName ? ` - ${lessonName}` : ''}
               </h2>
 
-              {/* Lesson Video (from getVideosForLessonId, same source as deep dive pages) */}
+              {/* Lesson Video — compact, alternates left/right with title + blurb beside */}
               {(() => {
                 const subjectForVideos = selectedSubject === 'macro' ? 'AP Macroeconomics' : 'AP Microeconomics';
                 const lessonVideos = getVideosForLessonId(lessonId)
@@ -2000,29 +2111,261 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                   });
                 const video = lessonVideos[0];
                 if (!video) return null;
-                const isLocked = !isProCustomer;
-                return (
-                  <div className="mb-6">
-                    <h3 className="text-xl font-semibold text-gray-700 mb-3">Video</h3>
-                    <div className="relative bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4 overflow-hidden group">
+                const videoKey = `${lessonId}:${video.id}`;
+                const isHardLocked = lessonVideoHardLockKeys.has(videoKey);
+                const courseKey = selectedSubject === 'macro' ? 'macro' : 'micro';
+                const isExpanded = inlineExpandedVideoKey === videoKey;
+                const comprehensionQs = video.questions ?? [];
+                const showInlineComprehension =
+                  isExpanded && comprehensionQs.length > 0 && !inlineComprehensionHidden;
+
+                const videoFrame = (
+                  <div
+                    className={`relative overflow-hidden rounded-lg border border-gray-200/90 bg-white p-1.5 shadow-sm ring-1 ring-black/[0.03] transition-[max-width] duration-300 ease-out ${
+                      !isExpanded
+                        ? 'mx-auto w-full max-w-[260px] shrink-0 sm:max-w-[300px] md:mx-0'
+                        : showInlineComprehension
+                          ? 'w-full shrink-0'
+                          : 'w-full max-w-none shrink-0'
+                    }`}
+                  >
+                    <div className="relative aspect-video w-full overflow-hidden rounded-md bg-zinc-950">
                       <video
+                        ref={(el) => {
+                          if (el) {
+                            inlineLessonVideoRefs.current.set(videoKey, el);
+                          } else {
+                            inlineLessonVideoRefs.current.delete(videoKey);
+                          }
+                        }}
                         src={video.videoUrl}
-                        controls={!isLocked}
-                        className={`w-full aspect-video rounded-lg ${isLocked ? 'pointer-events-none' : ''}`}
+                        controls={!isHardLocked}
+                        className={`absolute inset-0 h-full w-full object-contain ${isHardLocked ? 'pointer-events-none' : ''}`}
                         preload="metadata"
                         playsInline
+                        onTimeUpdate={(e) => bumpLessonVideoWatchProgress(videoKey, e.currentTarget)}
+                        onSeeked={(e) => bumpLessonVideoWatchProgress(videoKey, e.currentTarget)}
+                        onPlay={() => {
+                          if (isHardLocked) return;
+                          if (!isExpanded) {
+                            pendingLessonVideoResumeKeyRef.current = videoKey;
+                            setInlineExpandedVideoKey(videoKey);
+                          }
+                        }}
                       >
                         Your browser does not support the video tag.
                       </video>
-                      {isLocked && (
-                        <button
-                          type="button"
-                          onClick={() => setShowPacketSeasonPassModal(true)}
-                          className="absolute inset-0 z-10 cursor-pointer"
-                          aria-label="Unlock with Season Pass"
-                        />
-                      )}
                     </div>
+                    {isHardLocked && (
+                      <button
+                        type="button"
+                        onClick={() => setShowPacketSeasonPassModal(true)}
+                        className="absolute inset-0 z-10 cursor-pointer rounded-md"
+                        aria-label="Unlock with Season Pass"
+                      />
+                    )}
+                  </div>
+                );
+
+                const comprehensionAside =
+                  showInlineComprehension ? (
+                    <aside className="flex min-h-0 min-w-0 w-full flex-col rounded-lg border-2 border-black bg-white p-4 shadow-[4px_4px_0_0_rgba(0,0,0,0.85)] lg:min-h-0 lg:flex-1 lg:py-5">
+                      {!isHardLocked && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => setInlineComprehensionHidden(true)}
+                            className="mb-3 w-full shrink-0 text-left text-sm font-semibold text-gray-500 underline-offset-2 hover:text-gray-900 hover:underline"
+                          >
+                            Hide questions
+                          </button>
+                          <div className="mb-3 flex shrink-0 items-center justify-between gap-2 border-b border-gray-200 pb-3">
+                            <h4 className="text-sm font-black uppercase tracking-wide text-gray-900">
+                              Comprehension check
+                            </h4>
+                            <span className="text-xs font-bold tabular-nums text-gray-500">
+                              Question {inlineComprehensionIndex + 1} of {comprehensionQs.length}
+                            </span>
+                          </div>
+                        </>
+                      )}
+                      <div className="min-h-0 flex-1 overflow-y-auto pr-0.5">
+                        {isHardLocked ? (
+                          <InlineSeasonPassLessonPitch courseKey={courseKey} />
+                        ) : (
+                          (() => {
+                            const question = comprehensionQs[inlineComprehensionIndex];
+                            if (!question) return null;
+                            const answerKey = `${video.id}:${question.id}`;
+                            const selectedAnswer = videoQuestionAnswers[answerKey];
+                            const isAnswered = selectedAnswer !== undefined;
+                            return (
+                              <div className="space-y-3">
+                                <p className="text-sm font-medium leading-snug text-gray-800">{question.text}</p>
+                                <div className="space-y-2">
+                                  {question.options.map((option, index) => {
+                                    const isSelected = selectedAnswer === index;
+                                    const isCorrectOption = index === question.correctAnswer;
+                                    const showResult = isAnswered;
+                                    return (
+                                      <button
+                                        key={index}
+                                        type="button"
+                                        onClick={() => {
+                                          if (!isAnswered) {
+                                            setVideoQuestionAnswers((prev) => ({
+                                              ...prev,
+                                              [answerKey]: index,
+                                            }));
+                                          }
+                                        }}
+                                        disabled={isAnswered}
+                                        className={`w-full rounded-lg p-2.5 text-left text-sm transition-all ${
+                                          !showResult
+                                            ? isSelected
+                                              ? 'border-[3px] border-black bg-gray-200 text-gray-900'
+                                              : 'cursor-pointer border-2 border-gray-300 bg-white hover:border-black hover:bg-gray-50'
+                                            : isCorrectOption
+                                              ? 'border-[3px] border-green-500 bg-green-100 font-semibold text-green-900'
+                                              : isSelected
+                                                ? 'border-[3px] border-red-500 bg-red-100 font-semibold text-red-900'
+                                                : 'border-2 border-gray-300 bg-gray-50 text-gray-600'
+                                        } ${showResult ? 'cursor-default' : ''}`}
+                                      >
+                                        <span className="font-semibold">{String.fromCharCode(65 + index)}.</span>{' '}
+                                        {option}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                                {isAnswered && question.explanation && (
+                                  <div className="mt-2 rounded border-l-4 border-blue-400 bg-blue-50 p-2.5 text-xs text-gray-800">
+                                    <strong>Explanation:</strong> {question.explanation}
+                                  </div>
+                                )}
+                                {comprehensionQs.length > 1 && (
+                                  <div className="flex items-center justify-between gap-2 pt-2">
+                                    <button
+                                      type="button"
+                                      disabled={inlineComprehensionIndex === 0}
+                                      onClick={() => setInlineComprehensionIndex((i) => Math.max(0, i - 1))}
+                                      className="inline-flex items-center gap-1 rounded-md border-2 border-gray-300 px-2 py-1.5 text-xs font-bold text-gray-700 transition hover:border-black hover:bg-gray-50 disabled:pointer-events-none disabled:opacity-40"
+                                    >
+                                      <ArrowLeft className="h-3.5 w-3.5" aria-hidden />
+                                      Prev
+                                    </button>
+                                    <button
+                                      type="button"
+                                      disabled={inlineComprehensionIndex >= comprehensionQs.length - 1}
+                                      onClick={() =>
+                                        setInlineComprehensionIndex((i) =>
+                                          Math.min(comprehensionQs.length - 1, i + 1),
+                                        )
+                                      }
+                                      className="inline-flex items-center gap-1 rounded-md border-2 border-gray-300 px-2 py-1.5 text-xs font-bold text-gray-700 transition hover:border-black hover:bg-gray-50 disabled:pointer-events-none disabled:opacity-40"
+                                    >
+                                      Next
+                                      <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })()
+                        )}
+                      </div>
+                    </aside>
+                  ) : null;
+
+                const expandedTitleBlock = (
+                  <div className="min-w-0">
+                    <div className="mb-2">
+                      <h3 className="text-lg font-semibold leading-snug tracking-tight text-gray-900 text-balance sm:text-xl">
+                        {video.title}
+                      </h3>
+                    </div>
+                    <p className="text-sm leading-relaxed text-gray-500 text-pretty sm:text-[0.9375rem]">
+                      {video.description}
+                    </p>
+                    {isHardLocked && !showInlineComprehension && (
+                      <div className="mt-4 rounded-xl border-2 border-black bg-white p-3 shadow-[4px_4px_0_0_rgba(0,0,0,0.85)] sm:p-4">
+                        <InlineSeasonPassLessonPitch courseKey={courseKey} />
+                      </div>
+                    )}
+                    {comprehensionQs.length > 0 && inlineComprehensionHidden && !isHardLocked && (
+                      <button
+                        type="button"
+                        onClick={() => setInlineComprehensionHidden(false)}
+                        className="mt-3 text-left text-sm font-semibold text-gray-600 underline-offset-2 hover:text-gray-900 hover:underline"
+                      >
+                        Show questions
+                      </button>
+                    )}
+                  </div>
+                );
+
+                return (
+                  <div
+                    className={`mb-8 w-full rounded-xl border border-gray-200/90 bg-gradient-to-br shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_-8px_rgba(15,23,42,0.08)] ${
+                      selectedSubject === 'macro'
+                        ? 'from-white via-slate-50/80 to-blue-50/35'
+                        : 'from-white via-slate-50/80 to-emerald-50/30'
+                    } px-4 py-5 sm:px-6 sm:py-6 ${
+                      selectedSubject === 'macro'
+                        ? 'border-l-[3px] border-l-blue-300/50'
+                        : 'border-l-[3px] border-l-emerald-300/45'
+                    }`}
+                  >
+                    {!isExpanded ? (
+                      <div
+                        className={`flex flex-col gap-6 md:flex-row md:items-center md:gap-8 lg:gap-10 ${
+                          videoOnRight ? 'md:flex-row-reverse' : ''
+                        } ${videoOnRight ? 'flex-col-reverse' : ''}`}
+                      >
+                        {videoFrame}
+                        <div className="flex min-w-0 w-full max-w-[min(100%,17rem)] flex-col justify-center sm:max-w-[18rem] md:max-w-[16rem] lg:max-w-[18rem] md:py-0.5">
+                          <div className="mb-2">
+                            <h3 className="text-lg font-semibold leading-snug tracking-tight text-gray-900 text-balance sm:text-xl">
+                              {video.title}
+                            </h3>
+                          </div>
+                          <p className="text-sm leading-relaxed text-gray-500 text-pretty sm:text-[0.9375rem]">
+                            {video.description}
+                          </p>
+                        </div>
+                      </div>
+                    ) : showInlineComprehension ? (
+                      <div
+                        className={`grid w-full min-w-0 grid-cols-1 gap-6 lg:items-stretch lg:gap-8 ${
+                          videoOnRight
+                            ? 'lg:grid-cols-[1fr_minmax(0,min(100%,42rem))]'
+                            : 'lg:grid-cols-[minmax(0,min(100%,42rem))_1fr]'
+                        }`}
+                      >
+                        {videoOnRight ? (
+                          <>
+                            {comprehensionAside}
+                            <div className="flex min-w-0 flex-col gap-4 lg:max-w-[min(100%,42rem)]">
+                              {videoFrame}
+                              {expandedTitleBlock}
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="flex min-w-0 flex-col gap-4 lg:max-w-[min(100%,42rem)]">
+                              {videoFrame}
+                              {expandedTitleBlock}
+                            </div>
+                            {comprehensionAside}
+                          </>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="flex w-full min-w-0 flex-col gap-4">
+                        {videoFrame}
+                        {expandedTitleBlock}
+                      </div>
+                    )}
                   </div>
                 );
               })()}
@@ -3573,7 +3916,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
         )}
       </AnimatePresence>
 
-      {/* Shuffle daily limit: show premium Season Pass modal when free user has viewed 3 cards or hits limit in-modal */}
+      {/* Shuffle daily limit: show premium Season Pass modal when free user hits 2 views/day or taps Next past the 2 free cards */}
       {showShuffleLimitModal && (
         <SeasonPassModal
           subject={selectedSubject}
@@ -3594,19 +3937,35 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
         open={shuffleModalOpen}
         onClose={() => setShuffleModalOpen(false)}
         deck={shuffledDeck}
-        freeUserShuffleLimitReached={!isProCustomer && dailyShuffleViewed >= DAILY_FREE_SHUFFLE_VIEWS}
+        freeUserShuffleLimitReached={false}
         onCardView={handleShuffleCardView}
-        seasonPassCourseType={selectedSubject === 'macro' ? 'macro' : 'micro'}
-        isLocked={!isProCustomer}
-        onLockedFlip={() => { setShuffleModalOpen(false); setShowShuffleLimitModal(true); }}
+        seasonPassCourseType={econCourseFromSubject(selectedSubject) ?? 'macro'}
+        isLocked={false}
+        freeInteractiveCardCount={isProCustomer ? undefined : 2}
+        onExhaustedFreeNavigation={() => {
+          setShuffleModalOpen(false);
+          setShowShuffleLimitModal(true);
+        }}
+        onLockedFlip={() => {
+          setShuffleModalOpen(false);
+          setShowShuffleLimitModal(true);
+        }}
       />
 
       {/* Slide-up modal: redesigned Season Pass scroll popup */}
-      {showScrollPopup && (
+      {showScrollPopup && !shuffleModalOpen && (
         <SeasonPassScrollPopup
           selectedSubject={selectedSubject}
           onClose={() => setShowScrollPopup(false)}
           onPurchase={(url: string) => router.push(url)}
+        />
+      )}
+
+      {isPrettyCheatSheetRoute && (selectedSubject === 'macro' || selectedSubject === 'micro') && (
+        <CheatSheetChatBox
+          subject={selectedSubject}
+          unitNumber={activeUnitNum}
+          unitTitle={unitsToDisplay.find((u) => u.number === activeUnitNum)?.title}
         />
       )}
     </>

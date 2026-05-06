@@ -6,6 +6,8 @@ import { X, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { COURSE_CONFIG } from '@/data/seasonPassCourseConfig';
+import type { CourseSubject } from '@/lib/courseSubject';
+import { econCourseFromSubject } from '@/lib/courseSubject';
 
 export interface StudyModeCard {
   id: string;
@@ -19,11 +21,15 @@ export interface StudyModeCard {
 
 function getFlashcardTagClass(tag: string): string {
   const t = tag.toUpperCase();
-  if (t === 'GRAPH') return 'bg-purple-100 text-purple-700';
-  if (t === 'RULE') return 'bg-blue-100 text-blue-700';
-  if (t === 'LIST') return 'bg-orange-100 text-orange-700';
-  return 'bg-gray-100 text-gray-700';
+  if (t === 'GRAPH') return 'bg-purple-100 text-purple-800';
+  if (t === 'RULE') return 'bg-blue-100 text-blue-800';
+  if (t === 'LIST') return 'bg-orange-100 text-orange-800';
+  return 'bg-gray-100 text-slate-700';
 }
+
+/** Top-right type pill on each card face — softer than thick black border + hard offset shadow. */
+const CARD_CORNER_TAG_PILL =
+  'absolute right-3 top-3 rounded-full px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide shadow-sm ring-1 ring-slate-900/[0.08] backdrop-blur-[2px] transition hover:shadow hover:ring-slate-900/12 sm:right-4 sm:top-4';
 
 /** Dark-mode friendly classes for the filter dropdown trigger in the modal header. */
 function getFilterTriggerClass(filterType: 'all' | 'GRAPH' | 'RULE' | 'LIST'): string {
@@ -45,11 +51,18 @@ interface StudyModeModalProps {
   /** Called when user views a card (on open and when index changes). Used for daily limit counting. */
   onCardView?: (index: number) => void;
   /** For unit page only; unused when no overlay. */
-  seasonPassCourseType?: 'macro' | 'micro';
+  seasonPassCourseType?: CourseSubject;
   /** When true, flipping a card fires onLockedFlip instead of revealing the back. */
   isLocked?: boolean;
   /** Called when a locked user attempts to flip a card. */
   onLockedFlip?: () => void;
+  /**
+   * First N cards (indices 0..N-1) use normal flip; index >= N shows the Season Pass back.
+   * Omit for unlimited (e.g. premium or non–unit-shuffle callers).
+   */
+  freeInteractiveCardCount?: number;
+  /** When a free user hits Next at the last interactive card (before paywall). */
+  onExhaustedFreeNavigation?: () => void;
 }
 
 export function StudyModeModal({
@@ -62,12 +75,16 @@ export function StudyModeModal({
   seasonPassCourseType = 'macro',
   isLocked = false,
   onLockedFlip,
+  freeInteractiveCardCount,
+  onExhaustedFreeNavigation,
 }: StudyModeModalProps) {
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [filterType, setFilterType] = useState<'all' | 'GRAPH' | 'RULE' | 'LIST'>('all');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  /** GRAPH card back: image-first vs split explanation (unit shuffle). */
+  const [graphBackExplanationExpanded, setGraphBackExplanationExpanded] = useState(false);
 
   // Filter deck based on selected type
   const filteredDeck = filterType === 'all'
@@ -95,19 +112,32 @@ export function StudyModeModal({
       setFlipped(false);
       setFilterType('all');
       setDropdownOpen(false);
+      setGraphBackExplanationExpanded(false);
     }
   }, [open, initialIndex, filteredDeck.length]);
+
+  useEffect(() => {
+    setGraphBackExplanationExpanded(false);
+  }, [index, filterType]);
+
+  useEffect(() => {
+    if (!flipped) setGraphBackExplanationExpanded(false);
+  }, [flipped]);
 
   // Notify parent when user views a card (for daily limit counting)
   useEffect(() => {
     if (open && filteredDeck.length > 0 && onCardView != null) {
       onCardView(index);
     }
-  }, [filterType, filteredDeck.length]);
+  }, [open, index, filterType, filteredDeck.length, onCardView]);
 
   const currentCard = filteredDeck[index];
+  const flipBlocked =
+    isLocked ||
+    (freeInteractiveCardCount != null && index >= freeInteractiveCardCount);
   const canPrev = !freeUserShuffleLimitReached && index > 0;
-  const canNext = !freeUserShuffleLimitReached && index < filteredDeck.length - 1;
+  const canNext =
+    !freeUserShuffleLimitReached && index < filteredDeck.length - 1;
 
   // Cycle through filter types when tag is clicked; reset to first card of that type
   const handleTagClick = (e: React.MouseEvent) => {
@@ -132,11 +162,19 @@ export function StudyModeModal({
   };
   const goNext = () => {
     if (freeUserShuffleLimitReached) return;
-    if (index >= filteredDeck.length - 1) onClose();
-    else {
-      setFlipped(false);
-      setIndex((i) => i + 1);
+    if (index >= filteredDeck.length - 1) {
+      onClose();
+      return;
     }
+    if (
+      freeInteractiveCardCount != null &&
+      index >= freeInteractiveCardCount - 1
+    ) {
+      onExhaustedFreeNavigation?.();
+      return;
+    }
+    setFlipped(false);
+    setIndex((i) => i + 1);
   };
 
   // Keyboard: Space/ArrowUp/ArrowDown = flip, ArrowRight = next, ArrowLeft = prev, Escape = close
@@ -152,8 +190,14 @@ export function StudyModeModal({
         setFlipped((f) => !f);
       } else if (e.key === 'ArrowRight') {
         e.preventDefault();
-        if (index >= filteredDeck.length - 1) onClose();
-        else {
+        if (index >= filteredDeck.length - 1) {
+          onClose();
+        } else if (
+          freeInteractiveCardCount != null &&
+          index >= freeInteractiveCardCount - 1
+        ) {
+          onExhaustedFreeNavigation?.();
+        } else {
           setFlipped(false);
           setIndex((i) => i + 1);
         }
@@ -165,7 +209,18 @@ export function StudyModeModal({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [open, index, flipped, filteredDeck.length, onClose, freeUserShuffleLimitReached, isLocked, onLockedFlip]);
+  }, [
+    open,
+    index,
+    flipped,
+    filteredDeck.length,
+    onClose,
+    freeUserShuffleLimitReached,
+    freeInteractiveCardCount,
+    onExhaustedFreeNavigation,
+    isLocked,
+    onLockedFlip,
+  ]);
 
   if (!open || deck.length === 0 || filteredDeck.length === 0) return null;
 
@@ -334,7 +389,7 @@ export function StudyModeModal({
                       <button
                         type="button"
                         onClick={(e) => { e.stopPropagation(); setDropdownOpen((o) => !o); }}
-                        className={`absolute right-3 top-3 border-2 border-black px-3 py-1.5 text-xs font-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-transform hover:-translate-y-0.5 sm:right-4 sm:top-4 ${getFlashcardTagClass(currentCard.tag)}`}
+                        className={`${CARD_CORNER_TAG_PILL} ${getFlashcardTagClass(currentCard.tag)}`}
                         title="Click to filter by type"
                       >
                         {currentCard.tag}
@@ -346,7 +401,7 @@ export function StudyModeModal({
                         {currentCard.front}
                       </p>
                       <span className="mt-6 text-sm font-bold uppercase tracking-wide text-slate-600 sm:mt-8 sm:text-base">
-                        {isLocked ? 'Flip to reveal answer' : 'Space, ↑, or ↓ to flip'}
+                        {flipBlocked ? 'Flip to reveal answer' : 'Space, ↑, or ↓ to flip'}
                       </span>
                     </div>
                     <div
@@ -357,9 +412,10 @@ export function StudyModeModal({
                         transform: 'rotateY(180deg)',
                       }}
                     >
-                      {isLocked ? (
+                      {flipBlocked ? (
                         (() => {
-                          const courseKey = seasonPassCourseType === 'micro' ? 'micro' : 'macro';
+                          const courseKey =
+                            econCourseFromSubject(seasonPassCourseType ?? 'macro') ?? 'macro';
                           const config = COURSE_CONFIG[courseKey];
                           const accentBtn =
                             courseKey === 'micro'
@@ -401,19 +457,96 @@ export function StudyModeModal({
                             </div>
                           );
                         })()
+                      ) : currentCard.tag.toUpperCase() === 'GRAPH' && currentCard.backImage ? (
+                        <div className="relative flex h-full w-full flex-col overflow-hidden bg-white">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDropdownOpen((o) => !o);
+                            }}
+                            className={`${CARD_CORNER_TAG_PILL} z-10 ${getFlashcardTagClass(currentCard.tag)}`}
+                            title="Click to filter by type"
+                          >
+                            {currentCard.tag}
+                          </button>
+                          {!graphBackExplanationExpanded ? (
+                            <div
+                              role="presentation"
+                              onClick={(e) => e.stopPropagation()}
+                              className="flex min-h-0 flex-1 flex-col items-center justify-center gap-5 px-4 pb-6 pt-14 sm:px-8 sm:pt-16"
+                            >
+                              <div className="flex min-h-0 w-full flex-1 flex-col items-center justify-center">
+                                {/* eslint-disable-next-line @next/next/no-img-element -- remote graph assets */}
+                                <img
+                                  src={currentCard.backImage}
+                                  alt="Graph or diagram"
+                                  className="max-h-[min(52vh,460px)] w-auto max-w-[min(100%,720px)] rounded-sm border-2 border-black object-contain shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                                />
+                              </div>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setGraphBackExplanationExpanded(true);
+                                }}
+                                className="text-base font-bold text-purple-800 underline decoration-2 underline-offset-2 hover:text-purple-950"
+                              >
+                                View explanation
+                              </button>
+                              <span className="text-center text-xs font-bold uppercase tracking-wide text-slate-500 sm:text-sm">
+                                Space, ↑, or ↓ to flip back
+                              </span>
+                            </div>
+                          ) : (
+                            <div
+                              role="presentation"
+                              onClick={(e) => e.stopPropagation()}
+                              className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-4 pb-6 pt-14 sm:flex-row sm:items-start sm:gap-8 sm:px-6 sm:pt-16 md:gap-10"
+                            >
+                              <div className="flex shrink-0 justify-center sm:w-[36%] sm:max-w-[280px]">
+                                {/* eslint-disable-next-line @next/next/no-img-element -- remote graph assets */}
+                                <img
+                                  src={currentCard.backImage}
+                                  alt="Graph or diagram"
+                                  className="w-full max-w-[220px] rounded-sm border-2 border-black object-contain shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:max-w-none"
+                                />
+                              </div>
+                              <div className="flex min-w-0 flex-1 flex-col gap-3">
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setGraphBackExplanationExpanded(false);
+                                  }}
+                                  className="self-start text-sm font-bold text-purple-800 underline decoration-2 underline-offset-2 hover:text-purple-950"
+                                >
+                                  Graph only
+                                </button>
+                                <div className="text-left text-xl font-black leading-snug tracking-tight text-black sm:text-2xl md:text-3xl">
+                                  {currentCard.front}
+                                </div>
+                                <div className="text-left text-base font-semibold leading-relaxed text-gray-700 sm:text-lg">
+                                  {currentCard.back}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       ) : (
                         /* ── Normal card back (minimal, front-matched style) ── */
                         <div className="relative flex h-full w-full flex-col items-center justify-center bg-white p-6 sm:p-10 md:p-12">
                           <button
                             type="button"
                             onClick={(e) => { e.stopPropagation(); setDropdownOpen((o) => !o); }}
-                            className={`absolute right-3 top-3 border-2 border-black px-3 py-1.5 text-xs font-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-transform hover:-translate-y-0.5 sm:right-4 sm:top-4 ${getFlashcardTagClass(currentCard.tag)}`}
+                            className={`${CARD_CORNER_TAG_PILL} ${getFlashcardTagClass(currentCard.tag)}`}
                             title="Click to filter by type"
                           >
                             {currentCard.tag}
                           </button>
                           <div className="w-full max-w-4xl text-center">
                             {currentCard.backImage ? (
+                              // eslint-disable-next-line @next/next/no-img-element -- remote graph assets
                               <img
                                 src={currentCard.backImage}
                                 alt="Graph or diagram"
@@ -439,7 +572,7 @@ export function StudyModeModal({
           <button
             type="button"
             onClick={goNext}
-            disabled={freeUserShuffleLimitReached}
+            disabled={!canNext}
             className="flex-shrink-0 rounded-md border-2 border-white/25 p-3 text-slate-300 hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent sm:p-4"
             aria-label={canNext ? 'Next card' : 'Done'}
           >

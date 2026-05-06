@@ -15,6 +15,8 @@ import { db, storage } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp, query, where, getDocs, doc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { getSlugForScenario, getScenarioBySlug } from '@/lib/graphGymSlugs';
+import type { CourseSubject } from '@/lib/courseSubject';
+import { econCourseFromSubject } from '@/lib/courseSubject';
 import { SeasonPassModal } from '@/components/SeasonPassModal';
 import '@excalidraw/excalidraw/index.css';
 
@@ -35,7 +37,7 @@ const loadExcalidrawExports = async () => {
   return exportToCanvas;
 };
 
-function JoinDojoModal({ isOpen, onClose, selectedSubject }: { isOpen: boolean; onClose: () => void; selectedSubject: 'macro' | 'micro' }) {
+function JoinDojoModal({ isOpen, onClose, selectedSubject }: { isOpen: boolean; onClose: () => void; selectedSubject: CourseSubject }) {
   useEffect(() => {
     if (!isOpen) return;
     
@@ -79,11 +81,13 @@ function JoinDojoModal({ isOpen, onClose, selectedSubject }: { isOpen: boolean; 
             Unlock unlimited quiz generation, all Dojo Drills, FRQ practice, and full-length exams with a Season Pass.
           </p>
           <Link
-            href={`/purchase/season-pass?courseType=${selectedSubject}`}
+            href={`/purchase/season-pass?courseType=${selectedSubject === 'gov' ? 'bundle' : selectedSubject}`}
             className={`inline-flex items-center justify-center w-full px-6 py-3 text-white font-bold rounded-lg transition-colors shadow-md hover:shadow-lg ${
               selectedSubject === 'macro'
                 ? 'bg-blue-600 hover:bg-blue-700'
-                : 'bg-green-600 hover:bg-green-700'
+                : selectedSubject === 'micro'
+                  ? 'bg-green-600 hover:bg-green-700'
+                  : 'bg-violet-600 hover:bg-violet-700'
             }`}
             onClick={() => onClose()}
           >
@@ -150,7 +154,8 @@ export function GraphGym({ assignmentScenarios, isAssignment = false, assignment
     // Otherwise, filter from all scenarios by subject (show all for current course)
     let scenarios = graphGymScenarios.filter(scenario => {
       const scenarioSubjects = Array.isArray(scenario.subject) ? scenario.subject : [scenario.subject];
-      return scenarioSubjects.includes(currentCourse);
+      const econ = econCourseFromSubject(currentCourse);
+      return econ != null && scenarioSubjects.includes(econ);
     });
     
     // Filter by unit if selected
@@ -166,9 +171,14 @@ export function GraphGym({ assignmentScenarios, isAssignment = false, assignment
 
   // Get available units from scenarios
   const availableUnits = useMemo(() => {
+    const econ = econCourseFromSubject(currentCourse);
     const units = new Set<number>();
     graphGymScenarios
-      .filter(scenario => scenario.subject === currentCourse)
+      .filter(scenario => {
+        if (!econ) return false;
+        const subjects = Array.isArray(scenario.subject) ? scenario.subject : [scenario.subject];
+        return subjects.includes(econ);
+      })
       .forEach(scenario => {
         const unit = parseInt(scenario.lessonId.split('.')[0]);
         units.add(unit);
@@ -184,7 +194,10 @@ export function GraphGym({ assignmentScenarios, isAssignment = false, assignment
     }
 
     // Find the scenario by slug
-    const scenario = getScenarioBySlug(initialScenarioSlug, currentCourse);
+    const scenario = getScenarioBySlug(
+      initialScenarioSlug,
+      econCourseFromSubject(currentCourse) ?? undefined,
+    );
     if (!scenario) {
       console.warn('[GraphGym] Scenario not found for slug:', initialScenarioSlug);
       return;
@@ -677,7 +690,7 @@ export function GraphGym({ assignmentScenarios, isAssignment = false, assignment
                     )}
                   </button>
                   {showTip && (
-                    <div className="mt-2 p-3 bg-blue-50 border-2 border-blue-200 rounded-lg">
+                    <div className="mt-2 p-3 bg-muted border border-border rounded-lg">
                       <p className="text-sm text-gray-700">{(activeScenario as any).tip}</p>
                     </div>
                   )}
@@ -773,7 +786,7 @@ export function GraphGym({ assignmentScenarios, isAssignment = false, assignment
                 </div>
 
                 {/* Footer Action Area — independent from scroll/content above */}
-                <div className="flex-shrink-0 border-t-2 border-black bg-white p-6">
+                <div className="flex-shrink-0 bg-white p-6">
                   <Button
                     onClick={handleSubmit}
                     size="lg"
@@ -854,7 +867,7 @@ export function GraphGym({ assignmentScenarios, isAssignment = false, assignment
                             onClick={() => handleChecklistToggle(item.id)}
                             className={`w-full text-left p-3 rounded-lg border-2 border-black transition-transform hover:-translate-y-1 ${
                               isChecked
-                                ? 'bg-green-100 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                                ? 'bg-muted shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
                                 : 'bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]'
                             }`}
                           >
@@ -1108,7 +1121,7 @@ export function GraphGym({ assignmentScenarios, isAssignment = false, assignment
                           onClick={() => handleChecklistToggle(item.id)}
                           className={`w-full text-left p-3 rounded-lg border-2 border-black transition-transform hover:-translate-y-1 ${
                             isChecked
-                              ? 'bg-green-100 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                              ? 'bg-muted shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
                               : 'bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]'
                           }`}
                         >

@@ -13,6 +13,8 @@ import { FRQFeedbackDemo } from '@/components/FRQFeedbackDemo';
 const EXAM_DATES = {
   micro: new Date('2026-05-04T12:00:00'),
   macro: new Date('2026-05-08T12:00:00'),
+  /** Placeholder until AP Gov exam date is finalized in product copy. */
+  gov: new Date('2026-05-11T12:00:00'),
 };
 
 function getTimeLeft(target: Date) {

@@ -20,7 +20,7 @@ export default function MicroMCQPreview({ params }: { params: Promise<{ num: str
         questionBank={microSetOneQuestions}
         examType="micro"
         questionType="mcq"
-        examNumber={`preview/micro/mcq/${num}`}
+        examNumber={`full-micro-mcq-${num}`}
         isUnitTest={true}
       />
     </div>

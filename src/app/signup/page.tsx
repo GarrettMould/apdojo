@@ -8,6 +8,7 @@ import { Check, X, ArrowRight } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import Image from 'next/image'
+import { AuthDividerOr, GoogleSignInButton } from '@/components/GoogleSignInButton'
 
 export default function Signup() {
   const [email, setEmail] = useState('')
@@ -16,8 +17,9 @@ export default function Signup() {
   const [isSubscribed, setIsSubscribed] = useState(true)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [googleLoading, setGoogleLoading] = useState(false)
   const router = useRouter()
-  const { signup } = useAuthContext()
+  const { signup, loginWithGoogle } = useAuthContext()
 
   const [emailPlaceholder, setEmailPlaceholder] = useState('')
   const fullPlaceholder = 'sensei@apdojo.com'
@@ -34,10 +36,6 @@ export default function Signup() {
     }, 100)
     return () => clearInterval(id)
   }, [])
-
-  const [teacherCode, setTeacherCode] = useState('')
-  const teacherCodeStatus =
-    teacherCode.trim() === '' ? 'empty' : teacherCode.trim() === '9759' ? 'correct' : 'incorrect'
 
   const [hasMinLength, setHasMinLength] = useState(false)
   const [hasUpperCase, setHasUpperCase] = useState(false)
@@ -64,8 +62,7 @@ export default function Signup() {
     setError('')
     setLoading(true)
     try {
-      const isTeacher = teacherCode.trim() === '9759'
-      await signup(email, password, isSubscribed, isTeacher)
+      await signup(email, password, isSubscribed, false)
       router.push('/')
     } catch (err) {
       if (err instanceof FirebaseError) {
@@ -80,6 +77,29 @@ export default function Signup() {
       }
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleGoogleSignup = async () => {
+    setError('')
+    setGoogleLoading(true)
+    try {
+      await loginWithGoogle({ isSubscribedToMarketing: isSubscribed })
+      router.push('/')
+    } catch (err) {
+      if (err instanceof FirebaseError) {
+        if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
+          setError('')
+        } else if (err.code === 'auth/account-exists-with-different-credential') {
+          setError('An account already exists with this email. Sign in with email and password instead.')
+        } else {
+          setError('Google sign-up did not complete. Please try again.')
+        }
+      } else {
+        setError('Google sign-up did not complete. Please try again.')
+      }
+    } finally {
+      setGoogleLoading(false)
     }
   }
 
@@ -109,18 +129,27 @@ export default function Signup() {
           <h2 className="text-3xl font-black text-gray-900 mb-1">
             Join the Dojo
           </h2>
-          <p className="text-gray-600 font-medium mb-8">
+          <p className="text-gray-600 font-medium mb-6">
             Create your free account and start scoring 5s.
           </p>
 
-          <form className="space-y-5" onSubmit={handleSubmit}>
-            {error && (
-              <div className="flex items-center gap-2 p-4 bg-red-50 border-2 border-red-500 rounded-xl text-red-700 text-sm font-semibold">
-                <X className="w-4 h-4 flex-shrink-0" />
-                {error}
-              </div>
-            )}
+          {error && (
+            <div className="mb-5 flex items-center gap-2 p-4 bg-red-50 border-2 border-red-500 rounded-xl text-red-700 text-sm font-semibold">
+              <X className="w-4 h-4 flex-shrink-0" />
+              {error}
+            </div>
+          )}
 
+          <GoogleSignInButton
+            loading={googleLoading}
+            disabled={loading}
+            onClick={handleGoogleSignup}
+          >
+            Sign up with Google
+          </GoogleSignInButton>
+          <AuthDividerOr className="my-6" />
+
+          <form className="space-y-5" onSubmit={handleSubmit}>
             {/* Email */}
             <div>
               <label className="block text-xs font-black text-gray-900 uppercase tracking-widest mb-2">
@@ -133,7 +162,7 @@ export default function Signup() {
                 placeholder={emailPlaceholder || 'sensei@apdojo.com'}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                disabled={loading}
+                disabled={loading || googleLoading}
               />
             </div>
 
@@ -149,7 +178,7 @@ export default function Signup() {
                 placeholder="Create a strong password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                disabled={loading}
+                disabled={loading || googleLoading}
               />
             </div>
 
@@ -165,7 +194,7 @@ export default function Signup() {
                 placeholder="Confirm your password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                disabled={loading}
+                disabled={loading || googleLoading}
               />
             </div>
 
@@ -183,54 +212,25 @@ export default function Signup() {
               </div>
             </div>
 
-            {/* Subscribe */}
             <div className="flex items-start gap-3 p-4 bg-blue-50 border-2 border-blue-200 rounded-xl">
               <Checkbox
-                id="subscribe"
+                id="subscribe-email"
                 checked={isSubscribed}
                 onCheckedChange={(v) => setIsSubscribed(v as boolean)}
                 className="h-5 w-5 mt-0.5 border-2 border-black"
+                disabled={loading || googleLoading}
               />
-              <Label htmlFor="subscribe" className="text-sm font-semibold leading-relaxed text-gray-700 cursor-pointer">
+              <Label htmlFor="subscribe-email" className="text-sm font-semibold leading-relaxed text-gray-700 cursor-pointer">
                 Send me helpful tips, course updates, and special offers.
               </Label>
-            </div>
-
-            {/* Teacher code */}
-            <div>
-              <label className="block text-xs font-black text-gray-900 uppercase tracking-widest mb-2">
-                Teacher code <span className="text-gray-400 normal-case font-semibold tracking-normal">(optional)</span>
-              </label>
-              <input
-                type="text"
-                className={`w-full px-4 py-3 border-2 rounded-xl text-base font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder:text-gray-400 ${
-                  teacherCodeStatus === 'correct'
-                    ? 'border-green-500 bg-green-50'
-                    : teacherCodeStatus === 'incorrect'
-                    ? 'border-red-500 bg-red-50'
-                    : 'border-black'
-                }`}
-                placeholder="Enter teacher code"
-                value={teacherCode}
-                onChange={(e) => setTeacherCode(e.target.value)}
-                disabled={loading}
-              />
-              {teacherCodeStatus === 'incorrect' && (
-                <p className="mt-1.5 text-sm font-semibold text-red-600">Incorrect code — you can still create an account.</p>
-              )}
-              {teacherCodeStatus === 'correct' && (
-                <p className="mt-1.5 text-sm font-semibold text-green-600 flex items-center gap-1.5">
-                  <Check className="w-4 h-4" /> Teacher access will be enabled
-                </p>
-              )}
             </div>
 
             {/* Submit */}
             <button
               type="submit"
-              disabled={loading || !isValidPassword}
+              disabled={loading || googleLoading || !isValidPassword}
               className={`w-full flex items-center justify-center gap-2 py-3.5 px-6 font-black text-base text-white bg-blue-500 hover:bg-blue-600 border-2 border-blue-700 rounded-xl shadow-[0_4px_0_0_rgba(0,0,0,1)] active:translate-y-0.5 active:shadow-[0_2px_0_0_rgba(0,0,0,1)] transition-all ${
-                (loading || !isValidPassword) ? 'opacity-50 cursor-not-allowed' : ''
+                loading || googleLoading || !isValidPassword ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
               {loading ? (
