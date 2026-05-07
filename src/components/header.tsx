@@ -14,6 +14,7 @@ import { SubjectToggle } from '@/components/dashboard/SubjectToggle';
 import { hasValidSeasonPass, getPracticeTestsUrl } from '@/lib/utils';
 import type { CourseSubject } from '@/lib/courseSubject';
 import { isCourseSubject } from '@/lib/courseSubject';
+import { hasAdminRole } from '@/lib/adminAccess';
 
 export function Header() {
   const { user, logout, selectedSubject, setSelectedSubject, totalXP, guestXp, isCharacterClosetOpen, setIsCharacterClosetOpen, userData } = useAuthContext();
@@ -27,6 +28,7 @@ export function Header() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const isTeacher = !!(user && userData?.teacher === true);
+  const canAccessGov = Boolean(user && hasAdminRole(userData));
 
   // Ensure component is mounted before using selectedSubject to prevent hydration mismatch
   useEffect(() => {
@@ -219,12 +221,14 @@ export function Header() {
                 Graphing Practice
               </Link>
 
-              <Link
-                href={getPracticeTestsUrl('gov')}
-                className="text-lg text-gray-700 hover:text-violet-600 transition-colors font-bold"
-              >
-                AP Gov Practice
-              </Link>
+              {canAccessGov && (
+                <Link
+                  href={getPracticeTestsUrl('gov')}
+                  className="text-lg text-gray-700 hover:text-violet-600 transition-colors font-bold"
+                >
+                  AP Gov Practice
+                </Link>
+              )}
 
               {/* Cheat Sheets */}
               <Link
@@ -515,13 +519,15 @@ export function Header() {
               >
                 Full Practice Tests
               </Link>
-              <Link
-                href={getPracticeTestsUrl('gov')}
-                onClick={closeMobileMenu}
-                className="px-4 py-4 text-xl font-bold text-gray-800 hover:text-violet-600 hover:bg-violet-50 rounded-xl transition-colors"
-              >
-                AP Gov Practice
-              </Link>
+              {canAccessGov && (
+                <Link
+                  href={getPracticeTestsUrl('gov')}
+                  onClick={closeMobileMenu}
+                  className="px-4 py-4 text-xl font-bold text-gray-800 hover:text-violet-600 hover:bg-violet-50 rounded-xl transition-colors"
+                >
+                  AP Gov Practice
+                </Link>
+              )}
 
               <div className="my-3 border-t border-gray-100" />
 

@@ -2,11 +2,15 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { MessageCircle, Send, Sparkles, X } from 'lucide-react';
+import { MessageCircle, Send, X } from 'lucide-react';
 import type { CourseSubject } from '@/lib/courseSubject';
 import { displayCourseLabel } from '@/lib/courseSubject';
 import { personaForSubject } from '@/lib/chatPersonas';
+import { econTutorAvatarUrl } from '@/lib/tutorAvatar';
 import type { Question } from '@/data/questionBanks/types';
+import { useAuthContext } from '@/contexts/AuthContext';
+import { auth as firebaseAuth } from '@/lib/firebase';
+import { hasAdminRole } from '@/lib/adminAccess';
 
 type Role = 'user' | 'assistant';
 
@@ -17,8 +21,36 @@ interface ChatMessage {
   outboundContent?: string;
 }
 
+function toApiTurns(messages: ChatMessage[]): Array<{ role: Role; content: string }> {
+  const raw = messages
+    .filter((m) => m.id !== 'welcome')
+    .map((m) => ({
+      role: m.role,
+      content: m.role === 'user' ? (m.outboundContent ?? m.content) : m.content,
+    }));
+
+  // Ensure the sequence starts with user turns for the backend validator.
+  while (raw.length > 0 && raw[0].role !== 'user') raw.shift();
+
+  // Enforce strict alternation by keeping only the latest message
+  // when multiple consecutive messages have the same role.
+  const normalized: Array<{ role: Role; content: string }> = [];
+  for (const turn of raw) {
+    const prev = normalized[normalized.length - 1];
+    if (prev && prev.role === turn.role) {
+      normalized[normalized.length - 1] = turn;
+    } else {
+      normalized.push(turn);
+    }
+  }
+
+  return normalized;
+}
+
 const CHOICES_START = '[[CHOICES]]';
 const CHOICES_END = '[[/CHOICES]]';
+const PROMPT_PICK_OPTION = '__PICK_OPTION__';
+const PROMPT_PICK_KEY_TERM = '__PICK_KEY_TERM__';
 
 function buildChoicesBlock(choices: readonly { label: string; prompt: string }[]): string {
   const lines = choices.map((c) => `${c.label}|${c.prompt}`).join('\n');
@@ -206,24 +238,89 @@ function buildAllOutbound(answered: boolean, selectedLetter: string | undefined)
   );
 }
 
+function buildKeyTermOutbound(
+  term: string,
+  answered: boolean,
+  selectedLetter: string | undefined
+): string {
+  return (
+    `[Guided MCQ tutor]\n` +
+    `The learner wants to unpack this key term from the current question: **${term}**.\n\n` +
+    `${spoilerGuardNote(answered, selectedLetter)}\n\n` +
+    `Define the term in plain AP-level language, then connect it directly to this exact item and how it helps eliminate or support options. ` +
+    `Stay on this item only. End with [[CHOICES]] per system rules.`
+  );
+}
+
+function extractKeyTermsFromStem(stem: string, maxTerms = 6): string[] {
+  const stop = new Set([
+    'which', 'what', 'when', 'where', 'why', 'how', 'that', 'this', 'these', 'those', 'with', 'from',
+    'into', 'about', 'after', 'before', 'under', 'over', 'between', 'among', 'through', 'during',
+    'because', 'while', 'would', 'could', 'should', 'their', 'there', 'they', 'them', 'than', 'then',
+    'have', 'has', 'had', 'were', 'was', 'been', 'being', 'your', 'you', 'students', 'student', 'most',
+    'least', 'best', 'except', 'following', 'according', 'each', 'many', 'some', 'more', 'less', 'only',
+    'also', 'into', 'onto', 'upon', 'such', 'used', 'using', 'use', 'show', 'shows', 'shown', 'likely',
+    'main', 'primarily', 'generally', 'policy', 'policies', 'government', 'economy', 'economic', 'market',
+    'markets', 'answer', 'option', 'question', 'correct', 'incorrect', 'unit', 'course', 'ap'
+  ]);
+  const tokens = stem
+    .replace(/[^A-Za-z0-9\s'-]/g, ' ')
+    .split(/\s+/)
+    .map((raw) => raw.trim())
+    .filter(Boolean)
+    .map((raw) => ({ raw, key: raw.toLowerCase() }));
+
+  const out: string[] = [];
+  const seen = new Set<string>();
+  const push = (t: string) => {
+    const key = t.toLowerCase().trim();
+    if (!key || seen.has(key)) return;
+    seen.add(key);
+    out.push(t.trim());
+  };
+
+  for (let i = 0; i < tokens.length - 1 && out.length < maxTerms; i++) {
+    const a = tokens[i];
+    const b = tokens[i + 1];
+    if (a.key.length < 4 || b.key.length < 4) continue;
+    if (stop.has(a.key) || stop.has(b.key)) continue;
+    push(`${a.raw} ${b.raw}`);
+  }
+
+  for (const t of tokens) {
+    if (out.length >= maxTerms) break;
+    if (t.key.length < 4 || stop.has(t.key) || /^\d+$/.test(t.key)) continue;
+    push(t.raw);
+  }
+
+  return out;
+}
+
 export function buildMcqTutorWelcome(
   persona: ReturnType<typeof personaForSubject>,
   q: Question,
   ctx: { answered: boolean; selectedLetter?: string }
 ): ChatMessage[] {
-  const chips: { label: string; prompt: string }[] = [];
-  for (let i = 0; i < q.options.length; i++) {
-    const L = String.fromCharCode(65 + i);
-    chips.push({
-      label: L,
-      prompt: buildLetterOutbound(L, q.options[i], ctx.answered, ctx.selectedLetter),
-    });
-  }
+  const firstLetter = 'A';
+  const firstOption = q.options[0] ?? '(no option text available)';
+  const personaOpening =
+    persona.name === 'Adam Smith'
+      ? 'Adam Smith here, brought to you by the invisible hand.'
+      : `${persona.name} here, ready to reason this out with you.`;
+  const chips: { label: string; prompt: string }[] = [
+    {
+      label: 'Explain one of the answer options',
+      prompt: PROMPT_PICK_OPTION,
+    },
+    {
+      label: 'Explain one of the key terms',
+      prompt: PROMPT_PICK_KEY_TERM,
+    },
+  ];
 
   const intro =
-    `**Adam Smith, here to guide you.**\n\n` +
-    `**Can you identify any answer options that we can eliminate?** Tap **A–${String.fromCharCode(64 + q.options.length)}**. ` +
-    `Just tap the option letter you want to examine first.`;
+    `**${personaOpening}**\n\n` +
+    `How can I help you think through this question?`;
 
   return [
     {
@@ -254,6 +351,8 @@ export function McqQuestionTutorFab({
   splitScreenOnDesktop = false,
   onOpenChange,
 }: McqQuestionTutorFabProps) {
+  const { user, userData } = useAuthContext();
+  const canUseAdminChat = Boolean(user && hasAdminRole(userData));
   const persona = personaForSubject(subject);
   const subjectLabel = displayCourseLabel(subject);
   const theme = chatTheme(subject);
@@ -308,6 +407,32 @@ export function McqQuestionTutorFab({
     }),
     [question, selectedLetter, answered]
   );
+  const optionPickerChoices = useMemo(
+    () =>
+      question.options.map((text, i) => {
+        const letter = String.fromCharCode(65 + i);
+        return {
+          label: `${letter}`,
+          prompt: buildLetterOutbound(letter, text, answered, selectedLetter),
+        };
+      }),
+    [question.options, answered, selectedLetter]
+  );
+  const keyTermPickerChoices = useMemo(() => {
+    const terms = extractKeyTermsFromStem(question.question, 6);
+    if (terms.length === 0) {
+      return [
+        {
+          label: 'Question wording',
+          prompt: buildStemOutbound(answered, selectedLetter),
+        },
+      ];
+    }
+    return terms.map((term) => ({
+      label: term,
+      prompt: buildKeyTermOutbound(term, answered, selectedLetter),
+    }));
+  }, [question.question, answered, selectedLetter]);
 
   const sendTurn = useCallback(
     async (displayText: string, outboundText?: string) => {
@@ -315,12 +440,7 @@ export function McqQuestionTutorFab({
       const display = displayText.trim();
       if (!outbound || sending) return;
 
-      const prior = messagesRef.current
-        .filter((m) => m.id !== 'welcome')
-        .map((m) => ({
-          role: m.role,
-          content: m.role === 'user' ? (m.outboundContent ?? m.content) : m.content,
-        }));
+      const prior = toApiTurns(messagesRef.current);
 
       const userId = `u-${Date.now()}`;
       const needsOutbound = outbound !== display;
@@ -337,9 +457,13 @@ export function McqQuestionTutorFab({
       setSending(true);
 
       try {
+        const token = await firebaseAuth.currentUser?.getIdToken();
         const res = await fetch('/api/cheat-sheet-chat', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
           body: JSON.stringify({
             subject,
             unitNumber,
@@ -385,12 +509,36 @@ export function McqQuestionTutorFab({
 
   const onPickChoice = useCallback(
     (prompt: string, displayLabel: string) => {
+      if (prompt === PROMPT_PICK_OPTION) {
+        const assistantText =
+          `Great — let’s zoom in on one answer option first.\n\n` +
+          `Which option do you want to break down?` +
+          buildChoicesBlock(optionPickerChoices);
+        setMessages((prev) => [
+          ...prev,
+          { id: `a-${Date.now()}`, role: 'assistant', content: assistantText },
+        ]);
+        return;
+      }
+      if (prompt === PROMPT_PICK_KEY_TERM) {
+        const assistantText =
+          `Nice move — focusing on a key term usually clears up the whole item.\n\n` +
+          `Which term should we unpack?` +
+          buildChoicesBlock(keyTermPickerChoices);
+        setMessages((prev) => [
+          ...prev,
+          { id: `a-${Date.now()}`, role: 'assistant', content: assistantText },
+        ]);
+        return;
+      }
       void sendTurn(displayLabel, prompt);
     },
-    [sendTurn]
+    [sendTurn, optionPickerChoices, keyTermPickerChoices]
   );
 
   const canSendOptional = input.trim().length > 0 && !sending;
+
+  if (!canUseAdminChat) return null;
 
   return (
     <div
@@ -400,7 +548,8 @@ export function McqQuestionTutorFab({
           ? {
               left: 'max(0.75rem, env(safe-area-inset-left))',
               bottom: 'max(0.75rem, env(safe-area-inset-bottom))',
-              top: 'max(0.75rem, env(safe-area-inset-top))',
+              // Keep tutor panel below the fixed site header stack.
+              top: 'calc(80px + max(0.5rem, env(safe-area-inset-top)))',
             }
           : {
               left: 'max(1rem, env(safe-area-inset-left))',
@@ -412,32 +561,34 @@ export function McqQuestionTutorFab({
         <div
           role="dialog"
           aria-label="Question tutor"
-          className={`pointer-events-auto flex h-[min(720px,88vh)] max-h-[88vh] w-[min(400px,calc(100vw-2rem))] flex-col overflow-hidden rounded-[1.25rem] border border-slate-200/90 bg-white/95 shadow-2xl shadow-slate-900/10 ring-1 ring-slate-900/[0.04] backdrop-blur-md ${
+          className={`pointer-events-auto relative flex h-[min(720px,88vh)] max-h-[88vh] w-[min(400px,calc(100vw-2rem))] flex-col overflow-hidden rounded-[1.25rem] border border-slate-200/90 bg-white/95 shadow-2xl shadow-slate-900/10 ring-1 ring-slate-900/[0.04] backdrop-blur-md ${
             splitScreenOnDesktop
-              ? 'lg:h-full lg:max-h-none lg:w-[25vw] lg:min-w-[320px] lg:rounded-xl'
+              ? 'lg:h-full lg:max-h-none lg:w-[25vw] lg:min-w-[300px] lg:rounded-xl'
               : ''
           }`}
         >
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            className="absolute right-3 top-3 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-600 shadow-sm transition hover:bg-slate-100 hover:text-slate-900"
+            aria-label="Close question tutor"
+            title="Close chat"
+          >
+            <X className="h-5 w-5" strokeWidth={2} />
+          </button>
           <div className="relative flex-shrink-0 border-b border-slate-100 bg-gradient-to-b from-slate-50/90 to-white px-4 py-3.5">
             <div className={`absolute left-0 top-0 h-0.5 w-full ${theme.accentSoft} opacity-90`} aria-hidden />
-            <div className="flex items-start gap-3 pt-0.5">
-              <div
-                className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl ${theme.accentMuted} shadow-sm`}
-              >
-                <Sparkles className={`h-5 w-5 ${theme.accent}`} strokeWidth={1.75} />
-              </div>
-              <div className="min-w-0 flex-1 pt-0.5">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
-                  Guided — this question
-                </p>
-                <p className="truncate text-[15px] font-black tracking-tight text-slate-900">
-                  {persona.name}
-                </p>
-                <p className="truncate text-xs text-slate-500">
-                  Unit {unitNumber}
-                  {unitTitle ? ` · ${unitTitle}` : ''} · {subjectLabel}
-                </p>
-              </div>
+            <div className="min-w-0 pt-0.5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                Guided — this question
+              </p>
+              <p className="truncate text-[15px] font-black tracking-tight text-slate-900">
+                {persona.name}
+              </p>
+              <p className="truncate text-xs text-slate-500">
+                Unit {unitNumber}
+                {unitTitle ? ` · ${unitTitle}` : ''} · {subjectLabel}
+              </p>
             </div>
           </div>
 
@@ -452,39 +603,52 @@ export function McqQuestionTutorFab({
                   parsedAssistant.choices.length > 0 &&
                   m.id === lastAssistantId;
                 const assistantLead = parsedAssistant?.display.trim() ?? '';
+                const avatarUrl = econTutorAvatarUrl(subject);
+
+                if (m.role === 'user') {
+                  return (
+                    <div key={m.id} className="flex w-full flex-col items-end">
+                      <div className="max-w-[min(100%,20rem)] px-3.5 py-2.5 text-[14px] leading-relaxed shadow-sm rounded-2xl rounded-br-md bg-slate-700 text-white">
+                        <p className="whitespace-pre-wrap text-white/95 font-semibold">{m.content}</p>
+                      </div>
+                    </div>
+                  );
+                }
 
                 return (
-                  <div
-                    key={m.id}
-                    className={`flex w-full flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
-                  >
-                    <div
-                      className={`max-w-[min(100%,20rem)] px-3.5 py-2.5 text-[14px] leading-relaxed shadow-sm ${
-                        m.role === 'user'
-                          ? 'rounded-2xl rounded-br-md bg-slate-700 text-white'
-                          : 'rounded-2xl rounded-bl-md border border-slate-100/90 bg-white text-slate-800'
-                      }`}
-                    >
-                      {m.role === 'assistant' && parsedAssistant ? (
-                        assistantLead ? (
-                          <AssistantMarkdown text={assistantLead} />
-                        ) : parsedAssistant.choices.length > 0 ? (
-                          <p className="text-sm text-slate-500">Choose a step —</p>
-                        ) : (
-                          <p className="text-sm text-slate-500">—</p>
-                        )
-                      ) : m.role === 'user' ? (
-                        <p className="whitespace-pre-wrap text-white/95 font-semibold">{m.content}</p>
+                  <div key={m.id} className="flex w-full flex-col items-start">
+                    <div className="flex w-full max-w-[min(100%,22rem)] flex-row items-start gap-2 sm:max-w-[min(100%,23rem)]">
+                      {avatarUrl ? (
+                        <img
+                          src={avatarUrl}
+                          alt="Economics tutor"
+                          width={36}
+                          height={36}
+                          className="mt-0.5 h-9 w-9 shrink-0 rounded-full object-cover ring-2 ring-white shadow-sm"
+                        />
                       ) : null}
+                      <div className="flex min-w-0 flex-1 flex-col items-stretch gap-1">
+                        <div className="max-w-none px-3.5 py-2.5 text-[14px] leading-relaxed shadow-sm rounded-2xl rounded-bl-md border border-slate-100/90 bg-white text-slate-800">
+                          {parsedAssistant ? (
+                            assistantLead ? (
+                              <AssistantMarkdown text={assistantLead} />
+                            ) : parsedAssistant.choices.length > 0 ? (
+                              <p className="text-sm text-slate-500">Choose a step —</p>
+                            ) : (
+                              <p className="text-sm text-slate-500">—</p>
+                            )
+                          ) : null}
+                        </div>
+                        {showChoices ? (
+                          <QuickChoiceGrid
+                            choices={parsedAssistant!.choices}
+                            sending={sending}
+                            onPick={onPickChoice}
+                            theme={theme}
+                          />
+                        ) : null}
+                      </div>
                     </div>
-                    {showChoices ? (
-                      <QuickChoiceGrid
-                        choices={parsedAssistant!.choices}
-                        sending={sending}
-                        onPick={onPickChoice}
-                        theme={theme}
-                      />
-                    ) : null}
                   </div>
                 );
               })}
@@ -493,9 +657,6 @@ export function McqQuestionTutorFab({
           </div>
 
           <div className="flex-shrink-0 border-t border-slate-100 bg-white px-3 pb-3 pt-2">
-            <p className="mb-1.5 text-[11px] font-black text-slate-500">
-              Optional note <span className="font-normal text-slate-400">(only if you need one short aside)</span>
-            </p>
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -507,7 +668,7 @@ export function McqQuestionTutorFab({
               }}
               disabled={sending}
               rows={2}
-              placeholder="Mostly tap the tutor’s buttons above…"
+              placeholder="Type your message..."
               className={`mb-2 min-h-0 w-full resize-none rounded-xl border border-slate-200 bg-slate-50/80 px-3.5 py-2 text-sm font-semibold text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-4 disabled:opacity-60 ${theme.inputFocus}`}
             />
             <button
@@ -523,20 +684,18 @@ export function McqQuestionTutorFab({
         </div>
       )}
 
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        className={`pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full text-white transition hover:brightness-105 active:scale-[0.97] sm:h-[3.25rem] sm:w-[3.25rem] ${theme.fab}`}
-        aria-expanded={open}
-        aria-label={open ? 'Close question tutor' : 'Open question tutor'}
-        title="Guided help for this question"
-      >
-        {open ? (
-          <X className="h-6 w-6" strokeWidth={2} />
-        ) : (
+      {!open ? (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className={`pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full text-white transition hover:brightness-105 active:scale-[0.97] sm:h-[3.25rem] sm:w-[3.25rem] ${theme.fab}`}
+          aria-expanded={false}
+          aria-label="Open question tutor"
+          title="Guided help for this question"
+        >
           <MessageCircle className="h-6 w-6" strokeWidth={2} />
-        )}
-      </button>
+        </button>
+      ) : null}
     </div>
   );
 }

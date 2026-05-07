@@ -1270,7 +1270,7 @@ const QuestionArena = ({ question, onAnswerSelect, initialSelectedLetter, isAnsw
       </div>
 
       {/* Answer Options - Vertical Stack */}
-      <div className="space-y-3">
+      <div className="mt-6 space-y-3">
         {question.options.map((option, optIndex) => {
           const isHighlighted = !isSubmitted && highlightedIndex === optIndex;
           const isSelected = selectedAnswerIndex === optIndex;
@@ -1461,10 +1461,6 @@ export function UnitMCQs({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
-
-
-
-
 
   // Log when currentQuestionIndex prop changes
   useEffect(() => {
@@ -1858,7 +1854,7 @@ export function UnitMCQs({
         <div
           className={`h-full px-4 pt-4 pb-4 transition-all duration-300 lg:transform ${
             isTutorOpen
-              ? 'max-w-none lg:ml-auto lg:mr-4 lg:w-[75%] lg:translate-x-1'
+              ? 'max-w-none lg:ml-[25%] lg:w-[75%]'
               : 'max-w-3xl mx-auto'
           }`}
         >
@@ -1873,7 +1869,7 @@ export function UnitMCQs({
 
             {/* Center: QuestionArena */}
             {currentQuestion && (
-              <div className="min-h-0 flex-1 overflow-hidden rounded-lg border border-gray-200 bg-white p-4 shadow-md md:p-5">
+              <div className="min-h-0 overflow-y-auto rounded-lg border border-gray-200 bg-white p-4 shadow-md md:p-5">
                 <QuestionArena
                   question={currentQuestion}
                   onAnswerSelect={handleAnswerSelection}

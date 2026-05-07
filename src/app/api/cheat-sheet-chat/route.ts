@@ -2,6 +2,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextRequest, NextResponse } from 'next/server';
 import { displayCourseLabel, isCourseSubject, type CourseSubject } from '@/lib/courseSubject';
 import { personaForSubject } from '@/lib/chatPersonas';
+import { auth as adminAuth, db as adminDb } from '@/lib/firebase-admin';
 
 const MODEL_NAME = 'gemini-2.0-flash';
 
@@ -263,6 +264,38 @@ Substitute your own pairs when they fit the turn (e.g. "How is this tested?" or 
 }
 
 export async function POST(req: NextRequest) {
+  const authHeader = req.headers.get('authorization') || req.headers.get('Authorization');
+  const bearerToken =
+    authHeader && authHeader.startsWith('Bearer ') ? authHeader.slice('Bearer '.length).trim() : '';
+  if (!bearerToken || !adminAuth || !adminDb) {
+    return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
+  }
+
+  let uid = '';
+  try {
+    const decoded = await adminAuth.verifyIdToken(bearerToken);
+    uid = decoded.uid;
+  } catch {
+    return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
+  }
+
+  try {
+    const userSnap = await adminDb.collection('users').doc(uid).get();
+    const userData = userSnap.data() as
+      | { admin?: boolean; role?: string; roles?: string[] }
+      | undefined;
+    const isAdmin =
+      userData?.admin === true ||
+      (typeof userData?.role === 'string' && userData.role.toLowerCase() === 'admin') ||
+      (Array.isArray(userData?.roles) &&
+        userData.roles.some((r) => typeof r === 'string' && r.toLowerCase() === 'admin'));
+    if (!isAdmin) {
+      return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
+    }
+  } catch {
+    return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
+  }
+
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return NextResponse.json(
@@ -285,10 +318,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON body.' }, { status: 400 });
   }
 
-  const subject = body.subject;
-  if (!isCourseSubject(subject)) {
+  const subjectRaw = body.subject;
+  if (typeof subjectRaw !== 'string' || !isCourseSubject(subjectRaw)) {
     return NextResponse.json({ error: 'Invalid subject.' }, { status: 400 });
   }
+  const subject: CourseSubject = subjectRaw;
 
   const unitNumber = Number(body.unitNumber);
   if (!Number.isFinite(unitNumber) || unitNumber < 1 || unitNumber > 99) {

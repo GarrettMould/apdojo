@@ -1,7 +1,16 @@
+/** Matches `FullExamFRQ` `tableData` (optional `playerNames` for game-style tables). */
+export interface GovFrqTableData {
+  headers: string[];
+  rows: (string | number)[][];
+  rowHeaders?: boolean;
+}
+
 export interface GovStimulusFrq {
   id: string;
   title: string;
   stimulus?: string;
+  /** When set, rendered as HTML table instead of plain `stimulus` text (e.g. quantitative FRQs). */
+  tableData?: GovFrqTableData;
   prompt: string;
   tasks: string[];
   cedLink?: string;
@@ -30,8 +39,19 @@ export const govUnitStimulusFrqByUnit: Record<number, GovStimulusFrq[]> = {
     {
       id: 'u1-frq-2-quant-grants',
       title: 'FRQ 2: Quantitative Analysis (Unit 1: Foundations of Democracy)',
-      stimulus:
-        'Fiscal Year | Categorical Grants (Billions $) | Block Grants (Billions $)\n1960 | $7.0 | $0.0\n1980 | $82.5 | $9.2\n2000 | $254.7 | $30.1\n2020 | $640.3 | $51.5',
+      tableData: {
+        headers: [
+          'Fiscal Year',
+          'Categorical Grants (Billions $)',
+          'Block Grants (Billions $)',
+        ],
+        rows: [
+          [1960, '$7.0', '$0.0'],
+          [1980, '$82.5', '$9.2'],
+          [2000, '$254.7', '$30.1'],
+          [2020, '$640.3', '$51.5'],
+        ],
+      },
       prompt:
         'Use the table to answer each part, referencing specific evidence where appropriate.',
       tasks: [
@@ -61,5 +81,57 @@ export const govUnitStimulusFrqByUnit: Record<number, GovStimulusFrq[]> = {
 
 export function getGovUnitStimulusFrqs(unitNumber: number): GovStimulusFrq[] {
   return govUnitStimulusFrqByUnit[unitNumber] ?? [];
+}
+
+/** e.g. "Concept Application", "Quantitative Analysis", "SCOTUS Comparison" from `FRQ n: Type (…)` titles. */
+export function getGovUnitFrqFormatLabels(unitNumber: number): string[] {
+  return getGovUnitStimulusFrqs(unitNumber).map((frq) => {
+    const m = frq.title.match(/^FRQ\s*\d+\s*:\s*(.+?)(?:\s*\(|$)/i);
+    return m ? m[1].trim() : frq.title;
+  });
+}
+
+/** Shape expected by `FullExamFRQ` — one combined exam document for the unit pack. */
+export function buildGovUnitFrqPackForFullExam(unitNumber: number): {
+  examTitle: string;
+  questions: Array<{
+    questionNumber: number;
+    prompt: string;
+    tableData?: GovFrqTableData;
+    directionsAfterTable?: string;
+    parts: Array<{ label: string; text: string; answerType: 'text' }>;
+  }>;
+} | null {
+  const pack = getGovUnitStimulusFrqs(unitNumber);
+  if (pack.length === 0) return null;
+  return {
+    examTitle: `AP Gov Unit ${unitNumber} FRQ Pack (${pack.length} Questions)`,
+    questions: pack.map((frq, idx) => {
+      if (frq.tableData) {
+        return {
+          questionNumber: idx + 1,
+          prompt: `${frq.title}\n\nStimulus:`,
+          tableData: frq.tableData,
+          directionsAfterTable: `Task:\n${frq.prompt}`,
+          parts: frq.tasks.map((task, taskIdx) => ({
+            label: String.fromCharCode(65 + taskIdx),
+            text: task,
+            answerType: 'text' as const,
+          })),
+        };
+      }
+      return {
+        questionNumber: idx + 1,
+        prompt: frq.stimulus
+          ? `${frq.title}\n\nStimulus:\n${frq.stimulus}\n\nTask:\n${frq.prompt}`
+          : `${frq.title}\n\nTask:\n${frq.prompt}`,
+        parts: frq.tasks.map((task, taskIdx) => ({
+          label: String.fromCharCode(65 + taskIdx),
+          text: task,
+          answerType: 'text' as const,
+        })),
+      };
+    }),
+  };
 }
 

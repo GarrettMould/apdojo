@@ -17,7 +17,7 @@ import { videos, Video } from '@/data/videos';
 import { getVideosForLessonId } from '@/data/videosByLessonId';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question as QuestionType } from '@/data/questionBanks/types';
-import { X, ArrowRight, Lock, ArrowLeft, CheckCircle2, XCircle, Download, Bookmark, BookmarkPlus, Check, Brain, Maximize2, FileText, Zap, Lightbulb, FileQuestion, Award, Layers, Unlock, Sparkles, ChevronDown, ChevronUp, Pen } from 'lucide-react';
+import { X, ArrowRight, Lock, ArrowLeft, CheckCircle2, XCircle, Download, Bookmark, BookmarkPlus, Check, Brain, Maximize2, FileText, Zap, Lightbulb, FileQuestion, Award, Layers, Unlock, Sparkles, ChevronDown, ChevronUp, Pen, MoreHorizontal } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import jsPDF from 'jspdf';
@@ -541,8 +541,11 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
   const [loadingQuestionIndex, setLoadingQuestionIndex] = useState(0);
   const [quizError, setQuizError] = useState<string | null>(null);
   const [showExplanations, setShowExplanations] = useState<Set<number>>(new Set());
+  const [activeTermMenuId, setActiveTermMenuId] = useState<string | null>(null);
   const [showJoinDojoModal, setShowJoinDojoModal] = useState(false);
   const [shuffleModalOpen, setShuffleModalOpen] = useState(false);
+  const [isTutorOpen, setIsTutorOpen] = useState(false);
+  const [isDesktopViewport, setIsDesktopViewport] = useState(false);
   const [shuffledDeck, setShuffledDeck] = useState<UnitFlashcardData[]>([]);
   const [showShuffleLimitModal, setShowShuffleLimitModal] = useState(false);
   const [showPacketSeasonPassModal, setShowPacketSeasonPassModal] = useState(false);
@@ -550,6 +553,9 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
   const [entrySeasonPassPromoVisible, setEntrySeasonPassPromoVisible] = useState(false);
   const [entrySeasonPassPromoDismissed, setEntrySeasonPassPromoDismissed] = useState(false);
   const [unitMcqAnsweredIds, setUnitMcqAnsweredIds] = useState<Set<number>>(new Set());
+  const [chatPromptText, setChatPromptText] = useState<string>('');
+  const [chatPromptDisplayText, setChatPromptDisplayText] = useState<string>('');
+  const [chatPromptNonce, setChatPromptNonce] = useState(0);
 
   const isPrettyCheatSheetRoute = propSubject != null && propUnitNumber != null;
   const showEntrySeasonPassPromo =
@@ -592,6 +598,13 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
   }, [inlineExpandedVideoKey]);
 
   useEffect(() => {
+    const syncViewport = () => setIsDesktopViewport(window.innerWidth >= 1024);
+    syncViewport();
+    window.addEventListener('resize', syncViewport);
+    return () => window.removeEventListener('resize', syncViewport);
+  }, []);
+
+  useEffect(() => {
     if (inlineExpandedVideoKey == null) {
       pendingLessonVideoResumeKeyRef.current = null;
       return;
@@ -611,6 +624,20 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
   useEffect(() => {
     if (shuffleModalOpen) setShowScrollPopup(false);
   }, [shuffleModalOpen]);
+
+  useEffect(() => {
+    const onDocPointerDown = (event: MouseEvent | TouchEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (target?.closest?.('[data-term-menu="true"]')) return;
+      setActiveTermMenuId(null);
+    };
+    document.addEventListener('mousedown', onDocPointerDown, { capture: true });
+    document.addEventListener('touchstart', onDocPointerDown, { capture: true });
+    return () => {
+      document.removeEventListener('mousedown', onDocPointerDown, { capture: true } as any);
+      document.removeEventListener('touchstart', onDocPointerDown, { capture: true } as any);
+    };
+  }, []);
 
   // Free users: count up to 2 "new" card views per day (localStorage). Shuffle always opens; first two cards flip normally, then Next opens the Season Pass pitch (same every time they open shuffle that day).
   const DAILY_FREE_SHUFFLE_VIEWS = 2;
@@ -1242,6 +1269,27 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
     }
   };
 
+  const handleAskDojoAboutSelectedTerms = () => {
+    const allTerms = selectedSubject === 'macro' ? apMacroTerms : apMicroTerms;
+    const selectedTermObjects = Array.from(selectedTerms)
+      .map((termId) => allTerms.find((t) => t.id === termId))
+      .filter(Boolean) as KeyTerm[];
+    if (selectedTermObjects.length === 0) return;
+    const topTerms = selectedTermObjects.slice(0, 8).map((t) => t.term);
+    const displayPrompt =
+      selectedTermObjects.length === 1
+        ? `Please explain the concept of ${topTerms[0]}.`
+        : `Please explain these concepts: ${topTerms.join(', ')}.`;
+    const prompt =
+      selectedTermObjects.length === 1
+        ? `Unit ${activeUnitNum} (${selectedSubject}). Tutor me on **${topTerms[0]}** for AP exam use. Keep it concise: 3-5 bullets max, include 1 connection to a nearby unit concept and 1 common misconception. End with [[CHOICES]].`
+        : `Unit ${activeUnitNum} (${selectedSubject}). Tutor me on these selected terms: ${topTerms.join(', ')}. Keep it concise: 4-6 bullets total, highlight how they connect, and include 2 common misconceptions total. End with [[CHOICES]].`;
+    setChatPromptDisplayText(displayPrompt);
+    setChatPromptText(prompt);
+    setChatPromptNonce((n) => n + 1);
+    setActiveTermMenuId(null);
+  };
+
   // Cycle through loading question indices while generating
   useEffect(() => {
     if (!isGeneratingQuiz) {
@@ -1587,7 +1635,11 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
         <motion.div
           ref={leftPanelScrollRef}
           animate={{
-            width: showQuizPanel ? `${leftPanelWidth}%` : '100%',
+            width: showQuizPanel
+              ? `${leftPanelWidth}%`
+              : isTutorOpen && isDesktopViewport
+                ? '75%'
+                : '100%',
           }}
           transition={{
             type: 'spring',
@@ -1597,7 +1649,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           className={`flex-shrink-0 min-w-0 ${showScrollPopup || shuffleModalOpen ? 'overflow-hidden' : 'overflow-y-auto'}`}
         >
           <div
-            className="max-w-7xl mx-auto px-4 py-12 mt-12"
+            className={`max-w-7xl px-4 py-12 mt-12 ${isTutorOpen && isDesktopViewport ? 'mx-0' : 'mx-auto'}`}
             ref={cheatSheetContentRef}
           >
         {/* Unit header */}
@@ -2380,7 +2432,9 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                       // Create unique key combining lessonId and term.id to avoid duplicates when term appears in multiple lessons
                       const uniqueKey = `${lessonId}-${term.id}`;
                       
-                      const handleTermClick = () => {
+                      const handleTermClick = (e: React.MouseEvent<HTMLDivElement>) => {
+                        const target = e.target as HTMLElement | null;
+                        if (target?.closest?.('[data-term-menu="true"]')) return;
                         // Toggle term selection
                         setSelectedTerms(prev => {
                           const newSet = new Set(prev);
@@ -2406,8 +2460,58 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                         >
                           {/* Selection Indicator */}
                           {isSelected && (
-                            <div className="absolute top-3 right-3 w-6 h-6 bg-white rounded-full flex items-center justify-center border-2 border-gray-300">
-                              <Check className="w-4 h-4 text-gray-500" />
+                            <div className="absolute top-2.5 right-2.5 z-10 flex items-center gap-1.5">
+                              <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center border-2 border-gray-300">
+                                <Check className="w-4 h-4 text-gray-500" />
+                              </div>
+                              <div className="relative">
+                                <button
+                                  type="button"
+                                  onMouseDown={(e) => e.stopPropagation()}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setActiveTermMenuId((prev) => (prev === term.id ? null : term.id));
+                                  }}
+                                  data-term-menu="true"
+                                  className="flex h-6 w-6 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-600 hover:bg-gray-100"
+                                  aria-label="Selected term actions"
+                                >
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </button>
+                                {activeTermMenuId === term.id && (
+                                  <div
+                                    data-term-menu="true"
+                                    className="absolute right-0 top-7 z-30 min-w-[260px] rounded-md border border-gray-200 bg-white p-1 shadow-lg"
+                                    onMouseDown={(e) => e.stopPropagation()}
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        void handleMakeQuiz();
+                                        setActiveTermMenuId(null);
+                                      }}
+                                      className="block w-full rounded px-3 py-2 text-left text-sm text-gray-800 hover:bg-gray-100"
+                                    >
+                                      Generate a Quiz with ({availableQuizQuestions.length} selected questions)
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={handleAskDojoAboutSelectedTerms}
+                                      className="block w-full rounded px-3 py-2 text-left text-sm text-gray-800 hover:bg-gray-100"
+                                    >
+                                      Ask Dojo AI About ({selectedTerms.size} selected terms)
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => setActiveTermMenuId(null)}
+                                      className="block w-full rounded px-3 py-2 text-left text-sm text-gray-600 hover:bg-gray-100"
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           )}
                           <h3 className="font-bold text-gray-800 pr-8">
@@ -3389,7 +3493,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
 
       {/* Floating Action Dock */}
       {(() => {
-        const isAnythingSelected = selectedTerms.size > 0 || selectedWhiteboards.size > 0;
+        const isAnythingSelected = selectedWhiteboards.size > 0;
         const showDownload = selectedWhiteboards.size > 0;
         const showFullscreenButton = selectedWhiteboards.size === 1 && selectedTerms.size === 0;
 
@@ -3448,50 +3552,15 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
               whileTap={{ scale: 0.98 }}
               className="flex flex-col items-center gap-2 bg-white text-gray-800 rounded-2xl shadow-lg p-2 border border-gray-300"
             >
-              <motion.button 
-                onClick={handleMakeQuiz}
-                disabled={isGeneratingQuiz}
-                whileHover={!isGeneratingQuiz ? { scale: 1.05 } : {}}
-                whileTap={!isGeneratingQuiz ? { scale: 0.95 } : {}}
-                className={`flex flex-col items-center justify-center p-3 rounded-xl transition-all duration-200 w-20 h-16 ${
-                  isGeneratingQuiz 
-                    ? 'opacity-50 cursor-not-allowed' 
-                    : 'hover:bg-gradient-to-br hover:from-blue-50 hover:to-blue-100'
-                }`}
-                title="Generate Quiz"
-              >
-                {isGeneratingQuiz ? (
-                  <motion.div 
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                    className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full"
-                  />
-                ) : (
-                  <motion.div
-                    animate={{ 
-                      scale: [1, 1.1, 1],
-                    }}
-                    transition={{ 
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: "easeInOut"
-                    }}
-                  >
-                    <Zap className="w-6 h-6 text-blue-600" fill="currentColor" />
-                  </motion.div>
-                )}
-                <span className="text-xs font-semibold mt-1">{isGeneratingQuiz ? 'Generating...' : 'Quiz Me!'}</span>
-              </motion.button>
-              
-              <div className="w-px h-6 bg-gray-300" />
-
-              <button 
-                onClick={(e) => e.preventDefault()}
-                className="flex flex-col items-center justify-center p-2 rounded-md w-20 h-16 cursor-not-allowed"
-                title="Save to Board (Coming Soon)"
-              >
-                <BookmarkPlus className="w-6 h-6 text-gray-500" />
-              </button>
+              {showDownload || showFullscreenButton ? (
+                <button 
+                  onClick={(e) => e.preventDefault()}
+                  className="flex flex-col items-center justify-center p-2 rounded-md w-20 h-16 cursor-not-allowed"
+                  title="Save to Board (Coming Soon)"
+                >
+                  <BookmarkPlus className="w-6 h-6 text-gray-500" />
+                </button>
+              ) : null}
               
               {showFullscreenButton && (
                 <>
@@ -3966,6 +4035,11 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           subject={selectedSubject}
           unitNumber={activeUnitNum}
           unitTitle={unitsToDisplay.find((u) => u.number === activeUnitNum)?.title}
+          splitScreenOnDesktop
+          onOpenChange={setIsTutorOpen}
+          externalPromptText={chatPromptText}
+          externalPromptDisplayText={chatPromptDisplayText}
+          externalPromptNonce={chatPromptNonce}
         />
       )}
     </>

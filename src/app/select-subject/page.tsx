@@ -8,10 +8,13 @@ import { db } from '@/lib/firebase';
 import { Loader2, Check } from 'lucide-react';
 import type { CourseSubject } from '@/lib/courseSubject';
 import { unitXpDocumentId, unitsForCourseSubject } from '@/lib/courseSubject';
+import { hasAdminRole } from '@/lib/adminAccess';
 
 export default function SelectSubjectPage() {
-  const { user, loading: authLoading } = useAuthContext();
+  const { user, userData, loading: authLoading, loadingUserData } = useAuthContext();
   const router = useRouter();
+  const canAccessGov = Boolean(user && hasAdminRole(userData));
+
   const [selectedSubjects, setSelectedSubjects] = useState<Set<CourseSubject>>(new Set());
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -99,7 +102,7 @@ export default function SelectSubjectPage() {
     }
   };
 
-  if (authLoading || (!user && !authLoading)) {
+  if (authLoading || (!user && !authLoading) || (user && loadingUserData)) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
@@ -186,27 +189,29 @@ export default function SelectSubjectPage() {
               <span className="block text-sm text-gray-500">Study of individual and firm decisions.</span>
             </div>
           </label>
-          <label 
-            htmlFor="gov-checkbox"
-            className={`flex items-center p-4 border rounded-md cursor-pointer transition-colors ${selectedSubjects.has('gov') ? 'border-violet-500 ring-2 ring-violet-200 bg-violet-50' : 'border-gray-300 hover:border-gray-400'}`}
-          >
-            <div className={`w-6 h-6 flex-shrink-0 border-2 rounded flex items-center justify-center mr-4 ${selectedSubjects.has('gov') ? 'bg-violet-600 border-violet-600' : 'border-gray-400 bg-white'}`}>
-              {selectedSubjects.has('gov') && <Check className="w-4 h-4 text-white stroke-[3]" />}
-            </div>
-            <input
-              type="checkbox"
-              id="gov-checkbox"
-              name="subject"
-              value="gov"
-              checked={selectedSubjects.has('gov')}
-              onChange={() => handleSubjectToggle('gov')}
-              className="absolute opacity-0 w-0 h-0"
-            />
-            <div className="ml-3">
-              <span className="block text-base font-semibold text-gray-900">AP United States Government and Politics</span>
-              <span className="block text-sm text-gray-500">Foundations, institutions, and political behavior.</span>
-            </div>
-          </label>
+          {canAccessGov && (
+            <label 
+              htmlFor="gov-checkbox"
+              className={`flex items-center p-4 border rounded-md cursor-pointer transition-colors ${selectedSubjects.has('gov') ? 'border-violet-500 ring-2 ring-violet-200 bg-violet-50' : 'border-gray-300 hover:border-gray-400'}`}
+            >
+              <div className={`w-6 h-6 flex-shrink-0 border-2 rounded flex items-center justify-center mr-4 ${selectedSubjects.has('gov') ? 'bg-violet-600 border-violet-600' : 'border-gray-400 bg-white'}`}>
+                {selectedSubjects.has('gov') && <Check className="w-4 h-4 text-white stroke-[3]" />}
+              </div>
+              <input
+                type="checkbox"
+                id="gov-checkbox"
+                name="subject"
+                value="gov"
+                checked={selectedSubjects.has('gov')}
+                onChange={() => handleSubjectToggle('gov')}
+                className="absolute opacity-0 w-0 h-0"
+              />
+              <div className="ml-3">
+                <span className="block text-base font-semibold text-gray-900">AP United States Government and Politics</span>
+                <span className="block text-sm text-gray-500">Foundations, institutions, and political behavior.</span>
+              </div>
+            </label>
+          )}
         </div>
 
         <div>

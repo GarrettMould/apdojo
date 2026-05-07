@@ -78,6 +78,10 @@ export interface UserData {
   };
   // Add teacher field to indicate if user is a teacher/tutor
   teacher?: boolean;
+  // Access control fields
+  role?: string;
+  roles?: string[];
+  admin?: boolean;
 }
 
 // --- ADD LEVELING LOGIC --- 
@@ -640,6 +644,9 @@ export function useAuth() {
             lifetimeAiGenerations: 1,
           },
           teacher: isTeacher, // Set based on signup parameter or default to false
+          role: 'user',
+          roles: ['user'],
+          admin: false,
         });
         
         // If user subscribed, add their email to the subscribedEmails collection
@@ -765,6 +772,9 @@ export function useAuth() {
             lifetimeAiGenerations: 1,
           },
           teacher: teacherFlag,
+          role: 'user',
+          roles: ['user'],
+          admin: false,
         });
         if (marketingOptIn && newUser.email) {
           try {

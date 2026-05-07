@@ -2,11 +2,15 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Paperclip, MessageCircle, Send, Sparkles, X } from 'lucide-react';
+import { Paperclip, BrainCircuit, Send, X } from 'lucide-react';
 import type { CourseSubject } from '@/lib/courseSubject';
 import { displayCourseLabel } from '@/lib/courseSubject';
 import { personaForSubject } from '@/lib/chatPersonas';
+import { econTutorAvatarUrl } from '@/lib/tutorAvatar';
 import { getTutorWelcomeStarterChoices } from '@/lib/tutorStarterChoices';
+import { useAuthContext } from '@/contexts/AuthContext';
+import { auth as firebaseAuth } from '@/lib/firebase';
+import { hasAdminRole } from '@/lib/adminAccess';
 
 type Role = 'user' | 'assistant';
 
@@ -180,6 +184,13 @@ export interface CheatSheetChatBoxProps {
   subject: CourseSubject;
   unitNumber: number;
   unitTitle?: string;
+  splitScreenOnDesktop?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  /** Fire-and-forget prompt pushed from parent UI actions. */
+  externalPromptText?: string;
+  /** Optional user-facing bubble text when externalPromptText contains backend-only instructions. */
+  externalPromptDisplayText?: string;
+  externalPromptNonce?: number;
 }
 
 const DEFAULT_ATTACH_PROMPT =
@@ -222,6 +233,12 @@ function parseAssistantReply(raw: string): {
   return { display, choices };
 }
 
+function displayTextForChoiceLabel(label: string): string {
+  const t = label.trim();
+  if (!t) return 'Please explain this concept.';
+  return `Please explain ${t}.`;
+}
+
 type ChatThemeReturn = ReturnType<typeof chatTheme>;
 
 function QuickChoiceList({
@@ -232,7 +249,7 @@ function QuickChoiceList({
 }: {
   choices: { label: string; prompt: string }[];
   sending: boolean;
-  onPick: (prompt: string) => void;
+  onPick: (prompt: string, label: string) => void;
   theme: ChatThemeReturn;
 }) {
   return (
@@ -246,7 +263,7 @@ function QuickChoiceList({
             key={`${c.label}-${i}`}
             type="button"
             disabled={sending}
-            onClick={() => onPick(c.prompt)}
+            onClick={() => onPick(c.prompt, c.label)}
             className={`rounded-xl border px-3.5 py-2.5 text-left text-[13px] font-medium shadow-sm outline-none ring-offset-white transition hover:shadow-md focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-40 border-slate-200/95 bg-white text-slate-800 hover:bg-slate-50 active:scale-[0.99] ${theme.quickChoiceFocus}`}
           >
             <span className="block">{c.label}</span>
@@ -282,7 +299,18 @@ function buildWelcomeThread(
   ];
 }
 
-export function CheatSheetChatBox({ subject, unitNumber, unitTitle }: CheatSheetChatBoxProps) {
+export function CheatSheetChatBox({
+  subject,
+  unitNumber,
+  unitTitle,
+  splitScreenOnDesktop = false,
+  onOpenChange,
+  externalPromptText,
+  externalPromptDisplayText,
+  externalPromptNonce,
+}: CheatSheetChatBoxProps) {
+  const { user, userData } = useAuthContext();
+  const canUseAdminChat = Boolean(user && hasAdminRole(userData));
   const [open, setOpen] = useState(false);
   const subjectLabel = displayCourseLabel(subject);
   const persona = personaForSubject(subject);
@@ -309,6 +337,7 @@ export function CheatSheetChatBox({ subject, unitNumber, unitTitle }: CheatSheet
   const [fileError, setFileError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const lastExternalPromptNonceRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -324,6 +353,10 @@ export function CheatSheetChatBox({ subject, unitNumber, unitTitle }: CheatSheet
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
 
+  useEffect(() => {
+    onOpenChange?.(open);
+  }, [open, onOpenChange]);
+
   const onPickFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = '';
@@ -338,14 +371,19 @@ export function CheatSheetChatBox({ subject, unitNumber, unitTitle }: CheatSheet
   };
 
   const executeSend = useCallback(
-    async (trimmedInput: string, pendingSnap: PendingAttachment | null) => {
+    async (
+      trimmedInput: string,
+      pendingSnap: PendingAttachment | null,
+      outboundOverride?: string
+    ) => {
       const trimmed = trimmedInput.trim();
-      if ((!trimmed && !pendingSnap) || sending) return;
+      const outboundTrimmed = outboundOverride?.trim() ?? '';
+      if ((!trimmed && !pendingSnap && !outboundTrimmed) || sending) return;
 
       const userId = `u-${Date.now()}`;
     const attachLabel = pendingSnap?.fileName;
 
-    let lastMessageText = trimmed;
+    let lastMessageText = outboundTrimmed || trimmed;
     if (pendingSnap?.kind === 'text') {
       lastMessageText = trimmed
         ? `${trimmed}\n\n---\n**Attached:** ${pendingSnap.fileName}\n${pendingSnap.text}`
@@ -360,7 +398,7 @@ export function CheatSheetChatBox({ subject, unitNumber, unitTitle }: CheatSheet
         ? DEFAULT_ATTACH_PROMPT
         : pendingSnap?.kind === 'text'
           ? `Attached notes · ${pendingSnap.fileName}`
-          : '');
+          : outboundTrimmed);
 
     const priorTurns = messages
       .filter((m) => m.id !== 'welcome')
@@ -386,8 +424,8 @@ export function CheatSheetChatBox({ subject, unitNumber, unitTitle }: CheatSheet
     }
 
     const needsOutbound =
-      pendingSnap != null &&
-      (pendingSnap.kind === 'text' || bubbleText !== lastMessageText);
+      pendingSnap != null ||
+      bubbleText !== lastMessageText;
 
     setInput('');
     setPending(null);
@@ -410,9 +448,13 @@ export function CheatSheetChatBox({ subject, unitNumber, unitTitle }: CheatSheet
     setSending(true);
 
     try {
+      const token = await firebaseAuth.currentUser?.getIdToken();
       const res = await fetch('/api/cheat-sheet-chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify(body),
       });
       const data = (await res.json()) as { reply?: string; error?: string };
@@ -449,8 +491,8 @@ export function CheatSheetChatBox({ subject, unitNumber, unitTitle }: CheatSheet
   };
 
   const sendChoicePrompt = useCallback(
-    (prompt: string) => {
-      void executeSend(prompt, null);
+    (prompt: string, label: string) => {
+      void executeSend(displayTextForChoiceLabel(label), null, prompt);
     },
     [executeSend]
   );
@@ -464,41 +506,64 @@ export function CheatSheetChatBox({ subject, unitNumber, unitTitle }: CheatSheet
 
   const canSend = (input.trim() || pending) && !sending;
 
+  useEffect(() => {
+    if (!externalPromptNonce || !externalPromptText?.trim()) return;
+    if (lastExternalPromptNonceRef.current === externalPromptNonce) return;
+    lastExternalPromptNonceRef.current = externalPromptNonce;
+    if (!open) setOpen(true);
+    const displayText = externalPromptDisplayText?.trim() || externalPromptText.trim();
+    void executeSend(displayText, null, externalPromptText.trim());
+  }, [externalPromptNonce, externalPromptText, externalPromptDisplayText, executeSend, open]);
+
+  if (!canUseAdminChat) return null;
+
   return (
     <div
       className="fixed z-[110] flex flex-col items-end gap-3 print:hidden"
-      style={{
-        right: 'max(1rem, env(safe-area-inset-right))',
-        bottom: 'max(1rem, env(safe-area-inset-bottom))',
-      }}
+      style={
+        open && splitScreenOnDesktop
+          ? {
+              right: 'max(0.75rem, env(safe-area-inset-right))',
+              bottom: 'max(0.75rem, env(safe-area-inset-bottom))',
+              top: 'calc(80px + max(0.5rem, env(safe-area-inset-top)))',
+            }
+          : {
+              right: 'max(1rem, env(safe-area-inset-right))',
+              bottom: 'max(1rem, env(safe-area-inset-bottom))',
+            }
+      }
     >
       {open && (
         <div
           role="dialog"
           aria-label="Unit tutor chat"
-          className="pointer-events-auto flex h-[min(820px,92vh)] max-h-[92vh] w-[min(440px,calc(100vw-2rem))] flex-col overflow-hidden rounded-[1.25rem] border border-slate-200/90 bg-white/95 shadow-2xl shadow-slate-900/10 ring-1 ring-slate-900/[0.04] backdrop-blur-md"
+          className={`pointer-events-auto relative flex h-[min(820px,92vh)] max-h-[92vh] w-[min(440px,calc(100vw-2rem))] flex-col overflow-hidden rounded-[1.25rem] border border-slate-200/90 bg-white/95 shadow-2xl shadow-slate-900/10 ring-1 ring-slate-900/[0.04] backdrop-blur-md ${
+            splitScreenOnDesktop ? 'lg:h-full lg:max-h-none lg:w-[25vw] lg:min-w-[300px] lg:rounded-xl' : ''
+          }`}
         >
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            className="absolute right-3 top-3 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-600 shadow-sm transition hover:bg-slate-100 hover:text-slate-900"
+            aria-label="Close tutor chat"
+            title="Close chat"
+          >
+            <X className="h-5 w-5" strokeWidth={2} />
+          </button>
           {/* Header */}
           <div className="relative flex-shrink-0 border-b border-slate-100 bg-gradient-to-b from-slate-50/90 to-white px-4 py-3.5">
             <div className={`absolute left-0 top-0 h-0.5 w-full ${theme.accentSoft} opacity-90`} aria-hidden />
-            <div className="flex items-start gap-3 pt-0.5">
-              <div
-                className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl ${theme.accentMuted} shadow-sm`}
-              >
-                <Sparkles className={`h-5 w-5 ${theme.accent}`} strokeWidth={1.75} />
-              </div>
-              <div className="min-w-0 flex-1 pt-0.5">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
-                  Unit tutor
-                </p>
-                <p className="truncate text-[15px] font-semibold tracking-tight text-slate-900">
-                  {persona.name}
-                </p>
-                <p className="truncate text-xs text-slate-500">
-                  Unit {unitNumber}
-                  {unitTitle ? ` · ${unitTitle}` : ''} · {subjectLabel}
-                </p>
-              </div>
+            <div className="min-w-0 pt-0.5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                Unit tutor
+              </p>
+              <p className="truncate text-[15px] font-semibold tracking-tight text-slate-900">
+                {persona.name}
+              </p>
+              <p className="truncate text-xs text-slate-500">
+                Unit {unitNumber}
+                {unitTitle ? ` · ${unitTitle}` : ''} · {subjectLabel}
+              </p>
             </div>
           </div>
 
@@ -514,47 +579,63 @@ export function CheatSheetChatBox({ subject, unitNumber, unitTitle }: CheatSheet
                   parsedAssistant.choices.length > 0 &&
                   m.id === lastAssistantId;
                 const assistantLead = parsedAssistant?.display.trim() ?? '';
-                return (
-                  <div
-                    key={m.id}
-                    className={`flex w-full flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
-                  >
-                    <div
-                      className={`max-w-[min(100%,21rem)] px-3.5 py-2.5 text-[14px] leading-relaxed shadow-sm ${
-                        m.role === 'user'
-                          ? `${theme.userBubble} rounded-2xl rounded-br-md`
-                          : 'rounded-2xl rounded-bl-md border border-slate-100/90 bg-white text-slate-800'
-                      }`}
-                    >
-                      {m.role === 'assistant' && parsedAssistant ? (
-                        assistantLead ? (
-                          <AssistantMarkdown text={assistantLead} />
-                        ) : parsedAssistant.choices.length > 0 ? (
-                          <p className="text-sm text-slate-500">
-                            Continue with one of these next steps—
-                          </p>
-                        ) : (
-                          <p className="text-sm text-slate-500">
-                            Ask me anything about this unit.
-                          </p>
-                        )
-                      ) : m.role === 'user' ? (
+                const avatarUrl = econTutorAvatarUrl(subject);
+
+                if (m.role === 'user') {
+                  return (
+                    <div key={m.id} className="flex w-full flex-col items-end">
+                      <div
+                        className={`max-w-[min(100%,21rem)] px-3.5 py-2.5 text-[14px] leading-relaxed shadow-sm ${theme.userBubble} rounded-2xl rounded-br-md`}
+                      >
                         <p className="whitespace-pre-wrap text-white/95">{m.content}</p>
+                      </div>
+                      {m.attachmentHint ? (
+                        <p className="mt-1 max-w-[min(100%,21rem)] truncate text-[11px] font-medium text-slate-500">
+                          File · {m.attachmentHint}
+                        </p>
                       ) : null}
                     </div>
-                    {showChoices ? (
-                      <QuickChoiceList
-                        choices={parsedAssistant!.choices}
-                        sending={sending}
-                        onPick={sendChoicePrompt}
-                        theme={theme}
-                      />
-                    ) : null}
-                    {m.role === 'user' && m.attachmentHint ? (
-                      <p className="mt-1 max-w-[min(100%,21rem)] truncate text-[11px] font-medium text-slate-500">
-                        File · {m.attachmentHint}
-                      </p>
-                    ) : null}
+                  );
+                }
+
+                return (
+                  <div key={m.id} className="flex w-full flex-col items-start">
+                    <div className="flex w-full max-w-[min(100%,23rem)] flex-row items-start gap-2 sm:max-w-[min(100%,24rem)]">
+                      {avatarUrl ? (
+                        <img
+                          src={avatarUrl}
+                          alt="Economics tutor"
+                          width={36}
+                          height={36}
+                          className="mt-0.5 h-9 w-9 shrink-0 rounded-full object-cover ring-2 ring-white shadow-sm"
+                        />
+                      ) : null}
+                      <div className="flex min-w-0 flex-1 flex-col items-stretch gap-1">
+                        <div className="max-w-none px-3.5 py-2.5 text-[14px] leading-relaxed shadow-sm rounded-2xl rounded-bl-md border border-slate-100/90 bg-white text-slate-800">
+                          {parsedAssistant ? (
+                            assistantLead ? (
+                              <AssistantMarkdown text={assistantLead} />
+                            ) : parsedAssistant.choices.length > 0 ? (
+                              <p className="text-sm text-slate-500">
+                                Continue with one of these next steps—
+                              </p>
+                            ) : (
+                              <p className="text-sm text-slate-500">
+                                Ask me anything about this unit.
+                              </p>
+                            )
+                          ) : null}
+                        </div>
+                        {showChoices ? (
+                          <QuickChoiceList
+                            choices={parsedAssistant!.choices}
+                            sending={sending}
+                            onPick={sendChoicePrompt}
+                            theme={theme}
+                          />
+                        ) : null}
+                      </div>
+                    </div>
                   </div>
                 );
               })}
@@ -637,19 +718,23 @@ export function CheatSheetChatBox({ subject, unitNumber, unitTitle }: CheatSheet
         </div>
       )}
 
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        className={`pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full text-white transition hover:brightness-105 active:scale-[0.97] sm:h-[3.25rem] sm:w-[3.25rem] ${theme.fab}`}
-        aria-expanded={open}
-        aria-label={open ? 'Close tutor chat' : 'Open tutor chat'}
-      >
-        {open ? (
-          <X className="h-6 w-6 sm:h-6 sm:w-6" strokeWidth={2} />
-        ) : (
-          <MessageCircle className="h-6 w-6 sm:h-6 sm:w-6" strokeWidth={2} />
-        )}
-      </button>
+      {!open ? (
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className={`pointer-events-auto relative flex h-12 w-12 items-center justify-center rounded-full text-white transition hover:brightness-105 active:scale-[0.97] sm:h-[3.25rem] sm:w-[3.25rem] ${theme.fab}`}
+          aria-expanded={false}
+          aria-label="Open tutor chat"
+        >
+          <span
+            aria-hidden
+            className="absolute inset-[4px] rounded-full bg-white/15 ring-1 ring-white/30"
+          />
+          <span className="relative flex items-center justify-center">
+            <BrainCircuit className="h-[1.35rem] w-[1.35rem] sm:h-6 sm:w-6" strokeWidth={2.2} />
+          </span>
+        </button>
+      ) : null}
     </div>
   );
 }

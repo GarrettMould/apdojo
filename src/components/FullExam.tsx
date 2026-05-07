@@ -1328,6 +1328,18 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
     ).length;
     return (correctAnswers / totalQuestions) * 100;
   };
+  const correctAnswersCount = questions.filter((q) => answers[q.id] === q.correctAnswer).length;
+  const totalQuestionsCount = questions.length;
+  const percentScore =
+    totalQuestionsCount > 0 ? Math.round((correctAnswersCount / totalQuestionsCount) * 100) : 0;
+  const earnedXp = 20 + correctAnswersCount * 10;
+  const resultsHubUrl =
+    examType === 'gov'
+      ? '/ap-gov-practice-tests'
+      : examType === 'macro'
+        ? '/ap-macro-practice-tests'
+        : '/ap-micro-practice-tests';
+  const unitResultsHubUrl = `/unit-final-practice-tests?subject=${examType}`;
 
   const toggleExplanation = (questionId: number) => {
     setShowExplanations(prev => ({
@@ -1824,11 +1836,42 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
       {/* Only show exam content if not showing results, or if showing full results */}
       {(!showResults || showFullResults) && (
         <div className={`flex w-full flex-col relative ${shouldShowTestUI ? 'min-h-screen' : isCustomAssignment ? '' : 'lg:h-[calc(100vh-5rem)]'} ${shouldShowTestUI ? '' : 'overflow-hidden'}`}>
-          {/* Top Bar - Hidden when showing assessment results */}
-          {shouldShowTestUI && !showResults && (
+          {/* Top Bar */}
+          {shouldShowTestUI && (!showResults || (showResults && showFullResults && isUnitTest)) && (
             <div className={`w-full flex items-center justify-between flex-shrink-0 fixed left-0 right-0 z-40 ${isUnitTest ? 'top-0 bg-white border-b border-gray-200 h-14 px-6 py-0' : 'top-20 bg-gray-200 px-6 py-4 border-b-4 border-black shadow-lg'}`}>
             {/* ── UNIT TEST: Fiveable-style header ── */}
             {isUnitTest && (
+              showResults ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() => router.push('/')}
+                  className="flex items-center gap-2.5 p-0.5 -m-0.5 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 text-left"
+                  aria-label="Go home"
+                  title="Home"
+                >
+                  <Image src="/images/dojoIconJan26.svg" alt="" width={26} height={26} unoptimized />
+                  <span className="text-sm font-black text-gray-900 tracking-wide">AP Dojo</span>
+                </button>
+                <span className="text-sm font-medium text-gray-500 hidden sm:block">
+                  Unit test results
+                </span>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={() => router.push(unitResultsHubUrl)}
+                    className="px-3 py-1.5 text-xs font-semibold border border-gray-300 rounded hover:bg-gray-50 text-gray-700 transition-colors"
+                  >
+                    Unit practice tests
+                  </button>
+                  <button
+                    onClick={() => router.push(resultsHubUrl)}
+                    className="px-3 py-1.5 text-xs font-semibold border border-gray-300 rounded hover:bg-gray-50 text-gray-700 transition-colors"
+                  >
+                    {examType === 'gov' ? 'AP Gov hub' : 'Practice hub'}
+                  </button>
+                </div>
+              </>
+              ) : (
               <>
                 {/* Left: Logo + title — one save & exit control */}
                 <button
@@ -1913,6 +1956,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                   )}
                 </div>
               </>
+              )
             )}
             {/* ── EXISTING BAR (non-unit-test) ── */}
             {!isUnitTest && (
@@ -2915,30 +2959,36 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
               <div className="space-y-8 max-w-4xl mx-auto w-full">
             {/* Compact Results Summary - Only Assessment Results Section */}
             {showResults && showFullResults && (
-              <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden mb-8">
-                <div className="bg-gray-50 px-4 py-3 border-b border-gray-200">
-                  <h2 className="font-semibold text-gray-900">Assessment Results</h2>
+              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
+                <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                  <h2 className="text-lg font-bold text-slate-900">Assessment Results</h2>
+                  <span className="text-sm font-medium text-slate-500">
+                    {correctAnswersCount} of {totalQuestionsCount} correct
+                  </span>
                 </div>
-                <div className="p-4 bg-white">
-                  <div className="flex items-center gap-6 flex-wrap">
-                    <div className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold text-lg shadow-sm">
-                      Score: {Math.round((questions.filter((q) => answers[q.id] === q.correctAnswer).length / questions.length) * 100)}%
-                    </div>
-                    <div className="text-gray-900 font-semibold">
-                      {questions.filter((q) => answers[q.id] === q.correctAnswer).length} correct out of {questions.length}
-                    </div>
-                    <div className="bg-green-500 text-white px-4 py-2 rounded-lg font-semibold text-lg flex items-center gap-2 shadow-sm">
-                      <span className="inline-flex items-center">
-                        <Image
-                          src="/images/flame100.png"
-                          alt="XP Flame"
-                          width={20}
-                          height={20}
-                          className="w-5 h-5"
-                        />
-                      </span>
-                      <span>{20 + (questions.filter((q) => answers[q.id] === q.correctAnswer).length * 10)} XP</span>
-                    </div>
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <div className="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">Score</p>
+                    <p className="mt-1 text-2xl font-black text-blue-900">{percentScore}%</p>
+                  </div>
+                  <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-600">Questions</p>
+                    <p className="mt-1 text-2xl font-black text-slate-900">
+                      {correctAnswersCount}/{totalQuestionsCount}
+                    </p>
+                  </div>
+                  <div className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">XP Earned</p>
+                    <p className="mt-1 inline-flex items-center gap-2 text-2xl font-black text-emerald-900">
+                      <Image
+                        src="/images/flame100.png"
+                        alt="XP Flame"
+                        width={20}
+                        height={20}
+                        className="h-5 w-5"
+                      />
+                      {earnedXp}
+                    </p>
                   </div>
                 </div>
               </div>

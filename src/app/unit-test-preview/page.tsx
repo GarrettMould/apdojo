@@ -5,10 +5,12 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { PlayCircle, Clock, PauseCircle, PenLine, EyeOff, RotateCcw } from 'lucide-react';
 import Image from 'next/image';
 import { macroUnits, microUnits, govUnits } from '@/data/cheatSheets';
-import { getUnitMCQTestUrl } from '@/lib/utils';
+import { getUnitMCQTestUrl, getUnitFrqPackUrl, getUnitFinalPracticeTestsUrl } from '@/lib/utils';
 import { getUnitTestMeta, formatTestTime } from '@/data/unitTestMeta';
+import { getGovUnitStimulusFrqs } from '@/data/gov/govUnitStimulusFrqs';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { loadTestProgress, clearTestProgress } from '@/lib/testProgress';
+import { hasAdminRole } from '@/lib/adminAccess';
 
 const RULES = [
   'Each question has one correct answer — select the best choice.',
@@ -36,12 +38,19 @@ const TOOLS = [
   },
 ];
 
+const FRQ_RULES = [
+  'Each free-response item may include stimulus material — read carefully before you answer.',
+  'Type your response for each part; you can move between questions freely.',
+  'The timer is a suggested pace for practice — pause or hide it when you need focus.',
+  'Scoring guidance can be reviewed after you submit your responses.',
+];
+
 // Calculator intentionally excluded — not available on the AP Macro/Micro MCQ section
 
 function UnitTestPreviewContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { user } = useAuthContext();
+  const { user, userData, loadingUserData } = useAuthContext();
 
   const subjectParam = searchParams.get('subject');
   const subject =
@@ -50,19 +59,76 @@ function UnitTestPreviewContent() {
       : 'macro';
   const unitParam = searchParams.get('unit') || '1';
   const unitNumber = parseInt(unitParam, 10);
+  const testFormat: 'mcq' | 'frq' = searchParams.get('type') === 'frq' ? 'frq' : 'mcq';
+  const isFrqPreview = testFormat === 'frq';
 
   const units =
     subject === 'gov' ? govUnits : subject === 'micro' ? microUnits : macroUnits;
   const unit = units.find((u) => u.number === unitNumber);
   const isGov = subject === 'gov';
+  const canAccessGov = Boolean(user && hasAdminRole(userData));
   const isMicro = subject === 'micro';
   const subjectName = isGov
     ? 'U.S. Government and Politics'
     : isMicro
       ? 'Microeconomics'
       : 'Macroeconomics';
-  const accentColor = isGov ? 'text-violet-600' : isMicro ? 'text-green-600' : 'text-blue-600';
   const accentBg = isGov ? 'bg-violet-600' : isMicro ? 'bg-green-600' : 'bg-blue-600';
+
+  if (isGov && loadingUserData) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <p className="text-gray-600 font-semibold">Checking access…</p>
+      </div>
+    );
+  }
+
+  if (isGov && !canAccessGov) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="max-w-md text-center">
+          <PauseCircle className="w-12 h-12 mx-auto text-gray-500 mb-4 opacity-70" />
+          <h1 className="text-2xl font-black text-gray-900 mb-2">AP Gov is in admin preview</h1>
+          <p className="text-gray-600 font-medium mb-6">
+            This content is currently restricted to admin accounts.
+          </p>
+          <button
+            type="button"
+            onClick={() => router.push(getUnitFinalPracticeTestsUrl('macro'))}
+            className="w-full rounded-lg py-3 text-white font-black bg-blue-600 hover:bg-blue-700"
+          >
+            Back to AP Macro practice tests
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (isFrqPreview && subject !== 'gov') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="max-w-md text-center">
+          <PauseCircle className="w-12 h-12 mx-auto text-gray-500 mb-4 opacity-70" />
+          <h1 className="text-2xl font-black text-gray-900 mb-2">Unit FRQ packs</h1>
+          <p className="text-gray-600 font-medium mb-6">
+            Stimulus FRQ packs are only available for AP Gov right now. Use your course&apos;s full FRQ exams for
+            Macro and Micro.
+          </p>
+          <button
+            type="button"
+            onClick={() =>
+              router.push(getUnitFinalPracticeTestsUrl(isMicro ? 'micro' : 'macro'))
+            }
+            className={`w-full rounded-lg py-3 text-white font-black ${accentBg} hover:opacity-90`}
+          >
+            Back to unit practice tests
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const govFrqCount = isGov ? getGovUnitStimulusFrqs(unitNumber).length : 0;
 
   if (isGov && unitNumber !== 1) {
     return (
@@ -71,14 +137,15 @@ function UnitTestPreviewContent() {
           <PauseCircle className="w-12 h-12 mx-auto text-violet-500 mb-4 opacity-70" />
           <h1 className="text-2xl font-black text-gray-900 mb-2">Coming soon</h1>
           <p className="text-gray-600 font-medium mb-6">
-            The Unit {unitNumber} practice exam for AP Gov isn&apos;t available yet. Unit 1 is live now.
+            The Unit {unitNumber} {isFrqPreview ? 'FRQ pack' : 'practice exam'} for AP Gov isn&apos;t available yet.
+            Unit 1 is live now.
           </p>
           <button
             type="button"
-            onClick={() => router.push('/ap-gov-practice-tests')}
+            onClick={() => router.push(getUnitFinalPracticeTestsUrl('gov'))}
             className={`w-full rounded-lg py-3 text-white font-black ${accentBg} hover:opacity-90`}
           >
-            Back to AP Gov practice tests
+            Back to unit practice tests
           </button>
         </div>
       </div>
@@ -86,10 +153,15 @@ function UnitTestPreviewContent() {
   }
 
   const meta = getUnitTestMeta(subject, unitNumber);
-  const questionCount = meta?.questionCount ?? 15;
-  const timeLabel = meta ? formatTestTime(meta.timeLimitSeconds) : '—';
+  const mcqQuestionCount = meta?.questionCount ?? 15;
+  const mcqTimeLabel = meta ? formatTestTime(meta.timeLimitSeconds) : '—';
 
-  const testUrl = getUnitMCQTestUrl(unitNumber, subject);
+  /** FRQ pack (Gov): suggested pace matches `FullExamFRQ` default session timer. */
+  const frqSuggestedSeconds = 50 * 60;
+  const questionCount = isFrqPreview ? govFrqCount : mcqQuestionCount;
+  const timeLabel = isFrqPreview ? formatTestTime(frqSuggestedSeconds) : mcqTimeLabel;
+
+  const testUrl = isFrqPreview ? getUnitFrqPackUrl(unitNumber, subject) : getUnitMCQTestUrl(unitNumber, subject);
   // testId must match what FullExam saves: unit_${examNumber}_${examType}
   // examNumber is the [unitId] route param which is just the unit number (e.g. "1", "2")
   // because next.config.ts rewrites /ap-macro-unit-1-mcq-test → /unit-mcq-test/1
@@ -99,9 +171,9 @@ function UnitTestPreviewContent() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [isClearing, setIsClearing] = useState(false);
 
-  // Check for saved progress once user is available
+  // Check for saved progress once user is available (MCQ unit tests only — FRQ packs use a separate flow)
   useEffect(() => {
-    if (!user) { setSavedAnswerCount(null); return; }
+    if (!user || isFrqPreview) { setSavedAnswerCount(null); return; }
     loadTestProgress(user.uid, testId).then((progress) => {
       if (progress && !progress.isSubmitted && progress.answeredQuestions) {
         const count = Object.keys(progress.answeredQuestions).length;
@@ -110,7 +182,26 @@ function UnitTestPreviewContent() {
         setSavedAnswerCount(null);
       }
     }).catch(() => setSavedAnswerCount(null));
-  }, [user, testId]);
+  }, [user, testId, isFrqPreview]);
+
+  if (isFrqPreview && isGov && govFrqCount === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="max-w-md text-center">
+          <PauseCircle className="w-12 h-12 mx-auto text-violet-500 mb-4 opacity-70" />
+          <h1 className="text-2xl font-black text-gray-900 mb-2">FRQ pack coming soon</h1>
+          <p className="text-gray-600 font-medium mb-6">No stimulus FRQs are published for Unit {unitNumber} yet.</p>
+          <button
+            type="button"
+            onClick={() => router.push(getUnitFinalPracticeTestsUrl('gov'))}
+            className={`w-full rounded-lg py-3 text-white font-black ${accentBg} hover:opacity-90`}
+          >
+            Back to unit practice tests
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (!unit) {
     return (
@@ -124,7 +215,8 @@ function UnitTestPreviewContent() {
     <div className="min-h-screen bg-white flex items-center justify-center py-16 px-4">
       {/* Back link — top left */}
       <button
-        onClick={() => router.back()}
+        type="button"
+        onClick={() => router.push(getUnitFinalPracticeTestsUrl(subject))}
         className="fixed top-6 left-6 text-sm font-medium text-gray-400 hover:text-gray-700 transition-colors tracking-wide"
       >
         ← Back
@@ -149,6 +241,7 @@ function UnitTestPreviewContent() {
           {/* Unit pill — light, below headline */}
           <span className={`inline-block mt-3 text-[11px] font-semibold uppercase tracking-widest px-2.5 py-1 rounded ${isGov ? 'bg-violet-50 text-violet-800' : isMicro ? 'bg-green-50 text-green-700' : 'bg-blue-50 text-blue-700'}`}>
             AP {subjectName} · Unit {unitNumber}
+            {isFrqPreview ? ' · FRQ pack' : ''}
           </span>
 
           <p className="text-gray-500 mt-3 text-sm leading-relaxed">{unit.description}</p>
@@ -165,7 +258,9 @@ function UnitTestPreviewContent() {
               <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 text-right">Time</span>
             </div>
             <div className="grid grid-cols-[1fr_auto_auto] gap-x-10 px-6 py-5 items-center border-t border-gray-100">
-              <span className="text-sm font-semibold text-gray-900">Section I – Multiple Choice</span>
+              <span className="text-sm font-semibold text-gray-900">
+                {isFrqPreview ? 'Section II – Free Response (stimulus pack)' : 'Section I – Multiple Choice'}
+              </span>
               <span className="text-sm font-semibold text-gray-900 text-right">{questionCount}</span>
               <span className="text-sm text-gray-600 text-right">{timeLabel}</span>
             </div>
@@ -189,7 +284,7 @@ function UnitTestPreviewContent() {
           <div className="px-6 py-5 border-b border-gray-100">
             <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-4">Before you begin</p>
             <ul className="space-y-2.5">
-              {RULES.map((rule, i) => (
+              {(isFrqPreview ? FRQ_RULES : RULES).map((rule, i) => (
                 <li key={i} className="flex items-start gap-2.5 text-sm text-gray-600 leading-relaxed">
                   <span className="mt-1.5 w-1 h-1 rounded-full bg-gray-400 shrink-0" />
                   {rule}
@@ -228,12 +323,12 @@ function UnitTestPreviewContent() {
                 className={`w-full flex items-center justify-center gap-2.5 py-3.5 rounded text-white font-semibold text-base tracking-wide hover:opacity-90 active:opacity-80 transition-opacity ${accentBg}`}
               >
                 <PlayCircle className="w-4 h-4" />
-                Begin test
+                {isFrqPreview ? 'Begin FRQ pack' : 'Begin test'}
               </button>
             )}
             <p className="text-center text-xs text-gray-400 mt-3 flex items-center justify-center gap-1.5">
               <Clock className="w-3 h-3" />
-              {timeLabel} · {questionCount} questions
+              {timeLabel} · {questionCount} {isFrqPreview ? 'FRQs' : 'questions'}
             </p>
           </div>
         </div>

@@ -30,12 +30,13 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
   const isUnitMCQTestPage =
     pathname?.startsWith('/unit-mcq-test') ||
     pathname?.match(/^\/ap-(macro|micro|gov)-unit-\d+-mcq-test/);
+  const isUnitFrqPackPage = pathname?.startsWith('/unit-frq-pack');
   const isFullMCQExamPage = pathname?.startsWith('/preview/') || pathname?.match(/^\/ap-(macro|micro)-mcq-practice-test-\d+/) || pathname?.startsWith('/full-mcq-exam-preview') || pathname?.match(/^\/ap-(macro|micro)-frq-practice-test-\d+/);
   const isCustomExamPage = pathname?.startsWith('/exam/custom');
 
   return (
     <div className="flex flex-col">
-      {!isPacketPrintPage && !isTutorPrintPreviewPage && !isWorksheetsPage && !isUnitTestPreviewPage && !isUnitMCQTestPage && !isFullMCQExamPage && !isCustomExamPage && (
+      {!isPacketPrintPage && !isTutorPrintPreviewPage && !isWorksheetsPage && !isUnitTestPreviewPage && !isUnitMCQTestPage && !isUnitFrqPackPage && !isFullMCQExamPage && !isCustomExamPage && (
         <Suspense fallback={<div className="h-20 bg-white" />}>
           <HeaderWithSuspense />
         </Suspense>
@@ -43,7 +44,7 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
       <main>
         {children}
       </main>
-      {!isGraphGymPage && !isUnitCheatSheetPage && !isPacketPrintPage && !isTutorPrintPreviewPage && !isWorksheetsPage && !isUnitTestPreviewPage && !isUnitMCQTestPage && !isFullMCQExamPage && !isCustomExamPage && <Footer />}
+      {!isGraphGymPage && !isUnitCheatSheetPage && !isPacketPrintPage && !isTutorPrintPreviewPage && !isWorksheetsPage && !isUnitTestPreviewPage && !isUnitMCQTestPage && !isUnitFrqPackPage && !isFullMCQExamPage && !isCustomExamPage && <Footer />}
     </div>
   );
 } 

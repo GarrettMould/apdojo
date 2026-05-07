@@ -68,6 +68,31 @@ export function getUnitMCQTestUrl(unitId: number, subject: CourseSubject): strin
 }
 
 /**
+ * Unit test intro screen. Use `type=frq` for AP Gov (and future) unit FRQ packs.
+ * MCQ is the default when `type` is omitted.
+ */
+export function getUnitTestPreviewUrl(
+  unitId: number,
+  subject: CourseSubject,
+  format: 'mcq' | 'frq' = 'mcq'
+): string {
+  const q = new URLSearchParams({ subject, unit: String(unitId) });
+  if (format === 'frq') q.set('type', 'frq');
+  return `/unit-test-preview?${q.toString()}`;
+}
+
+/** Unit stimulus FRQ pack (typed answers) — query params match the preview page. */
+export function getUnitFrqPackUrl(unitId: number, subject: CourseSubject): string {
+  const q = new URLSearchParams({ subject, unit: String(unitId) });
+  return `/unit-frq-pack?${q.toString()}`;
+}
+
+/** Grid of unit MCQ + (Gov) FRQ pack cards — canonical “hub” for unit exams. */
+export function getUnitFinalPracticeTestsUrl(subject: CourseSubject): string {
+  return `/unit-final-practice-tests?subject=${subject}`;
+}
+
+/**
  * Generate SEO-friendly URL for full MCQ practice tests
  * @param subject - Subject ('macro' | 'micro')
  * @param testNumber - Test number (default: 1)

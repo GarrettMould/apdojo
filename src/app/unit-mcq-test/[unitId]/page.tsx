@@ -11,6 +11,7 @@ import { QuestionBank } from '@/data/questionBanks/types';
 import { FullExam } from '@/components/FullExam';
 import { Button } from '@/components/ui/button';
 import type { CourseSubject } from '@/lib/courseSubject';
+import { hasAdminRole } from '@/lib/adminAccess';
 
 /**
  * Pretty URLs are rewritten to /unit-mcq-test/:unit?subject=… but the browser bar has no query —
@@ -28,7 +29,7 @@ export default function UnitMCQTestPage() {
   const { unitId } = useParams();
   const searchParams = useSearchParams();
   const pathname = usePathname() ?? '';
-  const { selectedSubject } = useAuthContext();
+  const { selectedSubject, user, userData, loadingUserData } = useAuthContext();
 
   const subjectParam = searchParams.get('subject');
   const subjectFromPath = subjectFromUnitMcqPathname(pathname);
@@ -40,6 +41,7 @@ export default function UnitMCQTestPage() {
   const unitNumber = parseInt(unitId as string, 10);
 
   const isGovLockedUnit = effectiveSubject === 'gov' && unitNumber !== 1;
+  const canAccessGov = Boolean(user && hasAdminRole(userData));
 
   const subjectFilter =
     effectiveSubject === 'macro'
@@ -72,6 +74,33 @@ export default function UnitMCQTestPage() {
     effectiveSubject === 'gov'
       ? '/unit-final-practice-tests?subject=gov'
       : `/ap-${effectiveSubject}-practice-tests`;
+
+  if (effectiveSubject === 'gov' && loadingUserData) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p className="text-gray-600 font-semibold">Checking access…</p>
+      </div>
+    );
+  }
+
+  if (effectiveSubject === 'gov' && !canAccessGov) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center pt-16 pb-12 px-4">
+        <div className="bg-white p-8 rounded-lg shadow-md border border-gray-200 max-w-md w-full text-center">
+          <Lock className="w-12 h-12 mx-auto text-gray-500 mb-4" />
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">AP Gov is in admin preview</h2>
+          <p className="text-gray-600 mb-6">
+            This content is currently restricted to admin accounts.
+          </p>
+          <Link href="/ap-macro-practice-tests" className="inline-flex w-full">
+            <Button size="lg" className="w-full bg-blue-600 hover:bg-blue-700">
+              Back to practice tests
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   if (isGovLockedUnit) {
     return (

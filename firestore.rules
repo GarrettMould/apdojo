@@ -1,14 +1,37 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Access-control fields must never be client-escalated.
+    function isSafeUserCreate(data) {
+      return (
+        // New docs may omit these fields entirely...
+        !data.keys().hasAny(['admin', 'role', 'roles']) ||
+        // ...or include only explicit non-admin defaults.
+        (
+          data.admin == false &&
+          data.role == 'user' &&
+          data.roles is list &&
+          data.roles.size() == 1 &&
+          data.roles[0] == 'user'
+        )
+      );
+    }
+
+    function doesNotMutateAccessFields() {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['admin', 'role', 'roles']);
+    }
 
     // Rule for the users collection
     match /users/{userId} {
       // Allow users to read/update their own main document
-      allow read, update: if request.auth.uid == userId;
+      allow read: if request.auth.uid == userId;
+      allow update: if request.auth.uid == userId && doesNotMutateAccessFields();
       
       // Allow creating user doc during signup
-      allow create: if request.auth.uid != null && request.resource.data.uid == request.auth.uid;
+      allow create: if
+        request.auth.uid != null &&
+        request.resource.data.uid == request.auth.uid &&
+        isSafeUserCreate(request.resource.data);
 
       // --- RULES FOR mcqAnswers SUBCOLLECTION ---
       // Allow users to read/write their own mcqAnswers subcollection
