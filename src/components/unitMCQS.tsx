@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Question as QuestionType } from '@/data/questionBanks/types';
 import { Unit } from '@/data/cheatSheets';
-import { Check, X, Brain, FileText, ChevronDown, Triangle, Loader2, RefreshCw, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Clipboard, Lock, Play, Minus, Book, Lightbulb, Calculator, Pen, Strikethrough, CheckCircle2, XCircle } from 'lucide-react';
+import { Check, X, Brain, FileText, ChevronDown, Triangle, Loader2, RefreshCw, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Clipboard, Lock, Play, Minus, Book, Lightbulb, Pen, Strikethrough, CheckCircle2, XCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
@@ -21,12 +21,19 @@ import { keyTerms as apMacroTerms } from '@/data/apMacroTerms';
 import { keyTerms as apMicroTerms } from '@/data/apMicroTerms';
 import { KeyTerm } from '@/data/allContent';
 import ReactMarkdown from 'react-markdown';
-import { ExamCalculator } from './ExamCalculator';
-import { ExamWhiteboard } from './ExamWhiteboard';
+import dynamic from 'next/dynamic';
 import { McqQuestionTutorFab } from './McqQuestionTutorFab';
 import { courseSubjectFromQuestionSubject } from '@/lib/courseSubject';
+import '@excalidraw/excalidraw/index.css';
 
 import dojoIcon from "../../public/images/dojoIcon.png";
+
+type ScratchTool = 'draw' | 'notes';
+
+const Excalidraw = dynamic<any>(
+  async () => (await import('@excalidraw/excalidraw')).Excalidraw,
+  { ssr: false }
+);
 
 // Helper function to parse markdown table from text
 const parseMarkdownTable = (text: string): { tableData: { headers: string[]; rows: string[][] } | null; textWithoutTable: string } => {
@@ -197,30 +204,30 @@ const BeltHUD = ({ currentXP, nextBeltXP, currentBelt, percent }: BeltHUDProps) 
 
 // TacticalToolbar Component
 interface TacticalToolbarProps {
-  onCalculatorClick: () => void;
-  onWhiteboardClick: () => void;
+  onDrawClick: () => void;
+  onNotesClick: () => void;
 }
 
-const TacticalToolbar = ({ onCalculatorClick, onWhiteboardClick }: TacticalToolbarProps) => {
+const TacticalToolbar = ({ onDrawClick, onNotesClick }: TacticalToolbarProps) => {
   return (
     <>
       {/* Desktop: Fixed on right side */}
       <div className="hidden lg:flex fixed right-4 top-1/2 -translate-y-1/2 z-30">
         <div className="bg-white border-2 border-black shadow-lg rounded-full p-2 flex flex-col gap-4">
-          {/* Calculator Button */}
+          {/* Notes Button */}
           <button
-            onClick={onCalculatorClick}
+            onClick={onNotesClick}
             className="p-3 rounded-full bg-white border-2 border-black hover:bg-gray-50 transition-all active:scale-95"
-            title="Open Calculator"
+            title="Open Notes"
           >
-            <Calculator className="w-6 h-6 text-gray-900" />
+            <FileText className="w-6 h-6 text-gray-900" />
           </button>
           
-          {/* Whiteboard Button */}
+          {/* Drawing Pad Button */}
           <button
-            onClick={onWhiteboardClick}
+            onClick={onDrawClick}
             className="p-3 rounded-full bg-white border-2 border-black hover:bg-gray-50 transition-all active:scale-95"
-            title="Open Whiteboard"
+            title="Open Drawing Pad"
           >
             <Pen className="w-6 h-6 text-gray-900" />
           </button>
@@ -231,17 +238,17 @@ const TacticalToolbar = ({ onCalculatorClick, onWhiteboardClick }: TacticalToolb
       <div className="lg:hidden fixed bottom-4 left-4 right-4 z-30">
         <div className="bg-white border-2 border-black shadow-lg rounded-full p-2 flex flex-row gap-4 justify-center">
           <button
-            onClick={onCalculatorClick}
+            onClick={onNotesClick}
             className="p-3 rounded-full bg-white border-2 border-black hover:bg-gray-50 transition-all active:scale-95"
-            title="Open Calculator"
+            title="Open Notes"
           >
-            <Calculator className="w-6 h-6 text-gray-900" />
+            <FileText className="w-6 h-6 text-gray-900" />
           </button>
           
           <button
-            onClick={onWhiteboardClick}
+            onClick={onDrawClick}
             className="p-3 rounded-full bg-white border-2 border-black hover:bg-gray-50 transition-all active:scale-95"
-            title="Open Whiteboard"
+            title="Open Drawing Pad"
           >
             <Pen className="w-6 h-6 text-gray-900" />
           </button>
@@ -1768,8 +1775,10 @@ export function UnitMCQs({
   // --- >>> END: Sidebar Rendering Logic <<< ---
 
   // State for Focus Mode features
-  const [showCalculator, setShowCalculator] = useState(false);
-  const [showWhiteboard, setShowWhiteboard] = useState(false);
+  const [activeScratchTool, setActiveScratchTool] = useState<ScratchTool | null>(null);
+  const [scratchNotes, setScratchNotes] = useState('');
+  const [excalidrawElements, setExcalidrawElements] = useState<any[]>([]);
+  const [excalidrawAppState, setExcalidrawAppState] = useState<any>(null);
   const [showExplanationForCorrect, setShowExplanationForCorrect] = useState(false);
   const [isTutorOpen, setIsTutorOpen] = useState(false);
 
@@ -1782,19 +1791,8 @@ export function UnitMCQs({
   const beltProgress = getBeltProgress(userXP);
   const { percent, nextBelt, xpToNext, currentBelt } = beltProgress;
 
-  // Handle calculator click
-  const handleCalculatorClick = () => {
-    // Ensure only one slide-out tool is visible at a time
-    setShowWhiteboard(false);
-    setShowCalculator(true);
-  };
-
-  // Handle whiteboard click
-  const handleWhiteboardClick = () => {
-    // Ensure only one slide-out tool is visible at a time
-    setShowCalculator(false);
-    setShowWhiteboard(true);
-  };
+  const handleDrawClick = () => setActiveScratchTool('draw');
+  const handleNotesClick = () => setActiveScratchTool('notes');
 
   // Handle explanation click (for correct answers - shows as link)
   const handleExplanationClick = () => {
@@ -1839,15 +1837,89 @@ export function UnitMCQs({
         />
       )}
 
-      {/* Calculator */}
-      {showCalculator && (
-        <ExamCalculator onClose={() => setShowCalculator(false)} />
-      )}
-
-      {/* Whiteboard */}
-      {showWhiteboard && (
-        <ExamWhiteboard onClose={() => setShowWhiteboard(false)} />
-      )}
+      {/* Right slide-out scratch tools (matches unit test behavior) */}
+      <div
+        className={`fixed right-0 z-40 h-full w-full max-w-xl border-l border-gray-200 bg-white shadow-2xl transition-transform duration-300 ease-in-out ${
+          activeScratchTool ? 'translate-x-0' : 'translate-x-full'
+        }`}
+        style={{ top: '80px', height: 'calc(100vh - 80px)' }}
+      >
+        <div className="flex h-full flex-col">
+          <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setActiveScratchTool('draw')}
+                className={`rounded-md px-3 py-1.5 text-sm font-semibold transition-colors ${
+                  activeScratchTool === 'draw'
+                    ? 'bg-gray-900 text-white'
+                    : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                Drawing Pad
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveScratchTool('notes')}
+                className={`rounded-md px-3 py-1.5 text-sm font-semibold transition-colors ${
+                  activeScratchTool === 'notes'
+                    ? 'bg-gray-900 text-white'
+                    : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                Notes
+              </button>
+            </div>
+            <button
+              type="button"
+              onClick={() => setActiveScratchTool(null)}
+              className="rounded-md border border-gray-300 px-3 py-1.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+            >
+              Close
+            </button>
+          </div>
+          <div className="min-h-0 flex-1">
+            {activeScratchTool === 'notes' ? (
+              <div className="h-full p-4">
+                <textarea
+                  value={scratchNotes}
+                  onChange={(e) => setScratchNotes(e.target.value)}
+                  placeholder="Type your scratch notes here..."
+                  className="h-full w-full resize-none rounded-lg border border-gray-300 p-3 text-sm text-gray-900 focus:border-gray-500 focus:outline-none"
+                />
+              </div>
+            ) : (
+              <Excalidraw
+                zenModeEnabled={true}
+                viewModeEnabled={false}
+                gridModeEnabled={false}
+                UIOptions={{
+                  canvasActions: {
+                    toggleTheme: false,
+                    changeViewBackgroundColor: false,
+                    loadScene: false,
+                    saveToActiveFile: false,
+                    export: false,
+                  },
+                }}
+                initialData={{
+                  elements: excalidrawElements,
+                  appState: {
+                    ...excalidrawAppState,
+                    zenModeEnabled: true,
+                    theme: 'light',
+                    currentItemStrokeWidth: excalidrawAppState?.currentItemStrokeWidth ?? 1,
+                  },
+                }}
+                onChange={(elements: any[], appState: any) => {
+                  setExcalidrawElements(elements);
+                  setExcalidrawAppState(appState);
+                }}
+              />
+            )}
+          </div>
+        </div>
+      </div>
 
       {/* Focus Mode Layout */}
       <div className="h-[100dvh] overflow-hidden bg-gray-50">
@@ -1856,7 +1928,7 @@ export function UnitMCQs({
             isTutorOpen
               ? 'max-w-none lg:ml-[25%] lg:w-[75%]'
               : 'max-w-3xl mx-auto'
-          }`}
+          } ${activeScratchTool ? 'lg:pr-[min(40vw,32rem)]' : ''}`}
         >
           <div className="flex h-full min-h-0 flex-col">
             {/* Top Row: BeltHUD */}
@@ -1923,8 +1995,8 @@ export function UnitMCQs({
 
         {/* Right Side: TacticalToolbar */}
         <TacticalToolbar
-          onCalculatorClick={handleCalculatorClick}
-          onWhiteboardClick={handleWhiteboardClick}
+          onDrawClick={handleDrawClick}
+          onNotesClick={handleNotesClick}
         />
                       </div>
     </>

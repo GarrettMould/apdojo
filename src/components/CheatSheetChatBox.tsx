@@ -2,12 +2,13 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Paperclip, BrainCircuit, Send, X } from 'lucide-react';
+import { Paperclip, Send, X } from 'lucide-react';
 import type { CourseSubject } from '@/lib/courseSubject';
 import { displayCourseLabel } from '@/lib/courseSubject';
 import { personaForSubject } from '@/lib/chatPersonas';
-import { econTutorAvatarUrl } from '@/lib/tutorAvatar';
+import { tutorAvatarUrl } from '@/lib/tutorAvatar';
 import { getTutorWelcomeStarterChoices } from '@/lib/tutorStarterChoices';
+import { TutorTypingPlaceholder } from '@/components/TutorTypingPlaceholder';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { auth as firebaseAuth } from '@/lib/firebase';
 import { hasAdminRole } from '@/lib/adminAccess';
@@ -342,7 +343,7 @@ export function CheatSheetChatBox({
   useEffect(() => {
     if (!open) return;
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, open]);
+  }, [messages, open, sending]);
 
   useEffect(() => {
     if (!open) return;
@@ -579,7 +580,7 @@ export function CheatSheetChatBox({
                   parsedAssistant.choices.length > 0 &&
                   m.id === lastAssistantId;
                 const assistantLead = parsedAssistant?.display.trim() ?? '';
-                const avatarUrl = econTutorAvatarUrl(subject);
+                const avatarUrl = tutorAvatarUrl(subject);
 
                 if (m.role === 'user') {
                   return (
@@ -639,6 +640,9 @@ export function CheatSheetChatBox({
                   </div>
                 );
               })}
+              {sending ? (
+                <TutorTypingPlaceholder avatarUrl={tutorAvatarUrl(subject)} />
+              ) : null}
               <div ref={bottomRef} />
             </div>
           </div>
@@ -730,9 +734,13 @@ export function CheatSheetChatBox({
             aria-hidden
             className="absolute inset-[4px] rounded-full bg-white/15 ring-1 ring-white/30"
           />
-          <span className="relative flex items-center justify-center">
-            <BrainCircuit className="h-[1.35rem] w-[1.35rem] sm:h-6 sm:w-6" strokeWidth={2.2} />
-          </span>
+          {tutorAvatarUrl(subject) ? (
+            <img
+              src={tutorAvatarUrl(subject)!}
+              alt="Open tutor chat"
+              className="relative h-[84%] w-[84%] rounded-full object-cover ring-2 ring-white/80 shadow-sm"
+            />
+          ) : null}
         </button>
       ) : null}
     </div>

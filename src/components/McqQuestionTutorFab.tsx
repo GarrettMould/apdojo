@@ -2,12 +2,13 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { MessageCircle, Send, X } from 'lucide-react';
+import { Send, X } from 'lucide-react';
 import type { CourseSubject } from '@/lib/courseSubject';
 import { displayCourseLabel } from '@/lib/courseSubject';
 import { personaForSubject } from '@/lib/chatPersonas';
-import { econTutorAvatarUrl } from '@/lib/tutorAvatar';
+import { tutorAvatarUrl } from '@/lib/tutorAvatar';
 import type { Question } from '@/data/questionBanks/types';
+import { TutorTypingPlaceholder } from '@/components/TutorTypingPlaceholder';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { auth as firebaseAuth } from '@/lib/firebase';
 import { hasAdminRole } from '@/lib/adminAccess';
@@ -376,7 +377,7 @@ export function McqQuestionTutorFab({
   useEffect(() => {
     if (!open) return;
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, open]);
+  }, [messages, open, sending]);
 
   useEffect(() => {
     if (!open) return;
@@ -603,7 +604,7 @@ export function McqQuestionTutorFab({
                   parsedAssistant.choices.length > 0 &&
                   m.id === lastAssistantId;
                 const assistantLead = parsedAssistant?.display.trim() ?? '';
-                const avatarUrl = econTutorAvatarUrl(subject);
+                const avatarUrl = tutorAvatarUrl(subject);
 
                 if (m.role === 'user') {
                   return (
@@ -652,6 +653,9 @@ export function McqQuestionTutorFab({
                   </div>
                 );
               })}
+              {sending ? (
+                <TutorTypingPlaceholder avatarUrl={tutorAvatarUrl(subject)} />
+              ) : null}
               <div ref={bottomRef} />
             </div>
           </div>
@@ -688,12 +692,22 @@ export function McqQuestionTutorFab({
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className={`pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full text-white transition hover:brightness-105 active:scale-[0.97] sm:h-[3.25rem] sm:w-[3.25rem] ${theme.fab}`}
+          className={`pointer-events-auto relative flex h-12 w-12 items-center justify-center rounded-full text-white transition hover:brightness-105 active:scale-[0.97] sm:h-[3.25rem] sm:w-[3.25rem] ${theme.fab}`}
           aria-expanded={false}
           aria-label="Open question tutor"
           title="Guided help for this question"
         >
-          <MessageCircle className="h-6 w-6" strokeWidth={2} />
+          <span
+            aria-hidden
+            className="absolute inset-[4px] rounded-full bg-white/15 ring-1 ring-white/30"
+          />
+          {tutorAvatarUrl(subject) ? (
+            <img
+              src={tutorAvatarUrl(subject)!}
+              alt="Open question tutor"
+              className="relative h-[84%] w-[84%] rounded-full object-cover ring-2 ring-white/80 shadow-sm"
+            />
+          ) : null}
         </button>
       ) : null}
     </div>

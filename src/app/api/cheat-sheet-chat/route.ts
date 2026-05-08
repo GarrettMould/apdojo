@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextRequest, NextResponse } from 'next/server';
 import { displayCourseLabel, isCourseSubject, type CourseSubject } from '@/lib/courseSubject';
-import { personaForSubject } from '@/lib/chatPersonas';
+import { personaForSubject, scotusSenseiSystemPrompt } from '@/lib/chatPersonas';
 import { auth as adminAuth, db as adminDb } from '@/lib/firebase-admin';
 
 const MODEL_NAME = 'gemini-2.0-flash';
@@ -96,6 +96,38 @@ type McqContextForTutor = {
   selectedLetter: string | null;
   hasSubmittedAnswer: boolean;
 };
+
+type ScotusPromptContext = {
+  requiredCase: string;
+  nonRequiredCase: string;
+  topic: string;
+  scenario: string;
+  tasks: [string, string, string];
+};
+
+function parseScotusPromptContext(raw: unknown): ScotusPromptContext | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const o = raw as Record<string, unknown>;
+  const requiredCase = typeof o.requiredCase === 'string' ? o.requiredCase.slice(0, 200) : '';
+  const nonRequiredCase =
+    typeof o.nonRequiredCase === 'string' ? o.nonRequiredCase.slice(0, 200) : '';
+  const topic = typeof o.topic === 'string' ? o.topic.slice(0, 200) : '';
+  const scenario = typeof o.scenario === 'string' ? o.scenario.slice(0, 6000) : '';
+  const tasksRaw = o.tasks;
+  if (!requiredCase || !nonRequiredCase || !topic || !scenario || !Array.isArray(tasksRaw)) return null;
+  const tasks = tasksRaw
+    .slice(0, 3)
+    .map((t) => (typeof t === 'string' ? t.slice(0, 1000) : ''))
+    .filter(Boolean);
+  if (tasks.length !== 3) return null;
+  return {
+    requiredCase,
+    nonRequiredCase,
+    topic,
+    scenario,
+    tasks: [tasks[0], tasks[1], tasks[2]],
+  };
+}
 
 function normalizeKeyedMcqAnswer(raw: unknown): string {
   if (typeof raw === 'string') {
@@ -311,6 +343,8 @@ export async function POST(req: NextRequest) {
     messages?: unknown;
     attachment?: unknown;
     mcqContext?: unknown;
+    mode?: unknown;
+    scotusPrompt?: unknown;
   };
   try {
     body = await req.json();
@@ -338,9 +372,15 @@ export async function POST(req: NextRequest) {
 
   const attachment = parseAttachment(body);
   const mcqContext = parseMcqContext(body.mcqContext);
+  const mode = body.mode === 'scotus_essay' ? 'scotus_essay' : 'default';
+  const scotusPrompt =
+    mode === 'scotus_essay' ? parseScotusPromptContext(body.scotusPrompt) : null;
 
   if (body.mcqContext != null && mcqContext == null) {
     return NextResponse.json({ error: 'Invalid mcqContext payload.' }, { status: 400 });
+  }
+  if (mode === 'scotus_essay' && scotusPrompt == null) {
+    return NextResponse.json({ error: 'Invalid scotusPrompt payload.' }, { status: 400 });
   }
 
   const normalized: ClientTurn[] = [];
@@ -388,7 +428,9 @@ export async function POST(req: NextRequest) {
   }
 
   const systemInstruction =
-    mcqContext != null
+    mode === 'scotus_essay' && scotusPrompt != null
+      ? scotusSenseiSystemPrompt(scotusPrompt)
+      : mcqContext != null
       ? buildMcqSystemInstruction(subject, unitNumber, unitTitle, mcqContext)
       : buildSystemInstruction(subject, unitNumber, unitTitle);
 

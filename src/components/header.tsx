@@ -21,9 +21,11 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isBeltDropdownOpen, setIsBeltDropdownOpen] = useState(false);
   const [isPracticeDropdownOpen, setIsPracticeDropdownOpen] = useState(false);
+  const [isGovDropdownOpen, setIsGovDropdownOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const beltDropdownRef = useRef<HTMLDivElement>(null);
   const practiceDropdownRef = useRef<HTMLDivElement>(null);
+  const govDropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -125,6 +127,23 @@ export function Header() {
     };
   }, [isPracticeDropdownOpen]);
 
+  // Close gov dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (govDropdownRef.current && !govDropdownRef.current.contains(event.target as Node)) {
+        setIsGovDropdownOpen(false);
+      }
+    };
+
+    if (isGovDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isGovDropdownOpen]);
+
   return (
     <header className="bg-white sticky top-0 z-50 shadow-md">
       <div className="px-4 sm:px-8 lg:px-12">
@@ -222,12 +241,44 @@ export function Header() {
               </Link>
 
               {canAccessGov && (
-                <Link
-                  href={getPracticeTestsUrl('gov')}
-                  className="text-lg text-gray-700 hover:text-violet-600 transition-colors font-bold"
-                >
-                  AP Gov Practice
-                </Link>
+                <div className="relative" ref={govDropdownRef}>
+                  <button
+                    type="button"
+                    onClick={() => setIsGovDropdownOpen((p) => !p)}
+                    className="flex items-center gap-1 text-lg text-gray-700 hover:text-violet-600 transition-colors font-bold"
+                  >
+                    AP Gov
+                    <ChevronDown className={`w-5 h-5 transition-transform ${isGovDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                  {isGovDropdownOpen && (
+                    <div className="absolute top-full left-0 w-64 z-50">
+                      <div className="h-2 -mt-2 w-full pointer-events-auto"></div>
+                      <div className="bg-white rounded-lg shadow-lg border border-gray-200 py-2 pointer-events-auto">
+                        <Link
+                          href="/ap-gov-unit-1-cheat-sheet"
+                          className="block px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 hover:text-violet-600 transition-colors"
+                          onClick={() => setIsGovDropdownOpen(false)}
+                        >
+                          Cheat Sheets
+                        </Link>
+                        <Link
+                          href={getPracticeTestsUrl('gov')}
+                          className="block px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 hover:text-violet-600 transition-colors"
+                          onClick={() => setIsGovDropdownOpen(false)}
+                        >
+                          Practice Tests
+                        </Link>
+                        <Link
+                          href="/scotus-essay-practice"
+                          className="block px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 hover:text-violet-600 transition-colors"
+                          onClick={() => setIsGovDropdownOpen(false)}
+                        >
+                          SCOTUS Essay Practice
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+                </div>
               )}
 
               {/* Cheat Sheets */}
@@ -520,13 +571,29 @@ export function Header() {
                 Full Practice Tests
               </Link>
               {canAccessGov && (
-                <Link
-                  href={getPracticeTestsUrl('gov')}
-                  onClick={closeMobileMenu}
-                  className="px-4 py-4 text-xl font-bold text-gray-800 hover:text-violet-600 hover:bg-violet-50 rounded-xl transition-colors"
-                >
-                  AP Gov Practice
-                </Link>
+                <>
+                  <Link
+                    href="/ap-gov-unit-1-cheat-sheet"
+                    onClick={closeMobileMenu}
+                    className="px-4 py-4 text-xl font-bold text-gray-800 hover:text-violet-600 hover:bg-violet-50 rounded-xl transition-colors"
+                  >
+                    AP Gov Cheat Sheets
+                  </Link>
+                  <Link
+                    href={getPracticeTestsUrl('gov')}
+                    onClick={closeMobileMenu}
+                    className="px-4 py-4 text-xl font-bold text-gray-800 hover:text-violet-600 hover:bg-violet-50 rounded-xl transition-colors"
+                  >
+                    AP Gov Practice Tests
+                  </Link>
+                  <Link
+                    href="/scotus-essay-practice"
+                    onClick={closeMobileMenu}
+                    className="px-4 py-4 text-xl font-bold text-gray-800 hover:text-violet-600 hover:bg-violet-50 rounded-xl transition-colors"
+                  >
+                    AP Gov SCOTUS Essay Practice
+                  </Link>
+                </>
               )}
 
               <div className="my-3 border-t border-gray-100" />
