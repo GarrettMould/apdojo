@@ -17,6 +17,7 @@ import { UnitDetails } from '@/components/UnitPerformanceDisplay'
 import { getSubjectXP } from './useUserProgress'
 import type { CourseSubject } from '@/lib/courseSubject'
 import { nextCourseSubject, normalizeCourseSubject } from '@/lib/courseSubject'
+import { hasAdminRole } from '@/lib/adminAccess'
 
 // Define the structure of your MCQ answer data
 interface McqAnswer {
@@ -312,18 +313,34 @@ export function useAuth() {
 
   // --- ADD State for Selected Subject (works for both logged-in and guests) ---
   const [selectedSubject, setSelectedSubjectState] = useState<CourseSubject>('macro');
+  const canAccessGov = Boolean(user && hasAdminRole(userData));
   
   // Initialize subject from userData or localStorage
   useEffect(() => {
     if (user && userData?.selectedSubject) {
-      setSelectedSubjectState(normalizeCourseSubject(userData.selectedSubject as string));
+      const next = normalizeCourseSubject(userData.selectedSubject as string);
+      setSelectedSubjectState(next === 'gov' && !canAccessGov ? 'macro' : next);
     } else if (!user && typeof window !== 'undefined') {
       const storedSubject = localStorage.getItem('guestAPSubject');
       if (storedSubject) {
-        setSelectedSubjectState(normalizeCourseSubject(storedSubject));
+        const next = normalizeCourseSubject(storedSubject);
+        setSelectedSubjectState(next === 'gov' ? 'macro' : next);
       }
     }
-  }, [user, userData?.selectedSubject]);
+  }, [user, userData?.selectedSubject, canAccessGov]);
+
+  // Safety net: never let non-admin sessions remain on Gov.
+  useEffect(() => {
+    if (selectedSubject !== 'gov' || canAccessGov) return;
+    setSelectedSubjectState('macro');
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('guestAPSubject', 'macro');
+    }
+    if (user) {
+      const userDocRef = doc(db, 'users', user.uid);
+      void setDoc(userDocRef, { selectedSubject: 'macro' }, { merge: true });
+    }
+  }, [selectedSubject, canAccessGov, user]);
 
   // Initialize guest XP from localStorage for logged-out users
   useEffect(() => {
@@ -363,19 +380,21 @@ export function useAuth() {
 
   // Function to set selected subject (updates both state and storage)
   const setSelectedSubject = async (subject: CourseSubject) => {
-    setSelectedSubjectState(subject);
+    const nextSubject: CourseSubject =
+      subject === 'gov' && !canAccessGov ? 'macro' : subject;
+    setSelectedSubjectState(nextSubject);
     if (user) {
       // Update in Firestore for logged-in users
       try {
         const userDocRef = doc(db, 'users', user.uid);
-        await setDoc(userDocRef, { selectedSubject: subject }, { merge: true });
+        await setDoc(userDocRef, { selectedSubject: nextSubject }, { merge: true });
       } catch (error) {
         console.error('[useAuth] Error updating selected subject:', error);
       }
     } else {
       // Store in localStorage for guests
       if (typeof window !== 'undefined') {
-        localStorage.setItem('guestAPSubject', subject);
+        localStorage.setItem('guestAPSubject', nextSubject);
       }
     }
   };

@@ -1,7 +1,16 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextRequest, NextResponse } from 'next/server';
 import { displayCourseLabel, isCourseSubject, type CourseSubject } from '@/lib/courseSubject';
-import { personaForSubject, scotusSenseiSystemPrompt } from '@/lib/chatPersonas';
+import {
+  buildFrqPracticeTutorSystemInstruction,
+  personaForSubject,
+  scotusSenseiSystemPrompt,
+  type ScotusSenseiIntent,
+} from '@/lib/chatPersonas';
+import {
+  formatFrqTutorContextBlock,
+  parseFrqTutorContextPayload,
+} from '@/lib/frqTutorContext';
 import { auth as adminAuth, db as adminDb } from '@/lib/firebase-admin';
 
 const MODEL_NAME = 'gemini-2.0-flash';
@@ -103,6 +112,25 @@ type ScotusPromptContext = {
   topic: string;
   scenario: string;
   tasks: [string, string, string];
+  caseFacts?: string;
+  constitutionalClause?: string;
+  comparisonPoints?: string;
+  rubricChecklist?: string[];
+  gradingKey?: {
+    promptId: string;
+    groundTruth: {
+      clause: string;
+      requiredFacts: string;
+      bridgeLogic: string;
+      applicationPrinciple: string;
+    };
+    gradingRules: {
+      pointA: string;
+      pointBFacts: string;
+      pointBBridge: string;
+      pointC: string;
+    };
+  };
 };
 
 function parseScotusPromptContext(raw: unknown): ScotusPromptContext | null {
@@ -120,12 +148,90 @@ function parseScotusPromptContext(raw: unknown): ScotusPromptContext | null {
     .map((t) => (typeof t === 'string' ? t.slice(0, 1000) : ''))
     .filter(Boolean);
   if (tasks.length !== 3) return null;
+
+  const caseFacts = typeof o.caseFacts === 'string' ? o.caseFacts.slice(0, 4000) : undefined;
+  const constitutionalClause =
+    typeof o.constitutionalClause === 'string' ? o.constitutionalClause.slice(0, 500) : undefined;
+  const comparisonPoints =
+    typeof o.comparisonPoints === 'string' ? o.comparisonPoints.slice(0, 4000) : undefined;
+  let rubricChecklist: string[] | undefined;
+  const rubRaw = o.rubricChecklist;
+  if (Array.isArray(rubRaw)) {
+    rubricChecklist = rubRaw
+      .slice(0, 12)
+      .map((r) => (typeof r === 'string' ? r.slice(0, 240) : ''))
+      .filter(Boolean);
+    if (rubricChecklist.length === 0) rubricChecklist = undefined;
+  }
+
+  let gradingKey: ScotusPromptContext['gradingKey'];
+  const keyRaw = o.gradingKey;
+  if (keyRaw && typeof keyRaw === 'object') {
+    const k = keyRaw as Record<string, unknown>;
+    const promptId = typeof k.promptId === 'string' ? k.promptId.slice(0, 120) : '';
+    const gt = k.groundTruth;
+    const rules = k.gradingRules;
+    if (gt && typeof gt === 'object' && rules && typeof rules === 'object' && promptId) {
+      const gto = gt as Record<string, unknown>;
+      const ro = rules as Record<string, unknown>;
+      const clause = typeof gto.clause === 'string' ? gto.clause.slice(0, 800) : '';
+      const requiredFacts =
+        typeof gto.requiredFacts === 'string' ? gto.requiredFacts.slice(0, 2000) : '';
+      const bridgeLogic =
+        typeof gto.bridgeLogic === 'string' ? gto.bridgeLogic.slice(0, 2000) : '';
+      const applicationPrinciple =
+        typeof gto.applicationPrinciple === 'string'
+          ? gto.applicationPrinciple.slice(0, 2000)
+          : '';
+
+      const pointA = typeof ro.pointA === 'string' ? ro.pointA.slice(0, 1500) : '';
+      const pointBFacts =
+        typeof ro.pointBFacts === 'string' ? ro.pointBFacts.slice(0, 1500) : '';
+      const pointBBridge =
+        typeof ro.pointBBridge === 'string' ? ro.pointBBridge.slice(0, 1800) : '';
+      const pointC = typeof ro.pointC === 'string' ? ro.pointC.slice(0, 1500) : '';
+      if (
+        clause &&
+        requiredFacts &&
+        bridgeLogic &&
+        applicationPrinciple &&
+        pointA &&
+        pointBFacts &&
+        pointBBridge &&
+        pointC
+      ) {
+        gradingKey = {
+          promptId,
+          groundTruth: {
+            clause,
+            requiredFacts,
+            bridgeLogic,
+            applicationPrinciple,
+          },
+          gradingRules: {
+            pointA,
+            pointBFacts,
+            pointBBridge,
+            pointC,
+          },
+        };
+      }
+    }
+  }
+
   return {
     requiredCase,
     nonRequiredCase,
     topic,
     scenario,
     tasks: [tasks[0], tasks[1], tasks[2]],
+    ...(caseFacts != null && caseFacts.length > 0 ? { caseFacts } : {}),
+    ...(constitutionalClause != null && constitutionalClause.length > 0
+      ? { constitutionalClause }
+      : {}),
+    ...(comparisonPoints != null && comparisonPoints.length > 0 ? { comparisonPoints } : {}),
+    ...(rubricChecklist != null ? { rubricChecklist } : {}),
+    ...(gradingKey != null ? { gradingKey } : {}),
   };
 }
 
@@ -343,8 +449,10 @@ export async function POST(req: NextRequest) {
     messages?: unknown;
     attachment?: unknown;
     mcqContext?: unknown;
+    frqContext?: unknown;
     mode?: unknown;
     scotusPrompt?: unknown;
+    scotusEssayIntent?: unknown;
   };
   try {
     body = await req.json();
@@ -372,12 +480,34 @@ export async function POST(req: NextRequest) {
 
   const attachment = parseAttachment(body);
   const mcqContext = parseMcqContext(body.mcqContext);
+  const frqContextPayload = parseFrqTutorContextPayload(body.frqContext ?? null);
   const mode = body.mode === 'scotus_essay' ? 'scotus_essay' : 'default';
   const scotusPrompt =
     mode === 'scotus_essay' ? parseScotusPromptContext(body.scotusPrompt) : null;
 
+  let scotusEssayIntent: ScotusSenseiIntent = 'coach';
+  if (mode === 'scotus_essay') {
+    if (body.scotusEssayIntent === 'full_grade') scotusEssayIntent = 'full_grade';
+    else if (body.scotusEssayIntent === 'part_check') scotusEssayIntent = 'part_check';
+  }
+
   if (body.mcqContext != null && mcqContext == null) {
     return NextResponse.json({ error: 'Invalid mcqContext payload.' }, { status: 400 });
+  }
+  if (body.frqContext != null && frqContextPayload == null) {
+    return NextResponse.json({ error: 'Invalid frqContext payload.' }, { status: 400 });
+  }
+  if (mcqContext != null && frqContextPayload != null) {
+    return NextResponse.json(
+      { error: 'Cannot combine mcqContext and frqContext.' },
+      { status: 400 }
+    );
+  }
+  if (mode === 'scotus_essay' && frqContextPayload != null) {
+    return NextResponse.json(
+      { error: 'Cannot combine scotus_essay mode and frqContext.' },
+      { status: 400 }
+    );
   }
   if (mode === 'scotus_essay' && scotusPrompt == null) {
     return NextResponse.json({ error: 'Invalid scotusPrompt payload.' }, { status: 400 });
@@ -427,12 +557,29 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  if (frqContextPayload != null && attachment != null) {
+    return NextResponse.json(
+      { error: 'Attachments are not supported for FRQ tutor mode.' },
+      { status: 400 }
+    );
+  }
+
+  const frqContextBlock =
+    frqContextPayload != null ? formatFrqTutorContextBlock(frqContextPayload) : '';
+
   const systemInstruction =
     mode === 'scotus_essay' && scotusPrompt != null
-      ? scotusSenseiSystemPrompt(scotusPrompt)
-      : mcqContext != null
-      ? buildMcqSystemInstruction(subject, unitNumber, unitTitle, mcqContext)
-      : buildSystemInstruction(subject, unitNumber, unitTitle);
+      ? scotusSenseiSystemPrompt(scotusPrompt, scotusEssayIntent)
+      : frqContextPayload != null
+        ? buildFrqPracticeTutorSystemInstruction(
+            subject,
+            unitNumber,
+            unitTitle,
+            frqContextBlock
+          )
+        : mcqContext != null
+          ? buildMcqSystemInstruction(subject, unitNumber, unitTitle, mcqContext)
+          : buildSystemInstruction(subject, unitNumber, unitTitle);
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
@@ -440,8 +587,17 @@ export async function POST(req: NextRequest) {
       model: MODEL_NAME,
       systemInstruction,
       generationConfig: {
-        temperature: 0.72,
-        maxOutputTokens: mcqContext != null ? 1280 : 1024,
+        temperature: scotusEssayIntent === 'full_grade' ? 0.35 : 0.72,
+        maxOutputTokens:
+          scotusEssayIntent === 'full_grade'
+            ? 2048
+            : scotusEssayIntent === 'part_check'
+              ? 1536
+              : frqContextPayload != null
+                ? 1536
+                : mcqContext != null
+                  ? 1280
+                  : 1024,
       },
     });
 

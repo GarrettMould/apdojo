@@ -1721,7 +1721,7 @@ export function UnitMCQs({
                 <QuestionWithKeyTerms 
                   questionText={question.question} 
                   unit={question.unit} 
-                  subject={question.subject}
+                  subject={Array.isArray(question.subject) ? question.subject[0] : question.subject}
                 />
               </p>
               <div className="space-y-2">
@@ -1928,7 +1928,7 @@ export function UnitMCQs({
             isTutorOpen
               ? 'max-w-none lg:ml-[25%] lg:w-[75%]'
               : 'max-w-3xl mx-auto'
-          } ${activeScratchTool ? 'lg:pr-[min(40vw,32rem)]' : ''}`}
+          } ${activeScratchTool ? 'lg:-translate-x-[min(18vw,14rem)]' : ''}`}
         >
           <div className="flex h-full min-h-0 flex-col">
             {/* Top Row: BeltHUD */}

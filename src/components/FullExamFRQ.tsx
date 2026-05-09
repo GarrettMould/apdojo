@@ -536,8 +536,8 @@ export function FullExamFRQ({ questions, examType = 'macro', backUrl }: FullExam
             type="button"
             onClick={openExitFlow}
             className="flex items-center gap-2.5 p-0.5 -m-0.5 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 text-left"
-            aria-label="Save and exit"
-            title="Save & exit"
+            aria-label="Exit exam"
+            title="Exit"
           >
             <Image src="/images/dojoIconJan26.svg" alt="" width={26} height={26} unoptimized />
             <span className="text-sm font-black text-gray-900 tracking-wide">AP Dojo</span>
@@ -548,14 +548,14 @@ export function FullExamFRQ({ questions, examType = 'macro', backUrl }: FullExam
             Section II – Free Response
               </span>
 
-          {/* Right: Save & Exit + tools — order aligned with MCQ unit test */}
+          {/* Right: Exit + tools — order aligned with MCQ unit test */}
           <div className="flex items-center gap-1.5">
                 <button
               type="button"
               onClick={openExitFlow}
               className="px-3 py-1.5 text-xs font-semibold border border-gray-300 rounded hover:bg-gray-50 text-gray-700 transition-colors"
             >
-              Save & Exit
+              Exit
                 </button>
                 <button
               type="button"

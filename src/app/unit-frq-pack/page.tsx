@@ -7,7 +7,7 @@ import { ArrowLeft } from 'lucide-react';
 import { FullExamFRQ } from '@/components/FullExamFRQ';
 import { buildGovUnitFrqPackForFullExam } from '@/data/gov/govUnitStimulusFrqs';
 import { isCourseSubject, type CourseSubject } from '@/lib/courseSubject';
-import { getUnitTestPreviewUrl } from '@/lib/utils';
+import { getUnitFinalPracticeTestsUrl } from '@/lib/utils';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { hasAdminRole } from '@/lib/adminAccess';
 
@@ -20,9 +20,8 @@ function UnitFrqPackInner() {
   const subject: CourseSubject = isCourseSubject(subjectRaw) ? subjectRaw : 'gov';
   const unitNumber = parseInt(unitRaw, 10) || 1;
 
-  const backToPreview = getUnitTestPreviewUrl(unitNumber, subject, 'frq');
   const backToHub =
-    subject === 'gov' ? '/unit-final-practice-tests?subject=gov' : getPracticeHubForSubject(subject);
+    subject === 'gov' ? getUnitFinalPracticeTestsUrl('gov') : getPracticeHubForSubject(subject);
 
   if (subject !== 'gov') {
     return (
@@ -90,7 +89,7 @@ function UnitFrqPackInner() {
     );
   }
 
-  return <FullExamFRQ questions={pack} examType="gov" backUrl={backToPreview} />;
+  return <FullExamFRQ questions={pack} examType="gov" backUrl={backToHub} />;
 }
 
 function getPracticeHubForSubject(subject: CourseSubject): string {

@@ -4,9 +4,11 @@ import React, { useState, useEffect } from 'react';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import type { CourseSubject } from '@/lib/courseSubject';
+import { hasAdminRole } from '@/lib/adminAccess';
 
 export function SubjectToggle() {
-  const { selectedSubject, setSelectedSubject } = useAuthContext();
+  const { selectedSubject, setSelectedSubject, user, userData } = useAuthContext();
+  const canAccessGov = Boolean(user && hasAdminRole(userData));
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
@@ -21,6 +23,7 @@ export function SubjectToggle() {
   const displaySubject = mounted ? selectedSubject : 'macro';
 
   const handleSubjectChange = (newSubject: CourseSubject) => {
+    if (newSubject === 'gov' && !canAccessGov) return;
     // If we're on the blog home, update URL so the page stays in sync
     if (pathname === '/ap-blog-home') {
       setSelectedSubject(newSubject);
@@ -70,16 +73,18 @@ export function SubjectToggle() {
       >
         Micro
       </button>
-      <button
-        onClick={() => handleSubjectChange('gov')}
-        className={`flex-1 min-w-[4.5rem] px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 border-2 ${
-          displaySubject === 'gov'
-            ? 'bg-violet-600 text-white shadow-sm border-black'
-            : 'bg-stone-50 text-gray-700 hover:text-gray-900 border-black'
-        }`}
-      >
-        Gov
-      </button>
+      {canAccessGov && (
+        <button
+          onClick={() => handleSubjectChange('gov')}
+          className={`flex-1 min-w-[4.5rem] px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 border-2 ${
+            displaySubject === 'gov'
+              ? 'bg-violet-600 text-white shadow-sm border-black'
+              : 'bg-stone-50 text-gray-700 hover:text-gray-900 border-black'
+          }`}
+        >
+          Gov
+        </button>
+      )}
     </div>
   );
 }

@@ -56,7 +56,7 @@ function UnitFinalPracticeTestsContent() {
   const canAccessGov = Boolean(user && hasAdminRole(userData));
   const isMicro = effectiveSubject === 'micro';
   const subjectName = isGov
-    ? 'U.S. Government and Politics'
+    ? 'U.S. Government'
     : effectiveSubject === 'macro'
       ? 'Macroeconomics'
       : 'Microeconomics';

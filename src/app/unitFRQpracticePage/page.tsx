@@ -4,8 +4,25 @@ import React, { useState, useEffect, useRef, Suspense } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ArrowLeft, ChevronDown, ChevronUp, Sparkles, Loader2, PlayCircle, Upload, X, Pencil, Image as ImageIcon, Lock, Share2, Check, Lightbulb, ChevronsRight, ChevronsLeft, Printer } from 'lucide-react';
-import Link from 'next/link';
+import {
+  ArrowLeft,
+  ChevronDown,
+  ChevronUp,
+  ChevronRight,
+  Sparkles,
+  Loader2,
+  PlayCircle,
+  Upload,
+  X,
+  Pencil,
+  Image as ImageIcon,
+  Lock,
+  Share2,
+  Check,
+  ChevronsRight,
+  ChevronsLeft,
+  Printer,
+} from 'lucide-react';
 import { DrawingPad } from '@/components/DrawingPad';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { VideoModal } from '@/components/VideoModal';
@@ -18,9 +35,11 @@ import { CheckCircle2 } from 'lucide-react';
 import { LoginModal, SignupModal } from '@/components/AuthModals';
 import { SeasonPassModal } from '@/components/SeasonPassModal';
 import FRQLibrarySidebar, { FRQItem } from '@/components/FRQLibrarySidebar';
-import { hasValidSeasonPass } from '@/lib/utils';
+import { cn, hasValidSeasonPass } from '@/lib/utils';
 import type { CourseSubject } from '@/lib/courseSubject';
 import { econCourseFromSubject } from '@/lib/courseSubject';
+import { FrqPracticeChatFab } from '@/components/FrqPracticeChatFab';
+import { macroUnits, microUnits } from '@/data/cheatSheets';
 import { FRQCompletionModal } from '@/components/FRQCompletionModal';
 
 // Self-Review Component for Drawings
@@ -339,7 +358,14 @@ function UnitFRQPracticePageComponent() {
   // Otherwise, use the selected question
   const frqQuestion = selectedQuestion;
 
-  const [expandedParts, setExpandedParts] = useState<Record<string, boolean>>({});
+  const frqUnitTitle = React.useMemo(() => {
+    if (!frqEconSubject || !frqQuestion) return '';
+    const units = frqEconSubject === 'macro' ? macroUnits : microUnits;
+    return units.find((u) => u.number === frqQuestion.unit)?.title ?? '';
+  }, [frqEconSubject, frqQuestion]);
+
+  /** Single expanded part at a time — matches AP Gov {@link FullExamFRQ} accordion UX. */
+  const [activePartIndex, setActivePartIndex] = useState(0);
   const [expandedSubparts, setExpandedSubparts] = useState<Record<string, boolean>>({});
   const [showAnswers, setShowAnswers] = useState<Record<string, boolean>>({});
   const [textAnswers, setTextAnswers] = useState<Record<string, string>>({});
@@ -348,11 +374,18 @@ function UnitFRQPracticePageComponent() {
   const [isGrading, setIsGrading] = useState<Record<string, boolean>>({});
   const [submittedDrawings, setSubmittedDrawings] = useState<Record<string, boolean>>({});
   const [videoModalState, setVideoModalState] = useState<{ url: string; aspectRatio?: 'vertical' | 'horizontal' } | null>(null);
-  const [isExpertTipVisible, setIsExpertTipVisible] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [checklistPoints, setChecklistPoints] = useState<Record<string, number>>({});
   const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [totalXpEarned, setTotalXpEarned] = useState(0);
+  /** When FRQ tutor panel is open (desktop), main column shifts left so it clears the chat. */
+  const [frqTutorOpen, setFrqTutorOpen] = useState(false);
+
+  const showFrqTutorFab =
+    Boolean(frqEconSubject && frqQuestion && !isCurrentQuestionLocked);
+  useEffect(() => {
+    if (!showFrqTutorFab) setFrqTutorOpen(false);
+  }, [showFrqTutorFab]);
 
   const previousSubjectRef = useRef<CourseSubject | null>(null);
 
@@ -366,7 +399,7 @@ function UnitFRQPracticePageComponent() {
     previousSubjectRef.current = selectedSubject;
 
     setSelectedQuestionIndex(0);
-    setExpandedParts({});
+    setActivePartIndex(0);
     setExpandedSubparts({});
     setShowAnswers({});
     setTextAnswers({});
@@ -376,7 +409,6 @@ function UnitFRQPracticePageComponent() {
     setSubmittedDrawings({});
     setChecklistPoints({});
     setVideoModalState(null);
-    setIsExpertTipVisible(false);
     setShowCompletionModal(false);
     setTotalXpEarned(0);
   }, [selectedSubject]);
@@ -385,16 +417,9 @@ function UnitFRQPracticePageComponent() {
     window.print();
   };
 
-  // Effect to expand all question parts by default when a new question is loaded
   useEffect(() => {
-    if (frqQuestion && frqQuestion.parts) {
-      const allPartsExpanded = frqQuestion.parts.reduce((acc, part) => {
-        acc[part.label] = true;
-        return acc;
-      }, {} as Record<string, boolean>);
-      setExpandedParts(allPartsExpanded);
-    }
-  }, [frqQuestion]);
+    setActivePartIndex(0);
+  }, [frqQuestion?.id]);
 
   // Calculate total points and current points from feedback
   const totalPoints = React.useMemo(() => {
@@ -506,13 +531,6 @@ function UnitFRQPracticePageComponent() {
     }
   };
 
-  const togglePart = (partLabel: string) => {
-    setExpandedParts(prev => ({
-      ...prev,
-      [partLabel]: !prev[partLabel]
-    }));
-  };
-
   const toggleSubpart = (key: string) => {
     setExpandedSubparts(prev => ({
       ...prev,
@@ -567,7 +585,7 @@ function UnitFRQPracticePageComponent() {
     }
     setSelectedQuestionIndex(index);
     // Reset all answer and feedback states
-    setExpandedParts({});
+    setActivePartIndex(0);
     setExpandedSubparts({});
     setShowAnswers({});
     setTextAnswers({});
@@ -575,7 +593,6 @@ function UnitFRQPracticePageComponent() {
     setGradingFeedback({});
     setIsGrading({});
     setChecklistPoints({});
-    setIsExpertTipVisible(false);
     setShowCompletionModal(false);
     setTotalXpEarned(0);
   };
@@ -694,6 +711,11 @@ function UnitFRQPracticePageComponent() {
     setSubmittedDrawings(prev => ({ ...prev, [drawingKey]: true }));
   };
 
+  const focusAccentClass =
+    selectedSubject === 'micro'
+      ? 'focus:border-green-500 focus:ring-1 focus:ring-green-400'
+      : 'focus:border-blue-500 focus:ring-1 focus:ring-blue-400';
+
   return (
     <div className="min-h-screen bg-gray-50">
       {showSeasonPassModal && (
@@ -730,6 +752,16 @@ function UnitFRQPracticePageComponent() {
         videoUrl={videoModalState?.url || ''}
         aspectRatio={videoModalState?.aspectRatio}
       />
+
+      {showFrqTutorFab && (
+        <FrqPracticeChatFab
+          subject={frqEconSubject}
+          unitTitle={frqUnitTitle}
+          frqQuestion={frqQuestion}
+          onOpenChange={setFrqTutorOpen}
+        />
+      )}
+
       {/* Completion modal disabled - no longer showing */}
       {/* <FRQCompletionModal
         isOpen={showCompletionModal}
@@ -760,13 +792,13 @@ function UnitFRQPracticePageComponent() {
       )}
 
       {/* Left Sidebar: FRQ Library (Sliding Panel) */}
-      <div 
-        className={`fixed top-20 left-0 h-[calc(100vh-5rem)] bg-white lg:w-1/4 w-4/5 z-40 shadow-xl transition-transform duration-300 ease-in-out print:hidden ${
+      <div
+        className={`fixed left-0 top-20 z-40 h-[calc(100vh-5rem)] w-4/5 bg-white shadow-xl transition-transform duration-300 ease-in-out print:hidden lg:w-1/4 ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="h-full flex flex-col">
-          <div className="flex justify-between items-center p-4 border-b-2 border-black bg-gray-50">
+        <div className="flex h-full flex-col">
+          <div className="flex items-center justify-between border-b-2 border-black bg-gray-50 p-4">
             <h2 className="text-xl font-bold text-gray-800">FRQ Library</h2>
             <button
               onClick={() => setIsSidebarOpen(false)}
@@ -798,34 +830,32 @@ function UnitFRQPracticePageComponent() {
         </div>
       </div>
 
-      <div className="max-w-screen-2xl mx-auto px-4 py-8 print:px-0 print:py-0">
-        {/* Main Content Area - Side by Side Layout for Desktop */}
-        <div className="lg:grid lg:grid-cols-[1fr_1fr] lg:gap-6 lg:items-start print:block lg:h-screen">
-          {/* Left Column: Sticky Question and Graph */}
-          <div className="lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto print:static print:h-auto lg:max-w-full">
-            <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 print:shadow-none print:border-none">
-              {/* Header */}
-              <div className="mb-6 pb-4 border-b print:border-b-2 print:border-black">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                <h1 className="text-3xl font-bold text-gray-900 mb-1">
+      <div
+        className={cn(
+          'mx-auto max-w-3xl px-4 py-8 pb-28 sm:px-8 print:max-w-none print:px-0 print:pb-0 print:py-0',
+          'transition-[margin-inline-end] duration-300 ease-out',
+          frqTutorOpen &&
+            'me-3 sm:me-6 md:me-[min(22rem,42vw)] lg:me-[min(26rem,32vw)] xl:me-[28rem]'
+        )}
+      >
+        <div className="overflow-hidden rounded-2xl border-2 border-gray-200 bg-white shadow-[4px_4px_0px_0px_rgba(17,24,39,0.06)] print:rounded-none print:border-black print:shadow-none">
+          <div className="p-6 sm:p-8 print:border-none">
+            <div className="mb-6 flex flex-col gap-4 border-b border-gray-200 pb-4 print:border-b-2 print:border-black sm:flex-row sm:items-start sm:justify-between sm:gap-8 lg:gap-12">
+              <div className="min-w-0 w-full max-w-xl shrink sm:w-auto lg:max-w-2xl">
+                <h1 className="mb-1 text-2xl font-black text-gray-900 sm:text-3xl">
                   {frqQuestion ? frqQuestion.title : 'No FRQs for this course yet'}
                 </h1>
-                <p className="text-md text-gray-600">
-                  From: {frqQuestion?.examTitle ?? '—'}
-                </p>
-                  </div>
-                  {/* Points Display */}
-                  <div className="print:hidden flex-shrink-0">
-                    <div className="bg-gray-100 border-2 border-gray-300 rounded-lg p-4 text-center min-w-[100px]">
-                      <div className="text-sm font-semibold text-gray-600 mb-1">Points</div>
-                      <div className="text-2xl font-bold text-gray-900">
-                        {currentPoints}/{totalPoints}
-                      </div>
-                    </div>
+                <p className="text-sm font-medium text-gray-600">From: {frqQuestion?.examTitle ?? '—'}</p>
+              </div>
+              {frqQuestion && !isCurrentQuestionLocked && (
+                <div className="flex shrink-0 flex-col items-end justify-center pt-0.5 print:hidden sm:min-w-[5.5rem]">
+                  <div className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">Points</div>
+                  <div className="tabular-nums text-2xl font-black text-gray-900 sm:text-3xl">
+                    {currentPoints}/{totalPoints}
                   </div>
                 </div>
-              </div>
+              )}
+            </div>
 
               {/* Locked Question Message */}
               {isCurrentQuestionLocked && (
@@ -873,47 +903,21 @@ function UnitFRQPracticePageComponent() {
               {/* Question Content */}
               {!isCurrentQuestionLocked && (
                 <div>
-                  {/* Tip and Share Section */}
-                  <div className="flex items-center justify-between mb-4 print:hidden">
-                    {frqQuestion.expertTip ? (
-                      <button
-                        onClick={() => setIsExpertTipVisible(!isExpertTipVisible)}
-                        className={`flex items-center gap-2 text-sm font-semibold transition-colors px-3 py-1.5 rounded-md border ${
-                          isExpertTipVisible 
-                            ? 'bg-blue-100 border-blue-300 text-blue-800' 
-                            : 'bg-gray-100 border-gray-200 text-gray-700 hover:bg-gray-200'
-                        }`}
-                      >
-                        <Lightbulb className="w-4 h-4" />
-                        <span>{isExpertTipVisible ? 'Hide Tip' : 'Expert Tip'}</span>
-                      </button>
-                    ) : (
-                      <div />
-                    )}
-                    <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm" onClick={handlePrint}>
-                        <Printer className="w-4 h-4 mr-2" />
-                        Print FRQ
-                      </Button>
-                      <ShareFRQButton questionId={frqQuestion.id} />
-                    </div>
+                  <div className="mb-6 flex flex-wrap items-center gap-2 print:hidden [&_button]:h-9 [&_button]:text-xs">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="shrink-0"
+                      onClick={handlePrint}
+                      type="button"
+                    >
+                      <Printer className="mr-1.5 h-3.5 w-3.5" />
+                      Print
+                    </Button>
+                    <ShareFRQButton questionId={frqQuestion.id} />
                   </div>
-                  
-                  {/* Expert Tip */}
-                  {frqQuestion.expertTip && (
-                    <div className={`mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg ${!isExpertTipVisible ? 'hidden' : ''} print:block print:bg-white print:border-gray-300`}>
-                      <div className="flex items-start">
-                        <Lightbulb className="w-5 h-5 mr-3 mt-1 flex-shrink-0 text-blue-500 print:text-black" />
-                        <div>
-                          <h4 className="font-bold text-blue-900 print:text-black">Expert Tip</h4>
-                          <p className="mt-1 text-blue-800 print:text-black">{frqQuestion.expertTip}</p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
 
-                  {/* Question Prompt */}
-                  <p className="text-lg text-gray-800 leading-relaxed mb-6">
+                  <p className="mb-6 whitespace-pre-line text-base font-semibold leading-relaxed text-gray-900">
                     {frqQuestion.prompt}
                   </p>
 
@@ -984,32 +988,40 @@ function UnitFRQPracticePageComponent() {
                   )}
                 </div>
               )}
-            </div>
-          </div>
 
-          {/* Right Column: Scrollable Parts and Answers */}
-          <div className="lg:overflow-y-auto lg:overflow-x-hidden lg:h-screen print:static print:h-auto lg:max-w-full lg:min-w-0">
-            <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 print:shadow-none print:border-none lg:max-w-full lg:overflow-x-hidden">
-              {/* Parts */}
-              {!isCurrentQuestionLocked && (
-              <div className="space-y-4">
-            {frqQuestion.parts.map((part) => (
-              <div key={part.label} className="border border-gray-200 rounded-lg overflow-hidden print:border-none print:break-inside-avoid">
-                {/* Part Header */}
+              {!isCurrentQuestionLocked && frqQuestion.parts && (
+              <div
+                className="mt-6 overflow-hidden rounded-2xl border-2 border-gray-200 bg-gray-50/70 shadow-[4px_4px_0px_0px_rgba(17,24,39,0.06)] divide-y divide-gray-200 print:rounded-none print:border-black print:shadow-none"
+                role="tablist"
+                aria-label="Free response parts"
+              >
+            {frqQuestion.parts.map((part, partIndex) => {
+              const summary =
+                part.text.length > 120 ? `${part.text.slice(0, 118).trim()}…` : part.text;
+              return (
+              <div key={part.label} id={`econ-frq-part-${partIndex}`} className="print:break-inside-avoid">
+                {activePartIndex !== partIndex && (
                 <button
-                  onClick={() => togglePart(part.label)}
-                  className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors text-left print:hidden"
+                  type="button"
+                  role="tab"
+                  aria-selected={false}
+                  onClick={() => {
+                    setActivePartIndex(partIndex);
+                    requestAnimationFrame(() => {
+                      document
+                        .getElementById(`econ-frq-part-${partIndex}`)
+                        ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    });
+                  }}
+                  className="flex w-full items-start gap-3 bg-white/55 px-5 py-3.5 text-left transition-colors hover:bg-gray-100/90 print:hidden sm:px-6"
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="font-bold text-lg text-gray-900">{part.label}.</span>
-                    <span className="text-gray-800">{part.text}</span>
-                  </div>
-                  {expandedParts[part.label] ? (
-                    <ChevronUp className="w-5 h-5 text-gray-500 flex-shrink-0" />
-                  ) : (
-                    <ChevronDown className="w-5 h-5 text-gray-500 flex-shrink-0" />
-                  )}
+                  <span className="shrink-0 font-black text-gray-900">{part.label})</span>
+                  <span className="min-w-0 flex-1 leading-snug text-gray-600 line-clamp-2">
+                    {summary}
+                  </span>
+                  <ChevronRight className="mt-0.5 h-5 w-5 shrink-0 text-gray-400" aria-hidden />
                 </button>
+                )}
 
                 {/* Part Header for Print */}
                 <div className="hidden print:flex items-start gap-3 p-4 bg-gray-50 border-b">
@@ -1046,9 +1058,18 @@ function UnitFRQPracticePageComponent() {
                   </div>
                 )}
 
-                {/* Part Answer */}
-                {expandedParts[part.label] && (
-                  <div className="p-4 bg-white border-t border-gray-200 space-y-4 print:border-none print:p-0 print:pt-4">
+                <div
+                  className={cn(
+                    'space-y-4 bg-gray-50/90 p-5 sm:p-6',
+                    activePartIndex === partIndex ? 'block' : 'hidden print:!block'
+                  )}
+                >
+                    <div className="flex gap-3">
+                      <span className="shrink-0 font-black text-gray-900">{part.label})</span>
+                      <p className="whitespace-pre-line text-base font-semibold leading-relaxed text-gray-900">
+                        {part.text}
+                      </p>
+                    </div>
 
                     {/* Show Instructional Subparts (if they exist) */}
                     {part.subparts && part.subparts.some(sp => !sp.answerType) && (
@@ -1142,7 +1163,10 @@ function UnitFRQPracticePageComponent() {
                             value={textAnswers[`part-${part.label}`] || ''}
                             onChange={(e) => handleTextAnswer(`part-${part.label}`, e.target.value)}
                             placeholder="Type your answer here..."
-                            className="w-full"
+                            className={cn(
+                              'h-auto min-h-[min(52vh,360px)] w-full resize-y rounded-xl border-2 border-gray-200 bg-white px-4 py-3 text-base leading-relaxed text-gray-900 transition-colors',
+                              focusAccentClass
+                            )}
                             disabled={!!gradingFeedback[`part-${part.label}`]}
                             readOnly={!!gradingFeedback[`part-${part.label}`]}
                           />
@@ -1273,7 +1297,10 @@ function UnitFRQPracticePageComponent() {
                                         value={textAnswers[subpartKey] || ''}
                                         onChange={(e) => handleTextAnswer(subpartKey, e.target.value)}
                                         placeholder="Type your answer here..."
-                                        className="w-full"
+                                        className={cn(
+                                          'h-auto min-h-[min(40vh,280px)] w-full resize-y rounded-xl border-2 border-gray-200 bg-white px-4 py-3 text-base leading-relaxed text-gray-900 transition-colors',
+                                          focusAccentClass
+                                        )}
                                         disabled={!!gradingFeedback[subpartKey]}
                                         readOnly={!!gradingFeedback[subpartKey]}
                                       />
@@ -1318,32 +1345,15 @@ function UnitFRQPracticePageComponent() {
                         </div>
                       )}
                   </div>
-                )}
+                </div>
+              );
+            })}
               </div>
-            ))}
-              </div>
-            )}
-
-            {/* Call to Action Section */}
-            {!isCurrentQuestionLocked && (
-            <div className="mt-12 text-center bg-blue-50 border-2 border-blue-200 rounded-lg shadow-sm p-8 transition-shadow hover:shadow-md print:hidden">
-              <h3 className="text-3xl font-extrabold text-blue-900 mb-2">🚀 Ready to Master the MCQs?</h3>
-              <p className="text-blue-800 mb-6 max-w-2xl mx-auto">
-                FRQs are only half the battle. Test your knowledge with AP-style multiple-choice questions to make sure you're ready for everything the exam can throw at you.
-              </p>
-              <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-6 px-8 text-lg rounded-md shadow-lg transform hover:scale-105 transition-transform duration-200">
-                <Link href={`/unitMCQPracticePage?subject=${selectedSubject}&mode=custom&units=${frqQuestion.unit || 1}`}>
-                  Practice Unit {frqQuestion.unit || 1} MCQs
-                </Link>
-              </Button>
-              <p className="text-xs text-blue-600 mt-4 font-semibold">The best way to prepare for your next test.</p>
-            </div>
             )}
             </div>
           </div>
         </div>
       </div>
-    </div>
   );
 }
 

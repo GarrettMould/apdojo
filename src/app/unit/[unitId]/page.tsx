@@ -38,6 +38,7 @@ import SeasonPassScrollPopup from '@/app/SeasonPassScrollPopup';
 import { CheatSheetChatBox } from '@/components/CheatSheetChatBox';
 import type { CourseSubject } from '@/lib/courseSubject';
 import { econCourseFromSubject } from '@/lib/courseSubject';
+import { hasAdminRole } from '@/lib/adminAccess';
 import { COURSE_CURRICULUM_OUTLINES } from '@/data/courseCurriculumOutline';
 
 /**
@@ -501,6 +502,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
   
   // Use props if provided, otherwise use params/context
   const selectedSubject = propSubject || contextSubject;
+  const canAccessGov = Boolean(user && hasAdminRole(userData));
   const initialUnit = propUnitNumber ? String(propUnitNumber) : ((params.unitId as string) || '1');
   const [activeUnit, setActiveUnit] = useState(initialUnit);
   const [selectedWhiteboard, setSelectedWhiteboard] = useState<WhiteboardImage | null>(null);
@@ -1688,6 +1690,33 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
       window.open(pdfUrl, '_blank', 'noopener,noreferrer');
     }
   };
+
+  if (selectedSubject === 'gov' && (loading || loadingUserData)) {
+    return (
+      <div className="min-h-screen bg-gray-50 px-4 py-20">
+        <div className="mx-auto max-w-xl rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm">
+          <p className="text-gray-600 font-semibold">Checking access...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (selectedSubject === 'gov' && !canAccessGov) {
+    return (
+      <div className="min-h-screen bg-gray-50 px-4 py-20">
+        <div className="mx-auto max-w-xl rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm">
+          <h1 className="text-2xl font-black text-gray-900">AP Gov is in admin preview</h1>
+          <p className="mt-3 text-gray-600">This content is currently restricted to admin accounts.</p>
+          <Link
+            href="/ap-macro-unit-1-cheat-sheet"
+            className="mt-6 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-3 font-bold text-white hover:bg-blue-700"
+          >
+            Go to AP Macro cheat sheets
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
