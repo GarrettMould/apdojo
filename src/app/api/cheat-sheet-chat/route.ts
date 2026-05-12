@@ -299,6 +299,26 @@ function parseMcqContext(raw: unknown): McqContextForTutor | null {
   };
 }
 
+/** Detect guided "break down this letter" outbound from the MCQ tutor FAB. */
+function extractOptionZoomFromUserMessage(text: string): { letter: string; text: string } | null {
+  if (!text.includes('[Guided MCQ tutor]')) return null;
+  const modern = text.match(/\*\*Verbatim text of \(([A-Z])\)\*\*[^\n]*\n"""\s*([\s\S]*?)"""/);
+  if (modern) {
+    const letter = modern[1] ?? '';
+    const body = (modern[2] ?? '').trim();
+    if (letter && body) return { letter, text: body.slice(0, 12_000) };
+  }
+  const legacy = text.match(/\bFull text of\s+([A-Z]):\s*/);
+  if (!legacy) return null;
+  const letter = legacy[1] ?? '';
+  const start = legacy.index! + legacy[0].length;
+  const tail = text.slice(start);
+  const boundary = tail.indexOf('\n\nThey have');
+  const raw = (boundary === -1 ? tail.trim() : tail.slice(0, boundary).trim());
+  if (!letter || !raw) return null;
+  return { letter, text: raw.slice(0, 12_000) };
+}
+
 function formatMcqBlock(ctx: McqContextForTutor): string {
   const opts = ctx.options.map((x) => `${x.letter}. ${x.text}`).join('\n');
   const sel =
@@ -327,10 +347,25 @@ function buildMcqSystemInstruction(
   subject: CourseSubject,
   unitNumber: number,
   unitTitle: string | undefined,
-  ctx: McqContextForTutor
+  ctx: McqContextForTutor,
+  optionZoom: { letter: string; text: string } | null
 ): string {
   const persona = personaForSubject(subject);
   const course = displayCourseLabel(subject);
+  const zoomRules = optionZoom
+    ? `
+
+**THIS TURN — SINGLE-CHOICE FOCUS (mandatory; overrides generic “stem first” habits):**
+The learner explicitly chose to unpack **only choice (${optionZoom.letter})**. That option’s wording (also in their last message) is authoritative for what they mean.
+
+You **must**:
+1. **Name (${optionZoom.letter})** in your opening line or first short paragraph.
+2. **Engage the substance of that option’s text**—paraphrase or quote a short clause from it so it’s obvious you read **their** pick, not only the stem.
+3. Only then connect that claim to the stem, doctrine, or distractor logic. **Do not** write a reply that could apply equally to every choice without ever citing what (${optionZoom.letter}) actually says.
+
+`
+    : '';
+
   return `${persona.voice}
 
 You are **${persona.name}**, the **guided MCQ coach** in AP Dojo (Macro, Micro, or AP Gov—match **${course}** below). The learner is in **unit MCQ practice** on **one** item only. Unit ${unitNumber}${unitTitle ? ` (${unitTitle})` : ''}.
@@ -342,7 +377,7 @@ You are **${persona.name}**, the **guided MCQ coach** in AP Dojo (Macro, Micro, 
 Substance stays **neutral, precise, contemporary AP-first**—no archaic diction, no lesson content as historical reenactment; accuracy beats flourish.
 
 Item data below: stem, choices, keyed answer, optional bank explanation, submission state. Stay on **this** question only; redirect off-topic questions back to it.
-
+${zoomRules}
 **Spoilers**
 • If they have **not** submitted a final answer: **never** state or strongly imply the keyed correct option (no “the answer is…”, no “so D is wrong because…”). Teach definitions, logic, and what the **stem** demands—so they reason.
 • If they **have** submitted: you may confirm correctness when it helps learning and tie to **why**—still teach reasoning, not only the letter.
@@ -366,7 +401,15 @@ Rules for MCQ mode:
 Formatting: **bold** key terms sparingly (markdown).
 
 --- BEGIN ITEM CONTEXT ---
-${formatMcqBlock(ctx)}
+${formatMcqBlock(ctx)}${
+    optionZoom
+      ? `
+
+**Learner zoom (this turn):** They asked about **(${optionZoom.letter})** only. Option wording they are holding you to (verbatim from their tap):
+${optionZoom.text}
+`
+      : ''
+  }
 --- END ITEM CONTEXT ---`;
 }
 
@@ -567,6 +610,9 @@ export async function POST(req: NextRequest) {
   const frqContextBlock =
     frqContextPayload != null ? formatFrqTutorContextBlock(frqContextPayload) : '';
 
+  const optionZoom =
+    mcqContext != null ? extractOptionZoomFromUserMessage(lastUserText) : null;
+
   const systemInstruction =
     mode === 'scotus_essay' && scotusPrompt != null
       ? scotusSenseiSystemPrompt(scotusPrompt, scotusEssayIntent)
@@ -578,7 +624,7 @@ export async function POST(req: NextRequest) {
             frqContextBlock
           )
         : mcqContext != null
-          ? buildMcqSystemInstruction(subject, unitNumber, unitTitle, mcqContext)
+          ? buildMcqSystemInstruction(subject, unitNumber, unitTitle, mcqContext, optionZoom)
           : buildSystemInstruction(subject, unitNumber, unitTitle);
 
   try {

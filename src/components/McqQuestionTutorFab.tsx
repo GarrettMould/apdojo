@@ -58,6 +58,17 @@ function buildChoicesBlock(choices: readonly { label: string; prompt: string }[]
   return `\n\n${CHOICES_START}\n${lines}\n${CHOICES_END}`;
 }
 
+/** 0 = welcome, 1 = second assistant (e.g. option/term picker or first API reply) — only those may show [[CHOICES]] UI. */
+function assistantMessageIndex(messages: ChatMessage[], messageId: string): number {
+  let idx = -1;
+  for (const m of messages) {
+    if (m.role !== 'assistant') continue;
+    idx += 1;
+    if (m.id === messageId) return idx;
+  }
+  return -1;
+}
+
 function parseAssistantReply(raw: string): {
   display: string;
   choices: { label: string; prompt: string }[];
@@ -209,13 +220,15 @@ function buildLetterOutbound(
   answered: boolean,
   selectedLetter: string | undefined
 ): string {
+  const trimmed = optionText.trim();
   return (
     `[Guided MCQ tutor]\n` +
-    `The learner tapped **choice ${letter}** as something that doesn't fully make sense.\n\n` +
-    `Full text of ${letter}: ${optionText}\n\n` +
+    `The learner tapped **choice ${letter}** to break it down.\n\n` +
+    `**Verbatim text of (${letter})** (this is what you must analyze first—do not skip it or replace it with a generic stem recap):\n` +
+    `"""${trimmed}"""\n\n` +
     `${spoilerGuardNote(answered, selectedLetter)}\n\n` +
-    `Lead them: restate what ${letter} is claiming in plain language, then ONE concrete step toward resolving it. ` +
-    `Stay on this item only. End with [[CHOICES]] per system rules.`
+    `**Required opening move:** In your first substantive paragraph, name **(${letter})** and explain what **this option's wording** is asserting (you may quote a short clause from the text above). Only after that, tie it to the stem or relevant doctrine.\n` +
+    `Stay on (${letter}) until the student changes topic. End with [[CHOICES]] per system rules.`
   );
 }
 
@@ -341,6 +354,8 @@ export interface McqQuestionTutorFabProps {
   answered: boolean;
   splitScreenOnDesktop?: boolean;
   onOpenChange?: (open: boolean) => void;
+  /** Increment whenever another surface (e.g. scratch pad) opens — forces this panel closed. */
+  externalCloseRequest?: number;
 }
 
 export function McqQuestionTutorFab({
@@ -351,6 +366,7 @@ export function McqQuestionTutorFab({
   answered,
   splitScreenOnDesktop = false,
   onOpenChange,
+  externalCloseRequest = 0,
 }: McqQuestionTutorFabProps) {
   const { user, userData } = useAuthContext();
   const canUseAdminChat = Boolean(user && hasAdminRole(userData));
@@ -360,6 +376,7 @@ export function McqQuestionTutorFab({
   const unitNumber = question.unit;
 
   const [open, setOpen] = useState(false);
+  const lastExternalCloseRef = useRef(externalCloseRequest);
   const [messages, setMessages] = useState<ChatMessage[]>(() =>
     buildMcqTutorWelcome(persona, question, { answered, selectedLetter })
   );
@@ -391,6 +408,12 @@ export function McqQuestionTutorFab({
   useEffect(() => {
     onOpenChange?.(open);
   }, [open, onOpenChange]);
+
+  useEffect(() => {
+    if (externalCloseRequest === lastExternalCloseRef.current) return;
+    lastExternalCloseRef.current = externalCloseRequest;
+    setOpen(false);
+  }, [externalCloseRequest]);
 
   const mcqContext = useMemo(
     () => ({
@@ -507,6 +530,7 @@ export function McqQuestionTutorFab({
     }
     return null;
   }, [messages]);
+  const hasUserMessage = useMemo(() => messages.some((m) => m.role === 'user'), [messages]);
 
   const onPickChoice = useCallback(
     (prompt: string, displayLabel: string) => {
@@ -598,11 +622,17 @@ export function McqQuestionTutorFab({
               {messages.map((m) => {
                 const parsedAssistant =
                   m.role === 'assistant' ? parseAssistantReply(m.content) : null;
+                const assistantIdx =
+                  m.role === 'assistant' ? assistantMessageIndex(messages, m.id) : -1;
+                /** Only the first two assistant surfaces (welcome + one follow-up) may show tap suggestions. */
                 const showChoices =
                   m.role === 'assistant' &&
                   parsedAssistant &&
                   parsedAssistant.choices.length > 0 &&
-                  m.id === lastAssistantId;
+                  m.id === lastAssistantId &&
+                  !(m.id === 'welcome' && hasUserMessage) &&
+                  assistantIdx >= 0 &&
+                  assistantIdx < 2;
                 const assistantLead = parsedAssistant?.display.trim() ?? '';
                 const avatarUrl = tutorAvatarUrl(subject);
 

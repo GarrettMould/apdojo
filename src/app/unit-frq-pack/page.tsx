@@ -89,7 +89,9 @@ function UnitFrqPackInner() {
     );
   }
 
-  return <FullExamFRQ questions={pack} examType="gov" backUrl={backToHub} />;
+  return (
+    <FullExamFRQ questions={pack} examType="gov" backUrl={backToHub} hideExpandingQuestionNav />
+  );
 }
 
 function getPracticeHubForSubject(subject: CourseSubject): string {

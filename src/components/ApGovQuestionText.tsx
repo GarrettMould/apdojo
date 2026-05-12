@@ -1,6 +1,7 @@
 'use client';
 
 import type { Question } from '@/data/questionBanks/types';
+import { splitMcqStemAttribution } from '@/lib/splitMcqStemAttribution';
 
 const STEM_LINE_START =
   /^(Which of the following\b|Which model of\b|Based on the text\b|This quote is describing\b|This quote most clearly\b|This statement most directly\b|The "compound republic"|Select\b|Identify\b|Compared to\b|Under the\b)/i;
@@ -66,11 +67,26 @@ interface ApGovQuestionTextProps {
  * Gov MCQ copy: excerpt italic + stem. Inserts the real separator text between parts so
  * `textContent` matches `canonicalQuestionText(raw)` for highlighting.
  */
+function StemWithTrailingAttribution({ stem }: { stem: string }) {
+  const s = splitMcqStemAttribution(stem);
+  if (!s.attributionLine) {
+    return <>{stem}</>;
+  }
+  return (
+    <>
+      <span className="not-italic">{s.stem}</span>
+      <span className="mt-2 block text-base font-normal leading-snug text-gray-600 not-italic">
+        {s.attributionLine}
+      </span>
+    </>
+  );
+}
+
 export function ApGovQuestionText({ text }: ApGovQuestionTextProps) {
   const parts = getGovQuestionParts(text.replace(/\r\n/g, '\n'));
 
   if (parts.mode === 'single') {
-    return <>{parts.text}</>;
+    return <StemWithTrailingAttribution stem={parts.text} />;
   }
 
   const { excerpt, separator, stem } = parts;
@@ -84,7 +100,9 @@ export function ApGovQuestionText({ text }: ApGovQuestionTextProps) {
         {excerpt}
       </span>
       {separator}
-      <span className="mt-3 block leading-relaxed tracking-normal text-gray-900 not-italic">{stem}</span>
+      <span className="mt-3 block leading-relaxed tracking-normal text-gray-900 not-italic">
+        <StemWithTrailingAttribution stem={stem} />
+      </span>
     </>
   );
 }

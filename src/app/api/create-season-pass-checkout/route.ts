@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
-type PurchaseType = 'macro' | 'micro' | 'bundle';
+type PurchaseType = 'macro' | 'micro' | 'bundle' | 'gov';
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('STRIPE_SECRET_KEY is not set in environment variables');
@@ -23,9 +23,15 @@ export async function POST(req: Request) {
       cancelUrl?: string;
     };
     
-    if (!purchaseType || (purchaseType !== 'macro' && purchaseType !== 'micro' && purchaseType !== 'bundle')) {
+    if (
+      !purchaseType ||
+      (purchaseType !== 'macro' &&
+        purchaseType !== 'micro' &&
+        purchaseType !== 'bundle' &&
+        purchaseType !== 'gov')
+    ) {
       return NextResponse.json(
-        { error: 'Invalid purchaseType. Must be "macro", "micro", or "bundle"' },
+        { error: 'Invalid purchaseType. Must be "macro", "micro", "bundle", or "gov"' },
         { status: 400 }
       );
     }
@@ -36,10 +42,11 @@ export async function POST(req: Request) {
       macro: process.env.STRIPE_MACRO_SEASON_PASS_PRICE_ID,
       micro: process.env.STRIPE_MICRO_SEASON_PASS_PRICE_ID,
       bundle: process.env.STRIPE_BUNDLE_SEASON_PASS_PRICE_ID,
+      gov: process.env.STRIPE_GOV_SEASON_PASS_PRICE_ID || process.env.STRIPE_MACRO_SEASON_PASS_PRICE_ID,
     };
 
     // Validate that price IDs are set
-    if (!priceIds.macro || !priceIds.micro || !priceIds.bundle) {
+    if (!priceIds.macro || !priceIds.micro || !priceIds.bundle || !priceIds.gov) {
       console.error('Missing Stripe Price IDs:', {
         macro: !!priceIds.macro,
         micro: !!priceIds.micro,

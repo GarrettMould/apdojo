@@ -146,8 +146,8 @@ export async function POST(req: Request) {
             
             console.log(`✅ Added bundle season pass (macro + micro) to user ${checkoutUserId} (expires ${expirationDate})`);
           } 
-          // Handle single subject purchase
-          else if (courseType === 'macro' || courseType === 'micro') {
+          // Handle single subject purchase (econ or gov)
+          else if (courseType === 'macro' || courseType === 'micro' || courseType === 'gov') {
             await userRef.set({
               seasonPass: FieldValue.arrayUnion(courseType),
               seasonPassExpiration: {

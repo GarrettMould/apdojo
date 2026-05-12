@@ -90,7 +90,7 @@ function MobileReviewCarousel({ items }: { items: Review[] }) {
 
 export function EmbeddedCheckoutPage({ courseType }: EmbeddedCheckoutPageProps) {
   const { user } = useAuthContext();
-  const config = COURSE_CONFIG[courseType];
+  const config = COURSE_CONFIG[courseType] ?? COURSE_CONFIG.macro;
   const selectedReviews = reviews.slice(0, 3);
   const shuffledReviewsMobile = useMemo(() => shuffleReviews(reviews), []);
   const [checkoutReady, setCheckoutReady] = useState(false);
@@ -158,8 +158,8 @@ export function EmbeddedCheckoutPage({ courseType }: EmbeddedCheckoutPageProps) 
               </p>
             </motion.div>
 
-            {/* Bundle upsell (only show for single subject) */}
-            {courseType !== 'bundle' && (
+            {/* Bundle upsell (Macro / Micro only — Gov has its own pass) */}
+            {(courseType === 'macro' || courseType === 'micro') && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}

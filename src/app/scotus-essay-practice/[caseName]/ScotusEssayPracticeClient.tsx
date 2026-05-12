@@ -232,6 +232,7 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
     };
     const nextMessages = [...senseiMessages, userMessage];
     setSenseiMessages(nextMessages);
+    setSenseiQuickStartsHidden(true);
     if (intent === 'coach') {
       setSenseiInput('');
     }
@@ -300,7 +301,6 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
   const sendSenseiMessage = async () => {
     const text = senseiInput.trim();
     if (!text || senseiSending) return;
-    setSenseiQuickStartsHidden(true);
     await appendSenseiExchange(text, 'coach');
   };
 
@@ -327,7 +327,7 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
   };
 
   const submitPartForFeedback = async (idx: 0 | 1 | 2) => {
-    if (senseiSending) return;
+    if (senseiSending || !(answers[idx] ?? '').trim()) return;
     const partLabel = (String.fromCharCode(65 + idx) as 'A' | 'B' | 'C');
     const task = prompt.tasks[idx];
     const answer = (answers[idx] ?? '').trim();
@@ -346,10 +346,10 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
 
   return (
     <main className="min-h-screen bg-gray-50 text-gray-900">
-      <div className="mx-auto w-full max-w-[1700px] px-4 pb-10 pt-6 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-[1700px] px-4 pb-10 pt-10 sm:px-6 sm:pt-12 lg:px-8 lg:pt-14">
         <header className="mb-6">
           <p className="inline-flex w-fit rounded-md border-2 border-indigo-700 bg-indigo-500 px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-            SCOTUS Essay Practice
+            SCOTUS Comparison Practice
           </p>
           <h1 className="mt-3 text-4xl font-extrabold leading-tight tracking-tight text-gray-900 sm:text-5xl">
             {readableCaseName}
@@ -399,14 +399,16 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
                         }`}
                       >
                         <span className="text-sm font-black">Part {label}</span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-black">{isActive ? 'OPEN' : 'OPEN PART'}</span>
-                        </div>
+                        {!isActive && (
+                          <span className="text-xs font-black uppercase tracking-wide text-gray-500">
+                            Open part
+                          </span>
+                        )}
                       </button>
                       {isActive && (
                         <div className="space-y-3 border-t-2 border-indigo-800 bg-white p-4">
                           <p className="text-sm font-semibold leading-relaxed text-gray-800">{task}</p>
-                          <div className="relative">
+                          <div className="flex flex-col overflow-hidden rounded-xl border-2 border-gray-300 bg-white shadow-[0_2px_0_rgba(17,24,39,0.1)] transition focus-within:border-gray-500 focus-within:shadow-[0_4px_0_rgba(17,24,39,0.18)]">
                             <textarea
                               value={answers[idx] ?? ''}
                               onChange={(e) =>
@@ -416,16 +418,18 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
                                 }))
                               }
                               placeholder="Write your AP Gov FRQ response here..."
-                              className="min-h-[min(44vh,360px)] w-full rounded-xl border-2 border-gray-300 bg-white px-4 py-3 pb-14 text-base leading-relaxed text-gray-900 shadow-[0_2px_0_rgba(17,24,39,0.1)] outline-none transition focus:translate-y-[1px] focus:border-gray-500 focus:shadow-[0_4px_0_rgba(17,24,39,0.22)]"
+                              className="min-h-[min(44vh,360px)] w-full resize-none border-0 bg-transparent px-4 py-3 text-base leading-relaxed text-gray-900 outline-none ring-0 focus:ring-0"
                             />
-                            <button
-                              type="button"
-                              onClick={() => void submitPartForFeedback(idx as 0 | 1 | 2)}
-                              disabled={senseiSending}
-                              className="absolute bottom-3 right-3 rounded-md border border-violet-300 bg-violet-50 px-3 py-2 text-[11px] font-black uppercase tracking-wide text-violet-800 shadow-sm hover:bg-violet-100 disabled:cursor-not-allowed disabled:opacity-60"
-                            >
-                              Check My Work
-                            </button>
+                            <div className="flex shrink-0 justify-end border-t border-gray-200 bg-gray-50/90 px-3 py-2.5">
+                              <button
+                                type="button"
+                                onClick={() => void submitPartForFeedback(idx as 0 | 1 | 2)}
+                                disabled={senseiSending || !(answers[idx] ?? '').trim()}
+                                className="rounded-lg border border-violet-300 bg-violet-50 px-3 py-2 text-[11px] font-black uppercase tracking-wide text-violet-800 shadow-sm hover:bg-violet-100 disabled:pointer-events-none disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none"
+                              >
+                                Check My Work
+                              </button>
+                            </div>
                           </div>
                         </div>
                       )}
@@ -467,8 +471,8 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
 
           {isAiOpen && (
             <aside className="flex min-h-[min(380px,70svh)] w-full flex-col xl:col-span-3 xl:h-full xl:min-h-0 transition-all duration-300">
-              <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden rounded-xl border border-slate-200/90 bg-white/95 shadow-2xl shadow-slate-900/10 ring-1 ring-slate-900/[0.04]">
-                <div className="relative flex shrink-0 items-center justify-between border-b border-slate-100 bg-gradient-to-b from-slate-50/90 to-white px-4 py-3">
+              <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden rounded-xl border border-slate-200/90 bg-white shadow-2xl shadow-slate-900/10 ring-1 ring-slate-900/[0.04]">
+                <div className="relative flex shrink-0 items-center justify-between border-b border-slate-100 bg-white px-4 py-3">
                   <span aria-hidden className="absolute left-0 top-0 h-0.5 w-full bg-violet-500 opacity-90" />
                   <h2 className="relative text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">
                     AI Sensei
@@ -484,7 +488,7 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
                 </div>
 
                 <div
-                  className={`shrink-0 border-b border-slate-100 bg-gradient-to-b from-slate-50/90 to-white px-4 ${senseiQuickStartsHidden ? 'pb-3 pt-3' : 'pb-3.5 pt-3'}`}
+                  className={`shrink-0 bg-white px-4 ${senseiQuickStartsHidden ? 'pb-3 pt-3' : 'pb-3.5 pt-3'}`}
                 >
                   <div className="mt-1 flex gap-3">
                     {senseiAvatar ? (
@@ -551,7 +555,7 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
 
                 <div
                   ref={senseiScrollRef}
-                  className="min-h-0 flex-1 basis-0 overflow-y-auto overscroll-contain bg-slate-50/70 px-3 pb-8 pt-4"
+                  className="min-h-0 flex-1 basis-0 overflow-y-auto overscroll-contain bg-white px-3 pb-8 pt-4"
                 >
                   <div className="space-y-4">
                     {senseiMessages.map((m) =>

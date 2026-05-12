@@ -38,12 +38,38 @@ const TOOLS = [
   },
 ];
 
-const FRQ_RULES = [
-  'Each free-response item may include stimulus material — read carefully before you answer.',
-  'Type your response for each part; you can move between questions freely.',
-  'The timer is a suggested pace for practice — pause or hide it when you need focus.',
-  'Scoring guidance can be reviewed after you submit your responses.',
-];
+/** College Board–style directions for the unit FRQ pack preview (timing scales with question count). */
+function govFrqPackDirectionsParagraph(questionCount: number, totalSeconds: number): string {
+  const totalMin = Math.max(1, Math.round(totalSeconds / 60));
+  const n = questionCount;
+  const minutes = Array.from({ length: n }, (_, i) => {
+    const base = Math.floor(totalMin / n);
+    const rem = totalMin - base * n;
+    return i === n - 1 ? base + rem : base;
+  });
+  const qPhrase =
+    n === 1 ? 'the following question' : n === 2 ? 'both of the following questions' : `all ${n} of the following questions`;
+  const allPartsPhrase =
+    n === 1 ? 'all parts of the question' : `all parts of all ${n} questions`;
+
+  let pacing: string;
+  if (n <= 0) {
+    pacing = '';
+  } else if (n === 1) {
+    pacing = 'It is suggested that you use this time for that question.';
+  } else if (minutes.length > 0 && minutes.every((m) => m === minutes[0])) {
+    const per = minutes[0];
+    pacing = `It is suggested that you spend approximately ${per} minute${per === 1 ? '' : 's'} on each question.`;
+  } else {
+    const segments = minutes.map((m, i) => `approximately ${m} minute${m === 1 ? '' : 's'} on Question ${i + 1}`);
+    pacing =
+      n === 2
+        ? `It is suggested that you spend ${segments[0]} and ${segments[1]}.`
+        : `It is suggested that you spend ${segments.slice(0, -1).join(', ')}, and ${segments[n - 1]}.`;
+  }
+
+  return `You have approximately ${totalMin} minutes to answer ${qPhrase}. ${pacing} Unless directions indicate otherwise, respond to ${allPartsPhrase}. In your response, use substantive examples where appropriate. It is recommended that you take a few minutes to plan each answer. You may plan your answers using the optional on-screen notes available during the session; no credit is given for planning or scratch work alone. You may move between questions freely. The timer reflects a suggested pace for practice; pause or hide it when you need additional focus. After you submit, you can review scoring guidance for each item.`;
+}
 
 // Calculator intentionally excluded — not available on the AP Macro/Micro MCQ section
 
@@ -61,6 +87,30 @@ function UnitTestPreviewContent() {
   const unitNumber = parseInt(unitParam, 10);
   const testFormat: 'mcq' | 'frq' = searchParams.get('type') === 'frq' ? 'frq' : 'mcq';
   const isFrqPreview = testFormat === 'frq';
+
+  // testId must match what FullExam saves: unit_${examNumber}_${examType}
+  const testId = `unit_${unitNumber}_${subject}`;
+
+  const [savedAnswerCount, setSavedAnswerCount] = useState<number | null>(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [isClearing, setIsClearing] = useState(false);
+
+  useEffect(() => {
+    if (!user || isFrqPreview) {
+      setSavedAnswerCount(null);
+      return;
+    }
+    loadTestProgress(user.uid, testId)
+      .then((progress) => {
+        if (progress && !progress.isSubmitted && progress.answeredQuestions) {
+          const count = Object.keys(progress.answeredQuestions).length;
+          setSavedAnswerCount(count > 0 ? count : null);
+        } else {
+          setSavedAnswerCount(null);
+        }
+      })
+      .catch(() => setSavedAnswerCount(null));
+  }, [user, testId, isFrqPreview]);
 
   const units =
     subject === 'gov' ? govUnits : subject === 'micro' ? microUnits : macroUnits;
@@ -156,33 +206,12 @@ function UnitTestPreviewContent() {
   const mcqQuestionCount = meta?.questionCount ?? 15;
   const mcqTimeLabel = meta ? formatTestTime(meta.timeLimitSeconds) : '—';
 
-  /** FRQ pack (Gov): suggested pace matches `FullExamFRQ` default session timer. */
-  const frqSuggestedSeconds = 50 * 60;
+  /** FRQ pack (Gov): 60 minutes total (~20 minutes per FRQ — AP Gov Section II pacing). */
+  const frqSuggestedSeconds = 60 * 60;
   const questionCount = isFrqPreview ? govFrqCount : mcqQuestionCount;
   const timeLabel = isFrqPreview ? formatTestTime(frqSuggestedSeconds) : mcqTimeLabel;
 
   const testUrl = isFrqPreview ? getUnitFrqPackUrl(unitNumber, subject) : getUnitMCQTestUrl(unitNumber, subject);
-  // testId must match what FullExam saves: unit_${examNumber}_${examType}
-  // examNumber is the [unitId] route param which is just the unit number (e.g. "1", "2")
-  // because next.config.ts rewrites /ap-macro-unit-1-mcq-test → /unit-mcq-test/1
-  const testId = `unit_${unitNumber}_${subject}`;
-
-  const [savedAnswerCount, setSavedAnswerCount] = useState<number | null>(null);
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [isClearing, setIsClearing] = useState(false);
-
-  // Check for saved progress once user is available (MCQ unit tests only — FRQ packs use a separate flow)
-  useEffect(() => {
-    if (!user || isFrqPreview) { setSavedAnswerCount(null); return; }
-    loadTestProgress(user.uid, testId).then((progress) => {
-      if (progress && !progress.isSubmitted && progress.answeredQuestions) {
-        const count = Object.keys(progress.answeredQuestions).length;
-        setSavedAnswerCount(count > 0 ? count : null);
-      } else {
-        setSavedAnswerCount(null);
-      }
-    }).catch(() => setSavedAnswerCount(null));
-  }, [user, testId, isFrqPreview]);
 
   if (isFrqPreview && isGov && govFrqCount === 0) {
     return (
@@ -280,17 +309,23 @@ function UnitTestPreviewContent() {
             </div>
           </div>
 
-          {/* Rules */}
+          {/* Rules / FRQ directions */}
           <div className="px-6 py-5 border-b border-gray-100">
             <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-4">Before you begin</p>
-            <ul className="space-y-2.5">
-              {(isFrqPreview ? FRQ_RULES : RULES).map((rule, i) => (
-                <li key={i} className="flex items-start gap-2.5 text-sm text-gray-600 leading-relaxed">
-                  <span className="mt-1.5 w-1 h-1 rounded-full bg-gray-400 shrink-0" />
-                  {rule}
-                </li>
-              ))}
-            </ul>
+            {isFrqPreview ? (
+              <p className="text-sm text-gray-600 leading-relaxed">
+                {govFrqPackDirectionsParagraph(questionCount, frqSuggestedSeconds)}
+              </p>
+            ) : (
+              <ul className="space-y-2.5">
+                {RULES.map((rule, i) => (
+                  <li key={i} className="flex items-start gap-2.5 text-sm text-gray-600 leading-relaxed">
+                    <span className="mt-1.5 w-1 h-1 rounded-full bg-gray-400 shrink-0" />
+                    {rule}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
           {/* CTA */}

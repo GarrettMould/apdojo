@@ -27,77 +27,7 @@ import { whiteboardImages as allContentWhiteboards, WhiteboardImage } from '@/da
 import { unit1Whiteboards, apMacroUnit2Whiteboards, apMacroUnit3Whiteboards, apMacroUnit4Whiteboards, apMacroUnit5Whiteboards, apMicroUnit3Whiteboards, apMicroUnit4Whiteboards, apMicroUnit5Whiteboards, apMicroUnit6Whiteboards, Whiteboard } from '@/data/whiteboards';
 import { ExamCalculator } from './ExamCalculator';
 import { ExamWhiteboard } from './ExamWhiteboard';
-
-// Helper function to parse markdown table from text
-const parseMarkdownTable = (text: string): { tableData: { headers: string[]; rows: string[][] } | null; textWithoutTable: string } => {
-  const lines = text.split('\n');
-  let tableStartIndex = -1;
-  let tableEndIndex = -1;
-  
-  // Find table boundaries (lines starting with |)
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim();
-    if (line.startsWith('|') && line.endsWith('|')) {
-      if (tableStartIndex === -1) {
-        tableStartIndex = i;
-      }
-      tableEndIndex = i;
-    } else if (tableStartIndex !== -1 && !line.startsWith('|') && line.length > 0) {
-      // Table ended (non-empty line that doesn't start with |)
-      break;
-    }
-  }
-  
-  if (tableStartIndex === -1 || tableEndIndex === -1) {
-    return { tableData: null, textWithoutTable: text };
-  }
-  
-  // Extract table lines
-  const tableLines = lines.slice(tableStartIndex, tableEndIndex + 1);
-  
-  if (tableLines.length < 2) {
-    return { tableData: null, textWithoutTable: text };
-  }
-  
-  // Parse headers (first line)
-  const headerLine = tableLines[0];
-  const headers = headerLine
-    .split('|')
-    .map(h => h.trim())
-    .filter(h => h.length > 0);
-  
-  // Parse rows (skip header and separator line)
-  const rows: string[][] = [];
-  for (let i = 2; i < tableLines.length; i++) {
-    const line = tableLines[i].trim();
-    // Skip empty lines
-    if (!line || !line.startsWith('|')) continue;
-    
-    const cells = line
-      .split('|')
-      .map(c => c.trim())
-      .filter(c => c.length > 0);
-    
-    if (cells.length > 0) {
-      rows.push(cells);
-    }
-  }
-  
-  // Remove table from text
-  const textWithoutTable = [
-    ...lines.slice(0, tableStartIndex),
-    ...lines.slice(tableEndIndex + 1)
-  ].join('\n').trim();
-  
-  if (headers.length === 0 || rows.length === 0) {
-    return { tableData: null, textWithoutTable: text };
-  }
-  
-  return {
-    tableData: { headers, rows },
-    textWithoutTable
-  };
-};
+import { parseQuestionTableFromText } from '@/lib/parseQuestionTableFromText';
 
 interface DojoDrillProps {
   drill: DojoDrillType;
@@ -734,7 +664,7 @@ export default function DojoDrill({ drill, onComplete, isAssignment = false, ass
                     <div className="mb-6">
                       {/* Parse markdown table from question text */}
                       {(() => {
-                        const { tableData: parsedTableData, textWithoutTable } = parseMarkdownTable(currentMcqQuestion.question);
+                        const { tableData: parsedTableData, textWithoutTable } = parseQuestionTableFromText(currentMcqQuestion.question);
                         const displayTableData = currentMcqQuestion.tableData || parsedTableData;
                         const displayQuestionText = parsedTableData ? textWithoutTable : currentMcqQuestion.question;
                         

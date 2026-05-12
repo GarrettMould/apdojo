@@ -2,7 +2,15 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { CourseProvider } from '@/contexts/CourseContext';
 import { PracticePageContent } from './PracticePageContent';
-import { parseSubjectSlug, parseUnitSlug, getFullUnitName, getSubjectDisplayName, getUnitDetails, getSubjectSlug, getUnitSlug } from '@/lib/practiceSlugs';
+import {
+  parseSubjectSlug,
+  parseUnitSlug,
+  getFullUnitName,
+  getSubjectDisplayName,
+  getUnitDetails,
+  getSubjectSlug,
+  getUnitSlug,
+} from '@/lib/practiceSlugs';
 
 interface PracticePageProps {
   params: Promise<{
@@ -61,12 +69,15 @@ export default async function PracticePage({ params }: PracticePageProps) {
   
   const subject = parseSubjectSlug(subjectSlug);
   const unitNumber = parseUnitSlug(unitSlug);
-  
-  // If invalid subject or unit, show 404
+
   if (!subject || !unitNumber) {
     notFound();
   }
-  
+
+  if (subject === 'gov' && unitNumber !== 1) {
+    notFound();
+  }
+
   return (
     <CourseProvider initialSubject={subject}>
       <PracticePageContent subject={subject} unitNumber={unitNumber} />

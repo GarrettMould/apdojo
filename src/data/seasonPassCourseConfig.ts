@@ -1,4 +1,15 @@
-export type SeasonPassPurchaseType = 'macro' | 'micro' | 'bundle';
+export type SeasonPassPurchaseType = 'macro' | 'micro' | 'bundle' | 'gov';
+
+const VALID_SEASON_PASS_TYPES = new Set<SeasonPassPurchaseType>(['macro', 'micro', 'bundle', 'gov']);
+
+/** Coerce query param / route input to a supported checkout type (defaults to macro). */
+export function parseSeasonPassPurchaseType(raw: string | null | undefined): SeasonPassPurchaseType {
+  const v = (raw ?? '').trim().toLowerCase();
+  if (VALID_SEASON_PASS_TYPES.has(v as SeasonPassPurchaseType)) {
+    return v as SeasonPassPurchaseType;
+  }
+  return 'macro';
+}
 
 export const COURSE_CONFIG: Record<
   SeasonPassPurchaseType,
@@ -62,6 +73,23 @@ export const COURSE_CONFIG: Record<
       'Interactive Graphing Simulators',
       'Cheat Sheets + Downloadable PDFs',
       'Upload Notes to Create Quizzes',
+    ],
+  },
+  gov: {
+    badge: 'AP U.S. GOVERNMENT SEASON PASS',
+    headline: 'The Complete AP Gov Toolkit for a 5.',
+    subheadline: 'Everything you need for AP U.S. Government and Politics — in one place.',
+    price: 29,
+    originalPrice: 39,
+    accentColor: 'text-violet-600',
+    accentBg: 'bg-violet-600',
+    features: [
+      'Full Unit MCQ Practice + Formal Unit Tests',
+      'SCOTUS Comparison & Gov FRQ Practice',
+      'Unit Cheat Sheets + Printable PDFs',
+      'Dojo AI Tutor on Cheat Sheets',
+      'Unlimited Practice Where Unlocked',
+      'Valid Through June 30, 2026',
     ],
   },
 };

@@ -262,6 +262,13 @@ export function Header() {
                           Cheat Sheets
                         </Link>
                         <Link
+                          href="/select-practice-units?subject=gov"
+                          className="block px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 hover:text-violet-600 transition-colors"
+                          onClick={() => setIsGovDropdownOpen(false)}
+                        >
+                          MCQ Practice
+                        </Link>
+                        <Link
                           href={getPracticeTestsUrl('gov')}
                           className="block px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 hover:text-violet-600 transition-colors"
                           onClick={() => setIsGovDropdownOpen(false)}
@@ -273,7 +280,7 @@ export function Header() {
                           className="block px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 hover:text-violet-600 transition-colors"
                           onClick={() => setIsGovDropdownOpen(false)}
                         >
-                          SCOTUS Essay Practice
+                          SCOTUS Comparison Practice
                         </Link>
                       </div>
                     </div>
@@ -580,6 +587,13 @@ export function Header() {
                     AP Gov Cheat Sheets
                   </Link>
                   <Link
+                    href="/select-practice-units?subject=gov"
+                    onClick={closeMobileMenu}
+                    className="px-4 py-4 text-xl font-bold text-gray-800 hover:text-violet-600 hover:bg-violet-50 rounded-xl transition-colors"
+                  >
+                    AP Gov MCQ Practice
+                  </Link>
+                  <Link
                     href={getPracticeTestsUrl('gov')}
                     onClick={closeMobileMenu}
                     className="px-4 py-4 text-xl font-bold text-gray-800 hover:text-violet-600 hover:bg-violet-50 rounded-xl transition-colors"
@@ -591,7 +605,7 @@ export function Header() {
                     onClick={closeMobileMenu}
                     className="px-4 py-4 text-xl font-bold text-gray-800 hover:text-violet-600 hover:bg-violet-50 rounded-xl transition-colors"
                   >
-                    AP Gov SCOTUS Essay Practice
+                    AP Gov SCOTUS Comparison Practice
                   </Link>
                 </>
               )}

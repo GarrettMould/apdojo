@@ -71,35 +71,6 @@ function UnitFinalPracticeTestsContent() {
     return true;
   };
 
-  if (isGov && loadingUserData) {
-    return (
-      <div className="min-h-screen bg-gray-50 py-20">
-        <div className="mx-auto max-w-xl rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-          <p className="text-gray-600 font-semibold">Checking access…</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (isGov && !canAccessGov) {
-    return (
-      <div className="min-h-screen bg-gray-50 py-20">
-        <div className="mx-auto max-w-xl rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-          <h1 className="text-2xl font-black text-gray-900">AP Gov is in admin preview</h1>
-          <p className="mt-3 text-gray-600">
-            This content is currently restricted to admin accounts.
-          </p>
-          <Link
-            href="/ap-macro-practice-tests"
-            className="mt-6 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-3 font-bold text-white hover:bg-blue-700"
-          >
-            Go to AP Macro practice tests
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
   const apSubjectFilter = useMemo(() => {
     if (effectiveSubject === 'gov') return 'ap_us_government' as const;
     if (effectiveSubject === 'micro') return 'ap_microeconomics' as const;
@@ -166,6 +137,40 @@ function UnitFinalPracticeTestsContent() {
     };
   }, [user?.uid, effectiveSubject, units, apSubjectFilter]);
 
+  useEffect(() => {
+    const structuredData = {
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      name: `AP ${subjectName} Unit Practice Tests`,
+      description: `Full-length practice tests for each unit of AP ${subjectName}`,
+      itemListElement: units.map((unit: (typeof units)[number], index: number) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        item: {
+          '@type': 'Test',
+          name: `AP ${subjectName} Unit ${unit.number} Practice Test: ${unit.title}`,
+          description: unit.description,
+          educationalLevel: 'High School',
+          about: {
+            '@type': 'Thing',
+            name: `AP ${subjectName}`,
+          },
+        },
+      })),
+    };
+
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.text = JSON.stringify(structuredData);
+    document.head.appendChild(script);
+
+    return () => {
+      if (document.head.contains(script)) {
+        document.head.removeChild(script);
+      }
+    };
+  }, [units, subjectName]);
+
   const primaryCta = isGov
     ? 'border-2 border-violet-800 bg-violet-600 text-white shadow-[0_3px_0_0_rgba(17,24,39,0.9)] hover:bg-violet-700 active:translate-y-0.5 active:shadow-[0_1px_0_0_rgba(17,24,39,0.85)]'
     : isMicro
@@ -200,39 +205,34 @@ function UnitFinalPracticeTestsContent() {
   const resumeCta =
     'border-2 border-emerald-900 bg-emerald-600 text-white shadow-[0_3px_0_0_rgba(6,78,59,0.95)] hover:bg-emerald-700 active:translate-y-0.5 active:shadow-[0_1px_0_0_rgba(6,78,59,0.85)]';
 
-  useEffect(() => {
-    const structuredData = {
-      '@context': 'https://schema.org',
-      '@type': 'ItemList',
-      name: `AP ${subjectName} Unit Practice Tests`,
-      description: `Full-length practice tests for each unit of AP ${subjectName}`,
-      itemListElement: units.map((unit: (typeof units)[number], index: number) => ({
-        '@type': 'ListItem',
-        position: index + 1,
-        item: {
-          '@type': 'Test',
-          name: `AP ${subjectName} Unit ${unit.number} Practice Test: ${unit.title}`,
-          description: unit.description,
-          educationalLevel: 'High School',
-          about: {
-            '@type': 'Thing',
-            name: `AP ${subjectName}`,
-          },
-        },
-      })),
-    };
+  if (isGov && loadingUserData) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-20">
+        <div className="mx-auto max-w-xl rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm">
+          <p className="text-gray-600 font-semibold">Checking access…</p>
+        </div>
+      </div>
+    );
+  }
 
-    const script = document.createElement('script');
-    script.type = 'application/ld+json';
-    script.text = JSON.stringify(structuredData);
-    document.head.appendChild(script);
-
-    return () => {
-      if (document.head.contains(script)) {
-        document.head.removeChild(script);
-      }
-    };
-  }, [units, subjectName]);
+  if (isGov && !canAccessGov) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-20">
+        <div className="mx-auto max-w-xl rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm">
+          <h1 className="text-2xl font-black text-gray-900">AP Gov is in admin preview</h1>
+          <p className="mt-3 text-gray-600">
+            This content is currently restricted to admin accounts.
+          </p>
+          <Link
+            href="/ap-macro-practice-tests"
+            className="mt-6 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-3 font-bold text-white hover:bg-blue-700"
+          >
+            Go to AP Macro practice tests
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 sm:py-20">

@@ -26,6 +26,7 @@ import { dojoIcon } from '@/data/imagePaths';
 import { motion, AnimatePresence } from 'framer-motion';
 import { dojoDrills, drillAppliesToSubject, getDrillUnitForSubject } from '@/data/dojoDrills';
 import { getFlashcardsForLesson, UnitFlashcardData } from '@/data/unitFlashcards';
+import { getGovFlashcardsForLesson } from '@/data/apgov/unitFlashcards';
 import { StudyModeModal } from '@/components/StudyModeModal';
 import { SeasonPassModal } from '@/components/SeasonPassModal';
 import { SeasonPassEntryWideModal } from '@/components/SeasonPassEntryWideModal';
@@ -40,6 +41,17 @@ import type { CourseSubject } from '@/lib/courseSubject';
 import { econCourseFromSubject } from '@/lib/courseSubject';
 import { hasAdminRole } from '@/lib/adminAccess';
 import { COURSE_CURRICULUM_OUTLINES } from '@/data/courseCurriculumOutline';
+import { scotusEssayPrompts } from '@/data/gov/scotusEssayPrompts';
+
+const scotusComparisonFrqSlugSet = new Set(scotusEssayPrompts.map((p) => p.id));
+
+/** Maps cheat-sheet case `id` (e.g. with year suffix) to `/scotus-essay-practice/[slug]` when a comparison FRQ exists. */
+function getScotusComparisonFrqSlug(caseId: string): string | null {
+  if (scotusComparisonFrqSlugSet.has(caseId)) return caseId;
+  const withoutYear = caseId.replace(/-\d{4}$/, '');
+  if (withoutYear !== caseId && scotusComparisonFrqSlugSet.has(withoutYear)) return withoutYear;
+  return null;
+}
 
 /**
  * One flag for all pretty `/ap-*-unit-N-cheat-sheet` URLs in this tab (any subject/unit).
@@ -560,6 +572,8 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
   const [chatPromptText, setChatPromptText] = useState<string>('');
   const [chatPromptDisplayText, setChatPromptDisplayText] = useState<string>('');
   const [chatPromptNonce, setChatPromptNonce] = useState(0);
+  /** Bumped when another overlay opens so CheatSheetChatBox can force-close. */
+  const [cheatSheetChatCloseRequest, setCheatSheetChatCloseRequest] = useState(0);
 
   const isPrettyCheatSheetRoute = propSubject != null && propUnitNumber != null;
   const showEntrySeasonPassPromo =
@@ -628,6 +642,37 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
   useEffect(() => {
     if (shuffleModalOpen) setShowScrollPopup(false);
   }, [shuffleModalOpen]);
+
+  useEffect(() => {
+    const scrollPopupVisible = showScrollPopup && !shuffleModalOpen;
+    if (
+      showPacketSeasonPassModal ||
+      showShuffleLimitModal ||
+      showJoinDojoModal ||
+      showEntrySeasonPassPromo ||
+      scrollPopupVisible ||
+      shuffleModalOpen ||
+      showFullscreen ||
+      isModalOpen ||
+      showImageSlides ||
+      showQuizPanel ||
+      showVideoModal
+    ) {
+      setCheatSheetChatCloseRequest((n) => n + 1);
+    }
+  }, [
+    showPacketSeasonPassModal,
+    showShuffleLimitModal,
+    showJoinDojoModal,
+    showEntrySeasonPassPromo,
+    showScrollPopup,
+    shuffleModalOpen,
+    showFullscreen,
+    isModalOpen,
+    showImageSlides,
+    showQuizPanel,
+    showVideoModal,
+  ]);
 
   useEffect(() => {
     const onDocPointerDown = (event: MouseEvent | TouchEvent) => {
@@ -1918,7 +1963,11 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
         <div className="mb-8 flex flex-col sm:flex-row gap-3 sm:gap-4">
           {/* Primary CTA - Practice MCQs */}
           <Link
-            href={`/mcq-practice/${getSubjectSlug(selectedSubject === 'macro' ? 'macro' : 'micro')}/${getUnitSlug(activeUnitNum, selectedSubject === 'macro' ? 'macro' : 'micro')}`}
+            href={
+              selectedSubject === 'gov'
+                ? '/select-practice-units?subject=gov'
+                : `/mcq-practice/${getSubjectSlug(selectedSubject === 'macro' ? 'macro' : 'micro')}/${getUnitSlug(activeUnitNum, selectedSubject === 'macro' ? 'macro' : 'micro')}`
+            }
             className={`w-full sm:flex-1 inline-flex items-center justify-center font-black py-3.5 px-6 rounded-xl border-2 shadow-[0_4px_0_0_rgba(0,0,0,1)] active:translate-y-0.5 active:shadow-[0_2px_0_0_rgba(0,0,0,1)] transition-all ${
               selectedSubject === 'macro'
                 ? 'bg-blue-500 hover:bg-blue-600 text-white border-blue-700'
@@ -1932,7 +1981,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
 
           {/* Secondary CTA - Unit Test */}
           <Link
-            href={getUnitMCQTestUrl(activeUnitNum, selectedSubject === 'macro' ? 'macro' : 'micro')}
+            href={getUnitMCQTestUrl(activeUnitNum, selectedSubject)}
             className="w-full sm:flex-1 inline-flex items-center justify-center font-black py-3.5 px-6 rounded-xl border-2 border-gray-300 bg-white hover:border-black hover:bg-gray-50 active:translate-y-0.5 active:shadow-[0_2px_0_0_rgba(0,0,0,1)] shadow-[0_3px_0_0_rgba(209,213,219,1)] transition-all"
           >
             <span
@@ -2079,20 +2128,23 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
               </p>
             </div>
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-              {unitSupremeCourtCases.map((courtCase) => (
+              {unitSupremeCourtCases.map((courtCase) => {
+                const comparisonFrqSlug = getScotusComparisonFrqSlug(courtCase.id);
+                return (
                 <article
                   key={courtCase.id}
-                  className="overflow-hidden rounded-xl border border-violet-200 bg-white shadow-sm"
+                  className="overflow-hidden rounded-xl border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
                 >
-                  <div className="border-b border-violet-100 bg-violet-50/70 px-4 py-3">
-                    <h3 className="text-lg font-black text-violet-900">
+                  <div className="border-b-2 border-black bg-gray-100 px-4 py-3">
+                    <h3 className="text-lg font-black text-gray-900">
                       {courtCase.caseName} ({courtCase.year})
                     </h3>
-                    <p className="mt-1 text-sm text-violet-900/80">{courtCase.summary}</p>
+                    <p className="mt-1 text-sm font-semibold text-gray-700">{courtCase.summary}</p>
                   </div>
                   <div className="p-4">
+                    <div className="mb-4">
                     {courtCase.videoUrl ? (
-                      <div className="relative mb-4 aspect-video w-full overflow-hidden rounded-lg bg-black">
+                      <div className="relative aspect-video w-full overflow-hidden rounded-lg border-2 border-black bg-black">
                         <video
                           src={courtCase.videoUrl}
                           controls
@@ -2103,10 +2155,20 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                         </video>
                       </div>
                     ) : (
-                      <div className="mb-4 flex aspect-video w-full items-center justify-center rounded-lg border border-dashed border-violet-300 bg-violet-50 text-sm font-semibold text-violet-700">
+                      <div className="flex aspect-video w-full items-center justify-center rounded-lg border-2 border-dashed border-gray-400 bg-gray-50 text-sm font-semibold text-gray-700">
                         Video link pending
                       </div>
                     )}
+                    {comparisonFrqSlug != null && (
+                      <Link
+                        href={`/scotus-essay-practice/${comparisonFrqSlug}`}
+                        className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg border-2 border-black bg-white px-4 py-3 text-sm font-black uppercase tracking-wide text-gray-900 shadow-[3px_3px_0_0_rgba(0,0,0,1)] transition-all hover:bg-gray-100 active:translate-y-0.5 active:shadow-[1px_1px_0_0_rgba(0,0,0,1)]"
+                      >
+                        Supreme Court comparison FRQ
+                        <ArrowRight className="h-4 w-4 shrink-0" aria-hidden />
+                      </Link>
+                    )}
+                    </div>
                     <dl className="space-y-3 text-sm text-gray-800">
                       <div>
                         <dt className="font-bold text-gray-900">Facts</dt>
@@ -2135,7 +2197,8 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                     </dl>
                   </div>
                 </article>
-              ))}
+                );
+              })}
             </div>
           </section>
         )}
@@ -2167,12 +2230,21 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           const getAllUnitFlashcards = (): UnitFlashcardData[] => {
             const isMacro = selectedSubject === 'macro' && (activeUnitNum >= 1 && activeUnitNum <= 6);
             const isMicro = selectedSubject === 'micro' && (activeUnitNum >= 1 && activeUnitNum <= 6);
+            const isGovUnit1 =
+              selectedSubject === 'gov' && activeUnitNum === 1;
             if (isMacro || isMicro) {
               const allCards: UnitFlashcardData[] = [];
               const subject = selectedSubject as 'macro' | 'micro';
               sortedLessons.forEach(({ lessonId }) => {
                 const lessonCards = getFlashcardsForLesson(subject, activeUnitNum, lessonId);
                 allCards.push(...lessonCards);
+              });
+              return allCards;
+            }
+            if (isGovUnit1) {
+              const allCards: UnitFlashcardData[] = [];
+              sortedLessons.forEach(({ lessonId }) => {
+                allCards.push(...getGovFlashcardsForLesson(1, lessonId));
               });
               return allCards;
             }
@@ -2232,10 +2304,19 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
             setShuffleModalOpen(true);
           };
 
-          /** One real GRAPH card: preview shows its front, then its actual back (graph + text). */
+          /** Macro/Micro: prefer a real GRAPH card (front + graph back). Gov: term or rule card (text both sides). */
           const sampleGraphCard =
             allUnitFlashcards.find((c) => c.tag === 'GRAPH' && c.backImage) ??
             allUnitFlashcards.find((c) => c.tag === 'GRAPH');
+          const govCtaPreviewCard =
+            selectedSubject === 'gov'
+              ? allUnitFlashcards.find((c) => c.tag === 'RULE') ??
+                allUnitFlashcards.find((c) => c.tag === 'SCOTUS') ??
+                allUnitFlashcards.find((c) => c.type === 'list') ??
+                allUnitFlashcards[0]
+              : undefined;
+          const ctaPreviewCard = sampleGraphCard ?? govCtaPreviewCard;
+          const ctaPreviewIsGraph = ctaPreviewCard?.tag === 'GRAPH';
 
           return (
             <div id="unit-shuffle" className="mb-8">
@@ -2243,7 +2324,9 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                 className={`overflow-hidden rounded-xl border border-gray-200/90 bg-gradient-to-br shadow-[0_1px_2px_rgba(15,23,42,0.04),0_8px_24px_-8px_rgba(15,23,42,0.07)] ${
                   selectedSubject === 'macro'
                     ? 'from-white via-slate-50/90 to-blue-50/30'
-                    : 'from-white via-slate-50/90 to-emerald-50/25'
+                    : selectedSubject === 'micro'
+                      ? 'from-white via-slate-50/90 to-emerald-50/25'
+                      : 'from-white via-white to-white'
                 }`}
               >
                 <div className="flex flex-col gap-6 p-5 sm:flex-row sm:items-start sm:justify-between sm:gap-8 sm:p-6">
@@ -2251,11 +2334,23 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                     <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-gray-500">Built into this unit</p>
                     <h2 className="mt-1.5 text-2xl font-black tracking-tight text-gray-900 sm:text-3xl">Flashcards</h2>
                     <p className="mt-2 text-sm leading-relaxed text-gray-600 sm:text-base">
-                      <span className="font-semibold text-gray-800">{allUnitFlashcards.length} cards</span> mix{' '}
-                      <span className="font-semibold text-gray-800">graphs</span>,{' '}
-                      <span className="font-semibold text-gray-800">formulas</span>, and{' '}
-                      <span className="font-semibold text-gray-800">key terms</span>. Shuffle blends every type so you
-                      drill the whole unit—not just one format.
+                      {selectedSubject === 'gov' ? (
+                        <>
+                          <span className="font-semibold text-gray-800">{allUnitFlashcards.length} cards</span> mix{' '}
+                          <span className="font-semibold text-gray-800">key terms</span>,{' '}
+                          <span className="font-semibold text-gray-800">application rules</span>, and{' '}
+                          <span className="font-semibold text-gray-800">Court holdings</span>. Shuffle blends every
+                          format so you drill the whole unit—not just one type.
+                        </>
+                      ) : (
+                        <>
+                          <span className="font-semibold text-gray-800">{allUnitFlashcards.length} cards</span> mix{' '}
+                          <span className="font-semibold text-gray-800">graphs</span>,{' '}
+                          <span className="font-semibold text-gray-800">formulas</span>, and{' '}
+                          <span className="font-semibold text-gray-800">key terms</span>. Shuffle blends every type so
+                          you drill the whole unit—not just one format.
+                        </>
+                      )}
                     </p>
                     <button
                       type="button"
@@ -2266,7 +2361,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                       <ArrowRight className="h-4 w-4 shrink-0" aria-hidden />
                     </button>
                   </div>
-                  {sampleGraphCard ? (
+                  {ctaPreviewCard ? (
                     <div
                       className="pointer-events-none relative mx-auto mt-1 h-[176px] w-[min(100%,320px)] shrink-0 -translate-x-6 select-none sm:mx-0 sm:mt-0 sm:h-[176px] sm:w-[340px] sm:-translate-x-10"
                       aria-hidden
@@ -2274,14 +2369,26 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                       {/* Back (answer) — bottom right, lower z so it reads as behind */}
                       <div className="absolute bottom-0 right-0 z-[1] w-[min(100%,188px)] sm:w-[188px]">
                         <div className="flex h-[152px] flex-col overflow-hidden rounded-md border-[3px] border-black bg-white p-2 shadow-[6px_6px_0_0_rgba(0,0,0,0.88)]">
-                          <div className="min-h-0 flex-1 overflow-hidden rounded-sm bg-zinc-50 ring-1 ring-black/10">
-                            {sampleGraphCard.backImage ? (
+                          <div
+                            className={
+                              ctaPreviewIsGraph
+                                ? 'min-h-0 flex-1 overflow-hidden rounded-sm ring-1 ring-black/10 bg-zinc-50'
+                                : selectedSubject === 'gov'
+                                  ? 'min-h-0 flex-1 overflow-hidden'
+                                  : 'min-h-0 flex-1 overflow-hidden rounded-sm ring-1 ring-black/10 bg-violet-50/80'
+                            }
+                          >
+                            {ctaPreviewIsGraph && ctaPreviewCard.backImage ? (
                               <img
-                                src={sampleGraphCard.backImage}
+                                src={ctaPreviewCard.backImage}
                                 alt=""
                                 className="h-full w-full object-contain object-center"
                               />
-                            ) : null}
+                            ) : (
+                              <p className="h-full overflow-hidden px-0.5 pt-0.5 text-left text-[10px] font-semibold leading-snug tracking-tight text-gray-800 sm:text-[11px] sm:leading-snug line-clamp-[9] whitespace-pre-line">
+                                {ctaPreviewCard.back}
+                              </p>
+                            )}
                           </div>
                           <span className="shrink-0 pt-1.5 text-[7px] font-bold uppercase tracking-wide text-gray-400">
                             Back
@@ -2292,7 +2399,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                       <div className="absolute left-0 top-0 z-[2] w-[min(100%,188px)] sm:w-[188px]">
                         <div className="flex h-[152px] flex-col overflow-hidden rounded-md border-[3px] border-black bg-white p-2 shadow-[6px_6px_0_0_rgba(0,0,0,0.88)]">
                           <p className="min-h-0 flex-1 overflow-hidden text-left text-sm font-bold leading-snug tracking-tight text-gray-900 sm:text-[15px] sm:leading-snug line-clamp-[7]">
-                            {sampleGraphCard.front}
+                            {ctaPreviewCard.front}
                           </p>
                           <span className="shrink-0 pt-1.5 text-[7px] font-bold uppercase tracking-wide text-gray-400">
                             Front
@@ -2640,6 +2747,8 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                           id={`term-${term.id}`} 
                           onClick={handleTermClick}
                           className={`p-4 border rounded-lg scroll-mt-20 cursor-pointer transition-all duration-200 relative ${
+                            activeTermMenuId === term.id ? 'z-50' : ''
+                          } ${
                             isSelected 
                               ? 'border-gray-300 bg-gray-50 shadow-inner transform scale-[0.98]' 
                               : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm'
@@ -2668,7 +2777,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                                 {activeTermMenuId === term.id && (
                                   <div
                                     data-term-menu="true"
-                                    className="absolute right-0 top-7 z-30 min-w-[260px] rounded-md border border-gray-200 bg-white p-1 shadow-lg"
+                                    className="absolute right-0 top-7 z-[60] min-w-[260px] rounded-md border border-gray-200 bg-white p-1 shadow-lg"
                                     onMouseDown={(e) => e.stopPropagation()}
                                     onClick={(e) => e.stopPropagation()}
                                   >
@@ -4232,6 +4341,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           externalPromptText={chatPromptText}
           externalPromptDisplayText={chatPromptDisplayText}
           externalPromptNonce={chatPromptNonce}
+          externalCloseRequest={cheatSheetChatCloseRequest}
         />
       )}
     </>

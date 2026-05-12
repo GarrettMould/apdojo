@@ -192,6 +192,8 @@ export interface CheatSheetChatBoxProps {
   /** Optional user-facing bubble text when externalPromptText contains backend-only instructions. */
   externalPromptDisplayText?: string;
   externalPromptNonce?: number;
+  /** Increment from the parent to force-close the panel (e.g. another overlay opened). */
+  externalCloseRequest?: number;
 }
 
 const DEFAULT_ATTACH_PROMPT =
@@ -309,10 +311,12 @@ export function CheatSheetChatBox({
   externalPromptText,
   externalPromptDisplayText,
   externalPromptNonce,
+  externalCloseRequest = 0,
 }: CheatSheetChatBoxProps) {
   const { user, userData } = useAuthContext();
   const canUseAdminChat = Boolean(user && hasAdminRole(userData));
   const [open, setOpen] = useState(false);
+  const lastExternalCloseRef = useRef(externalCloseRequest);
   const subjectLabel = displayCourseLabel(subject);
   const persona = personaForSubject(subject);
   const theme = chatTheme(subject);
@@ -357,6 +361,12 @@ export function CheatSheetChatBox({
   useEffect(() => {
     onOpenChange?.(open);
   }, [open, onOpenChange]);
+
+  useEffect(() => {
+    if (externalCloseRequest === lastExternalCloseRef.current) return;
+    lastExternalCloseRef.current = externalCloseRequest;
+    setOpen(false);
+  }, [externalCloseRequest]);
 
   const onPickFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -504,6 +514,7 @@ export function CheatSheetChatBox({
     }
     return null;
   }, [messages]);
+  const hasUserMessage = useMemo(() => messages.some((m) => m.role === 'user'), [messages]);
 
   const canSend = (input.trim() || pending) && !sending;
 
@@ -578,7 +589,8 @@ export function CheatSheetChatBox({
                   m.role === 'assistant' &&
                   parsedAssistant &&
                   parsedAssistant.choices.length > 0 &&
-                  m.id === lastAssistantId;
+                  m.id === lastAssistantId &&
+                  !(m.id === 'welcome' && hasUserMessage);
                 const assistantLead = parsedAssistant?.display.trim() ?? '';
                 const avatarUrl = tutorAvatarUrl(subject);
 

@@ -3,11 +3,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Question as QuestionType } from '@/data/questionBanks/types';
 import { Unit } from '@/data/cheatSheets';
-import { Check, X, Brain, FileText, ChevronDown, Triangle, Loader2, RefreshCw, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Clipboard, Lock, Play, Minus, Book, Lightbulb, Pen, Strikethrough, CheckCircle2, XCircle } from 'lucide-react';
+import { Check, X, Brain, FileText, ChevronDown, Triangle, Loader2, RefreshCw, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Clipboard, Lock, Play, Minus, Book, Lightbulb, Pen, Strikethrough, CheckCircle2, XCircle, Link2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { getBeltProgress } from '@/lib/beltSystem';
+import { parseQuestionTableFromText } from '@/lib/parseQuestionTableFromText';
+import { splitMcqStemAttribution } from '@/lib/splitMcqStemAttribution';
 import { getSubjectXP } from '@/hooks/useUserProgress';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -19,11 +21,12 @@ import { videos as allVideos, Video } from '@/data/videos';
 import { QuestionWithKeyTerms } from './QuestionWithKeyTerms';
 import { keyTerms as apMacroTerms } from '@/data/apMacroTerms';
 import { keyTerms as apMicroTerms } from '@/data/apMicroTerms';
+import { keyTerms as apGovTerms } from '@/data/apGovTerms';
 import { KeyTerm } from '@/data/allContent';
 import ReactMarkdown from 'react-markdown';
 import dynamic from 'next/dynamic';
 import { McqQuestionTutorFab } from './McqQuestionTutorFab';
-import { courseSubjectFromQuestionSubject } from '@/lib/courseSubject';
+import { courseSubjectFromQuestionSubject, type CourseSubject } from '@/lib/courseSubject';
 import '@excalidraw/excalidraw/index.css';
 
 import dojoIcon from "../../public/images/dojoIcon.png";
@@ -34,77 +37,6 @@ const Excalidraw = dynamic<any>(
   async () => (await import('@excalidraw/excalidraw')).Excalidraw,
   { ssr: false }
 );
-
-// Helper function to parse markdown table from text
-const parseMarkdownTable = (text: string): { tableData: { headers: string[]; rows: string[][] } | null; textWithoutTable: string } => {
-  const lines = text.split('\n');
-  let tableStartIndex = -1;
-  let tableEndIndex = -1;
-  
-  // Find table boundaries (lines starting with |)
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim();
-    if (line.startsWith('|') && line.endsWith('|')) {
-      if (tableStartIndex === -1) {
-        tableStartIndex = i;
-      }
-      tableEndIndex = i;
-    } else if (tableStartIndex !== -1 && !line.startsWith('|') && line.length > 0) {
-      // Table ended (non-empty line that doesn't start with |)
-      break;
-    }
-  }
-  
-  if (tableStartIndex === -1 || tableEndIndex === -1) {
-    return { tableData: null, textWithoutTable: text };
-  }
-  
-  // Extract table lines
-  const tableLines = lines.slice(tableStartIndex, tableEndIndex + 1);
-  
-  if (tableLines.length < 2) {
-    return { tableData: null, textWithoutTable: text };
-  }
-  
-  // Parse headers (first line)
-  const headerLine = tableLines[0];
-  const headers = headerLine
-    .split('|')
-    .map(h => h.trim())
-    .filter(h => h.length > 0);
-  
-  // Parse rows (skip header and separator line)
-  const rows: string[][] = [];
-  for (let i = 2; i < tableLines.length; i++) {
-    const line = tableLines[i].trim();
-    // Skip empty lines
-    if (!line || !line.startsWith('|')) continue;
-    
-    const cells = line
-      .split('|')
-      .map(c => c.trim())
-      .filter(c => c.length > 0);
-    
-    if (cells.length > 0) {
-      rows.push(cells);
-    }
-  }
-  
-  // Remove table from text
-  const textWithoutTable = [
-    ...lines.slice(0, tableStartIndex),
-    ...lines.slice(tableEndIndex + 1)
-  ].join('\n').trim();
-  
-  if (headers.length === 0 || rows.length === 0) {
-    return { tableData: null, textWithoutTable: text };
-  }
-  
-  return {
-    tableData: { headers, rows },
-    textWithoutTable
-  };
-};
 
 // Type definition consistent with the parent page
 interface AnsweredQuestionState {
@@ -130,7 +62,7 @@ interface UnitMCQSProps {
   totalQuestions: number;
   unitName: string;
   questions: QuestionType[];
-  subject: 'macro' | 'micro';
+  subject: CourseSubject;
   practiceUnitIds: number[];
   isParentModalOpen: boolean;
   isSidebar?: boolean; // New optional prop
@@ -629,7 +561,12 @@ const QuestionCard = ({
   // Find matching video for the lesson
   const findVideoForLesson = (lessonIds: string[]): Video | null => {
     if (!lessonIds || lessonIds.length === 0) return null;
-    const subjectFilter = question.subject === 'ap_macroeconomics' ? 'AP Macroeconomics' : 'AP Microeconomics';
+    const subjectFilter =
+      question.subject === 'ap_macroeconomics'
+        ? 'AP Macroeconomics'
+        : question.subject === 'ap_microeconomics'
+          ? 'AP Microeconomics'
+          : 'AP United States Government and Politics';
     for (const lessonId of lessonIds) {
       const video = allVideos.find(v => 
         v.subjects.includes(subjectFilter) &&
@@ -652,7 +589,12 @@ const QuestionCard = ({
 
   // Find best matching key term for the question
   const findBestMatchingTerm = (): KeyTerm | null => {
-    const allTerms = question.subject === 'ap_macroeconomics' ? apMacroTerms : apMicroTerms;
+    const allTerms =
+      question.subject === 'ap_macroeconomics'
+        ? apMacroTerms
+        : question.subject === 'ap_microeconomics'
+          ? apMicroTerms
+          : apGovTerms;
     
     // Filter terms by subject and unit (prioritize same unit, but also check adjacent units)
     const sameUnitTerms = allTerms.filter(
@@ -738,15 +680,31 @@ const QuestionCard = ({
   };
 
   const matchingTerm = findBestMatchingTerm();
+  const isScenarioSet = question.questionGroup !== undefined;
 
   return (
     <>
-      <Card ref={cardRef} className="border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] relative">
+      <Card
+        ref={cardRef}
+        className={`border-4 relative shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] ${
+          isScenarioSet
+            ? 'border-amber-900 bg-gradient-to-b from-amber-50/90 via-white to-white shadow-[10px_10px_0px_0px_rgba(180,83,9,0.35)]'
+            : 'border-black bg-white'
+        }`}
+      >
         {/* Overlay: Simplified or removed if parent modal is sufficient */} 
         {showInternalOverlay && (
           <div className="absolute inset-0 bg-white bg-opacity-80 backdrop-blur-sm z-10 flex items-center justify-center p-4 rounded-lg">
             <div className="text-center">
-              <Loader2 className={`h-8 w-8 animate-spin mx-auto mb-4 ${question.subject === 'ap_macroeconomics' ? 'text-blue-600' : 'text-green-600'}`} />
+              <Loader2
+                className={`h-8 w-8 animate-spin mx-auto mb-4 ${
+                  question.subject === 'ap_macroeconomics'
+                    ? 'text-blue-600'
+                    : question.subject === 'ap_microeconomics'
+                      ? 'text-green-600'
+                      : 'text-violet-600'
+                }`}
+              />
               <p className="text-lg font-semibold text-gray-700">Loading options...</p>
               {/* Or a message like: "Please complete your selection via the plan modal." */}
             </div>
@@ -757,15 +715,25 @@ const QuestionCard = ({
           <CardTitle className="text-xl">
             Question {currentIndex + 1} of {totalQuestions}
           </CardTitle>
+          {isScenarioSet && (
+            <p className="mt-2 flex items-start gap-2 text-sm font-medium text-amber-950">
+              <Link2 className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+              <span>
+                Scenario set: this item is paired with another question that uses the same stimulus, and
+                both appear back-to-back in this session.
+              </span>
+            </p>
+          )}
         </CardHeader>
         <CardContent>
           <div className="space-y-4"> 
           {/* Parse and render markdown table if present */}
           {(() => {
-            const { tableData: parsedTableData, textWithoutTable } = parseMarkdownTable(question.question);
+            const { tableData: parsedTableData, textWithoutTable } = parseQuestionTableFromText(question.question);
             const displayTableData = question.tableData || parsedTableData;
             const displayQuestionText = parsedTableData ? textWithoutTable : question.question;
-            
+            const stemParts = splitMcqStemAttribution(displayQuestionText);
+
             return (
               <>
             {/* Question Text with markdown support */}
@@ -776,8 +744,13 @@ const QuestionCard = ({
                   strong: ({ children }) => <strong className="font-bold">{children}</strong>,
                 }}
               >
-                {displayQuestionText}
+                {stemParts.stem}
               </ReactMarkdown>
+              {stemParts.attributionLine ? (
+                <span className="mt-2 block text-base font-normal text-gray-600">
+                  {stemParts.attributionLine}
+                </span>
+              ) : null}
             </p>
                 {/* Table Data from tableData property or parsed from markdown - shown below question text */}
                 {displayTableData && (
@@ -1211,9 +1184,10 @@ const QuestionArena = ({ question, onAnswerSelect, initialSelectedLetter, isAnsw
   }, [isSubmitted, isAnswerDisabled, question.options.length, selectedAnswerIndex, question.id, question.lessonIDS, handleAnswerSelect]);
 
   // Parse markdown table if present
-  const { tableData: parsedTableData, textWithoutTable } = parseMarkdownTable(question.question);
+  const { tableData: parsedTableData, textWithoutTable } = parseQuestionTableFromText(question.question);
   const displayTableData = question.tableData || parsedTableData;
   const displayQuestionText = parsedTableData ? textWithoutTable : question.question;
+  const stemParts = splitMcqStemAttribution(displayQuestionText);
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-4">
@@ -1227,8 +1201,13 @@ const QuestionArena = ({ question, onAnswerSelect, initialSelectedLetter, isAnsw
               strong: ({ children }) => <strong className="font-black">{children}</strong>,
             }}
           >
-            {displayQuestionText}
+            {stemParts.stem}
           </ReactMarkdown>
+          {stemParts.attributionLine ? (
+            <p className="not-prose mb-0 mt-2 text-base font-normal leading-snug text-gray-600">
+              {stemParts.attributionLine}
+            </p>
+          ) : null}
         </div>
         
         {/* Table Data */}
@@ -1621,11 +1600,16 @@ export function UnitMCQs({
     }, 1500); 
   };
 
+  const scrollPracticeToTop = () => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  };
+
   const handlePreviousQuestion = () => {
     console.log('[Child] handlePreviousQuestion called', {
       currentIndex: currentQuestionIndex,
       totalQuestions: totalQuestions
     });
+    scrollPracticeToTop();
     onPreviousQuestion();
   };
 
@@ -1634,7 +1618,8 @@ export function UnitMCQs({
       currentIndex: currentQuestionIndex,
       totalQuestions: totalQuestions
     });
-    onNextQuestion(); 
+    scrollPracticeToTop();
+    onNextQuestion();
   };
 
   // Keyboard navigation: ArrowLeft/Right for prev/next question, ArrowUp/Down for options, Enter to submit
@@ -1781,18 +1766,29 @@ export function UnitMCQs({
   const [excalidrawAppState, setExcalidrawAppState] = useState<any>(null);
   const [showExplanationForCorrect, setShowExplanationForCorrect] = useState(false);
   const [isTutorOpen, setIsTutorOpen] = useState(false);
+  /** Bumped when scratch/draw opens so McqQuestionTutorFab closes (mutual exclusivity). */
+  const [tutorExternalCloseRequest, setTutorExternalCloseRequest] = useState(0);
 
   useEffect(() => {
     onTutorOpenChange?.(isTutorOpen);
   }, [isTutorOpen, onTutorOpenChange]);
+
+  useEffect(() => {
+    if (isTutorOpen) setActiveScratchTool(null);
+  }, [isTutorOpen]);
+
+  const openScratchTool = (tool: ScratchTool) => {
+    setTutorExternalCloseRequest((n) => n + 1);
+    setActiveScratchTool(tool);
+  };
   
   // Get belt progress
   const userXP = user ? getSubjectXP(userData, subject) : (guestXp ?? 0);
   const beltProgress = getBeltProgress(userXP);
   const { percent, nextBelt, xpToNext, currentBelt } = beltProgress;
 
-  const handleDrawClick = () => setActiveScratchTool('draw');
-  const handleNotesClick = () => setActiveScratchTool('notes');
+  const handleDrawClick = () => openScratchTool('draw');
+  const handleNotesClick = () => openScratchTool('notes');
 
   // Handle explanation click (for correct answers - shows as link)
   const handleExplanationClick = () => {
@@ -1834,6 +1830,7 @@ export function UnitMCQs({
           answered={!!currentAnswerState}
           splitScreenOnDesktop={true}
           onOpenChange={setIsTutorOpen}
+          externalCloseRequest={tutorExternalCloseRequest}
         />
       )}
 
@@ -1849,7 +1846,7 @@ export function UnitMCQs({
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={() => setActiveScratchTool('draw')}
+                onClick={() => openScratchTool('draw')}
                 className={`rounded-md px-3 py-1.5 text-sm font-semibold transition-colors ${
                   activeScratchTool === 'draw'
                     ? 'bg-gray-900 text-white'
@@ -1860,7 +1857,7 @@ export function UnitMCQs({
               </button>
               <button
                 type="button"
-                onClick={() => setActiveScratchTool('notes')}
+                onClick={() => openScratchTool('notes')}
                 className={`rounded-md px-3 py-1.5 text-sm font-semibold transition-colors ${
                   activeScratchTool === 'notes'
                     ? 'bg-gray-900 text-white'
@@ -1967,7 +1964,7 @@ export function UnitMCQs({
                   currentIndex: currentQuestionIndex,
                   totalQuestions: totalQuestions
                 });
-                onPreviousQuestion();
+                handlePreviousQuestion();
               }}
                 disabled={currentQuestionIndex === 0 || isNavigationDisabled}
               className="flex-1 px-6 py-4 border-4 border-black rounded-xl font-black text-lg bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:translate-y-1 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
@@ -1982,7 +1979,7 @@ export function UnitMCQs({
                   totalQuestions: totalQuestions,
                   willBeDisabled: currentQuestionIndex === totalQuestions - 1 || totalQuestions === 0
                 });
-                onNextQuestion();
+                handleNextQuestion();
               }}
                 disabled={currentQuestionIndex === totalQuestions - 1 || totalQuestions === 0 || isNavigationDisabled}
               className="flex-1 px-6 py-4 border-4 border-black rounded-xl font-black text-lg bg-black text-white hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:translate-y-1 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"

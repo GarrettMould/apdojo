@@ -5,12 +5,19 @@ export interface GovFrqTableData {
   rowHeaders?: boolean;
 }
 
+/** Official-style boilerplate for SCOTUS comparison stimulus (shown bold above the case citation). */
+export const GOV_SCOTUS_COMPARISON_INSTRUCTIONS =
+  'This question requires you to compare a Supreme Court case you studied in class with one you have not studied in class. A summary of the Supreme Court case you did not study in class is presented below and provides all of the information you need to know about this case to answer the prompts.';
+
 export interface GovStimulusFrq {
   id: string;
   title: string;
   stimulus?: string;
+  /** When set with `stimulus`, SCOTUS comparison is rendered: instructions (bold), citation (italic), then summary. */
+  scotusCaseCitation?: string;
   /** When set, rendered as HTML table instead of plain `stimulus` text (e.g. quantitative FRQs). */
   tableData?: GovFrqTableData;
+  /** Task line after stimulus; may be empty for SCOTUS comparison when only parts carry directions. */
   prompt: string;
   tasks: string[];
   cedLink?: string;
@@ -24,11 +31,10 @@ export const govUnitStimulusFrqByUnit: Record<number, GovStimulusFrq[]> = {
   1: [
     {
       id: 'u1-frq-1-stafford-act',
-      title: 'FRQ 1: Concept Application (Federal Response to Natural Disasters)',
+      title: 'FRQ 1: Concept Application',
       stimulus:
         'In 1988, Congress passed the Stafford Act, which allows the federal government to provide financial assistance to state and local governments during natural disasters. In the wake of a major hurricane, a state governor requests federal aid. The President, acting through FEMA, approves the request but attaches specific conditions to the funding, requiring the state to implement new building codes that exceed current state laws. The state government argues that while they need the money, the federal government is overstepping its authority by dictating local construction standards.',
-      prompt:
-        'Respond to the following prompts using constitutional reasoning and federalism concepts.',
+      prompt: 'After reading the scenario, please respond to A, B, and C below.',
       tasks: [
         'Describe the constitutional principle that defines the relationship between the national and state governments illustrated in the scenario.',
         'In the context of the scenario, explain how the use of categorical grants-in-aid could be used by the federal government to influence state policy.',
@@ -38,7 +44,7 @@ export const govUnitStimulusFrqByUnit: Record<number, GovStimulusFrq[]> = {
     },
     {
       id: 'u1-frq-2-quant-grants',
-      title: 'FRQ 2: Quantitative Analysis (Unit 1: Foundations of Democracy)',
+      title: 'FRQ 2: Quantitative Analysis',
       tableData: {
         headers: [
           'Fiscal Year',
@@ -64,11 +70,11 @@ export const govUnitStimulusFrqByUnit: Record<number, GovStimulusFrq[]> = {
     },
     {
       id: 'u1-frq-3-scotus-comparison',
-      title: 'FRQ 3: SCOTUS Comparison (Federalism and the Commerce Clause)',
+      title: 'FRQ 3: SCOTUS Comparison',
+      scotusCaseCitation: 'National Federation of Independent Business (NFIB) v. Sebelius (2012)',
       stimulus:
-        'Non-Required Case Summary: National Federation of Independent Business (NFIB) v. Sebelius (2012). In 2010, Congress passed the Affordable Care Act (ACA). The individual mandate required most Americans to purchase health insurance or pay a penalty. Congress argued it was valid under the Commerce Clause because uninsured decisions affect the national healthcare market. Several states and the NFIB challenged the law, arguing the Commerce Clause regulates existing economic activity, not compelling people into commerce. The Supreme Court held that the mandate was valid under Congress’s Taxing Power, but not under the Commerce Clause.',
-      prompt:
-        'Compare a required Supreme Court case from the course with the non-required case above.',
+        'In 2010, Congress passed the Affordable Care Act (ACA). The individual mandate required most Americans to purchase health insurance or pay a penalty. Congress argued it was valid under the Commerce Clause because uninsured decisions affect the national healthcare market. Several states and the NFIB challenged the law, arguing the Commerce Clause regulates existing economic activity, not compelling people into commerce. The Supreme Court held that the mandate was valid under Congress’s Taxing Power, but not under the Commerce Clause.',
+      prompt: '',
       tasks: [
         "Identify the required Supreme Court case that also involved a challenge to the federal government's use of the Commerce Clause to regulate non-economic activity.",
         'Explain how the facts in United States v. Lopez (1995) and NFIB v. Sebelius (2012) led to similar limits on the power of the national government.',
@@ -96,7 +102,14 @@ export function buildGovUnitFrqPackForFullExam(unitNumber: number): {
   examTitle: string;
   questions: Array<{
     questionNumber: number;
+    /** FRQ title line (e.g. “FRQ 3: …”). Shown above stimulus when set. */
+    questionTitle?: string;
     prompt: string;
+    govScotusStimulus?: {
+      instructions: string;
+      caseCitation: string;
+      summary: string;
+    };
     tableData?: GovFrqTableData;
     directionsAfterTable?: string;
     parts: Array<{ label: string; text: string; answerType: 'text' }>;
@@ -110,9 +123,27 @@ export function buildGovUnitFrqPackForFullExam(unitNumber: number): {
       if (frq.tableData) {
         return {
           questionNumber: idx + 1,
-          prompt: `${frq.title}\n\nStimulus:`,
+          questionTitle: frq.title,
+          prompt: '',
           tableData: frq.tableData,
-          directionsAfterTable: `Task:\n${frq.prompt}`,
+          directionsAfterTable: frq.prompt.trim() || undefined,
+          parts: frq.tasks.map((task, taskIdx) => ({
+            label: String.fromCharCode(65 + taskIdx),
+            text: task,
+            answerType: 'text' as const,
+          })),
+        };
+      }
+      if (frq.scotusCaseCitation && frq.stimulus) {
+        return {
+          questionNumber: idx + 1,
+          questionTitle: frq.title,
+          prompt: frq.prompt?.trim() ?? '',
+          govScotusStimulus: {
+            instructions: GOV_SCOTUS_COMPARISON_INSTRUCTIONS,
+            caseCitation: frq.scotusCaseCitation,
+            summary: frq.stimulus,
+          },
           parts: frq.tasks.map((task, taskIdx) => ({
             label: String.fromCharCode(65 + taskIdx),
             text: task,
@@ -122,9 +153,10 @@ export function buildGovUnitFrqPackForFullExam(unitNumber: number): {
       }
       return {
         questionNumber: idx + 1,
+        questionTitle: frq.title,
         prompt: frq.stimulus
-          ? `${frq.title}\n\nStimulus:\n${frq.stimulus}\n\nTask:\n${frq.prompt}`
-          : `${frq.title}\n\nTask:\n${frq.prompt}`,
+          ? `${frq.stimulus.trim()}\n\n${frq.prompt.trim()}`.trim()
+          : frq.prompt.trim(),
         parts: frq.tasks.map((task, taskIdx) => ({
           label: String.fromCharCode(65 + taskIdx),
           text: task,

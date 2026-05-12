@@ -15,10 +15,10 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { caseName } = await params;
   const prompt = scotusEssayPrompts.find((item) => item.id === caseName);
-  const caseTitle = `${prompt?.requiredCase ?? 'SCOTUS Essay Practice'} - STILL IN DEVELOPMENT`;
+  const caseTitle = `${prompt?.requiredCase ?? 'SCOTUS Comparison Practice'} - STILL IN DEVELOPMENT`;
 
   return {
-    title: `${caseTitle} | SCOTUS Essay Practice | AP Dojo`,
+    title: `${caseTitle} | SCOTUS Comparison Practice | AP Dojo`,
     description:
       'Practice AP Gov SCOTUS comparison FRQs with scaffolded prompts, A/B/C task flow, and structured writing support.',
   };

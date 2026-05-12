@@ -4,6 +4,7 @@ import React, { useEffect, useRef } from 'react';
 import type { Question } from '@/data/questionBanks/types';
 import { canonicalQuestionText } from '@/lib/questionTextCanonical';
 import { getGovQuestionParts, isApGovQuestion } from '@/components/ApGovQuestionText';
+import { splitMcqStemAttribution } from '@/lib/splitMcqStemAttribution';
 import { QuestionWithKeyTerms } from '@/components/QuestionWithKeyTerms';
 import { apQuestionSubjectTag } from '@/lib/courseSubject';
 import type { CourseSubject } from '@/lib/courseSubject';
@@ -177,6 +178,26 @@ export function UnitTestQuestionBody({
   const parts = getGovQuestionParts(canon);
 
   if (parts.mode === 'single') {
+    const t = parts.text.trimEnd();
+    const singleSplit = splitMcqStemAttribution(t);
+    const six = singleSplit.attributionStartIndex;
+    if (
+      singleSplit.attributionLine != null &&
+      six != null &&
+      six > 0 &&
+      six <= t.length
+    ) {
+      const head = t.slice(0, six);
+      const tail = t.slice(six);
+      return (
+        <span ref={rootRef} className={rootClassName}>
+          <span className="block">{applyMarksToSegment(head, 0, highlights, removeHighlight)}</span>
+          <span className="mt-2 block text-base font-normal leading-snug text-gray-600">
+            {applyMarksToSegment(tail, six, highlights, removeHighlight)}
+          </span>
+        </span>
+      );
+    }
     return (
       <span ref={rootRef} className={rootClassName}>
         {applyMarksToSegment(parts.text, 0, highlights, removeHighlight)}
@@ -185,6 +206,36 @@ export function UnitTestQuestionBody({
   }
 
   const { excerpt, separator, stem, stemStart } = parts;
+  const stemTrim = stem.trimEnd();
+  const stemSplit = splitMcqStemAttribution(stemTrim);
+  const idx = stemSplit.attributionStartIndex;
+
+  if (
+    stemSplit.attributionLine != null &&
+    idx != null &&
+    idx > 0 &&
+    idx <= stemTrim.length
+  ) {
+    const head = stemTrim.slice(0, idx);
+    const tail = stemTrim.slice(idx);
+    return (
+      <span ref={rootRef} className={rootClassName}>
+        <span
+          className="block mb-3 border-l-4 border-violet-400/80 pl-3.5 text-gray-800 italic leading-relaxed tracking-tight"
+          lang="en"
+        >
+          {applyMarksToSegment(excerpt, 0, highlights, removeHighlight)}
+        </span>
+        {separator}
+        <span className="mt-3 block not-italic font-normal leading-relaxed tracking-normal text-gray-900">
+          <span className="block">{applyMarksToSegment(head, stemStart, highlights, removeHighlight)}</span>
+          <span className="mt-2 block text-base font-normal leading-snug text-gray-600">
+            {applyMarksToSegment(tail, stemStart + idx, highlights, removeHighlight)}
+          </span>
+        </span>
+      </span>
+    );
+  }
 
   return (
     <span ref={rootRef} className={rootClassName}>

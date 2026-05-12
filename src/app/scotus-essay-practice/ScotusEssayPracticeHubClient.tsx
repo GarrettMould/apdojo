@@ -38,14 +38,14 @@ export default function ScotusEssayPracticeHubClient() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 px-4 py-10 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-gray-50 px-4 pb-10 pt-12 sm:px-6 sm:pt-14 lg:px-8 lg:pt-16">
       <div className="mx-auto w-full max-w-6xl">
         <header className="mb-8">
           <p className="inline-flex w-fit rounded-md border-2 border-violet-700 bg-violet-600 px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
             AP Gov
           </p>
-          <h1 className="mt-3 text-3xl font-black tracking-tight text-gray-900 sm:text-4xl">
-            SCOTUS Essay Practice Prompts
+          <h1 className="mt-4 text-3xl font-black tracking-tight text-gray-900 sm:mt-5 sm:text-4xl">
+            SCOTUS Comparison Practice Prompts
           </h1>
           <p className="mt-2 max-w-3xl text-sm text-gray-700 sm:text-base">
             Pick one prompt to open the full FRQ workspace. Each set includes a required case, a comparison case, and

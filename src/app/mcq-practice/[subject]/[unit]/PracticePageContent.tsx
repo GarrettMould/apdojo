@@ -13,12 +13,26 @@ import { Question as QuestionType } from '@/data/questionBanks/types';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp, doc, updateDoc, increment, getDoc } from 'firebase/firestore';
 import { Button } from "@/components/ui/button";
-import { macroUnits as allMacroUnitsData, microUnits as allMicroUnitsData } from '@/data/cheatSheets';
+import {
+  macroUnits as allMacroUnitsData,
+  microUnits as allMicroUnitsData,
+  govUnits as allGovUnitsData,
+} from '@/data/cheatSheets';
 import { LoginModal, SignupModal } from '@/components/AuthModals';
 import { logger } from '@/utils/logger';
-import { getFullUnitName, getSubjectDisplayName, getSubjectSlug, getUnitSlug } from '@/lib/practiceSlugs';
+import {
+  getFullUnitName,
+  getSubjectDisplayName,
+  getSubjectSlug,
+  getUnitSlug,
+  type PracticeMcqSubject,
+} from '@/lib/practiceSlugs';
+import type { CourseSubject } from '@/lib/courseSubject';
+import { apQuestionSubjectTag } from '@/lib/courseSubject';
 import { SeasonPassModal } from '@/components/SeasonPassModal';
 import { hasValidSeasonPass } from '@/lib/utils';
+import { shufflePracticeQuestions } from '@/lib/shufflePracticeQuestions';
+import { hasAdminRole } from '@/lib/adminAccess';
 
 // Assuming this matches the structure in useAuth.ts and Firestore
 interface McqAnswer {
@@ -96,22 +110,29 @@ function calculateWeakestUnits(answers: McqAnswer[]): WeakUnitInfo[] {
   return unitsWithStats;
 }
 
-function shuffleArray<T>(array: T[]): T[] {
-  const shuffled = [...array];
-  let currentIndex = shuffled.length;
-  while (currentIndex !== 0) {
-    const randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex--;
-    [shuffled[currentIndex], shuffled[randomIndex]] = [
-      shuffled[randomIndex], shuffled[currentIndex]];
-  }
-
-  return shuffled;
-}
-
-function AccessDenied({ unitId, subject, isCreditLimit = false }: { unitId: string, subject: string, isCreditLimit?: boolean }) {
-  const unitData = (subject === 'macro' ? allMacroUnitsData : allMicroUnitsData).find(u => u.number === parseInt(unitId));
+function AccessDenied({
+  unitId,
+  subject,
+  isCreditLimit = false,
+}: {
+  unitId: string;
+  subject: PracticeMcqSubject;
+  isCreditLimit?: boolean;
+}) {
+  const unitNum = parseInt(unitId, 10);
+  const unitData =
+    subject === 'gov'
+      ? allGovUnitsData.find((u) => u.number === unitNum)
+      : subject === 'micro'
+        ? allMicroUnitsData.find((u) => u.number === unitNum)
+        : allMacroUnitsData.find((u) => u.number === unitNum);
   const price = unitData?.price || 4.99;
+  const seasonBtnClass =
+    subject === 'gov'
+      ? 'bg-violet-600 hover:bg-violet-700'
+      : subject === 'micro'
+        ? 'bg-green-500 hover:bg-green-600'
+        : 'bg-blue-500 hover:bg-blue-600';
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 pt-16 pb-12">
@@ -130,7 +151,7 @@ function AccessDenied({ unitId, subject, isCreditLimit = false }: { unitId: stri
             href={`/purchase/season-pass?courseType=${subject}`}
             className="inline-block w-full"
           >
-            <Button size="lg" className={`w-full ${subject === 'macro' ? 'bg-blue-500 hover:bg-blue-600' : 'bg-green-500 hover:bg-green-600'}`}>
+            <Button size="lg" className={`w-full ${seasonBtnClass}`}>
               Get Unlimited Access
             </Button>
           </Link>
@@ -151,7 +172,7 @@ function AccessDenied({ unitId, subject, isCreditLimit = false }: { unitId: stri
 }
 
 // Breadcrumb Component
-function Breadcrumb({ subject, unitNumber }: { subject: 'macro' | 'micro'; unitNumber: number }) {
+function Breadcrumb({ subject, unitNumber }: { subject: PracticeMcqSubject; unitNumber: number }) {
   const subjectName = getSubjectDisplayName(subject);
   const unitName = getFullUnitName(subject, unitNumber);
   const subjectSlug = getSubjectSlug(subject);
@@ -186,7 +207,7 @@ function Breadcrumb({ subject, unitNumber }: { subject: 'macro' | 'micro'; unitN
 }
 
 interface PracticePageContentProps {
-  subject: 'macro' | 'micro';
+  subject: PracticeMcqSubject;
   unitNumber: number;
 }
 
@@ -195,6 +216,7 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
   const { 
     user, 
     userData,
+    loadingUserData,
     mcqAnswersData, 
     loadingMcqData, 
     correctStreak,
@@ -287,7 +309,31 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
     }
   }, [user, isPremiumEffective, hasDismissedSeasonPassModal]);
 
-  const unitsData = subject === 'micro' ? allMicroUnitsData : allMacroUnitsData;
+  const unitsData =
+    subject === 'gov' ? allGovUnitsData : subject === 'micro' ? allMicroUnitsData : allMacroUnitsData;
+  /** Gov: only Unit 1 has a practice bank — hide other units in the in-quiz unit switcher. */
+  const unitsForMcq = subject === 'gov' ? unitsData.filter((u) => u.number === 1) : unitsData;
+  const uiTheme =
+    subject === 'gov'
+      ? {
+          spin: 'text-violet-600',
+          circle: 'bg-violet-100',
+          primary: 'bg-violet-600 hover:bg-violet-700',
+          outline: 'border-violet-600 text-violet-700 hover:bg-violet-50',
+        }
+      : subject === 'micro'
+        ? {
+            spin: 'text-green-500',
+            circle: 'bg-green-100',
+            primary: 'bg-green-500 hover:bg-green-600',
+            outline: 'border-green-500 text-green-600 hover:bg-green-50',
+          }
+        : {
+            spin: 'text-blue-500',
+            circle: 'bg-blue-100',
+            primary: 'bg-blue-500 hover:bg-blue-600',
+            outline: 'border-blue-500 text-blue-600 hover:bg-blue-50',
+          };
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answeredQuestions, setAnsweredQuestions] = useState<Record<number, any>>({});
   const [questionsForPractice, setQuestionsForPractice] = useState<QuestionType[]>([]);
@@ -325,7 +371,7 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
     }
 
     setIsLoadingQuestionSet(true);
-    const subjectFilter = subject === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics';
+    const subjectFilter = apQuestionSubjectTag(subject as CourseSubject);
     
     let questions: QuestionType[] = allQuestions.filter(q => 
       q.subject === subjectFilter && 
@@ -363,8 +409,7 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
       }
     }
 
-    // Shuffle questions
-    const shuffled = shuffleArray(questions);
+    const shuffled = shufflePracticeQuestions(questions);
     setQuestionsForPractice(shuffled);
     setTotalQuestionsInSet(shuffled.length);
     setCurrentQuestionIndex(0);
@@ -461,10 +506,10 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
     setCurrentQuestionIndex(index);
   };
 
-  const handleUnitChange = (unitNumber: number) => {
-    // Navigate to new unit using the new route structure
+  const handleUnitChange = (nextUnit: number) => {
+    if (subject === 'gov' && nextUnit !== 1) return;
     const subjectSlug = getSubjectSlug(subject);
-    const unitSlug = getUnitSlug(unitNumber, subject);
+    const unitSlug = getUnitSlug(nextUnit, subject);
     router.push(`/mcq-practice/${subjectSlug}/${unitSlug}`);
   };
 
@@ -504,10 +549,39 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
     setShowSignupModal(false);
   };
 
+  const canAccessGov = Boolean(user && hasAdminRole(userData));
+  if (subject === 'gov') {
+    if (loadingUserData) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <Loader2 className="h-12 w-12 animate-spin text-violet-600" />
+        </div>
+      );
+    }
+    if (!canAccessGov) {
+      return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center pt-16 pb-12 px-4">
+          <div className="bg-white p-8 rounded-lg shadow-md border border-gray-200 max-w-md w-full text-center">
+            <Lock className="w-12 h-12 mx-auto text-gray-500 mb-4" />
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">AP Gov is in admin preview</h2>
+            <p className="text-gray-600 mb-6">
+              This content is currently restricted to admin accounts.
+            </p>
+            <Link href="/ap-macro-practice-tests" className="inline-block w-full">
+              <Button size="lg" className="w-full bg-blue-600 hover:bg-blue-700">
+                Back to practice tests
+              </Button>
+            </Link>
+          </div>
+        </div>
+      );
+    }
+  }
+
   if (isVerifying) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className={`h-12 w-12 animate-spin ${subject === 'macro' ? 'text-blue-500' : 'text-green-500'}`} />
+        <Loader2 className={`h-12 w-12 animate-spin ${uiTheme.spin}`} />
       </div>
     );
   }
@@ -540,7 +614,7 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
       />
       {showSeasonPassModal && (
         <SeasonPassModal
-          subject={subject}
+          subject={subject as CourseSubject}
           onClose={() => {
             setShowSeasonPassModal(false);
             setHasDismissedSeasonPassModal(true);
@@ -554,14 +628,14 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
 
           {isLoadingQuestionSet ? (
             <div className="flex items-center justify-center min-h-[400px]">
-              <Loader2 className={`h-12 w-12 animate-spin ${subject === 'macro' ? 'text-blue-500' : 'text-green-500'}`} />
+              <Loader2 className={`h-12 w-12 animate-spin ${uiTheme.spin}`} />
             </div>
           ) : questionsForPractice.length === 0 && !showAllQuestions ? (
             // Congratulations panel - user has mastered the unit
             <div className="max-w-2xl mx-auto">
               <div className="bg-white rounded-xl shadow-lg border-2 border-gray-200 p-8 md:p-12 text-center">
                 <div className="mb-6">
-                  <div className={`inline-flex items-center justify-center w-20 h-20 rounded-full ${subject === 'macro' ? 'bg-blue-100' : 'bg-green-100'} mb-4`}>
+                  <div className={`inline-flex items-center justify-center w-20 h-20 rounded-full ${uiTheme.circle} mb-4`}>
                     <span className="text-4xl">🎉</span>
                   </div>
                   <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
@@ -575,7 +649,7 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
                   <Link href={`/select-practice-units?subject=${subject}`} className="block">
                     <Button 
                       size="lg" 
-                      className={`w-full ${subject === 'macro' ? 'bg-blue-500 hover:bg-blue-600' : 'bg-green-500 hover:bg-green-600'} text-white font-semibold text-lg py-6`}
+                      className={`w-full ${uiTheme.primary} text-white font-semibold text-lg py-6`}
                     >
                       Practice another unit
                     </Button>
@@ -586,7 +660,7 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
                     onClick={() => {
                       setShowAllQuestions(true);
                     }}
-                    className={`w-full border-2 ${subject === 'macro' ? 'border-blue-500 text-blue-600 hover:bg-blue-50' : 'border-green-500 text-green-600 hover:bg-green-50'} font-semibold text-lg py-6`}
+                    className={`w-full border-2 ${uiTheme.outline} font-semibold text-lg py-6`}
                   >
                     Keep Practicing {currentUnitName}
                   </Button>
@@ -609,25 +683,29 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
               onQuestionSelect={handleQuestionSelect}
               onUnitChange={handleUnitChange}
               answeredQuestions={answeredQuestions}
-              units={unitsData}
+              units={unitsForMcq}
               dojoProgress={dojoProgress}
               correctStreak={correctStreak}
               isWeakestUnitsMode={false}
               isTopicMode={false}
               totalQuestions={totalQuestionsInSet}
               unitName={currentUnitName}
-              subject={subject} 
+              subject={subject as CourseSubject}
               practiceUnitIds={[unitNumber]}
               isParentModalOpen={showLoginModal || showSignupModal}
-              hasTestModeAccess={!!user && (hasValidSeasonPass(userData, subject) || purchasedTests.includes(String(unitNumber)))}
+              hasTestModeAccess={!!user && (hasValidSeasonPass(userData, subject as CourseSubject) || purchasedTests.includes(String(unitNumber)))}
               onEnterTestMode={() => {
                 const price = unitsData.find(u => u.number === unitNumber)?.price || 4.99;
-                const hasSeasonPassAccess = hasValidSeasonPass(userData, subject);
+                const hasSeasonPassAccess = hasValidSeasonPass(userData, subject as CourseSubject);
                 const hasPurchasedUnitTest = purchasedTests.includes(String(unitNumber));
                 if (!hasSeasonPassAccess && !hasPurchasedUnitTest) {
                   router.push(`/purchase/mcq-practice?units=${unitNumber}&total=${price}&subject=${subject}`);
                 } else {
-                  router.push(`/ap-${subject}-unit-${unitNumber}-mcq-test`);
+                  const testHref =
+                    subject === 'gov'
+                      ? `/ap-gov-unit-${unitNumber}-mcq-test`
+                      : `/ap-${subject}-unit-${unitNumber}-mcq-test`;
+                  router.push(testHref);
                 }
               }}
               isAnswerDisabled={

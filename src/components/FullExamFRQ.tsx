@@ -44,7 +44,15 @@ interface TableData {
 
 interface Question {
   questionNumber: number;
+  /** FRQ title (e.g. “FRQ 3: …”) when shown separately from prompt body. */
+  questionTitle?: string;
   prompt: string;
+  /** Gov SCOTUS comparison: instructions (bold), citation (italic), summary; `prompt` is the task line. */
+  govScotusStimulus?: {
+    instructions: string;
+    caseCitation: string;
+    summary: string;
+  };
   image?: StaticImageData;
   tableData?: TableData;
   /** Shown after `tableData` (e.g. Gov quantitative: task line after the stimulus table). */
@@ -59,15 +67,26 @@ interface FullExamFRQProps {
   };
   examType?: 'macro' | 'micro' | 'gov';
   backUrl?: string;
+  /** Hide the bottom “Question N of M” dropdown + numbered grid; use Prev/Next only. */
+  hideExpandingQuestionNav?: boolean;
 }
 
-const FRQ_TOTAL_SECONDS = 50 * 60;
+/** Macro/Micro FRQ practice sessions default; Gov unit FRQ pack uses AP Gov Section II–style pacing. */
+const DEFAULT_FRQ_TOTAL_SECONDS = 50 * 60;
+const GOV_UNIT_FRQ_PACK_TOTAL_SECONDS = 60 * 60;
 
 const FONT_SIZE_CLASSES = ['text-sm', 'text-base', 'text-lg', 'text-xl'];
 const FONT_SIZE_MAX = FONT_SIZE_CLASSES.length - 1;
 
-export function FullExamFRQ({ questions, examType = 'macro', backUrl }: FullExamFRQProps) {
+export function FullExamFRQ({
+  questions,
+  examType = 'macro',
+  backUrl,
+  hideExpandingQuestionNav = false,
+}: FullExamFRQProps) {
   const router = useRouter();
+  const frqSessionTotalSeconds =
+    examType === 'gov' ? GOV_UNIT_FRQ_PACK_TOTAL_SECONDS : DEFAULT_FRQ_TOTAL_SECONDS;
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [textAnswers, setTextAnswers] = useState<Record<string, string>>({});
   const [drawingAnswers, setDrawingAnswers] = useState<Record<string, string>>({});
@@ -75,7 +94,7 @@ export function FullExamFRQ({ questions, examType = 'macro', backUrl }: FullExam
   const [selectedImage, setSelectedImage] = useState<StaticImageData | null>(null);
   const [showResults, setShowResults] = useState(false);
   const [isTimerPaused, setIsTimerPaused] = useState(false);
-  const [timeRemaining, setTimeRemaining] = useState(FRQ_TOTAL_SECONDS);
+  const [timeRemaining, setTimeRemaining] = useState(frqSessionTotalSeconds);
   const [showTimer, setShowTimer] = useState(true);
   const [questionFontSize, setQuestionFontSize] = useState(1);
   const [savedDrawingKeys, setSavedDrawingKeys] = useState<Set<string>>(new Set());
@@ -121,6 +140,7 @@ export function FullExamFRQ({ questions, examType = 'macro', backUrl }: FullExam
   }, [showResults, isTimerPaused]);
 
   useEffect(() => {
+    if (hideExpandingQuestionNav) return;
     const handler = (event: MouseEvent) => {
       if (
         questionNavigatorRef.current &&
@@ -133,7 +153,7 @@ export function FullExamFRQ({ questions, examType = 'macro', backUrl }: FullExam
       document.addEventListener('mousedown', handler);
     }
     return () => document.removeEventListener('mousedown', handler);
-  }, [showQuestionNavigator]);
+  }, [showQuestionNavigator, hideExpandingQuestionNav]);
 
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60).toString().padStart(2, '0');
@@ -188,56 +208,109 @@ export function FullExamFRQ({ questions, examType = 'macro', backUrl }: FullExam
     const currentQuestion = questions.questions[currentQuestionIndex];
   const fontClass = FONT_SIZE_CLASSES[questionFontSize];
 
-  const renderTable = (tableData: TableData) => (
-    <div className="my-6 w-full max-w-full overflow-x-auto flex justify-center">
-                <div className="flex items-center gap-4">
-        {tableData.playerNames && (
-                    <div className="flex items-center justify-center h-full w-16">
-            <p className="transform -rotate-90 whitespace-nowrap text-center font-bold text-base text-gray-900 leading-tight">
-              {tableData.playerNames.row.split(' ')[0]}
-                        <br />
-              {tableData.playerNames.row.split(' ').slice(1).join(' ')}
-                      </p>
-                    </div>
-                  )}
-                  <div className="flex-1">
+  const renderTable = (tableData: TableData, _bleed: 'none' | 'exam' | 'results' = 'none') => {
+    const tableElClass = 'min-w-full border-collapse border border-black';
+    const cellBorder = 'border border-black';
+    const innerWrapClass = 'flex items-center gap-4';
+    const outerClass = 'my-6 w-full max-w-full overflow-x-auto flex justify-center';
+
+    return (
+      <div className={outerClass}>
+        <div className={innerWrapClass}>
           {tableData.playerNames && (
-            <p className="text-center font-bold text-base text-gray-900 mb-2">
-              {tableData.playerNames.column}
-                      </p>
-                    )}
-                    <table className="min-w-full border-collapse border border-black">
-                      <thead className="bg-white">
-                        <tr>
-                {tableData.headers.map(header => (
-                  <th key={header} className="border border-black px-4 py-3 text-center text-sm font-bold text-gray-900">
-                              {header}
-                            </th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white">
-              {tableData.rows.map((row, rowIndex) => (
-                          <tr key={rowIndex}>
-                            {row.map((cell, cellIndex) => {
-                    const isRowHeader = tableData.rowHeaders && cellIndex === 0;
-                              return (
-                                <td 
-                                  key={cellIndex} 
-                        className={`border border-black px-4 py-3 text-center text-sm ${isRowHeader ? 'font-bold' : ''}`}
-                                >
-                                  {cell}
-                                </td>
-                              );
-                            })}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-  );
+            <div className="flex h-full w-16 items-center justify-center">
+              <p className="transform -rotate-90 text-center text-base font-bold leading-tight text-gray-900 whitespace-nowrap">
+                {tableData.playerNames.row.split(' ')[0]}
+                <br />
+                {tableData.playerNames.row.split(' ').slice(1).join(' ')}
+              </p>
+            </div>
+          )}
+          <div className="flex-1">
+            {tableData.playerNames && (
+              <p className="mb-2 text-center text-base font-bold text-gray-900">
+                {tableData.playerNames.column}
+              </p>
+            )}
+            <table className={tableElClass}>
+              <thead className="bg-white">
+                <tr>
+                  {tableData.headers.map((header) => (
+                    <th
+                      key={header}
+                      className={`${cellBorder} bg-white px-4 py-3 text-center text-sm text-gray-900 font-bold`}
+                    >
+                      {header}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="bg-white">
+                {tableData.rows.map((row, rowIndex) => (
+                  <tr key={rowIndex}>
+                    {row.map((cell, cellIndex) => {
+                      const isRowHeader = tableData.rowHeaders && cellIndex === 0;
+                      return (
+                        <td
+                          key={cellIndex}
+                          className={`${cellBorder} bg-white px-4 py-3 text-center text-sm text-gray-900 ${
+                            isRowHeader ? 'font-bold' : ''
+                          }`}
+                        >
+                          {cell}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderGovFrqPrompt = (q: Question) => {
+    if (examType === 'gov' && q.govScotusStimulus) {
+      return (
+        <>
+          {q.questionTitle ? (
+            <h2 className={`mb-4 font-black text-gray-900 tracking-tight ${fontClass}`}>{q.questionTitle}</h2>
+          ) : null}
+          <div
+            className={`mb-5 space-y-4 text-gray-900 font-['Times_New_Roman',Times,serif] leading-relaxed ${fontClass}`}
+          >
+            <p className="font-bold whitespace-pre-line">{q.govScotusStimulus.instructions}</p>
+            <p className="text-center font-normal italic">{q.govScotusStimulus.caseCitation}</p>
+            <p className="font-normal whitespace-pre-line">{q.govScotusStimulus.summary}</p>
+            {q.prompt.trim() ? (
+              <p className="border-t border-gray-200 pt-4 font-semibold whitespace-pre-line">{q.prompt}</p>
+            ) : null}
+          </div>
+        </>
+      );
+    }
+    if (examType === 'gov' && q.questionTitle) {
+      return (
+        <>
+          <h2 className={`mb-4 font-black text-gray-900 tracking-tight ${fontClass}`}>{q.questionTitle}</h2>
+          {q.prompt.trim() ? (
+            <p
+              className={`mb-5 font-semibold text-gray-900 leading-relaxed whitespace-pre-line font-['Times_New_Roman',Times,serif] ${fontClass}`}
+            >
+              {q.prompt}
+            </p>
+          ) : null}
+        </>
+      );
+    }
+    return (
+      <p className={`font-semibold text-gray-900 mb-5 leading-relaxed whitespace-pre-line ${fontClass}`}>
+        {q.prompt}
+      </p>
+    );
+  };
 
   const renderPartBlock = (part: Part, partIndex: number, largeText: boolean) => {
     const answerMargin = largeText ? '' : 'ml-6';
@@ -359,7 +432,10 @@ export function FullExamFRQ({ questions, examType = 'macro', backUrl }: FullExam
     const [resultsIndex, setResultsIndex] = useState(0);
     const rq = questions.questions[resultsIndex];
     return (
-      <div className="p-8 max-w-4xl mx-auto pb-28">
+      <>
+      <div className="flex min-h-[calc(100dvh-56px)] w-full justify-center bg-gradient-to-b from-slate-50 via-white to-slate-100/85 px-3 py-6 sm:px-6 sm:py-10">
+        <div className="flex h-[min(920px,calc(100dvh-3.5rem))] w-full max-w-7xl flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-white/95 shadow-[0_24px_60px_-28px_rgba(15,23,42,0.12)] ring-1 ring-slate-900/[0.05]">
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-5 pb-28 sm:px-6 sm:py-6">
         <div className="mb-8">
           <p className="text-xs font-black uppercase tracking-widest text-gray-400 mb-1">Results</p>
           <h2 className={`font-bold text-gray-900 ${fontClass}`}>
@@ -367,13 +443,11 @@ export function FullExamFRQ({ questions, examType = 'macro', backUrl }: FullExam
           </h2>
           </div>
 
-        <p className={`font-semibold text-gray-900 mb-4 leading-relaxed whitespace-pre-line ${fontClass}`}>
-          {rq.prompt}
-        </p>
+        <div className="mb-4">{renderGovFrqPrompt(rq)}</div>
         {rq.image && (
           <img src={rq.image.src} alt="Question" className="max-h-[300px] object-contain mb-6 rounded" />
         )}
-        {rq.tableData && renderTable(rq.tableData)}
+        {rq.tableData && renderTable(rq.tableData, 'results')}
         {rq.directionsAfterTable ? (
           <p className={`font-semibold text-gray-900 mb-6 leading-relaxed whitespace-pre-line ${fontClass}`}>
             {rq.directionsAfterTable}
@@ -490,10 +564,13 @@ export function FullExamFRQ({ questions, examType = 'macro', backUrl }: FullExam
               </div>
             ))}
         </div>
+          </div>
+        </div>
+      </div>
 
         {/* Results navigation */}
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
-          <div className="max-w-4xl mx-auto px-6 py-3 flex items-center justify-between gap-4">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
             <button
               onClick={() => { setResultsIndex(i => Math.max(0, i - 1)); window.scrollTo({ top: 0 }); }}
               disabled={resultsIndex === 0}
@@ -521,7 +598,7 @@ export function FullExamFRQ({ questions, examType = 'macro', backUrl }: FullExam
             )}
           </div>
         </div>
-      </div>
+      </>
     );
   };
 
@@ -717,10 +794,8 @@ export function FullExamFRQ({ questions, examType = 'macro', backUrl }: FullExam
               </span>
             </div>
 
-            {/* Prompt */}
-            <p className={`font-semibold text-gray-900 mb-5 leading-relaxed whitespace-pre-line ${fontClass}`}>
-              {currentQuestion.prompt}
-            </p>
+            {/* Prompt / Gov SCOTUS stimulus layout */}
+            {renderGovFrqPrompt(currentQuestion)}
 
             {/* Image */}
               {currentQuestion.image && (
@@ -740,7 +815,7 @@ export function FullExamFRQ({ questions, examType = 'macro', backUrl }: FullExam
               )}
 
             {/* Table */}
-            {currentQuestion.tableData && renderTable(currentQuestion.tableData)}
+            {currentQuestion.tableData && renderTable(currentQuestion.tableData, 'exam')}
             {currentQuestion.directionsAfterTable ? (
               <p className={`font-semibold text-gray-900 mb-6 leading-relaxed whitespace-pre-line ${fontClass}`}>
                 {currentQuestion.directionsAfterTable}
@@ -804,81 +879,93 @@ export function FullExamFRQ({ questions, examType = 'macro', backUrl }: FullExam
       {/* Bottom bar — matches MCQ unit test navigator + Prev / Next */}
       {!showResults && (
         <div className="fixed bottom-0 left-0 right-0 bg-white z-50 border-t border-gray-200">
-          <AnimatePresence>
-            {showQuestionNavigator && (
-              <motion.div
-                key="question-navigator"
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 35 }}
-                className="overflow-hidden w-full border-b border-gray-200"
-              >
-                <div className="max-w-7xl mx-auto px-4 py-4">
-                  <div className="flex flex-wrap gap-2">
-                    {questions.questions.map((_, index) => {
-                      const isCurrent = index === currentQuestionIndex;
-                      return (
-                        <button
-                          key={index}
-                          type="button"
-                          onClick={() => {
-                            if (isTimerPaused) return;
-                            setCurrentQuestionIndex(index);
-                            setShowQuestionNavigator(false);
-                            window.scrollTo({ top: 0 });
-                          }}
-                          disabled={isTimerPaused}
-                          className={`w-10 h-10 rounded-lg font-semibold text-sm transition-all ${
-                            isTimerPaused
-                              ? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-300'
-                              : isCurrent
-                                ? `${
-                                    examType === 'macro' ? 'bg-blue-600' : 'bg-green-600'
-                                  } text-white ring-2 ring-offset-1 ring-gray-400`
-                                : 'bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200'
-                          }`}
-                          title={isTimerPaused ? 'Timer paused' : `Question ${index + 1}`}
-                        >
-                          {index + 1}
-                        </button>
-                      );
-                    })}
+          {!hideExpandingQuestionNav && (
+            <AnimatePresence>
+              {showQuestionNavigator && (
+                <motion.div
+                  key="question-navigator"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 35 }}
+                  className="overflow-hidden w-full border-b border-gray-200"
+                >
+                  <div className="max-w-7xl mx-auto px-4 py-4">
+                    <div className="flex flex-wrap gap-2">
+                      {questions.questions.map((_, index) => {
+                        const isCurrent = index === currentQuestionIndex;
+                        return (
+                          <button
+                            key={index}
+                            type="button"
+                            onClick={() => {
+                              if (isTimerPaused) return;
+                              setCurrentQuestionIndex(index);
+                              setShowQuestionNavigator(false);
+                              window.scrollTo({ top: 0 });
+                            }}
+                            disabled={isTimerPaused}
+                            className={`w-10 h-10 rounded-lg font-semibold text-sm transition-all ${
+                              isTimerPaused
+                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-300'
+                                : isCurrent
+                                  ? `${
+                                      examType === 'macro' ? 'bg-blue-600' : 'bg-green-600'
+                                    } text-white ring-2 ring-offset-1 ring-gray-400`
+                                  : 'bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200'
+                            }`}
+                            title={isTimerPaused ? 'Timer paused' : `Question ${index + 1}`}
+                          >
+                            {index + 1}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          )}
 
           <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-            <span className="hidden sm:block text-xs text-gray-400 font-medium shrink-0">
+            <span
+              className={`text-xs text-gray-400 font-medium shrink-0 ${
+                hideExpandingQuestionNav ? 'hidden min-[400px]:block' : 'hidden sm:block'
+              }`}
+            >
               Sec II &bull; {questions.questions.length} Questions
             </span>
-            <div className="relative flex-1 max-w-md" ref={questionNavigatorRef}>
-              <button
-                type="button"
-                onClick={() => setShowQuestionNavigator(v => !v)}
-                disabled={isTimerPaused}
-                className={`w-full px-4 py-2.5 rounded-lg font-semibold flex items-center justify-between transition-colors ${
-                  isTimerPaused
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <List className="w-5 h-5" />
-                  <span>
-                    Question {currentQuestionIndex + 1} of {questions.questions.length}
-                  </span>
-                </div>
-                {showQuestionNavigator ? (
-                  <ChevronUp className="w-5 h-5" />
-                ) : (
-                  <ChevronDown className="w-5 h-5" />
-                )}
-              </button>
-            </div>
-            <div className="flex items-center gap-3">
+            {hideExpandingQuestionNav ? (
+              <p className="min-w-0 flex-1 text-center text-sm font-semibold tabular-nums text-gray-800 sm:text-base">
+                Question {currentQuestionIndex + 1} of {questions.questions.length}
+              </p>
+            ) : (
+              <div className="relative flex-1 max-w-md" ref={questionNavigatorRef}>
+                <button
+                  type="button"
+                  onClick={() => setShowQuestionNavigator(v => !v)}
+                  disabled={isTimerPaused}
+                  className={`w-full px-4 py-2.5 rounded-lg font-semibold flex items-center justify-between transition-colors ${
+                    isTimerPaused
+                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <List className="w-5 h-5" />
+                    <span>
+                      Question {currentQuestionIndex + 1} of {questions.questions.length}
+                    </span>
+                  </div>
+                  {showQuestionNavigator ? (
+                    <ChevronUp className="w-5 h-5" />
+                  ) : (
+                    <ChevronDown className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
+            )}
+            <div className="flex items-center gap-3 shrink-0">
               <button
                 type="button"
                 onClick={goToPrev}
@@ -914,7 +1001,7 @@ export function FullExamFRQ({ questions, examType = 'macro', backUrl }: FullExam
               </button>
             </div>
           </div>
-              </div>
+        </div>
       )}
 
       {/* Exit confirmation modal */}

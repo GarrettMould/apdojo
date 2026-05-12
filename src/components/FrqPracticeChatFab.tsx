@@ -344,6 +344,7 @@ export function FrqPracticeChatFab({
     }
     return null;
   }, [messages]);
+  const hasUserMessage = useMemo(() => messages.some((m) => m.role === 'user'), [messages]);
 
   const onPickChoice = useCallback(
     (prompt: string, displayLabel: string) => {
@@ -404,7 +405,8 @@ export function FrqPracticeChatFab({
                   m.role === 'assistant' &&
                   parsedAssistant &&
                   parsedAssistant.choices.length > 0 &&
-                  m.id === lastAssistantId;
+                  m.id === lastAssistantId &&
+                  !(m.id === 'welcome' && hasUserMessage);
                 const assistantLead = parsedAssistant?.display.trim() ?? '';
                 const avatarUrl = tutorAvatarUrl(subject);
 

@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Question, QuestionBank } from '@/data/questionBanks/types';
 import { Button } from "@/components/ui/button";
-import { Bookmark, BookmarkX, X, Clock, Maximize2, Minimize2, Calculator, Pen, Eraser, Expand, Trash2, Circle, CircleDot, Check, Lock, Brain, FileText, ChevronLeft, ChevronRight, ChevronsRight, Triangle, Strikethrough, Eye, EyeOff, Play, ChevronDown, ChevronUp, List, Pause, Play as PlayIcon, Highlighter } from 'lucide-react';
+import { Bookmark, BookmarkX, X, Clock, Maximize2, Minimize2, Calculator, Pen, Eraser, Expand, Trash2, Circle, CircleDot, Check, Lock, Brain, FileText, ChevronLeft, ChevronRight, ChevronsRight, Triangle, Strikethrough, Eye, EyeOff, Play, ChevronDown, ChevronUp, List, Pause, Play as PlayIcon, Highlighter, Copy, Share2, Users, Mail, MessageCircle, Camera, Ghost } from 'lucide-react';
 import Image, { StaticImageData } from 'next/image';
 import Link from 'next/link';
 import { redirectToCheckout } from '@/lib/stripe';
@@ -117,6 +117,208 @@ const FeedbackProgressBar = ({ status }: { status: 'incorrect' | 'partial' | 'co
     </div>
   );
 };
+
+const SHARE_PREP_BODY =
+  'How does your score stack up? Same unit MCQ on AP Dojo — see if everyone is prepared.\n\n';
+
+/** Share row on unit test results — solid dojo purple + brutalist Share menu. */
+function UnitTestSharePrepRow() {
+  const [copied, setCopied] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
+  const [hint, setHint] = useState<string | null>(null);
+  const [pageUrl, setPageUrl] = useState('');
+  const shareWrapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setPageUrl(typeof window !== 'undefined' ? window.location.href : '');
+  }, []);
+
+  useEffect(() => {
+    if (!shareOpen) return;
+    const onDoc = (e: MouseEvent) => {
+      const el = shareWrapRef.current;
+      if (el && !el.contains(e.target as Node)) setShareOpen(false);
+    };
+    document.addEventListener('mousedown', onDoc);
+    return () => document.removeEventListener('mousedown', onDoc);
+  }, [shareOpen]);
+
+  const getUrl = () => (typeof window !== 'undefined' ? window.location.href : pageUrl);
+
+  const flashHint = (msg: string) => {
+    setHint(msg);
+    setTimeout(() => setHint(null), 2800);
+  };
+
+  const handleCopy = async () => {
+    const url = getUrl();
+    if (!url) return;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+      flashHint('Link copied to clipboard.');
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const sharePayload = () => {
+    const url = getUrl();
+    const body = `${SHARE_PREP_BODY}${url}`;
+    return { url, body };
+  };
+
+  const openGmail = () => {
+    const { url, body } = sharePayload();
+    if (!url) return;
+    const sub = encodeURIComponent('AP Dojo — unit practice');
+    const b = encodeURIComponent(body);
+    window.open(`https://mail.google.com/mail/?view=cm&fs=1&su=${sub}&body=${b}`, '_blank', 'noopener,noreferrer');
+    setShareOpen(false);
+  };
+
+  const openMessenger = () => {
+    const { url } = sharePayload();
+    if (!url) return;
+    // Web-friendly share surface; on many devices users route to Messenger from the Facebook sheet.
+    window.open(
+      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+      '_blank',
+      'noopener,noreferrer'
+    );
+    setShareOpen(false);
+  };
+
+  const openInstagram = async () => {
+    const { url, body } = sharePayload();
+    if (!url) return;
+    try {
+      await navigator.clipboard.writeText(body);
+      flashHint('Caption + link copied — paste into Instagram.');
+    } catch {
+      flashHint('Could not copy — try Copy link.');
+    }
+    window.open('https://www.instagram.com/', '_blank', 'noopener,noreferrer');
+    setShareOpen(false);
+  };
+
+  const openSnapchat = async () => {
+    const { url, body } = sharePayload();
+    if (!url) return;
+    try {
+      await navigator.clipboard.writeText(body);
+      flashHint('Caption + link copied — paste into Snapchat.');
+    } catch {
+      flashHint('Could not copy — try Copy link.');
+    }
+    window.open('https://www.snapchat.com/', '_blank', 'noopener,noreferrer');
+    setShareOpen(false);
+  };
+
+  return (
+    <div className="mt-6 border-t border-gray-200 pt-6">
+      <div className="relative rounded-2xl border-4 border-black bg-violet-800 p-5 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] sm:p-6">
+        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-5">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border-2 border-black bg-white text-violet-800 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+            <Users className="h-6 w-6" strokeWidth={2.25} aria-hidden />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-lg font-black tracking-tight text-white sm:text-xl">
+              How does that compare to your friends?
+            </p>
+            <p className="mt-2 text-sm font-semibold leading-relaxed text-white/90">
+              Share a link to see if everyone is prepared — same practice, your crew.
+            </p>
+            {hint ? (
+              <p className="mt-3 text-xs font-bold text-amber-200" role="status">
+                {hint}
+              </p>
+            ) : null}
+            <div className="mt-5 flex flex-wrap items-center gap-3">
+              <div className="relative" ref={shareWrapRef}>
+                <button
+                  type="button"
+                  onClick={() => setShareOpen((o) => !o)}
+                  aria-expanded={shareOpen}
+                  aria-haspopup="menu"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border-4 border-black bg-white px-4 py-2.5 text-sm font-black text-gray-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition hover:bg-violet-50 active:translate-y-0.5 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                >
+                  <Share2 className="h-4 w-4 shrink-0" aria-hidden />
+                  Share
+                  <ChevronDown
+                    className={`h-4 w-4 shrink-0 transition-transform ${shareOpen ? 'rotate-180' : ''}`}
+                    aria-hidden
+                  />
+                </button>
+                {shareOpen ? (
+                  <div
+                    role="menu"
+                    className="absolute left-0 top-full z-30 mt-2 w-[min(100vw-2rem,18rem)] overflow-hidden rounded-xl border-4 border-black bg-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]"
+                  >
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={openMessenger}
+                      className="flex w-full items-center gap-3 border-b-4 border-black px-4 py-3 text-left font-black text-gray-900 transition hover:bg-violet-100"
+                    >
+                      <MessageCircle className="h-5 w-5 shrink-0 text-[#0084FF]" aria-hidden />
+                      Messenger
+                    </button>
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={openInstagram}
+                      className="flex w-full items-center gap-3 border-b-4 border-black px-4 py-3 text-left font-black text-gray-900 transition hover:bg-violet-100"
+                    >
+                      <Camera className="h-5 w-5 shrink-0 text-pink-600" aria-hidden />
+                      Instagram
+                    </button>
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={openSnapchat}
+                      className="flex w-full items-center gap-3 border-b-4 border-black px-4 py-3 text-left font-black text-gray-900 transition hover:bg-violet-100"
+                    >
+                      <Ghost className="h-5 w-5 shrink-0 text-yellow-500" aria-hidden />
+                      Snapchat
+                    </button>
+                    <button
+                      type="button"
+                      role="menuitem"
+                      onClick={openGmail}
+                      className="flex w-full items-center gap-3 px-4 py-3 text-left font-black text-gray-900 transition hover:bg-violet-100"
+                    >
+                      <Mail className="h-5 w-5 shrink-0 text-red-600" aria-hidden />
+                      Gmail
+                    </button>
+                  </div>
+                ) : null}
+              </div>
+              <button
+                type="button"
+                onClick={handleCopy}
+                className="inline-flex items-center justify-center gap-2 rounded-xl border-4 border-black bg-violet-950 px-4 py-2.5 text-sm font-black text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition hover:bg-violet-900 active:translate-y-0.5 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+              >
+                {copied ? (
+                  <>
+                    <Check className="h-4 w-4 text-emerald-300" aria-hidden />
+                    Copied
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-4 w-4 shrink-0" aria-hidden />
+                    Copy link
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function FullExam({ questionBank, examType, questionType, examNumber, onTimeUpdate, isCustomAssignment = false, assignmentLinkId, isFreeUser = false, isUnitTest = false, isPreviewMode = false, liveSessionId, liveStudentId, liveStudentName }: FullExamProps) {
   const [answers, setAnswers] = useState<Answers>({});
@@ -2270,7 +2472,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                     ? 'p-8'
                     : showToolsPanel
                       ? 'p-8'
-                      : 'p-8 max-w-5xl mx-auto'
+                      : isUnitTest && showResults && showFullResults
+                        ? 'max-w-7xl mx-auto p-0 sm:px-4'
+                        : 'p-8 max-w-5xl mx-auto'
              } ${shouldShowTestUI ? 'pb-24' : ''}`}>
             {!showResults ? (
               <>
@@ -2955,14 +3159,18 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                   </button>
                 </div>
               </div>
-            ) : (
-              <div className="space-y-8 max-w-4xl mx-auto w-full">
-            {/* Compact Results Summary - Only Assessment Results Section */}
+            ) : (() => {
+              const resultsInner = (
+                <>
+            {/* Compact results summary (title lives outside this card on unit tests & full exam column) */}
             {showResults && showFullResults && (
-              <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
-                <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                  <h2 className="text-lg font-bold text-slate-900">Assessment Results</h2>
-                  <span className="text-sm font-medium text-slate-500">
+              <div
+                className={`rounded-2xl bg-white p-5 md:p-6 ${
+                  isUnitTest ? 'border border-gray-200 shadow-sm' : 'border border-slate-200 shadow-sm'
+                }`}
+              >
+                <div className="mb-4 flex flex-wrap items-center justify-end gap-3">
+                  <span className="text-sm font-semibold text-slate-600">
                     {correctAnswersCount} of {totalQuestionsCount} correct
                   </span>
                 </div>
@@ -2991,6 +3199,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                     </p>
                   </div>
                 </div>
+                {isUnitTest ? <UnitTestSharePrepRow /> : null}
               </div>
             )}
             {/* Questions Review */}
@@ -3247,8 +3456,30 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                   </div>
                   );
                 })}
-              </div>
-            )}
+                </>
+              );
+              return isUnitTest ? (
+                <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 py-6 pb-24 space-y-10 sm:space-y-12">
+                  {showResults && showFullResults ? (
+                    <div className="px-1 py-4 sm:px-2 sm:py-8 md:py-10">
+                      <h1 className="text-4xl font-black leading-[1.05] tracking-tight text-black sm:text-5xl md:text-6xl">
+                        Assessment Results
+                      </h1>
+                    </div>
+                  ) : null}
+                  <div className="rounded-2xl border-2 border-black bg-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+                    <div className="p-4 sm:p-6 space-y-8 w-full">{resultsInner}</div>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-8 max-w-4xl mx-auto w-full">
+                  {showResults && showFullResults ? (
+                    <h2 className="text-2xl font-black text-black tracking-tight">Assessment Results</h2>
+                  ) : null}
+                  {resultsInner}
+                </div>
+              );
+            })()}
             </div>
           </motion.div>
 
