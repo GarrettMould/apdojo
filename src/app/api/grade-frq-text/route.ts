@@ -4,7 +4,7 @@ import { generateGradingPrompt } from '@/lib/grading-logic';
 
 export const maxDuration = 30; // Set a 30-second timeout
 export const runtime = 'nodejs'; // Ensure Node.js runtime for Vercel
-const MODEL_NAME = 'gemini-2.0-flash';
+const MODEL_NAME = 'gemini-flash-latest';
 const MODEL_TIMEOUT_MS = 12000;
 const MAX_ATTEMPTS = 2;
 

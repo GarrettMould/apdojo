@@ -2,7 +2,7 @@ import type { Question } from '@/data/questionBanks/types';
 
 /**
  * AP U.S. Government & Politics — Unit 1 MCQ **practice** pool (cheat-sheet drills, `/mcq-practice`, etc.).
- * Same shape as Macro/Micro: these are merged into `allQuestions` in `unitPracticeProblems.ts`.
+ * Same shape as Macro/Micro: merged into `allQuestions` via `govMcqPractice.ts`.
  *
  * Unit 1 **formal unit test** uses `govUnit1McqTestQuestions` in `govUnit1McqExam.ts` (separate bank).
  *
@@ -670,5 +670,23 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     correctAnswer: 'A',
     explanation:
       'The Tenth Amendment reserves undelegated powers to states, while Congress often relies on the Commerce Clause plus Necessary and Proper Clause to justify broader national legislation. That recurring overlap creates a central federalism tension.',
+  },
+  {
+    id: 6078,
+    subject: 'ap_us_government',
+    unit: 1,
+    lessonIDS: ['1.5'],
+    unitName: 'Foundations of American Democracy',
+    question: 'Which of the following is the most common method for amending the U.S. Constitution?',
+    image: null,
+    options: [
+      'Proposed by 2/3 of state legislatures and ratified by 3/4 of Congress.',
+      'Proposed by a national convention and ratified by popular vote.',
+      'Proposed by 2/3 of both houses of Congress and ratified by 3/4 of state legislatures.',
+      'Proposed by the President and ratified by the Supreme Court.',
+    ],
+    correctAnswer: 'C',
+    explanation:
+      'Under Article V, the most frequent path is a 2/3 vote in both houses of Congress followed by ratification by 3/4 of state legislatures.',
   },
 ];

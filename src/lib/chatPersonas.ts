@@ -1,8 +1,8 @@
 import type { CourseSubject } from '@/lib/courseSubject';
 import { displayCourseLabel } from '@/lib/courseSubject';
 
-/** Persona bucket: shared Adam Smith voice for Macro + Micro; Franklin for Gov. */
-export type ChatPersonaKey = 'econ' | 'gov';
+/** Persona bucket: shared Adam Smith voice for Macro + Micro; Franklin for Gov; Nightingale for Stats. */
+export type ChatPersonaKey = 'econ' | 'gov' | 'stats';
 
 export type ChatPersonaPrompt = {
   name: string;
@@ -50,14 +50,67 @@ export const PERSONA_PROMPTS: Record<ChatPersonaKey, ChatPersonaPrompt> = {
     voice:
       'Students see you as an AP U.S. Government tutor presented under the name and temperament of Benjamin Franklin: practical, approachable, dryly witty, and strictly nonpartisan about parties and candidates. Speak in clear, contemporary English—the voice of a competent civics tutor in the present day. Avoid colonial idioms, pamphlet cadence, and founding-era vignettes as scaffolding for substantive teaching: explanations, hypotheses, drills, and follow-ups must reflect the current AP Government framework and modern institutions—not period reenactment. When your reply is long enough—roughly 120 words or three or more short paragraphs—you may add one persona garnish in plain English: one short sentence OR one playful-but-respectful clause that underscores civic patience, experiment-mindedness, or practical habits of mind (still nonpartisan; tone only—no novel legal or factual assertions). Omit in very short replies. Place it once, ideally as opener or connector before closure—not inside the middle of a definition list.',
   },
+  stats: {
+    name: 'Florence Nightingale',
+    voice:
+      'Students see you as an AP Statistics tutor embodied in the name and broad spirit of Florence Nightingale: precise, evidence-minded, and calm under uncertainty—focused on what the data actually show rather than intuition alone. Speak in plain, contemporary English—the same voice you would use in any high-quality tutoring session today. Never use Victorian bedside melodrama, archaic diction, or period hospital vignettes as lesson content: definitions, displays, conditions for inference, simulations, and exam-style setups must stay modern and AP-appropriate (current notation, textbook-style contexts, recognizable study designs—without inventing exam specifics). When your reply is long enough—roughly 120 words or three or more short paragraphs—you may add a single persona beat in modern prose: one short sentence OR one tight clause expressing quiet insistence on variation, context, or letting a good display do the arguing (tone only; it must not introduce new factual claims beyond what you already explained). Omit that beat entirely in terse answers. Prefer placing it once as an opening aside or closing bridge—not split across every paragraph.',
+  },
 };
 
 export function personaKeyForSubject(subject: CourseSubject): ChatPersonaKey {
-  return subject === 'gov' ? 'gov' : 'econ';
+  if (subject === 'gov') return 'gov';
+  if (subject === 'stats') return 'stats';
+  return 'econ';
 }
 
 export function personaForSubject(subject: CourseSubject): ChatPersonaPrompt {
   return PERSONA_PROMPTS[personaKeyForSubject(subject)];
+}
+
+/** Lightly branded first-line copy for tutor chat welcome threads. */
+export function tutorWelcomeOpening(
+  persona: ChatPersonaPrompt,
+  context: 'mcq' | 'frq' | 'cheat_sheet'
+): string {
+  if (persona.name === 'Adam Smith') {
+    if (context === 'mcq') return 'Adam Smith here, brought to you by the invisible hand.';
+    if (context === 'frq') return 'Adam Smith here — I have the full curriculum context for this FRQ.';
+    return `${persona.name} — Welcome to the Dojo.`;
+  }
+  if (persona.name === 'Florence Nightingale') {
+    if (context === 'mcq') return 'Florence Nightingale here — let the data tell the story.';
+    if (context === 'frq') return 'Florence Nightingale here — I have the full curriculum context for this FRQ.';
+    return `${persona.name} — Welcome to the Dojo.`;
+  }
+  if (context === 'mcq') return `${persona.name} here, ready to reason this out with you.`;
+  if (context === 'frq') return `${persona.name} here — I have the full curriculum context for this FRQ.`;
+  return `${persona.name} — Welcome to the Dojo.`;
+}
+
+export function cheatSheetPersonaBeatHint(subject: CourseSubject): string {
+  if (subject === 'gov') {
+    return 'dry civic wit and pragmatism, always nonpartisan';
+  }
+  if (subject === 'stats') {
+    return 'calm precision about variation, displays, and evidence—context before conclusion';
+  }
+  return 'calm curiosity about how orderly reasoning fits markets and trade';
+}
+
+export function mcqPersonaEnergyLabel(subject: CourseSubject): string {
+  if (subject === 'gov') return 'Franklin-esque';
+  if (subject === 'stats') return 'Nightingale-esque';
+  return 'Smith-esque';
+}
+
+export function mcqPersonaBeatHint(subject: CourseSubject): string {
+  if (subject === 'gov') {
+    return 'dry civic wit / practical patience—always nonpartisan, never cute colonial cosplay.';
+  }
+  if (subject === 'stats') {
+    return 'calm precision about variation, displays, and evidence—let the chart do the arguing; never Victorian bedside melodrama.';
+  }
+  return 'polite curiosity or quiet delight at how the logic fits together—in markets or incentives, whichever fits this item.';
 }
 
 function scotusSenseiPromptContextBlock(ctx: ScotusSenseiPromptContext, intent: ScotusSenseiIntent): string {

@@ -2,23 +2,24 @@
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Head from 'next/head';
-import { macroUnits, microUnits, govUnits } from '@/data/cheatSheets';
+import { macroUnits, microUnits, govUnits, statsUnits } from '@/data/cheatSheets';
 import { useParams, useRouter } from 'next/navigation'; // Import useRouter
 import Image from 'next/image';
 import { keyTerms as allContentKeyTerms, whiteboardImages as allContentWhiteboards, KeyTerm, WhiteboardImage } from '@/data/allContent';
-import { macroUnits as allMacroUnits, microUnits as allMicroUnits, govUnits as allGovUnits } from '@/data/cheatSheets';
+import { macroUnits as allMacroUnits, microUnits as allMicroUnits, govUnits as allGovUnits, statsUnits as allStatsUnits } from '@/data/cheatSheets';
 import { useAuthContext } from '@/contexts/AuthContext';
 import Link from 'next/link';
 import { keyTerms as apMacroTerms } from '@/data/apMacroTerms';
 import { keyTerms as apMicroTerms } from '@/data/apMicroTerms';
 import { keyTerms as apGovTerms, govUnitSupremeCourtCases } from '@/data/apGovTerms';
+import { keyTerms as apStatsTerms } from '@/data/apStatsTerms';
 import { unit1Whiteboards, apMacroUnit2Whiteboards, apMacroUnit3Whiteboards, apMacroUnit4Whiteboards, apMacroUnit5Whiteboards, apMicroUnit3Whiteboards, apMicroUnit4Whiteboards, apMicroUnit5Whiteboards, apMicroUnit6Whiteboards, Whiteboard } from '@/data/whiteboards';
 import { microLessons, macroLessons } from '@/data/lessons';
 import { videos, Video } from '@/data/videos';
 import { getVideosForLessonId } from '@/data/videosByLessonId';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question as QuestionType } from '@/data/questionBanks/types';
-import { X, ArrowRight, Lock, ArrowLeft, CheckCircle2, XCircle, Download, Bookmark, BookmarkPlus, Check, Brain, Maximize2, FileText, Zap, Lightbulb, FileQuestion, Award, Layers, Unlock, Sparkles, ChevronDown, ChevronUp, Pen, MoreHorizontal } from 'lucide-react';
+import { X, ArrowRight, Lock, ArrowLeft, CheckCircle2, XCircle, Download, Bookmark, BookmarkPlus, Check, Brain, Maximize2, FileText, Zap, Lightbulb, FileQuestion, Award, Layers, Unlock, Sparkles, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Pen, MoreHorizontal } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import jsPDF from 'jspdf';
@@ -26,7 +27,7 @@ import { dojoIcon } from '@/data/imagePaths';
 import { motion, AnimatePresence } from 'framer-motion';
 import { dojoDrills, drillAppliesToSubject, getDrillUnitForSubject } from '@/data/dojoDrills';
 import { getFlashcardsForLesson, UnitFlashcardData } from '@/data/unitFlashcards';
-import { getGovFlashcardsForLesson } from '@/data/apgov/unitFlashcards';
+import { getGovFlashcardsForLesson } from '@/data/gov/unitFlashcards';
 import { StudyModeModal } from '@/components/StudyModeModal';
 import { SeasonPassModal } from '@/components/SeasonPassModal';
 import { SeasonPassEntryWideModal } from '@/components/SeasonPassEntryWideModal';
@@ -38,12 +39,16 @@ import { Footer } from '@/components/Footer';
 import SeasonPassScrollPopup from '@/app/SeasonPassScrollPopup';
 import { CheatSheetChatBox } from '@/components/CheatSheetChatBox';
 import type { CourseSubject } from '@/lib/courseSubject';
-import { econCourseFromSubject } from '@/lib/courseSubject';
+import { courseUrlSlugPrefix, displayCourseLabel, econCourseFromSubject } from '@/lib/courseSubject';
 import { hasAdminRole } from '@/lib/adminAccess';
 import { COURSE_CURRICULUM_OUTLINES } from '@/data/courseCurriculumOutline';
 import { scotusEssayPrompts } from '@/data/gov/scotusEssayPrompts';
+import { processMathContent } from '@/utils/processMathContent';
 
 const scotusComparisonFrqSlugSet = new Set(scotusEssayPrompts.map((p) => p.id));
+
+const AI_GENERATED_QUIZ_DISCLAIMER =
+  'AI-generated questions may contain errors. Double-check answers and explanations against your course materials.';
 
 /** Maps cheat-sheet case `id` (e.g. with year suffix) to `/scotus-essay-practice/[slug]` when a comparison FRQ exists. */
 function getScotusComparisonFrqSlug(caseId: string): string | null {
@@ -368,6 +373,29 @@ function LessonMcqPractice({ lessonId, unit, subject, isProCustomer, unitAnswere
   );
 }
 
+function getTermSymbols(term: KeyTerm): string[] {
+  return (term.subNotes ?? [])
+    .filter((note) => note.startsWith('Symbol:'))
+    .map((note) => note.replace(/^Symbol:\s*/, '').trim());
+}
+
+function formatTermLabel(term: KeyTerm): React.ReactNode {
+  const symbols = getTermSymbols(term);
+  if (symbols.length === 0) {
+    return term.term;
+  }
+
+  return (
+    <>
+      {term.term} ({processMathContent(symbols.join('; '))})
+    </>
+  );
+}
+
+function getDisplaySubNotes(term: KeyTerm): string[] {
+  return (term.subNotes ?? []).filter((note) => !note.startsWith('Symbol:'));
+}
+
 // Helper function to format subnotes with bold text before colons
 function formatSubNote(note: string): React.ReactNode {
   // Find the first colon in the note
@@ -380,14 +408,13 @@ function formatSubNote(note: string): React.ReactNode {
     
     return (
       <>
-        <strong>{beforeColon}</strong>
-        <span>{afterColon}</span>
+        <strong>{processMathContent(beforeColon)}</strong>
+        <span>{processMathContent(afterColon)}</span>
       </>
     );
   }
   
-  // If no colon, return the note as-is
-  return <span>{note}</span>;
+  return <span>{processMathContent(note)}</span>;
 }
 
 // JoinDojoModal Component
@@ -504,7 +531,7 @@ function InlineSeasonPassLessonPitch({ courseKey }: { courseKey: 'macro' | 'micr
 
 interface UnitPageProps {
   unitNumber?: number;
-  subject?: 'macro' | 'micro' | 'gov';
+  subject?: CourseSubject;
 }
 
 export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubject }: UnitPageProps = {}) {
@@ -574,6 +601,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
   const [chatPromptNonce, setChatPromptNonce] = useState(0);
   /** Bumped when another overlay opens so CheatSheetChatBox can force-close. */
   const [cheatSheetChatCloseRequest, setCheatSheetChatCloseRequest] = useState(0);
+  const [scotusCasePageIndex, setScotusCasePageIndex] = useState(0);
 
   const isPrettyCheatSheetRoute = propSubject != null && propUnitNumber != null;
   const showEntrySeasonPassPromo =
@@ -750,9 +778,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
   const isProCustomer = useMemo(() => {
     if (!user || !userData) return false;
     // Check if user has valid season pass for current subject
-    const subjectKey: CourseSubject =
-      selectedSubject === 'macro' ? 'macro' : selectedSubject === 'micro' ? 'micro' : 'gov';
-    return hasValidSeasonPass(userData, subjectKey);
+    return hasValidSeasonPass(userData, selectedSubject);
   }, [user, userData, selectedSubject]);
 
   const bumpLessonVideoWatchProgress = useCallback((key: string, el: HTMLVideoElement) => {
@@ -830,7 +856,9 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
         ? 'ap_macroeconomics'
         : selectedSubject === 'micro'
           ? 'ap_microeconomics'
-          : 'ap_us_government',
+          : selectedSubject === 'stats'
+            ? 'ap_statistics'
+            : 'ap_us_government',
     [selectedSubject]
   );
 
@@ -840,8 +868,23 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
         ? apMacroTerms.filter((term) => term.unit === activeUnitNum)
         : selectedSubject === 'micro'
           ? apMicroTerms.filter((term) => term.unit === activeUnitNum)
-          : (apGovTerms.filter((term) => term.unit === activeUnitNum) as KeyTerm[]),
+          : selectedSubject === 'stats'
+            ? apStatsTerms.filter((term) => term.unit === activeUnitNum)
+            : (apGovTerms.filter((term) => term.unit === activeUnitNum) as KeyTerm[]),
     [selectedSubject, activeUnitNum]
+  );
+
+  /** Full term bank for the active course (quiz generation, term matching). */
+  const allTermsForSubject: KeyTerm[] = useMemo(
+    () =>
+      selectedSubject === 'macro'
+        ? apMacroTerms
+        : selectedSubject === 'micro'
+          ? apMicroTerms
+          : selectedSubject === 'stats'
+            ? apStatsTerms
+            : (apGovTerms as KeyTerm[]),
+    [selectedSubject]
   );
   
   const unitWhiteboards: WhiteboardImage[] = useMemo(
@@ -858,6 +901,10 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
     () => (selectedSubject === 'gov' ? (govUnitSupremeCourtCases[activeUnitNum] ?? []) : []),
     [selectedSubject, activeUnitNum]
   );
+
+  useEffect(() => {
+    setScotusCasePageIndex(0);
+  }, [activeUnitNum, selectedSubject]);
 
   // --- Modal Logic ---
   const openModal = (whiteboard: WhiteboardImage) => {
@@ -886,13 +933,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
     setActiveUnit(unitNumber);
     // If we have props (new static routes), use the new URL format
     if (propSubject && propUnitNumber) {
-      const subjectPrefix =
-        selectedSubject === 'macro'
-          ? 'ap-macro'
-          : selectedSubject === 'micro'
-            ? 'ap-micro'
-            : 'ap-gov';
-      router.push(`/${subjectPrefix}-unit-${unitNumber}-cheat-sheet`, { scroll: false });
+      router.push(`/${courseUrlSlugPrefix(selectedSubject)}-unit-${unitNumber}-cheat-sheet`, { scroll: false });
     } else {
       // Otherwise, use the old dynamic route (backwards compatibility)
       router.push(`/unit/${unitNumber}`, { scroll: false });
@@ -984,12 +1025,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
       return;
     }
 
-    const allTerms =
-      selectedSubject === 'macro'
-        ? apMacroTerms
-        : selectedSubject === 'micro'
-          ? apMicroTerms
-          : (apGovTerms as KeyTerm[]);
+    const allTerms = allTermsForSubject;
     const allRelevantQuestions: QuestionType[] = [];
 
     // Find questions for each selected term
@@ -1140,12 +1176,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
     if (availableQuizQuestions.length === 0) return null;
 
     // Get the selected term objects
-    const allTerms =
-      selectedSubject === 'macro'
-        ? apMacroTerms
-        : selectedSubject === 'micro'
-          ? apMicroTerms
-          : (apGovTerms as KeyTerm[]);
+    const allTerms = allTermsForSubject;
     const selectedTermObjects = Array.from(selectedTerms)
       .map(termId => allTerms.find(t => t.id === termId))
       .filter(Boolean) as KeyTerm[];
@@ -1239,12 +1270,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
 
     try {
       // Get selected term objects - only send term names
-      const allTerms =
-        selectedSubject === 'macro'
-          ? apMacroTerms
-          : selectedSubject === 'micro'
-            ? apMicroTerms
-            : (apGovTerms as KeyTerm[]);
+      const allTerms = allTermsForSubject;
       const selectedTermObjects = Array.from(selectedTerms)
         .map(termId => allTerms.find(t => t.id === termId))
         .filter(Boolean) as KeyTerm[];
@@ -1365,12 +1391,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
   };
 
   const handleAskDojoAboutSelectedTerms = () => {
-    const allTerms =
-      selectedSubject === 'macro'
-        ? apMacroTerms
-        : selectedSubject === 'micro'
-          ? apMicroTerms
-          : (apGovTerms as KeyTerm[]);
+    const allTerms = allTermsForSubject;
     const selectedTermObjects = Array.from(selectedTerms)
       .map((termId) => allTerms.find((t) => t.id === termId))
       .filter(Boolean) as KeyTerm[];
@@ -1442,7 +1463,13 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
         const score = Math.round((correctCount / totalQuestions) * 100);
         
         const unitsToDisplay =
-          selectedSubject === 'macro' ? allMacroUnits : selectedSubject === 'micro' ? allMicroUnits : allGovUnits;
+          selectedSubject === 'macro'
+            ? allMacroUnits
+            : selectedSubject === 'micro'
+              ? allMicroUnits
+              : selectedSubject === 'stats'
+                ? allStatsUnits
+                : allGovUnits;
         const currentUnit = unitsToDisplay.find(u => u.number === activeUnitNum);
         const title = `Unit ${activeUnitNum} Cheat Sheet Quiz${currentUnit ? `: ${currentUnit.title}` : ''}`;
 
@@ -1515,23 +1542,91 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
   }, [showQuizPanel, showScrollPopup, shuffleModalOpen]);
 
   const unitsToDisplay =
-    selectedSubject === 'macro' ? allMacroUnits : selectedSubject === 'micro' ? allMicroUnits : allGovUnits;
+    selectedSubject === 'macro'
+      ? allMacroUnits
+      : selectedSubject === 'micro'
+        ? allMicroUnits
+        : selectedSubject === 'stats'
+          ? allStatsUnits
+          : allGovUnits;
   const pageTitleSubject =
     selectedSubject === 'macro'
       ? 'Macroeconomics'
       : selectedSubject === 'micro'
         ? 'Microeconomics'
-        : 'U.S. Government and Politics';
-  const themeColor = selectedSubject === 'macro' ? 'blue' : selectedSubject === 'micro' ? 'green' : 'violet';
+        : selectedSubject === 'stats'
+          ? 'Statistics'
+          : 'U.S. Government and Politics';
+  const themeColor =
+    selectedSubject === 'macro'
+      ? 'blue'
+      : selectedSubject === 'micro'
+        ? 'green'
+        : selectedSubject === 'stats'
+          ? 'orange'
+          : 'violet';
+  /** Key term row: selected-state chrome (check + ⋯ menu) matches course accent. */
+  const keyTermSelectChrome =
+    selectedSubject === 'macro'
+      ? {
+          checkWrap: 'border-blue-300 bg-blue-50',
+          checkIcon: 'text-blue-600',
+          menuBtn: 'border-blue-200 text-blue-600 hover:bg-blue-50',
+        }
+      : selectedSubject === 'micro'
+        ? {
+            checkWrap: 'border-green-300 bg-green-50',
+            checkIcon: 'text-green-600',
+            menuBtn: 'border-green-200 text-green-600 hover:bg-green-50',
+          }
+        : selectedSubject === 'stats'
+          ? {
+              checkWrap: 'border-orange-300 bg-orange-50',
+              checkIcon: 'text-orange-600',
+              menuBtn: 'border-orange-200 text-orange-600 hover:bg-orange-50',
+            }
+          : {
+              checkWrap: 'border-violet-300 bg-violet-50',
+              checkIcon: 'text-violet-600',
+              menuBtn: 'border-violet-200 text-violet-600 hover:bg-violet-50',
+            };
+
+  const cheatSheetCtaStyles =
+    selectedSubject === 'macro'
+      ? {
+          practiceMcq:
+            'bg-blue-500 hover:bg-blue-600 text-white border-blue-700 shadow-[0_4px_0_0_rgba(0,0,0,1)] active:shadow-[0_2px_0_0_rgba(0,0,0,1)]',
+          unitTest: 'bg-white text-blue-600 hover:bg-blue-50',
+        }
+      : selectedSubject === 'micro'
+        ? {
+            practiceMcq:
+              'bg-green-500 hover:bg-green-600 text-white border-green-700 shadow-[0_4px_0_0_rgba(0,0,0,1)] active:shadow-[0_2px_0_0_rgba(0,0,0,1)]',
+            unitTest: 'bg-white text-green-600 hover:bg-green-50',
+          }
+        : selectedSubject === 'stats'
+          ? {
+              practiceMcq:
+                'bg-orange-600 hover:bg-orange-700 text-white border-orange-800 shadow-[0_4px_0_0_rgba(0,0,0,1)] active:shadow-[0_2px_0_0_rgba(0,0,0,1)]',
+              unitTest: 'bg-white text-orange-600 hover:bg-orange-50',
+            }
+          : {
+              practiceMcq:
+                'bg-violet-600 hover:bg-violet-700 text-white border-violet-800 shadow-[0_4px_0_0_rgba(0,0,0,1)] active:shadow-[0_2px_0_0_rgba(0,0,0,1)]',
+              unitTest: 'bg-white text-violet-700 hover:bg-violet-50',
+            };
   
   // Get lesson names
   const lessons =
     selectedSubject === 'gov'
       ? COURSE_CURRICULUM_OUTLINES.gov.units
           .flatMap((u) => u.lessons.map((lesson) => ({ unit: u.unitNumber, lessonNumber: lesson.lessonNumber, lessonName: lesson.name })))
-      : selectedSubject === 'macro'
-        ? macroLessons
-        : microLessons;
+      : selectedSubject === 'stats'
+        ? COURSE_CURRICULUM_OUTLINES.stats.units
+            .flatMap((u) => u.lessons.map((lesson) => ({ unit: u.unitNumber, lessonNumber: lesson.lessonNumber, lessonName: lesson.name })))
+        : selectedSubject === 'macro'
+          ? macroLessons
+          : microLessons;
   const getLessonName = (lessonId: string): string => {
     const lesson = lessons.find(l => l.lessonNumber === lessonId);
     return lesson ? lesson.lessonName : '';
@@ -1804,7 +1899,9 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                   ? macroUnits.find(u => u.number === activeUnitNum)?.title || ''
                   : selectedSubject === 'micro'
                     ? microUnits.find(u => u.number === activeUnitNum)?.title || ''
-                    : govUnits.find(u => u.number === activeUnitNum)?.title || ''}
+                    : selectedSubject === 'stats'
+                      ? statsUnits.find(u => u.number === activeUnitNum)?.title || ''
+                      : govUnits.find(u => u.number === activeUnitNum)?.title || ''}
               </>
             )}
           </h1>
@@ -1816,10 +1913,12 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                     ? 'bg-blue-500 text-white'
                     : selectedSubject === 'micro'
                       ? 'bg-green-500 text-white'
-                      : 'bg-violet-600 text-white'
+                      : selectedSubject === 'stats'
+                        ? 'bg-orange-500 text-white'
+                        : 'bg-violet-600 text-white'
                 }`}
               >
-                AP {selectedSubject === 'macro' ? 'Macro' : selectedSubject === 'micro' ? 'Micro' : 'Gov'}
+                AP {displayCourseLabel(selectedSubject)}
               </span>
               {/* Micro U1–U5: printable S3 strip below — hide link. U6: no strip — keep packet PDF link only. */}
               {selectedSubject === 'micro' && activeUnitNum >= 6 && activeUnitNum <= 6 && (
@@ -1968,13 +2067,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                 ? '/select-practice-units?subject=gov'
                 : `/mcq-practice/${getSubjectSlug(selectedSubject === 'macro' ? 'macro' : 'micro')}/${getUnitSlug(activeUnitNum, selectedSubject === 'macro' ? 'macro' : 'micro')}`
             }
-            className={`w-full sm:flex-1 inline-flex items-center justify-center font-black py-3.5 px-6 rounded-xl border-2 shadow-[0_4px_0_0_rgba(0,0,0,1)] active:translate-y-0.5 active:shadow-[0_2px_0_0_rgba(0,0,0,1)] transition-all ${
-              selectedSubject === 'macro'
-                ? 'bg-blue-500 hover:bg-blue-600 text-white border-blue-700'
-                : selectedSubject === 'micro'
-                  ? 'bg-green-500 hover:bg-green-600 text-white border-green-700'
-                  : 'bg-violet-600 hover:bg-violet-700 text-white border-violet-800'
-            }`}
+            className={`w-full sm:flex-1 inline-flex items-center justify-center font-black py-3.5 px-6 rounded-xl border-2 active:translate-y-0.5 transition-all ${cheatSheetCtaStyles.practiceMcq}`}
           >
             <span className="text-base sm:text-lg tracking-wide uppercase">Practice MCQs</span>
           </Link>
@@ -1982,17 +2075,9 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           {/* Secondary CTA - Unit Test */}
           <Link
             href={getUnitMCQTestUrl(activeUnitNum, selectedSubject)}
-            className="w-full sm:flex-1 inline-flex items-center justify-center font-black py-3.5 px-6 rounded-xl border-2 border-gray-300 bg-white hover:border-black hover:bg-gray-50 active:translate-y-0.5 active:shadow-[0_2px_0_0_rgba(0,0,0,1)] shadow-[0_3px_0_0_rgba(209,213,219,1)] transition-all"
+            className={`w-full sm:flex-1 inline-flex items-center justify-center font-black py-3.5 px-6 rounded-xl border-2 border-black shadow-[0_3px_0_0_rgba(0,0,0,1)] hover:border-black active:translate-y-0.5 active:shadow-[0_2px_0_0_rgba(0,0,0,1)] transition-all ${cheatSheetCtaStyles.unitTest}`}
           >
-            <span
-              className={`text-base sm:text-lg tracking-wide uppercase ${
-                selectedSubject === 'macro'
-                  ? 'text-blue-600'
-                  : selectedSubject === 'micro'
-                    ? 'text-green-600'
-                    : 'text-violet-700'
-              }`}
-            >
+            <span className="text-base sm:text-lg tracking-wide uppercase">
               Unit Test
             </span>
           </Link>
@@ -2016,7 +2101,9 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                   ? 'text-blue-700 focus:ring-blue-500'
                   : themeColor === 'green'
                     ? 'text-green-700 focus:ring-green-500'
-                    : 'text-violet-700 focus:ring-violet-500'
+                    : themeColor === 'orange'
+                      ? 'text-orange-700 focus:ring-orange-500'
+                      : 'text-violet-700 focus:ring-violet-500'
               }`}
               style={{
                 backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23111' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
@@ -2046,7 +2133,9 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                         ? 'border-blue-500 text-blue-600'
                         : themeColor === 'green'
                           ? 'border-green-500 text-green-600'
-                          : 'border-violet-500 text-violet-600'
+                          : themeColor === 'orange'
+                            ? 'border-orange-500 text-orange-600'
+                            : 'border-violet-500 text-violet-600'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
@@ -2119,16 +2208,58 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
         */}
         </div>
 
-        {selectedSubject === 'gov' && unitSupremeCourtCases.length > 0 && (
+        {selectedSubject === 'gov' && unitSupremeCourtCases.length > 0 && (() => {
+          const scotusCasesPerPage = 2;
+          const scotusCasePageCount = Math.ceil(unitSupremeCourtCases.length / scotusCasesPerPage);
+          const visibleScotusCases = unitSupremeCourtCases.slice(
+            scotusCasePageIndex * scotusCasesPerPage,
+            scotusCasePageIndex * scotusCasesPerPage + scotusCasesPerPage
+          );
+          const canGoToPrevScotusPage = scotusCasePageIndex > 0;
+          const canGoToNextScotusPage = scotusCasePageIndex < scotusCasePageCount - 1;
+          const scotusNavBtnBase =
+            'inline-flex h-10 w-10 items-center justify-center rounded-lg border-2 transition-all';
+          const scotusNavBtnEnabled =
+            'border-black bg-white text-gray-900 shadow-[2px_2px_0_0_rgba(0,0,0,1)] hover:bg-gray-50 active:translate-y-0.5 active:shadow-[1px_1px_0_0_rgba(0,0,0,1)]';
+          const scotusNavBtnDisabled =
+            'cursor-not-allowed border-gray-300 bg-gray-100 text-gray-400 shadow-none';
+
+          return (
           <section className="mb-10 space-y-4">
-            <div>
-              <h2 className="text-2xl font-black tracking-tight text-gray-900">Required Supreme Court Cases</h2>
-              <p className="mt-1 text-sm text-gray-600">
-                Unit {activeUnitNum} landmark cases with video walkthroughs and exam-ready breakdowns.
-              </p>
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0 flex-1">
+                <h2 className="text-2xl font-black tracking-tight text-gray-900">Required Supreme Court Cases</h2>
+                <p className="mt-1 text-sm text-gray-600">
+                  Unit {activeUnitNum} landmark cases with video walkthroughs and exam-ready breakdowns.
+                </p>
+              </div>
+              {scotusCasePageCount > 1 ? (
+                <div className="flex shrink-0 items-center gap-1.5">
+                  <button
+                    type="button"
+                    disabled={!canGoToPrevScotusPage}
+                    onClick={() => setScotusCasePageIndex((prev) => Math.max(0, prev - 1))}
+                    className={`${scotusNavBtnBase} ${canGoToPrevScotusPage ? scotusNavBtnEnabled : scotusNavBtnDisabled}`}
+                    aria-label="Previous Supreme Court cases"
+                  >
+                    <ChevronLeft className="h-5 w-5" aria-hidden />
+                  </button>
+                  <button
+                    type="button"
+                    disabled={!canGoToNextScotusPage}
+                    onClick={() =>
+                      setScotusCasePageIndex((prev) => Math.min(scotusCasePageCount - 1, prev + 1))
+                    }
+                    className={`${scotusNavBtnBase} ${canGoToNextScotusPage ? scotusNavBtnEnabled : scotusNavBtnDisabled}`}
+                    aria-label="Next Supreme Court cases"
+                  >
+                    <ChevronRight className="h-5 w-5" aria-hidden />
+                  </button>
+                </div>
+              ) : null}
             </div>
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-              {unitSupremeCourtCases.map((courtCase) => {
+              {visibleScotusCases.map((courtCase) => {
                 const comparisonFrqSlug = getScotusComparisonFrqSlug(courtCase.id);
                 return (
                 <article
@@ -2201,7 +2332,8 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
               })}
             </div>
           </section>
-        )}
+          );
+        })()}
 
         {/* Table of Contents - two columns, links scroll to lesson sections */}
         {sortedLessons.length > 0 && (
@@ -2740,6 +2872,8 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                           return newSet;
                         });
                       };
+
+                      const displaySubNotes = getDisplaySubNotes(term);
                       
                       return (
                         <div 
@@ -2757,8 +2891,10 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                           {/* Selection Indicator */}
                           {isSelected && (
                             <div className="absolute top-2.5 right-2.5 z-10 flex items-center gap-1.5">
-                              <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center border-2 border-gray-300">
-                                <Check className="w-4 h-4 text-gray-500" />
+                              <div
+                                className={`w-6 h-6 rounded-full flex items-center justify-center border-2 ${keyTermSelectChrome.checkWrap}`}
+                              >
+                                <Check className={`w-4 h-4 ${keyTermSelectChrome.checkIcon}`} />
                               </div>
                               <div className="relative">
                                 <button
@@ -2769,7 +2905,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                                     setActiveTermMenuId((prev) => (prev === term.id ? null : term.id));
                                   }}
                                   data-term-menu="true"
-                                  className="flex h-6 w-6 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-600 hover:bg-gray-100"
+                                  className={`flex h-6 w-6 items-center justify-center rounded-full border bg-white ${keyTermSelectChrome.menuBtn}`}
                                   aria-label="Selected term actions"
                                 >
                                   <MoreHorizontal className="h-4 w-4" />
@@ -2781,16 +2917,22 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                                     onMouseDown={(e) => e.stopPropagation()}
                                     onClick={(e) => e.stopPropagation()}
                                   >
-                                    <button
-                                      type="button"
-                                      onClick={() => {
-                                        void handleMakeQuiz();
-                                        setActiveTermMenuId(null);
-                                      }}
-                                      className="block w-full rounded px-3 py-2 text-left text-sm text-gray-800 hover:bg-gray-100"
-                                    >
-                                      Generate a Quiz with ({availableQuizQuestions.length} selected questions)
-                                    </button>
+                                    {(selectedSubject === 'macro' ||
+                                      selectedSubject === 'micro' ||
+                                      selectedSubject === 'gov' ||
+                                      selectedSubject === 'stats') && (
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          void handleMakeQuiz();
+                                          setActiveTermMenuId(null);
+                                        }}
+                                        className="block w-full rounded px-3 py-2 text-left text-sm text-gray-800 hover:bg-gray-100"
+                                      >
+                                        Generate a Quiz ({selectedTerms.size} selected term
+                                        {selectedTerms.size !== 1 ? 's' : ''})
+                                      </button>
+                                    )}
                                     <button
                                       type="button"
                                       onClick={handleAskDojoAboutSelectedTerms}
@@ -2811,13 +2953,13 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                             </div>
                           )}
                           <h3 className="font-bold text-gray-800 pr-8">
-                            {term.term}
+                            {formatTermLabel(term)}
                           </h3>
-                        <p className="mt-1 text-gray-600">{term.definition}</p>
-                        {term.subNotes && term.subNotes.length > 0 && (
+                        <p className="mt-1 text-gray-600">{processMathContent(term.definition)}</p>
+                        {displaySubNotes.length > 0 && (
                           <div className="mt-3 pt-3 border-t border-gray-100">
                             <ul className="space-y-1.5 pl-0 list-none">
-                              {term.subNotes.map((note, index) => (
+                              {displaySubNotes.map((note, index) => (
                                 <li key={index} className="text-sm text-gray-700 flex items-start gap-2">
                                   <span className="text-blue-500 flex-shrink-0 mt-0.5">•</span>
                                   <span className="leading-relaxed flex-1">{formatSubNote(note)}</span>
@@ -2940,7 +3082,13 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
         {/* Unit Navigation - Previous/Next Buttons */}
         {(() => {
           const unitsToDisplay =
-            selectedSubject === 'macro' ? allMacroUnits : selectedSubject === 'micro' ? allMicroUnits : allGovUnits;
+            selectedSubject === 'macro'
+            ? allMacroUnits
+            : selectedSubject === 'micro'
+              ? allMicroUnits
+              : selectedSubject === 'stats'
+                ? allStatsUnits
+                : allGovUnits;
           const prevUnit = unitsToDisplay.find(u => u.number === activeUnitNum - 1);
           const nextUnit = unitsToDisplay.find(u => u.number === activeUnitNum + 1);
           const buttonColorClass =
@@ -2948,7 +3096,9 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
               ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600'
               : themeColor === 'green'
                 ? 'bg-green-600 hover:bg-green-700 text-white border-green-600'
-                : 'bg-violet-600 hover:bg-violet-700 text-white border-violet-600';
+                : themeColor === 'orange'
+                  ? 'bg-orange-600 hover:bg-orange-700 text-white border-orange-600'
+                  : 'bg-violet-600 hover:bg-violet-700 text-white border-violet-600';
           
           return (
             <div className="mt-12 pt-8 border-t border-gray-200">
@@ -2957,7 +3107,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                 {prevUnit ? (
                   <Link
                     href={propSubject && propUnitNumber 
-                      ? `/${selectedSubject === 'macro' ? 'ap-macro' : selectedSubject === 'micro' ? 'ap-micro' : 'ap-gov'}-unit-${prevUnit.number}-cheat-sheet`
+                      ? `/${courseUrlSlugPrefix(selectedSubject)}-unit-${prevUnit.number}-cheat-sheet`
                       : `/unit/${prevUnit.number}`}
                     className={`flex-1 flex items-center gap-3 px-6 py-4 ${buttonColorClass} border-2 rounded-lg transition-all duration-200 group shadow-sm hover:shadow-md`}
                   >
@@ -2977,7 +3127,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                 {nextUnit ? (
                   <Link
                     href={propSubject && propUnitNumber 
-                      ? `/${selectedSubject === 'macro' ? 'ap-macro' : selectedSubject === 'micro' ? 'ap-micro' : 'ap-gov'}-unit-${nextUnit.number}-cheat-sheet`
+                      ? `/${courseUrlSlugPrefix(selectedSubject)}-unit-${nextUnit.number}-cheat-sheet`
                       : `/unit/${nextUnit.number}`}
                     className={`flex-1 flex items-center justify-end gap-3 px-6 py-4 ${buttonColorClass} border-2 rounded-lg transition-all duration-200 group shadow-sm hover:shadow-md`}
                   >
@@ -3045,6 +3195,9 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                       <h1 className="text-xl font-bold text-gray-900">Quiz Me!</h1>
                       <p className="text-sm text-gray-600">
                         {isGeneratingQuiz ? 'Generating your custom quiz...' : quizError ? 'Error generating quiz' : 'A quick question to test your knowledge.'}
+                      </p>
+                      <p className="mt-2 text-sm text-gray-500 leading-relaxed">
+                        {AI_GENERATED_QUIZ_DISCLAIMER}
                       </p>
                     </div>
                     {originalQuizQuestions.length > 0 && (
@@ -3430,6 +3583,9 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                         <h1 className="text-xl font-bold text-gray-900">Quiz Me!</h1>
                         <p className="text-sm text-gray-600">
                           {isGeneratingQuiz ? 'Generating your custom quiz...' : quizError ? 'Error generating quiz' : 'A quick question to test your knowledge.'}
+                        </p>
+                        <p className="mt-2 text-sm text-gray-500 leading-relaxed">
+                          {AI_GENERATED_QUIZ_DISCLAIMER}
                         </p>
                       </div>
                       {originalQuizQuestions.length > 0 && (
@@ -4331,7 +4487,10 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
       )}
 
       {isPrettyCheatSheetRoute &&
-        (selectedSubject === 'macro' || selectedSubject === 'micro' || selectedSubject === 'gov') && (
+        (selectedSubject === 'macro' ||
+          selectedSubject === 'micro' ||
+          selectedSubject === 'gov' ||
+          selectedSubject === 'stats') && (
         <CheatSheetChatBox
           subject={selectedSubject}
           unitNumber={activeUnitNum}

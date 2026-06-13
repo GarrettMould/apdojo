@@ -1,14 +1,14 @@
 import type { Unit } from '@/data/cheatSheets';
-import { govUnits, macroUnits, microUnits } from '@/data/cheatSheets';
+import { govUnits, macroUnits, microUnits, statsUnits } from '@/data/cheatSheets';
 import type { Question } from '@/data/questionBanks/types';
 
 /** Canonical in-app course (Firestore `selectedSubject`, URL slugs, XP keys, etc.). */
-export type CourseSubject = 'macro' | 'micro' | 'gov';
+export type CourseSubject = 'macro' | 'micro' | 'gov' | 'stats';
 
-export const COURSE_SUBJECTS = ['macro', 'micro', 'gov'] as const satisfies readonly CourseSubject[];
+export const COURSE_SUBJECTS = ['macro', 'micro', 'gov', 'stats'] as const satisfies readonly CourseSubject[];
 
 export function isCourseSubject(value: string | null | undefined): value is CourseSubject {
-  return value === 'macro' || value === 'micro' || value === 'gov';
+  return value === 'macro' || value === 'micro' || value === 'gov' || value === 'stats';
 }
 
 /** Macro/Micro only — used where question banks, Graph Gym, or Stripe are still econ-only. */
@@ -24,12 +24,13 @@ export function apEconomicsTagFromCourse(subject: CourseSubject): 'ap_macroecono
   return null;
 }
 
-/** Question bank / MCQ UI subject tag — includes Gov. */
+/** Question bank / MCQ UI subject tag — all four courses. */
 export function apQuestionSubjectTag(
   subject: CourseSubject
-): 'ap_macroeconomics' | 'ap_microeconomics' | 'ap_us_government' {
+): 'ap_macroeconomics' | 'ap_microeconomics' | 'ap_us_government' | 'ap_statistics' {
   if (subject === 'macro') return 'ap_macroeconomics';
   if (subject === 'micro') return 'ap_microeconomics';
+  if (subject === 'stats') return 'ap_statistics';
   return 'ap_us_government';
 }
 
@@ -37,6 +38,7 @@ export function apQuestionSubjectTag(
 export function courseSubjectFromQuestionSubject(tag: Question['subject']): CourseSubject {
   const t = Array.isArray(tag) ? tag[0] : tag;
   if (t === 'ap_us_government') return 'gov';
+  if (t === 'ap_statistics') return 'stats';
   if (t === 'ap_microeconomics') return 'micro';
   return 'macro';
 }
@@ -61,8 +63,19 @@ export function displayCourseLabel(subject: CourseSubject): string {
     case 'micro':
       return 'Micro';
     case 'gov':
-      return 'AP Gov';
+      return 'Gov';
+    case 'stats':
+      return 'Stats';
   }
+}
+
+/** Footer label on unit MCQ test bottom bar, e.g. "AP Gov Unit 4 MCQ Test - 19 Questions". */
+export function formatUnitMcqTestFooterLabel(
+  subject: CourseSubject,
+  unitNumber: number,
+  questionCount: number
+): string {
+  return `AP ${displayCourseLabel(subject)} Unit ${unitNumber} MCQ Test - ${questionCount} Questions`;
 }
 
 /** Longer label for onboarding / wizard copy. */
@@ -74,6 +87,8 @@ export function subjectOnboardingTitle(subject: CourseSubject): string {
       return 'AP Microeconomics';
     case 'gov':
       return 'AP United States Government and Politics';
+    case 'stats':
+      return 'AP Statistics';
   }
 }
 
@@ -86,6 +101,8 @@ export function courseUrlSlugPrefix(subject: CourseSubject): string {
       return 'ap-micro';
     case 'gov':
       return 'ap-gov';
+    case 'stats':
+      return 'ap-stats';
   }
 }
 
@@ -102,5 +119,97 @@ export function unitsForCourseSubject(subject: CourseSubject): Unit[] {
       return microUnits;
     case 'gov':
       return govUnits;
+    case 'stats':
+      return statsUnits;
   }
+}
+
+/** Macro or Micro — Graph Gym and other econ-only surfaces. */
+export function isEconCourse(subject: CourseSubject): boolean {
+  return subject === 'macro' || subject === 'micro';
+}
+
+/** First unit cheat sheet URL for the course (pretty route). */
+export function defaultCheatSheetUrl(subject: CourseSubject): string {
+  return cheatSheetUrlForUnit(subject, 1);
+}
+
+/** Pretty cheat sheet path for a subject + unit (unit clamped to that course's catalog). */
+export function cheatSheetUrlForUnit(subject: CourseSubject, unitNumber: number): string {
+  const units = unitsForCourseSubject(subject);
+  const maxUnit = units.reduce((max, u) => Math.max(max, u.number), 1);
+  const unit = Math.min(Math.max(1, unitNumber), maxUnit);
+  return `/${courseUrlSlugPrefix(subject)}-unit-${unit}-cheat-sheet`;
+}
+
+const PRETTY_CHEAT_SHEET_PATH =
+  /^\/ap-(macro|micro|gov|stats)-unit-(\d+)-cheat-sheet\/?$/;
+const LEGACY_CHEAT_SHEET_PATH = /^\/unit\/(\d+)\/?$/;
+
+/** Unit number from a cheat sheet URL (`/ap-macro-unit-3-cheat-sheet` or legacy `/unit/3`). */
+export function parseCheatSheetUnitFromPath(pathname: string): number | null {
+  const path = pathname.split('?')[0].replace(/\/$/, '') || '/';
+  const pretty = path.match(PRETTY_CHEAT_SHEET_PATH);
+  if (pretty) return parseInt(pretty[2], 10);
+  const legacy = path.match(LEGACY_CHEAT_SHEET_PATH);
+  if (legacy) return parseInt(legacy[1], 10);
+  return null;
+}
+
+export function isCheatSheetPath(pathname: string): boolean {
+  return parseCheatSheetUnitFromPath(pathname) !== null;
+}
+
+/**
+ * When switching subjects on a cheat sheet, keep the same unit when possible
+ * (clamped to the target course's unit list).
+ */
+export function getCheatSheetUrlForSubjectSwitch(
+  pathname: string,
+  newSubject: CourseSubject
+): string | null {
+  const unitNumber = parseCheatSheetUnitFromPath(pathname);
+  if (unitNumber === null) return null;
+  return cheatSheetUrlForUnit(newSubject, unitNumber);
+}
+
+/** Admin header / account subject picker (Stats reserved, not selectable yet). */
+export const ADMIN_SUBJECT_SELECT_OPTIONS = [
+  { value: 'macro' as const, label: 'AP Macro' },
+  { value: 'micro' as const, label: 'AP Micro' },
+  { value: 'stats' as const, label: 'AP Stats' },
+  { value: 'gov' as const, label: 'AP Gov' },
+] as const;
+
+export function adminSubjectSelectLabel(subject: CourseSubject): string {
+  const match = ADMIN_SUBJECT_SELECT_OPTIONS.find((o) => o.value === subject);
+  return match?.label ?? displayCourseLabel(subject);
+}
+
+/** Gov units with MCQ practice banks in `src/data/gov/govUnit*McqPractice.ts`. */
+export const GOV_MCQ_PRACTICE_UNIT_NUMBERS = [1, 2, 3, 5] as const;
+
+export function isGovMcqPracticeUnitAvailable(unitNumber: number): boolean {
+  return (GOV_MCQ_PRACTICE_UNIT_NUMBERS as readonly number[]).includes(unitNumber);
+}
+
+/** Gov units with formal MCQ unit tests in `src/data/gov/govUnit*McqExam.ts`. */
+export const GOV_MCQ_TEST_UNIT_NUMBERS = [1, 2, 3, 4, 5] as const;
+
+export function isGovMcqTestUnitAvailable(unitNumber: number): boolean {
+  return (GOV_MCQ_TEST_UNIT_NUMBERS as readonly number[]).includes(unitNumber);
+}
+
+/** Stats units with formal MCQ unit tests in `src/data/apstats/statsUnit*McqExam.ts`. */
+export const STATS_MCQ_TEST_UNIT_NUMBERS = [1] as const;
+
+export function isStatsMcqTestUnitAvailable(unitNumber: number): boolean {
+  return (STATS_MCQ_TEST_UNIT_NUMBERS as readonly number[]).includes(unitNumber);
+}
+
+/** Stats units with formal FRQ packs in `src/data/apstats/statsUnitStimulusFrqs.ts`. */
+export const STATS_FRQ_TEST_UNIT_NUMBERS = [1] as const;
+
+export function isStatsFrqTestUnitAvailable(unitNumber: number): boolean {
+  return (STATS_FRQ_TEST_UNIT_NUMBERS as readonly number[]).includes(unitNumber);
 }

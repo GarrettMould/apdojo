@@ -524,6 +524,9 @@ function InfinitePracticePage() {
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Upload your class notes, diagrams, or PDFs. We generate AP-style questions instantly.
           </p>
+          <p className="mt-3 text-sm text-gray-500 max-w-2xl mx-auto">
+            AI-generated questions may contain errors. Double-check answers and explanations against your course materials.
+          </p>
         </div>
 
         {/* Input Section */}

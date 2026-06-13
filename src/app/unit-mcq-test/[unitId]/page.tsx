@@ -12,6 +12,7 @@ import { FullExam } from '@/components/FullExam';
 import { Button } from '@/components/ui/button';
 import type { CourseSubject } from '@/lib/courseSubject';
 import { hasAdminRole } from '@/lib/adminAccess';
+import { isGovMcqTestUnitAvailable, isStatsMcqTestUnitAvailable } from '@/lib/courseSubject';
 
 /**
  * Pretty URLs are rewritten to /unit-mcq-test/:unit?subject=… but the browser bar has no query —
@@ -20,6 +21,7 @@ import { hasAdminRole } from '@/lib/adminAccess';
 function subjectFromUnitMcqPathname(pathname: string): CourseSubject | null {
   const p = pathname.replace(/\/$/, '') || '/';
   if (/^\/ap-gov-unit-\d+-mcq-test$/.test(p)) return 'gov';
+  if (/^\/ap-stats-unit-\d+-mcq-test$/.test(p)) return 'stats';
   if (/^\/ap-macro-unit-\d+-mcq-test$/.test(p)) return 'macro';
   if (/^\/ap-micro-unit-\d+-mcq-test$/.test(p)) return 'micro';
   return null;
@@ -34,13 +36,18 @@ export default function UnitMCQTestPage() {
   const subjectParam = searchParams.get('subject');
   const subjectFromPath = subjectFromUnitMcqPathname(pathname);
   const effectiveSubject: CourseSubject =
-    subjectParam === 'macro' || subjectParam === 'micro' || subjectParam === 'gov'
+    subjectParam === 'macro' ||
+    subjectParam === 'micro' ||
+    subjectParam === 'gov' ||
+    subjectParam === 'stats'
       ? subjectParam
       : subjectFromPath ?? selectedSubject;
 
   const unitNumber = parseInt(unitId as string, 10);
 
-  const isGovLockedUnit = effectiveSubject === 'gov' && unitNumber !== 1;
+  const isGovLockedUnit = effectiveSubject === 'gov' && !isGovMcqTestUnitAvailable(unitNumber);
+  const isStatsLockedUnit = effectiveSubject === 'stats' && !isStatsMcqTestUnitAvailable(unitNumber);
+  const isLockedUnit = isGovLockedUnit || isStatsLockedUnit;
   const canAccessGov = Boolean(user && hasAdminRole(userData));
 
   const subjectFilter =
@@ -48,19 +55,20 @@ export default function UnitMCQTestPage() {
       ? 'ap_macroeconomics'
       : effectiveSubject === 'gov'
         ? 'ap_us_government'
-        : 'ap_microeconomics';
+        : effectiveSubject === 'stats'
+          ? 'ap_statistics'
+          : 'ap_microeconomics';
 
   const questions = useMemo(
-    () => (isGovLockedUnit ? [] : getUnitMCQTest(unitNumber, subjectFilter)),
-    [unitNumber, subjectFilter, isGovLockedUnit]
+    () => (isLockedUnit ? [] : getUnitMCQTest(unitNumber, subjectFilter)),
+    [unitNumber, subjectFilter, isLockedUnit]
   );
 
   const unitInfo = apMacroCourseInfo.units.find(
     (unit) => unit.unit.split(':')[0].split(' ')[1] === (unitId as string)
   );
 
-  const examType =
-    effectiveSubject === 'gov' ? 'gov' : effectiveSubject === 'macro' ? 'macro' : 'micro';
+  const examType = effectiveSubject;
 
   const questionBank: QuestionBank = useMemo(
     () => ({
@@ -73,7 +81,9 @@ export default function UnitMCQTestPage() {
   const practiceTestsHref =
     effectiveSubject === 'gov'
       ? '/unit-final-practice-tests?subject=gov'
-      : `/ap-${effectiveSubject}-practice-tests`;
+      : effectiveSubject === 'stats'
+        ? '/unit-final-practice-tests?subject=stats'
+        : `/ap-${effectiveSubject}-practice-tests`;
 
   if (effectiveSubject === 'gov' && loadingUserData) {
     return (
@@ -102,14 +112,18 @@ export default function UnitMCQTestPage() {
     );
   }
 
-  if (isGovLockedUnit) {
+  if (isLockedUnit) {
+    const lockedMessage =
+      effectiveSubject === 'stats'
+        ? `AP Stats Unit ${unitNumber} practice exam is not available yet. Unit 1 is available now.`
+        : `AP Gov Unit ${unitNumber} practice exam is not available yet. Units 1–2 are available now.`;
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center pt-16 pb-12 px-4">
         <div className="bg-white p-8 rounded-lg shadow-md border border-gray-200 max-w-md w-full text-center">
           <Lock className="w-12 h-12 mx-auto text-violet-500 mb-4" />
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Coming soon</h2>
           <p className="text-gray-600 mb-6">
-            AP Gov Unit {unitNumber} practice exam is not available yet. Unit 1 is free to try today.
+            {lockedMessage}
           </p>
           <Link href={practiceTestsHref} className="inline-flex w-full">
             <Button size="lg" className="w-full bg-violet-600 hover:bg-violet-700">

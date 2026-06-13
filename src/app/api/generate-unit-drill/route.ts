@@ -4,6 +4,91 @@ import { NextResponse } from "next/server";
 // Setup the client
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
+type UnitDrillSubject =
+  | 'ap_macroeconomics'
+  | 'ap_microeconomics'
+  | 'ap_us_government'
+  | 'ap_statistics';
+
+const VALID_UNIT_DRILL_SUBJECTS: readonly UnitDrillSubject[] = [
+  'ap_macroeconomics',
+  'ap_microeconomics',
+  'ap_us_government',
+  'ap_statistics',
+];
+
+function isUnitDrillSubject(value: unknown): value is UnitDrillSubject {
+  return typeof value === 'string' && (VALID_UNIT_DRILL_SUBJECTS as readonly string[]).includes(value);
+}
+
+function subjectDisplayName(subject: UnitDrillSubject): string {
+  switch (subject) {
+    case 'ap_macroeconomics':
+      return 'Macroeconomics';
+    case 'ap_microeconomics':
+      return 'Microeconomics';
+    case 'ap_us_government':
+      return 'U.S. Government & Politics';
+    case 'ap_statistics':
+      return 'Statistics';
+  }
+}
+
+function buildSystemInstruction(subject: UnitDrillSubject, numQuestions: number): string {
+  const course = subjectDisplayName(subject);
+  const base = `
+        You are an expert AP (Advanced Placement) ${course} exam tutor.
+        
+        Based on the selected key terms and whiteboard images provided, generate ${numQuestions} challenging, AP-style multiple-choice questions.
+        
+        Requirements:
+        - Each question must test understanding of the key concepts from the selected terms and images
+        - Questions should be at the AP exam difficulty level
+        - Ensure distractor answers are plausible and test common misconceptions
+        - Provide clear, educational explanations for the correct answer
+        - Format the correct answer as a single capital letter (A, B, C, or D)
+        - All questions must have exactly 4 options
+      `;
+
+  if (subject === 'ap_us_government') {
+    return `${base}
+        Focus on constitutional principles, institutions, political processes, civil liberties/rights, and required Supreme Court cases when relevant.
+        Prefer scenario-based or application questions over pure definition recall.
+        Do NOT include tableData on any question.
+      `;
+  }
+
+  if (subject === 'ap_statistics') {
+    return `${base}
+        Focus on data analysis, study design, probability, sampling, inference, and interpreting results in AP Stats context.
+        Use realistic variable names and contexts aligned with the selected terms.
+        
+        CRITICAL: Do NOT include tableData on most questions. Only use tables when essential (e.g., frequency tables, two-way tables, small data summaries).
+        When you DO use a table, use 2-4 columns and 2-5 rows with rowHeaders when appropriate.
+      `;
+  }
+
+  return `${base}
+        CRITICAL: Do NOT include tableData on most questions. Only use tables when they are ABSOLUTELY ESSENTIAL for understanding the question.
+        
+        Use tableData ONLY for these specific scenarios:
+        - Comparative advantage questions (comparing production/cost data between 2-3 regions/countries)
+        - Production possibilities frontier questions (comparing output combinations)
+        - Game theory payoff matrices (comparing strategies between players)
+        - Cost/price/quantity comparison tables (when comparing multiple entities side-by-side is necessary)
+        
+        DO NOT use tables for:
+        - Regular conceptual questions
+        - Questions about definitions or theory
+        - Questions that can be understood from text alone
+        - Questions about graphs (describe the graph in text instead)
+        - Most standard AP exam questions
+        
+        When you DO use a table, it should have 2-3 columns (headers) and 2-3 rows. The first column can be row headers (set rowHeaders: true).
+        Remember: Most questions should NOT have tableData. Only include it when the question cannot be properly understood without a table.
+      `;
+}
+
 // Define the schema for unit drill questions (similar to infinite-drill but for 3-5 questions)
 const unitDrillSchema = {
   description: "AP Style Unit Drill Result",
@@ -68,12 +153,17 @@ export async function POST(req: Request) {
       }
     }
 
-    if (!subject || (subject !== 'ap_macroeconomics' && subject !== 'ap_microeconomics')) {
+    if (!isUnitDrillSubject(subject)) {
       return NextResponse.json(
-        { error: "Valid subject (ap_macroeconomics or ap_microeconomics) is required" },
+        {
+          error:
+            'Valid subject is required (ap_macroeconomics, ap_microeconomics, ap_us_government, or ap_statistics)',
+        },
         { status: 400 }
       );
     }
+
+    const drillSubject: UnitDrillSubject = subject;
 
     // Determine number of questions (3-5 based on selection count)
     const selectionCount = (selectedTerms?.length || 0) + (selectedImages?.length || 0);
@@ -115,46 +205,14 @@ export async function POST(req: Request) {
         responseMimeType: "application/json",
         responseSchema: unitDrillSchema as any,
       },
-      systemInstruction: `
-        You are an expert AP (Advanced Placement) ${subject === 'ap_macroeconomics' ? 'Macroeconomics' : 'Microeconomics'} Exam tutor.
-        
-        Based on the selected key terms and whiteboard images provided, generate ${numQuestions} challenging, AP-style multiple-choice questions.
-        
-        Requirements:
-        - Each question must test understanding of the key concepts from the selected terms and images
-        - Questions should be at the AP exam difficulty level
-        - Ensure distractor answers are plausible and test common misconceptions
-        - Provide clear, educational explanations for the correct answer
-        - Format the correct answer as a single capital letter (A, B, C, or D)
-        - All questions must have exactly 4 options
-        
-        CRITICAL: Do NOT include tableData on most questions. Only use tables when they are ABSOLUTELY ESSENTIAL for understanding the question.
-        
-        Use tableData ONLY for these specific scenarios:
-        - Comparative advantage questions (comparing production/cost data between 2-3 regions/countries)
-        - Production possibilities frontier questions (comparing output combinations)
-        - Game theory payoff matrices (comparing strategies between players)
-        - Cost/price/quantity comparison tables (when comparing multiple entities side-by-side is necessary)
-        
-        DO NOT use tables for:
-        - Regular conceptual questions
-        - Questions about definitions or theory
-        - Questions that can be understood from text alone
-        - Questions about graphs (describe the graph in text instead)
-        - Most standard AP exam questions
-        
-        When you DO use a table, it should have 2-3 columns (headers) and 2-3 rows. The first column can be row headers (set rowHeaders: true).
-        Example: For comparative advantage, use headers like ["Region", "Good X", "Good Y"] with rows showing each region's data.
-        
-        Remember: Most questions should NOT have tableData. Only include it when the question cannot be properly understood without a table.
-      `,
+      systemInstruction: buildSystemInstruction(drillSubject, numQuestions),
     });
 
     const parts = [];
 
     // Add text context from terms and images
     parts.push({
-      text: `You MUST generate EXACTLY ${numQuestions} AP ${subject === 'ap_macroeconomics' ? 'Macroeconomics' : 'Microeconomics'} practice questions based on the following selected content. Do not generate fewer than ${numQuestions} questions.\n\n${fullContext}\n\nIMPORTANT: Generate exactly ${numQuestions} questions. The response must contain ${numQuestions} questions in the questions array.`
+      text: `You MUST generate EXACTLY ${numQuestions} AP ${subjectDisplayName(drillSubject)} practice questions based on the following selected content. Do not generate fewer than ${numQuestions} questions.\n\n${fullContext}\n\nIMPORTANT: Generate exactly ${numQuestions} questions. The response must contain ${numQuestions} questions in the questions array.`
     });
 
     // Add image data if images are selected

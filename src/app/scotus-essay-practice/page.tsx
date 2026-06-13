@@ -4,7 +4,7 @@ import ScotusEssayPracticeHubClient from './ScotusEssayPracticeHubClient';
 export const metadata: Metadata = {
   title: 'SCOTUS Comparison Practice | AP Gov | AP Dojo',
   description:
-    'Choose from 15 AP Gov SCOTUS comparison FRQ prompts and practice structured constitutional analysis.',
+    'Practice AP Gov SCOTUS comparison FRQs for all 14 required Supreme Court cases.',
 };
 
 export default function ScotusEssayPracticeHubPage() {

@@ -9,42 +9,84 @@ export interface SubjectTestMeta {
   macro: UnitTestMeta[];
   micro: UnitTestMeta[];
   gov: UnitTestMeta[];
+  stats: UnitTestMeta[];
+}
+
+/** AP Macro/Micro MCQ section pacing: 60 Q in 70 min → 70s per question. */
+export const ECON_UNIT_MCQ_SECONDS_PER_QUESTION = 70;
+
+/** ceil(5400s ÷ 42 Q) — AP Stats unit MCQ pacing. */
+export const STATS_UNIT_MCQ_SECONDS_PER_QUESTION = 129;
+
+/** ceil(87.27s) — AP Gov unit MCQ pacing. */
+export const GOV_UNIT_MCQ_SECONDS_PER_QUESTION = 88;
+
+/** Total seconds for a unit MCQ test: (Q × sec/Q), rounded up to the nearest whole minute. */
+export function unitMcqTimeLimitSeconds(questionCount: number, secondsPerQuestion: number): number {
+  const rawSeconds = questionCount * secondsPerQuestion;
+  return Math.ceil(rawSeconds / 60) * 60;
+}
+
+function econUnitMeta(unit: number, questionCount: number): UnitTestMeta {
+  return {
+    unit,
+    questionCount,
+    timeLimitSeconds: unitMcqTimeLimitSeconds(questionCount, ECON_UNIT_MCQ_SECONDS_PER_QUESTION),
+  };
+}
+
+function govUnitMeta(unit: number, questionCount: number): UnitTestMeta {
+  return {
+    unit,
+    questionCount,
+    timeLimitSeconds: unitMcqTimeLimitSeconds(questionCount, GOV_UNIT_MCQ_SECONDS_PER_QUESTION),
+  };
+}
+
+function statsUnitMeta(unit: number, questionCount: number): UnitTestMeta {
+  return {
+    unit,
+    questionCount,
+    timeLimitSeconds: unitMcqTimeLimitSeconds(questionCount, STATS_UNIT_MCQ_SECONDS_PER_QUESTION),
+  };
 }
 
 /**
  * Official time limits and question counts for each unit test.
- * AP Macro unit tests follow the standard ~17m30s (1050s) for most units.
- * AP Micro unit tests follow the standard ~22m30s (1350s) for most units.
- * Adjust per unit as needed.
+ * Econ (Macro/Micro): 70s/Q (60 Q in 70 min), total rounded up to whole minutes.
+ * Gov/Stats: fixed sec/Q rates, total rounded up to whole minutes.
  */
 export const UNIT_TEST_META: SubjectTestMeta = {
   macro: [
-    { unit: 1, questionCount: 13, timeLimitSeconds: 900  }, // 15 min
-    { unit: 2, questionCount: 15, timeLimitSeconds: 1050 }, // 17m30s
-    { unit: 3, questionCount: 15, timeLimitSeconds: 1050 }, // 17m30s
-    { unit: 4, questionCount: 17, timeLimitSeconds: 1190 }, // 19m50s
-    { unit: 5, questionCount: 14, timeLimitSeconds: 980  }, // 16m20s
-    { unit: 6, questionCount: 12, timeLimitSeconds: 840  }, // 14 min
+    econUnitMeta(1, 13), // 16 min
+    econUnitMeta(2, 15), // 18 min
+    econUnitMeta(3, 15), // 18 min
+    econUnitMeta(4, 17), // 20 min
+    econUnitMeta(5, 14), // 17 min
+    econUnitMeta(6, 12), // 14 min
   ],
   micro: [
-    { unit: 1, questionCount: 16, timeLimitSeconds: 1120 }, // 18m40s
-    { unit: 2, questionCount: 15, timeLimitSeconds: 1050 }, // 17m30s
-    { unit: 3, questionCount: 15, timeLimitSeconds: 1050 }, // 17m30s
-    { unit: 4, questionCount: 15, timeLimitSeconds: 1050 }, // 17m30s
-    { unit: 5, questionCount: 14, timeLimitSeconds: 980  }, // 16m20s
-    { unit: 6, questionCount: 15, timeLimitSeconds: 1050 }, // 17m30s
+    econUnitMeta(1, 16), // 19 min
+    econUnitMeta(2, 15), // 18 min
+    econUnitMeta(3, 15), // 18 min
+    econUnitMeta(4, 15), // 18 min
+    econUnitMeta(5, 14), // 17 min
+    econUnitMeta(6, 15), // 18 min
   ],
   gov: [
-    { unit: 1, questionCount: 30, timeLimitSeconds: 2400 }, // 40 min — Unit 1 practice exam
-    { unit: 2, questionCount: 0, timeLimitSeconds: 0 }, // locked / coming soon
-    { unit: 3, questionCount: 0, timeLimitSeconds: 0 },
-    { unit: 4, questionCount: 0, timeLimitSeconds: 0 },
-    { unit: 5, questionCount: 0, timeLimitSeconds: 0 },
+    govUnitMeta(1, 18), // 27 min
+    govUnitMeta(2, 18), // 27 min
+    govUnitMeta(3, 18), // 27 min
+    govUnitMeta(4, 22), // 33 min
+    govUnitMeta(5, 18), // 27 min
+  ],
+  stats: [
+    statsUnitMeta(1, 20), // 43 min
   ],
 };
 
 export function getUnitTestMeta(
-  subject: 'macro' | 'micro' | 'gov',
+  subject: 'macro' | 'micro' | 'gov' | 'stats',
   unit: number
 ): UnitTestMeta | undefined {
   return UNIT_TEST_META[subject].find((m) => m.unit === unit);

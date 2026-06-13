@@ -1,5 +1,5 @@
 import { Question as QuestionType } from '@/data/questionBanks/types';
-import { govUnit1McqPracticeQuestions } from '@/data/gov/govUnit1McqPractice';
+import { govMcqPracticeQuestions } from '@/data/gov/govMcqPractice';
 
 // Import the macroSetTwoQuestions from the macroSetTwo.ts file
 import { macroSetTwoQuestions } from '../questionBanks/macro/mcqs/macroSetTwo';
@@ -14086,8 +14086,8 @@ export const allQuestions: QuestionType[] = [
   ...microUnit5Questions.map(q => ({ ...q, subject: "ap_microeconomics" as const })),
   ...microUnit6Questions.map(q => ({ ...q, subject: "ap_microeconomics" as const })),
 
-  // AP U.S. Government — Unit 1 practice pool (formal unit test bank is separate: `govUnit1McqExam.ts`)
-  ...govUnit1McqPracticeQuestions.map((q) => ({ ...q, subject: 'ap_us_government' as const })),
+  // AP U.S. Government — practice pools (formal unit tests are separate: `govUnit*McqExam.ts`)
+  ...govMcqPracticeQuestions.map((q) => ({ ...q, subject: 'ap_us_government' as const })),
 ];
 
 /**

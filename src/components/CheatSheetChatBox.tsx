@@ -6,8 +6,9 @@ import { Paperclip, Send, X } from 'lucide-react';
 import type { CourseSubject } from '@/lib/courseSubject';
 import { displayCourseLabel } from '@/lib/courseSubject';
 import { personaForSubject } from '@/lib/chatPersonas';
-import { tutorAvatarUrl } from '@/lib/tutorAvatar';
+import { tutorAvatarInitials, tutorAvatarUrl } from '@/lib/tutorAvatar';
 import { getTutorWelcomeStarterChoices } from '@/lib/tutorStarterChoices';
+import { TutorAvatar } from '@/components/TutorAvatar';
 import { TutorTypingPlaceholder } from '@/components/TutorTypingPlaceholder';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { auth as firebaseAuth } from '@/lib/firebase';
@@ -149,6 +150,21 @@ function chatTheme(subject: CourseSubject) {
       attachBtn:
         'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 focus-visible:ring-sky-500',
       quickChoiceFocus: 'focus-visible:ring-sky-500',
+    };
+  }
+  if (subject === 'stats') {
+    return {
+      accent: 'text-orange-700',
+      accentSoft: 'bg-orange-500',
+      accentMuted: 'bg-orange-50 text-orange-950',
+      userBubble: 'bg-orange-600 text-white',
+      sendBtn:
+        'bg-orange-600 text-white hover:bg-orange-700 shadow-md shadow-orange-900/15 focus-visible:outline focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2',
+      fab: 'bg-gradient-to-br from-orange-500 to-amber-600 shadow-lg shadow-orange-900/25 ring-1 ring-white/25',
+      inputFocus: 'focus:border-orange-400 focus:ring-orange-500/20',
+      attachBtn:
+        'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 focus-visible:ring-orange-500',
+      quickChoiceFocus: 'focus-visible:ring-orange-500',
     };
   }
   if (subject === 'micro') {
@@ -315,6 +331,7 @@ export function CheatSheetChatBox({
 }: CheatSheetChatBoxProps) {
   const { user, userData } = useAuthContext();
   const canUseAdminChat = Boolean(user && hasAdminRole(userData));
+  const chatEnabled = subject === 'stats' || canUseAdminChat;
   const [open, setOpen] = useState(false);
   const lastExternalCloseRef = useRef(externalCloseRequest);
   const subjectLabel = displayCourseLabel(subject);
@@ -527,7 +544,7 @@ export function CheatSheetChatBox({
     void executeSend(displayText, null, externalPromptText.trim());
   }, [externalPromptNonce, externalPromptText, externalPromptDisplayText, executeSend, open]);
 
-  if (!canUseAdminChat) return null;
+  if (!chatEnabled) return null;
 
   return (
     <div
@@ -592,7 +609,8 @@ export function CheatSheetChatBox({
                   m.id === lastAssistantId &&
                   !(m.id === 'welcome' && hasUserMessage);
                 const assistantLead = parsedAssistant?.display.trim() ?? '';
-                const avatarUrl = tutorAvatarUrl(subject);
+                const showTutorAvatar =
+                  tutorAvatarUrl(subject) != null || tutorAvatarInitials(subject) != null;
 
                 if (m.role === 'user') {
                   return (
@@ -614,14 +632,8 @@ export function CheatSheetChatBox({
                 return (
                   <div key={m.id} className="flex w-full flex-col items-start">
                     <div className="flex w-full max-w-[min(100%,23rem)] flex-row items-start gap-2 sm:max-w-[min(100%,24rem)]">
-                      {avatarUrl ? (
-                        <img
-                          src={avatarUrl}
-                          alt="Economics tutor"
-                          width={36}
-                          height={36}
-                          className="mt-0.5 h-9 w-9 shrink-0 rounded-full object-cover ring-2 ring-white shadow-sm"
-                        />
+                      {showTutorAvatar ? (
+                        <TutorAvatar subject={subject} alt="Unit tutor" />
                       ) : null}
                       <div className="flex min-w-0 flex-1 flex-col items-stretch gap-1">
                         <div className="max-w-none px-3.5 py-2.5 text-[14px] leading-relaxed shadow-sm rounded-2xl rounded-bl-md border border-slate-100/90 bg-white text-slate-800">
@@ -653,7 +665,7 @@ export function CheatSheetChatBox({
                 );
               })}
               {sending ? (
-                <TutorTypingPlaceholder avatarUrl={tutorAvatarUrl(subject)} />
+                <TutorTypingPlaceholder subject={subject} avatarUrl={tutorAvatarUrl(subject)} />
               ) : null}
               <div ref={bottomRef} />
             </div>
@@ -746,11 +758,11 @@ export function CheatSheetChatBox({
             aria-hidden
             className="absolute inset-[4px] rounded-full bg-white/15 ring-1 ring-white/30"
           />
-          {tutorAvatarUrl(subject) ? (
-            <img
-              src={tutorAvatarUrl(subject)!}
+          {tutorAvatarUrl(subject) || tutorAvatarInitials(subject) ? (
+            <TutorAvatar
+              subject={subject}
               alt="Open tutor chat"
-              className="relative h-[84%] w-[84%] rounded-full object-cover ring-2 ring-white/80 shadow-sm"
+              className="relative h-[84%] w-[84%] rounded-full"
             />
           ) : null}
         </button>

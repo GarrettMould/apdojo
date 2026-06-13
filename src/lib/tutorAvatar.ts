@@ -16,3 +16,9 @@ export function tutorAvatarUrl(subject: CourseSubject): string | null {
   if (subject === 'gov') return GOV_TUTOR_AVATAR_URL;
   return econTutorAvatarUrl(subject);
 }
+
+/** Initials placeholder until a Stats tutor portrait is uploaded. */
+export function tutorAvatarInitials(subject: CourseSubject): string | null {
+  if (subject === 'stats') return 'FN';
+  return null;
+}

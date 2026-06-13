@@ -10,6 +10,8 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import { getBeltProgress } from '@/lib/beltSystem';
 import { parseQuestionTableFromText } from '@/lib/parseQuestionTableFromText';
 import { splitMcqStemAttribution } from '@/lib/splitMcqStemAttribution';
+import { ApGovQuestionText, isApGovQuestion } from '@/components/ApGovQuestionText';
+import { McqOptionTableCells, McqOptionTableHeaderRow } from '@/components/McqTableOptions';
 import { getSubjectXP } from '@/hooks/useUserProgress';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -733,10 +735,16 @@ const QuestionCard = ({
             const displayTableData = question.tableData || parsedTableData;
             const displayQuestionText = parsedTableData ? textWithoutTable : question.question;
             const stemParts = splitMcqStemAttribution(displayQuestionText);
+            const isGovMcq = isApGovQuestion(question);
 
             return (
               <>
             {/* Question Text with markdown support */}
+            {isGovMcq ? (
+              <div className="text-lg text-gray-900">
+                <ApGovQuestionText text={displayQuestionText} />
+              </div>
+            ) : (
             <p className="text-lg font-semibold text-gray-900">
               <ReactMarkdown
                 components={{
@@ -752,6 +760,7 @@ const QuestionCard = ({
                 </span>
               ) : null}
             </p>
+            )}
                 {/* Table Data from tableData property or parsed from markdown - shown below question text */}
                 {displayTableData && (
                   <div className="my-6 flex justify-center">
@@ -804,6 +813,9 @@ const QuestionCard = ({
 
             {/* Answer Options (Dojo Infinite Style) */}
             <div className="space-y-2">
+              {question.optionTableHeaders ? (
+                <McqOptionTableHeaderRow headers={question.optionTableHeaders} />
+              ) : null}
               {question.options.map((option, optIndex) => {
                 const letter = String.fromCharCode(65 + optIndex);
                 const isSelected = selectedAnswerIndex === optIndex;
@@ -875,6 +887,8 @@ const QuestionCard = ({
                                 className={`max-w-[200px] max-h-[150px] object-contain ${isStruckThrough ? 'opacity-40' : ''}`}
                               />
                             </div>
+                          ) : question.optionTableHeaders ? (
+                            <McqOptionTableCells option={option} struckThrough={isStruckThrough} />
                           ) : (
                             <span className={`flex-1 text-gray-900 ${isStruckThrough ? 'line-through text-gray-400' : ''}`}>{option}</span>
                           )}
@@ -911,6 +925,8 @@ const QuestionCard = ({
                                 className="max-w-[200px] max-h-[150px] object-contain"
                               />
                             </div>
+                          ) : question.optionTableHeaders ? (
+                            <McqOptionTableCells option={option} />
                           ) : (
                             <span className="flex-1 text-gray-900">{option}</span>
                           )}
@@ -1188,12 +1204,18 @@ const QuestionArena = ({ question, onAnswerSelect, initialSelectedLetter, isAnsw
   const displayTableData = question.tableData || parsedTableData;
   const displayQuestionText = parsedTableData ? textWithoutTable : question.question;
   const stemParts = splitMcqStemAttribution(displayQuestionText);
+  const isGovMcq = isApGovQuestion(question);
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-4">
-      <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+    <div className="flex flex-col gap-4">
+      <div>
       {/* Question Text - Large and Readable */}
       <div className="space-y-3">
+        {isGovMcq ? (
+          <div className="max-w-none text-xl leading-snug text-gray-900">
+            <ApGovQuestionText text={displayQuestionText} />
+          </div>
+        ) : (
         <div className="prose prose-base max-w-none text-xl font-black leading-snug text-gray-900">
           <ReactMarkdown
             components={{
@@ -1209,6 +1231,7 @@ const QuestionArena = ({ question, onAnswerSelect, initialSelectedLetter, isAnsw
             </p>
           ) : null}
         </div>
+        )}
         
         {/* Table Data */}
         {displayTableData && (
@@ -1257,6 +1280,9 @@ const QuestionArena = ({ question, onAnswerSelect, initialSelectedLetter, isAnsw
 
       {/* Answer Options - Vertical Stack */}
       <div className="mt-6 space-y-3">
+        {question.optionTableHeaders ? (
+          <McqOptionTableHeaderRow headers={question.optionTableHeaders} />
+        ) : null}
         {question.options.map((option, optIndex) => {
           const isHighlighted = !isSubmitted && highlightedIndex === optIndex;
           const isSelected = selectedAnswerIndex === optIndex;
@@ -1301,7 +1327,11 @@ const QuestionArena = ({ question, onAnswerSelect, initialSelectedLetter, isAnsw
                 }`}>
                   {String.fromCharCode(65 + optIndex)}
                 </span>
-                <span className="flex-1 text-base font-semibold text-gray-900">{option}</span>
+                {question.optionTableHeaders ? (
+                  <McqOptionTableCells option={option} className="text-base font-semibold" />
+                ) : (
+                  <span className="flex-1 text-base font-semibold text-gray-900">{option}</span>
+                )}
                 {isSubmitted && (
                   <div className="flex-shrink-0">
                     {isCorrect ? (
@@ -1919,15 +1949,15 @@ export function UnitMCQs({
       </div>
 
       {/* Focus Mode Layout */}
-      <div className="h-[100dvh] overflow-hidden bg-gray-50">
+      <div className="bg-gray-50 pb-8">
         <div
-          className={`h-full px-4 pt-4 pb-4 transition-all duration-300 lg:transform ${
+          className={`px-4 pt-4 pb-4 transition-all duration-300 lg:transform ${
             isTutorOpen
               ? 'max-w-none lg:ml-[25%] lg:w-[75%]'
               : 'max-w-3xl mx-auto'
           } ${activeScratchTool ? 'lg:-translate-x-[min(18vw,14rem)]' : ''}`}
         >
-          <div className="flex h-full min-h-0 flex-col">
+          <div className="flex flex-col gap-3">
             {/* Top Row: BeltHUD */}
             <BeltHUD
               currentXP={userXP}
@@ -1938,7 +1968,7 @@ export function UnitMCQs({
 
             {/* Center: QuestionArena */}
             {currentQuestion && (
-              <div className="min-h-0 overflow-y-auto rounded-lg border border-gray-200 bg-white p-4 shadow-md md:p-5">
+              <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-md md:p-5">
                 <QuestionArena
                   question={currentQuestion}
                   onAnswerSelect={handleAnswerSelection}

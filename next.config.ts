@@ -177,6 +177,12 @@ const nextConfig = {
       });
     }
 
+    // Stats unit MCQ tests (Unit 1 available)
+    rewrites.push({
+      source: '/ap-stats-unit-1-mcq-test',
+      destination: '/unit-mcq-test/1?subject=stats',
+    });
+
     // Full MCQ practice tests
     // Macro: /ap-macro-mcq-practice-test-1 → /preview/macro/mcq/1
     rewrites.push({
@@ -221,6 +227,10 @@ const nextConfig = {
     rewrites.push({
       source: '/ap-gov-practice-tests',
       destination: '/unit-final-practice-tests?subject=gov',
+    });
+    rewrites.push({
+      source: '/ap-stats-practice-tests',
+      destination: '/unit-final-practice-tests?subject=stats',
     });
 
     return rewrites;

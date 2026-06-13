@@ -11,6 +11,7 @@ import {
   getSubjectSlug,
   getUnitSlug,
 } from '@/lib/practiceSlugs';
+import { isGovMcqPracticeUnitAvailable } from '@/lib/courseSubject';
 
 interface PracticePageProps {
   params: Promise<{
@@ -74,7 +75,7 @@ export default async function PracticePage({ params }: PracticePageProps) {
     notFound();
   }
 
-  if (subject === 'gov' && unitNumber !== 1) {
+  if (subject === 'gov' && !isGovMcqPracticeUnitAvailable(unitNumber)) {
     notFound();
   }
 

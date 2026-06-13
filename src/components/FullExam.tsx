@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Question, QuestionBank } from '@/data/questionBanks/types';
 import { Button } from "@/components/ui/button";
-import { Bookmark, BookmarkX, X, Clock, Maximize2, Minimize2, Calculator, Pen, Eraser, Expand, Trash2, Circle, CircleDot, Check, Lock, Brain, FileText, ChevronLeft, ChevronRight, ChevronsRight, Triangle, Strikethrough, Eye, EyeOff, Play, ChevronDown, ChevronUp, List, Pause, Play as PlayIcon, Highlighter, Copy, Share2, Users, Mail, MessageCircle, Camera, Ghost } from 'lucide-react';
+import { Bookmark, BookmarkX, X, Clock, Maximize2, Minimize2, Calculator, Pen, Eraser, Expand, Trash2, Circle, CircleDot, Check, Lock, Brain, FileText, ChevronLeft, ChevronRight, ChevronsRight, Triangle, Strikethrough, Eye, EyeOff, Play, ChevronDown, ChevronUp, List, Pause, Play as PlayIcon, Highlighter, Copy, ArrowLeft } from 'lucide-react';
 import Image, { StaticImageData } from 'next/image';
 import Link from 'next/link';
 import { redirectToCheckout } from '@/lib/stripe';
@@ -12,7 +12,7 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import { LoginModal, SignupModal } from './AuthModals';
 import { MCQFeedbackModal } from './MCQFeedbackModal';
 import { SeasonPassModal } from './SeasonPassModal';
-import { hasValidSeasonPass } from '@/lib/utils';
+import { hasValidSeasonPass, getUnitFinalPracticeTestsUrl } from '@/lib/utils';
 import { videos } from '@/data/videos';
 import { createPortal } from 'react-dom';
 import { HighlightableText } from './HighlightableText';
@@ -22,12 +22,21 @@ import { Scroll } from 'lucide-react';
 import { QuestionWithKeyTerms } from './QuestionWithKeyTerms';
 import { ApGovQuestionText, isApGovQuestion } from './ApGovQuestionText';
 import { UnitTestQuestionBody, type QuestionTextHighlight } from './UnitTestQuestionBody';
+import { ExpandableQuestionImage } from './ExpandableQuestionImage';
+import { MathText } from './MathText';
 import { ExamTutorialModal } from './ExamTutorialModal';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, doc, updateDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 import { saveQuizResult } from '@/lib/quizHistory';
 import { saveTestResult, saveTestProgress, loadTestProgress, TestProgress } from '@/lib/testProgress';
-import { apQuestionSubjectTag, type CourseSubject } from '@/lib/courseSubject';
+import {
+  apQuestionSubjectTag,
+  formatUnitMcqTestFooterLabel,
+  subjectOnboardingTitle,
+  unitsForCourseSubject,
+  type CourseSubject,
+} from '@/lib/courseSubject';
+import { getUnitTestMeta, unitMcqTimeLimitSeconds, ECON_UNIT_MCQ_SECONDS_PER_QUESTION } from '@/data/unitTestMeta';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
@@ -118,30 +127,16 @@ const FeedbackProgressBar = ({ status }: { status: 'incorrect' | 'partial' | 'co
   );
 };
 
-const SHARE_PREP_BODY =
-  'How does your score stack up? Same unit MCQ on AP Dojo — see if everyone is prepared.\n\n';
 
-/** Share row on unit test results — solid dojo purple + brutalist Share menu. */
+/** Share row on unit test results. */
 function UnitTestSharePrepRow() {
   const [copied, setCopied] = useState(false);
-  const [shareOpen, setShareOpen] = useState(false);
   const [hint, setHint] = useState<string | null>(null);
   const [pageUrl, setPageUrl] = useState('');
-  const shareWrapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setPageUrl(typeof window !== 'undefined' ? window.location.href : '');
   }, []);
-
-  useEffect(() => {
-    if (!shareOpen) return;
-    const onDoc = (e: MouseEvent) => {
-      const el = shareWrapRef.current;
-      if (el && !el.contains(e.target as Node)) setShareOpen(false);
-    };
-    document.addEventListener('mousedown', onDoc);
-    return () => document.removeEventListener('mousedown', onDoc);
-  }, [shareOpen]);
 
   const getUrl = () => (typeof window !== 'undefined' ? window.location.href : pageUrl);
 
@@ -163,158 +158,76 @@ function UnitTestSharePrepRow() {
     }
   };
 
+  /*
+  const [shareOpen, setShareOpen] = useState(false);
+  const shareWrapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!shareOpen) return;
+    const onDoc = (e: MouseEvent) => {
+      const el = shareWrapRef.current;
+      if (el && !el.contains(e.target as Node)) setShareOpen(false);
+    };
+    document.addEventListener('mousedown', onDoc);
+    return () => document.removeEventListener('mousedown', onDoc);
+  }, [shareOpen]);
+
   const sharePayload = () => {
     const url = getUrl();
     const body = `${SHARE_PREP_BODY}${url}`;
     return { url, body };
   };
 
-  const openGmail = () => {
-    const { url, body } = sharePayload();
-    if (!url) return;
-    const sub = encodeURIComponent('AP Dojo — unit practice');
-    const b = encodeURIComponent(body);
-    window.open(`https://mail.google.com/mail/?view=cm&fs=1&su=${sub}&body=${b}`, '_blank', 'noopener,noreferrer');
-    setShareOpen(false);
-  };
-
-  const openMessenger = () => {
-    const { url } = sharePayload();
-    if (!url) return;
-    // Web-friendly share surface; on many devices users route to Messenger from the Facebook sheet.
-    window.open(
-      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
-      '_blank',
-      'noopener,noreferrer'
-    );
-    setShareOpen(false);
-  };
-
-  const openInstagram = async () => {
-    const { url, body } = sharePayload();
-    if (!url) return;
-    try {
-      await navigator.clipboard.writeText(body);
-      flashHint('Caption + link copied — paste into Instagram.');
-    } catch {
-      flashHint('Could not copy — try Copy link.');
-    }
-    window.open('https://www.instagram.com/', '_blank', 'noopener,noreferrer');
-    setShareOpen(false);
-  };
-
-  const openSnapchat = async () => {
-    const { url, body } = sharePayload();
-    if (!url) return;
-    try {
-      await navigator.clipboard.writeText(body);
-      flashHint('Caption + link copied — paste into Snapchat.');
-    } catch {
-      flashHint('Could not copy — try Copy link.');
-    }
-    window.open('https://www.snapchat.com/', '_blank', 'noopener,noreferrer');
-    setShareOpen(false);
-  };
+  const openGmail = () => { ... };
+  const openMessenger = () => { ... };
+  const openInstagram = async () => { ... };
+  const openSnapchat = async () => { ... };
+  */
 
   return (
     <div className="mt-6 border-t border-gray-200 pt-6">
-      <div className="relative rounded-2xl border-4 border-black bg-violet-800 p-5 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] sm:p-6">
-        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-5">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border-2 border-black bg-white text-violet-800 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
-            <Users className="h-6 w-6" strokeWidth={2.25} aria-hidden />
-          </div>
+      <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-4 sm:px-5">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           <div className="min-w-0 flex-1">
-            <p className="text-lg font-black tracking-tight text-white sm:text-xl">
+            <p className="text-sm font-medium text-gray-900">
               How does that compare to your friends?
             </p>
-            <p className="mt-2 text-sm font-semibold leading-relaxed text-white/90">
+            <p className="mt-1 text-sm text-gray-600 leading-relaxed">
               Share a link to see if everyone is prepared — same practice, your crew.
             </p>
             {hint ? (
-              <p className="mt-3 text-xs font-bold text-amber-200" role="status">
+              <p className="mt-2 text-xs text-emerald-700" role="status">
                 {hint}
               </p>
             ) : null}
-            <div className="mt-5 flex flex-wrap items-center gap-3">
-              <div className="relative" ref={shareWrapRef}>
-                <button
-                  type="button"
-                  onClick={() => setShareOpen((o) => !o)}
-                  aria-expanded={shareOpen}
-                  aria-haspopup="menu"
-                  className="inline-flex items-center justify-center gap-2 rounded-xl border-4 border-black bg-white px-4 py-2.5 text-sm font-black text-gray-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition hover:bg-violet-50 active:translate-y-0.5 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-                >
-                  <Share2 className="h-4 w-4 shrink-0" aria-hidden />
-                  Share
-                  <ChevronDown
-                    className={`h-4 w-4 shrink-0 transition-transform ${shareOpen ? 'rotate-180' : ''}`}
-                    aria-hidden
-                  />
-                </button>
-                {shareOpen ? (
-                  <div
-                    role="menu"
-                    className="absolute left-0 top-full z-30 mt-2 w-[min(100vw-2rem,18rem)] overflow-hidden rounded-xl border-4 border-black bg-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]"
-                  >
-                    <button
-                      type="button"
-                      role="menuitem"
-                      onClick={openMessenger}
-                      className="flex w-full items-center gap-3 border-b-4 border-black px-4 py-3 text-left font-black text-gray-900 transition hover:bg-violet-100"
-                    >
-                      <MessageCircle className="h-5 w-5 shrink-0 text-[#0084FF]" aria-hidden />
-                      Messenger
-                    </button>
-                    <button
-                      type="button"
-                      role="menuitem"
-                      onClick={openInstagram}
-                      className="flex w-full items-center gap-3 border-b-4 border-black px-4 py-3 text-left font-black text-gray-900 transition hover:bg-violet-100"
-                    >
-                      <Camera className="h-5 w-5 shrink-0 text-pink-600" aria-hidden />
-                      Instagram
-                    </button>
-                    <button
-                      type="button"
-                      role="menuitem"
-                      onClick={openSnapchat}
-                      className="flex w-full items-center gap-3 border-b-4 border-black px-4 py-3 text-left font-black text-gray-900 transition hover:bg-violet-100"
-                    >
-                      <Ghost className="h-5 w-5 shrink-0 text-yellow-500" aria-hidden />
-                      Snapchat
-                    </button>
-                    <button
-                      type="button"
-                      role="menuitem"
-                      onClick={openGmail}
-                      className="flex w-full items-center gap-3 px-4 py-3 text-left font-black text-gray-900 transition hover:bg-violet-100"
-                    >
-                      <Mail className="h-5 w-5 shrink-0 text-red-600" aria-hidden />
-                      Gmail
-                    </button>
-                  </div>
-                ) : null}
-              </div>
-              <button
-                type="button"
-                onClick={handleCopy}
-                className="inline-flex items-center justify-center gap-2 rounded-xl border-4 border-black bg-violet-950 px-4 py-2.5 text-sm font-black text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition hover:bg-violet-900 active:translate-y-0.5 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-              >
-                {copied ? (
-                  <>
-                    <Check className="h-4 w-4 text-emerald-300" aria-hidden />
-                    Copied
-                  </>
-                ) : (
-                  <>
-                    <Copy className="h-4 w-4 shrink-0" aria-hidden />
-                    Copy link
-                  </>
-                )}
-              </button>
-            </div>
           </div>
+          <button
+            type="button"
+            onClick={handleCopy}
+            className="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors sm:self-center"
+          >
+            {copied ? (
+              <>
+                <Check className="h-4 w-4 text-emerald-600" aria-hidden />
+                Copied
+              </>
+            ) : (
+              <>
+                <Copy className="h-4 w-4 shrink-0" aria-hidden />
+                Copy link
+              </>
+            )}
+          </button>
         </div>
+        {/*
+        Social share dropdown — paused for now
+        <div className="relative" ref={shareWrapRef}>
+          <button type="button" onClick={() => setShareOpen((o) => !o)} ...>
+            Share <ChevronDown ... />
+          </button>
+          {shareOpen ? ( ... Messenger, Instagram, Snapchat, Gmail ... ) : null}
+        </div>
+        */}
       </div>
     </div>
   );
@@ -341,9 +254,6 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   const questions = questionBank.questions;
 
   // Calculate time limit dynamically for unit tests and preview exams
-  // AP Econ MCQ: 70 minutes for 60 questions = 1.167 minutes per question
-  // For unit tests, calculate based on number of questions
-  // For preview exams (when isUnitTest is true), use fixed 70 minutes
   const initialTimeLimit = useMemo(() => {
     if (isUnitTest) {
       // Check if this is a preview exam (examNumber like "preview/macro/mcq/1")
@@ -351,13 +261,19 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
         // Preview MCQ exam: 70 minutes = 4200 seconds
         return 70 * 60;
       }
-      // Unit tests: 70 minutes = 4200 seconds for 60 questions
-      // Time per question = 4200 / 60 = 70 seconds per question
-      return Math.round(70 * questions.length);
+      const unitNumber = parseInt(examNumber, 10);
+      if (Number.isFinite(unitNumber)) {
+        const meta = getUnitTestMeta(examType, unitNumber);
+        if (meta?.timeLimitSeconds) {
+          return meta.timeLimitSeconds;
+        }
+      }
+      // Fallback: AP Econ MCQ section pacing (70s/Q, rounded up to whole minutes)
+      return unitMcqTimeLimitSeconds(questions.length, ECON_UNIT_MCQ_SECONDS_PER_QUESTION);
     }
     // Default to 60 minutes for other exams
     return 60 * 60;
-  }, [isUnitTest, questions.length, examNumber]);
+  }, [isUnitTest, questions.length, examNumber, examType]);
 
   // Timer state
   const [timeRemaining, setTimeRemaining] = useState(initialTimeLimit);
@@ -382,15 +298,33 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
       ? 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800'
       : examType === 'micro'
         ? 'bg-green-600 hover:bg-green-700 active:bg-green-800'
-        : 'bg-violet-600 hover:bg-violet-700 active:bg-violet-800';
+        : examType === 'stats'
+          ? 'bg-orange-600 hover:bg-orange-700 active:bg-orange-800'
+          : 'bg-violet-600 hover:bg-violet-700 active:bg-violet-800';
   const accentHover =
     examType === 'macro'
       ? 'bg-blue-600 hover:bg-blue-700'
       : examType === 'micro'
         ? 'bg-green-600 hover:bg-green-700'
-        : 'bg-violet-600 hover:bg-violet-700';
+        : examType === 'stats'
+          ? 'bg-orange-600 hover:bg-orange-700'
+          : 'bg-violet-600 hover:bg-violet-700';
   const accentSolid =
-    examType === 'macro' ? 'bg-blue-600' : examType === 'micro' ? 'bg-green-600' : 'bg-violet-600';
+    examType === 'macro'
+      ? 'bg-blue-600'
+      : examType === 'micro'
+        ? 'bg-green-600'
+        : examType === 'stats'
+          ? 'bg-orange-600'
+          : 'bg-violet-600';
+  const resultsBackLinkClass =
+    examType === 'macro'
+      ? 'text-blue-700 hover:text-blue-900'
+      : examType === 'micro'
+        ? 'text-green-700 hover:text-green-900'
+        : examType === 'stats'
+          ? 'text-orange-700 hover:text-orange-900'
+          : 'text-violet-700 hover:text-violet-900';
 
   // Restore guest progress on mount (including timer)
   // This works for both guests AND logged-in users who were guests when they started the exam
@@ -476,10 +410,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   };
 
   const handleUnitTestSaveAndExit = async () => {
-    if (user) {
-      await saveUnitTestProgress();
-      router.push(`/unit-final-practice-tests?subject=${examType}`);
-    } else {
+    const exitUrl = getUnitFinalPracticeTestsUrl(examType);
+
+    if (!user) {
       if (typeof window !== 'undefined') {
         localStorage.setItem('guest_quiz_progress', JSON.stringify({
           examNumber,
@@ -495,7 +428,17 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
         }
       }
       setShowGuestSaveModal(true);
+      return;
     }
+
+    try {
+      await saveUnitTestProgress();
+    } catch (error) {
+      console.error('[FullExam] Error during unit test save & exit:', error);
+    }
+
+    // router.push after await is unreliable in the App Router; hard-navigate like full MCQ save modal
+    window.location.href = exitUrl;
   };
 
   // Restore saved progress for logged-in users on unit tests, or finish guest Save & Exit after auth
@@ -536,7 +479,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
         } catch {
           /* noop */
         }
-        router.push(`/unit-final-practice-tests?subject=${examType}`);
+        window.location.href = getUnitFinalPracticeTestsUrl(examType);
       })();
       return;
     }
@@ -645,6 +588,25 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   // Tools panel is closed by default on all exam types - users can open it if needed
   const isPreviewExam = examNumber && (examNumber.includes('preview') || examNumber.startsWith('preview'));
   const isFullExam = examNumber === 'full';
+  const unitMcqTestFooterLabel = useMemo(() => {
+    if (!isUnitTest || isCustomAssignment) return null;
+    const unitNumber = parseInt(examNumber, 10);
+    if (!Number.isFinite(unitNumber) || unitNumber < 1) return null;
+    return formatUnitMcqTestFooterLabel(examType, unitNumber, questions.length);
+  }, [isUnitTest, isCustomAssignment, examNumber, examType, questions.length]);
+
+  const unitTestResultsSubtitle = useMemo(() => {
+    if (!isUnitTest) return null;
+    const unitNumber = parseInt(examNumber, 10);
+    if (!Number.isFinite(unitNumber) || unitNumber < 1) return null;
+    const unitMeta = unitsForCourseSubject(examType).find((u) => u.number === unitNumber);
+    const unitName = unitMeta?.title ?? questions[0]?.unitName ?? '';
+    return {
+      subjectLabel: subjectOnboardingTitle(examType),
+      unitNumber,
+      unitName,
+    };
+  }, [isUnitTest, examNumber, examType, questions]);
   // Show top bar and bottom navigation for unit tests, preview exams, and full exams
   const shouldShowTestUI = isUnitTest || isPreviewExam || isFullExam || isCustomAssignment;
   /** Live session only: apply tutor/builder-style UI (rounded cards, shadow-xl, indigo/slate). Do not use for logic. */
@@ -724,10 +686,6 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
 
   // Add completed questions tracking
   const [completedQuestions, setCompletedQuestions] = useState<Set<number>>(new Set());
-
-  // Add state for image modal
-  const [showImageModal, setShowImageModal] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<StaticImageData | null>(null);
 
   // Add state for expandable question navigation
   const [showQuestionNavigator, setShowQuestionNavigator] = useState(false);
@@ -1535,13 +1493,6 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   const percentScore =
     totalQuestionsCount > 0 ? Math.round((correctAnswersCount / totalQuestionsCount) * 100) : 0;
   const earnedXp = 20 + correctAnswersCount * 10;
-  const resultsHubUrl =
-    examType === 'gov'
-      ? '/ap-gov-practice-tests'
-      : examType === 'macro'
-        ? '/ap-macro-practice-tests'
-        : '/ap-micro-practice-tests';
-  const unitResultsHubUrl = `/unit-final-practice-tests?subject=${examType}`;
 
   const toggleExplanation = (questionId: number) => {
     setShowExplanations(prev => ({
@@ -1864,6 +1815,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                 Already have an account? Log in
               </button>
               <button
+                type="button"
                 onClick={() => {
                   setShowGuestSaveModal(false);
                   try {
@@ -1872,7 +1824,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                   } catch {
                     /* noop */
                   }
-                  router.push(`/unit-final-practice-tests?subject=${examType}`);
+                  window.location.href = getUnitFinalPracticeTestsUrl(examType);
                 }}
                 className="w-full py-2 text-sm text-gray-400 hover:text-gray-600 transition-colors"
               >
@@ -1959,31 +1911,6 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
         )
       )}
 
-      {/* Image Modal */}
-      {showImageModal && selectedImage && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
-          onClick={() => setShowImageModal(false)}
-        >
-          <div className="relative max-w-4xl max-h-[90vh]">
-            <img 
-              src={selectedImage.src} 
-              alt="Question" 
-              className="max-w-full max-h-[90vh] object-contain scale-150 transform"
-            />
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowImageModal(false);
-              }}
-              className="absolute top-0 right-0 bg-white rounded-full p-1.5 shadow-lg hover:bg-gray-100 z-10"
-            >
-              <X className="w-6 h-6" />
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Video Slide-Out Panel */}
       <div 
         className={`fixed right-0 top-0 h-full w-[45%] bg-white shadow-2xl z-40 border-l border-gray-200 transform transition-transform duration-300 ease-in-out ${
@@ -2047,31 +1974,16 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
               <>
                 <button
                   type="button"
-                  onClick={() => router.push('/')}
-                  className="flex items-center gap-2.5 p-0.5 -m-0.5 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 text-left"
-                  aria-label="Go home"
-                  title="Home"
+                  onClick={() => router.push(getUnitFinalPracticeTestsUrl(examType))}
+                  className={`inline-flex items-center gap-2 p-0.5 -m-0.5 rounded-md text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1 ${resultsBackLinkClass}`}
                 >
-                  <Image src="/images/dojoIconJan26.svg" alt="" width={26} height={26} unoptimized />
-                  <span className="text-sm font-black text-gray-900 tracking-wide">AP Dojo</span>
+                  <ArrowLeft className="h-4 w-4 shrink-0" aria-hidden />
+                  Back to unit practice tests
                 </button>
                 <span className="text-sm font-medium text-gray-500 hidden sm:block">
                   Unit test results
                 </span>
-                <div className="flex items-center gap-1.5">
-                  <button
-                    onClick={() => router.push(unitResultsHubUrl)}
-                    className="px-3 py-1.5 text-xs font-semibold border border-gray-300 rounded hover:bg-gray-50 text-gray-700 transition-colors"
-                  >
-                    Unit practice tests
-                  </button>
-                  <button
-                    onClick={() => router.push(resultsHubUrl)}
-                    className="px-3 py-1.5 text-xs font-semibold border border-gray-300 rounded hover:bg-gray-50 text-gray-700 transition-colors"
-                  >
-                    {examType === 'gov' ? 'AP Gov hub' : 'Practice hub'}
-                  </button>
-                </div>
+                <div className="w-8 shrink-0" aria-hidden />
               </>
               ) : (
               <>
@@ -2096,12 +2008,13 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                 </span>
                 {/* Right: controls */}
                 <div className="flex items-center gap-1.5">
-                  <button
-                    onClick={handleUnitTestSaveAndExit}
-                    className="px-3 py-1.5 text-xs font-semibold border border-gray-300 rounded hover:bg-gray-50 text-gray-700 transition-colors"
-                  >
-                    Save & Exit
-                  </button>
+              <button
+                type="button"
+                onClick={handleUnitTestSaveAndExit}
+                className="px-3 py-1.5 text-xs font-semibold border border-gray-300 rounded hover:bg-gray-50 text-gray-700 transition-colors"
+              >
+                Save & Exit
+              </button>
                   <button
                     onClick={() => handleToolToggle('whiteboard')}
                     className="px-3 py-1.5 text-xs font-semibold border border-gray-300 rounded hover:bg-gray-50 text-gray-700 transition-colors"
@@ -2643,7 +2556,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                   ) : isApGovQuestion(question) ? (
                                     <ApGovQuestionText text={question.question} />
                                   ) : (
-                                    question.question
+                                    <MathText text={question.question} />
                                   )}
                                 </p>
                                 {/* Icons Row */}
@@ -2688,14 +2601,10 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                             <div className={isUnitTest ? 'col-start-1 row-start-2 pr-8 border-r border-gray-100' : 'w-full'}>
                               {question.image && (
                                 <div className="bg-white rounded-lg border border-gray-200 p-4">
-                                  <img 
+                                  <ExpandableQuestionImage
                                     src={question.image.src}
                                     alt="Question diagram"
-                                    className="w-full h-auto max-h-[400px] object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
-                                    onClick={() => {
-                                      setSelectedImage(question.image as StaticImageData);
-                                      setShowImageModal(true);
-                                    }}
+                                    imageClassName="w-full h-auto max-h-[400px] object-contain rounded-lg"
                                   />
                                 </div>
                               )}
@@ -2758,14 +2667,10 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                             <div className="space-y-4 w-full">
                               {question.image && (
                                 <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4 flex justify-center">
-                                  <img 
+                                  <ExpandableQuestionImage
                                     src={question.image.src}
                                     alt="Question diagram"
-                                    className="w-full max-w-2xl h-auto object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
-                                    onClick={() => {
-                                      setSelectedImage(question.image as StaticImageData);
-                                      setShowImageModal(true);
-                                    }}
+                                    imageClassName="w-full max-w-2xl h-auto object-contain rounded-lg"
                                   />
                                 </div>
                               )}
@@ -2824,7 +2729,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                           {/* Visual Content - Show below question text for custom assignments */}
                           {isCustomAssignment && question.image && (
                             <div className="bg-white border-2 border-gray-300 rounded-xl shadow-sm p-4 flex justify-center">
-                              <img
+                              <ExpandableQuestionImage
                                 src={
                                   typeof question.image === 'string'
                                     ? question.image
@@ -2832,17 +2737,10 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                 }
                                 alt={
                                   typeof question.image === 'string'
-                                    ? "Question diagram"
-                                    : (question.image as any).alt || "Question diagram"
+                                    ? 'Question diagram'
+                                    : (question.image as any).alt || 'Question diagram'
                                 }
-                                className="w-full max-w-3xl h-auto object-contain transition-all rounded-lg border border-slate-200 shadow-sm cursor-pointer hover:opacity-90"
-                                onClick={() => {
-                                  if (question.image && typeof question.image !== 'string') {
-                                    // Only open modal if image is an object (not a string)
-                                    setSelectedImage(question.image as StaticImageData);
-                                    setShowImageModal(true);
-                                  }
-                                }}
+                                imageClassName="w-full max-w-3xl h-auto object-contain rounded-lg border border-slate-200 shadow-sm"
                               />
                             </div>
                           )}
@@ -3052,14 +2950,14 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                       {/* Option Image or Text */}
                                       {question.optionImages && question.optionImages[index] ? (
                                         <div className="flex-1 flex items-center justify-center">
-                                          <img 
+                                          <ExpandableQuestionImage
                                             src={question.optionImages[index].src}
                                             alt={question.optionImages[index].alt || `Option ${String.fromCharCode(65 + index)}`}
-                                            className={`max-w-[200px] max-h-[150px] object-contain ${isStruckThrough ? 'opacity-40' : ''}`}
+                                            imageClassName={`max-w-[200px] max-h-[150px] object-contain ${isStruckThrough ? 'opacity-40' : ''}`}
                                           />
                                         </div>
                                       ) : (
-                                        <span className={`flex-1 ${isUnitTest ? `font-normal ${FONT_SIZE_CLASSES[questionFontSize]}` : 'text-sm'} ${isStruckThrough ? 'line-through text-gray-400' : ''} ${showResults ? 'text-gray-800' : isSelected ? 'text-gray-900' : 'text-gray-900'}`}>{option}</span>
+                                        <span className={`flex-1 ${isUnitTest ? `font-normal ${FONT_SIZE_CLASSES[questionFontSize]}` : 'text-sm'} ${isStruckThrough ? 'line-through text-gray-400' : ''} ${showResults ? 'text-gray-800' : isSelected ? 'text-gray-900' : 'text-gray-900'}`}><MathText text={option} /></span>
                                       )}
                                       {/* Strikethrough Button - Only show when not submitted */}
                                       {!showResults && (
@@ -3245,7 +3143,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                           ) : isApGovQuestion(question) ? (
                             <ApGovQuestionText text={question.question} />
                           ) : (
-                            question.question
+                                    <MathText text={question.question} />
                           )}
                         </p>
                         {/* Video Explanation Icon */}
@@ -3319,14 +3217,10 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                       {/* Add image display */}
                       {question.image && !isCustomAssignment && (
                         <div className="my-4">
-                          <img 
+                          <ExpandableQuestionImage
                             src={question.image.src}
                             alt="Question"
-                            className="max-h-[300px] object-contain cursor-pointer hover:opacity-90 transition-opacity rounded-lg"
-                            onClick={() => {
-                              setSelectedImage(question.image as StaticImageData);
-                              setShowImageModal(true);
-                            }}
+                            imageClassName="max-h-[300px] object-contain rounded-lg"
                           />
                         </div>
                       )}
@@ -3417,14 +3311,14 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                             {/* Option Image or Text */}
                             {question.optionImages && question.optionImages[idx] ? (
                               <div className="flex-1 flex items-center justify-center">
-                                <img 
+                                <ExpandableQuestionImage
                                   src={question.optionImages[idx].src}
                                   alt={question.optionImages[idx].alt || `Option ${letter}`}
-                                  className="max-w-[200px] max-h-[150px] object-contain"
+                                  imageClassName="max-w-[200px] max-h-[150px] object-contain"
                                 />
                               </div>
                             ) : (
-                              <span className="flex-1 text-sm text-gray-800">{option}</span>
+                              <span className="flex-1 text-sm text-gray-800"><MathText text={option} /></span>
                             )}
                             {/* Feedback Icon */}
                             {(isCorrectAnswer || (isSelected && !isCorrectAnswer)) && (
@@ -3448,7 +3342,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                         <div className="mt-3 p-3 bg-blue-50 border-l-4 border-blue-400 rounded">
                           <p className="text-sm text-gray-800 leading-relaxed">
                             <span className="text-gray-600">Explanation: </span>
-                            {question.explanation}
+                            <MathText text={question.explanation} />
                           </p>
                         </div>
                       </div>
@@ -3465,6 +3359,17 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                       <h1 className="text-4xl font-black leading-[1.05] tracking-tight text-black sm:text-5xl md:text-6xl">
                         Assessment Results
                       </h1>
+                      {unitTestResultsSubtitle ? (
+                        <p className="mt-3 text-base font-semibold text-gray-600 sm:text-lg">
+                          {unitTestResultsSubtitle.subjectLabel} · Unit {unitTestResultsSubtitle.unitNumber}
+                          {unitTestResultsSubtitle.unitName ? (
+                            <>
+                              <span className="text-gray-400"> · </span>
+                              {unitTestResultsSubtitle.unitName}
+                            </>
+                          ) : null}
+                        </p>
+                      ) : null}
                     </div>
                   ) : null}
                   <div className="rounded-2xl border-2 border-black bg-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
@@ -4384,7 +4289,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
             {/* Sec label (unit test only) */}
             {isUnitTest && (
               <span className="hidden sm:block text-xs text-gray-400 font-normal shrink-0">
-                Sec I-A &bull; {questions.length} Questions
+                {unitMcqTestFooterLabel ?? `Sec I-A • ${questions.length} Questions`}
               </span>
             )}
             {/* Question Navigator Button */}

@@ -1,22 +1,24 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import type { CourseSubject } from "@/lib/courseSubject"
+import { hasAdminRole } from "@/lib/adminAccess"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
 /**
- * Check if user has a valid (non-expired) season pass
+ * Check if user has premium access (valid season pass or admin role).
  * @param userData - User data object from Firestore
  * @param subject - Optional course to check. If not provided, checks if user has any valid pass.
- * @returns true if user has a valid season pass
+ * @returns true if user is admin or has a valid season pass
  */
 export function hasValidSeasonPass(
   userData: any,
   subject?: CourseSubject
 ): boolean {
   if (!userData) return false;
+  if (hasAdminRole(userData)) return true;
   
   const seasonPass = userData.seasonPass as string[] | undefined;
   const expiration = userData.seasonPassExpiration as Record<string, string> | undefined;

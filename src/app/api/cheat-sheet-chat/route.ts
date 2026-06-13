@@ -3,6 +3,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { displayCourseLabel, isCourseSubject, type CourseSubject } from '@/lib/courseSubject';
 import {
   buildFrqPracticeTutorSystemInstruction,
+  cheatSheetPersonaBeatHint,
+  mcqPersonaBeatHint,
+  mcqPersonaEnergyLabel,
   personaForSubject,
   scotusSenseiSystemPrompt,
   type ScotusSenseiIntent,
@@ -13,7 +16,7 @@ import {
 } from '@/lib/frqTutorContext';
 import { auth as adminAuth, db as adminDb } from '@/lib/firebase-admin';
 
-const MODEL_NAME = 'gemini-2.0-flash';
+const MODEL_NAME = 'gemini-flash-latest';
 
 const MAX_MESSAGES = 32;
 const MAX_MESSAGE_CHARS = 12_000;
@@ -368,11 +371,11 @@ You **must**:
 
   return `${persona.voice}
 
-You are **${persona.name}**, the **guided MCQ coach** in AP Dojo (Macro, Micro, or AP Gov—match **${course}** below). The learner is in **unit MCQ practice** on **one** item only. Unit ${unitNumber}${unitTitle ? ` (${unitTitle})` : ''}.
+You are **${persona.name}**, the **guided MCQ coach** in AP Dojo (Macro, Micro, AP Gov, or AP Stats—match **${course}** below). The learner is in **unit MCQ practice** on **one** item only. Unit ${unitNumber}${unitTitle ? ` (${unitTitle})` : ''}.
 
 **Your job:** You **lead**. The student mostly taps suggested next steps—**do not** invite open-ended “what do you want to ask?” coaching. Keep them moving with **short**, focused turns (Socratic walkthrough, not a free chat).
 
-**Personality (required—do not sound like a generic bot):** The voice block above is your baseline: **warm, human, lightly ${subject === 'gov' ? 'Franklin-esque' : 'Smith-esque'} tutoring energy** in plain contemporary English—the same temperament as the unit cheat-sheet tutor. **Every** assistant message—including short ones—must include **one** compact persona beat (a short opening aside, transitional clause, or bridge before [[CHOICES]]): ${subject === 'gov' ? 'dry civic wit / practical patience—always nonpartisan, never cute colonial cosplay.' : 'polite curiosity or quiet delight at how the logic fits together—in markets or incentives, whichever fits this item.'} That beat is **tone only**—it must **not** carry unique factual claims; all definitions, steps, and AP content stay rigorous and neutral. Skip the beat **only** if your entire prose is literally one very short sentence (e.g. a single corrective line).
+**Personality (required—do not sound like a generic bot):** The voice block above is your baseline: **warm, human, lightly ${mcqPersonaEnergyLabel(subject)} tutoring energy** in plain contemporary English—the same temperament as the unit cheat-sheet tutor. **Every** assistant message—including short ones—must include **one** compact persona beat (a short opening aside, transitional clause, or bridge before [[CHOICES]]): ${mcqPersonaBeatHint(subject)} That beat is **tone only**—it must **not** carry unique factual claims; all definitions, steps, and AP content stay rigorous and neutral. Skip the beat **only** if your entire prose is literally one very short sentence (e.g. a single corrective line).
 
 Substance stays **neutral, precise, contemporary AP-first**—no archaic diction, no lesson content as historical reenactment; accuracy beats flourish.
 
@@ -424,9 +427,9 @@ function buildSystemInstruction(
 
 You are tutoring a student in AP Dojo. They have the Unit ${unitNumber} cheat sheet open${unitTitle ? ` (${unitTitle})` : ''} for ${course}.
 
-Persona vs. substance: Core teaching stays neutral, precise, and contemporary AP—no antiquated diction or period vignettes bearing the explanatory load. Supplementary persona is welcome when substantial: if the reply reaches roughly 120+ words OR three-plus short paragraphs, weave in ONE plain-English temperament beat (economics tutor: calm curiosity about how orderly reasoning fits markets and trade; gov tutor: dry civic wit and pragmatism, always nonpartisan)—one sentence or clause, preferably as opener or transitional closer, not dribbled across every paragraph, and never the only place factual claims appear. Omit extra personality in terse replies.
+Persona vs. substance: Core teaching stays neutral, precise, and contemporary AP—no antiquated diction or period vignettes bearing the explanatory load. Supplementary persona is welcome when substantial: if the reply reaches roughly 120+ words OR three-plus short paragraphs, weave in ONE plain-English temperament beat (${cheatSheetPersonaBeatHint(subject)})—one sentence or clause, preferably as opener or transitional closer, not dribbled across every paragraph, and never the only place factual claims appear. Omit extra personality in terse replies.
 
-Help with AP-aligned content for this unit: terms, graphs, misconceptions (econ); institutions, doctrines, and FRQ reasoning (Gov); how ideas show up on the exam; and how to use their cheat sheet. Students may attach an image (e.g. notes or a graph), a PDF slide, or similar—use what you see to answer, tied to AP scope when relevant.
+Help with AP-aligned content for this unit: terms, graphs, misconceptions (econ); institutions, doctrines, and FRQ reasoning (gov); displays, variation, study design, and inference reasoning (stats); how ideas show up on the exam; and how to use their cheat sheet. Students may attach an image (e.g. notes or a graph), a PDF slide, or similar—use what you see to answer, tied to AP scope when relevant.
 
 Keep replies concise unless they ask for more depth—short paragraphs, not lectures. Use **bold** sparingly for key terms (markdown-style). Accuracy and exam alignment beat “staying in character”; avoid inventing exam details.
 
@@ -460,19 +463,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
   }
 
+  let isAdmin = false;
   try {
     const userSnap = await adminDb.collection('users').doc(uid).get();
     const userData = userSnap.data() as
       | { admin?: boolean; role?: string; roles?: string[] }
       | undefined;
-    const isAdmin =
+    isAdmin =
       userData?.admin === true ||
       (typeof userData?.role === 'string' && userData.role.toLowerCase() === 'admin') ||
       (Array.isArray(userData?.roles) &&
         userData.roles.some((r) => typeof r === 'string' && r.toLowerCase() === 'admin'));
-    if (!isAdmin) {
-      return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
-    }
   } catch {
     return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
   }
@@ -554,6 +555,16 @@ export async function POST(req: NextRequest) {
   }
   if (mode === 'scotus_essay' && scotusPrompt == null) {
     return NextResponse.json({ error: 'Invalid scotusPrompt payload.' }, { status: 400 });
+  }
+
+  const isStatsCheatSheetTutor =
+    subject === 'stats' &&
+    mode === 'default' &&
+    mcqContext == null &&
+    frqContextPayload == null;
+
+  if (!isAdmin && !isStatsCheatSheetTutor) {
+    return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
   }
 
   const normalized: ClientTurn[] = [];

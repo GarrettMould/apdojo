@@ -6,10 +6,12 @@ import { FileText, BookOpen, Pencil, PlayCircle, ArrowRight } from 'lucide-react
 import { useAuthContext } from '@/contexts/AuthContext';
 import { CourseProvider, useCourseContext, useCourseTheme } from '@/contexts/CourseContext';
 import { CourseToggle } from '@/components/CourseToggle';
+import { useSubjectSwitchNavigation } from '@/hooks/useSubjectSwitchNavigation';
 import { Button } from '@/components/ui/button';
 
 function AlternativeDashboardContent() {
-  const { user, userData, selectedSubject, setSelectedSubject } = useAuthContext();
+  const { user, userData, selectedSubject } = useAuthContext();
+  const handleSubjectSwitch = useSubjectSwitchNavigation();
   const { currentCourse } = useCourseContext();
   const theme = useCourseTheme();
   const subject = currentCourse === 'macro' ? 'macro' : 'micro';
@@ -38,7 +40,10 @@ function AlternativeDashboardContent() {
             <h1 className="text-3xl font-black text-gray-900">
               {subjectName} Dashboard
             </h1>
-            <CourseToggle activeTab={selectedSubject} onToggle={setSelectedSubject} />
+            <CourseToggle
+              activeTab={selectedSubject}
+              onToggle={(s) => void handleSubjectSwitch(s, selectedSubject)}
+            />
           </div>
         </div>
 

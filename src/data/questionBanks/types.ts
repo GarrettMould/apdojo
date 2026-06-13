@@ -10,7 +10,8 @@ export interface Question {
     | 'ap_macroeconomics'
     | 'ap_microeconomics'
     | 'ap_us_government'
-    | ('ap_macroeconomics' | 'ap_microeconomics' | 'ap_us_government')[];
+    | 'ap_statistics'
+    | ('ap_macroeconomics' | 'ap_microeconomics' | 'ap_us_government' | 'ap_statistics')[];
   unitName: string;
   question: string;
   image: StaticImageData | { src: string; alt: string } | null;

@@ -4,13 +4,15 @@ import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { PlayCircle, Clock, PauseCircle, PenLine, EyeOff, RotateCcw } from 'lucide-react';
 import Image from 'next/image';
-import { macroUnits, microUnits, govUnits } from '@/data/cheatSheets';
+import { macroUnits, microUnits, govUnits, statsUnits } from '@/data/cheatSheets';
 import { getUnitMCQTestUrl, getUnitFrqPackUrl, getUnitFinalPracticeTestsUrl } from '@/lib/utils';
 import { getUnitTestMeta, formatTestTime } from '@/data/unitTestMeta';
 import { getGovUnitStimulusFrqs } from '@/data/gov/govUnitStimulusFrqs';
+import { getStatsUnitStimulusFrqs } from '@/data/stats/statsUnitStimulusFrqs';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { loadTestProgress, clearTestProgress } from '@/lib/testProgress';
 import { hasAdminRole } from '@/lib/adminAccess';
+import { isGovMcqTestUnitAvailable, isStatsMcqTestUnitAvailable, isStatsFrqTestUnitAvailable } from '@/lib/courseSubject';
 
 const RULES = [
   'Each question has one correct answer — select the best choice.',
@@ -80,7 +82,10 @@ function UnitTestPreviewContent() {
 
   const subjectParam = searchParams.get('subject');
   const subject =
-    subjectParam === 'macro' || subjectParam === 'micro' || subjectParam === 'gov'
+    subjectParam === 'macro' ||
+    subjectParam === 'micro' ||
+    subjectParam === 'gov' ||
+    subjectParam === 'stats'
       ? subjectParam
       : 'macro';
   const unitParam = searchParams.get('unit') || '1';
@@ -113,17 +118,32 @@ function UnitTestPreviewContent() {
   }, [user, testId, isFrqPreview]);
 
   const units =
-    subject === 'gov' ? govUnits : subject === 'micro' ? microUnits : macroUnits;
+    subject === 'gov'
+      ? govUnits
+      : subject === 'stats'
+        ? statsUnits
+        : subject === 'micro'
+          ? microUnits
+          : macroUnits;
   const unit = units.find((u) => u.number === unitNumber);
   const isGov = subject === 'gov';
+  const isStats = subject === 'stats';
   const canAccessGov = Boolean(user && hasAdminRole(userData));
   const isMicro = subject === 'micro';
   const subjectName = isGov
     ? 'U.S. Government and Politics'
-    : isMicro
-      ? 'Microeconomics'
-      : 'Macroeconomics';
-  const accentBg = isGov ? 'bg-violet-600' : isMicro ? 'bg-green-600' : 'bg-blue-600';
+    : isStats
+      ? 'Statistics'
+      : isMicro
+        ? 'Microeconomics'
+        : 'Macroeconomics';
+  const accentBg = isGov
+    ? 'bg-violet-600'
+    : isStats
+      ? 'bg-orange-600'
+      : isMicro
+        ? 'bg-green-600'
+        : 'bg-blue-600';
 
   if (isGov && loadingUserData) {
     return (
@@ -154,14 +174,14 @@ function UnitTestPreviewContent() {
     );
   }
 
-  if (isFrqPreview && subject !== 'gov') {
+  if (isFrqPreview && subject !== 'gov' && subject !== 'stats') {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="max-w-md text-center">
           <PauseCircle className="w-12 h-12 mx-auto text-gray-500 mb-4 opacity-70" />
           <h1 className="text-2xl font-black text-gray-900 mb-2">Unit FRQ packs</h1>
           <p className="text-gray-600 font-medium mb-6">
-            Stimulus FRQ packs are only available for AP Gov right now. Use your course&apos;s full FRQ exams for
+            Stimulus FRQ packs are available for AP Gov and AP Stats. Use your course&apos;s full FRQ exams for
             Macro and Micro.
           </p>
           <button
@@ -179,20 +199,36 @@ function UnitTestPreviewContent() {
   }
 
   const govFrqCount = isGov ? getGovUnitStimulusFrqs(unitNumber).length : 0;
+  const statsFrqCount = isStats ? getStatsUnitStimulusFrqs(unitNumber).length : 0;
+  const frqPackCount = isFrqPreview ? (isGov ? govFrqCount : isStats ? statsFrqCount : 0) : 0;
 
-  if (isGov && unitNumber !== 1) {
+  const govMcqUnavailable = isGov && !isFrqPreview && !isGovMcqTestUnitAvailable(unitNumber);
+  const statsMcqUnavailable = isStats && !isFrqPreview && !isStatsMcqTestUnitAvailable(unitNumber);
+  const govFrqUnavailable =
+    isGov && isFrqPreview && getGovUnitStimulusFrqs(unitNumber).length === 0;
+  const statsFrqUnavailable =
+    isStats && isFrqPreview && !isStatsFrqTestUnitAvailable(unitNumber);
+
+  if (govMcqUnavailable || statsMcqUnavailable || govFrqUnavailable || statsFrqUnavailable) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="max-w-md text-center">
           <PauseCircle className="w-12 h-12 mx-auto text-violet-500 mb-4 opacity-70" />
           <h1 className="text-2xl font-black text-gray-900 mb-2">Coming soon</h1>
           <p className="text-gray-600 font-medium mb-6">
-            The Unit {unitNumber} {isFrqPreview ? 'FRQ pack' : 'practice exam'} for AP Gov isn&apos;t available yet.
-            Unit 1 is live now.
+            The Unit {unitNumber} {isFrqPreview ? 'FRQ pack' : 'practice exam'} for AP{' '}
+            {isStats ? 'Stats' : 'Gov'} isn&apos;t available yet.
+            {isStats
+              ? isFrqPreview
+                ? ' Unit 1 FRQ pack is live now.'
+                : ' Unit 1 MCQ test is live now.'
+              : isFrqPreview
+                ? ' Units 1–2 FRQ packs are live now.'
+                : ' Units 1–2 MCQ tests are live now.'}
           </p>
           <button
             type="button"
-            onClick={() => router.push(getUnitFinalPracticeTestsUrl('gov'))}
+            onClick={() => router.push(getUnitFinalPracticeTestsUrl(isStats ? 'stats' : 'gov'))}
             className={`w-full rounded-lg py-3 text-white font-black ${accentBg} hover:opacity-90`}
           >
             Back to unit practice tests
@@ -206,14 +242,15 @@ function UnitTestPreviewContent() {
   const mcqQuestionCount = meta?.questionCount ?? 15;
   const mcqTimeLabel = meta ? formatTestTime(meta.timeLimitSeconds) : '—';
 
-  /** FRQ pack (Gov): 60 minutes total (~20 minutes per FRQ — AP Gov Section II pacing). */
-  const frqSuggestedSeconds = 60 * 60;
-  const questionCount = isFrqPreview ? govFrqCount : mcqQuestionCount;
+  /** FRQ pack pacing: Gov 60 min; Stats 40 min for 2 questions. */
+  const frqSuggestedSeconds =
+    isStats && isFrqPreview ? 40 * 60 : isGov && isFrqPreview ? 60 * 60 : 60 * 60;
+  const questionCount = isFrqPreview ? frqPackCount : mcqQuestionCount;
   const timeLabel = isFrqPreview ? formatTestTime(frqSuggestedSeconds) : mcqTimeLabel;
 
   const testUrl = isFrqPreview ? getUnitFrqPackUrl(unitNumber, subject) : getUnitMCQTestUrl(unitNumber, subject);
 
-  if (isFrqPreview && isGov && govFrqCount === 0) {
+  if (isFrqPreview && ((isGov && govFrqCount === 0) || (isStats && statsFrqCount === 0))) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="max-w-md text-center">
@@ -259,7 +296,7 @@ function UnitTestPreviewContent() {
           <div className="flex items-center gap-2.5 mb-5">
             <Image src="/images/dojoIconJan26.svg" alt="AP Dojo" width={38} height={38} unoptimized />
             <span className="text-xl font-black tracking-wide text-gray-900">
-              AP <span className={isGov ? 'text-violet-600' : isMicro ? 'text-green-600' : 'text-blue-500'}>Dojo</span>
+              AP <span className={isGov ? 'text-violet-600' : isStats ? 'text-orange-600' : isMicro ? 'text-green-600' : 'text-blue-500'}>Dojo</span>
             </span>
           </div>
 
@@ -268,12 +305,10 @@ function UnitTestPreviewContent() {
           </h1>
 
           {/* Unit pill — light, below headline */}
-          <span className={`inline-block mt-3 text-[11px] font-semibold uppercase tracking-widest px-2.5 py-1 rounded ${isGov ? 'bg-violet-50 text-violet-800' : isMicro ? 'bg-green-50 text-green-700' : 'bg-blue-50 text-blue-700'}`}>
+          <span className={`inline-block mt-3 text-[11px] font-semibold uppercase tracking-widest px-2.5 py-1 rounded ${isGov ? 'bg-violet-50 text-violet-800' : isStats ? 'bg-orange-50 text-orange-800' : isMicro ? 'bg-green-50 text-green-700' : 'bg-blue-50 text-blue-700'}`}>
             AP {subjectName} · Unit {unitNumber}
             {isFrqPreview ? ' · FRQ pack' : ''}
           </span>
-
-          <p className="text-gray-500 mt-3 text-sm leading-relaxed">{unit.description}</p>
         </div>
 
         {/* Main card */}

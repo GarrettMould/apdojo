@@ -62,6 +62,16 @@ function useCourseTheme() {
       hoverBorder: 'hover:border-green-600',
     };
   }
+  if (currentCourse === 'stats') {
+    return {
+      theme: 'orange' as const,
+      primary: 'bg-orange-600',
+      text: 'text-orange-600',
+      border: 'border-orange-600',
+      lightBg: 'bg-orange-50',
+      hoverBorder: 'hover:border-orange-600',
+    };
+  }
   return {
     theme: 'violet' as const,
     primary: 'bg-violet-600',

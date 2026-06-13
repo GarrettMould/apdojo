@@ -373,13 +373,8 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
                   </button>
                 </div>
               )}
-              <h2 className="text-sm font-black uppercase tracking-wider text-gray-900">FRQ Prompt</h2>
-              <div className="mt-4 rounded-xl border-2 border-gray-200 bg-gray-50 p-4">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="inline-flex rounded-md border-2 border-violet-700 bg-violet-600 px-2.5 py-1 text-xs font-black uppercase tracking-wide text-white">
-                    {prompt.topic}
-                  </span>
-                </div>
+              <div className="rounded-xl border-2 border-gray-200 bg-gray-50 p-4">
+                <h2 className="text-sm font-black uppercase tracking-wider text-gray-900">FRQ Prompt</h2>
                 <p className="mt-3 text-sm leading-relaxed text-gray-800">{prompt.scenario}</p>
               </div>
 

@@ -2,9 +2,80 @@
 
 import Link from 'next/link';
 import { ArrowRight, Scale } from 'lucide-react';
+import {
+  AP_GOV_REQUIRED_SCOTUS_CASES,
+  formatScotusCaseTitle,
+  getScotusCaseRecord,
+  isScotusPracticeLive,
+} from '@/data/gov/scotusRequiredCases';
 import { scotusEssayPrompts } from '@/data/gov/scotusEssayPrompts';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { hasAdminRole } from '@/lib/adminAccess';
+
+function ScotusCaseCard({
+  caseIndex,
+  caseId,
+  caseTitle,
+  summary,
+  topic,
+  comparisonCase,
+  isLive,
+  href,
+}: {
+  caseIndex: number;
+  caseId: string;
+  caseTitle: string;
+  summary?: string;
+  topic?: string;
+  comparisonCase?: string;
+  isLive: boolean;
+  href?: string;
+}) {
+  const cardBody = (
+    <>
+      <div className="flex items-start justify-between gap-3">
+        <span className="inline-flex rounded-md border border-gray-300 bg-gray-50 px-2 py-1 text-xs font-black text-gray-700">
+          Case {caseIndex + 1}
+        </span>
+        <Scale className="h-4 w-4 text-violet-600" />
+      </div>
+      <h2 className="mt-3 text-lg font-black leading-snug text-gray-900">{caseTitle}</h2>
+      {topic ? <p className="mt-1 text-sm font-semibold text-violet-700">{topic}</p> : null}
+      {summary ? <p className="mt-2 line-clamp-3 text-sm text-gray-600">{summary}</p> : null}
+      {comparisonCase ? (
+        <p className="mt-2 line-clamp-2 text-sm text-gray-600">Comparison: {comparisonCase}</p>
+      ) : null}
+      {isLive ? (
+        <div className="mt-4 inline-flex items-center gap-2 text-sm font-black text-violet-700">
+          Open practice prompt
+          <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+        </div>
+      ) : (
+        <p className="mt-4 text-xs font-black uppercase tracking-wide text-gray-400">Coming soon</p>
+      )}
+    </>
+  );
+
+  const cardClassName = `group rounded-xl border-2 border-black bg-white p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition ${
+    isLive
+      ? 'hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]'
+      : 'opacity-75'
+  }`;
+
+  if (isLive && href) {
+    return (
+      <Link key={caseId} href={href} className={cardClassName}>
+        {cardBody}
+      </Link>
+    );
+  }
+
+  return (
+    <div key={caseId} className={cardClassName} aria-disabled="true">
+      {cardBody}
+    </div>
+  );
+}
 
 export default function ScotusEssayPracticeHubClient() {
   const { user, userData, loadingUserData } = useAuthContext();
@@ -45,41 +116,36 @@ export default function ScotusEssayPracticeHubClient() {
             AP Gov
           </p>
           <h1 className="mt-4 text-3xl font-black tracking-tight text-gray-900 sm:mt-5 sm:text-4xl">
-            SCOTUS Comparison Practice Prompts
+            SCOTUS Comparison Practice
           </h1>
           <p className="mt-2 max-w-3xl text-sm text-gray-700 sm:text-base">
-            Pick one prompt to open the full FRQ workspace. Each set includes a required case, a comparison case, and
-            A/B/C writing tasks.
+            All 14 required Supreme Court cases are available. Open a prompt to practice the full FRQ workspace with
+            A/B/C writing tasks and a comparison case.
           </p>
         </header>
 
         <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {scotusEssayPrompts.map((prompt, index) => (
-            <Link
-              key={prompt.id}
-              href={`/scotus-essay-practice/${prompt.id}`}
-              className="group rounded-xl border-2 border-black bg-white p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <span className="inline-flex rounded-md border border-gray-300 bg-gray-50 px-2 py-1 text-xs font-black text-gray-700">
-                  Prompt {index + 1}
-                </span>
-                <Scale className="h-4 w-4 text-violet-600" />
-              </div>
-              <h2 className="mt-3 text-lg font-black leading-snug text-gray-900">
-                {prompt.requiredCase} - STILL IN DEVELOPMENT
-              </h2>
-              <p className="mt-1 text-sm font-semibold text-gray-700">{prompt.topic}</p>
-              <p className="mt-2 line-clamp-2 text-sm text-gray-600">Comparison: {prompt.nonRequiredCase}</p>
-              <div className="mt-4 inline-flex items-center gap-2 text-sm font-black text-violet-700">
-                Open prompt
-                <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-              </div>
-            </Link>
-          ))}
+          {AP_GOV_REQUIRED_SCOTUS_CASES.map((requiredCase, index) => {
+            const prompt = scotusEssayPrompts.find((item) => item.id === requiredCase.id);
+            const record = getScotusCaseRecord(requiredCase);
+            const isLive = isScotusPracticeLive(requiredCase.id);
+
+            return (
+              <ScotusCaseCard
+                key={requiredCase.id}
+                caseIndex={index}
+                caseId={requiredCase.id}
+                caseTitle={formatScotusCaseTitle(requiredCase)}
+                summary={record?.summary}
+                topic={prompt?.topic}
+                comparisonCase={prompt?.nonRequiredCase}
+                isLive={isLive}
+                href={isLive ? `/scotus-essay-practice/${requiredCase.id}` : undefined}
+              />
+            );
+          })}
         </section>
       </div>
     </main>
   );
 }
-

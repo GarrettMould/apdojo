@@ -182,24 +182,6 @@ export const govUnit1McqTestQuestions: Question[] = [
       'The lack of power to regulate interstate commerce was a major weakness of the Articles, leading to "trade wars" and tariffs between states.',
   },
   {
-    id: 6111,
-    subject: 'ap_us_government',
-    unit: 1,
-    lessonIDS: ['1.5'],
-    unitName: 'Foundations of American Democracy',
-    question: 'Which of the following is the most common method for amending the U.S. Constitution?',
-    image: null,
-    options: [
-      'Proposed by 2/3 of state legislatures and ratified by 3/4 of Congress.',
-      'Proposed by a national convention and ratified by popular vote.',
-      'Proposed by 2/3 of both houses of Congress and ratified by 3/4 of state legislatures.',
-      'Proposed by the President and ratified by the Supreme Court.',
-    ],
-    correctAnswer: 'C',
-    explanation:
-      'Under Article V, the most frequent path is a 2/3 vote in both houses of Congress followed by ratification by 3/4 of state legislatures.',
-  },
-  {
     id: 6112,
     subject: 'ap_us_government',
     unit: 1,
@@ -231,6 +213,52 @@ export const govUnit1McqTestQuestions: Question[] = [
     correctAnswer: 'B',
     explanation:
       'Block grants are broad grants with few "strings attached," giving states the discretion to decide how to allocate funds within a general policy area.',
+  },
+  {
+    id: 6118,
+    subject: 'ap_us_government',
+    unit: 1,
+    lessonIDS: ['1.7', '1.9'],
+    unitName: 'Foundations of American Democracy',
+    questionGroup: 'u1-stim-federal-outlays',
+    question:
+      'Based on the line graph, which of the following is an accurate explanation for the decline in federal outlays to state and local governments during the 1980s?',
+    image: {
+      src: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/gov/unit_1/outlays+to+state+govt.svg',
+      alt: 'Line graph of federal outlays to state and local governments over time',
+    },
+    options: [
+      'Congress passed a constitutional amendment requiring states to fund their own programs.',
+      'The federal government expanded categorical grant funding as part of a strategy to increase national control.',
+      'The federal government prioritized "devolution" and the use of block grants to reduce federal fiscal responsibility and discretion for state spending.',
+      'The Supreme Court ruled that all forms of intergovernmental transfers were unconstitutional under the Tenth Amendment.',
+    ],
+    correctAnswer: 'C',
+    explanation:
+      'The decline in the 1980s (the Reagan era) is widely associated with the "Devolution Revolution," which sought to reduce federal fiscal footprints by shifting from restrictive categorical grants toward broader, more flexible block grants, which typically involve less total federal spending.',
+  },
+  {
+    id: 6119,
+    subject: 'ap_us_government',
+    unit: 1,
+    lessonIDS: ['1.7', '1.9'],
+    unitName: 'Foundations of American Democracy',
+    questionGroup: 'u1-stim-federal-outlays',
+    question:
+      'Which of the following conclusions is best supported by the overall trend shown in the line graph?',
+    image: {
+      src: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/gov/unit_1/outlays+to+state+govt.svg',
+      alt: 'Line graph of federal outlays to state and local governments over time',
+    },
+    options: [
+      'The federal government has steadily decreased its fiscal influence over state and local governments since 1950.',
+      'The federal government has increasingly utilized fiscal transfers to state and local governments, reflecting the expansion of cooperative federalism.',
+      'The trend indicates a return to the era of dual federalism, where the national government and states operate in separate, non-overlapping spheres.',
+      'Federal outlays to states have remained stagnant, demonstrating that the scope of the federal government has not expanded since the 1940s.',
+    ],
+    correctAnswer: 'B',
+    explanation:
+      'The overall upward trend since the 1950s—where the federal government spends an increasing portion of its budget on state and local governments—is a defining feature of cooperative federalism, where the two levels of government are fiscally linked.',
   },
   {
     id: 6114,
@@ -268,5 +296,51 @@ export const govUnit1McqTestQuestions: Question[] = [
     correctAnswer: 'B',
     explanation:
       'Federalism divides power between levels of government, creating multiple opportunities (access points) for interest groups to influence policy at different stages.',
+  },
+  {
+    id: 6116,
+    subject: 'ap_us_government',
+    unit: 1,
+    lessonIDS: ['1.7'],
+    unitName: 'Foundations of American Democracy',
+    questionGroup: 'u1-stim-budget-map',
+    question:
+      'The map showing that nearly all states have balanced budget requirements, while the federal government does not, best illustrates which of the following principles?',
+    image: {
+      src: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/gov/unit_1/balanced+budget+requirements+map.svg',
+      alt: 'Map showing which U.S. states have balanced budget requirements compared to the federal government',
+    },
+    options: [
+      'Dual federalism, because states and the federal government operate under completely identical fiscal rules',
+      'The Supremacy Clause, because federal budget law overrides state balanced budget requirements',
+      'A key structural difference between state and federal governments, in which states face fiscal constraints that limit deficit spending unlike the national government',
+      'Cooperative federalism, because states and the federal government share responsibility for balancing the national budget',
+    ],
+    correctAnswer: 'C',
+    explanation:
+      'This map illustrates the structural reality that states operate under sovereign limitations regarding debt and deficit spending that the federal government, with its control over monetary policy, does not face.',
+  },
+  {
+    id: 6117,
+    subject: 'ap_us_government',
+    unit: 1,
+    lessonIDS: ['1.5'],
+    unitName: 'Foundations of American Democracy',
+    questionGroup: 'u1-stim-budget-map',
+    question:
+      'A member of Congress proposes a federal balanced budget amendment modeled on state requirements shown in the map. Which of the following best describes the constitutional process required to enact this change?',
+    image: {
+      src: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/gov/unit_1/balanced+budget+requirements+map.svg',
+      alt: 'Map showing which U.S. states have balanced budget requirements compared to the federal government',
+    },
+    options: [
+      'The president must sign an executive order directing the Treasury to balance the budget each fiscal year',
+      'Congress must pass the amendment by a two-thirds vote in both chambers, followed by ratification by three-fourths of the states',
+      'The Supreme Court must first rule that deficit spending is unconstitutional before Congress can act',
+      'A simple majority vote in both chambers of Congress is sufficient to amend the Constitution',
+    ],
+    correctAnswer: 'B',
+    explanation:
+      'Article V of the U.S. Constitution sets a high bar for amendments, requiring a two-thirds supermajority in both houses of Congress and ratification by three-fourths of the state legislatures.',
   },
 ];

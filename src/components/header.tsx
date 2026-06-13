@@ -10,14 +10,15 @@ import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { getSubjectXP } from '@/hooks/useUserProgress';
 import { getBeltProgress } from '@/lib/beltSystem';
 import { motion } from 'framer-motion';
-import { SubjectToggle } from '@/components/dashboard/SubjectToggle';
+import { AdminSubjectSelect } from '@/components/dashboard/AdminSubjectSelect';
 import { hasValidSeasonPass, getPracticeTestsUrl } from '@/lib/utils';
 import type { CourseSubject } from '@/lib/courseSubject';
-import { isCourseSubject } from '@/lib/courseSubject';
+import { defaultCheatSheetUrl, isCourseSubject, isEconCourse } from '@/lib/courseSubject';
 import { hasAdminRole } from '@/lib/adminAccess';
+import { useSubjectSwitchNavigation } from '@/hooks/useSubjectSwitchNavigation';
 
 export function Header() {
-  const { user, logout, selectedSubject, setSelectedSubject, totalXP, guestXp, isCharacterClosetOpen, setIsCharacterClosetOpen, userData } = useAuthContext();
+  const { user, logout, selectedSubject, totalXP, guestXp, isCharacterClosetOpen, setIsCharacterClosetOpen, userData } = useAuthContext();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isBeltDropdownOpen, setIsBeltDropdownOpen] = useState(false);
   const [isPracticeDropdownOpen, setIsPracticeDropdownOpen] = useState(false);
@@ -29,8 +30,10 @@ export function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const handleSubjectSwitch = useSubjectSwitchNavigation();
   const isTeacher = !!(user && userData?.teacher === true);
-  const canAccessGov = Boolean(user && hasAdminRole(userData));
+  const isAdmin = Boolean(user && hasAdminRole(userData));
+  const canAccessGov = isAdmin;
 
   // Ensure component is mounted before using selectedSubject to prevent hydration mismatch
   useEffect(() => {
@@ -47,6 +50,35 @@ export function Header() {
 
   // Check if user is premium (has valid season pass) - must be after displaySubject is defined
   const isPremium = user && userData ? hasValidSeasonPass(userData, displaySubject) : false;
+  const navHoverClass =
+    displaySubject === 'gov'
+      ? 'hover:text-violet-600'
+      : displaySubject === 'micro'
+        ? 'hover:text-green-600'
+        : 'hover:text-blue-600';
+  const mcqPracticeHref =
+    displaySubject === 'gov'
+      ? '/select-practice-units?subject=gov'
+      : '/select-practice-units';
+
+  const mobilePracticeLinks: { label: string; href: string; prefetch?: boolean }[] = [
+    { label: 'MCQ Practice', href: mcqPracticeHref },
+    {
+      label: 'FRQ Practice',
+      href: `/unitFRQpracticePage?subject=${displaySubject}&frqId=${displaySubject === 'macro' ? 1 : displaySubject === 'micro' ? 2 : 1}`,
+    },
+    { label: 'Create a Quiz', href: '/dojo/infinite' },
+    ...(isEconCourse(displaySubject)
+      ? [
+          { label: 'Dojo Drills', href: '/dojo-drills' },
+          { label: 'Graphing Practice', href: '/graph-gym-dashboard', prefetch: false },
+        ]
+      : displaySubject === 'gov'
+        ? [{ label: 'SCOTUS Practice', href: '/scotus-essay-practice' }]
+        : []),
+    { label: 'Cheat Sheets', href: defaultCheatSheetUrl(displaySubject) },
+    ...(isEconCourse(displaySubject) ? [{ label: 'Blog', href: '/ap-blog-home' }] : []),
+  ];
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -56,25 +88,8 @@ export function Header() {
     setIsMobileMenuOpen(false);
   };
 
-  const handleSubjectChange = async (newSubject: CourseSubject) => {
-    // Update the subject in context (this will update localStorage for guests)
-    await setSelectedSubject(newSubject);
-    
-    // For logged-out users, ensure the change is reflected immediately
-    // The state update should trigger a re-render, but we can also force navigation
-    // if we're on a subject-specific page
-    if (!user) {
-      // If on a subject-specific route, navigate to the equivalent page for the new subject
-      if (pathname.includes('macro') || pathname.includes('micro') || pathname.includes('gov')) {
-        const newPath = pathname.replace(/macro|micro|gov/g, newSubject);
-        if (newPath !== pathname) {
-          router.push(newPath);
-          return;
-        }
-      }
-      // For other pages, just refresh to ensure all components pick up the change
-      router.refresh();
-    }
+  const handleSubjectChange = (newSubject: CourseSubject) => {
+    void handleSubjectSwitch(newSubject, displaySubject);
   };
 
   const handleLogout = async () => {
@@ -192,8 +207,8 @@ export function Header() {
                         Full Practice Tests
                       </Link>
                       <Link
-                        href="/select-practice-units"
-                        className="block px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                        href={mcqPracticeHref}
+                        className={`block px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 transition-colors ${navHoverClass}`}
                         onClick={() => setIsPracticeDropdownOpen(false)}
                       >
                         MCQ Practice
@@ -212,35 +227,47 @@ export function Header() {
                       >
                         Create a Quiz
                       </Link>
-                      <Link
-                        href="/dojo-drills"
-                        className="block px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
-                        onClick={() => setIsPracticeDropdownOpen(false)}
-                      >
-                        Dojo Drills
-                      </Link>
-                      <Link
-                        href="/ap-blog-home"
-                        className="block px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
-                        onClick={() => setIsPracticeDropdownOpen(false)}
-                      >
-                        Blog
-                      </Link>
+                      {isEconCourse(displaySubject) ? (
+                        <>
+                          <Link
+                            href="/dojo-drills"
+                            className={`block px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 transition-colors ${navHoverClass}`}
+                            onClick={() => setIsPracticeDropdownOpen(false)}
+                          >
+                            Dojo Drills
+                          </Link>
+                          <Link
+                            href="/ap-blog-home"
+                            className={`block px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 transition-colors ${navHoverClass}`}
+                            onClick={() => setIsPracticeDropdownOpen(false)}
+                          >
+                            Blog
+                          </Link>
+                        </>
+                      ) : null}
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* Graph Gym - links to dashboard (prefetch=false to avoid redirect/prefetch loops) */}
-              <Link
-                href="/graph-gym-dashboard"
-                prefetch={false}
-                className="text-lg text-gray-700 hover:text-blue-600 transition-colors font-bold"
-              >
-                Graphing Practice
-              </Link>
+              {isEconCourse(displaySubject) ? (
+                <Link
+                  href="/graph-gym-dashboard"
+                  prefetch={false}
+                  className={`text-lg text-gray-700 transition-colors font-bold ${navHoverClass}`}
+                >
+                  Graphing Practice
+                </Link>
+              ) : displaySubject === 'gov' ? (
+                <Link
+                  href="/scotus-essay-practice"
+                  className={`text-lg text-gray-700 transition-colors font-bold ${navHoverClass}`}
+                >
+                  SCOTUS Practice
+                </Link>
+              ) : null}
 
-              {canAccessGov && (
+              {canAccessGov && !isAdmin && (
                 <div className="relative" ref={govDropdownRef}>
                   <button
                     type="button"
@@ -288,10 +315,9 @@ export function Header() {
                 </div>
               )}
 
-              {/* Cheat Sheets */}
               <Link
-                href={displaySubject === 'macro' ? '/ap-macro-unit-1-cheat-sheet' : '/ap-micro-unit-1-cheat-sheet'}
-                className="text-lg text-gray-700 hover:text-blue-600 transition-colors font-bold"
+                href={defaultCheatSheetUrl(displaySubject)}
+                className={`text-lg text-gray-700 transition-colors font-bold ${navHoverClass}`}
               >
                 Cheat Sheets
               </Link>
@@ -349,8 +375,16 @@ export function Header() {
               </div> */}
             </nav>
 
-            {/* Subject Toggle for Logged-Out Users */}
-            {!user && (
+            {isAdmin && (
+              <AdminSubjectSelect
+                value={displaySubject}
+                onChange={handleSubjectChange}
+                size="compact"
+              />
+            )}
+
+            {/* Macro / Micro toggle — logged-out visitors only */}
+            {!user && !isAdmin && (
               <div className="flex items-center">
                 <div className="inline-flex items-center bg-gray-100 rounded-xl p-1 border-2 border-gray-300 shadow-[0_3px_0_0_rgba(209,213,219,1)]">
                   <button
@@ -577,58 +611,19 @@ export function Header() {
               >
                 Full Practice Tests
               </Link>
-              {canAccessGov && (
-                <>
-                  <Link
-                    href="/ap-gov-unit-1-cheat-sheet"
-                    onClick={closeMobileMenu}
-                    className="px-4 py-4 text-xl font-bold text-gray-800 hover:text-violet-600 hover:bg-violet-50 rounded-xl transition-colors"
-                  >
-                    AP Gov Cheat Sheets
-                  </Link>
-                  <Link
-                    href="/select-practice-units?subject=gov"
-                    onClick={closeMobileMenu}
-                    className="px-4 py-4 text-xl font-bold text-gray-800 hover:text-violet-600 hover:bg-violet-50 rounded-xl transition-colors"
-                  >
-                    AP Gov MCQ Practice
-                  </Link>
-                  <Link
-                    href={getPracticeTestsUrl('gov')}
-                    onClick={closeMobileMenu}
-                    className="px-4 py-4 text-xl font-bold text-gray-800 hover:text-violet-600 hover:bg-violet-50 rounded-xl transition-colors"
-                  >
-                    AP Gov Practice Tests
-                  </Link>
-                  <Link
-                    href="/scotus-essay-practice"
-                    onClick={closeMobileMenu}
-                    className="px-4 py-4 text-xl font-bold text-gray-800 hover:text-violet-600 hover:bg-violet-50 rounded-xl transition-colors"
-                  >
-                    AP Gov SCOTUS Comparison Practice
-                  </Link>
-                </>
-              )}
-
               <div className="my-3 border-t border-gray-100" />
 
               {/* Practice */}
               <p className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1 mb-1">Practice</p>
-              {[
-                { label: 'MCQ Practice', href: '/select-practice-units' },
-                { label: 'FRQ Practice', href: `/unitFRQpracticePage?subject=${displaySubject}&frqId=${displaySubject === 'macro' ? 1 : 2}` },
-                { label: 'Create a Quiz', href: '/dojo/infinite' },
-                { label: 'Dojo Drills', href: '/dojo-drills' },
-                { label: 'Graphing Practice', href: '/graph-gym-dashboard' },
-                { label: 'Cheat Sheets', href: displaySubject === 'macro' ? '/ap-macro-unit-1-cheat-sheet' : '/ap-micro-unit-1-cheat-sheet' },
-                { label: 'Blog', href: '/ap-blog-home' },
-              ].map(({ label, href }) => (
+              {mobilePracticeLinks.map(({ label, href, prefetch }) => (
                 <Link
                   key={label}
                   href={href}
-                  prefetch={label === 'Graphing Practice' ? false : undefined}
+                  prefetch={prefetch}
                   onClick={closeMobileMenu}
-                  className="px-4 py-4 text-xl font-bold text-gray-800 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-colors"
+                  className={`px-4 py-4 text-xl font-bold text-gray-800 rounded-xl transition-colors ${navHoverClass} ${
+                    displaySubject === 'gov' ? 'hover:bg-violet-50' : displaySubject === 'micro' ? 'hover:bg-green-50' : 'hover:bg-blue-50'
+                  }`}
                 >
                   {label}
                 </Link>
@@ -675,22 +670,39 @@ export function Header() {
                   );
                 })()}
 
-                {/* Subject toggle */}
-                <div className="inline-flex w-full bg-gray-100 rounded-xl p-1 border border-gray-200">
-                  {(['macro', 'micro'] as const).map((s) => (
-                    <button
-                      key={s}
-                      onClick={() => { handleSubjectChange(s); closeMobileMenu(); }}
-                      className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-200 capitalize ${
-                        displaySubject === s
-                          ? s === 'macro' ? 'bg-blue-600 text-white shadow-sm' : 'bg-green-600 text-white shadow-sm'
-                          : 'text-gray-600 hover:text-gray-900'
-                      }`}
-                    >
-                      {s.charAt(0).toUpperCase() + s.slice(1)}
-                    </button>
-                  ))}
-                </div>
+                {isAdmin ? (
+                  <AdminSubjectSelect
+                    value={displaySubject}
+                    onChange={(s) => {
+                      handleSubjectChange(s);
+                      closeMobileMenu();
+                    }}
+                    className="w-full min-w-0"
+                  />
+                ) : null}
+                {!isAdmin && (
+                  <div className="inline-flex w-full bg-gray-100 rounded-xl p-1 border border-gray-200">
+                    {(['macro', 'micro'] as const).map((s) => (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => {
+                          handleSubjectChange(s);
+                          closeMobileMenu();
+                        }}
+                        className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-200 capitalize ${
+                          displaySubject === s
+                            ? s === 'macro'
+                              ? 'bg-blue-600 text-white shadow-sm'
+                              : 'bg-green-600 text-white shadow-sm'
+                            : 'text-gray-600 hover:text-gray-900'
+                        }`}
+                      >
+                        {s.charAt(0).toUpperCase() + s.slice(1)}
+                      </button>
+                    ))}
+                  </div>
+                )}
 
                 {user && (
                   <button

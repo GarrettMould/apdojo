@@ -643,7 +643,7 @@ export interface KeyTerm {
   id: string;
   term: string;
   definition: string;
-  subject: 'ap_microeconomics' | 'ap_macroeconomics' | 'ap_us_government';
+  subject: 'ap_microeconomics' | 'ap_macroeconomics' | 'ap_us_government' | 'ap_statistics';
   unit: number;
   lessonIDs: string[];
   subNotes?: string[]; // Optional array of bullet point notes

@@ -1,6 +1,10 @@
 import { KeyTerm } from './allContent';
+import { apGovUnit2KeyTerms } from './gov/apGovUnit2KeyTerms';
+import { apGovUnit3CompleteMasterTerms } from './gov/apGovUnit3KeyTerms';
+import { apGovUnit4KeyTerms } from './gov/apGovUnit4KeyTerms';
+import { apGovUnit5KeyTerms } from './gov/apGovUnit5KeyTerms';
 
-export const keyTerms: KeyTerm[] = [
+const apGovUnit1KeyTerms: KeyTerm[] = [
   {
     id: 'natural-rights',
     term: 'Natural Rights',
@@ -450,6 +454,14 @@ export const keyTerms: KeyTerm[] = [
   },
 ];
 
+export const keyTerms: KeyTerm[] = [
+  ...apGovUnit1KeyTerms,
+  ...apGovUnit2KeyTerms,
+  ...apGovUnit3CompleteMasterTerms,
+  ...apGovUnit4KeyTerms,
+  ...apGovUnit5KeyTerms,
+];
+
 export interface GovSupremeCourtCase {
   id: string;
   caseName: string;
@@ -466,6 +478,27 @@ export interface GovSupremeCourtCase {
 
 export const govUnitSupremeCourtCases: Record<number, GovSupremeCourtCase[]> = {
   1: [
+    {
+      id: 'marbury-v-madison-1803',
+      caseName: 'Marbury v. Madison',
+      year: 1803,
+      unit: 1,
+      lessonIDs: ['1.6'],
+      videoUrl: '',
+      summary:
+        'Established judicial review by holding that the Supreme Court may declare acts of Congress unconstitutional.',
+      facts:
+        'William Marbury sued Secretary of State James Madison to deliver his judicial commission after a last-minute appointment by outgoing President John Adams.',
+      constitutionalQuestion:
+        'Did the Supreme Court have the authority to order Madison to deliver the commission, and could the Court strike down a federal law that conflicted with the Constitution?',
+      holding:
+        'The Court ruled that Marbury was entitled to his commission but could not receive it through the Court because the provision of the Judiciary Act of 1789 expanding original jurisdiction was unconstitutional.',
+      reasoning: [
+        'Article III defines the Court’s original jurisdiction; Congress cannot expand it by statute.',
+        'When a law conflicts with the Constitution, the Constitution must prevail.',
+        'The judiciary has the duty to say what the law is — the foundation of judicial review.',
+      ],
+    },
     {
       id: 'mcculloch-v-maryland-1819',
       caseName: 'McCulloch v. Maryland',
@@ -502,6 +535,256 @@ export const govUnitSupremeCourtCases: Record<number, GovSupremeCourtCase[]> = {
         'Carrying a gun in a school zone is non-economic activity.',
         'The statute lacked a sufficient connection to interstate commerce.',
         'The decision reaffirmed limits on federal power and preserved state sovereignty.',
+      ],
+    },
+  ],
+  2: [
+    {
+      id: 'baker-v-carr-1962',
+      caseName: 'Baker v. Carr',
+      year: 1962,
+      unit: 2,
+      lessonIDs: ['2.10'],
+      videoUrl: '',
+      summary:
+        'Legislative malapportionment claims are justiciable, opening the door to the “one person, one vote” principle.',
+      facts:
+        'Tennessee voters challenged grossly unequal state legislative districts that had not been redrawn in decades despite major population shifts.',
+      constitutionalQuestion:
+        'Can federal courts hear challenges to state legislative districting under the Equal Protection Clause, or is redistricting a nonjusticiable political question?',
+      holding:
+        'The Court held that malapportionment claims are justiciable and may be reviewed by federal courts.',
+      reasoning: [
+        'Unequal representation raises constitutional questions under the Fourteenth Amendment.',
+        'The case rejected the idea that all redistricting disputes are beyond judicial review.',
+        'It paved the way for later rulings requiring substantially equal population in legislative districts.',
+      ],
+    },
+    {
+      id: 'shaw-v-reno-1993',
+      caseName: 'Shaw v. Reno',
+      year: 1993,
+      unit: 2,
+      lessonIDs: ['2.3'],
+      videoUrl: '',
+      summary:
+        'Racial gerrymandering that sorts voters by race may violate the Equal Protection Clause even when intended to help minority representation.',
+      facts:
+        'North Carolina created a highly irregular congressional district drawn primarily to concentrate African American voters.',
+      constitutionalQuestion:
+        'Does a bizarrely shaped majority-minority district drawn predominantly on the basis of race violate the Equal Protection Clause?',
+      holding:
+        'The Court ruled that such districts are subject to strict scrutiny and remanded the case for further review.',
+      reasoning: [
+        'Redistricting driven primarily by race triggers Equal Protection analysis.',
+        'Irregular districts drawn to separate voters by race cannot escape constitutional scrutiny.',
+        'The decision limited race-conscious districting while leaving room for Voting Rights Act compliance.',
+      ],
+    },
+  ],
+  3: [
+    {
+      id: 'schenck-v-united-states-1919',
+      caseName: 'Schenck v. United States',
+      year: 1919,
+      unit: 3,
+      lessonIDs: ['3.3'],
+      videoUrl: '',
+      summary:
+        'Speech may be restricted when it creates a clear and present danger, especially during wartime.',
+      facts:
+        'Charles Schenck distributed anti-draft leaflets urging resistance to World War I conscription and was convicted under the Espionage Act.',
+      constitutionalQuestion:
+        'Does the First Amendment protect speech that encourages draft resistance during wartime?',
+      holding: 'The Court upheld Schenck’s conviction.',
+      reasoning: [
+        'The First Amendment is not absolute in every circumstance.',
+        'Speech that creates a clear and present danger to the nation may be punished.',
+        'The famous analogy: the most stringent protection of free speech would not protect falsely shouting fire in a crowded theater.',
+      ],
+    },
+    {
+      id: 'engel-v-vitale-1962',
+      caseName: 'Engel v. Vitale',
+      year: 1962,
+      unit: 3,
+      lessonIDs: ['3.2'],
+      videoUrl: '',
+      summary:
+        'State-sponsored prayer in public schools violates the Establishment Clause even when participation is voluntary.',
+      facts:
+        'New York required public schools to begin each day with a brief, state-composed prayer.',
+      constitutionalQuestion:
+        'Does a state-directed prayer in public schools violate the Establishment Clause of the First Amendment?',
+      holding: 'The Court struck down the state prayer requirement.',
+      reasoning: [
+        'Government may not compose or promote an official prayer for public schools.',
+        'The practice advanced religion even though students could remain silent.',
+        'The Establishment Clause forbids government endorsement of religion in public education.',
+      ],
+    },
+    {
+      id: 'wisconsin-v-yoder-1972',
+      caseName: 'Wisconsin v. Yoder',
+      year: 1972,
+      unit: 3,
+      lessonIDs: ['3.2'],
+      videoUrl: '',
+      summary:
+        'Amish families may be exempt from compulsory high school attendance when it burdens sincere religious practice.',
+      facts:
+        'Amish parents refused to send their children to high school after eighth grade, citing religious convictions.',
+      constitutionalQuestion:
+        'Does compulsory school attendance beyond eighth grade violate the Free Exercise Clause for the Amish?',
+      holding: 'The Court ruled for the Amish parents.',
+      reasoning: [
+        'Sincere religious belief outweighed the state’s general interest in compulsory education past eighth grade.',
+        'Forcing Amish students into high school would seriously threaten their way of life.',
+        'The Free Exercise Clause protects minority religious communities from substantial burdens.',
+      ],
+    },
+    {
+      id: 'mcdonald-v-chicago-2010',
+      caseName: 'McDonald v. Chicago',
+      year: 2010,
+      unit: 3,
+      lessonIDs: ['3.7'],
+      videoUrl: '',
+      summary:
+        'The Second Amendment right to bear arms for self-defense is incorporated against state and local governments.',
+      facts:
+        'Chicago residents challenged a city handgun ban after the Court recognized an individual Second Amendment right in Heller.',
+      constitutionalQuestion:
+        'Does the Second Amendment apply to state and local gun regulations through the Fourteenth Amendment?',
+      holding: 'The Court struck down the handgun ban as applied to the states.',
+      reasoning: [
+        'The right to keep and bear arms for self-defense is fundamental.',
+        'Selective incorporation extended the Second Amendment to the states via the Due Process Clause.',
+        'States and cities may not impose total handgun bans on law-abiding citizens for home self-defense.',
+      ],
+    },
+  ],
+  4: [
+    {
+      id: 'gideon-v-wainwright-1963',
+      caseName: 'Gideon v. Wainwright',
+      year: 1963,
+      unit: 4,
+      lessonIDs: ['4.10'],
+      videoUrl: '',
+      summary:
+        'States must provide attorneys to indigent defendants charged with serious crimes in felony cases.',
+      facts:
+        'Clarence Earl Gideon was denied a court-appointed lawyer in a Florida felony trial and was convicted of breaking into a pool hall.',
+      constitutionalQuestion:
+        'Does the Sixth Amendment right to counsel require states to provide lawyers for defendants who cannot afford one?',
+      holding: 'The Court ruled for Gideon and ordered a new trial with appointed counsel.',
+      reasoning: [
+        'A fair trial requires effective assistance of counsel in serious criminal cases.',
+        'The Sixth Amendment right to counsel was incorporated to the states.',
+        'Justice cannot depend on whether a defendant can pay for a lawyer.',
+      ],
+    },
+    {
+      id: 'tinker-v-des-moines-1969',
+      caseName: 'Tinker v. Des Moines',
+      year: 1969,
+      unit: 4,
+      lessonIDs: ['4.4'],
+      videoUrl: '',
+      summary:
+        'Students may engage in symbolic speech at school unless it causes a substantial disruption.',
+      facts:
+        'Students wore black armbands to protest the Vietnam War and were suspended after school officials banned the protest.',
+      constitutionalQuestion:
+        'Does the First Amendment protect symbolic student speech in public schools?',
+      holding: 'The Court ruled for the students and protected the armband protest.',
+      reasoning: [
+        'Students do not shed constitutional speech rights at the schoolhouse gate.',
+        'Schools may restrict speech only when it materially and substantially disrupts school operations.',
+        'Mere fear of disturbance is not enough to justify censorship of political expression.',
+      ],
+    },
+    {
+      id: 'new-york-times-v-united-states-1971',
+      caseName: 'New York Times Co. v. United States',
+      year: 1971,
+      unit: 4,
+      lessonIDs: ['4.4'],
+      videoUrl: '',
+      summary:
+        'The government may not impose prior restraint on the press without meeting an extremely heavy burden.',
+      facts:
+        'The Nixon administration sought to block newspapers from publishing the classified Pentagon Papers about the Vietnam War.',
+      constitutionalQuestion:
+        'Can the executive branch stop publication of classified material through prior restraint?',
+      holding: 'The Court refused to allow the government to block publication.',
+      reasoning: [
+        'Prior restraint on the press bears a heavy presumption against its constitutionality.',
+        'The government did not show that immediate, irreparable harm to national security justified censorship.',
+        'The case strengthened press freedom against executive secrecy claims.',
+      ],
+    },
+  ],
+  5: [
+    {
+      id: 'brown-v-board-of-education-1954',
+      caseName: 'Brown v. Board of Education',
+      year: 1954,
+      unit: 5,
+      lessonIDs: ['5.1'],
+      videoUrl: '',
+      summary:
+        'Racially segregated public schools violate the Equal Protection Clause because separate facilities are inherently unequal.',
+      facts:
+        'Multiple lawsuits challenged state laws requiring racially segregated public schools, consolidated before the Supreme Court.',
+      constitutionalQuestion:
+        'Does racial segregation in public education violate the Fourteenth Amendment’s Equal Protection Clause?',
+      holding: 'The Court unanimously declared school segregation unconstitutional.',
+      reasoning: [
+        'Separate educational facilities stamp African American children with a badge of inferiority.',
+        'Segregation in public schools denies equal protection even when physical facilities are similar.',
+        'The decision overturned the “separate but equal” doctrine from Plessy v. Ferguson in public education.',
+      ],
+    },
+    {
+      id: 'citizens-united-v-fec-2010',
+      caseName: 'Citizens United v. FEC',
+      year: 2010,
+      unit: 5,
+      lessonIDs: ['5.11'],
+      videoUrl: '',
+      summary:
+        'Independent political spending by corporations and unions is protected speech and cannot be limited by the government.',
+      facts:
+        'Citizens United produced a film critical of Hillary Clinton and sought to distribute it close to an election in ways restricted by federal campaign finance law.',
+      constitutionalQuestion:
+        'May the government ban independent political expenditures by corporations and unions under the First Amendment?',
+      holding: 'The Court struck down restrictions on independent corporate political spending.',
+      reasoning: [
+        'Political speech lies at the core of First Amendment protection.',
+        'Independent expenditures are not the same as direct contributions to candidates.',
+        'The government may not suppress speech based on the speaker’s corporate identity.',
+      ],
+    },
+    {
+      id: 'roe-v-wade-1973',
+      caseName: 'Roe v. Wade',
+      year: 1973,
+      unit: 5,
+      lessonIDs: ['5.7'],
+      videoUrl: '',
+      summary:
+        'The Constitution protects a woman’s right to choose an abortion, balanced against the state’s interest in regulating the procedure.',
+      facts:
+        'A Texas woman challenged a state law criminalizing nearly all abortions except those necessary to save the mother’s life.',
+      constitutionalQuestion:
+        'Does the Constitution recognize a right to privacy that limits state abortion restrictions?',
+      holding: 'The Court struck down Texas’s broad abortion ban.',
+      reasoning: [
+        'A zone of personal privacy includes decisions about marriage, family, and reproduction.',
+        'States may regulate abortion more heavily as pregnancy advances and fetal viability nears.',
+        'The decision framed abortion as a balance between individual liberty and legitimate state interests.',
       ],
     },
   ],

@@ -5,7 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import { Send, X } from 'lucide-react';
 import type { CourseSubject } from '@/lib/courseSubject';
 import { displayCourseLabel } from '@/lib/courseSubject';
-import { personaForSubject } from '@/lib/chatPersonas';
+import { personaForSubject, tutorWelcomeOpening } from '@/lib/chatPersonas';
 import { tutorAvatarUrl } from '@/lib/tutorAvatar';
 import { TutorTypingPlaceholder } from '@/components/TutorTypingPlaceholder';
 import { useAuthContext } from '@/contexts/AuthContext';
@@ -186,10 +186,7 @@ function buildFrqTutorWelcome(
   persona: ReturnType<typeof personaForSubject>,
   frqTitle: string
 ): ChatMessage[] {
-  const opening =
-    persona.name === 'Adam Smith'
-      ? 'Adam Smith here — I have the full curriculum context for this FRQ.'
-      : `${persona.name} here — I have the full curriculum context for this FRQ.`;
+  const opening = tutorWelcomeOpening(persona, 'frq');
   const chips: { label: string; prompt: string }[] = [
     {
       label: 'What is this asking?',

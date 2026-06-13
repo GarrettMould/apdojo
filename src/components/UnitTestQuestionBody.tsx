@@ -3,14 +3,36 @@
 import React, { useEffect, useRef } from 'react';
 import type { Question } from '@/data/questionBanks/types';
 import { canonicalQuestionText } from '@/lib/questionTextCanonical';
-import { getGovQuestionParts, isApGovQuestion } from '@/components/ApGovQuestionText';
+import {
+  getGovQuestionParts,
+  isApGovQuestion,
+  isGovMcqPromptLine,
+  GOV_MCQ_ATTRIBUTION_CLASS,
+  GOV_MCQ_EXCERPT_BLOCK_CLASS,
+  GOV_MCQ_EXCERPT_QUOTE_CLASS,
+  GOV_MCQ_PREAMBLE_CLASS,
+  GOV_MCQ_STEM_BLOCK_CLASS,
+} from '@/components/ApGovQuestionText';
 import { splitMcqStemAttribution } from '@/lib/splitMcqStemAttribution';
 import { QuestionWithKeyTerms } from '@/components/QuestionWithKeyTerms';
 import { apQuestionSubjectTag } from '@/lib/courseSubject';
 import type { CourseSubject } from '@/lib/courseSubject';
+import { renderMathText, type MathTextHighlight } from '@/utils/processMathContent';
 
-export type QuestionTextHighlight = { start: number; end: number; id: string };
+export type QuestionTextHighlight = MathTextHighlight;
 
+function applyMarksToSegment(
+  text: string,
+  offset: number,
+  highlights: QuestionTextHighlight[],
+  onRemove: (id: string) => void
+): React.ReactNode {
+  return renderMathText(text, {
+    highlights,
+    onRemoveHighlight: onRemove,
+    textOffset: offset,
+  });
+}
 function mergeNewHighlight(
   existing: QuestionTextHighlight[],
   start: number,
@@ -34,50 +56,6 @@ function mergeNewHighlight(
   );
   filtered.push(next);
   return filtered.sort((a, b) => a.start - b.start);
-}
-
-function applyMarksToSegment(
-  segment: string,
-  segmentOffset: number,
-  all: QuestionTextHighlight[],
-  onRemove: (id: string) => void
-): React.ReactNode {
-  const local = all
-    .map((h) => {
-      const s = Math.max(h.start, segmentOffset);
-      const e = Math.min(h.end, segmentOffset + segment.length);
-      return { id: h.id, start: s - segmentOffset, end: e - segmentOffset };
-    })
-    .filter((h) => h.end > h.start && h.start >= 0)
-    .sort((a, b) => a.start - b.start);
-
-  if (local.length === 0) return segment;
-
-  const parts: React.ReactNode[] = [];
-  let last = 0;
-  local.forEach((h, i) => {
-    if (h.start > last) {
-      parts.push(segment.slice(last, h.start));
-    }
-    parts.push(
-      <mark
-        key={`${h.id}-${i}`}
-        className="cursor-pointer rounded-sm bg-yellow-200/95 px-px text-inherit"
-        style={{ backgroundColor: 'rgb(254 240 138)' }}
-        title="Click to remove highlight"
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          onRemove(h.id);
-        }}
-      >
-        {segment.slice(h.start, h.end)}
-      </mark>
-    );
-    last = h.end;
-  });
-  if (last < segment.length) parts.push(segment.slice(last));
-  return <>{parts}</>;
 }
 
 interface UnitTestQuestionBodyProps {
@@ -153,6 +131,37 @@ export function UnitTestQuestionBody({
     onHighlightsChange(highlights.filter((h) => h.id !== id));
   };
 
+  const renderGovExcerpt = (excerpt: string, offset: number) => {
+    const trimmed = excerpt.trimEnd();
+    const excerptSplit = splitMcqStemAttribution(trimmed);
+    const attrIdx = excerptSplit.attributionStartIndex;
+    if (
+      excerptSplit.attributionLine != null &&
+      attrIdx != null &&
+      attrIdx > 0 &&
+      attrIdx <= trimmed.length
+    ) {
+      return (
+        <span className={GOV_MCQ_EXCERPT_BLOCK_CLASS} lang="en">
+          <span className={GOV_MCQ_EXCERPT_QUOTE_CLASS}>
+            {applyMarksToSegment(trimmed.slice(0, attrIdx), offset, highlights, removeHighlight)}
+          </span>
+          <span className={GOV_MCQ_ATTRIBUTION_CLASS}>
+            {applyMarksToSegment(trimmed.slice(attrIdx), offset + attrIdx, highlights, removeHighlight)}
+          </span>
+        </span>
+      );
+    }
+    return (
+      <span
+        className={`${GOV_MCQ_EXCERPT_BLOCK_CLASS} ${GOV_MCQ_EXCERPT_QUOTE_CLASS}`}
+        lang="en"
+      >
+        {applyMarksToSegment(excerpt, offset, highlights, removeHighlight)}
+      </span>
+    );
+  };
+
   const rootClassName = `inline-block min-w-0 w-full align-top ${
     highlightMode ? 'cursor-text' : ''
   }`;
@@ -189,10 +198,25 @@ export function UnitTestQuestionBody({
     ) {
       const head = t.slice(0, six);
       const tail = t.slice(six);
+      const promptLine =
+        head
+          .trim()
+          .split('\n')
+          .map((line) => line.trim())
+          .findLast((line) => line.length > 0) ?? '';
+      if (!isGovMcqPromptLine(promptLine)) {
+        return (
+          <span ref={rootRef} className={rootClassName}>
+            {renderGovExcerpt(t, 0)}
+          </span>
+        );
+      }
       return (
         <span ref={rootRef} className={rootClassName}>
-          <span className="block">{applyMarksToSegment(head, 0, highlights, removeHighlight)}</span>
-          <span className="mt-2 block text-base font-normal leading-snug text-gray-600">
+          <span className={GOV_MCQ_STEM_BLOCK_CLASS}>
+            {applyMarksToSegment(head, 0, highlights, removeHighlight)}
+          </span>
+          <span className={GOV_MCQ_ATTRIBUTION_CLASS}>
             {applyMarksToSegment(tail, six, highlights, removeHighlight)}
           </span>
         </span>
@@ -205,10 +229,22 @@ export function UnitTestQuestionBody({
     );
   }
 
-  const { excerpt, separator, stem, stemStart } = parts;
+  const { preamble, preambleSeparator, excerpt, separator, stem, stemStart } = parts;
+  const hasExcerpt = excerpt.trim().length > 0;
+  const preambleLen = preamble ? preamble.length + (preambleSeparator?.length ?? 0) : 0;
   const stemTrim = stem.trimEnd();
   const stemSplit = splitMcqStemAttribution(stemTrim);
   const idx = stemSplit.attributionStartIndex;
+
+  const renderPreamble = () =>
+    preamble ? (
+      <>
+        <span className={GOV_MCQ_PREAMBLE_CLASS}>
+          {applyMarksToSegment(preamble, 0, highlights, removeHighlight)}
+        </span>
+        {preambleSeparator}
+      </>
+    ) : null;
 
   if (
     stemSplit.attributionLine != null &&
@@ -220,16 +256,12 @@ export function UnitTestQuestionBody({
     const tail = stemTrim.slice(idx);
     return (
       <span ref={rootRef} className={rootClassName}>
-        <span
-          className="block mb-3 border-l-4 border-violet-400/80 pl-3.5 text-gray-800 italic leading-relaxed tracking-tight"
-          lang="en"
-        >
-          {applyMarksToSegment(excerpt, 0, highlights, removeHighlight)}
-        </span>
+        {renderPreamble()}
+        {renderGovExcerpt(excerpt, preambleLen)}
         {separator}
-        <span className="mt-3 block not-italic font-normal leading-relaxed tracking-normal text-gray-900">
+        <span className={GOV_MCQ_STEM_BLOCK_CLASS}>
           <span className="block">{applyMarksToSegment(head, stemStart, highlights, removeHighlight)}</span>
-          <span className="mt-2 block text-base font-normal leading-snug text-gray-600">
+          <span className={GOV_MCQ_ATTRIBUTION_CLASS}>
             {applyMarksToSegment(tail, stemStart + idx, highlights, removeHighlight)}
           </span>
         </span>
@@ -239,11 +271,10 @@ export function UnitTestQuestionBody({
 
   return (
     <span ref={rootRef} className={rootClassName}>
-      <span className="block mb-3 border-l-4 border-violet-400/80 pl-3.5 text-gray-800 italic leading-relaxed tracking-tight" lang="en">
-        {applyMarksToSegment(excerpt, 0, highlights, removeHighlight)}
-      </span>
-      {separator}
-      <span className="mt-3 block not-italic font-normal leading-relaxed tracking-normal text-gray-900">
+      {renderPreamble()}
+      {hasExcerpt ? renderGovExcerpt(excerpt, preambleLen) : null}
+      {hasExcerpt ? separator : null}
+      <span className={GOV_MCQ_STEM_BLOCK_CLASS}>
         {applyMarksToSegment(stem, stemStart, highlights, removeHighlight)}
       </span>
     </span>

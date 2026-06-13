@@ -15,7 +15,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { caseName } = await params;
   const prompt = scotusEssayPrompts.find((item) => item.id === caseName);
-  const caseTitle = `${prompt?.requiredCase ?? 'SCOTUS Comparison Practice'} - STILL IN DEVELOPMENT`;
+  const caseTitle = prompt?.requiredCase ?? 'SCOTUS Comparison Practice';
 
   return {
     title: `${caseTitle} | SCOTUS Comparison Practice | AP Dojo`,

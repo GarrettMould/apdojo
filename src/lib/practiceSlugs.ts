@@ -146,3 +146,10 @@ export function getSubjectDisplayName(subject: PracticeMcqSubject): string {
   if (subject === 'micro') return 'Microeconomics';
   return 'U.S. Government and Politics';
 }
+
+export {
+  GOV_MCQ_PRACTICE_UNIT_NUMBERS,
+  GOV_MCQ_TEST_UNIT_NUMBERS,
+  isGovMcqPracticeUnitAvailable,
+  isGovMcqTestUnitAvailable,
+} from '@/lib/courseSubject';

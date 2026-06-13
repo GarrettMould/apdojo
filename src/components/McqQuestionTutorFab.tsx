@@ -5,7 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import { Send, X } from 'lucide-react';
 import type { CourseSubject } from '@/lib/courseSubject';
 import { displayCourseLabel } from '@/lib/courseSubject';
-import { personaForSubject } from '@/lib/chatPersonas';
+import { personaForSubject, tutorWelcomeOpening } from '@/lib/chatPersonas';
 import { tutorAvatarUrl } from '@/lib/tutorAvatar';
 import type { Question } from '@/data/questionBanks/types';
 import { TutorTypingPlaceholder } from '@/components/TutorTypingPlaceholder';
@@ -317,10 +317,7 @@ export function buildMcqTutorWelcome(
 ): ChatMessage[] {
   const firstLetter = 'A';
   const firstOption = q.options[0] ?? '(no option text available)';
-  const personaOpening =
-    persona.name === 'Adam Smith'
-      ? 'Adam Smith here, brought to you by the invisible hand.'
-      : `${persona.name} here, ready to reason this out with you.`;
+  const personaOpening = tutorWelcomeOpening(persona, 'mcq');
   const chips: { label: string; prompt: string }[] = [
     {
       label: 'Explain one of the answer options',

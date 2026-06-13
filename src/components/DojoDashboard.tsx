@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useCourseContext } from '@/contexts/CourseContext';
 import { CourseToggle } from '@/components/CourseToggle';
+import { useSubjectSwitchNavigation } from '@/hooks/useSubjectSwitchNavigation';
 import { dojoDrills, drillAppliesToSubject, getDrillUnitForSubject } from '@/data/dojoDrills';
 import { frqExams } from '@/data/frqQuestions';
 import { loadDojoDrillProgress, getDrillProgress, DojoDrillProgress } from '@/lib/dojoDrillProgress';
@@ -61,7 +62,8 @@ const cardHoverVariants = {
 };
 
 export function DojoDashboard() {
-  const { user, userData, selectedSubject, setSelectedSubject } = useAuthContext();
+  const { user, userData, selectedSubject } = useAuthContext();
+  const handleSubjectSwitch = useSubjectSwitchNavigation();
   const { currentCourse } = useCourseContext();
   const [drillProgress, setDrillProgress] = useState<DojoDrillProgress | null>(null);
   const [loadingProgress, setLoadingProgress] = useState(true);
@@ -561,7 +563,10 @@ export function DojoDashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Subject Toggle - Mobile Only (visible on small screens) */}
         <div className="mb-4 md:hidden">
-          <CourseToggle activeTab={selectedSubject} onToggle={setSelectedSubject} />
+          <CourseToggle
+            activeTab={selectedSubject}
+            onToggle={(s) => void handleSubjectSwitch(s, selectedSubject)}
+          />
         </div>
         {/* Header + desktop subject toggle */}
         <motion.div
@@ -575,7 +580,10 @@ export function DojoDashboard() {
             <p className="text-lg text-gray-600 font-medium">Continue learning with your saved content</p>
                         </div>
           <div className="hidden md:block shrink-0">
-                    <CourseToggle activeTab={selectedSubject} onToggle={setSelectedSubject} />
+                    <CourseToggle
+            activeTab={selectedSubject}
+            onToggle={(s) => void handleSubjectSwitch(s, selectedSubject)}
+          />
           </div>
         </motion.div>
 

@@ -6,7 +6,8 @@ import { useSearchParams } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { FullExamFRQ } from '@/components/FullExamFRQ';
 import { buildGovUnitFrqPackForFullExam } from '@/data/gov/govUnitStimulusFrqs';
-import { isCourseSubject, type CourseSubject } from '@/lib/courseSubject';
+import { buildStatsUnitFrqPackForFullExam } from '@/data/stats/statsUnitStimulusFrqs';
+import { isCourseSubject, isStatsFrqTestUnitAvailable, type CourseSubject } from '@/lib/courseSubject';
 import { getUnitFinalPracticeTestsUrl } from '@/lib/utils';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { hasAdminRole } from '@/lib/adminAccess';
@@ -20,10 +21,9 @@ function UnitFrqPackInner() {
   const subject: CourseSubject = isCourseSubject(subjectRaw) ? subjectRaw : 'gov';
   const unitNumber = parseInt(unitRaw, 10) || 1;
 
-  const backToHub =
-    subject === 'gov' ? getUnitFinalPracticeTestsUrl('gov') : getPracticeHubForSubject(subject);
+  const backToHub = getUnitFinalPracticeTestsUrl(subject);
 
-  if (subject !== 'gov') {
+  if (subject !== 'gov' && subject !== 'stats') {
     return (
       <div className="min-h-screen bg-gray-50 px-4 py-14">
         <div className="mx-auto max-w-lg rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm">
@@ -41,7 +41,25 @@ function UnitFrqPackInner() {
     );
   }
 
-  if (loadingUserData) {
+  if (subject === 'stats' && !isStatsFrqTestUnitAvailable(unitNumber)) {
+    return (
+      <div className="min-h-screen bg-gray-50 px-4 py-14">
+        <div className="mx-auto max-w-lg rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm">
+          <h1 className="text-xl font-black text-gray-900">FRQ pack coming soon</h1>
+          <p className="mt-3 text-gray-600">This unit doesn&apos;t have an FRQ pack yet.</p>
+          <Link
+            href={backToHub}
+            className="mt-6 inline-flex items-center gap-2 rounded-lg bg-orange-600 px-5 py-3 font-bold text-white hover:bg-orange-700"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to AP Stats practice tests
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (subject === 'gov' && loadingUserData) {
     return (
       <div className="min-h-screen bg-gray-50 px-4 py-14">
         <div className="mx-auto max-w-lg rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm">
@@ -51,7 +69,7 @@ function UnitFrqPackInner() {
     );
   }
 
-  if (!user || !hasAdminRole(userData)) {
+  if (subject === 'gov' && (!user || !hasAdminRole(userData))) {
     return (
       <div className="min-h-screen bg-gray-50 px-4 py-14">
         <div className="mx-auto max-w-lg rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm">
@@ -69,7 +87,10 @@ function UnitFrqPackInner() {
     );
   }
 
-  const pack = buildGovUnitFrqPackForFullExam(unitNumber);
+  const pack =
+    subject === 'stats'
+      ? buildStatsUnitFrqPackForFullExam(unitNumber)
+      : buildGovUnitFrqPackForFullExam(unitNumber);
 
   if (!pack || pack.questions.length === 0) {
     return (
@@ -79,10 +100,10 @@ function UnitFrqPackInner() {
           <p className="mt-3 text-gray-600">This unit doesn&apos;t have a stimulus FRQ pack yet.</p>
           <Link
             href={backToHub}
-            className="mt-6 inline-flex items-center gap-2 rounded-lg bg-violet-600 px-5 py-3 font-bold text-white hover:bg-violet-700"
+            className={`mt-6 inline-flex items-center gap-2 rounded-lg px-5 py-3 font-bold text-white hover:opacity-90 ${subject === 'stats' ? 'bg-orange-600 hover:bg-orange-700' : 'bg-violet-600 hover:bg-violet-700'}`}
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to AP Gov practice tests
+            Back to practice tests
           </Link>
         </div>
       </div>
@@ -90,14 +111,13 @@ function UnitFrqPackInner() {
   }
 
   return (
-    <FullExamFRQ questions={pack} examType="gov" backUrl={backToHub} hideExpandingQuestionNav />
+    <FullExamFRQ
+      questions={pack}
+      examType={subject}
+      backUrl={backToHub}
+      hideExpandingQuestionNav
+    />
   );
-}
-
-function getPracticeHubForSubject(subject: CourseSubject): string {
-  if (subject === 'macro') return '/ap-macro-practice-tests';
-  if (subject === 'micro') return '/ap-micro-practice-tests';
-  return '/ap-gov-practice-tests';
 }
 
 export default function UnitFrqPackPage() {

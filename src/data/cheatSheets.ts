@@ -1,11 +1,11 @@
-import { govCurriculumOutline } from '@/data/courseCurriculumOutline';
+import { govCurriculumOutline, statsCurriculumOutline } from '@/data/courseCurriculumOutline';
 
 export type Unit = {
     number: number;
     title: string;
     description: string;
     pdfUrl: string;
-    subject: 'macro' | 'micro' | 'gov';
+    subject: 'macro' | 'micro' | 'gov' | 'stats';
     price: number; // Add price property
   }
 
@@ -25,6 +25,16 @@ export const govUnits: Unit[] = govCurriculumOutline.units.map((u) => ({
   description: `Unit ${u.unitNumber} of the AP U.S. Government and Politics course framework.`,
   pdfUrl: '',
   subject: 'gov' as const,
+  price: 4.99,
+}));
+
+/** AP Statistics — unit titles from `courseCurriculumOutline` (key terms / PDFs ship per unit). */
+export const statsUnits: Unit[] = statsCurriculumOutline.units.map((u) => ({
+  number: u.unitNumber,
+  title: u.unitName,
+  description: `Unit ${u.unitNumber} of the AP Statistics course framework.`,
+  pdfUrl: '',
+  subject: 'stats' as const,
   price: 4.99,
 }));
 

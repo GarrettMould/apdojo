@@ -6,7 +6,7 @@
  * `cheatSheets` / `lessons` or adding new courses.
  */
 
-export type CourseOutlineId = 'macro' | 'micro' | 'gov';
+export type CourseOutlineId = 'macro' | 'micro' | 'gov' | 'stats';
 
 /** CED-style lesson id (e.g. "3.2") plus display name only. */
 export interface CurriculumLessonOutline {
@@ -297,9 +297,101 @@ export const govCurriculumOutline: CourseCurriculumOutline = {
   ],
 };
 
-/** Lookup by course id. */
+export const statsCurriculumOutline: CourseCurriculumOutline = {
+  courseId: 'stats',
+  displayName: 'AP Statistics',
+  units: [
+    {
+      unitNumber: 1,
+      unitName: 'Exploring One-Variable Data and Collecting Data',
+      lessons: [
+        { lessonNumber: '1.1', name: 'Introducing Statistics: What Can We Learn from Data?' },
+        { lessonNumber: '1.2', name: 'Variables' },
+        { lessonNumber: '1.3', name: 'Tabular Representation and Summary Statistics for One Categorical Variable' },
+        { lessonNumber: '1.4', name: 'Graphical Representations for One Categorical Variable' },
+        { lessonNumber: '1.5', name: 'Graphical Representations for One Quantitative Variable' },
+        { lessonNumber: '1.6', name: 'Descriptions for One Quantitative Variable Distributions' },
+        { lessonNumber: '1.7', name: 'Summary Statistics for One Quantitative Variable' },
+        { lessonNumber: '1.8', name: 'Graphical Representations of Summary Statistics for One Quantitative Variable' },
+        { lessonNumber: '1.9', name: 'Comparisons of the Distributions for One Quantitative Variable' },
+        { lessonNumber: '1.10', name: 'The Investigative Question Revisited and Data Collection' },
+        { lessonNumber: '1.11', name: 'Random Sampling' },
+        { lessonNumber: '1.12', name: 'Potential Problems with Sampling' },
+        { lessonNumber: '1.13', name: 'Experimental Design' },
+      ],
+    },
+    {
+      unitNumber: 2,
+      unitName: 'Random Variables, and Probability Distributions',
+      lessons: [
+        { lessonNumber: '2.1', name: 'Tabular and Graphical Representations for the Distributions of Two Categorical Variables' },
+        { lessonNumber: '2.2', name: 'Summary Statistics for Two Categorical Variables' },
+        { lessonNumber: '2.3', name: 'Estimating Probabilities Using Simulation' },
+        { lessonNumber: '2.4', name: 'Introduction to Probability' },
+        { lessonNumber: '2.5', name: 'Mutually Exclusive Events' },
+        { lessonNumber: '2.6', name: 'Conditional Probability' },
+        { lessonNumber: '2.7', name: 'Independent Events and Unions of Events' },
+        { lessonNumber: '2.8', name: 'Introduction to Random Variables and Probability Distributions' },
+        { lessonNumber: '2.9', name: 'Parameters of Random Variables' },
+        { lessonNumber: '2.10', name: 'The Binomial Distribution' },
+        { lessonNumber: '2.11', name: 'The Normal Distribution' },
+        { lessonNumber: '2.12', name: 'Sampling Distributions and the Central Limit Theorem' },
+      ],
+    },
+    {
+      unitNumber: 3,
+      unitName: 'Inference for Categorical Data: Proportions',
+      lessons: [
+        { lessonNumber: '3.1', name: 'Estimators' },
+        { lessonNumber: '3.2', name: 'Sampling Distributions for Sample Proportions' },
+        { lessonNumber: '3.3', name: 'Constructing a Confidence Interval for a Population Proportion' },
+        { lessonNumber: '3.4', name: 'Justifying a Claim Based on a Confidence Interval for a Population Proportion' },
+        { lessonNumber: '3.5', name: 'Setting Up a Test for a Population Proportion' },
+        { lessonNumber: '3.6', name: 'p-Values' },
+        { lessonNumber: '3.7', name: 'Carrying Out a Test for a Population Proportion' },
+        { lessonNumber: '3.8', name: 'Potential Errors When Performing Tests' },
+        { lessonNumber: '3.9', name: 'Sampling Distributions for the Difference Between Sample Proportions' },
+        { lessonNumber: '3.10', name: 'Constructing a Confidence Interval for the Difference Between Two Population Proportions' },
+        { lessonNumber: '3.11', name: 'Justifying a Claim Based on a Confidence Interval for the Difference Between Two Population Proportions' },
+        { lessonNumber: '3.12', name: 'Setting Up a Test for the Difference Between Two Population Proportions' },
+        { lessonNumber: '3.13', name: 'Carrying Out a Test for the Difference Between Two Population Proportions' },
+        { lessonNumber: '3.14', name: 'Setting Up a Chi-Square Test for Homogeneity or Independence' },
+        { lessonNumber: '3.15', name: 'Carrying Out a Chi-Square Test for Homogeneity or Independence' },
+      ],
+    },
+    {
+      unitNumber: 4,
+      unitName: 'Inference for Quantitative Data: Means',
+      lessons: [
+        { lessonNumber: '4.1', name: 'Sampling Distributions for Sample Means' },
+        { lessonNumber: '4.2', name: 'Constructing a Confidence Interval for a Population Mean or Population Mean Difference' },
+        { lessonNumber: '4.3', name: 'Justifying a Claim Based on a Confidence Interval for a Population Mean or Population Mean Difference' },
+        { lessonNumber: '4.4', name: 'Setting Up a Test for a Population Mean or Population Mean Difference' },
+        { lessonNumber: '4.5', name: 'Carrying Out a Test for a Population Mean or Population Mean Difference' },
+        { lessonNumber: '4.6', name: 'Sampling Distributions for the Difference Between Two Sample Means' },
+        { lessonNumber: '4.7', name: 'Constructing a Confidence Interval for the Difference Between Two Population Means' },
+        { lessonNumber: '4.8', name: 'Justifying a Claim Based on a Confidence Interval for the Difference Between Two Population Means' },
+        { lessonNumber: '4.9', name: 'Setting Up a Test for the Difference Between Two Population Means' },
+        { lessonNumber: '4.10', name: 'Carrying Out a Test for the Difference Between Two Population Means' },
+      ],
+    },
+    {
+      unitNumber: 5,
+      unitName: 'Regression Analysis',
+      lessons: [
+        { lessonNumber: '5.1', name: 'Graphical Representations Between Two Quantitative Variables' },
+        { lessonNumber: '5.2', name: 'Correlation' },
+        { lessonNumber: '5.3', name: 'Linear Regression Models' },
+        { lessonNumber: '5.4', name: 'Residuals' },
+        { lessonNumber: '5.5', name: 'Least-Squares Regression' },
+      ],
+    },
+  ],
+};
+
 export const COURSE_CURRICULUM_OUTLINES: Record<CourseOutlineId, CourseCurriculumOutline> = {
   macro: macroCurriculumOutline,
   micro: microCurriculumOutline,
   gov: govCurriculumOutline,
+  stats: statsCurriculumOutline,
 };

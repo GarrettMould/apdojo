@@ -5,6 +5,7 @@ import { doc, getDoc, runTransaction, serverTimestamp } from 'firebase/firestore
 import { db } from '@/lib/firebase';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { UserData } from './useAuth';
+import { hasValidSeasonPass } from '@/lib/utils';
 
 interface CreditConsumptionResult {
   success: boolean;
@@ -32,27 +33,7 @@ export function useCreditSystem() {
    */
   const isPremium = useCallback((): boolean => {
     if (!userData) return false;
-    
-    const seasonPass = userData.seasonPass as string[] | undefined;
-    const expiration = userData.seasonPassExpiration as Record<string, string> | undefined;
-    
-    if (!seasonPass || seasonPass.length === 0) return false;
-    if (!expiration) return false; // If no expiration data, assume not premium (safety check)
-    
-    // Get current UTC time
-    const now = new Date();
-    const nowUTC = now.toISOString();
-    
-    // Check if user has at least one valid (non-expired) season pass
-    const hasValidPass = seasonPass.some((subject: string) => {
-      const expDate = expiration[subject];
-      if (!expDate) return false; // No expiration date = not valid
-      
-      // Compare ISO strings (lexicographic comparison works for ISO 8601)
-      return expDate >= nowUTC;
-    });
-    
-    return hasValidPass;
+    return hasValidSeasonPass(userData);
   }, [userData]);
 
   /**
@@ -128,10 +109,7 @@ export function useCreditSystem() {
         }
 
         // Premium Check: If user is premium, return success without deduction
-        const seasonPass = currentData.seasonPass as string[] | undefined;
-        const isUserPremium = !!seasonPass && (seasonPass.includes('macro') || seasonPass.includes('micro'));
-
-        if (isUserPremium) {
+        if (hasValidSeasonPass(currentData)) {
           // Update the document with reset credits (if needed) but don't deduct
           transaction.update(userDocRef, {
             credits,
@@ -229,10 +207,7 @@ export function useCreditSystem() {
         };
 
         // Premium Check: If user is premium, return success (unlimited)
-        const seasonPass = currentData.seasonPass as string[] | undefined;
-        const isUserPremium = !!seasonPass && (seasonPass.includes('macro') || seasonPass.includes('micro'));
-
-        if (isUserPremium) {
+        if (hasValidSeasonPass(currentData)) {
           // Update the document with initialized credits (if needed) but don't deduct
           transaction.update(userDocRef, {
             credits,

@@ -27,7 +27,7 @@ import {
   getUnitSlug,
   type PracticeMcqSubject,
 } from '@/lib/practiceSlugs';
-import type { CourseSubject } from '@/lib/courseSubject';
+import { isGovMcqPracticeUnitAvailable, type CourseSubject } from '@/lib/courseSubject';
 import { apQuestionSubjectTag } from '@/lib/courseSubject';
 import { SeasonPassModal } from '@/components/SeasonPassModal';
 import { hasValidSeasonPass } from '@/lib/utils';
@@ -311,8 +311,11 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
 
   const unitsData =
     subject === 'gov' ? allGovUnitsData : subject === 'micro' ? allMicroUnitsData : allMacroUnitsData;
-  /** Gov: only Unit 1 has a practice bank — hide other units in the in-quiz unit switcher. */
-  const unitsForMcq = subject === 'gov' ? unitsData.filter((u) => u.number === 1) : unitsData;
+  /** Gov: only units with practice banks appear in the in-quiz unit switcher. */
+  const unitsForMcq =
+    subject === 'gov'
+      ? unitsData.filter((u) => isGovMcqPracticeUnitAvailable(u.number))
+      : unitsData;
   const uiTheme =
     subject === 'gov'
       ? {
@@ -621,7 +624,7 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
           }}
         />
       )}
-      <div className="min-h-screen bg-gray-50 overflow-hidden">
+      <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 py-8 pt-8">
 
           {!isTutorOpen && <Breadcrumb subject={subject} unitNumber={unitNumber} />}

@@ -7,6 +7,7 @@ import {
   macroUnits as allMacroUnitsData,
   microUnits as allMicroUnitsData,
   govUnits as allGovUnitsData,
+  statsUnits as allStatsUnitsData,
 } from '@/data/cheatSheets';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { usePathname, useSearchParams } from 'next/navigation';
@@ -15,7 +16,9 @@ import { getUnitMCQTestUrl, getFullFRQTestUrl, getUnitTestPreviewUrl } from '@/l
 import { loadTestProgress } from '@/lib/testProgress';
 import { getUnitMCQTest } from '@/data/unitMCQTests';
 import { getGovUnitStimulusFrqs, getGovUnitFrqFormatLabels } from '@/data/gov/govUnitStimulusFrqs';
+import { getStatsUnitStimulusFrqs, getStatsUnitFrqFormatLabels } from '@/data/stats/statsUnitStimulusFrqs';
 import { hasAdminRole } from '@/lib/adminAccess';
+import { isGovMcqTestUnitAvailable, isStatsMcqTestUnitAvailable } from '@/lib/courseSubject';
 
 /** In-progress unit MCQ saved in Firestore (same testId as FullExam). */
 type UnitMcqResumeInfo = {
@@ -29,6 +32,7 @@ const availableMicroUnits = [1, 2, 3, 4, 5, 6];
 /** Pretty URLs rewrite internally without putting ?subject= in the address bar — use pathname as fallback. */
 function subjectFromPracticeTestsPathname(pathname: string): CourseSubject | null {
   if (pathname === '/ap-gov-practice-tests') return 'gov';
+  if (pathname === '/ap-stats-practice-tests') return 'stats';
   if (pathname === '/ap-micro-practice-tests') return 'micro';
   if (pathname === '/ap-macro-practice-tests') return 'macro';
   return null;
@@ -42,28 +46,39 @@ function UnitFinalPracticeTestsContent() {
   const subjectParam = searchParams.get('subject');
   const subjectFromPath = subjectFromPracticeTestsPathname(pathname);
   const effectiveSubject: CourseSubject =
-    subjectParam === 'macro' || subjectParam === 'micro' || subjectParam === 'gov'
+    subjectParam === 'macro' ||
+    subjectParam === 'micro' ||
+    subjectParam === 'gov' ||
+    subjectParam === 'stats'
       ? subjectParam
       : subjectFromPath ?? selectedSubject;
 
   const units =
     effectiveSubject === 'gov'
       ? allGovUnitsData
-      : effectiveSubject === 'micro'
-        ? allMicroUnitsData
-        : allMacroUnitsData;
+      : effectiveSubject === 'stats'
+        ? allStatsUnitsData
+        : effectiveSubject === 'micro'
+          ? allMicroUnitsData
+          : allMacroUnitsData;
   const isGov = effectiveSubject === 'gov';
+  const isStats = effectiveSubject === 'stats';
   const canAccessGov = Boolean(user && hasAdminRole(userData));
   const isMicro = effectiveSubject === 'micro';
   const subjectName = isGov
     ? 'U.S. Government'
-    : effectiveSubject === 'macro'
-      ? 'Macroeconomics'
-      : 'Microeconomics';
+    : isStats
+      ? 'Statistics'
+      : effectiveSubject === 'macro'
+        ? 'Macroeconomics'
+        : 'Microeconomics';
 
   const isUnitAvailable = (unitNumber: number) => {
+    if (isStats) {
+      return isStatsMcqTestUnitAvailable(unitNumber);
+    }
     if (isGov) {
-      return unitNumber === 1;
+      return isGovMcqTestUnitAvailable(unitNumber);
     }
     if (effectiveSubject === 'micro') {
       return availableMicroUnits.includes(unitNumber);
@@ -73,6 +88,7 @@ function UnitFinalPracticeTestsContent() {
 
   const apSubjectFilter = useMemo(() => {
     if (effectiveSubject === 'gov') return 'ap_us_government' as const;
+    if (effectiveSubject === 'stats') return 'ap_statistics' as const;
     if (effectiveSubject === 'micro') return 'ap_microeconomics' as const;
     return 'ap_macroeconomics' as const;
   }, [effectiveSubject]);
@@ -173,26 +189,43 @@ function UnitFinalPracticeTestsContent() {
 
   const primaryCta = isGov
     ? 'border-2 border-violet-800 bg-violet-600 text-white shadow-[0_3px_0_0_rgba(17,24,39,0.9)] hover:bg-violet-700 active:translate-y-0.5 active:shadow-[0_1px_0_0_rgba(17,24,39,0.85)]'
-    : isMicro
+    : isStats
+      ? 'border-2 border-orange-700 bg-orange-600 text-white shadow-[0_3px_0_0_rgba(17,24,39,0.9)] hover:bg-orange-700 active:translate-y-0.5 active:shadow-[0_1px_0_0_rgba(17,24,39,0.85)]'
+      : isMicro
       ? 'border-2 border-green-700 bg-green-500 text-white shadow-[0_3px_0_0_rgba(17,24,39,0.9)] hover:bg-green-600 active:translate-y-0.5 active:shadow-[0_1px_0_0_rgba(17,24,39,0.85)]'
       : 'border-2 border-blue-700 bg-blue-500 text-white shadow-[0_3px_0_0_rgba(17,24,39,0.9)] hover:bg-blue-600 active:translate-y-0.5 active:shadow-[0_1px_0_0_rgba(17,24,39,0.85)]';
 
-  const secondaryCta = isGov
-    ? 'border-2 border-gray-300 bg-white text-violet-700 shadow-[0_2px_0_0_rgba(156,163,175,0.9)] hover:border-gray-800 hover:bg-gray-50 active:translate-y-0.5 active:shadow-[0_1px_0_0_rgba(156,163,175,0.9)]'
-    : isMicro
-      ? 'border-2 border-gray-300 bg-white text-green-600 shadow-[0_2px_0_0_rgba(156,163,175,0.9)] hover:border-gray-800 hover:bg-gray-50 active:translate-y-0.5 active:shadow-[0_1px_0_0_rgba(156,163,175,0.9)]'
-      : 'border-2 border-gray-300 bg-white text-blue-600 shadow-[0_2px_0_0_rgba(156,163,175,0.9)] hover:border-gray-800 hover:bg-gray-50 active:translate-y-0.5 active:shadow-[0_1px_0_0_rgba(156,163,175,0.9)]';
+  const secondaryCtaOutline =
+    'border-2 border-black bg-white shadow-[0_3px_0_0_rgba(0,0,0,1)] hover:border-black active:translate-y-0.5 active:shadow-[0_2px_0_0_rgba(0,0,0,1)]';
 
-  const titleAccent = isGov ? 'text-violet-600' : isMicro ? 'text-green-600' : 'text-blue-600';
+  const secondaryCta = isGov
+    ? `${secondaryCtaOutline} text-violet-700 hover:bg-violet-50`
+    : isStats
+      ? `${secondaryCtaOutline} text-orange-600 hover:bg-orange-50`
+      : isMicro
+        ? `${secondaryCtaOutline} text-green-600 hover:bg-green-50`
+        : `${secondaryCtaOutline} text-blue-600 hover:bg-blue-50`;
+
+  const titleAccent = isGov
+    ? 'text-violet-600'
+    : isStats
+      ? 'text-orange-600'
+      : isMicro
+        ? 'text-green-600'
+        : 'text-blue-600';
   const titleShadow = isGov
     ? '2px 2px 0 rgba(124,58,237,0.2)'
-    : isMicro
+    : isStats
+      ? '2px 2px 0 rgba(234,88,12,0.2)'
+      : isMicro
       ? '2px 2px 0 rgba(22,163,74,0.2)'
       : '2px 2px 0 rgba(59,130,246,0.2)';
 
   const badgeCourse = isGov
     ? 'bg-violet-600 text-white'
-    : isMicro
+    : isStats
+      ? 'bg-orange-600 text-white'
+      : isMicro
       ? 'bg-green-500 text-white'
       : 'bg-blue-500 text-white';
 
@@ -204,6 +237,11 @@ function UnitFinalPracticeTestsContent() {
 
   const resumeCta =
     'border-2 border-emerald-900 bg-emerald-600 text-white shadow-[0_3px_0_0_rgba(6,78,59,0.95)] hover:bg-emerald-700 active:translate-y-0.5 active:shadow-[0_1px_0_0_rgba(6,78,59,0.85)]';
+
+  const comingSoonCta =
+    'inline-flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-xl border-2 border-gray-700 bg-gray-200 py-3.5 px-6 text-center text-base font-black uppercase tracking-wide text-gray-600 shadow-[0_3px_0_0_rgba(55,65,81,0.85)]';
+
+  const fullExamsComingSoon = isGov || isStats;
 
   if (isGov && loadingUserData) {
     return (
@@ -250,14 +288,13 @@ function UnitFinalPracticeTestsContent() {
           </p>
         </div>
 
-        {/* Full exams (econ only — Gov full exams not shipped yet) */}
-        {!isGov && (
+        {/* Full exams — live for Macro/Micro; coming soon for Gov and Stats */}
         <section className="mb-14 sm:mb-20">
           <h2 className="mb-8 border-b-2 border-gray-800 pb-2 text-2xl font-black tracking-tight text-gray-900 sm:text-3xl">
             Full Practice <span className={titleAccent}>Exams</span>
           </h2>
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
-            <div className={`flex flex-col gap-6 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8 ${cardShell}`}>
+            <div className={`flex flex-col gap-6 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8 ${cardShell} ${fullExamsComingSoon ? 'opacity-90' : ''}`}>
               <div className="min-w-0 flex-1">
                 <span className={`${badgeBase} ${badgeCourse}`}>
                   MCQ Exam
@@ -271,17 +308,24 @@ function UnitFinalPracticeTestsContent() {
                 </p>
               </div>
               <div className="flex shrink-0 flex-col sm:items-end">
-                <Link
-                  href={`/full-mcq-exam-preview?subject=${effectiveSubject}&num=1`}
-                  className={`inline-flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-center text-base font-black uppercase tracking-wide transition-all sm:w-auto sm:min-w-[200px] ${primaryCta}`}
-                >
-                  View test
-                  <PlayCircle className="h-5 w-5 shrink-0" />
-                </Link>
+                {fullExamsComingSoon ? (
+                  <span className={`${comingSoonCta} sm:min-w-[200px]`} aria-disabled>
+                    <Clock className="h-5 w-5 shrink-0" />
+                    Coming soon
+                  </span>
+                ) : (
+                  <Link
+                    href={`/full-mcq-exam-preview?subject=${effectiveSubject}&num=1`}
+                    className={`inline-flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-center text-base font-black uppercase tracking-wide transition-all sm:w-auto sm:min-w-[200px] ${primaryCta}`}
+                  >
+                    View test
+                    <PlayCircle className="h-5 w-5 shrink-0" />
+                  </Link>
+                )}
               </div>
             </div>
 
-            <div className={`flex flex-col gap-6 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8 ${cardShell}`}>
+            <div className={`flex flex-col gap-6 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8 ${cardShell} ${fullExamsComingSoon ? 'opacity-90' : ''}`}>
               <div className="min-w-0 flex-1">
                 <span className={`${badgeBase} ${badgeCourse}`}>
                   FRQ Exam
@@ -294,18 +338,24 @@ function UnitFinalPracticeTestsContent() {
                 </p>
               </div>
               <div className="flex shrink-0 flex-col sm:items-end">
-                <Link
-                  href={getFullFRQTestUrl(effectiveSubject)}
-                  className={`inline-flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-center text-base font-black uppercase tracking-wide transition-all sm:w-auto sm:min-w-[200px] ${secondaryCta}`}
-                >
-                  Start test
-                  <ArrowRight className="h-5 w-5 shrink-0" />
-                </Link>
+                {fullExamsComingSoon ? (
+                  <span className={`${comingSoonCta} sm:min-w-[200px]`} aria-disabled>
+                    <Clock className="h-5 w-5 shrink-0" />
+                    Coming soon
+                  </span>
+                ) : (
+                  <Link
+                    href={getFullFRQTestUrl(effectiveSubject)}
+                    className={`inline-flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-center text-base font-black uppercase tracking-wide transition-all sm:w-auto sm:min-w-[200px] ${secondaryCta}`}
+                  >
+                    Start test
+                    <ArrowRight className="h-5 w-5 shrink-0" />
+                  </Link>
+                )}
               </div>
             </div>
           </div>
         </section>
-        )}
 
         {/* Unit tests */}
         <section>
@@ -319,8 +369,23 @@ function UnitFinalPracticeTestsContent() {
               const showResume = Boolean(user?.uid && resume && !unitProgressLoading);
               const testHref = getUnitMCQTestUrl(unit.number, effectiveSubject);
               const previewHref = `/unit-test-preview?subject=${effectiveSubject}&unit=${unit.number}`;
-              const unitStimulusFrqs = isGov ? getGovUnitStimulusFrqs(unit.number) : [];
-              const frqFormatLabels = isGov ? getGovUnitFrqFormatLabels(unit.number) : [];
+              const unitStimulusFrqs = isGov
+                ? getGovUnitStimulusFrqs(unit.number)
+                : isStats
+                  ? getStatsUnitStimulusFrqs(unit.number)
+                  : [];
+              const frqFormatLabels = isGov
+                ? getGovUnitFrqFormatLabels(unit.number)
+                : isStats
+                  ? getStatsUnitFrqFormatLabels(unit.number)
+                  : [];
+              const frqAccentBorder = isStats ? 'border-orange-800' : 'border-violet-800';
+              const frqAccentBg = isStats ? 'bg-orange-100 text-orange-900' : 'bg-violet-100 text-violet-800';
+              const frqCta = isStats
+                ? 'border-2 border-orange-800 bg-orange-600 text-white shadow-[0_3px_0_0_rgba(17,24,39,0.9)] hover:bg-orange-700 active:translate-y-0.5 active:shadow-[0_1px_0_0_rgba(17,24,39,0.85)]'
+                : 'border-2 border-violet-800 bg-violet-600 text-white shadow-[0_3px_0_0_rgba(17,24,39,0.9)] hover:bg-violet-700 active:translate-y-0.5 active:shadow-[0_1px_0_0_rgba(17,24,39,0.85)]';
+              const showFrqPackCard = (isGov && unitStimulusFrqs.length > 0) || isStats;
+              const frqPackAvailable = isGov && unitStimulusFrqs.length > 0;
 
               return (
                 <div key={unit.number} className="flex h-full flex-col gap-3">
@@ -369,7 +434,7 @@ function UnitFinalPracticeTestsContent() {
                       )}
                     </div>
                   </div>
-                  {unitStimulusFrqs.length > 0 ? (
+                  {showFrqPackCard ? (
                     <div className="rounded-xl border-2 border-gray-900 bg-white p-4 shadow-[4px_4px_0px_0px_rgba(17,24,39,0.8)]">
                       <div className="mb-3 flex items-start justify-between gap-2">
                         <div className="min-w-0">
@@ -377,22 +442,35 @@ function UnitFinalPracticeTestsContent() {
                             Unit {unit.number} FRQ Pack
                           </h4>
                           {frqFormatLabels.length > 0 ? (
-                            <p className="mt-2 text-sm font-semibold leading-snug text-violet-900">
+                            <p className={`mt-2 text-sm font-semibold leading-snug ${isStats ? 'text-orange-900' : 'text-violet-900'}`}>
                               {frqFormatLabels.join(' · ')}
+                            </p>
+                          ) : isStats ? (
+                            <p className="mt-2 text-sm font-semibold leading-snug text-orange-900">
+                              Investigative Task · Free Response
                             </p>
                           ) : null}
                         </div>
-                        <span className="shrink-0 rounded-md border border-violet-800 bg-violet-100 px-2 py-1 text-[11px] font-black uppercase tracking-wide text-violet-800">
-                          Beta
-                        </span>
+                        {frqPackAvailable ? (
+                          <span className={`shrink-0 rounded-md border px-2 py-1 text-[11px] font-black uppercase tracking-wide ${frqAccentBorder} ${frqAccentBg}`}>
+                            Beta
+                          </span>
+                        ) : null}
                       </div>
-                      <Link
-                        href={getUnitTestPreviewUrl(unit.number, effectiveSubject, 'frq')}
-                        className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border-2 border-violet-800 bg-violet-600 px-4 py-3 text-sm font-black uppercase tracking-wide text-white shadow-[0_3px_0_0_rgba(17,24,39,0.9)] transition-all hover:bg-violet-700 active:translate-y-0.5 active:shadow-[0_1px_0_0_rgba(17,24,39,0.85)]"
-                      >
-                        Start FRQ Pack
-                        <PlayCircle className="h-4 w-4 shrink-0" />
-                      </Link>
+                      {frqPackAvailable ? (
+                        <Link
+                          href={getUnitTestPreviewUrl(unit.number, effectiveSubject, 'frq')}
+                          className={`mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-black uppercase tracking-wide transition-all active:translate-y-0.5 ${frqCta}`}
+                        >
+                          Start FRQ Pack
+                          <PlayCircle className="h-4 w-4 shrink-0" />
+                        </Link>
+                      ) : (
+                        <span className={`mt-3 ${comingSoonCta} py-3 text-sm`} aria-disabled>
+                          <Clock className="h-4 w-4 shrink-0" />
+                          Coming soon
+                        </span>
+                      )}
                     </div>
                   ) : null}
                 </div>

@@ -1,27 +1,43 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import { DrawingPad } from '@/components/DrawingPad';
+import { ExpandableQuestionImage } from '@/components/ExpandableQuestionImage';
+import { VideoModal } from '@/components/VideoModal';
 import {
-  X,
   Pause,
   Play,
+  PlayCircle,
   Eye,
   List,
   ChevronUp,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  ArrowLeft,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import Image, { StaticImageData } from 'next/image';
 import { useRouter } from 'next/navigation';
+
+interface TableData {
+  title?: string;
+  headers: string[];
+  rows: (string | number)[][];
+  rowHeaders?: boolean;
+  playerNames?: {
+    row: string;
+    column: string;
+  };
+}
 
 interface SubPart {
   label: string;
   text: string;
   answerType: 'draw' | 'text';
   answer?: StaticImageData | string;
+  partImage?: { src: string; alt?: string };
 }
 
 interface Part {
@@ -30,16 +46,16 @@ interface Part {
   answerType: 'draw' | 'text' | null;
   answer?: StaticImageData | string;
   subparts?: SubPart[];
+  tableData?: TableData;
+  /** Stimulus image after stem (e.g. summary statistics table SVG). */
+  stimulusImage?: { src: string; alt?: string };
+  partImage?: { src: string; alt?: string };
+  drawPrompt?: string;
 }
 
-interface TableData {
-  headers: string[];
-  rows: (string | number)[][];
-  rowHeaders?: boolean;
-  playerNames?: {
-    row: string;
-    column: string;
-  };
+interface FrqImageRef {
+  src: string;
+  alt?: string;
 }
 
 interface Question {
@@ -53,10 +69,12 @@ interface Question {
     caseCitation: string;
     summary: string;
   };
-  image?: StaticImageData;
+  image?: StaticImageData | FrqImageRef;
   tableData?: TableData;
   /** Shown after `tableData` (e.g. Gov quantitative: task line after the stimulus table). */
   directionsAfterTable?: string;
+  /** Gov unit FRQ pack: optional walkthrough shown on the results screen. */
+  walkthroughVideoUrl?: string;
   parts: Part[];
 }
 
@@ -65,7 +83,7 @@ interface FullExamFRQProps {
     examTitle: string;
     questions: Question[];
   };
-  examType?: 'macro' | 'micro' | 'gov';
+  examType?: 'macro' | 'micro' | 'gov' | 'stats';
   backUrl?: string;
   /** Hide the bottom “Question N of M” dropdown + numbered grid; use Prev/Next only. */
   hideExpandingQuestionNav?: boolean;
@@ -74,6 +92,34 @@ interface FullExamFRQProps {
 /** Macro/Micro FRQ practice sessions default; Gov unit FRQ pack uses AP Gov Section II–style pacing. */
 const DEFAULT_FRQ_TOTAL_SECONDS = 50 * 60;
 const GOV_UNIT_FRQ_PACK_TOTAL_SECONDS = 60 * 60;
+const STATS_UNIT_FRQ_PACK_TOTAL_SECONDS = 40 * 60;
+
+function frqImageSrc(image: StaticImageData | FrqImageRef): string {
+  return image.src;
+}
+
+function isFrqPackExamType(examType?: FullExamFRQProps['examType']): boolean {
+  return examType === 'gov' || examType === 'stats';
+}
+
+function statsFrqImageContainerClass(examType?: FullExamFRQProps['examType']): string {
+  return isFrqPackExamType(examType) ? 'flex justify-center w-full' : '';
+}
+
+function statsFrqImageClass(
+  examType?: FullExamFRQProps['examType'],
+  variant: 'default' | 'sketch' = 'default'
+): string {
+  const maxH = variant === 'sketch' ? 'max-h-[280px]' : 'max-h-[320px]';
+  const base = `${maxH} max-w-full object-contain rounded cursor-pointer`;
+  if (isFrqPackExamType(examType)) {
+    return `${base} border border-gray-300 bg-white p-1`;
+  }
+  if (variant === 'sketch') {
+    return `${base} border border-gray-200`;
+  }
+  return base;
+}
 
 const FONT_SIZE_CLASSES = ['text-sm', 'text-base', 'text-lg', 'text-xl'];
 const FONT_SIZE_MAX = FONT_SIZE_CLASSES.length - 1;
@@ -86,12 +132,14 @@ export function FullExamFRQ({
 }: FullExamFRQProps) {
   const router = useRouter();
   const frqSessionTotalSeconds =
-    examType === 'gov' ? GOV_UNIT_FRQ_PACK_TOTAL_SECONDS : DEFAULT_FRQ_TOTAL_SECONDS;
+    examType === 'gov'
+      ? GOV_UNIT_FRQ_PACK_TOTAL_SECONDS
+      : examType === 'stats'
+        ? STATS_UNIT_FRQ_PACK_TOTAL_SECONDS
+        : DEFAULT_FRQ_TOTAL_SECONDS;
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [textAnswers, setTextAnswers] = useState<Record<string, string>>({});
   const [drawingAnswers, setDrawingAnswers] = useState<Record<string, string>>({});
-  const [showImageModal, setShowImageModal] = useState(false);
-  const [selectedImage, setSelectedImage] = useState<StaticImageData | null>(null);
   const [showResults, setShowResults] = useState(false);
   const [isTimerPaused, setIsTimerPaused] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(frqSessionTotalSeconds);
@@ -120,14 +168,31 @@ export function FullExamFRQ({
   const questionNavigatorRef = useRef<HTMLDivElement>(null);
 
   const accentColor =
-    examType === 'macro' ? 'bg-blue-600' : examType === 'micro' ? 'bg-green-600' : 'bg-violet-600';
+    examType === 'macro'
+      ? 'bg-blue-600'
+      : examType === 'micro'
+        ? 'bg-green-600'
+        : examType === 'stats'
+          ? 'bg-orange-600'
+          : 'bg-violet-600';
+
+  const backLinkClass =
+    examType === 'macro'
+      ? 'text-blue-700 hover:text-blue-900'
+      : examType === 'micro'
+        ? 'text-green-700 hover:text-green-900'
+        : examType === 'stats'
+          ? 'text-orange-700 hover:text-orange-900'
+          : 'text-violet-700 hover:text-violet-900';
 
   const answerFocusClass =
     examType === 'macro'
       ? 'focus:border-blue-500 focus:ring-1 focus:ring-blue-400'
       : examType === 'micro'
         ? 'focus:border-green-500 focus:ring-1 focus:ring-green-400'
-        : 'focus:border-violet-500 focus:ring-1 focus:ring-violet-400';
+        : examType === 'stats'
+          ? 'focus:border-orange-500 focus:ring-1 focus:ring-orange-400'
+          : 'focus:border-violet-500 focus:ring-1 focus:ring-violet-400';
 
   const openExitFlow = () => setShowExitModal(true);
 
@@ -227,6 +292,11 @@ export function FullExamFRQ({
             </div>
           )}
           <div className="flex-1">
+            {tableData.title ? (
+              <p className="mb-3 text-center text-base font-bold text-gray-900 leading-snug">
+                {tableData.title}
+              </p>
+            ) : null}
             {tableData.playerNames && (
               <p className="mb-2 text-center text-base font-bold text-gray-900">
                 {tableData.playerNames.column}
@@ -291,7 +361,7 @@ export function FullExamFRQ({
         </>
       );
     }
-    if (examType === 'gov' && q.questionTitle) {
+    if ((examType === 'gov' || examType === 'stats') && q.questionTitle) {
       return (
         <>
           <h2 className={`mb-4 font-black text-gray-900 tracking-tight ${fontClass}`}>{q.questionTitle}</h2>
@@ -312,6 +382,35 @@ export function FullExamFRQ({
     );
   };
 
+  const renderQuestionStimulusImage = (
+    image: StaticImageData | FrqImageRef | undefined,
+    options?: { clickable?: boolean; marginClass?: string }
+  ) => {
+    if (!image?.src) return null;
+    const marginClass = options?.marginClass ?? 'mb-5';
+    const imageClassName = statsFrqImageClass(examType);
+    if (options?.clickable === false) {
+      return (
+        <div className={`${marginClass} ${statsFrqImageContainerClass(examType)}`}>
+          <img
+            src={frqImageSrc(image)}
+            alt={'alt' in image && image.alt ? image.alt : 'Question stimulus'}
+            className={imageClassName}
+          />
+        </div>
+      );
+    }
+    return (
+      <div className={`${marginClass} ${statsFrqImageContainerClass(examType)}`}>
+        <ExpandableQuestionImage
+          src={frqImageSrc(image)}
+          alt={'alt' in image && image.alt ? image.alt : 'Question stimulus'}
+          imageClassName={imageClassName}
+        />
+      </div>
+    );
+  };
+
   const renderPartBlock = (part: Part, partIndex: number, largeText: boolean) => {
     const answerMargin = largeText ? '' : 'ml-6';
     const textAreaClass = largeText
@@ -327,15 +426,80 @@ export function FullExamFRQ({
           </p>
         </div>
 
+        {part.tableData ? renderTable(part.tableData, 'part') : null}
+
+        {part.stimulusImage ? (
+          <div className={`${answerMargin} ${statsFrqImageContainerClass(examType)}`}>
+            <ExpandableQuestionImage
+              src={part.stimulusImage.src}
+              alt={part.stimulusImage.alt ?? 'Part stimulus'}
+              imageClassName={statsFrqImageClass(examType)}
+            />
+          </div>
+        ) : null}
+
+        {part.partImage && !part.drawPrompt ? (
+          <div className={`${answerMargin} ${statsFrqImageContainerClass(examType)}`}>
+            <ExpandableQuestionImage
+              src={part.partImage.src}
+              alt={part.partImage.alt ?? 'Part diagram'}
+              imageClassName={statsFrqImageClass(examType)}
+            />
+          </div>
+        ) : null}
+
         <div className={answerMargin}>
           {part.answerType === 'text' ? (
-            <textarea
-              placeholder="Enter your answer here..."
-              value={textAnswers[`${currentQuestionIndex}-${part.label}`] || ''}
-              onChange={(e) => handleTextAnswer(`${currentQuestionIndex}-${part.label}`, e.target.value)}
-              rows={largeText ? 18 : 4}
-              className={textAreaClass}
-            />
+            <>
+              <textarea
+                placeholder="Enter your answer here..."
+                value={textAnswers[`${currentQuestionIndex}-${part.label}`] || ''}
+                onChange={(e) => handleTextAnswer(`${currentQuestionIndex}-${part.label}`, e.target.value)}
+                rows={largeText ? 18 : 4}
+                className={textAreaClass}
+              />
+              {part.drawPrompt ? (
+                <div className="mt-6 space-y-3">
+                  <p className={`font-semibold text-gray-900 whitespace-pre-line ${fontClass}`}>{part.drawPrompt}</p>
+                  {part.partImage ? (
+                    <div className={statsFrqImageContainerClass(examType)}>
+                      <ExpandableQuestionImage
+                        src={part.partImage.src}
+                        alt={part.partImage.alt ?? 'Sketch grid'}
+                        imageClassName={statsFrqImageClass(examType, 'sketch')}
+                      />
+                    </div>
+                  ) : null}
+                  {(() => {
+                    const drawKey = `${currentQuestionIndex}-${part.label}-draw`;
+                    const isLocked = savedDrawingKeys.has(drawKey);
+                    const drawH = largeText ? 'min-h-[min(48vh,420px)]' : 'h-[400px]';
+                    return (
+                      <div className={`${drawH} relative border-2 border-gray-300 rounded-lg overflow-hidden`}>
+                        <DrawingPad
+                          isLarge={true}
+                          className="w-full relative"
+                          hideDoneButton
+                          initialData={drawingAnswers[drawKey]}
+                          onSave={(data) => handleDrawingAnswer(drawKey, data)}
+                        />
+                        {isLocked && (
+                          <div className="absolute inset-0 bg-white/70 backdrop-blur-[2px] flex flex-col items-center justify-center gap-3 z-20">
+                            <div className="flex items-center gap-2 bg-white border border-gray-200 shadow-sm rounded-full px-4 py-2">
+                              <svg className="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                              <span className="text-sm font-bold text-gray-700">Drawing saved</span>
+                            </div>
+                            <button type="button" onClick={() => unlockDrawing(drawKey)} className="text-xs font-semibold text-gray-400 hover:text-gray-600 underline transition-colors">
+                              Edit drawing
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
+                </div>
+              ) : null}
+            </>
           ) : part.answerType === 'draw' ? (
             (() => {
               const drawKey = `${currentQuestionIndex}-${part.label}`;
@@ -377,6 +541,15 @@ export function FullExamFRQ({
                     {subpart.text}
                   </p>
                 </div>
+                {subpart.partImage ? (
+                  <div className={`ml-6 ${statsFrqImageContainerClass(examType)}`}>
+                    <ExpandableQuestionImage
+                      src={subpart.partImage.src}
+                      alt={subpart.partImage.alt ?? 'Subpart diagram'}
+                      imageClassName={statsFrqImageClass(examType, 'sketch')}
+                    />
+                  </div>
+                ) : null}
                 <div className="ml-6">
                   {subpart.answerType === 'text' ? (
                     <textarea
@@ -430,29 +603,64 @@ export function FullExamFRQ({
 
   const ResultsView = () => {
     const [resultsIndex, setResultsIndex] = useState(0);
+    const [walkthroughVideoUrl, setWalkthroughVideoUrl] = useState<string | null>(null);
     const rq = questions.questions[resultsIndex];
+
+    useEffect(() => {
+      setWalkthroughVideoUrl(null);
+    }, [resultsIndex]);
+
     return (
       <>
-      <div className="flex min-h-[calc(100dvh-56px)] w-full justify-center bg-gradient-to-b from-slate-50 via-white to-slate-100/85 px-3 py-6 sm:px-6 sm:py-10">
-        <div className="flex h-[min(920px,calc(100dvh-3.5rem))] w-full max-w-7xl flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-white/95 shadow-[0_24px_60px_-28px_rgba(15,23,42,0.12)] ring-1 ring-slate-900/[0.05]">
-          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-5 pb-28 sm:px-6 sm:py-6">
+      <VideoModal
+        isOpen={!!walkthroughVideoUrl}
+        onClose={() => setWalkthroughVideoUrl(null)}
+        videoUrl={walkthroughVideoUrl ?? ''}
+      />
+      <div className="min-h-dvh w-full bg-gradient-to-b from-slate-50 via-white to-slate-100/85 pb-36">
+        {backUrl ? (
+          <div className="sticky top-0 z-40 border-b border-slate-200/90 bg-slate-50/95 backdrop-blur-md">
+            <div className="mx-auto flex w-full max-w-7xl items-center px-3 py-3 sm:px-6">
+              <Link
+                href={backUrl}
+                className={`inline-flex items-center gap-2 text-sm font-semibold transition-colors ${backLinkClass}`}
+              >
+                <ArrowLeft className="h-4 w-4 shrink-0" aria-hidden />
+                Back to unit practice tests
+              </Link>
+            </div>
+          </div>
+        ) : null}
+        <div className="px-3 pt-6 sm:px-6 sm:pt-8">
+        <div className="mx-auto mb-10 w-full max-w-7xl rounded-2xl border border-slate-200/90 bg-white/95 shadow-[0_24px_60px_-28px_rgba(15,23,42,0.12)] ring-1 ring-slate-900/[0.05] sm:mb-12">
+          <div className="px-4 py-5 sm:px-6 sm:py-6">
         <div className="mb-8">
           <p className="text-xs font-black uppercase tracking-widest text-gray-400 mb-1">Results</p>
-          <h2 className={`font-bold text-gray-900 ${fontClass}`}>
-            Question {resultsIndex + 1} of {questions.questions.length}
-          </h2>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <h2 className={`font-bold text-gray-900 ${fontClass}`}>
+              Question {resultsIndex + 1} of {questions.questions.length}
+            </h2>
+            {rq.walkthroughVideoUrl ? (
+              <button
+                type="button"
+                onClick={() => setWalkthroughVideoUrl(rq.walkthroughVideoUrl!)}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-sky-300 bg-sky-50 px-3 py-1.5 text-sm font-semibold text-sky-800 hover:bg-sky-100 transition-colors"
+              >
+                <PlayCircle className="h-4 w-4 shrink-0" aria-hidden />
+                Video walkthrough
+              </button>
+            ) : null}
           </div>
+        </div>
 
         <div className="mb-4">{renderGovFrqPrompt(rq)}</div>
-        {rq.image && (
-          <img src={rq.image.src} alt="Question" className="max-h-[300px] object-contain mb-6 rounded" />
-        )}
         {rq.tableData && renderTable(rq.tableData, 'results')}
         {rq.directionsAfterTable ? (
           <p className={`font-semibold text-gray-900 mb-6 leading-relaxed whitespace-pre-line ${fontClass}`}>
             {rq.directionsAfterTable}
           </p>
         ) : null}
+        {renderQuestionStimulusImage(rq.image, { clickable: false, marginClass: 'mb-6' })}
 
         <div className="space-y-8 mt-6">
           {rq.parts.map((part, partIndex) => (
@@ -472,7 +680,7 @@ export function FullExamFRQ({
                   {part.answer && (
                     <div className="mt-3">
                       <p className="text-xs font-semibold uppercase tracking-widest text-green-600 mb-1.5">Correct answer</p>
-                      <div className="p-3 bg-green-50 rounded border border-green-200 text-sm text-gray-800">
+                      <div className="p-3 bg-green-50 rounded border border-green-200 text-sm text-gray-800 whitespace-pre-line">
                         {typeof part.answer === 'string' ? part.answer : ''}
                       </div>
                     </div>
@@ -566,6 +774,7 @@ export function FullExamFRQ({
         </div>
           </div>
         </div>
+        </div>
       </div>
 
         {/* Results navigation */}
@@ -593,7 +802,7 @@ export function FullExamFRQ({
                 onClick={() => { setShowResults(false); setCurrentQuestionIndex(0); window.scrollTo({ top: 0 }); }}
                 className={`flex items-center gap-1.5 px-4 py-2.5 rounded font-semibold text-sm text-white ${accentColor} hover:opacity-90 transition-opacity`}
               >
-                Return to Exam
+                Exit
               </button>
             )}
           </div>
@@ -797,23 +1006,6 @@ export function FullExamFRQ({
             {/* Prompt / Gov SCOTUS stimulus layout */}
             {renderGovFrqPrompt(currentQuestion)}
 
-            {/* Image */}
-              {currentQuestion.image && (
-              <div className="mb-5">
-                  <img 
-                    src={currentQuestion.image.src}
-                    alt="Question"
-                  className="max-h-[320px] object-contain rounded cursor-pointer"
-                    onClick={() => {
-                      if (currentQuestion.image) {
-                        setSelectedImage(currentQuestion.image);
-                        setShowImageModal(true);
-                      }
-                    }}
-                  />
-                </div>
-              )}
-
             {/* Table */}
             {currentQuestion.tableData && renderTable(currentQuestion.tableData, 'exam')}
             {currentQuestion.directionsAfterTable ? (
@@ -821,6 +1013,8 @@ export function FullExamFRQ({
                 {currentQuestion.directionsAfterTable}
               </p>
             ) : null}
+
+            {renderQuestionStimulusImage(currentQuestion.image)}
 
             {/* Parts — fixed order A→B→C; one expanded at a time, no reordering */}
             <div className="mt-6">
@@ -1030,27 +1224,6 @@ export function FullExamFRQ({
         </div>
       )}
 
-      {/* Image modal */}
-      {showImageModal && selectedImage && (
-        <div 
-          className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4"
-          onClick={() => setShowImageModal(false)}
-        >
-          <div className="relative max-w-4xl max-h-[90vh]">
-            <img 
-              src={selectedImage.src} 
-              alt="Question" 
-              className="max-w-full max-h-[90vh] object-contain rounded"
-            />
-            <button
-              onClick={e => { e.stopPropagation(); setShowImageModal(false); }}
-              className="absolute top-2 right-2 bg-white rounded-full p-1.5 shadow-lg hover:bg-gray-100"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 } 

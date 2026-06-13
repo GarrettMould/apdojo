@@ -14,11 +14,11 @@ import { getBeltProgress } from '@/lib/beltSystem';
 import { getSubjectXP } from '@/hooks/useUserProgress';
 import { getSubjectSlug, getUnitSlug } from '@/lib/practiceSlugs';
 import type { CourseSubject } from '@/lib/courseSubject';
-import { isCourseSubject } from '@/lib/courseSubject';
+import { isCourseSubject, isGovMcqPracticeUnitAvailable } from '@/lib/courseSubject';
 import Image from 'next/image';
 
 function isGovPracticeUnitAvailable(unitNumber: number): boolean {
-  return unitNumber === 1;
+  return isGovMcqPracticeUnitAvailable(unitNumber);
 }
 
 function SelectPracticeUnitsContent() {
@@ -218,7 +218,7 @@ function SelectPracticeUnitsContent() {
 
           {isGov ? (
             <p className="mb-4 rounded-lg border border-violet-200 bg-violet-50 px-3 py-2 text-sm font-semibold text-violet-900">
-              Unit 1 MCQ practice is live. More units are coming soon—other units are shown but not selectable yet.
+              Units 1–3 and 5 MCQ practice are live. Unit 4 is coming soon.
             </p>
           ) : null}
 

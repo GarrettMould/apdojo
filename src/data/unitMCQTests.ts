@@ -1,8 +1,13 @@
 import { Question as QuestionType } from '@/data/questionBanks/types';
 import { getUnitTestQuestions } from './unitTestQuestions';
 import { getGovUnitMcqTestQuestions } from '@/data/gov/govUnitMcqTests';
+import { getStatsUnitMcqTestQuestions } from '@/data/stats/statsUnitMcqTests';
 
-export type UnitMcqApSubject = 'ap_macroeconomics' | 'ap_microeconomics' | 'ap_us_government';
+export type UnitMcqApSubject =
+  | 'ap_macroeconomics'
+  | 'ap_microeconomics'
+  | 'ap_us_government'
+  | 'ap_statistics';
 
 // Function to get unit test questions for each unit
 // Using dedicated unit test questions to ensure uniqueness
@@ -39,6 +44,9 @@ export const getUnitMCQTest = (
 ): QuestionType[] => {
   if (subject === 'ap_us_government') {
     return getGovUnitMcqTestQuestions(unitNumber);
+  }
+  if (subject === 'ap_statistics') {
+    return getStatsUnitMcqTestQuestions(unitNumber);
   }
   // If subject is provided, filter directly from the source
   if (subject === 'ap_macroeconomics' || subject === 'ap_microeconomics') {

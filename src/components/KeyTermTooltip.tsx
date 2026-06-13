@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { KeyTerm } from '@/data/apMicroTerms';
 import { keyTerms as allMacroTerms } from '@/data/apMacroTerms';
 import { keyTerms as allMicroTerms } from '@/data/apMicroTerms';
+import { processMathContent } from '@/utils/processMathContent';
 
 interface KeyTermTooltipProps {
   term: KeyTerm;
@@ -194,7 +195,7 @@ export function KeyTermTooltip({ term, children }: KeyTermTooltipProps) {
           <div className="text-sm pr-6">
             <h4 className="font-bold text-gray-900 mb-3 text-base">{term.term}</h4>
             <div className="mb-4">
-              <p className="text-gray-700 leading-relaxed">{term.definition}</p>
+              <p className="text-gray-700 leading-relaxed">{processMathContent(term.definition)}</p>
             </div>
             
             {/* Related Topics */}

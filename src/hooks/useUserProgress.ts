@@ -20,6 +20,9 @@ export function getSubjectXP(user: UserData | null, subject: CourseSubject): num
   if (subject === 'gov') {
     return user.xp_gov ?? 0;
   }
+  if (subject === 'stats') {
+    return user.xp_stats ?? 0;
+  }
   return user.xp_macro !== undefined ? user.xp_macro : (user.totalXP ?? 0);
 }
 

@@ -29,7 +29,7 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
   const isUnitTestPreviewPage = pathname?.startsWith('/unit-test-preview');
   const isUnitMCQTestPage =
     pathname?.startsWith('/unit-mcq-test') ||
-    pathname?.match(/^\/ap-(macro|micro|gov)-unit-\d+-mcq-test/);
+    pathname?.match(/^\/ap-(macro|micro|gov|stats)-unit-\d+-mcq-test/);
   const isUnitFrqPackPage = pathname?.startsWith('/unit-frq-pack');
   const isFullMCQExamPage = pathname?.startsWith('/preview/') || pathname?.match(/^\/ap-(macro|micro)-mcq-practice-test-\d+/) || pathname?.startsWith('/full-mcq-exam-preview') || pathname?.match(/^\/ap-(macro|micro)-frq-practice-test-\d+/);
   const isCustomExamPage = pathname?.startsWith('/exam/custom');
