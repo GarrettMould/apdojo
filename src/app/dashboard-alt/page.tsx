@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import Link from 'next/link';
 import { FileText, BookOpen, Pencil, PlayCircle, ArrowRight } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
@@ -159,7 +159,15 @@ function AlternativeDashboardContent() {
 export default function AlternativeDashboard() {
   return (
     <CourseProvider>
-      <AlternativeDashboardContent />
+      <Suspense
+        fallback={
+          <div className="min-h-screen flex items-center justify-center bg-gray-50">
+            <p className="text-gray-600">Loading dashboard…</p>
+          </div>
+        }
+      >
+        <AlternativeDashboardContent />
+      </Suspense>
     </CourseProvider>
   );
 }
