@@ -13,6 +13,7 @@ import { keyTerms as apMacroTerms } from '@/data/apMacroTerms';
 import { keyTerms as apMicroTerms } from '@/data/apMicroTerms';
 import { keyTerms as apGovTerms, govUnitSupremeCourtCases } from '@/data/apGovTerms';
 import { keyTerms as apStatsTerms } from '@/data/apStatsTerms';
+import { getStatsUnitCheatSheetVideos } from '@/data/stats/statsUnitVideos';
 import { unit1Whiteboards, apMacroUnit2Whiteboards, apMacroUnit3Whiteboards, apMacroUnit4Whiteboards, apMacroUnit5Whiteboards, apMicroUnit3Whiteboards, apMicroUnit4Whiteboards, apMicroUnit5Whiteboards, apMicroUnit6Whiteboards, Whiteboard } from '@/data/whiteboards';
 import { microLessons, macroLessons } from '@/data/lessons';
 import { videos, Video } from '@/data/videos';
@@ -2356,6 +2357,52 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
             </div>
           </div>
         )}
+
+        {selectedSubject === 'stats' && (() => {
+          const unitVideos = getStatsUnitCheatSheetVideos(activeUnitNum);
+          const firstVideo = unitVideos[0];
+          const secondVideo = unitVideos[1];
+          if (!firstVideo && !secondVideo) return null;
+          return (
+            <section className="mb-10">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Video Lessons</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <article className="overflow-hidden rounded-xl border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                  {firstVideo ? (
+                    <div className="relative aspect-video w-full overflow-hidden bg-black">
+                      <video
+                        src={firstVideo.videoUrl}
+                        controls
+                        playsInline
+                        className="h-full w-full"
+                      >
+                        Your browser does not support the video tag.
+                      </video>
+                    </div>
+                  ) : (
+                    <div className="aspect-video w-full bg-gray-50" aria-hidden />
+                  )}
+                </article>
+                <article className="overflow-hidden rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.08)]">
+                  {secondVideo ? (
+                    <div className="relative aspect-video w-full overflow-hidden bg-black">
+                      <video
+                        src={secondVideo.videoUrl}
+                        controls
+                        playsInline
+                        className="h-full w-full"
+                      >
+                        Your browser does not support the video tag.
+                      </video>
+                    </div>
+                  ) : (
+                    <div className="aspect-video w-full" aria-hidden />
+                  )}
+                </article>
+              </div>
+            </section>
+          );
+        })()}
 
         {/* Unit flashcards — feature preview + shuffle entry */}
         {SHOW_DEEP_DIVE_AND_SHUFFLE && (() => {

@@ -6,7 +6,12 @@ import { PlayCircle, Clock, PauseCircle, PenLine, EyeOff, RotateCcw } from 'luci
 import Image from 'next/image';
 import { macroUnits, microUnits, govUnits, statsUnits } from '@/data/cheatSheets';
 import { getUnitMCQTestUrl, getUnitFrqPackUrl, getUnitFinalPracticeTestsUrl } from '@/lib/utils';
-import { getUnitTestMeta, formatTestTime } from '@/data/unitTestMeta';
+import {
+  getUnitTestMeta,
+  formatTestTime,
+  getFrqSecondsPerQuestion,
+  unitFrqTimeLimitSeconds,
+} from '@/data/unitTestMeta';
 import { getGovUnitStimulusFrqs } from '@/data/gov/govUnitStimulusFrqs';
 import { getStatsUnitStimulusFrqs } from '@/data/stats/statsUnitStimulusFrqs';
 import { useAuthContext } from '@/contexts/AuthContext';
@@ -41,14 +46,17 @@ const TOOLS = [
 ];
 
 /** College Board–style directions for the unit FRQ pack preview (timing scales with question count). */
-function govFrqPackDirectionsParagraph(questionCount: number, totalSeconds: number): string {
+function frqPackDirectionsParagraph(
+  questionCount: number,
+  totalSeconds: number,
+  secondsPerQuestion: number
+): string {
   const totalMin = Math.max(1, Math.round(totalSeconds / 60));
   const n = questionCount;
-  const minutes = Array.from({ length: n }, (_, i) => {
-    const base = Math.floor(totalMin / n);
-    const rem = totalMin - base * n;
-    return i === n - 1 ? base + rem : base;
-  });
+  const perQuestionMin = secondsPerQuestion / 60;
+  const perQuestionLabel = Number.isInteger(perQuestionMin)
+    ? `${perQuestionMin} minute${perQuestionMin === 1 ? '' : 's'}`
+    : `${perQuestionMin} minutes`;
   const qPhrase =
     n === 1 ? 'the following question' : n === 2 ? 'both of the following questions' : `all ${n} of the following questions`;
   const allPartsPhrase =
@@ -59,15 +67,8 @@ function govFrqPackDirectionsParagraph(questionCount: number, totalSeconds: numb
     pacing = '';
   } else if (n === 1) {
     pacing = 'It is suggested that you use this time for that question.';
-  } else if (minutes.length > 0 && minutes.every((m) => m === minutes[0])) {
-    const per = minutes[0];
-    pacing = `It is suggested that you spend approximately ${per} minute${per === 1 ? '' : 's'} on each question.`;
-  } else {
-    const segments = minutes.map((m, i) => `approximately ${m} minute${m === 1 ? '' : 's'} on Question ${i + 1}`);
-    pacing =
-      n === 2
-        ? `It is suggested that you spend ${segments[0]} and ${segments[1]}.`
-        : `It is suggested that you spend ${segments.slice(0, -1).join(', ')}, and ${segments[n - 1]}.`;
+  } else if (n > 1) {
+    pacing = `It is suggested that you spend approximately ${perQuestionLabel} on each question.`;
   }
 
   return `You have approximately ${totalMin} minutes to answer ${qPhrase}. ${pacing} Unless directions indicate otherwise, respond to ${allPartsPhrase}. In your response, use substantive examples where appropriate. It is recommended that you take a few minutes to plan each answer. You may plan your answers using the optional on-screen notes available during the session; no credit is given for planning or scratch work alone. You may move between questions freely. The timer reflects a suggested pace for practice; pause or hide it when you need additional focus. After you submit, you can review scoring guidance for each item.`;
@@ -242,9 +243,13 @@ function UnitTestPreviewContent() {
   const mcqQuestionCount = meta?.questionCount ?? 15;
   const mcqTimeLabel = meta ? formatTestTime(meta.timeLimitSeconds) : '—';
 
-  /** FRQ pack pacing: Gov 60 min; Stats 40 min for 2 questions. */
+  const frqSubject = isStats ? 'stats' : isGov ? 'gov' : null;
   const frqSuggestedSeconds =
-    isStats && isFrqPreview ? 40 * 60 : isGov && isFrqPreview ? 60 * 60 : 60 * 60;
+    isFrqPreview && frqSubject
+      ? unitFrqTimeLimitSeconds(frqPackCount, frqSubject)
+      : 60 * 60;
+  const frqSecondsPerQuestion =
+    frqSubject && frqPackCount > 0 ? getFrqSecondsPerQuestion(frqSubject) : 0;
   const questionCount = isFrqPreview ? frqPackCount : mcqQuestionCount;
   const timeLabel = isFrqPreview ? formatTestTime(frqSuggestedSeconds) : mcqTimeLabel;
 
@@ -349,7 +354,7 @@ function UnitTestPreviewContent() {
             <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-4">Before you begin</p>
             {isFrqPreview ? (
               <p className="text-sm text-gray-600 leading-relaxed">
-                {govFrqPackDirectionsParagraph(questionCount, frqSuggestedSeconds)}
+                {frqPackDirectionsParagraph(questionCount, frqSuggestedSeconds, frqSecondsPerQuestion)}
               </p>
             ) : (
               <ul className="space-y-2.5">

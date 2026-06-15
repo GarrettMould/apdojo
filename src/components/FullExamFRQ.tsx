@@ -20,6 +20,7 @@ import {
 import { AnimatePresence, motion } from 'framer-motion';
 import Image, { StaticImageData } from 'next/image';
 import { useRouter } from 'next/navigation';
+import { unitFrqTimeLimitSeconds } from '@/data/unitTestMeta';
 
 interface TableData {
   title?: string;
@@ -89,10 +90,8 @@ interface FullExamFRQProps {
   hideExpandingQuestionNav?: boolean;
 }
 
-/** Macro/Micro FRQ practice sessions default; Gov unit FRQ pack uses AP Gov Section II–style pacing. */
+/** Macro/Micro FRQ practice sessions default. */
 const DEFAULT_FRQ_TOTAL_SECONDS = 50 * 60;
-const GOV_UNIT_FRQ_PACK_TOTAL_SECONDS = 60 * 60;
-const STATS_UNIT_FRQ_PACK_TOTAL_SECONDS = 40 * 60;
 
 function frqImageSrc(image: StaticImageData | FrqImageRef): string {
   return image.src;
@@ -132,11 +131,9 @@ export function FullExamFRQ({
 }: FullExamFRQProps) {
   const router = useRouter();
   const frqSessionTotalSeconds =
-    examType === 'gov'
-      ? GOV_UNIT_FRQ_PACK_TOTAL_SECONDS
-      : examType === 'stats'
-        ? STATS_UNIT_FRQ_PACK_TOTAL_SECONDS
-        : DEFAULT_FRQ_TOTAL_SECONDS;
+    examType === 'gov' || examType === 'stats'
+      ? unitFrqTimeLimitSeconds(questions.questions.length, examType)
+      : DEFAULT_FRQ_TOTAL_SECONDS;
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [textAnswers, setTextAnswers] = useState<Record<string, string>>({});
   const [drawingAnswers, setDrawingAnswers] = useState<Record<string, string>>({});
@@ -145,7 +142,6 @@ export function FullExamFRQ({
   const [timeRemaining, setTimeRemaining] = useState(frqSessionTotalSeconds);
   const [showTimer, setShowTimer] = useState(true);
   const [questionFontSize, setQuestionFontSize] = useState(1);
-  const [savedDrawingKeys, setSavedDrawingKeys] = useState<Set<string>>(new Set());
   const [showScratchPanel, setShowScratchPanel] = useState(false);
   const [scratchTab, setScratchTab] = useState<'draw' | 'text'>('draw');
   const [scratchNotes, setScratchNotes] = useState('');
@@ -232,15 +228,6 @@ export function FullExamFRQ({
 
   const handleDrawingAnswer = (key: string, data: string) => {
     setDrawingAnswers(prev => ({ ...prev, [key]: data }));
-    setSavedDrawingKeys(prev => new Set(prev).add(key));
-  };
-
-  const unlockDrawing = (key: string) => {
-    setSavedDrawingKeys(prev => {
-      const next = new Set(prev);
-      next.delete(key);
-      return next;
-    });
   };
 
   const goToNext = () => {
@@ -472,28 +459,17 @@ export function FullExamFRQ({
                   ) : null}
                   {(() => {
                     const drawKey = `${currentQuestionIndex}-${part.label}-draw`;
-                    const isLocked = savedDrawingKeys.has(drawKey);
                     const drawH = largeText ? 'min-h-[min(48vh,420px)]' : 'h-[400px]';
                     return (
                       <div className={`${drawH} relative border-2 border-gray-300 rounded-lg overflow-hidden`}>
                         <DrawingPad
+                          key={drawKey}
                           isLarge={true}
                           className="w-full relative"
                           hideDoneButton
                           initialData={drawingAnswers[drawKey]}
                           onSave={(data) => handleDrawingAnswer(drawKey, data)}
                         />
-                        {isLocked && (
-                          <div className="absolute inset-0 bg-white/70 backdrop-blur-[2px] flex flex-col items-center justify-center gap-3 z-20">
-                            <div className="flex items-center gap-2 bg-white border border-gray-200 shadow-sm rounded-full px-4 py-2">
-                              <svg className="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                              <span className="text-sm font-bold text-gray-700">Drawing saved</span>
-                            </div>
-                            <button type="button" onClick={() => unlockDrawing(drawKey)} className="text-xs font-semibold text-gray-400 hover:text-gray-600 underline transition-colors">
-                              Edit drawing
-                            </button>
-                          </div>
-                        )}
                       </div>
                     );
                   })()}
@@ -503,28 +479,17 @@ export function FullExamFRQ({
           ) : part.answerType === 'draw' ? (
             (() => {
               const drawKey = `${currentQuestionIndex}-${part.label}`;
-              const isLocked = savedDrawingKeys.has(drawKey);
               const drawH = largeText ? 'min-h-[min(48vh,420px)]' : 'h-[400px]';
               return (
                 <div className={`${drawH} relative border-2 border-gray-300 rounded-lg overflow-hidden`}>
                   <DrawingPad
+                    key={drawKey}
                     isLarge={true}
                     className="w-full relative"
                     hideDoneButton
                     initialData={drawingAnswers[drawKey]}
                     onSave={(data) => handleDrawingAnswer(drawKey, data)}
                   />
-                  {isLocked && (
-                    <div className="absolute inset-0 bg-white/70 backdrop-blur-[2px] flex flex-col items-center justify-center gap-3 z-20">
-                      <div className="flex items-center gap-2 bg-white border border-gray-200 shadow-sm rounded-full px-4 py-2">
-                        <svg className="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                        <span className="text-sm font-bold text-gray-700">Drawing saved</span>
-                      </div>
-                      <button type="button" onClick={() => unlockDrawing(drawKey)} className="text-xs font-semibold text-gray-400 hover:text-gray-600 underline transition-colors">
-                        Edit drawing
-                      </button>
-                    </div>
-                  )}
                 </div>
               );
             })()
@@ -567,27 +532,16 @@ export function FullExamFRQ({
                   ) : subpart.answerType === 'draw' ? (
                     (() => {
                       const drawKey = `${currentQuestionIndex}-${part.label}-${subpart.label}`;
-                      const isLocked = savedDrawingKeys.has(drawKey);
                       return (
                         <div className="h-[400px] relative border-2 border-gray-300 rounded overflow-hidden">
                           <DrawingPad
+                            key={drawKey}
                             isLarge={true}
                             className="w-full relative"
                             hideDoneButton
                             onSave={(data) => handleDrawingAnswer(drawKey, data)}
                             initialData={drawingAnswers[drawKey]}
                           />
-                          {isLocked && (
-                            <div className="absolute inset-0 bg-white/70 backdrop-blur-[2px] flex flex-col items-center justify-center gap-3 z-20">
-                              <div className="flex items-center gap-2 bg-white border border-gray-200 shadow-sm rounded-full px-4 py-2">
-                                <svg className="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                                <span className="text-sm font-bold text-gray-700">Drawing saved</span>
-                              </div>
-                              <button type="button" onClick={() => unlockDrawing(drawKey)} className="text-xs font-semibold text-gray-400 hover:text-gray-600 underline transition-colors">
-                                Edit drawing
-                              </button>
-                            </div>
-                          )}
                         </div>
                       );
                     })()

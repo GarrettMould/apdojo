@@ -63,10 +63,14 @@ export function Header() {
 
   const mobilePracticeLinks: { label: string; href: string; prefetch?: boolean }[] = [
     { label: 'MCQ Practice', href: mcqPracticeHref },
-    {
-      label: 'FRQ Practice',
-      href: `/unitFRQpracticePage?subject=${displaySubject}&frqId=${displaySubject === 'macro' ? 1 : displaySubject === 'micro' ? 2 : 1}`,
-    },
+    ...(displaySubject !== 'stats'
+      ? [
+          {
+            label: 'FRQ Practice',
+            href: `/unitFRQpracticePage?subject=${displaySubject}&frqId=${displaySubject === 'macro' ? 1 : displaySubject === 'micro' ? 2 : 1}`,
+          },
+        ]
+      : []),
     { label: 'Create a Quiz', href: '/dojo/infinite' },
     ...(isEconCourse(displaySubject)
       ? [
@@ -213,13 +217,15 @@ export function Header() {
                       >
                         MCQ Practice
                       </Link>
-                      <Link
-                        href={`/unitFRQpracticePage?subject=${displaySubject}&frqId=${displaySubject === 'macro' ? 1 : 2}`}
-                        className="block px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
-                        onClick={() => setIsPracticeDropdownOpen(false)}
-                      >
-                        FRQ Practice
-                      </Link>
+                      {displaySubject !== 'stats' ? (
+                        <Link
+                          href={`/unitFRQpracticePage?subject=${displaySubject}&frqId=${displaySubject === 'macro' ? 1 : 2}`}
+                          className="block px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                          onClick={() => setIsPracticeDropdownOpen(false)}
+                        >
+                          FRQ Practice
+                        </Link>
+                      ) : null}
                       <Link
                         href="/dojo/infinite"
                         className="block px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"

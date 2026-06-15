@@ -21,6 +21,22 @@ export const STATS_UNIT_MCQ_SECONDS_PER_QUESTION = 129;
 /** ceil(87.27s) — AP Gov unit MCQ pacing. */
 export const GOV_UNIT_MCQ_SECONDS_PER_QUESTION = 88;
 
+/** AP Stats Section II investigative task pacing: 22.5 min per FRQ. */
+export const STATS_FRQ_SECONDS_PER_QUESTION = 22.5 * 60;
+
+/** AP Gov Section II FRQ pacing: 20 min per FRQ (argumentative essay is longer; none in unit packs). */
+export const GOV_FRQ_SECONDS_PER_QUESTION = 20 * 60;
+
+/** Per-question FRQ pacing for unit FRQ packs. */
+export function getFrqSecondsPerQuestion(subject: 'gov' | 'stats'): number {
+  return subject === 'stats' ? STATS_FRQ_SECONDS_PER_QUESTION : GOV_FRQ_SECONDS_PER_QUESTION;
+}
+
+/** Total seconds for a unit FRQ pack: question count × per-question pacing. */
+export function unitFrqTimeLimitSeconds(questionCount: number, subject: 'gov' | 'stats'): number {
+  return questionCount * getFrqSecondsPerQuestion(subject);
+}
+
 /** Total seconds for a unit MCQ test: (Q × sec/Q), rounded up to the nearest whole minute. */
 export function unitMcqTimeLimitSeconds(questionCount: number, secondsPerQuestion: number): number {
   const rawSeconds = questionCount * secondsPerQuestion;
@@ -54,7 +70,8 @@ function statsUnitMeta(unit: number, questionCount: number): UnitTestMeta {
 /**
  * Official time limits and question counts for each unit test.
  * Econ (Macro/Micro): 70s/Q (60 Q in 70 min), total rounded up to whole minutes.
- * Gov/Stats: fixed sec/Q rates, total rounded up to whole minutes.
+ * Gov/Stats MCQ: fixed sec/Q rates, total rounded up to whole minutes.
+ * Gov/Stats FRQ packs: 20 min/FRQ (Gov) and 22.5 min/FRQ (Stats).
  */
 export const UNIT_TEST_META: SubjectTestMeta = {
   macro: [

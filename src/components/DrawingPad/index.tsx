@@ -45,6 +45,8 @@ export function DrawingPad({
 }: DrawingPadProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const flushDrawingRef = useRef(() => {});
+  /** Skip re-init when parent echoes back data we just emitted via onSave. */
+  const skipNextInitialDataSyncRef = useRef(false);
   const [isDrawing, setIsDrawing] = useState(false);
   const [isEraser, setIsEraser] = useState(false);
   const [penColor, setPenColor] = useState('#000000');
@@ -98,11 +100,17 @@ export function DrawingPad({
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     setStickers([]);
     setLines([]);
+    skipNextInitialDataSyncRef.current = true;
     onSave('');
   };
 
   // Effect to handle initialData and templateImageUrl changes
   useEffect(() => {
+    if (skipNextInitialDataSyncRef.current) {
+      skipNextInitialDataSyncRef.current = false;
+      return;
+    }
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -128,11 +136,8 @@ export function DrawingPad({
           const img = new Image();
           img.onload = () => {
             ctx.drawImage(img, 0, 0);
-            onSave(canvas.toDataURL());
           };
           img.src = initialData;
-        } else {
-          onSave(canvas.toDataURL());
         }
       };
       templateImg.onerror = () => {
@@ -142,7 +147,6 @@ export function DrawingPad({
           const img = new Image();
           img.onload = () => {
             ctx.drawImage(img, 0, 0);
-            onSave(canvas.toDataURL());
           };
           img.src = initialData;
         }
@@ -153,7 +157,6 @@ export function DrawingPad({
       const img = new Image();
       img.onload = () => {
         ctx.drawImage(img, 0, 0);
-        onSave(canvas.toDataURL());
       };
       img.src = initialData;
     }
@@ -469,8 +472,10 @@ export function DrawingPad({
         stickers: stickers,
         lines: lines
       };
+      skipNextInitialDataSyncRef.current = true;
       onSave(JSON.stringify(structuredData));
     } else {
+      skipNextInitialDataSyncRef.current = true;
       onSave(imageData);
     }
   };
@@ -606,6 +611,7 @@ export function DrawingPad({
             ctx.putImageData(previous, 0, 0);
             try {
               const imageData = canvas.toDataURL();
+              skipNextInitialDataSyncRef.current = true;
               onSave(imageData);
             } catch {
               // Ignore save errors on undo

@@ -17,6 +17,7 @@ import { loadTestProgress } from '@/lib/testProgress';
 import { getUnitMCQTest } from '@/data/unitMCQTests';
 import { getGovUnitStimulusFrqs, getGovUnitFrqFormatLabels } from '@/data/gov/govUnitStimulusFrqs';
 import { getStatsUnitStimulusFrqs, getStatsUnitFrqFormatLabels } from '@/data/stats/statsUnitStimulusFrqs';
+import { isStatsFrqTestUnitAvailable } from '@/lib/courseSubject';
 import { hasAdminRole } from '@/lib/adminAccess';
 import { isGovMcqTestUnitAvailable, isStatsMcqTestUnitAvailable } from '@/lib/courseSubject';
 
@@ -385,7 +386,9 @@ function UnitFinalPracticeTestsContent() {
                 ? 'border-2 border-orange-800 bg-orange-600 text-white shadow-[0_3px_0_0_rgba(17,24,39,0.9)] hover:bg-orange-700 active:translate-y-0.5 active:shadow-[0_1px_0_0_rgba(17,24,39,0.85)]'
                 : 'border-2 border-violet-800 bg-violet-600 text-white shadow-[0_3px_0_0_rgba(17,24,39,0.9)] hover:bg-violet-700 active:translate-y-0.5 active:shadow-[0_1px_0_0_rgba(17,24,39,0.85)]';
               const showFrqPackCard = (isGov && unitStimulusFrqs.length > 0) || isStats;
-              const frqPackAvailable = isGov && unitStimulusFrqs.length > 0;
+              const frqPackAvailable =
+                (isGov && unitStimulusFrqs.length > 0) ||
+                (isStats && unitStimulusFrqs.length > 0 && isStatsFrqTestUnitAvailable(unit.number));
 
               return (
                 <div key={unit.number} className="flex h-full flex-col gap-3">

@@ -2528,6 +2528,21 @@ export const videos: Video[] = [
         accessLevel: "free",
         questions: [],
       },
+      {
+        id: "stats-u1-vid1",
+        title: "1.6 & 1.9 - Describing and Comparing Distributions",
+        description:
+          "Learn how to describe one quantitative variable distributions and compare distributions across groups.",
+        videoSlug: "stats-u1-describing-comparing-distributions",
+        subjects: ["AP Statistics"],
+        unit: "1",
+        lessonIDS: ["1.6", "1.9"],
+        tags: ["Distributions", "Unit 1", "Describing Data", "Comparing Distributions"],
+        videoUrl:
+          "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/stats/unit_1/stats_u1_vid1.mp4",
+        accessLevel: "free",
+        questions: [],
+      },
 
       
   ];

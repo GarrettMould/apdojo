@@ -7,8 +7,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useCourseContext } from '@/contexts/CourseContext';
-import { CourseToggle } from '@/components/CourseToggle';
-import { useSubjectSwitchNavigation } from '@/hooks/useSubjectSwitchNavigation';
 import { dojoDrills, drillAppliesToSubject, getDrillUnitForSubject } from '@/data/dojoDrills';
 import { frqExams } from '@/data/frqQuestions';
 import { loadDojoDrillProgress, getDrillProgress, DojoDrillProgress } from '@/lib/dojoDrillProgress';
@@ -63,7 +61,6 @@ const cardHoverVariants = {
 
 export function DojoDashboard() {
   const { user, userData, selectedSubject } = useAuthContext();
-  const handleSubjectSwitch = useSubjectSwitchNavigation();
   const { currentCourse } = useCourseContext();
   const [drillProgress, setDrillProgress] = useState<DojoDrillProgress | null>(null);
   const [loadingProgress, setLoadingProgress] = useState(true);
@@ -561,30 +558,14 @@ export function DojoDashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Subject Toggle - Mobile Only (visible on small screens) */}
-        <div className="mb-4 md:hidden">
-          <CourseToggle
-            activeTab={selectedSubject}
-            onToggle={(s) => void handleSubjectSwitch(s, selectedSubject)}
-          />
-        </div>
-        {/* Header + desktop subject toggle */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
-          className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between"
+          className="mb-8"
         >
-                        <div>
-            <h1 className="text-4xl sm:text-5xl font-black text-gray-900 mb-2">Your Library</h1>
-            <p className="text-lg text-gray-600 font-medium">Continue learning with your saved content</p>
-                        </div>
-          <div className="hidden md:block shrink-0">
-                    <CourseToggle
-            activeTab={selectedSubject}
-            onToggle={(s) => void handleSubjectSwitch(s, selectedSubject)}
-          />
-          </div>
+          <h1 className="text-4xl sm:text-5xl font-black text-gray-900 mb-2">Your Library</h1>
+          <p className="text-lg text-gray-600 font-medium">Continue learning with your saved content</p>
         </motion.div>
 
         <AnimatePresence mode="wait">
