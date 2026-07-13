@@ -30,7 +30,21 @@ interface DrawingPadProps {
   submitButtonVariant?: 'default' | 'greenMini';
   /** Hide the Done control; persists to onSave automatically after strokes and text blur */
   hideDoneButton?: boolean;
+  /** Pen color swatches; defaults include grays for chart shading */
+  penColors?: string[];
 }
+
+const DEFAULT_PEN_COLORS = [
+  '#000000',
+  '#374151',
+  '#6B7280',
+  '#9CA3AF',
+  '#D1D5DB',
+  '#E5E7EB',
+  '#FF0000',
+  '#0000FF',
+  '#008000',
+];
 
 export function DrawingPad({ 
   isLarge = false, 
@@ -42,11 +56,19 @@ export function DrawingPad({
   templateImageUrl,
   submitButtonVariant = 'default',
   hideDoneButton = false,
+  penColors = DEFAULT_PEN_COLORS,
 }: DrawingPadProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const templateImgRef = useRef<HTMLImageElement>(null);
   const flushDrawingRef = useRef(() => {});
   /** Skip re-init when parent echoes back data we just emitted via onSave. */
   const skipNextInitialDataSyncRef = useRef(false);
+  const useTemplateLayer = Boolean(templateImageUrl);
+  const penLineWidth = useTemplateLayer ? 10 : 3.5;
+  const [showTemplateBackground, setShowTemplateBackground] = useState(
+    Boolean(templateImageUrl && !initialData),
+  );
   const [isDrawing, setIsDrawing] = useState(false);
   const [isEraser, setIsEraser] = useState(false);
   const [penColor, setPenColor] = useState('#000000');
@@ -69,6 +91,67 @@ export function DrawingPad({
   // Undo history for canvas states
   const historyRef = useRef<ImageData[]>([]);
   const MAX_HISTORY = 20;
+
+  const syncCanvasSize = () => {
+    const container = containerRef.current;
+    const canvas = canvasRef.current;
+    if (!container || !canvas) return;
+
+    const width = Math.max(container.clientWidth, isLarge ? 600 : 300);
+    const height = Math.max(container.clientHeight, isLarge ? 400 : 200);
+    if (canvas.width !== width || canvas.height !== height) {
+      canvas.width = width;
+      canvas.height = height;
+    }
+  };
+
+  const clearStrokeLayer = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  };
+
+  const drawInitialData = (
+    ctx: CanvasRenderingContext2D,
+    canvas: HTMLCanvasElement,
+    data: string,
+  ) => {
+    const img = new Image();
+    img.onload = () => {
+      if (useTemplateLayer) {
+        clearStrokeLayer(ctx, canvas);
+      } else {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    };
+    img.src = data;
+  };
+
+  const getExportDataUrl = (): string | null => {
+    const canvas = canvasRef.current;
+    if (!canvas) return null;
+
+    const templateImg = templateImgRef.current;
+    if (useTemplateLayer && templateImg?.complete && templateImg.naturalWidth > 0) {
+      const offscreen = document.createElement('canvas');
+      offscreen.width = canvas.width;
+      offscreen.height = canvas.height;
+      const offCtx = offscreen.getContext('2d');
+      if (!offCtx) return null;
+      offCtx.drawImage(templateImg, 0, 0, offscreen.width, offscreen.height);
+      offCtx.drawImage(canvas, 0, 0);
+      return offscreen.toDataURL();
+    }
+
+    return canvas.toDataURL();
+  };
+
+  const exportCanvasData = () => {
+    const imageData = getExportDataUrl();
+    if (!imageData) return;
+    skipNextInitialDataSyncRef.current = true;
+    onSave(imageData);
+  };
 
   const saveHistory = () => {
     const canvas = canvasRef.current;
@@ -96,6 +179,14 @@ export function DrawingPad({
     // Save state before clearing for undo
     saveHistory();
 
+    if (useTemplateLayer) {
+      clearStrokeLayer(ctx, canvas);
+      setStickers([]);
+      setLines([]);
+      exportCanvasData();
+      return;
+    }
+
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     setStickers([]);
@@ -103,6 +194,18 @@ export function DrawingPad({
     skipNextInitialDataSyncRef.current = true;
     onSave('');
   };
+
+  useEffect(() => {
+    syncCanvasSize();
+    const container = containerRef.current;
+    if (!container) return;
+
+    const observer = new ResizeObserver(() => {
+      syncCanvasSize();
+    });
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [isLarge]);
 
   // Effect to handle initialData and templateImageUrl changes
   useEffect(() => {
@@ -117,50 +220,27 @@ export function DrawingPad({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Reset undo history when reinitializing
+    syncCanvasSize();
     historyRef.current = [];
 
-    // Clear the canvas first
+    if (useTemplateLayer) {
+      if (initialData) {
+        setShowTemplateBackground(false);
+        drawInitialData(ctx, canvas, initialData);
+      } else {
+        setShowTemplateBackground(true);
+        clearStrokeLayer(ctx, canvas);
+      }
+      return;
+    }
+
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Load template image first as background (if provided)
-    if (templateImageUrl) {
-      const templateImg = new Image();
-      templateImg.crossOrigin = 'anonymous';
-      templateImg.onload = () => {
-        // Draw template as background
-        ctx.drawImage(templateImg, 0, 0, canvas.width, canvas.height);
-        // Then draw initialData on top if it exists
-        if (initialData) {
-          const img = new Image();
-          img.onload = () => {
-            ctx.drawImage(img, 0, 0);
-          };
-          img.src = initialData;
-        }
-      };
-      templateImg.onerror = () => {
-        console.error('Failed to load template image:', templateImageUrl);
-        // If template fails, still try to load initialData
-        if (initialData) {
-          const img = new Image();
-          img.onload = () => {
-            ctx.drawImage(img, 0, 0);
-          };
-          img.src = initialData;
-        }
-      };
-      templateImg.src = templateImageUrl;
-    } else if (initialData) {
-      // If there's no template but there's initialData, draw it
-      const img = new Image();
-      img.onload = () => {
-        ctx.drawImage(img, 0, 0);
-      };
-      img.src = initialData;
+    if (initialData) {
+      drawInitialData(ctx, canvas, initialData);
     }
-  }, [initialData, templateImageUrl, isLarge]);
+  }, [initialData, templateImageUrl, isLarge, useTemplateLayer]);
 
   const isVertical = (line: Line): boolean => {
     const dx = Math.abs(line.endX - line.startX);
@@ -297,7 +377,7 @@ export function DrawingPad({
       ctx.moveTo(lineStart.x, lineStart.y);
       ctx.lineTo(x, y);
       ctx.strokeStyle = penColor;
-      ctx.lineWidth = 3.5;
+      ctx.lineWidth = penLineWidth;
       ctx.stroke();
       
       return;
@@ -306,10 +386,18 @@ export function DrawingPad({
     ctx.beginPath();
     ctx.moveTo(lastPos.current.x, lastPos.current.y);
     ctx.lineTo(x, y);
-    ctx.strokeStyle = tool === 'eraser' ? '#ffffff' : penColor;
-    ctx.lineWidth = tool === 'eraser' ? eraserSize : 3.5;
+    if (tool === 'eraser' && useTemplateLayer) {
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.strokeStyle = 'rgba(0,0,0,1)';
+      ctx.lineWidth = eraserSize;
+    } else {
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.strokeStyle = tool === 'eraser' ? '#ffffff' : penColor;
+      ctx.lineWidth = tool === 'eraser' ? eraserSize : penLineWidth;
+    }
     ctx.lineCap = 'round';
     ctx.stroke();
+    ctx.globalCompositeOperation = 'source-over';
 
     lastPos.current = { x, y };
   };
@@ -345,7 +433,7 @@ export function DrawingPad({
       ctx.moveTo(lineStart.x, lineStart.y);
       ctx.lineTo(x, y);
       ctx.strokeStyle = penColor;
-      ctx.lineWidth = 3.5;
+      ctx.lineWidth = penLineWidth;
       ctx.stroke();
 
       // Store line data for grading
@@ -463,19 +551,19 @@ export function DrawingPad({
     });
 
     // Save canvas image
-    const imageData = canvas.toDataURL();
-    
-    // If stickers are enabled, also save structured data
+    const imageData = getExportDataUrl();
+    if (!imageData) return;
+
+    skipNextInitialDataSyncRef.current = true;
     if (enableStickers) {
-      const structuredData = {
-        image: imageData,
-        stickers: stickers,
-        lines: lines
-      };
-      skipNextInitialDataSyncRef.current = true;
-      onSave(JSON.stringify(structuredData));
+      onSave(
+        JSON.stringify({
+          image: imageData,
+          stickers,
+          lines,
+        }),
+      );
     } else {
-      skipNextInitialDataSyncRef.current = true;
       onSave(imageData);
     }
   };
@@ -514,17 +602,18 @@ export function DrawingPad({
   };
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={`flex h-full min-h-[inherit] w-full flex-col ${className}`}>
       {/* Sticker Toolbar */}
       {enableStickers && (
-        <div className="mb-2 p-2 bg-gray-50 border-b border-gray-200 rounded-t-lg">
-          <p className="text-xs text-gray-600 mb-2 font-medium">Drag labels onto your graph:</p>
+        <div className="shrink-0 border-b border-gray-200 bg-gray-50 p-2">
+          <p className="mb-2 text-xs font-medium text-gray-600">Drag labels onto your graph:</p>
           <div className="flex flex-wrap gap-2">
             {stickerLabels.map(label => (
               <button
                 key={label}
+                type="button"
                 onClick={() => addSticker(label)}
-                className="px-3 py-1.5 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors shadow-sm"
+                className="rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:border-gray-400 hover:bg-gray-50"
               >
                 {label}
               </button>
@@ -533,214 +622,261 @@ export function DrawingPad({
         </div>
       )}
 
-      <div className="absolute top-2 left-2 flex gap-2 z-10">
-        <div className="relative group">
+      {/* Drawing tools — outside canvas so clicks are not blocked */}
+      <div className="shrink-0 border-b border-gray-200 bg-white px-2 py-1.5">
+        <div className="flex flex-wrap items-center gap-1.5">
           <button
+            type="button"
             onClick={() => {
               setTool('pen');
               setIsEraser(false);
             }}
-            className={`p-1 rounded ${tool === 'pen' && !isEraser ? 'bg-blue-100' : 'hover:bg-gray-100'}`}
+            className={`rounded p-1.5 ${tool === 'pen' && !isEraser ? 'bg-blue-100' : 'hover:bg-gray-100'}`}
+            title="Pen"
           >
-            <Pen className="w-4 h-4" style={{ color: penColor }} />
+            <Pen className="h-4 w-4" style={{ color: penColor }} />
           </button>
-          {tool === 'pen' && !isEraser && (
-            <div className="absolute left-0 top-full mt-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-100">
-              <div className="pt-2">
-                <div className="bg-white rounded-lg shadow-lg border p-2 flex flex-col gap-2">
-                  {['#000000', '#FF0000', '#0000FF', '#008000'].map((color) => (
-                    <button
-                      key={color}
-                      onClick={() => setPenColor(color)}
-                      className={`w-6 h-6 rounded-full hover:ring-2 hover:ring-offset-2 hover:ring-blue-500 ${
-                        penColor === color ? 'ring-2 ring-offset-2 ring-blue-500' : ''
-                      }`}
-                      style={{ backgroundColor: color }}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-        <button
-          onClick={() => {
-            setTool('line');
-            setIsEraser(false);
-          }}
-          className={`p-1 rounded ${tool === 'line' ? 'bg-blue-100' : 'hover:bg-gray-100'}`}
-        >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <line x1="2" y1="14" x2="14" y2="2" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-          </svg>
-        </button>
-        {!enableStickers && (
-          <button
-            onClick={() => {
-              setTool('text');
-              setIsEraser(false);
-            }}
-            className={`p-1 rounded ${tool === 'text' ? 'bg-blue-100' : 'hover:bg-gray-100'}`}
-          >
-            <Type className="w-4 h-4" />
-          </button>
-        )}
-        <button
-          onClick={() => {
-            setTool('eraser');
-            setIsEraser(true);
-          }}
-          className={`p-1 rounded ${tool === 'eraser' ? 'bg-blue-100' : 'hover:bg-gray-100'}`}
-        >
-          <Eraser className="w-4 h-4" />
-        </button>
-        <button
-          onClick={clearCanvas}
-          className="p-1 rounded hover:bg-gray-100"
-        >
-          <Trash2 className="w-4 h-4" />
-        </button>
-        <button
-          onClick={() => {
-            const canvas = canvasRef.current;
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            if (!ctx) return;
-            const previous = historyRef.current.pop();
-            if (!previous) return;
-            ctx.putImageData(previous, 0, 0);
-            try {
-              const imageData = canvas.toDataURL();
-              skipNextInitialDataSyncRef.current = true;
-              onSave(imageData);
-            } catch {
-              // Ignore save errors on undo
-            }
-          }}
-          className="p-1 rounded hover:bg-gray-100"
-          title="Undo"
-        >
-          <Undo2 className="w-4 h-4" />
-        </button>
-      </div>
-      {!hideDoneButton && (
-        <div className="absolute top-2 right-2 z-10">
           <button
             type="button"
-            onClick={handleSave}
-            className={
-              submitButtonVariant === 'greenMini'
-                ? 'inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black text-white bg-green-500 hover:bg-green-600 rounded-lg border border-green-700 shadow-[0_2px_0_0_rgba(0,0,0,1)] active:translate-y-0.5 active:shadow-[0_1px_0_0_rgba(0,0,0,1)] transition-all'
-                : 'flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors'
-            }
+            onClick={() => {
+              setTool('line');
+              setIsEraser(false);
+            }}
+            className={`rounded p-1.5 ${tool === 'line' ? 'bg-blue-100' : 'hover:bg-gray-100'}`}
+            title="Line"
           >
-            <CheckCircle className="w-4 h-4" />
-            Done
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <line x1="2" y1="14" x2="14" y2="2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
           </button>
-        </div>
-      )}
-      <canvas
-        ref={canvasRef}
-        width={isLarge ? 600 : 300}
-        height={isLarge ? 400 : 200}
-        className="bg-white"
-        style={{ 
-          cursor: tool === 'line' 
-            ? 'crosshair' 
-            : tool === 'eraser' 
-              ? getEraserCursor()
-              : getPenCursor(),
-          touchAction: 'none'
-        }}
-        onMouseDown={startDrawing}
-        onMouseMove={(e) => {
-          handleMouseMove(e);
-          draw(e);
-          handleStickerDrag(e);
-        }}
-        onMouseUp={(e) => {
-          stopDrawing(e);
-          handleStickerDragEnd();
-        }}
-        onMouseLeave={(e) => {
-          setCursorPos(null);
-          stopDrawing(e);
-          handleStickerDragEnd();
-        }}
-        onTouchStart={startDrawing}
-        onTouchMove={draw}
-        onTouchEnd={stopDrawing}
-      />
-      {/* Sticker overlays */}
-      {enableStickers && stickers.map(sticker => (
-        <div
-          key={sticker.id}
-          draggable
-          onMouseDown={(e) => handleStickerDragStart(e, sticker.id)}
-          className="absolute px-2 py-1 bg-blue-100 border-2 border-blue-400 rounded text-sm font-semibold text-blue-800 cursor-move z-30 select-none"
-          style={{
-            left: `${sticker.x}px`,
-            top: `${sticker.y - 20}px`,
-          }}
-        >
-          {sticker.label}
-        </div>
-      ))}
-      {/* Visible cursor indicator */}
-      {cursorPos && (
-        <div
-          className="absolute pointer-events-none z-20"
-          style={{
-            left: `${cursorPos.x}px`,
-            top: `${cursorPos.y}px`,
-            transform: 'translate(-50%, -50%)',
-          }}
-        >
-          <div className={`w-2 h-2 rounded-full ${
-            tool === 'eraser' ? 'bg-white border border-gray-400' : 
-            tool === 'text' ? 'bg-blue-500' : 
-            'bg-black'
-          }`} />
-        </div>
-      )}
-      {/* Text input overlays (only if stickers not enabled) */}
-      {!enableStickers && textElements.map(textEl => {
-        const isEditing = editingTextId === textEl.id;
-        return isEditing ? (
-          <input
-            key={textEl.id}
-            ref={textInputRef}
-            type="text"
-            value={textEl.text}
-            onChange={(e) => handleTextChange(textEl.id, e.target.value)}
-            onBlur={handleTextBlur}
-            onClick={(e) => e.stopPropagation()}
-            onMouseDown={(e) => e.stopPropagation()}
-            className="absolute border-2 border-blue-500 bg-white px-2 py-1 rounded text-sm z-30"
-            style={{
-              left: `${textEl.x}px`,
-              top: `${textEl.y - 20}px`,
+          {!enableStickers && (
+            <button
+              type="button"
+              onClick={() => {
+                setTool('text');
+                setIsEraser(false);
+              }}
+              className={`rounded p-1.5 ${tool === 'text' ? 'bg-blue-100' : 'hover:bg-gray-100'}`}
+              title="Text"
+            >
+              <Type className="h-4 w-4" />
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => {
+              setTool('eraser');
+              setIsEraser(true);
             }}
-            autoFocus
+            className={`rounded p-1.5 ${tool === 'eraser' ? 'bg-blue-100' : 'hover:bg-gray-100'}`}
+            title="Eraser"
+          >
+            <Eraser className="h-4 w-4" />
+          </button>
+          <button type="button" onClick={clearCanvas} className="rounded p-1.5 hover:bg-gray-100" title="Clear">
+            <Trash2 className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              const canvas = canvasRef.current;
+              if (!canvas) return;
+              const ctx = canvas.getContext('2d');
+              if (!ctx) return;
+              const previous = historyRef.current.pop();
+              if (!previous) return;
+              ctx.putImageData(previous, 0, 0);
+              try {
+                exportCanvasData();
+              } catch {
+                // Ignore save errors on undo
+              }
+            }}
+            className="rounded p-1.5 hover:bg-gray-100"
+            title="Undo"
+          >
+            <Undo2 className="h-4 w-4" />
+          </button>
+
+          {!hideDoneButton ? (
+            <div className="ml-auto">
+              <button
+                type="button"
+                onClick={handleSave}
+                className={
+                  submitButtonVariant === 'greenMini'
+                    ? 'inline-flex items-center gap-1.5 rounded-lg border border-green-700 bg-green-500 px-3 py-1.5 text-xs font-black text-white shadow-[0_2px_0_0_rgba(0,0,0,1)] transition-all hover:bg-green-600 active:translate-y-0.5 active:shadow-[0_1px_0_0_rgba(0,0,0,1)]'
+                    : 'flex items-center gap-2 rounded-md bg-green-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-green-700'
+                }
+              >
+                <CheckCircle className="h-4 w-4" />
+                Done
+              </button>
+            </div>
+          ) : null}
+        </div>
+
+        {(tool === 'pen' || tool === 'line' || tool === 'text') && (
+          <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+            <span className="text-xs font-medium text-gray-500">Color:</span>
+            {penColors.map((color) => (
+              <button
+                key={color}
+                type="button"
+                onClick={() => {
+                  setPenColor(color);
+                  if (tool === 'eraser') {
+                    setTool('pen');
+                    setIsEraser(false);
+                  }
+                }}
+                className={`h-6 w-6 rounded-full border border-gray-300 hover:ring-2 hover:ring-blue-400 hover:ring-offset-1 ${
+                  penColor === color ? 'ring-2 ring-blue-500 ring-offset-1' : ''
+                }`}
+                style={{ backgroundColor: color }}
+                title={`Color ${color}`}
+                aria-label={`Select color ${color}`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div
+        ref={containerRef}
+        className="relative min-h-0 w-full flex-1"
+        style={
+          showTemplateBackground && templateImageUrl
+            ? {
+                backgroundImage: `url(${templateImageUrl})`,
+                backgroundSize: 'contain',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center',
+              }
+            : undefined
+        }
+      >
+        {showTemplateBackground && templateImageUrl ? (
+          <img
+            ref={templateImgRef}
+            src={templateImageUrl}
+            alt=""
+            className="pointer-events-none absolute h-0 w-0 overflow-hidden opacity-0"
+            draggable={false}
+            aria-hidden
           />
-        ) : (
+        ) : null}
+        <canvas
+          ref={canvasRef}
+          width={isLarge ? 600 : 300}
+          height={isLarge ? 400 : 200}
+          className={useTemplateLayer ? 'h-full w-full bg-transparent' : 'h-full w-full bg-white'}
+          style={{
+            cursor:
+              tool === 'line'
+                ? 'crosshair'
+                : tool === 'eraser'
+                  ? getEraserCursor()
+                  : getPenCursor(),
+            touchAction: 'none',
+          }}
+          onMouseDown={startDrawing}
+          onMouseMove={(e) => {
+            handleMouseMove(e);
+            draw(e);
+            handleStickerDrag(e);
+          }}
+          onMouseUp={(e) => {
+            stopDrawing(e);
+            handleStickerDragEnd();
+          }}
+          onMouseLeave={(e) => {
+            setCursorPos(null);
+            stopDrawing(e);
+            handleStickerDragEnd();
+          }}
+          onTouchStart={startDrawing}
+          onTouchMove={draw}
+          onTouchEnd={stopDrawing}
+        />
+        {/* Sticker overlays */}
+        {enableStickers &&
+          stickers.map((sticker) => (
+            <div
+              key={sticker.id}
+              draggable
+              onMouseDown={(e) => handleStickerDragStart(e, sticker.id)}
+              className="absolute z-30 cursor-move select-none rounded border-2 border-blue-400 bg-blue-100 px-2 py-1 text-sm font-semibold text-blue-800"
+              style={{
+                left: `${sticker.x}px`,
+                top: `${sticker.y - 20}px`,
+              }}
+            >
+              {sticker.label}
+            </div>
+          ))}
+        {/* Visible cursor indicator */}
+        {cursorPos && (
           <div
-            key={textEl.id}
-            onClick={(e) => {
-              e.stopPropagation();
-              setEditingTextId(textEl.id);
-            }}
-            className="absolute px-2 py-1 rounded text-sm z-30 cursor-pointer hover:bg-blue-50 border border-transparent hover:border-blue-300"
+            className="pointer-events-none absolute z-20"
             style={{
-              left: `${textEl.x}px`,
-              top: `${textEl.y - 20}px`,
-              color: penColor,
+              left: `${cursorPos.x}px`,
+              top: `${cursorPos.y}px`,
+              transform: 'translate(-50%, -50%)',
             }}
           >
-            {textEl.text || ' '}
+            <div
+              className={`h-2 w-2 rounded-full ${
+                tool === 'eraser'
+                  ? 'border border-gray-400 bg-white'
+                  : tool === 'text'
+                    ? 'bg-blue-500'
+                    : 'bg-black'
+              }`}
+              style={tool === 'pen' || tool === 'line' ? { backgroundColor: penColor } : undefined}
+            />
           </div>
-        );
-      })}
+        )}
+        {/* Text input overlays (only if stickers not enabled) */}
+        {!enableStickers &&
+          textElements.map((textEl) => {
+            const isEditing = editingTextId === textEl.id;
+            return isEditing ? (
+              <input
+                key={textEl.id}
+                ref={textInputRef}
+                type="text"
+                value={textEl.text}
+                onChange={(e) => handleTextChange(textEl.id, e.target.value)}
+                onBlur={handleTextBlur}
+                onClick={(e) => e.stopPropagation()}
+                onMouseDown={(e) => e.stopPropagation()}
+                className="absolute z-30 rounded border-2 border-blue-500 bg-white px-2 py-1 text-sm"
+                style={{
+                  left: `${textEl.x}px`,
+                  top: `${textEl.y - 20}px`,
+                }}
+                autoFocus
+              />
+            ) : (
+              <div
+                key={textEl.id}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setEditingTextId(textEl.id);
+                }}
+                className="absolute z-30 cursor-pointer rounded border border-transparent px-2 py-1 text-sm hover:border-blue-300 hover:bg-blue-50"
+                style={{
+                  left: `${textEl.x}px`,
+                  top: `${textEl.y - 20}px`,
+                  color: penColor,
+                }}
+              >
+                {textEl.text || ' '}
+              </div>
+            );
+          })}
+      </div>
     </div>
   );
 }

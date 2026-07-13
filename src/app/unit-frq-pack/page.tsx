@@ -114,6 +114,7 @@ function UnitFrqPackInner() {
     <FullExamFRQ
       questions={pack}
       examType={subject}
+      unitNumber={unitNumber}
       backUrl={backToHub}
       hideExpandingQuestionNav
     />

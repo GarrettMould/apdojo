@@ -18,7 +18,18 @@ import { hasAdminRole } from '@/lib/adminAccess';
 import { useSubjectSwitchNavigation } from '@/hooks/useSubjectSwitchNavigation';
 
 export function Header() {
-  const { user, logout, selectedSubject, totalXP, guestXp, isCharacterClosetOpen, setIsCharacterClosetOpen, userData } = useAuthContext();
+  const {
+    user,
+    logout,
+    selectedSubject,
+    totalXP,
+    guestXp,
+    isCharacterClosetOpen,
+    setIsCharacterClosetOpen,
+    userData,
+    setShowSignupModal,
+    setShowLoginModal,
+  } = useAuthContext();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isBeltDropdownOpen, setIsBeltDropdownOpen] = useState(false);
   const [isPracticeDropdownOpen, setIsPracticeDropdownOpen] = useState(false);
@@ -90,6 +101,18 @@ export function Header() {
 
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false);
+  };
+
+  const openSignupModal = () => {
+    closeMobileMenu();
+    setIsBeltDropdownOpen(false);
+    setShowSignupModal(true);
+  };
+
+  const openLoginModal = () => {
+    closeMobileMenu();
+    setIsBeltDropdownOpen(false);
+    setShowLoginModal(true);
   };
 
   const handleSubjectChange = (newSubject: CourseSubject) => {
@@ -418,7 +441,7 @@ export function Header() {
             )}
 
             {/* User Icon & Auth Buttons */}
-            <div className="flex items-center gap-3">
+            <div className="relative z-[51] flex items-center gap-3">
               {/* Account icon — opens belt/XP dropdown */}
               <div className="flex items-center relative" ref={beltDropdownRef}>
                 {(() => {
@@ -531,12 +554,13 @@ export function Header() {
               </div>
 
               {!user && (
-                <Link
-                  href="/signup"
+                <button
+                  type="button"
+                  onClick={openSignupModal}
                   className="inline-flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white font-black text-base px-6 py-2.5 rounded-xl border-2 border-blue-700 shadow-[0_4px_0_0_rgba(0,0,0,1)] active:translate-y-0.5 active:shadow-[0_2px_0_0_rgba(0,0,0,1)] transition-all"
                 >
                   Sign up free →
-                </Link>
+                </button>
               )}
             </div>
           </div>
@@ -575,20 +599,20 @@ export function Header() {
               {/* Auth CTAs — only for logged-out users */}
               {!user && (
                 <div className="flex flex-col gap-3 mb-6">
-                  <Link
-                    href="/signup"
-                    onClick={closeMobileMenu}
+                  <button
+                    type="button"
+                    onClick={openSignupModal}
                     className="w-full text-center py-4 bg-blue-600 hover:bg-blue-700 text-white text-lg font-black rounded-2xl transition-colors shadow-sm"
                   >
                     Create Account
-                  </Link>
-                  <Link
-                    href="/login"
-                    onClick={closeMobileMenu}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={openLoginModal}
                     className="w-full text-center py-4 border-2 border-gray-200 hover:border-gray-300 text-gray-900 text-lg font-black rounded-2xl transition-colors"
                   >
                     Sign In
-                  </Link>
+                  </button>
                 </div>
               )}
 

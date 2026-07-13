@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import ReactMarkdown from 'react-markdown';
 import { Paperclip, Send, X } from 'lucide-react';
 import type { CourseSubject } from '@/lib/courseSubject';
 import { displayCourseLabel } from '@/lib/courseSubject';
@@ -10,6 +9,7 @@ import { tutorAvatarInitials, tutorAvatarUrl } from '@/lib/tutorAvatar';
 import { getTutorWelcomeStarterChoices } from '@/lib/tutorStarterChoices';
 import { TutorAvatar } from '@/components/TutorAvatar';
 import { TutorTypingPlaceholder } from '@/components/TutorTypingPlaceholder';
+import { TutorAssistantMarkdown } from '@/components/TutorAssistantMarkdown';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { auth as firebaseAuth } from '@/lib/firebase';
 import { hasAdminRole } from '@/lib/adminAccess';
@@ -233,10 +233,15 @@ function parseAssistantReply(raw: string): {
     return { display: raw.trimEnd(), choices: [] };
   }
 
-  const display = raw.slice(0, start).trimEnd();
   const rest = raw.slice(start + CHOICES_START.length);
   const end = rest.indexOf(CHOICES_END);
-  const block = (end === -1 ? rest : rest.slice(0, end)).trim();
+  if (end === -1) {
+    // Incomplete machine block — show prose only; don't hide mid-response text.
+    return { display: raw.slice(0, start).trimEnd(), choices: [] };
+  }
+
+  const display = raw.slice(0, start).trimEnd();
+  const block = rest.slice(0, end).trim();
 
   const choices: { label: string; prompt: string }[] = [];
   for (const line of block.split('\n')) {
@@ -639,7 +644,7 @@ export function CheatSheetChatBox({
                         <div className="max-w-none px-3.5 py-2.5 text-[14px] leading-relaxed shadow-sm rounded-2xl rounded-bl-md border border-slate-100/90 bg-white text-slate-800">
                           {parsedAssistant ? (
                             assistantLead ? (
-                              <AssistantMarkdown text={assistantLead} />
+                              <TutorAssistantMarkdown text={assistantLead} />
                             ) : parsedAssistant.choices.length > 0 ? (
                               <p className="text-sm text-slate-500">
                                 Continue with one of these next steps—
@@ -769,55 +774,4 @@ export function CheatSheetChatBox({
       ) : null}
     </div>
   );
-}
-
-/**
- * Renders model markdown (`**bold**`, `*italic*`, `__bold__`, lists) with safe defaults (no raw HTML).
- */
-function AssistantMarkdown({ text }: { text: string }) {
-  return (
-    <div className="tutor-markdown text-slate-700 [&_strong]:font-semibold [&_strong]:text-slate-900 [&_b]:font-semibold [&_b]:text-slate-900 [&_em]:italic [&_blockquote]:border-l-2 [&_blockquote]:border-slate-200 [&_blockquote]:pl-3 [&_blockquote]:italic [&_blockquote]:text-slate-600">
-      <ReactMarkdown
-        components={{
-          p: ({ children }) => <p className="mb-2 whitespace-pre-wrap last:mb-0">{children}</p>,
-          strong: ({ children }) => (
-            <strong className="font-semibold text-slate-900">{children}</strong>
-          ),
-          em: ({ children }) => <em className="italic text-slate-800">{children}</em>,
-          b: ({ children }) => (
-            <b className="font-semibold text-slate-900">{children}</b>
-          ),
-          ul: ({ children }) => (
-            <ul className="mb-2 list-disc space-y-0.5 pl-5 last:mb-0">{children}</ul>
-          ),
-          ol: ({ children }) => (
-            <ol className="mb-2 list-decimal space-y-0.5 pl-5 last:mb-0">{children}</ol>
-          ),
-          li: ({ children }) => <li className="leading-snug">{children}</li>,
-          a: ({ href, children }) => (
-            <a
-              href={href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-medium text-sky-700 underline underline-offset-2 hover:text-sky-800"
-            >
-              {children}
-            </a>
-          ),
-          code: ({ children }) => (
-            <code className="rounded bg-slate-100 px-1 py-0.5 text-[13px] text-slate-800">
-              {children}
-            </code>
-          ),
-        }}
-      >
-        {sanitizeTutorMarkdownAsteriskLookalikes(text)}
-      </ReactMarkdown>
-    </div>
-  );
-}
-
-/** Map unicode asterisk lookalikes → ASCII so `**`/`*` match CommonMark emphasis rules. */
-function sanitizeTutorMarkdownAsteriskLookalikes(raw: string): string {
-  return raw.replace(/[\uFF0A\u2217\u204E\uFE61\u2731]/g, '*');
 }

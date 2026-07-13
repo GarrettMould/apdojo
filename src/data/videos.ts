@@ -2543,6 +2543,51 @@ export const videos: Video[] = [
         accessLevel: "free",
         questions: [],
       },
+      {
+        id: "stats-u1-vid2",
+        title: "1.11 - Random Sampling",
+        description:
+          "Learn how to design and use random sampling methods to select representative samples.",
+        videoSlug: "stats-u1-random-sampling",
+        subjects: ["AP Statistics"],
+        unit: "1",
+        lessonIDS: ["1.11"],
+        tags: ["Random Sampling", "Unit 1", "Study Design"],
+        videoUrl:
+          "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/stats/unit_1/stats_u1_topic_1.11.mp4",
+        accessLevel: "free",
+        questions: [],
+      },
+      {
+        id: "stats-u2-vid1",
+        title: "2.2–2.6 - Two-Way Tables, Simulation & Probability",
+        description:
+          "Covers summary statistics for two categorical variables, simulation, introduction to probability, mutually exclusive events, and conditional probability.",
+        videoSlug: "stats-u2-two-way-tables-through-conditional-probability",
+        subjects: ["AP Statistics"],
+        unit: "2",
+        lessonIDS: ["2.2", "2.3", "2.4", "2.5", "2.6"],
+        tags: ["Probability", "Unit 2", "Two-Way Tables", "Conditional Probability"],
+        videoUrl:
+          "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/stats/unit_2/stats_u2_topic_2.2_2.6.mp4",
+        accessLevel: "free",
+        questions: [],
+      },
+      {
+        id: "stats-u2-vid2",
+        title: "2.11 - The Normal Distribution",
+        description:
+          "Learn the properties of the normal distribution and how to use it in probability calculations.",
+        videoSlug: "stats-u2-normal-distribution",
+        subjects: ["AP Statistics"],
+        unit: "2",
+        lessonIDS: ["2.11"],
+        tags: ["Normal Distribution", "Unit 2", "Probability Distributions"],
+        videoUrl:
+          "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/stats/unit_2/stats_u2_topic_2.11.mp4",
+        accessLevel: "free",
+        questions: [],
+      },
 
       
   ];

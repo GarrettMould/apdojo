@@ -12,7 +12,7 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import { LoginModal, SignupModal } from './AuthModals';
 import { MCQFeedbackModal } from './MCQFeedbackModal';
 import { SeasonPassModal } from './SeasonPassModal';
-import { hasValidSeasonPass, getUnitFinalPracticeTestsUrl } from '@/lib/utils';
+import { hasValidSeasonPass, getUnitFinalPracticeTestsUrl, getUnitTestPreviewUrl } from '@/lib/utils';
 import { videos } from '@/data/videos';
 import { createPortal } from 'react-dom';
 import { HighlightableText } from './HighlightableText';
@@ -28,10 +28,13 @@ import { ExamTutorialModal } from './ExamTutorialModal';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, doc, updateDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 import { saveQuizResult } from '@/lib/quizHistory';
-import { saveTestResult, saveTestProgress, loadTestProgress, TestProgress } from '@/lib/testProgress';
+import { saveTestResult, saveTestProgress, loadTestProgress, hasUnitFrqTestResult, TestProgress } from '@/lib/testProgress';
 import {
   apQuestionSubjectTag,
+  cheatSheetUrlForUnit,
   formatUnitMcqTestFooterLabel,
+  isUnitFrqPackAvailable,
+  isUnitMcqTestAvailable,
   subjectOnboardingTitle,
   unitsForCourseSubject,
   type CourseSubject,
@@ -249,6 +252,8 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   const [showSeasonPassModal, setShowSeasonPassModal] = useState(false);
   /** Live session only: when true, show Score Summary card first; "See full results" sets to false. */
   const [liveSessionScoreSummaryOnly, setLiveSessionScoreSummaryOnly] = useState(true);
+  const [unitFrqHasResult, setUnitFrqHasResult] = useState<boolean | null>(null);
+  const [unitTestCongratsPhrase, setUnitTestCongratsPhrase] = useState('');
   
   // Remove the shuffling logic and just use the pre-shuffled questions
   const questions = questionBank.questions;
@@ -605,6 +610,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
       subjectLabel: subjectOnboardingTitle(examType),
       unitNumber,
       unitName,
+      cheatSheetHref: cheatSheetUrlForUnit(examType, unitNumber),
     };
   }, [isUnitTest, examNumber, examType, questions]);
   // Show top bar and bottom navigation for unit tests, preview exams, and full exams
@@ -1493,6 +1499,52 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   const percentScore =
     totalQuestionsCount > 0 ? Math.round((correctAnswersCount / totalQuestionsCount) * 100) : 0;
   const earnedXp = 20 + correctAnswersCount * 10;
+
+  const UNIT_TEST_CONGRATS_PHRASES = [
+    'Fantastic!',
+    'Well Done!',
+    'Bravo!',
+    'Fantastic! Well Done!',
+    'Well Done! Bravo!',
+    'Fantastic! Bravo!',
+    'Fantastic! Well Done! Bravo!',
+  ] as const;
+
+  useEffect(() => {
+    setUnitTestCongratsPhrase('');
+    setUnitFrqHasResult(null);
+  }, [examNumber, examType]);
+
+  useEffect(() => {
+    if (showResults && showFullResults && percentScore >= 80) {
+      const options = UNIT_TEST_CONGRATS_PHRASES;
+      setUnitTestCongratsPhrase(options[Math.floor(Math.random() * options.length)]);
+    } else {
+      setUnitTestCongratsPhrase('');
+    }
+  }, [showResults, showFullResults, percentScore]);
+
+  useEffect(() => {
+    if (!showResults || !showFullResults || !isUnitTest || !unitTestResultsSubtitle) {
+      return;
+    }
+    const { unitNumber } = unitTestResultsSubtitle;
+    if (!isUnitFrqPackAvailable(examType, unitNumber)) {
+      setUnitFrqHasResult(true);
+      return;
+    }
+    if (!user?.uid) {
+      setUnitFrqHasResult(false);
+      return;
+    }
+    let cancelled = false;
+    void hasUnitFrqTestResult(user.uid, unitNumber, examType).then((has) => {
+      if (!cancelled) setUnitFrqHasResult(has);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [showResults, showFullResults, isUnitTest, unitTestResultsSubtitle, user?.uid, examType]);
 
   const toggleExplanation = (questionId: number) => {
     setShowExplanations(prev => ({
@@ -3336,14 +3388,18 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                     )}
                     </div>
 
-                    {/* Explanation - Comp Check Style */}
-                    {question.explanation && selectedAnswer && (
+                    {/* Explanation - Comp Check Style
+                       For AP Stats unit tests, always show explanations on results (even if unanswered). */}
+                    {question.explanation && (selectedAnswer || (isUnitTest && examType === 'stats')) && (
                       <div className="p-4 border-t border-gray-100">
                         <div className="mt-3 p-3 bg-blue-50 border-l-4 border-blue-400 rounded">
                           <p className="text-sm text-gray-800 leading-relaxed">
                             <span className="text-gray-600">Explanation: </span>
                             <MathText text={question.explanation} />
                           </p>
+                          {!selectedAnswer && isUnitTest && examType === 'stats' && (
+                            <p className="mt-2 text-xs text-gray-500">No answer selected for this question.</p>
+                          )}
                         </div>
                       </div>
                     )}
@@ -3355,7 +3411,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
               return isUnitTest ? (
                 <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 py-6 pb-24 space-y-10 sm:space-y-12">
                   {showResults && showFullResults ? (
-                    <div className="px-1 py-4 sm:px-2 sm:py-8 md:py-10">
+                    <div className="px-1 pt-4 pb-0 sm:px-2 sm:pt-8 sm:pb-0 md:pt-10 md:pb-0">
                       <h1 className="text-4xl font-black leading-[1.05] tracking-tight text-black sm:text-5xl md:text-6xl">
                         Assessment Results
                       </h1>
@@ -3369,6 +3425,64 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                             </>
                           ) : null}
                         </p>
+                      ) : null}
+                      {unitTestResultsSubtitle ? (
+                        <div className="mt-5 w-full rounded-xl border-2 border-black bg-white px-4 py-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:px-5 sm:py-5">
+                          {percentScore < 80 ? (
+                            <>
+                              <p className="text-base font-bold text-gray-900 sm:text-lg">
+                                Ready to improve your Unit {unitTestResultsSubtitle.unitNumber} performance? Let&apos;s do this!
+                              </p>
+                              <Link
+                                href={unitTestResultsSubtitle.cheatSheetHref}
+                                className={`mt-2 inline-flex items-center gap-1 text-sm font-black underline underline-offset-2 sm:text-base ${resultsBackLinkClass}`}
+                              >
+                                Review the Unit {unitTestResultsSubtitle.unitNumber} cheat sheet →
+                              </Link>
+                            </>
+                          ) : (
+                            <>
+                              <p className="text-base font-bold text-gray-900 sm:text-lg">
+                                {unitTestCongratsPhrase}{' '}
+                                {isUnitFrqPackAvailable(examType, unitTestResultsSubtitle.unitNumber) &&
+                                unitFrqHasResult === false
+                                  ? `Ready to tackle the FRQ section of Unit ${unitTestResultsSubtitle.unitNumber}?`
+                                  : isUnitMcqTestAvailable(examType, unitTestResultsSubtitle.unitNumber + 1)
+                                    ? `Ready for Unit ${unitTestResultsSubtitle.unitNumber + 1}?`
+                                    : 'Great work — keep the momentum going!'}
+                              </p>
+                              {isUnitFrqPackAvailable(examType, unitTestResultsSubtitle.unitNumber) &&
+                              unitFrqHasResult === false ? (
+                                <Link
+                                  href={getUnitTestPreviewUrl(
+                                    unitTestResultsSubtitle.unitNumber,
+                                    examType,
+                                    'frq'
+                                  )}
+                                  className={`mt-2 inline-flex items-center gap-1 text-sm font-black underline underline-offset-2 sm:text-base ${resultsBackLinkClass}`}
+                                >
+                                  Start Unit {unitTestResultsSubtitle.unitNumber} FRQ Pack →
+                                </Link>
+                              ) : unitFrqHasResult !== null &&
+                                isUnitMcqTestAvailable(examType, unitTestResultsSubtitle.unitNumber + 1) ? (
+                                <Link
+                                  href={getUnitTestPreviewUrl(
+                                    unitTestResultsSubtitle.unitNumber + 1,
+                                    examType,
+                                    'mcq'
+                                  )}
+                                  className={`mt-2 inline-flex items-center gap-1 text-sm font-black underline underline-offset-2 sm:text-base ${resultsBackLinkClass}`}
+                                >
+                                  View Unit {unitTestResultsSubtitle.unitNumber + 1} test →
+                                </Link>
+                              ) : user?.uid &&
+                                isUnitFrqPackAvailable(examType, unitTestResultsSubtitle.unitNumber) &&
+                                unitFrqHasResult === null ? (
+                                <p className="mt-2 text-sm font-semibold text-gray-500">Checking your progress…</p>
+                              ) : null}
+                            </>
+                          )}
+                        </div>
                       ) : null}
                     </div>
                   ) : null}

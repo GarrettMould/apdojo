@@ -177,10 +177,18 @@ const nextConfig = {
       });
     }
 
-    // Stats unit MCQ tests (Unit 1 available)
+    // Stats unit MCQ tests (Units 1–2 available; others show locked UI)
+    for (let unit = 1; unit <= 5; unit++) {
+      rewrites.push({
+        source: `/ap-stats-unit-${unit}-mcq-test`,
+        destination: `/unit-mcq-test/${unit}?subject=stats`,
+      });
+    }
+
+    // Same-origin proxy for unit test / FRQ template images (canvas CORS)
     rewrites.push({
-      source: '/ap-stats-unit-1-mcq-test',
-      destination: '/unit-mcq-test/1?subject=stats',
+      source: '/unit-test-images/:path*',
+      destination: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/:path*',
     });
 
     // Full MCQ practice tests

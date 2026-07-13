@@ -1,5 +1,18 @@
 import { db } from './firebase';
-import { doc, setDoc, getDoc, updateDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  limit,
+  serverTimestamp,
+} from 'firebase/firestore';
+import type { CourseSubject } from './courseSubject';
 
 export interface TestProgress {
   userId: string;
@@ -126,6 +139,32 @@ export const clearTestProgress = async (userId: string, testId: string): Promise
     console.error('Error clearing test progress:', error);
   }
 };
+
+/** Firestore testId for a unit stimulus FRQ pack (distinct from unit MCQ `unit_{n}_{subject}`). */
+export function getUnitFrqTestId(unitNumber: number, subject: CourseSubject): string {
+  return `unit_${unitNumber}_${subject}_frq`;
+}
+
+/** Whether the user has submitted this unit's FRQ pack (progress or saved result). */
+export async function hasUnitFrqTestResult(
+  userId: string,
+  unitNumber: number,
+  subject: CourseSubject
+): Promise<boolean> {
+  const testId = getUnitFrqTestId(unitNumber, subject);
+  try {
+    const progress = await loadTestProgress(userId, testId);
+    if (progress?.isSubmitted) return true;
+
+    const resultsRef = collection(doc(db, 'userTestResults', userId), 'results');
+    const resultsQuery = query(resultsRef, where('testId', '==', testId), limit(1));
+    const snapshot = await getDocs(resultsQuery);
+    return !snapshot.empty;
+  } catch (error) {
+    console.error('[hasUnitFrqTestResult] Error checking FRQ completion:', error);
+    return false;
+  }
+}
 
 // Get user's test completion history
 export const getUserTestHistory = async (userId: string) => {

@@ -3,29 +3,17 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Star } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { MCQPracticePreview } from '@/components/MCQPracticePreview';
 import { CheatSheetPreview } from '@/components/CheatSheetPreview';
 import { FRQFeedbackDemo } from '@/components/FRQFeedbackDemo';
-
-const EXAM_DATES = {
-  micro: new Date('2026-05-04T12:00:00'),
-  macro: new Date('2026-05-08T12:00:00'),
-  /** Placeholder until AP Gov exam date is finalized in product copy. */
-  gov: new Date('2026-05-11T12:00:00'),
-};
-
-function getTimeLeft(target: Date) {
-  const diff = target.getTime() - Date.now();
-  return {
-    days: Math.max(0, Math.floor(diff / (1000 * 60 * 60 * 24))),
-    hours: Math.max(0, Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))),
-    minutes: Math.max(0, Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))),
-    seconds: Math.max(0, Math.floor((diff % (1000 * 60)) / 1000)),
-  };
-}
+import {
+  getLoggedOutHeroConfig,
+  type LoggedOutHeroVariant,
+} from '@/data/loggedOutHeroConfig';
 
 const SLIDES = [
   { label: 'Unlimited MCQ Practice', component: <MCQPracticePreview /> },
@@ -39,23 +27,52 @@ const slideVariants = {
   exit: (d: number) => ({ opacity: 0, x: d > 0 ? -60 : 60 }),
 };
 
-export function HeroSection() {
+const heroVariantVariants = {
+  enter: { opacity: 0, y: 16 },
+  center: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -16 },
+};
+
+const CHEAT_SHEET_TERMS: Record<'stats' | 'gov', Array<{ term: string; def: string }>> = {
+  stats: [
+    { term: 'Population', def: 'Entire group of interest' },
+    { term: 'Sample', def: 'Subset selected for study' },
+    { term: 'Parameter', def: 'Numerical summary of a population' },
+    { term: 'Statistic', def: 'Numerical summary of a sample' },
+    { term: 'Random Sample', def: 'Every individual has equal chance' },
+    { term: 'Bias', def: 'Systematic favor toward certain outcomes' },
+  ],
+  gov: [
+    { term: 'Federalism', def: 'Power divided between national and state governments' },
+    { term: 'Separation of Powers', def: 'Branches check and balance each other' },
+    { term: 'Limited Government', def: 'Government power is restricted' },
+    { term: 'Pluralism', def: 'Competing groups influence policy' },
+    { term: 'Republic', def: 'Citizens elect representatives' },
+    { term: 'Judicial Review', def: 'Courts review laws for constitutionality' },
+  ],
+};
+
+type HeroSectionProps = {
+  variant?: LoggedOutHeroVariant;
+};
+
+export function HeroSection({ variant = 'econ' }: HeroSectionProps) {
   const { selectedSubject } = useAuthContext();
   const [mounted, setMounted] = useState(false);
-  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const pdfCardRef = useRef<HTMLDivElement>(null);
   const [pdfScale, setPdfScale] = useState(0.77);
   const [activeSlide, setActiveSlide] = useState(0);
   const [slideDir, setSlideDir] = useState(1);
   const slideTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  const econSubject = mounted && selectedSubject === 'micro' ? 'micro' : 'macro';
+  const config = getLoggedOutHeroConfig(variant, econSubject);
+  const { theme } = config;
+  const headlineLines = config.headline.split('\n');
+
   useEffect(() => {
     setMounted(true);
-    const target = EXAM_DATES[selectedSubject] ?? EXAM_DATES.macro;
-    setTimeLeft(getTimeLeft(target));
-    const id = setInterval(() => setTimeLeft(getTimeLeft(target)), 1000);
-    return () => clearInterval(id);
-  }, [selectedSubject]);
+  }, []);
 
   useEffect(() => {
     const update = () => {
@@ -66,14 +83,16 @@ export function HeroSection() {
     update();
     window.addEventListener('resize', update);
     return () => window.removeEventListener('resize', update);
-  }, []);
+  }, [variant]);
 
   useEffect(() => {
     slideTimerRef.current = setInterval(() => {
       setSlideDir(1);
-      setActiveSlide(i => (i + 1) % SLIDES.length);
+      setActiveSlide((i) => (i + 1) % SLIDES.length);
     }, 3500);
-    return () => { if (slideTimerRef.current) clearInterval(slideTimerRef.current); };
+    return () => {
+      if (slideTimerRef.current) clearInterval(slideTimerRef.current);
+    };
   }, []);
 
   const goToSlide = (index: number) => {
@@ -82,15 +101,9 @@ export function HeroSection() {
     if (slideTimerRef.current) clearInterval(slideTimerRef.current);
     slideTimerRef.current = setInterval(() => {
       setSlideDir(1);
-      setActiveSlide(i => (i + 1) % SLIDES.length);
+      setActiveSlide((i) => (i + 1) % SLIDES.length);
     }, 3500);
   };
-
-  const pad = (n: number) => String(n).padStart(2, '0');
-  const isMicro = mounted && selectedSubject === 'micro';
-  const subject = mounted ? (selectedSubject === 'micro' ? 'Micro' : 'Macro') : 'Macro';
-  const accentClass = isMicro ? 'text-green-500' : 'text-blue-500';
-  const btnClass = isMicro ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700';
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -109,6 +122,18 @@ export function HeroSection() {
     },
   };
 
+  const cheatSheetTerms = variant === 'stats' || variant === 'gov' ? CHEAT_SHEET_TERMS[variant] : null;
+
+  /** Literal class names so Tailwind keeps subject accents (dynamic strings can be dropped). */
+  const yearAccentClass =
+    variant === 'stats'
+      ? 'text-orange-600'
+      : variant === 'gov'
+        ? 'text-violet-600'
+        : econSubject === 'micro'
+          ? 'text-green-600'
+          : 'text-blue-600';
+
   return (
     <section className="relative flex flex-col justify-center pt-14 pb-10 sm:pt-16 sm:pb-16 lg:min-h-screen lg:pt-24 lg:pb-56 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
       <div className="max-w-screen-xl mx-auto w-full">
@@ -121,63 +146,57 @@ export function HeroSection() {
 
           {/* ── LEFT: text + CTA ── */}
           <div className="w-full lg:w-[46%] flex flex-col items-center text-center lg:items-start lg:text-left gap-9">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={variant}
+                variants={heroVariantVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] as const }}
+                className="flex flex-col items-center text-center lg:items-start lg:text-left gap-9 w-full"
+              >
 
-            {/* Countdown */}
-            <motion.div variants={itemVariants} className="flex flex-col items-center lg:items-start gap-2">
+            {/* Coming soon note (replaces expired 2026 exam countdown) */}
+            <div className="flex flex-col items-center lg:items-start gap-1.5 min-h-[4.75rem] sm:min-h-[5.25rem] justify-center">
               <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">
-                AP <span className={accentClass}>{subject}</span> Exam In
+                AP {config.countdownLabel}
               </p>
-              <div className="flex items-start gap-2">
-                {[
-                  { value: mounted ? timeLeft.days : 0, label: 'Days' },
-                  { value: mounted ? timeLeft.hours : 0, label: 'Hrs' },
-                  { value: mounted ? timeLeft.minutes : 0, label: 'Min' },
-                  { value: mounted ? timeLeft.seconds : 0, label: 'Sec' },
-                ].map(({ value, label }, i) => (
-                  <div key={label} className="flex items-start gap-2">
-                    <div className="flex flex-col items-center">
-                      <div className="bg-gray-900 text-white border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center">
-                        <span className="text-xl sm:text-2xl font-black tabular-nums leading-none">
-                          {pad(value)}
-                        </span>
-                      </div>
-                      <span className="text-[9px] font-bold text-gray-400 mt-1.5 uppercase tracking-wide">
-                        {label}
-                      </span>
-                    </div>
-                    {i < 3 && (
-                      <span className="text-xl font-black text-gray-300 mt-2 select-none">:</span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </motion.div>
+              <p className="text-xl sm:text-2xl lg:text-3xl font-black text-gray-900 leading-tight tracking-tight">
+                Updated <span className={yearAccentClass}>2027</span> Exam Course
+                <br />
+                Coming Soon!
+              </p>
+            </div>
 
             {/* Headline */}
-            <motion.h1
-              variants={itemVariants}
+            <h1
               className="text-5xl sm:text-6xl lg:text-8xl font-black text-gray-900 leading-[1.05] tracking-tight"
             >
-              Score a 5 on<br />AP Econ.
-            </motion.h1>
+              {headlineLines.map((line, index) => (
+                <span key={line}>
+                  {line}
+                  {index < headlineLines.length - 1 && <br />}
+                </span>
+              ))}
+            </h1>
 
             {/* Subheadline */}
-            <motion.p
-              variants={itemVariants}
+            <p
               className="text-xl sm:text-2xl text-gray-600 font-medium leading-relaxed max-w-lg mx-auto lg:mx-0"
             >
-              Full practice exams, unlimited MCQ practice, AI-graded FRQs, printable cheat sheets, and more — all for $29.
-            </motion.p>
+              {config.subheadline}
+            </p>
 
             {/* CTA + social proof */}
-            <motion.div variants={itemVariants} className="flex flex-col items-center lg:items-start gap-6 w-full">
+            <div className="flex flex-col items-center lg:items-start gap-6 w-full">
               <Button
                 asChild
                 size="lg"
-                className={`w-full sm:w-auto text-lg font-black py-7 px-10 rounded-2xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-0.5 text-white ${btnClass}`}
+                className={`w-full sm:w-auto text-lg font-black py-7 px-10 rounded-2xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-0.5 text-white ${theme.btnClass}`}
               >
-                <Link href="/purchase/season-pass">
-                  Get the Season Pass — $29
+                <Link href={config.ctaHref}>
+                  {config.ctaLabel}
                 </Link>
               </Button>
 
@@ -189,18 +208,19 @@ export function HeroSection() {
                 </div>
                 <p className="text-sm font-semibold text-gray-600">1,000+ students helped</p>
                 <Link
-                  href="/purchase/season-pass"
+                  href={config.ctaHref}
                   className="text-xs font-semibold text-blue-600 hover:text-blue-800 underline underline-offset-2"
                 >
                   See reviews →
                 </Link>
               </div>
-            </motion.div>
+            </div>
+              </motion.div>
+            </AnimatePresence>
           </div>
 
           {/* ── MOBILE ONLY: auto-rotating feature carousel ── */}
           <motion.div variants={itemVariants} className="lg:hidden w-full mt-4">
-            {/* Slide label */}
             <div className="text-center mb-4 h-8 flex items-center justify-center">
               <AnimatePresence mode="wait">
                 <motion.h3
@@ -216,7 +236,6 @@ export function HeroSection() {
               </AnimatePresence>
             </div>
 
-            {/* Slide content */}
             <div className="relative overflow-hidden w-full min-h-[400px]">
               <AnimatePresence custom={slideDir} mode="wait">
                 <motion.div
@@ -234,7 +253,6 @@ export function HeroSection() {
               </AnimatePresence>
             </div>
 
-            {/* Dot navigation */}
             <div className="flex justify-center gap-2 mt-5">
               {SLIDES.map((_, i) => (
                 <button
@@ -254,25 +272,82 @@ export function HeroSection() {
             className="hidden lg:block lg:w-[54%] flex-shrink-0 relative"
             style={{ height: 500 }}
           >
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={variant}
+                variants={heroVariantVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] as const }}
+                className="absolute inset-0"
+              >
 
-            {/* Large base card — full-width PDF, top quarter visible */}
-            <div
-              ref={pdfCardRef}
-              className="absolute rounded-2xl border-2 border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
+            {/* Large base card */}
+            <Link
+              href={config.cheatSheetHref}
+              className="absolute rounded-2xl border-2 border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden block hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] transition-shadow"
               style={{ top: 44, left: 20, right: 20, height: 420 }}
             >
-              <iframe
-                src={`https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/AP+${isMicro ? 'Micro' : 'Macro'}+-+Unit+1.pdf#toolbar=0&navpanes=0&scrollbar=0`}
-                title="Cheat sheet preview"
-                className="absolute top-0 left-0 pointer-events-none select-none border-none"
-                style={{
-                  width: '833px',
-                  height: '1080px',
-                  transform: `scale(${pdfScale})`,
-                  transformOrigin: 'top left',
-                }}
-              />
-            </div>
+              {config.pdfSrc ? (
+                <div ref={pdfCardRef} className="relative w-full h-full">
+                  <iframe
+                    src={config.pdfSrc}
+                    title="Cheat sheet preview"
+                    className="absolute top-0 left-0 pointer-events-none select-none border-none"
+                    style={{
+                      width: '833px',
+                      height: '1080px',
+                      transform: `scale(${pdfScale})`,
+                      transformOrigin: 'top left',
+                    }}
+                  />
+                </div>
+              ) : (
+                <div className="p-5 h-full flex flex-col overflow-hidden">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">
+                    Unit 1 Cheat Sheet Preview
+                  </p>
+                  <div className="grid grid-cols-2 gap-2.5 flex-1 min-h-0 content-start auto-rows-min">
+                    {/* Terms first — like a real cheat sheet */}
+                    {cheatSheetTerms?.slice(0, 2).map(({ term, def }) => (
+                      <div
+                        key={term}
+                        className="rounded-xl border-2 border-gray-100 bg-gray-50 p-2.5"
+                      >
+                        <p className="text-xs font-black text-gray-900">{term}</p>
+                        <p className="text-[10px] text-gray-600 mt-0.5 leading-snug">{def}</p>
+                      </div>
+                    ))}
+                    {/* 1–2 stimulus / FRQ images */}
+                    {config.cheatSheetPreviewImages.slice(0, 2).map(({ src, alt }) => (
+                      <div
+                        key={src}
+                        className="relative col-span-1 rounded-xl border-2 border-gray-100 bg-white overflow-hidden min-h-[88px]"
+                      >
+                        <Image
+                          src={src}
+                          alt={alt}
+                          fill
+                          className="object-contain p-1.5"
+                          sizes="200px"
+                        />
+                      </div>
+                    ))}
+                    {/* More terms to fill the sheet */}
+                    {cheatSheetTerms?.slice(2).map(({ term, def }) => (
+                      <div
+                        key={term}
+                        className="rounded-xl border-2 border-gray-100 bg-gray-50 p-2.5"
+                      >
+                        <p className="text-xs font-black text-gray-900">{term}</p>
+                        <p className="text-[10px] text-gray-600 mt-0.5 leading-snug">{def}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </Link>
 
             {/* Floating card — MCQ Practice (top-right) */}
             <div
@@ -281,21 +356,20 @@ export function HeroSection() {
             >
               <p className="text-[8px] font-black uppercase tracking-widest text-gray-400 mb-2">AP MCQ Practice</p>
               <p className="text-[11px] font-bold text-gray-900 leading-snug mb-2.5">
-                "In a competitive market, equilibrium is achieved when..."
+                {config.mcqPreview.question}
               </p>
               <div className="space-y-1.5">
-                {[
-                  { letter: 'A', text: 'There is a surplus of the good', correct: false },
-                  { letter: 'B', text: 'Qty supplied = qty demanded', correct: true },
-                  { letter: 'C', text: 'Price is set by the government', correct: false },
-                ].map(({ letter, text, correct }) => (
+                {config.mcqPreview.options.map(({ letter, text, correct }) => (
                   <div
                     key={letter}
                     className={`flex items-center gap-2 px-2 py-1.5 rounded-lg border text-[9px] font-semibold ${
-                      correct ? 'bg-green-50 border-green-400 text-green-800' : 'border-gray-100 text-gray-500'
+                      correct ? theme.mcqCorrectClass : 'border-gray-100 text-gray-500'
                     }`}
                   >
-                    <span className={`w-4 h-4 rounded-full border flex items-center justify-center text-[7px] font-black flex-shrink-0 ${correct ? 'bg-green-500 border-green-500 text-white' : 'border-gray-300 text-gray-400'}`}>
+                    <span className={`w-4 h-4 rounded-full border flex items-center justify-center text-[7px] font-black flex-shrink-0 ${
+                      correct ? theme.mcqCorrectBadgeClass : 'border-gray-300 text-gray-400'
+                    }`}
+                    >
                       {letter}
                     </span>
                     {text}
@@ -304,22 +378,24 @@ export function HeroSection() {
               </div>
             </div>
 
-            {/* Floating card — AI FRQ Feedback (bottom-left) */}
+            {/* Floating card — FRQ / practice feedback (bottom-left) */}
             <div
               className="absolute rounded-2xl border-2 border-black bg-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] p-3.5"
               style={{ bottom: 0, left: 0, width: 250, zIndex: 20 }}
             >
               <div className="flex items-center justify-between mb-2">
-                <p className="text-[8px] font-black uppercase tracking-widest text-gray-400">AI FRQ Feedback</p>
+                <p className="text-[8px] font-black uppercase tracking-widest text-gray-400">{config.frqPreview.label}</p>
                 <span className="text-[8px] font-black bg-green-100 text-green-700 border border-green-300 px-2 py-0.5 rounded-full">
-                  1 / 1 pts
+                  {config.frqPreview.score}
                 </span>
               </div>
               <div className="text-[10px] text-gray-700 font-medium leading-snug bg-gray-50 rounded-xl p-2.5 border border-gray-100">
-                <span className="text-green-600 font-black">✓ Correct.</span> You identified that decreasing the IOR rate increases the money supply and lowers interest rates — consistent with expansionary monetary policy.
+                {config.frqPreview.feedback}
               </div>
             </div>
 
+              </motion.div>
+            </AnimatePresence>
           </motion.div>
 
         </motion.div>

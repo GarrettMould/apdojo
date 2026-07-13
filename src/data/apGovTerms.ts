@@ -484,7 +484,8 @@ export const govUnitSupremeCourtCases: Record<number, GovSupremeCourtCase[]> = {
       year: 1803,
       unit: 1,
       lessonIDs: ['1.6'],
-      videoUrl: '',
+      videoUrl:
+        'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/ap_gov/supreme_court_cases/marbury+mads+final.mp4',
       summary:
         'Established judicial review by holding that the Supreme Court may declare acts of Congress unconstitutional.',
       facts:

@@ -99,6 +99,10 @@ export const UNIT_TEST_META: SubjectTestMeta = {
   ],
   stats: [
     statsUnitMeta(1, 20), // 43 min
+    statsUnitMeta(2, 20), // 43 min
+    statsUnitMeta(3, 20), // 43 min
+    statsUnitMeta(4, 20), // 43 min
+    statsUnitMeta(5, 20), // 43 min
   ],
 };
 

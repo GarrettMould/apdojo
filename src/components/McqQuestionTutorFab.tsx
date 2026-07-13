@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import ReactMarkdown from 'react-markdown';
 import { Send, X } from 'lucide-react';
+import { TutorAssistantMarkdown } from '@/components/TutorAssistantMarkdown';
 import type { CourseSubject } from '@/lib/courseSubject';
 import { displayCourseLabel } from '@/lib/courseSubject';
 import { personaForSubject, tutorWelcomeOpening } from '@/lib/chatPersonas';
@@ -168,40 +168,6 @@ function QuickChoiceGrid({
           </button>
         ))}
       </div>
-    </div>
-  );
-}
-
-function sanitizeTutorMarkdownAsteriskLookalikes(raw: string): string {
-  return raw.replace(/[\uFF0A\u2217\u204E\uFE61\u2731]/g, '*');
-}
-
-function AssistantMarkdown({ text }: { text: string }) {
-  return (
-    <div className="tutor-markdown text-slate-700 font-semibold [&_strong]:font-black [&_strong]:text-slate-900 [&_b]:font-black [&_b]:text-slate-900 [&_em]:italic [&_blockquote]:border-l-2 [&_blockquote]:border-slate-200 [&_blockquote]:pl-3 [&_blockquote]:italic [&_blockquote]:text-slate-600">
-      <ReactMarkdown
-        components={{
-          p: ({ children }) => <p className="mb-2 whitespace-pre-wrap last:mb-0">{children}</p>,
-          strong: ({ children }) => (
-            <strong className="font-semibold text-slate-900">{children}</strong>
-          ),
-          em: ({ children }) => <em className="italic text-slate-800">{children}</em>,
-          ul: ({ children }) => (
-            <ul className="mb-2 list-disc space-y-0.5 pl-5 last:mb-0">{children}</ul>
-          ),
-          ol: ({ children }) => (
-            <ol className="mb-2 list-decimal space-y-0.5 pl-5 last:mb-0">{children}</ol>
-          ),
-          li: ({ children }) => <li className="leading-snug">{children}</li>,
-          code: ({ children }) => (
-            <code className="rounded bg-slate-100 px-1 py-0.5 text-[13px] text-slate-800">
-              {children}
-            </code>
-          ),
-        }}
-      >
-        {sanitizeTutorMarkdownAsteriskLookalikes(text)}
-      </ReactMarkdown>
     </div>
   );
 }
@@ -659,7 +625,10 @@ export function McqQuestionTutorFab({
                         <div className="max-w-none px-3.5 py-2.5 text-[14px] leading-relaxed shadow-sm rounded-2xl rounded-bl-md border border-slate-100/90 bg-white text-slate-800">
                           {parsedAssistant ? (
                             assistantLead ? (
-                              <AssistantMarkdown text={assistantLead} />
+                              <TutorAssistantMarkdown
+                                text={assistantLead}
+                                className="tutor-markdown text-slate-700 font-semibold [&_strong]:font-black [&_strong]:text-slate-900 [&_b]:font-black [&_b]:text-slate-900 [&_em]:italic [&_blockquote]:border-l-2 [&_blockquote]:border-slate-200 [&_blockquote]:pl-3 [&_blockquote]:italic [&_blockquote]:text-slate-600 [&_.katex]:text-inherit"
+                              />
                             ) : parsedAssistant.choices.length > 0 ? (
                               <p className="text-sm text-slate-500">Choose a step —</p>
                             ) : (

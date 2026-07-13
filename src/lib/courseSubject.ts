@@ -1,5 +1,7 @@
 import type { Unit } from '@/data/cheatSheets';
 import { govUnits, macroUnits, microUnits, statsUnits } from '@/data/cheatSheets';
+import { getGovUnitStimulusFrqs } from '@/data/gov/govUnitStimulusFrqs';
+import { getStatsUnitStimulusFrqs } from '@/data/stats/statsUnitStimulusFrqs';
 import type { Question } from '@/data/questionBanks/types';
 
 /** Canonical in-app course (Firestore `selectedSubject`, URL slugs, XP keys, etc.). */
@@ -201,15 +203,31 @@ export function isGovMcqTestUnitAvailable(unitNumber: number): boolean {
 }
 
 /** Stats units with formal MCQ unit tests in `src/data/apstats/statsUnit*McqExam.ts`. */
-export const STATS_MCQ_TEST_UNIT_NUMBERS = [1] as const;
+export const STATS_MCQ_TEST_UNIT_NUMBERS = [1, 2, 3, 4, 5] as const;
 
 export function isStatsMcqTestUnitAvailable(unitNumber: number): boolean {
   return (STATS_MCQ_TEST_UNIT_NUMBERS as readonly number[]).includes(unitNumber);
 }
 
 /** Stats units with formal FRQ packs in `src/data/apstats/statsUnitStimulusFrqs.ts`. */
-export const STATS_FRQ_TEST_UNIT_NUMBERS = [1] as const;
+export const STATS_FRQ_TEST_UNIT_NUMBERS = [1, 2, 3, 4, 5] as const;
 
 export function isStatsFrqTestUnitAvailable(unitNumber: number): boolean {
   return (STATS_FRQ_TEST_UNIT_NUMBERS as readonly number[]).includes(unitNumber);
+}
+
+export function isUnitMcqTestAvailable(subject: CourseSubject, unitNumber: number): boolean {
+  if (subject === 'stats') return isStatsMcqTestUnitAvailable(unitNumber);
+  if (subject === 'gov') return isGovMcqTestUnitAvailable(unitNumber);
+  return unitNumber >= 1 && unitNumber <= 6;
+}
+
+export function isUnitFrqPackAvailable(subject: CourseSubject, unitNumber: number): boolean {
+  if (subject === 'stats') {
+    return isStatsFrqTestUnitAvailable(unitNumber) && getStatsUnitStimulusFrqs(unitNumber).length > 0;
+  }
+  if (subject === 'gov') {
+    return getGovUnitStimulusFrqs(unitNumber).length > 0;
+  }
+  return false;
 }

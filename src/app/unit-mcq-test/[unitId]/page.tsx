@@ -115,7 +115,7 @@ export default function UnitMCQTestPage() {
   if (isLockedUnit) {
     const lockedMessage =
       effectiveSubject === 'stats'
-        ? `AP Stats Unit ${unitNumber} practice exam is not available yet. Unit 1 is available now.`
+        ? `AP Stats Unit ${unitNumber} practice exam is not available yet. Units 1–5 are available now.`
         : `AP Gov Unit ${unitNumber} practice exam is not available yet. Units 1–2 are available now.`;
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center pt-16 pb-12 px-4">

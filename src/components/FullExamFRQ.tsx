@@ -9,6 +9,7 @@ import {
   Pause,
   Play,
   PlayCircle,
+  Lock,
   Eye,
   List,
   ChevronUp,
@@ -21,6 +22,13 @@ import { AnimatePresence, motion } from 'framer-motion';
 import Image, { StaticImageData } from 'next/image';
 import { useRouter } from 'next/navigation';
 import { unitFrqTimeLimitSeconds } from '@/data/unitTestMeta';
+import { useAuthContext } from '@/contexts/AuthContext';
+import {
+  getUnitFrqTestId,
+  saveTestProgress,
+  saveTestResult,
+} from '@/lib/testProgress';
+import type { CourseSubject } from '@/lib/courseSubject';
 
 interface TableData {
   title?: string;
@@ -39,6 +47,7 @@ interface SubPart {
   answerType: 'draw' | 'text';
   answer?: StaticImageData | string;
   partImage?: { src: string; alt?: string };
+  templateImageUrl?: string;
 }
 
 interface Part {
@@ -52,6 +61,7 @@ interface Part {
   stimulusImage?: { src: string; alt?: string };
   partImage?: { src: string; alt?: string };
   drawPrompt?: string;
+  templateImageUrl?: string;
 }
 
 interface FrqImageRef {
@@ -86,6 +96,8 @@ interface FullExamFRQProps {
   };
   examType?: 'macro' | 'micro' | 'gov' | 'stats';
   backUrl?: string;
+  /** When set with gov/stats examType, submission is saved for unit FRQ completion tracking. */
+  unitNumber?: number;
   /** Hide the bottom “Question N of M” dropdown + numbered grid; use Prev/Next only. */
   hideExpandingQuestionNav?: boolean;
 }
@@ -127,9 +139,11 @@ export function FullExamFRQ({
   questions,
   examType = 'macro',
   backUrl,
+  unitNumber,
   hideExpandingQuestionNav = false,
 }: FullExamFRQProps) {
   const router = useRouter();
+  const { user } = useAuthContext();
   const frqSessionTotalSeconds =
     examType === 'gov' || examType === 'stats'
       ? unitFrqTimeLimitSeconds(questions.questions.length, examType)
@@ -180,6 +194,34 @@ export function FullExamFRQ({
         : examType === 'stats'
           ? 'text-orange-700 hover:text-orange-900'
           : 'text-violet-700 hover:text-violet-900';
+
+  const walkthroughTheme =
+    examType === 'stats'
+      ? {
+          banner: 'border-orange-300 bg-gradient-to-br from-orange-50 to-amber-50/90 text-orange-950',
+          iconWrap: 'border-orange-400 bg-orange-100 text-orange-700',
+          pill: 'border-orange-300 bg-white/90 text-orange-800',
+          pillUnlocked: 'border-emerald-400 bg-emerald-50 text-emerald-800',
+          button:
+            'border-orange-900 bg-orange-500 text-white hover:bg-orange-600 shadow-[3px_3px_0px_0px_rgba(154,52,18,1)] hover:shadow-[2px_2px_0px_0px_rgba(154,52,18,1)]',
+        }
+      : examType === 'gov'
+        ? {
+            banner: 'border-violet-300 bg-gradient-to-br from-violet-50 to-fuchsia-50/80 text-violet-950',
+            iconWrap: 'border-violet-400 bg-violet-100 text-violet-700',
+            pill: 'border-violet-300 bg-white/90 text-violet-800',
+            pillUnlocked: 'border-emerald-400 bg-emerald-50 text-emerald-800',
+            button:
+              'border-violet-900 bg-violet-500 text-white hover:bg-violet-600 shadow-[3px_3px_0px_0px_rgba(76,29,149,1)] hover:shadow-[2px_2px_0px_0px_rgba(76,29,149,1)]',
+          }
+        : {
+            banner: 'border-sky-300 bg-gradient-to-br from-sky-50 to-cyan-50/80 text-sky-950',
+            iconWrap: 'border-sky-400 bg-sky-100 text-sky-700',
+            pill: 'border-sky-300 bg-white/90 text-sky-800',
+            pillUnlocked: 'border-emerald-400 bg-emerald-50 text-emerald-800',
+            button:
+              'border-sky-900 bg-sky-500 text-white hover:bg-sky-600 shadow-[3px_3px_0px_0px_rgba(12,74,110,1)] hover:shadow-[2px_2px_0px_0px_rgba(12,74,110,1)]',
+          };
 
   const answerFocusClass =
     examType === 'macro'
@@ -244,9 +286,45 @@ export function FullExamFRQ({
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setShowResults(true);
     window.scrollTo({ top: 0 });
+
+    const isUnitFrqPack =
+      unitNumber != null &&
+      (examType === 'gov' || examType === 'stats') &&
+      questions.questions.length > 0;
+
+    if (user && isUnitFrqPack) {
+      const subject = examType as CourseSubject;
+      const testId = getUnitFrqTestId(unitNumber, subject);
+      const totalQuestions = questions.questions.length;
+      try {
+        await saveTestResult({
+          userId: user.uid,
+          testType: 'full_frq',
+          testId,
+          score: 0,
+          totalQuestions,
+        });
+        await saveTestProgress({
+          userId: user.uid,
+          testType: 'full_frq',
+          testId,
+          progress: {
+            textAnswers,
+            drawingAnswers,
+            currentQuestionIndex,
+            isSubmitted: true,
+            totalQuestions,
+            startedAt: new Date(),
+            lastUpdated: new Date(),
+          },
+        });
+      } catch (error) {
+        console.error('[FullExamFRQ] Error saving unit FRQ result:', error);
+      }
+    }
   };
 
   const handleExit = () => {
@@ -259,6 +337,76 @@ export function FullExamFRQ({
 
     const currentQuestion = questions.questions[currentQuestionIndex];
   const fontClass = FONT_SIZE_CLASSES[questionFontSize];
+  const hasWalkthroughVideos =
+    isFrqPackExamType(examType) && questions.questions.some((q) => q.walkthroughVideoUrl);
+  const walkthroughQuestionCount = questions.questions.filter((q) => q.walkthroughVideoUrl).length;
+  const currentQuestionHasWalkthrough = !!currentQuestion.walkthroughVideoUrl;
+
+  const renderWalkthroughCard = (
+    mode: 'locked' | 'unlocked',
+    options?: { onWatch?: () => void; className?: string },
+  ) => {
+    const isLocked = mode === 'locked';
+    const StatusIcon = isLocked ? Lock : PlayCircle;
+
+    return (
+      <div
+        className={`overflow-hidden rounded-2xl border-2 shadow-[4px_4px_0px_0px_rgba(17,24,39,0.07)] ${walkthroughTheme.banner} ${options?.className ?? ''}`}
+        role="note"
+      >
+        <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+          <div className="flex min-w-0 items-start gap-3.5 sm:gap-4">
+            <div
+              className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border-2 ${walkthroughTheme.iconWrap}`}
+              aria-hidden
+            >
+              <StatusIcon className="h-5 w-5" />
+            </div>
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="text-sm font-black tracking-tight text-gray-900">Video walkthrough</p>
+                <span
+                  className={`rounded-full border px-2 py-0.5 text-[10px] font-black uppercase tracking-wider ${
+                    isLocked ? walkthroughTheme.pill : walkthroughTheme.pillUnlocked
+                  }`}
+                >
+                  {isLocked ? 'Unlocks on submit' : 'Unlocked'}
+                </span>
+              </div>
+              <p className="mt-1.5 text-sm leading-relaxed text-gray-700">
+                {isLocked ? (
+                  currentQuestionHasWalkthrough ? (
+                    <>
+                      Finish and submit to watch a step-by-step solution for{' '}
+                      <span className="font-semibold text-gray-900">this question</span>.
+                    </>
+                  ) : (
+                    <>
+                      {walkthroughQuestionCount} question{walkthroughQuestionCount === 1 ? '' : 's'} in this
+                      pack {walkthroughQuestionCount === 1 ? 'includes a' : 'include'} walkthrough on your
+                      results page.
+                    </>
+                  )
+                ) : (
+                  'Review the model solution part by part and compare it to your responses.'
+                )}
+              </p>
+            </div>
+          </div>
+          {!isLocked && options?.onWatch ? (
+            <button
+              type="button"
+              onClick={options.onWatch}
+              className={`inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-xl border-2 px-4 py-2.5 text-sm font-bold transition-transform hover:-translate-y-0.5 sm:w-auto ${walkthroughTheme.button}`}
+            >
+              <PlayCircle className="h-5 w-5 shrink-0" aria-hidden />
+              Watch walkthrough
+            </button>
+          ) : null}
+        </div>
+      </div>
+    );
+  };
 
   const renderTable = (tableData: TableData, _bleed: 'none' | 'exam' | 'results' = 'none') => {
     const tableElClass = 'min-w-full border-collapse border border-black';
@@ -425,7 +573,7 @@ export function FullExamFRQ({
           </div>
         ) : null}
 
-        {part.partImage && !part.drawPrompt ? (
+        {part.partImage && !part.drawPrompt && !part.templateImageUrl ? (
           <div className={`${answerMargin} ${statsFrqImageContainerClass(examType)}`}>
             <ExpandableQuestionImage
               src={part.partImage.src}
@@ -465,9 +613,10 @@ export function FullExamFRQ({
                         <DrawingPad
                           key={drawKey}
                           isLarge={true}
-                          className="w-full relative"
+                          className="relative h-full w-full"
                           hideDoneButton
                           initialData={drawingAnswers[drawKey]}
+                          templateImageUrl={part.templateImageUrl}
                           onSave={(data) => handleDrawingAnswer(drawKey, data)}
                         />
                       </div>
@@ -485,9 +634,10 @@ export function FullExamFRQ({
                   <DrawingPad
                     key={drawKey}
                     isLarge={true}
-                    className="w-full relative"
+                    className="relative h-full w-full"
                     hideDoneButton
                     initialData={drawingAnswers[drawKey]}
+                    templateImageUrl={part.templateImageUrl}
                     onSave={(data) => handleDrawingAnswer(drawKey, data)}
                   />
                 </div>
@@ -506,7 +656,7 @@ export function FullExamFRQ({
                     {subpart.text}
                   </p>
                 </div>
-                {subpart.partImage ? (
+                {subpart.partImage && !subpart.templateImageUrl ? (
                   <div className={`ml-6 ${statsFrqImageContainerClass(examType)}`}>
                     <ExpandableQuestionImage
                       src={subpart.partImage.src}
@@ -537,10 +687,11 @@ export function FullExamFRQ({
                           <DrawingPad
                             key={drawKey}
                             isLarge={true}
-                            className="w-full relative"
+                            className="relative h-full w-full"
                             hideDoneButton
                             onSave={(data) => handleDrawingAnswer(drawKey, data)}
                             initialData={drawingAnswers[drawKey]}
+                            templateImageUrl={subpart.templateImageUrl}
                           />
                         </div>
                       );
@@ -557,19 +708,20 @@ export function FullExamFRQ({
 
   const ResultsView = () => {
     const [resultsIndex, setResultsIndex] = useState(0);
-    const [walkthroughVideoUrl, setWalkthroughVideoUrl] = useState<string | null>(null);
+    const [walkthroughOpen, setWalkthroughOpen] = useState(false);
     const rq = questions.questions[resultsIndex];
 
     useEffect(() => {
-      setWalkthroughVideoUrl(null);
+      setWalkthroughOpen(false);
     }, [resultsIndex]);
 
     return (
       <>
       <VideoModal
-        isOpen={!!walkthroughVideoUrl}
-        onClose={() => setWalkthroughVideoUrl(null)}
-        videoUrl={walkthroughVideoUrl ?? ''}
+        isOpen={walkthroughOpen && !!rq.walkthroughVideoUrl}
+        onClose={() => setWalkthroughOpen(false)}
+        videoUrl={rq.walkthroughVideoUrl ?? ''}
+        title={`Question ${resultsIndex + 1} walkthrough`}
       />
       <div className="min-h-dvh w-full bg-gradient-to-b from-slate-50 via-white to-slate-100/85 pb-36">
         {backUrl ? (
@@ -589,22 +741,15 @@ export function FullExamFRQ({
         <div className="mx-auto mb-10 w-full max-w-7xl rounded-2xl border border-slate-200/90 bg-white/95 shadow-[0_24px_60px_-28px_rgba(15,23,42,0.12)] ring-1 ring-slate-900/[0.05] sm:mb-12">
           <div className="px-4 py-5 sm:px-6 sm:py-6">
         <div className="mb-8">
-          <p className="text-xs font-black uppercase tracking-widest text-gray-400 mb-1">Results</p>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <div>
+            <p className="text-xs font-black uppercase tracking-widest text-gray-400 mb-1">Results</p>
             <h2 className={`font-bold text-gray-900 ${fontClass}`}>
               Question {resultsIndex + 1} of {questions.questions.length}
             </h2>
-            {rq.walkthroughVideoUrl ? (
-              <button
-                type="button"
-                onClick={() => setWalkthroughVideoUrl(rq.walkthroughVideoUrl!)}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-sky-300 bg-sky-50 px-3 py-1.5 text-sm font-semibold text-sky-800 hover:bg-sky-100 transition-colors"
-              >
-                <PlayCircle className="h-4 w-4 shrink-0" aria-hidden />
-                Video walkthrough
-              </button>
-            ) : null}
           </div>
+          {rq.walkthroughVideoUrl
+            ? renderWalkthroughCard('unlocked', { onWatch: () => setWalkthroughOpen(true), className: 'mt-4' })
+            : null}
         </div>
 
         <div className="mb-4">{renderGovFrqPrompt(rq)}</div>
@@ -956,6 +1101,8 @@ export function FullExamFRQ({
                 of {questions.questions.length}
               </span>
             </div>
+
+            {hasWalkthroughVideos ? renderWalkthroughCard('locked', { className: 'mb-6' }) : null}
 
             {/* Prompt / Gov SCOTUS stimulus layout */}
             {renderGovFrqPrompt(currentQuestion)}

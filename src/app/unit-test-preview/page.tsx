@@ -221,8 +221,8 @@ function UnitTestPreviewContent() {
             {isStats ? 'Stats' : 'Gov'} isn&apos;t available yet.
             {isStats
               ? isFrqPreview
-                ? ' Unit 1 FRQ pack is live now.'
-                : ' Unit 1 MCQ test is live now.'
+                ? ' Units 1–5 FRQ packs are live now.'
+                : ' Units 1–5 MCQ tests are live now.'
               : isFrqPreview
                 ? ' Units 1–2 FRQ packs are live now.'
                 : ' Units 1–2 MCQ tests are live now.'}

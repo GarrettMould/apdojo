@@ -12,7 +12,7 @@ import Link from 'next/link';
 import { keyTerms as apMacroTerms } from '@/data/apMacroTerms';
 import { keyTerms as apMicroTerms } from '@/data/apMicroTerms';
 import { keyTerms as apGovTerms, govUnitSupremeCourtCases } from '@/data/apGovTerms';
-import { keyTerms as apStatsTerms } from '@/data/apStatsTerms';
+import { keyTerms as apStatsTerms, getStatsLessonStudyTips } from '@/data/apStatsTerms';
 import { getStatsUnitCheatSheetVideos } from '@/data/stats/statsUnitVideos';
 import { unit1Whiteboards, apMacroUnit2Whiteboards, apMacroUnit3Whiteboards, apMacroUnit4Whiteboards, apMacroUnit5Whiteboards, apMicroUnit3Whiteboards, apMicroUnit4Whiteboards, apMicroUnit5Whiteboards, apMicroUnit6Whiteboards, Whiteboard } from '@/data/whiteboards';
 import { microLessons, macroLessons } from '@/data/lessons';
@@ -1404,8 +1404,8 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
         : `Please explain these concepts: ${topTerms.join(', ')}.`;
     const prompt =
       selectedTermObjects.length === 1
-        ? `Unit ${activeUnitNum} (${selectedSubject}). Tutor me on **${topTerms[0]}** for AP exam use. Keep it concise: 3-5 bullets max, include 1 connection to a nearby unit concept and 1 common misconception. End with [[CHOICES]].`
-        : `Unit ${activeUnitNum} (${selectedSubject}). Tutor me on these selected terms: ${topTerms.join(', ')}. Keep it concise: 4-6 bullets total, highlight how they connect, and include 2 common misconceptions total. End with [[CHOICES]].`;
+        ? `Unit ${activeUnitNum} (${selectedSubject}). Tutor me on **${topTerms[0]}** for AP exam use. Give a complete short explanation (several short paragraphs or bullets), include 1 connection to a nearby unit concept and 1 common misconception, then finish with a proper [[CHOICES]] follow-up block per your instructions.`
+        : `Unit ${activeUnitNum} (${selectedSubject}). Tutor me on these selected terms: ${topTerms.join(', ')}. Give a complete short explanation (4–6 bullets total), highlight how they connect, include 2 common misconceptions total, then finish with a proper [[CHOICES]] follow-up block per your instructions.`;
     setChatPromptDisplayText(displayPrompt);
     setChatPromptText(prompt);
     setChatPromptNonce((n) => n + 1);
@@ -1654,6 +1654,19 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
       lessonGroups.get(lessonId)!.keyTerms.push(term);
     });
   });
+
+  // Stats cheat sheets: show every CED lesson for the unit even before key terms ship.
+  if (selectedSubject === 'stats') {
+    const statsUnitOutline = COURSE_CURRICULUM_OUTLINES.stats.units.find(
+      (u) => u.unitNumber === activeUnitNum
+    );
+    statsUnitOutline?.lessons.forEach((lesson) => {
+      const lessonId = lesson.lessonNumber;
+      if (!lessonGroups.has(lessonId)) {
+        lessonGroups.set(lessonId, { whiteboards: [], keyTerms: [] });
+      }
+    });
+  }
                 
   const sortedLessons: LessonContent[] = Array.from(lessonGroups.entries())
     .map(([lessonId, content]) => ({ lessonId, ...content }))
@@ -2374,6 +2387,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                         src={firstVideo.videoUrl}
                         controls
                         playsInline
+                        preload="metadata"
                         className="h-full w-full"
                       >
                         Your browser does not support the video tag.
@@ -2383,13 +2397,20 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                     <div className="aspect-video w-full bg-gray-50" aria-hidden />
                   )}
                 </article>
-                <article className="overflow-hidden rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.08)]">
+                <article
+                  className={
+                    secondVideo
+                      ? 'overflow-hidden rounded-xl border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]'
+                      : 'overflow-hidden rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.08)]'
+                  }
+                >
                   {secondVideo ? (
                     <div className="relative aspect-video w-full overflow-hidden bg-black">
                       <video
                         src={secondVideo.videoUrl}
                         controls
                         playsInline
+                        preload="metadata"
                         className="h-full w-full"
                       >
                         Your browser does not support the video tag.
@@ -2895,6 +2916,24 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                 );
               })()}
               
+              {selectedSubject === 'stats' && (() => {
+                const lessonStudyTips = getStatsLessonStudyTips(activeUnitNum, lessonId);
+                if (lessonStudyTips.length === 0) return null;
+                return (
+                  <div className="mb-6 rounded-lg border border-orange-200 bg-orange-50/90 p-4 sm:p-5">
+                    <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-orange-900">
+                      <Lightbulb className="h-5 w-5 shrink-0" aria-hidden />
+                      Study Tips
+                    </h3>
+                    <ul className="list-disc space-y-2 pl-5 text-sm leading-relaxed text-orange-950/90">
+                      {lessonStudyTips.map((tip) => (
+                        <li key={tip}>{tip}</li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })()}
+
               {/* Key Terms Section */}
               {keyTerms.length > 0 && (
                 <div>

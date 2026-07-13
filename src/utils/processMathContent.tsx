@@ -218,7 +218,11 @@ function applyHighlightsToPlainText(
   highlights: MathTextHighlight[],
   onRemoveHighlight?: (id: string) => void
 ): React.ReactNode {
-  if (segment.includes('*')) {
+  // Only recurse into emphasis rendering when a valid *...* pair exists.
+  // Plain stray asterisks (e.g. "p*") should be treated as normal text.
+  SINGLE_EMPHASIS_PATTERN.lastIndex = 0;
+  if (SINGLE_EMPHASIS_PATTERN.test(segment)) {
+    SINGLE_EMPHASIS_PATTERN.lastIndex = 0;
     return renderEmphasisWithHighlights(
       segment,
       segmentOffset,

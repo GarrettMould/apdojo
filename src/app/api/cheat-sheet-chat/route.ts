@@ -15,8 +15,7 @@ import {
   parseFrqTutorContextPayload,
 } from '@/lib/frqTutorContext';
 import { auth as adminAuth, db as adminDb } from '@/lib/firebase-admin';
-
-const MODEL_NAME = 'gemini-flash-latest';
+import { geminiModelForCheatSheetChat } from '@/lib/geminiModels';
 
 const MAX_MESSAGES = 32;
 const MAX_MESSAGE_CHARS = 12_000;
@@ -639,23 +638,34 @@ export async function POST(req: NextRequest) {
           : buildSystemInstruction(subject, unitNumber, unitTitle);
 
   try {
+    const modelName = geminiModelForCheatSheetChat({
+      mode,
+      scotusEssayIntent,
+      hasMcqContext: mcqContext != null,
+      hasFrqContext: frqContextPayload != null,
+    });
+
+    const generationConfig: Record<string, unknown> = {
+      temperature: scotusEssayIntent === 'full_grade' ? 0.35 : 0.72,
+      maxOutputTokens:
+        scotusEssayIntent === 'full_grade'
+          ? 2048
+          : scotusEssayIntent === 'part_check'
+            ? 1536
+            : frqContextPayload != null
+              ? 1536
+              : mcqContext != null
+                ? 1024
+                : 1536,
+      // 2.5 models: thinking tokens share maxOutputTokens unless disabled.
+      thinkingConfig: { thinkingBudget: 0 },
+    };
+
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
-      model: MODEL_NAME,
+      model: modelName,
       systemInstruction,
-      generationConfig: {
-        temperature: scotusEssayIntent === 'full_grade' ? 0.35 : 0.72,
-        maxOutputTokens:
-          scotusEssayIntent === 'full_grade'
-            ? 2048
-            : scotusEssayIntent === 'part_check'
-              ? 1536
-              : frqContextPayload != null
-                ? 1536
-                : mcqContext != null
-                  ? 1280
-                  : 1024,
-      },
+      generationConfig,
     });
 
     const chat = model.startChat({ history });
@@ -676,10 +686,23 @@ export async function POST(req: NextRequest) {
       result = await chat.sendMessage(lastUserText);
     }
 
-    const reply = result.response.text()?.trim();
+    const candidate = result.response.candidates?.[0];
+    const finishReason = candidate?.finishReason;
+    let reply = result.response.text()?.trim() ?? '';
+
+    if (!reply && candidate?.content?.parts?.length) {
+      reply = candidate.content.parts
+        .map((part) => ('text' in part && typeof part.text === 'string' ? part.text : ''))
+        .join('')
+        .trim();
+    }
 
     if (!reply) {
       return NextResponse.json({ error: 'Empty model response.' }, { status: 502 });
+    }
+
+    if (finishReason === 'MAX_TOKENS') {
+      reply = `${reply}\n\n_(This reply was cut short by the model token limit—tap a follow-up or ask me to continue.)_`;
     }
 
     return NextResponse.json({ reply });

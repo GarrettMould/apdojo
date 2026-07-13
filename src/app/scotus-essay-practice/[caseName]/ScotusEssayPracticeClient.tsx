@@ -20,8 +20,8 @@ import { personaForSubject } from '@/lib/chatPersonas';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { hasAdminRole } from '@/lib/adminAccess';
 import Link from 'next/link';
-import ReactMarkdown from 'react-markdown';
 import { TutorTypingPlaceholder } from '@/components/TutorTypingPlaceholder';
+import { TutorAssistantMarkdown } from '@/components/TutorAssistantMarkdown';
 
 type ScotusEssayPracticeClientProps = {
   caseName: string;
@@ -114,50 +114,6 @@ function buildPartCheckPayload(args: {
     '- Point out exactly what legal/historical detail is missing.',
     '- Give a concise rewrite move the student can apply immediately.',
   ].join('\n');
-}
-
-/** Map unicode asterisk lookalikes → ASCII so `**`/`*` match CommonMark emphasis rules (cheat sheet parity). */
-function sanitizeTutorMarkdownAsteriskLookalikes(raw: string): string {
-  return raw.replace(/[\uFF0A\u2217\u204E\uFE61\u2731]/g, '*');
-}
-
-function SenseiAssistantMarkdown({ text }: { text: string }) {
-  return (
-    <div className="tutor-markdown text-slate-700 [&_strong]:font-semibold [&_strong]:text-slate-900 [&_b]:font-semibold [&_b]:text-slate-900 [&_em]:italic [&_blockquote]:border-l-2 [&_blockquote]:border-slate-200 [&_blockquote]:pl-3 [&_blockquote]:italic [&_blockquote]:text-slate-600">
-      <ReactMarkdown
-        components={{
-          p: ({ children }) => <p className="mb-2 whitespace-pre-wrap last:mb-0">{children}</p>,
-          strong: ({ children }) => (
-            <strong className="font-semibold text-slate-900">{children}</strong>
-          ),
-          em: ({ children }) => <em className="italic text-slate-800">{children}</em>,
-          b: ({ children }) => <b className="font-semibold text-slate-900">{children}</b>,
-          ul: ({ children }) => (
-            <ul className="mb-2 list-disc space-y-0.5 pl-5 last:mb-0">{children}</ul>
-          ),
-          ol: ({ children }) => (
-            <ol className="mb-2 list-decimal space-y-0.5 pl-5 last:mb-0">{children}</ol>
-          ),
-          li: ({ children }) => <li className="leading-snug">{children}</li>,
-          a: ({ href, children }) => (
-            <a
-              href={href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-medium text-violet-700 underline underline-offset-2 hover:text-violet-800"
-            >
-              {children}
-            </a>
-          ),
-          code: ({ children }) => (
-            <code className="rounded bg-slate-100 px-1 py-0.5 text-[13px] text-slate-800">{children}</code>
-          ),
-        }}
-      >
-        {sanitizeTutorMarkdownAsteriskLookalikes(text)}
-      </ReactMarkdown>
-    </div>
-  );
 }
 
 export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPracticeClientProps) {
@@ -575,7 +531,10 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
                             ) : null}
                             <div className="flex min-w-0 flex-1 flex-col gap-1">
                               <div className="max-w-none rounded-2xl rounded-bl-md border border-slate-100/90 bg-white px-3.5 py-2.5 text-[14px] leading-relaxed text-slate-800 shadow-sm">
-                                <SenseiAssistantMarkdown text={m.content} />
+                                <TutorAssistantMarkdown
+                                  text={m.content}
+                                  linkClassName="font-medium text-violet-700 underline underline-offset-2 hover:text-violet-800"
+                                />
                               </div>
                             </div>
                           </div>

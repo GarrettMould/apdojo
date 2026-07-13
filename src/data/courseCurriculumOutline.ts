@@ -322,7 +322,7 @@ export const statsCurriculumOutline: CourseCurriculumOutline = {
     },
     {
       unitNumber: 2,
-      unitName: 'Random Variables, and Probability Distributions',
+      unitName: 'Probability, Random Variables, and Probability Distributions',
       lessons: [
         { lessonNumber: '2.1', name: 'Tabular and Graphical Representations for the Distributions of Two Categorical Variables' },
         { lessonNumber: '2.2', name: 'Summary Statistics for Two Categorical Variables' },
