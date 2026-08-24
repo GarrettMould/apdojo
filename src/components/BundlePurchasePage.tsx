@@ -111,7 +111,7 @@ export function BundlePurchasePage() {
                 </span>
               </div>
               <p className="text-sm text-gray-600 mt-2">
-                Valid until June 30th, 2026
+                Valid until June 30, 2027
               </p>
             </div>
 

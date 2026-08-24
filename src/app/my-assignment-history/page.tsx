@@ -6,7 +6,7 @@ import { useCourseContext, CourseProvider } from '@/contexts/CourseContext';
 import { collection, query, where, orderBy, limit, getDocs, getDoc, doc, collectionGroup } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { QuizHistoryEntry, restoreTableData } from '@/lib/quizHistory';
-import { getUnitMCQTestUrl } from '@/lib/utils';
+import { getUnitMCQTestUrl, getFullMCQExamPreviewUrl } from '@/lib/utils';
 import { dojoDrills, drillAppliesToSubject, getDrillUnitForSubject } from '@/data/dojoDrills';
 import { loadDojoDrillProgress } from '@/lib/dojoDrillProgress';
 import Link from 'next/link';
@@ -286,7 +286,8 @@ function MyAssignmentHistoryContent() {
     } else if (activity.type === 'quiz' || activity.type === 'custom-quiz') {
       return `/dashboard/history/${activity.id}`;
     } else if (activity.type === 'full-exam') {
-      return '/full-mcq-exam';
+      const subject = currentCourse === 'micro' ? 'micro' : 'macro';
+      return getFullMCQExamPreviewUrl(subject, 1);
     } else if (activity.type === 'unit-exam') {
       const unitMatch = activity.title.match(/Unit (\d+)/);
       return unitMatch ? getUnitMCQTestUrl(parseInt(unitMatch[1]), currentCourse) : '#';

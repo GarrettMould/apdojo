@@ -31,7 +31,7 @@ export function LayoutWrapper({ children }: LayoutWrapperProps) {
     pathname?.startsWith('/unit-mcq-test') ||
     pathname?.match(/^\/ap-(macro|micro|gov|stats)-unit-\d+-mcq-test/);
   const isUnitFrqPackPage = pathname?.startsWith('/unit-frq-pack');
-  const isFullMCQExamPage = pathname?.startsWith('/preview/') || pathname?.match(/^\/ap-(macro|micro)-mcq-practice-test-\d+/) || pathname?.startsWith('/full-mcq-exam-preview') || pathname?.match(/^\/ap-(macro|micro)-frq-practice-test-\d+/);
+  const isFullMCQExamPage = pathname?.startsWith('/preview/') || pathname?.match(/^\/ap-(macro|micro)-mcq-practice-test-\d+/) || pathname?.startsWith('/full-mcq-exam-preview') || pathname?.startsWith('/full-mcq-exam') || pathname?.match(/^\/ap-(macro|micro)-frq-practice-test-\d+/);
   const isCustomExamPage = pathname?.startsWith('/exam/custom');
 
   return (

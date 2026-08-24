@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     title: 'AP Macroeconomics Full MCQ Practice Exam | AP Dojo',
     description: 'Take a full-length AP Macroeconomics multiple-choice practice exam. 60 questions covering all 6 units.',
     type: 'website',
-    url: 'https://apdojo.com/full-mcq-exam',
+    url: 'https://apdojo.com/full-mcq-exam-preview?subject=macro&num=1',
   },
   twitter: {
     card: 'summary_large_image',
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     description: 'Take a full-length AP Macroeconomics multiple-choice practice exam. 60 questions covering all 6 units.',
   },
   alternates: {
-    canonical: 'https://apdojo.com/full-mcq-exam',
+    canonical: 'https://apdojo.com/full-mcq-exam-preview?subject=macro&num=1',
   },
 };
 

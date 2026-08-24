@@ -1,53 +1,36 @@
 'use client';
 
-import { Suspense, useMemo } from 'react';
+import { Suspense, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuthContext } from '@/contexts/AuthContext';
-import { hasValidSeasonPass } from '@/lib/utils';
-import { FullExam } from '@/components/FullExam';
-import { macroSetOneQuestions } from '@/data/questionBanks/macro/mcqs/macroSetOne';
-import { microSetOneQuestions } from '@/data/questionBanks/micro/mcqs/setOne';
-import { QuestionBank } from '@/data/questionBanks/types';
+import { getFullMCQExamPreviewUrl } from '@/lib/utils';
 
-export default function FullMCQExamPage() {
-  const { user, userData, selectedSubject } = useAuthContext();
-  
-  // No redirect - allow everyone to see question 1, access check happens in FullExam
+function FullMCQExamRedirect() {
+  const router = useRouter();
+  const { selectedSubject } = useAuthContext();
+  const subject = selectedSubject === 'micro' ? 'micro' : 'macro';
 
-  // Determine exam type from selectedSubject
-  const examType = selectedSubject === 'macro' ? 'macro' : 'micro';
-
-  // Convert questions to QuestionBank format for FullExam component
-  // Load the appropriate question set based on selectedSubject
-  const questionBank: QuestionBank = useMemo(() => {
-    if (selectedSubject === 'macro') {
-      return {
-        name: 'AP Macroeconomics Full MCQ Exam',
-        questions: macroSetOneQuestions.questions
-      };
-    } else {
-      return {
-        name: 'AP Microeconomics Full MCQ Exam',
-        questions: microSetOneQuestions.questions
-      };
-    }
-  }, [selectedSubject]);
+  useEffect(() => {
+    router.replace(getFullMCQExamPreviewUrl(subject, 1));
+  }, [router, subject]);
 
   return (
-    <div className="min-h-screen">
-      <Suspense
-        fallback={
-          <div className="flex min-h-[50vh] items-center justify-center text-slate-500">
-            Loading exam…
-          </div>
-        }
-      >
-        <FullExam
-          questionBank={questionBank}
-          examType={examType}
-          questionType="mcq"
-          examNumber="full"
-        />
-      </Suspense>
+    <div className="flex min-h-[50vh] items-center justify-center text-slate-500">
+      Loading exam…
     </div>
   );
-} 
+}
+
+export default function FullMCQExamPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-[50vh] items-center justify-center text-slate-500">
+          Loading exam…
+        </div>
+      }
+    >
+      <FullMCQExamRedirect />
+    </Suspense>
+  );
+}

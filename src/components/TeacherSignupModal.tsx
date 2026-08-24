@@ -89,8 +89,8 @@ export function TeacherSignupModal({ isOpen, onClose }: TeacherSignupModalProps)
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100]" />
-      <div className="fixed inset-0 flex items-center justify-center z-[101] p-4">
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[130]" />
+      <div className="fixed inset-0 flex items-center justify-center z-[131] p-4">
         <div className="max-w-xl w-full bg-white rounded-2xl shadow-xl border border-slate-200 relative overflow-y-auto max-h-[90vh]">
           <button
             type="button"

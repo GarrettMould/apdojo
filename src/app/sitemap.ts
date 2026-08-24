@@ -27,7 +27,25 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/full-mcq-exam`,
+      url: `${baseUrl}/full-mcq-exam-preview?subject=macro&num=1`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/full-mcq-exam-preview?subject=micro&num=1`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/ap-macro-mcq-practice-test-1`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/ap-micro-mcq-practice-test-1`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.9,

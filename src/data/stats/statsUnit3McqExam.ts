@@ -25,11 +25,13 @@ const TWO_CITY_VOTER_TABLE = {
   ],
 };
 
-const SODA_TAX_OPINION_TOTALS_TABLE = {
-  headers: ['Category', 'Support', 'Oppose', 'Total'],
+const SODA_TAX_OPINION_TABLE = {
+  headers: ['Age Group', 'Support', 'Oppose', 'Total'],
   rows: [
-    ['Row totals', '100', '100', '200'],
-    ['Age-group column totals', '50', '70', '80'],
+    ['18–30', '20', '30', '50'],
+    ['31–50', '45', '25', '70'],
+    ['51+', '35', '45', '80'],
+    ['Total', '100', '100', '200'],
   ],
 };
 
@@ -702,13 +704,13 @@ export const statsUnit3McqTestQuestions: Question[] = [
     lessonIDS: ['3.15'],
     unitName: UNIT_NAME,
     question:
-      'A public health researcher wants to know whether opinion on a proposed soda tax (support or oppose) is associated with age group. She surveys 200 randomly selected adults. The relevant row and column totals are shown in the table below. If the chi-square test assumes the variables are independent, what is the expected count for the "support" and "31–50" cell?',
+      'A public health researcher wants to know whether opinion on a proposed soda tax (Support, Oppose) is associated with age group. She surveys a random sample of 200 adults. The results are shown in the two-way table below. If a chi-square test for independence is performed on these data, what is the expected count for the "Support" and "31–50" cell?',
     image: null,
-    tableData: SODA_TAX_OPINION_TOTALS_TABLE,
+    tableData: SODA_TAX_OPINION_TABLE,
     options: stripOptionPrefixes(['A) 25', 'B) 35', 'C) 40', 'D) 50', 'E) 70']),
     correctAnswer: 'B',
     explanation:
-      'Expected count = (row total x column total) / total. Here, (100 x 70) / 200 = 35.',
+      'The expected count for a cell is (row total × column total) / table total. For the 31–50 and Support cell: (70 × 100) / 200 = 35.',
   },
   {
     id: 7309,
@@ -846,12 +848,12 @@ export const statsUnit3McqTestQuestions: Question[] = [
     lessonIDS: ['3.6'],
     unitName: UNIT_NAME,
     question:
-      'A researcher tests H0: p = 0.50 versus Ha: p ≠ 0.50 and obtains a test statistic of z = 2.10. The graph below shows the null distribution of the test statistic, with the shaded regions representing the p-value. Which of the following is closest to the p-value of this test?',
+      'A researcher tests H0: p = 0.50 versus Ha: p ≠ 0.50 and obtains a test statistic of z = 2.10. Which of the following is closest to the p-value of this test?',
     image: PVALUE_TWO_TAILED_CURVE,
     options: stripOptionPrefixes(['A) 0.0179', 'B) 0.0358', 'C) 0.9642', 'D) 0.4821', 'E) 0.0716']),
     correctAnswer: 'B',
     explanation:
-      'Because the alternative hypothesis is two-sided, the p-value is the combined area in both tails beyond |z| = 2.10, matching the two shaded regions shown in the graph: P(z ≤ -2.10) + P(z ≥ 2.10) = 2(0.0179) = 0.0358. Option A gives only one tail’s area, and option C gives the area between -2.10 and 2.10 (the complement of the p-value).',
+      'Because the alternative hypothesis is two-sided, the p-value is the combined area in both tails beyond |z| = 2.10: P(Z ≤ -2.10) + P(Z ≥ 2.10) = 2(0.0179) = 0.0358. Option A is only one tail, option C is the area between -2.10 and 2.10 (the complement of the p-value), option D is about half of that middle area, and option E is twice the two-tailed p-value.',
   },
   {
     id: 7317,

@@ -142,14 +142,19 @@ function chatTheme(subject: CourseSubject) {
       accent: 'text-sky-700',
       accentSoft: 'bg-sky-500',
       accentMuted: 'bg-sky-50 text-sky-950',
+      accentRing: 'ring-sky-500/25',
       userBubble: 'bg-sky-600 text-white',
       sendBtn:
-        'bg-sky-600 text-white hover:bg-sky-700 shadow-md shadow-sky-900/15 focus-visible:outline focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2',
+        'bg-sky-600 text-white hover:bg-sky-700 shadow-md shadow-sky-900/20 focus-visible:outline focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2',
       fab: 'bg-gradient-to-br from-sky-500 to-blue-600 shadow-lg shadow-sky-900/25 ring-1 ring-white/25',
-      inputFocus: 'focus:border-sky-400 focus:ring-sky-500/20',
+      inputFocus: 'focus-within:border-sky-400 focus-within:ring-sky-500/20',
       attachBtn:
-        'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 focus-visible:ring-sky-500',
+        'text-slate-500 hover:bg-sky-50 hover:text-sky-700 focus-visible:ring-sky-500',
+      quickChoice:
+        'border-sky-200/80 bg-sky-50/70 text-sky-950 hover:border-sky-300 hover:bg-sky-50',
       quickChoiceFocus: 'focus-visible:ring-sky-500',
+      headerWash: 'from-sky-50/90 via-white to-white',
+      onlineDot: 'bg-sky-500',
     };
   }
   if (subject === 'stats') {
@@ -157,14 +162,19 @@ function chatTheme(subject: CourseSubject) {
       accent: 'text-orange-700',
       accentSoft: 'bg-orange-500',
       accentMuted: 'bg-orange-50 text-orange-950',
+      accentRing: 'ring-orange-500/25',
       userBubble: 'bg-orange-600 text-white',
       sendBtn:
-        'bg-orange-600 text-white hover:bg-orange-700 shadow-md shadow-orange-900/15 focus-visible:outline focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2',
+        'bg-orange-600 text-white hover:bg-orange-700 shadow-md shadow-orange-900/20 focus-visible:outline focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2',
       fab: 'bg-gradient-to-br from-orange-500 to-amber-600 shadow-lg shadow-orange-900/25 ring-1 ring-white/25',
-      inputFocus: 'focus:border-orange-400 focus:ring-orange-500/20',
+      inputFocus: 'focus-within:border-orange-400 focus-within:ring-orange-500/20',
       attachBtn:
-        'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 focus-visible:ring-orange-500',
+        'text-slate-500 hover:bg-orange-50 hover:text-orange-700 focus-visible:ring-orange-500',
+      quickChoice:
+        'border-orange-200/80 bg-orange-50/70 text-orange-950 hover:border-orange-300 hover:bg-orange-50',
       quickChoiceFocus: 'focus-visible:ring-orange-500',
+      headerWash: 'from-orange-50/90 via-white to-white',
+      onlineDot: 'bg-orange-500',
     };
   }
   if (subject === 'micro') {
@@ -172,28 +182,38 @@ function chatTheme(subject: CourseSubject) {
       accent: 'text-emerald-700',
       accentSoft: 'bg-emerald-500',
       accentMuted: 'bg-emerald-50 text-emerald-950',
+      accentRing: 'ring-emerald-500/25',
       userBubble: 'bg-emerald-600 text-white',
       sendBtn:
-        'bg-emerald-600 text-white hover:bg-emerald-700 shadow-md shadow-emerald-900/15 focus-visible:outline focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2',
+        'bg-emerald-600 text-white hover:bg-emerald-700 shadow-md shadow-emerald-900/20 focus-visible:outline focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2',
       fab: 'bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg shadow-emerald-900/25 ring-1 ring-white/25',
-      inputFocus: 'focus:border-emerald-400 focus:ring-emerald-500/20',
+      inputFocus: 'focus-within:border-emerald-400 focus-within:ring-emerald-500/20',
       attachBtn:
-        'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 focus-visible:ring-emerald-500',
+        'text-slate-500 hover:bg-emerald-50 hover:text-emerald-700 focus-visible:ring-emerald-500',
+      quickChoice:
+        'border-emerald-200/80 bg-emerald-50/70 text-emerald-950 hover:border-emerald-300 hover:bg-emerald-50',
       quickChoiceFocus: 'focus-visible:ring-emerald-500',
+      headerWash: 'from-emerald-50/90 via-white to-white',
+      onlineDot: 'bg-emerald-500',
     };
   }
   return {
     accent: 'text-violet-700',
     accentSoft: 'bg-violet-500',
     accentMuted: 'bg-violet-50 text-violet-950',
+    accentRing: 'ring-violet-500/25',
     userBubble: 'bg-violet-600 text-white',
     sendBtn:
-      'bg-violet-600 text-white hover:bg-violet-700 shadow-md shadow-violet-900/15 focus-visible:outline focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2',
+      'bg-violet-600 text-white hover:bg-violet-700 shadow-md shadow-violet-900/20 focus-visible:outline focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2',
     fab: 'bg-gradient-to-br from-violet-500 to-fuchsia-600 shadow-lg shadow-violet-900/25 ring-1 ring-white/25',
-    inputFocus: 'focus:border-violet-400 focus:ring-violet-500/20',
+    inputFocus: 'focus-within:border-violet-400 focus-within:ring-violet-500/20',
     attachBtn:
-      'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 focus-visible:ring-violet-500',
+      'text-slate-500 hover:bg-violet-50 hover:text-violet-700 focus-visible:ring-violet-500',
+    quickChoice:
+      'border-violet-200/80 bg-violet-50/70 text-violet-950 hover:border-violet-300 hover:bg-violet-50',
     quickChoiceFocus: 'focus-visible:ring-violet-500',
+    headerWash: 'from-violet-50/90 via-white to-white',
+    onlineDot: 'bg-violet-500',
   };
 }
 
@@ -277,18 +297,18 @@ function QuickChoiceList({
   theme: ChatThemeReturn;
 }) {
   return (
-    <div className="mt-3 w-full max-w-[min(100%,21rem)]">
-      <p className="mb-2 text-xs font-medium tracking-tight text-slate-500">
-        What would you like to do now?
+    <div className="mt-2.5 w-full max-w-[min(100%,22rem)]">
+      <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-400">
+        Continue with
       </p>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-1.5">
         {choices.map((c, i) => (
           <button
             key={`${c.label}-${i}`}
             type="button"
             disabled={sending}
             onClick={() => onPick(c.prompt, c.label)}
-            className={`rounded-xl border px-3.5 py-2.5 text-left text-[13px] font-medium shadow-sm outline-none ring-offset-white transition hover:shadow-md focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-40 border-slate-200/95 bg-white text-slate-800 hover:bg-slate-50 active:scale-[0.99] ${theme.quickChoiceFocus}`}
+            className={`rounded-xl border px-3.5 py-2.5 text-left text-[13px] font-semibold leading-snug shadow-sm outline-none ring-offset-white transition hover:shadow-md focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-40 active:scale-[0.99] ${theme.quickChoice} ${theme.quickChoiceFocus}`}
           >
             <span className="block">{c.label}</span>
           </button>
@@ -523,6 +543,14 @@ export function CheatSheetChatBox({
     void executeSend(input.trim(), pending);
   };
 
+  const handleLauncherSubmit = () => {
+    const question = input.trim();
+    setOpen(true);
+    if (question) {
+      void executeSend(question, null);
+    }
+  };
+
   const sendChoicePrompt = useCallback(
     (prompt: string, label: string) => {
       void executeSend(displayTextForChoiceLabel(label), null, prompt);
@@ -557,8 +585,8 @@ export function CheatSheetChatBox({
       style={
         open && splitScreenOnDesktop
           ? {
-              right: 'max(0.75rem, env(safe-area-inset-right))',
-              bottom: 'max(0.75rem, env(safe-area-inset-bottom))',
+              right: 'max(1rem, env(safe-area-inset-right))',
+              bottom: 'max(1rem, env(safe-area-inset-bottom))',
               top: 'calc(80px + max(0.5rem, env(safe-area-inset-top)))',
             }
           : {
@@ -571,39 +599,58 @@ export function CheatSheetChatBox({
         <div
           role="dialog"
           aria-label="Unit tutor chat"
-          className={`pointer-events-auto relative flex h-[min(820px,92vh)] max-h-[92vh] w-[min(440px,calc(100vw-2rem))] flex-col overflow-hidden rounded-[1.25rem] border border-slate-200/90 bg-white/95 shadow-2xl shadow-slate-900/10 ring-1 ring-slate-900/[0.04] backdrop-blur-md ${
-            splitScreenOnDesktop ? 'lg:h-full lg:max-h-none lg:w-[25vw] lg:min-w-[300px] lg:rounded-xl' : ''
+          className={`pointer-events-auto relative flex h-[min(820px,92vh)] max-h-[92vh] w-[min(440px,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_24px_64px_-16px_rgba(15,23,42,0.28)] ring-1 ring-slate-900/[0.03] ${
+            splitScreenOnDesktop
+              ? 'lg:h-full lg:max-h-none lg:w-[min(26vw,380px)] lg:min-w-[300px] lg:rounded-xl'
+              : ''
           }`}
         >
-          <button
-            type="button"
-            onClick={() => setOpen(false)}
-            className="absolute right-3 top-3 z-20 flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white/90 text-slate-600 shadow-sm transition hover:bg-slate-100 hover:text-slate-900"
-            aria-label="Close tutor chat"
-            title="Close chat"
-          >
-            <X className="h-5 w-5" strokeWidth={2} />
-          </button>
           {/* Header */}
-          <div className="relative flex-shrink-0 border-b border-slate-100 bg-gradient-to-b from-slate-50/90 to-white px-4 py-3.5">
-            <div className={`absolute left-0 top-0 h-0.5 w-full ${theme.accentSoft} opacity-90`} aria-hidden />
-            <div className="min-w-0 pt-0.5">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
-                Unit tutor
-              </p>
-              <p className="truncate text-[15px] font-semibold tracking-tight text-slate-900">
-                {persona.name}
-              </p>
-              <p className="truncate text-xs text-slate-500">
-                Unit {unitNumber}
-                {unitTitle ? ` · ${unitTitle}` : ''} · {subjectLabel}
-              </p>
+          <div
+            className={`relative flex-shrink-0 border-b border-slate-100/90 bg-gradient-to-b ${theme.headerWash} px-4 pb-3.5 pt-3.5`}
+          >
+            <div className={`absolute inset-x-0 top-0 h-1 ${theme.accentSoft}`} aria-hidden />
+            <div className="flex items-start gap-3">
+              {(tutorAvatarUrl(subject) || tutorAvatarInitials(subject)) && (
+                <div className="relative flex-shrink-0">
+                  <TutorAvatar
+                    subject={subject}
+                    alt={persona.name}
+                    className={`h-11 w-11 rounded-full ring-2 ring-white shadow-md ${theme.accentRing}`}
+                  />
+                  <span
+                    className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white bg-emerald-500 shadow-[0_0_0_1px_rgba(16,185,129,0.35)]"
+                    aria-hidden
+                  />
+                </div>
+              )}
+              <div className="min-w-0 flex-1 pr-10">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">
+                  Dojo tutor
+                </p>
+                <p className="mt-0.5 truncate text-base font-bold tracking-tight text-slate-900">
+                  {persona.name}
+                </p>
+                <p className="mt-0.5 truncate text-xs text-slate-500">
+                  Unit {unitNumber}
+                  {unitTitle ? ` · ${unitTitle}` : ''} · {subjectLabel}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-800"
+                aria-label="Close tutor chat"
+                title="Close chat"
+              >
+                <X className="h-5 w-5" strokeWidth={2} />
+              </button>
             </div>
           </div>
 
           {/* Messages */}
-          <div className="min-h-0 flex-1 overflow-y-auto bg-slate-50/70 px-3 py-4">
-            <div className="space-y-4">
+          <div className="min-h-0 flex-1 overflow-y-auto bg-[linear-gradient(180deg,#f8fafc_0%,#f1f5f9_100%)] px-3.5 py-4">
+            <div className="space-y-5">
               {messages.map((m) => {
                 const parsedAssistant =
                   m.role === 'assistant' ? parseAssistantReply(m.content) : null;
@@ -621,13 +668,13 @@ export function CheatSheetChatBox({
                   return (
                     <div key={m.id} className="flex w-full flex-col items-end">
                       <div
-                        className={`max-w-[min(100%,21rem)] px-3.5 py-2.5 text-[14px] leading-relaxed shadow-sm ${theme.userBubble} rounded-2xl rounded-br-md`}
+                        className={`max-w-[min(100%,22rem)] px-3.5 py-2.5 text-[14px] leading-relaxed shadow-sm ${theme.userBubble} rounded-2xl rounded-br-md`}
                       >
                         <p className="whitespace-pre-wrap text-white/95">{m.content}</p>
                       </div>
                       {m.attachmentHint ? (
-                        <p className="mt-1 max-w-[min(100%,21rem)] truncate text-[11px] font-medium text-slate-500">
-                          File · {m.attachmentHint}
+                        <p className="mt-1.5 max-w-[min(100%,22rem)] truncate text-[11px] font-medium text-slate-500">
+                          Attached · {m.attachmentHint}
                         </p>
                       ) : null}
                     </div>
@@ -636,12 +683,15 @@ export function CheatSheetChatBox({
 
                 return (
                   <div key={m.id} className="flex w-full flex-col items-start">
-                    <div className="flex w-full max-w-[min(100%,23rem)] flex-row items-start gap-2 sm:max-w-[min(100%,24rem)]">
+                    <div className="flex w-full max-w-[min(100%,24rem)] flex-row items-start gap-2.5">
                       {showTutorAvatar ? (
                         <TutorAvatar subject={subject} alt="Unit tutor" />
                       ) : null}
                       <div className="flex min-w-0 flex-1 flex-col items-stretch gap-1">
-                        <div className="max-w-none px-3.5 py-2.5 text-[14px] leading-relaxed shadow-sm rounded-2xl rounded-bl-md border border-slate-100/90 bg-white text-slate-800">
+                        <p className={`mb-1 text-[11px] font-semibold ${theme.accent}`}>
+                          {persona.name}
+                        </p>
+                        <div className="max-w-none rounded-2xl rounded-tl-md border border-white/80 bg-white px-3.5 py-2.5 text-[14px] leading-relaxed text-slate-800 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
                           {parsedAssistant ? (
                             assistantLead ? (
                               <TutorAssistantMarkdown text={assistantLead} />
@@ -677,7 +727,7 @@ export function CheatSheetChatBox({
           </div>
 
           {/* Composer */}
-          <div className="flex-shrink-0 border-t border-slate-100 bg-white px-3 pb-3 pt-2">
+          <div className="flex-shrink-0 border-t border-slate-100 bg-white px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
             <input
               ref={fileInputRef}
               type="file"
@@ -686,15 +736,15 @@ export function CheatSheetChatBox({
               onChange={onPickFile}
             />
             {fileError ? (
-              <p className="mb-2 rounded-lg bg-amber-50 px-2.5 py-1.5 text-xs text-amber-900">
+              <p className="mb-2 rounded-xl bg-amber-50 px-3 py-2 text-xs font-medium text-amber-900">
                 {fileError}
               </p>
             ) : null}
             {pending ? (
-              <div className="mb-2 flex items-center justify-between gap-2 rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-2 text-xs text-slate-700">
+              <div className="mb-2 flex items-center justify-between gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-700">
                 <span className="flex min-w-0 items-center gap-1.5">
                   <Paperclip className="h-3.5 w-3.5 flex-shrink-0 text-slate-500" />
-                  <span className="truncate font-medium">{pending.fileName}</span>
+                  <span className="truncate font-semibold">{pending.fileName}</span>
                   <span className="flex-shrink-0 text-slate-400">
                     {pending.kind === 'text' ? 'Text' : pending.mimeType === 'application/pdf' ? 'PDF' : 'Image'}
                   </span>
@@ -705,19 +755,21 @@ export function CheatSheetChatBox({
                     setPending(null);
                     setFileError(null);
                   }}
-                  className="flex-shrink-0 rounded-lg p-1 text-slate-500 hover:bg-slate-200/80 hover:text-slate-800"
+                  className="flex-shrink-0 rounded-lg p-1 text-slate-500 transition hover:bg-slate-200/80 hover:text-slate-800"
                   aria-label="Remove attachment"
                 >
                   <X className="h-4 w-4" />
                 </button>
               </div>
             ) : null}
-            <div className="mb-2 flex gap-2">
+            <div
+              className={`flex items-end gap-1.5 rounded-2xl border border-slate-200 bg-slate-50/80 p-1.5 shadow-inner transition focus-within:bg-white focus-within:ring-4 ${theme.inputFocus}`}
+            >
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={sending}
-                className={`flex h-[5.25rem] w-11 flex-shrink-0 items-center justify-center rounded-xl border-2 text-slate-600 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 disabled:opacity-50 ${theme.attachBtn}`}
+                className={`mb-0.5 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 disabled:opacity-50 ${theme.attachBtn}`}
                 aria-label="Attach file"
                 title="Attach image, PDF, or text notes"
               >
@@ -733,44 +785,94 @@ export function CheatSheetChatBox({
                   }
                 }}
                 disabled={sending}
-                rows={3}
-                placeholder="Ask anything, or attach a file first…"
-                className={`min-h-0 flex-1 resize-none rounded-xl border border-slate-200 bg-slate-50/80 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-4 disabled:opacity-60 ${theme.inputFocus}`}
+                rows={2}
+                autoFocus
+                placeholder={`Message ${persona.name}…`}
+                className="min-h-[2.75rem] max-h-32 flex-1 resize-none bg-transparent px-1.5 py-2.5 text-sm text-slate-900 outline-none placeholder:text-slate-400 disabled:opacity-60"
               />
+              <button
+                type="button"
+                onClick={handleSend}
+                disabled={!canSend}
+                className={`mb-0.5 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl transition disabled:pointer-events-none disabled:opacity-40 ${theme.sendBtn}`}
+                aria-label={sending ? 'Thinking' : 'Send message'}
+              >
+                <Send className="h-4 w-4" strokeWidth={2.25} />
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={handleSend}
-              disabled={!canSend}
-              className={`flex h-10 w-full items-center justify-center gap-2 rounded-xl text-sm font-semibold transition-colors disabled:pointer-events-none disabled:opacity-45 ${theme.sendBtn}`}
-            >
-              <Send className="h-4 w-4 opacity-95" strokeWidth={2} />
-              {sending ? 'Thinking…' : 'Send'}
-            </button>
+            <p className="mt-2 text-center text-[10px] font-medium tracking-wide text-slate-400">
+              Enter to send · Shift+Enter for a new line
+            </p>
           </div>
         </div>
       )}
 
       {!open ? (
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          className={`pointer-events-auto relative flex h-12 w-12 items-center justify-center rounded-full text-white transition hover:brightness-105 active:scale-[0.97] sm:h-[3.25rem] sm:w-[3.25rem] ${theme.fab}`}
-          aria-expanded={false}
-          aria-label="Open tutor chat"
-        >
-          <span
-            aria-hidden
-            className="absolute inset-[4px] rounded-full bg-white/15 ring-1 ring-white/30"
-          />
-          {tutorAvatarUrl(subject) || tutorAvatarInitials(subject) ? (
-            <TutorAvatar
-              subject={subject}
-              alt="Open tutor chat"
-              className="relative h-[84%] w-[84%] rounded-full"
+        <>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleLauncherSubmit();
+            }}
+            className="pointer-events-auto flex h-14 w-[calc(100vw-2rem)] items-center gap-2.5 rounded-2xl border border-slate-200/90 bg-white/95 px-2.5 shadow-[0_12px_40px_-12px_rgba(15,23,42,0.35)] ring-1 ring-slate-900/[0.04] backdrop-blur-md lg:hidden"
+          >
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
+              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2"
+              aria-label="Open tutor chat"
+            >
+              {tutorAvatarUrl(subject) || tutorAvatarInitials(subject) ? (
+                <TutorAvatar
+                  subject={subject}
+                  alt=""
+                  className="h-10 w-10 rounded-full"
+                />
+              ) : null}
+            </button>
+            <input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleLauncherSubmit();
+                }
+              }}
+              placeholder={`Ask ${persona.name}…`}
+              aria-label={`Ask ${persona.name} a question`}
+              className="min-w-0 flex-1 border-0 bg-transparent px-1 text-sm font-medium text-slate-900 outline-none placeholder:font-normal placeholder:text-slate-400"
             />
-          ) : null}
-        </button>
+            <button
+              type="submit"
+              disabled={!input.trim()}
+              className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full transition disabled:opacity-35 ${theme.sendBtn}`}
+              aria-label="Send"
+            >
+              <Send className="h-3.5 w-3.5" strokeWidth={2.5} />
+            </button>
+          </form>
+
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className={`pointer-events-auto relative hidden h-14 w-14 items-center justify-center rounded-full text-white transition hover:brightness-105 hover:scale-[1.03] active:scale-[0.97] lg:flex ${theme.fab}`}
+            aria-expanded={false}
+            aria-label="Open tutor chat"
+          >
+            <span
+              aria-hidden
+              className="absolute inset-[3px] rounded-full bg-white/15 ring-1 ring-white/30"
+            />
+            {tutorAvatarUrl(subject) || tutorAvatarInitials(subject) ? (
+              <TutorAvatar
+                subject={subject}
+                alt="Open tutor chat"
+                className="relative h-[82%] w-[82%] rounded-full"
+              />
+            ) : null}
+          </button>
+        </>
       ) : null}
     </div>
   );

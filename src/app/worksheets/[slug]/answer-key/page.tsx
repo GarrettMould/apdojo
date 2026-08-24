@@ -37,6 +37,7 @@ function AnswerKeyPageContent() {
     const search = new URLSearchParams();
     if (worksheet.q) search.set('q', worksheet.q);
     if (worksheet.f) search.set('f', worksheet.f);
+    if (worksheet.title) search.set('title', worksheet.title);
     if (embed) search.set('embed', '1');
     search.set('answerKey', '1');
     return `${origin}/tutor/print-preview?${search.toString()}`;

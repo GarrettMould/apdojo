@@ -154,7 +154,7 @@ export function EmbeddedCheckoutPage({ courseType }: EmbeddedCheckoutPageProps) 
                 </span>
               </div>
               <p className="text-sm text-gray-500">
-                One-time payment · Valid until June 30, 2026
+                One-time payment · Valid until June 30, 2027
               </p>
             </motion.div>
 

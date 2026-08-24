@@ -14,13 +14,19 @@ import { keyTerms as apMicroTerms } from '@/data/apMicroTerms';
 import { keyTerms as apGovTerms, govUnitSupremeCourtCases } from '@/data/apGovTerms';
 import { keyTerms as apStatsTerms, getStatsLessonStudyTips } from '@/data/apStatsTerms';
 import { getStatsUnitCheatSheetVideos } from '@/data/stats/statsUnitVideos';
+import {
+  cheatSheetWatchPath,
+  getEconVideoWatchId,
+  getScotusVideoWatchId,
+  getStatsVideoWatchId,
+} from '@/lib/cheatSheetVideos';
 import { unit1Whiteboards, apMacroUnit2Whiteboards, apMacroUnit3Whiteboards, apMacroUnit4Whiteboards, apMacroUnit5Whiteboards, apMicroUnit3Whiteboards, apMicroUnit4Whiteboards, apMicroUnit5Whiteboards, apMicroUnit6Whiteboards, Whiteboard } from '@/data/whiteboards';
 import { microLessons, macroLessons } from '@/data/lessons';
 import { videos, Video } from '@/data/videos';
 import { getVideosForLessonId } from '@/data/videosByLessonId';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question as QuestionType } from '@/data/questionBanks/types';
-import { X, ArrowRight, Lock, ArrowLeft, CheckCircle2, XCircle, Download, Bookmark, BookmarkPlus, Check, Brain, Maximize2, FileText, Zap, Lightbulb, FileQuestion, Award, Layers, Unlock, Sparkles, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Pen, MoreHorizontal } from 'lucide-react';
+import { X, ArrowRight, Lock, ArrowLeft, CheckCircle2, XCircle, Download, Bookmark, BookmarkPlus, Check, Brain, Maximize2, FileText, Zap, Lightbulb, FileQuestion, Award, Layers, Unlock, Sparkles, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Pen } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import jsPDF from 'jspdf';
@@ -41,7 +47,6 @@ import SeasonPassScrollPopup from '@/app/SeasonPassScrollPopup';
 import { CheatSheetChatBox } from '@/components/CheatSheetChatBox';
 import type { CourseSubject } from '@/lib/courseSubject';
 import { courseUrlSlugPrefix, displayCourseLabel, econCourseFromSubject } from '@/lib/courseSubject';
-import { hasAdminRole } from '@/lib/adminAccess';
 import { COURSE_CURRICULUM_OUTLINES } from '@/data/courseCurriculumOutline';
 import { scotusEssayPrompts } from '@/data/gov/scotusEssayPrompts';
 import { processMathContent } from '@/utils/processMathContent';
@@ -65,6 +70,18 @@ function getScotusComparisonFrqSlug(caseId: string): string | null {
  */
 const PRETTY_CHEAT_SHEET_ENTRY_MODAL_SESSION_KEY = 'apdojo_pretty_cheat_sheet_season_pass_entry_any_v1';
 const FREE_LESSON_VIDEO_PREVIEW_SECONDS = 5;
+
+const GOV_UNIT_PDF_URLS: Record<number, string> = {
+  1: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/apgov/AP+Gov+-+Unit+1+-+CS.pdf',
+  2: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/apgov/AP+Gov+-+Unit+2+-+CS.pdf',
+  3: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/apgov/AP+Gov+-+Unit+3+-+CS.pdf',
+  4: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/apgov/AP+Gov+-+Unit+4+-+CS.pdf',
+  5: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/apgov/AP+Gov+-+Unit+5+-+CS.pdf',
+};
+
+const STATS_UNIT_PDF_URLS: Record<number, string> = {
+  2: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/apstats/AP+Stats+-+Unit+2.pdf',
+};
 
 function prettyCheatSheetEntryModalAlreadyShown(): boolean {
   try {
@@ -471,7 +488,7 @@ function JoinDojoModal({ isOpen, onClose, selectedSubject }: JoinDojoModalProps)
             Unlock unlimited quiz generation, all Dojo Drills, FRQ practice, and full-length exams with a Season Pass.
           </p>
           <Link
-            href={`/purchase/season-pass?courseType=${selectedSubject === 'gov' ? 'bundle' : selectedSubject}`}
+            href={`/purchase/season-pass?courseType=${selectedSubject}`}
             className={`inline-flex items-center justify-center w-full px-6 py-3 text-white font-bold rounded-lg transition-colors shadow-md hover:shadow-lg ${
               selectedSubject === 'macro'
                 ? 'bg-blue-600 hover:bg-blue-700'
@@ -542,9 +559,18 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
   
   // Use props if provided, otherwise use params/context
   const selectedSubject = propSubject || contextSubject;
-  const canAccessGov = Boolean(user && hasAdminRole(userData));
   const initialUnit = propUnitNumber ? String(propUnitNumber) : ((params.unitId as string) || '1');
   const [activeUnit, setActiveUnit] = useState(initialUnit);
+
+  useEffect(() => {
+    if (propUnitNumber != null) {
+      setActiveUnit(String(propUnitNumber));
+      return;
+    }
+    if (params.unitId) {
+      setActiveUnit(params.unitId as string);
+    }
+  }, [propUnitNumber, params.unitId]);
   const [selectedWhiteboard, setSelectedWhiteboard] = useState<WhiteboardImage | null>(null);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
@@ -585,7 +611,6 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
   const [loadingQuestionIndex, setLoadingQuestionIndex] = useState(0);
   const [quizError, setQuizError] = useState<string | null>(null);
   const [showExplanations, setShowExplanations] = useState<Set<number>>(new Set());
-  const [activeTermMenuId, setActiveTermMenuId] = useState<string | null>(null);
   const [showJoinDojoModal, setShowJoinDojoModal] = useState(false);
   const [shuffleModalOpen, setShuffleModalOpen] = useState(false);
   const [isTutorOpen, setIsTutorOpen] = useState(false);
@@ -702,20 +727,6 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
     showQuizPanel,
     showVideoModal,
   ]);
-
-  useEffect(() => {
-    const onDocPointerDown = (event: MouseEvent | TouchEvent) => {
-      const target = event.target as HTMLElement | null;
-      if (target?.closest?.('[data-term-menu="true"]')) return;
-      setActiveTermMenuId(null);
-    };
-    document.addEventListener('mousedown', onDocPointerDown, { capture: true });
-    document.addEventListener('touchstart', onDocPointerDown, { capture: true });
-    return () => {
-      document.removeEventListener('mousedown', onDocPointerDown, { capture: true } as any);
-      document.removeEventListener('touchstart', onDocPointerDown, { capture: true } as any);
-    };
-  }, []);
 
   // Free users: count up to 2 "new" card views per day (localStorage). Shuffle always opens; first two cards flip normally, then Next opens the Season Pass pitch (same every time they open shuffle that day).
   const DAILY_FREE_SHUFFLE_VIEWS = 2;
@@ -1409,7 +1420,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
     setChatPromptDisplayText(displayPrompt);
     setChatPromptText(prompt);
     setChatPromptNonce((n) => n + 1);
-    setActiveTermMenuId(null);
+    setIsTutorOpen(true);
   };
 
   // Cycle through loading question indices while generating
@@ -1566,31 +1577,17 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
         : selectedSubject === 'stats'
           ? 'orange'
           : 'violet';
-  /** Key term row: selected-state chrome (check + ⋯ menu) matches course accent. */
+  /** Key term selected-state action text + soft glow (course accent). */
   const keyTermSelectChrome =
     selectedSubject === 'macro'
-      ? {
-          checkWrap: 'border-blue-300 bg-blue-50',
-          checkIcon: 'text-blue-600',
-          menuBtn: 'border-blue-200 text-blue-600 hover:bg-blue-50',
-        }
+      ? 'text-blue-700 hover:text-blue-900 [text-shadow:0_0_12px_rgba(255,255,255,0.95),0_0_18px_rgba(59,130,246,0.35)]'
       : selectedSubject === 'micro'
-        ? {
-            checkWrap: 'border-green-300 bg-green-50',
-            checkIcon: 'text-green-600',
-            menuBtn: 'border-green-200 text-green-600 hover:bg-green-50',
-          }
+        ? 'text-green-700 hover:text-green-900 [text-shadow:0_0_12px_rgba(255,255,255,0.95),0_0_18px_rgba(34,197,94,0.35)]'
         : selectedSubject === 'stats'
-          ? {
-              checkWrap: 'border-orange-300 bg-orange-50',
-              checkIcon: 'text-orange-600',
-              menuBtn: 'border-orange-200 text-orange-600 hover:bg-orange-50',
-            }
-          : {
-              checkWrap: 'border-violet-300 bg-violet-50',
-              checkIcon: 'text-violet-600',
-              menuBtn: 'border-violet-200 text-violet-600 hover:bg-violet-50',
-            };
+          ? 'text-orange-700 hover:text-orange-900 [text-shadow:0_0_12px_rgba(255,255,255,0.95),0_0_18px_rgba(249,115,22,0.35)]'
+          : 'text-violet-700 hover:text-violet-900 [text-shadow:0_0_12px_rgba(255,255,255,0.95),0_0_18px_rgba(139,92,246,0.35)]';
+  const showTermSelectionBar =
+    selectedTerms.size > 0 && !showQuizPanel && !isGeneratingQuiz && !isTutorOpen;
 
   const cheatSheetCtaStyles =
     selectedSubject === 'macro'
@@ -1849,24 +1846,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
     return (
       <div className="min-h-screen bg-gray-50 px-4 py-20">
         <div className="mx-auto max-w-xl rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-          <p className="text-gray-600 font-semibold">Checking access...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (selectedSubject === 'gov' && !canAccessGov) {
-    return (
-      <div className="min-h-screen bg-gray-50 px-4 py-20">
-        <div className="mx-auto max-w-xl rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-          <h1 className="text-2xl font-black text-gray-900">AP Gov is in admin preview</h1>
-          <p className="mt-3 text-gray-600">This content is currently restricted to admin accounts.</p>
-          <Link
-            href="/ap-macro-unit-1-cheat-sheet"
-            className="mt-6 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-3 font-bold text-white hover:bg-blue-700"
-          >
-            Go to AP Macro cheat sheets
-          </Link>
+          <p className="text-gray-600 font-semibold">Loading...</p>
         </div>
       </div>
     );
@@ -1880,6 +1860,64 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
         />
       </Head>
+      <AnimatePresence>
+        {showTermSelectionBar ? (
+          <motion.div
+            key="term-selection-bar"
+            initial={{ y: '-100%', opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: '-100%', opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 420, damping: 36 }}
+            className={`fixed top-20 left-0 right-0 z-[110] border-b bg-white shadow-sm ${
+              selectedSubject === 'macro'
+                ? 'border-blue-200'
+                : selectedSubject === 'micro'
+                  ? 'border-green-200'
+                  : selectedSubject === 'stats'
+                    ? 'border-orange-200'
+                    : 'border-violet-200'
+            }`}
+          >
+            <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-2.5 sm:px-6">
+              <p className="text-sm font-semibold text-gray-700">
+                {selectedTerms.size} term{selectedTerms.size !== 1 ? 's' : ''} selected
+              </p>
+              <div className="flex flex-wrap items-center gap-1 sm:gap-2">
+                {(selectedSubject === 'macro' ||
+                  selectedSubject === 'micro' ||
+                  selectedSubject === 'gov' ||
+                  selectedSubject === 'stats') && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      void handleMakeQuiz();
+                    }}
+                    className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-semibold transition-colors ${keyTermSelectChrome}`}
+                  >
+                    <Brain className="h-3.5 w-3.5" aria-hidden />
+                    Quiz
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={handleAskDojoAboutSelectedTerms}
+                  className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-semibold transition-colors ${keyTermSelectChrome}`}
+                >
+                  <Sparkles className="h-3.5 w-3.5" aria-hidden />
+                  Ask AI
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedTerms(new Set())}
+                  className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-sm font-medium text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-800"
+                >
+                  Clear
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
       <div ref={containerRef} className="flex h-[calc(100vh-5rem)] overflow-hidden bg-gray-50">
         {/* Main cheat sheet column (left of quiz panel when open) */}
         <motion.div
@@ -1888,7 +1926,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
             width: showQuizPanel
               ? `${leftPanelWidth}%`
               : isTutorOpen && isDesktopViewport
-                ? '75%'
+                ? '68%'
                 : '100%',
           }}
           transition={{
@@ -1899,7 +1937,11 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           className={`flex-shrink-0 min-w-0 ${showScrollPopup || shuffleModalOpen ? 'overflow-hidden' : 'overflow-y-auto'}`}
         >
           <div
-            className={`max-w-7xl px-4 py-12 mt-12 ${isTutorOpen && isDesktopViewport ? 'mx-0' : 'mx-auto'}`}
+            className={`py-12 mt-12 transition-[max-width,padding,margin] duration-500 ease-out ${
+              isTutorOpen && isDesktopViewport
+                ? 'mx-0 max-w-5xl px-4 pl-8 pr-8 lg:pl-12 lg:pr-10'
+                : 'mx-auto max-w-7xl px-4'
+            }`}
             ref={cheatSheetContentRef}
           >
         {/* Unit header */}
@@ -1986,46 +2028,77 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           </div>
         </div>
 
-        {/* Printable cheat sheet PDFs: macro (all units); micro units 1–5 only — hidden on micro U6 */}
+        {/* Printable cheat sheet PDFs: macro (all); micro 1–5; stats units with PDFs; gov units 1–5 */}
         {(selectedSubject === 'macro' ||
-          (selectedSubject === 'micro' && activeUnitNum >= 1 && activeUnitNum <= 5)) && (
+          (selectedSubject === 'micro' && activeUnitNum >= 1 && activeUnitNum <= 5) ||
+          (selectedSubject === 'stats' && Boolean(STATS_UNIT_PDF_URLS[activeUnitNum])) ||
+          (selectedSubject === 'gov' && Boolean(GOV_UNIT_PDF_URLS[activeUnitNum]))) && (
         <div className="mb-8 flex flex-row items-center gap-6 sm:gap-8">
           {/* Stacked overlapping PDF previews - bundle style */}
           {(() => {
-            const previewUnits = selectedSubject === 'macro' ? macroUnits : microUnits.filter((u) => u.number <= 5);
-            const baseCardWidth = 100;
-            const horizontalOffset = 20;
-            const stackWidth = baseCardWidth + (previewUnits.length - 1) * horizontalOffset + 12;
-            return (
-          <div
-            className={`relative h-[130px] sm:h-[145px] flex-shrink-0 ${
-              selectedSubject === 'micro' ? '' : ''
-            }`}
-            style={{ width: `${stackWidth}px` }}
-          >
-            {previewUnits.map((unit, index) => {
+            const previewUnits =
+              selectedSubject === 'macro'
+                ? macroUnits
+                : selectedSubject === 'micro'
+                  ? microUnits.filter((u) => u.number <= 5)
+                  : selectedSubject === 'stats'
+                    ? statsUnits.filter((u) => Boolean(STATS_UNIT_PDF_URLS[u.number]))
+                    : govUnits.filter((u) => Boolean(GOV_UNIT_PDF_URLS[u.number]));
+
+            const getUnitPdfUrl = (unitNumber: number) => {
+              if (selectedSubject === 'stats') {
+                return STATS_UNIT_PDF_URLS[unitNumber];
+              }
+              if (selectedSubject === 'gov') {
+                return GOV_UNIT_PDF_URLS[unitNumber];
+              }
               const pdfSubject =
                 selectedSubject === 'macro' ? 'Macro' : selectedSubject === 'micro' ? 'Micro' : 'Gov';
-              const pdfUrl = `https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/AP+${pdfSubject}+-+Unit+${unit.number}.pdf`;
-              const filename = `AP-Dojo-${pdfSubject}-Unit-${unit.number}-Cheat-Sheet.pdf`;
+              return `https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/AP+${pdfSubject}+-+Unit+${unitNumber}.pdf`;
+            };
+
+            const getUnitPdfFilename = (unitNumber: number) => {
+              if (selectedSubject === 'stats') return `AP-Dojo-Stats-Unit-${unitNumber}-Cheat-Sheet.pdf`;
+              if (selectedSubject === 'gov') return `AP-Dojo-Gov-Unit-${unitNumber}-Cheat-Sheet.pdf`;
+              const pdfSubject = selectedSubject === 'macro' ? 'Macro' : 'Micro';
+              return `AP-Dojo-${pdfSubject}-Unit-${unitNumber}-Cheat-Sheet.pdf`;
+            };
+
+            const baseCardWidth = 100;
+            const horizontalOffset = 20;
+            /** Must match the iframe’s rendered size after scale (833×1080 × scale). */
+            const iframeRenderWidth = 833;
+            const iframeRenderHeight = 1080;
+            const iframeScale = baseCardWidth / iframeRenderWidth;
+            const cardHeight = Math.round(iframeRenderHeight * iframeScale);
+            const stackWidth = baseCardWidth + (previewUnits.length - 1) * horizontalOffset;
+            return (
+          <div
+            className="relative flex-shrink-0"
+            style={{ width: `${stackWidth}px`, height: `${cardHeight}px` }}
+          >
+            {previewUnits.map((unit, index) => {
+              const pdfUrl = getUnitPdfUrl(unit.number);
+              const filename = getUnitPdfFilename(unit.number);
               return (
                 <div
                   key={unit.number}
-                  className="absolute bottom-0 left-0 w-[100px] sm:w-[110px] border border-black bg-white overflow-hidden group rounded-sm shadow-md hover:z-20 hover:scale-105 transition-transform cursor-pointer"
+                  className="absolute bottom-0 left-0 border border-black bg-white overflow-hidden group rounded-sm shadow-md hover:z-20 hover:scale-105 transition-transform cursor-pointer"
                   style={{
-                    aspectRatio: '8.5/11',
-                    transform: `translateX(${index * 20}px)`,
+                    width: `${baseCardWidth}px`,
+                    height: `${cardHeight}px`,
+                    transform: `translateX(${index * horizontalOffset}px)`,
                     zIndex: index,
                   }}
                 >
                   <iframe
                     src={`${pdfUrl}#toolbar=0&navpanes=0`}
                     title={`Unit ${unit.number} cheat sheet preview`}
-                    className="absolute top-0 left-0 pointer-events-none w-full h-full"
+                    className="absolute top-0 left-0 pointer-events-none"
                     style={{
-                      width: '833px',
-                      height: '1080px',
-                      transform: 'scale(0.12)',
+                      width: `${iframeRenderWidth}px`,
+                      height: `${iframeRenderHeight}px`,
+                      transform: `scale(${iframeScale})`,
                       transformOrigin: 'top left',
                     }}
                   />
@@ -2053,21 +2126,55 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
             <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
               {selectedSubject === 'macro'
                 ? 'Printable Cheat Sheets for Every Unit'
-                : 'Printable Cheat Sheets for Units 1–5'}
+                : selectedSubject === 'micro'
+                  ? 'Printable Cheat Sheets for Units 1–5'
+                  : selectedSubject === 'gov'
+                    ? 'Printable Cheat Sheets for Units 1–5'
+                    : 'Printable Unit 2 Cheat Sheet'}
             </h2>
             <p className="text-gray-600 text-sm sm:text-base">
               {selectedSubject === 'macro'
                 ? 'Everything you need to ace your exam, all on a single page.'
-                : 'Single-page PDFs for Units 1-5. The full unit experience for Unit 6 stays on this cheat sheet page.'}
+                : selectedSubject === 'micro'
+                  ? 'Single-page PDFs for Units 1-5. The full unit experience for Unit 6 stays on this cheat sheet page.'
+                  : selectedSubject === 'gov'
+                    ? 'Single-page PDFs for Units 1–5. Click a sheet to download.'
+                    : 'A single-page PDF you can print or save — everything from this unit in one place.'}
             </p>
-            <Link
-              href="/cheat-sheets"
-              className="inline-flex items-center justify-center gap-2 w-fit px-5 py-3 bg-yellow-300 text-black font-black text-base rounded-xl border-2 border-black transition-all hover:-translate-y-0.5 active:translate-y-0"
-              style={{ boxShadow: '4px 4px 0 0 #000' }}
-            >
-              <Download className="w-4 h-4" />
-              Download PDF Cheat Sheets
-            </Link>
+            {selectedSubject === 'macro' || selectedSubject === 'micro' ? (
+              <Link
+                href="/cheat-sheets"
+                className="inline-flex items-center justify-center gap-2 w-fit px-5 py-3 bg-yellow-300 text-black font-black text-base rounded-xl border-2 border-black transition-all hover:-translate-y-0.5 active:translate-y-0"
+                style={{ boxShadow: '4px 4px 0 0 #000' }}
+              >
+                <Download className="w-4 h-4" />
+                Download PDF Cheat Sheets
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  if (!isProCustomer) {
+                    setShowPacketSeasonPassModal(true);
+                    return;
+                  }
+                  const pdfUrl =
+                    selectedSubject === 'stats'
+                      ? STATS_UNIT_PDF_URLS[activeUnitNum]
+                      : GOV_UNIT_PDF_URLS[activeUnitNum];
+                  const filename =
+                    selectedSubject === 'stats'
+                      ? `AP-Dojo-Stats-Unit-${activeUnitNum}-Cheat-Sheet.pdf`
+                      : `AP-Dojo-Gov-Unit-${activeUnitNum}-Cheat-Sheet.pdf`;
+                  handleDownloadPdf(pdfUrl, filename);
+                }}
+                className="inline-flex items-center justify-center gap-2 w-fit px-5 py-3 bg-yellow-300 text-black font-black text-base rounded-xl border-2 border-black transition-all hover:-translate-y-0.5 active:translate-y-0"
+                style={{ boxShadow: '4px 4px 0 0 #000' }}
+              >
+                <Download className="w-4 h-4" />
+                Download PDF Cheat Sheet
+              </button>
+            )}
           </div>
         </div>
         )}
@@ -2075,16 +2182,32 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
         {/* Practice MCQs + Unit Test buttons */}
         <div className="mb-8 flex flex-col sm:flex-row gap-3 sm:gap-4">
           {/* Primary CTA - Practice MCQs */}
-          <Link
-            href={
-              selectedSubject === 'gov'
-                ? '/select-practice-units?subject=gov'
-                : `/mcq-practice/${getSubjectSlug(selectedSubject === 'macro' ? 'macro' : 'micro')}/${getUnitSlug(activeUnitNum, selectedSubject === 'macro' ? 'macro' : 'micro')}`
-            }
-            className={`w-full sm:flex-1 inline-flex items-center justify-center font-black py-3.5 px-6 rounded-xl border-2 active:translate-y-0.5 transition-all ${cheatSheetCtaStyles.practiceMcq}`}
-          >
-            <span className="text-base sm:text-lg tracking-wide uppercase">Practice MCQs</span>
-          </Link>
+          {selectedSubject === 'gov' || selectedSubject === 'stats' ? (
+            <div className="relative w-full sm:flex-1">
+              <span className="absolute -left-2 -top-2 z-10 -rotate-12 rounded-md border-2 border-black bg-yellow-300 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-black shadow-[2px_2px_0_0_#000] sm:text-xs">
+                Coming soon!
+              </span>
+              <button
+                type="button"
+                disabled
+                aria-disabled="true"
+                className={`inline-flex w-full cursor-not-allowed items-center justify-center rounded-xl border-2 py-3.5 px-6 font-black opacity-80 ${
+                  selectedSubject === 'stats'
+                    ? 'border-orange-300 bg-orange-200 text-orange-400'
+                    : 'border-violet-300 bg-violet-200 text-violet-400'
+                }`}
+              >
+                <span className="text-base tracking-wide uppercase sm:text-lg">Practice MCQs</span>
+              </button>
+            </div>
+          ) : (
+            <Link
+              href={`/mcq-practice/${getSubjectSlug(selectedSubject === 'macro' ? 'macro' : 'micro')}/${getUnitSlug(activeUnitNum, selectedSubject === 'macro' ? 'macro' : 'micro')}`}
+              className={`w-full sm:flex-1 inline-flex items-center justify-center font-black py-3.5 px-6 rounded-xl border-2 active:translate-y-0.5 transition-all ${cheatSheetCtaStyles.practiceMcq}`}
+            >
+              <span className="text-base sm:text-lg tracking-wide uppercase">Practice MCQs</span>
+            </Link>
+          )}
 
           {/* Secondary CTA - Unit Test */}
           <Link
@@ -2291,10 +2414,39 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                     {courtCase.videoUrl ? (
                       <div className="relative aspect-video w-full overflow-hidden rounded-lg border-2 border-black bg-black">
                         <video
+                          key={courtCase.id}
                           src={courtCase.videoUrl}
                           controls
                           preload="metadata"
                           className="h-full w-full object-contain"
+                          onLoadedMetadata={(e) => {
+                            const posterAt = courtCase.videoPosterTimeSeconds;
+                            if (posterAt == null || posterAt <= 0) return;
+                            const v = e.currentTarget;
+                            if (!v.paused) return;
+                            v.dataset.posterFrame = '1';
+                            try {
+                              v.currentTime = posterAt;
+                            } catch {
+                              /* ignore seek errors before data is ready */
+                            }
+                          }}
+                          onPlay={(e) => {
+                            const v = e.currentTarget;
+                            if (v.dataset.posterFrame === '1') {
+                              v.dataset.posterFrame = '0';
+                              v.currentTime = 0;
+                            }
+                            v.pause();
+                            if (!isProCustomer) {
+                              setShowPacketSeasonPassModal(true);
+                              return;
+                            }
+                            const watchId = getScotusVideoWatchId(courtCase.id);
+                            if (watchId) {
+                              router.push(cheatSheetWatchPath(watchId));
+                            }
+                          }}
                         >
                           Your browser does not support the video tag.
                         </video>
@@ -2349,6 +2501,82 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           );
         })()}
 
+        {selectedSubject === 'stats' && (() => {
+          const unitVideos = getStatsUnitCheatSheetVideos(activeUnitNum);
+          const firstVideo = unitVideos[0];
+          const secondVideo = unitVideos[1];
+          if (!firstVideo && !secondVideo) return null;
+          return (
+            <section className="mb-10">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">Video Lessons</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <article className="overflow-hidden rounded-xl border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                  {firstVideo ? (
+                    <div className="relative aspect-video w-full overflow-hidden bg-white">
+                      <video
+                        src={firstVideo.videoUrl}
+                        controls
+                        playsInline
+                        preload="metadata"
+                        className="absolute inset-0 h-full w-full object-cover"
+                        onPlay={(e) => {
+                          e.currentTarget.pause();
+                          if (!isProCustomer) {
+                            setShowPacketSeasonPassModal(true);
+                            return;
+                          }
+                          const watchId = getStatsVideoWatchId(firstVideo.id);
+                          if (watchId) {
+                            router.push(cheatSheetWatchPath(watchId));
+                          }
+                        }}
+                      >
+                        Your browser does not support the video tag.
+                      </video>
+                    </div>
+                  ) : (
+                    <div className="aspect-video w-full bg-gray-50" aria-hidden />
+                  )}
+                </article>
+                <article
+                  className={
+                    secondVideo
+                      ? 'overflow-hidden rounded-xl border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]'
+                      : 'overflow-hidden rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.08)]'
+                  }
+                >
+                  {secondVideo ? (
+                    <div className="relative aspect-video w-full overflow-hidden bg-white">
+                      <video
+                        src={secondVideo.videoUrl}
+                        controls
+                        playsInline
+                        preload="metadata"
+                        className="absolute inset-0 h-full w-full object-cover"
+                        onPlay={(e) => {
+                          e.currentTarget.pause();
+                          if (!isProCustomer) {
+                            setShowPacketSeasonPassModal(true);
+                            return;
+                          }
+                          const watchId = getStatsVideoWatchId(secondVideo.id);
+                          if (watchId) {
+                            router.push(cheatSheetWatchPath(watchId));
+                          }
+                        }}
+                      >
+                        Your browser does not support the video tag.
+                      </video>
+                    </div>
+                  ) : (
+                    <div className="aspect-video w-full" aria-hidden />
+                  )}
+                </article>
+              </div>
+            </section>
+          );
+        })()}
+
         {/* Table of Contents - two columns, links scroll to lesson sections */}
         {sortedLessons.length > 0 && (
           <div className="mb-8">
@@ -2370,60 +2598,6 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
             </div>
           </div>
         )}
-
-        {selectedSubject === 'stats' && (() => {
-          const unitVideos = getStatsUnitCheatSheetVideos(activeUnitNum);
-          const firstVideo = unitVideos[0];
-          const secondVideo = unitVideos[1];
-          if (!firstVideo && !secondVideo) return null;
-          return (
-            <section className="mb-10">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Video Lessons</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <article className="overflow-hidden rounded-xl border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                  {firstVideo ? (
-                    <div className="relative aspect-video w-full overflow-hidden bg-black">
-                      <video
-                        src={firstVideo.videoUrl}
-                        controls
-                        playsInline
-                        preload="metadata"
-                        className="h-full w-full"
-                      >
-                        Your browser does not support the video tag.
-                      </video>
-                    </div>
-                  ) : (
-                    <div className="aspect-video w-full bg-gray-50" aria-hidden />
-                  )}
-                </article>
-                <article
-                  className={
-                    secondVideo
-                      ? 'overflow-hidden rounded-xl border-2 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]'
-                      : 'overflow-hidden rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.08)]'
-                  }
-                >
-                  {secondVideo ? (
-                    <div className="relative aspect-video w-full overflow-hidden bg-black">
-                      <video
-                        src={secondVideo.videoUrl}
-                        controls
-                        playsInline
-                        preload="metadata"
-                        className="h-full w-full"
-                      >
-                        Your browser does not support the video tag.
-                      </video>
-                    </div>
-                  ) : (
-                    <div className="aspect-video w-full" aria-hidden />
-                  )}
-                </article>
-              </div>
-            </section>
-          );
-        })()}
 
         {/* Unit flashcards — feature preview + shuffle entry */}
         {SHOW_DEEP_DIVE_AND_SHUFFLE && (() => {
@@ -2691,11 +2865,15 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                         playsInline
                         onTimeUpdate={(e) => bumpLessonVideoWatchProgress(videoKey, e.currentTarget)}
                         onSeeked={(e) => bumpLessonVideoWatchProgress(videoKey, e.currentTarget)}
-                        onPlay={() => {
-                          if (isHardLocked) return;
-                          if (!isExpanded) {
-                            pendingLessonVideoResumeKeyRef.current = videoKey;
-                            setInlineExpandedVideoKey(videoKey);
+                        onPlay={(e) => {
+                          e.currentTarget.pause();
+                          if (!isProCustomer) {
+                            setShowPacketSeasonPassModal(true);
+                            return;
+                          }
+                          const watchId = getEconVideoWatchId(video.videoSlug, courseKey);
+                          if (watchId) {
+                            router.push(cheatSheetWatchPath(watchId));
                           }
                         }}
                       >
@@ -2944,10 +3122,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                       // Create unique key combining lessonId and term.id to avoid duplicates when term appears in multiple lessons
                       const uniqueKey = `${lessonId}-${term.id}`;
                       
-                      const handleTermClick = (e: React.MouseEvent<HTMLDivElement>) => {
-                        const target = e.target as HTMLElement | null;
-                        if (target?.closest?.('[data-term-menu="true"]')) return;
-                        // Toggle term selection
+                      const handleTermClick = () => {
                         setSelectedTerms(prev => {
                           const newSet = new Set(prev);
                           if (newSet.has(term.id)) {
@@ -2966,79 +3141,29 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                           key={uniqueKey} 
                           id={`term-${term.id}`} 
                           onClick={handleTermClick}
-                          className={`p-4 border rounded-lg scroll-mt-20 cursor-pointer transition-all duration-200 relative ${
-                            activeTermMenuId === term.id ? 'z-50' : ''
-                          } ${
+                          className={`relative scroll-mt-20 cursor-pointer rounded-lg border p-4 transition-all duration-200 ${
                             isSelected 
-                              ? 'border-gray-300 bg-gray-50 shadow-inner transform scale-[0.98]' 
-                              : 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm'
+                              ? 'scale-[0.98] transform border-gray-300 bg-gray-50 shadow-inner' 
+                              : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
                           }`}
                         >
-                          {/* Selection Indicator */}
-                          {isSelected && (
-                            <div className="absolute top-2.5 right-2.5 z-10 flex items-center gap-1.5">
-                              <div
-                                className={`w-6 h-6 rounded-full flex items-center justify-center border-2 ${keyTermSelectChrome.checkWrap}`}
-                              >
-                                <Check className={`w-4 h-4 ${keyTermSelectChrome.checkIcon}`} />
-                              </div>
-                              <div className="relative">
-                                <button
-                                  type="button"
-                                  onMouseDown={(e) => e.stopPropagation()}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setActiveTermMenuId((prev) => (prev === term.id ? null : term.id));
-                                  }}
-                                  data-term-menu="true"
-                                  className={`flex h-6 w-6 items-center justify-center rounded-full border bg-white ${keyTermSelectChrome.menuBtn}`}
-                                  aria-label="Selected term actions"
-                                >
-                                  <MoreHorizontal className="h-4 w-4" />
-                                </button>
-                                {activeTermMenuId === term.id && (
-                                  <div
-                                    data-term-menu="true"
-                                    className="absolute right-0 top-7 z-[60] min-w-[260px] rounded-md border border-gray-200 bg-white p-1 shadow-lg"
-                                    onMouseDown={(e) => e.stopPropagation()}
-                                    onClick={(e) => e.stopPropagation()}
-                                  >
-                                    {(selectedSubject === 'macro' ||
-                                      selectedSubject === 'micro' ||
-                                      selectedSubject === 'gov' ||
-                                      selectedSubject === 'stats') && (
-                                      <button
-                                        type="button"
-                                        onClick={() => {
-                                          void handleMakeQuiz();
-                                          setActiveTermMenuId(null);
-                                        }}
-                                        className="block w-full rounded px-3 py-2 text-left text-sm text-gray-800 hover:bg-gray-100"
-                                      >
-                                        Generate a Quiz ({selectedTerms.size} selected term
-                                        {selectedTerms.size !== 1 ? 's' : ''})
-                                      </button>
-                                    )}
-                                    <button
-                                      type="button"
-                                      onClick={handleAskDojoAboutSelectedTerms}
-                                      className="block w-full rounded px-3 py-2 text-left text-sm text-gray-800 hover:bg-gray-100"
-                                    >
-                                      Ask Dojo AI About ({selectedTerms.size} selected terms)
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={() => setActiveTermMenuId(null)}
-                                      className="block w-full rounded px-3 py-2 text-left text-sm text-gray-600 hover:bg-gray-100"
-                                    >
-                                      Cancel
-                                    </button>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          )}
-                          <h3 className="font-bold text-gray-800 pr-8">
+                          {isSelected ? (
+                            <span
+                              className={`absolute top-3 right-3 inline-flex h-5 w-5 items-center justify-center rounded-full ${
+                                selectedSubject === 'macro'
+                                  ? 'bg-blue-100 text-blue-700'
+                                  : selectedSubject === 'micro'
+                                    ? 'bg-green-100 text-green-700'
+                                    : selectedSubject === 'stats'
+                                      ? 'bg-orange-100 text-orange-700'
+                                      : 'bg-violet-100 text-violet-700'
+                              }`}
+                              aria-hidden
+                            >
+                              <Check className="h-3 w-3" />
+                            </span>
+                          ) : null}
+                          <h3 className={`font-bold text-gray-800 ${isSelected ? 'pr-8' : ''}`}>
                             {formatTermLabel(term)}
                           </h3>
                         <p className="mt-1 text-gray-600">{processMathContent(term.definition)}</p>
@@ -3179,12 +3304,12 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           const nextUnit = unitsToDisplay.find(u => u.number === activeUnitNum + 1);
           const buttonColorClass =
             themeColor === 'blue'
-              ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600'
+              ? 'bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200'
               : themeColor === 'green'
-                ? 'bg-green-600 hover:bg-green-700 text-white border-green-600'
+                ? 'bg-green-50 hover:bg-green-100 text-green-700 border-green-200'
                 : themeColor === 'orange'
-                  ? 'bg-orange-600 hover:bg-orange-700 text-white border-orange-600'
-                  : 'bg-violet-600 hover:bg-violet-700 text-white border-violet-600';
+                  ? 'bg-orange-50 hover:bg-orange-100 text-orange-700 border-orange-200'
+                  : 'bg-violet-50 hover:bg-violet-100 text-violet-700 border-violet-200';
           
           return (
             <div className="mt-12 pt-8 border-t border-gray-200">
@@ -3195,11 +3320,11 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                     href={propSubject && propUnitNumber 
                       ? `/${courseUrlSlugPrefix(selectedSubject)}-unit-${prevUnit.number}-cheat-sheet`
                       : `/unit/${prevUnit.number}`}
-                    className={`flex-1 flex items-center gap-3 px-6 py-4 ${buttonColorClass} border-2 rounded-lg transition-all duration-200 group shadow-sm hover:shadow-md`}
+                    className={`flex-1 flex items-center gap-3 px-6 py-4 ${buttonColorClass} border rounded-lg transition-all duration-200 group`}
                   >
-                    <ArrowLeft className="w-5 h-5 flex-shrink-0" />
+                    <ArrowLeft className="w-5 h-5 flex-shrink-0 opacity-70" />
                     <div className="text-left min-w-0">
-                      <div className="text-xs opacity-80 uppercase tracking-wide">Previous</div>
+                      <div className="text-xs opacity-60 uppercase tracking-wide">Previous</div>
                       <div className="text-base font-semibold truncate">
                         Unit {prevUnit.number}: {prevUnit.title}
                       </div>
@@ -3215,15 +3340,15 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                     href={propSubject && propUnitNumber 
                       ? `/${courseUrlSlugPrefix(selectedSubject)}-unit-${nextUnit.number}-cheat-sheet`
                       : `/unit/${nextUnit.number}`}
-                    className={`flex-1 flex items-center justify-end gap-3 px-6 py-4 ${buttonColorClass} border-2 rounded-lg transition-all duration-200 group shadow-sm hover:shadow-md`}
+                    className={`flex-1 flex items-center justify-end gap-3 px-6 py-4 ${buttonColorClass} border rounded-lg transition-all duration-200 group`}
                   >
                     <div className="text-right min-w-0">
-                      <div className="text-xs opacity-80 uppercase tracking-wide">Next</div>
+                      <div className="text-xs opacity-60 uppercase tracking-wide">Next</div>
                       <div className="text-base font-semibold truncate">
                         Unit {nextUnit.number}: {nextUnit.title}
                       </div>
                     </div>
-                    <ArrowRight className="w-5 h-5 flex-shrink-0" />
+                    <ArrowRight className="w-5 h-5 flex-shrink-0 opacity-70" />
                   </Link>
                 ) : (
                   <div className="flex-1" />
@@ -3276,18 +3401,16 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
               <div className="p-6 md:p-8">
                 {/* Header */}
                 <div className="border-b border-gray-200 mb-6 pb-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h1 className="text-xl font-bold text-gray-900">Quiz Me!</h1>
-                      <p className="text-sm text-gray-600">
-                        {isGeneratingQuiz ? 'Generating your custom quiz...' : quizError ? 'Error generating quiz' : 'A quick question to test your knowledge.'}
-                      </p>
-                      <p className="mt-2 text-sm text-gray-500 leading-relaxed">
-                        {AI_GENERATED_QUIZ_DISCLAIMER}
-                      </p>
-                    </div>
+                  <div>
+                    <h1 className="text-xl font-bold text-gray-900">Quiz Me!</h1>
+                    <p className="text-sm text-gray-600">
+                      {isGeneratingQuiz ? 'Generating your custom quiz...' : quizError ? 'Error generating quiz' : 'A quick question to test your knowledge.'}
+                    </p>
+                    <p className="mt-2 text-sm text-gray-500 leading-relaxed">
+                      {AI_GENERATED_QUIZ_DISCLAIMER}
+                    </p>
                     {originalQuizQuestions.length > 0 && (
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <div className="mt-2 flex items-center gap-2 text-sm text-gray-600">
                         <FileText className="w-4 h-4" />
                         <span>{originalQuizQuestions.length} Question{originalQuizQuestions.length !== 1 ? 's' : ''}</span>
                       </div>
@@ -3664,18 +3787,16 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                 <div className="p-6 md:p-8">
                   {/* Header */}
                   <div className="border-b border-gray-200 mb-6 pb-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h1 className="text-xl font-bold text-gray-900">Quiz Me!</h1>
-                        <p className="text-sm text-gray-600">
-                          {isGeneratingQuiz ? 'Generating your custom quiz...' : quizError ? 'Error generating quiz' : 'A quick question to test your knowledge.'}
-                        </p>
-                        <p className="mt-2 text-sm text-gray-500 leading-relaxed">
-                          {AI_GENERATED_QUIZ_DISCLAIMER}
-                        </p>
-                      </div>
+                    <div>
+                      <h1 className="text-xl font-bold text-gray-900">Quiz Me!</h1>
+                      <p className="text-sm text-gray-600">
+                        {isGeneratingQuiz ? 'Generating your custom quiz...' : quizError ? 'Error generating quiz' : 'A quick question to test your knowledge.'}
+                      </p>
+                      <p className="mt-2 text-sm text-gray-500 leading-relaxed">
+                        {AI_GENERATED_QUIZ_DISCLAIMER}
+                      </p>
                       {originalQuizQuestions.length > 0 && (
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <div className="mt-2 flex items-center gap-2 text-sm text-gray-600">
                           <FileText className="w-4 h-4" />
                           <span>{originalQuizQuestions.length} Question{originalQuizQuestions.length !== 1 ? 's' : ''}</span>
                         </div>
@@ -4535,13 +4656,19 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
         />
       )}
 
-      {/* Packet/PDF download: show Season Pass modal when non-premium user clicks download link */}
-      {showPacketSeasonPassModal && (
-        <SeasonPassModal
-          subject={selectedSubject}
-          onClose={() => setShowPacketSeasonPassModal(false)}
-        />
-      )}
+      {/* Packet / video gate: wide showcase for Gov & Stats; compact modal for Econ */}
+      {showPacketSeasonPassModal &&
+        (selectedSubject === 'gov' || selectedSubject === 'stats' ? (
+          <SeasonPassEntryWideModal
+            subject={selectedSubject}
+            onClose={() => setShowPacketSeasonPassModal(false)}
+          />
+        ) : (
+          <SeasonPassModal
+            subject={selectedSubject}
+            onClose={() => setShowPacketSeasonPassModal(false)}
+          />
+        ))}
 
       {/* Ultimate Shuffle: same Study Mode modal as deep dive pages, mixed deck randomized */}
       <StudyModeModal

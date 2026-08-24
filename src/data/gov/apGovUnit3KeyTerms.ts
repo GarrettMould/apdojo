@@ -616,4 +616,503 @@ export const apGovUnit3CompleteMasterTerms: KeyTerm[] = [
     unit: 3,
     lessonIDs: ['3.8'],
   },
+  {
+    id: 'right-to-legal-counsel',
+    term: 'Right to Legal Counsel',
+    definition:
+      'The guarantee that an accused person can have an attorney represent them at trial.',
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.8'],
+    subNotes: [
+      'Required Case: Gideon v. Wainwright (1963) extended this Sixth Amendment guarantee to state felony prosecutions.',
+    ],
+  },
+  {
+    id: 'speedy-and-public-trial',
+    term: 'Speedy and Public Trial',
+    definition:
+      "The accused's right to have their case heard promptly and openly, preventing indefinite detention or secret proceedings.",
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.8'],
+    subNotes: [
+      'Source: Guaranteed by the Sixth Amendment as a core component of procedural due process.',
+    ],
+  },
+  {
+    id: 'impartial-jury',
+    term: 'Impartial Jury',
+    definition: 'A jury free of bias, required for a fair criminal trial.',
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.8'],
+    subNotes: [
+      'Application: Supports procedures such as jury selection challenges and changes of venue in high-publicity cases.',
+    ],
+  },
+  {
+    id: 'riley-v-california',
+    term: 'Riley v. California (2014)',
+    definition:
+      "Supreme Court case holding that police must get a warrant before searching data on an arrested person's cell phone.",
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.8'],
+    subNotes: [
+      'Significance: Extended Fourth Amendment privacy protections into the digital era.',
+    ],
+  },
+  {
+    id: 'bulk-metadata-collection',
+    term: 'Bulk Metadata Collection',
+    definition:
+      'Large-scale government gathering of communication records (timing, routing, destination) rather than content.',
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.8'],
+    subNotes: [
+      'Statutory Framework: Authorized under the Patriot Act and later curtailed by the USA Freedom Act.',
+    ],
+  },
+  {
+    id: 'plea-bargain',
+    term: 'Plea Bargain',
+    definition:
+      'An agreement where a defendant pleads guilty in exchange for a lighter sentence.',
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.8'],
+    subNotes: [
+      'Scale: Resolves the vast majority of criminal cases, avoiding a full jury trial.',
+    ],
+  },
+  {
+    id: 'substantive-due-process',
+    term: 'Substantive Due Process',
+    definition:
+      "The idea that some rights are so fundamental the government can't infringe them regardless of what procedure it follows.",
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.9'],
+    subNotes: [
+      'Contrast: Focuses on the *substance* of the right itself, while procedural due process focuses on the fairness of the process.',
+    ],
+  },
+  {
+    id: 'ninth-amendment',
+    term: 'Ninth Amendment',
+    definition:
+      'States that rights not listed in the Constitution are still retained by the people.',
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.9'],
+    subNotes: ['Significance: The textual anchor for unenumerated rights such as privacy.'],
+  },
+  {
+    id: 'unenumerated-rights',
+    term: 'Unenumerated Rights',
+    definition:
+      'Rights not explicitly written in the Constitution but recognized by the Court as protected.',
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.9'],
+    subNotes: [
+      'Debate: Critics argue recognizing these rights gives unelected judges excessive policymaking power.',
+    ],
+  },
+  {
+    id: 'right-to-privacy',
+    term: 'Right to Privacy',
+    definition:
+      'A judicially recognized right shielding personal decisions from government intrusion, built through substantive due process.',
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.9'],
+    subNotes: [
+      'Required Case: Griswold v. Connecticut (1965) first established this right explicitly.',
+    ],
+  },
+  {
+    id: 'penumbras-and-emanations',
+    term: 'Penumbras and Emanations',
+    definition:
+      "Justice Douglas's reasoning that privacy rights exist in the \"shadows\" cast by other Bill of Rights protections, even without being explicitly stated.",
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.9'],
+    subNotes: [
+      'Origin: Introduced in the majority opinion in Griswold v. Connecticut (1965).',
+    ],
+  },
+  {
+    id: 'griswold-v-connecticut',
+    term: 'Griswold v. Connecticut (1965)',
+    definition:
+      'Landmark Supreme Court case establishing the constitutional right to privacy, striking down a ban on contraceptive use by married couples.',
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.9'],
+    subNotes: [
+      'Legal Foundation: Became the precedent later relied on in Roe v. Wade (1973).',
+    ],
+  },
+  {
+    id: 'pierce-v-society-of-sisters',
+    term: 'Pierce v. Society of Sisters (1925)',
+    definition:
+      "Supreme Court case holding that parents have a right to direct their children's education, including choosing private school.",
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.9'],
+    subNotes: [
+      'Significance: An early recognition of family autonomy under substantive due process.',
+    ],
+  },
+  {
+    id: 'board-of-education-v-earls',
+    term: 'Board of Education v. Earls (2002)',
+    definition:
+      "Supreme Court case holding that random drug testing of students in extracurriculars doesn't violate their privacy rights.",
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.9'],
+    subNotes: [
+      'Balance: Illustrates that school safety interests can outweigh limited student privacy claims.',
+    ],
+  },
+  {
+    id: 'roe-v-wade',
+    term: 'Roe v. Wade (1973)',
+    definition:
+      "Landmark required Supreme Court case extending the right to privacy to a woman's decision to have an abortion.",
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.9'],
+    subNotes: [
+      'Status: Overturned in 2022 by Dobbs v. Jackson Women\u2019s Health Organization.',
+    ],
+  },
+  {
+    id: 'dobbs-v-jackson',
+    term: 'Dobbs v. Jackson Women\u2019s Health Org. (2022)',
+    definition:
+      "Supreme Court case overturning Roe, holding that the Constitution doesn't guarantee a right to abortion.",
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.9'],
+    subNotes: [
+      'Effect: Returned abortion policy to elected state legislatures and Congress.',
+    ],
+  },
+  {
+    id: 'equal-protection-clause',
+    term: 'Equal Protection Clause',
+    definition:
+      'Fourteenth Amendment provision barring states from denying any person equal protection under the law.',
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.10'],
+    subNotes: [
+      'Required Case: Brown v. Board of Education (1954) used this clause to strike down school segregation.',
+    ],
+  },
+  {
+    id: 'civil-rights',
+    term: 'Civil Rights',
+    definition:
+      'Legal guarantees of equal treatment regardless of race, ethnicity, or other protected traits.',
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.10'],
+    subNotes: [
+      'Contrast: Civil rights are positive guarantees of equal treatment; civil liberties are limits on government power.',
+    ],
+  },
+  {
+    id: 'u3-social-movements',
+    term: 'Social Movements',
+    definition:
+      'Organized, broad-based efforts by groups seeking social or political change.',
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.10'],
+    subNotes: [
+      'Examples: The civil rights, women\u2019s rights, and LGBTQ rights movements each pressured all three branches for change.',
+    ],
+  },
+  {
+    id: 'levels-of-scrutiny',
+    term: 'Levels of Scrutiny',
+    definition:
+      'The standard courts use to evaluate a law: strict scrutiny, intermediate scrutiny, or rational basis review.',
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.10'],
+    subNotes: [
+      'Tiers: Strict scrutiny applies to race, intermediate scrutiny to gender, and rational basis to most other classifications.',
+    ],
+  },
+  {
+    id: 'title-vi',
+    term: 'Title VI',
+    definition:
+      'Bars discrimination based on race, color, or national origin in federally funded programs.',
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.10'],
+    subNotes: ['Source: Enacted as part of the Civil Rights Act of 1964.'],
+  },
+  {
+    id: 'title-vii',
+    term: 'Title VII',
+    definition:
+      'Bars employment discrimination based on race, color, religion, sex, or national origin.',
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.10'],
+    subNotes: [
+      'Enforcement: Administered by the Equal Employment Opportunity Commission (EEOC).',
+    ],
+  },
+  {
+    id: 'title-ix',
+    term: 'Title IX',
+    definition:
+      'Bars sex discrimination in federally funded education programs, including athletics.',
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.10'],
+    subNotes: [
+      'Impact: Dramatically expanded funding and participation opportunities in women\u2019s school sports.',
+    ],
+  },
+  {
+    id: 'lgbtq-rights',
+    term: 'LGBTQ Rights',
+    definition:
+      'Advocacy for equal treatment and protection for LGBTQ individuals under the law.',
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.10'],
+    subNotes: [
+      'Judicial Path: Advanced largely through Fourteenth Amendment due process and equal protection litigation.',
+    ],
+  },
+  {
+    id: 'pro-choice-pro-life-movements',
+    term: 'Pro-Choice / Pro-Life Movements',
+    definition:
+      'Competing movements over abortion access — pro-choice supports the right to choose; pro-life seeks legal restrictions.',
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.10'],
+    subNotes: [
+      'Tactics: Both use litigation, lobbying, and electoral mobilization to shape policy.',
+    ],
+  },
+  {
+    id: 'civil-rights-act-1964',
+    term: 'Civil Rights Act of 1964',
+    definition:
+      'Banned discrimination based on race, color, religion, sex, or national origin in public accommodations, schools, and employment.',
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.11'],
+    subNotes: [
+      'Significance: The most sweeping congressional response to the civil rights movement.',
+    ],
+  },
+  {
+    id: 'u3-voting-rights-act-1965',
+    term: 'Voting Rights Act of 1965',
+    definition:
+      'Banned racial discrimination in voting and authorized federal oversight of elections in discriminatory jurisdictions.',
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.11'],
+    subNotes: [
+      'Mechanism: Suspended literacy tests and required federal preclearance of election changes in covered jurisdictions.',
+    ],
+  },
+  {
+    id: 'title-ix-education-amendments-1972',
+    term: 'Title IX of the Education Amendments Act (1972)',
+    definition:
+      "The statutory basis for Title IX's ban on sex discrimination in federally funded education.",
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.11'],
+    subNotes: [
+      'Leverage: Ties compliance to continued receipt of federal education funding.',
+    ],
+  },
+  {
+    id: 'race-based-school-segregation',
+    term: 'Race-Based School Segregation',
+    definition:
+      'The practice of separating students by race, later ruled unconstitutional.',
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.11'],
+    subNotes: [
+      'Required Case: Declared a violation of the Equal Protection Clause in Brown v. Board of Education (1954).',
+    ],
+  },
+  {
+    id: 'brown-v-board-of-education',
+    term: 'Brown v. Board of Education (1954)',
+    definition:
+      'Landmark required Supreme Court case ruling racial segregation in public schools unconstitutional.',
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.11'],
+    subNotes: [
+      'Holding: Overturned the "separate but equal" doctrine of Plessy v. Ferguson (1896) in public education.',
+    ],
+  },
+  {
+    id: 'majority-rights',
+    term: 'Majority Rights',
+    definition:
+      'The interests of the larger population, which courts must weigh against minority protections.',
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.12'],
+    subNotes: [
+      'Tension: Unchecked majority rule can produce the "tyranny of the majority" warned of in Federalist No. 10.',
+    ],
+  },
+  {
+    id: 'minority-rights',
+    term: 'Minority Rights',
+    definition:
+      "Legal protections ensuring smaller population groups aren't subject to majority-imposed discrimination.",
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.12'],
+    subNotes: [
+      'Judicial Role: Courts often protect these rights when elected majorities will not.',
+    ],
+  },
+  {
+    id: 'segregation',
+    term: 'Segregation',
+    definition:
+      'Forced separation of racial groups in public facilities, schools, or accommodations.',
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.12'],
+    subNotes: [
+      'Legal History: Constitutional under Plessy (1896) until struck down in public schools by Brown (1954).',
+    ],
+  },
+  {
+    id: 'separate-but-equal-doctrine',
+    term: 'Separate But Equal Doctrine',
+    definition:
+      'Legal principle allowing segregation if facilities were nominally "equal."',
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.12'],
+    subNotes: [
+      'Status: Overturned in public education by Brown v. Board of Education (1954).',
+    ],
+  },
+  {
+    id: 'plessy-v-ferguson',
+    term: 'Plessy v. Ferguson (1896)',
+    definition:
+      'Supreme Court case establishing the "separate but equal" doctrine, upholding racial segregation as constitutional.',
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.12'],
+    subNotes: [
+      'Legacy: Legitimized Jim Crow laws for nearly six decades before Brown (1954).',
+    ],
+  },
+  {
+    id: 'majority-minority-districting',
+    term: 'Majority-Minority Districting',
+    definition:
+      'Drawing district lines so a minority group forms the voting majority, to increase representation.',
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.12'],
+    subNotes: [
+      'Required Case: Shaw v. Reno (1993) held that districts drawn predominantly by race face strict scrutiny.',
+    ],
+  },
+  {
+    id: 'emancipation-proclamation',
+    term: 'Emancipation Proclamation',
+    definition:
+      "Lincoln's Civil War order freeing enslaved people in rebelling states.",
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.12'],
+    subNotes: [
+      'Significance: An early marker of the shift toward federal protection of civil rights.',
+    ],
+  },
+  {
+    id: 'affirmative-action',
+    term: 'Affirmative Action',
+    definition:
+      'Policies aiming to address workplace and educational disparities based on race, gender, disability, or similar traits.',
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.13'],
+    subNotes: [
+      'Judicial Limit: Race-conscious college admissions were struck down in Students for Fair Admissions v. Harvard (2023).',
+    ],
+  },
+  {
+    id: 'educational-disparities',
+    term: 'Educational Disparities',
+    definition:
+      'Unequal access to or outcomes in education based on a protected characteristic.',
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.13'],
+    subNotes: [
+      'Policy Response: A primary justification offered for affirmative action programs.',
+    ],
+  },
+  {
+    id: 'workplace-disparities',
+    term: 'Workplace Disparities',
+    definition:
+      'Unequal employment opportunities or treatment based on a protected characteristic.',
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.13'],
+    subNotes: [
+      'Statutory Check: Addressed primarily through Title VII of the Civil Rights Act of 1964.',
+    ],
+  },
+  {
+    id: 'regents-v-bakke',
+    term: 'Regents of the University of California v. Bakke (1978)',
+    definition:
+      'Supreme Court case banning racial quotas in admissions but allowing race as one factor among many.',
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.13'],
+    subNotes: [
+      'Framework: Governed college admissions policy until it was effectively ended in 2023.',
+    ],
+  },
+  {
+    id: 'students-for-fair-admissions-v-harvard',
+    term: 'Students for Fair Admissions v. Harvard (2023)',
+    definition:
+      'Supreme Court case striking down race-conscious college admissions, effectively ending the Bakke framework.',
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDs: ['3.13'],
+    subNotes: [
+      'Reasoning: Held that such admissions programs violate the Equal Protection Clause.',
+    ],
+  },
 ];

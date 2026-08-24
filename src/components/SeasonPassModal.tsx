@@ -7,6 +7,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { useAuthContext } from '@/contexts/AuthContext';
 import type { CourseSubject } from '@/lib/courseSubject';
 import { displayCourseLabel } from '@/lib/courseSubject';
+import type { SeasonPassPurchaseType } from '@/data/seasonPassCourseConfig';
 
 interface SeasonPassModalProps {
   subject: CourseSubject;
@@ -29,20 +30,32 @@ export function SeasonPassModal({ subject, onClose, showFeatureBlur = false }: S
   const [isBundleLoading, setIsBundleLoading] = useState(false);
 
   const isGov = subject === 'gov';
+  const isStats = subject === 'stats';
+  const isEcon = subject === 'macro' || subject === 'micro';
   const isGreen = subject === 'micro';
-  const accentBgClass = isGov
-    ? 'bg-violet-600 hover:bg-violet-700 border-violet-800'
-    : isGreen
-      ? 'bg-green-600 hover:bg-green-700 border-green-800'
-      : 'bg-blue-600 hover:bg-blue-700 border-blue-800';
-  const accentPillClass = isGov
-    ? 'bg-violet-100 text-violet-800'
-    : isGreen
-      ? 'bg-green-100 text-green-800'
-      : 'bg-blue-100 text-blue-800';
+  const accentBgClass = isStats
+    ? 'bg-orange-600 hover:bg-orange-700 border-orange-800'
+    : isGov
+      ? 'bg-violet-600 hover:bg-violet-700 border-violet-800'
+      : isGreen
+        ? 'bg-green-600 hover:bg-green-700 border-green-800'
+        : 'bg-blue-600 hover:bg-blue-700 border-blue-800';
+  const accentPillClass = isStats
+    ? 'bg-orange-100 text-orange-800'
+    : isGov
+      ? 'bg-violet-100 text-violet-800'
+      : isGreen
+        ? 'bg-green-100 text-green-800'
+        : 'bg-blue-100 text-blue-800';
   const subjectLabel = displayCourseLabel(subject);
-  const topBarClass = isGov ? 'bg-violet-500' : isGreen ? 'bg-green-500' : 'bg-blue-500';
-  const headlineAccentClass = isGov ? 'text-violet-600' : isGreen ? 'text-green-600' : 'text-blue-600';
+  const topBarClass = isStats ? 'bg-orange-500' : isGov ? 'bg-violet-500' : isGreen ? 'bg-green-500' : 'bg-blue-500';
+  const headlineAccentClass = isStats
+    ? 'text-orange-600'
+    : isGov
+      ? 'text-violet-600'
+      : isGreen
+        ? 'text-green-600'
+        : 'text-blue-600';
   const priceAccentClass = headlineAccentClass;
   const listIconClass = headlineAccentClass;
 
@@ -54,7 +67,7 @@ export function SeasonPassModal({ subject, onClose, showFeatureBlur = false }: S
     return () => document.removeEventListener('keydown', handleEscape);
   }, [onClose]);
 
-  const handleCheckout = async (type: 'macro' | 'micro' | 'bundle') => {
+  const handleCheckout = async (type: SeasonPassPurchaseType) => {
     const setLoading = type === 'bundle' ? setIsBundleLoading : setIsLoading;
     setLoading(true);
     try {
@@ -141,20 +154,17 @@ export function SeasonPassModal({ subject, onClose, showFeatureBlur = false }: S
                   <span className={`text-4xl font-black leading-none ${priceAccentClass}`}>$29</span>
                   <span className="text-xl font-semibold text-gray-400 line-through">$39</span>
                 </div>
-                <p className="text-xs font-medium text-gray-500">One-time payment - valid through June 30, 2026</p>
+                <p className="text-xs font-medium text-gray-500">One-time payment - valid through June 30, 2027</p>
 
                 <button
-                  onClick={() => handleCheckout(isGov ? 'bundle' : subject)}
+                  onClick={() => handleCheckout(subject)}
                   disabled={isLoading}
                   className={`w-full rounded-xl border-4 py-4 text-base font-black text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-y-[-1px] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] disabled:opacity-70 ${accentBgClass}`}
                 >
-                  {isLoading
-                    ? 'Processing...'
-                    : isGov
-                      ? 'Unlock Macro + Micro bundle - $49'
-                      : `Unlock AP ${subjectLabel} - $29`}
+                  {isLoading ? 'Processing...' : `Unlock AP ${subjectLabel} — $29`}
                 </button>
 
+                {isEcon ? (
                 <button
                   onClick={() => handleCheckout('bundle')}
                   disabled={isBundleLoading}
@@ -162,9 +172,10 @@ export function SeasonPassModal({ subject, onClose, showFeatureBlur = false }: S
                 >
                   <span className="inline-flex items-center gap-1.5">
                     <Sparkles className="h-4 w-4" />
-                    {isBundleLoading ? 'Processing...' : 'Need both? Get Macro + Micro Bundle - $49'}
+                    {isBundleLoading ? 'Processing...' : 'Need both? Get Macro + Micro Bundle — $49'}
                   </span>
                 </button>
+                ) : null}
               </div>
             </div>
           </div>

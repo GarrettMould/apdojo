@@ -163,6 +163,7 @@ export function scotusSenseiSystemPrompt(
   const govPersona = personaForSubject('gov');
   const sharedContext = scotusSenseiPromptContextBlock(ctx, intent);
 
+  // Full FRQ submit — scored X/4. Model: gemini-3.5-flash (see SCOTUS_FULL_GRADE.md).
   if (intent === 'full_grade') {
     return `${govPersona.voice}
 

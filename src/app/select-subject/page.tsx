@@ -8,12 +8,10 @@ import { db } from '@/lib/firebase';
 import { Loader2, Check } from 'lucide-react';
 import type { CourseSubject } from '@/lib/courseSubject';
 import { unitXpDocumentId, unitsForCourseSubject } from '@/lib/courseSubject';
-import { hasAdminRole } from '@/lib/adminAccess';
 
 export default function SelectSubjectPage() {
   const { user, userData, loading: authLoading, loadingUserData } = useAuthContext();
   const router = useRouter();
-  const canAccessGov = Boolean(user && hasAdminRole(userData));
 
   const [selectedSubjects, setSelectedSubjects] = useState<Set<CourseSubject>>(new Set());
   const [isLoading, setIsLoading] = useState(false);
@@ -189,29 +187,48 @@ export default function SelectSubjectPage() {
               <span className="block text-sm text-gray-500">Study of individual and firm decisions.</span>
             </div>
           </label>
-          {canAccessGov && (
-            <label 
-              htmlFor="gov-checkbox"
-              className={`flex items-center p-4 border rounded-md cursor-pointer transition-colors ${selectedSubjects.has('gov') ? 'border-violet-500 ring-2 ring-violet-200 bg-violet-50' : 'border-gray-300 hover:border-gray-400'}`}
-            >
-              <div className={`w-6 h-6 flex-shrink-0 border-2 rounded flex items-center justify-center mr-4 ${selectedSubjects.has('gov') ? 'bg-violet-600 border-violet-600' : 'border-gray-400 bg-white'}`}>
-                {selectedSubjects.has('gov') && <Check className="w-4 h-4 text-white stroke-[3]" />}
-              </div>
-              <input
-                type="checkbox"
-                id="gov-checkbox"
-                name="subject"
-                value="gov"
-                checked={selectedSubjects.has('gov')}
-                onChange={() => handleSubjectToggle('gov')}
-                className="absolute opacity-0 w-0 h-0"
-              />
-              <div className="ml-3">
-                <span className="block text-base font-semibold text-gray-900">AP United States Government and Politics</span>
-                <span className="block text-sm text-gray-500">Foundations, institutions, and political behavior.</span>
-              </div>
-            </label>
-          )}
+          <label 
+            htmlFor="gov-checkbox"
+            className={`flex items-center p-4 border rounded-md cursor-pointer transition-colors ${selectedSubjects.has('gov') ? 'border-violet-500 ring-2 ring-violet-200 bg-violet-50' : 'border-gray-300 hover:border-gray-400'}`}
+          >
+            <div className={`w-6 h-6 flex-shrink-0 border-2 rounded flex items-center justify-center mr-4 ${selectedSubjects.has('gov') ? 'bg-violet-600 border-violet-600' : 'border-gray-400 bg-white'}`}>
+              {selectedSubjects.has('gov') && <Check className="w-4 h-4 text-white stroke-[3]" />}
+            </div>
+            <input
+              type="checkbox"
+              id="gov-checkbox"
+              name="subject"
+              value="gov"
+              checked={selectedSubjects.has('gov')}
+              onChange={() => handleSubjectToggle('gov')}
+              className="absolute opacity-0 w-0 h-0"
+            />
+            <div className="ml-3">
+              <span className="block text-base font-semibold text-gray-900">AP United States Government and Politics</span>
+              <span className="block text-sm text-gray-500">Foundations, institutions, and political behavior.</span>
+            </div>
+          </label>
+          <label 
+            htmlFor="stats-checkbox"
+            className={`flex items-center p-4 border rounded-md cursor-pointer transition-colors ${selectedSubjects.has('stats') ? 'border-orange-500 ring-2 ring-orange-200 bg-orange-50' : 'border-gray-300 hover:border-gray-400'}`}
+          >
+            <div className={`w-6 h-6 flex-shrink-0 border-2 rounded flex items-center justify-center mr-4 ${selectedSubjects.has('stats') ? 'bg-orange-600 border-orange-600' : 'border-gray-400 bg-white'}`}>
+              {selectedSubjects.has('stats') && <Check className="w-4 h-4 text-white stroke-[3]" />}
+            </div>
+            <input
+              type="checkbox"
+              id="stats-checkbox"
+              name="subject"
+              value="stats"
+              checked={selectedSubjects.has('stats')}
+              onChange={() => handleSubjectToggle('stats')}
+              className="absolute opacity-0 w-0 h-0"
+            />
+            <div className="ml-3">
+              <span className="block text-base font-semibold text-gray-900">AP Statistics</span>
+              <span className="block text-sm text-gray-500">Data analysis, inference, and modeling.</span>
+            </div>
+          </label>
         </div>
 
         <div>

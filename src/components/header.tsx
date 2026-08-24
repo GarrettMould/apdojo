@@ -14,7 +14,6 @@ import { AdminSubjectSelect } from '@/components/dashboard/AdminSubjectSelect';
 import { hasValidSeasonPass, getPracticeTestsUrl } from '@/lib/utils';
 import type { CourseSubject } from '@/lib/courseSubject';
 import { defaultCheatSheetUrl, isCourseSubject, isEconCourse } from '@/lib/courseSubject';
-import { hasAdminRole } from '@/lib/adminAccess';
 import { useSubjectSwitchNavigation } from '@/hooks/useSubjectSwitchNavigation';
 
 export function Header() {
@@ -33,18 +32,14 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isBeltDropdownOpen, setIsBeltDropdownOpen] = useState(false);
   const [isPracticeDropdownOpen, setIsPracticeDropdownOpen] = useState(false);
-  const [isGovDropdownOpen, setIsGovDropdownOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const beltDropdownRef = useRef<HTMLDivElement>(null);
   const practiceDropdownRef = useRef<HTMLDivElement>(null);
-  const govDropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const handleSubjectSwitch = useSubjectSwitchNavigation();
   const isTeacher = !!(user && userData?.teacher === true);
-  const isAdmin = Boolean(user && hasAdminRole(userData));
-  const canAccessGov = isAdmin;
 
   // Ensure component is mounted before using selectedSubject to prevent hydration mismatch
   useEffect(() => {
@@ -64,21 +59,22 @@ export function Header() {
   const navHoverClass =
     displaySubject === 'gov'
       ? 'hover:text-violet-600'
-      : displaySubject === 'micro'
-        ? 'hover:text-green-600'
-        : 'hover:text-blue-600';
-  const mcqPracticeHref =
-    displaySubject === 'gov'
-      ? '/select-practice-units?subject=gov'
-      : '/select-practice-units';
+      : displaySubject === 'stats'
+        ? 'hover:text-orange-600'
+        : displaySubject === 'micro'
+          ? 'hover:text-green-600'
+          : 'hover:text-blue-600';
+  const mcqPracticeHref = '/select-practice-units';
 
   const mobilePracticeLinks: { label: string; href: string; prefetch?: boolean }[] = [
-    { label: 'MCQ Practice', href: mcqPracticeHref },
-    ...(displaySubject !== 'stats'
+    ...(isEconCourse(displaySubject)
+      ? [{ label: 'MCQ Practice', href: mcqPracticeHref }]
+      : []),
+    ...(isEconCourse(displaySubject)
       ? [
           {
             label: 'FRQ Practice',
-            href: `/unitFRQpracticePage?subject=${displaySubject}&frqId=${displaySubject === 'macro' ? 1 : displaySubject === 'micro' ? 2 : 1}`,
+            href: `/unitFRQpracticePage?subject=${displaySubject}&frqId=${displaySubject === 'macro' ? 1 : 2}`,
           },
         ]
       : []),
@@ -169,25 +165,8 @@ export function Header() {
     };
   }, [isPracticeDropdownOpen]);
 
-  // Close gov dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (govDropdownRef.current && !govDropdownRef.current.contains(event.target as Node)) {
-        setIsGovDropdownOpen(false);
-      }
-    };
-
-    if (isGovDropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isGovDropdownOpen]);
-
   return (
-    <header className="bg-white sticky top-0 z-50 shadow-md">
+    <header className="bg-white sticky top-0 z-[120] shadow-md">
       <div className="px-4 sm:px-8 lg:px-12">
         <div className="flex justify-between items-center h-20">
           {/* Logo and Brand */}
@@ -210,12 +189,11 @@ export function Header() {
           {/* Desktop Navigation, XP, and Auth Buttons */}
           <div className="hidden lg:flex items-center gap-x-8">
             <nav className="flex items-center space-x-10">
-              {/* Practice Dropdown */}
               <div className="relative" ref={practiceDropdownRef}>
                 <button
                   type="button"
                   onClick={() => setIsPracticeDropdownOpen(prev => !prev)}
-                  className="flex items-center gap-1 text-lg text-gray-700 hover:text-blue-600 transition-colors font-bold"
+                  className={`flex items-center gap-1 text-lg text-gray-700 transition-colors font-bold ${navHoverClass}`}
                 >
                   Practice
                   <ChevronDown className={`w-5 h-5 transition-transform ${isPracticeDropdownOpen ? 'rotate-180' : ''}`} />
@@ -228,19 +206,21 @@ export function Header() {
                     <div className="bg-white rounded-lg shadow-lg border border-gray-200 py-2 pointer-events-auto">
                       <Link
                         href={getPracticeTestsUrl(selectedSubject)}
-                        className="block px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                        className={`block px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 transition-colors ${navHoverClass}`}
                         onClick={() => setIsPracticeDropdownOpen(false)}
                       >
                         Full Practice Tests
                       </Link>
-                      <Link
-                        href={mcqPracticeHref}
-                        className={`block px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 transition-colors ${navHoverClass}`}
-                        onClick={() => setIsPracticeDropdownOpen(false)}
-                      >
-                        MCQ Practice
-                      </Link>
-                      {displaySubject !== 'stats' ? (
+                      {isEconCourse(displaySubject) ? (
+                        <Link
+                          href={mcqPracticeHref}
+                          className={`block px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 transition-colors ${navHoverClass}`}
+                          onClick={() => setIsPracticeDropdownOpen(false)}
+                        >
+                          MCQ Practice
+                        </Link>
+                      ) : null}
+                      {isEconCourse(displaySubject) ? (
                         <Link
                           href={`/unitFRQpracticePage?subject=${displaySubject}&frqId=${displaySubject === 'macro' ? 1 : 2}`}
                           className="block px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
@@ -296,59 +276,18 @@ export function Header() {
                 </Link>
               ) : null}
 
-              {canAccessGov && !isAdmin && (
-                <div className="relative" ref={govDropdownRef}>
-                  <button
-                    type="button"
-                    onClick={() => setIsGovDropdownOpen((p) => !p)}
-                    className="flex items-center gap-1 text-lg text-gray-700 hover:text-violet-600 transition-colors font-bold"
-                  >
-                    AP Gov
-                    <ChevronDown className={`w-5 h-5 transition-transform ${isGovDropdownOpen ? 'rotate-180' : ''}`} />
-                  </button>
-                  {isGovDropdownOpen && (
-                    <div className="absolute top-full left-0 w-64 z-50">
-                      <div className="h-2 -mt-2 w-full pointer-events-auto"></div>
-                      <div className="bg-white rounded-lg shadow-lg border border-gray-200 py-2 pointer-events-auto">
-                        <Link
-                          href="/ap-gov-unit-1-cheat-sheet"
-                          className="block px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 hover:text-violet-600 transition-colors"
-                          onClick={() => setIsGovDropdownOpen(false)}
-                        >
-                          Cheat Sheets
-                        </Link>
-                        <Link
-                          href="/select-practice-units?subject=gov"
-                          className="block px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 hover:text-violet-600 transition-colors"
-                          onClick={() => setIsGovDropdownOpen(false)}
-                        >
-                          MCQ Practice
-                        </Link>
-                        <Link
-                          href={getPracticeTestsUrl('gov')}
-                          className="block px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 hover:text-violet-600 transition-colors"
-                          onClick={() => setIsGovDropdownOpen(false)}
-                        >
-                          Practice Tests
-                        </Link>
-                        <Link
-                          href="/scotus-essay-practice"
-                          className="block px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 hover:text-violet-600 transition-colors"
-                          onClick={() => setIsGovDropdownOpen(false)}
-                        >
-                          SCOTUS Comparison Practice
-                        </Link>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-
               <Link
                 href={defaultCheatSheetUrl(displaySubject)}
                 className={`text-lg text-gray-700 transition-colors font-bold ${navHoverClass}`}
               >
                 Cheat Sheets
+              </Link>
+
+              <Link
+                href={`/tutoring/${displaySubject}`}
+                className={`text-lg text-gray-700 transition-colors font-bold ${navHoverClass}`}
+              >
+                Tutoring
               </Link>
 
               {/* Season Pass - Only show if user is not logged in or not premium */}
@@ -360,85 +299,14 @@ export function Header() {
                   Season Pass
                 </Link>
               )}
-
-              {/* Tutoring Dropdown - HIDDEN */}
-              {/* <div 
-                className="relative"
-                onMouseEnter={() => setIsTutoringDropdownOpen(true)}
-                onMouseLeave={() => setIsTutoringDropdownOpen(false)}
-              >
-                <button className="flex items-center gap-1 text-gray-700 hover:text-blue-600 transition-colors font-semibold">
-                  Tutoring
-                  <ChevronDown className={`w-4 h-4 transition-transform ${isTutoringDropdownOpen ? 'rotate-180' : ''}`} />
-                </button>
-                
-                {isTutoringDropdownOpen && (
-                  <div className="absolute top-full left-0 pt-2 w-56 z-50">
-                    <div className="bg-white rounded-lg shadow-lg border border-gray-200 py-2">
-                      <Link
-                        href="/tutoring"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
-                        onClick={() => setIsTutoringDropdownOpen(false)}
-                      >
-                        Book a Lesson
-                      </Link>
-                      <Link
-                        href="/async-tutoring"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
-                        onClick={() => setIsTutoringDropdownOpen(false)}
-                      >
-                        Ask a Question
-                      </Link>
-                      <Link
-                        href="https://www.youtube.com/@apdojo"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
-                        onClick={() => setIsTutoringDropdownOpen(false)}
-                      >
-                        Join a YouTube Live Session
-                      </Link>
-                    </div>
-                  </div>
-                )}
-              </div> */}
             </nav>
 
-            {isAdmin && (
-              <AdminSubjectSelect
-                value={displaySubject}
-                onChange={handleSubjectChange}
-                size="compact"
-              />
-            )}
-
-            {/* Macro / Micro toggle — logged-out visitors only */}
-            {!user && !isAdmin && (
-              <div className="flex items-center">
-                <div className="inline-flex items-center bg-gray-100 rounded-xl p-1 border-2 border-gray-300 shadow-[0_3px_0_0_rgba(209,213,219,1)]">
-                  <button
-                    onClick={() => handleSubjectChange('macro')}
-                    className={`px-4 py-1.5 text-sm font-black rounded-lg transition-all duration-200 ${
-                      (mounted ? selectedSubject : 'macro') === 'macro'
-                        ? 'bg-blue-500 text-white border-2 border-blue-700 shadow-[0_2px_0_0_rgba(0,0,0,0.4)]'
-                        : 'bg-gray-100 text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    Macro
-                  </button>
-                  <button
-                    onClick={() => handleSubjectChange('micro')}
-                    className={`px-4 py-1.5 text-sm font-black rounded-lg transition-all duration-200 ${
-                      (mounted ? selectedSubject : 'macro') === 'micro'
-                        ? 'bg-green-500 text-white border-2 border-green-700 shadow-[0_2px_0_0_rgba(0,0,0,0.4)]'
-                        : 'bg-gray-100 text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    Micro
-                  </button>
-                </div>
-              </div>
-            )}
+            <AdminSubjectSelect
+              value={displaySubject}
+              onChange={handleSubjectChange}
+              size="compact"
+              userData={userData}
+            />
 
             {/* User Icon & Auth Buttons */}
             <div className="relative z-[51] flex items-center gap-3">
@@ -533,6 +401,14 @@ export function Header() {
 
                               {user && (
                                 <div className="border-t border-gray-200 pt-3 mt-3">
+                                  {(user.email ?? userData?.email) && (
+                                    <p
+                                      className="mb-2 truncate rounded-md bg-gray-100 px-3 py-2 text-xs font-medium text-gray-600"
+                                      title={user.email ?? userData?.email}
+                                    >
+                                      {user.email ?? userData?.email}
+                                    </p>
+                                  )}
                                   <button
                                     onClick={() => {
                                       handleLogout();
@@ -579,7 +455,7 @@ export function Header() {
 
         {/* Mobile Navigation — Full-screen overlay */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden fixed inset-0 z-[60] bg-white flex flex-col overflow-y-auto">
+          <div className="lg:hidden fixed inset-0 z-[125] bg-white flex flex-col overflow-y-auto">
 
             {/* Overlay header row */}
             <div className="flex items-center justify-between px-5 h-20 border-b border-gray-100 flex-shrink-0">
@@ -658,6 +534,17 @@ export function Header() {
                   {label}
                 </Link>
               ))}
+              <div className="my-3 border-t border-gray-100" />
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1 mb-1">Tutoring</p>
+              <Link
+                href={`/tutoring/${displaySubject}`}
+                onClick={closeMobileMenu}
+                className={`px-4 py-4 text-xl font-bold text-gray-800 rounded-xl transition-colors ${navHoverClass} ${
+                  displaySubject === 'gov' ? 'hover:bg-violet-50' : displaySubject === 'micro' ? 'hover:bg-green-50' : 'hover:bg-blue-50'
+                }`}
+              >
+                Book a Tutor
+              </Link>
 
               {/* Bottom section — XP, subject toggle, logout */}
               <div className="mt-auto pt-6 border-t border-gray-100 space-y-4">
@@ -700,47 +587,33 @@ export function Header() {
                   );
                 })()}
 
-                {isAdmin ? (
-                  <AdminSubjectSelect
-                    value={displaySubject}
-                    onChange={(s) => {
-                      handleSubjectChange(s);
-                      closeMobileMenu();
-                    }}
-                    className="w-full min-w-0"
-                  />
-                ) : null}
-                {!isAdmin && (
-                  <div className="inline-flex w-full bg-gray-100 rounded-xl p-1 border border-gray-200">
-                    {(['macro', 'micro'] as const).map((s) => (
-                      <button
-                        key={s}
-                        type="button"
-                        onClick={() => {
-                          handleSubjectChange(s);
-                          closeMobileMenu();
-                        }}
-                        className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-200 capitalize ${
-                          displaySubject === s
-                            ? s === 'macro'
-                              ? 'bg-blue-600 text-white shadow-sm'
-                              : 'bg-green-600 text-white shadow-sm'
-                            : 'text-gray-600 hover:text-gray-900'
-                        }`}
-                      >
-                        {s.charAt(0).toUpperCase() + s.slice(1)}
-                      </button>
-                    ))}
-                  </div>
-                )}
+                <AdminSubjectSelect
+                  value={displaySubject}
+                  onChange={(s) => {
+                    handleSubjectChange(s);
+                    closeMobileMenu();
+                  }}
+                  className="w-full min-w-0"
+                  userData={userData}
+                />
 
                 {user && (
-                  <button
-                    onClick={() => { handleLogout(); closeMobileMenu(); }}
-                    className="w-full py-3 text-red-600 hover:bg-red-50 transition-colors font-semibold rounded-xl text-sm"
-                  >
-                    Logout
-                  </button>
+                  <div className="space-y-1">
+                    {(user.email ?? userData?.email) && (
+                      <p
+                        className="truncate rounded-md bg-gray-100 px-3 py-2 text-center text-xs font-medium text-gray-600"
+                        title={user.email ?? userData?.email}
+                      >
+                        {user.email ?? userData?.email}
+                      </p>
+                    )}
+                    <button
+                      onClick={() => { handleLogout(); closeMobileMenu(); }}
+                      className="w-full py-3 text-red-600 hover:bg-red-50 transition-colors font-semibold rounded-xl text-sm"
+                    >
+                      Logout
+                    </button>
+                  </div>
                 )}
               </div>
             </nav>

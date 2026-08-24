@@ -1,6 +1,6 @@
-export type SeasonPassPurchaseType = 'macro' | 'micro' | 'bundle' | 'gov';
+export type SeasonPassPurchaseType = 'macro' | 'micro' | 'bundle' | 'gov' | 'stats';
 
-const VALID_SEASON_PASS_TYPES = new Set<SeasonPassPurchaseType>(['macro', 'micro', 'bundle', 'gov']);
+const VALID_SEASON_PASS_TYPES = new Set<SeasonPassPurchaseType>(['macro', 'micro', 'bundle', 'gov', 'stats']);
 
 /** Coerce query param / route input to a supported checkout type (defaults to macro). */
 export function parseSeasonPassPurchaseType(raw: string | null | undefined): SeasonPassPurchaseType {
@@ -89,7 +89,24 @@ export const COURSE_CONFIG: Record<
       'Unit Cheat Sheets + Printable PDFs',
       'Dojo AI Tutor on Cheat Sheets',
       'Unlimited Practice Where Unlocked',
-      'Valid Through June 30, 2026',
+      'Valid Through June 30, 2027',
+    ],
+  },
+  stats: {
+    badge: 'AP STATISTICS SEASON PASS',
+    headline: 'The Complete AP Stats Toolkit for a 5.',
+    subheadline: 'Everything you need for AP Statistics — in one place.',
+    price: 29,
+    originalPrice: 39,
+    accentColor: 'text-orange-600',
+    accentBg: 'bg-orange-600',
+    features: [
+      'Full Unit MCQ Practice + Formal Unit Tests',
+      'Unit FRQ Packs with Stimulus Practice',
+      'Unit Cheat Sheets + Printable PDFs',
+      'Dojo AI Tutor on Cheat Sheets',
+      'Unlimited Practice Where Unlocked',
+      'Valid Through June 30, 2027',
     ],
   },
 };

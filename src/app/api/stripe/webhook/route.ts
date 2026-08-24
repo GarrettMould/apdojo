@@ -4,6 +4,7 @@ import { stripe } from '@/lib/stripe-server';
 import { db as adminDb } from '@/lib/firebase-admin'; 
 import { FieldValue } from 'firebase-admin/firestore';
 import Stripe from 'stripe';
+import { getSeasonPassExpirationDate } from '@/lib/seasonPassExpiration';
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
@@ -76,15 +77,9 @@ export async function POST(req: Request) {
       const { purchaseType, courseType, examId: checkoutExamId, userId: metadataUserId } = checkoutSession.metadata || {};
       const checkoutUserId = metadataUserId || checkoutSession.client_reference_id;
 
-      // Calculate expiration date: June 30th of current or next year
+      // Calculate expiration date: June 30th of current or next school year
       const now = new Date();
-      const currentYear = now.getUTCFullYear();
-      const currentMonth = now.getUTCMonth();
-      const currentDay = now.getUTCDate();
-      const expirationYear = (currentMonth > 5 || (currentMonth === 5 && currentDay > 30))
-        ? currentYear + 1
-        : currentYear;
-      const expirationDate = `${expirationYear}-06-30T23:59:59.999Z`;
+      const expirationDate = getSeasonPassExpirationDate(now);
 
       // Guest checkout: no userId — store a pending pass keyed by email
       if (!checkoutUserId) {
@@ -147,7 +142,7 @@ export async function POST(req: Request) {
             console.log(`✅ Added bundle season pass (macro + micro) to user ${checkoutUserId} (expires ${expirationDate})`);
           } 
           // Handle single subject purchase (econ or gov)
-          else if (courseType === 'macro' || courseType === 'micro' || courseType === 'gov') {
+          else if (courseType === 'macro' || courseType === 'micro' || courseType === 'gov' || courseType === 'stats') {
             await userRef.set({
               seasonPass: FieldValue.arrayUnion(courseType),
               seasonPassExpiration: {

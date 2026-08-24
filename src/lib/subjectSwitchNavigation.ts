@@ -38,6 +38,11 @@ export function getUrlForSubjectSwitch(
 ): string {
   const path = normalizePath(pathname);
 
+  // Logged-in home: "Your Library" dashboard — stay on `/`, only swap subject context.
+  if (path === '/') {
+    return '/';
+  }
+
   const cheatSheetTarget = getCheatSheetUrlForSubjectSwitch(path, newSubject);
   if (cheatSheetTarget) return cheatSheetTarget;
 
@@ -85,6 +90,18 @@ export function getUrlForSubjectSwitch(
   }
 
   if (path.startsWith('/scotus-essay-practice')) {
+    return subjectHomeUrl(newSubject);
+  }
+
+  const tutoringMatch = path.match(/^\/tutoring\/(macro|micro|gov|stats)$/);
+  if (tutoringMatch || path === '/tutoring') {
+    return `/tutoring/${newSubject}`;
+  }
+
+  if (path.startsWith('/offer/')) {
+    if (newSubject === 'macro' || newSubject === 'micro' || newSubject === 'gov' || newSubject === 'stats') {
+      return `/offer/${newSubject}`;
+    }
     return subjectHomeUrl(newSubject);
   }
 

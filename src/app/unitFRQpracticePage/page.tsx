@@ -38,6 +38,9 @@ import FRQLibrarySidebar, { FRQItem } from '@/components/FRQLibrarySidebar';
 import { cn, hasValidSeasonPass } from '@/lib/utils';
 import type { CourseSubject } from '@/lib/courseSubject';
 import { econCourseFromSubject } from '@/lib/courseSubject';
+import {
+  PrintableWorksheetHeader,
+} from '@/components/PrintableWorksheetHeader';
 import { FrqPracticeChatFab } from '@/components/FrqPracticeChatFab';
 import { macroUnits, microUnits } from '@/data/cheatSheets';
 import { FRQCompletionModal } from '@/components/FRQCompletionModal';
@@ -840,7 +843,16 @@ function UnitFRQPracticePageComponent() {
       >
         <div className="overflow-hidden rounded-2xl border-2 border-gray-200 bg-white shadow-[4px_4px_0px_0px_rgba(17,24,39,0.06)] print:rounded-none print:border-black print:shadow-none">
           <div className="p-6 sm:p-8 print:border-none">
-            <div className="mb-6 flex flex-col gap-4 border-b border-gray-200 pb-4 print:border-b-2 print:border-black sm:flex-row sm:items-start sm:justify-between sm:gap-8 lg:gap-12">
+            {frqQuestion ? (
+              <div className="mb-6 hidden print:block">
+                <PrintableWorksheetHeader
+                  title={frqQuestion.title}
+                  totalQuestions={1}
+                  sectionLabel="Worksheets"
+                />
+              </div>
+            ) : null}
+            <div className="mb-6 flex flex-col gap-4 border-b border-gray-200 pb-4 print:hidden sm:flex-row sm:items-start sm:justify-between sm:gap-8 lg:gap-12">
               <div className="min-w-0 w-full max-w-xl shrink sm:w-auto lg:max-w-2xl">
                 <h1 className="mb-1 text-2xl font-black text-gray-900 sm:text-3xl">
                   {frqQuestion ? frqQuestion.title : 'No FRQs for this course yet'}
@@ -848,7 +860,7 @@ function UnitFRQPracticePageComponent() {
                 <p className="text-sm font-medium text-gray-600">From: {frqQuestion?.examTitle ?? '—'}</p>
               </div>
               {frqQuestion && !isCurrentQuestionLocked && (
-                <div className="flex shrink-0 flex-col items-end justify-center pt-0.5 print:hidden sm:min-w-[5.5rem]">
+                <div className="flex shrink-0 flex-col items-end justify-center pt-0.5 sm:min-w-[5.5rem]">
                   <div className="text-[11px] font-semibold uppercase tracking-wide text-gray-500">Points</div>
                   <div className="tabular-nums text-2xl font-black text-gray-900 sm:text-3xl">
                     {currentPoints}/{totalPoints}
@@ -1019,6 +1031,18 @@ function UnitFRQPracticePageComponent() {
                   <span className="min-w-0 flex-1 leading-snug text-gray-600 line-clamp-2">
                     {summary}
                   </span>
+                  {(
+                    Boolean(textAnswers[`part-${part.label}`]?.trim()) ||
+                    Boolean(
+                      part.subparts?.some((sp) =>
+                        textAnswers[`subpart-${part.label}-${sp.label}`]?.trim()
+                      )
+                    )
+                  ) && (
+                    <span className="mt-0.5 shrink-0 self-center bg-violet-600 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-white">
+                      Saved
+                    </span>
+                  )}
                   <ChevronRight className="mt-0.5 h-5 w-5 shrink-0 text-gray-400" aria-hidden />
                 </button>
                 )}

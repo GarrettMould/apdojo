@@ -16,7 +16,6 @@ import { getGovUnitStimulusFrqs } from '@/data/gov/govUnitStimulusFrqs';
 import { getStatsUnitStimulusFrqs } from '@/data/stats/statsUnitStimulusFrqs';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { loadTestProgress, clearTestProgress } from '@/lib/testProgress';
-import { hasAdminRole } from '@/lib/adminAccess';
 import { isGovMcqTestUnitAvailable, isStatsMcqTestUnitAvailable, isStatsFrqTestUnitAvailable } from '@/lib/courseSubject';
 
 const RULES = [
@@ -79,7 +78,7 @@ function frqPackDirectionsParagraph(
 function UnitTestPreviewContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { user, userData, loadingUserData } = useAuthContext();
+  const { user } = useAuthContext();
 
   const subjectParam = searchParams.get('subject');
   const subject =
@@ -129,7 +128,6 @@ function UnitTestPreviewContent() {
   const unit = units.find((u) => u.number === unitNumber);
   const isGov = subject === 'gov';
   const isStats = subject === 'stats';
-  const canAccessGov = Boolean(user && hasAdminRole(userData));
   const isMicro = subject === 'micro';
   const subjectName = isGov
     ? 'U.S. Government and Politics'
@@ -145,35 +143,6 @@ function UnitTestPreviewContent() {
       : isMicro
         ? 'bg-green-600'
         : 'bg-blue-600';
-
-  if (isGov && loadingUserData) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-        <p className="text-gray-600 font-semibold">Checking access…</p>
-      </div>
-    );
-  }
-
-  if (isGov && !canAccessGov) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-        <div className="max-w-md text-center">
-          <PauseCircle className="w-12 h-12 mx-auto text-gray-500 mb-4 opacity-70" />
-          <h1 className="text-2xl font-black text-gray-900 mb-2">AP Gov is in admin preview</h1>
-          <p className="text-gray-600 font-medium mb-6">
-            This content is currently restricted to admin accounts.
-          </p>
-          <button
-            type="button"
-            onClick={() => router.push(getUnitFinalPracticeTestsUrl('macro'))}
-            className="w-full rounded-lg py-3 text-white font-black bg-blue-600 hover:bg-blue-700"
-          >
-            Back to AP Macro practice tests
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   if (isFrqPreview && subject !== 'gov' && subject !== 'stats') {
     return (

@@ -13,11 +13,56 @@ import { loadDojoDrillProgress, getDrillProgress, DojoDrillProgress } from '@/li
 import { collection, query, where, orderBy, limit, getDocs, getDoc, doc, collectionGroup } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { QuizHistoryEntry, restoreTableData } from '@/lib/quizHistory';
-import { hasValidSeasonPass, getUnitMCQTestUrl } from '@/lib/utils';
+import {
+  hasValidSeasonPass,
+  getUnitMCQTestUrl,
+  getUnitTestPreviewUrl,
+  getUnitFinalPracticeTestsUrl,
+  getFullMCQExamPreviewUrl,
+  getFullMCQExamTestId,
+  getLegacyFullMCQExamTestId,
+} from '@/lib/utils';
 import { loadTestProgress } from '@/lib/testProgress';
 import { blogPosts, type BlogPost } from '@/data/blogPosts';
 import { generateSeoUrl } from '@/utils/blogUrls';
-import { apEconomicsTagFromCourse, econCourseFromSubject } from '@/lib/courseSubject';
+import {
+  apEconomicsTagFromCourse,
+  econCourseFromSubject,
+  unitsForCourseSubject,
+  isEconCourse,
+  isUnitMcqTestAvailable,
+  isUnitFrqPackAvailable,
+} from '@/lib/courseSubject';
+import {
+  AP_GOV_REQUIRED_SCOTUS_CASES,
+  formatScotusCaseTitle,
+  getScotusCaseRecord,
+  isScotusPracticeLive,
+} from '@/data/gov/scotusRequiredCases';
+import { getStatsUnitCheatSheetVideos } from '@/data/stats/statsUnitVideos';
+import {
+  cheatSheetWatchPath,
+  getScotusVideoWatchId,
+  getStatsVideoWatchId,
+} from '@/lib/cheatSheetVideos';
+import { SeasonPassEntryWideModal } from '@/components/SeasonPassEntryWideModal';
+import type { CourseSubject } from '@/lib/courseSubject';
+
+function PremiumLockBadge() {
+  return (
+    <div className="absolute right-3 top-3 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-black/80">
+      <Lock className="h-3.5 w-3.5 text-white" strokeWidth={2.25} />
+    </div>
+  );
+}
+
+function TryForFreeBadge() {
+  return (
+    <span className="absolute -left-2 top-1 z-10 -rotate-12 rounded-md border-2 border-black bg-yellow-300 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-black shadow-[2px_2px_0_0_#000] sm:text-xs">
+      Try for Free
+    </span>
+  );
+}
 
 // Container animation variants (LITE - very subtle)
 const containerVariants = {
@@ -43,22 +88,6 @@ const itemVariants = {
   },
 };
 
-// Card hover animation (LITE - subtle lift with shadow)
-const cardHoverVariants = {
-  rest: { 
-    y: 0,
-    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
-  },
-  hover: {
-    y: -4,
-    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-    transition: {
-      duration: 0.2,
-      ease: 'easeOut',
-    },
-  },
-};
-
 export function DojoDashboard() {
   const { user, userData, selectedSubject } = useAuthContext();
   const { currentCourse } = useCourseContext();
@@ -69,6 +98,7 @@ export function DojoDashboard() {
   const [recentActivities, setRecentActivities] = useState<any[]>([]);
   const [loadingActivities, setLoadingActivities] = useState(true);
   const [fullExamProgress, setFullExamProgress] = useState<any>(null); // Track full exam progress
+  const [showSeasonPassModal, setShowSeasonPassModal] = useState(false);
 
   // Helper to check if user has access to a course
   const hasCourseAccess = useMemo(() => {
@@ -81,10 +111,28 @@ export function DojoDashboard() {
     return false;
   }, [user, userData, currentCourse]);
 
-  // Helper to check if a unit is locked
+  const isEcon = isEconCourse(currentCourse);
+
+  // Helper to check if a unit exam / FRQ pack is locked
   const isUnitLocked = (unitNumber: number): boolean => {
-    if (unitNumber === 1) return false; // Unit 1 is always free
-    return !hasCourseAccess; // Units 2-6 require access
+    if (hasCourseAccess) return false;
+    // Gov/Stats: all MCQ tests, FRQ packs, and videos require Season Pass
+    if (!isEcon) return true;
+    return unitNumber !== 1; // Econ: Unit 1 is free
+  };
+
+  const handleLockedContentClick = (
+    e: React.MouseEvent,
+    isLocked: boolean,
+    subject: CourseSubject = currentCourse,
+  ) => {
+    if (!isLocked) return;
+    e.preventDefault();
+    if (subject === 'gov' || subject === 'stats') {
+      setShowSeasonPassModal(true);
+      return;
+    }
+    window.location.href = `/purchase/season-pass?courseType=${subject}`;
   };
 
   // Load drill progress
@@ -168,15 +216,22 @@ export function DojoDashboard() {
       }
       
       try {
-        const subjectKey = currentCourse === 'macro' ? 'macro' : 'micro';
-        const testId = `full_${subjectKey}_mcq`;
-        const progress = await loadTestProgress(user.uid, testId);
+        if (currentCourse !== 'macro' && currentCourse !== 'micro') {
+          setFullExamProgress(null);
+          return;
+        }
+        const subjectKey = currentCourse;
+        const newTestId = getFullMCQExamTestId(subjectKey, 1);
+        let progress = await loadTestProgress(user.uid, newTestId);
+        if (!progress) {
+          progress = await loadTestProgress(user.uid, getLegacyFullMCQExamTestId(subjectKey));
+        }
         
         if (progress && !progress.isSubmitted && 
             progress.answeredQuestions && 
             Object.keys(progress.answeredQuestions).length > 0) {
           setFullExamProgress({
-            testId: testId,
+            testId: newTestId,
             answeredCount: Object.keys(progress.answeredQuestions).length,
             totalQuestions: progress.totalQuestions,
             currentQuestionIndex: progress.currentQuestionIndex
@@ -415,13 +470,13 @@ export function DojoDashboard() {
     }
   }, [user, quizHistory, drillProgress, loadingQuizHistory, loadingProgress, currentCourse]);
 
-  // Filter dojo drills by course
+  // Filter dojo drills by course (econ only)
   const subjectFilter = apEconomicsTagFromCourse(currentCourse);
   const filteredDrills = subjectFilter
     ? Object.values(dojoDrills).filter((drill) => drillAppliesToSubject(drill, subjectFilter))
     : [];
 
-  // Filter FRQ exams by course
+  // Filter FRQ exams by course (econ FRQ bank only)
   const econCourse = econCourseFromSubject(currentCourse);
   const filteredFRQs = econCourse
     ? frqExams.filter((exam) =>
@@ -441,63 +496,150 @@ export function DojoDashboard() {
     }))
   );
 
+  // Gov / Stats unit FRQ packs — first pack is free to try
+  const subjectFrqPacks = useMemo(() => {
+    if (isEcon) return [];
+    return unitsForCourseSubject(currentCourse)
+      .filter((unit) => isUnitFrqPackAvailable(currentCourse, unit.number))
+      .map((unit, index) => {
+        const isFreePreview = !hasCourseAccess && index === 0;
+        return {
+          id: `frq-pack-${currentCourse}-${unit.number}`,
+          title: `Unit ${unit.number} FRQ Pack`,
+          description: unit.title,
+          unitNumber: unit.number,
+          href: getUnitTestPreviewUrl(unit.number, currentCourse, 'frq'),
+          isLocked: hasCourseAccess ? false : !isFreePreview,
+          isFreePreview,
+        };
+      });
+  }, [currentCourse, hasCourseAccess, isEcon]);
+
+  // SCOTUS comparison FRQs (Gov)
+  const scotusPracticeCards = useMemo(() => {
+    if (currentCourse !== 'gov') return [];
+    return AP_GOV_REQUIRED_SCOTUS_CASES.filter((c) => isScotusPracticeLive(c.id))
+      .slice(0, 4)
+      .map((c) => ({
+        id: c.id,
+        title: formatScotusCaseTitle(c),
+        description: `Unit ${c.unit} · Supreme Court comparison FRQ`,
+        unitNumber: c.unit,
+        href: `/scotus-essay-practice/${c.id}`,
+        isLocked: isUnitLocked(c.unit),
+      }));
+  }, [currentCourse, hasCourseAccess]);
+
+  // Subject video lessons (Stats cheat-sheet videos + Gov SCOTUS videos) — first video free to try
+  const subjectVideoCards = useMemo(() => {
+    if (currentCourse === 'stats') {
+      const cards: {
+        id: string;
+        title: string;
+        description: string;
+        href: string;
+        unitNumber: number;
+        isLocked: boolean;
+        isFreePreview: boolean;
+      }[] = [];
+      for (const unit of unitsForCourseSubject('stats')) {
+        for (const video of getStatsUnitCheatSheetVideos(unit.number)) {
+          const watchId = getStatsVideoWatchId(video.id);
+          if (!watchId) continue;
+          const isFreePreview = !hasCourseAccess && cards.length === 0;
+          cards.push({
+            id: video.id,
+            title: video.title,
+            description: `Unit ${unit.number} · Video lesson`,
+            href: cheatSheetWatchPath(watchId),
+            unitNumber: unit.number,
+            isLocked: hasCourseAccess ? false : !isFreePreview,
+            isFreePreview,
+          });
+          if (cards.length >= 4) return cards;
+        }
+      }
+      return cards;
+    }
+    if (currentCourse === 'gov') {
+      const cards: {
+        id: string;
+        title: string;
+        description: string;
+        href: string;
+        unitNumber: number;
+        isLocked: boolean;
+        isFreePreview: boolean;
+      }[] = [];
+      for (const required of AP_GOV_REQUIRED_SCOTUS_CASES) {
+        const record = getScotusCaseRecord(required);
+        if (!record?.videoUrl) continue;
+        const watchId = getScotusVideoWatchId(record.id);
+        if (!watchId) continue;
+        const isFreePreview = !hasCourseAccess && cards.length === 0;
+        cards.push({
+          id: required.id,
+          title: formatScotusCaseTitle(required),
+          description: `Unit ${required.unit} · Case video`,
+          href: cheatSheetWatchPath(watchId),
+          unitNumber: required.unit,
+          isLocked: hasCourseAccess ? false : !isFreePreview,
+          isFreePreview,
+        });
+        if (cards.length >= 4) break;
+      }
+      return cards;
+    }
+    return [];
+  }, [currentCourse, hasCourseAccess]);
+
   // Limit to first 4 for display (4 per row, no second row)
   const displayedDrills = filteredDrills.slice(0, 4);
-  const displayedFRQs = allFRQQuestions.slice(0, 4);
+  const displayedFRQs = isEcon ? allFRQQuestions.slice(0, 4) : subjectFrqPacks.slice(0, 4);
+  const displayedScotusCards = scotusPracticeCards.slice(0, 4);
+  const displayedSubjectVideos = subjectVideoCards.slice(0, 4);
 
-  // Full Exams data
-  const fullExams = [
-    {
-      id: 'full-mcq-exam',
-      title: 'Full MCQ Exam',
-      description: 'Complete AP-style multiple choice exam',
-      type: 'MCQ',
-      href: '/full-mcq-exam',
-    },
-    {
-      id: 'full-frq-exam',
-      title: 'Full FRQ Exam',
-      description: 'Complete AP-style free response exam',
-      type: 'FRQ',
-      href: '/full-frq-exam',
-    },
-  ];
+  // Full Exams data (econ full exams only — Gov/Stats use unit MCQ + FRQ packs)
+  const fullExams = isEcon
+    ? [
+        {
+          id: 'full-mcq-exam',
+          title: 'Full MCQ Exam',
+          description: 'Complete AP-style multiple choice exam',
+          type: 'MCQ',
+          href: getFullMCQExamPreviewUrl(currentCourse, 1),
+        },
+        {
+          id: 'full-frq-exam',
+          title: 'Full FRQ Exam',
+          description: 'Complete AP-style free response exam',
+          type: 'FRQ',
+          href: '/full-frq-exam',
+        },
+      ]
+    : [];
 
-  // Unit Exams data - create cards for units 1-6
+  // Unit Exams — subject-specific MCQ unit tests
   const unitExams = useMemo(() => {
-    const units = currentCourse === 'macro' 
-      ? [
-          { number: 1, title: 'Basic Economic Concepts' },
-          { number: 2, title: 'Economic Indicators and the Business Cycle' },
-          { number: 3, title: 'National Income and Price Determination' },
-          { number: 4, title: 'Financial Sector' },
-          { number: 5, title: 'Long-Run Consequences of Stabilization Policies' },
-          { number: 6, title: 'Open Economy—International Trade and Finance' },
-        ]
-      : [
-          { number: 1, title: 'Basic Economic Concepts' },
-          { number: 2, title: 'Supply and Demand' },
-          { number: 3, title: 'Production, Cost, and the Perfect Competition Model' },
-          { number: 4, title: 'Imperfect Competition' },
-          { number: 5, title: 'Factor Markets' },
-          { number: 6, title: 'Market Failure and the Role of Government' },
-        ];
-    
-    return units.map(unit => ({
-      id: `unit-${unit.number}`,
-      title: `Unit ${unit.number} Test`,
-      description: unit.title,
-      unitNumber: unit.number,
-      href: getUnitMCQTestUrl(unit.number, currentCourse),
-      isLocked: isUnitLocked(unit.number),
-    }));
+    return unitsForCourseSubject(currentCourse)
+      .filter((unit) => isUnitMcqTestAvailable(currentCourse, unit.number))
+      .map((unit) => ({
+        id: `unit-${currentCourse}-${unit.number}`,
+        title: `Unit ${unit.number} MCQ Test`,
+        description: unit.title,
+        unitNumber: unit.number,
+        href: getUnitTestPreviewUrl(unit.number, currentCourse, 'mcq'),
+        isLocked: isUnitLocked(unit.number),
+      }));
   }, [currentCourse, hasCourseAccess]);
 
   // Limit to first 4 for display
   const displayedFullExams = fullExams.slice(0, 4);
   const displayedUnitExams = unitExams.slice(0, 4);
+  const unitExamsSeeAllHref = getUnitFinalPracticeTestsUrl(currentCourse);
 
   const displayedBlogPosts = useMemo(() => {
+    if (!isEconCourse(currentCourse)) return [];
     const course = currentCourse === 'macro' ? 'macro' : 'micro';
     const excludedSlugs = new Set(['nominal-vs-real-gdp-explained']);
     const pool = Object.values(blogPosts).filter(
@@ -593,18 +735,12 @@ export function DojoDashboard() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {displayedBlogPosts.map((post) => (
-                <motion.div
+                <div
                     key={post.slug}
-                  variants={cardHoverVariants}
-                  initial="rest"
-                  whileHover="hover"
                     className="group"
                   >
                     <Link href={`/blog/${generateSeoUrl(post.slug, post.subject, post.unit)}`}>
-                <motion.div
-                  variants={cardHoverVariants}
-                  initial="rest"
-                  whileHover="hover"
+                <div
                         className="bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-1 overflow-hidden text-left transition-all flex flex-col h-full"
                 >
                         <div className="relative w-full aspect-[16/10] border-b-2 border-gray-300 bg-gray-100">
@@ -629,44 +765,50 @@ export function DojoDashboard() {
                           <h3 className="text-xl font-black text-gray-900 mb-2 line-clamp-2">{post.title}</h3>
                           <p className="text-sm text-gray-500 line-clamp-2 mt-auto">{post.description}</p>
                   </div>
-                </motion.div>
+                </div>
               </Link>
-                  </motion.div>
+                  </div>
                 ))}
             </div>
           </motion.section>
           )}
 
-          {/* FRQ Practice Row */}
+          {/* FRQ Practice Row — econ FRQ bank, or Gov/Stats unit FRQ packs */}
           {displayedFRQs.length > 0 && (
-            <motion.section variants={itemVariants}>
+            <motion.section variants={itemVariants} className="overflow-visible">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-black text-gray-900 uppercase tracking-wide">FRQ Practice</h2>
+                <h2 className="text-2xl font-black text-gray-900 uppercase tracking-wide">
+                  {isEcon ? 'FRQ Practice' : 'Unit FRQ Packs'}
+                </h2>
                 <Link
-                  href="/unitFRQpracticePage"
+                  href={isEcon ? '/unitFRQpracticePage' : unitExamsSeeAllHref}
                   className="text-sm font-black text-gray-900 border-2 border-gray-300 rounded-lg px-3 py-1.5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-1"
                 >
                   See all
                   <ChevronRight className="w-4 h-4" />
                 </Link>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {displayedFRQs.map((frq, index) => (
-                    <motion.div
+              <div className="grid grid-cols-1 gap-6 overflow-visible sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                {displayedFRQs.map((frq, index) => {
+                  const isLocked = 'isLocked' in frq && Boolean(frq.isLocked);
+                  const isFreePreview = 'isFreePreview' in frq && Boolean(frq.isFreePreview);
+                  const href =
+                    'href' in frq && frq.href ? frq.href : `/unitFRQpracticePage?frqId=${frq.id}`;
+
+                  return (
+                    <div
                     key={frq.id || index}
-                      variants={cardHoverVariants}
-                      initial="rest"
-                      whileHover="hover"
-                      className="group"
+                      className="group relative overflow-visible"
                     >
-                    <Link href={`/unitFRQpracticePage?frqId=${frq.id}`}>
-                        <motion.div
-                          variants={cardHoverVariants}
-                          initial="rest"
-                          whileHover="hover"
-                        className="bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:shadow-md p-6 text-left transition-all flex flex-col h-full overflow-hidden"
+                      {isFreePreview ? <TryForFreeBadge /> : null}
+                    <Link
+                      href={isLocked ? '#' : href}
+                      onClick={(e) => handleLockedContentClick(e, isLocked)}
+                    >
+                        <div
+                        className="relative bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:shadow-md p-6 text-left transition-all flex flex-col h-full overflow-hidden"
                         >
-                          {/* Header: Icon, XP, Activity Type */}
+                          {isLocked ? <PremiumLockBadge /> : null}
                           <div className="flex items-start justify-between mb-4">
                             <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl bg-gray-100 border-2 border-gray-300 flex items-center justify-center flex-shrink-0">
@@ -679,24 +821,14 @@ export function DojoDashboard() {
                                   />
                               </div>
                               <div className="flex flex-col gap-1">
-                              {frq.unit && (
-                                <span className="text-xs font-medium text-gray-500">Unit {frq.unit.toString().padStart(2, '0')}</span>
-                                )}
+                              {(('unitNumber' in frq && frq.unitNumber) || ('unit' in frq && frq.unit)) ? (
+                                <span className="text-xs font-medium text-gray-500">
+                                  Unit {String(('unitNumber' in frq && frq.unitNumber) || frq.unit).padStart(2, '0')}
+                                </span>
+                              ) : null}
                               <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">FRQ</span>
                               </div>
                             </div>
-                          {frq.totalPoints && (
-                              <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
-                              <span>{(frq.totalPoints * 100).toLocaleString()}</span>
-                                <Image
-                                  src="/images/flame100.png"
-                                  alt="XP"
-                                  width={16}
-                                  height={16}
-                                  className="w-4 h-4"
-                                />
-                              </div>
-                            )}
                           </div>
                           
                           {/* Title */}
@@ -705,12 +837,112 @@ export function DojoDashboard() {
                           </h3>
                           
                           {/* Meta */}
-                        {frq.unit && (
+                        {'description' in frq && frq.description ? (
+                          <p className="text-sm text-gray-500 mt-auto line-clamp-2">{frq.description}</p>
+                        ) : 'unit' in frq && frq.unit ? (
                           <p className="text-sm text-gray-500 mt-auto">Unit {frq.unit}</p>
-                        )}
-                        </motion.div>
+                        ) : null}
+                        </div>
                       </Link>
-                    </motion.div>
+                    </div>
+                  );
+                })}
+              </div>
+            </motion.section>
+          )}
+
+          {/* SCOTUS Essay Practice (Gov) */}
+          {displayedScotusCards.length > 0 && (
+            <motion.section variants={itemVariants}>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-black text-gray-900 uppercase tracking-wide">SCOTUS Essay Practice</h2>
+                <Link
+                  href="/scotus-essay-practice"
+                  className="text-sm font-black text-gray-900 border-2 border-gray-300 rounded-lg px-3 py-1.5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-1"
+                >
+                  See all
+                  <ChevronRight className="w-4 h-4" />
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {displayedScotusCards.map((card) => (
+                  <div
+                    key={card.id}
+                    className="group"
+                  >
+                    <Link
+                      href={card.isLocked ? '#' : card.href}
+                      onClick={(e) => handleLockedContentClick(e, card.isLocked)}
+                    >
+                      <div
+                        className="relative bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-1 p-6 text-left transition-all flex flex-col h-full overflow-hidden"
+                      >
+                        {card.isLocked ? <PremiumLockBadge /> : null}
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-violet-50 border-2 border-gray-300 flex items-center justify-center flex-shrink-0">
+                              <FileText className="w-5 h-5 text-violet-700" />
+                            </div>
+                            <div className="flex flex-col gap-1">
+                              <span className="text-xs font-medium text-gray-500">Unit {String(card.unitNumber).padStart(2, '0')}</span>
+                              <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">SCOTUS FRQ</span>
+                            </div>
+                          </div>
+                        </div>
+                        <h3 className="text-xl font-black text-gray-900 mb-3 line-clamp-2">{card.title}</h3>
+                        <p className="text-sm text-gray-500 mt-auto">{card.description}</p>
+                      </div>
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            </motion.section>
+          )}
+
+          {/* Video Lessons (Stats / Gov) */}
+          {displayedSubjectVideos.length > 0 && (
+            <motion.section variants={itemVariants} className="overflow-visible">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-black text-gray-900 uppercase tracking-wide">Video Lessons</h2>
+                <Link
+                  href={currentCourse === 'gov' ? '/scotus-essay-practice' : unitExamsSeeAllHref}
+                  className="text-sm font-black text-gray-900 border-2 border-gray-300 rounded-lg px-3 py-1.5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-1"
+                >
+                  See all
+                  <ChevronRight className="w-4 h-4" />
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 gap-6 overflow-visible sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                {displayedSubjectVideos.map((video) => (
+                  <div
+                    key={video.id}
+                    className="group relative overflow-visible"
+                  >
+                    {video.isFreePreview ? <TryForFreeBadge /> : null}
+                    <Link
+                      href={video.isLocked ? '#' : video.href}
+                      onClick={(e) => handleLockedContentClick(e, video.isLocked)}
+                    >
+                      <div
+                        className="relative bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-1 p-6 text-left transition-all flex flex-col h-full overflow-hidden"
+                      >
+                        {video.isLocked ? <PremiumLockBadge /> : null}
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-orange-50 border-2 border-gray-300 flex items-center justify-center flex-shrink-0">
+                              <Play className="w-5 h-5 text-gray-800" />
+                            </div>
+                            <div className="flex flex-col gap-1">
+                              <span className="text-xs font-medium text-gray-500">Unit {String(video.unitNumber).padStart(2, '0')}</span>
+                              <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Video</span>
+                            </div>
+                          </div>
+                        </div>
+                        <h3 className="text-xl font-black text-gray-900 mb-3 line-clamp-2">{video.title}</h3>
+                        <p className="text-sm text-gray-500 mt-auto">{video.description}</p>
+                      </div>
+                    </Link>
+                  </div>
                 ))}
               </div>
             </motion.section>
@@ -722,7 +954,7 @@ export function DojoDashboard() {
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-black text-gray-900 uppercase tracking-wide">Unit Exams</h2>
                 <Link
-                  href={getUnitMCQTestUrl(1, currentCourse)}
+                  href={unitExamsSeeAllHref}
                   className="text-sm font-black text-gray-900 border-2 border-gray-300 rounded-lg px-3 py-1.5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-1"
                 >
                   See all
@@ -731,21 +963,18 @@ export function DojoDashboard() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {displayedUnitExams.map((exam) => (
-                    <motion.div
+                    <div
                     key={exam.id}
-                      variants={cardHoverVariants}
-                      initial="rest"
-                      whileHover="hover"
                     className="group"
                     >
-                    <Link href={exam.isLocked ? `/purchase/season-pass?courseType=${currentCourse}` : exam.href}>
-                        <motion.div
-                          variants={cardHoverVariants}
-                          initial="rest"
-                          whileHover="hover"
-                        className="bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-1 p-6 text-left transition-all flex flex-col h-full overflow-hidden"
+                    <Link
+                      href={exam.isLocked ? '#' : exam.href}
+                      onClick={(e) => handleLockedContentClick(e, exam.isLocked)}
+                    >
+                        <div
+                        className="relative bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-1 p-6 text-left transition-all flex flex-col h-full overflow-hidden"
                         >
-                          {/* Header: Icon, XP, Activity Type */}
+                          {exam.isLocked ? <PremiumLockBadge /> : null}
                           <div className="flex items-start justify-between mb-4">
                             <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-xl bg-gray-100 border-2 border-gray-300 flex items-center justify-center flex-shrink-0">
@@ -764,16 +993,6 @@ export function DojoDashboard() {
                               <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Test</span>
                               </div>
                             </div>
-                              <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
-                            <span>1,000</span>
-                                <Image
-                                  src="/images/flame100.png"
-                                  alt="XP"
-                                  width={16}
-                                  height={16}
-                                  className="w-4 h-4"
-                                />
-                              </div>
                           </div>
                           
                           {/* Title */}
@@ -783,9 +1002,9 @@ export function DojoDashboard() {
                           
                           {/* Meta */}
                         <p className="text-sm line-clamp-2 mt-auto text-gray-500">{exam.description}</p>
-                        </motion.div>
+                        </div>
                       </Link>
-                </motion.div>
+                </div>
                 ))}
           </div>
             </motion.section>
@@ -810,25 +1029,18 @@ export function DojoDashboard() {
                   const inProgress = isDrillInProgress(drill.id);
                   
                   return (
-                  <motion.div
+                  <div
                       key={drill.id}
-                    variants={cardHoverVariants}
-                    initial="rest"
-                    whileHover="hover"
                       className="group relative"
                   >
                       <Link href={`/dojo-drills/preview/${drill.id}`}>
-                      <motion.div
-                        variants={cardHoverVariants}
-                        initial="rest"
-                        whileHover="hover"
+                      <div
                           className="bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-1 p-6 text-left transition-all flex flex-col h-full overflow-hidden"
                       >
-                        {/* Header: Icon, XP, Activity Type */}
-                        <div className="flex items-start justify-between mb-4">
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-xl bg-gray-100 border-2 border-gray-300 flex items-center justify-center flex-shrink-0">
-                              <Image
+                                <Image
                                   src="/images/dojoIconBold.png"
                                   alt="Drill"
                                 width={20}
@@ -841,18 +1053,6 @@ export function DojoDashboard() {
                                 <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Drill</span>
                             </div>
                           </div>
-                            {drill.xpReward.total !== undefined && (
-                            <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
-                                <span>{drill.xpReward.total.toLocaleString()}</span>
-                              <Image
-                                src="/images/flame100.png"
-                                alt="XP"
-                                width={16}
-                                height={16}
-                                className="w-4 h-4"
-                              />
-                            </div>
-                          )}
                         </div>
                         
                         {/* Title */}
@@ -870,9 +1070,9 @@ export function DojoDashboard() {
                             )}
                             {!inProgress && !isCompleted && <span></span>}
                           </div>
-                      </motion.div>
+                      </div>
                     </Link>
-                  </motion.div>
+                  </div>
               );
             })}
               </div>
@@ -885,7 +1085,7 @@ export function DojoDashboard() {
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-black text-gray-900 uppercase tracking-wide">Full Exams</h2>
                 <Link
-                  href="/full-mcq-exam"
+                  href={getFullMCQExamPreviewUrl(currentCourse, 1)}
                   className="text-sm font-black text-gray-900 border-2 border-gray-300 rounded-lg px-3 py-1.5 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all flex items-center gap-1"
                 >
                   See all
@@ -898,21 +1098,14 @@ export function DojoDashboard() {
                   const hasProgress = exam.id === 'full-mcq-exam' && fullExamProgress && fullExamProgress.answeredCount > 0;
                   
                   return (
-                    <motion.div
+                    <div
                       key={exam.id}
-                      variants={cardHoverVariants}
-                      initial="rest"
-                      whileHover="hover"
                       className="group"
                     >
                       <Link href={exam.href}>
-                        <motion.div
-                          variants={cardHoverVariants}
-                          initial="rest"
-                          whileHover="hover"
+                        <div
                           className="bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-1 p-6 text-left transition-all flex flex-col h-full overflow-hidden"
                         >
-                          {/* Header: Icon, XP, Activity Type */}
                           <div className="flex items-start justify-between mb-4">
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-xl bg-gray-100 border-2 border-gray-300 flex items-center justify-center flex-shrink-0">
@@ -927,16 +1120,6 @@ export function DojoDashboard() {
                               <div className="flex flex-col gap-1">
                                 <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Exam</span>
                               </div>
-                            </div>
-                            <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
-                              <span>6,000</span>
-                              <Image
-                                src="/images/flame100.png"
-                                alt="XP"
-                                width={16}
-                                height={16}
-                                className="w-4 h-4"
-                              />
                             </div>
                           </div>
                           
@@ -957,9 +1140,9 @@ export function DojoDashboard() {
                               </div>
                             )}
                           </div>
-                        </motion.div>
+                        </div>
                       </Link>
-                    </motion.div>
+                    </div>
                   );
                 })}
               </div>
@@ -1025,7 +1208,7 @@ export function DojoDashboard() {
                   } else if (activity.type === 'full-exam') {
                     thumbnailType = 'exam';
                     Icon = ClipboardList;
-                    href = '/full-mcq-exam';
+                    href = getFullMCQExamPreviewUrl(currentCourse, 1);
                   } else if (activity.type === 'unit-exam') {
                     thumbnailType = 'exam';
                     Icon = BookOpen;
@@ -1044,19 +1227,13 @@ export function DojoDashboard() {
                   const unitNumber = unitMatch ? unitMatch[1] : undefined;
 
                   return (
-                  <motion.div
+                  <div
                       key={activity.id}
-                    variants={cardHoverVariants}
-                    initial="rest"
-                    whileHover="hover"
                     className="group"
                       style={{ opacity: 1, visibility: 'visible' }}
                   >
                       <Link href={href}>
-                      <motion.div
-                        variants={cardHoverVariants}
-                        initial="rest"
-                        whileHover="hover"
+                      <div
                           className="bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-1 p-6 text-left transition-all flex flex-col h-full overflow-hidden"
                       >
                         {/* Header: Icon, XP, Activity Type */}
@@ -1100,18 +1277,6 @@ export function DojoDashboard() {
                                 </span>
                             </div>
                           </div>
-                            {activity.xpReward !== undefined && (
-                          <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
-                                <span>{activity.xpReward.toLocaleString()}</span>
-                            <Image
-                              src="/images/flame100.png"
-                              alt="XP"
-                              width={16}
-                              height={16}
-                              className="w-4 h-4"
-                            />
-                          </div>
-                            )}
                         </div>
                         
                         {/* Title */}
@@ -1168,9 +1333,9 @@ export function DojoDashboard() {
                               </Link>
                             )}
                           </div>
-                      </motion.div>
+                      </div>
                     </Link>
-                  </motion.div>
+                  </div>
                   );
                 })}
               </div>
@@ -1180,6 +1345,13 @@ export function DojoDashboard() {
           </motion.div>
         </AnimatePresence>
       </div>
+
+      {(currentCourse === 'gov' || currentCourse === 'stats') && showSeasonPassModal && (
+        <SeasonPassEntryWideModal
+          subject={currentCourse}
+          onClose={() => setShowSeasonPassModal(false)}
+        />
+      )}
     </div>
   );
 }

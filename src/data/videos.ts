@@ -2539,7 +2539,7 @@ export const videos: Video[] = [
         lessonIDS: ["1.6", "1.9"],
         tags: ["Distributions", "Unit 1", "Describing Data", "Comparing Distributions"],
         videoUrl:
-          "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/stats/unit_1/stats_u1_vid1.mp4",
+          "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/stats/unit_1/stats_u1_topic_1.6_1.9.mp4",
         accessLevel: "free",
         questions: [],
       },
@@ -2569,9 +2569,40 @@ export const videos: Video[] = [
         lessonIDS: ["2.2", "2.3", "2.4", "2.5", "2.6"],
         tags: ["Probability", "Unit 2", "Two-Way Tables", "Conditional Probability"],
         videoUrl:
-          "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/stats/unit_2/stats_u2_topic_2.2_2.6.mp4",
+          "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/stats/unit_2/stats_u2_topic_2.2_2.6f.mp4",
         accessLevel: "free",
-        questions: [],
+        questions: [
+          {
+            id: "7601",
+            text: "In a two-way table, which value belongs in the denominator when you calculate a marginal relative frequency?",
+            options: [
+              "The grand total of the table.",
+              "The joint frequency in the intersecting cell.",
+              "Only the row total, never the column total.",
+              "The largest value in the table.",
+              "The smallest marginal total in the table.",
+            ],
+            correctAnswer: 0,
+            explanation:
+              'A marginal relative frequency takes a row or column total (a value on the "margin" of the table) and divides it by the grand total, since it describes a proportion of the entire surveyed group.',
+          },
+          {
+            id: "7602",
+            text: "At a school, seniors are surveyed on their favorite core subject. Of the 30 seniors surveyed, 10 chose Math and 15 chose English. If a senior is selected at random, what is the probability that their favorite subject is English?",
+            options: ["15/140", "15/30", "10/30", "25/30", "10/140"],
+            correctAnswer: 1,
+            explanation:
+              'Because the condition is "given the student is a senior," the denominator is the senior total (30), not the grand total (140). 15 seniors chose English, so the probability is 15/30 = 0.5.',
+          },
+          {
+            id: "7603",
+            text: "A company surveys 100 employees about their preferred work location: Office, Remote, or Hybrid. Of the 30 employees in the Marketing department, 8 said they prefer Remote work. If an employee is selected at random from the Marketing department, what is the probability they prefer Remote work?",
+            options: ["8/100", "30/100", "8/30", "22/30", "8/22"],
+            correctAnswer: 2,
+            explanation:
+              'Since the employee is selected "from the Marketing department," the denominator is the Marketing total (30), not the grand total (100). 8 of those 30 prefer Remote, so the probability is 8/30.',
+          },
+        ],
       },
       {
         id: "stats-u2-vid2",
@@ -2584,7 +2615,37 @@ export const videos: Video[] = [
         lessonIDS: ["2.11"],
         tags: ["Normal Distribution", "Unit 2", "Probability Distributions"],
         videoUrl:
-          "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/stats/unit_2/stats_u2_topic_2.11.mp4",
+          "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/stats/unit_2/stats_u2_topic_2.11f.mp4",
+        accessLevel: "free",
+        questions: [],
+      },
+      {
+        id: "stats-u3-vid1",
+        title: "Conditions for Inference",
+        description:
+          "Covers the conditions required for valid inference with population proportions, including randomization, the 10% condition, and normality.",
+        videoSlug: "stats-u3-conditions-for-inference",
+        subjects: ["AP Statistics"],
+        unit: "3",
+        lessonIDS: ["3.2", "3.3"],
+        tags: ["Unit 3", "Inference", "Conditions", "Confidence Intervals"],
+        videoUrl:
+          "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/stats/unit_3/Unit+3+-+Conditions+for+Inference.mp4",
+        accessLevel: "free",
+        questions: [],
+      },
+      {
+        id: "stats-u3-vid2",
+        title: "Confidence Intervals vs. Hypothesis Tests",
+        description:
+          "Compares confidence intervals and significance tests for population proportions — when to use each and how they relate.",
+        videoSlug: "stats-u3-confidence-intervals-vs-hypothesis-tests",
+        subjects: ["AP Statistics"],
+        unit: "3",
+        lessonIDS: ["3.3", "3.5", "3.7"],
+        tags: ["Unit 3", "Inference", "Confidence Intervals", "Hypothesis Tests"],
+        videoUrl:
+          "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/stats/unit_3/Unit+3+-+Confidence+Intervals+vs.+Hypothesis+Tests.mp4",
         accessLevel: "free",
         questions: [],
       },

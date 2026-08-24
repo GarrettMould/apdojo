@@ -12,7 +12,13 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import { LoginModal, SignupModal } from './AuthModals';
 import { MCQFeedbackModal } from './MCQFeedbackModal';
 import { SeasonPassModal } from './SeasonPassModal';
-import { hasValidSeasonPass, getUnitFinalPracticeTestsUrl, getUnitTestPreviewUrl } from '@/lib/utils';
+import {
+  getLegacyFullMCQExamTestId,
+  getUnitFinalPracticeTestsUrl,
+  getUnitTestPreviewUrl,
+  hasValidSeasonPass,
+  isFullLengthMcqExamNumber,
+} from '@/lib/utils';
 import { videos } from '@/data/videos';
 import { createPortal } from 'react-dom';
 import { HighlightableText } from './HighlightableText';
@@ -266,6 +272,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
         // Preview MCQ exam: 70 minutes = 4200 seconds
         return 70 * 60;
       }
+      if (isFullLengthMcqExamNumber(examNumber)) {
+        return 70 * 60;
+      }
       const unitNumber = parseInt(examNumber, 10);
       if (Number.isFinite(unitNumber)) {
         const meta = getUnitTestMeta(examType, unitNumber);
@@ -492,7 +501,17 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
     const restoreUnitTestProgress = async () => {
       try {
         const testId = `unit_${examNumber}_${examType}`;
-        const savedProgress = await loadTestProgress(user.uid, testId);
+        let savedProgress = await loadTestProgress(user.uid, testId);
+        if (
+          !savedProgress &&
+          isFullLengthMcqExamNumber(examNumber) &&
+          (examType === 'macro' || examType === 'micro')
+        ) {
+          savedProgress = await loadTestProgress(
+            user.uid,
+            getLegacyFullMCQExamTestId(examType),
+          );
+        }
         if (savedProgress && !savedProgress.isSubmitted) {
           if (savedProgress.answeredQuestions) {
             const restoredAnswers: Answers = {};
@@ -1150,132 +1169,35 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
     if (bookmarkedQuestions.size > 0) {
       setShowBookmarkConfirmModal(true);
     } else {
-      const correctCount = questions.filter(q => answers[q.id] === q.correctAnswer).length;
-      const score = Math.round((correctCount / questions.length) * 100);
-      
-      // Award XP for unit tests and regular exams (not custom assignments - those handle it separately)
-      if (!isCustomAssignment && awardXp && user && !xpAwarded) {
-        if (correctCount > 0) {
-          // Calculate XP: 20 for completion + 10 per correct answer (same as AssessmentResultsPanel)
-          const totalXP = 20 + (correctCount * 10);
-          try {
-            await awardXp(totalXP, examType);
-            setXpAwarded(true);
-            console.log(`[FullExam] Awarded ${totalXP} XP (20 completion + ${correctCount} correct × 10 XP)`);
-          } catch (xpError) {
-            console.error('[FullExam] Error awarding XP:', xpError);
-          }
-        }
-      }
-
-      // Save test result for unit tests and full exams
-      console.log('[FullExam] Checking if should save test result:', {
-        isCustomAssignment,
-        hasUser: !!user,
-        isUnitTest,
-        isFullExam,
-        isPreviewExam,
-        examNumber,
-        examType
-      });
-      
-      if (!isCustomAssignment && user && (isUnitTest || isFullExam || isPreviewExam)) {
-        try {
-          let testType: 'unit_mcq' | 'full_exam' | 'full_frq' = 'full_exam';
-          let testId = 'full_mcq_exam';
-          let testTitle = 'Full MCQ Exam';
-          
-          if (isUnitTest && examNumber) {
-            testType = 'unit_mcq';
-            testId = `unit_${examNumber}_${examType}`;
-            testTitle = `Unit ${examNumber} MCQ Test`;
-          } else if (isFullExam) {
-            testType = questionType === 'frq' ? 'full_frq' : 'full_exam';
-            testId = questionType === 'frq' ? 'full_frq_exam' : `full_${examType}_mcq`;
-            testTitle =
-              questionType === 'frq'
-                ? 'Full FRQ Exam'
-                : `Full MCQ Exam (${examType === 'macro' ? 'Macro' : examType === 'micro' ? 'Micro' : 'Gov'})`;
-          } else if (isPreviewExam && examNumber) {
-            // Preview exams are treated as full exams
-            testType = questionType === 'frq' ? 'full_frq' : 'full_exam';
-            testId = questionType === 'frq' ? `preview_frq_${examNumber}` : `preview_mcq_${examNumber}`;
-            testTitle = questionType === 'frq' ? `Preview FRQ Exam ${examNumber}` : `Preview MCQ Exam ${examNumber}`;
-          }
-
-          console.log('[FullExam] Saving test result with:', {
-            userId: user.uid,
-            testType,
-            testId,
-            score,
-            totalQuestions: questions.length
-          });
-
-          // Save to testResults collection (for my-assignment-history page)
-          await saveTestResult({
-            userId: user.uid,
-            testType,
-            testId,
-            score,
-            totalQuestions: questions.length,
-            completedAt: new Date()
-          });
-          console.log(`[FullExam] Successfully saved test result: ${testType} - ${testId} - Score: ${score}%`);
-
-          // Also save to quizHistory for Recent Activity on dashboard
-          try {
-            await saveQuizResult({
-              userId: user.uid,
-              type: 'custom-link', // Using existing type since we don't have 'unit-test' type yet
-              title: testTitle,
-              score,
-              correctCount,
-              totalQuestions: questions.length,
-              questions: questions,
-              userAnswers: answers as unknown as Record<string, string>,
-            });
-            console.log(`[FullExam] Successfully saved quiz history: ${testTitle}`);
-          } catch (quizHistoryError) {
-            console.error('[FullExam] Error saving quiz history:', quizHistoryError);
-            // Don't throw - quizHistory is secondary, testResults is primary
-          }
-        } catch (testResultError) {
-          console.error('[FullExam] Error saving test result:', testResultError);
-        }
-      } else {
-        console.log('[FullExam] Skipping test result save - conditions not met');
-      }
-
-      // For assignments: live session already has name from lobby — skip name modal; link-only still asks for name
-      if (isCustomAssignment) {
-        if (liveSessionId && liveStudentId && liveStudentName) {
-          setStudentName(liveStudentName);
-          setShowResults(true);
-          setShowFullResults(true);
-          setShowNameInputModal(false);
-          saveAssignmentResults(liveStudentName);
-        } else {
-          setShowResults(true);
-          setShowFullResults(true); // Must be true so results are in the DOM and visible (blurred) behind the modal
-          setShowNameInputModal(true); // Show name input overlay
-        }
-      } else {
-        // Go straight to full results view (skip AssessmentResultsPanel)
-        setShowResults(true);
-        setShowFullResults(true);
-      }
+      await finalizeExamSubmission();
     }
   };
 
-  const handleConfirmSubmit = async () => {
-    setShowBookmarkConfirmModal(false);
+  const finalizeExamSubmission = async () => {
     const correctCount = questions.filter(q => answers[q.id] === q.correctAnswer).length;
     const score = Math.round((correctCount / questions.length) * 100);
-    
+
+    // Reveal results immediately so Firebase saves never leave the UI looking frozen.
+    if (isCustomAssignment) {
+      if (liveSessionId && liveStudentId && liveStudentName) {
+        setStudentName(liveStudentName);
+        setShowResults(true);
+        setShowFullResults(true);
+        setShowNameInputModal(false);
+      } else {
+        setShowResults(true);
+        setShowFullResults(true);
+        setShowNameInputModal(true);
+      }
+    } else {
+      setShowResults(true);
+      setShowFullResults(true);
+    }
+    setShowToolsPanel(false);
+
     // Award XP for unit tests and regular exams (not custom assignments - those handle it separately)
     if (!isCustomAssignment && awardXp && user && !xpAwarded) {
       if (correctCount > 0) {
-        // Calculate XP: 20 for completion + 10 per correct answer (same as AssessmentResultsPanel)
         const totalXP = 20 + (correctCount * 10);
         try {
           await awardXp(totalXP, examType);
@@ -1287,13 +1209,12 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
       }
     }
 
-    // Save test result for unit tests and full exams
     if (!isCustomAssignment && user && (isUnitTest || isFullExam || isPreviewExam)) {
       try {
         let testType: 'unit_mcq' | 'full_exam' | 'full_frq' = 'full_exam';
         let testId = 'full_mcq_exam';
         let testTitle = 'Full MCQ Exam';
-        
+
         if (isUnitTest && examNumber) {
           testType = 'unit_mcq';
           testId = `unit_${examNumber}_${examType}`;
@@ -1304,15 +1225,13 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
           testTitle =
             questionType === 'frq'
               ? 'Full FRQ Exam'
-              : `Full MCQ Exam (${examType === 'macro' ? 'Macro' : examType === 'micro' ? 'Micro' : 'Gov'})`;
+              : `Full MCQ Exam (${examType === 'macro' ? 'Macro' : examType === 'micro' ? 'Micro' : examType === 'stats' ? 'Stats' : 'Gov'})`;
         } else if (isPreviewExam && examNumber) {
-          // Preview exams are treated as full exams
           testType = questionType === 'frq' ? 'full_frq' : 'full_exam';
           testId = questionType === 'frq' ? `preview_frq_${examNumber}` : `preview_mcq_${examNumber}`;
           testTitle = questionType === 'frq' ? `Preview FRQ Exam ${examNumber}` : `Preview MCQ Exam ${examNumber}`;
         }
 
-        // Save to testResults collection (for my-assignment-history page)
         await saveTestResult({
           userId: user.uid,
           testType,
@@ -1321,13 +1240,12 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
           totalQuestions: questions.length,
           completedAt: new Date()
         });
-        console.log(`[FullExam] Saved test result: ${testType} - ${testId} - Score: ${score}%`);
+        console.log(`[FullExam] Successfully saved test result: ${testType} - ${testId} - Score: ${score}%`);
 
-        // Also save to quizHistory for Recent Activity on dashboard
         try {
           await saveQuizResult({
             userId: user.uid,
-            type: 'custom-link', // Using existing type since we don't have 'unit-test' type yet
+            type: 'custom-link',
             title: testTitle,
             score,
             correctCount,
@@ -1338,30 +1256,20 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
           console.log(`[FullExam] Successfully saved quiz history: ${testTitle}`);
         } catch (quizHistoryError) {
           console.error('[FullExam] Error saving quiz history:', quizHistoryError);
-          // Don't throw - quizHistory is secondary, testResults is primary
         }
       } catch (testResultError) {
         console.error('[FullExam] Error saving test result:', testResultError);
       }
     }
 
-    // For assignments, show results but blurred until name is entered (skip name for live session)
-    if (isCustomAssignment) {
-      if (liveSessionId && liveStudentId && liveStudentName) {
-        setStudentName(liveStudentName);
-        setShowResults(true);
-        setShowNameInputModal(false);
-        saveAssignmentResults(liveStudentName);
-      } else {
-        setShowResults(true);
-        setShowFullResults(true); // Show results underneath so they're visible (blurred) behind the modal
-        setShowNameInputModal(true); // Show name input overlay
-      }
-    } else {
-      // Go straight to full results view (skip AssessmentResultsPanel)
-      setShowResults(true);
-      setShowFullResults(true);
+    if (isCustomAssignment && liveSessionId && liveStudentId && liveStudentName) {
+      await saveAssignmentResults(liveStudentName);
     }
+  };
+
+  const handleConfirmSubmit = async () => {
+    setShowBookmarkConfirmModal(false);
+    await finalizeExamSubmission();
   };
 
   const handleNameSubmit = async () => {
@@ -1573,6 +1481,11 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
     // Custom assignments don't require season pass
     if (isCustomAssignment) return true;
     
+    // For full-length MCQ exams: allow first 5 questions (indices 0-4)
+    if (isUnitTest && isFullLengthMcqExamNumber(examNumber) && questionIndex <= 4) {
+      return true;
+    }
+
     // For unit tests: allow first 2 questions (indices 0-1)
     if (isUnitTest && questionIndex <= 1) {
       return true;
@@ -2450,25 +2363,42 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                   <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
                     <span className="font-normal">Progress Bar</span>
                   </div>
-                  <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(20, minmax(0, 1fr))' }}>
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
                     {questions.map((q, index) => {
                       const isAnswered = answers[q.id] !== undefined;
                       const isBookmarked = bookmarkedQuestions.has(q.id);
-                      let buttonClasses = 'w-8 h-8 rounded-lg flex items-center justify-center font-normal text-xs transition-colors';
-                      let textClasses = '';
-                      if (isBookmarked) {
-                        buttonClasses += ' bg-yellow-200';
-                        textClasses += ' text-yellow-800';
-                      } else if (isAnswered) {
-                        buttonClasses += ' bg-blue-300';
-                        textClasses += ' text-blue-800';
-                      } else {
-                        buttonClasses += ' bg-gray-200';
-                        textClasses += ' text-gray-600';
-                      }
+                      const isCurrent = index === currentPage;
+                      const accentLink =
+                        examType === 'macro'
+                          ? 'text-blue-700 hover:text-blue-900'
+                          : examType === 'micro'
+                            ? 'text-green-700 hover:text-green-900'
+                            : examType === 'stats'
+                              ? 'text-orange-700 hover:text-orange-900'
+                              : 'text-violet-700 hover:text-violet-900';
+                      /** Current = slate, answered = subject soft, bookmark = amber */
+                      const currentHighlight = 'rounded-md border border-slate-800 bg-slate-800 px-2 py-0.5 text-white no-underline hover:text-white';
+                      const answeredHighlight =
+                        examType === 'macro'
+                          ? 'rounded-md border border-blue-300 bg-blue-100 px-2 py-0.5'
+                          : examType === 'micro'
+                            ? 'rounded-md border border-green-300 bg-green-100 px-2 py-0.5'
+                            : examType === 'stats'
+                              ? 'rounded-md border border-orange-300 bg-orange-100 px-2 py-0.5'
+                              : 'rounded-md border border-violet-300 bg-violet-100 px-2 py-0.5';
+                      const bookmarkHighlight =
+                        'rounded-md border border-amber-300 bg-amber-100 px-2 py-0.5';
+                      const stateHighlight = isCurrent
+                        ? currentHighlight
+                        : isBookmarked
+                          ? bookmarkHighlight
+                          : isAnswered
+                            ? answeredHighlight
+                            : '';
                       return (
                         <button
                           key={q.id}
+                          type="button"
                           onClick={() => {
                             if (canNavigateToQuestion(index)) {
                               setCurrentPage(index);
@@ -2483,10 +2413,12 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                               setShowSeasonPassModal(true);
                             }
                           }}
-                          className={buttonClasses}
-                          title={`Question ${index + 1}`}
+                          className={`text-sm font-semibold underline underline-offset-4 transition ${
+                            isCurrent ? 'font-bold' : accentLink
+                          } ${stateHighlight}`}
+                          title={`Question ${index + 1}${isCurrent ? ' (Current)' : ''}${isBookmarked ? ' (Bookmarked)' : ''}${isAnswered ? ' (Answered)' : ''}`}
                         >
-                          <span className={textClasses}>{index + 1}</span>
+                          {index + 1}
                         </button>
                       );
                     })}
@@ -3278,8 +3210,14 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                       )}
                     </div>
 
-                    {/* Answer Options */}
-                    <div className="p-4 space-y-3">
+                      {/* Answer Options — unanswered questions get a clear red group outline. */}
+                    <div
+                      className={`m-4 space-y-3 rounded-lg border-2 p-3 ${
+                        selectedAnswer
+                          ? 'border-transparent'
+                          : 'border-red-400'
+                      }`}
+                    >
                     {question.optionTableHeaders ? (
                       <div className="space-y-3">
                         {/* Column Headers */}
@@ -4356,14 +4294,45 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                 className={`overflow-hidden w-full ${isUnitTest ? 'border-b border-gray-200' : 'border-b-4 border-black'}`}
               >
                 <div className="max-w-7xl mx-auto px-4 py-4">
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                     {questions.map((q, index) => {
                       const isAnswered = answers[q.id] !== undefined;
                       const isBookmarked = bookmarkedQuestions.has(q.id);
                       const isCurrent = index === currentPage;
+                      const accentLink =
+                        examType === 'macro'
+                          ? 'text-blue-700 hover:text-blue-900'
+                          : examType === 'micro'
+                            ? 'text-green-700 hover:text-green-900'
+                            : examType === 'stats'
+                              ? 'text-orange-700 hover:text-orange-900'
+                              : 'text-violet-700 hover:text-violet-900';
+                      /** Current = slate, answered = subject soft, bookmark = amber */
+                      const currentHighlight = 'rounded-md border border-slate-800 bg-slate-800 px-2 py-0.5 text-white no-underline hover:text-white';
+                      const answeredHighlight =
+                        examType === 'macro'
+                          ? 'rounded-md border border-blue-300 bg-blue-100 px-2 py-0.5'
+                          : examType === 'micro'
+                            ? 'rounded-md border border-green-300 bg-green-100 px-2 py-0.5'
+                            : examType === 'stats'
+                              ? 'rounded-md border border-orange-300 bg-orange-100 px-2 py-0.5'
+                              : 'rounded-md border border-violet-300 bg-violet-100 px-2 py-0.5';
+                      const bookmarkHighlight =
+                        'rounded-md border border-amber-300 bg-amber-100 px-2 py-0.5';
+                      const paused = isTimerPaused && !isCustomAssignment;
+                      const stateHighlight = paused
+                        ? ''
+                        : isCurrent
+                          ? currentHighlight
+                          : isBookmarked
+                            ? bookmarkHighlight
+                            : isAnswered
+                              ? answeredHighlight
+                              : '';
                       return (
                         <button
                           key={q.id}
+                          type="button"
                           onClick={() => {
                             if (isTimerPaused && !isCustomAssignment) return;
                             if (canNavigateToQuestion(index)) {
@@ -4377,18 +4346,14 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                             }
                           }}
                           disabled={isTimerPaused && !isCustomAssignment}
-                          className={`w-10 h-10 rounded-lg font-normal text-sm transition-all ${
-                            isTimerPaused && !isCustomAssignment
-                              ? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-300'
+                          className={`text-base font-semibold underline underline-offset-4 transition sm:text-lg ${
+                            paused
+                              ? 'cursor-not-allowed text-gray-300 no-underline'
                               : isCurrent
-                              ? `${accentSolid} text-white ring-2 ${isUnitTest ? 'ring-offset-1 ring-gray-400' : 'ring-black'}`
-                              : isBookmarked
-                              ? 'bg-yellow-200 text-yellow-900 border-2 border-yellow-400'
-                              : isAnswered
-                              ? 'bg-blue-200 text-blue-900 border border-blue-300'
-                              : 'bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200'
-                          }`}
-                          title={`Question ${index + 1}${isBookmarked ? ' (Bookmarked)' : ''}${isTimerPaused && !isCustomAssignment ? ' (Test Paused)' : ''}`}
+                                ? 'font-bold'
+                                : accentLink
+                          } ${stateHighlight}`}
+                          title={`Question ${index + 1}${isCurrent ? ' (Current)' : ''}${isBookmarked ? ' (Bookmarked)' : ''}${isAnswered ? ' (Answered)' : ''}${paused ? ' (Test Paused)' : ''}`}
                         >
                           {index + 1}
                         </button>

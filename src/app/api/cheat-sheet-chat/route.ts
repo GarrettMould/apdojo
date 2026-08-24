@@ -657,9 +657,12 @@ export async function POST(req: NextRequest) {
               : mcqContext != null
                 ? 1024
                 : 1536,
-      // 2.5 models: thinking tokens share maxOutputTokens unless disabled.
-      thinkingConfig: { thinkingBudget: 0 },
     };
+    // 2.5 models: thinking tokens share maxOutputTokens unless disabled.
+    // Gemini 3.x uses thinkingLevel instead — omit budget config there.
+    if (modelName.includes('2.5')) {
+      generationConfig.thinkingConfig = { thinkingBudget: 0 };
+    }
 
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({

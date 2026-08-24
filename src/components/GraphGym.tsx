@@ -81,7 +81,7 @@ function JoinDojoModal({ isOpen, onClose, selectedSubject }: { isOpen: boolean; 
             Unlock unlimited quiz generation, all Dojo Drills, FRQ practice, and full-length exams with a Season Pass.
           </p>
           <Link
-            href={`/purchase/season-pass?courseType=${selectedSubject === 'gov' ? 'bundle' : selectedSubject}`}
+            href={`/purchase/season-pass?courseType=${selectedSubject}`}
             className={`inline-flex items-center justify-center w-full px-6 py-3 text-white font-bold rounded-lg transition-colors shadow-md hover:shadow-lg ${
               selectedSubject === 'macro'
                 ? 'bg-blue-600 hover:bg-blue-700'

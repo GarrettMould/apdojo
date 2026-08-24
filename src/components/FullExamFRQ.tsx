@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { Source_Serif_4 } from 'next/font/google';
 import { DrawingPad } from '@/components/DrawingPad';
 import { ExpandableQuestionImage } from '@/components/ExpandableQuestionImage';
 import { VideoModal } from '@/components/VideoModal';
@@ -29,6 +30,12 @@ import {
   saveTestResult,
 } from '@/lib/testProgress';
 import type { CourseSubject } from '@/lib/courseSubject';
+
+/** Readable on-screen FRQ body type — replaces hard-to-read Times New Roman. */
+const frqBody = Source_Serif_4({
+  subsets: ['latin'],
+  weight: ['400', '600', '700'],
+});
 
 interface TableData {
   title?: string;
@@ -195,32 +202,26 @@ export function FullExamFRQ({
           ? 'text-orange-700 hover:text-orange-900'
           : 'text-violet-700 hover:text-violet-900';
 
-  const walkthroughTheme =
+  const walkthroughAccent =
     examType === 'stats'
       ? {
-          banner: 'border-orange-300 bg-gradient-to-br from-orange-50 to-amber-50/90 text-orange-950',
-          iconWrap: 'border-orange-400 bg-orange-100 text-orange-700',
-          pill: 'border-orange-300 bg-white/90 text-orange-800',
-          pillUnlocked: 'border-emerald-400 bg-emerald-50 text-emerald-800',
-          button:
-            'border-orange-900 bg-orange-500 text-white hover:bg-orange-600 shadow-[3px_3px_0px_0px_rgba(154,52,18,1)] hover:shadow-[2px_2px_0px_0px_rgba(154,52,18,1)]',
+          bar: 'border-l-orange-500 bg-orange-50/70',
+          muted: 'text-orange-800/70',
+          strong: 'text-orange-950',
+          btn: 'bg-orange-600 text-white hover:bg-orange-700',
         }
       : examType === 'gov'
         ? {
-            banner: 'border-violet-300 bg-gradient-to-br from-violet-50 to-fuchsia-50/80 text-violet-950',
-            iconWrap: 'border-violet-400 bg-violet-100 text-violet-700',
-            pill: 'border-violet-300 bg-white/90 text-violet-800',
-            pillUnlocked: 'border-emerald-400 bg-emerald-50 text-emerald-800',
-            button:
-              'border-violet-900 bg-violet-500 text-white hover:bg-violet-600 shadow-[3px_3px_0px_0px_rgba(76,29,149,1)] hover:shadow-[2px_2px_0px_0px_rgba(76,29,149,1)]',
+            bar: 'border-l-violet-500 bg-violet-50/70',
+            muted: 'text-violet-800/70',
+            strong: 'text-violet-950',
+            btn: 'bg-violet-600 text-white hover:bg-violet-700',
           }
         : {
-            banner: 'border-sky-300 bg-gradient-to-br from-sky-50 to-cyan-50/80 text-sky-950',
-            iconWrap: 'border-sky-400 bg-sky-100 text-sky-700',
-            pill: 'border-sky-300 bg-white/90 text-sky-800',
-            pillUnlocked: 'border-emerald-400 bg-emerald-50 text-emerald-800',
-            button:
-              'border-sky-900 bg-sky-500 text-white hover:bg-sky-600 shadow-[3px_3px_0px_0px_rgba(12,74,110,1)] hover:shadow-[2px_2px_0px_0px_rgba(12,74,110,1)]',
+            bar: 'border-l-sky-500 bg-sky-50/70',
+            muted: 'text-sky-800/70',
+            strong: 'text-sky-950',
+            btn: 'bg-sky-600 text-white hover:bg-sky-700',
           };
 
   const answerFocusClass =
@@ -347,63 +348,46 @@ export function FullExamFRQ({
     options?: { onWatch?: () => void; className?: string },
   ) => {
     const isLocked = mode === 'locked';
-    const StatusIcon = isLocked ? Lock : PlayCircle;
 
     return (
       <div
-        className={`overflow-hidden rounded-2xl border-2 shadow-[4px_4px_0px_0px_rgba(17,24,39,0.07)] ${walkthroughTheme.banner} ${options?.className ?? ''}`}
+        className={`flex items-center gap-3 border-l-[3px] py-3 pl-3.5 pr-3 sm:gap-4 sm:pl-4 ${walkthroughAccent.bar} ${options?.className ?? ''}`}
         role="note"
       >
-        <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
-          <div className="flex min-w-0 items-start gap-3.5 sm:gap-4">
-            <div
-              className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border-2 ${walkthroughTheme.iconWrap}`}
-              aria-hidden
-            >
-              <StatusIcon className="h-5 w-5" />
-            </div>
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <p className="text-sm font-black tracking-tight text-gray-900">Video walkthrough</p>
-                <span
-                  className={`rounded-full border px-2 py-0.5 text-[10px] font-black uppercase tracking-wider ${
-                    isLocked ? walkthroughTheme.pill : walkthroughTheme.pillUnlocked
-                  }`}
-                >
-                  {isLocked ? 'Unlocks on submit' : 'Unlocked'}
-                </span>
-              </div>
-              <p className="mt-1.5 text-sm leading-relaxed text-gray-700">
-                {isLocked ? (
-                  currentQuestionHasWalkthrough ? (
-                    <>
-                      Finish and submit to watch a step-by-step solution for{' '}
-                      <span className="font-semibold text-gray-900">this question</span>.
-                    </>
-                  ) : (
-                    <>
-                      {walkthroughQuestionCount} question{walkthroughQuestionCount === 1 ? '' : 's'} in this
-                      pack {walkthroughQuestionCount === 1 ? 'includes a' : 'include'} walkthrough on your
-                      results page.
-                    </>
-                  )
-                ) : (
-                  'Review the model solution part by part and compare it to your responses.'
-                )}
-              </p>
-            </div>
-          </div>
-          {!isLocked && options?.onWatch ? (
-            <button
-              type="button"
-              onClick={options.onWatch}
-              className={`inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-xl border-2 px-4 py-2.5 text-sm font-bold transition-transform hover:-translate-y-0.5 sm:w-auto ${walkthroughTheme.button}`}
-            >
-              <PlayCircle className="h-5 w-5 shrink-0" aria-hidden />
-              Watch walkthrough
-            </button>
-          ) : null}
+        <div
+          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/80 ${walkthroughAccent.strong}`}
+          aria-hidden
+        >
+          {isLocked ? <Lock className="h-4 w-4" /> : <PlayCircle className="h-4 w-4" />}
         </div>
+
+        <div className="min-w-0 flex-1">
+          <p className={`text-sm font-semibold leading-snug ${walkthroughAccent.strong}`}>
+            {isLocked
+              ? currentQuestionHasWalkthrough
+                ? 'Solution video unlocks when you submit'
+                : `${walkthroughQuestionCount} solution video${walkthroughQuestionCount === 1 ? '' : 's'} unlock after submit`
+              : 'Solution video ready'}
+          </p>
+          <p className={`mt-0.5 text-xs leading-snug ${walkthroughAccent.muted}`}>
+            {isLocked
+              ? currentQuestionHasWalkthrough
+                ? 'A step-by-step walkthrough for this question.'
+                : 'Available on your results page for questions that have one.'
+              : 'Compare your work to a model solution.'}
+          </p>
+        </div>
+
+        {!isLocked && options?.onWatch ? (
+          <button
+            type="button"
+            onClick={options.onWatch}
+            className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${walkthroughAccent.btn}`}
+          >
+            <Play className="h-3.5 w-3.5 fill-current" aria-hidden />
+            Watch
+          </button>
+        ) : null}
       </div>
     );
   };
@@ -484,7 +468,7 @@ export function FullExamFRQ({
             <h2 className={`mb-4 font-black text-gray-900 tracking-tight ${fontClass}`}>{q.questionTitle}</h2>
           ) : null}
           <div
-            className={`mb-5 space-y-4 text-gray-900 font-['Times_New_Roman',Times,serif] leading-relaxed ${fontClass}`}
+            className={`mb-5 space-y-4 text-gray-900 leading-relaxed ${frqBody.className} ${fontClass}`}
           >
             <p className="font-bold whitespace-pre-line">{q.govScotusStimulus.instructions}</p>
             <p className="text-center font-normal italic">{q.govScotusStimulus.caseCitation}</p>
@@ -502,7 +486,7 @@ export function FullExamFRQ({
           <h2 className={`mb-4 font-black text-gray-900 tracking-tight ${fontClass}`}>{q.questionTitle}</h2>
           {q.prompt.trim() ? (
             <p
-              className={`mb-5 font-semibold text-gray-900 leading-relaxed whitespace-pre-line font-['Times_New_Roman',Times,serif] ${fontClass}`}
+              className={`mb-5 font-semibold text-gray-900 leading-relaxed whitespace-pre-line ${frqBody.className} ${fontClass}`}
             >
               {q.prompt}
             </p>
@@ -548,15 +532,16 @@ export function FullExamFRQ({
 
   const renderPartBlock = (part: Part, partIndex: number, largeText: boolean) => {
     const answerMargin = largeText ? '' : 'ml-6';
+    const promptFont = examType === 'gov' ? frqBody.className : '';
     const textAreaClass = largeText
-      ? `w-full min-h-[min(52vh,460px)] px-4 py-4 rounded-xl border-2 border-gray-200 ${answerFocusClass} outline-none text-base text-gray-900 resize-y leading-relaxed transition-colors`
-      : `w-full px-3 py-2.5 rounded border border-gray-300 ${answerFocusClass} outline-none text-sm text-gray-900 resize-y transition-colors`;
+      ? `w-full min-h-[min(52vh,460px)] px-4 py-4 rounded-xl border-2 border-gray-200 ${answerFocusClass} outline-none text-base text-gray-900 resize-y leading-relaxed transition-colors ${promptFont}`
+      : `w-full px-3 py-2.5 rounded border border-gray-300 ${answerFocusClass} outline-none text-sm text-gray-900 resize-y transition-colors ${promptFont}`;
 
     return (
       <div className="space-y-4">
         <div className="flex gap-3">
-          <span className={`font-black text-gray-700 shrink-0 ${fontClass}`}>{part.label})</span>
-          <p className={`text-gray-900 font-semibold leading-relaxed whitespace-pre-line ${fontClass}`}>
+          <span className={`font-black text-gray-700 shrink-0 ${promptFont} ${fontClass}`}>{part.label})</span>
+          <p className={`text-gray-900 font-semibold leading-relaxed whitespace-pre-line ${promptFont} ${fontClass}`}>
             {part.text}
           </p>
         </div>
@@ -877,11 +862,16 @@ export function FullExamFRQ({
       </div>
 
         {/* Results navigation */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
+        <div
+          className={`fixed bottom-0 left-0 right-0 border-t border-gray-200 z-50 bg-white transition-opacity ${
+            walkthroughOpen ? 'pointer-events-none opacity-40' : ''
+          }`}
+          aria-hidden={walkthroughOpen}
+        >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
             <button
               onClick={() => { setResultsIndex(i => Math.max(0, i - 1)); window.scrollTo({ top: 0 }); }}
-              disabled={resultsIndex === 0}
+              disabled={walkthroughOpen || resultsIndex === 0}
               className="flex items-center gap-1.5 px-4 py-2.5 rounded font-semibold text-sm border border-gray-300 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-gray-700"
             >
               <ChevronLeft className="w-4 h-4" /> Previous
@@ -892,14 +882,16 @@ export function FullExamFRQ({
             {resultsIndex < questions.questions.length - 1 ? (
               <button
                 onClick={() => { setResultsIndex(i => i + 1); window.scrollTo({ top: 0 }); }}
-                className="flex items-center gap-1.5 px-4 py-2.5 rounded font-semibold text-sm border border-gray-300 hover:bg-gray-50 transition-colors text-gray-700"
+                disabled={walkthroughOpen}
+                className="flex items-center gap-1.5 px-4 py-2.5 rounded font-semibold text-sm border border-gray-300 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-gray-700"
               >
                 Next <ChevronRight className="w-4 h-4" />
               </button>
             ) : (
               <button
                 onClick={() => { setShowResults(false); setCurrentQuestionIndex(0); window.scrollTo({ top: 0 }); }}
-                className={`flex items-center gap-1.5 px-4 py-2.5 rounded font-semibold text-sm text-white ${accentColor} hover:opacity-90 transition-opacity`}
+                disabled={walkthroughOpen}
+                className={`flex items-center gap-1.5 px-4 py-2.5 rounded font-semibold text-sm text-white disabled:opacity-40 disabled:cursor-not-allowed ${accentColor} hover:opacity-90 transition-opacity`}
               >
                 Exit
               </button>
@@ -1158,6 +1150,18 @@ export function FullExamFRQ({
                             >
                               {summary}
                             </span>
+                            {(
+                              Boolean(textAnswers[`${currentQuestionIndex}-${part.label}`]?.trim()) ||
+                              Boolean(
+                                part.subparts?.some((sp) =>
+                                  textAnswers[`${currentQuestionIndex}-${part.label}-${sp.label}`]?.trim()
+                                )
+                              )
+                            ) && (
+                              <span className="mt-0.5 shrink-0 self-center bg-violet-600 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-white">
+                                Saved
+                              </span>
+                            )}
                             <ChevronRight className="mt-0.5 h-5 w-5 shrink-0 text-gray-400" aria-hidden />
                           </button>
                         )}
@@ -1186,9 +1190,17 @@ export function FullExamFRQ({
                   className="overflow-hidden w-full border-b border-gray-200"
                 >
                   <div className="max-w-7xl mx-auto px-4 py-4">
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                       {questions.questions.map((_, index) => {
                         const isCurrent = index === currentQuestionIndex;
+                        const accentLink =
+                          examType === 'macro'
+                            ? 'text-blue-700 hover:text-blue-900'
+                            : examType === 'micro'
+                              ? 'text-green-700 hover:text-green-900'
+                              : examType === 'stats'
+                                ? 'text-orange-700 hover:text-orange-900'
+                                : 'text-violet-700 hover:text-violet-900';
                         return (
                           <button
                             key={index}
@@ -1200,14 +1212,12 @@ export function FullExamFRQ({
                               window.scrollTo({ top: 0 });
                             }}
                             disabled={isTimerPaused}
-                            className={`w-10 h-10 rounded-lg font-semibold text-sm transition-all ${
+                            className={`text-base font-semibold underline underline-offset-4 transition sm:text-lg ${
                               isTimerPaused
-                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-300'
+                                ? 'cursor-not-allowed text-gray-300 no-underline'
                                 : isCurrent
-                                  ? `${
-                                      examType === 'macro' ? 'bg-blue-600' : 'bg-green-600'
-                                    } text-white ring-2 ring-offset-1 ring-gray-400`
-                                  : 'bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200'
+                                  ? `${accentLink} decoration-2 font-bold`
+                                  : accentLink
                             }`}
                             title={isTimerPaused ? 'Timer paused' : `Question ${index + 1}`}
                           >

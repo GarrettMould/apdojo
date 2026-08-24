@@ -9,13 +9,12 @@ import { LoginModal, SignupModal, SelectPlanModal } from '@/components/AuthModal
 // MVP: Removed authentication import
 // import { useAuthContext } from '@/contexts/AuthContext';
 import { PageHeader } from '@/components/ui/PageHeader';
-import { useRouter } from 'next/navigation';
-
-interface VideoLibraryPageProps {
-  params: {
-    subject: string;
-  };
-}
+import { useParams, useRouter } from 'next/navigation';
+import { CheatSheetVideoWatchClient } from '@/components/CheatSheetVideoWatchClient';
+import {
+  getCheatSheetWatchVideo,
+  isCheatSheetWatchId,
+} from '@/lib/cheatSheetVideos';
 
 const groupVideosByUnit = (videos: VideoType[]) => {
   return videos.reduce((acc, video) => {
@@ -28,8 +27,9 @@ const groupVideosByUnit = (videos: VideoType[]) => {
   }, {} as Record<string, VideoType[]>);
 };
 
-export default function VideoLibraryPage({ params }: VideoLibraryPageProps) {
-  const { subject } = params;
+export default function VideoLibraryPage() {
+  const routeParams = useParams();
+  const subject = typeof routeParams?.subject === 'string' ? routeParams.subject : '';
   const [selectedUnit, setSelectedUnit] = useState<string | null>(null);
   const router = useRouter();
 
@@ -39,6 +39,14 @@ export default function VideoLibraryPage({ params }: VideoLibraryPageProps) {
 
   // MVP: Removed authentication context
   // const { user } = useAuthContext();
+
+  if (isCheatSheetWatchId(subject)) {
+    const watchVideo = getCheatSheetWatchVideo(subject);
+    if (!watchVideo) {
+      return <div className="p-8 text-center text-red-500">Video not found.</div>;
+    }
+    return <CheatSheetVideoWatchClient video={watchVideo} />;
+  }
 
   if (subject !== 'macro' && subject !== 'micro') {
     return <div className="p-8 text-center text-red-500">Invalid subject specified.</div>;

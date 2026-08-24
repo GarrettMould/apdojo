@@ -537,6 +537,10 @@ function TutorBuilderContent() {
       if (selectedFrqExamIndices.length > 0) {
         params.set('f', btoa(selectedFrqExamIndices.join(',')));
       }
+      const parts: string[] = [];
+      if (selectedIdsOrder.length > 0) parts.push('MCQ');
+      if (selectedFrqExamIndices.length > 0) parts.push('FRQ');
+      params.set('title', `AP Dojo ${parts.join(' + ')} Worksheet`);
       return `${origin}/tutor/print-preview?${params.toString()}`;
     }
     if (selectedIdsOrder.length === 0) return null;
@@ -692,6 +696,10 @@ function TutorBuilderContent() {
     if (selectedFrqExamIndices.length > 0) {
       params.set('f', btoa(selectedFrqExamIndices.join(',')));
     }
+    const parts: string[] = [];
+    if (selectedIdsOrder.length > 0) parts.push('MCQ');
+    if (selectedFrqExamIndices.length > 0) parts.push('FRQ');
+    params.set('title', `AP Dojo ${parts.join(' + ')} Worksheet`);
     const url = `${typeof window !== 'undefined' ? window.location.origin : ''}/tutor/print-preview?${params.toString()}`;
     window.open(url, '_blank', 'noopener,noreferrer');
   };

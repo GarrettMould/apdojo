@@ -175,7 +175,7 @@ export function getCheatSheetUrlForSubjectSwitch(
   return cheatSheetUrlForUnit(newSubject, unitNumber);
 }
 
-/** Admin header / account subject picker (Stats reserved, not selectable yet). */
+/** Header subject picker — all four AP courses. */
 export const ADMIN_SUBJECT_SELECT_OPTIONS = [
   { value: 'macro' as const, label: 'AP Macro' },
   { value: 'micro' as const, label: 'AP Micro' },
@@ -186,6 +186,25 @@ export const ADMIN_SUBJECT_SELECT_OPTIONS = [
 export function adminSubjectSelectLabel(subject: CourseSubject): string {
   const match = ADMIN_SUBJECT_SELECT_OPTIONS.find((o) => o.value === subject);
   return match?.label ?? displayCourseLabel(subject);
+}
+
+/** Parse Firestore `selectedSubjects` into validated course keys. */
+export function parseSelectedSubjects(raw: unknown): CourseSubject[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.filter((s): s is CourseSubject => typeof s === 'string' && isCourseSubject(s));
+}
+
+/**
+ * Enrolled courses for a logged-in user. Returns `null` for guests or legacy accounts
+ * without `selectedSubjects` — caller should show all courses in those cases.
+ */
+export function getUserEnrolledSubjects(
+  isLoggedIn: boolean,
+  userData: { selectedSubjects?: unknown } | null | undefined,
+): CourseSubject[] | null {
+  if (!isLoggedIn) return null;
+  const parsed = parseSelectedSubjects(userData?.selectedSubjects);
+  return parsed.length > 0 ? parsed : null;
 }
 
 /** Gov units with MCQ practice banks in `src/data/gov/govUnit*McqPractice.ts`. */

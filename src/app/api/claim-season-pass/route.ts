@@ -1,18 +1,11 @@
 import { NextResponse } from 'next/server';
 import { db as adminDb } from '@/lib/firebase-admin';
 import { stripe } from '@/lib/stripe-server';
+import { getSeasonPassExpirationDate } from '@/lib/seasonPassExpiration';
 
 const TEST_SESSION_ID = 'test';
 const TEST_EMAIL = 'testdojo@gmail.com';
 const TEST_COURSE_TYPE = 'macro';
-
-function getExpirationDate(): string {
-  const now = new Date();
-  const year = now.getUTCMonth() > 5 || (now.getUTCMonth() === 5 && now.getUTCDate() > 30)
-    ? now.getUTCFullYear() + 1
-    : now.getUTCFullYear();
-  return `${year}-06-30T23:59:59.999Z`;
-}
 
 export async function POST(req: Request) {
   try {
@@ -48,7 +41,7 @@ export async function POST(req: Request) {
     }
 
     // Store pending pass in Firestore keyed by email
-    const expirationDate = getExpirationDate();
+    const expirationDate = getSeasonPassExpirationDate();
     const subjects = courseType === 'bundle' ? ['macro', 'micro'] : [courseType];
     const expiration: Record<string, string> = {};
     subjects.forEach(s => { expiration[s] = expirationDate; });

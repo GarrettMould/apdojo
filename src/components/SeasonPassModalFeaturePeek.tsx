@@ -1,16 +1,20 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FRQFeedbackDemo } from '@/components/FRQFeedbackDemo';
 import { MCQPracticePreview } from '@/components/MCQPracticePreview';
 import { CheatSheetPreview } from '@/components/CheatSheetPreview';
 import { cn } from '@/lib/utils';
+import { getLoggedOutHeroConfig } from '@/data/loggedOutHeroConfig';
+import type { CourseSubject } from '@/lib/courseSubject';
 
 const ROTATE_MS = 4000;
 
-const SLIDES = [
+type PeekSlide = { label: string; component: ReactNode };
+
+const ECON_SLIDES: PeekSlide[] = [
   { label: 'AI-Graded FRQs', component: <FRQFeedbackDemo /> },
   { label: 'Unlimited MCQ Practice', component: <MCQPracticePreview /> },
   {
@@ -21,18 +25,142 @@ const SLIDES = [
       </div>
     ),
   },
-] as const;
+];
+
+/**
+ * Homepage-style showcase: cheat sheet base + MCQ + FRQ cards layered on top.
+ */
+function FeatureStackShowcase({ courseType }: { courseType: 'gov' | 'stats' }) {
+  const config = getLoggedOutHeroConfig(courseType);
+  const pdfCardRef = useRef<HTMLDivElement>(null);
+  const [pdfScale, setPdfScale] = useState(0.55);
+  const { theme } = config;
+
+  useEffect(() => {
+    const update = () => {
+      if (pdfCardRef.current) {
+        setPdfScale(pdfCardRef.current.offsetWidth / 833);
+      }
+    };
+    update();
+    const t = window.setTimeout(update, 50);
+    window.addEventListener('resize', update);
+    return () => {
+      window.clearTimeout(t);
+      window.removeEventListener('resize', update);
+    };
+  }, [courseType]);
+
+  return (
+    <div className="relative w-full">
+      <div className="relative ml-3.5 mr-2">
+        {/* PDF window — 3× prior height (~top 105% of sheet, capped by full page) */}
+        <div
+          ref={pdfCardRef}
+          className="relative overflow-hidden rounded-2xl border-2 border-black bg-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] aspect-[833/1140]"
+        >
+          {config.pdfSrc ? (
+            <>
+              <iframe
+                src={config.pdfSrc}
+                title="Cheat sheet preview"
+                className="pointer-events-none absolute left-0 top-0 select-none border-none"
+                style={{
+                  width: '833px',
+                  height: '1080px',
+                  transform: `scale(${pdfScale})`,
+                  transformOrigin: 'top left',
+                }}
+              />
+              <div
+                className="pointer-events-none absolute inset-x-0 bottom-0 h-[18%]"
+                style={{
+                  background: 'linear-gradient(to bottom, transparent, rgba(255,255,255,0.92))',
+                }}
+              />
+            </>
+          ) : null}
+        </div>
+
+        {/* Feature cards — hug bottom-left corner of cheat sheet */}
+        <div
+          className="absolute bottom-0 left-0 z-20 w-[min(13.75rem,78%)]"
+          style={{ height: '7.75rem' }}
+        >
+          {/* Back card: Unit MCQ */}
+          <div
+            className="absolute bottom-0 left-0 w-full rounded-xl border-2 border-black bg-white p-2.5 shadow-[5px_5px_0px_0px_rgba(0,0,0,1)]"
+            style={{ transform: 'translate(-6px, -10px) rotate(-3deg)', transformOrigin: 'bottom left', zIndex: 1 }}
+          >
+            <p className="mb-1 text-[7px] font-black uppercase tracking-widest text-gray-400">
+              Unit MCQ Test
+            </p>
+            <p className="mb-1.5 line-clamp-2 text-[10px] font-bold leading-snug text-gray-900">
+              {config.mcqPreview.question}
+            </p>
+            <div className="space-y-1">
+              {config.mcqPreview.options.slice(0, 2).map(({ letter, text, correct }) => (
+                <div
+                  key={letter}
+                  className={`flex items-center gap-1.5 rounded-md border px-1.5 py-1 text-[8px] font-semibold ${
+                    correct ? theme.mcqCorrectClass : 'border-gray-100 text-gray-500'
+                  }`}
+                >
+                  <span
+                    className={`flex h-3.5 w-3.5 flex-shrink-0 items-center justify-center rounded-full border text-[6px] font-black ${
+                      correct ? theme.mcqCorrectBadgeClass : 'border-gray-300 text-gray-400'
+                    }`}
+                  >
+                    {letter}
+                  </span>
+                  <span className="line-clamp-1">{text}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Front card: FRQ / SCOTUS */}
+          <div
+            className="absolute bottom-0 left-0 w-full rounded-xl border-2 border-black bg-white p-2.5 shadow-[5px_5px_0px_0px_rgba(0,0,0,1)]"
+            style={{ transform: 'translate(4px, 0) rotate(2deg)', transformOrigin: 'bottom left', zIndex: 2 }}
+          >
+            <div className="mb-1.5 flex items-center justify-between gap-2">
+              <p className="text-[7px] font-black uppercase tracking-widest text-gray-400">
+                {config.frqPreview.label}
+              </p>
+              <span className="rounded-full border border-green-300 bg-green-100 px-1.5 py-0.5 text-[7px] font-black text-green-700">
+                {config.frqPreview.score}
+              </span>
+            </div>
+            <div className="line-clamp-3 rounded-lg border border-gray-100 bg-gray-50 p-2 text-[9px] font-medium leading-snug text-gray-700">
+              {config.frqPreview.feedback}
+            </div>
+          </div>
+        </div>
+
+        <Link
+          href={`/purchase/season-pass?courseType=${courseType}`}
+          className="absolute inset-0 z-30 cursor-pointer"
+          aria-label="Get the Season Pass"
+        />
+      </div>
+    </div>
+  );
+}
 
 type SeasonPassModalFeaturePeekProps = {
-  courseType: 'macro' | 'micro';
+  courseType: CourseSubject;
   /** When placed in a flex/grid column, pass `min-h-0 flex-1` so the peek grows to match sibling column height. */
   className?: string;
 };
 
 /**
- * One preview at a time, full column width (cards keep their own borders). Vertical window shows a readable slice with a soft fade.
+ * Econ: rotating one-at-a-time peeks.
+ * Gov/Stats: homepage-style stack — cheat sheet + MCQ + FRQ all visible together.
  */
 export function SeasonPassModalFeaturePeek({ courseType, className }: SeasonPassModalFeaturePeekProps) {
+  const isStacked = courseType === 'gov' || courseType === 'stats';
+  const slides = useMemo(() => ECON_SLIDES, []);
   const [active, setActive] = useState(0);
   const [direction, setDirection] = useState(1);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -43,14 +171,28 @@ export function SeasonPassModalFeaturePeek({ courseType, className }: SeasonPass
   };
 
   useEffect(() => {
+    if (isStacked) return;
+    setActive(0);
+  }, [courseType, isStacked]);
+
+  useEffect(() => {
+    if (isStacked) return;
     timerRef.current = setInterval(() => {
       setDirection(1);
-      setActive((i) => (i + 1) % SLIDES.length);
+      setActive((i) => (i + 1) % slides.length);
     }, ROTATE_MS);
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, []);
+  }, [slides.length, courseType, isStacked]);
+
+  if (isStacked) {
+    return (
+      <div className={cn('w-full', className)}>
+        <FeatureStackShowcase courseType={courseType} />
+      </div>
+    );
+  }
 
   const variants = {
     enter: (d: number) => ({ opacity: 0, x: d > 0 ? 40 : -40 }),
@@ -59,25 +201,18 @@ export function SeasonPassModalFeaturePeek({ courseType, className }: SeasonPass
   };
 
   return (
-    <div
-      className={cn(
-        'flex w-full min-h-0 flex-col',
-        // In the modal’s two-column row, grow to fill the stretched grid cell so preview matches left column height.
-        'lg:h-full lg:min-h-0',
-        className
-      )}
-    >
+    <div className={cn('flex w-full min-h-0 flex-col lg:h-full lg:min-h-0', className)}>
       <div className="mb-3 shrink-0 text-center">
         <AnimatePresence mode="wait">
           <motion.h3
-            key={active}
+            key={`${courseType}-${active}`}
             initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.2 }}
             className="text-lg font-black text-gray-900 sm:text-xl"
           >
-            {SLIDES[active].label}
+            {slides[active]?.label}
           </motion.h3>
         </AnimatePresence>
       </div>
@@ -86,7 +221,7 @@ export function SeasonPassModalFeaturePeek({ courseType, className }: SeasonPass
         <div className="absolute inset-0 overflow-hidden bg-transparent">
           <AnimatePresence custom={direction} mode="wait">
             <motion.div
-              key={active}
+              key={`${courseType}-${active}`}
               custom={direction}
               variants={variants}
               initial="enter"
@@ -95,7 +230,7 @@ export function SeasonPassModalFeaturePeek({ courseType, className }: SeasonPass
               transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
               className="w-full min-w-0"
             >
-              {SLIDES[active].component}
+              {slides[active]?.component}
             </motion.div>
           </AnimatePresence>
           <div
@@ -114,15 +249,15 @@ export function SeasonPassModalFeaturePeek({ courseType, className }: SeasonPass
       </div>
 
       <div className="mt-4 flex shrink-0 justify-center gap-2">
-        {SLIDES.map((_, i) => (
+        {slides.map((slide, i) => (
           <button
-            key={i}
+            key={slide.label}
             type="button"
             onClick={() => goTo(i)}
             className={`h-2 rounded-full transition-all duration-300 ${
               i === active ? 'w-6 bg-gray-900' : 'w-2 bg-gray-300'
             }`}
-            aria-label={`Show ${SLIDES[i].label}`}
+            aria-label={`Show ${slide.label}`}
             aria-current={i === active ? 'true' : undefined}
           />
         ))}

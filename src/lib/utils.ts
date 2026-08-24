@@ -48,6 +48,16 @@ export function hasValidSeasonPass(
   return hasValidPass;
 }
 
+/** AP Gov premium surfaces — season-pass model. */
+export function hasGovPremiumAccess(userData: unknown): boolean {
+  return hasValidSeasonPass(userData, 'gov');
+}
+
+/** AP Stats premium surfaces — season-pass model. */
+export function hasStatsPremiumAccess(userData: unknown): boolean {
+  return hasValidSeasonPass(userData, 'stats');
+}
+
 // Assigns light pastel background colors based on unit ID
 // (Using darker fills like bg-blue-500 for better visibility on the bar)
 export const getUnitColor = (unitId: number): string => {
@@ -102,6 +112,30 @@ export function getUnitFinalPracticeTestsUrl(subject: CourseSubject): string {
  */
 export function getFullMCQTestUrl(subject: CourseSubject, testNumber: number = 1): string {
   return `/ap-${subject}-mcq-practice-test-${testNumber}`;
+}
+
+/** examNumber prop for FullExam full-length MCQ tests (e.g. full-macro-mcq-1). */
+export function getFullMCQExamNumber(subject: 'macro' | 'micro', testNumber: number = 1): string {
+  return `full-${subject}-mcq-${testNumber}`;
+}
+
+/** Firestore progress key for full-length MCQ exams using the unit-test UI. */
+export function getFullMCQExamTestId(subject: 'macro' | 'micro', testNumber: number = 1): string {
+  return `unit_${getFullMCQExamNumber(subject, testNumber)}_${subject}`;
+}
+
+/** Legacy progress key from the old /full-mcq-exam route. */
+export function getLegacyFullMCQExamTestId(subject: 'macro' | 'micro'): string {
+  return `full_${subject}_mcq`;
+}
+
+export function isFullLengthMcqExamNumber(examNumber?: string): boolean {
+  return !!examNumber && /^full-(macro|micro)-mcq-\d+$/.test(examNumber);
+}
+
+/** Landing page before a full-length MCQ exam (Begin / Resume). */
+export function getFullMCQExamPreviewUrl(subject: CourseSubject, testNumber: number = 1): string {
+  return `/full-mcq-exam-preview?subject=${subject}&num=${testNumber}`;
 }
 
 /**

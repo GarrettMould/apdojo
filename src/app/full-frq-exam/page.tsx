@@ -10,6 +10,7 @@ import { StaticImageData } from 'next/image';
 import { frqSetOneQuestions } from '@/data/questionBanks/macro/frqs/setOne';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { saveTestProgress, loadTestProgress, saveTestResult } from '@/lib/testProgress';
+import { getFullMCQExamPreviewUrl } from '@/lib/utils';
 
 interface SubPart {
   label: string;
@@ -48,7 +49,8 @@ const isStaticImageData = (value: any): value is StaticImageData => {
 };
 
 export default function FullFRQExamPage() {
-  const { user } = useAuthContext();
+  const { user, selectedSubject } = useAuthContext();
+  const mcqPreviewHref = getFullMCQExamPreviewUrl(selectedSubject === 'micro' ? 'micro' : 'macro', 1);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [textAnswers, setTextAnswers] = useState<Record<string, string>>({});
   const [drawingAnswers, setDrawingAnswers] = useState<Record<string, string>>({});
@@ -565,7 +567,7 @@ export default function FullFRQExamPage() {
               {/* Previous Button */}
               <div className="flex-1">
                 <Link
-                  href="/full-mcq-exam"
+                  href={mcqPreviewHref}
                   className="block w-full h-24 p-4 rounded-lg border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 group"
                 >
                   <div className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-2">

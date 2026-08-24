@@ -2,18 +2,19 @@
 
 import Link from 'next/link';
 import { Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { FullExamFRQ } from '@/components/FullExamFRQ';
+import { SeasonPassEntryWideModal } from '@/components/SeasonPassEntryWideModal';
 import { buildGovUnitFrqPackForFullExam } from '@/data/gov/govUnitStimulusFrqs';
 import { buildStatsUnitFrqPackForFullExam } from '@/data/stats/statsUnitStimulusFrqs';
 import { isCourseSubject, isStatsFrqTestUnitAvailable, type CourseSubject } from '@/lib/courseSubject';
-import { getUnitFinalPracticeTestsUrl } from '@/lib/utils';
+import { getUnitFinalPracticeTestsUrl, hasGovPremiumAccess, hasStatsPremiumAccess } from '@/lib/utils';
 import { useAuthContext } from '@/contexts/AuthContext';
-import { hasAdminRole } from '@/lib/adminAccess';
 
 function UnitFrqPackInner() {
-  const { user, userData, loadingUserData } = useAuthContext();
+  const router = useRouter();
+  const { userData, loadingUserData } = useAuthContext();
   const searchParams = useSearchParams();
   const subjectRaw = searchParams.get('subject');
   const unitRaw = searchParams.get('unit') ?? '1';
@@ -22,6 +23,12 @@ function UnitFrqPackInner() {
   const unitNumber = parseInt(unitRaw, 10) || 1;
 
   const backToHub = getUnitFinalPracticeTestsUrl(subject);
+  const hasPremium =
+    subject === 'gov'
+      ? hasGovPremiumAccess(userData)
+      : subject === 'stats'
+        ? hasStatsPremiumAccess(userData)
+        : false;
 
   if (subject !== 'gov' && subject !== 'stats') {
     return (
@@ -59,29 +66,11 @@ function UnitFrqPackInner() {
     );
   }
 
-  if (subject === 'gov' && loadingUserData) {
+  if (loadingUserData) {
     return (
       <div className="min-h-screen bg-gray-50 px-4 py-14">
         <div className="mx-auto max-w-lg rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-          <p className="text-gray-600 font-semibold">Checking access…</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (subject === 'gov' && (!user || !hasAdminRole(userData))) {
-    return (
-      <div className="min-h-screen bg-gray-50 px-4 py-14">
-        <div className="mx-auto max-w-lg rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-          <h1 className="text-xl font-black text-gray-900">AP Gov is in admin preview</h1>
-          <p className="mt-3 text-gray-600">This content is currently restricted to admin accounts.</p>
-          <Link
-            href="/ap-macro-practice-tests"
-            className="mt-6 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-3 font-bold text-white hover:bg-blue-700"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to practice tests
-          </Link>
+          <p className="text-gray-600 font-semibold">Loading FRQ pack…</p>
         </div>
       </div>
     );
@@ -100,10 +89,10 @@ function UnitFrqPackInner() {
           <p className="mt-3 text-gray-600">This unit doesn&apos;t have a stimulus FRQ pack yet.</p>
           <Link
             href={backToHub}
-            className={`mt-6 inline-flex items-center gap-2 rounded-lg px-5 py-3 font-bold text-white hover:opacity-90 ${subject === 'stats' ? 'bg-orange-600 hover:bg-orange-700' : 'bg-violet-600 hover:bg-violet-700'}`}
+            className="mt-6 inline-flex items-center gap-2 rounded-lg bg-gray-900 px-5 py-3 font-bold text-white hover:bg-gray-800"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to practice tests
+            Back
           </Link>
         </div>
       </div>
@@ -111,13 +100,27 @@ function UnitFrqPackInner() {
   }
 
   return (
-    <FullExamFRQ
-      questions={pack}
-      examType={subject}
-      unitNumber={unitNumber}
-      backUrl={backToHub}
-      hideExpandingQuestionNav
-    />
+    <>
+      <div
+        className={hasPremium ? undefined : 'pointer-events-none select-none blur-[6px] saturate-[0.85]'}
+        aria-hidden={!hasPremium ? true : undefined}
+      >
+        <FullExamFRQ
+          questions={pack}
+          examType={subject}
+          unitNumber={unitNumber}
+          backUrl={backToHub}
+          hideExpandingQuestionNav
+        />
+      </div>
+
+      {!hasPremium ? (
+        <SeasonPassEntryWideModal
+          subject={subject}
+          onClose={() => router.push(backToHub)}
+        />
+      ) : null}
+    </>
   );
 }
 
@@ -125,8 +128,8 @@ export default function UnitFrqPackPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-screen items-center justify-center bg-white">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-gray-200 border-t-gray-800" />
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <p className="text-gray-600 font-semibold">Loading FRQ pack…</p>
         </div>
       }
     >

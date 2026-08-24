@@ -469,6 +469,8 @@ export interface GovSupremeCourtCase {
   unit: number;
   lessonIDs: string[];
   videoUrl?: string;
+  /** Seconds into the video to show as the preview frame before play (avoids a black/blank 0:00 poster). */
+  videoPosterTimeSeconds?: number;
   summary: string;
   facts: string;
   constitutionalQuestion: string;
@@ -506,7 +508,8 @@ export const govUnitSupremeCourtCases: Record<number, GovSupremeCourtCase[]> = {
       year: 1819,
       unit: 1,
       lessonIDs: ['1.8'],
-      videoUrl: '',
+      videoUrl:
+        'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/ap_gov/supreme_court_cases/mcculloch+v+maryland+final.mp4',
       summary:
         'Congress has implied powers under the Necessary and Proper Clause, and states cannot tax valid federal institutions.',
       facts: 'Congress created a national bank, and Maryland attempted to tax that bank.',
@@ -524,7 +527,9 @@ export const govUnitSupremeCourtCases: Record<number, GovSupremeCourtCase[]> = {
       year: 1995,
       unit: 1,
       lessonIDs: ['1.9'],
-      videoUrl: '',
+      videoUrl:
+        'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/ap_gov/supreme_court_cases/US+v+Lopez.mp4',
+      videoPosterTimeSeconds: 4,
       summary:
         'Congress exceeded its Commerce Clause authority by criminalizing gun possession in school zones.',
       facts:
@@ -546,7 +551,8 @@ export const govUnitSupremeCourtCases: Record<number, GovSupremeCourtCase[]> = {
       year: 1962,
       unit: 2,
       lessonIDs: ['2.10'],
-      videoUrl: '',
+      videoUrl:
+        'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/ap_gov/supreme_court_cases/baker+vcarr.mp4',
       summary:
         'Legislative malapportionment claims are justiciable, opening the door to the “one person, one vote” principle.',
       facts:
@@ -567,7 +573,8 @@ export const govUnitSupremeCourtCases: Record<number, GovSupremeCourtCase[]> = {
       year: 1993,
       unit: 2,
       lessonIDs: ['2.3'],
-      videoUrl: '',
+      videoUrl:
+        'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/ap_gov/supreme_court_cases/shaw+v+reno.mp4',
       summary:
         'Racial gerrymandering that sorts voters by race may violate the Equal Protection Clause even when intended to help minority representation.',
       facts:
@@ -590,7 +597,8 @@ export const govUnitSupremeCourtCases: Record<number, GovSupremeCourtCase[]> = {
       year: 1919,
       unit: 3,
       lessonIDs: ['3.3'],
-      videoUrl: '',
+      videoUrl:
+        'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/ap_gov/supreme_court_cases/schenck+vs+usa.mp4',
       summary:
         'Speech may be restricted when it creates a clear and present danger, especially during wartime.',
       facts:
@@ -610,7 +618,8 @@ export const govUnitSupremeCourtCases: Record<number, GovSupremeCourtCase[]> = {
       year: 1962,
       unit: 3,
       lessonIDs: ['3.2'],
-      videoUrl: '',
+      videoUrl:
+        'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/ap_gov/supreme_court_cases/engel+v+vitale.mp4',
       summary:
         'State-sponsored prayer in public schools violates the Establishment Clause even when participation is voluntary.',
       facts:
@@ -630,7 +639,8 @@ export const govUnitSupremeCourtCases: Record<number, GovSupremeCourtCase[]> = {
       year: 1972,
       unit: 3,
       lessonIDs: ['3.2'],
-      videoUrl: '',
+      videoUrl:
+        'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/ap_gov/supreme_court_cases/wisc+v+yoder.mp4',
       summary:
         'Amish families may be exempt from compulsory high school attendance when it burdens sincere religious practice.',
       facts:
@@ -650,7 +660,8 @@ export const govUnitSupremeCourtCases: Record<number, GovSupremeCourtCase[]> = {
       year: 2010,
       unit: 3,
       lessonIDs: ['3.7'],
-      videoUrl: '',
+      videoUrl:
+        'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/ap_gov/supreme_court_cases/mdonald+v+chicago.mp4',
       summary:
         'The Second Amendment right to bear arms for self-defense is incorporated against state and local governments.',
       facts:
@@ -672,7 +683,8 @@ export const govUnitSupremeCourtCases: Record<number, GovSupremeCourtCase[]> = {
       year: 1963,
       unit: 4,
       lessonIDs: ['4.10'],
-      videoUrl: '',
+      videoUrl:
+        'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/ap_gov/supreme_court_cases/gideon+v+wainwight.mp4',
       summary:
         'States must provide attorneys to indigent defendants charged with serious crimes in felony cases.',
       facts:
@@ -692,7 +704,8 @@ export const govUnitSupremeCourtCases: Record<number, GovSupremeCourtCase[]> = {
       year: 1969,
       unit: 4,
       lessonIDs: ['4.4'],
-      videoUrl: '',
+      videoUrl:
+        'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/ap_gov/supreme_court_cases/tinker+v+des+moines.mp4',
       summary:
         'Students may engage in symbolic speech at school unless it causes a substantial disruption.',
       facts:
@@ -712,7 +725,8 @@ export const govUnitSupremeCourtCases: Record<number, GovSupremeCourtCase[]> = {
       year: 1971,
       unit: 4,
       lessonIDs: ['4.4'],
-      videoUrl: '',
+      videoUrl:
+        'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/ap_gov/supreme_court_cases/NYT+VS+USA.mp4',
       summary:
         'The government may not impose prior restraint on the press without meeting an extremely heavy burden.',
       facts:
@@ -734,7 +748,8 @@ export const govUnitSupremeCourtCases: Record<number, GovSupremeCourtCase[]> = {
       year: 1954,
       unit: 5,
       lessonIDs: ['5.1'],
-      videoUrl: '',
+      videoUrl:
+        'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/ap_gov/supreme_court_cases/brown+v+board.mp4',
       summary:
         'Racially segregated public schools violate the Equal Protection Clause because separate facilities are inherently unequal.',
       facts:
@@ -754,7 +769,8 @@ export const govUnitSupremeCourtCases: Record<number, GovSupremeCourtCase[]> = {
       year: 2010,
       unit: 5,
       lessonIDs: ['5.11'],
-      videoUrl: '',
+      videoUrl:
+        'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/ap_gov/supreme_court_cases/citizens+united+vs+fec.mp4',
       summary:
         'Independent political spending by corporations and unions is protected speech and cannot be limited by the government.',
       facts:
@@ -774,7 +790,8 @@ export const govUnitSupremeCourtCases: Record<number, GovSupremeCourtCase[]> = {
       year: 1973,
       unit: 5,
       lessonIDs: ['5.7'],
-      videoUrl: '',
+      videoUrl:
+        'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/ap_gov/supreme_court_cases/roe+v+wade.mp4',
       summary:
         'The Constitution protects a woman’s right to choose an abortion, balanced against the state’s interest in regulating the procedure.',
       facts:

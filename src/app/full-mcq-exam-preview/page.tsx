@@ -6,7 +6,10 @@ import { PlayCircle, Clock, PauseCircle, PenLine, EyeOff, RotateCcw } from 'luci
 import Image from 'next/image';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { loadTestProgress, clearTestProgress } from '@/lib/testProgress';
-import { getFullMCQTestUrl } from '@/lib/utils';
+import {
+  getFullMCQExamTestId,
+  getFullMCQTestUrl,
+} from '@/lib/utils';
 
 const RULES = [
   'Each question has one correct answer — select the best choice.',
@@ -38,9 +41,7 @@ function FullMCQExamPreviewContent() {
   const accentBg = isMicro ? 'bg-green-600' : 'bg-blue-600';
 
   const testUrl = getFullMCQTestUrl(subject, examNum);
-  // Must match examNumber used in FullExam: full-{subject}-mcq-{num}
-  const examNumber = `full-${subject}-mcq-${examNum}`;
-  const testId = `unit_${examNumber}_${subject}`;
+  const testId = getFullMCQExamTestId(subject, examNum);
 
   const [savedAnswerCount, setSavedAnswerCount] = useState<number | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);

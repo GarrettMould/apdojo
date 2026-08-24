@@ -190,7 +190,7 @@ export function PurchasePage({ courseType }: PurchasePageProps) {
                   </span>
                 </div>
                 <p className="text-sm text-gray-600 mt-2">
-                  Valid until June 30th, 2026
+                  Valid until June 30, 2027
                 </p>
               </div>
 
@@ -361,7 +361,7 @@ export function PurchasePage({ courseType }: PurchasePageProps) {
                 Ready to unlock instant access?
               </p>
               <p className="text-xs text-gray-600">
-                ${config.price} • Valid until June 30th, 2026
+                ${config.price} • Valid until June 30, 2027
               </p>
             </div>
             <div className="flex flex-col items-center gap-2 w-full sm:w-auto">

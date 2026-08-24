@@ -55,16 +55,16 @@ export function TutorTypingPlaceholder({
             aria-hidden
           />
         )}
-        <div className="min-w-0 flex-1 rounded-2xl rounded-bl-md border border-slate-100/90 bg-white px-3.5 py-3 shadow-sm">
+        <div className="min-w-0 flex-1 rounded-2xl rounded-tl-md border border-white/80 bg-white px-3.5 py-3 shadow-[0_1px_2px_rgba(15,23,42,0.04)]">
           <div className="flex items-start gap-2">
             <span
               className="mt-0.5 inline-block h-[1.1rem] w-0.5 shrink-0 animate-pulse rounded-sm bg-slate-400"
               aria-hidden
             />
-            <div className="min-h-[4.5rem] flex-1 space-y-2.5 pt-0.5">
-              <div className="h-2.5 w-[94%] animate-pulse rounded-full bg-slate-200" />
-              <div className="h-2.5 w-[88%] animate-pulse rounded-full bg-slate-200 delay-100" />
-              <div className="h-2.5 w-[72%] animate-pulse rounded-full bg-slate-200 delay-200" />
+            <div className="min-h-[3.5rem] flex-1 space-y-2 pt-0.5">
+              <div className="h-2 w-[92%] animate-pulse rounded-full bg-slate-200/90" />
+              <div className="h-2 w-[78%] animate-pulse rounded-full bg-slate-200/90" />
+              <div className="h-2 w-[64%] animate-pulse rounded-full bg-slate-200/90" />
               <p className="pt-1 text-[11px] font-medium text-slate-400">{label}</p>
             </div>
           </div>

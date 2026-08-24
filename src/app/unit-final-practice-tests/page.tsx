@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, Suspense, useMemo } from 'react';
 import Link from 'next/link';
-import { ArrowRight, PlayCircle, Clock } from 'lucide-react';
+import { ArrowRight, Clock } from 'lucide-react';
 import {
   macroUnits as allMacroUnitsData,
   microUnits as allMicroUnitsData,
@@ -18,7 +18,6 @@ import { getUnitMCQTest } from '@/data/unitMCQTests';
 import { getGovUnitStimulusFrqs, getGovUnitFrqFormatLabels } from '@/data/gov/govUnitStimulusFrqs';
 import { getStatsUnitStimulusFrqs, getStatsUnitFrqFormatLabels } from '@/data/stats/statsUnitStimulusFrqs';
 import { isStatsFrqTestUnitAvailable } from '@/lib/courseSubject';
-import { hasAdminRole } from '@/lib/adminAccess';
 import { isGovMcqTestUnitAvailable, isStatsMcqTestUnitAvailable } from '@/lib/courseSubject';
 
 /** In-progress unit MCQ saved in Firestore (same testId as FullExam). */
@@ -64,7 +63,6 @@ function UnitFinalPracticeTestsContent() {
           : allMacroUnitsData;
   const isGov = effectiveSubject === 'gov';
   const isStats = effectiveSubject === 'stats';
-  const canAccessGov = Boolean(user && hasAdminRole(userData));
   const isMicro = effectiveSubject === 'micro';
   const subjectName = isGov
     ? 'U.S. Government'
@@ -188,169 +186,122 @@ function UnitFinalPracticeTestsContent() {
     };
   }, [units, subjectName]);
 
-  const primaryCta = isGov
-    ? 'border-2 border-violet-800 bg-violet-600 text-white shadow-[0_3px_0_0_rgba(17,24,39,0.9)] hover:bg-violet-700 active:translate-y-0.5 active:shadow-[0_1px_0_0_rgba(17,24,39,0.85)]'
+  const accentText = isGov
+    ? 'text-violet-700'
     : isStats
-      ? 'border-2 border-orange-700 bg-orange-600 text-white shadow-[0_3px_0_0_rgba(17,24,39,0.9)] hover:bg-orange-700 active:translate-y-0.5 active:shadow-[0_1px_0_0_rgba(17,24,39,0.85)]'
+      ? 'text-orange-700'
       : isMicro
-      ? 'border-2 border-green-700 bg-green-500 text-white shadow-[0_3px_0_0_rgba(17,24,39,0.9)] hover:bg-green-600 active:translate-y-0.5 active:shadow-[0_1px_0_0_rgba(17,24,39,0.85)]'
-      : 'border-2 border-blue-700 bg-blue-500 text-white shadow-[0_3px_0_0_rgba(17,24,39,0.9)] hover:bg-blue-600 active:translate-y-0.5 active:shadow-[0_1px_0_0_rgba(17,24,39,0.85)]';
+        ? 'text-green-700'
+        : 'text-blue-700';
 
-  const secondaryCtaOutline =
-    'border-2 border-black bg-white shadow-[0_3px_0_0_rgba(0,0,0,1)] hover:border-black active:translate-y-0.5 active:shadow-[0_2px_0_0_rgba(0,0,0,1)]';
-
-  const secondaryCta = isGov
-    ? `${secondaryCtaOutline} text-violet-700 hover:bg-violet-50`
+  const accentLink = isGov
+    ? 'text-violet-700 hover:text-violet-900'
     : isStats
-      ? `${secondaryCtaOutline} text-orange-600 hover:bg-orange-50`
+      ? 'text-orange-700 hover:text-orange-900'
       : isMicro
-        ? `${secondaryCtaOutline} text-green-600 hover:bg-green-50`
-        : `${secondaryCtaOutline} text-blue-600 hover:bg-blue-50`;
+        ? 'text-green-700 hover:text-green-900'
+        : 'text-blue-700 hover:text-blue-900';
 
-  const titleAccent = isGov
-    ? 'text-violet-600'
+  const accentSoft = isGov
+    ? 'bg-violet-50 text-violet-800'
     : isStats
-      ? 'text-orange-600'
+      ? 'bg-orange-50 text-orange-800'
       : isMicro
-        ? 'text-green-600'
-        : 'text-blue-600';
-  const titleShadow = isGov
-    ? '2px 2px 0 rgba(124,58,237,0.2)'
+        ? 'bg-green-50 text-green-800'
+        : 'bg-blue-50 text-blue-800';
+
+  const accentRing = isGov
+    ? 'hover:bg-violet-50/40'
     : isStats
-      ? '2px 2px 0 rgba(234,88,12,0.2)'
+      ? 'hover:bg-orange-50/40'
       : isMicro
-      ? '2px 2px 0 rgba(22,163,74,0.2)'
-      : '2px 2px 0 rgba(59,130,246,0.2)';
-
-  const badgeCourse = isGov
-    ? 'bg-violet-600 text-white'
-    : isStats
-      ? 'bg-orange-600 text-white'
-      : isMicro
-      ? 'bg-green-500 text-white'
-      : 'bg-blue-500 text-white';
-
-  const cardShell =
-    'rounded-xl border-2 border-gray-900 bg-white shadow-[5px_5px_0px_0px_rgba(17,24,39,0.85)] transition-all hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_0px_rgba(17,24,39,0.85)]';
-
-  const badgeBase =
-    'inline-flex w-fit items-center border border-gray-900 px-3 py-1.5 text-xs font-black uppercase tracking-wide shadow-[2px_2px_0px_0px_rgba(17,24,39,0.75)]';
-
-  const resumeCta =
-    'border-2 border-emerald-900 bg-emerald-600 text-white shadow-[0_3px_0_0_rgba(6,78,59,0.95)] hover:bg-emerald-700 active:translate-y-0.5 active:shadow-[0_1px_0_0_rgba(6,78,59,0.85)]';
-
-  const comingSoonCta =
-    'inline-flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-xl border-2 border-gray-700 bg-gray-200 py-3.5 px-6 text-center text-base font-black uppercase tracking-wide text-gray-600 shadow-[0_3px_0_0_rgba(55,65,81,0.85)]';
+        ? 'hover:bg-green-50/40'
+        : 'hover:bg-blue-50/40';
 
   const fullExamsComingSoon = isGov || isStats;
 
-  if (isGov && loadingUserData) {
-    return (
-      <div className="min-h-screen bg-gray-50 py-20">
-        <div className="mx-auto max-w-xl rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-          <p className="text-gray-600 font-semibold">Checking access…</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (isGov && !canAccessGov) {
-    return (
-      <div className="min-h-screen bg-gray-50 py-20">
-        <div className="mx-auto max-w-xl rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-          <h1 className="text-2xl font-black text-gray-900">AP Gov is in admin preview</h1>
-          <p className="mt-3 text-gray-600">
-            This content is currently restricted to admin accounts.
-          </p>
-          <Link
-            href="/ap-macro-practice-tests"
-            className="mt-6 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-3 font-bold text-white hover:bg-blue-700"
-          >
-            Go to AP Macro practice tests
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50 py-12 sm:py-20">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-12 text-center sm:mb-16">
-          <h1
-            className="text-3xl font-black tracking-tight text-gray-900 sm:text-5xl sm:leading-tight"
-            style={{ textShadow: titleShadow }}
+    <div className="min-h-screen bg-white">
+      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
+        <header className="mb-14 sm:mb-16">
+          <p
+            className={`inline-flex rounded-md px-3.5 py-1.5 text-sm font-semibold sm:text-base ${
+              isGov
+                ? 'bg-violet-100 text-violet-800'
+                : isStats
+                  ? 'bg-orange-100 text-orange-800'
+                  : isMicro
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-blue-100 text-blue-800'
+            }`}
           >
-            Full AP {subjectName}{' '}
-            <span className={titleAccent}>Practice Tests</span>
-          </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lg font-semibold text-gray-600 sm:text-xl">
-            Test your knowledge with full-length practice exams and unit tests.
+            AP {subjectName}
           </p>
-        </div>
+          <h1 className="mt-4 text-4xl font-black tracking-tight text-gray-950 sm:text-5xl lg:text-6xl">
+            Practice Tests
+          </h1>
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-gray-600 sm:text-lg">
+            Full-length exams and unit assessments for AP {subjectName}. Timed sections, scored like the real thing.
+          </p>
+        </header>
 
-        {/* Full exams — live for Macro/Micro; coming soon for Gov and Stats */}
-        <section className="mb-14 sm:mb-20">
-          <h2 className="mb-8 border-b-2 border-gray-800 pb-2 text-2xl font-black tracking-tight text-gray-900 sm:text-3xl">
-            Full Practice <span className={titleAccent}>Exams</span>
+        {/* Full exams */}
+        <section className="mb-16 sm:mb-20">
+          <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-gray-500">
+            Full practice exams
           </h2>
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
-            <div className={`flex flex-col gap-6 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8 ${cardShell} ${fullExamsComingSoon ? 'opacity-90' : ''}`}>
-              <div className="min-w-0 flex-1">
-                <span className={`${badgeBase} ${badgeCourse}`}>
-                  MCQ Exam
-                </span>
-                <h3 className="mt-4 text-xl font-black text-gray-900 sm:text-2xl">
-                  AP {subjectName} Full MCQ Exam 1
+          <div className="mt-4 divide-y divide-gray-200 border-y border-gray-200">
+            <div className="flex flex-col gap-3 py-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
+              <div className="min-w-0">
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Section I</p>
+                <h3 className="mt-1 text-xl font-semibold text-gray-950 sm:text-2xl">
+                  Full MCQ Exam 1
                 </h3>
-                <p className="mt-2 font-medium leading-relaxed text-gray-600">
-                  Comprehensive practice exam covering all units of AP {subjectName} with detailed explanations and progress
-                  tracking.
+                <p className="mt-1.5 text-base text-gray-600">
+                  Comprehensive multiple-choice exam across all units.
                 </p>
               </div>
-              <div className="flex shrink-0 flex-col sm:items-end">
+              <div className="shrink-0">
                 {fullExamsComingSoon ? (
-                  <span className={`${comingSoonCta} sm:min-w-[200px]`} aria-disabled>
-                    <Clock className="h-5 w-5 shrink-0" />
+                  <span className="inline-flex items-center gap-1.5 text-base font-medium text-gray-400">
+                    <Clock className="h-4 w-4" />
                     Coming soon
                   </span>
                 ) : (
                   <Link
                     href={`/full-mcq-exam-preview?subject=${effectiveSubject}&num=1`}
-                    className={`inline-flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-center text-base font-black uppercase tracking-wide transition-all sm:w-auto sm:min-w-[200px] ${primaryCta}`}
+                    className={`inline-flex items-center gap-1.5 text-base font-semibold underline underline-offset-4 ${accentLink}`}
                   >
-                    View test
-                    <PlayCircle className="h-5 w-5 shrink-0" />
+                    View exam
+                    <ArrowRight className="h-4 w-4" />
                   </Link>
                 )}
               </div>
             </div>
 
-            <div className={`flex flex-col gap-6 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8 ${cardShell} ${fullExamsComingSoon ? 'opacity-90' : ''}`}>
-              <div className="min-w-0 flex-1">
-                <span className={`${badgeBase} ${badgeCourse}`}>
-                  FRQ Exam
-                </span>
-                <h3 className="mt-4 text-xl font-black text-gray-900 sm:text-2xl">
-                  AP {subjectName} Full FRQ Exam 1
+            <div className="flex flex-col gap-3 py-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
+              <div className="min-w-0">
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Section II</p>
+                <h3 className="mt-1 text-xl font-semibold text-gray-950 sm:text-2xl">
+                  Full FRQ Exam 1
                 </h3>
-                <p className="mt-2 font-medium leading-relaxed text-gray-600">
-                  Full-length free response exam covering key units of AP {subjectName} with detailed explanations.
+                <p className="mt-1.5 text-base text-gray-600">
+                  Free-response exam covering key course topics.
                 </p>
               </div>
-              <div className="flex shrink-0 flex-col sm:items-end">
+              <div className="shrink-0">
                 {fullExamsComingSoon ? (
-                  <span className={`${comingSoonCta} sm:min-w-[200px]`} aria-disabled>
-                    <Clock className="h-5 w-5 shrink-0" />
+                  <span className="inline-flex items-center gap-1.5 text-base font-medium text-gray-400">
+                    <Clock className="h-4 w-4" />
                     Coming soon
                   </span>
                 ) : (
                   <Link
                     href={getFullFRQTestUrl(effectiveSubject)}
-                    className={`inline-flex w-full items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-center text-base font-black uppercase tracking-wide transition-all sm:w-auto sm:min-w-[200px] ${secondaryCta}`}
+                    className={`inline-flex items-center gap-1.5 text-base font-semibold underline underline-offset-4 ${accentLink}`}
                   >
-                    Start test
-                    <ArrowRight className="h-5 w-5 shrink-0" />
+                    Start exam
+                    <ArrowRight className="h-4 w-4" />
                   </Link>
                 )}
               </div>
@@ -360,10 +311,15 @@ function UnitFinalPracticeTestsContent() {
 
         {/* Unit tests */}
         <section>
-          <h2 className="mb-8 border-b-2 border-gray-800 pb-2 text-2xl font-black tracking-tight text-gray-900 sm:text-3xl">
-            Unit Practice <span className={titleAccent}>Tests</span>
+          <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-gray-500">
+            Unit practice tests
           </h2>
-          <div className="space-y-4 sm:space-y-5">
+          <p className="mt-2 max-w-2xl text-base text-gray-600">
+            One assessment per unit. Start a timed MCQ test
+            {(isGov || isStats) ? ', or open the unit FRQ pack where available' : ''}.
+          </p>
+
+          <div className="mt-6 divide-y divide-gray-200 border-y border-gray-200">
             {units.map((unit) => {
               const isAvailable = isUnitAvailable(unit.number);
               const resume = isAvailable ? unitResumeByUnit[unit.number] : null;
@@ -380,131 +336,132 @@ function UnitFinalPracticeTestsContent() {
                 : isStats
                   ? getStatsUnitFrqFormatLabels(unit.number)
                   : [];
-              const frqCta = isStats
-                ? 'border-2 border-orange-800 bg-orange-600 text-white shadow-[0_3px_0_0_rgba(17,24,39,0.9)] hover:bg-orange-700 active:translate-y-0.5 active:shadow-[0_1px_0_0_rgba(17,24,39,0.85)]'
-                : 'border-2 border-violet-800 bg-violet-600 text-white shadow-[0_3px_0_0_rgba(17,24,39,0.9)] hover:bg-violet-700 active:translate-y-0.5 active:shadow-[0_1px_0_0_rgba(17,24,39,0.85)]';
               const showFrqPackCard = (isGov && unitStimulusFrqs.length > 0) || isStats;
               const showEconFrqPracticeCard = !isGov && !isStats;
               const frqPackAvailable =
                 (isGov && unitStimulusFrqs.length > 0) ||
                 (isStats && unitStimulusFrqs.length > 0 && isStatsFrqTestUnitAvailable(unit.number));
               const econFrqPracticeHref = `/unitFRQpracticePage?subject=${effectiveSubject}&frqId=${effectiveSubject === 'macro' ? 1 : 2}`;
+              const frqLabels =
+                frqFormatLabels.length > 0
+                  ? frqFormatLabels
+                  : isStats && frqPackAvailable
+                    ? ['Investigative Task', 'Free Response']
+                    : [];
 
               return (
-                <div key={unit.number} className="grid grid-cols-1 gap-3 lg:grid-cols-3 lg:gap-4">
-                  <div
-                    className={`flex rounded-xl border-2 border-gray-900 bg-white p-4 shadow-[5px_5px_0px_0px_rgba(17,24,39,0.85)] lg:col-span-2 ${!isAvailable ? 'opacity-80' : ''}`}
-                  >
-                    <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                      <div className="min-h-0 sm:pr-3">
-                        <div className="flex flex-wrap items-center gap-4">
-                          <span className={`${badgeBase} ${badgeCourse}`}>
-                            Unit {unit.number} MCQ
-                          </span>
-                          {showResume && resume ? (
-                            <p className="text-sm font-bold text-emerald-800">
-                              {resume.answered}/{resume.total} questions ({resume.percentFinished}% finished)
-                            </p>
-                          ) : null}
-                        </div>
-                        <h3 className="mt-3 text-lg font-black leading-snug text-gray-900 sm:text-xl">{unit.title}</h3>
-                        <p className="mt-2 line-clamp-2 text-sm font-medium leading-relaxed text-gray-600">
+                <article
+                  key={unit.number}
+                  className={`group relative grid gap-5 py-8 transition-colors sm:grid-cols-[5rem_minmax(0,1fr)] sm:gap-8 sm:py-9 ${
+                    isAvailable ? accentRing : 'opacity-50'
+                  }`}
+                >
+                  <div className="flex items-start gap-3 sm:block">
+                    <span
+                      className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-sm font-bold tabular-nums sm:h-12 sm:w-12 sm:text-base ${accentSoft}`}
+                    >
+                      {String(unit.number).padStart(2, '0')}
+                    </span>
+                    <p className="pt-2.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-400 sm:mt-2 sm:pt-0">
+                      Unit
+                    </p>
+                  </div>
+
+                  <div className="min-w-0">
+                    <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between lg:gap-10">
+                      <div className="min-w-0 flex-1">
+                        <h3 className="text-xl font-semibold tracking-tight text-gray-950 sm:text-[1.35rem] sm:leading-snug">
+                          {unit.title}
+                        </h3>
+                        <p className="mt-1.5 max-w-xl text-[0.9375rem] leading-relaxed text-gray-500">
                           {unit.description}
                         </p>
+
+                        {showResume && resume ? (
+                          <div className="mt-4 max-w-md">
+                            <div className="flex items-center justify-between gap-3 text-xs font-medium text-emerald-800">
+                              <span>In progress</span>
+                              <span className="tabular-nums">
+                                {resume.answered}/{resume.total} · {resume.percentFinished}%
+                              </span>
+                            </div>
+                            <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-emerald-100">
+                              <div
+                                className="h-full rounded-full bg-emerald-500 transition-[width]"
+                                style={{ width: `${resume.percentFinished}%` }}
+                              />
+                            </div>
+                          </div>
+                        ) : null}
                       </div>
-                      <div className="sm:min-w-[180px] sm:max-w-[200px] sm:self-center">
-                      {!isAvailable ? (
-                        <span
-                          className="inline-flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-xl border-2 border-gray-700 bg-gray-200 py-2.5 px-4 text-center text-sm font-black uppercase tracking-wide text-gray-600 shadow-[0_3px_0_0_rgba(55,65,81,0.85)]"
-                          aria-disabled
-                        >
-                          <Clock className="h-4 w-4 shrink-0" />
-                          Coming soon
-                        </span>
-                      ) : showResume ? (
-                        <Link
-                          href={testHref}
-                          className={`inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-center text-sm font-black uppercase tracking-wide transition-all ${resumeCta}`}
-                        >
-                          Resume test
-                          <PlayCircle className="h-4 w-4 shrink-0" />
-                        </Link>
-                      ) : (
-                        <Link
-                          href={previewHref}
-                          className={`inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-center text-sm font-black uppercase tracking-wide transition-all ${primaryCta} ${unitProgressLoading && user?.uid ? 'opacity-70' : ''}`}
-                        >
-                          Start test
-                          <PlayCircle className="h-4 w-4 shrink-0" />
-                        </Link>
-                      )}
+
+                      <div className="flex w-full shrink-0 flex-col gap-2.5 sm:max-w-xs lg:w-56 lg:items-stretch">
+                        {!isAvailable ? (
+                          <span className="inline-flex items-center gap-1.5 self-start text-sm font-medium text-gray-400">
+                            <Clock className="h-3.5 w-3.5" />
+                            Coming soon
+                          </span>
+                        ) : (
+                          <>
+                            <Link
+                              href={showResume ? testHref : previewHref}
+                              className={`group/link inline-flex items-center justify-between gap-3 rounded-lg border px-3.5 py-2.5 text-sm font-semibold transition ${
+                                showResume
+                                  ? 'border-emerald-200 bg-emerald-50 text-emerald-900 hover:border-emerald-300 hover:bg-emerald-100'
+                                  : `border-gray-200 bg-white text-gray-900 hover:border-gray-300 hover:bg-gray-50 ${
+                                      unitProgressLoading && user?.uid ? 'opacity-70' : ''
+                                    }`
+                              }`}
+                            >
+                              <span>{showResume ? 'Resume MCQ test' : 'Start MCQ test'}</span>
+                              <ArrowRight
+                                className={`h-3.5 w-3.5 shrink-0 transition-transform group-hover/link:translate-x-0.5 ${
+                                  showResume ? 'text-emerald-700' : accentText
+                                }`}
+                              />
+                            </Link>
+
+                            {showFrqPackCard ? (
+                              frqPackAvailable ? (
+                                <div>
+                                  <Link
+                                    href={getUnitTestPreviewUrl(unit.number, effectiveSubject, 'frq')}
+                                    className={`group/link inline-flex w-full items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white px-3.5 py-2.5 text-sm font-semibold text-gray-900 transition hover:border-gray-300 hover:bg-gray-50`}
+                                  >
+                                    <span>Start FRQ pack</span>
+                                    <ArrowRight
+                                      className={`h-3.5 w-3.5 shrink-0 transition-transform group-hover/link:translate-x-0.5 ${accentText}`}
+                                    />
+                                  </Link>
+                                  {frqLabels.length > 0 ? (
+                                    <p className="mt-1.5 px-0.5 text-[11px] leading-snug text-gray-400">
+                                      {frqLabels.join(' · ')}
+                                    </p>
+                                  ) : null}
+                                </div>
+                              ) : (
+                                <span className="inline-flex items-center gap-1.5 self-start px-0.5 text-sm font-medium text-gray-400">
+                                  <Clock className="h-3.5 w-3.5" />
+                                  FRQ pack soon
+                                </span>
+                              )
+                            ) : showEconFrqPracticeCard ? (
+                              <Link
+                                href={econFrqPracticeHref}
+                                className={`group/link inline-flex items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white px-3.5 py-2.5 text-sm font-semibold text-gray-900 transition hover:border-gray-300 hover:bg-gray-50`}
+                              >
+                                <span>FRQ practice</span>
+                                <ArrowRight
+                                  className={`h-3.5 w-3.5 shrink-0 transition-transform group-hover/link:translate-x-0.5 ${accentText}`}
+                                />
+                              </Link>
+                            ) : null}
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
-
-                  {showFrqPackCard ? (
-                    <div className="flex rounded-xl border-2 border-gray-900 bg-white p-4 shadow-[4px_4px_0px_0px_rgba(17,24,39,0.8)] lg:col-span-1">
-                      <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_170px] sm:items-center">
-                        <div>
-                          <h4 className="text-base font-black leading-tight tracking-tight text-gray-900">
-                            Unit {unit.number} FRQ Pack
-                          </h4>
-                          {frqFormatLabels.length > 0 ? (
-                            <p
-                              className={`mt-2 text-xs font-semibold leading-snug ${isStats ? 'text-orange-900' : 'text-violet-900'}`}
-                            >
-                              {frqFormatLabels.join(' · ')}
-                            </p>
-                          ) : isStats ? (
-                            <p className="mt-2 text-xs font-semibold leading-snug text-orange-900">
-                              Investigative Task · Free Response
-                            </p>
-                          ) : null}
-                        </div>
-                        <div>
-                          {frqPackAvailable ? (
-                            <Link
-                              href={getUnitTestPreviewUrl(unit.number, effectiveSubject, 'frq')}
-                              className={`inline-flex w-full items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-black uppercase tracking-wide transition-all active:translate-y-0.5 ${frqCta}`}
-                            >
-                              Start FRQ Pack
-                              <PlayCircle className="h-4 w-4 shrink-0" />
-                            </Link>
-                          ) : (
-                            <span className={`${comingSoonCta} py-2.5 px-3 text-xs`} aria-disabled>
-                              <Clock className="h-4 w-4 shrink-0" />
-                              Coming soon
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ) : showEconFrqPracticeCard ? (
-                    <div className="flex rounded-xl border-2 border-gray-900 bg-white p-4 shadow-[4px_4px_0px_0px_rgba(17,24,39,0.8)] lg:col-span-1">
-                      <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_170px] sm:items-center">
-                        <div>
-                          <h4 className="text-base font-black leading-tight tracking-tight text-gray-900">
-                            Unit {unit.number} FRQ Practice
-                          </h4>
-                          <p className="mt-2 text-xs font-semibold leading-snug text-gray-700">
-                            Unit FRQ tests are not available yet for AP {subjectName}. Use FRQ Practice to keep training.
-                          </p>
-                        </div>
-                        <div>
-                          <Link
-                            href={econFrqPracticeHref}
-                            className={`inline-flex w-full items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-black uppercase tracking-wide transition-all active:translate-y-0.5 ${secondaryCta}`}
-                          >
-                            Start FRQ Practice
-                            <PlayCircle className="h-4 w-4 shrink-0" />
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="hidden lg:block" />
-                  )}
-                </div>
+                </article>
               );
             })}
           </div>
@@ -518,10 +475,10 @@ export default function UnitFinalPracticeTestsPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <div className="flex min-h-screen items-center justify-center bg-white">
           <div className="text-center">
-            <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-2 border-gray-800 border-t-transparent" />
-            <p className="font-bold text-gray-700">Loading…</p>
+            <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-2 border-gray-300 border-t-gray-800" />
+            <p className="font-medium text-gray-600">Loading…</p>
           </div>
         </div>
       }

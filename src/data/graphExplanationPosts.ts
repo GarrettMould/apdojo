@@ -344,8 +344,8 @@ export const graphExplanationPosts: Record<string, GraphExplanationPost> = {
         <img src="/images/blog/B3ID.jpg" alt="Monopoly demand and marginal revenue curves" class="w-full h-auto rounded-md shadow-sm" />
       </div>
       <p class="mb-6">This is why the MR curve is steeper than the Demand curve. Every time the monopolist wants to sell one more unit, they must:</p>
-      <ul class="mb-6">
-        <li>Lower the price for <strong>everyone</strong>, not just the new customer</li>
+      <ul class="purple-bullets mb-6 list-disc list-outside space-y-2 pl-6">
+        <li>Lower the price for everyone, not just the new customer</li>
         <li>Lose revenue on all previous units sold at the higher price</li>
         <li>Only gain revenue from the one new unit at the lower price</li>
       </ul>

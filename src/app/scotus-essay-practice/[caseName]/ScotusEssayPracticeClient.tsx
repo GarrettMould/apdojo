@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { Source_Serif_4 } from 'next/font/google';
 import {
   ClipboardCheck,
   Sparkles,
@@ -11,6 +12,7 @@ import {
   Scale,
   GitCompareArrows,
   Loader2,
+  RotateCcw,
 } from 'lucide-react';
 import { scotusEssayPrompts } from '@/data/gov/scotusEssayPrompts';
 import { getScotusGradingKey } from '@/data/gov/scotusGradingKeys';
@@ -18,10 +20,15 @@ import { auth as firebaseAuth } from '@/lib/firebase';
 import { tutorAvatarUrl } from '@/lib/tutorAvatar';
 import { personaForSubject } from '@/lib/chatPersonas';
 import { useAuthContext } from '@/contexts/AuthContext';
-import { hasAdminRole } from '@/lib/adminAccess';
+import { hasGovPremiumAccess } from '@/lib/utils';
 import Link from 'next/link';
 import { TutorTypingPlaceholder } from '@/components/TutorTypingPlaceholder';
 import { TutorAssistantMarkdown } from '@/components/TutorAssistantMarkdown';
+
+const frqBody = Source_Serif_4({
+  subsets: ['latin'],
+  weight: ['400', '600', '700'],
+});
 
 type ScotusEssayPracticeClientProps = {
   caseName: string;
@@ -35,8 +42,67 @@ type SenseiMessage = {
   apiContent?: string;
 };
 
-const GRADING_REQUEST_DISPLAY =
-  'Please grade my FRQ and provide constructive feedback.';
+type FullGradeResult = {
+  feedback: string;
+  submittedAnswers: Record<number, string>;
+};
+
+type RubricCriterion = {
+  id: string;
+  text: string;
+};
+
+/** Student-facing scoring bullets for self-marking (not a full sample essay). */
+function rubricCriteriaForPart(
+  prompt: (typeof scotusEssayPrompts)[number],
+  partIndex: number,
+  gradingKey: ReturnType<typeof getScotusGradingKey>
+): RubricCriterion[] {
+  const gt = gradingKey?.groundTruth;
+  const checklist = prompt.rubricChecklist;
+  const prefix = `${prompt.id}-part${partIndex}`;
+
+  if (partIndex === 0) {
+    const mustName = gt?.clause ?? prompt.constitutionalClause;
+    return [
+      {
+        id: `${prefix}-0`,
+        text: checklist[0]
+          ? `${checklist[0]}. Response must name: ${mustName}`
+          : `Identify the correct clause/liberty. Must name: ${mustName}`,
+      },
+    ];
+  }
+
+  if (partIndex === 1) {
+    const facts = gt?.requiredFacts ?? prompt.caseFacts;
+    const bridge = gt?.bridgeLogic ?? prompt.comparisonPoints;
+    return [
+      {
+        id: `${prefix}-0`,
+        text: checklist[1]
+          ? `${checklist[1]}. Must include: ${facts}`
+          : `Describe the required case facts. Must include: ${facts}`,
+      },
+      {
+        id: `${prefix}-1`,
+        text: checklist[2]
+          ? `${checklist[2]}. Must include: ${bridge}`
+          : `Explain the bridge between the cases. Must include: ${bridge}`,
+      },
+    ];
+  }
+
+  const principle = gt?.applicationPrinciple ?? prompt.comparisonPoints;
+  return [
+    {
+      id: `${prefix}-0`,
+      text: checklist[3]
+        ? `${checklist[3]}. Must include: ${principle}`
+        : `Explain the principle illustrated. Must include: ${principle}`,
+    },
+  ];
+}
 
 function toApiTurns(messages: SenseiMessage[]): { role: 'user' | 'assistant'; content: string }[] {
   const filtered = messages
@@ -118,7 +184,7 @@ function buildPartCheckPayload(args: {
 
 export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPracticeClientProps) {
   const { user, userData, loadingUserData } = useAuthContext();
-  const canAccessGov = Boolean(user && hasAdminRole(userData));
+  const hasGovPass = hasGovPremiumAccess(userData);
   const caseSlug = decodeURIComponent(caseName).toLowerCase();
   const prompt = useMemo(
     () => scotusEssayPrompts.find((item) => item.id === caseSlug) ?? scotusEssayPrompts[0],
@@ -133,6 +199,10 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
   const [senseiMessages, setSenseiMessages] = useState<SenseiMessage[]>([]);
   /** After the user sends from the composer, hide quick starts to free vertical space. */
   const [senseiQuickStartsHidden, setSenseiQuickStartsHidden] = useState(false);
+  const [isFullGrading, setIsFullGrading] = useState(false);
+  const [fullGradeResult, setFullGradeResult] = useState<FullGradeResult | null>(null);
+  /** Local self-check marks against the scoring rubric (not persisted). */
+  const [rubricSelfMarks, setRubricSelfMarks] = useState<Record<string, boolean>>({});
   const senseiScrollRef = useRef<HTMLDivElement | null>(null);
 
   const readableCaseName = prompt.requiredCase;
@@ -154,17 +224,19 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
     );
   }
 
-  if (!canAccessGov) {
+  if (!hasGovPass) {
     return (
       <main className="min-h-screen bg-gray-50 px-4 py-20">
         <div className="mx-auto max-w-xl rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-          <h1 className="text-2xl font-black text-gray-900">AP Gov is in admin preview</h1>
-          <p className="mt-3 text-gray-600">This content is currently restricted to admin accounts.</p>
+          <h1 className="text-2xl font-black text-gray-900">Unlock SCOTUS Practice</h1>
+          <p className="mt-3 text-gray-600">
+            SCOTUS comparison drills are included with the AP Gov Season Pass.
+          </p>
           <Link
-            href="/ap-macro-practice-tests"
-            className="mt-6 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-3 font-bold text-white hover:bg-blue-700"
+            href="/purchase/season-pass?courseType=gov"
+            className="mt-6 inline-flex items-center gap-2 rounded-lg bg-violet-600 px-5 py-3 font-bold text-white hover:bg-violet-700"
           >
-            Go to AP Macro practice tests
+            Get the Season Pass — $29
           </Link>
         </div>
       </main>
@@ -172,10 +244,11 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
   }
 
   const hasAnyDraftAnswer = [0, 1, 2].some((i) => Boolean(answers[i]?.trim()));
+  const isBusy = senseiSending || isFullGrading;
 
   const appendSenseiExchange = async (
     userContent: string,
-    intent: 'coach' | 'part_check' | 'full_grade' = 'coach',
+    intent: 'coach' | 'part_check' = 'coach',
     apiUserPayload?: string
   ) => {
     const userMessage: SenseiMessage = {
@@ -207,11 +280,7 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
           unitNumber: 1,
           unitTitle: prompt.topic,
           mode: 'scotus_essay',
-          ...(intent === 'full_grade'
-            ? { scotusEssayIntent: 'full_grade' }
-            : intent === 'part_check'
-              ? { scotusEssayIntent: 'part_check' }
-              : {}),
+          ...(intent === 'part_check' ? { scotusEssayIntent: 'part_check' } : {}),
           scotusPrompt: {
             requiredCase: prompt.requiredCase,
             nonRequiredCase: prompt.nonRequiredCase,
@@ -256,12 +325,12 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
 
   const sendSenseiMessage = async () => {
     const text = senseiInput.trim();
-    if (!text || senseiSending) return;
+    if (!text || isBusy) return;
     await appendSenseiExchange(text, 'coach');
   };
 
   const sendQuickStartPrompt = async (kind: 'case' | 'clause' | 'bridge' | 'rubric') => {
-    if (senseiSending) return;
+    if (isBusy) return;
     const promptsByKind: Record<typeof kind, string> = {
       case: `Tell me more about the required case facts in ${prompt.requiredCase} and what I should include for full credit.`,
       clause: `Help me identify the exact constitutional clause/liberty for this prompt and what wording will earn the point.`,
@@ -272,18 +341,69 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
   };
 
   const submitFullResponseForGrading = async () => {
-    if (senseiSending || !hasAnyDraftAnswer) return;
+    if (isBusy || !hasAnyDraftAnswer) return;
     const partTexts = [0, 1, 2].map((i) => (answers[i] ?? '').trim());
     const gradingPayload = buildFullFrqSubmissionForApi({
       tasks: prompt.tasks,
       partTexts,
     });
-    setIsAiOpen(true);
-    await appendSenseiExchange(GRADING_REQUEST_DISPLAY, 'full_grade', gradingPayload);
+    const submittedAnswers: Record<number, string> = {
+      0: partTexts[0],
+      1: partTexts[1],
+      2: partTexts[2],
+    };
+    setIsFullGrading(true);
+    setFullGradeResult(null);
+
+    try {
+      const token = await firebaseAuth.currentUser?.getIdToken();
+      const res = await fetch('/api/cheat-sheet-chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          subject: 'gov',
+          unitNumber: 1,
+          unitTitle: prompt.topic,
+          mode: 'scotus_essay',
+          scotusEssayIntent: 'full_grade',
+          scotusPrompt: {
+            requiredCase: prompt.requiredCase,
+            nonRequiredCase: prompt.nonRequiredCase,
+            topic: prompt.topic,
+            scenario: prompt.scenario,
+            tasks: prompt.tasks,
+            caseFacts: prompt.caseFacts,
+            constitutionalClause: prompt.constitutionalClause,
+            comparisonPoints: prompt.comparisonPoints,
+            rubricChecklist: prompt.rubricChecklist,
+            gradingKey,
+          },
+          messages: [{ role: 'user', content: gradingPayload }],
+        }),
+      });
+      const data = (await res.json()) as { reply?: string; error?: string };
+      const feedback =
+        res.ok && data.reply?.trim()
+          ? data.reply.trim()
+          : `Could not grade this submission: ${data.error || res.statusText || 'try again.'}`;
+      setRubricSelfMarks({});
+      setFullGradeResult({ feedback, submittedAnswers });
+    } catch {
+      setRubricSelfMarks({});
+      setFullGradeResult({
+        feedback: 'Grading failed. Check your network and try again.',
+        submittedAnswers,
+      });
+    } finally {
+      setIsFullGrading(false);
+    }
   };
 
   const submitPartForFeedback = async (idx: 0 | 1 | 2) => {
-    if (senseiSending || !(answers[idx] ?? '').trim()) return;
+    if (isBusy || !(answers[idx] ?? '').trim()) return;
     const partLabel = (String.fromCharCode(65 + idx) as 'A' | 'B' | 'C');
     const task = prompt.tasks[idx];
     const answer = (answers[idx] ?? '').trim();
@@ -298,6 +418,13 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
     });
     setIsAiOpen(true);
     await appendSenseiExchange(userFacing, 'part_check', payload);
+  };
+
+  const resetFrqAttempt = () => {
+    setFullGradeResult(null);
+    setRubricSelfMarks({});
+    setAnswers({});
+    setActiveTaskIndex(0);
   };
 
   return (
@@ -331,9 +458,122 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
               )}
               <div className="rounded-xl border-2 border-gray-200 bg-gray-50 p-4">
                 <h2 className="text-sm font-black uppercase tracking-wider text-gray-900">FRQ Prompt</h2>
-                <p className="mt-3 text-sm leading-relaxed text-gray-800">{prompt.scenario}</p>
+                <p className={`mt-3 text-base leading-relaxed text-gray-800 ${frqBody.className}`}>
+                  {prompt.scenario}
+                </p>
               </div>
 
+              {fullGradeResult ? (
+                <div className="mt-5 space-y-5">
+                  <div className="rounded-xl border-2 border-black bg-gray-950 px-4 py-4 text-white shadow-[3px_3px_0_0_rgba(0,0,0,1)] sm:px-5">
+                    <p className="text-[10px] font-black uppercase tracking-[0.16em] text-indigo-300">
+                      FRQ #3 · Submitted
+                    </p>
+                    <h2 className="mt-1 text-xl font-black tracking-tight sm:text-2xl">
+                      Official Score Report
+                    </h2>
+                    <p className="mt-1.5 text-sm text-gray-300">
+                      This attempt is locked. Review the Sensei score and rubric below, then start a clean attempt if you want to retry.
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl border-2 border-black bg-white p-4 shadow-[3px_3px_0_0_rgba(0,0,0,1)] sm:p-5">
+                    <h3 className="text-sm font-black uppercase tracking-wider text-gray-900">
+                      Sensei Score & Feedback
+                    </h3>
+                    <div className="mt-3 border-t border-gray-200 pt-3 text-sm leading-relaxed text-gray-800">
+                      <TutorAssistantMarkdown
+                        text={fullGradeResult.feedback}
+                        linkClassName="font-medium text-indigo-700 underline underline-offset-2 hover:text-indigo-800"
+                      />
+                    </div>
+                  </div>
+
+                  {prompt.tasks.map((task, idx) => {
+                    const label = String.fromCharCode(65 + idx);
+                    const studentAnswer =
+                      fullGradeResult.submittedAnswers[idx]?.trim() ||
+                      '(No response submitted)';
+                    const criteria = rubricCriteriaForPart(prompt, idx, gradingKey);
+                    return (
+                      <article
+                        key={`result-${label}`}
+                        className="overflow-hidden rounded-xl border-2 border-black bg-white shadow-[3px_3px_0_0_rgba(0,0,0,1)]"
+                      >
+                        <div className="border-b-2 border-black bg-gray-900 px-4 py-3">
+                          <h3 className="text-sm font-black uppercase tracking-wide text-white">
+                            Part {label} · Locked
+                          </h3>
+                        </div>
+                        <div className="space-y-4 p-4 sm:p-5">
+                          <div>
+                            <p className="text-[10px] font-black uppercase tracking-wider text-gray-400">
+                              Question
+                            </p>
+                            <p className={`mt-1 text-base font-semibold leading-relaxed text-gray-900 ${frqBody.className}`}>
+                              {task}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] font-black uppercase tracking-wider text-gray-400">
+                              Submitted Answer
+                            </p>
+                            <div className={`mt-1 border-l-4 border-gray-900 bg-gray-50 px-3 py-3 text-base leading-relaxed text-gray-800 whitespace-pre-wrap ${frqBody.className}`}>
+                              {studentAnswer}
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-[10px] font-black uppercase tracking-wider text-emerald-700">
+                              Scoring Rubric
+                            </p>
+                            <p className="mt-1 text-xs font-medium text-emerald-900/70">
+                              Self-check: mark each criterion your submission earned.
+                            </p>
+                            <ul className="mt-2 space-y-2 border border-emerald-200 bg-emerald-50/80 p-3">
+                              {criteria.map((item) => {
+                                const checked = Boolean(rubricSelfMarks[item.id]);
+                                return (
+                                  <li key={item.id}>
+                                    <label className="flex cursor-pointer items-start gap-2.5 text-sm leading-relaxed text-emerald-950">
+                                      <input
+                                        type="checkbox"
+                                        checked={checked}
+                                        onChange={() =>
+                                          setRubricSelfMarks((prev) => ({
+                                            ...prev,
+                                            [item.id]: !prev[item.id],
+                                          }))
+                                        }
+                                        className="mt-0.5 h-4 w-4 shrink-0 rounded border-emerald-400 text-emerald-700 focus:ring-emerald-500"
+                                      />
+                                      <span>{item.text}</span>
+                                    </label>
+                                  </li>
+                                );
+                              })}
+                            </ul>
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })}
+
+                  <div className="flex flex-col items-stretch gap-2 border-t-2 border-gray-200 pt-5 sm:items-end">
+                    <button
+                      type="button"
+                      onClick={resetFrqAttempt}
+                      className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border-2 border-black bg-white px-5 text-sm font-black uppercase tracking-wide text-gray-900 shadow-[2px_2px_0_0_rgba(0,0,0,1)] transition hover:bg-gray-50"
+                    >
+                      <RotateCcw className="h-4 w-4 shrink-0" aria-hidden />
+                      Try This FRQ Again
+                    </button>
+                    <p className="text-xs text-gray-500 sm:text-right">
+                      Clears your answers and starts a new attempt from Part A.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <>
               <div className="mt-5 rounded-xl border-2 border-gray-200 bg-white">
                 {prompt.tasks.map((task, idx) => {
                   const label = String.fromCharCode(65 + idx);
@@ -351,14 +591,23 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
                       >
                         <span className="text-sm font-black">Part {label}</span>
                         {!isActive && (
-                          <span className="text-xs font-black uppercase tracking-wide text-gray-500">
-                            Open part
+                          <span className="flex items-center gap-2">
+                            {(answers[idx] ?? '').trim() ? (
+                              <span className="bg-violet-100 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-violet-700">
+                                Saved
+                              </span>
+                            ) : null}
+                            <span className="text-xs font-black uppercase tracking-wide text-gray-500">
+                              Open part
+                            </span>
                           </span>
                         )}
                       </button>
                       {isActive && (
                         <div className="space-y-3 border-t-2 border-indigo-800 bg-white p-4">
-                          <p className="text-sm font-semibold leading-relaxed text-gray-800">{task}</p>
+                          <p className={`text-base font-semibold leading-relaxed text-gray-800 ${frqBody.className}`}>
+                            {task}
+                          </p>
                           <div className="flex flex-col overflow-hidden rounded-xl border-2 border-gray-300 bg-white shadow-[0_2px_0_rgba(17,24,39,0.1)] transition focus-within:border-gray-500 focus-within:shadow-[0_4px_0_rgba(17,24,39,0.18)]">
                             <textarea
                               value={answers[idx] ?? ''}
@@ -369,13 +618,13 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
                                 }))
                               }
                               placeholder="Write your AP Gov FRQ response here..."
-                              className="min-h-[min(44vh,360px)] w-full resize-none border-0 bg-transparent px-4 py-3 text-base leading-relaxed text-gray-900 outline-none ring-0 focus:ring-0"
+                              className={`min-h-[min(44vh,360px)] w-full resize-none border-0 bg-transparent px-4 py-3 text-base leading-relaxed text-gray-900 outline-none ring-0 focus:ring-0 ${frqBody.className}`}
                             />
                             <div className="flex shrink-0 justify-end border-t border-gray-200 bg-gray-50/90 px-3 py-2.5">
                               <button
                                 type="button"
                                 onClick={() => void submitPartForFeedback(idx as 0 | 1 | 2)}
-                                disabled={senseiSending || !(answers[idx] ?? '').trim()}
+                                disabled={isBusy || !(answers[idx] ?? '').trim()}
                                 className="rounded-lg border border-violet-300 bg-violet-50 px-3 py-2 text-[11px] font-black uppercase tracking-wide text-violet-800 shadow-sm hover:bg-violet-100 disabled:pointer-events-none disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none"
                               >
                                 Check My Work
@@ -389,34 +638,53 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
                 })}
               </div>
 
-              <div className="mt-5 rounded-xl border-2 border-dashed border-indigo-700 bg-indigo-50 p-4 sm:p-5">
-                <h3 className="text-sm font-black uppercase tracking-wider text-indigo-800">Final Assembly</h3>
-                <p className="mt-2 w-full max-w-none text-sm leading-relaxed text-gray-700">
-                  When Parts A–C are drafted, submit your full attempt for AI grading. Sensei scores 4 points (A, B-facts,
-                  B-bridge, C) and replies in AI Sensei on the right—open that panel first if your layout hides it.
-                </p>
+              <div className="mt-5 flex flex-col gap-4 border-t-2 border-gray-200 pt-5 sm:flex-row sm:items-end sm:justify-between">
+                <div className="min-w-0 space-y-2">
+                  <p className="text-sm font-black text-gray-900">Grade full response</p>
+                  <p className="text-xs leading-relaxed text-gray-500">
+                    Scores Parts A–C based on FRQ rubric. Submit only after completing all parts.
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {([0, 1, 2] as const).map((i) => {
+                      const filled = Boolean(answers[i]?.trim());
+                      const part = String.fromCharCode(65 + i);
+                      return (
+                        <span
+                          key={part}
+                          className={`inline-flex items-center rounded border px-2 py-0.5 text-[10px] font-black uppercase tracking-wide ${
+                            filled
+                              ? 'border-indigo-300 bg-indigo-50 text-indigo-800'
+                              : 'border-gray-200 bg-gray-50 text-gray-400'
+                          }`}
+                        >
+                          Part {part}
+                          {filled ? ' · ready' : ' · empty'}
+                        </span>
+                      );
+                    })}
+                  </div>
+                </div>
                 <button
                   type="button"
                   onClick={() => void submitFullResponseForGrading()}
-                  disabled={senseiSending || !hasAnyDraftAnswer}
-                  className="mt-4 flex w-full min-h-[3.5rem] items-center justify-center gap-2 rounded-xl border-2 border-indigo-900 bg-indigo-600 px-4 py-4 text-base font-black uppercase tracking-wide text-white shadow-[0_4px_0_rgba(49,46,129,1)] transition hover:bg-indigo-700 disabled:translate-y-0 disabled:cursor-not-allowed disabled:border-gray-400 disabled:bg-gray-300 disabled:text-gray-600 disabled:shadow-none"
+                  disabled={isBusy || !hasAnyDraftAnswer}
+                  className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-lg border-2 border-black bg-gray-900 px-5 text-sm font-black uppercase tracking-wide text-white shadow-[2px_2px_0_0_rgba(0,0,0,1)] transition hover:bg-black disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none"
                 >
-                  {senseiSending ? (
+                  {isFullGrading ? (
                     <>
-                      <Loader2 className="h-5 w-5 shrink-0 animate-spin" aria-hidden />
+                      <Loader2 className="h-4 w-4 shrink-0 animate-spin" aria-hidden />
                       Grading…
                     </>
                   ) : (
                     <>
-                      <ClipboardCheck className="h-5 w-5 shrink-0" aria-hidden />
-                      Submit full response and grade
+                      <ClipboardCheck className="h-4 w-4 shrink-0" aria-hidden />
+                      Submit & grade
                     </>
                   )}
                 </button>
-                {!hasAnyDraftAnswer && (
-                  <p className="mt-2 text-xs font-semibold text-indigo-900/80">Write something in at least one part to enable submit.</p>
-                )}
               </div>
+                </>
+              )}
             </div>
           </section>
 
@@ -470,7 +738,7 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
                       <button
                         type="button"
                         onClick={() => void sendQuickStartPrompt('case')}
-                        disabled={senseiSending}
+                        disabled={isBusy}
                         className="rounded-xl border border-slate-200/95 bg-white px-3.5 py-2.5 text-left text-[13px] font-medium text-slate-800 shadow-sm outline-none ring-offset-white transition hover:bg-slate-50 hover:shadow-md focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-40"
                       >
                         <span className="flex items-center gap-2">
@@ -481,7 +749,7 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
                       <button
                         type="button"
                         onClick={() => void sendQuickStartPrompt('clause')}
-                        disabled={senseiSending}
+                        disabled={isBusy}
                         className="rounded-xl border border-slate-200/95 bg-white px-3.5 py-2.5 text-left text-[13px] font-medium text-slate-800 shadow-sm outline-none ring-offset-white transition hover:bg-slate-50 hover:shadow-md focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-40"
                       >
                         <span className="flex items-center gap-2">
@@ -492,7 +760,7 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
                       <button
                         type="button"
                         onClick={() => void sendQuickStartPrompt('bridge')}
-                        disabled={senseiSending}
+                        disabled={isBusy}
                         className="rounded-xl border border-slate-200/95 bg-white px-3.5 py-2.5 text-left text-[13px] font-medium text-slate-800 shadow-sm outline-none ring-offset-white transition hover:bg-slate-50 hover:shadow-md focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-40"
                       >
                         <span className="flex items-center gap-2">
@@ -568,14 +836,14 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
                       }}
                       rows={3}
                       placeholder="Type your next FRQ sentence…"
-                      disabled={senseiSending}
+                      disabled={isBusy}
                       className="min-h-0 flex-1 resize-none rounded-xl border border-slate-200 bg-slate-50/80 px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-violet-400 focus:bg-white focus:outline-none focus:ring-4 focus:ring-violet-500/20 disabled:opacity-60"
                     />
                   </div>
                   <button
                     type="button"
                     onClick={() => void sendSenseiMessage()}
-                    disabled={senseiSending || !senseiInput.trim()}
+                    disabled={isBusy || !senseiInput.trim()}
                     className="flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-violet-600 text-sm font-semibold text-white shadow-md shadow-violet-900/15 transition-colors hover:bg-violet-700 focus-visible:outline focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-45"
                   >
                     {senseiSending ? (

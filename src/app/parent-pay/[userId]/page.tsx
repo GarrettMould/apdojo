@@ -202,7 +202,7 @@ export default function ParentPayPage() {
                     <li>Receipt and confirmation sent to your email.</li>
                   </ol>
                   <p className="text-xs text-gray-500">
-                    Access valid until June 30, 2026. 100% money-back guarantee if not satisfied.
+                    Access valid until June 30, 2027. 100% money-back guarantee if not satisfied.
                   </p>
                 </div>
               </div>

@@ -2,19 +2,28 @@
 
 import { InlineWidget } from 'react-calendly'
 
-export default function CalendlyWidget() {
+interface CalendlyWidgetProps {
+  url?: string;
+  height?: number;
+}
+
+export default function CalendlyWidget({
+  url = 'https://calendly.com/garrettmould/apdojo',
+  height = 700,
+}: CalendlyWidgetProps) {
   return (
     <InlineWidget
-      url="https://calendly.com/garrettmould/apdojo" // Update this with your actual Calendly URL
+      url={url}
       styles={{
-        height: '800px',
+        height: `${height}px`,
         width: '100%',
+        minWidth: '320px',
       }}
       prefill={{
-        email: undefined, // This will be filled by the user
+        email: undefined,
         firstName: undefined,
         lastName: undefined,
       }}
     />
   )
-} 
+}

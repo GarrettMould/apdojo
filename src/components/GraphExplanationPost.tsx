@@ -186,6 +186,13 @@ export function GraphExplanationPost({ post }: GraphExplanationPostProps) {
               margin-top: 0.1rem;
               color: #000000;
             }
+            .graph-blog-content ul.purple-bullets {
+              list-style-type: disc;
+              padding-left: 1.5rem;
+            }
+            .graph-blog-content ul.purple-bullets > li::marker {
+              color: #9333ea !important;
+            }
           `}} />
           <div className="graph-blog-content prose prose-xl max-w-none prose-black text-xl [&_p]:leading-relaxed [&_p]:mb-6 [&_h2]:mb-4 [&_h2]:mt-12 [&_h2]:text-3xl [&_h2]:font-bold [&_ul]:mb-6 [&_li]:mb-2 [&_img]:my-8 [&_img]:rounded-lg [&_img]:border-2 [&_img]:border-gray-300">
             <ContentWithMath content={post.content} />

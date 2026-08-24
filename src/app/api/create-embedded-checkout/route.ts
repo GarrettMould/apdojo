@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe-server';
 
-type PurchaseType = 'macro' | 'micro' | 'bundle' | 'gov';
+type PurchaseType = 'macro' | 'micro' | 'bundle' | 'gov' | 'stats';
 
 export async function POST(req: Request) {
   try {
@@ -13,7 +13,7 @@ export async function POST(req: Request) {
       userId?: string;
     };
 
-    if (!purchaseType || !['macro', 'micro', 'bundle', 'gov'].includes(purchaseType)) {
+    if (!purchaseType || !['macro', 'micro', 'bundle', 'gov', 'stats'].includes(purchaseType)) {
       return NextResponse.json({ error: 'Invalid purchaseType' }, { status: 400 });
     }
 
@@ -22,6 +22,7 @@ export async function POST(req: Request) {
       micro: process.env.STRIPE_MICRO_SEASON_PASS_PRICE_ID,
       bundle: process.env.STRIPE_BUNDLE_SEASON_PASS_PRICE_ID,
       gov: process.env.STRIPE_GOV_SEASON_PASS_PRICE_ID || process.env.STRIPE_MACRO_SEASON_PASS_PRICE_ID,
+      stats: process.env.STRIPE_STATS_SEASON_PASS_PRICE_ID || process.env.STRIPE_MACRO_SEASON_PASS_PRICE_ID,
     };
 
     const priceId = priceIds[purchaseType];

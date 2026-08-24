@@ -32,7 +32,6 @@ import { apQuestionSubjectTag } from '@/lib/courseSubject';
 import { SeasonPassModal } from '@/components/SeasonPassModal';
 import { hasValidSeasonPass } from '@/lib/utils';
 import { shufflePracticeQuestions } from '@/lib/shufflePracticeQuestions';
-import { hasAdminRole } from '@/lib/adminAccess';
 
 // Assuming this matches the structure in useAuth.ts and Firestore
 interface McqAnswer {
@@ -552,34 +551,6 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
     setShowSignupModal(false);
   };
 
-  const canAccessGov = Boolean(user && hasAdminRole(userData));
-  if (subject === 'gov') {
-    if (loadingUserData) {
-      return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <Loader2 className="h-12 w-12 animate-spin text-violet-600" />
-        </div>
-      );
-    }
-    if (!canAccessGov) {
-      return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center pt-16 pb-12 px-4">
-          <div className="bg-white p-8 rounded-lg shadow-md border border-gray-200 max-w-md w-full text-center">
-            <Lock className="w-12 h-12 mx-auto text-gray-500 mb-4" />
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">AP Gov is in admin preview</h2>
-            <p className="text-gray-600 mb-6">
-              This content is currently restricted to admin accounts.
-            </p>
-            <Link href="/ap-macro-practice-tests" className="inline-block w-full">
-              <Button size="lg" className="w-full bg-blue-600 hover:bg-blue-700">
-                Back to practice tests
-              </Button>
-            </Link>
-          </div>
-        </div>
-      );
-    }
-  }
 
   if (isVerifying) {
     return (

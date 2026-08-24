@@ -63,6 +63,13 @@ const ECON_THEMES = {
   },
 } as const;
 
+const PDF_VIEWER_FRAGMENT = '#toolbar=0&navpanes=0&scrollbar=0';
+
+const STATS_UNIT_2_PDF =
+  'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/apstats/AP+Stats+-+Unit+2.pdf';
+const GOV_UNIT_2_PDF =
+  'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/apgov/AP+Gov+-+Unit+2+-+CS.pdf';
+
 export function getLoggedOutHeroConfig(
   variant: LoggedOutHeroVariant,
   econSubject: 'macro' | 'micro' = 'macro',
@@ -79,11 +86,11 @@ export function getLoggedOutHeroConfig(
         mcqCorrectClass: 'bg-green-50 border-green-400 text-green-800',
         mcqCorrectBadgeClass: 'bg-green-500 border-green-500 text-white',
       },
-      ctaHref: '/ap-stats-unit-1-cheat-sheet',
-      ctaLabel: 'Start with Unit 1 — Free',
+      ctaHref: '/purchase/season-pass?courseType=stats',
+      ctaLabel: 'Get the Season Pass — $29',
       subheadline:
         'Unit MCQ practice, FRQ packs, printable cheat sheets, and more — built for the 2026 AP Statistics CED.',
-      pdfSrc: null,
+      pdfSrc: `${STATS_UNIT_2_PDF}${PDF_VIEWER_FRAGMENT}`,
       cheatSheetPreviewImages: [
         {
           src: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/stats/unit1/type_y_boxplot.svg',
@@ -94,7 +101,7 @@ export function getLoggedOutHeroConfig(
           alt: 'Histogram of daily step counts',
         },
       ],
-      cheatSheetHref: '/ap-stats-unit-1-cheat-sheet',
+      cheatSheetHref: '/ap-stats-unit-2-cheat-sheet',
       mcqPreview: {
         question: 'Which of the following best describes a simple random sample (SRS)?',
         options: [
@@ -128,7 +135,7 @@ export function getLoggedOutHeroConfig(
       ctaLabel: 'Get the Season Pass — $29',
       subheadline:
         'Full unit MCQ practice, SCOTUS comparison drills, Gov FRQ packs, printable cheat sheets, and more — all for $29.',
-      pdfSrc: null,
+      pdfSrc: `${GOV_UNIT_2_PDF}${PDF_VIEWER_FRAGMENT}`,
       cheatSheetPreviewImages: [
         {
           src: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/gov/u4-frq2.svg',
@@ -139,7 +146,7 @@ export function getLoggedOutHeroConfig(
           alt: 'Balanced budget requirements map',
         },
       ],
-      cheatSheetHref: '/ap-gov-unit-1-cheat-sheet',
+      cheatSheetHref: '/ap-gov-unit-2-cheat-sheet',
       mcqPreview: {
         question: 'Which principle best explains why the Bill of Rights limits national government power?',
         options: [
@@ -170,7 +177,7 @@ export function getLoggedOutHeroConfig(
     ctaLabel: 'Get the Season Pass — $29',
     subheadline:
       'Full practice exams, unlimited MCQ practice, AI-graded FRQs, printable cheat sheets, and more — all for $29.',
-    pdfSrc: `https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/AP+${isMicro ? 'Micro' : 'Macro'}+-+Unit+1.pdf#toolbar=0&navpanes=0&scrollbar=0`,
+    pdfSrc: `https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/AP+${isMicro ? 'Micro' : 'Macro'}+-+Unit+1.pdf${PDF_VIEWER_FRAGMENT}`,
     cheatSheetPreviewImages: [],
     cheatSheetHref: '/unit/1',
     mcqPreview: {

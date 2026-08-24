@@ -16,8 +16,7 @@ import { doc, setDoc, serverTimestamp, collection, query, getDocs, onSnapshot, g
 import { UnitDetails } from '@/components/UnitPerformanceDisplay'
 import { getSubjectXP } from './useUserProgress'
 import type { CourseSubject } from '@/lib/courseSubject'
-import { nextCourseSubject, normalizeCourseSubject } from '@/lib/courseSubject'
-import { hasAdminRole } from '@/lib/adminAccess'
+import { nextCourseSubject, normalizeCourseSubject, getUserEnrolledSubjects } from '@/lib/courseSubject'
 
 // Define the structure of your MCQ answer data
 interface McqAnswer {
@@ -48,6 +47,10 @@ export interface UserData {
   email: string;
   // ... other user data fields ...
   selectedSubject?: CourseSubject;
+  selectedSubjects?: CourseSubject[];
+  targetApScores?: Partial<Record<CourseSubject, number>>;
+  preferredResources?: string[];
+  hasCompletedSubjectSelection?: boolean;
   hasCompletedInitialUnitSelection?: boolean;
   initialPracticeUnitIds?: number[];
   // Add level/XP fields if they are part of UserData
@@ -57,6 +60,7 @@ export interface UserData {
   xp_macro?: number;
   xp_micro?: number;
   xp_gov?: number;
+  xp_stats?: number;
   // Add the new map field for MCQ answer status
   mcqAnswerStatus?: { [key: string]: boolean }; 
   // Keep viewedMcqIds for now if needed elsewhere, remove later if redundant
@@ -313,34 +317,20 @@ export function useAuth() {
 
   // --- ADD State for Selected Subject (works for both logged-in and guests) ---
   const [selectedSubject, setSelectedSubjectState] = useState<CourseSubject>('macro');
-  const canAccessGov = Boolean(user && hasAdminRole(userData));
   
   // Initialize subject from userData or localStorage
   useEffect(() => {
     if (user && userData?.selectedSubject) {
       const next = normalizeCourseSubject(userData.selectedSubject as string);
-      setSelectedSubjectState(next === 'gov' && !canAccessGov ? 'macro' : next);
+      setSelectedSubjectState(next);
     } else if (!user && typeof window !== 'undefined') {
       const storedSubject = localStorage.getItem('guestAPSubject');
       if (storedSubject) {
         const next = normalizeCourseSubject(storedSubject);
-        setSelectedSubjectState(next === 'gov' ? 'macro' : next);
+        setSelectedSubjectState(next);
       }
     }
-  }, [user, userData?.selectedSubject, canAccessGov]);
-
-  // Safety net: never let non-admin sessions remain on Gov.
-  useEffect(() => {
-    if (selectedSubject !== 'gov' || canAccessGov) return;
-    setSelectedSubjectState('macro');
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('guestAPSubject', 'macro');
-    }
-    if (user) {
-      const userDocRef = doc(db, 'users', user.uid);
-      void setDoc(userDocRef, { selectedSubject: 'macro' }, { merge: true });
-    }
-  }, [selectedSubject, canAccessGov, user]);
+  }, [user, userData?.selectedSubject]);
 
   // Initialize guest XP from localStorage for logged-out users
   useEffect(() => {
@@ -380,24 +370,32 @@ export function useAuth() {
 
   // Function to set selected subject (updates both state and storage)
   const setSelectedSubject = async (subject: CourseSubject) => {
-    const nextSubject: CourseSubject =
-      subject === 'gov' && !canAccessGov ? 'macro' : subject;
-    setSelectedSubjectState(nextSubject);
+    setSelectedSubjectState(subject);
     if (user) {
       // Update in Firestore for logged-in users
       try {
         const userDocRef = doc(db, 'users', user.uid);
-        await setDoc(userDocRef, { selectedSubject: nextSubject }, { merge: true });
+        await setDoc(userDocRef, { selectedSubject: subject }, { merge: true });
       } catch (error) {
         console.error('[useAuth] Error updating selected subject:', error);
       }
     } else {
       // Store in localStorage for guests
       if (typeof window !== 'undefined') {
-        localStorage.setItem('guestAPSubject', nextSubject);
+        localStorage.setItem('guestAPSubject', subject);
       }
     }
   };
+
+  // Keep active subject inside enrolled list when user has selectedSubjects
+  useEffect(() => {
+    if (!user || !userData) return;
+    const enrolled = getUserEnrolledSubjects(true, userData);
+    if (!enrolled?.length) return;
+    if (!enrolled.includes(selectedSubject)) {
+      void setSelectedSubject(enrolled[0]);
+    }
+  }, [user, userData?.selectedSubjects, selectedSubject]);
 
   // Function to toggle between macro and micro
   const toggleSubject = () => {
@@ -601,7 +599,13 @@ export function useAuth() {
         const newTotal = currentXP + amount;
         
         const fieldName =
-          subject === 'macro' ? 'xp_macro' : subject === 'micro' ? 'xp_micro' : 'xp_gov';
+          subject === 'macro'
+            ? 'xp_macro'
+            : subject === 'micro'
+              ? 'xp_micro'
+              : subject === 'stats'
+                ? 'xp_stats'
+                : 'xp_gov';
         
         // Logged-in: update subject-specific XP in Firestore
         const userDocRef = doc(db, 'users', user.uid);

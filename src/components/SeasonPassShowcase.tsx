@@ -24,7 +24,7 @@ const COURSE_CONFIG: Record<
     subtitle: 'Everything you need to score a 5 in AP Macro.',
     price: 29,
     originalPrice: 39,
-    validUntilLabel: 'Valid until June 30th, 2026',
+    validUntilLabel: 'Valid until June 30, 2027',
     theme: 'blue',
     features: [
       { text: 'Full Practice Exams based on 2026 AP Macro CED', key: 'Full Practice Exams' },
@@ -41,7 +41,7 @@ const COURSE_CONFIG: Record<
     subtitle: 'Everything you need to score a 5 in AP Micro.',
     price: 29,
     originalPrice: 39,
-    validUntilLabel: 'Valid until June 30th, 2026',
+    validUntilLabel: 'Valid until June 30, 2027',
     theme: 'green',
     features: [
       { text: 'Full Practice Exams based on 2026 AP Micro CED', key: 'Full Practice Exams' },

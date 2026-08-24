@@ -1,6 +1,7 @@
 const STATS_FRQ_WALKTHROUGH_BASE_BY_UNIT: Record<number, string> = {
   1: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/stats/unit_1',
   2: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/stats/unit_2',
+  3: 'https://apdojovideos.s3.ap-southeast-2.amazonaws.com/stats/unit_3',
 };
 
 /**
@@ -9,12 +10,16 @@ const STATS_FRQ_WALKTHROUGH_BASE_BY_UNIT: Record<number, string> = {
  */
 const STATS_FRQ_WALKTHROUGH_BY_UNIT: Record<number, Partial<Record<number, string>>> = {
   1: {
-    1: `${STATS_FRQ_WALKTHROUGH_BASE_BY_UNIT[1]}/Unit+1+FRQ+Practice+Q1.mov`,
-    2: `${STATS_FRQ_WALKTHROUGH_BASE_BY_UNIT[1]}/Unit+1+FRQ+Practice+Q2.mov`,
+    1: `${STATS_FRQ_WALKTHROUGH_BASE_BY_UNIT[1]}/unit+1+-+frq+1.mp4`,
+    2: `${STATS_FRQ_WALKTHROUGH_BASE_BY_UNIT[1]}/unit+1+-+frq+2.mp4`,
   },
   2: {
-    1: `${STATS_FRQ_WALKTHROUGH_BASE_BY_UNIT[2]}/Unit+2+FRQ+Practice+1.mov`,
-    2: `${STATS_FRQ_WALKTHROUGH_BASE_BY_UNIT[2]}/Unit+2+FRQ+Practice+2.mov`,
+    1: `${STATS_FRQ_WALKTHROUGH_BASE_BY_UNIT[2]}/Unit+2+-+FRQ+1.mp4`,
+    2: `${STATS_FRQ_WALKTHROUGH_BASE_BY_UNIT[2]}/Unit+2+-+FRQ+2.mp4`,
+  },
+  3: {
+    1: `${STATS_FRQ_WALKTHROUGH_BASE_BY_UNIT[3]}/Unit+3+-+Frq+1.mov`,
+    2: `${STATS_FRQ_WALKTHROUGH_BASE_BY_UNIT[3]}/Unit+3+-+FRQ+2.mp4`,
   },
 };
 

@@ -7,6 +7,9 @@ import { frqExams, type FRQExam, type FRQQuestion, type FRQPart, type FRQSubPart
 import { Question } from '@/data/questionBanks/types';
 import { Printer, Loader2, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
+import {
+  PrintableWorksheetHeader,
+} from '@/components/PrintableWorksheetHeader';
 
 /** Square area for graphing (draw questions). */
 function GraphArea() {
@@ -76,45 +79,6 @@ function FormattedExplanation({ text }: { text: string }) {
     );
   }
   return <p className="text-sm text-slate-600">{text}</p>;
-}
-
-/** Assignment header: AP Dojo + logo left, Name/Date/Class right. */
-function AssignmentHeader({ compactPrint }: { compactPrint?: boolean }) {
-  return (
-    <header className={`pb-6 mb-6 border-b-2 border-slate-300 print:pb-4 print:mb-4 ${compactPrint ? 'print:!pb-1 print:!mb-1' : ''}`}>
-      <div className={`flex items-start justify-between gap-6 ${compactPrint ? 'print:gap-3' : ''}`}>
-        <div className="flex flex-col gap-1">
-          <div className={`flex items-center gap-3 ${compactPrint ? 'print:gap-2' : ''}`}>
-            <img
-              src="/images/dojoIconJan26.svg"
-              alt=""
-              className={`w-12 h-12 print:w-10 print:h-10 ${compactPrint ? 'print:!w-8 print:!h-8' : ''}`}
-            />
-            <span className="text-xl font-black text-slate-900 print:text-lg">
-              AP <span className="text-blue-600">Dojo</span>
-            </span>
-          </div>
-          <p className="text-sm text-slate-600 print:text-xs">
-            Practice Tests, MCQ, FRQ Practice at apdojo.com
-          </p>
-        </div>
-        <div className={`flex flex-col gap-2 min-w-[180px] print:min-w-[160px] ${compactPrint ? 'print:!min-w-[120px] print:!gap-1' : ''}`}>
-        <div className="flex items-baseline gap-2">
-          <span className={`text-sm font-bold text-slate-700 w-12 flex-shrink-0 print:text-xs ${compactPrint ? 'print:!text-[10px]' : ''}`}>Name:</span>
-          <div className={`flex-1 border-b-2 border-black min-h-[1.25rem] ${compactPrint ? 'print:!min-h-[0.875rem]' : ''}`} />
-        </div>
-        <div className="flex items-baseline gap-2">
-          <span className={`text-sm font-bold text-slate-700 w-12 flex-shrink-0 print:text-xs ${compactPrint ? 'print:!text-[10px]' : ''}`}>Date:</span>
-          <div className={`flex-1 border-b-2 border-black min-h-[1.25rem] ${compactPrint ? 'print:!min-h-[0.875rem]' : ''}`} />
-        </div>
-        <div className="flex items-baseline gap-2">
-          <span className={`text-sm font-bold text-slate-700 w-12 flex-shrink-0 print:text-xs ${compactPrint ? 'print:!text-[10px]' : ''}`}>Class:</span>
-          <div className={`flex-1 border-b-2 border-black min-h-[1.25rem] ${compactPrint ? 'print:!min-h-[0.875rem]' : ''}`} />
-        </div>
-      </div>
-      </div>
-    </header>
-  );
 }
 
 function PrintPreviewContent() {
@@ -231,6 +195,18 @@ function PrintPreviewContent() {
   const isEmbed = searchParams.get('embed') === '1' || searchParams.get('embed') === 'true';
   const isAnswerKey = searchParams.get('answerKey') === '1' || searchParams.get('answerKey') === 'true';
   const frqOnly = !hasMcq && hasFrq;
+  const frqQuestionCount = frqExamsList.reduce((sum, exam) => sum + (exam.questions?.length ?? 0), 0);
+  const totalQuestions = mcqQuestions.length + frqQuestionCount;
+  const titleFromUrl = searchParams.get('title')?.trim();
+  const worksheetTitle =
+    titleFromUrl ||
+    (isAnswerKey
+      ? 'Answer Key'
+      : hasMcq && hasFrq
+        ? 'AP Dojo Practice Worksheet'
+        : hasFrq
+          ? 'AP Dojo FRQ Worksheet'
+          : 'AP Dojo MCQ Worksheet');
 
   return (
     <div className={`min-h-screen bg-white ${frqOnly ? 'frq-only-print' : ''}`}>
@@ -278,11 +254,13 @@ function PrintPreviewContent() {
 
       <div className={`max-w-3xl mx-auto px-6 py-8 print:py-4 print:px-4 print:pt-4 print-preview-content ${frqOnly ? 'print:pt-0' : ''}`}>
         <div className={frqOnly ? 'print-preview-header-compact' : ''}>
-          <AssignmentHeader compactPrint={frqOnly} />
+          <PrintableWorksheetHeader
+            title={worksheetTitle}
+            totalQuestions={Math.max(1, totalQuestions)}
+            sectionLabel={isAnswerKey ? 'Answer Key' : 'Worksheets'}
+            compact={frqOnly}
+          />
         </div>
-        <h1 className={`text-2xl font-black text-slate-900 mb-6 print:mb-4 ${frqOnly ? 'print:mb-1' : ''}`}>
-          {isAnswerKey ? 'Answer Key' : 'Assignment'}
-        </h1>
 
         {/* Part 1: Multiple Choice */}
         {hasMcq && (

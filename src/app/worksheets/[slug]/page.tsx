@@ -39,6 +39,7 @@ function WorksheetPageContent() {
     const params = new URLSearchParams();
     if (worksheet.q) params.set('q', worksheet.q);
     if (worksheet.f) params.set('f', worksheet.f);
+    if (worksheet.title) params.set('title', worksheet.title);
     if (embed) params.set('embed', '1');
     return `${origin}/tutor/print-preview?${params.toString()}`;
   };
