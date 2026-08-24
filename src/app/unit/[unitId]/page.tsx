@@ -1262,9 +1262,8 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
   };
 
   const handleMakeQuiz = async () => {
-    // Check if user is pro customer
     if (!isProCustomer) {
-      setShowJoinDojoModal(true);
+      setShowPacketSeasonPassModal(true);
       return;
     }
 
@@ -1403,6 +1402,11 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
   };
 
   const handleAskDojoAboutSelectedTerms = () => {
+    if (!isProCustomer) {
+      setShowPacketSeasonPassModal(true);
+      return;
+    }
+
     const allTerms = allTermsForSubject;
     const selectedTermObjects = Array.from(selectedTerms)
       .map((termId) => allTerms.find((t) => t.id === termId))
