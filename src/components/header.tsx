@@ -283,13 +283,6 @@ export function Header() {
                 Cheat Sheets
               </Link>
 
-              <Link
-                href={`/tutoring/${displaySubject}`}
-                className={`text-lg text-gray-700 transition-colors font-bold ${navHoverClass}`}
-              >
-                Tutoring
-              </Link>
-
               {/* Season Pass - Only show if user is not logged in or not premium */}
               {(!user || !isPremium) && (
                 <Link
@@ -535,16 +528,6 @@ export function Header() {
                 </Link>
               ))}
               <div className="my-3 border-t border-gray-100" />
-              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1 mb-1">Tutoring</p>
-              <Link
-                href={`/tutoring/${displaySubject}`}
-                onClick={closeMobileMenu}
-                className={`px-4 py-4 text-xl font-bold text-gray-800 rounded-xl transition-colors ${navHoverClass} ${
-                  displaySubject === 'gov' ? 'hover:bg-violet-50' : displaySubject === 'micro' ? 'hover:bg-green-50' : 'hover:bg-blue-50'
-                }`}
-              >
-                Book a Tutor
-              </Link>
 
               {/* Bottom section — XP, subject toggle, logout */}
               <div className="mt-auto pt-6 border-t border-gray-100 space-y-4">

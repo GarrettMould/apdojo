@@ -8,6 +8,7 @@ import { auth } from '@/lib/firebase'
 import { ArrowRight, X } from 'lucide-react'
 import Image from 'next/image'
 import { AuthDividerOr, GoogleSignInButton } from '@/components/GoogleSignInButton'
+import { PasswordInput } from '@/components/PasswordInput'
 
 function LoginPageContent() {
   const [email, setEmail] = useState('')
@@ -150,14 +151,14 @@ function LoginPageContent() {
               <label className="block text-xs font-black text-gray-900 uppercase tracking-widest mb-2">
                 Password
               </label>
-              <input
-                type="password"
+              <PasswordInput
                 required
                 className="w-full px-4 py-3 border-2 border-black rounded-xl text-base font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all placeholder:text-gray-400"
                 placeholder="Your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={loadingSubmit || googleLoading}
+                autoComplete="current-password"
               />
             </div>
 

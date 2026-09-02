@@ -6,6 +6,7 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import { SubscriptionOfferPrompt } from './SubscriptionOfferPrompt';
 import { AuthDividerOr, GoogleSignInButton } from '@/components/GoogleSignInButton';
 import { SignupOnboardingModal } from './SignupOnboardingModal';
+import { PasswordInput } from '@/components/PasswordInput';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -126,14 +127,14 @@ export function LoginModal({ isOpen, onClose, switchToSignup, onAuthSuccess }: A
                 />
               </div>
               <div>
-                <input
-                  type="password"
+                <PasswordInput
                   required
                   className="appearance-none rounded-none relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 text-base"
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={loading || googleLoading}
+                  autoComplete="current-password"
                 />
               </div>
             </div>

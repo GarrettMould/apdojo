@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, Suspense, useMemo } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Clock } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import {
   macroUnits as allMacroUnitsData,
   microUnits as allMicroUnitsData,
@@ -220,6 +220,224 @@ function UnitFinalPracticeTestsContent() {
 
   const fullExamsComingSoon = isGov || isStats;
 
+  const { availableUnits, unavailableUnits } = useMemo(() => {
+    const available: (typeof units)[number][] = [];
+    const unavailable: (typeof units)[number][] = [];
+    for (const unit of units) {
+      if (isUnitAvailable(unit.number)) available.push(unit);
+      else unavailable.push(unit);
+    }
+    return { availableUnits: available, unavailableUnits: unavailable };
+  }, [units, effectiveSubject, isGov, isStats, isMicro]);
+
+  const renderUnitCard = (unit: (typeof units)[number], isAvailable: boolean) => {
+    const resume = isAvailable ? unitResumeByUnit[unit.number] : null;
+    const showResume = Boolean(user?.uid && resume && !unitProgressLoading);
+    const testHref = getUnitMCQTestUrl(unit.number, effectiveSubject);
+    const previewHref = `/unit-test-preview?subject=${effectiveSubject}&unit=${unit.number}`;
+    const unitStimulusFrqs = isGov
+      ? getGovUnitStimulusFrqs(unit.number)
+      : isStats
+        ? getStatsUnitStimulusFrqs(unit.number)
+        : [];
+    const frqFormatLabels = isGov
+      ? getGovUnitFrqFormatLabels(unit.number)
+      : isStats
+        ? getStatsUnitFrqFormatLabels(unit.number)
+        : [];
+    const showFrqPackCard = (isGov && unitStimulusFrqs.length > 0) || isStats;
+    const showEconFrqPracticeCard = !isGov && !isStats;
+    const frqPackAvailable =
+      (isGov && unitStimulusFrqs.length > 0) ||
+      (isStats && unitStimulusFrqs.length > 0 && isStatsFrqTestUnitAvailable(unit.number));
+    const econFrqPracticeHref = `/unitFRQpracticePage?subject=${effectiveSubject}&frqId=${effectiveSubject === 'macro' ? 1 : 2}`;
+    const frqLabels =
+      frqFormatLabels.length > 0
+        ? frqFormatLabels
+        : isStats && frqPackAvailable
+          ? ['Investigative Task', 'Free Response']
+          : [];
+
+    return (
+      <article
+        key={unit.number}
+        className={`group relative grid gap-5 py-8 transition-colors sm:grid-cols-[5rem_minmax(0,1fr)] sm:gap-8 sm:py-9 ${
+          isAvailable ? accentRing : 'opacity-60'
+        }`}
+      >
+        <div className="flex items-start gap-3 sm:block">
+          <span
+            className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-sm font-bold tabular-nums sm:h-12 sm:w-12 sm:text-base ${accentSoft}`}
+          >
+            {String(unit.number).padStart(2, '0')}
+          </span>
+          <p className="pt-2.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-400 sm:mt-2 sm:pt-0">
+            Unit
+          </p>
+        </div>
+
+        <div className="min-w-0">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between lg:gap-10">
+            <div className="min-w-0 flex-1">
+              <h3 className="text-xl font-semibold tracking-tight text-gray-950 sm:text-[1.35rem] sm:leading-snug">
+                {unit.title}
+              </h3>
+              <p className="mt-1.5 max-w-xl text-[0.9375rem] leading-relaxed text-gray-500">
+                {unit.description}
+              </p>
+
+              {showResume && resume ? (
+                <div className="mt-4 max-w-md">
+                  <div className="flex items-center justify-between gap-3 text-xs font-medium text-emerald-800">
+                    <span>In progress</span>
+                    <span className="tabular-nums">
+                      {resume.answered}/{resume.total} · {resume.percentFinished}%
+                    </span>
+                  </div>
+                  <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-emerald-100">
+                    <div
+                      className="h-full rounded-full bg-emerald-500 transition-[width]"
+                      style={{ width: `${resume.percentFinished}%` }}
+                    />
+                  </div>
+                </div>
+              ) : null}
+            </div>
+
+            {isAvailable ? (
+              <div className="flex w-full shrink-0 flex-col gap-2.5 sm:max-w-xs lg:w-56 lg:items-stretch">
+                <Link
+                  href={showResume ? testHref : previewHref}
+                  className={`group/link inline-flex items-center justify-between gap-3 rounded-lg border px-3.5 py-2.5 text-sm font-semibold transition ${
+                    showResume
+                      ? 'border-emerald-200 bg-emerald-50 text-emerald-900 hover:border-emerald-300 hover:bg-emerald-100'
+                      : `border-gray-200 bg-white text-gray-900 hover:border-gray-300 hover:bg-gray-50 ${
+                          unitProgressLoading && user?.uid ? 'opacity-70' : ''
+                        }`
+                  }`}
+                >
+                  <span>{showResume ? 'Resume MCQ test' : 'Start MCQ test'}</span>
+                  <ArrowRight
+                    className={`h-3.5 w-3.5 shrink-0 transition-transform group-hover/link:translate-x-0.5 ${
+                      showResume ? 'text-emerald-700' : accentText
+                    }`}
+                  />
+                </Link>
+
+                {showFrqPackCard && frqPackAvailable ? (
+                  <div>
+                    <Link
+                      href={getUnitTestPreviewUrl(unit.number, effectiveSubject, 'frq')}
+                      className="group/link inline-flex w-full items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white px-3.5 py-2.5 text-sm font-semibold text-gray-900 transition hover:border-gray-300 hover:bg-gray-50"
+                    >
+                      <span>Start FRQ pack</span>
+                      <ArrowRight
+                        className={`h-3.5 w-3.5 shrink-0 transition-transform group-hover/link:translate-x-0.5 ${accentText}`}
+                      />
+                    </Link>
+                    {frqLabels.length > 0 ? (
+                      <p className="mt-1.5 px-0.5 text-[11px] leading-snug text-gray-400">
+                        {frqLabels.join(' · ')}
+                      </p>
+                    ) : null}
+                  </div>
+                ) : showEconFrqPracticeCard ? (
+                  <Link
+                    href={econFrqPracticeHref}
+                    className="group/link inline-flex items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white px-3.5 py-2.5 text-sm font-semibold text-gray-900 transition hover:border-gray-300 hover:bg-gray-50"
+                  >
+                    <span>FRQ practice</span>
+                    <ArrowRight
+                      className={`h-3.5 w-3.5 shrink-0 transition-transform group-hover/link:translate-x-0.5 ${accentText}`}
+                    />
+                  </Link>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </article>
+    );
+  };
+
+  const fullExamsSection = (
+    <section className={fullExamsComingSoon ? 'mt-16 sm:mt-20' : 'mb-16 sm:mb-20'}>
+      <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-gray-500">
+        Full practice exams
+      </h2>
+      <div className="mt-4 divide-y divide-gray-200 border-y border-gray-200">
+        <div className="flex flex-col gap-3 py-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
+          <div className="min-w-0">
+            <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Section I</p>
+            <h3 className="mt-1 text-xl font-semibold text-gray-950 sm:text-2xl">Full MCQ Exam 1</h3>
+            <p className="mt-1.5 text-base text-gray-600">
+              Comprehensive multiple-choice exam across all units.
+            </p>
+          </div>
+          <div className="shrink-0">
+            {fullExamsComingSoon ? null : (
+              <Link
+                href={`/full-mcq-exam-preview?subject=${effectiveSubject}&num=1`}
+                className={`inline-flex items-center gap-1.5 text-base font-semibold underline underline-offset-4 ${accentLink}`}
+              >
+                View exam
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            )}
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3 py-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
+          <div className="min-w-0">
+            <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Section II</p>
+            <h3 className="mt-1 text-xl font-semibold text-gray-950 sm:text-2xl">Full FRQ Exam 1</h3>
+            <p className="mt-1.5 text-base text-gray-600">
+              Free-response exam covering key course topics.
+            </p>
+          </div>
+          <div className="shrink-0">
+            {fullExamsComingSoon ? null : (
+              <Link
+                href={getFullFRQTestUrl(effectiveSubject)}
+                className={`inline-flex items-center gap-1.5 text-base font-semibold underline underline-offset-4 ${accentLink}`}
+              >
+                Start exam
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+
+  const unitTestsSection = (
+    <section>
+      <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-gray-500">
+        Unit practice tests
+      </h2>
+      <p className="mt-2 max-w-2xl text-base text-gray-600">
+        One assessment per unit. Start a timed MCQ test
+        {isGov || isStats ? ', or open the unit FRQ pack where available' : ''}.
+      </p>
+
+      <div className="mt-6 divide-y divide-gray-200 border-y border-gray-200">
+        {availableUnits.map((unit) => renderUnitCard(unit, true))}
+      </div>
+
+      {unavailableUnits.length > 0 ? (
+        <div className="mt-10">
+          <h3 className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-400">
+            More unit tests
+          </h3>
+          <div className="mt-4 divide-y divide-gray-100 border-y border-gray-100">
+            {unavailableUnits.map((unit) => renderUnitCard(unit, false))}
+          </div>
+        </div>
+      ) : null}
+    </section>
+  );
+
   return (
     <div className="min-h-screen bg-white">
       <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
@@ -245,227 +463,17 @@ function UnitFinalPracticeTestsContent() {
           </p>
         </header>
 
-        {/* Full exams */}
-        <section className="mb-16 sm:mb-20">
-          <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-gray-500">
-            Full practice exams
-          </h2>
-          <div className="mt-4 divide-y divide-gray-200 border-y border-gray-200">
-            <div className="flex flex-col gap-3 py-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
-              <div className="min-w-0">
-                <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Section I</p>
-                <h3 className="mt-1 text-xl font-semibold text-gray-950 sm:text-2xl">
-                  Full MCQ Exam 1
-                </h3>
-                <p className="mt-1.5 text-base text-gray-600">
-                  Comprehensive multiple-choice exam across all units.
-                </p>
-              </div>
-              <div className="shrink-0">
-                {fullExamsComingSoon ? (
-                  <span className="inline-flex items-center gap-1.5 text-base font-medium text-gray-400">
-                    <Clock className="h-4 w-4" />
-                    Coming soon
-                  </span>
-                ) : (
-                  <Link
-                    href={`/full-mcq-exam-preview?subject=${effectiveSubject}&num=1`}
-                    className={`inline-flex items-center gap-1.5 text-base font-semibold underline underline-offset-4 ${accentLink}`}
-                  >
-                    View exam
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                )}
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-3 py-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
-              <div className="min-w-0">
-                <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Section II</p>
-                <h3 className="mt-1 text-xl font-semibold text-gray-950 sm:text-2xl">
-                  Full FRQ Exam 1
-                </h3>
-                <p className="mt-1.5 text-base text-gray-600">
-                  Free-response exam covering key course topics.
-                </p>
-              </div>
-              <div className="shrink-0">
-                {fullExamsComingSoon ? (
-                  <span className="inline-flex items-center gap-1.5 text-base font-medium text-gray-400">
-                    <Clock className="h-4 w-4" />
-                    Coming soon
-                  </span>
-                ) : (
-                  <Link
-                    href={getFullFRQTestUrl(effectiveSubject)}
-                    className={`inline-flex items-center gap-1.5 text-base font-semibold underline underline-offset-4 ${accentLink}`}
-                  >
-                    Start exam
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
-                )}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Unit tests */}
-        <section>
-          <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-gray-500">
-            Unit practice tests
-          </h2>
-          <p className="mt-2 max-w-2xl text-base text-gray-600">
-            One assessment per unit. Start a timed MCQ test
-            {(isGov || isStats) ? ', or open the unit FRQ pack where available' : ''}.
-          </p>
-
-          <div className="mt-6 divide-y divide-gray-200 border-y border-gray-200">
-            {units.map((unit) => {
-              const isAvailable = isUnitAvailable(unit.number);
-              const resume = isAvailable ? unitResumeByUnit[unit.number] : null;
-              const showResume = Boolean(user?.uid && resume && !unitProgressLoading);
-              const testHref = getUnitMCQTestUrl(unit.number, effectiveSubject);
-              const previewHref = `/unit-test-preview?subject=${effectiveSubject}&unit=${unit.number}`;
-              const unitStimulusFrqs = isGov
-                ? getGovUnitStimulusFrqs(unit.number)
-                : isStats
-                  ? getStatsUnitStimulusFrqs(unit.number)
-                  : [];
-              const frqFormatLabels = isGov
-                ? getGovUnitFrqFormatLabels(unit.number)
-                : isStats
-                  ? getStatsUnitFrqFormatLabels(unit.number)
-                  : [];
-              const showFrqPackCard = (isGov && unitStimulusFrqs.length > 0) || isStats;
-              const showEconFrqPracticeCard = !isGov && !isStats;
-              const frqPackAvailable =
-                (isGov && unitStimulusFrqs.length > 0) ||
-                (isStats && unitStimulusFrqs.length > 0 && isStatsFrqTestUnitAvailable(unit.number));
-              const econFrqPracticeHref = `/unitFRQpracticePage?subject=${effectiveSubject}&frqId=${effectiveSubject === 'macro' ? 1 : 2}`;
-              const frqLabels =
-                frqFormatLabels.length > 0
-                  ? frqFormatLabels
-                  : isStats && frqPackAvailable
-                    ? ['Investigative Task', 'Free Response']
-                    : [];
-
-              return (
-                <article
-                  key={unit.number}
-                  className={`group relative grid gap-5 py-8 transition-colors sm:grid-cols-[5rem_minmax(0,1fr)] sm:gap-8 sm:py-9 ${
-                    isAvailable ? accentRing : 'opacity-50'
-                  }`}
-                >
-                  <div className="flex items-start gap-3 sm:block">
-                    <span
-                      className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-sm font-bold tabular-nums sm:h-12 sm:w-12 sm:text-base ${accentSoft}`}
-                    >
-                      {String(unit.number).padStart(2, '0')}
-                    </span>
-                    <p className="pt-2.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-gray-400 sm:mt-2 sm:pt-0">
-                      Unit
-                    </p>
-                  </div>
-
-                  <div className="min-w-0">
-                    <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between lg:gap-10">
-                      <div className="min-w-0 flex-1">
-                        <h3 className="text-xl font-semibold tracking-tight text-gray-950 sm:text-[1.35rem] sm:leading-snug">
-                          {unit.title}
-                        </h3>
-                        <p className="mt-1.5 max-w-xl text-[0.9375rem] leading-relaxed text-gray-500">
-                          {unit.description}
-                        </p>
-
-                        {showResume && resume ? (
-                          <div className="mt-4 max-w-md">
-                            <div className="flex items-center justify-between gap-3 text-xs font-medium text-emerald-800">
-                              <span>In progress</span>
-                              <span className="tabular-nums">
-                                {resume.answered}/{resume.total} · {resume.percentFinished}%
-                              </span>
-                            </div>
-                            <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-emerald-100">
-                              <div
-                                className="h-full rounded-full bg-emerald-500 transition-[width]"
-                                style={{ width: `${resume.percentFinished}%` }}
-                              />
-                            </div>
-                          </div>
-                        ) : null}
-                      </div>
-
-                      <div className="flex w-full shrink-0 flex-col gap-2.5 sm:max-w-xs lg:w-56 lg:items-stretch">
-                        {!isAvailable ? (
-                          <span className="inline-flex items-center gap-1.5 self-start text-sm font-medium text-gray-400">
-                            <Clock className="h-3.5 w-3.5" />
-                            Coming soon
-                          </span>
-                        ) : (
-                          <>
-                            <Link
-                              href={showResume ? testHref : previewHref}
-                              className={`group/link inline-flex items-center justify-between gap-3 rounded-lg border px-3.5 py-2.5 text-sm font-semibold transition ${
-                                showResume
-                                  ? 'border-emerald-200 bg-emerald-50 text-emerald-900 hover:border-emerald-300 hover:bg-emerald-100'
-                                  : `border-gray-200 bg-white text-gray-900 hover:border-gray-300 hover:bg-gray-50 ${
-                                      unitProgressLoading && user?.uid ? 'opacity-70' : ''
-                                    }`
-                              }`}
-                            >
-                              <span>{showResume ? 'Resume MCQ test' : 'Start MCQ test'}</span>
-                              <ArrowRight
-                                className={`h-3.5 w-3.5 shrink-0 transition-transform group-hover/link:translate-x-0.5 ${
-                                  showResume ? 'text-emerald-700' : accentText
-                                }`}
-                              />
-                            </Link>
-
-                            {showFrqPackCard ? (
-                              frqPackAvailable ? (
-                                <div>
-                                  <Link
-                                    href={getUnitTestPreviewUrl(unit.number, effectiveSubject, 'frq')}
-                                    className={`group/link inline-flex w-full items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white px-3.5 py-2.5 text-sm font-semibold text-gray-900 transition hover:border-gray-300 hover:bg-gray-50`}
-                                  >
-                                    <span>Start FRQ pack</span>
-                                    <ArrowRight
-                                      className={`h-3.5 w-3.5 shrink-0 transition-transform group-hover/link:translate-x-0.5 ${accentText}`}
-                                    />
-                                  </Link>
-                                  {frqLabels.length > 0 ? (
-                                    <p className="mt-1.5 px-0.5 text-[11px] leading-snug text-gray-400">
-                                      {frqLabels.join(' · ')}
-                                    </p>
-                                  ) : null}
-                                </div>
-                              ) : (
-                                <span className="inline-flex items-center gap-1.5 self-start px-0.5 text-sm font-medium text-gray-400">
-                                  <Clock className="h-3.5 w-3.5" />
-                                  FRQ pack soon
-                                </span>
-                              )
-                            ) : showEconFrqPracticeCard ? (
-                              <Link
-                                href={econFrqPracticeHref}
-                                className={`group/link inline-flex items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white px-3.5 py-2.5 text-sm font-semibold text-gray-900 transition hover:border-gray-300 hover:bg-gray-50`}
-                              >
-                                <span>FRQ practice</span>
-                                <ArrowRight
-                                  className={`h-3.5 w-3.5 shrink-0 transition-transform group-hover/link:translate-x-0.5 ${accentText}`}
-                                />
-                              </Link>
-                            ) : null}
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        </section>
+        {fullExamsComingSoon ? (
+          <>
+            {unitTestsSection}
+            {fullExamsSection}
+          </>
+        ) : (
+          <>
+            {fullExamsSection}
+            {unitTestsSection}
+          </>
+        )}
       </div>
     </div>
   );

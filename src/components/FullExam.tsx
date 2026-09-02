@@ -2587,10 +2587,25 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                 <div className="bg-white rounded-lg border border-gray-200 p-4">
                                   <ExpandableQuestionImage
                                     src={question.image.src}
-                                    alt="Question diagram"
+                                    alt={
+                                      typeof question.image === 'object' && 'alt' in question.image
+                                        ? question.image.alt
+                                        : 'Question diagram'
+                                    }
                                     imageClassName="w-full h-auto max-h-[400px] object-contain rounded-lg"
                                   />
                                 </div>
+                              )}
+                              {question.questionAfterImage && (
+                                <p
+                                  className={`mt-3 leading-relaxed ${
+                                    isUnitTest
+                                      ? `font-normal text-gray-900 ${FONT_SIZE_CLASSES[questionFontSize]}`
+                                      : 'text-base md:text-lg font-normal font-serif text-gray-800'
+                                  }`}
+                                >
+                                  <MathText text={question.questionAfterImage} />
+                                </p>
                               )}
                               {question.tableData && (
                                 <div className="bg-white rounded-lg border border-gray-200 p-4">
@@ -2653,10 +2668,25 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                 <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4 flex justify-center">
                                   <ExpandableQuestionImage
                                     src={question.image.src}
-                                    alt="Question diagram"
+                                    alt={
+                                      typeof question.image === 'object' && 'alt' in question.image
+                                        ? question.image.alt
+                                        : 'Question diagram'
+                                    }
                                     imageClassName="w-full max-w-2xl h-auto object-contain rounded-lg"
                                   />
                                 </div>
+                              )}
+                              {question.questionAfterImage && (
+                                <p
+                                  className={`leading-relaxed ${
+                                    isUnitTest
+                                      ? `font-normal text-gray-900 ${FONT_SIZE_CLASSES[questionFontSize]}`
+                                      : 'text-base md:text-lg font-normal font-serif text-gray-800'
+                                  }`}
+                                >
+                                  <MathText text={question.questionAfterImage} />
+                                </p>
                               )}
                               {question.tableData && (
                                 <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4">
@@ -3203,10 +3233,19 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                         <div className="my-4">
                           <ExpandableQuestionImage
                             src={question.image.src}
-                            alt="Question"
+                            alt={
+                              typeof question.image === 'object' && 'alt' in question.image
+                                ? question.image.alt
+                                : 'Question'
+                            }
                             imageClassName="max-h-[300px] object-contain rounded-lg"
                           />
                         </div>
+                      )}
+                      {question.questionAfterImage && (
+                        <p className="my-4 leading-relaxed text-base md:text-lg font-normal font-serif text-gray-800">
+                          <MathText text={question.questionAfterImage} />
+                        </p>
                       )}
                     </div>
 

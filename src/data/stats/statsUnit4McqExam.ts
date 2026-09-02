@@ -325,9 +325,10 @@ export const statsUnit4McqTestQuestions: Question[] = [
     lessonIDS: ['4.1'],
     unitName: UNIT_NAME,
     question:
-      'Scores on a standardized math exam have a population mean of 680 and a population standard deviation of 90. A random sample of n = 36 test-takers is selected. Since n ≥ 30, the sampling distribution of the sample mean score is approximately normal, with standard deviation $\\sigma_{\\bar{x}} = \\sigma / \\sqrt{n} = 90 / \\sqrt{36} = 15$, as shown in the curve below. Standard deviation intervals are marked on the horizontal axis, and the shaded region represents sample means between 665 and 710.\n\n' +
-      'Using the empirical rule (68-95-99.7 rule), what is the approximate probability that the sample mean falls between 665 and 710?',
+      'Scores on a standardized math exam have a population mean of 680 and a population standard deviation of 90. For a random sample of $n = 36$ test-takers, the sampling distribution of the sample mean is shown below.',
     image: SAMPLING_DIST_MEAN_CURVE,
+    questionAfterImage:
+      'Using the empirical rule (68-95-99.7 rule) and the shaded region, what is the approximate probability that the sample mean falls between 665 and 710?',
     options: stripOptionPrefixes([
       'A) 81.5%',
       'B) 68%',
@@ -380,8 +381,7 @@ export const statsUnit4McqTestQuestions: Question[] = [
     lessonIDS: ['4.2'],
     unitName: UNIT_NAME,
     question:
-      'An operations manager records the time (in minutes) it takes each of 24 randomly selected employees to complete a new onboarding task. The histogram of the resulting data is shown below. The manager wants to construct a 95% one-sample t-interval for the true mean completion time.\n\n' +
-      'Based on the histogram, is it appropriate to construct the t-interval using this sample?',
+      'An operations manager records the time (in minutes) it takes a random sample of $n = 24$ employees to complete a new onboarding task. Based on the histogram of the data shown below, is it appropriate to construct a one-sample t-interval?',
     image: ONBOARDING_TIME_HISTOGRAM,
     options: stripOptionPrefixes([
       'A) Yes, because the sample was randomly selected, and that is the only condition that must be checked.',
@@ -542,11 +542,10 @@ export const statsUnit4McqTestQuestions: Question[] = [
     lessonIDS: ['4.7', '4.8'],
     unitName: UNIT_NAME,
     question:
-      'A transportation researcher wants to estimate the difference in mean commute time between two bus routes. Independent random samples of riders were selected from each route, and their commute times (in minutes) were recorded. The boxplots below show the distribution of commute times for each sample; neither distribution shows strong skewness or outliers.\n\n' +
-      'Route A: n = 16, sample mean = 42.3 minutes, sample standard deviation = 5.8 minutes\n' +
-      'Route B: n = 14, sample mean = 38.1 minutes, sample standard deviation = 6.5 minutes\n\n' +
-      'Using the conservative degrees of freedom (the smaller of n1 − 1 and n2 − 1), the critical value for a 95% confidence interval is t* = 2.160. What is the margin of error for a 95% confidence interval for the difference in mean commute times ($\\mu_A - \\mu_B$)?',
+      'A transportation researcher wants to estimate the difference in mean commute time between two bus routes. Independent random samples of riders were selected from each route, and their commute times (in minutes) were recorded. The boxplots and summary statistics for each sample are shown below:',
     image: ROUTE_COMMUTE_BOXPLOTS,
+    questionAfterImage:
+      'What is the margin of error for a 95% confidence interval for the difference in mean commute times ($\\mu_A - \\mu_B$)?',
     options: stripOptionPrefixes([
       'A) 4.89 minutes',
       'B) 3.43 minutes',

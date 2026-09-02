@@ -9,6 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import Image from 'next/image'
 import { AuthDividerOr, GoogleSignInButton } from '@/components/GoogleSignInButton'
+import { PasswordInput } from '@/components/PasswordInput'
 
 export default function Signup() {
   const [email, setEmail] = useState('')
@@ -171,14 +172,14 @@ export default function Signup() {
               <label className="block text-xs font-black text-gray-900 uppercase tracking-widest mb-2">
                 Password
               </label>
-              <input
-                type="password"
+              <PasswordInput
                 required
                 className="w-full px-4 py-3 border-2 border-black rounded-xl text-base font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all placeholder:text-gray-400"
                 placeholder="Create a strong password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={loading || googleLoading}
+                autoComplete="new-password"
               />
             </div>
 
@@ -187,14 +188,14 @@ export default function Signup() {
               <label className="block text-xs font-black text-gray-900 uppercase tracking-widest mb-2">
                 Confirm Password
               </label>
-              <input
-                type="password"
+              <PasswordInput
                 required
                 className="w-full px-4 py-3 border-2 border-black rounded-xl text-base font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all placeholder:text-gray-400"
                 placeholder="Confirm your password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 disabled={loading || googleLoading}
+                autoComplete="new-password"
               />
             </div>
 

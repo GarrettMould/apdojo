@@ -15,6 +15,8 @@ export interface Question {
   unitName: string;
   question: string;
   image: StaticImageData | { src: string; alt: string } | null;
+  /** Optional prose rendered after the question image (e.g. the ask when the figure is mid-stem). */
+  questionAfterImage?: string;
   options: string[];
   correctAnswer: string;
   explanation?: string;

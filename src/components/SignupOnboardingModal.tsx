@@ -12,6 +12,7 @@ import { db } from '@/lib/firebase';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { AuthDividerOr, GoogleSignInButton } from '@/components/GoogleSignInButton';
+import { PasswordInput } from '@/components/PasswordInput';
 import {
   SIGNUP_RESOURCE_OPTIONS,
   persistSignupOnboarding,
@@ -413,8 +414,7 @@ export function SignupOnboardingModal({
                       disabled={loading || googleLoading}
                       className="w-full rounded-xl border-2 border-gray-300 bg-white px-4 py-3 text-base text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none disabled:opacity-60"
                     />
-                    <input
-                      type="password"
+                    <PasswordInput
                       autoComplete="new-password"
                       placeholder="Password"
                       value={password}
@@ -425,8 +425,7 @@ export function SignupOnboardingModal({
                       disabled={loading || googleLoading}
                       className="w-full rounded-xl border-2 border-gray-300 bg-white px-4 py-3 text-base text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none disabled:opacity-60"
                     />
-                    <input
-                      type="password"
+                    <PasswordInput
                       autoComplete="new-password"
                       placeholder="Confirm password"
                       value={confirmPassword}
