@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import Image from 'next/image';
+import { HeroCheatSheetPreview } from '@/components/HeroCheatSheetPreview';
 import { Button } from '@/components/ui/button';
 import { Star } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
@@ -33,24 +33,6 @@ const heroVariantVariants = {
   exit: { opacity: 0, y: -16 },
 };
 
-const CHEAT_SHEET_TERMS: Record<'stats' | 'gov', Array<{ term: string; def: string }>> = {
-  stats: [
-    { term: 'Population', def: 'Entire group of interest' },
-    { term: 'Sample', def: 'Subset selected for study' },
-    { term: 'Parameter', def: 'Numerical summary of a population' },
-    { term: 'Statistic', def: 'Numerical summary of a sample' },
-    { term: 'Random Sample', def: 'Every individual has equal chance' },
-    { term: 'Bias', def: 'Systematic favor toward certain outcomes' },
-  ],
-  gov: [
-    { term: 'Federalism', def: 'Power divided between national and state governments' },
-    { term: 'Separation of Powers', def: 'Branches check and balance each other' },
-    { term: 'Limited Government', def: 'Government power is restricted' },
-    { term: 'Pluralism', def: 'Competing groups influence policy' },
-    { term: 'Republic', def: 'Citizens elect representatives' },
-    { term: 'Judicial Review', def: 'Courts review laws for constitutionality' },
-  ],
-};
 
 type HeroSectionProps = {
   variant?: LoggedOutHeroVariant;
@@ -59,8 +41,6 @@ type HeroSectionProps = {
 export function HeroSection({ variant = 'econ' }: HeroSectionProps) {
   const { selectedSubject } = useAuthContext();
   const [mounted, setMounted] = useState(false);
-  const pdfCardRef = useRef<HTMLDivElement>(null);
-  const [pdfScale, setPdfScale] = useState(0.77);
   const [activeSlide, setActiveSlide] = useState(0);
   const [slideDir, setSlideDir] = useState(1);
   const slideTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -73,17 +53,6 @@ export function HeroSection({ variant = 'econ' }: HeroSectionProps) {
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  useEffect(() => {
-    const update = () => {
-      if (pdfCardRef.current) {
-        setPdfScale(pdfCardRef.current.offsetWidth / 833);
-      }
-    };
-    update();
-    window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
-  }, [variant]);
 
   useEffect(() => {
     slideTimerRef.current = setInterval(() => {
@@ -122,8 +91,6 @@ export function HeroSection({ variant = 'econ' }: HeroSectionProps) {
     },
   };
 
-  const cheatSheetTerms = variant === 'stats' || variant === 'gov' ? CHEAT_SHEET_TERMS[variant] : null;
-
   /** Literal class names so Tailwind keeps subject accents (dynamic strings can be dropped). */
   const yearAccentClass =
     variant === 'stats'
@@ -148,7 +115,7 @@ export function HeroSection({ variant = 'econ' }: HeroSectionProps) {
           <div className="w-full lg:w-[46%] flex flex-col items-center text-center lg:items-start lg:text-left gap-9">
             <AnimatePresence mode="wait">
               <motion.div
-                key={variant}
+                key={variant === 'econ' ? `econ-${econSubject}` : variant}
                 variants={heroVariantVariants}
                 initial="enter"
                 animate="center"
@@ -274,7 +241,7 @@ export function HeroSection({ variant = 'econ' }: HeroSectionProps) {
           >
             <AnimatePresence mode="wait">
               <motion.div
-                key={variant}
+                key={variant === 'econ' ? `econ-${econSubject}` : variant}
                 variants={heroVariantVariants}
                 initial="enter"
                 animate="center"
@@ -289,64 +256,13 @@ export function HeroSection({ variant = 'econ' }: HeroSectionProps) {
               className="absolute rounded-2xl border-2 border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden block hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] transition-shadow"
               style={{ top: 44, left: 20, right: 20, height: 420 }}
             >
-              {config.pdfSrc ? (
-                <div ref={pdfCardRef} className="relative w-full h-full">
-                  <iframe
-                    src={config.pdfSrc}
-                    title="Cheat sheet preview"
-                    className="absolute top-0 left-0 pointer-events-none select-none border-none"
-                    style={{
-                      width: '833px',
-                      height: '1080px',
-                      transform: `scale(${pdfScale})`,
-                      transformOrigin: 'top left',
-                    }}
-                  />
-                </div>
-              ) : (
-                <div className="p-5 h-full flex flex-col overflow-hidden">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">
-                    Unit 1 Cheat Sheet Preview
-                  </p>
-                  <div className="grid grid-cols-2 gap-2.5 flex-1 min-h-0 content-start auto-rows-min">
-                    {/* Terms first — like a real cheat sheet */}
-                    {cheatSheetTerms?.slice(0, 2).map(({ term, def }) => (
-                      <div
-                        key={term}
-                        className="rounded-xl border-2 border-gray-100 bg-gray-50 p-2.5"
-                      >
-                        <p className="text-xs font-black text-gray-900">{term}</p>
-                        <p className="text-[10px] text-gray-600 mt-0.5 leading-snug">{def}</p>
-                      </div>
-                    ))}
-                    {/* 1–2 stimulus / FRQ images */}
-                    {config.cheatSheetPreviewImages.slice(0, 2).map(({ src, alt }) => (
-                      <div
-                        key={src}
-                        className="relative col-span-1 rounded-xl border-2 border-gray-100 bg-white overflow-hidden min-h-[88px]"
-                      >
-                        <Image
-                          src={src}
-                          alt={alt}
-                          fill
-                          className="object-contain p-1.5"
-                          sizes="200px"
-                        />
-                      </div>
-                    ))}
-                    {/* More terms to fill the sheet */}
-                    {cheatSheetTerms?.slice(2).map(({ term, def }) => (
-                      <div
-                        key={term}
-                        className="rounded-xl border-2 border-gray-100 bg-gray-50 p-2.5"
-                      >
-                        <p className="text-xs font-black text-gray-900">{term}</p>
-                        <p className="text-[10px] text-gray-600 mt-0.5 leading-snug">{def}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+              {config.cheatSheetPreviewSrc ? (
+                <HeroCheatSheetPreview
+                  src={config.cheatSheetPreviewSrc}
+                  alt={config.cheatSheetPreviewAlt}
+                  priority
+                />
+              ) : null}
             </Link>
 
             {/* Floating card — MCQ Practice (top-right) */}

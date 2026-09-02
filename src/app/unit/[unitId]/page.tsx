@@ -50,6 +50,16 @@ import { courseUrlSlugPrefix, displayCourseLabel, econCourseFromSubject } from '
 import { COURSE_CURRICULUM_OUTLINES } from '@/data/courseCurriculumOutline';
 import { scotusEssayPrompts } from '@/data/gov/scotusEssayPrompts';
 import { processMathContent } from '@/utils/processMathContent';
+import { CheatSheetPdfPreviewThumbnail } from '@/components/CheatSheetPdfPreviewThumbnail';
+import {
+  GOV_UNIT_PDF_URLS,
+  STATS_UNIT_PDF_URLS,
+  ULTIMATE_ADAS_PDF_URL,
+  cheatSheetPdfPreviewPath,
+  getEconUnitPdfUrl,
+  getUnitPdfUrl,
+  ultimateAdasPreviewPath,
+} from '@/data/cheatSheetPdfPreviews';
 
 const scotusComparisonFrqSlugSet = new Set(scotusEssayPrompts.map((p) => p.id));
 
@@ -70,18 +80,6 @@ function getScotusComparisonFrqSlug(caseId: string): string | null {
  */
 const PRETTY_CHEAT_SHEET_ENTRY_MODAL_SESSION_KEY = 'apdojo_pretty_cheat_sheet_season_pass_entry_any_v1';
 const FREE_LESSON_VIDEO_PREVIEW_SECONDS = 5;
-
-const GOV_UNIT_PDF_URLS: Record<number, string> = {
-  1: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/apgov/AP+Gov+-+Unit+1+-+CS.pdf',
-  2: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/apgov/AP+Gov+-+Unit+2+-+CS.pdf',
-  3: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/apgov/AP+Gov+-+Unit+3+-+CS.pdf',
-  4: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/apgov/AP+Gov+-+Unit+4+-+CS.pdf',
-  5: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/apgov/AP+Gov+-+Unit+5+-+CS.pdf',
-};
-
-const STATS_UNIT_PDF_URLS: Record<number, string> = {
-  2: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/apstats/AP+Stats+-+Unit+2.pdf',
-};
 
 function prettyCheatSheetEntryModalAlreadyShown(): boolean {
   try {
@@ -1826,8 +1824,6 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
     }
   };
 
-  const ULTIMATE_ADAS_PDF_URL = 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/ultimate_adas.pdf';
-
   const handleDownloadPdf = async (pdfUrl: string, filename: string) => {
     try {
       const res = await fetch(pdfUrl);
@@ -1999,16 +1995,10 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
             </div>
             {SHOW_ADAS_BLOB && selectedSubject === 'macro' && activeUnitNum === 3 && (
               <div className="mt-4 w-[200px] flex-shrink-0 relative border-4 border-black bg-white overflow-hidden group" style={{ aspectRatio: '8.5/11' }}>
-                <iframe
-                  src={`${ULTIMATE_ADAS_PDF_URL}#toolbar=0&navpanes=0`}
-                  title="Ultimate AD-AS cheat sheet preview"
-                  className="absolute top-0 left-0 pointer-events-none"
-                  style={{
-                    width: '833px',
-                    height: '1080px',
-                    transform: 'scale(0.24)',
-                    transformOrigin: 'top left',
-                  }}
+                <CheatSheetPdfPreviewThumbnail
+                  src={ultimateAdasPreviewPath()}
+                  alt="Ultimate AD-AS cheat sheet preview"
+                  containerWidth={200}
                 />
                 <button
                   type="button"
@@ -2049,16 +2039,11 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                     ? statsUnits.filter((u) => Boolean(STATS_UNIT_PDF_URLS[u.number]))
                     : govUnits.filter((u) => Boolean(GOV_UNIT_PDF_URLS[u.number]));
 
-            const getUnitPdfUrl = (unitNumber: number) => {
-              if (selectedSubject === 'stats') {
-                return STATS_UNIT_PDF_URLS[unitNumber];
+            const getUnitPdfUrlForSubject = (unitNumber: number) => {
+              if (selectedSubject === 'macro' || selectedSubject === 'micro') {
+                return getEconUnitPdfUrl(selectedSubject, unitNumber);
               }
-              if (selectedSubject === 'gov') {
-                return GOV_UNIT_PDF_URLS[unitNumber];
-              }
-              const pdfSubject =
-                selectedSubject === 'macro' ? 'Macro' : selectedSubject === 'micro' ? 'Micro' : 'Gov';
-              return `https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/AP+${pdfSubject}+-+Unit+${unitNumber}.pdf`;
+              return getUnitPdfUrl(selectedSubject, unitNumber);
             };
 
             const getUnitPdfFilename = (unitNumber: number) => {
@@ -2070,11 +2055,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
 
             const baseCardWidth = 100;
             const horizontalOffset = 20;
-            /** Must match the iframe’s rendered size after scale (833×1080 × scale). */
-            const iframeRenderWidth = 833;
-            const iframeRenderHeight = 1080;
-            const iframeScale = baseCardWidth / iframeRenderWidth;
-            const cardHeight = Math.round(iframeRenderHeight * iframeScale);
+            const cardHeight = Math.round((1080 * baseCardWidth) / 833);
             const stackWidth = baseCardWidth + (previewUnits.length - 1) * horizontalOffset;
             return (
           <div
@@ -2082,8 +2063,10 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
             style={{ width: `${stackWidth}px`, height: `${cardHeight}px` }}
           >
             {previewUnits.map((unit, index) => {
-              const pdfUrl = getUnitPdfUrl(unit.number);
+              const pdfUrl = getUnitPdfUrlForSubject(unit.number);
+              const previewSrc = cheatSheetPdfPreviewPath(selectedSubject, unit.number);
               const filename = getUnitPdfFilename(unit.number);
+              if (!pdfUrl || !previewSrc) return null;
               return (
                 <div
                   key={unit.number}
@@ -2095,16 +2078,10 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                     zIndex: index,
                   }}
                 >
-                  <iframe
-                    src={`${pdfUrl}#toolbar=0&navpanes=0`}
-                    title={`Unit ${unit.number} cheat sheet preview`}
-                    className="absolute top-0 left-0 pointer-events-none"
-                    style={{
-                      width: `${iframeRenderWidth}px`,
-                      height: `${iframeRenderHeight}px`,
-                      transform: `scale(${iframeScale})`,
-                      transformOrigin: 'top left',
-                    }}
+                  <CheatSheetPdfPreviewThumbnail
+                    src={previewSrc}
+                    alt={`Unit ${unit.number} cheat sheet preview`}
+                    containerWidth={baseCardWidth}
                   />
                   <button
                     type="button"
@@ -2359,11 +2336,11 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           const canGoToPrevScotusPage = scotusCasePageIndex > 0;
           const canGoToNextScotusPage = scotusCasePageIndex < scotusCasePageCount - 1;
           const scotusNavBtnBase =
-            'inline-flex h-10 w-10 items-center justify-center rounded-lg border-2 transition-all';
+            'inline-flex h-8 w-8 items-center justify-center rounded-full border transition-colors';
           const scotusNavBtnEnabled =
-            'border-black bg-white text-gray-900 shadow-[2px_2px_0_0_rgba(0,0,0,1)] hover:bg-gray-50 active:translate-y-0.5 active:shadow-[1px_1px_0_0_rgba(0,0,0,1)]';
+            'border-gray-200 bg-white/80 text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-800';
           const scotusNavBtnDisabled =
-            'cursor-not-allowed border-gray-300 bg-gray-100 text-gray-400 shadow-none';
+            'cursor-not-allowed border-transparent bg-transparent text-gray-300';
 
           return (
           <section className="mb-10 space-y-4">
@@ -2375,7 +2352,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                 </p>
               </div>
               {scotusCasePageCount > 1 ? (
-                <div className="flex shrink-0 items-center gap-1.5">
+                <div className="flex shrink-0 items-center gap-0.5 pt-0.5">
                   <button
                     type="button"
                     disabled={!canGoToPrevScotusPage}
@@ -2383,7 +2360,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                     className={`${scotusNavBtnBase} ${canGoToPrevScotusPage ? scotusNavBtnEnabled : scotusNavBtnDisabled}`}
                     aria-label="Previous Supreme Court cases"
                   >
-                    <ChevronLeft className="h-5 w-5" aria-hidden />
+                    <ChevronLeft className="h-4 w-4" aria-hidden />
                   </button>
                   <button
                     type="button"
@@ -2394,7 +2371,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                     className={`${scotusNavBtnBase} ${canGoToNextScotusPage ? scotusNavBtnEnabled : scotusNavBtnDisabled}`}
                     aria-label="Next Supreme Court cases"
                   >
-                    <ChevronRight className="h-5 w-5" aria-hidden />
+                    <ChevronRight className="h-4 w-4" aria-hidden />
                   </button>
                 </div>
               ) : null}

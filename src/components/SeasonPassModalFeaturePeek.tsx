@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import Link from 'next/link';
+import { HeroCheatSheetPreview } from '@/components/HeroCheatSheetPreview';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FRQFeedbackDemo } from '@/components/FRQFeedbackDemo';
 import { MCQPracticePreview } from '@/components/MCQPracticePreview';
@@ -32,45 +32,17 @@ const ECON_SLIDES: PeekSlide[] = [
  */
 function FeatureStackShowcase({ courseType }: { courseType: 'gov' | 'stats' }) {
   const config = getLoggedOutHeroConfig(courseType);
-  const pdfCardRef = useRef<HTMLDivElement>(null);
-  const [pdfScale, setPdfScale] = useState(0.55);
   const { theme } = config;
 
-  useEffect(() => {
-    const update = () => {
-      if (pdfCardRef.current) {
-        setPdfScale(pdfCardRef.current.offsetWidth / 833);
-      }
-    };
-    update();
-    const t = window.setTimeout(update, 50);
-    window.addEventListener('resize', update);
-    return () => {
-      window.clearTimeout(t);
-      window.removeEventListener('resize', update);
-    };
-  }, [courseType]);
-
   return (
-    <div className="relative w-full">
+    <div className="relative w-full pointer-events-none select-none">
       <div className="relative ml-3.5 mr-2">
-        {/* PDF window — 3× prior height (~top 105% of sheet, capped by full page) */}
-        <div
-          ref={pdfCardRef}
-          className="relative overflow-hidden rounded-2xl border-2 border-black bg-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] aspect-[833/1140]"
-        >
-          {config.pdfSrc ? (
+        <div className="relative overflow-hidden rounded-2xl border-2 border-black bg-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] aspect-[833/1140]">
+          {config.cheatSheetPreviewSrc ? (
             <>
-              <iframe
-                src={config.pdfSrc}
-                title="Cheat sheet preview"
-                className="pointer-events-none absolute left-0 top-0 select-none border-none"
-                style={{
-                  width: '833px',
-                  height: '1080px',
-                  transform: `scale(${pdfScale})`,
-                  transformOrigin: 'top left',
-                }}
+              <HeroCheatSheetPreview
+                src={config.cheatSheetPreviewSrc}
+                alt={config.cheatSheetPreviewAlt}
               />
               <div
                 className="pointer-events-none absolute inset-x-0 bottom-0 h-[18%]"
@@ -137,12 +109,6 @@ function FeatureStackShowcase({ courseType }: { courseType: 'gov' | 'stats' }) {
             </div>
           </div>
         </div>
-
-        <Link
-          href={`/purchase/season-pass?courseType=${courseType}`}
-          className="absolute inset-0 z-30 cursor-pointer"
-          aria-label="Get the Season Pass"
-        />
       </div>
     </div>
   );
@@ -218,7 +184,7 @@ export function SeasonPassModalFeaturePeek({ courseType, className }: SeasonPass
       </div>
 
       <div className="relative min-h-0 w-full flex-1 lg:min-h-[12rem]">
-        <div className="absolute inset-0 overflow-hidden bg-transparent">
+        <div className="absolute inset-0 overflow-hidden bg-transparent pointer-events-none select-none">
           <AnimatePresence custom={direction} mode="wait">
             <motion.div
               key={`${courseType}-${active}`}
@@ -241,11 +207,6 @@ export function SeasonPassModalFeaturePeek({ courseType, className }: SeasonPass
             }}
           />
         </div>
-        <Link
-          href={`/purchase/season-pass?courseType=${courseType}`}
-          className="absolute inset-0 z-10 cursor-pointer"
-          aria-label="Get the Season Pass"
-        />
       </div>
 
       <div className="mt-4 flex shrink-0 justify-center gap-2">

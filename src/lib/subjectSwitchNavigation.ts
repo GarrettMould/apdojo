@@ -35,12 +35,14 @@ export function getUrlForSubjectSwitch(
   pathname: string,
   searchParams: SearchParamsLike,
   newSubject: CourseSubject,
+  options?: { isLoggedIn?: boolean },
 ): string {
   const path = normalizePath(pathname);
 
   // Logged-in home: "Your Library" dashboard — stay on `/`, only swap subject context.
+  // Logged-out home (Season Pass landing): go to that course's Unit 1 cheat sheet.
   if (path === '/') {
-    return '/';
+    return options?.isLoggedIn ? '/' : defaultCheatSheetUrl(newSubject);
   }
 
   const cheatSheetTarget = getCheatSheetUrlForSubjectSwitch(path, newSubject);

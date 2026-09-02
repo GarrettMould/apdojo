@@ -13,6 +13,7 @@ import {
   GitCompareArrows,
   Loader2,
   RotateCcw,
+  Lock,
 } from 'lucide-react';
 import { scotusEssayPrompts } from '@/data/gov/scotusEssayPrompts';
 import { getScotusGradingKey } from '@/data/gov/scotusGradingKeys';
@@ -21,7 +22,6 @@ import { tutorAvatarUrl } from '@/lib/tutorAvatar';
 import { personaForSubject } from '@/lib/chatPersonas';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { hasGovPremiumAccess } from '@/lib/utils';
-import Link from 'next/link';
 import { TutorTypingPlaceholder } from '@/components/TutorTypingPlaceholder';
 import { TutorAssistantMarkdown } from '@/components/TutorAssistantMarkdown';
 
@@ -183,7 +183,7 @@ function buildPartCheckPayload(args: {
 }
 
 export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPracticeClientProps) {
-  const { user, userData, loadingUserData } = useAuthContext();
+  const { userData, loadingUserData } = useAuthContext();
   const hasGovPass = hasGovPremiumAccess(userData);
   const caseSlug = decodeURIComponent(caseName).toLowerCase();
   const prompt = useMemo(
@@ -209,48 +209,21 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
   const senseiAvatar = tutorAvatarUrl('gov');
   const senseiName = personaForSubject('gov').name;
 
+  const hasAnyDraftAnswer = [0, 1, 2].some((i) => Boolean(answers[i]?.trim()));
+  const isBusy = senseiSending || isFullGrading;
+  const canUsePremiumTools = hasGovPass && !loadingUserData;
+
   useEffect(() => {
     if (!senseiScrollRef.current) return;
     senseiScrollRef.current.scrollTop = senseiScrollRef.current.scrollHeight;
   }, [senseiMessages, senseiSending]);
-
-  if (loadingUserData) {
-    return (
-      <main className="min-h-screen bg-gray-50 px-4 py-20">
-        <div className="mx-auto max-w-xl rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-          <p className="text-gray-600 font-semibold">Checking access...</p>
-        </div>
-      </main>
-    );
-  }
-
-  if (!hasGovPass) {
-    return (
-      <main className="min-h-screen bg-gray-50 px-4 py-20">
-        <div className="mx-auto max-w-xl rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-          <h1 className="text-2xl font-black text-gray-900">Unlock SCOTUS Practice</h1>
-          <p className="mt-3 text-gray-600">
-            SCOTUS comparison drills are included with the AP Gov Season Pass.
-          </p>
-          <Link
-            href="/purchase/season-pass?courseType=gov"
-            className="mt-6 inline-flex items-center gap-2 rounded-lg bg-violet-600 px-5 py-3 font-bold text-white hover:bg-violet-700"
-          >
-            Get the Season Pass — $29
-          </Link>
-        </div>
-      </main>
-    );
-  }
-
-  const hasAnyDraftAnswer = [0, 1, 2].some((i) => Boolean(answers[i]?.trim()));
-  const isBusy = senseiSending || isFullGrading;
 
   const appendSenseiExchange = async (
     userContent: string,
     intent: 'coach' | 'part_check' = 'coach',
     apiUserPayload?: string
   ) => {
+    if (!canUsePremiumTools) return;
     const userMessage: SenseiMessage = {
       id: `u-${Date.now()}`,
       role: 'user',
@@ -341,7 +314,7 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
   };
 
   const submitFullResponseForGrading = async () => {
-    if (isBusy || !hasAnyDraftAnswer) return;
+    if (!canUsePremiumTools || isBusy || !hasAnyDraftAnswer) return;
     const partTexts = [0, 1, 2].map((i) => (answers[i] ?? '').trim());
     const gradingPayload = buildFullFrqSubmissionForApi({
       tasks: prompt.tasks,
@@ -403,7 +376,7 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
   };
 
   const submitPartForFeedback = async (idx: 0 | 1 | 2) => {
-    if (isBusy || !(answers[idx] ?? '').trim()) return;
+    if (!canUsePremiumTools || isBusy || !(answers[idx] ?? '').trim()) return;
     const partLabel = (String.fromCharCode(65 + idx) as 'A' | 'B' | 'C');
     const task = prompt.tasks[idx];
     const answer = (answers[idx] ?? '').trim();
@@ -624,10 +597,19 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
                               <button
                                 type="button"
                                 onClick={() => void submitPartForFeedback(idx as 0 | 1 | 2)}
-                                disabled={isBusy || !(answers[idx] ?? '').trim()}
-                                className="rounded-lg border border-violet-300 bg-violet-50 px-3 py-2 text-[11px] font-black uppercase tracking-wide text-violet-800 shadow-sm hover:bg-violet-100 disabled:pointer-events-none disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none"
+                                disabled={
+                                  !canUsePremiumTools || isBusy || !(answers[idx] ?? '').trim()
+                                }
+                                className="inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-[11px] font-black uppercase tracking-wide shadow-sm disabled:pointer-events-none disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none border-violet-300 bg-violet-50 text-violet-800 hover:bg-violet-100"
                               >
-                                Check My Work
+                                {!canUsePremiumTools ? (
+                                  <>
+                                    <Lock className="h-3 w-3 shrink-0" aria-hidden />
+                                    Unlock with Season Pass
+                                  </>
+                                ) : (
+                                  'Check My Work'
+                                )}
                               </button>
                             </div>
                           </div>
@@ -641,39 +623,52 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
               <div className="mt-5 flex flex-col gap-4 border-t-2 border-gray-200 pt-5 sm:flex-row sm:items-end sm:justify-between">
                 <div className="min-w-0 space-y-2">
                   <p className="text-sm font-black text-gray-900">Grade full response</p>
-                  <p className="text-xs leading-relaxed text-gray-500">
-                    Scores Parts A–C based on FRQ rubric. Submit only after completing all parts.
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {([0, 1, 2] as const).map((i) => {
-                      const filled = Boolean(answers[i]?.trim());
-                      const part = String.fromCharCode(65 + i);
-                      return (
-                        <span
-                          key={part}
-                          className={`inline-flex items-center rounded border px-2 py-0.5 text-[10px] font-black uppercase tracking-wide ${
-                            filled
-                              ? 'border-indigo-300 bg-indigo-50 text-indigo-800'
-                              : 'border-gray-200 bg-gray-50 text-gray-400'
-                          }`}
-                        >
-                          Part {part}
-                          {filled ? ' · ready' : ' · empty'}
-                        </span>
-                      );
-                    })}
-                  </div>
+                  {canUsePremiumTools ? (
+                    <>
+                      <p className="text-xs leading-relaxed text-gray-500">
+                        Scores Parts A–C based on FRQ rubric. Submit only after completing all parts.
+                      </p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {([0, 1, 2] as const).map((i) => {
+                          const filled = Boolean(answers[i]?.trim());
+                          const part = String.fromCharCode(65 + i);
+                          return (
+                            <span
+                              key={part}
+                              className={`inline-flex items-center rounded border px-2 py-0.5 text-[10px] font-black uppercase tracking-wide ${
+                                filled
+                                  ? 'border-indigo-300 bg-indigo-50 text-indigo-800'
+                                  : 'border-gray-200 bg-gray-50 text-gray-400'
+                              }`}
+                            >
+                              Part {part}
+                              {filled ? ' · ready' : ' · empty'}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    </>
+                  ) : (
+                    <p className="text-xs leading-relaxed text-gray-500">
+                      Submitting for AI grading is included with the AP Gov Season Pass.
+                    </p>
+                  )}
                 </div>
                 <button
                   type="button"
                   onClick={() => void submitFullResponseForGrading()}
-                  disabled={isBusy || !hasAnyDraftAnswer}
-                  className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-lg border-2 border-black bg-gray-900 px-5 text-sm font-black uppercase tracking-wide text-white shadow-[2px_2px_0_0_rgba(0,0,0,1)] transition hover:bg-black disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none"
+                  disabled={!canUsePremiumTools || isBusy || !hasAnyDraftAnswer}
+                  className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-lg border-2 px-5 text-sm font-black uppercase tracking-wide shadow-[2px_2px_0_0_rgba(0,0,0,1)] transition disabled:pointer-events-none disabled:cursor-not-allowed disabled:border-gray-300 disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none border-black bg-gray-900 text-white hover:bg-black"
                 >
                   {isFullGrading ? (
                     <>
                       <Loader2 className="h-4 w-4 shrink-0 animate-spin" aria-hidden />
                       Grading…
+                    </>
+                  ) : !canUsePremiumTools ? (
+                    <>
+                      <Lock className="h-4 w-4 shrink-0" aria-hidden />
+                      Unlock with Season Pass
                     </>
                   ) : (
                     <>
@@ -738,7 +733,7 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
                       <button
                         type="button"
                         onClick={() => void sendQuickStartPrompt('case')}
-                        disabled={isBusy}
+                        disabled={!canUsePremiumTools || isBusy}
                         className="rounded-xl border border-slate-200/95 bg-white px-3.5 py-2.5 text-left text-[13px] font-medium text-slate-800 shadow-sm outline-none ring-offset-white transition hover:bg-slate-50 hover:shadow-md focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-40"
                       >
                         <span className="flex items-center gap-2">
@@ -749,7 +744,7 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
                       <button
                         type="button"
                         onClick={() => void sendQuickStartPrompt('clause')}
-                        disabled={isBusy}
+                        disabled={!canUsePremiumTools || isBusy}
                         className="rounded-xl border border-slate-200/95 bg-white px-3.5 py-2.5 text-left text-[13px] font-medium text-slate-800 shadow-sm outline-none ring-offset-white transition hover:bg-slate-50 hover:shadow-md focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-40"
                       >
                         <span className="flex items-center gap-2">
@@ -760,7 +755,7 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
                       <button
                         type="button"
                         onClick={() => void sendQuickStartPrompt('bridge')}
-                        disabled={isBusy}
+                        disabled={!canUsePremiumTools || isBusy}
                         className="rounded-xl border border-slate-200/95 bg-white px-3.5 py-2.5 text-left text-[13px] font-medium text-slate-800 shadow-sm outline-none ring-offset-white transition hover:bg-slate-50 hover:shadow-md focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-40"
                       >
                         <span className="flex items-center gap-2">
@@ -843,13 +838,18 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
                   <button
                     type="button"
                     onClick={() => void sendSenseiMessage()}
-                    disabled={isBusy || !senseiInput.trim()}
-                    className="flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-violet-600 text-sm font-semibold text-white shadow-md shadow-violet-900/15 transition-colors hover:bg-violet-700 focus-visible:outline focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-45"
+                    disabled={!canUsePremiumTools || isBusy || !senseiInput.trim()}
+                    className="flex h-10 w-full items-center justify-center gap-2 rounded-xl bg-violet-600 text-sm font-semibold text-white shadow-md shadow-violet-900/15 transition-colors hover:bg-violet-700 focus-visible:outline focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none"
                   >
                     {senseiSending ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin opacity-95" aria-hidden />
                         Thinking…
+                      </>
+                    ) : !canUsePremiumTools ? (
+                      <>
+                        <Lock className="h-4 w-4 shrink-0" aria-hidden />
+                        Unlock with Season Pass
                       </>
                     ) : (
                       <>Send</>

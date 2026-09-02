@@ -340,7 +340,7 @@ const macroUnit1Questions = [
     "unit": 1,
     "lessonIDS": ["1.3"],
     "unitName": "Comparative Advantage and Gains from Trade",
-    "question": "Two neighboring countries, Westland and Eastland, have identical resource quantities but different production technologies. If Westland exports microchips to Eastland and imports lumber from Eastland, which of the following conclusions must be true?",
+    "question": "If two neighboring countries engage in mutually beneficial trade, with Westland exporting microchips to Eastland and importing lumber from Eastland, which of the following conclusions must be true?",
     "image": null,
     "options": [
       "Westland has a higher opportunity cost for producing microchips than Eastland.",
@@ -4726,7 +4726,7 @@ const microUnit1Questions = [
     "unit": 1,
     "lessonIDS": ["1.4"],
     "unitName": "Comparative Advantage and Gains from Trade",
-    "question": "Two neighboring countries, Westland and Eastland, have identical resource quantities but different production technologies. If Westland exports microchips to Eastland and imports lumber from Eastland, which of the following conclusions must be true?",
+    "question": "If two neighboring countries engage in mutually beneficial trade, with Westland exporting microchips to Eastland and importing lumber from Eastland, which of the following conclusions must be true?",
     "image": null,
     "options": [
       "Westland has a higher opportunity cost for producing microchips than Eastland.",

@@ -11,14 +11,10 @@ import {
   type ScotusRequiredCase,
 } from '@/data/gov/scotusRequiredCases';
 import { scotusEssayPrompts } from '@/data/gov/scotusEssayPrompts';
-import { useAuthContext } from '@/contexts/AuthContext';
-import { hasGovPremiumAccess } from '@/lib/utils';
 
 const FILTER_UNITS = [1, 2, 3, 4, 5] as const;
 
 export default function ScotusEssayPracticeHubClient() {
-  const { user, userData, loadingUserData } = useAuthContext();
-  const hasGovPass = hasGovPremiumAccess(userData);
   const [selectedUnit, setSelectedUnit] = useState<number | null>(null);
 
   const orderedCases = useMemo(() => {
@@ -47,35 +43,6 @@ export default function ScotusEssayPracticeHubClient() {
 
     return [...matching, ...others];
   }, [selectedUnit]);
-
-  if (loadingUserData) {
-    return (
-      <main className="min-h-screen bg-white px-4 py-20">
-        <div className="mx-auto max-w-xl rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-          <p className="font-semibold text-gray-600">Checking access...</p>
-        </div>
-      </main>
-    );
-  }
-
-  if (!hasGovPass) {
-    return (
-      <main className="min-h-screen bg-white px-4 py-20">
-        <div className="mx-auto max-w-xl rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-          <h1 className="text-2xl font-black text-gray-900">Unlock SCOTUS Practice</h1>
-          <p className="mt-3 text-gray-600">
-            SCOTUS comparison drills are included with the AP Gov Season Pass.
-          </p>
-          <Link
-            href="/purchase/season-pass?courseType=gov"
-            className="mt-6 inline-flex items-center gap-2 rounded-lg bg-violet-600 px-5 py-3 font-bold text-white hover:bg-violet-700"
-          >
-            Get the Season Pass — $29
-          </Link>
-        </div>
-      </main>
-    );
-  }
 
   return (
     <main className="min-h-screen bg-white px-4 pb-16 pt-12 sm:px-6 sm:pt-14 lg:px-8 lg:pt-16">

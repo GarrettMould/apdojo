@@ -16,14 +16,16 @@ export function useSubjectSwitchNavigation() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { selectedSubject, setSelectedSubject } = useAuthContext();
+  const { selectedSubject, setSelectedSubject, user } = useAuthContext();
 
   return useCallback(
     async (newSubject: CourseSubject, currentSubject?: CourseSubject) => {
       const fromSubject = currentSubject ?? selectedSubject;
       if (newSubject === fromSubject) return;
 
-      const targetUrl = getUrlForSubjectSwitch(pathname ?? '/', searchParams, newSubject);
+      const targetUrl = getUrlForSubjectSwitch(pathname ?? '/', searchParams, newSubject, {
+        isLoggedIn: !!user,
+      });
       const here = currentLocationKey(pathname ?? '/', searchParams);
 
       await setSelectedSubject(newSubject);
@@ -35,6 +37,6 @@ export function useSubjectSwitchNavigation() {
 
       router.refresh();
     },
-    [pathname, router, searchParams, selectedSubject, setSelectedSubject],
+    [pathname, router, searchParams, selectedSubject, setSelectedSubject, user],
   );
 }

@@ -5,6 +5,11 @@ import { Download, CheckCircle, Lock } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { hasValidSeasonPass } from '@/lib/utils';
 import { macroUnits as macroUnitsFromData, microUnits as microUnitsFromData } from '@/data/cheatSheets';
+import { CheatSheetPdfPreviewThumbnail } from '@/components/CheatSheetPdfPreviewThumbnail';
+import {
+  cheatSheetPdfPreviewPath,
+  getEconUnitPdfUrl,
+} from '@/data/cheatSheetPdfPreviews';
 
 type CopyMode = 'cheat-sheets' | 'study-guides';
 
@@ -60,7 +65,8 @@ function UnitResourceRow({ unit, isProCustomer, index, copyMode, subject, pdfAva
   const copy = getCopy(copyMode);
 
   const pdfLabel = subject === 'macro' ? 'Macro' : 'Micro';
-  const pdfUrl = `https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/AP+${pdfLabel}+-+Unit+${unit.number}.pdf`;
+  const pdfUrl = getEconUnitPdfUrl(subject, unit.number);
+  const previewSrc = cheatSheetPdfPreviewPath(subject, unit.number);
   const filename = `AP-Dojo-${pdfLabel}-Unit-${unit.number}-${copy.filenameLabel}.pdf`;
   const isEven = index % 2 === 0;
 
@@ -117,12 +123,12 @@ function UnitResourceRow({ unit, isProCustomer, index, copyMode, subject, pdfAva
           filter: pdfAvailable ? 'blur(0.5px)' : 'none',
         }}
       >
-        {pdfAvailable ? (
+        {pdfAvailable && previewSrc ? (
           <>
-            <iframe
-              src={`${pdfUrl}#toolbar=0&navpanes=0`}
-              title={`Unit ${unit.number} ${copy.previewTitle}`}
-              style={{ position: 'absolute', top: 0, left: 0, width: '833px', height: '1080px', transform: 'scale(0.2)', transformOrigin: 'top left', pointerEvents: 'none' }}
+            <CheatSheetPdfPreviewThumbnail
+              src={previewSrc}
+              alt={`Unit ${unit.number} ${copy.previewTitle}`}
+              containerWidth={170}
             />
             <button
               onClick={handleDownload}

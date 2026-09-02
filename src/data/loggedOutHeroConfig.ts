@@ -33,9 +33,9 @@ export type LoggedOutHeroConfig = {
   ctaHref: string;
   ctaLabel: string;
   subheadline: string;
-  pdfSrc: string | null;
-  /** Subject FRQ / stimulus images shown in the Unit 1 cheat sheet preview (stats & gov). */
-  cheatSheetPreviewImages: Array<{ src: string; alt: string }>;
+  /** Static raster of the cheat-sheet PDF (same crop as the old iframe preview). */
+  cheatSheetPreviewSrc: string | null;
+  cheatSheetPreviewAlt: string;
   cheatSheetHref: string;
   mcqPreview: {
     question: string;
@@ -63,12 +63,13 @@ const ECON_THEMES = {
   },
 } as const;
 
-const PDF_VIEWER_FRAGMENT = '#toolbar=0&navpanes=0&scrollbar=0';
 
-const STATS_UNIT_2_PDF =
-  'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/apstats/AP+Stats+-+Unit+2.pdf';
-const GOV_UNIT_2_PDF =
-  'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/apgov/AP+Gov+-+Unit+2+-+CS.pdf';
+const HERO_PREVIEWS = {
+  macro: '/cheat-sheet-previews/macro/unit-1.webp',
+  micro: '/cheat-sheet-previews/micro/unit-1.webp',
+  stats: '/cheat-sheet-previews/stats/unit-2.webp',
+  gov: '/cheat-sheet-previews/gov/unit-2.webp',
+} as const;
 
 export function getLoggedOutHeroConfig(
   variant: LoggedOutHeroVariant,
@@ -90,17 +91,8 @@ export function getLoggedOutHeroConfig(
       ctaLabel: 'Get the Season Pass — $29',
       subheadline:
         'Unit MCQ practice, FRQ packs, printable cheat sheets, and more — built for the 2026 AP Statistics CED.',
-      pdfSrc: `${STATS_UNIT_2_PDF}${PDF_VIEWER_FRAGMENT}`,
-      cheatSheetPreviewImages: [
-        {
-          src: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/stats/unit1/type_y_boxplot.svg',
-          alt: 'Boxplot of Type Y loaf weights',
-        },
-        {
-          src: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/stats/unit1/step_count_histogram.svg',
-          alt: 'Histogram of daily step counts',
-        },
-      ],
+      cheatSheetPreviewSrc: HERO_PREVIEWS.stats,
+      cheatSheetPreviewAlt: 'AP Stats Unit 2 cheat sheet preview',
       cheatSheetHref: '/ap-stats-unit-2-cheat-sheet',
       mcqPreview: {
         question: 'Which of the following best describes a simple random sample (SRS)?',
@@ -135,17 +127,8 @@ export function getLoggedOutHeroConfig(
       ctaLabel: 'Get the Season Pass — $29',
       subheadline:
         'Full unit MCQ practice, SCOTUS comparison drills, Gov FRQ packs, printable cheat sheets, and more — all for $29.',
-      pdfSrc: `${GOV_UNIT_2_PDF}${PDF_VIEWER_FRAGMENT}`,
-      cheatSheetPreviewImages: [
-        {
-          src: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/gov/u4-frq2.svg',
-          alt: 'AP Gov FRQ quantitative chart',
-        },
-        {
-          src: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/gov/unit_1/balanced+budget+requirements+map.svg',
-          alt: 'Balanced budget requirements map',
-        },
-      ],
+      cheatSheetPreviewSrc: HERO_PREVIEWS.gov,
+      cheatSheetPreviewAlt: 'AP Gov Unit 2 cheat sheet preview',
       cheatSheetHref: '/ap-gov-unit-2-cheat-sheet',
       mcqPreview: {
         question: 'Which principle best explains why the Bill of Rights limits national government power?',
@@ -177,8 +160,10 @@ export function getLoggedOutHeroConfig(
     ctaLabel: 'Get the Season Pass — $29',
     subheadline:
       'Full practice exams, unlimited MCQ practice, AI-graded FRQs, printable cheat sheets, and more — all for $29.',
-    pdfSrc: `https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/pdfs/AP+${isMicro ? 'Micro' : 'Macro'}+-+Unit+1.pdf${PDF_VIEWER_FRAGMENT}`,
-    cheatSheetPreviewImages: [],
+    cheatSheetPreviewSrc: isMicro ? HERO_PREVIEWS.micro : HERO_PREVIEWS.macro,
+    cheatSheetPreviewAlt: isMicro
+      ? 'AP Micro Unit 1 cheat sheet preview'
+      : 'AP Macro Unit 1 cheat sheet preview',
     cheatSheetHref: '/unit/1',
     mcqPreview: {
       question: '"In a competitive market, equilibrium is achieved when..."',
