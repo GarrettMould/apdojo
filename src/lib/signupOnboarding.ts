@@ -36,6 +36,7 @@ export async function persistSignupOnboarding(
     targetApScores: data.targetScores,
     preferredResources: data.resources,
     hasCompletedSubjectSelection: true,
+    hasCompletedInitialUnitSelection: true,
   });
 
   const initialBaseXP = 25;

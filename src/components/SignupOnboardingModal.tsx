@@ -201,7 +201,7 @@ export function SignupOnboardingModal({
     setError('');
     try {
       let userId = googleAuthenticatedUid;
-      const destination = deferredRedirect ?? redirectOnLogin ?? '/initial-unit-selection';
+      const destination = deferredRedirect ?? redirectOnLogin ?? '/';
       setRedirectOnLogin(null);
       setDeferredRedirect(null);
 

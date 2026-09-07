@@ -65,7 +65,8 @@ export default function SelectSubjectPage() {
       // 1. Update the main user document with the selected subjects
       batch.update(userDocRef, {
         selectedSubjects: subjects,
-        hasCompletedSubjectSelection: true
+        hasCompletedSubjectSelection: true,
+        hasCompletedInitialUnitSelection: true,
       });
 
       // 2. Create initial XP docs for all units of the selected subjects
@@ -90,8 +91,7 @@ export default function SelectSubjectPage() {
 
       console.log(`User ${user.uid} updated with subjects: ${subjects.join(', ')} and initial XP docs created.`);
       
-      // 4. Redirect to the NEXT step (initial unit selection)
-      router.push('/initial-unit-selection');
+      router.push('/');
 
     } catch (err) {
       console.error("Error updating subject and initializing XP:", err);
@@ -239,7 +239,7 @@ export default function SelectSubjectPage() {
             }`}
             disabled={selectedSubjects.size === 0 || isLoading}
           >
-            {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Continue to Unit Selection'}
+            {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Continue'}
           </button>
         </div>
       </div>
