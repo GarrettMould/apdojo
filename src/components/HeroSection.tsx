@@ -124,7 +124,7 @@ export function HeroSection({ variant = 'econ' }: HeroSectionProps) {
                 className="flex flex-col items-center text-center lg:items-start lg:text-left gap-9 w-full"
               >
 
-            {/* Coming soon note (replaces expired 2026 exam countdown) */}
+            {/* 2027 exam course availability note */}
             <div className="flex flex-col items-center lg:items-start gap-1.5 min-h-[4.75rem] sm:min-h-[5.25rem] justify-center">
               <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">
                 AP {config.countdownLabel}
@@ -132,7 +132,7 @@ export function HeroSection({ variant = 'econ' }: HeroSectionProps) {
               <p className="text-xl sm:text-2xl lg:text-3xl font-black text-gray-900 leading-tight tracking-tight">
                 Updated <span className={yearAccentClass}>2027</span> Exam Course
                 <br />
-                Coming Soon!
+                Available Now!
               </p>
             </div>
 

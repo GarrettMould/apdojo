@@ -2630,7 +2630,7 @@ export const videos: Video[] = [
         lessonIDS: ["3.2", "3.3"],
         tags: ["Unit 3", "Inference", "Conditions", "Confidence Intervals"],
         videoUrl:
-          "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/stats/unit_3/Unit+3+-+Conditions+for+Inference.mp4",
+          "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/stats/unit_3/conditions+for+inference.mp4",
         accessLevel: "free",
         questions: [],
       },
@@ -2645,7 +2645,7 @@ export const videos: Video[] = [
         lessonIDS: ["3.3", "3.5", "3.7"],
         tags: ["Unit 3", "Inference", "Confidence Intervals", "Hypothesis Tests"],
         videoUrl:
-          "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/stats/unit_3/Unit+3+-+Confidence+Intervals+vs.+Hypothesis+Tests.mp4",
+          "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/stats/unit_3/confidence+intervals+and+hypothesis+tests.mp4",
         accessLevel: "free",
         questions: [],
       },

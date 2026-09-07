@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
+import { normalizeMathMarkdown } from '@/lib/mathSolver/normalizeMathMarkdown';
 
 /** Map unicode asterisk lookalikes → ASCII so `**`/`*` match CommonMark emphasis rules. */
 export function sanitizeTutorMarkdownAsteriskLookalikes(raw: string): string {
@@ -20,23 +21,34 @@ export interface TutorAssistantMarkdownProps {
   text: string;
   className?: string;
   linkClassName?: string;
+  /** Render without block paragraph margins — for titles / one-liners. */
+  inline?: boolean;
 }
 
 /**
  * Renders tutor/model replies: CommonMark emphasis + `$...$` / `$$...$$` KaTeX (remark-math + rehype-katex).
+ * Also normalizes `\(...\)` / `\[...\]` and bare TeX command lines into `$` delimiters.
  */
 export function TutorAssistantMarkdown({
   text,
   className = DEFAULT_MARKDOWN_CLASS,
   linkClassName = DEFAULT_LINK_CLASS,
+  inline = false,
 }: TutorAssistantMarkdownProps) {
+  const prepared = normalizeMathMarkdown(sanitizeTutorMarkdownAsteriskLookalikes(text));
+
   return (
     <div className={className}>
       <ReactMarkdown
         remarkPlugins={[remarkMath]}
         rehypePlugins={[rehypeKatex]}
         components={{
-          p: ({ children }) => <p className="mb-2 whitespace-pre-wrap last:mb-0">{children}</p>,
+          p: ({ children }) =>
+            inline ? (
+              <span className="[&_.katex]:text-inherit">{children}</span>
+            ) : (
+              <p className="mb-2 last:mb-0">{children}</p>
+            ),
           strong: ({ children }) => (
             <strong className="font-semibold text-slate-900">{children}</strong>
           ),
@@ -66,7 +78,7 @@ export function TutorAssistantMarkdown({
           ),
         }}
       >
-        {sanitizeTutorMarkdownAsteriskLookalikes(text)}
+        {prepared}
       </ReactMarkdown>
     </div>
   );

@@ -62,3 +62,23 @@ export function getScotusCaseRecord(requiredCase: ScotusRequiredCase): GovSuprem
 export function formatScotusCaseTitle(requiredCase: ScotusRequiredCase): string {
   return `${requiredCase.caseName} (${requiredCase.year})`;
 }
+
+/** Live SCOTUS comparison FRQ slugs (matches `scotusEssayPrompts[].id`). */
+export function getLiveScotusPracticeCaseIds(): string[] {
+  return AP_GOV_REQUIRED_SCOTUS_CASES.filter((c) => isScotusPracticeLive(c.id)).map((c) => c.id);
+}
+
+export function scotusPracticeCasePath(caseId: string): string {
+  return `/scotus-essay-practice/${caseId}`;
+}
+
+/** Pick a random live case; pass `excludeId` to avoid re-picking the current case when shuffling. */
+export function pickRandomScotusPracticeCaseId(excludeId?: string): string {
+  const live = getLiveScotusPracticeCaseIds();
+  const pool = excludeId ? live.filter((id) => id !== excludeId) : live;
+  const ids = pool.length > 0 ? pool : live;
+  if (ids.length === 0) {
+    return scotusEssayPrompts[0]?.id ?? 'marbury-v-madison';
+  }
+  return ids[Math.floor(Math.random() * ids.length)];
+}

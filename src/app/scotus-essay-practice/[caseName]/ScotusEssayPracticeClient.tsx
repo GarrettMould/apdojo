@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Source_Serif_4 } from 'next/font/google';
 import {
   ClipboardCheck,
@@ -14,6 +15,8 @@ import {
   Loader2,
   RotateCcw,
   Lock,
+  Shuffle,
+  List,
 } from 'lucide-react';
 import { scotusEssayPrompts } from '@/data/gov/scotusEssayPrompts';
 import { getScotusGradingKey } from '@/data/gov/scotusGradingKeys';
@@ -24,6 +27,11 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import { hasGovPremiumAccess } from '@/lib/utils';
 import { TutorTypingPlaceholder } from '@/components/TutorTypingPlaceholder';
 import { TutorAssistantMarkdown } from '@/components/TutorAssistantMarkdown';
+import { ScotusCaseListOverlay } from '@/components/ScotusCaseListPanel';
+import {
+  pickRandomScotusPracticeCaseId,
+  scotusPracticeCasePath,
+} from '@/data/gov/scotusRequiredCases';
 
 const frqBody = Source_Serif_4({
   subsets: ['latin'],
@@ -183,6 +191,7 @@ function buildPartCheckPayload(args: {
 }
 
 export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPracticeClientProps) {
+  const router = useRouter();
   const { userData, loadingUserData } = useAuthContext();
   const hasGovPass = hasGovPremiumAccess(userData);
   const caseSlug = decodeURIComponent(caseName).toLowerCase();
@@ -203,6 +212,7 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
   const [fullGradeResult, setFullGradeResult] = useState<FullGradeResult | null>(null);
   /** Local self-check marks against the scoring rubric (not persisted). */
   const [rubricSelfMarks, setRubricSelfMarks] = useState<Record<string, boolean>>({});
+  const [caseListOpen, setCaseListOpen] = useState(false);
   const senseiScrollRef = useRef<HTMLDivElement | null>(null);
 
   const readableCaseName = prompt.requiredCase;
@@ -217,6 +227,22 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
     if (!senseiScrollRef.current) return;
     senseiScrollRef.current.scrollTop = senseiScrollRef.current.scrollHeight;
   }, [senseiMessages, senseiSending]);
+
+  useEffect(() => {
+    setAnswers({});
+    setActiveTaskIndex(0);
+    setFullGradeResult(null);
+    setRubricSelfMarks({});
+    setSenseiMessages([]);
+    setSenseiInput('');
+    setSenseiQuickStartsHidden(false);
+    setCaseListOpen(false);
+  }, [caseSlug]);
+
+  const shuffleToRandomCase = () => {
+    const nextId = pickRandomScotusPracticeCaseId(caseSlug);
+    router.push(scotusPracticeCasePath(nextId));
+  };
 
   const appendSenseiExchange = async (
     userContent: string,
@@ -403,14 +429,41 @@ export default function ScotusEssayPracticeClient({ caseName }: ScotusEssayPract
   return (
     <main className="min-h-screen bg-gray-50 text-gray-900">
       <div className="mx-auto w-full max-w-[1700px] px-4 pb-10 pt-10 sm:px-6 sm:pt-12 lg:px-8 lg:pt-14">
-        <header className="mb-6">
-          <p className="inline-flex w-fit rounded-md border-2 border-indigo-700 bg-indigo-500 px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-            SCOTUS Comparison Practice
-          </p>
-          <h1 className="mt-3 text-4xl font-extrabold leading-tight tracking-tight text-gray-900 sm:text-5xl">
-            {readableCaseName}
-          </h1>
+        <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0 flex-1">
+            <p className="inline-flex w-fit rounded-md border-2 border-indigo-700 bg-indigo-500 px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+              SCOTUS Comparison Practice
+            </p>
+            <h1 className="mt-3 text-4xl font-extrabold leading-tight tracking-tight text-gray-900 sm:text-5xl">
+              {readableCaseName}
+            </h1>
+          </div>
+          <div className="flex shrink-0 items-center gap-2 self-start">
+            <button
+              type="button"
+              onClick={shuffleToRandomCase}
+              className="inline-flex items-center gap-2 rounded-xl border-2 border-black bg-yellow-300 px-3.5 py-2.5 text-sm font-black text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] active:translate-y-0 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+              aria-label="Shuffle to a random SCOTUS case"
+            >
+              <Shuffle className="h-4 w-4 shrink-0" aria-hidden />
+              Shuffle
+            </button>
+            <button
+              type="button"
+              onClick={() => setCaseListOpen(true)}
+              className="inline-flex h-[42px] w-[42px] items-center justify-center rounded-xl border-2 border-black bg-white text-gray-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition hover:bg-gray-50"
+              aria-label="Browse all SCOTUS cases"
+            >
+              <List className="h-5 w-5" aria-hidden />
+            </button>
+          </div>
         </header>
+
+        <ScotusCaseListOverlay
+          open={caseListOpen}
+          onClose={() => setCaseListOpen(false)}
+          currentCaseId={caseSlug}
+        />
 
         <section className="grid grid-cols-1 gap-4 xl:grid-cols-12 xl:gap-5">
           <section

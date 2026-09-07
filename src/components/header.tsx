@@ -86,7 +86,9 @@ export function Header() {
         ]
       : displaySubject === 'gov'
         ? [{ label: 'SCOTUS Practice', href: '/scotus-essay-practice' }]
-        : []),
+        : displaySubject === 'stats'
+          ? [{ label: 'TI-84 Drills', href: '/ap-stats-calculator-simulator' }]
+          : []),
     { label: 'Cheat Sheets', href: defaultCheatSheetUrl(displaySubject) },
     ...(isEconCourse(displaySubject) ? [{ label: 'Blog', href: '/ap-blog-home' }] : []),
   ];
@@ -273,6 +275,13 @@ export function Header() {
                   className={`text-lg text-gray-700 transition-colors font-bold ${navHoverClass}`}
                 >
                   SCOTUS Practice
+                </Link>
+              ) : displaySubject === 'stats' ? (
+                <Link
+                  href="/ap-stats-calculator-simulator"
+                  className={`text-lg text-gray-700 transition-colors font-bold ${navHoverClass}`}
+                >
+                  TI-84 Drills
                 </Link>
               ) : null}
 

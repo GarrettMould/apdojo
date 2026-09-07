@@ -18,8 +18,8 @@ const STATS_FRQ_WALKTHROUGH_BY_UNIT: Record<number, Partial<Record<number, strin
     2: `${STATS_FRQ_WALKTHROUGH_BASE_BY_UNIT[2]}/Unit+2+-+FRQ+2.mp4`,
   },
   3: {
-    1: `${STATS_FRQ_WALKTHROUGH_BASE_BY_UNIT[3]}/Unit+3+-+Frq+1.mov`,
-    2: `${STATS_FRQ_WALKTHROUGH_BASE_BY_UNIT[3]}/Unit+3+-+FRQ+2.mp4`,
+    1: `${STATS_FRQ_WALKTHROUGH_BASE_BY_UNIT[3]}/FRQ+1.mp4`,
+    2: `${STATS_FRQ_WALKTHROUGH_BASE_BY_UNIT[3]}/FRQ+2.mp4`,
   },
 };
 

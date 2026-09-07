@@ -51,9 +51,9 @@ import { COURSE_CURRICULUM_OUTLINES } from '@/data/courseCurriculumOutline';
 import { scotusEssayPrompts } from '@/data/gov/scotusEssayPrompts';
 import { processMathContent } from '@/utils/processMathContent';
 import { CheatSheetPdfPreviewThumbnail } from '@/components/CheatSheetPdfPreviewThumbnail';
+import { StatsCalculatorCheatSheetCta } from '@/components/StatsCalculatorCheatSheetCta';
 import {
   GOV_UNIT_PDF_URLS,
-  STATS_UNIT_PDF_URLS,
   ULTIMATE_ADAS_PDF_URL,
   cheatSheetPdfPreviewPath,
   getEconUnitPdfUrl,
@@ -2022,10 +2022,9 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           </div>
         </div>
 
-        {/* Printable cheat sheet PDFs: macro (all); micro 1–5; stats units with PDFs; gov units 1–5 */}
+        {/* Printable cheat sheet PDFs: macro (all); micro 1–5; gov units 1–5 (not stats — calculator CTA instead) */}
         {(selectedSubject === 'macro' ||
           (selectedSubject === 'micro' && activeUnitNum >= 1 && activeUnitNum <= 5) ||
-          (selectedSubject === 'stats' && Boolean(STATS_UNIT_PDF_URLS[activeUnitNum])) ||
           (selectedSubject === 'gov' && Boolean(GOV_UNIT_PDF_URLS[activeUnitNum]))) && (
         <div className="mb-8 flex flex-row items-center gap-6 sm:gap-8">
           {/* Stacked overlapping PDF previews - bundle style */}
@@ -2035,9 +2034,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                 ? macroUnits
                 : selectedSubject === 'micro'
                   ? microUnits.filter((u) => u.number <= 5)
-                  : selectedSubject === 'stats'
-                    ? statsUnits.filter((u) => Boolean(STATS_UNIT_PDF_URLS[u.number]))
-                    : govUnits.filter((u) => Boolean(GOV_UNIT_PDF_URLS[u.number]));
+                  : govUnits.filter((u) => Boolean(GOV_UNIT_PDF_URLS[u.number]));
 
             const getUnitPdfUrlForSubject = (unitNumber: number) => {
               if (selectedSubject === 'macro' || selectedSubject === 'micro') {
@@ -2047,7 +2044,6 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
             };
 
             const getUnitPdfFilename = (unitNumber: number) => {
-              if (selectedSubject === 'stats') return `AP-Dojo-Stats-Unit-${unitNumber}-Cheat-Sheet.pdf`;
               if (selectedSubject === 'gov') return `AP-Dojo-Gov-Unit-${unitNumber}-Cheat-Sheet.pdf`;
               const pdfSubject = selectedSubject === 'macro' ? 'Macro' : 'Micro';
               return `AP-Dojo-${pdfSubject}-Unit-${unitNumber}-Cheat-Sheet.pdf`;
@@ -2107,20 +2103,14 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
             <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
               {selectedSubject === 'macro'
                 ? 'Printable Cheat Sheets for Every Unit'
-                : selectedSubject === 'micro'
-                  ? 'Printable Cheat Sheets for Units 1–5'
-                  : selectedSubject === 'gov'
-                    ? 'Printable Cheat Sheets for Units 1–5'
-                    : 'Printable Unit 2 Cheat Sheet'}
+                : 'Printable Cheat Sheets for Units 1–5'}
             </h2>
             <p className="text-gray-600 text-sm sm:text-base">
               {selectedSubject === 'macro'
                 ? 'Everything you need to ace your exam, all on a single page.'
                 : selectedSubject === 'micro'
                   ? 'Single-page PDFs for Units 1-5. The full unit experience for Unit 6 stays on this cheat sheet page.'
-                  : selectedSubject === 'gov'
-                    ? 'Single-page PDFs for Units 1–5. Click a sheet to download.'
-                    : 'A single-page PDF you can print or save — everything from this unit in one place.'}
+                  : 'Single-page PDFs for Units 1–5. Click a sheet to download.'}
             </p>
             {selectedSubject === 'macro' || selectedSubject === 'micro' ? (
               <Link
@@ -2139,15 +2129,10 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                     setShowPacketSeasonPassModal(true);
                     return;
                   }
-                  const pdfUrl =
-                    selectedSubject === 'stats'
-                      ? STATS_UNIT_PDF_URLS[activeUnitNum]
-                      : GOV_UNIT_PDF_URLS[activeUnitNum];
-                  const filename =
-                    selectedSubject === 'stats'
-                      ? `AP-Dojo-Stats-Unit-${activeUnitNum}-Cheat-Sheet.pdf`
-                      : `AP-Dojo-Gov-Unit-${activeUnitNum}-Cheat-Sheet.pdf`;
-                  handleDownloadPdf(pdfUrl, filename);
+                  handleDownloadPdf(
+                    GOV_UNIT_PDF_URLS[activeUnitNum],
+                    `AP-Dojo-Gov-Unit-${activeUnitNum}-Cheat-Sheet.pdf`,
+                  );
                 }}
                 className="inline-flex items-center justify-center gap-2 w-fit px-5 py-3 bg-yellow-300 text-black font-black text-base rounded-xl border-2 border-black transition-all hover:-translate-y-0.5 active:translate-y-0"
                 style={{ boxShadow: '4px 4px 0 0 #000' }}
@@ -2159,6 +2144,9 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           </div>
         </div>
         )}
+
+        {/* AP Stats — TI-84 drills CTA (same slot as printable cheat sheets on other courses) */}
+        {selectedSubject === 'stats' && <StatsCalculatorCheatSheetCta />}
 
         {/* Practice MCQs + Unit Test buttons */}
         <div className="mb-8 flex flex-col sm:flex-row gap-3 sm:gap-4">
