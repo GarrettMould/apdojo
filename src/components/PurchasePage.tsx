@@ -29,7 +29,7 @@ const COURSE_CONFIG: Record<'macro' | 'micro', CourseConfig> = {
     headline: 'The Complete AP Micro Toolkit for a 5.',
     price: 29,
     features: [
-      { text: 'Full Practice Exams based on 2026 AP Micro CED', key: 'Full Practice Exams' },
+      { text: 'Full Practice Exams based on 2027 AP Micro CED', key: 'Full Practice Exams' },
       { text: 'Endless AP-Style MCQ Bank', key: 'Endless' },
       { text: 'AI-Graded FRQs with Graphing Help', key: 'AI-Graded' },
       { text: 'Interactive Graphing Simulators', key: 'Interactive Graphing Simulators' },
@@ -43,7 +43,7 @@ const COURSE_CONFIG: Record<'macro' | 'micro', CourseConfig> = {
     headline: 'The Complete AP Macro Toolkit for a 5.',
     price: 29,
     features: [
-      { text: 'Full Practice Exams based on 2026 AP Macro CED', key: 'Full Practice Exams' },
+      { text: 'Full Practice Exams based on 2027 AP Macro CED', key: 'Full Practice Exams' },
       { text: 'Endless AP-Style MCQ Bank', key: 'Endless' },
       { text: 'AI-Graded FRQs with Graphing Help', key: 'AI-Graded' },
       { text: 'Interactive Graphing Simulators', key: 'Interactive Graphing Simulators' },

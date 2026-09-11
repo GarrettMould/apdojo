@@ -33,7 +33,7 @@ export const COURSE_CONFIG: Record<
     accentColor: 'text-blue-600',
     accentBg: 'bg-blue-600',
     features: [
-      'Full Practice Exams (2026 AP Macro CED)',
+      'Full Practice Exams (2027 AP Macro CED)',
       'Endless AP-Style MCQ Bank',
       'AI-Graded FRQs with Graphing Help',
       'Interactive Graphing Simulators',
@@ -50,7 +50,7 @@ export const COURSE_CONFIG: Record<
     accentColor: 'text-green-600',
     accentBg: 'bg-green-600',
     features: [
-      'Full Practice Exams (2026 AP Micro CED)',
+      'Full Practice Exams (2027 AP Micro CED)',
       'Endless AP-Style MCQ Bank',
       'AI-Graded FRQs with Graphing Help',
       'Interactive Graphing Simulators',

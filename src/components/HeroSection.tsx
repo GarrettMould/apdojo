@@ -94,10 +94,10 @@ export function HeroSection() {
               Start free
             </button>
             <a
-              href="#courses"
+              href="/purchase/season-pass"
               className="inline-flex items-center justify-center rounded-2xl border-2 border-black bg-white px-8 py-4 text-base font-black text-slate-900 shadow-[4px_4px_0_0_rgba(0,0,0,1)] transition hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_rgba(0,0,0,1)]"
             >
-              Browse courses
+              Season Pass
             </a>
           </motion.div>
 

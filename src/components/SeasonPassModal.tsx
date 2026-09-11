@@ -16,7 +16,7 @@ interface SeasonPassModalProps {
 }
 
 const FEATURES = [
-  { text: 'Full Practice Exams (2026 CED)' },
+  { text: 'Full Practice Exams (2027 CED)' },
   { text: 'Endless AP-Style MCQ Bank' },
   { text: 'AI-Graded FRQs with Graphing Help' },
   { text: 'Interactive Graphing Simulators' },

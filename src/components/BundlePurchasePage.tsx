@@ -6,6 +6,7 @@ import { CheckCircle2, Star, ShieldCheck } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { ParentPaymentModal } from '@/components/ParentPaymentModal';
+import { SeasonPassCourseSwitcher } from '@/components/EmbeddedCheckoutPage';
 import { reviews } from '@/data/reviews';
 
 export function BundlePurchasePage() {
@@ -67,7 +68,7 @@ export function BundlePurchasePage() {
   const selectedReviews = reviews.slice(0, 3);
 
   const features = [
-    { text: 'Full Practice Exams based on 2026 AP Macro & Micro CED', key: 'Full Practice Exams' },
+    { text: 'Full Practice Exams based on 2027 AP Macro & Micro CED', key: 'Full Practice Exams' },
     { text: 'Endless AP-Style MCQ Bank', key: 'Endless' },
     { text: 'AI-Graded FRQs with Graphing Help', key: 'AI-Graded' },
     { text: 'Interactive Graphing Simulators', key: 'Interactive Graphing Simulators' },
@@ -78,6 +79,8 @@ export function BundlePurchasePage() {
   return (
     <div className="min-h-[calc(100vh-5rem)] bg-white">
       <div className="max-w-7xl mx-auto p-8 lg:p-12">
+        <SeasonPassCourseSwitcher current="bundle" />
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-0">
           {/* Left Column - Bundle Content */}
           <div className="lg:col-span-2 space-y-8 pr-0 lg:pr-12 pb-8 lg:pb-0 border-b lg:border-b-0 lg:border-r-4 border-black">

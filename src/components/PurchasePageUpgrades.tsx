@@ -160,7 +160,7 @@ const MACRO_FEATURES: FeatureItem[] = [
   {
     emoji: '📝',
     outcome: 'Walk into exam day knowing every question type',
-    detail: 'Full practice exams built on the 2026 AP Macro CED — same format, same difficulty.',
+    detail: 'Full practice exams built on the 2027 AP Macro CED — same format, same difficulty.',
   },
   {
     emoji: '⚡',
@@ -193,7 +193,7 @@ const MICRO_FEATURES: FeatureItem[] = [
   {
     emoji: '📝',
     outcome: 'Walk into exam day knowing every question type',
-    detail: 'Full practice exams built on the 2026 AP Micro CED — same format, same difficulty.',
+    detail: 'Full practice exams built on the 2027 AP Micro CED — same format, same difficulty.',
   },
   {
     emoji: '⚡',

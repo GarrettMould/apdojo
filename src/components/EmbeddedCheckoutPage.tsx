@@ -6,6 +6,7 @@ import { EmbeddedCheckout, EmbeddedCheckoutProvider } from '@stripe/react-stripe
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, Star, ShieldCheck, Sparkles, Zap } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { reviews, type Review } from '@/data/reviews';
 import { COURSE_CONFIG, type SeasonPassPurchaseType } from '@/data/seasonPassCourseConfig';
@@ -88,6 +89,40 @@ function MobileReviewCarousel({ items }: { items: Review[] }) {
   );
 }
 
+const COURSE_SWITCHER: { type: SeasonPassPurchaseType; label: string }[] = [
+  { type: 'macro', label: 'AP Macro' },
+  { type: 'micro', label: 'AP Micro' },
+  { type: 'bundle', label: 'Macro + Micro Bundle' },
+  { type: 'gov', label: 'AP Gov' },
+  { type: 'stats', label: 'AP Stats' },
+];
+
+export function SeasonPassCourseSwitcher({ current }: { current: SeasonPassPurchaseType }) {
+  const router = useRouter();
+
+  return (
+    <div className="mb-8">
+      <label htmlFor="season-pass-course-switcher" className="mr-2 text-sm text-gray-600">
+        Looking for a different course?
+      </label>
+      <select
+        id="season-pass-course-switcher"
+        value={current}
+        onChange={(e) => {
+          const next = e.target.value as SeasonPassPurchaseType;
+          router.push(`/purchase/season-pass?courseType=${next}`);
+        }}
+      >
+        {COURSE_SWITCHER.map(({ type, label }) => (
+          <option key={type} value={type}>
+            {label}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
 export function EmbeddedCheckoutPage({ courseType }: EmbeddedCheckoutPageProps) {
   const { user } = useAuthContext();
   const config = COURSE_CONFIG[courseType] ?? COURSE_CONFIG.macro;
@@ -110,6 +145,8 @@ export function EmbeddedCheckoutPage({ courseType }: EmbeddedCheckoutPageProps) 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8 lg:py-12">
+        <SeasonPassCourseSwitcher current={courseType} />
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 lg:items-start">
 
           {/* ── Product / pitch (row 1 col 1 on lg) ── */}
