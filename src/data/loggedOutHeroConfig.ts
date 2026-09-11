@@ -1,21 +1,79 @@
+import type { CourseSubject } from '@/lib/courseSubject';
+
 export type LoggedOutHeroVariant = 'econ' | 'stats' | 'gov';
 
 export const LOGGED_OUT_HERO_VARIANTS: LoggedOutHeroVariant[] = ['econ', 'stats', 'gov'];
 
-/** Time each hero subject is shown during the one-time homepage cycle (~15s total). */
+/** @deprecated Subject cycling removed from the logged-out homepage. */
 export const LOGGED_OUT_HERO_CYCLE_MS = 5000;
 
+/** @deprecated Prefer the static multi-course homepage. */
 export function pickLoggedOutHeroVariant(): LoggedOutHeroVariant {
   return LOGGED_OUT_HERO_VARIANTS[Math.floor(Math.random() * LOGGED_OUT_HERO_VARIANTS.length)];
 }
 
-/** Random start, then the other two — shown once each, no loop. */
+/** @deprecated Prefer the static multi-course homepage. */
 export function buildHeroVariantCycle(): LoggedOutHeroVariant[] {
   const startIdx = Math.floor(Math.random() * LOGGED_OUT_HERO_VARIANTS.length);
   return LOGGED_OUT_HERO_VARIANTS.map(
     (_, i) => LOGGED_OUT_HERO_VARIANTS[(startIdx + i) % LOGGED_OUT_HERO_VARIANTS.length],
   );
 }
+
+export type LoggedOutCourseOffering = {
+  id: CourseSubject;
+  shortLabel: string;
+  title: string;
+  blurb: string;
+  badgeClass: string;
+  accentText: string;
+  tileHover: string;
+  purchaseHref: string;
+};
+
+/** Four courses shown on the logged-out homepage. */
+export const LOGGED_OUT_COURSE_OFFERINGS: LoggedOutCourseOffering[] = [
+  {
+    id: 'macro',
+    shortLabel: 'Macro',
+    title: 'AP Macroeconomics',
+    blurb: 'National income, policy graphs, and FRQ drills rebuilt for the 2027 exam.',
+    badgeClass: 'bg-blue-600',
+    accentText: 'text-blue-600',
+    tileHover: 'hover:bg-blue-50/40',
+    purchaseHref: '/purchase/season-pass?courseType=macro',
+  },
+  {
+    id: 'micro',
+    shortLabel: 'Micro',
+    title: 'AP Microeconomics',
+    blurb: 'Markets, costs, and firm behavior with interactive practice for 2027.',
+    badgeClass: 'bg-emerald-600',
+    accentText: 'text-emerald-600',
+    tileHover: 'hover:bg-emerald-50/40',
+    purchaseHref: '/purchase/season-pass?courseType=micro',
+  },
+  {
+    id: 'gov',
+    shortLabel: 'Gov',
+    title: 'AP U.S. Government',
+    blurb: 'Constitution, institutions, and SCOTUS comparison practice for 2027.',
+    badgeClass: 'bg-violet-600',
+    accentText: 'text-violet-600',
+    tileHover: 'hover:bg-violet-50/40',
+    purchaseHref: '/purchase/season-pass?courseType=gov',
+  },
+  {
+    id: 'stats',
+    shortLabel: 'Stats',
+    title: 'AP Statistics',
+    blurb: 'Inference, FRQ packs, and TI-84 drills updated for the 2027 CED.',
+    badgeClass: 'bg-orange-600',
+    accentText: 'text-orange-600',
+    tileHover: 'hover:bg-orange-50/40',
+    purchaseHref: '/purchase/season-pass?courseType=stats',
+  },
+];
 
 export type HeroTheme = {
   accentClass: string;
@@ -63,7 +121,6 @@ const ECON_THEMES = {
   },
 } as const;
 
-
 const HERO_PREVIEWS = {
   macro: '/cheat-sheet-previews/macro/unit-1.webp',
   micro: '/cheat-sheet-previews/micro/unit-1.webp',
@@ -71,6 +128,7 @@ const HERO_PREVIEWS = {
   gov: '/cheat-sheet-previews/gov/unit-2.webp',
 } as const;
 
+/** Kept for feature-preview components that still key off a single subject. */
 export function getLoggedOutHeroConfig(
   variant: LoggedOutHeroVariant,
   econSubject: 'macro' | 'micro' = 'macro',
@@ -80,7 +138,7 @@ export function getLoggedOutHeroConfig(
       variant,
       headline: 'Score a 5 on\nAP Stats.',
       countdownLabel: 'Stats',
-      examDate: new Date('2026-05-14T12:00:00'),
+      examDate: new Date('2027-05-14T12:00:00'),
       theme: {
         accentClass: 'text-orange-500',
         btnClass: 'bg-orange-600 hover:bg-orange-700',
@@ -90,7 +148,7 @@ export function getLoggedOutHeroConfig(
       ctaHref: '/purchase/season-pass?courseType=stats',
       ctaLabel: 'Get the Season Pass — $29',
       subheadline:
-        'Unit MCQ practice, FRQ packs, printable cheat sheets, and more — built for the 2026 AP Statistics CED.',
+        'Unit MCQ practice, FRQ packs, printable cheat sheets, and more — built for the 2027 AP Statistics CED.',
       cheatSheetPreviewSrc: HERO_PREVIEWS.stats,
       cheatSheetPreviewAlt: 'AP Stats Unit 2 cheat sheet preview',
       cheatSheetHref: '/ap-stats-unit-2-cheat-sheet',
@@ -116,7 +174,7 @@ export function getLoggedOutHeroConfig(
       variant,
       headline: 'Score a 5 on\nAP Gov.',
       countdownLabel: 'Gov',
-      examDate: new Date('2026-05-11T12:00:00'),
+      examDate: new Date('2027-05-11T12:00:00'),
       theme: {
         accentClass: 'text-violet-500',
         btnClass: 'bg-violet-600 hover:bg-violet-700',
@@ -154,7 +212,7 @@ export function getLoggedOutHeroConfig(
     variant: 'econ',
     headline: 'Score a 5 on\nAP Econ.',
     countdownLabel: isMicro ? 'Micro' : 'Macro',
-    examDate: new Date(isMicro ? '2026-05-04T12:00:00' : '2026-05-08T12:00:00'),
+    examDate: new Date(isMicro ? '2027-05-04T12:00:00' : '2027-05-08T12:00:00'),
     theme,
     ctaHref: `/purchase/season-pass?courseType=${econSubject}`,
     ctaLabel: 'Get the Season Pass — $29',

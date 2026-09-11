@@ -1,319 +1,169 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { HeroCheatSheetPreview } from '@/components/HeroCheatSheetPreview';
-import { Button } from '@/components/ui/button';
-import { Star } from 'lucide-react';
+import { ArrowRight, Star } from 'lucide-react';
 import { useAuthContext } from '@/contexts/AuthContext';
-import { MCQPracticePreview } from '@/components/MCQPracticePreview';
-import { CheatSheetPreview } from '@/components/CheatSheetPreview';
-import { FRQFeedbackDemo } from '@/components/FRQFeedbackDemo';
-import {
-  getLoggedOutHeroConfig,
-  type LoggedOutHeroVariant,
-} from '@/data/loggedOutHeroConfig';
+import type { CourseSubject } from '@/lib/courseSubject';
+import { defaultCheatSheetUrl } from '@/lib/courseSubject';
+import { LOGGED_OUT_COURSE_OFFERINGS } from '@/data/loggedOutHeroConfig';
 
-const SLIDES = [
-  { label: 'Unlimited MCQ Practice', component: <MCQPracticePreview /> },
-  { label: 'AI-Graded FRQs', component: <FRQFeedbackDemo /> },
-  { label: 'Unit Cheat Sheets', component: <div className="w-full flex min-h-[400px]"><CheatSheetPreview /></div> },
-];
-
-const slideVariants = {
-  enter: (d: number) => ({ opacity: 0, x: d > 0 ? 60 : -60 }),
-  center: { opacity: 1, x: 0 },
-  exit: (d: number) => ({ opacity: 0, x: d > 0 ? -60 : 60 }),
-};
-
-const heroVariantVariants = {
-  enter: { opacity: 0, y: 16 },
-  center: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -16 },
-};
-
-
-type HeroSectionProps = {
-  variant?: LoggedOutHeroVariant;
-};
-
-export function HeroSection({ variant = 'econ' }: HeroSectionProps) {
-  const { selectedSubject } = useAuthContext();
-  const [mounted, setMounted] = useState(false);
-  const [activeSlide, setActiveSlide] = useState(0);
-  const [slideDir, setSlideDir] = useState(1);
-  const slideTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  const econSubject = mounted && selectedSubject === 'micro' ? 'micro' : 'macro';
-  const config = getLoggedOutHeroConfig(variant, econSubject);
-  const { theme } = config;
-  const headlineLines = config.headline.split('\n');
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    slideTimerRef.current = setInterval(() => {
-      setSlideDir(1);
-      setActiveSlide((i) => (i + 1) % SLIDES.length);
-    }, 3500);
-    return () => {
-      if (slideTimerRef.current) clearInterval(slideTimerRef.current);
-    };
-  }, []);
-
-  const goToSlide = (index: number) => {
-    setSlideDir(index > activeSlide ? 1 : -1);
-    setActiveSlide(index);
-    if (slideTimerRef.current) clearInterval(slideTimerRef.current);
-    slideTimerRef.current = setInterval(() => {
-      setSlideDir(1);
-      setActiveSlide((i) => (i + 1) % SLIDES.length);
-    }, 3500);
-  };
+export function HeroSection() {
+  const { setSelectedSubject, setShowSignupModal } = useAuthContext();
 
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.15, delayChildren: 0.1 },
+      transition: { staggerChildren: 0.1, delayChildren: 0.08 },
     },
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 18 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as const },
+      transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] as const },
     },
   };
 
-  /** Literal class names so Tailwind keeps subject accents (dynamic strings can be dropped). */
-  const yearAccentClass =
-    variant === 'stats'
-      ? 'text-orange-600'
-      : variant === 'gov'
-        ? 'text-violet-600'
-        : econSubject === 'micro'
-          ? 'text-green-600'
-          : 'text-blue-600';
+  const handleCourseClick = (subject: CourseSubject) => {
+    setSelectedSubject(subject);
+  };
 
   return (
-    <section className="relative flex flex-col justify-center pt-14 pb-10 sm:pt-16 sm:pb-16 lg:min-h-screen lg:pt-24 lg:pb-56 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
-      <div className="max-w-screen-xl mx-auto w-full">
+    <section className="relative overflow-hidden px-4 pb-16 pt-14 sm:px-6 sm:pb-20 sm:pt-16 lg:px-8 lg:pb-28 lg:pt-20">
+      {/* Atmosphere */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(59,130,246,0.12),_transparent_55%),radial-gradient(ellipse_at_80%_20%,_rgba(249,115,22,0.1),_transparent_45%),radial-gradient(ellipse_at_20%_80%,_rgba(139,92,246,0.08),_transparent_50%),linear-gradient(to_bottom,#f8fafc,#ffffff)]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.35] [background-image:linear-gradient(rgba(15,23,42,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(15,23,42,0.04)_1px,transparent_1px)] [background-size:48px_48px] [mask-image:radial-gradient(ellipse_at_center,black_35%,transparent_75%)]"
+      />
+
+      <div className="relative mx-auto w-full max-w-6xl">
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="flex flex-col lg:flex-row items-center gap-10 lg:gap-8"
+          className="flex flex-col items-center text-center"
         >
+          <motion.p
+            variants={itemVariants}
+            className="text-sm font-black uppercase tracking-[0.28em] text-slate-900 sm:text-base"
+          >
+            AP Dojo
+          </motion.p>
 
-          {/* ── LEFT: text + CTA ── */}
-          <div className="w-full lg:w-[46%] flex flex-col items-center text-center lg:items-start lg:text-left gap-9">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={variant === 'econ' ? `econ-${econSubject}` : variant}
-                variants={heroVariantVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] as const }}
-                className="flex flex-col items-center text-center lg:items-start lg:text-left gap-9 w-full"
-              >
+          <motion.p
+            variants={itemVariants}
+            className="mt-5 inline-flex items-center rounded-full border-2 border-black bg-white px-4 py-1.5 text-xs font-black uppercase tracking-[0.14em] text-slate-800 shadow-[3px_3px_0_0_rgba(0,0,0,1)] sm:text-sm"
+          >
+            Brand new <span className="mx-1.5 text-blue-600">2027</span> courses available
+          </motion.p>
 
-            {/* 2027 exam course availability note */}
-            <div className="flex flex-col items-center lg:items-start gap-1.5 min-h-[4.75rem] sm:min-h-[5.25rem] justify-center">
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">
-                AP {config.countdownLabel}
-              </p>
-              <p className="text-xl sm:text-2xl lg:text-3xl font-black text-gray-900 leading-tight tracking-tight">
-                Updated <span className={yearAccentClass}>2027</span> Exam Course
-                <br />
-                Available Now!
-              </p>
-            </div>
+          <motion.h1
+            variants={itemVariants}
+            className="mt-6 max-w-4xl text-4xl font-black tracking-tight text-slate-900 sm:text-6xl lg:text-7xl lg:leading-[1.05]"
+          >
+            Four AP courses.
+            <br />
+            One place to score a 5.
+          </motion.h1>
 
-            {/* Headline */}
-            <h1
-              className="text-5xl sm:text-6xl lg:text-8xl font-black text-gray-900 leading-[1.05] tracking-tight"
-            >
-              {headlineLines.map((line, index) => (
-                <span key={line}>
-                  {line}
-                  {index < headlineLines.length - 1 && <br />}
-                </span>
-              ))}
-            </h1>
+          <motion.p
+            variants={itemVariants}
+            className="mt-5 max-w-2xl text-base font-medium leading-relaxed text-slate-600 sm:text-xl"
+          >
+            Macro, Micro, Gov, and Stats, rebuilt for the 2027 exams with practice, cheat sheets, and
+            season-pass tools.
+          </motion.p>
 
-            {/* Subheadline */}
-            <p
-              className="text-xl sm:text-2xl text-gray-600 font-medium leading-relaxed max-w-lg mx-auto lg:mx-0"
-            >
-              {config.subheadline}
-            </p>
-
-            {/* CTA + social proof */}
-            <div className="flex flex-col items-center lg:items-start gap-6 w-full">
-              <Button
-                asChild
-                size="lg"
-                className={`w-full sm:w-auto text-lg font-black py-7 px-10 rounded-2xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-0.5 text-white ${theme.btnClass}`}
-              >
-                <Link href={config.ctaHref}>
-                  {config.ctaLabel}
-                </Link>
-              </Button>
-
-              <div className="flex items-center gap-2 flex-wrap justify-center lg:justify-start">
-                <div className="flex gap-0.5">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                  ))}
-                </div>
-                <p className="text-sm font-semibold text-gray-600">1,000+ students helped</p>
-                <Link
-                  href={config.ctaHref}
-                  className="text-xs font-semibold text-blue-600 hover:text-blue-800 underline underline-offset-2"
-                >
-                  See reviews →
-                </Link>
-              </div>
-            </div>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-
-          {/* ── MOBILE ONLY: auto-rotating feature carousel ── */}
-          <motion.div variants={itemVariants} className="lg:hidden w-full mt-4">
-            <div className="text-center mb-4 h-8 flex items-center justify-center">
-              <AnimatePresence mode="wait">
-                <motion.h3
-                  key={activeSlide}
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -6 }}
-                  transition={{ duration: 0.25 }}
-                  className="text-xl font-black text-gray-900"
-                >
-                  {SLIDES[activeSlide].label}
-                </motion.h3>
-              </AnimatePresence>
-            </div>
-
-            <div className="relative overflow-hidden w-full min-h-[400px]">
-              <AnimatePresence custom={slideDir} mode="wait">
-                <motion.div
-                  key={activeSlide}
-                  custom={slideDir}
-                  variants={slideVariants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] as const }}
-                  className="w-full"
-                >
-                  {SLIDES[activeSlide].component}
-                </motion.div>
-              </AnimatePresence>
-            </div>
-
-            <div className="flex justify-center gap-2 mt-5">
-              {SLIDES.map((_, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => goToSlide(i)}
-                  className={`h-2 rounded-full transition-all duration-300 ${i === activeSlide ? 'w-6 bg-gray-900' : 'w-2 bg-gray-300'}`}
-                  aria-label={`Go to slide ${i + 1}`}
-                />
-              ))}
-            </div>
-          </motion.div>
-
-          {/* ── RIGHT (desktop only): large cheat sheet + two floating cards ── */}
           <motion.div
             variants={itemVariants}
-            className="hidden lg:block lg:w-[54%] flex-shrink-0 relative"
-            style={{ height: 500 }}
+            className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:gap-4"
           >
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={variant === 'econ' ? `econ-${econSubject}` : variant}
-                variants={heroVariantVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] as const }}
-                className="absolute inset-0"
-              >
-
-            {/* Large base card */}
-            <Link
-              href={config.cheatSheetHref}
-              className="absolute rounded-2xl border-2 border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden block hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] transition-shadow"
-              style={{ top: 44, left: 20, right: 20, height: 420 }}
+            <button
+              type="button"
+              onClick={() => setShowSignupModal(true)}
+              className="inline-flex items-center justify-center rounded-2xl border-2 border-black bg-slate-900 px-8 py-4 text-base font-black text-white shadow-[4px_4px_0_0_rgba(0,0,0,1)] transition hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_rgba(0,0,0,1)]"
             >
-              {config.cheatSheetPreviewSrc ? (
-                <HeroCheatSheetPreview
-                  src={config.cheatSheetPreviewSrc}
-                  alt={config.cheatSheetPreviewAlt}
-                  priority
-                />
-              ) : null}
-            </Link>
-
-            {/* Floating card — MCQ Practice (top-right) */}
-            <div
-              className="absolute rounded-2xl border-2 border-black bg-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] p-3.5"
-              style={{ top: 0, right: 0, width: 242, zIndex: 20 }}
+              Start free
+            </button>
+            <a
+              href="#courses"
+              className="inline-flex items-center justify-center rounded-2xl border-2 border-black bg-white px-8 py-4 text-base font-black text-slate-900 shadow-[4px_4px_0_0_rgba(0,0,0,1)] transition hover:-translate-y-0.5 hover:shadow-[6px_6px_0_0_rgba(0,0,0,1)]"
             >
-              <p className="text-[8px] font-black uppercase tracking-widest text-gray-400 mb-2">AP MCQ Practice</p>
-              <p className="text-[11px] font-bold text-gray-900 leading-snug mb-2.5">
-                {config.mcqPreview.question}
-              </p>
-              <div className="space-y-1.5">
-                {config.mcqPreview.options.map(({ letter, text, correct }) => (
-                  <div
-                    key={letter}
-                    className={`flex items-center gap-2 px-2 py-1.5 rounded-lg border text-[9px] font-semibold ${
-                      correct ? theme.mcqCorrectClass : 'border-gray-100 text-gray-500'
-                    }`}
-                  >
-                    <span className={`w-4 h-4 rounded-full border flex items-center justify-center text-[7px] font-black flex-shrink-0 ${
-                      correct ? theme.mcqCorrectBadgeClass : 'border-gray-300 text-gray-400'
-                    }`}
-                    >
-                      {letter}
-                    </span>
-                    {text}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Floating card — FRQ / practice feedback (bottom-left) */}
-            <div
-              className="absolute rounded-2xl border-2 border-black bg-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] p-3.5"
-              style={{ bottom: 0, left: 0, width: 250, zIndex: 20 }}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-[8px] font-black uppercase tracking-widest text-gray-400">{config.frqPreview.label}</p>
-                <span className="text-[8px] font-black bg-green-100 text-green-700 border border-green-300 px-2 py-0.5 rounded-full">
-                  {config.frqPreview.score}
-                </span>
-              </div>
-              <div className="text-[10px] text-gray-700 font-medium leading-snug bg-gray-50 rounded-xl p-2.5 border border-gray-100">
-                {config.frqPreview.feedback}
-              </div>
-            </div>
-
-              </motion.div>
-            </AnimatePresence>
+              Browse courses
+            </a>
           </motion.div>
 
+          <motion.div
+            variants={itemVariants}
+            className="mt-5 flex items-center gap-2 text-sm font-semibold text-slate-600"
+          >
+            <div className="flex gap-0.5">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+              ))}
+            </div>
+            <span>1,000+ students helped</span>
+          </motion.div>
+        </motion.div>
+
+        <motion.div
+          id="courses"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="mt-12 grid grid-cols-1 gap-4 sm:mt-16 sm:grid-cols-2 lg:gap-5"
+        >
+          {LOGGED_OUT_COURSE_OFFERINGS.map((course) => (
+            <motion.article
+              key={course.id}
+              variants={itemVariants}
+              className={`flex h-full flex-col rounded-3xl border-4 border-black bg-white p-6 text-left shadow-[8px_8px_0_0_rgba(0,0,0,1)] transition hover:-translate-y-1 hover:shadow-[10px_10px_0_0_rgba(0,0,0,1)] sm:p-7 ${course.tileHover}`}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <span
+                  className={`inline-flex rounded-lg border-2 border-black px-3 py-1 text-[11px] font-black uppercase tracking-wider text-white ${course.badgeClass}`}
+                >
+                  {course.shortLabel}
+                </span>
+                <span className="rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-emerald-700">
+                  2027 ready
+                </span>
+              </div>
+
+              <h2 className="mt-5 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">
+                {course.title}
+              </h2>
+              <p className="mt-2 flex-1 text-sm font-medium leading-relaxed text-slate-600 sm:text-base">
+                {course.blurb}
+              </p>
+
+              <div className="mt-6 flex flex-wrap items-center gap-4">
+                <Link
+                  href={defaultCheatSheetUrl(course.id)}
+                  onClick={() => handleCourseClick(course.id)}
+                  className={`inline-flex items-center gap-1.5 text-sm font-black ${course.accentText}`}
+                >
+                  Explore free
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+                <Link
+                  href={course.purchaseHref}
+                  onClick={() => handleCourseClick(course.id)}
+                  className="text-sm font-semibold text-slate-500 underline decoration-slate-300 underline-offset-4 hover:text-slate-800"
+                >
+                  Season Pass $29
+                </Link>
+              </div>
+            </motion.article>
+          ))}
         </motion.div>
       </div>
     </section>

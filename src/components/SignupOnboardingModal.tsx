@@ -346,7 +346,7 @@ export function SignupOnboardingModal({
           role="dialog"
           aria-modal="true"
           aria-labelledby="signup-onboarding-title"
-          className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl border-4 border-black bg-gradient-to-b from-gray-50 to-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] sm:p-8"
+          className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl border-4 border-black bg-gradient-to-b from-gray-50 to-white p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] sm:p-8"
           onClick={(e) => e.stopPropagation()}
         >
           <button
@@ -401,61 +401,63 @@ export function SignupOnboardingModal({
                     </GoogleSignInButton>
                     <AuthDividerOr centerBgClassName="bg-gradient-to-b from-gray-50 to-white" />
                   </div>
-                  <div className="space-y-3">
-                    <input
-                      type="email"
-                      autoComplete="email"
-                      placeholder="Email address"
-                      value={email}
-                      onChange={(e) => {
-                        setError('');
-                        setEmail(e.target.value);
-                      }}
-                      disabled={loading || googleLoading}
-                      className="w-full rounded-xl border-2 border-gray-300 bg-white px-4 py-3 text-base text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none disabled:opacity-60"
-                    />
-                    <PasswordInput
-                      autoComplete="new-password"
-                      placeholder="Password"
-                      value={password}
-                      onChange={(e) => {
-                        setError('');
-                        setPassword(e.target.value);
-                      }}
-                      disabled={loading || googleLoading}
-                      className="w-full rounded-xl border-2 border-gray-300 bg-white px-4 py-3 text-base text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none disabled:opacity-60"
-                    />
-                    <PasswordInput
-                      autoComplete="new-password"
-                      placeholder="Confirm password"
-                      value={confirmPassword}
-                      onChange={(e) => {
-                        setError('');
-                        setConfirmPassword(e.target.value);
-                      }}
-                      disabled={loading || googleLoading}
-                      className="w-full rounded-xl border-2 border-gray-300 bg-white px-4 py-3 text-base text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none disabled:opacity-60"
-                    />
-                  </div>
-                  <div className="mt-4 space-y-1 text-sm text-gray-500">
-                    <p className="text-xs font-bold uppercase tracking-wide text-gray-900">Password requirements</p>
-                    <p className={hasMinLength ? 'font-medium text-green-600' : ''}>✓ At least 8 characters</p>
-                    <p className={hasUpperCase ? 'font-medium text-green-600' : ''}>✓ At least one uppercase letter</p>
-                    <p className={hasLowerCase ? 'font-medium text-green-600' : ''}>✓ At least one lowercase letter</p>
-                    <p className={hasNumber ? 'font-medium text-green-600' : ''}>✓ At least one number</p>
-                    <p className={passwordsMatch ? 'font-medium text-green-600' : ''}>✓ Passwords match</p>
-                  </div>
-                  <div className="mt-4 flex items-center space-x-3 rounded-xl border-2 border-gray-200 bg-white p-3">
-                    <Checkbox
-                      id="subscribe-onboarding"
-                      checked={isSubscribed}
-                      onCheckedChange={(checked) => setIsSubscribed(checked === true)}
-                      className="h-5 w-5"
-                      disabled={loading || googleLoading}
-                    />
-                    <Label htmlFor="subscribe-onboarding" className="cursor-pointer text-sm font-medium leading-normal text-gray-600">
-                      Send me helpful tips, course updates, and special offers.
-                    </Label>
+                  <div className="grid gap-5 md:grid-cols-2 md:items-stretch">
+                    <div className="space-y-3">
+                      <input
+                        type="email"
+                        autoComplete="email"
+                        placeholder="Email address"
+                        value={email}
+                        onChange={(e) => {
+                          setError('');
+                          setEmail(e.target.value);
+                        }}
+                        disabled={loading || googleLoading}
+                        className="w-full rounded-xl border-2 border-gray-300 bg-white px-4 py-3 text-base text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none disabled:opacity-60"
+                      />
+                      <PasswordInput
+                        autoComplete="new-password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => {
+                          setError('');
+                          setPassword(e.target.value);
+                        }}
+                        disabled={loading || googleLoading}
+                        className="w-full rounded-xl border-2 border-gray-300 bg-white px-4 py-3 text-base text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none disabled:opacity-60"
+                      />
+                      <PasswordInput
+                        autoComplete="new-password"
+                        placeholder="Confirm password"
+                        value={confirmPassword}
+                        onChange={(e) => {
+                          setError('');
+                          setConfirmPassword(e.target.value);
+                        }}
+                        disabled={loading || googleLoading}
+                        className="w-full rounded-xl border-2 border-gray-300 bg-white px-4 py-3 text-base text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none disabled:opacity-60"
+                      />
+                      <div className="flex items-center space-x-3 rounded-xl border-2 border-gray-200 bg-white p-3">
+                        <Checkbox
+                          id="subscribe-onboarding"
+                          checked={isSubscribed}
+                          onCheckedChange={(checked) => setIsSubscribed(checked === true)}
+                          className="h-5 w-5"
+                          disabled={loading || googleLoading}
+                        />
+                        <Label htmlFor="subscribe-onboarding" className="cursor-pointer text-sm font-medium leading-normal text-gray-600">
+                          Send me helpful tips, course updates, and special offers.
+                        </Label>
+                      </div>
+                    </div>
+                    <div className="flex h-full flex-col justify-center rounded-xl border-2 border-gray-200 bg-white p-4 space-y-1 text-sm text-gray-500">
+                      <p className="text-xs font-bold uppercase tracking-wide text-gray-900">Password requirements</p>
+                      <p className={hasMinLength ? 'font-medium text-green-600' : ''}>✓ At least 8 characters</p>
+                      <p className={hasUpperCase ? 'font-medium text-green-600' : ''}>✓ At least one uppercase letter</p>
+                      <p className={hasLowerCase ? 'font-medium text-green-600' : ''}>✓ At least one lowercase letter</p>
+                      <p className={hasNumber ? 'font-medium text-green-600' : ''}>✓ At least one number</p>
+                      <p className={passwordsMatch ? 'font-medium text-green-600' : ''}>✓ Passwords match</p>
+                    </div>
                   </div>
                 </>
               ) : null}
@@ -483,7 +485,7 @@ export function SignupOnboardingModal({
               <p className="mt-2 text-sm font-medium text-gray-600">
                 Select every AP course you&apos;re taking. You can add more later.
               </p>
-              <div className="mt-5 space-y-3">
+              <div className="mt-5 grid gap-3 sm:grid-cols-2">
                 {COURSES.map((course) => {
                   const on = subjects.has(course.id);
                   return (
@@ -568,7 +570,7 @@ export function SignupOnboardingModal({
               <p className="mt-2 text-sm font-medium text-gray-600">
                 Choose the AP Dojo resources you care about most.
               </p>
-              <div className="mt-5 space-y-2.5">
+              <div className="mt-5 grid gap-2.5 sm:grid-cols-2">
                 {SIGNUP_RESOURCE_OPTIONS.map((resource) => {
                   const on = resources.has(resource.id);
                   return (

@@ -52,12 +52,10 @@ import { scotusEssayPrompts } from '@/data/gov/scotusEssayPrompts';
 import { processMathContent } from '@/utils/processMathContent';
 import { CheatSheetPdfPreviewThumbnail } from '@/components/CheatSheetPdfPreviewThumbnail';
 import { StatsCalculatorCheatSheetCta } from '@/components/StatsCalculatorCheatSheetCta';
+import { CheatSheetPdfCta } from '@/components/CheatSheetPdfCta';
 import {
   GOV_UNIT_PDF_URLS,
   ULTIMATE_ADAS_PDF_URL,
-  cheatSheetPdfPreviewPath,
-  getEconUnitPdfUrl,
-  getUnitPdfUrl,
   ultimateAdasPreviewPath,
 } from '@/data/cheatSheetPdfPreviews';
 
@@ -2022,127 +2020,17 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           </div>
         </div>
 
-        {/* Printable cheat sheet PDFs: macro (all); micro 1–5; gov units 1–5 (not stats — calculator CTA instead) */}
+        {/* Printable cheat sheet PDFs: macro (all); micro 1–5; gov units with PDFs (not stats — calculator CTA instead) */}
         {(selectedSubject === 'macro' ||
           (selectedSubject === 'micro' && activeUnitNum >= 1 && activeUnitNum <= 5) ||
           (selectedSubject === 'gov' && Boolean(GOV_UNIT_PDF_URLS[activeUnitNum]))) && (
-        <div className="mb-8 flex flex-row items-center gap-6 sm:gap-8">
-          {/* Stacked overlapping PDF previews - bundle style */}
-          {(() => {
-            const previewUnits =
-              selectedSubject === 'macro'
-                ? macroUnits
-                : selectedSubject === 'micro'
-                  ? microUnits.filter((u) => u.number <= 5)
-                  : govUnits.filter((u) => Boolean(GOV_UNIT_PDF_URLS[u.number]));
-
-            const getUnitPdfUrlForSubject = (unitNumber: number) => {
-              if (selectedSubject === 'macro' || selectedSubject === 'micro') {
-                return getEconUnitPdfUrl(selectedSubject, unitNumber);
-              }
-              return getUnitPdfUrl(selectedSubject, unitNumber);
-            };
-
-            const getUnitPdfFilename = (unitNumber: number) => {
-              if (selectedSubject === 'gov') return `AP-Dojo-Gov-Unit-${unitNumber}-Cheat-Sheet.pdf`;
-              const pdfSubject = selectedSubject === 'macro' ? 'Macro' : 'Micro';
-              return `AP-Dojo-${pdfSubject}-Unit-${unitNumber}-Cheat-Sheet.pdf`;
-            };
-
-            const baseCardWidth = 100;
-            const horizontalOffset = 20;
-            const cardHeight = Math.round((1080 * baseCardWidth) / 833);
-            const stackWidth = baseCardWidth + (previewUnits.length - 1) * horizontalOffset;
-            return (
-          <div
-            className="relative flex-shrink-0"
-            style={{ width: `${stackWidth}px`, height: `${cardHeight}px` }}
-          >
-            {previewUnits.map((unit, index) => {
-              const pdfUrl = getUnitPdfUrlForSubject(unit.number);
-              const previewSrc = cheatSheetPdfPreviewPath(selectedSubject, unit.number);
-              const filename = getUnitPdfFilename(unit.number);
-              if (!pdfUrl || !previewSrc) return null;
-              return (
-                <div
-                  key={unit.number}
-                  className="absolute bottom-0 left-0 border border-black bg-white overflow-hidden group rounded-sm shadow-md hover:z-20 hover:scale-105 transition-transform cursor-pointer"
-                  style={{
-                    width: `${baseCardWidth}px`,
-                    height: `${cardHeight}px`,
-                    transform: `translateX(${index * horizontalOffset}px)`,
-                    zIndex: index,
-                  }}
-                >
-                  <CheatSheetPdfPreviewThumbnail
-                    src={previewSrc}
-                    alt={`Unit ${unit.number} cheat sheet preview`}
-                    containerWidth={baseCardWidth}
-                  />
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      if (!isProCustomer) {
-                        setShowPacketSeasonPassModal(true);
-                        return;
-                      }
-                      handleDownloadPdf(pdfUrl, filename);
-                    }}
-                    className="absolute inset-0 z-10 cursor-pointer"
-                    title="Download PDF"
-                  />
-                </div>
-              );
-            })}
-          </div>
-            );
-          })()}
-          {/* Text and CTA to the right of the bundle */}
-          <div className="flex-1 flex flex-col gap-2 sm:gap-3">
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
-              {selectedSubject === 'macro'
-                ? 'Printable Cheat Sheets for Every Unit'
-                : 'Printable Cheat Sheets for Units 1–5'}
-            </h2>
-            <p className="text-gray-600 text-sm sm:text-base">
-              {selectedSubject === 'macro'
-                ? 'Everything you need to ace your exam, all on a single page.'
-                : selectedSubject === 'micro'
-                  ? 'Single-page PDFs for Units 1-5. The full unit experience for Unit 6 stays on this cheat sheet page.'
-                  : 'Single-page PDFs for Units 1–5. Click a sheet to download.'}
-            </p>
-            {selectedSubject === 'macro' || selectedSubject === 'micro' ? (
-              <Link
-                href="/cheat-sheets"
-                className="inline-flex items-center justify-center gap-2 w-fit px-5 py-3 bg-yellow-300 text-black font-black text-base rounded-xl border-2 border-black transition-all hover:-translate-y-0.5 active:translate-y-0"
-                style={{ boxShadow: '4px 4px 0 0 #000' }}
-              >
-                <Download className="w-4 h-4" />
-                Download PDF Cheat Sheets
-              </Link>
-            ) : (
-              <button
-                type="button"
-                onClick={() => {
-                  if (!isProCustomer) {
-                    setShowPacketSeasonPassModal(true);
-                    return;
-                  }
-                  handleDownloadPdf(
-                    GOV_UNIT_PDF_URLS[activeUnitNum],
-                    `AP-Dojo-Gov-Unit-${activeUnitNum}-Cheat-Sheet.pdf`,
-                  );
-                }}
-                className="inline-flex items-center justify-center gap-2 w-fit px-5 py-3 bg-yellow-300 text-black font-black text-base rounded-xl border-2 border-black transition-all hover:-translate-y-0.5 active:translate-y-0"
-                style={{ boxShadow: '4px 4px 0 0 #000' }}
-              >
-                <Download className="w-4 h-4" />
-                Download PDF Cheat Sheet
-              </button>
-            )}
-          </div>
-        </div>
+          <CheatSheetPdfCta
+            subject={selectedSubject}
+            unitNumber={activeUnitNum}
+            isProCustomer={!!isProCustomer}
+            onLockedClick={() => setShowPacketSeasonPassModal(true)}
+            onDownload={handleDownloadPdf}
+          />
         )}
 
         {/* AP Stats — TI-84 drills CTA (same slot as printable cheat sheets on other courses) */}

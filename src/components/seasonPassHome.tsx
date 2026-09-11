@@ -16,11 +16,6 @@ import { SeasonPassShowcase } from '@/components/SeasonPassShowcase';
 import { HomeDojoDrills } from '@/components/HomeDojoDrills';
 import { HeroSection } from '@/components/HeroSection';
 import { HomeSocialProofSection } from '@/components/HomeSocialProofSection';
-import {
-  buildHeroVariantCycle,
-  LOGGED_OUT_HERO_CYCLE_MS,
-  type LoggedOutHeroVariant,
-} from '@/data/loggedOutHeroConfig';
 
 interface FeatureItem {
   icon: React.ReactNode;
@@ -48,23 +43,10 @@ const microFeatures: FeatureItem[] = [
 ];
 
 export function SeasonPassHome() {
-  const [variantCycle] = useState<LoggedOutHeroVariant[]>(() => buildHeroVariantCycle());
-  const [cycleIndex, setCycleIndex] = useState(0);
-  const heroVariant = variantCycle[cycleIndex];
-
-  useEffect(() => {
-    if (cycleIndex >= variantCycle.length - 1) return;
-    const timer = window.setTimeout(() => {
-      setCycleIndex((i) => i + 1);
-    }, LOGGED_OUT_HERO_CYCLE_MS);
-    return () => window.clearTimeout(timer);
-  }, [cycleIndex, variantCycle.length]);
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* Hero cycles Econ → Stats → Gov once (~5s each), then stops on the last */}
-      <HeroSection variant={heroVariant} />
-      
+      <HeroSection />
+
       {/* Social proof section (reviews) */}
       <HomeSocialProofSection />
 
