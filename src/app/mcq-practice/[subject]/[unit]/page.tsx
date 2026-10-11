@@ -11,7 +11,7 @@ import {
   getSubjectSlug,
   getUnitSlug,
 } from '@/lib/practiceSlugs';
-import { isGovMcqPracticeUnitAvailable } from '@/lib/courseSubject';
+import { isGovMcqPracticeUnitAvailable, isStatsMcqPracticeUnitAvailable } from '@/lib/courseSubject';
 
 interface PracticePageProps {
   params: Promise<{
@@ -23,18 +23,29 @@ interface PracticePageProps {
 // Generate static params for all subject/unit combinations for better SEO
 export async function generateStaticParams() {
   const params = [];
-  
-  // Generate for both macro and micro, units 1-6
+
   for (const subject of ['macro', 'micro'] as const) {
     const subjectSlug = getSubjectSlug(subject);
     for (let unit = 1; unit <= 6; unit++) {
       params.push({
         subject: subjectSlug,
-        unit: getUnitSlug(unit, subject), // Include subject to get topic name in slug
+        unit: getUnitSlug(unit, subject),
       });
     }
   }
-  
+
+  for (const subject of ['gov', 'stats'] as const) {
+    const subjectSlug = getSubjectSlug(subject);
+    for (let unit = 1; unit <= 5; unit++) {
+      if (subject === 'gov' && !isGovMcqPracticeUnitAvailable(unit)) continue;
+      if (subject === 'stats' && !isStatsMcqPracticeUnitAvailable(unit)) continue;
+      params.push({
+        subject: subjectSlug,
+        unit: getUnitSlug(unit, subject),
+      });
+    }
+  }
+
   return params;
 }
 
@@ -76,6 +87,10 @@ export default async function PracticePage({ params }: PracticePageProps) {
   }
 
   if (subject === 'gov' && !isGovMcqPracticeUnitAvailable(unitNumber)) {
+    notFound();
+  }
+
+  if (subject === 'stats' && !isStatsMcqPracticeUnitAvailable(unitNumber)) {
     notFound();
   }
 

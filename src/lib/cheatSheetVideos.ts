@@ -30,6 +30,7 @@ const STATS_WATCH_IDS: Record<string, string> = {
   'stats-u2-vid2': '812002',
   'stats-u3-vid1': '813001',
   'stats-u3-vid2': '813002',
+  'stats-u4-vid1': '814001',
 };
 
 /** Stable numeric ids for SCOTUS case videos on cheat sheets. */

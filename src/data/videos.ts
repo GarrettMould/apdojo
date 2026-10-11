@@ -2649,8 +2649,21 @@ export const videos: Video[] = [
         accessLevel: "free",
         questions: [],
       },
-
-      
+      {
+        id: "stats-u4-vid1",
+        title: "Means vs. Proportions",
+        description:
+          "Compares inference for means and proportions — when each procedure applies and how the frameworks differ.",
+        videoSlug: "stats-u4-means-vs-proportions",
+        subjects: ["AP Statistics"],
+        unit: "4",
+        lessonIDS: ["4.1", "4.2", "4.3"],
+        tags: ["Unit 4", "Inference", "Means", "Proportions"],
+        videoUrl:
+          "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/stats/unit_4/Unit+4+-+Means+vs+Proportions.mp4",
+        accessLevel: "free",
+        questions: [],
+      },
   ];
   
 const macroUnitVideos = videos

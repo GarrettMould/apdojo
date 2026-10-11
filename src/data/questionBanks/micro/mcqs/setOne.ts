@@ -119,7 +119,7 @@ export const microSetOneQuestions: QuestionBank = {
         "Neither region should specialize because trade is not beneficial."
       ],
       "correctAnswer": "D",
-      "explanation": "This is an **Input** problem (Acres). Use 'Other Goes Under'. \n- Region A Opp Cost for Rice: $2/4 = 0.5$ Corn.\n- Region B Opp Cost for Rice: $5/5 = 1$ Corn.\nRegion A has the lower opportunity cost for Rice ($0.5 < 1$) and should specialize in Rice. By default, Region B specializes in Corn."
+      "explanation": "This is an Input problem (Acres). Use 'Other Goes Under'. \n- Region A Opp Cost for Rice: $2/4 = 0.5$ Corn.\n- Region B Opp Cost for Rice: $5/5 = 1$ Corn.\nRegion A has the lower opportunity cost for Rice ($0.5 < 1$) and should specialize in Rice. By default, Region B specializes in Corn."
     },
     {
       "id": 3,
@@ -461,7 +461,7 @@ export const microSetOneQuestions: QuestionBank = {
         "$20,000"
       ],
       "correctAnswer": "B",
-      "explanation": "Explicit costs = Rent ($10,000) + Supplies ($5,000) = $15,000. Implicit costs = Foregone Salary ($60,000) + Foregone Interest ($20,000 * 0.05 = $1,000) = $61,000. Total costs = $76,000. Economic profit = Revenue ($100,000) - Total costs ($76,000) = $24,000."
+      "explanation": "Explicit costs = Rent ($10,000) + Supplies ($5,000) = $15,000. Implicit costs = Foregone Salary ($60,000) + Foregone Interest ($20,000 × 0.05 = $1,000) = $61,000. Total costs = $76,000. Economic profit = Revenue ($100,000) - Total costs ($76,000) = $24,000."
     },
     {
       "id": 21,
@@ -529,7 +529,7 @@ export const microSetOneQuestions: QuestionBank = {
         "The firm is productively efficient and earning economic losses."
       ],
       "correctAnswer": "A",
-      "explanation": "Perfectly competitive firms maximize profit where marginal revenue equals marginal cost ($MR = MC$). Since Price equals marginal revenue ($P = MR$) in this market structure, the firm is producing where $P = MC$, which is the condition for **Allocative Efficiency**. The graph shows that at this quantity, the Price is higher than the average total cost ($P > ATC$), meaning the firm is earning positive **Economic Profits**. (Note: The firm is not productively efficient because it is not producing at the lowest point of the ATC curve)."
+      "explanation": "Perfectly competitive firms maximize profit where marginal revenue equals marginal cost ($MR = MC$). Since Price equals marginal revenue ($P = MR$) in this market structure, the firm is producing where $P = MC$, which is the condition for Allocative Efficiency. The graph shows that at this quantity, the Price is higher than the average total cost ($P > ATC$), meaning the firm is earning positive Economic Profits. (Note: The firm is not productively efficient because it is not producing at the lowest point of the ATC curve)."
     },
     {
       "id": 25,
@@ -546,7 +546,7 @@ export const microSetOneQuestions: QuestionBank = {
         "The firm will experience increasing returns to scale."
       ],
       "correctAnswer": "A",
-      "explanation": "Beyond Q2, the firm enters the region of **Diseconomies of Scale**. In this region, the long-run average total cost (LRATC) curve slopes upward because the firm becomes too large to manage efficiently (often due to communication issues or bureaucracy). This inefficiency means that if the firm increases all inputs by a certain percentage (e.g., doubles them), the resulting output increases by a smaller percentage (less than double)."
+      "explanation": "Beyond Q2, the firm enters the region of Diseconomies of Scale. In this region, the long-run average total cost (LRATC) curve slopes upward because the firm becomes too large to manage efficiently (often due to communication issues or bureaucracy). This inefficiency means that if the firm increases all inputs by a certain percentage (e.g., doubles them), the resulting output increases by a smaller percentage (less than double)."
     },
     {
       "id": 26,
@@ -572,7 +572,7 @@ export const microSetOneQuestions: QuestionBank = {
         "4 units"
       ],
       "correctAnswer": "C",
-      "explanation": "To maximize profit, the firm should produce where marginal revenue (MR) equals marginal cost (MC), or the last unit where $MR \\ge MC$. \n* Moving from Q=1 to Q=2: $TR$ rises from $25 to $48, so $MR = $23$. Since $23 > $14 (MC), produce it.\n* Moving from Q=2 to Q=3: $TR$ rises from $48 to $69, so $MR = $21$. Since $21 = $21 (MC), produce it.\n* Moving from Q=3 to Q=4: $TR$ rises from $69 to $88, so $MR = $19$. Since $19 < $23 (MC), do not produce it.\nThus, the optimal quantity is 3."
+      "explanation": "To maximize profit, the firm should produce where marginal revenue (MR) equals marginal cost (MC), or the last unit where $MR \\ge MC$. \n- Moving from Q=1 to Q=2: $TR$ rises from $25 to $48, so $MR = $23$. Since $23 > $14 (MC), produce it.\n- Moving from Q=2 to Q=3: $TR$ rises from $48 to $69, so $MR = $21$. Since $21 = $21 (MC), produce it.\n- Moving from Q=3 to Q=4: $TR$ rises from $69 to $88, so $MR = $19$. Since $19 < $23 (MC), do not produce it.\nThus, the optimal quantity is 3."
     },
     {
       "id": 27,
@@ -631,7 +631,7 @@ export const microSetOneQuestions: QuestionBank = {
         "AirBlue does not have a dominant strategy."
       ],
       "correctAnswer": "B",
-      "explanation": "To check for a dominant strategy for AirBlue, compare their payoffs regardless of what SkyRed does.\n* If SkyRed chooses High: AirBlue compares $100 (High) vs $150 (Low). Low is better.\n* If SkyRed chooses Low: AirBlue compares $30 (High) vs $60 (Low). Low is better.\nSince 'Low Price' always yields a higher payoff for AirBlue regardless of SkyRed's decision, it is their dominant strategy.",
+      "explanation": "To check for a dominant strategy for AirBlue, compare their payoffs regardless of what SkyRed does.\n- If SkyRed chooses High: AirBlue compares $100 (High) vs $150 (Low). Low is better.\n- If SkyRed chooses Low: AirBlue compares $30 (High) vs $60 (Low). Low is better.\nSince 'Low Price' always yields a higher payoff for AirBlue regardless of SkyRed's decision, it is their dominant strategy.",
       "questionGroup": "payoff-matrix-airblue-skyred"
     },
     {
@@ -684,7 +684,7 @@ export const microSetOneQuestions: QuestionBank = {
         "Q3 | P1 | Zero Economic Profit"
       ],
       "correctAnswer": "B",
-      "explanation": "1. **Find Quantity:** The profit-maximizing quantity is where marginal revenue equals marginal cost ($MR=MC$). On the graph, these curves intersect at point S, which corresponds to quantity **Q1**.\n2. **Find Price:** To find the price consumers are willing to pay for Q1, go up from Q1 to the **Demand curve** (point V). This corresponds to price **P4**.\n3. **Find Profit:** Economic profit is the difference between Price and average total cost (ATC) multiplied by the quantity. At Q1, the price is P4 (point V) and the ATC is P2 (point T). The area of profit is the rectangle defined by these points: **P4-P2-T-V**."
+      "explanation": "1. Find Quantity: The profit-maximizing quantity is where marginal revenue equals marginal cost ($MR=MC$). On the graph, these curves intersect at point S, which corresponds to quantity Q1.\n2. Find Price: To find the price consumers are willing to pay for Q1, go up from Q1 to the Demand curve (point V). This corresponds to price P4.\n3. Find Profit: Economic profit is the difference between Price and average total cost (ATC) multiplied by the quantity. At Q1, the price is P4 (point V) and the ATC is P2 (point T). The area of profit is the rectangle defined by these points: P4-P2-T-V."
     },
     {
       "id": 32,
@@ -791,7 +791,7 @@ export const microSetOneQuestions: QuestionBank = {
         "4 workers"
       ],
       "correctAnswer": "B",
-      "explanation": "The firm should hire workers as long as the marginal revenue product (MRP) is greater than or equal to the wage ($MRP \\ge Wage$).\n* 1st Worker: $MP=10$, $MRP=$50$. ($50 > $35$) -> Hire.\n* 2nd Worker: $MP=8$, $MRP=$40$. ($40 > $35$) -> Hire.\n* 3rd Worker: $MP=6$, $MRP=$30$. ($30 < $35$) -> Do not hire.\nThe firm stops at 2 workers.",
+      "explanation": "The firm should hire workers as long as the marginal revenue product (MRP) is greater than or equal to the wage ($MRP \\ge Wage$).\n- 1st Worker: $MP=10$, $MRP=$50$. ($50 > $35$) -> Hire.\n- 2nd Worker: $MP=8$, $MRP=$40$. ($40 > $35$) -> Hire.\n- 3rd Worker: $MP=6$, $MRP=$30$. ($30 < $35$) -> Do not hire.\nThe firm stops at 2 workers.",
       "questionGroup": "mrp-table-workers"
     },
     {
@@ -809,7 +809,7 @@ export const microSetOneQuestions: QuestionBank = {
         "Maintain the current combination of labor and capital."
       ],
       "correctAnswer": "A",
-      "explanation": "The firm should verify if the Least-Cost Rule holds: $MP_L / P_L = MP_K / P_K$.\n* Labor: $50 / $10 = 5$ widgets per dollar.\n* Capital: $100 / $50 = 2$ widgets per dollar.\nSince labor provides more 'bang for the buck' (5 > 2), the firm should shift spending away from capital and towards labor."
+      "explanation": "The firm should verify if the Least-Cost Rule holds: $MP_L / P_L = MP_K / P_K$.\n- Labor: $50 / $10 = 5$ widgets per dollar.\n- Capital: $100 / $50 = 2$ widgets per dollar.\nSince labor provides more 'bang for the buck' (5 > 2), the firm should shift spending away from capital and towards labor."
     },
     {
       "id": 38,
@@ -1084,7 +1084,7 @@ export const microSetOneQuestions: QuestionBank = {
         "Increase by 10%"
       ],
       "correctAnswer": "A",
-      "explanation": "First, calculate the percentage change in price: $(12 - 10) / 10 = 0.20$ (or 20%). Next, use the elasticity formula: $E_s = \\%\\Delta Q / \\%\\Delta P$. Substitute the known values: $2.0 = \\%\\Delta Q / 20\\%$. Solving for the change in quantity: $\\%\\Delta Q = 2.0 \\times 20\\% = 40\\%$. Since the price increased and the supply curve is upward-sloping, the quantity supplied must **increase**."
+      "explanation": "First, calculate the percentage change in price: $(12 - 10) / 10 = 0.20$ (or 20%). Next, use the elasticity formula: $E_s = \\%\\Delta Q / \\%\\Delta P$. Substitute the known values: $2.0 = \\%\\Delta Q / 20\\%$. Solving for the change in quantity: $\\%\\Delta Q = 2.0 \\times 20\\% = 40\\%$. Since the price increased and the supply curve is upward-sloping, the quantity supplied must increase."
     },
     {
       "id": 52,
@@ -1138,7 +1138,7 @@ export const microSetOneQuestions: QuestionBank = {
         "Fire both labor and capital."
       ],
       "correctAnswer": "A",
-      "explanation": "Compare the 'marginal product per dollar' for each input.\n* Labor: $40 / $10 = 4$ loaves per dollar.\n* Capital: $100 / $20 = 5$ loaves per dollar.\nSince Capital provides a higher return per dollar spent ($5 > 4$), the firm should shift resources toward Capital and away from Labor."
+      "explanation": "Compare the 'marginal product per dollar' for each input.\n- Labor: $40 / $10 = 4$ loaves per dollar.\n- Capital: $100 / $20 = 5$ loaves per dollar.\nSince Capital provides a higher return per dollar spent ($5 > 4$), the firm should shift resources toward Capital and away from Labor."
     },
     {
       "id": 55,
@@ -1150,11 +1150,11 @@ export const microSetOneQuestions: QuestionBank = {
       "image": q55,
       "optionTableHeaders": ["Per-Unit Tax", "Total Tax Revenue"],
       "options": [
-        "P4 - P2 | (P4 - P2) * Q1",
-        "P4 - P3 | (P4 - P3) * Q1",
-        "P4 - P1 | (P4 - P1) * Q1",
-        "P3 - P1 | (P3 - P1) * Q2",
-        "P5 - P1 | (P5 - P1) * Q1"
+        "P4 - P2 | (P4 - P2) × Q1",
+        "P4 - P3 | (P4 - P3) × Q1",
+        "P4 - P1 | (P4 - P1) × Q1",
+        "P3 - P1 | (P3 - P1) × Q2",
+        "P5 - P1 | (P5 - P1) × Q1"
       ],
       "correctAnswer": "A",
       "explanation": "The per-unit tax is the vertical distance between the original supply curve (S) and the new supply curve (S + tax). On the graph, this distance is represented by the difference between P4 and P2 at the quantity traded (Q1). Total Tax Revenue is calculated as (Per-Unit Tax) × (Quantity Sold). Therefore, the revenue corresponds to the area of the rectangle with height (P4 - P2) and width Q1.",
@@ -1177,7 +1177,7 @@ export const microSetOneQuestions: QuestionBank = {
         "P3 | P2 | Area C-D-E"
       ],
       "correctAnswer": "A",
-      "explanation": "The tax shifts the supply curve left, moving the equilibrium from point D to point E. Consumers pay the new higher equilibrium price, **P4**. Producers receive this price minus the tax amount, leaving them with **P2** (the point on the original supply curve directly below the new equilibrium). The deadweight loss is the triangle **C-D-E**, representing the lost economic surplus because the quantity traded fell from Q2 to Q1.",
+      "explanation": "The tax shifts the supply curve left, moving the equilibrium from point D to point E. Consumers pay the new higher equilibrium price, P4. Producers receive this price minus the tax amount, leaving them with P2 (the point on the original supply curve directly below the new equilibrium). The deadweight loss is the triangle C-D-E, representing the lost economic surplus because the quantity traded fell from Q2 to Q1.",
       "questionGroup": "excise-tax-graph-q60"
     },
     {
@@ -1214,7 +1214,7 @@ export const microSetOneQuestions: QuestionBank = {
         "Technology is improving at a constant rate."
       ],
       "correctAnswer": "B",
-      "explanation": "A concave (bowed out) PPC indicates **increasing opportunity costs**. This happens because resources are not perfectly adaptable (e.g., a tractor is great for farming but terrible for making microchips). As you shift more resources from one good to the other, you are forced to use less and less suitable resources, causing the opportunity cost to rise."
+      "explanation": "A concave (bowed out) PPC indicates increasing opportunity costs. This happens because resources are not perfectly adaptable (e.g., a tractor is great for farming but terrible for making microchips). As you shift more resources from one good to the other, you are forced to use less and less suitable resources, causing the opportunity cost to rise."
     },
     {
       "id": 59,
@@ -1252,7 +1252,7 @@ export const microSetOneQuestions: QuestionBank = {
         "Provide a lump-sum subsidy to producers."
       ],
       "correctAnswer": "D",
-      "explanation": "To correct a positive externality (underproduction), the government should encourage more consumption/production. The most efficient tool is a **per-unit subsidy** equal to the vertical distance between the marginal social benefit (MSB) and marginal private benefit (MPB) curves. This distance represents the **marginal external benefit** ($6). This subsidy effectively internalizes the external benefit, aligning the private market outcome with the social optimum.",
+      "explanation": "To correct a positive externality (underproduction), the government should encourage more consumption/production. The most efficient tool is a per-unit subsidy equal to the vertical distance between the marginal social benefit (MSB) and marginal private benefit (MPB) curves. This distance represents the marginal external benefit ($6). This subsidy effectively internalizes the external benefit, aligning the private market outcome with the social optimum.",
       "questionGroup": "positive-externality-graph-q63"
     }
     ];

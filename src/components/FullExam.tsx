@@ -31,6 +31,7 @@ import { UnitTestQuestionBody, type QuestionTextHighlight } from './UnitTestQues
 import { ExpandableQuestionImage } from './ExpandableQuestionImage';
 import { MathText } from './MathText';
 import { ExamTutorialModal } from './ExamTutorialModal';
+import { ExamToolsCalculator } from '@/components/exam/ExamToolsCalculator';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, doc, updateDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 import { saveQuizResult } from '@/lib/quizHistory';
@@ -678,20 +679,18 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
     }
   };
 
-  // Update leftPanelWidth when tools panel opens/closes
+  const isStatsDesmosPanel =
+    examType === 'stats' && activeTool === 'calculator';
+  const toolsPanelWidthClass = isStatsDesmosPanel ? 'w-[52%]' : 'w-[35%]';
+
+  // Update leftPanelWidth when tools panel opens/closes (wider for Stats Desmos)
   useEffect(() => {
     if (showToolsPanel) {
-      setLeftPanelWidth(65);
+      setLeftPanelWidth(isStatsDesmosPanel ? 48 : 65);
     } else {
       setLeftPanelWidth(100);
     }
-  }, [showToolsPanel]);
-
-  // Add calculator states (for inline calculator in slide-out)
-  const [calculatorDisplay, setCalculatorDisplay] = useState('0');
-  const [calculatorPreviousValue, setCalculatorPreviousValue] = useState<number | null>(null);
-  const [calculatorOperation, setCalculatorOperation] = useState<string | null>(null);
-  const [calculatorWaitingForNewValue, setCalculatorWaitingForNewValue] = useState(false);
+  }, [showToolsPanel, isStatsDesmosPanel]);
 
   // Excalidraw state
   const [excalidrawElements, setExcalidrawElements] = useState<any[]>([]);
@@ -1568,74 +1567,6 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
       element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 100);
   };
-
-  // Calculator functions for slide-out panel
-  const handleCalculatorNumber = (num: string) => {
-    if (calculatorWaitingForNewValue) {
-      setCalculatorDisplay(num);
-      setCalculatorWaitingForNewValue(false);
-    } else {
-      setCalculatorDisplay(calculatorDisplay === '0' ? num : calculatorDisplay + num);
-    }
-  };
-
-  const handleCalculatorOperation = (op: string) => {
-    const inputValue = parseFloat(calculatorDisplay);
-
-    if (calculatorPreviousValue === null) {
-      setCalculatorPreviousValue(inputValue);
-    } else if (calculatorOperation) {
-      const result = calculateResult(calculatorPreviousValue, inputValue, calculatorOperation);
-      setCalculatorDisplay(String(result));
-      setCalculatorPreviousValue(result);
-    }
-
-    setCalculatorWaitingForNewValue(true);
-    setCalculatorOperation(op);
-  };
-
-  const calculateResult = (firstValue: number, secondValue: number, op: string): number => {
-    switch (op) {
-      case '+':
-        return firstValue + secondValue;
-      case '-':
-        return firstValue - secondValue;
-      case '×':
-        return firstValue * secondValue;
-      case '÷':
-        return secondValue !== 0 ? firstValue / secondValue : 0;
-      default:
-        return secondValue;
-    }
-  };
-
-  const handleCalculatorEquals = () => {
-    if (calculatorPreviousValue !== null && calculatorOperation) {
-      const inputValue = parseFloat(calculatorDisplay);
-      const result = calculateResult(calculatorPreviousValue, inputValue, calculatorOperation);
-      setCalculatorDisplay(String(result));
-      setCalculatorPreviousValue(null);
-      setCalculatorOperation(null);
-      setCalculatorWaitingForNewValue(true);
-    }
-  };
-
-  const handleCalculatorClear = () => {
-    setCalculatorDisplay('0');
-    setCalculatorPreviousValue(null);
-    setCalculatorOperation(null);
-    setCalculatorWaitingForNewValue(false);
-  };
-
-  const handleCalculatorDecimal = () => {
-    if (calculatorWaitingForNewValue) {
-      setCalculatorDisplay('0.');
-      setCalculatorWaitingForNewValue(false);
-    } else if (!calculatorDisplay.includes('.')) {
-      setCalculatorDisplay(calculatorDisplay + '.');
-    }
-  };
-
 
   // Add effect to reset tools state when component unmounts/remounts
   useEffect(() => {
@@ -3485,12 +3416,16 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
             {/* For unit tests, preview exams, full exams, and custom assignments, always show panel without animation */}
             {shouldShowToolsByDefault ? (
                 showToolsPanel && (
-                  <div className="hidden lg:block flex-shrink-0 w-[35%] bg-white shadow-2xl z-40 border-l border-gray-200 overflow-hidden fixed right-0" style={{ top: isUnitTest ? '56px' : '144px', height: isUnitTest ? 'calc(100vh - 56px)' : 'calc(100vh - 144px)' }}>
+                  <div className={`hidden lg:block flex-shrink-0 ${toolsPanelWidthClass} bg-white shadow-2xl z-40 border-l border-gray-200 overflow-hidden fixed right-0`} style={{ top: isUnitTest ? '56px' : '144px', height: isUnitTest ? 'calc(100vh - 56px)' : 'calc(100vh - 144px)' }}>
                     <div className="w-full h-full flex flex-col overflow-hidden">
                     {/* Header */}
                     <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between flex-shrink-0">
                       <span className="text-sm font-semibold text-gray-900">
-                        {activeTool === 'calculator' ? 'Calculator' : 'Drawing Pad'}
+                        {activeTool === 'calculator'
+                          ? examType === 'stats'
+                            ? 'Desmos (exam-style)'
+                            : 'Calculator'
+                          : 'Drawing Pad'}
                       </span>
                       {shouldShowToolsByDefault && (
                         <button
@@ -3544,131 +3479,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
 
                       {/* Calculator Section */}
                       {activeTool === 'calculator' && (
-                        <div className="flex-1 overflow-y-auto bg-gray-50">
-                          <div className="p-4">
-                            {/* Calculator Display */}
-                            <div className="bg-white border border-gray-200 rounded-lg mb-3 p-4 shadow-sm">
-                              <div className="text-right text-3xl font-semibold text-gray-900 overflow-hidden min-h-[48px] flex items-center justify-end">
-                                {calculatorDisplay}
-                              </div>
-                            </div>
-
-                            {/* Calculator Buttons */}
-                            <div className="grid grid-cols-4 gap-2.5">
-                              {/* Row 1 */}
-                              <button
-                                onClick={handleCalculatorClear}
-                                className="col-span-2 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 font-semibold py-3 rounded-lg transition-colors text-sm"
-                              >
-                                Clear
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorOperation('÷')}
-                                className={`${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
-                              >
-                                ÷
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorOperation('×')}
-                                className={`${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
-                              >
-                                ×
-                              </button>
-
-                              {/* Row 2 */}
-                              <button
-                                onClick={() => handleCalculatorNumber('7')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                7
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorNumber('8')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                8
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorNumber('9')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                9
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorOperation('-')}
-                                className={`${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
-                              >
-                                −
-                              </button>
-
-                              {/* Row 3 */}
-                              <button
-                                onClick={() => handleCalculatorNumber('4')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                4
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorNumber('5')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                5
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorNumber('6')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                6
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorOperation('+')}
-                                className={`${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
-                              >
-                                +
-                              </button>
-
-                              {/* Row 4 */}
-                              <button
-                                onClick={() => handleCalculatorNumber('1')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                1
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorNumber('2')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                2
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorNumber('3')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                3
-                              </button>
-                              <button
-                                onClick={handleCalculatorEquals}
-                                className={`row-span-2 ${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-xl`}
-                              >
-                                =
-                              </button>
-
-                              {/* Row 5 */}
-                              <button
-                                onClick={() => handleCalculatorNumber('0')}
-                                className="col-span-2 bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                0
-                              </button>
-                              <button
-                                onClick={handleCalculatorDecimal}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                .
-                              </button>
-                            </div>
-                          </div>
-                        </div>
+                        <ExamToolsCalculator examType={examType} accentClassName={accentFull} />
                       )}
                     </>
                   </div>
@@ -3682,7 +3493,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.2 }}
-                      className="hidden lg:block flex-shrink-0 w-[35%] bg-white shadow-2xl z-40 border-l border-gray-200 overflow-hidden fixed right-0" style={{ top: isUnitTest ? '56px' : '144px', height: isUnitTest ? 'calc(100vh - 56px)' : 'calc(100vh - 144px)' }}
+                      className={`hidden lg:block flex-shrink-0 ${toolsPanelWidthClass} bg-white shadow-2xl z-40 border-l border-gray-200 overflow-hidden fixed right-0`} style={{ top: isUnitTest ? '56px' : '144px', height: isUnitTest ? 'calc(100vh - 56px)' : 'calc(100vh - 144px)' }}
                     >
                     <motion.div
                       initial={{ x: '100%' }}
@@ -3740,132 +3551,8 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                       <>
                         {/* Calculator Section */}
                         {activeTool === 'calculator' && (
-                        <div className="flex-1 overflow-y-auto bg-gray-50">
-                          <div className="p-4">
-                            {/* Calculator Display */}
-                            <div className="bg-white border border-gray-200 rounded-lg mb-3 p-4 shadow-sm">
-                              <div className="text-right text-3xl font-semibold text-gray-900 overflow-hidden min-h-[48px] flex items-center justify-end">
-                                {calculatorDisplay}
-                              </div>
-                            </div>
-
-                            {/* Calculator Buttons */}
-                            <div className="grid grid-cols-4 gap-2.5">
-                              {/* Row 1 */}
-                              <button
-                                onClick={handleCalculatorClear}
-                                className="col-span-2 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 font-semibold py-3 rounded-lg transition-colors text-sm"
-                              >
-                                Clear
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorOperation('÷')}
-                                className={`${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
-                              >
-                                ÷
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorOperation('×')}
-                                className={`${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
-                              >
-                                ×
-                              </button>
-
-                              {/* Row 2 */}
-                              <button
-                                onClick={() => handleCalculatorNumber('7')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                7
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorNumber('8')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                8
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorNumber('9')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                9
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorOperation('-')}
-                                className={`${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
-                              >
-                                −
-                              </button>
-
-                              {/* Row 3 */}
-                              <button
-                                onClick={() => handleCalculatorNumber('4')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                4
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorNumber('5')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                5
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorNumber('6')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                6
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorOperation('+')}
-                                className={`${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
-                              >
-                                +
-                              </button>
-
-                              {/* Row 4 */}
-                              <button
-                                onClick={() => handleCalculatorNumber('1')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                1
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorNumber('2')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                2
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorNumber('3')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                3
-                              </button>
-                              <button
-                                onClick={handleCalculatorEquals}
-                                className={`row-span-2 ${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-xl`}
-                              >
-                                =
-                              </button>
-
-                              {/* Row 5 */}
-                              <button
-                                onClick={() => handleCalculatorNumber('0')}
-                                className="col-span-2 bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                0
-                              </button>
-                              <button
-                                onClick={handleCalculatorDecimal}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                .
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                        )}
+                        <ExamToolsCalculator examType={examType} accentClassName={accentFull} />
+                      )}
 
                         {/* Excalidraw / Type Pad Section */}
                         {activeTool === 'whiteboard' && (
@@ -3950,7 +3637,11 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                       </div>
                     ) : (
                       <span className="text-sm font-semibold text-gray-900">
-                        {activeTool === 'calculator' ? 'Calculator' : 'Drawing Pad'}
+                        {activeTool === 'calculator'
+                          ? examType === 'stats'
+                            ? 'Desmos (exam-style)'
+                            : 'Calculator'
+                          : 'Drawing Pad'}
                       </span>
                     )}
                     {!shouldShowToolsByDefault && (
@@ -4015,131 +3706,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
 
                       {/* Calculator Section */}
                       {activeTool === 'calculator' && (
-                        <div className="flex-1 overflow-y-auto bg-gray-50">
-                          <div className="p-4">
-                            {/* Calculator Display */}
-                            <div className="bg-white border border-gray-200 rounded-lg mb-3 p-4 shadow-sm">
-                              <div className="text-right text-3xl font-semibold text-gray-900 overflow-hidden min-h-[48px] flex items-center justify-end">
-                                {calculatorDisplay}
-                              </div>
-                            </div>
-
-                            {/* Calculator Buttons */}
-                            <div className="grid grid-cols-4 gap-2.5">
-                              {/* Row 1 */}
-                              <button
-                                onClick={handleCalculatorClear}
-                                className="col-span-2 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 font-semibold py-3 rounded-lg transition-colors text-sm"
-                              >
-                                Clear
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorOperation('÷')}
-                                className={`${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
-                              >
-                                ÷
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorOperation('×')}
-                                className={`${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
-                              >
-                                ×
-                              </button>
-
-                              {/* Row 2 */}
-                              <button
-                                onClick={() => handleCalculatorNumber('7')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                7
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorNumber('8')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                8
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorNumber('9')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                9
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorOperation('-')}
-                                className={`${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
-                              >
-                                −
-                              </button>
-
-                              {/* Row 3 */}
-                              <button
-                                onClick={() => handleCalculatorNumber('4')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                4
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorNumber('5')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                5
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorNumber('6')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                6
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorOperation('+')}
-                                className={`${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
-                              >
-                                +
-                              </button>
-
-                              {/* Row 4 */}
-                              <button
-                                onClick={() => handleCalculatorNumber('1')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                1
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorNumber('2')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                2
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorNumber('3')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                3
-                              </button>
-                              <button
-                                onClick={handleCalculatorEquals}
-                                className={`row-span-2 ${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-xl`}
-                              >
-                                =
-                              </button>
-
-                              {/* Row 5 */}
-                              <button
-                                onClick={() => handleCalculatorNumber('0')}
-                                className="col-span-2 bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                0
-                              </button>
-                              <button
-                                onClick={handleCalculatorDecimal}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                .
-                              </button>
-                            </div>
-                          </div>
-                        </div>
+                        <ExamToolsCalculator examType={examType} accentClassName={accentFull} />
                       )}
                       </>
                     ) : (
@@ -4147,132 +3714,8 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                         {/* For all exam types: Show only the active tool */}
                         {/* Calculator Section */}
                         {activeTool === 'calculator' && (
-                        <div className="flex-1 overflow-y-auto bg-gray-50">
-                          <div className="p-4">
-                            {/* Calculator Display */}
-                            <div className="bg-white border border-gray-200 rounded-lg mb-3 p-4 shadow-sm">
-                              <div className="text-right text-3xl font-semibold text-gray-900 overflow-hidden min-h-[48px] flex items-center justify-end">
-                                {calculatorDisplay}
-                              </div>
-                            </div>
-
-                            {/* Calculator Buttons - Same structure as unit test version */}
-                            <div className="grid grid-cols-4 gap-2.5">
-                              {/* Row 1 */}
-                              <button
-                                onClick={handleCalculatorClear}
-                                className="col-span-2 bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700 font-semibold py-3 rounded-lg transition-colors text-sm"
-                              >
-                                Clear
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorOperation('÷')}
-                                className={`${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
-                              >
-                                ÷
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorOperation('×')}
-                                className={`${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
-                              >
-                                ×
-                              </button>
-
-                              {/* Row 2 */}
-                              <button
-                                onClick={() => handleCalculatorNumber('7')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                7
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorNumber('8')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                8
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorNumber('9')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                9
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorOperation('-')}
-                                className={`${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
-                              >
-                                −
-                              </button>
-
-                              {/* Row 3 */}
-                              <button
-                                onClick={() => handleCalculatorNumber('4')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                4
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorNumber('5')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                5
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorNumber('6')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                6
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorOperation('+')}
-                                className={`${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-lg`}
-                              >
-                                +
-                              </button>
-
-                              {/* Row 4 */}
-                              <button
-                                onClick={() => handleCalculatorNumber('1')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                1
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorNumber('2')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                2
-                              </button>
-                              <button
-                                onClick={() => handleCalculatorNumber('3')}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                3
-                              </button>
-                              <button
-                                onClick={handleCalculatorEquals}
-                                className={`row-span-2 ${accentFull} text-white font-semibold py-3 rounded-lg transition-colors text-xl`}
-                              >
-                                =
-                              </button>
-
-                              {/* Row 5 */}
-                              <button
-                                onClick={() => handleCalculatorNumber('0')}
-                                className="col-span-2 bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                0
-                              </button>
-                              <button
-                                onClick={handleCalculatorDecimal}
-                                className="bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold py-3 rounded-lg border border-gray-200 shadow-sm transition-colors text-base"
-                              >
-                                .
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                        )}
+                        <ExamToolsCalculator examType={examType} accentClassName={accentFull} />
+                      )}
 
                         {/* Excalidraw Section */}
                         {activeTool === 'whiteboard' && (

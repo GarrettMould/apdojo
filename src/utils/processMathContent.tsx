@@ -132,6 +132,24 @@ function isCurrencyMathContent(content: string): boolean {
 }
 
 /**
+ * False when two `$` signs are really currency bookends around prose
+ * (e.g. "$3.00. If the market price is currently set at $5.00").
+ * Those should not render as italic KaTeX.
+ */
+function looksLikeInlineMathContent(content: string): boolean {
+  const trimmed = content.trim();
+  if (!trimmed) return false;
+  if (/\\[a-zA-Z]+/.test(trimmed)) return true;
+  if (/[=^_{}]/.test(trimmed)) return true;
+  if (/[×·÷±≤≥≠≈]/.test(trimmed)) return true;
+  // Multi-word prose between dollar signs → currency collision, not math
+  if (/\s/.test(trimmed) && /[A-Za-z]{2,}/.test(trimmed) && !/\\/.test(trimmed)) {
+    return false;
+  }
+  return true;
+}
+
+/**
  * Processes text for inline math ($...$).
  * Uses delimiter scanning so expressions like $1.5 \times IQR$ parse correctly.
  */
@@ -187,15 +205,24 @@ function processInlineMathInText(text: string, startKey: number): React.ReactNod
           {text.slice(openIndex, closeIndex + 1)}
         </React.Fragment>
       );
-    } else {
-      parts.push(
-        <KatexRenderer
-          key={`math-inline-${keyCounter++}`}
-          math={`$${mathContent}$`}
-          displayMode={false}
-        />
-      );
+      cursor = closeIndex + 1;
+      continue;
     }
+
+    if (!looksLikeInlineMathContent(mathContent)) {
+      // Opening $ is a currency sign; keep scanning for the next delimiter.
+      parts.push(<React.Fragment key={`text-${keyCounter++}`}>$</React.Fragment>);
+      cursor = openIndex + 1;
+      continue;
+    }
+
+    parts.push(
+      <KatexRenderer
+        key={`math-inline-${keyCounter++}`}
+        math={`$${mathContent}$`}
+        displayMode={false}
+      />
+    );
 
     cursor = closeIndex + 1;
   }
@@ -207,7 +234,22 @@ function processInlineMathInText(text: string, startKey: number): React.ReactNod
   return parts;
 }
 
-export type MathTextHighlight = { start: number; end: number; id: string };
+export type HighlightColor = 'yellow' | 'pink' | 'green';
+
+export type MathTextHighlight = {
+  start: number;
+  end: number;
+  id: string;
+  color?: HighlightColor;
+};
+
+export const HIGHLIGHT_COLOR_ORDER: HighlightColor[] = ['yellow', 'pink', 'green'];
+
+export const HIGHLIGHT_BG: Record<HighlightColor, string> = {
+  yellow: 'rgb(254 240 138)',
+  pink: 'rgb(251 207 232)',
+  green: 'rgb(187 247 208)',
+};
 
 /** Single-asterisk emphasis (`*case name*`) used in Gov MCQ copy. */
 const SINGLE_EMPHASIS_PATTERN = /\*([^*]+)\*/g;
@@ -237,7 +279,12 @@ function applyHighlightsToPlainText(
     .map((h) => {
       const s = Math.max(h.start, segmentOffset);
       const e = Math.min(h.end, segmentOffset + segment.length);
-      return { id: h.id, start: s - segmentOffset, end: e - segmentOffset };
+      return {
+        id: h.id,
+        start: s - segmentOffset,
+        end: e - segmentOffset,
+        color: h.color ?? 'yellow',
+      };
     })
     .filter((h) => h.end > h.start && h.start >= 0)
     .sort((a, b) => a.start - b.start);
@@ -253,8 +300,8 @@ function applyHighlightsToPlainText(
     parts.push(
       <mark
         key={`${h.id}-${i}`}
-        className="cursor-pointer rounded-sm bg-yellow-200/95 px-px text-inherit"
-        style={{ backgroundColor: 'rgb(254 240 138)' }}
+        className="cursor-pointer rounded-sm px-px text-inherit"
+        style={{ backgroundColor: HIGHLIGHT_BG[h.color] }}
         title="Click to remove highlight"
         onClick={(e) => {
           e.preventDefault();
@@ -386,15 +433,25 @@ function appendInlineMathParts(
           {applyHighlightsToPlainText(fullMatch, charOffset, highlights, onRemoveHighlight)}
         </React.Fragment>
       );
-    } else {
-      parts.push(
-        <KatexRenderer
-          key={`math-inline-${keyCounter++}`}
-          math={`$${mathContent}$`}
-          displayMode={false}
-        />
-      );
+      charOffset += fullMatch.length;
+      cursor = closeIndex + 1;
+      continue;
     }
+
+    if (!looksLikeInlineMathContent(mathContent)) {
+      parts.push(<React.Fragment key={`text-${keyCounter++}`}>$</React.Fragment>);
+      charOffset += 1;
+      cursor = openIndex + 1;
+      continue;
+    }
+
+    parts.push(
+      <KatexRenderer
+        key={`math-inline-${keyCounter++}`}
+        math={`$${mathContent}$`}
+        displayMode={false}
+      />
+    );
 
     charOffset += fullMatch.length;
     cursor = closeIndex + 1;

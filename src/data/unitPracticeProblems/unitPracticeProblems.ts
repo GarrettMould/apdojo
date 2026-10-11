@@ -1,5 +1,6 @@
 import { Question as QuestionType } from '@/data/questionBanks/types';
 import { govMcqPracticeQuestions } from '@/data/gov/govMcqPractice';
+import { statsMcqPracticeQuestions } from '@/data/stats/statsMcqPractice';
 
 // Import the macroSetTwoQuestions from the macroSetTwo.ts file
 import { macroSetTwoQuestions } from '../questionBanks/macro/mcqs/macroSetTwo';
@@ -5563,7 +5564,7 @@ const microUnit3Questions = [
     "$25"
     ],
     "correctAnswer": "B",
-    "explanation": "1. Find Labor: $L = Output / AP = 20 / 4 = 5$ workers. 2. Find TVC: $5 workers * $20 wage = $100$. 3. Find TC: $TFC ($100) + TVC ($100) = $200$. 4. Find ATC: $TC / Output = 200 / 20 = $10$.",
+    "explanation": "1. Find Labor: $L = Output / AP = 20 / 4 = 5$ workers. 2. Find TVC: $5 workers × $20 wage = $100$. 3. Find TC: $TFC ($100) + TVC ($100) = $200$. 4. Find ATC: $TC / Output = 200 / 20 = $10$.",
     "videoExplanation": null
     },
     // COMMENTED OUT: Table not working properly
@@ -5599,7 +5600,7 @@ const microUnit3Questions = [
     "$800"
     ],
     "correctAnswer": "C",
-    "explanation": "Total variable cost = $AVC * Quantity = $8 * 50 = $400$. Total fixed cost = $Total cost - Total variable cost = $600 - $400 = $200$.",
+    "explanation": "Total variable cost = $AVC × Quantity = $8 × 50 = $400$. Total fixed cost = $Total cost - Total variable cost = $600 - $400 = $200$.",
     "videoExplanation": null
     },
     {
@@ -5794,7 +5795,7 @@ const microUnit3Questions = [
     "$1,200"
     ],
     "correctAnswer": "A",
-    "explanation": "Operating loss: $(ATC - P) * Q = ($20 - $10) * 100 = $1,000$. Shutdown loss (fixed costs): $(ATC - AVC) * Q = ($20 - $12) * 100 = $800$. The firm reduces its loss from $1,000 to $800 by shutting down, a difference of $200.",
+    "explanation": "Operating loss: $(ATC - P) × Q = ($20 - $10) × 100 = $1,000$. Shutdown loss (fixed costs): $(ATC - AVC) × Q = ($20 - $12) × 100 = $800$. The firm reduces its loss from $1,000 to $800 by shutting down, a difference of $200.",
     "videoExplanation": null
     },
     {
@@ -6434,7 +6435,7 @@ const microUnit5Questions = [
       "decrease its demand for labor"
     ],
     "correctAnswer": "A",
-    "explanation": "Factor demand is a 'derived demand.' Even in monopolistic competition, if demand for the product increases, both the price and marginal revenue (MR) for the product rise. This increases the marginal revenue product (MRP = MP * MR) of the inputs, leading the firm to increase its demand for capital and labor.",
+    "explanation": "Factor demand is a 'derived demand.' Even in monopolistic competition, if demand for the product increases, both the price and marginal revenue (MR) for the product rise. This increases the marginal revenue product (MRP = MP × MR) of the inputs, leading the firm to increase its demand for capital and labor.",
     "videoExplanation": null
   },
   {
@@ -6510,7 +6511,7 @@ const microUnit5Questions = [
       "The demand curve for labor will shift to the right."
     ],
     "correctAnswer": "A",
-    "explanation": "MRP = MP * MR. If marginal revenue decreases due to falling product demand, the MRP decreases. Since the labor demand curve is the MRP curve, the firm's demand for labor decreases.",
+    "explanation": "MRP = MP × MR. If marginal revenue decreases due to falling product demand, the MRP decreases. Since the labor demand curve is the MRP curve, the firm's demand for labor decreases.",
     "videoExplanation": null
   },
   {
@@ -6529,7 +6530,7 @@ const microUnit5Questions = [
       "P = $40 and MR = $40"
     ],
     "correctAnswer": "B",
-    "explanation": "The firm hires where wage = MRP. So, $40 = MRP. Since MRP = MP * MR, we have $40 = 8 * MR, which means MR = $5. For a firm with market power (downward sloping demand), price (P) is always greater than marginal revenue (MR). Therefore, P > $5.",
+    "explanation": "The firm hires where wage = MRP. So, $40 = MRP. Since MRP = MP × MR, we have $40 = 8 × MR, which means MR = $5. For a firm with market power (downward sloping demand), price (P) is always greater than marginal revenue (MR). Therefore, P > $5.",
     "videoExplanation": null
   },
   {
@@ -6605,7 +6606,7 @@ const microUnit5Questions = [
       "Marginal Product (MP) × Marginal Revenue (MR)"
     ],
     "correctAnswer": "E",
-    "explanation": "This is a key distinction. For a perfect competitor, P=MR, so MRP=MP*P. But for a firm with market power, price > marginal revenue, so the strictly correct definition is MRP = MP * MR.",
+    "explanation": "This is a key distinction. For a perfect competitor, P=MR, so MRP=MP × P. But for a firm with market power, price > marginal revenue, so the strictly correct definition is MRP = MP × MR.",
     "videoExplanation": null
   },
   {
@@ -6624,7 +6625,7 @@ const microUnit5Questions = [
       "Keep employment levels unchanged"
     ],
     "correctAnswer": "D",
-    "explanation": "We must calculate MRP using MR, not price. MRP = MP * MR = 5 * $8 = $40. The wage (MFC) is $50. Since MRP ($40) < MFC ($50), the firm is losing money on the last worker and should employ fewer workers.",
+    "explanation": "We must calculate MRP using MR, not price. MRP = MP × MR = 5 × $8 = $40. The wage (MFC) is $50. Since MRP ($40) < MFC ($50), the firm is losing money on the last worker and should employ fewer workers.",
     "videoExplanation": null
   },
   {
@@ -11510,7 +11511,7 @@ export const allQuestions: QuestionType[] = [
             "Increase by 2%"
           ],
           "correctAnswer": "B",
-          "explanation": "Price elasticity of demand (PED) = % Change in Quantity Demanded / % Change in Price. Rearranging, % Change in Quantity Demanded = PED * % Change in Price. So, % Change in Qd = 0.2 * 10% = 2%. Since price increased, quantity demanded decreases.",
+          "explanation": "Price elasticity of demand (PED) = % Change in Quantity Demanded / % Change in Price. Rearranging, % Change in Quantity Demanded = PED × % Change in Price. So, % Change in Qd = 0.2 × 10% = 2%. Since price increased, quantity demanded decreases.",
         "videoExplanation": null
         },
         {
@@ -11567,7 +11568,7 @@ export const allQuestions: QuestionType[] = [
             "Decrease by 16%"
           ],
           "correctAnswer": "B",
-          "explanation": "Price elasticity of supply (PES) = % Change in Quantity Supplied / % Change in Price. Rearranging, % Change in Quantity Supplied = PES * % Change in Price. So, % Change in Qs = 0.8 * 20% = 16%. Since price increased, quantity supplied increases.",
+          "explanation": "Price elasticity of supply (PES) = % Change in Quantity Supplied / % Change in Price. Rearranging, % Change in Quantity Supplied = PES × % Change in Price. So, % Change in Qs = 0.8 × 20% = 16%. Since price increased, quantity supplied increases.",
         "videoExplanation": null
         },
         {
@@ -11928,7 +11929,7 @@ export const allQuestions: QuestionType[] = [
               "100 units" // Correct
             ],
             "correctAnswer": "E",
-            "explanation": "The least-cost combination rule states that MP_L / P_L = MP_K / P_K. Plugging in the values: 40 / $20 = MP_K / $50. This simplifies to 2 = MP_K / $50. Solving for MP_K gives MP_K = 2 * $50 = 100 units.",
+            "explanation": "The least-cost combination rule states that MP_L / P_L = MP_K / P_K. Plugging in the values: 40 / $20 = MP_K / $50. This simplifies to 2 = MP_K / $50. Solving for MP_K gives MP_K = 2 × $50 = 100 units.",
           "videoExplanation": null
           },
           {
@@ -12023,7 +12024,7 @@ export const allQuestions: QuestionType[] = [
               "$3.33 per hour"
             ],
             "correctAnswer": "D",
-            "explanation": "Marginal Revenue Product (MRP) = Marginal Product (MP) x Price (P). MRP = 10 widgets/hour * $3/widget = $30 per hour.",
+            "explanation": "Marginal Revenue Product (MRP) = Marginal Product (MP) x Price (P). MRP = 10 widgets/hour × $3/widget = $30 per hour.",
           "videoExplanation": null
           },
           {
@@ -14088,6 +14089,9 @@ export const allQuestions: QuestionType[] = [
 
   // AP U.S. Government — practice pools (formal unit tests are separate: `govUnit*McqExam.ts`)
   ...govMcqPracticeQuestions.map((q) => ({ ...q, subject: 'ap_us_government' as const })),
+
+  // AP Statistics — practice pools (formal unit tests are separate: `statsUnit*McqExam.ts`)
+  ...statsMcqPracticeQuestions.map((q) => ({ ...q, subject: 'ap_statistics' as const })),
 ];
 
 /**

@@ -38,6 +38,14 @@ import { getGovFlashcardsForLesson } from '@/data/gov/unitFlashcards';
 import { StudyModeModal } from '@/components/StudyModeModal';
 import { SeasonPassModal } from '@/components/SeasonPassModal';
 import { SeasonPassEntryWideModal } from '@/components/SeasonPassEntryWideModal';
+import { StudyBucketDock } from '@/components/cheat-sheet/StudyBucketDock';
+import { StudyBucketQuizModal } from '@/components/cheat-sheet/StudyBucketQuizModal';
+import {
+  mergeStudyBucketItem,
+  setStudyBucketDragData,
+  termNamesFromStudyBucket,
+  type StudyBucketItem,
+} from '@/components/cheat-sheet/studyBucketTypes';
 import { saveQuizResult } from '@/lib/quizHistory';
 import { hasValidSeasonPass, getUnitMCQTestUrl } from '@/lib/utils';
 import { COURSE_CONFIG } from '@/data/seasonPassCourseConfig';
@@ -46,7 +54,12 @@ import { Footer } from '@/components/Footer';
 import SeasonPassScrollPopup from '@/app/SeasonPassScrollPopup';
 import { CheatSheetChatBox } from '@/components/CheatSheetChatBox';
 import type { CourseSubject } from '@/lib/courseSubject';
-import { courseUrlSlugPrefix, displayCourseLabel, econCourseFromSubject } from '@/lib/courseSubject';
+import {
+  courseUrlSlugPrefix,
+  displayCourseLabel,
+  econCourseFromSubject,
+  isMcqPracticeUnitAvailable,
+} from '@/lib/courseSubject';
 import { COURSE_CURRICULUM_OUTLINES } from '@/data/courseCurriculumOutline';
 import { scotusEssayPrompts } from '@/data/gov/scotusEssayPrompts';
 import { processMathContent } from '@/utils/processMathContent';
@@ -584,6 +597,12 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [visibleWhiteboardsCount, setVisibleWhiteboardsCount] = useState<Record<string, number>>({});
   const [selectedTerms, setSelectedTerms] = useState<Set<string>>(new Set());
+  const [studyBucketVisible, setStudyBucketVisible] = useState(false);
+  const [studyBucketItems, setStudyBucketItems] = useState<StudyBucketItem[]>([]);
+  const [studyBucketQuizOpen, setStudyBucketQuizOpen] = useState(false);
+  const [studyBucketGenerating, setStudyBucketGenerating] = useState(false);
+  const [studyBucketQuizError, setStudyBucketQuizError] = useState<string | null>(null);
+  const [studyBucketQuestions, setStudyBucketQuestions] = useState<QuestionType[]>([]);
   const [showQuizPanel, setShowQuizPanel] = useState(false);
   const [quizQuestion, setQuizQuestion] = useState<QuestionType | null>(null);
   const [availableQuizQuestions, setAvailableQuizQuestions] = useState<QuestionType[]>([]);
@@ -658,6 +677,11 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
   // Reset unit MCQ count when switching unit or subject
   useEffect(() => {
     setUnitMcqAnsweredIds(new Set());
+    setStudyBucketItems([]);
+    setStudyBucketVisible(false);
+    setStudyBucketQuizOpen(false);
+    setStudyBucketQuestions([]);
+    setStudyBucketQuizError(null);
   }, [activeUnit, selectedSubject]);
 
   useEffect(() => {
@@ -1423,6 +1447,68 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
     setIsTutorOpen(true);
   };
 
+  const handleStudyBucketQuiz = async () => {
+    if (!isProCustomer) {
+      setShowPacketSeasonPassModal(true);
+      return;
+    }
+    const termNames = termNamesFromStudyBucket(studyBucketItems);
+    if (termNames.length === 0) return;
+
+    setStudyBucketQuizOpen(true);
+    setStudyBucketGenerating(true);
+    setStudyBucketQuizError(null);
+    setStudyBucketQuestions([]);
+
+    try {
+      const response = await fetch('/api/generate-unit-drill', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          selectedTerms: termNames,
+          selectedImages: [],
+          subject: subjectFilter,
+          unit: activeUnitNum,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to generate quiz');
+      }
+
+      const data = await response.json();
+      const convertedQuestions: QuestionType[] = (data.questions || []).map(
+        (q: any, index: number) => {
+          const question: QuestionType = {
+            id: parseInt(q.id?.replace(/\D/g, '') || `${Date.now()}${index}`, 10),
+            unit: activeUnitNum,
+            subject: subjectFilter,
+            unitName: unitsToDisplay.find((u) => u.number === activeUnitNum)?.title || '',
+            question: q.question || '',
+            image: null,
+            options: q.options || [],
+            correctAnswer: q.correctAnswer || '',
+            explanation: q.explanation || null,
+            lessonIDS: [],
+          };
+          if (q.tableData) question.tableData = q.tableData;
+          return question;
+        }
+      );
+
+      if (convertedQuestions.length === 0) {
+        throw new Error('No questions were generated');
+      }
+      setStudyBucketQuestions(convertedQuestions);
+    } catch (error: any) {
+      console.error('Study bucket quiz error:', error);
+      setStudyBucketQuizError(error.message || 'Failed to generate quiz. Please try again.');
+    } finally {
+      setStudyBucketGenerating(false);
+    }
+  };
+
   // Cycle through loading question indices while generating
   useEffect(() => {
     if (!isGeneratingQuiz) {
@@ -1916,6 +2002,26 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
           </motion.div>
         ) : null}
       </AnimatePresence>
+
+      <StudyBucketDock
+        visible={false}
+        items={studyBucketItems}
+        isGenerating={studyBucketGenerating}
+        onDropItem={(item) =>
+          setStudyBucketItems((prev) => mergeStudyBucketItem(prev, item))
+        }
+        onOpenQuiz={() => {
+          void handleStudyBucketQuiz();
+        }}
+      />
+      <StudyBucketQuizModal
+        open={studyBucketQuizOpen}
+        onClose={() => setStudyBucketQuizOpen(false)}
+        isGenerating={studyBucketGenerating}
+        error={studyBucketQuizError}
+        questions={studyBucketQuestions}
+      />
+
       <div ref={containerRef} className="flex h-[calc(100vh-5rem)] overflow-hidden bg-gray-50">
         {/* Main cheat sheet column (left of quiz panel when open) */}
         <motion.div
@@ -2039,7 +2145,14 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
         {/* Practice MCQs + Unit Test buttons */}
         <div className="mb-8 flex flex-col sm:flex-row gap-3 sm:gap-4">
           {/* Primary CTA - Practice MCQs */}
-          {selectedSubject === 'gov' || selectedSubject === 'stats' ? (
+          {isMcqPracticeUnitAvailable(selectedSubject, activeUnitNum) ? (
+            <Link
+              href={`/mcq-practice/${getSubjectSlug(selectedSubject)}/${getUnitSlug(activeUnitNum, selectedSubject)}`}
+              className={`w-full sm:flex-1 inline-flex items-center justify-center font-black py-3.5 px-6 rounded-xl border-2 active:translate-y-0.5 transition-all ${cheatSheetCtaStyles.practiceMcq}`}
+            >
+              <span className="text-base sm:text-lg tracking-wide uppercase">Practice MCQs</span>
+            </Link>
+          ) : (
             <div className="relative w-full sm:flex-1">
               <span className="absolute -left-2 -top-2 z-10 -rotate-12 rounded-md border-2 border-black bg-yellow-300 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-black shadow-[2px_2px_0_0_#000] sm:text-xs">
                 Coming soon!
@@ -2051,19 +2164,14 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                 className={`inline-flex w-full cursor-not-allowed items-center justify-center rounded-xl border-2 py-3.5 px-6 font-black opacity-80 ${
                   selectedSubject === 'stats'
                     ? 'border-orange-300 bg-orange-200 text-orange-400'
-                    : 'border-violet-300 bg-violet-200 text-violet-400'
+                    : selectedSubject === 'gov'
+                      ? 'border-violet-300 bg-violet-200 text-violet-400'
+                      : 'border-gray-300 bg-gray-200 text-gray-400'
                 }`}
               >
                 <span className="text-base tracking-wide uppercase sm:text-lg">Practice MCQs</span>
               </button>
             </div>
-          ) : (
-            <Link
-              href={`/mcq-practice/${getSubjectSlug(selectedSubject === 'macro' ? 'macro' : 'micro')}/${getUnitSlug(activeUnitNum, selectedSubject === 'macro' ? 'macro' : 'micro')}`}
-              className={`w-full sm:flex-1 inline-flex items-center justify-center font-black py-3.5 px-6 rounded-xl border-2 active:translate-y-0.5 transition-all ${cheatSheetCtaStyles.practiceMcq}`}
-            >
-              <span className="text-base sm:text-lg tracking-wide uppercase">Practice MCQs</span>
-            </Link>
           )}
 
           {/* Secondary CTA - Unit Test */}
@@ -2655,8 +2763,22 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
             return (
                     <React.Fragment key={lessonId}>
                       <div id={`lesson-${lessonId.replace('.', '-')}`} className="space-y-8 scroll-mt-24">
-              {/* Lesson Header */}
-              <h2 className="text-2xl font-bold text-gray-800 pb-2 border-b border-gray-200">
+              {/* Lesson Header — drag into study bucket to quiz the whole lesson */}
+              <h2
+                draggable
+                onDragStart={(e) => {
+                  setStudyBucketVisible(true);
+                  setStudyBucketDragData(e, {
+                    kind: 'lesson',
+                    lessonId,
+                    label: lessonName ? `${lessonId} — ${lessonName}` : lessonId,
+                    termIds: keyTerms.map((t) => t.id),
+                    termLabels: keyTerms.map((t) => t.term),
+                  });
+                }}
+                title="Drag into the study bucket to quiz this whole lesson"
+                className="cursor-grab text-2xl font-bold text-gray-800 pb-2 border-b border-gray-200 active:cursor-grabbing"
+              >
                 {lessonId}{lessonName ? ` - ${lessonName}` : ''}
               </h2>
 
@@ -2980,6 +3102,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                       const uniqueKey = `${lessonId}-${term.id}`;
                       
                       const handleTermClick = () => {
+                        setStudyBucketVisible(true);
                         setSelectedTerms(prev => {
                           const newSet = new Set(prev);
                           if (newSet.has(term.id)) {
@@ -2997,8 +3120,18 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                         <div 
                           key={uniqueKey} 
                           id={`term-${term.id}`} 
+                          draggable
+                          onDragStart={(e) => {
+                            setStudyBucketVisible(true);
+                            setStudyBucketDragData(e, {
+                              kind: 'term',
+                              id: term.id,
+                              label: term.term,
+                            });
+                          }}
                           onClick={handleTermClick}
-                          className={`relative scroll-mt-20 cursor-pointer rounded-lg border p-4 transition-all duration-200 ${
+                          title="Click to select · drag into the study bucket to save for a quiz"
+                          className={`relative scroll-mt-20 cursor-grab rounded-lg border p-4 transition-all duration-200 active:cursor-grabbing ${
                             isSelected 
                               ? 'scale-[0.98] transform border-gray-300 bg-gray-50 shadow-inner' 
                               : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'

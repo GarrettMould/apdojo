@@ -1,7 +1,15 @@
-import { macroUnits, microUnits, govUnits } from '@/data/cheatSheets';
+import { macroUnits, microUnits, govUnits, statsUnits } from '@/data/cheatSheets';
+import {
+  GOV_MCQ_PRACTICE_UNIT_NUMBERS,
+  GOV_MCQ_TEST_UNIT_NUMBERS,
+  STATS_MCQ_PRACTICE_UNIT_NUMBERS,
+  isGovMcqPracticeUnitAvailable,
+  isGovMcqTestUnitAvailable,
+  isStatsMcqPracticeUnitAvailable,
+} from '@/lib/courseSubject';
 
 /** Subject keys used under `/mcq-practice/[subject]/[unit]`. */
-export type PracticeMcqSubject = 'macro' | 'micro' | 'gov';
+export type PracticeMcqSubject = 'macro' | 'micro' | 'gov' | 'stats';
 
 /**
  * Convert a title string to a URL-friendly slug
@@ -49,6 +57,15 @@ export function parseSubjectSlug(subjectSlug: string): PracticeMcqSubject | null
     return 'gov';
   }
 
+  if (
+    normalized === 'ap-statistics' ||
+    normalized === 'ap-stats' ||
+    normalized === 'statistics' ||
+    normalized === 'stats'
+  ) {
+    return 'stats';
+  }
+
   return null;
 }
 
@@ -60,14 +77,15 @@ export function parseSubjectSlug(subjectSlug: string): PracticeMcqSubject | null
 export function getSubjectSlug(subject: PracticeMcqSubject): string {
   if (subject === 'macro') return 'ap-macroeconomics';
   if (subject === 'micro') return 'ap-microeconomics';
-  return 'ap-us-government';
+  if (subject === 'gov') return 'ap-us-government';
+  return 'ap-statistics';
 }
 
 /**
  * Convert unit slug to unit number
  * Supports both old format (unit-3) and new format (unit-3-national-income)
  * @param unitSlug - URL slug like "unit-3" or "unit-3-national-income" or "3"
- * @returns Unit number (1–6 for econ; Gov framework uses 1–5 in data, still parsed up to 6 for URL compatibility)
+ * @returns Unit number (1–6 for econ; Gov/Stats framework uses 1–5 in data, still parsed up to 6 for URL compatibility)
  */
 export function parseUnitSlug(unitSlug: string): number | null {
   const normalized = unitSlug.toLowerCase().trim();
@@ -114,7 +132,14 @@ export function getUnitSlug(unitNumber: number, subject?: PracticeMcqSubject): s
  * Get unit details by subject and unit number
  */
 export function getUnitDetails(subject: PracticeMcqSubject, unitNumber: number) {
-  const units = subject === 'macro' ? macroUnits : subject === 'micro' ? microUnits : govUnits;
+  const units =
+    subject === 'macro'
+      ? macroUnits
+      : subject === 'micro'
+        ? microUnits
+        : subject === 'gov'
+          ? govUnits
+          : statsUnits;
   return units.find((u) => u.number === unitNumber) || null;
 }
 
@@ -144,12 +169,15 @@ export function getFullUnitName(subject: PracticeMcqSubject, unitNumber: number)
 export function getSubjectDisplayName(subject: PracticeMcqSubject): string {
   if (subject === 'macro') return 'Macroeconomics';
   if (subject === 'micro') return 'Microeconomics';
-  return 'U.S. Government and Politics';
+  if (subject === 'gov') return 'U.S. Government and Politics';
+  return 'Statistics';
 }
 
 export {
   GOV_MCQ_PRACTICE_UNIT_NUMBERS,
   GOV_MCQ_TEST_UNIT_NUMBERS,
+  STATS_MCQ_PRACTICE_UNIT_NUMBERS,
   isGovMcqPracticeUnitAvailable,
   isGovMcqTestUnitAvailable,
-} from '@/lib/courseSubject';
+  isStatsMcqPracticeUnitAvailable,
+};

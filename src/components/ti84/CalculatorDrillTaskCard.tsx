@@ -2,7 +2,18 @@
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import type { CalculatorDrill, DrillCheckStatus } from '@/lib/ti84-drills/types';
+import type { DrillCheckStatus } from '@/lib/ti84-drills/types';
+
+/** Fields the task card needs — TI and Desmos drills both satisfy this. */
+export type DrillCardContent = {
+  id: string;
+  skillLabel: string;
+  prompt: string;
+  goalText: string;
+  successCue?: string;
+  hints: string[];
+  showPath: string;
+};
 
 const SUCCESS_PHRASES = [
   'Well done!',
@@ -26,14 +37,17 @@ const STACK_VISIBLE = 3;
 const STACK_OFFSET = 18;
 
 type Props = {
-  drills: CalculatorDrill[];
+  drills: DrillCardContent[];
   index: number;
   hintLevel: number;
   status: DrillCheckStatus;
   feedback: string | null;
   showPath: boolean;
+  /** Desmos mode: student marks complete instead of TI auto-grade. */
+  selfCheck?: boolean;
   onHint: () => void;
   onResetCalc: () => void;
+  onMarkComplete?: () => void;
   onContinue: () => void;
   onBackToDecks?: () => void;
 };
@@ -62,19 +76,23 @@ function ActiveCardBody({
   status,
   feedback,
   showPath,
+  selfCheck = false,
   onHint,
   onResetCalc,
+  onMarkComplete,
   onContinue,
 }: {
-  drill: CalculatorDrill;
+  drill: DrillCardContent;
   index: number;
   total: number;
   hintLevel: number;
   status: DrillCheckStatus;
   feedback: string | null;
   showPath: boolean;
+  selfCheck?: boolean;
   onHint: () => void;
   onResetCalc: () => void;
+  onMarkComplete?: () => void;
   onContinue: () => void;
 }) {
   const visibleHints = drill.hints.slice(0, hintLevel);
@@ -86,7 +104,9 @@ function ActiveCardBody({
     <CardChrome>
       <div className="flex items-center justify-between gap-3 border-b border-gray-200 bg-slate-100 px-4 py-2.5">
         <div>
-          <p className="text-[10px] font-medium uppercase tracking-wide text-slate-500">Calculator drill</p>
+          <p className="text-[10px] font-medium uppercase tracking-wide text-slate-500">
+            {selfCheck ? 'Desmos drill' : 'TI-84 drill'}
+          </p>
           <p className="text-xs font-semibold text-slate-800">{drill.skillLabel}</p>
         </div>
         <p className="shrink-0 tabular-nums text-[11px] font-medium text-slate-500">
@@ -133,7 +153,9 @@ function ActiveCardBody({
               >
                 ✓
               </span>
-              Screen matches. {successPhraseForDrill(drill.id)}
+              {selfCheck
+                ? `Marked complete. ${successPhraseForDrill(drill.id)}`
+                : `Screen matches. ${successPhraseForDrill(drill.id)}`}
             </p>
             <button
               type="button"
@@ -160,9 +182,7 @@ function ActiveCardBody({
               <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-amber-700">
                 Not quite
               </p>
-              <p className="mt-0.5 text-sm leading-snug text-amber-950">
-                {feedback}
-              </p>
+              <p className="mt-0.5 text-sm leading-snug text-amber-950">{feedback}</p>
             </div>
           </div>
         )}
@@ -186,7 +206,11 @@ function ActiveCardBody({
         )}
 
         {!isCorrect && (
-          <div className="grid grid-cols-2 gap-2">
+          <div
+            className={`grid gap-2 ${
+              selfCheck ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-2'
+            }`}
+          >
             <button
               type="button"
               onClick={onHint}
@@ -195,13 +219,24 @@ function ActiveCardBody({
             >
               {canHint ? `Hint · ${hintLevel}/${drill.hints.length}` : 'Hints done'}
             </button>
-            <button
-              type="button"
-              onClick={onResetCalc}
-              className="inline-flex items-center justify-center rounded-xl bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50 hover:ring-gray-300"
-            >
-              Reset calculator
-            </button>
+            {!selfCheck && (
+              <button
+                type="button"
+                onClick={onResetCalc}
+                className="inline-flex items-center justify-center rounded-xl bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50 hover:ring-gray-300"
+              >
+                Reset calculator
+              </button>
+            )}
+            {selfCheck && onMarkComplete && (
+              <button
+                type="button"
+                onClick={onMarkComplete}
+                className="inline-flex items-center justify-center rounded-xl bg-orange-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-orange-700"
+              >
+                Got it
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -210,7 +245,18 @@ function ActiveCardBody({
 }
 
 export function CalculatorDrillTaskCard(props: Props) {
-  const { drills, index, onContinue, hintLevel, status, feedback, showPath, onBackToDecks } = props;
+  const {
+    drills,
+    index,
+    onContinue,
+    hintLevel,
+    status,
+    feedback,
+    showPath,
+    selfCheck,
+    onMarkComplete,
+    onBackToDecks,
+  } = props;
   const remaining = drills.length - index;
   const visibleCount = Math.min(STACK_VISIBLE, remaining);
   const stackDrills = drills.slice(index, index + visibleCount);

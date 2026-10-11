@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { X, Loader2, Lock, ArrowRight, ChevronRight, Home } from 'lucide-react';
+import { X, Loader2, Lock, ArrowRight, ChevronRight, Home, Pen } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useCreditSystem } from '@/hooks/useCreditSystem';
@@ -17,6 +17,7 @@ import {
   macroUnits as allMacroUnitsData,
   microUnits as allMicroUnitsData,
   govUnits as allGovUnitsData,
+  statsUnits as allStatsUnitsData,
 } from '@/data/cheatSheets';
 import { LoginModal, SignupModal } from '@/components/AuthModals';
 import { logger } from '@/utils/logger';
@@ -27,11 +28,40 @@ import {
   getUnitSlug,
   type PracticeMcqSubject,
 } from '@/lib/practiceSlugs';
-import { isGovMcqPracticeUnitAvailable, type CourseSubject } from '@/lib/courseSubject';
+import {
+  isGovMcqPracticeUnitAvailable,
+  isStatsMcqPracticeUnitAvailable,
+  type CourseSubject,
+} from '@/lib/courseSubject';
 import { apQuestionSubjectTag } from '@/lib/courseSubject';
 import { SeasonPassModal } from '@/components/SeasonPassModal';
 import { hasValidSeasonPass } from '@/lib/utils';
 import { shufflePracticeQuestions } from '@/lib/shufflePracticeQuestions';
+import { REMATCH_ENABLED } from '@/lib/reviewFolder';
+import { ReviewFolderButton } from '@/components/review-folder/ReviewFolderButton';
+import { ReviewFolderPanel } from '@/components/review-folder/ReviewFolderPanel';
+import { PracticePacketModal } from '@/components/practice-packet/PracticePacketModal';
+import {
+  clearReviewFolder,
+  loadReviewFolder,
+  loadReviewFolderFromCloud,
+  saveReviewFolder,
+  saveReviewFolderToCloud,
+  applyAnswerHistoryToReviewFolder,
+  filterReviewFolderBySubject,
+  missedQuestionIds,
+  previewFromQuestion,
+  recordCorrect,
+  recordMiss,
+  removeMiss,
+  rollupByLesson,
+  type ReviewFolderState,
+} from '@/lib/reviewFolder';
+import {
+  assemblePracticePacket,
+  PRACTICE_PACKET_SESSION_KEY,
+  type PracticePacket,
+} from '@/lib/practicePacket';
 
 // Assuming this matches the structure in useAuth.ts and Firestore
 interface McqAnswer {
@@ -40,6 +70,8 @@ interface McqAnswer {
   isCorrect: boolean;
   unitId: number;
   lessonIDS: string[];
+  selectedLetter?: string;
+  subject?: string;
   timestamp?: any;
 }
 
@@ -122,16 +154,20 @@ function AccessDenied({
   const unitData =
     subject === 'gov'
       ? allGovUnitsData.find((u) => u.number === unitNum)
-      : subject === 'micro'
-        ? allMicroUnitsData.find((u) => u.number === unitNum)
-        : allMacroUnitsData.find((u) => u.number === unitNum);
+      : subject === 'stats'
+        ? allStatsUnitsData.find((u) => u.number === unitNum)
+        : subject === 'micro'
+          ? allMicroUnitsData.find((u) => u.number === unitNum)
+          : allMacroUnitsData.find((u) => u.number === unitNum);
   const price = unitData?.price || 4.99;
   const seasonBtnClass =
     subject === 'gov'
       ? 'bg-violet-600 hover:bg-violet-700'
-      : subject === 'micro'
-        ? 'bg-green-500 hover:bg-green-600'
-        : 'bg-blue-500 hover:bg-blue-600';
+      : subject === 'stats'
+        ? 'bg-orange-600 hover:bg-orange-700'
+        : subject === 'micro'
+          ? 'bg-green-500 hover:bg-green-600'
+          : 'bg-blue-500 hover:bg-blue-600';
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 pt-16 pb-12">
@@ -173,11 +209,10 @@ function AccessDenied({
 // Breadcrumb Component
 function Breadcrumb({ subject, unitNumber }: { subject: PracticeMcqSubject; unitNumber: number }) {
   const subjectName = getSubjectDisplayName(subject);
-  const unitName = getFullUnitName(subject, unitNumber);
   const subjectSlug = getSubjectSlug(subject);
   
   return (
-    <nav className="flex items-center gap-2 text-sm mb-6" aria-label="Breadcrumb">
+    <nav className="flex min-w-0 flex-1 flex-wrap items-center gap-2 text-sm" aria-label="Breadcrumb">
       <Link 
         href="/" 
         className="text-gray-600 hover:text-gray-900 transition-colors flex items-center gap-1"
@@ -234,6 +269,149 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
   const [showSeasonPassModal, setShowSeasonPassModal] = useState(false);
   const [hasDismissedSeasonPassModal, setHasDismissedSeasonPassModal] = useState(false);
   const [isTutorOpen, setIsTutorOpen] = useState(false);
+  const [scratchToggleSignal, setScratchToggleSignal] = useState(0);
+  const [scratchActive, setScratchActive] = useState<'draw' | 'notes' | null>(null);
+  const [reviewState, setReviewState] = useState<ReviewFolderState>({
+    version: 1,
+    misses: [],
+    lessonWarmth: {},
+  });
+  const [reviewFolderOpen, setReviewFolderOpen] = useState(false);
+  const [reviewPulseKey, setReviewPulseKey] = useState(0);
+  const [justFiledQuestionId, setJustFiledQuestionId] = useState<number | null>(null);
+  const [practiceMissedMode, setPracticeMissedMode] = useState(false);
+  const [practiceMissedUnitFilter, setPracticeMissedUnitFilter] = useState<
+    number[] | null
+  >(null);
+  const [practicePacketOpen, setPracticePacketOpen] = useState(false);
+  const [practicePacketBuilding, setPracticePacketBuilding] = useState(false);
+  const [practicePacketError, setPracticePacketError] = useState<string | null>(null);
+  const [practicePacket, setPracticePacket] = useState<PracticePacket | null>(null);
+  const reviewUserKey = user?.uid ?? 'guest';
+
+  const persistReview = (next: ReviewFolderState) => {
+    saveReviewFolder(reviewUserKey, subject, unitNumber, next);
+    if (user?.uid) {
+      void saveReviewFolderToCloud(user.uid, subject, unitNumber, next).catch(
+        (err) => console.error('[ReviewFolder] cloud save failed:', err)
+      );
+    }
+  };
+
+  // Hydrate from localStorage + Firestore (logged-in). Cloud wins when present.
+  useEffect(() => {
+    let cancelled = false;
+
+    const hydrate = async () => {
+      let next = loadReviewFolder(reviewUserKey, subject, unitNumber);
+      let cloudExists = false;
+
+      if (user?.uid) {
+        try {
+          const cloud = await loadReviewFolderFromCloud(
+            user.uid,
+            subject,
+            unitNumber
+          );
+          cloudExists = cloud.exists;
+          if (cloud.exists) {
+            next = cloud.state;
+          } else if (next.misses.length > 0) {
+            // Migrate local → cloud on first login for this unit
+            void saveReviewFolderToCloud(user.uid, subject, unitNumber, next);
+            cloudExists = true;
+          }
+        } catch (err) {
+          console.error('[ReviewFolder] cloud load failed:', err);
+        }
+      }
+
+      if (cancelled) return;
+      next = filterReviewFolderBySubject(next, subject, allQuestions);
+      setReviewState(next);
+      saveReviewFolder(reviewUserKey, subject, unitNumber, next);
+      setJustFiledQuestionId(null);
+      setPracticeMissedMode(false);
+      setPracticeMissedUnitFilter(null);
+      setReviewFolderOpen(false);
+
+      // Seed from answer history only when this user has never had a cloud folder
+      if (
+        user?.uid &&
+        !cloudExists &&
+        next.misses.length === 0 &&
+        !loadingMcqData &&
+        Array.isArray(mcqAnswersData) &&
+        mcqAnswersData.length > 0
+      ) {
+        const seeded = applyAnswerHistoryToReviewFolder(next, mcqAnswersData, {
+          subject,
+          unitNumber,
+          bankQuestions: allQuestions,
+        });
+        const scoped = filterReviewFolderBySubject(seeded, subject, allQuestions);
+        if (scoped.misses.length > 0) {
+          setReviewState(scoped);
+          persistReview(scoped);
+        } else {
+          void saveReviewFolderToCloud(user.uid, subject, unitNumber, scoped);
+        }
+      }
+    };
+
+    void hydrate();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reviewUserKey, subject, unitNumber, user?.uid]);
+
+  // Seed once answers load if cloud folder still doesn't exist and local is empty
+  useEffect(() => {
+    if (!user?.uid || loadingMcqData) return;
+    if (!Array.isArray(mcqAnswersData) || mcqAnswersData.length === 0) return;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const cloud = await loadReviewFolderFromCloud(
+          user.uid,
+          subject,
+          unitNumber
+        );
+        if (cancelled || cloud.exists) return;
+
+        setReviewState((prev) => {
+          if (prev.misses.length > 0) {
+            void saveReviewFolderToCloud(user.uid, subject, unitNumber, prev);
+            return prev;
+          }
+          const seeded = applyAnswerHistoryToReviewFolder(prev, mcqAnswersData, {
+            subject,
+            unitNumber,
+            bankQuestions: allQuestions,
+          });
+          const scoped = filterReviewFolderBySubject(seeded, subject, allQuestions);
+          void saveReviewFolderToCloud(user.uid, subject, unitNumber, scoped);
+          saveReviewFolder(reviewUserKey, subject, unitNumber, scoped);
+          return scoped;
+        });
+      } catch (err) {
+        console.error('[ReviewFolder] seed failed:', err);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    user?.uid,
+    loadingMcqData,
+    mcqAnswersData,
+    subject,
+    unitNumber,
+    reviewUserKey,
+  ]);
 
   const getLocalDateKey = (d: Date) => {
     const yyyy = d.getFullYear();
@@ -309,12 +487,20 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
   }, [user, isPremiumEffective, hasDismissedSeasonPassModal]);
 
   const unitsData =
-    subject === 'gov' ? allGovUnitsData : subject === 'micro' ? allMicroUnitsData : allMacroUnitsData;
-  /** Gov: only units with practice banks appear in the in-quiz unit switcher. */
+    subject === 'gov'
+      ? allGovUnitsData
+      : subject === 'stats'
+        ? allStatsUnitsData
+        : subject === 'micro'
+          ? allMicroUnitsData
+          : allMacroUnitsData;
+  /** Only units with practice banks appear in the in-quiz unit switcher. */
   const unitsForMcq =
     subject === 'gov'
       ? unitsData.filter((u) => isGovMcqPracticeUnitAvailable(u.number))
-      : unitsData;
+      : subject === 'stats'
+        ? unitsData.filter((u) => isStatsMcqPracticeUnitAvailable(u.number))
+        : unitsData;
   const uiTheme =
     subject === 'gov'
       ? {
@@ -323,19 +509,26 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
           primary: 'bg-violet-600 hover:bg-violet-700',
           outline: 'border-violet-600 text-violet-700 hover:bg-violet-50',
         }
-      : subject === 'micro'
+      : subject === 'stats'
         ? {
-            spin: 'text-green-500',
-            circle: 'bg-green-100',
-            primary: 'bg-green-500 hover:bg-green-600',
-            outline: 'border-green-500 text-green-600 hover:bg-green-50',
+            spin: 'text-orange-600',
+            circle: 'bg-orange-100',
+            primary: 'bg-orange-600 hover:bg-orange-700',
+            outline: 'border-orange-600 text-orange-700 hover:bg-orange-50',
           }
-        : {
-            spin: 'text-blue-500',
-            circle: 'bg-blue-100',
-            primary: 'bg-blue-500 hover:bg-blue-600',
-            outline: 'border-blue-500 text-blue-600 hover:bg-blue-50',
-          };
+        : subject === 'micro'
+          ? {
+              spin: 'text-green-500',
+              circle: 'bg-green-100',
+              primary: 'bg-green-500 hover:bg-green-600',
+              outline: 'border-green-500 text-green-600 hover:bg-green-50',
+            }
+          : {
+              spin: 'text-blue-500',
+              circle: 'bg-blue-100',
+              primary: 'bg-blue-500 hover:bg-blue-600',
+              outline: 'border-blue-500 text-blue-600 hover:bg-blue-50',
+            };
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answeredQuestions, setAnsweredQuestions] = useState<Record<number, any>>({});
   const [questionsForPractice, setQuestionsForPractice] = useState<QuestionType[]>([]);
@@ -358,6 +551,8 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
       subject,
       unitNumber,
       showAllQuestions,
+      practiceMissedMode,
+      practiceMissedUnitFilter: practiceMissedUnitFilter?.join(',') ?? '',
       loadingMcqData: loadingMcqData ? 'loading' : 'loaded'
     });
     
@@ -381,8 +576,22 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
       !q.isTest // Exclude test questions for practice mode
     );
 
-    // Filter out correctly answered questions (unless showAllQuestions is true)
-    if (!showAllQuestions && (!user || (user && mcqAnswersData && !loadingMcqData))) {
+    if (practiceMissedMode) {
+      const scopedMisses =
+        practiceMissedUnitFilter && practiceMissedUnitFilter.length > 0
+          ? reviewState.misses.filter((m) =>
+              practiceMissedUnitFilter.includes(m.unitNumber)
+            )
+          : reviewState.misses;
+      const order = missedQuestionIds({
+        ...reviewState,
+        misses: scopedMisses,
+      });
+      const missIds = new Set(order);
+      questions = questions
+        .filter((q) => missIds.has(q.id))
+        .sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
+    } else if (!showAllQuestions && (!user || (user && mcqAnswersData && !loadingMcqData))) {
       if (user && mcqAnswersData) {
         // Create a set of question IDs that have been answered correctly
         // Handle both string and number questionIds (Firestore may store as string)
@@ -411,7 +620,9 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
       }
     }
 
-    const shuffled = shufflePracticeQuestions(questions);
+    const shuffled = practiceMissedMode
+      ? questions
+      : shufflePracticeQuestions(questions);
     setQuestionsForPractice(shuffled);
     setTotalQuestionsInSet(shuffled.length);
     setCurrentQuestionIndex(0);
@@ -422,7 +633,7 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
     setCurrentUnitName(unit ? `Unit ${unitNumber}: ${unit.title}` : `Unit ${unitNumber}`);
 
     setIsLoadingQuestionSet(false);
-  }, [subject, unitNumber, showAllQuestions, user, loadingMcqData, mcqAnswersData]);
+  }, [subject, unitNumber, showAllQuestions, practiceMissedMode, practiceMissedUnitFilter, reviewState.misses, reviewUserKey, user, loadingMcqData, mcqAnswersData]);
 
   // Access control check
   useEffect(() => {
@@ -465,16 +676,44 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
       [questionId]: { selectedLetter: answerLetter, isCorrect }
     }));
 
+    const question = allQuestions.find(q => q.id === questionId);
+    const lessons = lessonIDS || question?.lessonIDS || [];
+
+    if (isCorrect) {
+      setJustFiledQuestionId((prev) => (prev === questionId ? null : prev));
+      setReviewState((prev) => {
+        const next = recordCorrect(prev, questionId, lessons);
+        persistReview(next);
+        return next;
+      });
+    } else {
+      setReviewState((prev) => {
+        const next = recordMiss(prev, {
+          questionId,
+          subject,
+          unitNumber,
+          lessonIDS: lessons,
+          selectedLetter: answerLetter,
+          questionPreview: previewFromQuestion(question?.question || `Question ${questionId}`),
+        });
+        persistReview(next);
+        return next;
+      });
+      setJustFiledQuestionId(questionId);
+      setReviewPulseKey((n) => n + 1);
+    }
+
     // Save to Firestore if logged in
     if (user && isCorrect !== undefined) {
       try {
-        const question = allQuestions.find(q => q.id === questionId);
         if (question) {
           const answerData: McqAnswer = {
             questionId: questionId,
             isCorrect: isCorrect,
             unitId: question.unit,
-            lessonIDS: lessonIDS || question.lessonIDS || [],
+            lessonIDS: lessons,
+            selectedLetter: answerLetter,
+            subject,
             timestamp: serverTimestamp()
           };
 
@@ -489,6 +728,113 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
       } catch (error) {
         console.error('Error saving answer:', error);
       }
+    }
+  };
+
+  const handlePracticeMissed = (unitNumbers: number[]) => {
+    setReviewFolderOpen(false);
+    setPracticeMissedUnitFilter(
+      unitNumbers.length > 0 ? unitNumbers : [unitNumber]
+    );
+    setPracticeMissedMode(true);
+    setShowAllQuestions(true);
+    prevFilterCriteriaRef.current = '';
+  };
+
+  const handleOpenPracticePacket = async (unitNumbers: number[]) => {
+    if (reviewState.misses.length === 0) return;
+
+    const selected =
+      unitNumbers.length > 0 ? unitNumbers : [unitNumber];
+    const draft = assemblePracticePacket(
+      reviewState,
+      subject,
+      selected[0] ?? unitNumber,
+      allQuestions,
+      selected
+    );
+    if (draft.chapters.length === 0) {
+      setPracticePacketError('Could not build a packet from your misses yet.');
+      setPracticePacketOpen(true);
+      return;
+    }
+
+    setReviewFolderOpen(false);
+    setPracticePacketOpen(true);
+    setPracticePacketBuilding(true);
+    setPracticePacketError(null);
+    setPracticePacket({ ...draft });
+
+    try {
+      const explainerRes = await fetch('/api/generate-practice-packet-explainers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subject,
+          unit: selected[0] ?? unitNumber,
+          lessons: draft.chapters.map((ch) => ({
+            lessonNumber: ch.lessonId,
+            name: ch.lessonName,
+            unit: ch.unitNumber,
+            keyTerms: ch.keyTerms,
+          })),
+        }),
+      });
+
+      if (!explainerRes.ok) {
+        const errorData = await explainerRes.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to generate explainers');
+      }
+
+      const explainerData = await explainerRes.json();
+      const explainerByLesson = new Map<
+        string,
+        { eli5: string; analogy: string; commonMistake: string }
+      >(
+        (explainerData.explainers || []).map(
+          (e: {
+            lessonNumber: string;
+            eli5: string;
+            analogy: string;
+            commonMistake: string;
+          }) => [
+            e.lessonNumber,
+            {
+              eli5: e.eli5,
+              analogy: e.analogy,
+              commonMistake: e.commonMistake,
+            },
+          ]
+        )
+      );
+
+      const completed: PracticePacket = {
+        ...draft,
+        chapters: draft.chapters.map((ch) => ({
+          ...ch,
+          explainer: explainerByLesson.get(ch.lessonId) ?? null,
+          checkQuestions: [],
+        })),
+        builtAt: Date.now(),
+      };
+
+      if (completed.chapters.some((ch) => !ch.explainer)) {
+        throw new Error('Incomplete explainers. Please try again.');
+      }
+
+      setPracticePacket(completed);
+      try {
+        sessionStorage.setItem(PRACTICE_PACKET_SESSION_KEY, JSON.stringify(completed));
+      } catch {
+        /* ignore quota */
+      }
+    } catch (error: any) {
+      console.error('Practice packet error:', error);
+      setPracticePacketError(
+        error?.message || 'Failed to build practice packet. Please try again.'
+      );
+    } finally {
+      setPracticePacketBuilding(false);
     }
   };
 
@@ -509,7 +855,8 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
   };
 
   const handleUnitChange = (nextUnit: number) => {
-    if (subject === 'gov' && nextUnit !== 1) return;
+    if (subject === 'gov' && !isGovMcqPracticeUnitAvailable(nextUnit)) return;
+    if (subject === 'stats' && !isStatsMcqPracticeUnitAvailable(nextUnit)) return;
     const subjectSlug = getSubjectSlug(subject);
     const unitSlug = getUnitSlug(nextUnit, subject);
     router.push(`/mcq-practice/${subjectSlug}/${unitSlug}`);
@@ -598,7 +945,42 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 py-8 pt-8">
 
-          {!isTutorOpen && <Breadcrumb subject={subject} unitNumber={unitNumber} />}
+          <div className="mb-6 flex items-center justify-between gap-3">
+            {!isTutorOpen ? (
+              <Breadcrumb subject={subject} unitNumber={unitNumber} />
+            ) : (
+              <div className="min-w-0 flex-1" />
+            )}
+            {!isLoadingQuestionSet && (questionsForPractice.length > 0 || reviewState.misses.length > 0) ? (
+              <div className="flex flex-shrink-0 items-center gap-4">
+                {REMATCH_ENABLED ? (
+                  <ReviewFolderButton
+                    count={reviewState.misses.length}
+                    pulseKey={reviewPulseKey}
+                    active={reviewFolderOpen}
+                    onClick={() => setReviewFolderOpen(true)}
+                  />
+                ) : null}
+                {questionsForPractice.length > 0 ? (
+                  <button
+                    type="button"
+                    onClick={() => setScratchToggleSignal((n) => n + 1)}
+                    className={`inline-flex flex-shrink-0 items-center gap-1.5 text-sm transition-colors ${
+                      scratchActive
+                        ? 'text-gray-900 font-medium'
+                        : 'text-gray-500 hover:text-gray-800'
+                    }`}
+                    aria-pressed={!!scratchActive}
+                    aria-label={scratchActive ? 'Close scratch pad' : 'Open scratch pad'}
+                    title={scratchActive ? 'Close scratch pad' : 'Scratch pad (draw or notes)'}
+                  >
+                    <Pen className="h-4 w-4" />
+                    <span>Scratch pad</span>
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
 
           {isLoadingQuestionSet ? (
             <div className="flex items-center justify-center min-h-[400px]">
@@ -678,7 +1060,9 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
                   const testHref =
                     subject === 'gov'
                       ? `/ap-gov-unit-${unitNumber}-mcq-test`
-                      : `/ap-${subject}-unit-${unitNumber}-mcq-test`;
+                      : subject === 'stats'
+                        ? `/ap-stats-unit-${unitNumber}-mcq-test`
+                        : `/ap-${subject}-unit-${unitNumber}-mcq-test`;
                   router.push(testHref);
                 }
               }}
@@ -696,10 +1080,54 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
                 (!isPremiumEffective && dailyQuestionsAnswered >= DAILY_FREE_ANSWERS)
               }
               onTutorOpenChange={setIsTutorOpen}
+              showFloatingScratchToolbar={false}
+              scratchToggleSignal={scratchToggleSignal}
+              onScratchActiveChange={setScratchActive}
             />
           )}
         </div>
       </div>
+
+      {REMATCH_ENABLED ? (
+      <>
+      <ReviewFolderPanel
+        open={reviewFolderOpen}
+        onClose={() => setReviewFolderOpen(false)}
+        unitNumber={unitNumber}
+        groups={rollupByLesson(reviewState, subject)}
+        totalCount={reviewState.misses.length}
+        onRemoveMiss={(questionId) => {
+          setReviewState((prev) => {
+            const next = removeMiss(prev, questionId);
+            persistReview(next);
+            return next;
+          });
+          if (justFiledQuestionId === questionId) setJustFiledQuestionId(null);
+        }}
+        onClearAll={() => {
+          const next = clearReviewFolder();
+          setReviewState(next);
+          persistReview(next);
+          setJustFiledQuestionId(null);
+          setPracticeMissedMode(false);
+          setPracticeMissedUnitFilter(null);
+        }}
+        onPracticeMissed={handlePracticeMissed}
+        onOpenPracticePacket={(units) => {
+          void handleOpenPracticePacket(units);
+        }}
+        isBuildingPacket={practicePacketBuilding}
+      />
+
+      <PracticePacketModal
+        open={practicePacketOpen}
+        onClose={() => setPracticePacketOpen(false)}
+        packet={practicePacket}
+        isBuilding={practicePacketBuilding}
+        error={practicePacketError}
+      />
+      </>
+      ) : null}
     </>
   );
 }

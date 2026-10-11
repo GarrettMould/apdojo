@@ -1,5 +1,5 @@
 import { MetadataRoute } from 'next';
-import { macroUnits, microUnits } from '@/data/cheatSheets';
+import { govUnits, macroUnits, microUnits, statsUnits } from '@/data/cheatSheets';
 import { blogPosts } from '@/data/blogPosts';
 import { generateSeoUrl } from '@/utils/blogUrls';
 
@@ -106,6 +106,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
     ...microUnits.map(unit => ({
       url: `${baseUrl}/ap-micro-unit-${unit.number}-cheat-sheet`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.8,
+    })),
+    ...govUnits.map(unit => ({
+      url: `${baseUrl}/ap-gov-unit-${unit.number}-cheat-sheet`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.8,
+    })),
+    ...statsUnits.map(unit => ({
+      url: `${baseUrl}/ap-stats-unit-${unit.number}-cheat-sheet`,
       lastModified: new Date(),
       changeFrequency: 'monthly' as const,
       priority: 0.8,

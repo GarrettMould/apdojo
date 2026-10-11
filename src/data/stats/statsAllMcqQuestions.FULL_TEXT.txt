@@ -1,0 +1,2451 @@
+AP STATISTICS — ALL MCQ QUESTIONS (Units 1–5)
+========================================================================
+
+
+########################################################################
+UNIT 1  (20 questions)
+########################################################################
+
+----- Q1 | Unit 1 | id 7112 | #1 in unit -----
+Unit name: Exploring One-Variable Data and Collecting Data
+Lessons: 1.6
+
+QUESTION:
+A researcher is investigating the physical activity levels of teenagers. She selects a random sample of 50 high school students and asks them to record the total number of minutes of moderate-to-vigorous physical activity they engaged in over the course of one weekend. The data collected are summarized in the histogram below. Based on the distribution, which of the following statements about the mean and the median of the distribution is most likely true?
+
+IMAGE: https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/stats/unit1/q1.svg
+
+OPTIONS:
+  A) The mean is greater than the median because the distribution is skewed to the right.
+  B) The mean is less than the median because the distribution is skewed to the left. ✓
+  C) The mean is equal to the median because the distribution is approximately symmetric.
+  D) The mean is less than the median because the distribution is skewed to the right.
+  E) The mean is greater than the median because the distribution is skewed to the left.
+
+CORRECT: B
+
+EXPLANATION:
+Calculating the mean using midpoints: (30 × 5 + 90 × 12 + 150 × 22 + 210 × 8 + 270 × 3) / 50 = 140.4. The median falls in the 120–180 bin. Since the frequency of the bins to the right of the median bin (8 + 3 = 11) is lower than the frequency of the bins to the left (5 + 12 = 17), the distribution has a longer tail on the left, indicating it is skewed to the left. In a left-skewed distribution, the mean (140.4) is less than the median.
+
+
+----- Q2 | Unit 1 | id 7113 | #2 in unit -----
+Unit name: Exploring One-Variable Data and Collecting Data
+Lessons: 1.3
+
+QUESTION:
+Using the frequency distribution shown in the histogram below, what proportion of the 50 students spent less than 180 minutes on physical activity?
+
+IMAGE: https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/stats/unit1/q1.svg
+
+OPTIONS:
+  A) 0.39
+  B) 0.50
+  C) 0.70
+  D) 0.78 ✓
+  E) 0.82
+
+CORRECT: D
+
+EXPLANATION:
+To find the proportion, sum the frequencies of the bins less than 180 minutes: 5 (0–60) + 12 (60–120) + 22 (120–180) = 39 students. Dividing 39 by the total (50) gives 0.78.
+
+
+----- Q3 | Unit 1 | id 7110 | #3 in unit -----
+Unit name: Exploring One-Variable Data and Collecting Data
+Lessons: 1.2
+
+QUESTION:
+Which of the following is an example of a continuous quantitative variable?
+
+OPTIONS:
+  A) The number of students absent from school on a given day.
+  B) The brand of mobile phone used by a student.
+  C) The weight of a newborn baby in kilograms. ✓
+  D) The number of siblings a student has.
+  E) The zip code of a student’s residence.
+
+CORRECT: C
+
+EXPLANATION:
+A continuous quantitative variable can take on an infinite number of possible values within a given interval, such as weight, which is measurable.
+
+
+----- Q4 | Unit 1 | id 7108 | #4 in unit -----
+Unit name: Exploring One-Variable Data and Collecting Data
+Lessons: 1.1
+
+QUESTION:
+Which of the following describes the purpose of random assignment in a well-designed experiment?
+
+OPTIONS:
+  A) To ensure that the sample is representative of the entire population.
+  B) To create treatment groups that are as similar as possible with respect to extraneous sources of variation. ✓
+  C) To eliminate the need for a control group in the experiment.
+  D) To guarantee that the results of the experiment will be statistically significant.
+  E) To ensure that all participants in the experiment know which treatment they are receiving.
+
+CORRECT: B
+
+EXPLANATION:
+Random assignment is used in experiments to balance the effects of uncontrolled variables (extraneous sources of variation) across different treatment groups, helping to establish a cause-and-effect relationship.
+
+
+----- Q5 | Unit 1 | id 7101 | #5 in unit -----
+Unit name: Exploring One-Variable Data and Collecting Data
+Lessons: 1.7
+
+QUESTION:
+A researcher records the number of text messages sent by a sample of 10 students in one day, as shown in the table below. What is the interquartile range (IQR) of this data set?
+
+TABLE:
+{
+  "headers": [
+    "Student",
+    "Text messages (one day)"
+  ],
+  "rows": [
+    [
+      "1",
+      "5"
+    ],
+    [
+      "2",
+      "8"
+    ],
+    [
+      "3",
+      "12"
+    ],
+    [
+      "4",
+      "12"
+    ],
+    [
+      "5",
+      "15"
+    ],
+    [
+      "6",
+      "18"
+    ],
+    [
+      "7",
+      "20"
+    ],
+    [
+      "8",
+      "22"
+    ],
+    [
+      "9",
+      "25"
+    ],
+    [
+      "10",
+      "30"
+    ]
+  ]
+}
+
+OPTIONS:
+  A) 7
+  B) 10 ✓
+  C) 12
+  D) 15
+  E) 22
+
+CORRECT: B
+
+EXPLANATION:
+The data is ordered. The median of the 10 values is between 15 and 18. Q1 is the median of the lower 5 values (5, 8, 12, 12, 15), which is 12. Q3 is the median of the upper 5 values (18, 20, 22, 25, 30), which is 22. The IQR is Q3 - Q1 = 22 - 12 = 10.
+
+
+----- Q6 | Unit 1 | id 7120 | #6 in unit -----
+Unit name: Exploring One-Variable Data and Collecting Data
+Lessons: 1.7
+
+QUESTION:
+A biologist measures the tail lengths (in millimeters) of 100 lizards in a specific habitat. The five-number summary is 40, 55, 70, 95, 120. About what percentage of lizards have a tail length between 55 and 120 millimeters?
+
+OPTIONS:
+  A) 25%
+  B) 50%
+  C) 75% ✓
+  D) 85%
+  E) 95%
+
+CORRECT: C
+
+EXPLANATION:
+Each segment of the five-number summary represents 25% of the data. The range from 55 (Q1) to 120 (Max) covers the second, third, and fourth segments, which totals 75%.
+
+
+----- Q7 | Unit 1 | id 7119 | #7 in unit -----
+Unit name: Exploring One-Variable Data and Collecting Data
+Lessons: 1.7
+
+QUESTION:
+A dataset of 50 test scores has a mean of 78 and a median of 80. It is discovered that a score of 72 was incorrectly recorded as 62. If the data is corrected, what is the effect on the mean and median?
+
+OPTIONS:
+  A) The mean increases, but the median remains the same. ✓
+  B) The mean and median both increase.
+  C) The median increases, but the mean remains the same.
+  D) The mean and median both remain the same.
+  E) The mean increases, but the variance decreases.
+
+CORRECT: A
+
+EXPLANATION:
+Correcting a recorded value from 62 to 72 increases the total sum, which increases the mean. The median is resistant to changes in individual values unless the shift moves a data point across the median position, which is unlikely here.
+
+
+----- Q8 | Unit 1 | id 7116 | #8 in unit -----
+Unit name: Exploring One-Variable Data and Collecting Data
+Lessons: 1.6
+
+QUESTION:
+The bar chart below shows the age distribution of 30 employees at a small company. Which of the following statements is correct regarding the distribution of employee ages?
+
+IMAGE: https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/stats/unit1/employee_age.svg
+
+OPTIONS:
+  A) The distribution is symmetric.
+  B) The distribution is skewed to the right. ✓
+  C) The distribution is skewed to the left.
+  D) The distribution is uniform.
+  E) The distribution is bimodal.
+
+CORRECT: B
+
+EXPLANATION:
+The distribution has a peak at the younger age groups and a long tail extending toward the older age groups, which characterizes a right-skewed distribution.
+
+
+----- Q9 | Unit 1 | id 7117 | #9 in unit -----
+Unit name: Exploring One-Variable Data and Collecting Data
+Lessons: 1.6
+
+QUESTION:
+Based on the age distribution for the 30 employees shown in the bar chart, which of the following intervals contains the median age?
+
+IMAGE: https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/stats/unit1/employee_age.svg
+
+OPTIONS:
+  A) 20–29
+  B) 30–39 ✓
+  C) 40–49
+  D) 50–59
+  E) 60–69
+
+CORRECT: B
+
+EXPLANATION:
+With 30 total observations, the median is the average of the 15th and 16th values. The 20–29 bar contains the first 14 values, so the 15th and 16th values fall into the 30–39 interval.
+
+
+----- Q10 | Unit 1 | id 7104 | #10 in unit -----
+Unit name: Exploring One-Variable Data and Collecting Data
+Lessons: 1.7
+
+QUESTION:
+A dataset has the summary statistics shown in the table below. If every value in the dataset is multiplied by 2 and then increased by 5, what are the new mean and standard deviation?
+
+TABLE:
+{
+  "headers": [
+    "Statistic",
+    "Value"
+  ],
+  "rows": [
+    [
+      "Mean",
+      "50"
+    ],
+    [
+      "Standard deviation",
+      "10"
+    ]
+  ]
+}
+
+OPTIONS:
+  A) Mean=100, SD=20
+  B) Mean=105, SD=20 ✓
+  C) Mean=105, SD=25
+  D) Mean=100, SD=25
+  E) Mean=105, SD=10
+
+CORRECT: B
+
+EXPLANATION:
+Multiplication affects both mean and standard deviation (new mean = 2 × 50 = 100; new SD = 2 × 10 = 20). Adding a constant only affects the mean (new mean = 100 + 5 = 105).
+
+
+----- Q11 | Unit 1 | id 7121 | #11 in unit -----
+Unit name: Exploring One-Variable Data and Collecting Data
+Lessons: 1.8
+
+QUESTION:
+Two groups, Group X and Group Y, are compared using boxplots of their exam scores. The box for Group X is wider than the box for Group Y, and Group X's median is higher than Group Y's entire box. Which statement is NOT correct?
+
+OPTIONS:
+  A) Group X has a larger interquartile range (IQR) than Group Y.
+  B) More than 50% of Group X scored higher than the lowest-scoring student in Group Y.
+  C) The median exam score for Group X is higher than the median for Group Y.
+  D) Group X shows more variability in exam scores than Group Y.
+  E) The range of exam scores for Group X is smaller than the range for Group Y. ✓
+
+CORRECT: E
+
+EXPLANATION:
+Because Group X has a wider box and a higher center, it is inconsistent for it to have a smaller overall range than Group Y.
+
+
+----- Q12 | Unit 1 | id 7115 | #12 in unit -----
+Unit name: Exploring One-Variable Data and Collecting Data
+Lessons: 1.7
+
+QUESTION:
+Based on the boxplot provided for Office A, what is the interquartile range (IQR) of the commute times?
+
+IMAGE: https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/stats/unit1/commute_time_boxplot.svg
+
+OPTIONS:
+  A) 10
+  B) 20 ✓
+  C) 35
+  D) 45
+  E) 25
+
+CORRECT: B
+
+EXPLANATION:
+The IQR is the length of the box, calculated as Q3 - Q1 = 45 - 25 = 20.
+
+
+----- Q13 | Unit 1 | id 7114 | #13 in unit -----
+Unit name: Exploring One-Variable Data and Collecting Data
+Lessons: 1.7, 1.8
+
+QUESTION:
+A researcher is studying commute times (in minutes) for employees at two offices. Both offices have 20 employees. Using the 1.5 × IQR rule, which of the following is true?
+
+IMAGE: https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/stats/unit1/commute_time_boxplot.svg
+
+OPTIONS:
+  A) Both Office A and Office B have at least one outlier.
+  B) Only Office A has an outlier.
+  C) Only Office B has an outlier. ✓
+  D) Neither Office A nor Office B has an outlier.
+  E) Only Office A has an outlier in the upper tail.
+
+CORRECT: C
+
+EXPLANATION:
+Office A IQR = 20. Upper bound = 45 + (1.5 × 20) = 75 (no outlier). Office B IQR = 20. Upper bound = 40 + (1.5 × 20) = 70 (85 > 70, outlier present).
+
+
+----- Q14 | Unit 1 | id 7103 | #14 in unit -----
+Unit name: Exploring One-Variable Data and Collecting Data
+Lessons: 1.7
+
+QUESTION:
+A local business tracks the daily number of customers over 5 days. If an additional day has 30 customers, which of the following describes the change in the mean and median?
+
+TABLE:
+{
+  "headers": [
+    "Day",
+    "Number of customers"
+  ],
+  "rows": [
+    [
+      "1",
+      "20"
+    ],
+    [
+      "2",
+      "25"
+    ],
+    [
+      "3",
+      "30"
+    ],
+    [
+      "4",
+      "35"
+    ],
+    [
+      "5",
+      "100"
+    ]
+  ]
+}
+
+OPTIONS:
+  A) Both increase
+  B) Mean increases, median stays same
+  C) Mean decreases, median stays same ✓
+  D) Both decrease
+  E) Both stay the same
+
+CORRECT: C
+
+EXPLANATION:
+Adding 30 customers to the sum decreases the mean from 42 to 40. The median remains 30.
+
+
+----- Q15 | Unit 1 | id 7122 | #15 in unit -----
+Unit name: Exploring One-Variable Data and Collecting Data
+Lessons: 1.7
+
+QUESTION:
+A teacher adjusts grades by multiplying every score by 1.1 and then adding 5 points. What are the new mean and new standard deviation?
+
+OPTIONS:
+  A) 87.5, 5.5 ✓
+  B) 87.5, 10.5
+  C) 82.5, 5.5
+  D) 82.5, 11.0
+  E) 87.5, 6.0
+
+CORRECT: A
+
+EXPLANATION:
+Mean: (75 × 1.1) + 5 = 87.5. Standard deviation: 5 × 1.1 = 5.5.
+
+
+----- Q16 | Unit 1 | id 7105 | #16 in unit -----
+Unit name: Exploring One-Variable Data and Collecting Data
+Lessons: 1.9
+
+QUESTION:
+For a dataset with the summary statistics shown, what is the z-score of a value of 92?
+
+TABLE:
+{
+  "headers": [
+    "Statistic",
+    "Value"
+  ],
+  "rows": [
+    [
+      "Mean",
+      "80"
+    ],
+    [
+      "Standard deviation",
+      "8"
+    ]
+  ]
+}
+
+OPTIONS:
+  A) 0.66
+  B) 1.20
+  C) 1.50 ✓
+  D) 1.60
+  E) 2.00
+
+CORRECT: C
+
+EXPLANATION:
+z = (92 - 80) / 8 = 1.5.
+
+
+----- Q17 | Unit 1 | id 7123 | #17 in unit -----
+Unit name: Exploring One-Variable Data and Collecting Data
+Lessons: 1.9
+
+QUESTION:
+A machine fills boxes of cereal with a mean of 20.2 ounces and a standard deviation of 0.2 ounces. What is the approximate percentage of boxes between 20.0 and 20.2 ounces?
+
+OPTIONS:
+  A) 16%
+  B) 34% ✓
+  C) 47.5%
+  D) 68%
+  E) 95%
+
+CORRECT: B
+
+EXPLANATION:
+20.0 is one SD below the mean. 68% falls within ±1 SD, so 34% falls between the mean and one SD below.
+
+
+----- Q18 | Unit 1 | id 7125 | #18 in unit -----
+Unit name: Exploring One-Variable Data and Collecting Data
+Lessons: 1.9
+
+QUESTION:
+A student scored an 85 on an exam where the class mean was 75 and the standard deviation was 5. What is the student's z-score?
+
+OPTIONS:
+  A) 0.5
+  B) 1.0
+  C) 1.5
+  D) 2.0 ✓
+  E) 2.5
+
+CORRECT: D
+
+EXPLANATION:
+z = (85 - 75) / 5 = 2.0.
+
+
+----- Q19 | Unit 1 | id 7107 | #19 in unit -----
+Unit name: Exploring One-Variable Data and Collecting Data
+Lessons: 1.7
+
+QUESTION:
+A set of 5 numbers has a mean of 10. Four numbers are 8, 12, 10, and 7. What is the fifth number?
+
+OPTIONS:
+  A) 9
+  B) 11
+  C) 12
+  D) 13 ✓
+  E) 15
+
+CORRECT: D
+
+EXPLANATION:
+Sum must be 50. 8 + 12 + 10 + 7 = 37. 50 - 37 = 13.
+
+
+----- Q20 | Unit 1 | id 7111 | #20 in unit -----
+Unit name: Exploring One-Variable Data and Collecting Data
+Lessons: 1.13
+
+QUESTION:
+In a double-blind experiment, which of the following is true?
+
+OPTIONS:
+  A) Neither the participants nor the members of the research team who interact with them know which treatment each participant is receiving. ✓
+  B) Only the participants are unaware of the treatment they are receiving.
+  C) Only the research team is unaware of which treatment each participant is receiving.
+  D) Neither the participants nor the statistical analysts know the purpose of the study.
+  E) The participants know the treatment, but the research team does not.
+
+CORRECT: A
+
+EXPLANATION:
+In a double-blind experiment, neither the participants nor the researchers who interact with them know the treatment assignment.
+
+
+
+########################################################################
+UNIT 2  (20 questions)
+########################################################################
+
+----- Q21 | Unit 2 | id 7210 | #1 in unit -----
+Unit name: Probability, Random Variables, and Probability Distributions
+Lessons: 2.5, 2.7
+
+QUESTION:
+Suppose P(A) = 0.15, P(B) = 0.10, and P(A and B) = 0 for varsity sports participation. Which of the following is correct?
+
+OPTIONS:
+  A) Events A and B are independent.
+  B) Events A and B are mutually exclusive. ✓
+  C) Events A and B are both mutually exclusive and independent.
+  D) P(A or B) = P(A) × P(B) = 0.015.
+  E) Independence cannot be evaluated.
+
+CORRECT: B
+
+EXPLANATION:
+P(A and B) = 0 means the events cannot occur together, making them mutually exclusive.
+
+
+----- Q22 | Unit 2 | id 7201 | #2 in unit -----
+Unit name: Probability, Random Variables, and Probability Distributions
+Lessons: 2.1
+
+QUESTION:
+A school counselor collected data on 200 students, recording their typical hours of sleep per night and whether they reported feeling stressed on a given day. Based on the segmented bar chart of these results, which of the following statements is best supported by the data?
+
+IMAGE: https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/stats/unit2/q1.png
+
+OPTIONS:
+  A) Hours of sleep and stress level are independent.
+  B) Students who sleep less than 7 hours are more likely to report feeling stressed than students who sleep 7 or more hours. ✓
+  C) The majority of all 200 students reported feeling stressed.
+  D) Exactly 70 students slept less than 7 hours.
+  E) There is a higher count of stressed students among those sleeping 7+ hours.
+
+CORRECT: B
+
+EXPLANATION:
+The segmented bar chart shows conditional distributions—70% of the "less than 7 hours" group reported stress, compared to only 35% of the "7 or more hours" group. Since these conditional percentages differ substantially, there is an association between sleep and stress.
+
+
+----- Q23 | Unit 2 | id 7213 | #3 in unit -----
+Unit name: Probability, Random Variables, and Probability Distributions
+Lessons: 2.4
+
+QUESTION:
+A bag contains 6 red, 4 blue, and 5 green marbles. What is the probability that a marble selected at random is NOT blue?
+
+OPTIONS:
+  A) 0.267
+  B) 0.400
+  C) 0.600
+  D) 0.733 ✓
+  E) 0.800
+
+CORRECT: D
+
+EXPLANATION:
+P(not blue) = 1 - P(blue) = 1 - (4/15) ≈ 0.733.
+
+
+----- Q24 | Unit 2 | id 7211 | #4 in unit -----
+Unit name: Probability, Random Variables, and Probability Distributions
+Lessons: 2.3
+
+QUESTION:
+A student flips a fair coin repeatedly. After 10 flips, the relative frequency of heads is 0.70. After 1,000 flips, it is 0.51. What explains this?
+
+OPTIONS:
+  A) The coin became less biased.
+  B) The law of large numbers: as trials increase, relative frequency gets closer to true probability. ✓
+  C) The result after 1,000 flips is unreliable.
+  D) The coin is not fair.
+  E) Relative frequency and true probability are unrelated.
+
+CORRECT: B
+
+EXPLANATION:
+The law of large numbers states that long-run relative frequency approaches the true probability.
+
+
+----- Q25 | Unit 2 | id 7206 | #5 in unit -----
+Unit name: Probability, Random Variables, and Probability Distributions
+Lessons: 2.2, 2.6
+
+QUESTION:
+A survey of 300 randomly selected adults asked whether they own a smartphone and whether they own a tablet. What is the probability that a randomly selected adult owns a tablet, given that they own a smartphone?
+
+TABLE:
+{
+  "headers": [
+    " ",
+    "Owns Tablet",
+    "Does Not Own Tablet",
+    "Total"
+  ],
+  "rows": [
+    [
+      "Owns Smartphone",
+      "140",
+      "70",
+      "210"
+    ],
+    [
+      "Does Not Own Smartphone",
+      "20",
+      "70",
+      "90"
+    ],
+    [
+      "Total",
+      "160",
+      "140",
+      "300"
+    ]
+  ]
+}
+
+OPTIONS:
+  A) 0.467
+  B) 0.500
+  C) 0.667 ✓
+  D) 0.700
+  E) 0.875
+
+CORRECT: C
+
+EXPLANATION:
+P(Tablet | Smartphone) = 140 / 210 ≈ 0.667.
+
+
+----- Q26 | Unit 2 | id 7207 | #6 in unit -----
+Unit name: Probability, Random Variables, and Probability Distributions
+Lessons: 2.7
+
+QUESTION:
+Using the smartphone and tablet survey data, are the events "owns a smartphone" and "owns a tablet" independent?
+
+TABLE:
+{
+  "headers": [
+    " ",
+    "Owns Tablet",
+    "Does Not Own Tablet",
+    "Total"
+  ],
+  "rows": [
+    [
+      "Owns Smartphone",
+      "140",
+      "70",
+      "210"
+    ],
+    [
+      "Does Not Own Smartphone",
+      "20",
+      "70",
+      "90"
+    ],
+    [
+      "Total",
+      "160",
+      "140",
+      "300"
+    ]
+  ]
+}
+
+OPTIONS:
+  A) Yes, because P(Tablet) = P(Tablet | Smartphone).
+  B) Yes, because both events have a probability greater than 0.
+  C) No, because P(Tablet) ≈ 0.533 but P(Tablet | Smartphone) ≈ 0.667. ✓
+  D) No, because the two-way table has unequal row totals.
+  E) Cannot be determined without a chi-square test.
+
+CORRECT: C
+
+EXPLANATION:
+P(Tablet) = 160/300 ≈ 0.533. P(Tablet | Smartphone) = 140/210 ≈ 0.667. Since these are not equal, the events are not independent.
+
+
+----- Q27 | Unit 2 | id 7203 | #7 in unit -----
+Unit name: Probability, Random Variables, and Probability Distributions
+Lessons: 2.11
+
+QUESTION:
+IQ scores in a certain population are approximately normally distributed with a mean of 100 and a standard deviation of 15. Using the empirical rule, the shaded region in the figure representing scores greater than 115 represents approximately what percentage of the population?
+
+IMAGE: https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/stats/unit2/q3.png
+
+OPTIONS:
+  A) 2.5%
+  B) 13.5%
+  C) 16% ✓
+  D) 34%
+  E) 50%
+
+CORRECT: C
+
+EXPLANATION:
+115 is exactly 1 standard deviation above the mean (100 + 15 = 115). By the empirical rule, 68% of values fall within 1 SD of the mean, leaving 32% split evenly between the two tails (16% above 115).
+
+
+----- Q28 | Unit 2 | id 7216 | #8 in unit -----
+Unit name: Probability, Random Variables, and Probability Distributions
+Lessons: 2.9
+
+QUESTION:
+A random variable X has P(X = 1) = 0.5 and P(X = 3) = 0.5. What is the standard deviation of X?
+
+OPTIONS:
+  A) 0
+  B) 1 ✓
+  C) 1.41
+  D) 2
+  E) 4
+
+CORRECT: B
+
+EXPLANATION:
+E(X) = 2. Var(X) = (1-2)^2(0.5) + (3-2)^2(0.5) = 1. SD(X) = √1 = 1.
+
+
+----- Q29 | Unit 2 | id 7202 | #9 in unit -----
+Unit name: Probability, Random Variables, and Probability Distributions
+Lessons: 2.8, 2.9
+
+QUESTION:
+The probability distribution of X, the number of pets owned by a randomly selected household in a certain neighborhood, is shown in the probability histogram. What is the probability that a randomly selected household owns at least 2 pets?
+
+IMAGE: https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/stats/unit2/q2.png
+
+OPTIONS:
+  A) 0.30
+  B) 0.45
+  C) 0.55 ✓
+  D) 0.65
+  E) 0.70
+
+CORRECT: C
+
+EXPLANATION:
+P(X ≥ 2) = P(2) + P(3) + P(4) = 0.30 + 0.15 + 0.10 = 0.55.
+
+
+----- Q30 | Unit 2 | id 7212 | #10 in unit -----
+Unit name: Probability, Random Variables, and Probability Distributions
+Lessons: 2.3
+
+QUESTION:
+A researcher simulates a basketball player making 80% of free throws 500 times (10 throws each). 380 trials resulted in at least 8 makes. What is the estimated probability?
+
+OPTIONS:
+  A) 0.080
+  B) 0.380
+  C) 0.500
+  D) 0.760 ✓
+  E) 0.800
+
+CORRECT: D
+
+EXPLANATION:
+The estimated probability is the relative frequency: 380 / 500 = 0.76.
+
+
+----- Q31 | Unit 2 | id 7204 | #11 in unit -----
+Unit name: Probability, Random Variables, and Probability Distributions
+Lessons: 2.10
+
+QUESTION:
+The histogram displays the probability distribution for X, the number of successes in 8 independent trials of a binomial random variable with probability of success p = 0.5 on each trial. Based on the histogram, which of the following is the best approximation for the standard deviation of X?
+
+IMAGE: https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/stats/unit2/q4.png
+
+OPTIONS:
+  A) 0.50
+  B) 1.00
+  C) 1.41 ✓
+  D) 2.00
+  E) 4.00
+
+CORRECT: C
+
+EXPLANATION:
+For a binomial distribution, the standard deviation is σ = √(np(1-p)) = √(8 × 0.5 × 0.5) = √2 ≈ 1.41.
+
+
+----- Q32 | Unit 2 | id 7209 | #12 in unit -----
+Unit name: Probability, Random Variables, and Probability Distributions
+Lessons: 2.10
+
+QUESTION:
+A high school has 1,200 students, of whom 30% participate in a fall sport. A researcher selects a random sample of 15 students without replacement and records how many participate in a fall sport. Why can this be treated as approximately binomial?
+
+OPTIONS:
+  A) No, because sampling without replacement always violates independence.
+  B) No, because np = 4.5, which is less than 10.
+  C) Yes, because the sample size is less than 10% of the population. ✓
+  D) Yes, because every student has the same probability of participating.
+  E) No, because the probability of success is not 0.5.
+
+CORRECT: C
+
+EXPLANATION:
+Since 15 is less than 10% of 1,200, the trials can be treated as approximately independent.
+
+
+----- Q33 | Unit 2 | id 7208 | #13 in unit -----
+Unit name: Probability, Random Variables, and Probability Distributions
+Lessons: 2.9
+
+QUESTION:
+A game show contestant spins a wheel that lands on one of four prize amounts. What is the expected value of the prize amount?
+
+TABLE:
+{
+  "headers": [
+    "Prize (X)",
+    "P(x)"
+  ],
+  "rows": [
+    [
+      "$0",
+      "0.40"
+    ],
+    [
+      "$50",
+      "0.35"
+    ],
+    [
+      "$200",
+      "0.20"
+    ],
+    [
+      "$500",
+      "0.05"
+    ]
+  ]
+}
+
+OPTIONS:
+  A) $100.00
+  B) $112.50
+  C) $137.50 ✓
+  D) $150.00
+  E) $187.50
+
+CORRECT: C
+
+EXPLANATION:
+E(X) = 0(0.40) + 50(0.35) + 200(0.20) + 500(0.05) = $137.50.
+
+
+----- Q34 | Unit 2 | id 7217 | #14 in unit -----
+Unit name: Probability, Random Variables, and Probability Distributions
+Lessons: 2.10
+
+QUESTION:
+A multiple-choice quiz has 6 questions, each with 4 answer choices (one correct). If a student guesses randomly, what is the probability they get exactly 2 correct?
+
+OPTIONS:
+  A) 0.0879
+  B) 0.1318
+  C) 0.2966
+  D) 0.3115 ✓
+  E) 0.4392
+
+CORRECT: D
+
+EXPLANATION:
+Using the binomial formula with n=6, p=0.25, x=2: C(6,2) × (0.25)^2 × (0.75)^4 ≈ 0.3115.
+
+
+----- Q35 | Unit 2 | id 7205 | #15 in unit -----
+Unit name: Probability, Random Variables, and Probability Distributions
+Lessons: 2.12
+
+QUESTION:
+A statistics class simulated the sampling distribution of the sample mean by repeatedly drawing random samples of size n from a population with a strongly right-skewed distribution. Which of the following best explains the pattern shown as sample size increases from n=5 to n=100?
+
+IMAGE: https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/stats/unit2/q5.png
+
+OPTIONS:
+  A) As sample size increases, the sampling distribution becomes more skewed.
+  B) As sample size increases, the sampling distribution of the sample mean becomes approximately normal and less variable, illustrating the central limit theorem. ✓
+  C) As sample size increases, the population distribution becomes more normal.
+  D) The shape change shown is due to bias introduced by larger sample sizes.
+  E) The histograms should all have the same shape and spread regardless of sample size.
+
+CORRECT: B
+
+EXPLANATION:
+This illustrates the central limit theorem: the sampling distribution of the sample mean becomes more normal and less variable as n increases.
+
+
+----- Q36 | Unit 2 | id 7214 | #16 in unit -----
+Unit name: Probability, Random Variables, and Probability Distributions
+Lessons: 2.4
+
+QUESTION:
+A standard six-sided die is rolled once. Let event E be "the die shows a number greater than 4." What is P(E)?
+
+OPTIONS:
+  A) 1/6
+  B) 1/3 ✓
+  C) 1/2
+  D) 2/3
+  E) 5/6
+
+CORRECT: B
+
+EXPLANATION:
+The outcomes greater than 4 are {5, 6}. P(E) = 2/6 = 1/3.
+
+
+----- Q37 | Unit 2 | id 7218 | #17 in unit -----
+Unit name: Probability, Random Variables, and Probability Distributions
+Lessons: 2.11
+
+QUESTION:
+Bolt lengths are normally distributed (mean 50 mm, SD 0.8 mm). A bolt is "long" if it is at or above the 95th percentile. What is the minimum length for a bolt to be "long"?
+
+OPTIONS:
+  A) 50.80
+  B) 51.32 ✓
+  C) 51.60
+  D) 52.40
+  E) 53.20
+
+CORRECT: B
+
+EXPLANATION:
+Using the 95th percentile z-score (1.645): x = 50 + 1.645(0.8) ≈ 51.32 mm.
+
+
+----- Q38 | Unit 2 | id 7215 | #18 in unit -----
+Unit name: Probability, Random Variables, and Probability Distributions
+Lessons: 2.6
+
+QUESTION:
+A box contains 10 components, 3 of which are defective. If two are selected without replacement, what is the probability that both are defective?
+
+OPTIONS:
+  A) 0.06
+  B) 0.09
+  C) 0.067 ✓
+  D) 0.30
+  E) 0.233
+
+CORRECT: C
+
+EXPLANATION:
+P(both defective) = (3/10) × (2/9) = 6/90 ≈ 0.067.
+
+
+----- Q39 | Unit 2 | id 7219 | #19 in unit -----
+Unit name: Probability, Random Variables, and Probability Distributions
+Lessons: 2.11
+
+QUESTION:
+Maria took a math test and a verbal test, each normally distributed with the mean, standard deviation, and Maria's score shown in the table below. On which test did she perform better relative to the distribution?
+
+TABLE:
+{
+  "headers": [
+    "Test",
+    "Mean",
+    "SD",
+    "Maria's Score"
+  ],
+  "rows": [
+    [
+      "Math",
+      "500",
+      "100",
+      "620"
+    ],
+    [
+      "Verbal",
+      "450",
+      "80",
+      "580"
+    ]
+  ]
+}
+
+OPTIONS:
+  A) Math, because 620 > 580.
+  B) Math, because her z-score (1.20) is lower.
+  C) Verbal, because her z-score (1.625) is higher. ✓
+  D) Cannot be compared.
+  E) Verbal, because 580 is closer to a perfect score.
+
+CORRECT: C
+
+EXPLANATION:
+Math z = 1.20; Verbal z = 1.625. A higher z-score indicates better relative performance.
+
+
+----- Q40 | Unit 2 | id 7220 | #20 in unit -----
+Unit name: Probability, Random Variables, and Probability Distributions
+Lessons: 2.12
+
+QUESTION:
+Adult heights have a mean of 68 inches and SD of 3 inches. For samples of size n = 36, what are the mean and standard deviation of the sampling distribution of the sample mean?
+
+OPTIONS:
+  A) Mean = 68, SD = 3
+  B) Mean = 68, SD = 0.5 ✓
+  C) Mean = 11.33, SD = 3
+  D) Mean = 68, SD = 0.083
+  E) Mean = 11.33, SD = 0.5
+
+CORRECT: B
+
+EXPLANATION:
+The mean is the population mean (68). The standard deviation (standard error) is σ / √n = 3 / 6 = 0.5.
+
+
+
+########################################################################
+UNIT 3  (20 questions)
+########################################################################
+
+----- Q41 | Unit 3 | id 7301 | #1 in unit -----
+Unit name: Inference for Categorical Data: Proportions
+Lessons: 3.15
+
+QUESTION:
+A researcher conducted a chi-square test for homogeneity to compare the distribution of preferred learning styles (Visual, Auditory, Kinesthetic) across three different age groups (18-24, 25-34, 35+). Based on the two-way table provided below, what is the expected count for the number of participants aged 35+ who prefer a Visual learning style?
+
+TABLE:
+{
+  "headers": [
+    "Age Group",
+    "Visual",
+    "Auditory",
+    "Kinesthetic",
+    "Total"
+  ],
+  "rows": [
+    [
+      "18-24",
+      "12",
+      "8",
+      "9",
+      "29"
+    ],
+    [
+      "25-34",
+      "10",
+      "15",
+      "55",
+      "80"
+    ],
+    [
+      "35+",
+      "18",
+      "22",
+      "51",
+      "91"
+    ],
+    [
+      "Total",
+      "40",
+      "45",
+      "115",
+      "200"
+    ]
+  ]
+}
+
+OPTIONS:
+  A) 12.5
+  B) 15.0
+  C) 18.2 ✓
+  D) 20.0
+  E) 22.5
+
+CORRECT: C
+
+EXPLANATION:
+The expected count for a cell is (row total x column total) / table total. For 35+ and Visual: (91 x 40) / 200 = 18.2.
+
+
+----- Q42 | Unit 3 | id 7302 | #2 in unit -----
+Unit name: Inference for Categorical Data: Proportions
+Lessons: 3.4
+
+QUESTION:
+A polling firm surveyed 400 voters regarding their support for a local bond issue. The 95% confidence interval for the proportion of voters who support the issue is (0.42, 0.54). Based on the provided confidence interval, which of the following statements is correct?
+
+OPTIONS:
+  A) We are 95% confident that the sample proportion is 0.48.
+  B) There is a 95% probability that the population proportion is between 0.42 and 0.54.
+  C) We are 95% confident that the population proportion of voters who support the bond issue is between 0.42 and 0.54. ✓
+  D) 95% of all voters support the bond issue.
+  E) The margin of error for this interval is 0.12.
+
+CORRECT: C
+
+EXPLANATION:
+A confidence interval is interpreted in terms of the population parameter: we are C% confident that the interval captures the true population proportion.
+
+
+----- Q43 | Unit 3 | id 7303 | #3 in unit -----
+Unit name: Inference for Categorical Data: Proportions
+Lessons: 3.10
+
+QUESTION:
+Two independent samples were taken to compare the proportions of success for a new medicine vs. a placebo. The segment bar chart below displays the proportion of patients who recovered. Which observation is best supported by the chart?
+
+IMAGE: https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/stats/unit3/u3q3.png
+
+OPTIONS:
+  A) The proportion of recovery is higher for the placebo group.
+  B) The proportions of recovery are identical.
+  C) The proportion of recovery is significantly higher for the treatment group. ✓
+  D) The sample sizes for both groups must be different.
+  E) The data is not categorical.
+
+CORRECT: C
+
+EXPLANATION:
+The segmented bar chart shows the proportion of successes (recovery) is visually larger for the treatment bar than the placebo bar.
+
+
+----- Q44 | Unit 3 | id 7304 | #4 in unit -----
+Unit name: Inference for Categorical Data: Proportions
+Lessons: 3.14
+
+QUESTION:
+A study was conducted to check for an association between age range and smartphone ownership. The mosaic plot below shows the breakdown of ownership across four age groups (18-29, 30-44, 45-59, and 60+). If the two variables were independent, what would the mosaic plot look like?
+
+IMAGE: https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/stats/unit3/u3q4.png
+
+OPTIONS:
+  A) The heights of the bars would be different, but the widths would be the same.
+  B) The segment proportions within each age-group bar would be identical across all four age groups. ✓
+  C) The area of the "Owns Smartphone" segments would be zero.
+  D) The bars would show a strong upward trend.
+  E) The plot would be skewed to the left.
+
+CORRECT: B
+
+EXPLANATION:
+Independence in a mosaic plot is visualized when conditional distributions are identical across categories (horizontal segment lines align across bars).
+
+
+----- Q45 | Unit 3 | id 7305 | #5 in unit -----
+Unit name: Inference for Categorical Data: Proportions
+Lessons: 3.7
+
+QUESTION:
+A company tests a new packaging design. The null hypothesis is that the proportion of damaged packages is 0.05. A sample of 200 packages results in a p-value of 0.02. Which conclusion is correct?
+
+OPTIONS:
+  A) There is convincing evidence that the proportion of damaged packages is 0.05.
+  B) There is convincing evidence that the proportion of damaged packages is different from 0.05. ✓
+  C) We fail to reject the null hypothesis at the 0.05 level.
+  D) The proportion of damaged packages is exactly 0.02.
+  E) The result is not statistically significant.
+
+CORRECT: B
+
+EXPLANATION:
+Since the p-value (0.02) < alpha (0.05), we reject the null hypothesis, providing convincing evidence for the alternative.
+
+
+----- Q46 | Unit 3 | id 7306 | #6 in unit -----
+Unit name: Inference for Categorical Data: Proportions
+Lessons: 3.13
+
+QUESTION:
+A researcher conducts a two-sample z-test for the difference in proportions of voters favoring Candidate A in two cities. The sample summaries are shown in the table below. What is the pooled proportion (p-hat-c) used for the test statistic?
+
+TABLE:
+{
+  "headers": [
+    "City",
+    "Sample Size (n)",
+    "In Favor of Candidate A (x)"
+  ],
+  "rows": [
+    [
+      "City 1",
+      "100",
+      "60"
+    ],
+    [
+      "City 2",
+      "150",
+      "75"
+    ]
+  ]
+}
+
+OPTIONS:
+  A) 0.54 ✓
+  B) 0.55
+  C) 0.60
+  D) 0.50
+  E) 0.53
+
+CORRECT: A
+
+EXPLANATION:
+The pooled proportion is total successes divided by total sample size: (60 + 75) / (100 + 150) = 135 / 250 = 0.54.
+
+
+----- Q47 | Unit 3 | id 7307 | #7 in unit -----
+Unit name: Inference for Categorical Data: Proportions
+Lessons: 3.4
+
+QUESTION:
+A city health department reports a 90% confidence interval for the proportion of residents who received a flu vaccine this year as (0.35, 0.45). If the department recalculates using the same sample data but increases the confidence level to 99%, what happens to the width of the interval?
+
+OPTIONS:
+  A) The width remains constant.
+  B) The width increases. ✓
+  C) The width decreases.
+  D) The interval becomes (0.38, 0.42).
+  E) The width is halved.
+
+CORRECT: B
+
+EXPLANATION:
+Increasing confidence requires a larger critical value, which increases margin of error and makes the interval wider.
+
+
+----- Q48 | Unit 3 | id 7308 | #8 in unit -----
+Unit name: Inference for Categorical Data: Proportions
+Lessons: 3.15
+
+QUESTION:
+A public health researcher wants to know whether opinion on a proposed soda tax (Support, Oppose) is associated with age group. She surveys a random sample of 200 adults. The results are shown in the two-way table below. If a chi-square test for independence is performed on these data, what is the expected count for the "Support" and "31–50" cell?
+
+TABLE:
+{
+  "headers": [
+    "Age Group",
+    "Support",
+    "Oppose",
+    "Total"
+  ],
+  "rows": [
+    [
+      "18–30",
+      "20",
+      "30",
+      "50"
+    ],
+    [
+      "31–50",
+      "45",
+      "25",
+      "70"
+    ],
+    [
+      "51+",
+      "35",
+      "45",
+      "80"
+    ],
+    [
+      "Total",
+      "100",
+      "100",
+      "200"
+    ]
+  ]
+}
+
+OPTIONS:
+  A) 25
+  B) 35 ✓
+  C) 40
+  D) 50
+  E) 70
+
+CORRECT: B
+
+EXPLANATION:
+The expected count for a cell is (row total × column total) / table total. For the 31–50 and Support cell: (70 × 100) / 200 = 35.
+
+
+----- Q49 | Unit 3 | id 7309 | #9 in unit -----
+Unit name: Inference for Categorical Data: Proportions
+Lessons: 3.7
+
+QUESTION:
+A mobile game studio claims that 20% of new players who download their app are still playing after one week. A market analyst suspects the true retention rate is different and tests H0: p = 0.20 versus Ha: p ≠ 0.20 using a random sample of new players, obtaining a p-value of 0.04. Which of the following is true at alpha = 0.05?
+
+OPTIONS:
+  A) We reject the null and conclude there is evidence p does not equal 0.20. ✓
+  B) We fail to reject the null and conclude p = 0.20.
+  C) We reject the null and conclude p is 0.20.
+  D) We fail to reject the null because the p-value is too low.
+  E) We reject the null and conclude there is no evidence of a difference.
+
+CORRECT: A
+
+EXPLANATION:
+Since p-value (0.04) is less than alpha (0.05), we reject the null hypothesis and provide evidence for the alternative.
+
+
+----- Q50 | Unit 3 | id 7310 | #10 in unit -----
+Unit name: Inference for Categorical Data: Proportions
+Lessons: 3.11
+
+QUESTION:
+A pollster compares the proportion of registered voters who support a ballot initiative in two neighboring counties. She constructs a 95% confidence interval for the difference in proportions (p₁ − p₂). The interval endpoints are shown in the table below. What is the margin of error for this interval?
+
+TABLE:
+{
+  "headers": [
+    "Statistic",
+    "Value"
+  ],
+  "rows": [
+    [
+      "Lower bound",
+      "0.03"
+    ],
+    [
+      "Upper bound",
+      "0.12"
+    ]
+  ]
+}
+
+OPTIONS:
+  A) 0.09
+  B) 0.045 ✓
+  C) 0.15
+  D) 0.075
+  E) 0.03
+
+CORRECT: B
+
+EXPLANATION:
+Margin of error is half the interval width. Width = 0.12 - 0.03 = 0.09, so MOE = 0.09 / 2 = 0.045.
+
+
+----- Q51 | Unit 3 | id 7311 | #11 in unit -----
+Unit name: Inference for Categorical Data: Proportions
+Lessons: 3.1
+
+QUESTION:
+A statistician is deciding how to estimate an unknown population proportion p from a random sample of size n in which x successes are observed. She considers five possible formulas for the estimator. Which of the following formulas is an unbiased estimator of p?
+
+OPTIONS:
+  A) x / n ✓
+  B) (x + 1) / (n + 2)
+  C) (x + 2) / n
+  D) x / (n - 1)
+  E) (x - 1) / n
+
+CORRECT: A
+
+EXPLANATION:
+An estimator is unbiased if, on average, it neither overestimates nor underestimates the parameter. The sample proportion p-hat = x/n is the standard unbiased estimator of a population proportion because E(x/n) = p. The other formulas each add or subtract a constant to the numerator or denominator, which shifts the expected value away from p and introduces bias (e.g., option B is a form of the Laplace/"add-two" smoothed estimator, which is biased toward 0.5).
+
+
+----- Q52 | Unit 3 | id 7312 | #12 in unit -----
+Unit name: Inference for Categorical Data: Proportions
+Lessons: 3.2
+
+QUESTION:
+A machine produces bolts with a true defect proportion of p = 0.08. A quality control engineer takes a random sample of n = 200 bolts. The graph below shows the sampling distribution of the sample proportion of defective bolts, with the shaded region representing the values within one standard deviation of the mean. Which of the following is closest to the standard deviation of this sampling distribution?
+
+IMAGE: https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/stats/unit3/u3_7312.png
+
+OPTIONS:
+  A) 0.019 ✓
+  B) 0.038
+  C) 0.0128
+  D) 0.0026
+  E) 0.16
+
+CORRECT: A
+
+EXPLANATION:
+The standard deviation of the sampling distribution of p-hat is sqrt[p(1-p)/n] = sqrt[(0.08)(0.92)/200] = sqrt(0.000368) ≈ 0.019, matching the width of the shaded region in the graph. Option B doubles this value (a common error from failing to take the square root correctly), option C uses n = 400, option D omits the square root entirely, and option E uses p(1-p) without dividing by n.
+
+
+----- Q53 | Unit 3 | id 7313 | #13 in unit -----
+Unit name: Inference for Categorical Data: Proportions
+Lessons: 3.3
+
+QUESTION:
+In a random sample of 85 adults, 34 reported that they read at least one book per month. Assuming all conditions for inference are met, which of the following is a correctly calculated 90% confidence interval for the true proportion of adults who read at least one book per month?
+
+OPTIONS:
+  A) (0.313, 0.487) ✓
+  B) (0.296, 0.504)
+  C) (0.362, 0.438)
+  D) (0.395, 0.405)
+  E) (0.4, 0.6)
+
+CORRECT: A
+
+EXPLANATION:
+p-hat = 34/85 = 0.400. SE = sqrt[(0.4)(0.6)/85] ≈ 0.0531. For 90% confidence, z* = 1.645, so the margin of error ≈ 1.645(0.0531) ≈ 0.087, giving the interval (0.313, 0.487). Option B incorrectly uses z* = 1.96 (the 95% critical value). Option D results from forgetting to take the square root when calculating SE, which produces an interval that is far too narrow.
+
+
+----- Q54 | Unit 3 | id 7314 | #14 in unit -----
+Unit name: Inference for Categorical Data: Proportions
+Lessons: 3.3
+
+QUESTION:
+A researcher wants to construct a 95% confidence interval to estimate the proportion of left-handed students in a large school district (N = 3,000 students). She selects a random sample of n = 20 students and finds that 1 student is left-handed. Which condition required for constructing a one-sample z-interval for a population proportion is NOT met?
+
+OPTIONS:
+  A) The randomization condition
+  B) The 10% condition
+  C) The normality condition ✓
+  D) The independence condition
+  E) All conditions are met
+
+CORRECT: C
+
+EXPLANATION:
+The normality condition requires that the observed number of successes and the observed number of failures each be at least 10. Here, the number of observed successes is only 1 (fewer than 10), so the sampling distribution of p-hat cannot be assumed to be approximately normal. The randomization condition is satisfied (random sample), and the 10% condition is satisfied since 20 is well under 10% of 3,000.
+
+
+----- Q55 | Unit 3 | id 7315 | #15 in unit -----
+Unit name: Inference for Categorical Data: Proportions
+Lessons: 3.5
+
+QUESTION:
+A shipping company claims that 90% of its packages are delivered on time. A consumer watchdog group suspects the true on-time delivery rate is lower than claimed and plans to test this suspicion using a random sample of the company's shipping records. Which of the following is the correct set of hypotheses for the appropriate significance test?
+
+OPTIONS:
+  A) H0: p = 0.90, Ha: p < 0.90 ✓
+  B) H0: p = 0.90, Ha: p ≠ 0.90
+  C) H0: p-hat = 0.90, Ha: p-hat < 0.90
+  D) H0: p < 0.90, Ha: p = 0.90
+  E) H0: p = 0.90, Ha: p > 0.90
+
+CORRECT: A
+
+EXPLANATION:
+Let p be the true proportion of all packages delivered on time. Because the watchdog group suspects the rate is lower than claimed, the alternative hypothesis should be one-sided: Ha: p < 0.90, with H0: p = 0.90. Option B is two-sided and does not match the stated suspicion. Option C incorrectly states the hypotheses in terms of the sample statistic p-hat rather than the population parameter p. Option D reverses the null and alternative hypotheses, and option E has the alternative pointed in the wrong direction.
+
+
+----- Q56 | Unit 3 | id 7316 | #16 in unit -----
+Unit name: Inference for Categorical Data: Proportions
+Lessons: 3.6
+
+QUESTION:
+A researcher tests H0: p = 0.50 versus Ha: p ≠ 0.50 and obtains a test statistic of z = 2.10. Which of the following is closest to the p-value of this test?
+
+IMAGE: https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/stats/unit3/u3_7316.png
+
+OPTIONS:
+  A) 0.0179
+  B) 0.0358 ✓
+  C) 0.9642
+  D) 0.4821
+  E) 0.0716
+
+CORRECT: B
+
+EXPLANATION:
+Because the alternative hypothesis is two-sided, the p-value is the combined area in both tails beyond |z| = 2.10: P(Z ≤ -2.10) + P(Z ≥ 2.10) = 2(0.0179) = 0.0358. Option A is only one tail, option C is the area between -2.10 and 2.10 (the complement of the p-value), option D is about half of that middle area, and option E is twice the two-tailed p-value.
+
+
+----- Q57 | Unit 3 | id 7317 | #17 in unit -----
+Unit name: Inference for Categorical Data: Proportions
+Lessons: 3.6
+
+QUESTION:
+A hypothesis test of H0: p = 0.60 versus Ha: p ≠ 0.60 produces a p-value of 0.031. Which of the following is the correct interpretation of this p-value?
+
+OPTIONS:
+  A) Assuming the true population proportion is 0.60, there is a 0.031 probability of obtaining a sample proportion as extreme as, or more extreme than, the one observed. ✓
+  B) There is a 3.1% probability that H0 is true.
+  C) There is a 96.9% probability that Ha is true.
+  D) The probability that the sample proportion exactly equals 0.60 is 0.031.
+  E) Only 3.1% of all possible samples would produce this result.
+
+CORRECT: A
+
+EXPLANATION:
+A p-value is a conditional probability computed by assuming the null hypothesis is true; it describes how unusual the observed (or a more extreme) sample result would be under that assumption. It is never a probability statement about whether H0 or Ha is true — that is a common misinterpretation reflected in options B and C. It also does not refer to the probability of an exact outcome (option D).
+
+
+----- Q58 | Unit 3 | id 7318 | #18 in unit -----
+Unit name: Inference for Categorical Data: Proportions
+Lessons: 3.8
+
+QUESTION:
+The graph below shows the null sampling distribution (solid curve, centered at the hypothesized proportion p0 = 0.50) and the true sampling distribution (dashed curve, centered at the true proportion p = 0.58) for a one-sided test of H0: p = 0.50 versus Ha: p > 0.50. Region A is the shaded area under the solid curve to the right of the critical value; Region B is the shaded area under the dashed curve to the left of the critical value. Which region represents the probability of a Type II error?
+
+IMAGE: https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/stats/unit3/u3_7318.png
+
+OPTIONS:
+  A) Region A
+  B) Region B ✓
+  C) The unshaded area under the solid curve to the left of the critical value
+  D) Region A and Region B combined
+  E) The area where the two curves overlap entirely
+
+CORRECT: B
+
+EXPLANATION:
+A Type II error occurs when the null hypothesis is not rejected even though the alternative hypothesis is actually true. This corresponds to outcomes that fall short of the critical value even though the true sampling distribution (centered at p = 0.58) generated them — that is, Region B. Region A represents alpha, the probability of a Type I error (rejecting H0 when it is actually true), since it is the tail of the null distribution beyond the critical value.
+
+
+----- Q59 | Unit 3 | id 7319 | #19 in unit -----
+Unit name: Inference for Categorical Data: Proportions
+Lessons: 3.9
+
+QUESTION:
+Two large populations have true proportions of support for a policy of p1 = 0.40 and p2 = 0.35. Independent random samples of size n1 = 120 and n2 = 150 are planned. Using the table below, what is the standard deviation of the sampling distribution of the difference in sample proportions, p-hat1 − p-hat2?
+
+TABLE:
+{
+  "headers": [
+    "Population",
+    "True proportion (p)",
+    "Sample size (n)"
+  ],
+  "rows": [
+    [
+      "Population 1",
+      "0.40",
+      "120"
+    ],
+    [
+      "Population 2",
+      "0.35",
+      "150"
+    ]
+  ]
+}
+
+OPTIONS:
+  A) 0.059 ✓
+  B) 0.0035
+  C) 0.0129
+  D) 0.077
+  E) 0.240
+
+CORRECT: A
+
+EXPLANATION:
+The standard deviation of the sampling distribution for the difference in sample proportions is sqrt[p1(1-p1)/n1 + p2(1-p2)/n2] = sqrt[(0.4)(0.6)/120 + (0.35)(0.65)/150] = sqrt(0.0020 + 0.001517) = sqrt(0.003517) ≈ 0.059. Option B is the value before taking the square root, and option D incorrectly adds the two standard deviations (sqrt of each term) instead of combining variances first.
+
+
+----- Q60 | Unit 3 | id 7320 | #20 in unit -----
+Unit name: Inference for Categorical Data: Proportions
+Lessons: 3.12
+
+QUESTION:
+A marketing team runs an A/B test on two landing page designs to see whether Design A produces a higher conversion rate than Design B. Of 500 visitors randomly assigned to Design A, 60 converted; of 500 visitors randomly assigned to Design B, 45 converted. Which of the following is the correct set of hypotheses for the appropriate significance test?
+
+OPTIONS:
+  A) H0: pA = pB, Ha: pA > pB ✓
+  B) H0: pA ≠ pB, Ha: pA = pB
+  C) H0: p-hatA = p-hatB, Ha: p-hatA > p-hatB
+  D) H0: pA − pB = 1, Ha: pA − pB ≠ 1
+  E) H0: pA = pB, Ha: pA ≠ pB
+
+CORRECT: A
+
+EXPLANATION:
+Let pA and pB be the true conversion rates for Design A and Design B, respectively. Since the marketing team specifically wants to know whether Design A’s rate is higher, the test should be one-sided: H0: pA = pB (no difference) versus Ha: pA > pB. Option B reverses the null and alternative statements, option C incorrectly uses sample statistics (p-hat) rather than population parameters, option D uses a nonsensical hypothesized difference of 1, and option E is two-sided and does not match the stated research question.
+
+
+
+########################################################################
+UNIT 4  (20 questions)
+########################################################################
+
+----- Q61 | Unit 4 | id 7401 | #1 in unit -----
+Unit name: Inference for Quantitative Data: Means
+Lessons: 4.2
+
+QUESTION:
+A veterinary clinic weighs a random sample of 25 newborn kittens brought in for checkups over the course of a month. Based on this sample, the clinic calculates a 90% confidence interval for the mean birth weight (in grams) of newborn kittens: (85.2, 94.8). What is the sample mean weight, and what is the margin of error?
+
+OPTIONS:
+  A) Mean = 90.0, Margin of Error = 4.8 ✓
+  B) Mean = 90.0, Margin of Error = 9.6
+  C) Mean = 85.2, Margin of Error = 9.6
+  D) Mean = 94.8, Margin of Error = 4.8
+  E) Mean = 90.0, Margin of Error = 2.4
+
+CORRECT: A
+
+EXPLANATION:
+The sample mean is the midpoint of the interval: (85.2 + 94.8) / 2 = 90.0. The margin of error is the distance from the mean to the bound: 94.8 - 90.0 = 4.8.
+
+
+----- Q62 | Unit 4 | id 7402 | #2 in unit -----
+Unit name: Inference for Quantitative Data: Means
+Lessons: 4.5
+
+QUESTION:
+A battery manufacturer claims its new AA battery has a mean voltage output of 100 millivolts above baseline. A quality control engineer wants to test whether the true mean output actually differs from this target, so she tests $H_0: \mu = 100$ versus $H_a: \mu \neq 100$ using a random sample of 20 batteries. The calculated t-statistic is 2.15. Which of the following is the correct range for the p-value?
+
+OPTIONS:
+  A) 0.01 < p < 0.02
+  B) 0.02 < p < 0.05 ✓
+  C) 0.05 < p < 0.10
+  D) 0.10 < p < 0.20
+  E) p > 0.20
+
+CORRECT: B
+
+EXPLANATION:
+With df = 19, a t-statistic of 2.15 is between the critical values for alpha = 0.05 (2.093) and alpha = 0.025 (2.539). For a two-tailed test, the p-value is between 0.02 and 0.05.
+
+
+----- Q63 | Unit 4 | id 7423 | #3 in unit -----
+Unit name: Inference for Quantitative Data: Means
+Lessons: 4.1
+
+QUESTION:
+Scores on a standardized math exam have a population mean of 680 and a population standard deviation of 90. For a random sample of $n = 36$ test-takers, the sampling distribution of the sample mean is shown below.
+
+IMAGE: https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/stats/unit4/u4_7423.png
+
+OPTIONS:
+  A) 81.5% ✓
+  B) 68%
+  C) 95%
+  D) 47.5%
+  E) 13.5%
+
+CORRECT: A
+
+EXPLANATION:
+The shaded region spans from 1 standard deviation below the mean (665) to 2 standard deviations above the mean (710). Using the empirical rule, the area from -1 SD to +1 SD is 68%, so the area from -1 SD to the mean is 34%. The area from the mean to +2 SD is 34% + 13.5% = 47.5%. Adding these pieces together: 34% + 47.5% = 81.5%.
+
+
+----- Q64 | Unit 4 | id 7403 | #4 in unit -----
+Unit name: Inference for Quantitative Data: Means
+Lessons: 4.1
+
+QUESTION:
+A cereal company's automated filling machine dispenses boxes of cereal with a population standard deviation of 12 grams. A quality inspector plans to randomly sample 36 boxes each shift to monitor the process. What is the standard deviation of the sampling distribution of the sample mean weight?
+
+OPTIONS:
+  A) 12
+  B) 6
+  C) 3
+  D) 2 ✓
+  E) 0.33
+
+CORRECT: D
+
+EXPLANATION:
+The standard deviation of the sampling distribution is sigma / sqrt(n). 12 / sqrt(36) = 12 / 6 = 2.
+
+
+----- Q65 | Unit 4 | id 7404 | #5 in unit -----
+Unit name: Inference for Quantitative Data: Means
+Lessons: 4.5
+
+QUESTION:
+A lightbulb manufacturer, Brightline Inc., claims that the mean lifespan of its LED bulbs is 1,200 hours. A consumer advocacy group suspects this is overstated and tests a random sample of 40 bulbs, finding a mean lifespan of 1,180 hours with a standard deviation of 50 hours. To test whether the true mean lifespan is less than 1,200 hours, they calculate a test statistic. What is it?
+
+OPTIONS:
+  A) (1180 - 1200) / (50/sqrt(40)) ✓
+  B) (1200 - 1180) / (50/sqrt(40))
+  C) (1180 - 1200) / (50/40)
+  D) (1180 - 1200) / (50/sqrt(39))
+  E) (1180 - 1200) / 50
+
+CORRECT: A
+
+EXPLANATION:
+The t-statistic formula is (x-bar - mu0) / (s / sqrt(n)). Here: (1180 - 1200) / (50 / sqrt(40)).
+
+
+----- Q66 | Unit 4 | id 7424 | #6 in unit -----
+Unit name: Inference for Quantitative Data: Means
+Lessons: 4.2
+
+QUESTION:
+An operations manager records the time (in minutes) it takes a random sample of $n = 24$ employees to complete a new onboarding task. Based on the histogram of the data shown below, is it appropriate to construct a one-sample t-interval?
+
+IMAGE: https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/stats/unit4/u4_7424.png
+
+OPTIONS:
+  A) Yes, because the sample was randomly selected, and that is the only condition that must be checked.
+  B) Yes, because the t-distribution automatically adjusts for skewness regardless of sample size.
+  C) No, because the sample size is less than 30 and the histogram shows strong right skew with an outlier, so the sample data condition is not met. ✓
+  D) No, because the population standard deviation is unknown.
+  E) Yes, because n = 24 is close enough to 30 for the central limit theorem to apply.
+
+CORRECT: C
+
+EXPLANATION:
+A one-sample t-interval requires the sample data condition: the population distribution is approximately normal, or n ≥ 30, or (if n < 30) the sample data are free of strong skewness and outliers. Here n = 24 < 30, and the histogram shows strong right skew along with an isolated outlier near 60 minutes, so this condition is not satisfied. Not knowing the population standard deviation (D) is actually the reason a t-procedure, rather than a z-procedure, is used — it is not a barrier to inference.
+
+
+----- Q67 | Unit 4 | id 7405 | #7 in unit -----
+Unit name: Inference for Quantitative Data: Means
+Lessons: 4.8
+
+QUESTION:
+An automotive magazine compared the fuel efficiency of two competing sedan models by test-driving independent samples of each on identical routes. A 95% confidence interval for the difference in mean miles per gallon ($\mu_1 - \mu_2$) is (-3.2, 1.8). What is the correct interpretation?
+
+OPTIONS:
+  A) We are 95% confident that the mean fuel efficiency of model 1 is 3.2 mpg less than model 2.
+  B) There is a 95% chance that the true mean difference is between -3.2 and 1.8.
+  C) We are 95% confident that the true difference in mean fuel efficiency is between -3.2 and 1.8 mpg. ✓
+  D) 95% of cars have a difference in efficiency between -3.2 and 1.8.
+  E) We can conclude that model 1 is more efficient than model 2.
+
+CORRECT: C
+
+EXPLANATION:
+The standard interpretation of a confidence interval for a mean difference is that we are C% confident the true difference in means is contained within the interval.
+
+
+----- Q68 | Unit 4 | id 7406 | #8 in unit -----
+Unit name: Inference for Quantitative Data: Means
+Lessons: 4.3
+
+QUESTION:
+A pollster is constructing a confidence interval for the mean amount of time (in minutes) that registered voters spent researching candidates before a local election, using a known population standard deviation. If the pollster changes the confidence level from 95% to 90%, what will happen to the margin of error?
+
+OPTIONS:
+  A) The margin of error will increase.
+  B) The margin of error will decrease. ✓
+  C) The margin of error will stay the same.
+  D) The margin of error will double.
+  E) The effect on the margin of error cannot be determined.
+
+CORRECT: B
+
+EXPLANATION:
+The margin of error is calculated as $z^* \times (\sigma / \sqrt{n})$. A 90% confidence level has a smaller critical value than a 95% level, resulting in a smaller margin of error.
+
+
+----- Q69 | Unit 4 | id 7407 | #9 in unit -----
+Unit name: Inference for Quantitative Data: Means
+Lessons: 4.5
+
+QUESTION:
+A snack food company labels its granola bars as containing 50 calories. A dietitian suspects the true mean calorie content is higher and collects a random sample of 25 bars, finding a sample mean of 52 calories with a standard error of 1.5. What is the value of the t-statistic for testing whether the true mean differs from the labeled value?
+
+OPTIONS:
+  A) 0.67
+  B) 1.33 ✓
+  C) 2.00
+  D) 3.00
+  E) 33.33
+
+CORRECT: B
+
+EXPLANATION:
+The t-statistic is calculated as $( \overline{x} - \mu_0 ) / SE$. Here, $(52 - 50) / 1.5 = 2 / 1.5 = 1.33$.
+
+
+----- Q70 | Unit 4 | id 7422 | #10 in unit -----
+Unit name: Inference for Quantitative Data: Means
+Lessons: 4.4
+
+QUESTION:
+A golf instructor records the scores of 8 golfers before and after a one-week lesson series. The dotplot below shows the difference in score (after − before) for each golfer, where a negative value indicates the golfer's score improved (decreased).
+
+What is the sample mean difference, $\bar{x}_d$ (after − before), for these 8 golfers?
+
+IMAGE: https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/stats/unit4/u4_7422.png
+
+OPTIONS:
+  A) -3.0 ✓
+  B) -2.5
+  C) -24
+  D) -2.0
+  E) 3.0
+
+CORRECT: A
+
+EXPLANATION:
+Reading the dotplot, the 8 differences are -5, -4, -4, -3, -3, -2, -2, -1. The sum is -24, so the sample mean difference is $-24 / 8 = -3.0$. Answer (C) is the sum rather than the mean, and the other options result from misreading the dots or the direction of the difference.
+
+
+----- Q71 | Unit 4 | id 7408 | #11 in unit -----
+Unit name: Inference for Quantitative Data: Means
+Lessons: 4.7
+
+QUESTION:
+A school district compares standardized test scores between two middle schools, School A and School B, using independent random samples of students from each. A 95% confidence interval for the difference in mean scores ($\mu_A - \mu_B$) is (2.5, 7.5). What is the point estimate for the difference in means?
+
+OPTIONS:
+  A) 2.5
+  B) 5.0 ✓
+  C) 7.5
+  D) 10.0
+  E) 0
+
+CORRECT: B
+
+EXPLANATION:
+The point estimate is the midpoint of the confidence interval: $(2.5 + 7.5) / 2 = 5.0$.
+
+
+----- Q72 | Unit 4 | id 7409 | #12 in unit -----
+Unit name: Inference for Quantitative Data: Means
+Lessons: 4.2
+
+QUESTION:
+A botanist studying an endangered species of orchid wants to estimate the mean height of mature plants to within 2 cm with 95% confidence. Based on similar species, she assumes the population standard deviation is 10 cm. Approximately how large a sample of orchids is required?
+
+OPTIONS:
+  A) 25
+  B) 50
+  C) 97 ✓
+  D) 100
+  E) 150
+
+CORRECT: C
+
+EXPLANATION:
+Margin of Error (MOE) = $z^* \times (\sigma / \sqrt{n})$. $2 = 1.96 \times (10 / \sqrt{n})$. Solving for n gives $n = (1.96 * 10 / 2)^2 \approx 96.04$. Round up to 97.
+
+
+----- Q73 | Unit 4 | id 7410 | #13 in unit -----
+Unit name: Inference for Quantitative Data: Means
+Lessons: 4.9
+
+QUESTION:
+A marketing analyst wants to compare the average dollar amount spent by customers who viewed Advertisement A versus customers who viewed Advertisement B, using two separately recruited groups of shoppers. Which of the following is an assumption required to perform a two-sample t-test for the difference between these two population means?
+
+OPTIONS:
+  A) The two population standard deviations must be equal.
+  B) Both sample sizes must be exactly equal.
+  C) The two samples must be independent. ✓
+  D) The population distributions must be exactly normal for any sample size.
+  E) The sum of the means must be 0.
+
+CORRECT: C
+
+EXPLANATION:
+For a two-sample t-test, the two samples must be independent.
+
+
+----- Q74 | Unit 4 | id 7411 | #14 in unit -----
+Unit name: Inference for Quantitative Data: Means
+Lessons: 4.5
+
+QUESTION:
+A pharmaceutical company tests a new supplement to see whether it raises mean HDL ("good") cholesterol above the current population mean of 20 mg/dL. The researchers test $H_0: \mu = 20$ vs $H_a: \mu > 20$ and calculate a p-value of 0.08. At the $\alpha = 0.05$ significance level, what should they conclude?
+
+OPTIONS:
+  A) Reject H0 and conclude the mean is greater than 20.
+  B) Fail to reject H0 and conclude the mean is greater than 20.
+  C) Fail to reject H0 and conclude there is not sufficient evidence the mean is greater than 20. ✓
+  D) Accept H0 as true.
+  E) The test is invalid because the p-value is too high.
+
+CORRECT: C
+
+EXPLANATION:
+Since 0.08 > 0.05, we fail to reject the null. We conclude there is not sufficient evidence for the alternative.
+
+
+----- Q75 | Unit 4 | id 7421 | #15 in unit -----
+Unit name: Inference for Quantitative Data: Means
+Lessons: 4.7, 4.8
+
+QUESTION:
+A transportation researcher wants to estimate the difference in mean commute time between two bus routes. Independent random samples of riders were selected from each route, and their commute times (in minutes) were recorded. The boxplots and summary statistics for each sample are shown below:
+
+IMAGE: https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/stats/unit4/u4_7421.png
+
+OPTIONS:
+  A) 4.89 minutes ✓
+  B) 3.43 minutes
+  C) 11.06 minutes
+  D) 4.44 minutes
+  E) 2.26 minutes
+
+CORRECT: A
+
+EXPLANATION:
+The standard error is $SE = \sqrt{s_1^2/n_1 + s_2^2/n_2} = \sqrt{5.8^2/16 + 6.5^2/14} = \sqrt{2.1025 + 3.0179} = \sqrt{5.1204} \approx 2.263$. The margin of error is $t^* \times SE = 2.160 \times 2.263 \approx 4.89$ minutes. (B) results from incorrectly pooling the sample sizes in the denominator, (C) omits the square root in the SE calculation, (D) incorrectly uses $z^* = 1.96$ instead of $t^*$, and (E) reports the standard error without multiplying by the critical value.
+
+
+----- Q76 | Unit 4 | id 7412 | #16 in unit -----
+Unit name: Inference for Quantitative Data: Means
+Lessons: 4.2
+
+QUESTION:
+A landscaper measures the height of a random sample of 18 saplings from a new shipment to construct a t-interval for the mean height of all saplings in the shipment. What are the degrees of freedom for this one-sample t-procedure?
+
+OPTIONS:
+  A) 19
+  B) 18
+  C) 17 ✓
+  D) 9
+  E) 35
+
+CORRECT: C
+
+EXPLANATION:
+Degrees of freedom for a one-sample t-test is n - 1. Here, 18 - 1 = 17.
+
+
+----- Q77 | Unit 4 | id 7414 | #17 in unit -----
+Unit name: Inference for Quantitative Data: Means
+Lessons: 4.2
+
+QUESTION:
+A high school counselor surveys a random sample of 40 students and finds a mean weekly study time of 15 hours with a standard deviation of 4 hours. What is the margin of error for a 90% confidence interval for the true mean study time of all students at the school?
+
+OPTIONS:
+  A) 1.645 * (4 / sqrt(40))
+  B) 1.684 * (4 / sqrt(40)) ✓
+  C) 1.96 * (4 / sqrt(40))
+  D) 1.645 * (4 / 40)
+  E) 1.684 * (4 / 40)
+
+CORRECT: B
+
+EXPLANATION:
+Margin of error is $t^* \times (s / \sqrt{n})$. For 90% confidence and df=39, $t^* \approx 1.684$.
+
+
+----- Q78 | Unit 4 | id 7425 | #18 in unit -----
+Unit name: Inference for Quantitative Data: Means
+Lessons: 4.9, 4.10
+
+QUESTION:
+An education researcher believes that students taught with Method A will have a higher mean exam score than students taught with Method B. She conducts a two-sample t-test using statistical software, which by default reports a two-tailed p-value. The output is shown below:
+
+Two-Sample T-Test
+Difference = μ(Method A) − μ(Method B)
+t = 2.87     DF = 26     P-value (two-tailed) = 0.0081
+
+Since the researcher's alternative hypothesis is one-sided ($H_a: \mu_A > \mu_B$), which of the following gives the correct p-value to use for her test, along with the correct conclusion at $\alpha = 0.01$?
+
+OPTIONS:
+  A) p ≈ 0.0081; fail to reject H0; there is not sufficient evidence Method A produces a higher mean score.
+  B) p ≈ 0.0041; reject H0; there is sufficient evidence Method A produces a higher mean score. ✓
+  C) p ≈ 0.0162; reject H0; there is sufficient evidence Method A produces a higher mean score.
+  D) p ≈ 0.0041; fail to reject H0; there is not sufficient evidence Method A produces a higher mean score.
+  E) p ≈ 0.0081; reject H0; there is sufficient evidence Method A produces a higher mean score.
+
+CORRECT: B
+
+EXPLANATION:
+Because the software reports a two-tailed p-value but the researcher is conducting a one-sided test, the correct p-value is half the reported value: $0.0081 / 2 \approx 0.0041$. Since $0.0041 < \alpha = 0.01$, the researcher should reject H0. There is sufficient evidence that Method A produces a higher mean exam score than Method B. Answer (E) fails to halve the p-value, and (A), (C), and (D) either misapply the halving or draw the wrong conclusion from the resulting p-value.
+
+
+----- Q79 | Unit 4 | id 7419 | #19 in unit -----
+Unit name: Inference for Quantitative Data: Means
+Lessons: 4.1
+
+QUESTION:
+An orchard owner records the weight of every apple harvested this season, forming a population with mean $\mu$. If she repeatedly draws random samples of apples and computes the sample mean weight each time, what is the mean of this sampling distribution of $\overline{x}$?
+
+OPTIONS:
+  A) sigma
+  B) mu ✓
+  C) mu / sqrt(n)
+  D) x-bar
+  E) sigma / n
+
+CORRECT: B
+
+EXPLANATION:
+The mean of the sampling distribution of the sample mean is equal to the population mean, mu.
+
+
+----- Q80 | Unit 4 | id 7420 | #20 in unit -----
+Unit name: Inference for Quantitative Data: Means
+Lessons: 4.1
+
+QUESTION:
+As in data on sale prices for previously owned homes in a western city, suppose a quantitative variable's population distribution is strongly right-skewed. What must be true for the sampling distribution of the sample mean to be approximately normal?
+
+OPTIONS:
+  A) The sample size n must be very large (n >> 30). ✓
+  B) The sample size n can be as small as 5.
+  C) The population standard deviation must be known.
+  D) The t-distribution cannot be used.
+  E) The mean must be 0.
+
+CORRECT: A
+
+EXPLANATION:
+If the population distribution is extremely skewed, a sample size much larger than 30 may be needed to ensure the sampling distribution is approximately normal.
+
+
+
+########################################################################
+UNIT 5  (20 questions)
+########################################################################
+
+----- Q81 | Unit 5 | id 7501 | #1 in unit -----
+Unit name: Regression Analysis
+Lessons: 5.4
+
+QUESTION:
+A real estate agent builds a least-squares regression line to predict a home's sale price (y, in thousands of dollars) from its square footage (x): ŷ = 50 + 0.15x. One house in her listings has 2,000 square feet and actually sold for $380,000. What is the residual for this house?
+
+OPTIONS:
+  A) 350
+  B) 30 ✓
+  C) -30
+  D) 0.15
+  E) 50
+
+CORRECT: B
+
+EXPLANATION:
+Predicted price is ŷ = 50 + 0.15(2000) = 350 (thousand). Observed price is y = 380 (thousand). Residual is y − ŷ = 380 − 350 = 30.
+
+
+----- Q82 | Unit 5 | id 7502 | #2 in unit -----
+Unit name: Regression Analysis
+Lessons: 5.5
+
+QUESTION:
+A nutritionist studies the relationship between daily fiber intake (grams) and reduction in LDL cholesterol (mg/dL) among a sample of patients and finds a correlation of r = -0.80. What proportion of the variation in cholesterol reduction is explained by the linear relationship with fiber intake?
+
+OPTIONS:
+  A) 0.20
+  B) 0.64 ✓
+  C) 0.80
+  D) 0.36
+  E) -0.64
+
+CORRECT: B
+
+EXPLANATION:
+The coefficient of determination is r². Here, (-0.80)² = 0.64.
+
+
+----- Q83 | Unit 5 | id 7516 | #3 in unit -----
+Unit name: Regression Analysis
+Lessons: 5.4
+
+QUESTION:
+The scatterplot above shows the relationship between hours studied (x) and quiz score (y) for five students, along with the least-squares regression line. Point C represents a student who studied 6 hours and scored 65 points. Which of the following is closest to the residual for this student, calculated as observed − predicted?
+
+IMAGE: https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/stats/unit5/u5_7516.png
+
+OPTIONS:
+  A) -20
+  B) -15 ✓
+  C) -5
+  D) 5
+  E) 15
+
+CORRECT: B
+
+EXPLANATION:
+Reading the graph, the regression line passes through (0, 50) and (10, 100), so the predicted score at x = 6 is 50 + 5(6) = 80. The residual is observed − predicted = 65 − 80 = -15.
+
+
+----- Q84 | Unit 5 | id 7503 | #4 in unit -----
+Unit name: Regression Analysis
+Lessons: 5.5
+
+QUESTION:
+An agricultural researcher models crop yield (bushels per acre) as a function of fertilizer applied (pounds per acre). The least-squares regression line has a slope of 2.5. If a farmer increases fertilizer application by 4 pounds per acre, what is the predicted change in crop yield?
+
+OPTIONS:
+  A) Increase of 2.5 bushels per acre
+  B) Increase of 6.5 bushels per acre
+  C) Increase of 10.0 bushels per acre ✓
+  D) Increase of 1.6 bushels per acre
+  E) Decrease of 10.0 bushels per acre
+
+CORRECT: C
+
+EXPLANATION:
+The predicted change is slope × change in x: 2.5 × 4 = 10.0 bushels per acre.
+
+
+----- Q85 | Unit 5 | id 7504 | #5 in unit -----
+Unit name: Regression Analysis
+Lessons: 5.5
+
+QUESTION:
+A tutoring company studies the relationship between weekly study hours (mean x̄ = 10 hours) and exam scores (mean ȳ = 20 points above baseline) for its students. The least-squares regression line is ŷ = 5 + 1.5x. If a new student is added to the data set with exactly 10 study hours and a score of 20 points above baseline, what happens to the regression line?
+
+OPTIONS:
+  A) The slope increases.
+  B) The y-intercept decreases.
+  C) The regression line does not change. ✓
+  D) The correlation increases.
+  E) The residual sum of squares increases.
+
+CORRECT: C
+
+EXPLANATION:
+The least-squares regression line always passes through (x̄, ȳ). Adding a point exactly at (x̄, ȳ) does not change the line.
+
+
+----- Q86 | Unit 5 | id 7505 | #6 in unit -----
+Unit name: Regression Analysis
+Lessons: 5.5
+
+QUESTION:
+A pediatrician models the relationship between a child's age in years (x) and height in centimeters (y) using the equation ŷ = 10 + 2x. Which of the following is an appropriate interpretation of the y-intercept in this model?
+
+OPTIONS:
+  A) The predicted height of a newborn (0 years old) is 10 cm. ✓
+  B) The average height of all people is 10 cm.
+  C) For every year of age, height increases by 10 cm.
+  D) The height of a person when they stop growing.
+  E) The intercept has no practical meaning.
+
+CORRECT: A
+
+EXPLANATION:
+The y-intercept is the predicted value of y when x = 0.
+
+
+----- Q87 | Unit 5 | id 7517 | #7 in unit -----
+Unit name: Regression Analysis
+Lessons: 5.2, 5.4
+
+QUESTION:
+A statistics student calculates r = 0.93 for the linear relationship between two variables and constructs the residual plot shown above. Which of the following is the most appropriate conclusion?
+
+IMAGE: https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/stats/unit5/u5_7517.png
+
+OPTIONS:
+  A) Because r is close to 1, the linear model is appropriate despite the pattern in the residual plot.
+  B) The residual plot shows a curved pattern, indicating that a linear model may not be appropriate even though r is close to 1. ✓
+  C) The correlation of 0.93 confirms that the residuals are randomly scattered.
+  D) The curved pattern indicates that the correlation is actually negative.
+  E) Because the residuals are all less than 10 in absolute value, the linear model provides a good fit.
+
+CORRECT: B
+
+EXPLANATION:
+A high correlation does not guarantee a linear model is appropriate. The residual plot shows a clear U-shaped (curved) pattern, which indicates the true relationship is non-linear even though r is close to 1.
+
+
+----- Q88 | Unit 5 | id 7506 | #8 in unit -----
+Unit name: Regression Analysis
+Lessons: 5.4
+
+QUESTION:
+An economist fits a straight-line model relating a company's monthly advertising spend to its monthly sales revenue. When she plots the residuals against advertising spend, the residual plot shows a clear U-shaped pattern. What does this indicate?
+
+OPTIONS:
+  A) The data are perfectly linear.
+  B) The model is a good fit.
+  C) The relationship between advertising spend and sales revenue is non-linear. ✓
+  D) There are no outliers.
+  E) The correlation is -1.
+
+CORRECT: C
+
+EXPLANATION:
+A curved pattern in a residual plot indicates a linear model is not appropriate.
+
+
+----- Q89 | Unit 5 | id 7507 | #9 in unit -----
+Unit name: Regression Analysis
+Lessons: 5.2
+
+QUESTION:
+A physics student records the time elapsed (x) and remaining battery charge (y) for a device that drains power at a perfectly constant rate. When she plots her data, every point falls exactly on a line with a negative slope. What is the correlation coefficient r for this data set?
+
+OPTIONS:
+  A) 0
+  B) 1
+  C) -1 ✓
+  D) 0.5
+  E) -0.5
+
+CORRECT: C
+
+EXPLANATION:
+A perfect negative linear association has r = -1.
+
+
+----- Q90 | Unit 5 | id 7508 | #10 in unit -----
+Unit name: Regression Analysis
+Lessons: 5.5
+
+QUESTION:
+A real estate analyst is building a regression model relating house size to sale price for a neighborhood of modest, similarly sized homes. One enormous mansion is included in the data set, far larger and more expensive than any other house. What is the likely effect of this influential point on the least-squares regression line?
+
+OPTIONS:
+  A) It has no effect.
+  B) It pulls the line toward itself, changing the slope and intercept. ✓
+  C) It moves the line away from itself.
+  D) It only changes the y-intercept.
+  E) It only changes the slope.
+
+CORRECT: B
+
+EXPLANATION:
+Influential outliers pull the least-squares regression line toward them, often substantially changing slope and intercept.
+
+
+----- Q91 | Unit 5 | id 7518 | #11 in unit -----
+Unit name: Regression Analysis
+Lessons: 5.2, 5.5
+
+QUESTION:
+The scatterplot above shows the relationship between two variables for 10 observations, with the least-squares regression line drawn (all 10 points, including P, were used to fit this line). If the point labeled P is removed and the regression line is refit, which of the following would most likely happen?
+
+IMAGE: https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/stats/unit5/u5_7518.png
+
+OPTIONS:
+  A) The slope would increase, and r would increase in magnitude. ✓
+  B) The slope would increase, and r would decrease in magnitude.
+  C) The slope would decrease, and r would increase in magnitude.
+  D) The slope would decrease, and r would decrease in magnitude.
+  E) Neither the slope nor r would change because P is not an outlier.
+
+CORRECT: A
+
+EXPLANATION:
+Point P is a high-leverage point far to the right of the main cluster and well below the pattern formed by the other 9 points. It pulls the regression line down, flattening the slope and weakening the fit. Removing P allows the line to fit the tightly linear main cluster, so the slope increases (becomes steeper) and r increases in magnitude (closer to +1).
+
+
+----- Q92 | Unit 5 | id 7509 | #12 in unit -----
+Unit name: Regression Analysis
+Lessons: 5.2
+
+QUESTION:
+A pediatric researcher builds a scatterplot relating children's height (cm) to weight, originally measured in kilograms. If she converts the weight measurements to grams (1 kg = 1,000 g) before recalculating the correlation coefficient, what happens to r?
+
+OPTIONS:
+  A) r increases by 1000.
+  B) r decreases by 1000.
+  C) r is multiplied by 1000.
+  D) r stays the same. ✓
+  E) r becomes 0.
+
+CORRECT: D
+
+EXPLANATION:
+Correlation is unit-free and does not change under linear rescaling of either variable.
+
+
+----- Q93 | Unit 5 | id 7510 | #13 in unit -----
+Unit name: Regression Analysis
+Lessons: 5.4
+
+QUESTION:
+A teacher uses a linear model to predict a student's final exam score from hours spent studying. For one particular student, the residual from this model is 5. What does this residual mean?
+
+OPTIONS:
+  A) The student's actual score was 5 points higher than the model predicted. ✓
+  B) The student's actual score was 5 points lower than the model predicted.
+  C) The model predicted a score 5 points higher than the student actually earned.
+  D) The correlation between study hours and score is 0.5.
+  E) The model made a perfectly accurate prediction.
+
+CORRECT: A
+
+EXPLANATION:
+Residual = observed − predicted. If the residual is 5, the observed value is 5 units higher than the predicted value.
+
+
+----- Q94 | Unit 5 | id 7511 | #14 in unit -----
+Unit name: Regression Analysis
+Lessons: 5.5
+
+QUESTION:
+A college admissions office studies the relationship between applicants' SAT scores and their first-year college GPA and finds a correlation of 0.85. Which of the following statements is a correct interpretation of this result?
+
+OPTIONS:
+  A) 85% of the variation in GPA is explained by the linear relationship with SAT scores.
+  B) 72.25% of the variation in GPA is explained by the linear relationship with SAT scores. ✓
+  C) 85% of students' GPAs lie exactly on the regression line.
+  D) The slope of the regression line is 0.85.
+  E) SAT scores and GPA have a perfectly linear relationship.
+
+CORRECT: B
+
+EXPLANATION:
+Explained variation is r². Here, (0.85)² = 0.7225 = 72.25%.
+
+
+----- Q95 | Unit 5 | id 7519 | #15 in unit -----
+Unit name: Regression Analysis
+Lessons: 5.3
+
+QUESTION:
+The scatterplot shows the relationship between the age of a used car (in years) and its value (in thousands of dollars) for a sample of 10 cars, along with the least-squares regression line. A collector wants to use this line to predict the value of a car that is 25 years old. Which of the following best explains whether this is an appropriate use of the regression line?
+
+IMAGE: https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/stats/unit5/u5_7519.png
+
+OPTIONS:
+  A) Appropriate, because substituting x = 25 into the equation of the line gives a predicted value of -$28,000, which makes sense for an old car.
+  B) Appropriate, because the correlation between age and value appears strong and negative.
+  C) Not appropriate, because 25 years is outside the interval of ages (about 1 to 9 years) represented in the data, so the prediction would require extrapolation. ✓
+  D) Not appropriate, because the slope of the line is negative.
+  E) Not appropriate, because the y-intercept of $22,000 has no meaningful interpretation.
+
+CORRECT: C
+
+EXPLANATION:
+The data only cover ages from about 1 to 9 years. Using the line to predict at x = 25 requires extrapolating far beyond the observed x-values, which is unreliable — as shown by the nonsensical negative predicted value in choice A.
+
+
+----- Q96 | Unit 5 | id 7512 | #16 in unit -----
+Unit name: Regression Analysis
+Lessons: 5.5
+
+QUESTION:
+A marketing analyst fits a regression model relating monthly advertising budget to monthly sales using data from a sample of 50 franchise stores. The calculated slope is 0.5 with a standard error of 0.1. What is the t-statistic for testing whether the true slope differs from 0?
+
+OPTIONS:
+  A) 0.05
+  B) 0.5
+  C) 5 ✓
+  D) 0.1
+  E) 50
+
+CORRECT: C
+
+EXPLANATION:
+The t-statistic for slope is b / SE(b) = 0.5 / 0.1 = 5.
+
+
+----- Q97 | Unit 5 | id 7513 | #17 in unit -----
+Unit name: Regression Analysis
+Lessons: 5.1
+
+QUESTION:
+A botanist wants to study how the amount of daily sunlight a plant receives affects its height, so she plans to construct a scatterplot using data collected from a greenhouse experiment. Which of the following is true regarding how she should set up this scatterplot?
+
+OPTIONS:
+  A) Plant height (the response variable) is always on the x-axis.
+  B) Sunlight exposure (the explanatory variable) is always on the x-axis. ✓
+  C) The axes must be measured in the same units.
+  D) The points must form a straight line.
+  E) The correlation must be positive.
+
+CORRECT: B
+
+EXPLANATION:
+By convention, the explanatory variable is on the x-axis and the response variable is on the y-axis.
+
+
+----- Q98 | Unit 5 | id 7514 | #18 in unit -----
+Unit name: Regression Analysis
+Lessons: 5.5
+
+QUESTION:
+An engineer fits a straight-line model relating the temperature of a metal rod to its length, using the "least-squares" method to determine the line of best fit. What is the primary goal of this method?
+
+OPTIONS:
+  A) To maximize the correlation.
+  B) To minimize the sum of the squares of the residuals. ✓
+  C) To make the y-intercept 0.
+  D) To force the line to pass through the origin.
+  E) To make the slope equal to 1.
+
+CORRECT: B
+
+EXPLANATION:
+The least-squares regression line minimizes the sum of squared residuals.
+
+
+----- Q99 | Unit 5 | id 7520 | #19 in unit -----
+Unit name: Regression Analysis
+Lessons: 5.2
+
+QUESTION:
+Of the following scatterplots, which shows a correlation coefficient r closest to -0.9?
+
+IMAGE: https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/stats/unit5/u5_7520.png
+
+OPTIONS:
+  A) Plot A
+  B) Plot B ✓
+  C) Plot C
+  D) Plot D
+  E) Plot E
+
+CORRECT: B
+
+EXPLANATION:
+Plot B shows a tight, strongly negative linear pattern with almost no scatter around the trend, consistent with r ≈ -0.9. Plot A is strongly positive, Plot C is only moderately negative, Plot D shows almost no linear association, and Plot E is weakly negative.
+
+
+----- Q100 | Unit 5 | id 7515 | #20 in unit -----
+Unit name: Regression Analysis
+Lessons: 5.4
+
+QUESTION:
+A quality control engineer builds a model relating a machine's input settings to its output measurements. When she checks the model against every observation in her data set, she finds that every single residual equals 0. What does this tell her about the data?
+
+OPTIONS:
+  A) The correlation is 0.
+  B) The model is non-linear.
+  C) Every data point lies exactly on the regression line. ✓
+  D) The sample size is too small.
+  E) The slope is 0.
+
+CORRECT: C
+
+EXPLANATION:
+If every residual is 0, observed values equal predicted values for all points, so all points lie on the regression line.
+
+
+========================================================================
+TOTAL: 100 questions

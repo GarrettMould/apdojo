@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { X, Loader2, Lock, ArrowRight, CheckCircle2, Star, ShieldCheck } from 'lucide-react';
+import { X, Loader2, Lock, ArrowRight, CheckCircle2, Star, ShieldCheck, Pen } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { SeasonPassModal } from '@/components/SeasonPassModal';
@@ -21,6 +21,7 @@ import {
   macroUnits as allMacroUnitsData,
   microUnits as allMicroUnitsData,
   govUnits as allGovUnitsData,
+  statsUnits as allStatsUnitsData,
 } from '@/data/cheatSheets';
 import { macroLessons, microLessons } from '@/data/lessons'; // Import lessons
 import { LoginModal, SignupModal } from '@/components/AuthModals';
@@ -28,8 +29,39 @@ import { logger } from '@/utils/logger';
 import { getSubjectSlug, getUnitSlug } from '@/lib/practiceSlugs';
 import { hasValidSeasonPass } from '@/lib/utils';
 import type { CourseSubject } from '@/lib/courseSubject';
-import { apQuestionSubjectTag } from '@/lib/courseSubject';
+import {
+  apQuestionSubjectTag,
+  isCourseSubject,
+  isGovMcqPracticeUnitAvailable,
+  isStatsMcqPracticeUnitAvailable,
+} from '@/lib/courseSubject';
 import { shufflePracticeQuestions } from '@/lib/shufflePracticeQuestions';
+import { REMATCH_ENABLED } from '@/lib/reviewFolder';
+import { ReviewFolderButton } from '@/components/review-folder/ReviewFolderButton';
+import { ReviewFolderPanel } from '@/components/review-folder/ReviewFolderPanel';
+import { PracticePacketModal } from '@/components/practice-packet/PracticePacketModal';
+import {
+  clearReviewFolder,
+  loadReviewFolder,
+  loadMergedReviewFolders,
+  loadReviewFolderFromCloud,
+  saveReviewFolder,
+  saveReviewFolderToCloud,
+  applyAnswerHistoryToReviewFolder,
+  filterReviewFolderBySubject,
+  missedQuestionIds,
+  previewFromQuestion,
+  recordCorrect,
+  recordMiss,
+  removeMiss,
+  rollupByLesson,
+  type ReviewFolderState,
+} from '@/lib/reviewFolder';
+import {
+  assemblePracticePacket,
+  PRACTICE_PACKET_SESSION_KEY,
+  type PracticePacket,
+} from '@/lib/practicePacket';
 
 // Assuming this matches the structure in useAuth.ts and Firestore
 interface McqAnswer {
@@ -127,16 +159,20 @@ function AccessDenied({
   const unitData =
     subject === 'gov'
       ? allGovUnitsData.find((u) => u.number === unitNum)
-      : subject === 'micro'
-        ? allMicroUnitsData.find((u) => u.number === unitNum)
-        : allMacroUnitsData.find((u) => u.number === unitNum);
+      : subject === 'stats'
+        ? allStatsUnitsData.find((u) => u.number === unitNum)
+        : subject === 'micro'
+          ? allMicroUnitsData.find((u) => u.number === unitNum)
+          : allMacroUnitsData.find((u) => u.number === unitNum);
   const price = unitData?.price || 4.99;
   const btnClass =
     subject === 'gov'
       ? 'bg-violet-600 hover:bg-violet-700'
-      : subject === 'micro'
-        ? 'bg-green-500 hover:bg-green-600'
-        : 'bg-blue-500 hover:bg-blue-600';
+      : subject === 'stats'
+        ? 'bg-orange-600 hover:bg-orange-700'
+        : subject === 'micro'
+          ? 'bg-green-500 hover:bg-green-600'
+          : 'bg-blue-500 hover:bg-blue-600';
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 pt-16 pb-12">
@@ -190,6 +226,7 @@ function UnitMCQPracticeContent() {
     isNextQuestionDoubleXp,
     setIsNextQuestionDoubleXp,
     awardXp,
+    selectedSubject,
   } = useAuthContext();
   const { isPremium } = useCreditSystem();
   
@@ -276,30 +313,56 @@ function UnitMCQPracticeContent() {
 
   // Determine Subject and Mode from params
   const subjectParam = searchParams.get('subject');
-  const subject: CourseSubject =
-    subjectParam === 'macro' || subjectParam === 'micro' || subjectParam === 'gov' ? subjectParam : 'macro';
+  const subject: CourseSubject = isCourseSubject(subjectParam)
+    ? subjectParam
+    : isCourseSubject(selectedSubject)
+      ? selectedSubject
+      : 'macro';
   const unitsParam = searchParams.get('units');
   const currentUnitForAccessCheck = unitsParam ? unitsParam.split(',')[0] : '1';
   const lessonIdParam = searchParams.get('lessonId');
   const modeParam = searchParams.get('mode');
   const testMode = searchParams.get('test') === 'true'; // Enable test questions when ?test=true
   const unitsData =
-    subject === 'gov' ? allGovUnitsData : subject === 'micro' ? allMicroUnitsData : allMacroUnitsData;
+    subject === 'gov'
+      ? allGovUnitsData
+      : subject === 'stats'
+        ? allStatsUnitsData
+        : subject === 'micro'
+          ? allMicroUnitsData
+          : allMacroUnitsData;
   const uiSpin =
-    subject === 'macro' ? 'text-blue-500' : subject === 'micro' ? 'text-green-500' : 'text-violet-600';
-  const uiCircle = subject === 'macro' ? 'bg-blue-100' : subject === 'micro' ? 'bg-green-100' : 'bg-violet-100';
+    subject === 'macro'
+      ? 'text-blue-500'
+      : subject === 'micro'
+        ? 'text-green-500'
+        : subject === 'stats'
+          ? 'text-orange-600'
+          : 'text-violet-600';
+  const uiCircle =
+    subject === 'macro'
+      ? 'bg-blue-100'
+      : subject === 'micro'
+        ? 'bg-green-100'
+        : subject === 'stats'
+          ? 'bg-orange-100'
+          : 'bg-violet-100';
   const uiPrimary =
     subject === 'macro'
       ? 'bg-blue-500 hover:bg-blue-600'
       : subject === 'micro'
         ? 'bg-green-500 hover:bg-green-600'
-        : 'bg-violet-600 hover:bg-violet-700';
+        : subject === 'stats'
+          ? 'bg-orange-600 hover:bg-orange-700'
+          : 'bg-violet-600 hover:bg-violet-700';
   const uiOutline =
     subject === 'macro'
       ? 'border-blue-500 text-blue-600 hover:bg-blue-50'
       : subject === 'micro'
         ? 'border-green-500 text-green-600 hover:bg-green-50'
-        : 'border-violet-600 text-violet-700 hover:bg-violet-50';
+        : subject === 'stats'
+          ? 'border-orange-600 text-orange-700 hover:bg-orange-50'
+          : 'border-violet-600 text-violet-700 hover:bg-violet-50';
 
   const initialCustomUnitIds = unitsParam 
       ? unitsParam.split(',').map(id => parseInt(id.trim(), 10)).filter(id => !isNaN(id))
@@ -324,7 +387,11 @@ function UnitMCQPracticeContent() {
     const unitOkForRedirect =
       initialCustomUnitIds.length === 1 &&
       firstUnit >= 1 &&
-      (subject === 'gov' ? firstUnit === 1 : firstUnit <= 6);
+      (subject === 'gov'
+        ? isGovMcqPracticeUnitAvailable(firstUnit)
+        : subject === 'stats'
+          ? isStatsMcqPracticeUnitAvailable(firstUnit)
+          : firstUnit <= 6);
     if (!testMode && !lessonIdParam && initialPracticeMode !== 'weakest' && unitOkForRedirect) {
       const unitNumber = firstUnit;
       const subjectSlug = getSubjectSlug(subject);
@@ -364,12 +431,149 @@ function UnitMCQPracticeContent() {
   const [showAllQuestions, setShowAllQuestions] = useState(false); // Bypass filter to show all questions
   const purchasedTests = (userData?.purchasedTests || []) as string[];
 
+  // Review folder + scratch pad (same chrome as /mcq-practice/...)
+  const [scratchToggleSignal, setScratchToggleSignal] = useState(0);
+  const [scratchActive, setScratchActive] = useState<'draw' | 'notes' | null>(null);
+  const [reviewState, setReviewState] = useState<ReviewFolderState>({
+    version: 1,
+    misses: [],
+    lessonWarmth: {},
+  });
+  const [reviewFolderOpen, setReviewFolderOpen] = useState(false);
+  const [reviewPulseKey, setReviewPulseKey] = useState(0);
+  const [justFiledQuestionId, setJustFiledQuestionId] = useState<number | null>(null);
+  const [practiceMissedMode, setPracticeMissedMode] = useState(false);
+  const [practiceMissedUnitFilter, setPracticeMissedUnitFilter] = useState<
+    number[] | null
+  >(null);
+  const [practicePacketOpen, setPracticePacketOpen] = useState(false);
+  const [practicePacketBuilding, setPracticePacketBuilding] = useState(false);
+  const [practicePacketError, setPracticePacketError] = useState<string | null>(null);
+  const [practicePacket, setPracticePacket] = useState<PracticePacket | null>(null);
+  const reviewUserKey = user?.uid ?? 'guest';
+
   // Developer tool: Test specific question by ID
   const [testQuestionId, setTestQuestionId] = useState<string>("");
   const isDeveloper = user?.email === 'garrett@apdojo.com' || user?.email === 'garrettmould@gmail.com' || (typeof window !== 'undefined' && window.location.hostname === 'localhost');
   
   // Track previous filter criteria to prevent unnecessary reloads
   const prevFilterCriteriaRef = useRef<string>('');
+
+  const reviewUnitIds =
+    practiceMode === 'custom'
+      ? customUnitIds
+      : practiceMode === 'weakest'
+        ? weakestUnitIds
+        : practiceMode === 'singleUnit'
+          ? [currentUnit]
+          : customUnitIds.length > 0
+            ? customUnitIds
+            : [currentUnit];
+
+  const primaryReviewUnit = reviewUnitIds[0] ?? currentUnit;
+  const reviewUnitLabel =
+    reviewUnitIds.length > 1
+      ? `Units ${reviewUnitIds.join(', ')}`
+      : `Unit ${primaryReviewUnit}`;
+
+  const persistReviewUnit = (unitNumber: number, next: ReviewFolderState) => {
+    saveReviewFolder(reviewUserKey, subject, unitNumber, next);
+    if (user?.uid) {
+      void saveReviewFolderToCloud(user.uid, subject, unitNumber, next).catch(
+        (err) => console.error('[ReviewFolder] cloud save failed:', err)
+      );
+    }
+  };
+
+  const refreshMergedReview = () => {
+    const merged = filterReviewFolderBySubject(
+      loadMergedReviewFolders(reviewUserKey, subject, reviewUnitIds),
+      subject,
+      allQuestions
+    );
+    setReviewState(merged);
+    return merged;
+  };
+
+  // Hydrate review folders for all units in this session
+  useEffect(() => {
+    let cancelled = false;
+
+    const hydrate = async () => {
+      if (reviewUnitIds.length === 0) return;
+
+      let merged = loadMergedReviewFolders(reviewUserKey, subject, reviewUnitIds);
+
+      if (user?.uid) {
+        try {
+          for (const unitNumber of reviewUnitIds) {
+            const cloud = await loadReviewFolderFromCloud(
+              user.uid,
+              subject,
+              unitNumber
+            );
+            if (cloud.exists) {
+              saveReviewFolder(reviewUserKey, subject, unitNumber, cloud.state);
+            } else {
+              const local = loadReviewFolder(reviewUserKey, subject, unitNumber);
+              if (local.misses.length > 0) {
+                void saveReviewFolderToCloud(
+                  user.uid,
+                  subject,
+                  unitNumber,
+                  local
+                );
+              }
+            }
+          }
+          merged = loadMergedReviewFolders(reviewUserKey, subject, reviewUnitIds);
+        } catch (err) {
+          console.error('[ReviewFolder] cloud load failed:', err);
+        }
+      }
+
+      if (cancelled) return;
+      merged = filterReviewFolderBySubject(merged, subject, allQuestions);
+      setReviewState(merged);
+      setJustFiledQuestionId(null);
+      setPracticeMissedMode(false);
+      setPracticeMissedUnitFilter(null);
+      setReviewFolderOpen(false);
+
+      if (
+        user?.uid &&
+        merged.misses.length === 0 &&
+        !loadingMcqData &&
+        Array.isArray(mcqAnswersData) &&
+        mcqAnswersData.length > 0
+      ) {
+        for (const unitNumber of reviewUnitIds) {
+          const cloud = await loadReviewFolderFromCloud(
+            user.uid,
+            subject,
+            unitNumber
+          );
+          if (cloud.exists) continue;
+          const seeded = applyAnswerHistoryToReviewFolder(
+            loadReviewFolder(reviewUserKey, subject, unitNumber),
+            mcqAnswersData,
+            { subject, unitNumber, bankQuestions: allQuestions }
+          );
+          const scoped = filterReviewFolderBySubject(seeded, subject, allQuestions);
+          if (scoped.misses.length > 0) {
+            persistReviewUnit(unitNumber, scoped);
+          }
+        }
+        if (!cancelled) refreshMergedReview();
+      }
+    };
+
+    void hydrate();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reviewUserKey, subject, reviewUnitIds.join(','), user?.uid]);
 
   const hasTestModeAccess =
     !!user &&
@@ -403,6 +607,8 @@ function UnitMCQPracticeContent() {
       subject,
       testQuestionId,
       showAllQuestions,
+      practiceMissedMode,
+      practiceMissedUnitFilter: practiceMissedUnitFilter?.join(',') ?? '',
       loadingMcqData: loadingMcqData ? 'loading' : 'loaded'
     });
     
@@ -485,7 +691,22 @@ function UnitMCQPracticeContent() {
 
     // Filter out correctly answered questions (unless showAllQuestions is true)
     // Only filter if user is logged in and data is loaded (or user is not logged in)
-    if (!showAllQuestions && (!user || (user && mcqAnswersData && !loadingMcqData))) {
+    if (practiceMissedMode) {
+      const scopedMisses =
+        practiceMissedUnitFilter && practiceMissedUnitFilter.length > 0
+          ? reviewState.misses.filter((m) =>
+              practiceMissedUnitFilter.includes(m.unitNumber)
+            )
+          : reviewState.misses;
+      const order = missedQuestionIds({
+        ...reviewState,
+        misses: scopedMisses,
+      });
+      const missIds = new Set(order);
+      questions = questions
+        .filter((q) => missIds.has(q.id))
+        .sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
+    } else if (!showAllQuestions && (!user || (user && mcqAnswersData && !loadingMcqData))) {
       if (user && mcqAnswersData) {
         // Create a set of question IDs that have been answered correctly
         // Handle both string and number questionIds (Firestore may store as string)
@@ -514,7 +735,9 @@ function UnitMCQPracticeContent() {
       }
     }
 
-    const shuffled = shufflePracticeQuestions(questions);
+    const shuffled = practiceMissedMode
+      ? questions
+      : shufflePracticeQuestions(questions);
     console.log('[Parent] Questions loaded and shuffled', {
       questionCount: shuffled.length,
       previousIndex: currentQuestionIndex,
@@ -540,7 +763,7 @@ function UnitMCQPracticeContent() {
     }
 
     setIsLoadingQuestionSet(false);
-  }, [practiceMode, currentUnit, customUnitIds, weakestUnitIds, lessonIdParam, subject, testQuestionId, isDeveloper, showAllQuestions, user, loadingMcqData]);
+  }, [practiceMode, currentUnit, customUnitIds, weakestUnitIds, lessonIdParam, subject, testQuestionId, isDeveloper, showAllQuestions, practiceMissedMode, practiceMissedUnitFilter, reviewState.misses.length, user, loadingMcqData]);
 
   // Access control check and credit status
   useEffect(() => {
@@ -574,7 +797,9 @@ function UnitMCQPracticeContent() {
     const testHref =
       subject === 'gov'
         ? `/ap-gov-unit-${currentUnit}-mcq-test`
-        : `/ap-${subject}-unit-${currentUnit}-mcq-test`;
+        : subject === 'stats'
+          ? `/ap-stats-unit-${currentUnit}-mcq-test`
+          : `/ap-${subject}-unit-${currentUnit}-mcq-test`;
     router.push(testHref);
   };
 
@@ -617,16 +842,48 @@ function UnitMCQPracticeContent() {
       [questionId]: { selectedLetter: answerLetter, isCorrect }
     }));
 
+    const question = allQuestions.find(q => q.id === questionId);
+    const lessons = lessonIDS || question?.lessonIDS || [];
+    const missUnit = question?.unit ?? primaryReviewUnit;
+
+    if (isCorrect) {
+      setJustFiledQuestionId((prev) => (prev === questionId ? null : prev));
+      const unitState = recordCorrect(
+        loadReviewFolder(reviewUserKey, subject, missUnit),
+        questionId,
+        lessons
+      );
+      persistReviewUnit(missUnit, unitState);
+      refreshMergedReview();
+    } else {
+      const unitState = recordMiss(
+        loadReviewFolder(reviewUserKey, subject, missUnit),
+        {
+          questionId,
+          subject,
+          unitNumber: missUnit,
+          lessonIDS: lessons,
+          selectedLetter: answerLetter,
+          questionPreview: previewFromQuestion(
+            question?.question || `Question ${questionId}`
+          ),
+        }
+      );
+      persistReviewUnit(missUnit, unitState);
+      refreshMergedReview();
+      setJustFiledQuestionId(questionId);
+      setReviewPulseKey((n) => n + 1);
+    }
+
     // Save to Firestore if logged in
     if (user && isCorrect !== undefined) {
       try {
-        const question = allQuestions.find(q => q.id === questionId);
         if (question) {
           const answerData: McqAnswer = {
             questionId: questionId,
             isCorrect: isCorrect,
             unitId: question.unit,
-            lessonIDS: lessonIDS || question.lessonIDS || [],
+            lessonIDS: lessons,
             timestamp: serverTimestamp()
           };
 
@@ -646,6 +903,113 @@ function UnitMCQPracticeContent() {
 
     // Note: XP is awarded in unitMCQS.tsx handleAnswerSelection, not here
     // to avoid double-awarding
+  };
+
+  const handlePracticeMissed = (unitNumbers: number[]) => {
+    setReviewFolderOpen(false);
+    setPracticeMissedUnitFilter(
+      unitNumbers.length > 0 ? unitNumbers : reviewUnitIds
+    );
+    setPracticeMissedMode(true);
+    setShowAllQuestions(true);
+    prevFilterCriteriaRef.current = '';
+  };
+
+  const handleOpenPracticePacket = async (unitNumbers: number[]) => {
+    if (reviewState.misses.length === 0) return;
+
+    const selected =
+      unitNumbers.length > 0 ? unitNumbers : [primaryReviewUnit];
+    const draft = assemblePracticePacket(
+      reviewState,
+      subject,
+      selected[0] ?? primaryReviewUnit,
+      allQuestions,
+      selected
+    );
+    if (draft.chapters.length === 0) {
+      setPracticePacketError('Could not build a packet from your misses yet.');
+      setPracticePacketOpen(true);
+      return;
+    }
+
+    setReviewFolderOpen(false);
+    setPracticePacketOpen(true);
+    setPracticePacketBuilding(true);
+    setPracticePacketError(null);
+    setPracticePacket({ ...draft });
+
+    try {
+      const explainerRes = await fetch('/api/generate-practice-packet-explainers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subject,
+          unit: selected[0] ?? primaryReviewUnit,
+          lessons: draft.chapters.map((ch) => ({
+            lessonNumber: ch.lessonId,
+            name: ch.lessonName,
+            unit: ch.unitNumber,
+            keyTerms: ch.keyTerms,
+          })),
+        }),
+      });
+
+      if (!explainerRes.ok) {
+        const errorData = await explainerRes.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to generate explainers');
+      }
+
+      const explainerData = await explainerRes.json();
+      const explainerByLesson = new Map<
+        string,
+        { eli5: string; analogy: string; commonMistake: string }
+      >(
+        (explainerData.explainers || []).map(
+          (e: {
+            lessonNumber: string;
+            eli5: string;
+            analogy: string;
+            commonMistake: string;
+          }) => [
+            e.lessonNumber,
+            {
+              eli5: e.eli5,
+              analogy: e.analogy,
+              commonMistake: e.commonMistake,
+            },
+          ]
+        )
+      );
+
+      const completed: PracticePacket = {
+        ...draft,
+        chapters: draft.chapters.map((ch) => ({
+          ...ch,
+          explainer: explainerByLesson.get(ch.lessonId) ?? null,
+          checkQuestions: [],
+        })),
+        builtAt: Date.now(),
+      };
+
+      if (completed.chapters.some((ch) => !ch.explainer)) {
+        throw new Error('Incomplete explainers. Please try again.');
+      }
+
+      setPracticePacket(completed);
+      try {
+        sessionStorage.setItem(PRACTICE_PACKET_SESSION_KEY, JSON.stringify(completed));
+      } catch {
+        /* ignore quota */
+      }
+    } catch (error: any) {
+      console.error('Practice packet error:', error);
+      setPracticePacketError(
+        error?.message || 'Failed to build practice packet. Please try again.'
+      );
+    } finally {
+      setPracticePacketBuilding(false);
+    }
   };
 
   const handleNextQuestion = () => {
@@ -788,6 +1152,35 @@ function UnitMCQPracticeContent() {
       )}
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 py-8 pt-8">
+          {!isLoadingQuestionSet && (questionsForPractice.length > 0 || reviewState.misses.length > 0) ? (
+            <div className="mb-6 flex items-center justify-end gap-4">
+              {REMATCH_ENABLED ? (
+                <ReviewFolderButton
+                  count={reviewState.misses.length}
+                  pulseKey={reviewPulseKey}
+                  active={reviewFolderOpen}
+                  onClick={() => setReviewFolderOpen(true)}
+                />
+              ) : null}
+              {questionsForPractice.length > 0 ? (
+                <button
+                  type="button"
+                  onClick={() => setScratchToggleSignal((n) => n + 1)}
+                  className={`inline-flex flex-shrink-0 items-center gap-1.5 text-sm transition-colors ${
+                    scratchActive
+                      ? 'text-gray-900 font-medium'
+                      : 'text-gray-500 hover:text-gray-800'
+                  }`}
+                  aria-pressed={!!scratchActive}
+                  aria-label={scratchActive ? 'Close scratch pad' : 'Open scratch pad'}
+                  title={scratchActive ? 'Close scratch pad' : 'Scratch pad (draw or notes)'}
+                >
+                  <Pen className="h-4 w-4" />
+                  <span>Scratch pad</span>
+                </button>
+              ) : null}
+            </div>
+          ) : null}
           {isLoadingQuestionSet ? (
             <div className="flex items-center justify-center min-h-[400px]">
               <Loader2 className={`h-12 w-12 animate-spin ${uiSpin}`} />
@@ -870,10 +1263,59 @@ function UnitMCQPracticeContent() {
               isNavigationDisabled={
                 (!isPremiumEffective && dailyQuestionsAnswered >= DAILY_FREE_ANSWERS)
               }
+              showFloatingScratchToolbar={false}
+              scratchToggleSignal={scratchToggleSignal}
+              onScratchActiveChange={setScratchActive}
             />
           )}
         </div>
       </div>
+
+      {REMATCH_ENABLED ? (
+      <>
+      <ReviewFolderPanel
+        open={reviewFolderOpen}
+        onClose={() => setReviewFolderOpen(false)}
+        unitNumber={primaryReviewUnit}
+        unitLabel={reviewUnitLabel}
+        groups={rollupByLesson(reviewState, subject)}
+        totalCount={reviewState.misses.length}
+        onRemoveMiss={(questionId) => {
+          const miss = reviewState.misses.find((m) => m.questionId === questionId);
+          const unitNumber = miss?.unitNumber ?? primaryReviewUnit;
+          const next = removeMiss(
+            loadReviewFolder(reviewUserKey, subject, unitNumber),
+            questionId
+          );
+          persistReviewUnit(unitNumber, next);
+          refreshMergedReview();
+          if (justFiledQuestionId === questionId) setJustFiledQuestionId(null);
+        }}
+        onClearAll={() => {
+          for (const unitNumber of reviewUnitIds) {
+            persistReviewUnit(unitNumber, clearReviewFolder());
+          }
+          setReviewState(clearReviewFolder());
+          setJustFiledQuestionId(null);
+          setPracticeMissedMode(false);
+          setPracticeMissedUnitFilter(null);
+        }}
+        onPracticeMissed={handlePracticeMissed}
+        onOpenPracticePacket={(units) => {
+          void handleOpenPracticePacket(units);
+        }}
+        isBuildingPacket={practicePacketBuilding}
+      />
+
+      <PracticePacketModal
+        open={practicePacketOpen}
+        onClose={() => setPracticePacketOpen(false)}
+        packet={practicePacket}
+        isBuilding={practicePacketBuilding}
+        error={practicePacketError}
+      />
+      </>
+      ) : null}
     </>
   );
 }

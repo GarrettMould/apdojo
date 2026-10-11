@@ -812,7 +812,7 @@ export const unitTestQuestions: QuestionType[] = [
       "$450"
     ],
     correctAnswer: "C",
-    explanation: "Consumer surplus is the area below the demand curve and above the price consumers pay. Before the tax, the price is $40 and quantity is 30, so CS is the triangle 0.5 * (70-40) * 30 = $450. After the tax, consumers pay $50 and buy 20 units, so new CS is 0.5 * (70-50) * 20 = $200. The decrease is $450 - $200 = $250. Alternatively, you can calculate the area of the trapezoid between the prices of $40 and $50: (($30 + $20)/2) * $10 = $250."
+    explanation: "Consumer surplus is the area below the demand curve and above the price consumers pay. Before the tax, the price is $40 and quantity is 30, so CS is the triangle 0.5 × (70-40) × 30 = $450. After the tax, consumers pay $50 and buy 20 units, so new CS is 0.5 × (70-50) × 20 = $200. The decrease is $450 - $200 = $250. Alternatively, you can calculate the area of the trapezoid between the prices of $40 and $50: (($30 + $20)/2) × $10 = $250."
   },
   {
     id: 2012,
@@ -831,7 +831,7 @@ export const unitTestQuestions: QuestionType[] = [
       "$1000 | $50"
     ],
     correctAnswer: "B",
-    explanation: "Tax Revenue is calculated as the Tax Per Unit × New Quantity. The vertical distance between the curves at Q=20 is $20 ($50 - $30), and the quantity sold is 20. Thus, Revenue = $20 * 20 = $400. Deadweight Loss is the area of the triangle formed by the reduction in quantity (from 30 to 20) and the tax wedge ($20). Area = 0.5 * (30-20) * ($50-$30) = 0.5 * 10 * 20 = $100."
+    explanation: "Tax Revenue is calculated as the Tax Per Unit × New Quantity. The vertical distance between the curves at Q=20 is $20 ($50 - $30), and the quantity sold is 20. Thus, Revenue = $20 × 20 = $400. Deadweight Loss is the area of the triangle formed by the reduction in quantity (from 30 to 20) and the tax wedge ($20). Area = 0.5 × (30-20) × ($50-$30) = 0.5 × 10 × 20 = $100."
   },
   {
     id: 2013,
@@ -2727,7 +2727,7 @@ options: [
       "Wage P3, Quantity Q3 | Wage P2, Quantity Q2"
     ],
     correctAnswer: "A",
-    explanation: "A profit-maximizing monopsony hires labor where the Marginal Resource Cost (MRC) equals the Marginal Revenue Product (Demand). On the graph, MRC intersects Demand at quantity **Q2**. The firm then pays the wage indicated by the Supply curve at that quantity, which is **P2**. In a perfectly competitive labor market, equilibrium is determined where Market Supply intersects Market Demand, resulting in quantity **Q3** and wage **P3**.",
+    explanation: "A profit-maximizing monopsony hires labor where the Marginal Resource Cost (MRC) equals the Marginal Revenue Product (Demand). On the graph, MRC intersects Demand at quantity Q2. The firm then pays the wage indicated by the Supply curve at that quantity, which is P2. In a perfectly competitive labor market, equilibrium is determined where Market Supply intersects Market Demand, resulting in quantity Q3 and wage P3.",
     videoExplanation: null
   },
   {

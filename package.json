@@ -88,6 +88,7 @@
     "@types/request": "^2.48.12",
     "@types/send": "^0.17.4",
     "@types/serve-static": "^1.15.7",
+    "baseline-browser-mapping": "^2.11.26",
     "eslint": "^9",
     "eslint-config-next": "^16.0.7",
     "pdf-to-img": "^7.0.0",

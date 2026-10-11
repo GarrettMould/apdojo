@@ -49,6 +49,12 @@ service cloud.firestore {
       }
       // --- End unitXP Subcollection Rules ---
 
+      // --- RULES FOR reviewFolders SUBCOLLECTION ---
+      match /reviewFolders/{folderId} {
+        allow read, write: if request.auth.uid == userId;
+      }
+      // --- End reviewFolders Subcollection Rules ---
+
       // (Add similar blocks for other subcollections if needed)
 
     } // Closing brace for match /users/{userId}

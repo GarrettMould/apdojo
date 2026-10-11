@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  devIndicators: false,
   images: {
     loader: 'custom',
     loaderFile: './src/lib/cloudinaryLoader.ts',

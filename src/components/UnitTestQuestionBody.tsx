@@ -17,7 +17,7 @@ import { splitMcqStemAttribution } from '@/lib/splitMcqStemAttribution';
 import { QuestionWithKeyTerms } from '@/components/QuestionWithKeyTerms';
 import { apQuestionSubjectTag } from '@/lib/courseSubject';
 import type { CourseSubject } from '@/lib/courseSubject';
-import { renderMathText, type MathTextHighlight } from '@/utils/processMathContent';
+import { renderMathText, type HighlightColor, type MathTextHighlight } from '@/utils/processMathContent';
 
 export type QuestionTextHighlight = MathTextHighlight;
 
@@ -36,7 +36,8 @@ function applyMarksToSegment(
 function mergeNewHighlight(
   existing: QuestionTextHighlight[],
   start: number,
-  end: number
+  end: number,
+  color: HighlightColor = 'yellow'
 ): QuestionTextHighlight[] {
   const lo = Math.min(start, end);
   const hi = Math.max(start, end);
@@ -45,6 +46,7 @@ function mergeNewHighlight(
     start: lo,
     end: hi,
     id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+    color,
   };
   const filtered = existing.filter(
     (h) =>
@@ -64,12 +66,14 @@ interface UnitTestQuestionBodyProps {
   highlightMode: boolean;
   highlights: QuestionTextHighlight[];
   onHighlightsChange: (highlights: QuestionTextHighlight[]) => void;
+  /** Color used for new highlights while highlight mode is on. Defaults to yellow. */
+  highlightColor?: HighlightColor;
   /** Custom assignment uses key-term tooltips — highlighting disabled in that mode. */
   isCustomAssignment?: boolean;
 }
 
 /**
- * Renders unit-test question prose with optional yellow highlights. Selection → highlight only when
+ * Renders unit-test question prose with optional highlights. Selection → highlight only when
  * `highlightMode` is true and selection lies inside this body (not answer options).
  */
 export function UnitTestQuestionBody({
@@ -78,6 +82,7 @@ export function UnitTestQuestionBody({
   highlightMode,
   highlights,
   onHighlightsChange,
+  highlightColor = 'yellow',
   isCustomAssignment = false,
 }: UnitTestQuestionBodyProps) {
   const rootRef = useRef<HTMLSpanElement>(null);
@@ -85,6 +90,8 @@ export function UnitTestQuestionBody({
   highlightsRef.current = highlights;
   const onHighlightsChangeRef = useRef(onHighlightsChange);
   onHighlightsChangeRef.current = onHighlightsChange;
+  const highlightColorRef = useRef(highlightColor);
+  highlightColorRef.current = highlightColor;
 
   const canon = canonicalQuestionText(question.question);
 
@@ -111,7 +118,7 @@ export function UnitTestQuestionBody({
       }
 
       onHighlightsChangeRef.current(
-        mergeNewHighlight(highlightsRef.current, start, end)
+        mergeNewHighlight(highlightsRef.current, start, end, highlightColorRef.current)
       );
       sel.removeAllRanges();
     };

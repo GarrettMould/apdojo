@@ -208,10 +208,23 @@ export function getUserEnrolledSubjects(
 }
 
 /** Gov units with MCQ practice banks in `src/data/gov/govUnit*McqPractice.ts`. */
-export const GOV_MCQ_PRACTICE_UNIT_NUMBERS = [1, 2, 3, 5] as const;
+export const GOV_MCQ_PRACTICE_UNIT_NUMBERS = [1, 2, 3, 4, 5] as const;
 
 export function isGovMcqPracticeUnitAvailable(unitNumber: number): boolean {
   return (GOV_MCQ_PRACTICE_UNIT_NUMBERS as readonly number[]).includes(unitNumber);
+}
+
+/** Stats units with MCQ practice banks in `src/data/stats/statsUnit*McqPractice.ts`. */
+export const STATS_MCQ_PRACTICE_UNIT_NUMBERS = [1, 2, 3, 4, 5] as const;
+
+export function isStatsMcqPracticeUnitAvailable(unitNumber: number): boolean {
+  return (STATS_MCQ_PRACTICE_UNIT_NUMBERS as readonly number[]).includes(unitNumber);
+}
+
+export function isMcqPracticeUnitAvailable(subject: CourseSubject, unitNumber: number): boolean {
+  if (subject === 'stats') return isStatsMcqPracticeUnitAvailable(unitNumber);
+  if (subject === 'gov') return isGovMcqPracticeUnitAvailable(unitNumber);
+  return unitNumber >= 1 && unitNumber <= 6;
 }
 
 /** Gov units with formal MCQ unit tests in `src/data/gov/govUnit*McqExam.ts`. */

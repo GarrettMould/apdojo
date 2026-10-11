@@ -64,10 +64,12 @@ export function Header() {
         : displaySubject === 'micro'
           ? 'hover:text-green-600'
           : 'hover:text-blue-600';
-  const mcqPracticeHref = '/select-practice-units';
+  const mcqPracticeHref = `/select-practice-units?subject=${displaySubject}`;
+  const showMcqPractice =
+    isEconCourse(displaySubject) || displaySubject === 'gov' || displaySubject === 'stats';
 
   const mobilePracticeLinks: { label: string; href: string; prefetch?: boolean }[] = [
-    ...(isEconCourse(displaySubject)
+    ...(showMcqPractice
       ? [{ label: 'MCQ Practice', href: mcqPracticeHref }]
       : []),
     ...(isEconCourse(displaySubject)
@@ -87,7 +89,7 @@ export function Header() {
       : displaySubject === 'gov'
         ? [{ label: 'SCOTUS Practice', href: '/scotus-essay-practice' }]
         : displaySubject === 'stats'
-          ? [{ label: 'TI-84 Drills', href: '/ap-stats-calculator-simulator' }]
+          ? [{ label: 'Calculator Drills', href: '/ap-stats-calculator-simulator' }]
           : []),
     { label: 'Cheat Sheets', href: defaultCheatSheetUrl(displaySubject) },
     ...(isEconCourse(displaySubject) ? [{ label: 'Blog', href: '/ap-blog-home' }] : []),
@@ -213,7 +215,7 @@ export function Header() {
                       >
                         Full Practice Tests
                       </Link>
-                      {isEconCourse(displaySubject) ? (
+                      {showMcqPractice ? (
                         <Link
                           href={mcqPracticeHref}
                           className={`block px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 transition-colors ${navHoverClass}`}
@@ -281,7 +283,7 @@ export function Header() {
                   href="/ap-stats-calculator-simulator"
                   className={`text-lg text-gray-700 transition-colors font-bold ${navHoverClass}`}
                 >
-                  TI-84 Drills
+                  Calculator Drills
                 </Link>
               ) : null}
 

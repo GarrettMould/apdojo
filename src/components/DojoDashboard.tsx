@@ -1154,7 +1154,7 @@ export function DojoDashboard() {
             <h2 className="text-2xl font-black text-gray-900 mb-6 uppercase tracking-wide">Quick Access</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {[
-                { href: '/unitMCQPracticePage', label: 'MCQ Practice', sub: 'Practice questions by unit', img: '/images/boltGrey.svg', alt: 'MCQ Practice' },
+                { href: `/select-practice-units?subject=${currentCourse}`, label: 'MCQ Practice', sub: 'Practice questions by unit', img: '/images/boltGrey.svg', alt: 'MCQ Practice' },
                 { href: '/dojo/infinite', label: 'Generate Quiz', sub: 'AI-powered practice mode', img: null, alt: '' },
                 { href: '/diagnostic-test', label: 'Diagnostic Test', sub: 'Assess your knowledge', img: '/images/fiveGrey.svg', alt: 'Diagnostic' },
               ].map(({ href, label, sub, img, alt }) => (

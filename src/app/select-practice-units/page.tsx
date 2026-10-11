@@ -7,6 +7,7 @@ import {
   macroUnits as allMacroCheatSheets,
   microUnits as allMicroCheatSheets,
   govUnits as allGovCheatSheets,
+  statsUnits as allStatsCheatSheets,
   Unit as UnitDetailsType,
 } from '@/data/cheatSheets';
 import { useAuthContext } from '@/contexts/AuthContext';
@@ -14,11 +15,17 @@ import { getBeltProgress } from '@/lib/beltSystem';
 import { getSubjectXP } from '@/hooks/useUserProgress';
 import { getSubjectSlug, getUnitSlug } from '@/lib/practiceSlugs';
 import type { CourseSubject } from '@/lib/courseSubject';
-import { isCourseSubject, isGovMcqPracticeUnitAvailable } from '@/lib/courseSubject';
+import {
+  isCourseSubject,
+  isGovMcqPracticeUnitAvailable,
+  isStatsMcqPracticeUnitAvailable,
+} from '@/lib/courseSubject';
 import Image from 'next/image';
 
-function isGovPracticeUnitAvailable(unitNumber: number): boolean {
-  return isGovMcqPracticeUnitAvailable(unitNumber);
+function isPracticeUnitAvailable(subject: CourseSubject, unitNumber: number): boolean {
+  if (subject === 'gov') return isGovMcqPracticeUnitAvailable(unitNumber);
+  if (subject === 'stats') return isStatsMcqPracticeUnitAvailable(unitNumber);
+  return true;
 }
 
 function SelectPracticeUnitsContent() {
@@ -77,10 +84,12 @@ function SelectPracticeUnitsContent() {
     const data =
       subject === 'gov'
         ? allGovCheatSheets
-        : subject === 'micro'
-          ? allMicroCheatSheets
-          : allMacroCheatSheets;
-    setUnitsData(subject === 'gov' ? data : data.slice(0, 6));
+        : subject === 'stats'
+          ? allStatsCheatSheets
+          : subject === 'micro'
+            ? allMicroCheatSheets
+            : allMacroCheatSheets;
+    setUnitsData(subject === 'gov' || subject === 'stats' ? data : data.slice(0, 6));
 
     const currentUnitsParam = searchParams.get('currentUnits');
     let initialSelected: number[] = [];
@@ -91,18 +100,14 @@ function SelectPracticeUnitsContent() {
           .split(',')
           .map(Number)
           .filter((id) => !isNaN(id) && id > 0);
-        if (subject === 'gov') {
-          initialSelected = initialSelected.filter(isGovPracticeUnitAvailable);
-        }
+        initialSelected = initialSelected.filter((id) => isPracticeUnitAvailable(subject, id));
         console.log('[Select Practice Units] Initialized selected units from URL:', initialSelected);
       } catch (error) {
         console.error("[Select Practice Units] Error parsing 'currentUnits' URL param:", error);
       }
     } else if (lastSelectedPracticeUnits && lastSelectedPracticeUnits[subject]) {
       initialSelected = [...(lastSelectedPracticeUnits[subject] ?? [])];
-      if (subject === 'gov') {
-        initialSelected = initialSelected.filter(isGovPracticeUnitAvailable);
-      }
+      initialSelected = initialSelected.filter((id) => isPracticeUnitAvailable(subject, id));
       console.log('[Select Practice Units] Initialized selected units from context:', initialSelected);
     } else {
       console.log('[Select Practice Units] Initialized selected units empty (no param/context).');
@@ -113,7 +118,7 @@ function SelectPracticeUnitsContent() {
   }, [subject, searchParams, lastSelectedPracticeUnits]);
 
   const handleUnitToggle = (unitNumber: number) => {
-    if (subject === 'gov' && !isGovPracticeUnitAvailable(unitNumber)) return;
+    if (!isPracticeUnitAvailable(subject, unitNumber)) return;
     setSelectedUnits((prevSelected) =>
       prevSelected.includes(unitNumber)
         ? prevSelected.filter((num) => num !== unitNumber)
@@ -141,50 +146,73 @@ function SelectPracticeUnitsContent() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <Loader2
           className={`h-8 w-8 animate-spin ${
-            subject === 'gov' ? 'text-violet-600' : subject === 'micro' ? 'text-green-500' : 'text-blue-500'
+            subject === 'gov'
+              ? 'text-violet-600'
+              : subject === 'stats'
+                ? 'text-orange-600'
+                : subject === 'micro'
+                  ? 'text-green-500'
+                  : 'text-blue-500'
           }`}
         />
       </div>
     );
   }
 
-  const displayUnits = subject === 'gov' ? unitsData : unitsData.slice(0, 6);
+  const displayUnits = subject === 'gov' || subject === 'stats' ? unitsData : unitsData.slice(0, 6);
   const isMicro = subject === 'micro';
   const isGov = subject === 'gov';
-  const themeColor = isGov ? 'violet' : isMicro ? 'green' : 'blue';
+  const isStats = subject === 'stats';
+  const themeColor = isGov ? 'violet' : isStats ? 'orange' : isMicro ? 'green' : 'blue';
 
   const selectedRing =
     themeColor === 'violet'
       ? 'border-violet-500 shadow-md shadow-violet-100/50 bg-gradient-to-br from-violet-50 to-violet-100'
-      : themeColor === 'green'
-        ? 'border-green-500 shadow-md shadow-green-100/50 bg-gradient-to-br from-green-50 to-green-100'
-        : 'border-blue-500 shadow-md shadow-blue-100/50 bg-gradient-to-br from-blue-50 to-blue-100';
+      : themeColor === 'orange'
+        ? 'border-orange-500 shadow-md shadow-orange-100/50 bg-gradient-to-br from-orange-50 to-orange-100'
+        : themeColor === 'green'
+          ? 'border-green-500 shadow-md shadow-green-100/50 bg-gradient-to-br from-green-50 to-green-100'
+          : 'border-blue-500 shadow-md shadow-blue-100/50 bg-gradient-to-br from-blue-50 to-blue-100';
   const idleRing =
     themeColor === 'violet'
       ? 'border-gray-200 hover:border-violet-400 hover:shadow-md hover:shadow-violet-100/30 bg-white hover:bg-violet-50'
-      : themeColor === 'green'
-        ? 'border-gray-200 hover:border-green-400 hover:shadow-md hover:shadow-green-100/30 bg-white hover:bg-green-50'
-        : 'border-gray-200 hover:border-blue-400 hover:shadow-md hover:shadow-blue-100/30 bg-white hover:bg-blue-50';
+      : themeColor === 'orange'
+        ? 'border-gray-200 hover:border-orange-400 hover:shadow-md hover:shadow-orange-100/30 bg-white hover:bg-orange-50'
+        : themeColor === 'green'
+          ? 'border-gray-200 hover:border-green-400 hover:shadow-md hover:shadow-green-100/30 bg-white hover:bg-green-50'
+          : 'border-gray-200 hover:border-blue-400 hover:shadow-md hover:shadow-blue-100/30 bg-white hover:bg-blue-50';
   const numColor =
-    themeColor === 'violet' ? 'text-violet-600' : themeColor === 'green' ? 'text-green-500' : 'text-blue-500';
+    themeColor === 'violet'
+      ? 'text-violet-600'
+      : themeColor === 'orange'
+        ? 'text-orange-600'
+        : themeColor === 'green'
+          ? 'text-green-500'
+          : 'text-blue-500';
   const dotSelected =
     themeColor === 'violet'
       ? 'border-violet-500 bg-violet-500'
-      : themeColor === 'green'
-        ? 'border-green-500 bg-green-500'
-        : 'border-blue-500 bg-blue-500';
+      : themeColor === 'orange'
+        ? 'border-orange-500 bg-orange-500'
+        : themeColor === 'green'
+          ? 'border-green-500 bg-green-500'
+          : 'border-blue-500 bg-blue-500';
   const dotIdle =
     themeColor === 'violet'
       ? 'border-gray-300 group-hover:border-violet-400'
-      : themeColor === 'green'
-        ? 'border-gray-300 group-hover:border-green-400'
-        : 'border-gray-300 group-hover:border-blue-400';
+      : themeColor === 'orange'
+        ? 'border-gray-300 group-hover:border-orange-400'
+        : themeColor === 'green'
+          ? 'border-gray-300 group-hover:border-green-400'
+          : 'border-gray-300 group-hover:border-blue-400';
   const startEnabled =
     themeColor === 'violet'
       ? 'bg-violet-600 hover:bg-violet-700 text-white shadow-md hover:shadow-lg hover:shadow-violet-500/25'
-      : themeColor === 'green'
-        ? 'bg-green-600 hover:bg-green-700 text-white shadow-md hover:shadow-lg hover:shadow-green-500/25'
-        : 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg hover:shadow-blue-500/25';
+      : themeColor === 'orange'
+        ? 'bg-orange-600 hover:bg-orange-700 text-white shadow-md hover:shadow-lg hover:shadow-orange-500/25'
+        : themeColor === 'green'
+          ? 'bg-green-600 hover:bg-green-700 text-white shadow-md hover:shadow-lg hover:shadow-green-500/25'
+          : 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg hover:shadow-blue-500/25';
 
   return (
     <div className="min-h-screen bg-gray-50 py-2 px-4 sm:px-6 lg:px-8 flex flex-col justify-center overflow-hidden">
@@ -200,7 +228,13 @@ function SelectPracticeUnitsContent() {
                 Choose Your{' '}
                 <span
                   className={
-                    themeColor === 'violet' ? 'text-violet-600' : themeColor === 'green' ? 'text-green-500' : 'text-blue-500'
+                    themeColor === 'violet'
+                      ? 'text-violet-600'
+                      : themeColor === 'orange'
+                        ? 'text-orange-600'
+                        : themeColor === 'green'
+                          ? 'text-green-500'
+                          : 'text-blue-500'
                   }
                 >
                   Units
@@ -216,15 +250,9 @@ function SelectPracticeUnitsContent() {
             </div>
           </div>
 
-          {isGov ? (
-            <p className="mb-4 rounded-lg border border-violet-200 bg-violet-50 px-3 py-2 text-sm font-semibold text-violet-900">
-              Units 1–3 and 5 MCQ practice are live. Unit 4 is coming soon.
-            </p>
-          ) : null}
-
           <div className="space-y-2 mb-6">
             {displayUnits.map((unit) => {
-              const isAvailable = subject !== 'gov' || isGovPracticeUnitAvailable(unit.number);
+              const isAvailable = isPracticeUnitAvailable(subject, unit.number);
               const isSelected = selectedUnits.includes(unit.number);
               return (
                 <button

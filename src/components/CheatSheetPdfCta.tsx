@@ -117,22 +117,24 @@ export function CheatSheetPdfCta({
             </div>
           </div>
 
-          {/* Fills remaining card width — top of PDF only, bleeds to edges */}
+          {/* PDF cutout — framed page peek, bleeds into the card */}
           <button
             type="button"
             onClick={handleDownload}
-            className="relative h-[160px] w-full min-w-0 flex-1 overflow-hidden bg-white sm:h-auto sm:min-h-[200px]"
+            className="relative h-[160px] w-full min-w-0 flex-1 overflow-hidden bg-slate-100/80 sm:h-auto sm:min-h-[200px]"
             title="Download PDF"
             aria-label={`Download Unit ${unitNumber} cheat sheet PDF`}
           >
-            <Image
-              src={previewSrc}
-              alt=""
-              fill
-              priority
-              className="pointer-events-none origin-bottom object-cover object-top scale-[0.8]"
-              sizes="(max-width: 640px) 100vw, 55vw"
-            />
+            <div className="absolute inset-3 overflow-hidden rounded-md border-2 border-slate-300/90 bg-white shadow-[0_2px_8px_rgba(15,23,42,0.08),0_0_0_1px_rgba(15,23,42,0.04)] sm:inset-4 sm:rounded-lg sm:border-[2.5px] sm:border-slate-400/70">
+              <Image
+                src={previewSrc}
+                alt=""
+                fill
+                priority
+                className="pointer-events-none object-cover object-top"
+                sizes="(max-width: 640px) 100vw, 55vw"
+              />
+            </div>
           </button>
         </div>
       </div>

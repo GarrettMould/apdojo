@@ -305,12 +305,12 @@ export const OFFER_PAGES: Record<OfferCourseSlug, OfferPageConfig> = {
     courseLabel: 'AP Statistics',
     badge: 'AP STATISTICS',
     headline: 'A clearer path through AP Stats.',
-    supporting: 'Unit cheat sheets, formal unit tests, and FRQ packs — more of the Season Pass toolkit coming soon.',
+    supporting: 'Unit cheat sheets, MCQ practice, formal unit tests, and FRQ packs for the AP Statistics exam.',
     checkoutType: 'stats',
     accentText: 'text-orange-700',
     accentBg: 'bg-orange-600',
     accentBorder: 'border-orange-600',
-    featureTiles: ['Cheat Sheets', 'Unit Tests', 'FRQ Packs', 'Video Lessons'],
+    featureTiles: ['Cheat Sheets', 'MCQ Practice', 'Unit Tests', 'FRQ Packs'],
     teacher: {
       name: 'Casey Nguyen',
       title: 'AP Stats teacher · 8 years',
@@ -323,6 +323,12 @@ export const OFFER_PAGES: Record<OfferCourseSlug, OfferPageConfig> = {
         title: 'Unit Cheat Sheets',
         blurb: 'Unit notes, formulas, and study tips for AP Stats.',
         previewHref: defaultCheatSheetUrl('stats'),
+      },
+      {
+        id: 'mcq-bank',
+        title: 'MCQ Practice',
+        blurb: 'Practice by unit until the question patterns feel familiar.',
+        previewHref: '/select-practice-units?subject=stats',
       },
       {
         id: 'unit-tests',
@@ -339,6 +345,7 @@ export const OFFER_PAGES: Record<OfferCourseSlug, OfferPageConfig> = {
     ],
     howItWorks: [
       'Review the unit cheat sheet',
+      'Drill unit MCQ practice',
       'Practice the unit FRQ pack',
       'Take the timed unit MCQ test',
     ],

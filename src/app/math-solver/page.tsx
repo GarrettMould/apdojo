@@ -5,6 +5,10 @@ export const metadata: Metadata = {
   title: 'AI Math Problem Solver | AP Dojo',
   description:
     'Upload a photo or PDF of any math problem and get a step-by-step solution instantly. Free AI math solver for AP Statistics, Calculus, and more.',
+  robots: {
+    index: false,
+    follow: false,
+  },
   openGraph: {
     title: 'AI Math Problem Solver | AP Dojo',
     description:

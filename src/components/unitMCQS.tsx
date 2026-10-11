@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Question as QuestionType } from '@/data/questionBanks/types';
 import { Unit } from '@/data/cheatSheets';
-import { Check, X, Brain, FileText, ChevronDown, Triangle, Loader2, RefreshCw, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Clipboard, Lock, Play, Minus, Book, Lightbulb, Pen, Strikethrough, CheckCircle2, XCircle, Link2 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Check, X, Brain, FileText, ChevronDown, Triangle, Loader2, RefreshCw, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Clipboard, Lock, Play, Minus, Book, Lightbulb, Pen, Strikethrough, CheckCircle2, XCircle, Link2, Highlighter } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { getBeltProgress } from '@/lib/beltSystem';
@@ -12,6 +12,15 @@ import { parseQuestionTableFromText } from '@/lib/parseQuestionTableFromText';
 import { splitMcqStemAttribution } from '@/lib/splitMcqStemAttribution';
 import { ApGovQuestionText, isApGovQuestion } from '@/components/ApGovQuestionText';
 import { McqOptionTableCells, McqOptionTableHeaderRow } from '@/components/McqTableOptions';
+import {
+  UnitTestQuestionBody,
+  type QuestionTextHighlight,
+} from '@/components/UnitTestQuestionBody';
+import {
+  HIGHLIGHT_BG,
+  HIGHLIGHT_COLOR_ORDER,
+  type HighlightColor,
+} from '@/utils/processMathContent';
 import { getSubjectXP } from '@/hooks/useUserProgress';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -74,6 +83,11 @@ interface UnitMCQSProps {
   onLoginPrompt?: () => void; // Callback when user tries to answer but is disabled
   isNavigationDisabled?: boolean; // New prop to disable Next/Previous buttons
   onTutorOpenChange?: (open: boolean) => void;
+  /** When false, hides the floating pen/notes toolbar (parent can open scratch via `scratchToggleSignal`). Default true. */
+  showFloatingScratchToolbar?: boolean;
+  /** Increment to toggle the scratch panel open/closed (opens to drawing pad). */
+  scratchToggleSignal?: number;
+  onScratchActiveChange?: (active: 'draw' | 'notes' | null) => void;
 }
 
 // BeltHUD Component
@@ -214,10 +228,10 @@ const InlineExplanation = ({ question, aiExplanation, isLoadingAI, isVisible }: 
       className="mt-6 pt-6 border-t border-gray-200 space-y-6"
     >
       {/* Correct Answer Summary */}
-      <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+      <div className="p-4 rounded-lg border border-emerald-600 bg-white">
         <h4 className="font-semibold text-gray-900 mb-2 text-sm">Correct Answer</h4>
         <div className="flex items-center gap-3">
-          <span className="w-6 h-6 flex items-center justify-center rounded-full bg-white border border-green-200 text-green-600 font-medium">
+          <span className="w-6 h-6 flex items-center justify-center rounded-full bg-white border border-emerald-600 text-emerald-700 font-medium">
             {question.correctAnswer}
           </span>
           <span className="font-medium text-gray-900">
@@ -235,7 +249,7 @@ const InlineExplanation = ({ question, aiExplanation, isLoadingAI, isVisible }: 
           </div>
         </div>
       ) : aiExplanation ? (
-        <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+        <div className="p-4 rounded-lg border border-emerald-600 bg-white">
           <h4 className="font-semibold text-gray-900 mb-2 text-sm">Explanation</h4>
           <p className="text-gray-900">{aiExplanation}</p>
         </div>
@@ -846,9 +860,9 @@ const QuestionCard = ({
                 let optionStyle = 'bg-white border-gray-300';
                 if (isSubmitted) {
                   if (isCorrectAnswer) {
-                    optionStyle = 'bg-green-50 border-green-500';
+                    optionStyle = 'bg-white border border-emerald-600';
                   } else if (isSelected && !isCorrectAnswer) {
-                    optionStyle = 'bg-red-50 border-red-500';
+                    optionStyle = 'bg-white border border-rose-600';
                   }
                 } else if (isStruckThrough) {
                   optionStyle = 'bg-gray-100 border-gray-300 opacity-60';
@@ -860,9 +874,9 @@ const QuestionCard = ({
                   <motion.div
                     key={optIndex}
                     initial={false}
-                    animate={isSubmitted && isCorrectAnswer ? { scale: [1, 1.05, 1] } : {}}
+                    animate={{}}
                     transition={{ duration: 0.3 }}
-                    className={`p-3 rounded-lg border-2 transition-colors ${optionStyle} ${
+                    className={`p-3 rounded-lg border transition-colors ${optionStyle} ${
                       !isSubmitted && !isStruckThrough ? 'cursor-pointer hover:bg-blue-50 hover:border-blue-300' : ''
                     }`}
                     onClick={!isSubmitted && !isStruckThrough ? () => handleAnswerSelect(optIndex) : isStruckThrough ? () => handleStrikethroughToggle({ stopPropagation: () => {} } as React.MouseEvent) : undefined}
@@ -907,12 +921,12 @@ const QuestionCard = ({
                       ) : (
                         <>
                           <span
-                            className={`w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0 ${
+                            className={`w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0 border-2 bg-white ${
                               isCorrectAnswer
-                                ? 'bg-green-500 text-white'
+                                ? 'border-emerald-600 text-emerald-700'
                                 : isSelected
-                                  ? 'bg-red-500 text-white'
-                                  : 'bg-gray-200 text-gray-700'
+                                  ? 'border-rose-600 text-rose-700'
+                                  : 'border-gray-300 text-gray-700'
                             }`}
                           >
                             {letter}
@@ -931,10 +945,10 @@ const QuestionCard = ({
                             <span className="flex-1 text-gray-900">{option}</span>
                           )}
                           {isCorrectAnswer && (
-                            <CheckCircle2 className="w-6 h-6 text-green-600 flex-shrink-0" />
+                            <CheckCircle2 className="w-5 h-5 text-emerald-700 flex-shrink-0" strokeWidth={1.75} />
                           )}
                           {isSelected && !isCorrectAnswer && (
-                            <XCircle className="w-6 h-6 text-red-600 flex-shrink-0" />
+                            <XCircle className="w-5 h-5 text-rose-700 flex-shrink-0" strokeWidth={1.75} />
                           )}
                         </>
                       )}
@@ -957,7 +971,7 @@ const QuestionCard = ({
                     transition={{ duration: 0.3 }}
                     className="mt-6 pt-6 border-t border-gray-200"
                   >
-                    <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                    <div className="p-4 rounded-lg border border-emerald-600 bg-white">
                       <h4 className="font-semibold text-gray-900 mb-2 text-sm">Explanation</h4>
                       <p className="text-gray-900">{aiExplanation}</p>
                     </div>
@@ -983,7 +997,7 @@ const QuestionCard = ({
                         transition={{ duration: 0.3 }}
                         className="mt-4"
                       >
-                        <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                        <div className="p-4 rounded-lg border border-emerald-600 bg-white">
                           <h4 className="font-semibold text-gray-900 mb-2 text-sm">Explanation</h4>
                           <p className="text-gray-900">{aiExplanation}</p>
                         </div>
@@ -1050,7 +1064,7 @@ const QuestionCard = ({
                               key={optIndex}
                               className={`p-3 rounded-lg border-2 ${
                                 optIndex === q.correctAnswer
-                                  ? 'bg-green-100 border-green-400 text-green-800'
+                                  ? 'bg-white border border-emerald-600 text-emerald-700'
                                   : 'bg-white border-gray-300 text-gray-700'
                               }`}
                             >
@@ -1058,7 +1072,7 @@ const QuestionCard = ({
                                 {String.fromCharCode(65 + optIndex)}. {option}
                               </span>
                               {optIndex === q.correctAnswer && (
-                                <Check className="w-5 h-5 text-green-600 inline-block ml-2" />
+                                <Check className="w-5 h-5 text-emerald-700 inline-block ml-2" />
                               )}
                             </div>
                           ))}
@@ -1102,9 +1116,10 @@ interface QuestionArenaProps {
   showExplanationForCorrect?: boolean;
   isAnswerDisabled?: boolean;
   onLoginPrompt?: () => void;
+  subject?: CourseSubject;
 }
 
-const QuestionArena = ({ question, onAnswerSelect, initialSelectedLetter, isAnswered, highlightedIndex, aiExplanation, isLoadingAI, onExplanationClick, showExplanationForCorrect, isAnswerDisabled = false, onLoginPrompt }: QuestionArenaProps) => {
+const QuestionArena = ({ question, onAnswerSelect, initialSelectedLetter, isAnswered, highlightedIndex, aiExplanation, isLoadingAI, onExplanationClick, showExplanationForCorrect, isAnswerDisabled = false, onLoginPrompt, subject }: QuestionArenaProps) => {
   const letterToIndex = (letter?: string): number | null => {
     if (!letter) return null;
     const index = letter.charCodeAt(0) - 65;
@@ -1114,16 +1129,70 @@ const QuestionArena = ({ question, onAnswerSelect, initialSelectedLetter, isAnsw
   const initialSelectedIndex = letterToIndex(initialSelectedLetter);
   const [selectedAnswerIndex, setSelectedAnswerIndex] = useState<number | null>(initialSelectedIndex);
   const [isSubmitted, setIsSubmitted] = useState(isAnswered);
+  const [struckThroughOptions, setStruckThroughOptions] = useState<Set<number>>(new Set());
+  const [highlightMode, setHighlightMode] = useState(false);
+  const [highlightColor, setHighlightColor] = useState<HighlightColor>('yellow');
+  const [questionTextHighlights, setQuestionTextHighlights] = useState<
+    Record<number, QuestionTextHighlight[]>
+  >({});
   const correctAnswerIndex = letterToIndex(question.correctAnswer);
+
+  const cycleHighlightTool = () => {
+    if (!highlightMode) {
+      setHighlightMode(true);
+      setHighlightColor('yellow');
+      return;
+    }
+    const idx = HIGHLIGHT_COLOR_ORDER.indexOf(highlightColor);
+    const next = HIGHLIGHT_COLOR_ORDER[(idx + 1) % HIGHLIGHT_COLOR_ORDER.length];
+    // After green, turn the tool off so the button still acts as on/off.
+    if (highlightColor === 'green') {
+      setHighlightMode(false);
+      setHighlightColor('yellow');
+      return;
+    }
+    setHighlightColor(next);
+  };
 
   useEffect(() => {
     const currentSelectedIndex = letterToIndex(initialSelectedLetter);
     setSelectedAnswerIndex(currentSelectedIndex);
     setIsSubmitted(isAnswered && !!initialSelectedLetter);
+    setStruckThroughOptions(new Set());
   }, [question.id, initialSelectedLetter, isAnswered]);
+
+  const handleStrikethroughToggle = (optIndex: number) => {
+    if (isSubmitted) return;
+
+    // If the option being struck through is the currently selected answer, deselect it.
+    if (selectedAnswerIndex === optIndex && !struckThroughOptions.has(optIndex)) {
+      setSelectedAnswerIndex(null);
+    }
+
+    setStruckThroughOptions((prev) => {
+      const next = new Set(prev);
+      if (next.has(optIndex)) {
+        next.delete(optIndex);
+      } else {
+        next.add(optIndex);
+      }
+      return next;
+    });
+  };
 
   const handleAnswerSelect = (index: number) => {
     if (isSubmitted) return;
+
+    // If option is struck through, just remove strikethrough and don't select
+    // This matches the exact logic from FullExam.tsx / unit tests
+    if (struckThroughOptions.has(index)) {
+      setStruckThroughOptions((prev) => {
+        const next = new Set(prev);
+        next.delete(index);
+        return next;
+      });
+      return;
+    }
     
     // Block if answer selection is disabled (e.g., guest user hit limit)
     if (isAnswerDisabled) {
@@ -1203,35 +1272,70 @@ const QuestionArena = ({ question, onAnswerSelect, initialSelectedLetter, isAnsw
   const { tableData: parsedTableData, textWithoutTable } = parseQuestionTableFromText(question.question);
   const displayTableData = question.tableData || parsedTableData;
   const displayQuestionText = parsedTableData ? textWithoutTable : question.question;
-  const stemParts = splitMcqStemAttribution(displayQuestionText);
-  const isGovMcq = isApGovQuestion(question);
+  const questionForHighlight = {
+    ...question,
+    question: displayQuestionText,
+  };
+  const examType: CourseSubject =
+    subject ?? courseSubjectFromQuestionSubject(question.subject);
+  const highlights = questionTextHighlights[question.id] ?? [];
 
   return (
     <div className="flex flex-col gap-4">
       <div>
       {/* Question Text - Large and Readable */}
       <div className="space-y-3">
-        {isGovMcq ? (
-          <div className="max-w-none text-xl leading-snug text-gray-900">
-            <ApGovQuestionText text={displayQuestionText} />
-          </div>
-        ) : (
-        <div className="prose prose-base max-w-none text-xl font-black leading-snug text-gray-900">
-          <ReactMarkdown
-            components={{
-              p: ({ children }) => <p className="mb-4">{children}</p>,
-              strong: ({ children }) => <strong className="font-black">{children}</strong>,
-            }}
+        <div className="flex items-start gap-2">
+          <div
+            className={`min-w-0 flex-1 max-w-none text-base leading-relaxed text-gray-900 md:text-lg ${
+              highlightMode ? 'cursor-text' : ''
+            }`}
           >
-            {stemParts.stem}
-          </ReactMarkdown>
-          {stemParts.attributionLine ? (
-            <p className="not-prose mb-0 mt-2 text-base font-normal leading-snug text-gray-600">
-              {stemParts.attributionLine}
-            </p>
-          ) : null}
+            <UnitTestQuestionBody
+              question={questionForHighlight}
+              examType={examType}
+              highlightMode={highlightMode}
+              highlightColor={highlightColor}
+              highlights={highlights}
+              onHighlightsChange={(next) =>
+                setQuestionTextHighlights((prev) => ({
+                  ...prev,
+                  [question.id]: next,
+                }))
+              }
+            />
+          </div>
+          <button
+            type="button"
+            onClick={cycleHighlightTool}
+            className={`mt-0.5 flex-shrink-0 rounded-md p-1.5 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-blue-500 ${
+              highlightMode
+                ? 'ring-1 ring-black/10'
+                : 'text-slate-400 hover:bg-stone-100 hover:text-slate-600'
+            }`}
+            style={
+              highlightMode
+                ? {
+                    backgroundColor: HIGHLIGHT_BG[highlightColor],
+                    color: '#1c1917',
+                  }
+                : undefined
+            }
+            aria-pressed={highlightMode}
+            aria-label={
+              highlightMode
+                ? `Highlight mode on (${highlightColor}). Click to change color`
+                : 'Highlight mode'
+            }
+            title={
+              highlightMode
+                ? `Highlight color: ${highlightColor}. Click to cycle colors`
+                : 'Highlight text in the question (not answers)'
+            }
+          >
+            <Highlighter className="h-4 w-4" strokeWidth={2} />
+          </button>
         </div>
-        )}
         
         {/* Table Data */}
         {displayTableData && (
@@ -1284,60 +1388,93 @@ const QuestionArena = ({ question, onAnswerSelect, initialSelectedLetter, isAnsw
           <McqOptionTableHeaderRow headers={question.optionTableHeaders} />
         ) : null}
         {question.options.map((option, optIndex) => {
+          const isStruckThrough = struckThroughOptions.has(optIndex);
           const isHighlighted = !isSubmitted && highlightedIndex === optIndex;
-          const isSelected = selectedAnswerIndex === optIndex;
+          // Only show as selected if NOT struck through (strikethrough takes priority)
+          const isSelected = !isStruckThrough && selectedAnswerIndex === optIndex;
           const isCorrect = optIndex === correctAnswerIndex;
           
-          let optionClass = 'w-full text-left p-4 border-4 rounded-xl cursor-pointer transition-all ';
+          let optionClass = 'w-full text-left p-3 rounded-lg border cursor-pointer transition-all ';
           
           if (isSubmitted) {
             if (isCorrect) {
-              optionClass += 'bg-green-50 border-green-500 shadow-sm';
+              optionClass += 'bg-white border border-emerald-600';
             } else if (isSelected) {
-              optionClass += 'bg-red-50 border-red-500 shadow-sm';
+              optionClass += 'bg-white border border-rose-600';
             } else {
-              optionClass += 'bg-transparent border-gray-100';
+              optionClass += 'bg-transparent border border-gray-200';
             }
+          } else if (isStruckThrough) {
+            optionClass += 'bg-gray-100 border border-gray-300 opacity-60';
           } else {
-            if (isSelected) {
-              optionClass += 'bg-blue-50 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]';
+            if (isSelected || isHighlighted) {
+              optionClass += 'bg-white border-2 border-blue-500 shadow-sm';
             } else {
-              optionClass += 'bg-transparent border-gray-100 hover:border-black';
+              optionClass += 'bg-white border border-gray-200 hover:border-gray-400 hover:bg-gray-50';
             }
           }
           
           return (
             <button
               key={optIndex}
+              type="button"
               onClick={() => handleAnswerSelect(optIndex)}
-              disabled={isSubmitted || isAnswerDisabled}
-              className={optionClass + (isAnswerDisabled ? ' opacity-60 cursor-not-allowed' : '')}
+              disabled={isSubmitted}
+              className={optionClass + (isAnswerDisabled && !isStruckThrough ? ' opacity-60' : '')}
             >
-              <div className="flex items-center gap-4">
-                <span className={`w-8 h-8 flex items-center justify-center rounded-full border-2 text-sm font-bold flex-shrink-0 ${
+              <div className="flex items-center gap-3">
+                <span className={`w-7 h-7 flex items-center justify-center rounded-full border text-xs font-normal flex-shrink-0 ${
                   isSubmitted
                     ? isCorrect
-                      ? 'bg-green-100 border-green-500 text-green-700'
+                      ? 'bg-white border-emerald-600 text-emerald-700'
                       : isSelected
-                        ? 'bg-red-100 border-red-500 text-red-700'
+                        ? 'bg-white border-rose-600 text-rose-700'
                         : 'bg-white border-gray-300 text-gray-500'
-                    : isSelected
-                      ? 'bg-blue-100 border-black text-blue-900'
-                      : 'bg-white border-gray-300 text-gray-600'
+                    : isStruckThrough
+                      ? 'bg-gray-200 border-gray-300 text-gray-400'
+                      : isSelected || isHighlighted
+                        ? 'bg-blue-500 border-blue-600 text-white'
+                        : 'bg-white border-gray-300 text-gray-600'
                 }`}>
                   {String.fromCharCode(65 + optIndex)}
                 </span>
                 {question.optionTableHeaders ? (
-                  <McqOptionTableCells option={option} className="text-base font-semibold" />
+                  <McqOptionTableCells
+                    option={option}
+                    struckThrough={isStruckThrough}
+                    className="text-sm font-normal md:text-base"
+                  />
                 ) : (
-                  <span className="flex-1 text-base font-semibold text-gray-900">{option}</span>
+                  <span
+                    className={`flex-1 text-sm font-normal md:text-base ${
+                      isStruckThrough ? 'line-through text-gray-400' : 'text-gray-900'
+                    }`}
+                  >
+                    {option}
+                  </span>
                 )}
-                {isSubmitted && (
+                {!isSubmitted ? (
+                  <div
+                    role="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleStrikethroughToggle(optIndex);
+                    }}
+                    className={`flex-shrink-0 p-2 rounded-lg transition-colors cursor-pointer ${
+                      isStruckThrough
+                        ? 'bg-slate-200 text-slate-600'
+                        : 'bg-white hover:bg-slate-100 text-slate-400 hover:text-slate-600'
+                    }`}
+                    aria-label={isStruckThrough ? 'Remove strikethrough' : 'Strikethrough option'}
+                  >
+                    <Strikethrough className="w-5 h-5" />
+                  </div>
+                ) : (
                   <div className="flex-shrink-0">
                     {isCorrect ? (
-                      <Check className="w-6 h-6 text-green-500" />
+                      <Check className="w-5 h-5 text-emerald-700" strokeWidth={1.75} />
                     ) : isSelected ? (
-                      <X className="w-6 h-6 text-red-500" />
+                      <X className="w-5 h-5 text-rose-700" strokeWidth={1.75} />
                     ) : null}
                   </div>
                 )}
@@ -1369,7 +1506,7 @@ const QuestionArena = ({ question, onAnswerSelect, initialSelectedLetter, isAnsw
                   </div>
                 </div>
               ) : aiExplanation ? (
-                <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                <div className="p-4 rounded-lg border border-emerald-600 bg-white">
                   <h4 className="font-semibold text-gray-900 mb-2 text-sm">Explanation</h4>
                   <p className="text-gray-900">{aiExplanation}</p>
                 </div>
@@ -1406,7 +1543,7 @@ const QuestionArena = ({ question, onAnswerSelect, initialSelectedLetter, isAnsw
                       transition={{ duration: 0.3 }}
                       className="mt-4"
                     >
-                      <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                      <div className="p-4 rounded-lg border border-emerald-600 bg-white">
                         <h4 className="font-semibold text-gray-900 mb-2 text-sm">Explanation</h4>
                         <p className="text-gray-900">{aiExplanation}</p>
                       </div>
@@ -1453,6 +1590,9 @@ export function UnitMCQs({
   onLoginPrompt,
   isNavigationDisabled = false,
   onTutorOpenChange,
+  showFloatingScratchToolbar = true,
+  scratchToggleSignal = 0,
+  onScratchActiveChange,
 }: UnitMCQSProps) {
   const { login, signup, userData, loadingUserData, user, awardXp, totalXP, guestXp } = useAuthContext();
   const [aiExplanations, setAiExplanations] = useState<Record<number, string>>({});
@@ -1749,9 +1889,9 @@ export function UnitMCQs({
                   if (answerState) {
                     // Answered
                     if (isCorrect) {
-                      buttonClass += 'bg-green-50 border-green-200 text-gray-900 cursor-default';
+                      buttonClass += 'bg-white border border-emerald-600 text-gray-900 cursor-default';
                     } else if (isSelected) {
-                      buttonClass += 'bg-red-50 border-red-200 text-gray-900 cursor-default';
+                      buttonClass += 'bg-white border border-rose-600 text-gray-900 cursor-default';
                     } else {
                       buttonClass += 'bg-gray-50 border-gray-100 text-gray-500 cursor-default';
                     }
@@ -1768,15 +1908,15 @@ export function UnitMCQs({
                       className={buttonClass}
                     >
                       <span className={`w-5 h-5 flex items-center justify-center rounded-full border text-xs font-semibold flex-shrink-0 
-                        ${answerState && isCorrect ? 'bg-green-100 border-green-300 text-green-700' : ''}
-                        ${answerState && isSelected && !isCorrect ? 'bg-red-100 border-red-300 text-red-700' : ''}
+                        ${answerState && isCorrect ? 'bg-white border-emerald-600 text-emerald-700' : ''}
+                        ${answerState && isSelected && !isCorrect ? 'bg-white border-rose-600 text-rose-700' : ''}
                         ${!answerState ? 'bg-white border-gray-300 text-gray-600' : ''}
                       `}>
                         {letter}
                       </span>
                       <span className="flex-1">{option}</span>
-                      {answerState && isCorrect && <Check className="w-4 h-4 text-green-500" />}
-                      {answerState && isSelected && !isCorrect && <X className="w-4 h-4 text-red-500" />}
+                      {answerState && isCorrect && <Check className="w-4 h-4 text-emerald-700" />}
+                      {answerState && isSelected && !isCorrect && <X className="w-4 h-4 text-rose-700" />}
                     </button>
                   );
                 })}
@@ -1792,8 +1932,48 @@ export function UnitMCQs({
   // State for Focus Mode features
   const [activeScratchTool, setActiveScratchTool] = useState<ScratchTool | null>(null);
   const [scratchNotes, setScratchNotes] = useState('');
-  const [excalidrawElements, setExcalidrawElements] = useState<any[]>([]);
-  const [excalidrawAppState, setExcalidrawAppState] = useState<any>(null);
+  // Keep Excalidraw scene in refs — setState in onChange re-renders the parent and
+  // can loop ("Maximum update depth exceeded") with Excalidraw 0.18.
+  const excalidrawElementsRef = useRef<any[]>([]);
+  const excalidrawPrefsRef = useRef<{
+    currentItemStrokeWidth?: number;
+    currentItemStrokeColor?: string;
+  }>({
+    currentItemStrokeWidth: 1,
+    currentItemStrokeColor: '#1e1e1e',
+  });
+  const [excalidrawKey, setExcalidrawKey] = useState(0);
+  const excalidrawInitialData = useMemo(
+    () => ({
+      elements: excalidrawElementsRef.current,
+      appState: {
+        zenModeEnabled: true,
+        viewModeEnabled: false,
+        theme: 'light' as const,
+        currentItemStrokeWidth: excalidrawPrefsRef.current.currentItemStrokeWidth ?? 1,
+        currentItemStrokeColor: excalidrawPrefsRef.current.currentItemStrokeColor ?? '#1e1e1e',
+        activeTool: {
+          type: 'freedraw' as const,
+          lastActiveTool: null,
+          locked: false,
+          customType: null,
+        },
+      },
+    }),
+    [excalidrawKey]
+  );
+  const excalidrawUIOptions = useMemo(
+    () => ({
+      canvasActions: {
+        toggleTheme: false,
+        changeViewBackgroundColor: false,
+        loadScene: false,
+        saveToActiveFile: false,
+        export: false as const,
+      },
+    }),
+    []
+  );
   const [showExplanationForCorrect, setShowExplanationForCorrect] = useState(false);
   const [isTutorOpen, setIsTutorOpen] = useState(false);
   /** Bumped when scratch/draw opens so McqQuestionTutorFab closes (mutual exclusivity). */
@@ -1807,8 +1987,29 @@ export function UnitMCQs({
     if (isTutorOpen) setActiveScratchTool(null);
   }, [isTutorOpen]);
 
+  useEffect(() => {
+    onScratchActiveChange?.(activeScratchTool);
+  }, [activeScratchTool, onScratchActiveChange]);
+
+  const scratchToggleSignalRef = useRef(0);
+  useEffect(() => {
+    if (!scratchToggleSignal || scratchToggleSignal === scratchToggleSignalRef.current) return;
+    scratchToggleSignalRef.current = scratchToggleSignal;
+    if (activeScratchTool) {
+      setActiveScratchTool(null);
+    } else {
+      setTutorExternalCloseRequest((n) => n + 1);
+      setExcalidrawKey((k) => k + 1);
+      setActiveScratchTool('draw');
+    }
+  }, [scratchToggleSignal, activeScratchTool]);
+
   const openScratchTool = (tool: ScratchTool) => {
     setTutorExternalCloseRequest((n) => n + 1);
+    if (tool === 'draw' && activeScratchTool !== 'draw') {
+      // Remount so Excalidraw measures the visible panel (not the off-screen shell).
+      setExcalidrawKey((k) => k + 1);
+    }
     setActiveScratchTool(tool);
   };
   
@@ -1866,13 +2067,14 @@ export function UnitMCQs({
 
       {/* Right slide-out scratch tools (matches unit test behavior) */}
       <div
-        className={`fixed right-0 z-40 h-full w-full max-w-xl border-l border-gray-200 bg-white shadow-2xl transition-transform duration-300 ease-in-out ${
-          activeScratchTool ? 'translate-x-0' : 'translate-x-full'
+        className={`fixed right-0 z-[115] h-full w-full max-w-xl border-l border-gray-200 bg-white shadow-2xl transition-transform duration-300 ease-in-out ${
+          activeScratchTool ? 'translate-x-0' : 'translate-x-full pointer-events-none'
         }`}
         style={{ top: '80px', height: 'calc(100vh - 80px)' }}
+        aria-hidden={!activeScratchTool}
       >
-        <div className="flex h-full flex-col">
-          <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
+        <div className="flex h-full flex-col overflow-hidden">
+          <div className="flex flex-shrink-0 items-center justify-between border-b border-gray-200 px-4 py-3">
             <div className="flex items-center gap-2">
               <button
                 type="button"
@@ -1905,7 +2107,7 @@ export function UnitMCQs({
               Close
             </button>
           </div>
-          <div className="min-h-0 flex-1">
+          <div className="relative min-h-0 flex-1 overflow-hidden">
             {activeScratchTool === 'notes' ? (
               <div className="h-full p-4">
                 <textarea
@@ -1915,35 +2117,25 @@ export function UnitMCQs({
                   className="h-full w-full resize-none rounded-lg border border-gray-300 p-3 text-sm text-gray-900 focus:border-gray-500 focus:outline-none"
                 />
               </div>
-            ) : (
-              <Excalidraw
-                zenModeEnabled={true}
-                viewModeEnabled={false}
-                gridModeEnabled={false}
-                UIOptions={{
-                  canvasActions: {
-                    toggleTheme: false,
-                    changeViewBackgroundColor: false,
-                    loadScene: false,
-                    saveToActiveFile: false,
-                    export: false,
-                  },
-                }}
-                initialData={{
-                  elements: excalidrawElements,
-                  appState: {
-                    ...excalidrawAppState,
-                    zenModeEnabled: true,
-                    theme: 'light',
-                    currentItemStrokeWidth: excalidrawAppState?.currentItemStrokeWidth ?? 1,
-                  },
-                }}
-                onChange={(elements: any[], appState: any) => {
-                  setExcalidrawElements(elements);
-                  setExcalidrawAppState(appState);
-                }}
-              />
-            )}
+            ) : activeScratchTool === 'draw' ? (
+              <div className="absolute inset-0 h-full w-full">
+                <Excalidraw
+                  key={excalidrawKey}
+                  zenModeEnabled={true}
+                  viewModeEnabled={false}
+                  gridModeEnabled={false}
+                  UIOptions={excalidrawUIOptions}
+                  initialData={excalidrawInitialData}
+                  onChange={(elements: readonly any[], appState: any) => {
+                    excalidrawElementsRef.current = [...elements];
+                    excalidrawPrefsRef.current = {
+                      currentItemStrokeWidth: appState?.currentItemStrokeWidth,
+                      currentItemStrokeColor: appState?.currentItemStrokeColor,
+                    };
+                  }}
+                />
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
@@ -1981,6 +2173,7 @@ export function UnitMCQs({
                   showExplanationForCorrect={showExplanationForCorrect}
                   isAnswerDisabled={isAnswerDisabled}
                   onLoginPrompt={onLoginPrompt}
+                  subject={subject}
                 />
               </div>
             )}
@@ -1997,7 +2190,7 @@ export function UnitMCQs({
                 handlePreviousQuestion();
               }}
                 disabled={currentQuestionIndex === 0 || isNavigationDisabled}
-              className="flex-1 px-6 py-4 border-4 border-black rounded-xl font-black text-lg bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:translate-y-1 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+              className="flex-1 px-6 py-3 border-2 border-gray-300 rounded-lg font-semibold text-base bg-white text-gray-800 hover:bg-gray-50 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
                 Previous
               </button>
@@ -2012,7 +2205,7 @@ export function UnitMCQs({
                 handleNextQuestion();
               }}
                 disabled={currentQuestionIndex === totalQuestions - 1 || totalQuestions === 0 || isNavigationDisabled}
-              className="flex-1 px-6 py-4 border-4 border-black rounded-xl font-black text-lg bg-black text-white hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:translate-y-1 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+              className="flex-1 px-6 py-3 border-2 border-gray-900 rounded-lg font-semibold text-base bg-gray-900 text-white hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
                 Next
               </button>
@@ -2021,10 +2214,12 @@ export function UnitMCQs({
           </div>
 
         {/* Right Side: TacticalToolbar */}
-        <TacticalToolbar
-          onDrawClick={handleDrawClick}
-          onNotesClick={handleNotesClick}
-        />
+        {showFloatingScratchToolbar ? (
+          <TacticalToolbar
+            onDrawClick={handleDrawClick}
+            onNotesClick={handleNotesClick}
+          />
+        ) : null}
                       </div>
     </>
   );

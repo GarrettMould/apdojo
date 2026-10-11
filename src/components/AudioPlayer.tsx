@@ -21,15 +21,21 @@ export function AudioPlayer({ src, className = '' }: AudioPlayerProps) {
     const updateTime = () => setCurrentTime(audio.currentTime);
     const updateDuration = () => setDuration(audio.duration);
     const handleEnded = () => setIsPlaying(false);
+    const handlePlay = () => setIsPlaying(true);
+    const handlePause = () => setIsPlaying(false);
 
     audio.addEventListener('timeupdate', updateTime);
     audio.addEventListener('loadedmetadata', updateDuration);
     audio.addEventListener('ended', handleEnded);
+    audio.addEventListener('play', handlePlay);
+    audio.addEventListener('pause', handlePause);
 
     return () => {
       audio.removeEventListener('timeupdate', updateTime);
       audio.removeEventListener('loadedmetadata', updateDuration);
       audio.removeEventListener('ended', handleEnded);
+      audio.removeEventListener('play', handlePlay);
+      audio.removeEventListener('pause', handlePause);
     };
   }, []);
 
@@ -37,12 +43,11 @@ export function AudioPlayer({ src, className = '' }: AudioPlayerProps) {
     const audio = audioRef.current;
     if (!audio) return;
 
-    if (isPlaying) {
-      audio.pause();
+    if (audio.paused) {
+      void audio.play();
     } else {
-      audio.play();
+      audio.pause();
     }
-    setIsPlaying(!isPlaying);
   };
 
   const formatTime = (seconds: number): string => {
@@ -59,6 +64,7 @@ export function AudioPlayer({ src, className = '' }: AudioPlayerProps) {
       <audio ref={audioRef} src={src} preload="metadata" />
       <div className="flex items-center gap-4">
         <button
+          type="button"
           onClick={togglePlay}
           className="flex-shrink-0 w-12 h-12 rounded-full bg-purple-600 hover:bg-purple-700 text-white flex items-center justify-center transition-colors"
           aria-label={isPlaying ? 'Pause' : 'Play'}
