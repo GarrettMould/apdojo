@@ -2,10 +2,10 @@
 
 import { useMemo } from 'react';
 import { DrillDeepDive } from '@/components/DrillDeepDive';
+import { useLessonMcqPreview } from '@/hooks/useQuestionBank';
 import { getFlashcardsForLesson } from '@/data/unitFlashcards';
 import { getKeyTermsForLesson } from '@/data/cheatSheetTerms';
 import { videos } from '@/data/videos';
-import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 
 export default function MoneyGrowthInflationDeepDivePage() {
   const lessonPills = [
@@ -33,20 +33,11 @@ export default function MoneyGrowthInflationDeepDivePage() {
     };
   }, []);
 
-  const lessonMcqQuestions = useMemo(() => {
-    const matching = allQuestions.filter(
-      q => q.unit === 5 && q.subject === 'ap_macroeconomics' && q.lessonIDS?.includes('5.3')
-    );
-    return matching.slice(0, 3).map(q => ({
-      id: q.id,
-      question: q.question,
-      options: q.options,
-      correctAnswer: typeof q.correctAnswer === 'string' ? q.correctAnswer.charCodeAt(0) - 65 : q.correctAnswer,
-      explanation: q.explanation,
-      image: q.image ?? null,
-      tableData: q.tableData,
-    }));
-  }, []);
+  const lessonMcqQuestions = useLessonMcqPreview({
+    unit: 5,
+    subject: 'ap_macroeconomics',
+    lessonId: '5.3',
+  });
 
   return (
     <DrillDeepDive

@@ -286,7 +286,7 @@ export function DiagnosticTest({ questions, onComplete, initialAnswers = {}, use
             <button
               onClick={onSubjectToggle}
               className="text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors"
-              style={{ fontFamily: 'Permanent Marker, cursive' }}
+              style={{ fontFamily: 'var(--font-permanent-marker), cursive' }}
             >
               Switch to {currentSubject === 'macro' ? 'Micro' : 'Macro'}
             </button>

@@ -60,11 +60,41 @@ export function ReviewFolderPanel({
     setSelectedUnits(unitsInFolder.length > 0 ? unitsInFolder : [unitNumber]);
   }, [open, unitsInFolder, unitNumber]);
 
+  const selectedSet = useMemo(() => new Set(selectedUnits), [selectedUnits]);
+
+  const scopedGroups = useMemo(() => {
+    if (selectedUnits.length === 0) return groups;
+    return groups
+      .map((group) => {
+        const misses = group.misses.filter((m) => selectedSet.has(m.unitNumber));
+        if (misses.length === 0) return null;
+        return {
+          ...group,
+          misses,
+          missCount: misses.length,
+        };
+      })
+      .filter((g): g is ReviewLessonGroup => g !== null);
+  }, [groups, selectedUnits, selectedSet]);
+
+  const scopedMissCount = useMemo(
+    () => scopedGroups.reduce((sum, g) => sum + g.missCount, 0),
+    [scopedGroups]
+  );
+
+  const boutOpponentLabel = useMemo(() => {
+    if (selectedUnits.length === 0) return unitLabel ?? `Unit ${unitNumber}`;
+    if (selectedUnits.length === 1) return `Unit ${selectedUnits[0]}`;
+    if (selectedUnits.length === 2) {
+      return `Units ${selectedUnits[0]} & ${selectedUnits[1]}`;
+    }
+    return `Units ${selectedUnits.join(', ')}`;
+  }, [selectedUnits, unitLabel, unitNumber]);
+
   if (!mounted) return null;
 
   const lessonCount = groups.length;
   const scopeLabel = unitLabel ?? `Unit ${unitNumber}`;
-  const selectedSet = new Set(selectedUnits);
   const canAct = selectedUnits.length > 0;
 
   const toggleUnit = (n: number) => {
@@ -139,10 +169,50 @@ export function ReviewFolderPanel({
                 </div>
               ) : (
                 <div className="space-y-5">
-                  <div className="flex aspect-[16/9] w-full items-center justify-center rounded-xl border-2 border-black bg-stone-100">
-                    <p className="text-sm font-semibold text-stone-500">
-                      Visual coming soon
-                    </p>
+                  <div className="relative overflow-hidden rounded-xl border-2 border-black bg-gradient-to-br from-amber-50 via-stone-50 to-rose-50 px-5 py-5 sm:px-6 sm:py-6">
+                    <div className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-amber-200/40" />
+                    <div className="pointer-events-none absolute -bottom-8 -left-4 h-28 w-28 rounded-full bg-rose-200/30" />
+
+                    <div className="relative">
+                      <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-stone-500">
+                        <Swords className="h-3.5 w-3.5 text-black" strokeWidth={2.5} />
+                        Bout card
+                      </div>
+
+                      <p className="mt-3 text-2xl font-black tracking-tight text-black sm:text-3xl">
+                        You{' '}
+                        <span className="text-stone-400">vs</span>{' '}
+                        {boutOpponentLabel}
+                      </p>
+
+                      <p className="mt-2 text-sm font-semibold text-stone-600">
+                        {scopedMissCount} miss{scopedMissCount === 1 ? '' : 'es'} ·{' '}
+                        {scopedGroups.length} lesson
+                        {scopedGroups.length === 1 ? '' : 's'}
+                      </p>
+
+                      {scopedGroups.length > 0 ? (
+                        <div className="mt-4 flex flex-wrap gap-x-3 gap-y-1.5">
+                          {scopedGroups.map((group) => (
+                            <span
+                              key={group.lessonId}
+                              className="text-sm font-bold text-black underline decoration-stone-300 underline-offset-2"
+                            >
+                              {group.lessonId}
+                              {group.missCount > 1 ? (
+                                <span className="ml-1 font-semibold text-stone-500 no-underline">
+                                  ×{group.missCount}
+                                </span>
+                              ) : null}
+                            </span>
+                          ))}
+                        </div>
+                      ) : null}
+
+                      <p className="mt-5 text-xs font-bold uppercase tracking-[0.14em] text-stone-500">
+                        Learn → Replay → Reflect
+                      </p>
+                    </div>
                   </div>
 
                   {showUnitPicker ? (

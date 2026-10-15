@@ -669,7 +669,7 @@ export const statsUnit3McqTestQuestions: Question[] = [
     lessonIDS: ['3.13'],
     unitName: UNIT_NAME,
     question:
-      'A researcher conducts a two-sample z-test for the difference in proportions of voters favoring Candidate A in two cities. The sample summaries are shown in the table below. What is the pooled proportion (p-hat-c) used for the test statistic?',
+      'A researcher conducts a two-sample z-test for the difference in proportions of voters favoring Candidate A in two cities. The sample summaries are shown in the table below. What is the pooled proportion (p̂c) used for the test statistic?',
     image: null,
     tableData: TWO_CITY_VOTER_TABLE,
     options: stripOptionPrefixes(['A) 0.54', 'B) 0.55', 'C) 0.60', 'D) 0.50', 'E) 0.53']),
@@ -765,7 +765,7 @@ export const statsUnit3McqTestQuestions: Question[] = [
     ]),
     correctAnswer: 'A',
     explanation:
-      'An estimator is unbiased if, on average, it neither overestimates nor underestimates the parameter. The sample proportion p-hat = x/n is the standard unbiased estimator of a population proportion because E(x/n) = p. The other formulas each add or subtract a constant to the numerator or denominator, which shifts the expected value away from p and introduces bias (e.g., option B is a form of the Laplace/"add-two" smoothed estimator, which is biased toward 0.5).',
+      'An estimator is unbiased if, on average, it neither overestimates nor underestimates the parameter. The sample proportion p̂ = x/n is the standard unbiased estimator of a population proportion because E(x/n) = p. The other formulas each add or subtract a constant to the numerator or denominator, which shifts the expected value away from p and introduces bias (e.g., option B is a form of the Laplace/"add-two" smoothed estimator, which is biased toward 0.5).',
   },
   {
     id: 7312,
@@ -779,7 +779,7 @@ export const statsUnit3McqTestQuestions: Question[] = [
     options: stripOptionPrefixes(['A) 0.019', 'B) 0.038', 'C) 0.0128', 'D) 0.0026', 'E) 0.16']),
     correctAnswer: 'A',
     explanation:
-      'The standard deviation of the sampling distribution of p-hat is sqrt[p(1-p)/n] = sqrt[(0.08)(0.92)/200] = sqrt(0.000368) ≈ 0.019, matching the width of the shaded region in the graph. Option B doubles this value (a common error from failing to take the square root correctly), option C uses n = 400, option D omits the square root entirely, and option E uses p(1-p) without dividing by n.',
+      'The standard deviation of the sampling distribution of p̂ is √[p(1-p)/n] = √[(0.08)(0.92)/200] = sqrt(0.000368) ≈ 0.019, matching the width of the shaded region in the graph. Option B doubles this value (a common error from failing to take the square root correctly), option C uses n = 400, option D omits the square root entirely, and option E uses p(1-p) without dividing by n.',
   },
   {
     id: 7313,
@@ -799,7 +799,7 @@ export const statsUnit3McqTestQuestions: Question[] = [
     ]),
     correctAnswer: 'A',
     explanation:
-      'p-hat = 34/85 = 0.400. SE = sqrt[(0.4)(0.6)/85] ≈ 0.0531. For 90% confidence, z* = 1.645, so the margin of error ≈ 1.645(0.0531) ≈ 0.087, giving the interval (0.313, 0.487). Option B incorrectly uses z* = 1.96 (the 95% critical value). Option D results from forgetting to take the square root when calculating SE, which produces an interval that is far too narrow.',
+      'p̂ = 34/85 = 0.400. SE = √[(0.4)(0.6)/85] ≈ 0.0531. For 90% confidence, z* = 1.645, so the margin of error ≈ 1.645(0.0531) ≈ 0.087, giving the interval (0.313, 0.487). Option B incorrectly uses z* = 1.96 (the 95% critical value). Option D results from forgetting to take the square root when calculating SE, which produces an interval that is far too narrow.',
   },
   {
     id: 7314,
@@ -819,7 +819,7 @@ export const statsUnit3McqTestQuestions: Question[] = [
     ]),
     correctAnswer: 'C',
     explanation:
-      'The normality condition requires that the observed number of successes and the observed number of failures each be at least 10. Here, the number of observed successes is only 1 (fewer than 10), so the sampling distribution of p-hat cannot be assumed to be approximately normal. The randomization condition is satisfied (random sample), and the 10% condition is satisfied since 20 is well under 10% of 3,000.',
+      'The normality condition requires that the observed number of successes and the observed number of failures each be at least 10. Here, the number of observed successes is only 1 (fewer than 10), so the sampling distribution of p̂ cannot be assumed to be approximately normal. The randomization condition is satisfied (random sample), and the 10% condition is satisfied since 20 is well under 10% of 3,000.',
   },
   {
     id: 7315,
@@ -833,13 +833,13 @@ export const statsUnit3McqTestQuestions: Question[] = [
     options: stripOptionPrefixes([
       'A) H0: p = 0.90, Ha: p < 0.90',
       'B) H0: p = 0.90, Ha: p ≠ 0.90',
-      'C) H0: p-hat = 0.90, Ha: p-hat < 0.90',
+      'C) H0: p̂ = 0.90, Ha: p̂ < 0.90',
       'D) H0: p < 0.90, Ha: p = 0.90',
       'E) H0: p = 0.90, Ha: p > 0.90',
     ]),
     correctAnswer: 'A',
     explanation:
-      'Let p be the true proportion of all packages delivered on time. Because the watchdog group suspects the rate is lower than claimed, the alternative hypothesis should be one-sided: Ha: p < 0.90, with H0: p = 0.90. Option B is two-sided and does not match the stated suspicion. Option C incorrectly states the hypotheses in terms of the sample statistic p-hat rather than the population parameter p. Option D reverses the null and alternative hypotheses, and option E has the alternative pointed in the wrong direction.',
+      'Let p be the true proportion of all packages delivered on time. Because the watchdog group suspects the rate is lower than claimed, the alternative hypothesis should be one-sided: Ha: p < 0.90, with H0: p = 0.90. Option B is two-sided and does not match the stated suspicion. Option C incorrectly states the hypotheses in terms of the sample statistic p̂ rather than the population parameter p. Option D reverses the null and alternative hypotheses, and option E has the alternative pointed in the wrong direction.',
   },
   {
     id: 7316,
@@ -902,13 +902,13 @@ export const statsUnit3McqTestQuestions: Question[] = [
     lessonIDS: ['3.9'],
     unitName: UNIT_NAME,
     question:
-      'Two large populations have true proportions of support for a policy of p1 = 0.40 and p2 = 0.35. Independent random samples of size n1 = 120 and n2 = 150 are planned. Using the table below, what is the standard deviation of the sampling distribution of the difference in sample proportions, p-hat1 − p-hat2?',
+      'Two large populations have true proportions of support for a policy of p1 = 0.40 and p2 = 0.35. Independent random samples of size n1 = 120 and n2 = 150 are planned. Using the table below, what is the standard deviation of the sampling distribution of the difference in sample proportions, p̂₁ − p̂₂?',
     image: null,
     tableData: TWO_POPULATION_PROPORTIONS_TABLE,
     options: stripOptionPrefixes(['A) 0.059', 'B) 0.0035', 'C) 0.0129', 'D) 0.077', 'E) 0.240']),
     correctAnswer: 'A',
     explanation:
-      'The standard deviation of the sampling distribution for the difference in sample proportions is sqrt[p1(1-p1)/n1 + p2(1-p2)/n2] = sqrt[(0.4)(0.6)/120 + (0.35)(0.65)/150] = sqrt(0.0020 + 0.001517) = sqrt(0.003517) ≈ 0.059. Option B is the value before taking the square root, and option D incorrectly adds the two standard deviations (sqrt of each term) instead of combining variances first.',
+      'The standard deviation of the sampling distribution for the difference in sample proportions is √[p1(1-p1)/n1 + p2(1-p2)/n2] = √[(0.4)(0.6)/120 + (0.35)(0.65)/150] = sqrt(0.0020 + 0.001517) = sqrt(0.003517) ≈ 0.059. Option B is the value before taking the square root, and option D incorrectly adds the two standard deviations (sqrt of each term) instead of combining variances first.',
   },
   {
     id: 7320,
@@ -922,12 +922,12 @@ export const statsUnit3McqTestQuestions: Question[] = [
     options: stripOptionPrefixes([
       'A) H0: pA = pB, Ha: pA > pB',
       'B) H0: pA ≠ pB, Ha: pA = pB',
-      'C) H0: p-hatA = p-hatB, Ha: p-hatA > p-hatB',
+      'C) H0: p̂A = p̂B, Ha: p̂A > p̂B',
       'D) H0: pA − pB = 1, Ha: pA − pB ≠ 1',
       'E) H0: pA = pB, Ha: pA ≠ pB',
     ]),
     correctAnswer: 'A',
     explanation:
-      'Let pA and pB be the true conversion rates for Design A and Design B, respectively. Since the marketing team specifically wants to know whether Design A’s rate is higher, the test should be one-sided: H0: pA = pB (no difference) versus Ha: pA > pB. Option B reverses the null and alternative statements, option C incorrectly uses sample statistics (p-hat) rather than population parameters, option D uses a nonsensical hypothesized difference of 1, and option E is two-sided and does not match the stated research question.',
+      'Let pA and pB be the true conversion rates for Design A and Design B, respectively. Since the marketing team specifically wants to know whether Design A’s rate is higher, the test should be one-sided: H0: pA = pB (no difference) versus Ha: pA > pB. Option B reverses the null and alternative statements, option C incorrectly uses sample statistics (p̂) rather than population parameters, option D uses a nonsensical hypothesized difference of 1, and option E is two-sided and does not match the stated research question.',
   },
 ];

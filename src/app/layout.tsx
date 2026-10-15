@@ -1,15 +1,19 @@
 import './globals.css'
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google';
+import { Inter, Permanent_Marker } from 'next/font/google';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/Footer';
 import { AuthProvider } from '@/contexts/AuthContext'
 import { LayoutClientWrapper } from '@/components/LayoutClientWrapper'
 import { LayoutWrapper } from '@/components/LayoutWrapper'
 import Script from 'next/script'
-import { GoogleTagManager } from '@next/third-parties/google'
-
 const inter = Inter({ subsets: ['latin'] });
+const permanentMarker = Permanent_Marker({
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-permanent-marker',
+  display: 'swap',
+});
 
 // Default metadata for the site
 export const metadata: Metadata = {
@@ -82,9 +86,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap" rel="stylesheet" />
         <Script
           id="ms-clarity"
           strategy="afterInteractive"
@@ -93,8 +94,14 @@ export default function RootLayout({
           }}
         />
       </head>
-      <GoogleTagManager gtmId="AW-18008787960" />
-      <body className={inter.className}>
+      <Script id="google-ads-tag" strategy="lazyOnload">
+        {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','AW-18008787960');`}
+      </Script>
+      <body className={`${inter.className} ${permanentMarker.variable}`}>
         <AuthProvider>
           <LayoutWrapper>
             <LayoutClientWrapper>

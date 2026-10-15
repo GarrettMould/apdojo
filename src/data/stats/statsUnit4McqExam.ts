@@ -352,7 +352,7 @@ export const statsUnit4McqTestQuestions: Question[] = [
     options: stripOptionPrefixes(['A) 12', 'B) 6', 'C) 3', 'D) 2', 'E) 0.33']),
     correctAnswer: 'D',
     explanation:
-      'The standard deviation of the sampling distribution is sigma / sqrt(n). 12 / sqrt(36) = 12 / 6 = 2.',
+      'The standard deviation of the sampling distribution is σ / √n. 12 / √36 = 12 / 6 = 2.',
   },
   {
     id: 7404,
@@ -372,7 +372,7 @@ export const statsUnit4McqTestQuestions: Question[] = [
     ]),
     correctAnswer: 'A',
     explanation:
-      'The t-statistic formula is (x-bar - mu0) / (s / sqrt(n)). Here: (1180 - 1200) / (50 / sqrt(40)).',
+      'The t-statistic formula is (x̄ − μ₀) / (s / √n). Here: (1180 − 1200) / (50 / √40).',
   },
   {
     id: 7424,
@@ -623,10 +623,10 @@ export const statsUnit4McqTestQuestions: Question[] = [
     question:
       'An orchard owner records the weight of every apple harvested this season, forming a population with mean $\\mu$. If she repeatedly draws random samples of apples and computes the sample mean weight each time, what is the mean of this sampling distribution of $\\overline{x}$?',
     image: null,
-    options: stripOptionPrefixes(['A) sigma', 'B) mu', 'C) mu / sqrt(n)', 'D) x-bar', 'E) sigma / n']),
+    options: stripOptionPrefixes(['A) σ', 'B) μ', 'C) μ / √n', 'D) x̄', 'E) σ / n']),
     correctAnswer: 'B',
     explanation:
-      'The mean of the sampling distribution of the sample mean is equal to the population mean, mu.',
+      'The mean of the sampling distribution of the sample mean is equal to the population mean, μ.',
   },
   {
     id: 7420,

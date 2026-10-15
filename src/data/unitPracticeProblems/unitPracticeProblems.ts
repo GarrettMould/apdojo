@@ -1,6 +1,16 @@
 import { Question as QuestionType } from '@/data/questionBanks/types';
 import { govMcqPracticeQuestions } from '@/data/gov/govMcqPractice';
 import { statsMcqPracticeQuestions } from '@/data/stats/statsMcqPractice';
+import { microTableMcqPreviewQuestions } from '@/data/micro/microTableMcqPreview';
+import { macroV2McqPreviewQuestions } from '@/data/macro/macroV2McqPreview';
+
+/** v2 micro table MCQs (ids 25xxx). Appended into each micro unit practice array. */
+const microV2TableByUnit = (unit: number) =>
+  microTableMcqPreviewQuestions.filter((q) => q.unit === unit);
+
+/** v2 macro table MCQs (ids 26xxx). Appended into each macro unit practice array. */
+const macroV2TableByUnit = (unit: number) =>
+  macroV2McqPreviewQuestions.filter((q) => q.unit === unit);
 
 // Import the macroSetTwoQuestions from the macroSetTwo.ts file
 import { macroSetTwoQuestions } from '../questionBanks/macro/mcqs/macroSetTwo';
@@ -1815,7 +1825,8 @@ const macroUnit2Questions = [
     "correctAnswer": "D",
     "explanation": "To compare purchasing power, calculate the Real Wage for Year 2 in Year 1 dollars: Real Wage = (Nominal Wage / CPI) * 100. Year 2 Real Wage = ($22 / 110) * 100 = 0.2 * 100 = $20.00. Since the real wage was $20.00 in Year 1 and is $20.00 in Year 2, purchasing power remained constant.",
     "videoExplanation": null
-  }
+  },
+  ...macroV2TableByUnit(2),
 ]
 
 
@@ -2730,7 +2741,8 @@ const macroUnit3Questions = [
     "correctAnswer": "E",
     "explanation": "The marginal propensity to consume is calculated from the change in personal-consumption expenditures divided by the change in disposable income. When disposable income increases by $100 and consumption increases by $80, the marginal propensity to consume is 0.8. Because MPC + MPS = 1, the marginal propensity to save is 0.20.",
     "videoExplanation": null
-    }
+    },
+  ...macroV2TableByUnit(3),
 ]
 
 
@@ -3474,7 +3486,8 @@ const macroUnit4Questions = [
     "correctAnswer": "E",
     "explanation": "The interest rate is the 'price' on the vertical axis of the money market graph. A change in the price of the good (interest rate) causes a movement along the curve (change in quantity demanded). Any other factor (GDP, price level, technology) shifts the entire curve.",
     "videoExplanation": null
-    }
+    },
+  ...macroV2TableByUnit(4),
 ]
 
 
@@ -4218,7 +4231,8 @@ const macroUnit5Questions = [
 "correctAnswer": "E",
 "explanation": "Economic growth is an increase in real potential output. Changes in the price level (inflation/deflation) are nominal variables and do not affect the economy's productive capacity in the long run.",
 "videoExplanation": null
-}
+},
+  ...macroV2TableByUnit(5),
 ]
 
 
@@ -4492,7 +4506,8 @@ const macroUnit6Questions = [
     "correctAnswer": "C",
     "explanation": "Net capital inflow means that foreigners are purchasing more of the country's assets than residents are purchasing of foreign assets. This inflow of funds is recorded as a credit (+) balance, or a surplus, in the financial account.",
     "videoExplanation": null
-  }
+  },
+  ...macroV2TableByUnit(6),
 ]
 
 
@@ -4520,226 +4535,6 @@ const microUnit1Questions = [
   },
   // Lesson 1.2: (left empty)
   // Lesson 1.3: Opportunity Cost and PPC (copied from macro 1.2)
-  {
-    "id": 201,
-    "unit": 1,
-    "lessonIDS": ["1.3"], 
-    "unitName": "Basic Economic Concepts",
-    "question": "The value of the best alternative forgone when a choice is made is called:",
-    "image": null,
-    "options": [
-      "Explicit cost.",
-      "Marginal cost.",
-      "Scarcity.",
-      "Opportunity cost.",
-      "Comparative cost."
-    ],
-    "correctAnswer": "D",
-    "explanation": "Opportunity cost is the value of the next best alternative that must be sacrificed when making a decision. It highlights the trade-offs inherent in every choice.",
-    "videoExplanation": null
-  },
-  {
-    "id": 202,
-    "unit": 1,
-    "lessonIDS": ["1.3"], 
-    "unitName": "Basic Economic Concepts",
-    "question": "A point located inside the Production Possibilities Curve (PPC) indicates that:",
-    "image": null,
-    "options": [
-      "The economy is operating at full employment.",
-      "Resources are being used inefficiently or are unemployed.",
-      "The economy has experienced economic growth.",
-      "The combination of goods is unattainable with current resources.",
-      "The economy is producing beyond its capacity."
-    ],
-    "correctAnswer": "B",
-    "explanation": "Points inside the PPC represent attainable production levels but signify inefficiency, meaning resources (like labor or capital) are either unemployed or not being used to their full potential.",
-    "videoExplanation": "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/mcqExplanations/q202VideoExplanation.mp4"
-  },
-  {
-    "id": 203,
-    "unit": 1,
-    "lessonIDS": ["1.3"], 
-    "unitName": "Basic Economic Concepts",
-    "question": "Which of the following would cause an outward shift of a nation's Production Possibilities Curve (PPC)?",
-    "image": null,
-    "options": [
-      "A decrease in unemployment.",
-      "An increase in the general price level.",
-      "A natural disaster destroying resources.",
-      "An improvement in technology applicable to production.",
-      "A shift in consumer preferences."
-    ],
-    "correctAnswer": "D",
-    "explanation": "An outward shift of the PPC signifies economic growth. This can result from increases in resource availability (land, labor, capital) or improvements in technology that allow more output to be produced with the same resources.",
-    "videoExplanation": null
-  },
-  // Lesson 1.4: Comparative Advantage (copied from macro 1.3)
-  {
-    "id": 204,
-    "unit": 1,
-    "lessonIDS": ["1.4"], 
-    "unitName": "Basic Economic Concepts",
-    "question": "Country A can produce 10 cars or 20 computers. Country B can produce 8 cars or 12 computers. Which country has the comparative advantage in producing cars?",
-    "image": null,
-    "options": [
-      "Country A.",
-      "Country B.",
-      "Neither country.",
-      "Both countries.",
-      "Cannot be determined from the information given."
-    ],
-    "correctAnswer": "B",
-    "explanation": "To find comparative advantage, calculate opportunity costs. Country A's opportunity cost of 1 car is 2 computers (20/10). Country B's opportunity cost of 1 car is 1.5 computers (12/8). Since Country B has the lower opportunity cost for cars, it has the comparative advantage.",
-    "videoExplanation": null
-  },
-  {
-    "id": 205,
-    "unit": 1,
-    "lessonIDS": ["1.4"], 
-    "unitName": "Basic Economic Concepts",
-    "question": "Specialization and trade based on comparative advantage lead to:",
-    "image": null,
-    "options": [
-      "Increased scarcity.",
-      "A decrease in total world production.",
-      "Higher opportunity costs for all nations.",
-      "An increase in total world production and consumption possibilities.",
-      "A shift inward of the Production Possibilities Curve for trading nations."
-    ],
-    "correctAnswer": "D",
-    "explanation": "When countries specialize in goods where they have a lower opportunity cost (comparative advantage) and trade, global efficiency increases. This results in higher total world output and allows countries to consume beyond their individual production possibilities.",
-    "videoExplanation": null
-  },
-  {
-    "id": 2083,
-    "unit": 1,
-    "lessonIDS": ["1.3"],
-    "unitName": "Basic Economic Concepts",
-    "question": "The table below shows the maximum potential output for two countries, Rohan and Gondor, if they use all their resources efficiently.\n\nIf these countries decide to specialize and trade based on comparative advantage, which of the following scenarios represents a mutually beneficial trade agreement?",
-    "image": null,
-    "tableData": {
-      "headers": ["Country", "Tonnes of Steel", "Tonnes of Grain"],
-      "rows": [
-        ["Rohan", "10", "40"],
-        ["Gondor", "20", "20"]
-      ]
-    },
-    "options": [
-      "Rohan exports grain, and they trade at a rate of 1 Steel for 3 Grain.",
-      "Rohan exports steel, and they trade at a rate of 1 Steel for 5 Grain.",
-      "Gondor exports grain, and they trade at a rate of 1 Steel for 2 Grain.",
-      "Gondor exports steel, and they trade at a rate of 1 Steel for 3 Grain.",
-      "Gondor exports steel, and they trade at a rate of 1 Steel for 5 Grain."
-    ],
-    "correctAnswer": "D",
-    "explanation": "Calculate Opportunity Costs for Steel: Rohan gives up 4 Grain (40/10). Gondor gives up 1 Grain (20/20). Gondor has the lower opp. cost (1 < 4) and exports Steel. The terms of trade must fall between the two opportunity costs (between 1 Grain and 4 Grain). 1 Steel for 3 Grain is the only option in that range.",
-    "videoExplanation": null
-  },
-  {
-    "id": 2090,
-    "unit": 1,
-    "lessonIDS": ["1.4"],
-    "unitName": "Comparative Advantage and Gains from Trade",
-    "question": "Dr. Aris is a highly skilled neurosurgeon who earns $300 per hour. He is also an exceptionally fast typist, capable of transcribing medical records twice as fast as the average medical transcriptionist, who earns $20 per hour. According to economic principles of advantage, which course of action is most efficient?",
-    "image": null,
-    "options": [
-      "Dr. Aris should perform his own transcription because he has an absolute advantage in both surgery and typing.",
-      "Dr. Aris should hire a transcriptionist because he has a comparative advantage in surgery.",
-      "Dr. Aris should quit surgery to become a transcriptionist because his typing speed gives him a comparative advantage.",
-      "The transcriptionist should charge Dr. Aris $300 per hour since that is the opportunity cost of the doctor's time.",
-      "Dr. Aris should do his own transcription because saving $20 per hour is economically rational."
-    ],
-    "correctAnswer": "B",
-    "explanation": "Even though Dr. Aris has an absolute advantage in typing (he is faster), his opportunity cost is too high. Every hour he spends typing costs him $300 in lost surgical income. He should specialize where his comparative advantage is highest (surgery) and trade for the other service.",
-    "videoExplanation": null
-  },
-  {
-    "id": 2091,
-    "unit": 1,
-    "lessonIDS": ["1.4"],
-    "unitName": "Comparative Advantage and Gains from Trade",
-    "question": "Consider two factories, Alpha and Beta, that produce only widgets and gadgets. If a worker in Factory Alpha can produce three times as many widgets as a worker in Factory Beta using the same amount of time, which of the following is true?",
-    "image": null,
-    "options": [
-      "Factory Alpha has a comparative advantage in widgets.",
-      "Factory Alpha has an absolute advantage in widgets.",
-      "Factory Beta has a comparative advantage in gadgets.",
-      "Factory Beta has an absolute advantage in gadgets.",
-      "Factory Alpha should specialize in widgets."
-    ],
-    "correctAnswer": "B",
-    "explanation": "Absolute advantage is defined by productivity per unit of input. Since Alpha produces more widgets per worker (input), it has an absolute advantage. We cannot determine comparative advantage without knowing the production data for gadgets to calculate opportunity cost.",
-    "videoExplanation": null
-  },
-  {
-    "id": 2092,
-    "unit": 1,
-    "lessonIDS": ["1.4"],
-    "unitName": "Comparative Advantage and Gains from Trade",
-    "question": "The table below shows the maximum potential output for two countries, Rohan and Gondor, if they use all their resources efficiently.\n\nIf these countries decide to specialize and trade based on comparative advantage, which of the following scenarios represents a mutually beneficial trade agreement?",
-    "image": null,
-    "tableData": {
-      "headers": ["Country", "Tonnes of Steel", "Tonnes of Grain"],
-      "rows": [
-        ["Rohan", "10", "40"],
-        ["Gondor", "20", "20"]
-      ]
-    },
-    "options": [
-      "Rohan exports grain, and they trade at a rate of 1 Steel for 3 Grain.",
-      "Rohan exports steel, and they trade at a rate of 1 Steel for 5 Grain.",
-      "Gondor exports grain, and they trade at a rate of 1 Steel for 2 Grain.",
-      "Gondor exports steel, and they trade at a rate of 1 Steel for 3 Grain.",
-      "Gondor exports steel, and they trade at a rate of 1 Steel for 5 Grain."
-    ],
-    "correctAnswer": "D",
-    "explanation": "Calculate Opportunity Costs for Steel: Rohan gives up 4 Grain (40/10). Gondor gives up 1 Grain (20/20). Gondor has the lower opp. cost (1 < 4) and exports Steel. The terms of trade must fall between the two opportunity costs (between 1 Grain and 4 Grain). 1 Steel for 3 Grain is the only option in that range.",
-    "videoExplanation": null
-  },
-  {
-    "id": 2093,
-    "unit": 1,
-    "lessonIDS": ["1.4"],
-    "unitName": "Comparative Advantage and Gains from Trade",
-    "question": "The production possibilities for two island nations, Island A and Island B, are shown in the table below. The numbers represent the annual output of either Coconuts or Fish using all available resources.\n\nWhich terms of trade would incentivize both islands to specialize and engage in trade?",
-    "image": null,
-    "tableData": {
-      "headers": ["Nation", "Coconuts", "Fish"],
-      "rows": [
-        ["Island A", "100", "50"],
-        ["Island B", "50", "100"]
-      ]
-    },
-    "options": [
-      "1 Coconut for 0.2 Fish",
-      "1 Coconut for 1.5 Fish",
-      "1 Coconut for 3 Fish",
-      "1 Coconut for 4 Fish",
-      "1 Coconut for 5 Fish"
-    ],
-    "correctAnswer": "B",
-    "explanation": "Calculate Opp Cost of 1 Coconut: Island A = 0.5 Fish (50/100). Island B = 2 Fish (100/50). For trade to benefit both, the price must settle between their opportunity costs (0.5 Fish < Price < 2 Fish). 1.5 Fish is the only option within this range.",
-    "videoExplanation": null
-  },
-  {
-    "id": 2094,
-    "unit": 1,
-    "lessonIDS": ["1.4"],
-    "unitName": "Comparative Advantage and Gains from Trade",
-    "question": "If two neighboring countries engage in mutually beneficial trade, with Westland exporting microchips to Eastland and importing lumber from Eastland, which of the following conclusions must be true?",
-    "image": null,
-    "options": [
-      "Westland has a higher opportunity cost for producing microchips than Eastland.",
-      "Eastland has a comparative advantage in producing lumber.",
-      "Eastland has an absolute advantage in producing microchips.",
-      "Westland's workers are less productive at making microchips than Eastland's workers.",
-      "Eastland consumers have a stronger preference for microchips."
-    ],
-    "correctAnswer": "B",
-    "explanation": "Trade flows are dictated by comparative advantage. If Eastland is exporting lumber, it must be because it can produce lumber at a lower opportunity cost than Westland, meaning it holds the comparative advantage.",
-    "videoExplanation": null
-  },
   {
     "id": 2095,
     "unit": 1,
@@ -5033,9 +4828,10 @@ const microUnit1Questions = [
     "correctAnswer": "C",
     "explanation": "To move from Combination B to Combination C, the production of Heavy Trucks increases from 10,000 to 20,000. However, the production of Patrol Boats decreases from 18,000 to 15,000. The opportunity cost is the amount of the alternative good given up: $18,000 - 15,000 = 3,000$ Patrol Boats.",
     "videoExplanation": null
-  }
+  },
   // Lesson 1.5: (left empty)
   // Lesson 1.6: (left empty)
+  ...microV2TableByUnit(1),
 ]
 
 // Microeconomics Unit 2 Practice Problems
@@ -5453,7 +5249,8 @@ const microUnit2Questions = [
     "correctAnswer": "C",
     "explanation": "A negative cross-price elasticity means that when the price of one good goes up, the demand for the other goes down (and vice versa), which defines Complementary goods.",
     "videoExplanation": null
-  }
+  },
+  ...microV2TableByUnit(2),
 ]
 
 
@@ -6031,7 +5828,8 @@ const microUnit3Questions = [
     "correctAnswer": "B",
     "explanation": "The Marginal Cost curve shifts only when the price of a variable input changes. Wages are a variable cost. Rent and property taxes are fixed costs (which shift ATC but not MC), and technology improvements usually shift MC down, not up.",
     "videoExplanation": null
-    }, 
+    },
+  ...microV2TableByUnit(3),
 ]
 
 
@@ -6234,7 +6032,8 @@ const microUnit4Questions = [
     "correctAnswer": "B",
     "explanation": "For a monopolist, marginal revenue falls faster than price because to sell an additional unit, the monopolist must lower the price on all units sold, not just the new unit. This means the revenue gained from the new unit is offset by the revenue lost from lowering the price on all previous units.",
     "videoExplanation": null
-  }
+  },
+  ...microV2TableByUnit(4),
 ]
 
 // Microeconomics Unit 5 Practice Problems
@@ -7035,8 +6834,8 @@ const microUnit5Questions = [
     "correctAnswer": "C",
     "explanation": "In a monopsony, a minimum wage can actually increase employment. By setting a floor at $20, the firm's MRC becomes flat (equal to the minimum wage) up to the point it hits the supply curve. If the MRP is still higher than $20 at 120 workers, the firm will hire more workers than it did at the monopsony equilibrium.",
     "videoExplanation": null
-  }
-
+  },
+  ...microV2TableByUnit(5),
 ]
 
 
@@ -7677,7 +7476,8 @@ const microUnit6Questions = [
     "correctAnswer": "C",
     "explanation": "At the Fair Return price (P=ATC), the firm's total revenue equals its total costs, meaning it earns zero economic profit (normal profit). However, it is not allocatively efficient because Price is still greater than Marginal Cost.",
     "videoExplanation": null
-  }
+  },
+  ...microV2TableByUnit(6),
 ];
 
 export const allQuestions: QuestionType[] = [

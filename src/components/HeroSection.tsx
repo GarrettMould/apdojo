@@ -45,47 +45,27 @@ export function HeroSection() {
       />
 
       <div className="relative mx-auto w-full max-w-6xl">
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="flex flex-col items-center text-center"
-        >
-          <motion.p
-            variants={itemVariants}
-            className="text-sm font-black uppercase tracking-[0.28em] text-slate-900 sm:text-base"
-          >
+        <div className="flex flex-col items-center text-center">
+          <p className="text-sm font-black uppercase tracking-[0.28em] text-slate-900 sm:text-base">
             AP Dojo
-          </motion.p>
+          </p>
 
-          <motion.p
-            variants={itemVariants}
-            className="mt-5 inline-flex items-center rounded-full border-2 border-black bg-white px-4 py-1.5 text-xs font-black uppercase tracking-[0.14em] text-slate-800 shadow-[3px_3px_0_0_rgba(0,0,0,1)] sm:text-sm"
-          >
+          <p className="mt-5 inline-flex items-center rounded-full border-2 border-black bg-white px-4 py-1.5 text-xs font-black uppercase tracking-[0.14em] text-slate-800 shadow-[3px_3px_0_0_rgba(0,0,0,1)] sm:text-sm">
             Brand new <span className="mx-1.5 text-blue-600">2027</span> courses available
-          </motion.p>
+          </p>
 
-          <motion.h1
-            variants={itemVariants}
-            className="mt-6 max-w-4xl text-4xl font-black tracking-tight text-slate-900 sm:text-6xl lg:text-7xl lg:leading-[1.05]"
-          >
+          <h1 className="mt-6 max-w-4xl text-4xl font-black tracking-tight text-slate-900 sm:text-6xl lg:text-7xl lg:leading-[1.05]">
             Four AP courses.
             <br />
             One place to score a 5.
-          </motion.h1>
+          </h1>
 
-          <motion.p
-            variants={itemVariants}
-            className="mt-5 max-w-2xl text-base font-medium leading-relaxed text-slate-600 sm:text-xl"
-          >
+          <p className="mt-5 max-w-2xl text-base font-medium leading-relaxed text-slate-600 sm:text-xl">
             Macro, Micro, Gov, and Stats, rebuilt for the 2027 exams with practice, cheat sheets, and
             season-pass tools.
-          </motion.p>
+          </p>
 
-          <motion.div
-            variants={itemVariants}
-            className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:gap-4"
-          >
+          <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:gap-4">
             <button
               type="button"
               onClick={() => setShowSignupModal(true)}
@@ -99,20 +79,17 @@ export function HeroSection() {
             >
               Season Pass
             </a>
-          </motion.div>
+          </div>
 
-          <motion.div
-            variants={itemVariants}
-            className="mt-5 flex items-center gap-2 text-sm font-semibold text-slate-600"
-          >
+          <div className="mt-5 flex items-center gap-2 text-sm font-semibold text-slate-600">
             <div className="flex gap-0.5">
               {[...Array(5)].map((_, i) => (
                 <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
               ))}
             </div>
             <span>1,000+ students helped</span>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
 
         <motion.div
           id="courses"

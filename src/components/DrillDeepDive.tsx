@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { dojoDrills, DojoDrill } from '@/data/dojoDrills';
-import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
+import { useQuestionBank } from '@/hooks/useQuestionBank';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight, CheckCircle2, XCircle, CheckCircle, X } from 'lucide-react';
@@ -64,11 +64,11 @@ interface DrillDeepDiveProps {
     id: number;
     question: string;
     options: string[];
-    correctAnswer: string;
+    correctAnswer: string | number;
     explanation?: string;
-    image?: { src: string; alt: string } | null;
+    image?: { src: string; alt?: string } | null;
     tableData?: { headers: string[]; rows: string[][] };
-  }>;
+  }> | null;
 }
 
 /** Tag badge colors for flashcard front */
@@ -155,13 +155,16 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonTitle, le
   const isReviewOnly = !drillId || !drill;
 
   // Get MCQ questions for stage 3: use lessonMcqQuestions when provided (e.g. 3 per lesson from unitPracticeProblems), else from drill
+  const questionBank = useQuestionBank();
   const subjectFilter = drill ? (drill.subject === 'ap_macroeconomics' ? 'ap_macroeconomics' : 'ap_microeconomics') : 'ap_macroeconomics';
-  const drillMcqQuestions = drill
+  const drillMcqQuestions = drill && questionBank
     ? drill.stage3.mcqIds
-        .map(id => allQuestions.find(q => q.id === id && q.subject === subjectFilter))
-        .filter((q): q is typeof allQuestions[0] => q !== undefined)
+        .map(id => questionBank.find(q => q.id === id && q.subject === subjectFilter))
+        .filter((q): q is NonNullable<typeof q> => q !== undefined)
     : [];
-  const mcqQuestions = lessonMcqQuestions?.length
+  const mcqQuestions = lessonMcqQuestions === null
+    ? []
+    : lessonMcqQuestions?.length
     ? lessonMcqQuestions.map(q => ({
         id: q.id,
         question: q.question,
@@ -287,7 +290,7 @@ export function DrillDeepDive({ drillId, backLink, backLinkText, lessonTitle, le
           >
             <div>
               <p className="text-xl sm:text-2xl text-black whitespace-nowrap" style={{
-                fontFamily: "'Permanent Marker', cursive",
+                fontFamily: "var(--font-permanent-marker), cursive",
                 textShadow: '1px 1px 0px rgba(0,0,0,0.1)',
                 letterSpacing: '0.02em',
                 lineHeight: '1.2',

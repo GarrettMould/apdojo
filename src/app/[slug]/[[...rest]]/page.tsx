@@ -1,14 +1,14 @@
 'use client';
 
-import { Suspense, useEffect, useMemo } from 'react';
+import { Suspense, useEffect, useMemo, type ComponentProps } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { GraphGym } from '@/components/GraphGym';
 import { Loader2 } from 'lucide-react';
 import { getScenarioBySlug, getSlugForScenario } from '@/lib/graphGymSlugs';
 import { getLessonData } from '@/data/lessonRegistry';
 import { getVideosForLessonId } from '@/data/videosByLessonId';
-import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { DrillDeepDive } from '@/components/DrillDeepDive';
+import { useLessonMcqPreview } from '@/hooks/useQuestionBank';
 
 /** Key Takeaways for PPC deep dive (same as old page). */
 function PPCKeyTakeaways() {
@@ -77,6 +77,20 @@ function GraphGymSlugContent() {
   );
 }
 
+function MacroLessonDeepDive({
+  unit,
+  lessonId,
+  ...props
+}: ComponentProps<typeof DrillDeepDive> & { unit: number; lessonId: string }) {
+  const lessonMcqQuestions = useLessonMcqPreview({
+    unit,
+    subject: 'ap_macroeconomics',
+    lessonId,
+    answerAsIndex: false,
+  });
+  return <DrillDeepDive {...props} lessonMcqQuestions={lessonMcqQuestions} />;
+}
+
 function SlugPageContent() {
   const params = useParams();
   const router = useRouter();
@@ -130,29 +144,6 @@ function SlugPageContent() {
       : null;
   }, [lesson, slug]);
 
-  // 3 MCQs per lesson from unitPracticeProblems for Unit 1 & 2 macro deep dives
-  const lessonMcqQuestions = useMemo(() => {
-    if (!lesson || slug !== 'ap-macro') return undefined;
-    const unitId = rest?.[0]?.replace(/^unit-/, '');
-    const unitNum = unitId === '1' ? 1 : unitId === '2' ? 2 : null;
-    if (unitNum == null) return undefined;
-    const matching = allQuestions.filter(
-      (q) =>
-        q.unit === unitNum &&
-        q.subject === 'ap_macroeconomics' &&
-        q.lessonIDS?.includes(lesson.id)
-    );
-    return matching.slice(0, 3).map((q) => ({
-      id: q.id,
-      question: q.question,
-      options: q.options,
-      correctAnswer: q.correctAnswer,
-      explanation: q.explanation,
-      image: q.image ?? null,
-      tableData: q.tableData,
-    }));
-  }, [lesson, slug, rest]);
-
   useEffect(() => {
     if (!isDeepDive) return;
     if (lesson == null) {
@@ -175,20 +166,27 @@ function SlugPageContent() {
       { label: `AP Macro - ${lesson.id}` },
       { label: `AP Micro - ${lesson.id}` },
     ];
-    return (
-      <DrillDeepDive
-        drillId={lesson.drillId}
-        backLink={backLink}
-        backLinkText={backLinkText}
-        lessonTitle={lesson.title}
-        lessonPills={lessonPills}
-        flashcards={lesson.flashcards}
-        instantAnswer={lesson.instantAnswer}
-        keyTakeaways={lesson.content ?? <PPCKeyTakeaways />}
-        fallbackVideo={fallbackVideo}
-        lessonMcqQuestions={lessonMcqQuestions}
-      />
-    );
+    const shared = {
+      drillId: lesson.drillId,
+      backLink,
+      backLinkText,
+      lessonTitle: lesson.title,
+      lessonPills,
+      flashcards: lesson.flashcards,
+      instantAnswer: lesson.instantAnswer,
+      keyTakeaways: lesson.content ?? <PPCKeyTakeaways />,
+      fallbackVideo,
+    };
+    if (slug === 'ap-macro' && (unitId === '1' || unitId === '2')) {
+      return (
+        <MacroLessonDeepDive
+          {...shared}
+          unit={Number(unitId)}
+          lessonId={lesson.id}
+        />
+      );
+    }
+    return <DrillDeepDive {...shared} />;
   }
 
   return <GraphGymSlugContent />;

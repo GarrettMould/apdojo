@@ -1,5 +1,5 @@
 /** Flip to true to show Rematch on MCQ practice pages. */
-export const REMATCH_ENABLED = false;
+export const REMATCH_ENABLED = true;
 
 export type {
   ReviewMiss,

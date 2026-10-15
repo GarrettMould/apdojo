@@ -147,7 +147,7 @@ export function PlacementResults({ results }: PlacementResultsProps) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6, duration: 0.5 }}
         className="text-3xl sm:text-4xl text-gray-800 max-w-2xl leading-relaxed font-semibold"
-        style={{ fontFamily: 'Permanent Marker, cursive' }}
+        style={{ fontFamily: 'var(--font-permanent-marker), cursive' }}
       >
         {results.message}
       </motion.p>

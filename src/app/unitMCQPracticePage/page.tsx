@@ -10,7 +10,7 @@ import { SeasonPassModal } from '@/components/SeasonPassModal';
 import { loadStripe } from '@stripe/stripe-js';
 import { useCreditSystem } from '@/hooks/useCreditSystem';
 import { UnitMCQs } from '@/components/unitMCQS';
-import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems'; // Reverted import
+import { useQuestionBank } from '@/hooks/useQuestionBank';
 import { Question as QuestionType } from '@/data/questionBanks/types';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp, doc, updateDoc, increment, getDoc } from 'firebase/firestore';
@@ -213,6 +213,8 @@ function AccessDenied({
 
 
 function UnitMCQPracticeContent() {
+  const questionBank = useQuestionBank();
+  const allQuestions = questionBank ?? [];
   const router = useRouter();
   const searchParams = useSearchParams();
   const { 
@@ -500,6 +502,7 @@ function UnitMCQPracticeContent() {
     let cancelled = false;
 
     const hydrate = async () => {
+      if (!questionBank) return;
       if (reviewUnitIds.length === 0) return;
 
       let merged = loadMergedReviewFolders(reviewUserKey, subject, reviewUnitIds);
@@ -573,7 +576,7 @@ function UnitMCQPracticeContent() {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reviewUserKey, subject, reviewUnitIds.join(','), user?.uid]);
+  }, [questionBank, reviewUserKey, subject, reviewUnitIds.join(','), user?.uid]);
 
   const hasTestModeAccess =
     !!user &&
@@ -597,6 +600,11 @@ function UnitMCQPracticeContent() {
 
   // Load questions based on practice mode
   useEffect(() => {
+    if (!questionBank) {
+      setIsLoadingQuestionSet(true);
+      return;
+    }
+
     // Create a unique key for the current filter criteria
     const filterKey = JSON.stringify({
       practiceMode,
@@ -763,7 +771,7 @@ function UnitMCQPracticeContent() {
     }
 
     setIsLoadingQuestionSet(false);
-  }, [practiceMode, currentUnit, customUnitIds, weakestUnitIds, lessonIdParam, subject, testQuestionId, isDeveloper, showAllQuestions, practiceMissedMode, practiceMissedUnitFilter, reviewState.misses.length, user, loadingMcqData]);
+  }, [questionBank, practiceMode, currentUnit, customUnitIds, weakestUnitIds, lessonIdParam, subject, testQuestionId, isDeveloper, showAllQuestions, practiceMissedMode, practiceMissedUnitFilter, reviewState.misses.length, user, loadingMcqData]);
 
   // Access control check and credit status
   useEffect(() => {

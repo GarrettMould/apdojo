@@ -8,7 +8,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useCreditSystem } from '@/hooks/useCreditSystem';
 import { UnitMCQs } from '@/components/unitMCQS';
-import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question as QuestionType } from '@/data/questionBanks/types';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp, doc, updateDoc, increment, getDoc } from 'firebase/firestore';
@@ -243,9 +242,10 @@ function Breadcrumb({ subject, unitNumber }: { subject: PracticeMcqSubject; unit
 interface PracticePageContentProps {
   subject: PracticeMcqSubject;
   unitNumber: number;
+  practiceQuestions: QuestionType[];
 }
 
-export function PracticePageContent({ subject, unitNumber }: PracticePageContentProps) {
+export function PracticePageContent({ subject, unitNumber, practiceQuestions }: PracticePageContentProps) {
   const router = useRouter();
   const { 
     user, 
@@ -327,7 +327,7 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
       }
 
       if (cancelled) return;
-      next = filterReviewFolderBySubject(next, subject, allQuestions);
+      next = filterReviewFolderBySubject(next, subject, practiceQuestions);
       setReviewState(next);
       saveReviewFolder(reviewUserKey, subject, unitNumber, next);
       setJustFiledQuestionId(null);
@@ -347,9 +347,9 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
         const seeded = applyAnswerHistoryToReviewFolder(next, mcqAnswersData, {
           subject,
           unitNumber,
-          bankQuestions: allQuestions,
+          bankQuestions: practiceQuestions,
         });
-        const scoped = filterReviewFolderBySubject(seeded, subject, allQuestions);
+        const scoped = filterReviewFolderBySubject(seeded, subject, practiceQuestions);
         if (scoped.misses.length > 0) {
           setReviewState(scoped);
           persistReview(scoped);
@@ -389,9 +389,9 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
           const seeded = applyAnswerHistoryToReviewFolder(prev, mcqAnswersData, {
             subject,
             unitNumber,
-            bankQuestions: allQuestions,
+            bankQuestions: practiceQuestions,
           });
-          const scoped = filterReviewFolderBySubject(seeded, subject, allQuestions);
+          const scoped = filterReviewFolderBySubject(seeded, subject, practiceQuestions);
           void saveReviewFolderToCloud(user.uid, subject, unitNumber, scoped);
           saveReviewFolder(reviewUserKey, subject, unitNumber, scoped);
           return scoped;
@@ -570,7 +570,7 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
     setIsLoadingQuestionSet(true);
     const subjectFilter = apQuestionSubjectTag(subject as CourseSubject);
     
-    let questions: QuestionType[] = allQuestions.filter(q => 
+    let questions: QuestionType[] = practiceQuestions.filter(q => 
       q.subject === subjectFilter && 
       q.unit === unitNumber &&
       !q.isTest // Exclude test questions for practice mode
@@ -676,7 +676,7 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
       [questionId]: { selectedLetter: answerLetter, isCorrect }
     }));
 
-    const question = allQuestions.find(q => q.id === questionId);
+    const question = practiceQuestions.find(q => q.id === questionId);
     const lessons = lessonIDS || question?.lessonIDS || [];
 
     if (isCorrect) {
@@ -750,7 +750,7 @@ export function PracticePageContent({ subject, unitNumber }: PracticePageContent
       reviewState,
       subject,
       selected[0] ?? unitNumber,
-      allQuestions,
+      practiceQuestions,
       selected
     );
     if (draft.chapters.length === 0) {

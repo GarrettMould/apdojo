@@ -83,7 +83,7 @@ const DojoThumbnail: React.FC<DojoThumbnailProps> = ({
       {/* Bottom-Right: Activity Type in Whiteboard Font */}
       {activityType && (
         <div className="absolute bottom-3 right-3 z-20">
-          <span className="text-2xl font-bold text-gray-800 drop-shadow-sm" style={{ fontFamily: 'Permanent Marker, cursive' }}>
+          <span className="text-2xl font-bold text-gray-800 drop-shadow-sm" style={{ fontFamily: 'var(--font-permanent-marker), cursive' }}>
             {activityTypeText}
           </span>
         </div>

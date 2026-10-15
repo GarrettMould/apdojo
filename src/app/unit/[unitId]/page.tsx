@@ -24,7 +24,7 @@ import { unit1Whiteboards, apMacroUnit2Whiteboards, apMacroUnit3Whiteboards, apM
 import { microLessons, macroLessons } from '@/data/lessons';
 import { videos, Video } from '@/data/videos';
 import { getVideosForLessonId } from '@/data/videosByLessonId';
-import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
+import { useQuestionBank } from '@/hooks/useQuestionBank';
 import { Question as QuestionType } from '@/data/questionBanks/types';
 import { X, ArrowRight, Lock, ArrowLeft, CheckCircle2, XCircle, Download, Bookmark, BookmarkPlus, Check, Brain, Maximize2, FileText, Zap, Lightbulb, FileQuestion, Award, Layers, Unlock, Sparkles, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Pen } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -199,16 +199,17 @@ interface LessonContent {
 // Inline MCQ practice for a lesson (uses unitPracticeProblems, same as unitMCQ practice page)
 function LessonMcqPractice({ lessonId, unit, subject, isProCustomer, unitAnsweredCount = 0, onAnswer }: { lessonId: string; unit: number; subject: 'macro' | 'micro'; isProCustomer?: boolean; unitAnsweredCount?: number; onAnswer?: (questionId: number) => void }) {
   const subjectFilter = subject === 'macro' ? 'ap_macroeconomics' : 'ap_microeconomics';
+  const questionBank = useQuestionBank();
   const questions = useMemo(
     () =>
-      allQuestions.filter(
+      (questionBank ?? []).filter(
         (q) =>
           q.subject === subjectFilter &&
           q.unit === unit &&
           q.lessonIDS?.includes(lessonId) &&
           !q.isTest
       ),
-    [lessonId, unit, subjectFilter]
+    [lessonId, unit, subjectFilter, questionBank]
   );
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -562,6 +563,8 @@ interface UnitPageProps {
 }
 
 export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubject }: UnitPageProps = {}) {
+  const questionBank = useQuestionBank();
+  const allQuestions = questionBank ?? [];
   const params = useParams();
   const router = useRouter(); // Initialize useRouter
   const { user, userData, loading, loadingUserData, selectedSubject: contextSubject, awardXp } = useAuthContext();

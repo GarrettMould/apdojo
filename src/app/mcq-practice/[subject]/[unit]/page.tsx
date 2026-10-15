@@ -12,6 +12,7 @@ import {
   getUnitSlug,
 } from '@/lib/practiceSlugs';
 import { isGovMcqPracticeUnitAvailable, isStatsMcqPracticeUnitAvailable } from '@/lib/courseSubject';
+import { questionsForPracticeSubject } from '@/data/unitPracticeProblems/practiceQuestions';
 
 interface PracticePageProps {
   params: Promise<{
@@ -96,7 +97,11 @@ export default async function PracticePage({ params }: PracticePageProps) {
 
   return (
     <CourseProvider initialSubject={subject}>
-      <PracticePageContent subject={subject} unitNumber={unitNumber} />
+      <PracticePageContent
+        subject={subject}
+        unitNumber={unitNumber}
+        practiceQuestions={questionsForPracticeSubject(subject)}
+      />
     </CourseProvider>
   );
 }
