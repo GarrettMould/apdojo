@@ -7,6 +7,8 @@ import {
   packetCourseDisplayName,
 } from '@/lib/practicePacket/subjects';
 
+export const maxDuration = 60;
+
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 export async function POST(req: Request) {
