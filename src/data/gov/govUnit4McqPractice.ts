@@ -16,12 +16,12 @@ export const govUnit4McqPracticeQuestions: Question[] = [
     question: "The tension between \"equality of opportunity\" and \"equality of outcome\" in American political culture is best illustrated by which of the following debates?",
     image: null,
     options: [
-      "Whether the government should ensure everyone has access to public education versus whether it should guarantee everyone achieves the same level of income.",
       "Whether states should have equal representation in the Senate versus the House.",
+      "Whether the government should ensure everyone has access to public education versus whether it should guarantee everyone achieves the same level of income.",
       "Whether federal judges should serve life terms versus fixed terms.",
       "Whether the president should be elected by popular vote versus the Electoral College.",
     ],
-    correctAnswer: "A",
+    correctAnswer: "B",
     explanation: "Equality of opportunity emphasizes providing everyone a fair starting point (such as access to education), while equality of outcome emphasizes ensuring similar end results (such as income). This tension is a recurring theme in American political ideology.",
   },
   {
@@ -34,11 +34,11 @@ export const govUnit4McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "The family",
-      "The mass media",
       "Schools",
+      "The mass media",
       "Peer groups",
     ],
-    correctAnswer: "C",
+    correctAnswer: "B",
     explanation: "Schools are a major agent of political socialization, instilling civic values, national identity, and basic political knowledge through practices like the Pledge of Allegiance and formal civics education.",
   },
   {
@@ -51,11 +51,11 @@ export const govUnit4McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "A generational effect, because their entire age cohort shares this same shift.",
-      "A life cycle effect, because their views changed as their personal circumstances changed with age.",
       "Political realignment, because they switched political parties.",
+      "A life cycle effect, because their views changed as their personal circumstances changed with age.",
       "A period effect caused by a single national event.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "C",
     explanation: "A life cycle effect describes changes in political priorities or attitudes that occur as an individual moves through different stages of life (such as becoming a homeowner), rather than reflecting a shared generational experience.",
   },
   {
@@ -67,12 +67,12 @@ export const govUnit4McqPracticeQuestions: Question[] = [
     question: "A major economic recession leads an entire generation of young adults entering the workforce during that period to hold more favorable views of government intervention in the economy for the rest of their lives. This is an example of:",
     image: null,
     options: [
-      "A life cycle effect",
       "A generational effect",
+      "A life cycle effect",
       "Selective exposure",
       "The politico model of representation",
     ],
-    correctAnswer: "B",
+    correctAnswer: "A",
     explanation: "A generational effect occurs when a shared historical experience (such as coming of age during a major recession) shapes the political attitudes of an entire age cohort in a lasting way, distinguishing it from life cycle effects tied to individual aging.",
   },
   {
@@ -102,11 +102,11 @@ export const govUnit4McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "A random sample designed to minimize bias.",
-      "A push poll, since the question's framing is designed to influence the respondent's opinion rather than measure it objectively.",
       "A benchmark poll used only at the start of a campaign.",
+      "A push poll, since the question's framing is designed to influence the respondent's opinion rather than measure it objectively.",
       "An exit poll conducted after voting concludes.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "C",
     explanation: "Push polls use leading or loaded language to shape respondents' opinions rather than to gather objective, unbiased data, making them a form of political messaging disguised as legitimate polling.",
   },
   {
@@ -118,12 +118,12 @@ export const govUnit4McqPracticeQuestions: Question[] = [
     question: "A policymaker who supports raising the federal minimum wage and expanding government-funded job training programs is most likely operating from which ideological position?",
     image: null,
     options: [
-      "Modern American liberalism, which favors government intervention to address economic inequality.",
-      "Modern American conservatism, which favors deregulation and lower taxes.",
       "Libertarianism, which favors minimal government involvement in both economic and social life.",
+      "Modern American conservatism, which favors deregulation and lower taxes.",
+      "Modern American liberalism, which favors government intervention to address economic inequality.",
       "Populism, which rejects the legitimacy of elected government entirely.",
     ],
-    correctAnswer: "A",
+    correctAnswer: "C",
     explanation: "Support for raising the minimum wage and expanding job training programs reflects the modern liberal position that government should actively intervene in the economy to reduce inequality and support workers.",
   },
   {
@@ -136,11 +136,11 @@ export const govUnit4McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "Individualism versus collectivism.",
-      "Individual liberty versus the government's interest in maintaining public order.",
-      "Popular sovereignty versus judicial supremacy.",
       "Federalism versus unitary government.",
+      "Popular sovereignty versus judicial supremacy.",
+      "Individual liberty versus the government's interest in maintaining public order.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "D",
     explanation: "Permit requirements for public demonstrations illustrate the ongoing tension between protecting individual liberties (such as the right to assemble and protest) and the government's legitimate interest in maintaining public safety and order.",
   },
   {
@@ -153,11 +153,11 @@ export const govUnit4McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "Keynesian economics",
-      "Supply-side economics",
-      "Command economy principles",
       "Protectionist trade theory",
+      "Command economy principles",
+      "Supply-side economics",
     ],
-    correctAnswer: "B",
+    correctAnswer: "D",
     explanation: "Supply-side economics holds that reducing tax burdens and regulation on businesses and individuals stimulates investment and production, ultimately growing the overall economy and tax base — a view generally associated with the conservative economic tradition.",
   },
   {
@@ -188,11 +188,11 @@ export const govUnit4McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "Only elected officials are subject to legal consequences for their actions.",
-      "All individuals, including government officials, are equally subject to and accountable under the law.",
       "Judges may create new laws whenever existing statutes seem unjust.",
+      "All individuals, including government officials, are equally subject to and accountable under the law.",
       "Federal law always takes precedence over any moral or ethical consideration.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "C",
     explanation: "The rule of law is the principle that no individual — including those in positions of government power — is above the law, and that all are equally subject to publicly known and fairly applied legal standards.",
   },
   {
@@ -204,12 +204,12 @@ export const govUnit4McqPracticeQuestions: Question[] = [
     question: "A pollster wants to estimate the opinions of a state's entire adult population but only has the resources to survey a small fraction of residents. To ensure the survey results are generalizable to the full population, the pollster must primarily focus on:",
     image: null,
     options: [
-      "Selecting a sample using proper random sampling methods so every individual has a known chance of selection.",
+      "Increasing the number of questions asked to at least fifty.",
       "Ensuring every single question uses open-ended response formats.",
       "Surveying only individuals who have voted in the past three elections.",
-      "Increasing the number of questions asked to at least fifty.",
+      "Selecting a sample using proper random sampling methods so every individual has a known chance of selection.",
     ],
-    correctAnswer: "A",
+    correctAnswer: "D",
     explanation: "Random sampling — where every member of the population has a known, non-zero chance of being selected — is the foundational requirement for a sample's results to be reasonably generalized to the broader population.",
   },
   {
@@ -239,11 +239,11 @@ export const govUnit4McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "That all voters must choose exclusively liberal or conservative positions on every issue.",
-      "That real-world political ideology can be more nuanced than the simplified liberal-conservative spectrum suggests.",
-      "That the candidate is committing a constitutional violation.",
       "That third-party candidates are constitutionally prohibited from holding mixed views.",
+      "That the candidate is committing a constitutional violation.",
+      "That real-world political ideology can be more nuanced than the simplified liberal-conservative spectrum suggests.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "D",
     explanation: "While the liberal-conservative spectrum is a useful simplification, individual citizens and candidates often hold a mix of positions that do not align perfectly with one ideological label across every issue area, reflecting the complexity of real-world political belief systems.",
   },
   {
@@ -255,12 +255,12 @@ export const govUnit4McqPracticeQuestions: Question[] = [
     question: "A poll conducted the week before an election reports a candidate leading by 5 percentage points, with a stated margin of error of ±4%. Based on this information, which of the following is the most statistically accurate interpretation?",
     image: null,
     options: [
-      "The candidate is certain to win the election.",
       "The true level of support could reasonably fall within a range that makes the race very close, given the overlap between the margin of error and the reported lead.",
+      "The candidate is certain to win the election.",
       "The poll is invalid because the margin of error is too large to be meaningful.",
       "The margin of error only applies to the losing candidate's numbers.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "A",
     explanation: "Because the margin of error (±4%) is close to the size of the reported lead (5 points), the actual gap between candidates could be much smaller or even reversed, meaning the race should be interpreted as closer than the raw numbers alone suggest.",
   },
   {
@@ -272,12 +272,12 @@ export const govUnit4McqPracticeQuestions: Question[] = [
     question: "A government economic policy that emphasizes strict adherence to free-market principles, minimal regulation, and limited government intervention in business decisions is most closely associated with which economic philosophy?",
     image: null,
     options: [
-      "Keynesian economics",
       "Laissez-faire capitalism",
+      "Keynesian economics",
       "Command economy principles",
       "Protectionism",
     ],
-    correctAnswer: "B",
+    correctAnswer: "A",
     explanation: "Laissez-faire capitalism emphasizes minimal government interference in economic markets, trusting market forces of supply and demand to regulate economic activity — a philosophy generally associated with more conservative or libertarian economic positions.",
   },
   {
@@ -290,11 +290,11 @@ export const govUnit4McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "A life cycle effect",
-      "A period or generational effect",
-      "Selective exposure",
       "The politico model of representation",
+      "Selective exposure",
+      "A period or generational effect",
     ],
-    correctAnswer: "B",
+    correctAnswer: "D",
     explanation: "A shared historical experience — such as the Vietnam War and the resulting government distrust — that shapes the political attitudes of an entire age cohort for the rest of their lives is a defining feature of a generational (or period) effect.",
   },
   {
@@ -306,12 +306,12 @@ export const govUnit4McqPracticeQuestions: Question[] = [
     question: "Research shows that older Americans are generally more likely than younger Americans to vote consistently in every election, including midterms. Which of the following best explains this pattern through a life cycle lens?",
     image: null,
     options: [
-      "Older citizens have accumulated greater personal stakes in government policy (such as property, retirement benefits, and healthcare), along with more stable schedules that make voting easier.",
       "Older citizens are legally required to vote in every election under federal law.",
+      "Older citizens have accumulated greater personal stakes in government policy (such as property, retirement benefits, and healthcare), along with more stable schedules that make voting easier.",
       "Younger citizens are constitutionally barred from voting in midterm elections.",
       "Voting habits have no relationship to a person's stage of life.",
     ],
-    correctAnswer: "A",
+    correctAnswer: "B",
     explanation: "As individuals age, they typically develop greater personal investment in policy outcomes (property taxes, Social Security, healthcare) and often have more settled routines, both of which are associated with higher and more consistent voter turnout — a classic life cycle effect.",
   },
   {
@@ -340,12 +340,12 @@ export const govUnit4McqPracticeQuestions: Question[] = [
     question: "A government requires citizens to obtain a license before opening certain types of businesses, arguing this protects public health and safety. Critics argue the licensing requirement is overly burdensome and infringes on economic freedom. This debate reflects the broader American tension between:",
     image: null,
     options: [
-      "Popular sovereignty and judicial supremacy.",
       "Individual economic liberty and the government's interest in regulating for the public welfare.",
+      "Popular sovereignty and judicial supremacy.",
       "Federalism and unitary government.",
       "Bicameralism and unicameralism.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "A",
     explanation: "This scenario reflects the ongoing tension in American political culture between protecting individual economic freedom (the right to operate a business with minimal restriction) and the government's legitimate interest in regulating activity to protect public health, safety, and welfare.",
   },
 

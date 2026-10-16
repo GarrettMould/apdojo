@@ -577,8 +577,8 @@ export const statsUnit3McqTestQuestions: Question[] = [
       'A researcher conducted a chi-square test for homogeneity to compare the distribution of preferred learning styles (Visual, Auditory, Kinesthetic) across three different age groups (18-24, 25-34, 35+). Based on the two-way table provided below, what is the expected count for the number of participants aged 35+ who prefer a Visual learning style?',
     image: null,
     tableData: LEARNING_STYLE_AGE_TABLE,
-    options: stripOptionPrefixes(['A) 12.5', 'B) 15.0', 'C) 18.2', 'D) 20.0', 'E) 22.5']),
-    correctAnswer: 'C',
+    options: stripOptionPrefixes(['A) 18.2', 'B) 15.0', 'C) 12.5', 'D) 20.0', 'E) 22.5']),
+    correctAnswer: 'A',
     explanation:
       'The expected count for a cell is (row total x column total) / table total. For 35+ and Visual: (91 x 40) / 200 = 18.2.',
   },
@@ -593,12 +593,12 @@ export const statsUnit3McqTestQuestions: Question[] = [
     image: null,
     options: stripOptionPrefixes([
       'A) We are 95% confident that the sample proportion is 0.48.',
-      'B) There is a 95% probability that the population proportion is between 0.42 and 0.54.',
-      'C) We are 95% confident that the population proportion of voters who support the bond issue is between 0.42 and 0.54.',
+      'B) We are 95% confident that the population proportion of voters who support the bond issue is between 0.42 and 0.54.',
+      'C) There is a 95% probability that the population proportion is between 0.42 and 0.54.',
       'D) 95% of all voters support the bond issue.',
       'E) The margin of error for this interval is 0.12.',
     ]),
-    correctAnswer: 'C',
+    correctAnswer: 'B',
     explanation:
       'A confidence interval is interpreted in terms of the population parameter: we are C% confident that the interval captures the true population proportion.',
   },
@@ -614,11 +614,11 @@ export const statsUnit3McqTestQuestions: Question[] = [
     options: stripOptionPrefixes([
       'A) The proportion of recovery is higher for the placebo group.',
       'B) The proportions of recovery are identical.',
-      'C) The proportion of recovery is significantly higher for the treatment group.',
+      'C) The data is not categorical.',
       'D) The sample sizes for both groups must be different.',
-      'E) The data is not categorical.',
+      'E) The proportion of recovery is significantly higher for the treatment group.',
     ]),
-    correctAnswer: 'C',
+    correctAnswer: 'E',
     explanation:
       'The segmented bar chart shows the proportion of successes (recovery) is visually larger for the treatment bar than the placebo bar.',
   },
@@ -633,12 +633,12 @@ export const statsUnit3McqTestQuestions: Question[] = [
     image: SMARTPHONE_OWNERSHIP_MOSAIC,
     options: stripOptionPrefixes([
       'A) The heights of the bars would be different, but the widths would be the same.',
-      'B) The segment proportions within each age-group bar would be identical across all four age groups.',
+      'B) The bars would show a strong upward trend.',
       'C) The area of the "Owns Smartphone" segments would be zero.',
-      'D) The bars would show a strong upward trend.',
+      'D) The segment proportions within each age-group bar would be identical across all four age groups.',
       'E) The plot would be skewed to the left.',
     ]),
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'Independence in a mosaic plot is visualized when conditional distributions are identical across categories (horizontal segment lines align across bars).',
   },
@@ -653,12 +653,12 @@ export const statsUnit3McqTestQuestions: Question[] = [
     image: null,
     options: stripOptionPrefixes([
       'A) There is convincing evidence that the proportion of damaged packages is 0.05.',
-      'B) There is convincing evidence that the proportion of damaged packages is different from 0.05.',
-      'C) We fail to reject the null hypothesis at the 0.05 level.',
+      'B) We fail to reject the null hypothesis at the 0.05 level.',
+      'C) There is convincing evidence that the proportion of damaged packages is different from 0.05.',
       'D) The proportion of damaged packages is exactly 0.02.',
       'E) The result is not statistically significant.',
     ]),
-    correctAnswer: 'B',
+    correctAnswer: 'C',
     explanation:
       'Since the p-value (0.02) < alpha (0.05), we reject the null hypothesis, providing convincing evidence for the alternative.',
   },
@@ -688,12 +688,12 @@ export const statsUnit3McqTestQuestions: Question[] = [
     image: null,
     options: stripOptionPrefixes([
       'A) The width remains constant.',
-      'B) The width increases.',
+      'B) The width is halved.',
       'C) The width decreases.',
       'D) The interval becomes (0.38, 0.42).',
-      'E) The width is halved.',
+      'E) The width increases.',
     ]),
-    correctAnswer: 'B',
+    correctAnswer: 'E',
     explanation:
       'Increasing confidence requires a larger critical value, which increases margin of error and makes the interval wider.',
   },
@@ -707,8 +707,8 @@ export const statsUnit3McqTestQuestions: Question[] = [
       'A public health researcher wants to know whether opinion on a proposed soda tax (Support, Oppose) is associated with age group. She surveys a random sample of 200 adults. The results are shown in the two-way table below. If a chi-square test for independence is performed on these data, what is the expected count for the "Support" and "31–50" cell?',
     image: null,
     tableData: SODA_TAX_OPINION_TABLE,
-    options: stripOptionPrefixes(['A) 25', 'B) 35', 'C) 40', 'D) 50', 'E) 70']),
-    correctAnswer: 'B',
+    options: stripOptionPrefixes(['A) 25', 'B) 70', 'C) 40', 'D) 50', 'E) 35']),
+    correctAnswer: 'E',
     explanation:
       'The expected count for a cell is (row total × column total) / table total. For the 31–50 and Support cell: (70 × 100) / 200 = 35.',
   },
@@ -742,8 +742,8 @@ export const statsUnit3McqTestQuestions: Question[] = [
       'A pollster compares the proportion of registered voters who support a ballot initiative in two neighboring counties. She constructs a 95% confidence interval for the difference in proportions (p₁ − p₂). The interval endpoints are shown in the table below. What is the margin of error for this interval?',
     image: null,
     tableData: COUNTY_BALLOT_INTERVAL_TABLE,
-    options: stripOptionPrefixes(['A) 0.09', 'B) 0.045', 'C) 0.15', 'D) 0.075', 'E) 0.03']),
-    correctAnswer: 'B',
+    options: stripOptionPrefixes(['A) 0.09', 'B) 0.075', 'C) 0.15', 'D) 0.045', 'E) 0.03']),
+    correctAnswer: 'D',
     explanation:
       'Margin of error is half the interval width. Width = 0.12 - 0.03 = 0.09, so MOE = 0.09 / 2 = 0.045.',
   },
@@ -757,15 +757,15 @@ export const statsUnit3McqTestQuestions: Question[] = [
       'A statistician is deciding how to estimate an unknown population proportion p from a random sample of size n in which x successes are observed. She considers five possible formulas for the estimator. Which of the following formulas is an unbiased estimator of p?',
     image: null,
     options: stripOptionPrefixes([
-      'A) x / n',
-      'B) (x + 1) / (n + 2)',
+      'A) (x + 1) / (n + 2)',
+      'B) x / n',
       'C) (x + 2) / n',
       'D) x / (n - 1)',
       'E) (x - 1) / n',
     ]),
-    correctAnswer: 'A',
+    correctAnswer: 'B',
     explanation:
-      'An estimator is unbiased if, on average, it neither overestimates nor underestimates the parameter. The sample proportion p̂ = x/n is the standard unbiased estimator of a population proportion because E(x/n) = p. The other formulas each add or subtract a constant to the numerator or denominator, which shifts the expected value away from p and introduces bias (e.g., option B is a form of the Laplace/"add-two" smoothed estimator, which is biased toward 0.5).',
+      'An estimator is unbiased if, on average, it neither overestimates nor underestimates the parameter. The sample proportion p̂ = x/n is the standard unbiased estimator of a population proportion because E(x/n) = p. The other formulas each add or subtract a constant to the numerator or denominator, which shifts the expected value away from p and introduces bias (e.g., option A is a form of the Laplace/"add-two" smoothed estimator, which is biased toward 0.5).',
   },
   {
     id: 7312,
@@ -776,10 +776,10 @@ export const statsUnit3McqTestQuestions: Question[] = [
     question:
       'A machine produces bolts with a true defect proportion of p = 0.08. A quality control engineer takes a random sample of n = 200 bolts. The graph below shows the sampling distribution of the sample proportion of defective bolts, with the shaded region representing the values within one standard deviation of the mean. Which of the following is closest to the standard deviation of this sampling distribution?',
     image: SAMPLING_DIST_PROPORTION_CURVE,
-    options: stripOptionPrefixes(['A) 0.019', 'B) 0.038', 'C) 0.0128', 'D) 0.0026', 'E) 0.16']),
-    correctAnswer: 'A',
+    options: stripOptionPrefixes(['A) 0.16', 'B) 0.038', 'C) 0.0128', 'D) 0.0026', 'E) 0.019']),
+    correctAnswer: 'E',
     explanation:
-      'The standard deviation of the sampling distribution of p̂ is √[p(1-p)/n] = √[(0.08)(0.92)/200] = sqrt(0.000368) ≈ 0.019, matching the width of the shaded region in the graph. Option B doubles this value (a common error from failing to take the square root correctly), option C uses n = 400, option D omits the square root entirely, and option E uses p(1-p) without dividing by n.',
+      'The standard deviation of the sampling distribution of p̂ is √[p(1-p)/n] = √[(0.08)(0.92)/200] = sqrt(0.000368) ≈ 0.019, matching the width of the shaded region in the graph. Option B doubles this value (a common error from failing to take the square root correctly), option C uses n = 400, option D omits the square root entirely, and option A uses p(1-p) without dividing by n.',
   },
   {
     id: 7313,
@@ -791,15 +791,15 @@ export const statsUnit3McqTestQuestions: Question[] = [
       'In a random sample of 85 adults, 34 reported that they read at least one book per month. Assuming all conditions for inference are met, which of the following is a correctly calculated 90% confidence interval for the true proportion of adults who read at least one book per month?',
     image: null,
     options: stripOptionPrefixes([
-      'A) (0.313, 0.487)',
-      'B) (0.296, 0.504)',
+      'A) (0.296, 0.504)',
+      'B) (0.313, 0.487)',
       'C) (0.362, 0.438)',
       'D) (0.395, 0.405)',
       'E) (0.4, 0.6)',
     ]),
-    correctAnswer: 'A',
+    correctAnswer: 'B',
     explanation:
-      'p̂ = 34/85 = 0.400. SE = √[(0.4)(0.6)/85] ≈ 0.0531. For 90% confidence, z* = 1.645, so the margin of error ≈ 1.645(0.0531) ≈ 0.087, giving the interval (0.313, 0.487). Option B incorrectly uses z* = 1.96 (the 95% critical value). Option D results from forgetting to take the square root when calculating SE, which produces an interval that is far too narrow.',
+      'p̂ = 34/85 = 0.400. SE = √[(0.4)(0.6)/85] ≈ 0.0531. For 90% confidence, z* = 1.645, so the margin of error ≈ 1.645(0.0531) ≈ 0.087, giving the interval (0.313, 0.487). Option A incorrectly uses z* = 1.96 (the 95% critical value). Option D results from forgetting to take the square root when calculating SE, which produces an interval that is far too narrow.',
   },
   {
     id: 7314,
@@ -831,15 +831,15 @@ export const statsUnit3McqTestQuestions: Question[] = [
       "A shipping company claims that 90% of its packages are delivered on time. A consumer watchdog group suspects the true on-time delivery rate is lower than claimed and plans to test this suspicion using a random sample of the company's shipping records. Which of the following is the correct set of hypotheses for the appropriate significance test?",
     image: null,
     options: stripOptionPrefixes([
-      'A) H0: p = 0.90, Ha: p < 0.90',
+      'A) H0: p < 0.90, Ha: p = 0.90',
       'B) H0: p = 0.90, Ha: p ≠ 0.90',
       'C) H0: p̂ = 0.90, Ha: p̂ < 0.90',
-      'D) H0: p < 0.90, Ha: p = 0.90',
+      'D) H0: p = 0.90, Ha: p < 0.90',
       'E) H0: p = 0.90, Ha: p > 0.90',
     ]),
-    correctAnswer: 'A',
+    correctAnswer: 'D',
     explanation:
-      'Let p be the true proportion of all packages delivered on time. Because the watchdog group suspects the rate is lower than claimed, the alternative hypothesis should be one-sided: Ha: p < 0.90, with H0: p = 0.90. Option B is two-sided and does not match the stated suspicion. Option C incorrectly states the hypotheses in terms of the sample statistic p̂ rather than the population parameter p. Option D reverses the null and alternative hypotheses, and option E has the alternative pointed in the wrong direction.',
+      'Let p be the true proportion of all packages delivered on time. Because the watchdog group suspects the rate is lower than claimed, the alternative hypothesis should be one-sided: Ha: p < 0.90, with H0: p = 0.90. Option B is two-sided and does not match the stated suspicion. Option C incorrectly states the hypotheses in terms of the sample statistic p̂ rather than the population parameter p. Option A reverses the null and alternative hypotheses, and option E has the alternative pointed in the wrong direction.',
   },
   {
     id: 7316,
@@ -850,10 +850,10 @@ export const statsUnit3McqTestQuestions: Question[] = [
     question:
       'A researcher tests H0: p = 0.50 versus Ha: p ≠ 0.50 and obtains a test statistic of z = 2.10. Which of the following is closest to the p-value of this test?',
     image: PVALUE_TWO_TAILED_CURVE,
-    options: stripOptionPrefixes(['A) 0.0179', 'B) 0.0358', 'C) 0.9642', 'D) 0.4821', 'E) 0.0716']),
-    correctAnswer: 'B',
+    options: stripOptionPrefixes(['A) 0.0179', 'B) 0.9642', 'C) 0.0358', 'D) 0.4821', 'E) 0.0716']),
+    correctAnswer: 'C',
     explanation:
-      'Because the alternative hypothesis is two-sided, the p-value is the combined area in both tails beyond |z| = 2.10: P(Z ≤ -2.10) + P(Z ≥ 2.10) = 2(0.0179) = 0.0358. Option A is only one tail, option C is the area between -2.10 and 2.10 (the complement of the p-value), option D is about half of that middle area, and option E is twice the two-tailed p-value.',
+      'Because the alternative hypothesis is two-sided, the p-value is the combined area in both tails beyond |z| = 2.10: P(Z ≤ -2.10) + P(Z ≥ 2.10) = 2(0.0179) = 0.0358. Option A is only one tail, option B is the area between -2.10 and 2.10 (the complement of the p-value), option D is about half of that middle area, and option E is twice the two-tailed p-value.',
   },
   {
     id: 7317,
@@ -886,12 +886,12 @@ export const statsUnit3McqTestQuestions: Question[] = [
     image: TYPE_I_II_ERROR_DIAGRAM,
     options: stripOptionPrefixes([
       'A) Region A',
-      'B) Region B',
+      'B) Region A and Region B combined',
       'C) The unshaded area under the solid curve to the left of the critical value',
-      'D) Region A and Region B combined',
+      'D) Region B',
       'E) The area where the two curves overlap entirely',
     ]),
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'A Type II error occurs when the null hypothesis is not rejected even though the alternative hypothesis is actually true. This corresponds to outcomes that fall short of the critical value even though the true sampling distribution (centered at p = 0.58) generated them — that is, Region B. Region A represents alpha, the probability of a Type I error (rejecting H0 when it is actually true), since it is the tail of the null distribution beyond the critical value.',
   },
@@ -905,10 +905,10 @@ export const statsUnit3McqTestQuestions: Question[] = [
       'Two large populations have true proportions of support for a policy of p1 = 0.40 and p2 = 0.35. Independent random samples of size n1 = 120 and n2 = 150 are planned. Using the table below, what is the standard deviation of the sampling distribution of the difference in sample proportions, p̂₁ − p̂₂?',
     image: null,
     tableData: TWO_POPULATION_PROPORTIONS_TABLE,
-    options: stripOptionPrefixes(['A) 0.059', 'B) 0.0035', 'C) 0.0129', 'D) 0.077', 'E) 0.240']),
-    correctAnswer: 'A',
+    options: stripOptionPrefixes(['A) 0.0035', 'B) 0.059', 'C) 0.0129', 'D) 0.077', 'E) 0.240']),
+    correctAnswer: 'B',
     explanation:
-      'The standard deviation of the sampling distribution for the difference in sample proportions is √[p1(1-p1)/n1 + p2(1-p2)/n2] = √[(0.4)(0.6)/120 + (0.35)(0.65)/150] = sqrt(0.0020 + 0.001517) = sqrt(0.003517) ≈ 0.059. Option B is the value before taking the square root, and option D incorrectly adds the two standard deviations (sqrt of each term) instead of combining variances first.',
+      'The standard deviation of the sampling distribution for the difference in sample proportions is √[p1(1-p1)/n1 + p2(1-p2)/n2] = √[(0.4)(0.6)/120 + (0.35)(0.65)/150] = sqrt(0.0020 + 0.001517) = sqrt(0.003517) ≈ 0.059. Option A is the value before taking the square root, and option D incorrectly adds the two standard deviations (sqrt of each term) instead of combining variances first.',
   },
   {
     id: 7320,
@@ -920,14 +920,14 @@ export const statsUnit3McqTestQuestions: Question[] = [
       'A marketing team runs an A/B test on two landing page designs to see whether Design A produces a higher conversion rate than Design B. Of 500 visitors randomly assigned to Design A, 60 converted; of 500 visitors randomly assigned to Design B, 45 converted. Which of the following is the correct set of hypotheses for the appropriate significance test?',
     image: null,
     options: stripOptionPrefixes([
-      'A) H0: pA = pB, Ha: pA > pB',
+      'A) H0: p̂A = p̂B, Ha: p̂A > p̂B',
       'B) H0: pA ≠ pB, Ha: pA = pB',
-      'C) H0: p̂A = p̂B, Ha: p̂A > p̂B',
+      'C) H0: pA = pB, Ha: pA > pB',
       'D) H0: pA − pB = 1, Ha: pA − pB ≠ 1',
       'E) H0: pA = pB, Ha: pA ≠ pB',
     ]),
-    correctAnswer: 'A',
+    correctAnswer: 'C',
     explanation:
-      'Let pA and pB be the true conversion rates for Design A and Design B, respectively. Since the marketing team specifically wants to know whether Design A’s rate is higher, the test should be one-sided: H0: pA = pB (no difference) versus Ha: pA > pB. Option B reverses the null and alternative statements, option C incorrectly uses sample statistics (p̂) rather than population parameters, option D uses a nonsensical hypothesized difference of 1, and option E is two-sided and does not match the stated research question.',
+      'Let pA and pB be the true conversion rates for Design A and Design B, respectively. Since the marketing team specifically wants to know whether Design A’s rate is higher, the test should be one-sided: H0: pA = pB (no difference) versus Ha: pA > pB. Option B reverses the null and alternative statements, option A incorrectly uses sample statistics (p̂) rather than population parameters, option D uses a nonsensical hypothesized difference of 1, and option E is two-sided and does not match the stated research question.',
   },
 ];

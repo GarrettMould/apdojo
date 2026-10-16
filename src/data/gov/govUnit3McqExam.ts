@@ -39,12 +39,12 @@ export const govUnit3McqTestQuestions: Question[] = [
       'King’s argument in the excerpt serves as a philosophical justification for which of the following democratic concepts?',
     image: null,
     options: [
-      'Participatory democracy through nonviolent civil disobedience.',
       'Elite democracy through legal challenges in the Supreme Court.',
+      'Participatory democracy through nonviolent civil disobedience.',
       'Pluralist democracy through the lobbying of congressional committees.',
       'Limited government through the strict adherence to state-level ordinances.',
     ],
-    correctAnswer: 'A',
+    correctAnswer: 'B',
     explanation:
       'King advocates for the people to participate directly in the democratic process by using nonviolent civil disobedience to highlight and change systemic injustice.',
   },
@@ -60,11 +60,11 @@ export const govUnit3McqTestQuestions: Question[] = [
     image: null,
     options: [
       'The doctrine of total state sovereignty.',
-      'The doctrine of selective incorporation of the Bill of Rights.',
-      'The doctrine of implied presidential emergency powers.',
       'The doctrine of absolute judicial restraint.',
+      'The doctrine of implied presidential emergency powers.',
+      'The doctrine of selective incorporation of the Bill of Rights.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'The 14th Amendment’s Due Process and Equal Protection clauses are the constitutional foundations the Supreme Court uses to apply Bill of Rights protections to state governments.',
   },
@@ -79,12 +79,12 @@ export const govUnit3McqTestQuestions: Question[] = [
       'Question 4 refers to the following excerpt.\n\n"Congress shall make no law... abridging the freedom of speech, or of the press; or the right of the people peaceably to assemble, and to petition the Government for a redress of grievances."\n—First Amendment, 1791\n\nWhich of the following scenarios would constitute a direct violation of the protections listed above?',
     image: null,
     options: [
-      'A city council denies a permit for a protest because they disagree with the protesters’ message.',
       'A school district requires all students to wear uniforms.',
+      'A city council denies a permit for a protest because they disagree with the protesters’ message.',
       'The federal government imposes a tax on all commercial radio advertisements.',
       'A local library requires library cards to check out materials.',
     ],
-    correctAnswer: 'A',
+    correctAnswer: 'B',
     explanation:
       'The government cannot deny a permit based on the *content* of the message; this is a violation of the freedom of assembly and speech.',
   },
@@ -100,11 +100,11 @@ export const govUnit3McqTestQuestions: Question[] = [
     image: null,
     options: [
       'Gideon v. Wainwright (1963)',
-      'Miranda v. Arizona (1966)',
-      'New York Times Co. v. United States (1971)',
       'Tinker v. Des Moines (1969)',
+      'New York Times Co. v. United States (1971)',
+      'Miranda v. Arizona (1966)',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'The Miranda rule requires police to inform suspects of their right against self-incrimination (5th Amendment) and the right to counsel (6th Amendment).',
   },
@@ -119,12 +119,12 @@ export const govUnit3McqTestQuestions: Question[] = [
       'How does the Due Process clause of the Fifth Amendment apply to the federal government compared to the Fourteenth Amendment’s application to the states?',
     image: null,
     options: [
-      'The Fifth Amendment protects the accused from the national government, while the Fourteenth Amendment protects the accused from state governments.',
-      'The Fifth Amendment only applies to civil cases, whereas the Fourteenth Amendment applies to all cases.',
       'They are identical in wording and have no difference in application.',
+      'The Fifth Amendment only applies to civil cases, whereas the Fourteenth Amendment applies to all cases.',
+      'The Fifth Amendment protects the accused from the national government, while the Fourteenth Amendment protects the accused from state governments.',
       'The Fourteenth Amendment supersedes and completely replaces the Fifth Amendment.',
     ],
-    correctAnswer: 'A',
+    correctAnswer: 'C',
     explanation:
       'The 5th Amendment constrains the federal government, and the 14th Amendment, through selective incorporation, constrains the states.',
   },
@@ -161,10 +161,10 @@ export const govUnit3McqTestQuestions: Question[] = [
     options: [
       'Unconstitutional, because the government can never restrict speech in a public forum',
       'Unconstitutional, because the restriction targets the political content of the group\'s message',
-      'Constitutional, because it is a content-neutral time, place, and manner restriction that serves a significant government interest',
       'Constitutional, because political speech in public parks receives no First Amendment protection',
+      'Constitutional, because it is a content-neutral time, place, and manner restriction that serves a significant government interest',
     ],
-    correctAnswer: 'C',
+    correctAnswer: 'D',
     explanation:
       'A content-neutral regulation of when and how speech occurs in a public forum is permissible if it serves a significant government interest and leaves open alternative channels for expression.',
   },
@@ -180,11 +180,11 @@ export const govUnit3McqTestQuestions: Question[] = [
     image: null,
     options: [
       'A legitimate exercise of executive war powers that courts must defer to',
-      'Prior restraint, which carries a heavy presumption of unconstitutionality under First Amendment doctrine',
-      'A valid application of the exclusionary rule to protect national security',
       'An example of symbolic speech regulation, which receives reduced constitutional protection',
+      'A valid application of the exclusionary rule to protect national security',
+      'Prior restraint, which carries a heavy presumption of unconstitutionality under First Amendment doctrine',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'Government censorship before publication is prior restraint; the Supreme Court has held that such orders face a heavy presumption against their constitutionality, as in *New York Times Co. v. United States*.',
   },
@@ -242,12 +242,12 @@ export const govUnit3McqTestQuestions: Question[] = [
       alt: 'Line graph showing public support for the death penalty over time since 1994',
     },
     options: [
-      'The Supreme Court ruled capital punishment unconstitutional for all crimes in 1994, which shifted public opinion.',
       'Shifting public attitudes about cruel and unusual punishment, increased awareness of wrongful convictions, and changing social norms have contributed to declining support over time.',
+      'The Supreme Court ruled capital punishment unconstitutional for all crimes in 1994, which shifted public opinion.',
       'Congress passed legislation banning the death penalty in federal cases, which influenced state-level public opinion.',
       'The decline reflects a generational effect in which all Americans born after 1980 oppose capital punishment.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'A',
     explanation:
       'Public opinion on social issues is multifaceted; the decline in support for capital punishment is attributed to a variety of factors, including the exoneration of death row inmates via DNA evidence and changing perspectives on what constitutes a fair and humane justice system.',
   },
@@ -266,11 +266,11 @@ export const govUnit3McqTestQuestions: Question[] = [
     },
     options: [
       'The incorporation doctrine, which requires states to apply federal standards for capital punishment.',
-      'The principle of evolving standards of decency, in which the Supreme Court considers shifting public opinion when evaluating whether a punishment constitutes cruel and unusual punishment.',
-      'The due process clause, which requires unanimous jury verdicts before a death sentence can be imposed.',
       'The equal protection clause, which prohibits the application of the death penalty to any protected class.',
+      'The due process clause, which requires unanimous jury verdicts before a death sentence can be imposed.',
+      'The principle of evolving standards of decency, in which the Supreme Court considers shifting public opinion when evaluating whether a punishment constitutes cruel and unusual punishment.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'The Supreme Court has long held that the Eighth Amendment\'s prohibition against "cruel and unusual punishment" must draw its meaning from the "evolving standards of decency that mark the progress of a maturing society," often looking to public opinion and legislative trends as indicators.',
   },
@@ -307,12 +307,12 @@ export const govUnit3McqTestQuestions: Question[] = [
       alt: 'Line graph showing public support for legal recognition of same-sex marriage over time',
     },
     options: [
-      'The Supreme Court\'s decision in Engel v. Vitale expanded the right to privacy to include personal relationship choices.',
       'The Supreme Court\'s use of the Due Process and Equal Protection Clauses to strike down laws restricting same-sex relationships reflected and reinforced a broader shift in public attitudes toward equal treatment under the law.',
+      'The Supreme Court\'s decision in Engel v. Vitale expanded the right to privacy to include personal relationship choices.',
       'Congress passed the Defense of Marriage Act in 1996, which accelerated public support for same-sex marriage by drawing national attention to the issue.',
       'The incorporation of the First Amendment\'s free exercise clause to the states required state governments to recognize same-sex marriages performed in other states.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'A',
     explanation:
       'Judicial decisions like Obergefell v. Hodges used the Due Process and Equal Protection clauses to protect marriage rights, mirroring and encouraging the trend of increasing public acceptance for equality.',
   },
@@ -330,12 +330,12 @@ export const govUnit3McqTestQuestions: Question[] = [
       alt: 'Line graph showing public support for legal recognition of same-sex marriage over time',
     },
     options: [
-      'The Supreme Court consistently leads public opinion by striking down discriminatory laws before a majority of Americans support change.',
-      'Public opinion has no measurable effect on Supreme Court decisions because justices are insulated from political pressure through lifetime appointments.',
       'Organized social movements can shift public opinion over time, creating political pressure that eventually influences both legislative and judicial responses, consistent with the pluralist model of democracy.',
+      'Public opinion has no measurable effect on Supreme Court decisions because justices are insulated from political pressure through lifetime appointments.',
+      'The Supreme Court consistently leads public opinion by striking down discriminatory laws before a majority of Americans support change.',
       'The data demonstrates that civil liberties expansions occur exclusively through constitutional amendments rather than through judicial reinterpretation of existing clauses.',
     ],
-    correctAnswer: 'C',
+    correctAnswer: 'A',
     explanation:
       'The rising trend in public support reflects decades of advocacy by social movements, demonstrating how grassroots efforts act as linkage institutions that eventually influence judicial and policy outcomes.',
   },
@@ -350,12 +350,12 @@ export const govUnit3McqTestQuestions: Question[] = [
       'A state law requires children to attend racially separate public schools, provided the facilities receive comparable funding. Parents sue, arguing the law violates the Equal Protection Clause. Which precedent would their attorneys most likely cite, and why?',
     image: null,
     options: [
-      'Plessy v. Ferguson (1896), because the state has ensured truly equal facilities',
       'Brown v. Board of Education (1954), because separate public schools are inherently unequal regardless of physical conditions',
+      'Plessy v. Ferguson (1896), because the state has ensured truly equal facilities',
       'Shaw v. Reno (1993), because the law draws electoral district lines based on race',
       'Engel v. Vitale (1962), because the state is imposing religious practices in schools',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'A',
     explanation:
       'Brown held that state-mandated racial segregation in public education violates the Equal Protection Clause because separate facilities are inherently unequal—directly undermining the separate-but-equal logic the state invokes in this scenario.',
   },
@@ -371,11 +371,11 @@ export const govUnit3McqTestQuestions: Question[] = [
     image: null,
     options: [
       'Established that the Bill of Rights was always intended to apply automatically to all levels of government',
-      "Marked one of the earliest applications of selective incorporation, using the 14th Amendment's Due Process Clause to extend a federal right to the states",
-      'Overturned the precedent set by Brown v. Board of Education regarding state authority',
       'Granted Congress the authority to pass laws directly regulating state court procedures',
+      'Overturned the precedent set by Brown v. Board of Education regarding state authority',
+      "Marked one of the earliest applications of selective incorporation, using the 14th Amendment's Due Process Clause to extend a federal right to the states",
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       '*Gitlow* was an early incorporation case in which the Court used the 14th Amendment’s Due Process Clause to apply a Bill of Rights protection—the freedom of speech—to state governments.',
   },
@@ -394,12 +394,12 @@ export const extras: Question[] = [
       'The Equal Protection Clause of the Fourteenth Amendment has most often been used by the Supreme Court to:',
     image: null,
     options: [
-      'Protect the economic interests of large corporations against state regulation.',
       'Invalidate state-mandated segregation and discriminatory voting practices.',
+      'Protect the economic interests of large corporations against state regulation.',
       'Grant the federal government power to regulate interstate commerce.',
       'Ensure that religious organizations do not receive tax-exempt status.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'A',
     explanation:
       'The Equal Protection Clause is the standard used to challenge laws that discriminate based on characteristics such as race, origin, or gender (e.g., *Brown v. Board*).',
   },
@@ -415,11 +415,11 @@ export const extras: Question[] = [
     image: null,
     options: [
       'Under the Articles, the national government had supreme authority to enforce civil rights, whereas today, states have exclusive control.',
-      'The Articles prioritized state sovereignty, while the modern national government uses the Fourteenth Amendment to enforce civil rights nationwide.',
-      'The Articles established a robust Bill of Rights that prohibited state discrimination, while the current Constitution does not.',
       'The Articles created a national court system, which the modern Constitution abolished.',
+      'The Articles established a robust Bill of Rights that prohibited state discrimination, while the current Constitution does not.',
+      'The Articles prioritized state sovereignty, while the modern national government uses the Fourteenth Amendment to enforce civil rights nationwide.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'The Articles emphasized state independence over national authority. The modern era uses the 14th Amendment to grant the national government power to protect rights *against* state actions.',
   },
@@ -434,12 +434,12 @@ export const extras: Question[] = [
       'Which constitutional amendment was specifically created to address the limitation of state power suggested by the "sovereignty" language in the Articles of Confederation?',
     image: null,
     options: [
-      'The First Amendment',
-      'The Tenth Amendment',
       'The Fourteenth Amendment',
+      'The Tenth Amendment',
+      'The First Amendment',
       'The Twenty-Seventh Amendment',
     ],
-    correctAnswer: 'C',
+    correctAnswer: 'A',
     explanation:
       'The 14th Amendment serves as a limit on state power, specifically countering the concept that states have absolute sovereignty to deny rights to their citizens.',
   },
@@ -493,11 +493,11 @@ export const extras: Question[] = [
     image: null,
     options: [
       'The government may choose one religion as the official state religion.',
-      'The government cannot create a national church or favor one religion over another.',
       'All religious institutions are exempt from federal taxation.',
+      'The government cannot create a national church or favor one religion over another.',
       'Private schools must adhere to the same curriculum as public schools.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'C',
     explanation:
       'The Establishment Clause creates a "wall of separation" between church and state, prohibiting the government from sanctioning or favoring religious practice.',
   },
@@ -512,11 +512,11 @@ export const extras: Question[] = [
     image: null,
     options: [
       'Financial support from the government for religious construction.',
-      'Practice their religious beliefs as they see fit, provided the actions do not harm public order or safety.',
       'Exemptions from all federal laws if those laws conflict with their faith.',
+      'Practice their religious beliefs as they see fit, provided the actions do not harm public order or safety.',
       'Deny services to others regardless of federal anti-discrimination statutes.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'C',
     explanation:
       'While religious *belief* is absolute, religious *actions* are subject to legal limitations if they violate a compelling state interest or threaten public safety.',
   },
@@ -532,11 +532,11 @@ export const extras: Question[] = [
     image: null,
     options: [
       'Defamatory speech (slander/libel).',
-      'Obscenity.',
       'Symbolic speech (nonverbal action that communicates an idea).',
+      'Obscenity.',
       'Fighting words likely to provoke immediate violence.',
     ],
-    correctAnswer: 'C',
+    correctAnswer: 'B',
     explanation:
       'Symbolic speech is protected under the First Amendment; by contrast, obscenity, defamation, and fighting words are considered exceptions to free speech protection.',
   },
@@ -552,11 +552,11 @@ export const extras: Question[] = [
     image: null,
     options: [
       'The length of prison sentences for non-violent drug offenses.',
-      'The application of the death penalty.',
-      'The conditions of juvenile detention centers.',
       'The use of solitary confinement for political prisoners.',
+      'The conditions of juvenile detention centers.',
+      'The application of the death penalty.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'The legality of capital punishment is the primary constitutional battleground for Eighth Amendment claims regarding "cruel and unusual" standards.',
   },
@@ -570,12 +570,12 @@ export const extras: Question[] = [
     question: 'Which of the following is a key requirement of procedural due process?',
     image: null,
     options: [
-      'The government must provide a unanimous verdict for all criminal trials.',
       'The government must follow established, non-arbitrary procedures before depriving a person of life, liberty, or property.',
+      'The government must provide a unanimous verdict for all criminal trials.',
       'The government must provide financial compensation for all legal expenses incurred by the accused.',
       'The government must bypass traditional court trials for matters involving national security.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'A',
     explanation:
       'Procedural due process focuses on the "how" of government action; it ensures the methods used by officials to deprive rights are fair and not arbitrary.',
   },
@@ -609,12 +609,12 @@ export const extras: Question[] = [
     question: 'The "Equal Protection Clause" of the Fourteenth Amendment is the primary legal basis for:',
     image: null,
     options: [
-      'Combating discrimination based on race, gender, and other protected characteristics.',
-      'Regulating interstate commerce.',
       'Establishing the federal income tax.',
+      'Regulating interstate commerce.',
+      'Combating discrimination based on race, gender, and other protected characteristics.',
       'Managing the election process for the Electoral College.',
     ],
-    correctAnswer: 'A',
+    correctAnswer: 'C',
     explanation:
       'The Equal Protection Clause serves as the constitutional backbone for civil rights, prohibiting states from denying any person equal protection under the law.',
   },
@@ -629,12 +629,12 @@ export const extras: Question[] = [
       'Dr. Martin Luther King Jr.’s "Letter from a Birmingham Jail" was a pivotal document in the civil rights movement because it:',
     image: null,
     options: [
-      'Argued that citizens have a moral duty to disobey unjust laws through nonviolent direct action.',
+      'Requested that Congress immediately dissolve the separation of church and state.',
       'Demanded an immediate constitutional amendment to abolish the Supreme Court.',
       'Advocated for violent revolution to dismantle segregated institutions.',
-      'Requested that Congress immediately dissolve the separation of church and state.',
+      'Argued that citizens have a moral duty to disobey unjust laws through nonviolent direct action.',
     ],
-    correctAnswer: 'A',
+    correctAnswer: 'D',
     explanation:
       'The letter provides a philosophical defense of civil disobedience and the nonviolent approach to challenging systemic racial injustice.',
   },
@@ -649,12 +649,12 @@ export const extras: Question[] = [
       'Which of the following is a primary difference between the Civil Rights Act of 1964 and the Voting Rights Act of 1965?',
     image: null,
     options: [
-      'The Civil Rights Act focused on public accommodations and employment, while the Voting Rights Act targeted racial discrimination in voting.',
-      'The Civil Rights Act only applied to the North, while the Voting Rights Act only applied to the South.',
       'The Civil Rights Act established a national education curriculum, while the Voting Rights Act regulated campaign finance.',
+      'The Civil Rights Act only applied to the North, while the Voting Rights Act only applied to the South.',
+      'The Civil Rights Act focused on public accommodations and employment, while the Voting Rights Act targeted racial discrimination in voting.',
       'The Civil Rights Act required constitutional amendments, while the Voting Rights Act was passed by executive order.',
     ],
-    correctAnswer: 'A',
+    correctAnswer: 'C',
     explanation:
       'The Civil Rights Act of 1964 largely addressed private/public discrimination in trade and hiring, while the Voting Rights Act specifically addressed barriers to the franchise.',
   },
@@ -670,11 +670,11 @@ export const extras: Question[] = [
     image: null,
     options: [
       'The Necessary and Proper Clause.',
-      'The Equal Protection Clause of the Fourteenth Amendment.',
       'The Fourth Amendment’s protection against search and seizure.',
+      'The Equal Protection Clause of the Fourteenth Amendment.',
       'The First Amendment’s Freedom of Assembly.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'C',
     explanation:
       'The core legal debate in affirmative action is whether race-conscious admissions violate the Equal Protection Clause by discriminating against other groups.',
   },
@@ -688,12 +688,12 @@ export const extras: Question[] = [
     question: 'What is the constitutional significance of the Ninth Amendment?',
     image: null,
     options: [
-      'It reserves all powers not delegated to the federal government to the states.',
       'It states that the existence of specific rights in the Constitution does not deny other rights retained by the people.',
+      'It reserves all powers not delegated to the federal government to the states.',
       'It clarifies the definition of citizenship.',
       'It outlines the process for presidential succession.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'A',
     explanation:
       'The Ninth Amendment is a vital safeguard that prevents the government from arguing that because a right isn’t explicitly listed, it doesn’t exist.',
   },
@@ -728,11 +728,11 @@ export const extras: Question[] = [
     image: null,
     options: [
       'Requiring all schools to teach religious studies.',
-      'Prohibiting sex-based discrimination in any education program or activity receiving federal funding.',
       'Forcing state governments to fund private religious schools.',
+      'Prohibiting sex-based discrimination in any education program or activity receiving federal funding.',
       'Mandating that all students pass a federal test to graduate.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'C',
     explanation:
       'Title IX prevents institutions from excluding individuals from participation in or denying them benefits of educational programs based on sex.',
   },
@@ -747,12 +747,12 @@ export const extras: Question[] = [
       'Which constitutional interpretation has most significantly influenced the power of the federal government to enforce civil rights protections against the states?',
     image: null,
     options: [
-      'The interpretation of the Fourteenth Amendment’s Due Process and Equal Protection Clauses.',
       'The interpretation of the Seventh Amendment’s right to a jury trial.',
+      'The interpretation of the Fourteenth Amendment’s Due Process and Equal Protection Clauses.',
       'The interpretation of the Third Amendment’s prohibition on quartering soldiers.',
       'The interpretation of the Twenty-Second Amendment’s term limits.',
     ],
-    correctAnswer: 'A',
+    correctAnswer: 'B',
     explanation:
       'The 14th Amendment effectively created a national standard for civil rights that states cannot violate, greatly expanding federal judicial power.',
   },
@@ -766,12 +766,12 @@ export const extras: Question[] = [
     question: 'A "social movement" is best defined as:',
     image: null,
     options: [
-      'A government-created agency tasked with public outreach.',
       'A large, informal grouping of individuals and organizations focused on specific political or social issues to bring about change.',
+      'A government-created agency tasked with public outreach.',
       'A formal political party running candidates for office.',
       'An elite group of lobbyists working in Washington, D.C.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'A',
     explanation:
       'Social movements are decentralized, collective efforts (like the Women’s Rights or LGBTQ+ movements) that pressure the government for change from the outside.',
   },

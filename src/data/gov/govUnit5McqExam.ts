@@ -19,12 +19,12 @@ export const govUnit5McqTestQuestions: Question[] = [
       'A voter decides to cast their ballot for an incumbent representative specifically because the representative successfully secured federal funding for a new bridge in their district during the previous term. This behavior best exemplifies which model of voting?',
     image: null,
     options: [
-      'Prospective voting',
-      'Rational choice voting',
       'Retrospective voting',
+      'Rational choice voting',
+      'Prospective voting',
       'Straight-ticket voting',
     ],
-    correctAnswer: 'C',
+    correctAnswer: 'A',
     explanation:
       'Retrospective voting involves evaluating the candidate’s or party’s past performance ("what have they done for me lately?") to decide whether to keep them in power.',
   },
@@ -59,12 +59,12 @@ export const govUnit5McqTestQuestions: Question[] = [
       'An interest group representing automobile manufacturers submits an *amicus curiae* brief to the Supreme Court regarding a case on emission standards. What is the group’s likely strategic goal?',
     image: null,
     options: [
-      'To directly lobby the president for a executive order.',
       'To provide the Court with additional information or arguments to influence the legal outcome.',
+      'To directly lobby the president for a executive order.',
       'To initiate a grassroots protest at the steps of the courthouse.',
       'To contribute directly to the justices’ personal campaign funds.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'A',
     explanation:
       'An *amicus curiae* ("friend of the court") brief is a formal way for interest groups to influence judicial policymaking by providing specialized expertise to the Court.',
   },
@@ -143,11 +143,11 @@ export const govUnit5McqTestQuestions: Question[] = [
     },
     options: [
       'The Constitution prohibits third party candidates from receiving electoral votes in presidential elections.',
-      'The winner-take-all structure of the Electoral College means that a candidate must win a plurality in a state to receive any of its electoral votes, making it nearly impossible for third party candidates with diffuse national support to translate popular votes into electoral votes.',
-      'Third party candidates are prohibited by federal law from appearing on the ballot in more than half of the states.',
       'The Federal Election Commission systematically excludes third party candidates from official vote counts.',
+      'Third party candidates are prohibited by federal law from appearing on the ballot in more than half of the states.',
+      'The winner-take-all structure of the Electoral College means that a candidate must win a plurality in a state to receive any of its electoral votes, making it nearly impossible for third party candidates with diffuse national support to translate popular votes into electoral votes.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'Because most states award all electoral votes to the winner of the state\'s popular vote, a candidate who earns votes spread thinly across the nation will fail to win a state outright, resulting in zero electoral votes.',
   },
@@ -185,11 +185,11 @@ export const govUnit5McqTestQuestions: Question[] = [
     image: null,
     options: [
       'It has made the party structure the central focus of all political messaging.',
-      'It has shifted power away from party leadership and toward individual candidates and their personal fundraising networks.',
-      'It has resulted in stricter party discipline and forced all candidates to adopt identical platforms.',
       'It has effectively eliminated the need for candidates to raise money.',
+      'It has resulted in stricter party discipline and forced all candidates to adopt identical platforms.',
+      'It has shifted power away from party leadership and toward individual candidates and their personal fundraising networks.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'Modern campaigns often focus on the candidate’s personal brand, social media presence, and individual donor networks, which weakens the party’s historical control over candidate selection.',
   },
@@ -204,11 +204,11 @@ export const govUnit5McqTestQuestions: Question[] = [
     image: null,
     options: [
       'Automatic, same-day voter registration laws.',
-      'Strict photo identification requirements combined with limited polling station hours.',
-      'Universal mail-in balloting for all eligible voters.',
       'Holding elections on weekends.',
+      'Universal mail-in balloting for all eligible voters.',
+      'Strict photo identification requirements combined with limited polling station hours.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'Strict ID laws and limited polling hours are structural barriers that increase the "cost" of voting, often leading to lower turnout among marginalized groups.',
   },
@@ -226,12 +226,12 @@ export const govUnit5McqTestQuestions: Question[] = [
       alt: 'Map showing which U.S. states have adopted automatic voter registration',
     },
     options: [
-      'The decentralized structure of American federalism allows states to determine their own voter registration procedures, creating variation in structural barriers to participation across the country.',
-      'The Constitution prohibits Congress from passing federal voter registration laws because elections are exclusively reserved to the states under the Electoral College system.',
       'States that have not adopted automatic voter registration have done so because their electorates have consistently voted against registration reform in statewide referenda.',
+      'The Constitution prohibits Congress from passing federal voter registration laws because elections are exclusively reserved to the states under the Electoral College system.',
+      'The decentralized structure of American federalism allows states to determine their own voter registration procedures, creating variation in structural barriers to participation across the country.',
       'Federal campaign finance laws prevent Congress from allocating funds necessary to implement a national automatic voter registration system.',
     ],
-    correctAnswer: 'A',
+    correctAnswer: 'C',
     explanation:
       'Because the Constitution grants states primary authority over the administration of elections, voter registration procedures vary widely across the country, preventing a uniform national system.',
   },
@@ -270,11 +270,11 @@ export const govUnit5McqTestQuestions: Question[] = [
     image: null,
     options: [
       'The media acting as a "scorekeeper" to focus purely on poll numbers.',
-      'The media acting as a "watchdog" to hold government institutions accountable.',
       'The media acting as a "gatekeeper" by deciding which candidates are eligible for the ballot.',
+      'The media acting as a "watchdog" to hold government institutions accountable.',
       'The media acting as a "horse-race" analyst to determine electoral trends.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'C',
     explanation:
       'The "watchdog" function of the media involves investigative journalism that monitors government actions, uncovers corruption, and compels legislative or executive responses.',
   },
@@ -347,12 +347,12 @@ export const govUnit5McqTestQuestions: Question[] = [
       'Which of the following best explains the trend of significantly higher voter turnout in presidential election years compared to midterm election years?',
     image: null,
     options: [
-      'Presidential elections feature higher national media visibility and a wider perception that the presidency has a greater impact on the average citizen\'s life.',
       'Federal law mandates that midterm elections be held in alternate months, creating confusion for the electorate.',
+      'Presidential elections feature higher national media visibility and a wider perception that the presidency has a greater impact on the average citizen\'s life.',
       'States are constitutionally prohibited from opening polling stations for midterm elections.',
       'Voter registration is automatically cancelled by the federal government at the end of a presidential term, requiring all voters to re-register.',
     ],
-    correctAnswer: 'A',
+    correctAnswer: 'B',
     explanation:
       'The "visibility" and the perceived stakes of the presidential office drive higher interest and engagement, whereas midterms often struggle with lower media focus.',
   },
@@ -367,11 +367,11 @@ export const govUnit5McqTestQuestions: Question[] = [
     image: null,
     options: [
       'Formally nominating candidates during private, invitation-only conventions that exclude the general public.',
-      'Utilizing sophisticated voter databases to micro-target messages and send personalized digital outreach to low-propensity voters.',
       'Directly appointing legislative committee chairs to bypass the primary election process.',
+      'Utilizing sophisticated voter databases to micro-target messages and send personalized digital outreach to low-propensity voters.',
       'Passing state laws that make it illegal for voters to register for more than one party.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'C',
     explanation:
       'Parties use "Big Data" to identify voters who are infrequent participants but lean toward their party, then use targeted digital ads and canvassing to mobilize them.',
   },

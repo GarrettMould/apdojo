@@ -288,13 +288,13 @@ export const statsUnit4McqTestQuestions: Question[] = [
       'A veterinary clinic weighs a random sample of 25 newborn kittens brought in for checkups over the course of a month. Based on this sample, the clinic calculates a 90% confidence interval for the mean birth weight (in grams) of newborn kittens: (85.2, 94.8). What is the sample mean weight, and what is the margin of error?',
     image: null,
     options: stripOptionPrefixes([
-      'A) Mean = 90.0, Margin of Error = 4.8',
+      'A) Mean = 90.0, Margin of Error = 2.4',
       'B) Mean = 90.0, Margin of Error = 9.6',
       'C) Mean = 85.2, Margin of Error = 9.6',
       'D) Mean = 94.8, Margin of Error = 4.8',
-      'E) Mean = 90.0, Margin of Error = 2.4',
+      'E) Mean = 90.0, Margin of Error = 4.8',
     ]),
-    correctAnswer: 'A',
+    correctAnswer: 'E',
     explanation:
       'The sample mean is the midpoint of the interval: (85.2 + 94.8) / 2 = 90.0. The margin of error is the distance from the mean to the bound: 94.8 - 90.0 = 4.8.',
   },
@@ -309,12 +309,12 @@ export const statsUnit4McqTestQuestions: Question[] = [
     image: null,
     options: stripOptionPrefixes([
       'A) 0.01 < p < 0.02',
-      'B) 0.02 < p < 0.05',
+      'B) 0.10 < p < 0.20',
       'C) 0.05 < p < 0.10',
-      'D) 0.10 < p < 0.20',
+      'D) 0.02 < p < 0.05',
       'E) p > 0.20',
     ]),
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'With df = 19, a t-statistic of 2.15 is between the critical values for alpha = 0.05 (2.093) and alpha = 0.025 (2.539). For a two-tailed test, the p-value is between 0.02 and 0.05.',
   },
@@ -349,8 +349,8 @@ export const statsUnit4McqTestQuestions: Question[] = [
     question:
       "A cereal company's automated filling machine dispenses boxes of cereal with a population standard deviation of 12 grams. A quality inspector plans to randomly sample 36 boxes each shift to monitor the process. What is the standard deviation of the sampling distribution of the sample mean weight?",
     image: null,
-    options: stripOptionPrefixes(['A) 12', 'B) 6', 'C) 3', 'D) 2', 'E) 0.33']),
-    correctAnswer: 'D',
+    options: stripOptionPrefixes(['A) 12', 'B) 6', 'C) 2', 'D) 3', 'E) 0.33']),
+    correctAnswer: 'C',
     explanation:
       'The standard deviation of the sampling distribution is σ / √n. 12 / √36 = 12 / 6 = 2.',
   },
@@ -364,13 +364,13 @@ export const statsUnit4McqTestQuestions: Question[] = [
       'A lightbulb manufacturer, Brightline Inc., claims that the mean lifespan of its LED bulbs is 1,200 hours. A consumer advocacy group suspects this is overstated and tests a random sample of 40 bulbs, finding a mean lifespan of 1,180 hours with a standard deviation of 50 hours. To test whether the true mean lifespan is less than 1,200 hours, they calculate a test statistic. What is it?',
     image: null,
     options: stripOptionPrefixes([
-      'A) (1180 - 1200) / (50/sqrt(40))',
+      'A) (1180 - 1200) / (50/sqrt(39))',
       'B) (1200 - 1180) / (50/sqrt(40))',
       'C) (1180 - 1200) / (50/40)',
-      'D) (1180 - 1200) / (50/sqrt(39))',
+      'D) (1180 - 1200) / (50/sqrt(40))',
       'E) (1180 - 1200) / 50',
     ]),
-    correctAnswer: 'A',
+    correctAnswer: 'D',
     explanation:
       'The t-statistic formula is (x̄ − μ₀) / (s / √n). Here: (1180 − 1200) / (50 / √40).',
   },
@@ -384,13 +384,13 @@ export const statsUnit4McqTestQuestions: Question[] = [
       'An operations manager records the time (in minutes) it takes a random sample of $n = 24$ employees to complete a new onboarding task. Based on the histogram of the data shown below, is it appropriate to construct a one-sample t-interval?',
     image: ONBOARDING_TIME_HISTOGRAM,
     options: stripOptionPrefixes([
-      'A) Yes, because the sample was randomly selected, and that is the only condition that must be checked.',
+      'A) No, because the sample size is less than 30 and the histogram shows strong right skew with an outlier, so the sample data condition is not met.',
       'B) Yes, because the t-distribution automatically adjusts for skewness regardless of sample size.',
-      'C) No, because the sample size is less than 30 and the histogram shows strong right skew with an outlier, so the sample data condition is not met.',
+      'C) Yes, because the sample was randomly selected, and that is the only condition that must be checked.',
       'D) No, because the population standard deviation is unknown.',
       'E) Yes, because n = 24 is close enough to 30 for the central limit theorem to apply.',
     ]),
-    correctAnswer: 'C',
+    correctAnswer: 'A',
     explanation:
       'A one-sample t-interval requires the sample data condition: the population distribution is approximately normal, or n ≥ 30, or (if n < 30) the sample data are free of strong skewness and outliers. Here n = 24 < 30, and the histogram shows strong right skew along with an isolated outlier near 60 minutes, so this condition is not satisfied. Not knowing the population standard deviation (D) is actually the reason a t-procedure, rather than a z-procedure, is used — it is not a barrier to inference.',
   },
@@ -404,13 +404,13 @@ export const statsUnit4McqTestQuestions: Question[] = [
       'An automotive magazine compared the fuel efficiency of two competing sedan models by test-driving independent samples of each on identical routes. A 95% confidence interval for the difference in mean miles per gallon ($\\mu_1 - \\mu_2$) is (-3.2, 1.8). What is the correct interpretation?',
     image: null,
     options: stripOptionPrefixes([
-      'A) We are 95% confident that the mean fuel efficiency of model 1 is 3.2 mpg less than model 2.',
+      'A) We are 95% confident that the true difference in mean fuel efficiency is between -3.2 and 1.8 mpg.',
       'B) There is a 95% chance that the true mean difference is between -3.2 and 1.8.',
-      'C) We are 95% confident that the true difference in mean fuel efficiency is between -3.2 and 1.8 mpg.',
+      'C) We are 95% confident that the mean fuel efficiency of model 1 is 3.2 mpg less than model 2.',
       'D) 95% of cars have a difference in efficiency between -3.2 and 1.8.',
       'E) We can conclude that model 1 is more efficient than model 2.',
     ]),
-    correctAnswer: 'C',
+    correctAnswer: 'A',
     explanation:
       'The standard interpretation of a confidence interval for a mean difference is that we are C% confident the true difference in means is contained within the interval.',
   },
@@ -425,12 +425,12 @@ export const statsUnit4McqTestQuestions: Question[] = [
     image: null,
     options: stripOptionPrefixes([
       'A) The margin of error will increase.',
-      'B) The margin of error will decrease.',
+      'B) The effect on the margin of error cannot be determined.',
       'C) The margin of error will stay the same.',
       'D) The margin of error will double.',
-      'E) The effect on the margin of error cannot be determined.',
+      'E) The margin of error will decrease.',
     ]),
-    correctAnswer: 'B',
+    correctAnswer: 'E',
     explanation:
       'The margin of error is calculated as $z^* \\times (\\sigma / \\sqrt{n})$. A 90% confidence level has a smaller critical value than a 95% level, resulting in a smaller margin of error.',
   },
@@ -443,8 +443,8 @@ export const statsUnit4McqTestQuestions: Question[] = [
     question:
       'A snack food company labels its granola bars as containing 50 calories. A dietitian suspects the true mean calorie content is higher and collects a random sample of 25 bars, finding a sample mean of 52 calories with a standard error of 1.5. What is the value of the t-statistic for testing whether the true mean differs from the labeled value?',
     image: null,
-    options: stripOptionPrefixes(['A) 0.67', 'B) 1.33', 'C) 2.00', 'D) 3.00', 'E) 33.33']),
-    correctAnswer: 'B',
+    options: stripOptionPrefixes(['A) 0.67', 'B) 3.00', 'C) 2.00', 'D) 1.33', 'E) 33.33']),
+    correctAnswer: 'D',
     explanation:
       'The t-statistic is calculated as $( \\overline{x} - \\mu_0 ) / SE$. Here, $(52 - 50) / 1.5 = 2 / 1.5 = 1.33$.',
   },
@@ -459,13 +459,13 @@ export const statsUnit4McqTestQuestions: Question[] = [
       'What is the sample mean difference, $\\bar{x}_d$ (after − before), for these 8 golfers?',
     image: GOLF_SCORE_DIFF_DOTPLOT,
     options: stripOptionPrefixes([
-      'A) -3.0',
-      'B) -2.5',
+      'A) -2.5',
+      'B) -3.0',
       'C) -24',
       'D) -2.0',
       'E) 3.0',
     ]),
-    correctAnswer: 'A',
+    correctAnswer: 'B',
     explanation:
       'Reading the dotplot, the 8 differences are -5, -4, -4, -3, -3, -2, -2, -1. The sum is -24, so the sample mean difference is $-24 / 8 = -3.0$. Answer (C) is the sum rather than the mean, and the other options result from misreading the dots or the direction of the difference.',
   },
@@ -478,8 +478,8 @@ export const statsUnit4McqTestQuestions: Question[] = [
     question:
       'A school district compares standardized test scores between two middle schools, School A and School B, using independent random samples of students from each. A 95% confidence interval for the difference in mean scores ($\\mu_A - \\mu_B$) is (2.5, 7.5). What is the point estimate for the difference in means?',
     image: null,
-    options: stripOptionPrefixes(['A) 2.5', 'B) 5.0', 'C) 7.5', 'D) 10.0', 'E) 0']),
-    correctAnswer: 'B',
+    options: stripOptionPrefixes(['A) 2.5', 'B) 10.0', 'C) 7.5', 'D) 5.0', 'E) 0']),
+    correctAnswer: 'D',
     explanation: 'The point estimate is the midpoint of the confidence interval: $(2.5 + 7.5) / 2 = 5.0$.',
   },
   {
@@ -491,8 +491,8 @@ export const statsUnit4McqTestQuestions: Question[] = [
     question:
       'A botanist studying an endangered species of orchid wants to estimate the mean height of mature plants to within 2 cm with 95% confidence. Based on similar species, she assumes the population standard deviation is 10 cm. Approximately how large a sample of orchids is required?',
     image: null,
-    options: stripOptionPrefixes(['A) 25', 'B) 50', 'C) 97', 'D) 100', 'E) 150']),
-    correctAnswer: 'C',
+    options: stripOptionPrefixes(['A) 25', 'B) 97', 'C) 50', 'D) 100', 'E) 150']),
+    correctAnswer: 'B',
     explanation:
       'Margin of Error (MOE) = $z^* \\times (\\sigma / \\sqrt{n})$. $2 = 1.96 \\times (10 / \\sqrt{n})$. Solving for n gives $n = (1.96 * 10 / 2)^2 \\approx 96.04$. Round up to 97.',
   },
@@ -526,12 +526,12 @@ export const statsUnit4McqTestQuestions: Question[] = [
     image: null,
     options: stripOptionPrefixes([
       'A) Reject H0 and conclude the mean is greater than 20.',
-      'B) Fail to reject H0 and conclude the mean is greater than 20.',
-      'C) Fail to reject H0 and conclude there is not sufficient evidence the mean is greater than 20.',
+      'B) Fail to reject H0 and conclude there is not sufficient evidence the mean is greater than 20.',
+      'C) Fail to reject H0 and conclude the mean is greater than 20.',
       'D) Accept H0 as true.',
       'E) The test is invalid because the p-value is too high.',
     ]),
-    correctAnswer: 'C',
+    correctAnswer: 'B',
     explanation:
       'Since 0.08 > 0.05, we fail to reject the null. We conclude there is not sufficient evidence for the alternative.',
   },
@@ -547,15 +547,15 @@ export const statsUnit4McqTestQuestions: Question[] = [
     questionAfterImage:
       'What is the margin of error for a 95% confidence interval for the difference in mean commute times ($\\mu_A - \\mu_B$)?',
     options: stripOptionPrefixes([
-      'A) 4.89 minutes',
+      'A) 2.26 minutes',
       'B) 3.43 minutes',
       'C) 11.06 minutes',
       'D) 4.44 minutes',
-      'E) 2.26 minutes',
+      'E) 4.89 minutes',
     ]),
-    correctAnswer: 'A',
+    correctAnswer: 'E',
     explanation:
-      'The standard error is $SE = \\sqrt{s_1^2/n_1 + s_2^2/n_2} = \\sqrt{5.8^2/16 + 6.5^2/14} = \\sqrt{2.1025 + 3.0179} = \\sqrt{5.1204} \\approx 2.263$. The margin of error is $t^* \\times SE = 2.160 \\times 2.263 \\approx 4.89$ minutes. (B) results from incorrectly pooling the sample sizes in the denominator, (C) omits the square root in the SE calculation, (D) incorrectly uses $z^* = 1.96$ instead of $t^*$, and (E) reports the standard error without multiplying by the critical value.',
+      'The standard error is $SE = \\sqrt{s_1^2/n_1 + s_2^2/n_2} = \\sqrt{5.8^2/16 + 6.5^2/14} = \\sqrt{2.1025 + 3.0179} = \\sqrt{5.1204} \\approx 2.263$. The margin of error is $t^* \\times SE = 2.160 \\times 2.263 \\approx 4.89$ minutes. (B) results from incorrectly pooling the sample sizes in the denominator, (C) omits the square root in the SE calculation, (D) incorrectly uses $z^* = 1.96$ instead of $t^*$, and (A) reports the standard error without multiplying by the critical value.',
   },
   {
     id: 7412,
@@ -581,12 +581,12 @@ export const statsUnit4McqTestQuestions: Question[] = [
     image: null,
     options: stripOptionPrefixes([
       'A) 1.645 * (4 / sqrt(40))',
-      'B) 1.684 * (4 / sqrt(40))',
-      'C) 1.96 * (4 / sqrt(40))',
+      'B) 1.96 * (4 / sqrt(40))',
+      'C) 1.684 * (4 / sqrt(40))',
       'D) 1.645 * (4 / 40)',
       'E) 1.684 * (4 / 40)',
     ]),
-    correctAnswer: 'B',
+    correctAnswer: 'C',
     explanation:
       'Margin of error is $t^* \\times (s / \\sqrt{n})$. For 90% confidence and df=39, $t^* \\approx 1.684$.',
   },
@@ -623,8 +623,8 @@ export const statsUnit4McqTestQuestions: Question[] = [
     question:
       'An orchard owner records the weight of every apple harvested this season, forming a population with mean $\\mu$. If she repeatedly draws random samples of apples and computes the sample mean weight each time, what is the mean of this sampling distribution of $\\overline{x}$?',
     image: null,
-    options: stripOptionPrefixes(['A) σ', 'B) μ', 'C) μ / √n', 'D) x̄', 'E) σ / n']),
-    correctAnswer: 'B',
+    options: stripOptionPrefixes(['A) μ', 'B) σ', 'C) μ / √n', 'D) x̄', 'E) σ / n']),
+    correctAnswer: 'A',
     explanation:
       'The mean of the sampling distribution of the sample mean is equal to the population mean, μ.',
   },
@@ -638,13 +638,13 @@ export const statsUnit4McqTestQuestions: Question[] = [
       "As in data on sale prices for previously owned homes in a western city, suppose a quantitative variable's population distribution is strongly right-skewed. What must be true for the sampling distribution of the sample mean to be approximately normal?",
     image: null,
     options: stripOptionPrefixes([
-      'A) The sample size n must be very large (n >> 30).',
+      'A) The mean must be 0.',
       'B) The sample size n can be as small as 5.',
       'C) The population standard deviation must be known.',
       'D) The t-distribution cannot be used.',
-      'E) The mean must be 0.',
+      'E) The sample size n must be very large (n >> 30).',
     ]),
-    correctAnswer: 'A',
+    correctAnswer: 'E',
     explanation:
       'If the population distribution is extremely skewed, a sample size much larger than 30 may be needed to ensure the sampling distribution is approximately normal.',
   },

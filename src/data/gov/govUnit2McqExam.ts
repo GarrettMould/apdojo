@@ -19,11 +19,11 @@ export const govUnit2McqTestQuestions: Question[] = [
     image: null,
     options: [
       'The framers intended the House to be insulated from rapid shifts in public opinion, while the Senate acts as a direct mirror of democracy.',
-      'The House was intended to be more responsive to the immediate passions of the electorate, while the Senate serves as a more deliberate and continuous body.',
       'The structure reflects a compromise where the executive branch can easily control the House but cannot influence the Senate.',
+      'The House was intended to be more responsive to the immediate passions of the electorate, while the Senate serves as a more deliberate and continuous body.',
       'The Senate was created with short terms to encourage frequent rotation in office, preventing elite control.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'C',
     explanation:
       'The smaller size and two-year terms make the House more accountable to the people, whereas the six-year staggered terms insulate the Senate, making it a more stable, continuous legislative body.',
   },
@@ -38,11 +38,11 @@ export const govUnit2McqTestQuestions: Question[] = [
     image: null,
     options: [
       'A motion for cloture',
-      'A unanimous consent agreement',
       'A discharge petition',
+      'A unanimous consent agreement',
       'A hold',
     ],
-    correctAnswer: 'C',
+    correctAnswer: 'B',
     explanation:
       'Under House rules, an individual representative can file a discharge petition to force a bill out of committee to the floor for debate if signed by a majority of members. Cloture, unanimous consent, and holds are unique Senate procedures.',
   },
@@ -56,12 +56,12 @@ export const govUnit2McqTestQuestions: Question[] = [
       'The federal budget consists of both mandatory and discretionary spending. As spending on entitlement programs like Social Security and Medicare automatically grows due to demographic changes, which of the following is a long-term economic consequence for federal budgeting?',
     image: null,
     options: [
-      'Discretionary spending opportunities will decrease unless tax revenues increase or the budget deficit increases.',
+      'Interest groups will reduce lobbying efforts on discretionary spending due to constitutional constraints.',
       'Congress must pass a completely new authorization act annually to keep mandatory spending active.',
       'The federal government will automatically eliminate its budget deficit by balancing national priorities.',
-      'Interest groups will reduce lobbying efforts on discretionary spending due to constitutional constraints.',
+      'Discretionary spending opportunities will decrease unless tax revenues increase or the budget deficit increases.',
     ],
-    correctAnswer: 'A',
+    correctAnswer: 'D',
     explanation:
       'Because mandatory spending is required by law for entitlement programs, its growth shifts fiscal pressure, meaning discretionary funding opportunities shrink unless funding is recovered through higher taxes or borrowing.',
   },
@@ -74,8 +74,8 @@ export const govUnit2McqTestQuestions: Question[] = [
     question:
       'A member of Congress votes to support a highly controversial environmental regulation after receiving thousands of letters from constituents demanding its passage, even though the member personally believes the bill will harm local industrial businesses. This member is acting under which model of representation?',
     image: null,
-    options: ['Trustee model', 'Delegate model', 'Politico model', 'Partisan model'],
-    correctAnswer: 'B',
+    options: ['Trustee model', 'Politico model', 'Delegate model', 'Partisan model'],
+    correctAnswer: 'C',
     explanation:
       'A representative acting as a delegate suppresses their personal judgment and votes based on the clear instructions or perceived interests of their constituents.',
   },
@@ -89,12 +89,12 @@ export const govUnit2McqTestQuestions: Question[] = [
       'Which of the following scenarios describes the structural condition of a "divided government"?',
     image: null,
     options: [
-      'The Democratic party holds a unified majority in both the House of Representatives and the Senate while working under a Democratic president.',
       'The President is a Democrat, while the Republican party controls at least one chamber of Congress.',
+      'The Democratic party holds a unified majority in both the House of Representatives and the Senate while working under a Democratic president.',
       'A legislative gridlock occurs because the Supreme Court strikes down executive orders from a lame-duck president.',
       'Members of a single political party split their votes along regional, ideological lines during a budget confirmation.'
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'A',
     explanation:
       'Divided government is formally defined as when one political party controls the presidency and the opposing party controls at least one of the chambers of Congress. This condition frequently intensifies partisan polarization, complicates the confirmation process, and leads to legislative gridlock.',
   },
@@ -135,12 +135,12 @@ export const govUnit2McqTestQuestions: Question[] = [
       alt: 'Map showing congressional district competitiveness across the United States',
     },
     options: [
-      'Marbury v. Madison (1803), because it established the Court\'s power to hear election disputes.',
       'Baker v. Carr (1961), because it established the "one person, one vote" principle and allowed federal courts to intervene in redistricting.',
+      'Marbury v. Madison (1803), because it established the Court\'s power to hear election disputes.',
       'McCulloch v. Maryland (1819), because it dealt with the implied powers of the federal government over states.',
       'United States v. Lopez (1995), because it limited Congress\'s authority to regulate local activities.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'A',
     explanation:
       'Baker v. Carr is the foundational case regarding redistricting; it determined that redistricting issues present justiciable questions, enabling federal courts to intervene in cases of unequal district representation.',
   },
@@ -154,12 +154,12 @@ export const govUnit2McqTestQuestions: Question[] = [
       'Energy in the Executive is a leading character in the definition of good government. It is essential to the protection of the community against foreign attacks... to the steady administration of the laws...\n—Federalist No. 70\n\nWhich of the following presidential actions is an example of an informal power justified by the argument above?',
     image: null,
     options: [
-      'Vetoing a major defense appropriations bill passed by Congress.',
-      'Negotiating a formal treaty with a foreign nation requiring a two-thirds Senate vote.',
       'Issuing an executive agreement with a foreign ally to secure immediate military cooperation.',
+      'Negotiating a formal treaty with a foreign nation requiring a two-thirds Senate vote.',
+      'Vetoing a major defense appropriations bill passed by Congress.',
       'Nominating an ambassador to serve as the chief diplomatic envoy to the United Nations.',
     ],
-    correctAnswer: 'C',
+    correctAnswer: 'A',
     explanation:
       'Executive agreements are informal tools that allow the executive to manage foreign policy quickly and single-handedly without legislative delays, fulfilling Hamilton\'s vision of an "energetic" executive.',
   },
@@ -174,11 +174,11 @@ export const govUnit2McqTestQuestions: Question[] = [
     image: null,
     options: [
       'The Senate can vote by simple majority to instantly declare the executive order null and void.',
-      'Congress can use its power of the purse to pass legislation explicitly withholding or blocking appropriations for the defense barriers.',
-      'The House of Representatives can force the President to submit the order for legislative veto evaluation.',
       'Congress can appeal to the Electoral College to adjust the administration\'s policy jurisdiction.',
+      'The House of Representatives can force the President to submit the order for legislative veto evaluation.',
+      'Congress can use its power of the purse to pass legislation explicitly withholding or blocking appropriations for the defense barriers.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'Congress can use its "power of the purse" to control or cut off money to check presidential policy initiatives or administrative overreach.',
   },
@@ -193,11 +193,11 @@ export const govUnit2McqTestQuestions: Question[] = [
     image: null,
     options: [
       'Sixteenth Amendment',
-      'Seventeenth Amendment',
       'Twenty-Second Amendment',
+      'Seventeenth Amendment',
       'Twenty-Fifth Amendment',
     ],
-    correctAnswer: 'C',
+    correctAnswer: 'B',
     explanation:
       'The Twenty-Second Amendment established formal presidential term limits, showing institutional concern about the long-term expansion of executive power.',
   },
@@ -212,11 +212,11 @@ export const govUnit2McqTestQuestions: Question[] = [
     image: null,
     options: [
       'The exercise of formal judicial review authority',
-      'The use of the presidential bully pulpit to set the political agenda',
       'An invocation of the advice and consent clause',
+      'The use of the presidential bully pulpit to set the political agenda',
       'The application of retrospective constituent delegation',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'C',
     explanation:
       'The "bully pulpit" describes a president\'s use of the office\'s prestige and media visibility to influence public opinion and pressure other government actors to support their agenda.',
   },
@@ -249,12 +249,12 @@ export const govUnit2McqTestQuestions: Question[] = [
       'A conservative Supreme Court majority issues a ruling that strikes down a long-standing federal campaign finance law passed by Congress. In response, a coalition of liberal senators begins drafting legislation to alter the appellate jurisdiction of the Court to prevent them from reviewing similar cases. This scenario illustrates which of the following constitutional dynamics?',
     image: null,
     options: [
-      'An application of executive supremacy over judicial interpretation',
-      'The use of statutory exemptions to remove life tenure from federal justices',
       'How Congress can attempt to place structural checks or jurisdictional limits on the judicial branch',
+      'The use of statutory exemptions to remove life tenure from federal justices',
+      'An application of executive supremacy over judicial interpretation',
       'The mandatory function of compliance monitoring under iron triangle systems',
     ],
-    correctAnswer: 'C',
+    correctAnswer: 'A',
     explanation:
       'Under Article III, Congress possesses the explicit power to limit or adjust the Supreme Court\'s appellate jurisdiction as a check on judicial power.',
   },
@@ -268,12 +268,12 @@ export const govUnit2McqTestQuestions: Question[] = [
       'Which of the following scenarios best demonstrates the concept of an "iron triangle" in the federal policymaking process?',
     image: null,
     options: [
-      'The President, the Prime Minister of a foreign nation, and the Secretary of State draft an alliance.',
       'A bureaucratic agency, a congressional committee, and an interest group collaborate over time to create and protect industry-specific policy regulations.',
+      'The President, the Prime Minister of a foreign nation, and the Secretary of State draft an alliance.',
       'The Supreme Court, the House of Representatives, and state governors negotiate a constitutional amendment.',
       'A temporary alliance of multi-industry journalists and academic scientists forms to raise awareness about public health issues.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'A',
     explanation:
       'Iron triangles are long-lasting, reciprocal alliances of congressional committees, bureaucratic agencies, and interest groups working within specific policy areas.',
   },
@@ -288,11 +288,11 @@ export const govUnit2McqTestQuestions: Question[] = [
     image: null,
     options: [
       'Constitutional concurrent original jurisdiction',
-      'Delegated discretionary and rulemaking authority',
-      'Executive treaty implementation procedures',
       'Congressional override of bureaucratic civil service specialization',
+      'Executive treaty implementation procedures',
+      'Delegated discretionary and rulemaking authority',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'The federal bureaucracy utilizes delegated discretionary authority from Congress to implement and interpret legislation through its rulemaking powers.',
   },
@@ -354,10 +354,10 @@ export const govUnit2McqTestQuestions: Question[] = [
     options: [
       'Modern Presidents have been granted significantly more formal authority by Congress to rewrite laws, reducing the need for formal vetoes.',
       'Recent Presidents are less likely to face opposition from Congress due to a decrease in party polarization.',
-      'Presidents in the modern era are more likely to utilize executive orders and other unilateral actions to shape policy, rather than relying on the legislative process where vetoes occur.',
       'The Constitution has been amended to restrict the President\'s ability to issue regular vetoes, resulting in the drastic decline seen in the 21st century.',
+      'Presidents in the modern era are more likely to utilize executive orders and other unilateral actions to shape policy, rather than relying on the legislative process where vetoes occur.',
     ],
-    correctAnswer: 'C',
+    correctAnswer: 'D',
     explanation:
       'A major trend in modern American government is the "unilateral presidency." As legislative gridlock has increased, modern Presidents have increasingly relied on executive orders, memoranda, and administrative rulemaking to bypass Congress, resulting in fewer bills on their desk to veto.',
   },

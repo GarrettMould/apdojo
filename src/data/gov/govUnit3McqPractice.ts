@@ -17,12 +17,12 @@ export const govUnit3McqPracticeQuestions: Question[] = [
     question: 'The Miranda rule serves to protect which constitutional guarantee?',
     image: null,
     options: [
-      'The right to be free from unreasonable searches.',
       'The right to a fair trial and protection from self-incrimination during interrogation.',
+      'The right to be free from unreasonable searches.',
       'The right to petition the government for redress of grievances.',
       'The right to keep and bear arms.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'A',
     explanation:
       'Miranda warnings ensure that individuals in custody are aware of their 5th Amendment right against self-incrimination and 6th Amendment right to counsel.',
   },
@@ -36,12 +36,12 @@ export const govUnit3McqPracticeQuestions: Question[] = [
     question: "In Schenck v. United States (1919), the Supreme Court established which standard for determining when speech may be restricted?",
     image: null,
     options: [
-      "The \"clear and present danger\" test.",
-      "The \"strict scrutiny\" test.",
       "The \"rational basis\" test.",
+      "The \"strict scrutiny\" test.",
+      "The \"clear and present danger\" test.",
       "The \"least restrictive means\" test.",
     ],
-    correctAnswer: "A",
+    correctAnswer: "C",
     explanation: "Schenck established that speech creating a \"clear and present danger\" of substantive evils Congress has a right to prevent (in that case, related to draft resistance during wartime) is not protected by the First Amendment.",
   },
   {
@@ -53,12 +53,12 @@ export const govUnit3McqPracticeQuestions: Question[] = [
     question: "In Tinker v. Des Moines (1969), the Supreme Court ruled that public school students:",
     image: null,
     options: [
-      "Have no First Amendment rights while on school property.",
       "Retain the right to symbolic speech, such as wearing armbands in protest, as long as it does not substantially disrupt the educational environment.",
+      "Have no First Amendment rights while on school property.",
       "Can be punished for any speech school administrators personally disagree with.",
       "Must obtain school board approval before engaging in any political expression.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "A",
     explanation: "Tinker established that students \"do not shed their constitutional rights to freedom of speech or expression at the schoolhouse gate,\" protecting symbolic speech like armbands unless it causes substantial disruption to school operations.",
   },
   {
@@ -70,12 +70,12 @@ export const govUnit3McqPracticeQuestions: Question[] = [
     question: "In Engel v. Vitale (1962), the Supreme Court ruled that state-sponsored prayer in public schools violated the:",
     image: null,
     options: [
-      "Free Exercise Clause of the First Amendment.",
       "Establishment Clause of the First Amendment.",
+      "Free Exercise Clause of the First Amendment.",
       "Equal Protection Clause of the Fourteenth Amendment.",
       "Due Process Clause of the Fifth Amendment.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "A",
     explanation: "Engel v. Vitale held that a state-composed, officially sponsored prayer recited in public schools violated the Establishment Clause, which prohibits government from endorsing or promoting religion.",
   },
   {
@@ -87,12 +87,12 @@ export const govUnit3McqPracticeQuestions: Question[] = [
     question: "In Wisconsin v. Yoder (1972), the Supreme Court ruled that Amish parents could not be compelled to send their children to public school past the eighth grade because doing so would:",
     image: null,
     options: [
-      "Violate the Establishment Clause by promoting a specific religion.",
       "Violate the Free Exercise Clause by substantially burdening their sincerely held religious beliefs.",
+      "Violate the Establishment Clause by promoting a specific religion.",
       "Violate the Equal Protection Clause by discriminating against non-religious families.",
       "Violate the Commerce Clause by regulating interstate education standards.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "A",
     explanation: "The Court held that Wisconsin's compulsory education law placed an undue burden on the Amish community's religious practices and way of life, violating their Free Exercise rights under the First Amendment.",
   },
   {
@@ -121,12 +121,12 @@ export const govUnit3McqPracticeQuestions: Question[] = [
     question: "In Gideon v. Wainwright (1963), the Supreme Court ruled that:",
     image: null,
     options: [
-      "Suspects must be informed of their right to remain silent before police questioning.",
       "States must provide legal counsel to criminal defendants who cannot afford an attorney.",
+      "Suspects must be informed of their right to remain silent before police questioning.",
       "Evidence obtained without a warrant cannot be used in state courts.",
       "Defendants have the right to a jury of exactly twelve people in every state trial.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "A",
     explanation: "Gideon v. Wainwright incorporated the Sixth Amendment's right to counsel against the states, requiring state courts to provide a public defender for defendants in felony cases who cannot afford their own attorney.",
   },
   {
@@ -139,11 +139,11 @@ export const govUnit3McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "Procedural due process, because they were denied a fair hearing.",
-      "Substantive due process, because they are challenging the fundamental fairness and reasonableness of the law itself.",
       "The Establishment Clause, because the ordinance favors one type of business.",
+      "Substantive due process, because they are challenging the fundamental fairness and reasonableness of the law itself.",
       "The Necessary and Proper Clause, because the city lacks authority to regulate businesses.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "C",
     explanation: "Substantive due process concerns whether a law's substance — what it does, not how it was passed or enforced — is fundamentally fair and constitutional, as opposed to procedural due process, which concerns the fairness of the process used to apply or enforce a law.",
   },
   {
@@ -156,11 +156,11 @@ export const govUnit3McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "The Establishment Clause of the First Amendment.",
-      "The Equal Protection Clause of the Fourteenth Amendment.",
-      "The Due Process Clause of the Fifth Amendment.",
       "The Necessary and Proper Clause of Article I.",
+      "The Due Process Clause of the Fifth Amendment.",
+      "The Equal Protection Clause of the Fourteenth Amendment.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "D",
     explanation: "Brown relied on the Equal Protection Clause of the Fourteenth Amendment to overturn the \"separate but equal\" doctrine, holding that segregated public schools deny equal protection of the laws to minority students regardless of the physical equality of the facilities.",
   },
   {
@@ -190,11 +190,11 @@ export const govUnit3McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "Only rights explicitly listed in the Bill of Rights are protected by the Constitution.",
-      "Individuals may possess fundamental rights not specifically named in the Constitution's text.",
-      "State governments have unlimited authority over any right not mentioned in the Bill of Rights.",
       "The federal government may create new rights only through a constitutional amendment.",
+      "State governments have unlimited authority over any right not mentioned in the Bill of Rights.",
+      "Individuals may possess fundamental rights not specifically named in the Constitution's text.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "D",
     explanation: "The Ninth Amendment reflects the framers' concern that listing specific rights might imply that unlisted rights do not exist. Instead, it affirms that people may retain rights (such as privacy) that are not explicitly enumerated in the constitutional text.",
   },
 
@@ -209,11 +209,11 @@ export const govUnit3McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "A confession from the suspect.",
-      "A warrant based on probable cause.",
       "Written consent from the suspect's employer.",
+      "A warrant based on probable cause.",
       "A congressional resolution.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "C",
     explanation: "The Fourth Amendment generally requires law enforcement to obtain a warrant, supported by probable cause and issued by a judge, before conducting a search of a person's home, except in specific well-defined exceptions.",
   },
   {
@@ -226,11 +226,11 @@ export const govUnit3McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "The documents were not actually classified.",
-      "The government failed to meet the heavy burden required to justify prior restraint on the press.",
-      "The First Amendment does not apply to national security matters.",
       "The newspaper had already been granted a warrant to publish the material.",
+      "The First Amendment does not apply to national security matters.",
+      "The government failed to meet the heavy burden required to justify prior restraint on the press.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "D",
     explanation: "The Court held that the government did not meet the extremely high burden of proof required to justify prior restraint — censorship before publication — reinforcing the strong presumption against government censorship of the press even on sensitive national security matters.",
   },
   {
@@ -277,11 +277,11 @@ export const govUnit3McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "A procedural due process claim, focused only on how the law is enforced.",
-      "A substantive due process claim, since it challenges whether the law itself, as written, is fundamentally fair.",
       "An Equal Protection Clause claim, because it involves discrimination against a protected class.",
+      "A substantive due process claim, since it challenges whether the law itself, as written, is fundamentally fair.",
       "A claim under the Establishment Clause.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "C",
     explanation: "A challenge to a law's own content — such as arguing that its vagueness makes it fundamentally unfair regardless of how it is applied — is a substantive due process claim, since it targets the substance of the law itself rather than the fairness of the procedures used to enforce it.",
   },
   {
@@ -293,12 +293,12 @@ export const govUnit3McqPracticeQuestions: Question[] = [
     question: "The doctrine of \"separate but equal,\" established in Plessy v. Ferguson (1896) and later overturned by Brown v. Board of Education (1954), had originally permitted:",
     image: null,
     options: [
-      "State-mandated racial segregation in public facilities, provided the facilities were considered equal in quality.",
-      "The complete exclusion of racial minorities from all public services.",
       "Federal oversight of all state education systems.",
+      "The complete exclusion of racial minorities from all public services.",
+      "State-mandated racial segregation in public facilities, provided the facilities were considered equal in quality.",
       "The abolition of the Equal Protection Clause.",
     ],
-    correctAnswer: "A",
+    correctAnswer: "C",
     explanation: "Plessy v. Ferguson upheld state laws requiring \"separate but equal\" facilities for different races, a doctrine the Court later rejected in Brown v. Board of Education, which held that segregated facilities are inherently unequal.",
   },
   {
@@ -310,12 +310,12 @@ export const govUnit3McqPracticeQuestions: Question[] = [
     question: "A law grants a specific hiring preference to members of a historically disadvantaged group in order to remedy the effects of past discrimination. Policies of this kind, often controversial and subject to strict judicial scrutiny, are commonly referred to as:",
     image: null,
     options: [
-      "Reserved powers",
       "Affirmative action policies",
+      "Reserved powers",
       "Devolution measures",
       "Categorical grants",
     ],
-    correctAnswer: "B",
+    correctAnswer: "A",
     explanation: "Affirmative action refers to policies intended to increase opportunities for historically disadvantaged or underrepresented groups, often in employment or education, and remains a subject of ongoing legal and political debate regarding its constitutionality under the Equal Protection Clause.",
   },
   {
@@ -328,11 +328,11 @@ export const govUnit3McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "A content-neutral time, place, and manner restriction.",
-      "Viewpoint discrimination, targeting speech based on the specific opinion expressed.",
-      "A valid exercise of the city's police powers.",
       "Protected under the doctrine of prior restraint.",
+      "A valid exercise of the city's police powers.",
+      "Viewpoint discrimination, targeting speech based on the specific opinion expressed.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "D",
     explanation: "Unlike content-neutral regulations (which apply regardless of the message expressed), this ordinance specifically targets criticism of one official while permitting other viewpoints — a form of viewpoint discrimination that receives the strictest First Amendment scrutiny and is rarely upheld.",
   },
   {
@@ -361,12 +361,12 @@ export const govUnit3McqPracticeQuestions: Question[] = [
     question: "Which of the following best distinguishes civil liberties from civil rights?",
     image: null,
     options: [
-      "Civil liberties are protections from government action, while civil rights concern equal treatment and protection from discrimination.",
+      "There is no meaningful distinction between the two terms.",
       "Civil liberties apply only to citizens, while civil rights apply to all persons regardless of citizenship.",
       "Civil liberties are found only in state constitutions, while civil rights are found only in the U.S. Constitution.",
-      "There is no meaningful distinction between the two terms.",
+      "Civil liberties are protections from government action, while civil rights concern equal treatment and protection from discrimination.",
     ],
-    correctAnswer: "A",
+    correctAnswer: "D",
     explanation: "Civil liberties are generally understood as individual freedoms protected from government interference (such as freedom of speech), while civil rights concern protections against discrimination and guarantees of equal treatment under the law.",
   },
 

@@ -79,12 +79,12 @@ export const statsUnit2McqTestQuestions: Question[] = [
     image: null,
     options: stripOptionPrefixes([
       'A) Events A and B are independent.',
-      'B) Events A and B are mutually exclusive.',
-      'C) Events A and B are both mutually exclusive and independent.',
+      'B) Events A and B are both mutually exclusive and independent.',
+      'C) Events A and B are mutually exclusive.',
       'D) P(A or B) = P(A) × P(B) = 0.015.',
       'E) Independence cannot be evaluated.',
     ]),
-    correctAnswer: 'B',
+    correctAnswer: 'C',
     explanation: 'P(A and B) = 0 means the events cannot occur together, making them mutually exclusive.',
   }
 ,
@@ -99,12 +99,12 @@ export const statsUnit2McqTestQuestions: Question[] = [
     image: SLEEP_STRESS_SEGMENTED_BAR,
     options: stripOptionPrefixes([
       'A) Hours of sleep and stress level are independent.',
-      'B) Students who sleep less than 7 hours are more likely to report feeling stressed than students who sleep 7 or more hours.',
+      'B) There is a higher count of stressed students among those sleeping 7+ hours.',
       'C) The majority of all 200 students reported feeling stressed.',
       'D) Exactly 70 students slept less than 7 hours.',
-      'E) There is a higher count of stressed students among those sleeping 7+ hours.',
+      'E) Students who sleep less than 7 hours are more likely to report feeling stressed than students who sleep 7 or more hours.',
     ]),
-    correctAnswer: 'B',
+    correctAnswer: 'E',
     explanation:
       'The segmented bar chart shows conditional distributions—70% of the "less than 7 hours" group reported stress, compared to only 35% of the "7 or more hours" group. Since these conditional percentages differ substantially, there is an association between sleep and stress.',
   }
@@ -118,8 +118,8 @@ export const statsUnit2McqTestQuestions: Question[] = [
     question:
       'A bag contains 6 red, 4 blue, and 5 green marbles. What is the probability that a marble selected at random is NOT blue?',
     image: null,
-    options: stripOptionPrefixes(['A) 0.267', 'B) 0.400', 'C) 0.600', 'D) 0.733', 'E) 0.800']),
-    correctAnswer: 'D',
+    options: stripOptionPrefixes(['A) 0.267', 'B) 0.733', 'C) 0.600', 'D) 0.400', 'E) 0.800']),
+    correctAnswer: 'B',
     explanation: 'P(not blue) = 1 - P(blue) = 1 - (4/15) ≈ 0.733.',
   }
 ,
@@ -134,12 +134,12 @@ export const statsUnit2McqTestQuestions: Question[] = [
     image: null,
     options: stripOptionPrefixes([
       'A) The coin became less biased.',
-      'B) The law of large numbers: as trials increase, relative frequency gets closer to true probability.',
+      'B) The coin is not fair.',
       'C) The result after 1,000 flips is unreliable.',
-      'D) The coin is not fair.',
+      'D) The law of large numbers: as trials increase, relative frequency gets closer to true probability.',
       'E) Relative frequency and true probability are unrelated.',
     ]),
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'The law of large numbers states that long-run relative frequency approaches the true probability.',
   }
@@ -154,8 +154,8 @@ export const statsUnit2McqTestQuestions: Question[] = [
       'A survey of 300 randomly selected adults asked whether they own a smartphone and whether they own a tablet. What is the probability that a randomly selected adult owns a tablet, given that they own a smartphone?',
     image: null,
     tableData: SMARTPHONE_TABLET_TABLE,
-    options: stripOptionPrefixes(['A) 0.467', 'B) 0.500', 'C) 0.667', 'D) 0.700', 'E) 0.875']),
-    correctAnswer: 'C',
+    options: stripOptionPrefixes(['A) 0.467', 'B) 0.500', 'C) 0.700', 'D) 0.667', 'E) 0.875']),
+    correctAnswer: 'D',
     explanation: 'P(Tablet | Smartphone) = 140 / 210 ≈ 0.667.',
   }
 ,
@@ -172,11 +172,11 @@ export const statsUnit2McqTestQuestions: Question[] = [
     options: stripOptionPrefixes([
       'A) Yes, because P(Tablet) = P(Tablet | Smartphone).',
       'B) Yes, because both events have a probability greater than 0.',
-      'C) No, because P(Tablet) ≈ 0.533 but P(Tablet | Smartphone) ≈ 0.667.',
+      'C) Cannot be determined without a chi-square test.',
       'D) No, because the two-way table has unequal row totals.',
-      'E) Cannot be determined without a chi-square test.',
+      'E) No, because P(Tablet) ≈ 0.533 but P(Tablet | Smartphone) ≈ 0.667.',
     ]),
-    correctAnswer: 'C',
+    correctAnswer: 'E',
     explanation:
       'P(Tablet) = 160/300 ≈ 0.533. P(Tablet | Smartphone) = 140/210 ≈ 0.667. Since these are not equal, the events are not independent.',
   }
@@ -190,8 +190,8 @@ export const statsUnit2McqTestQuestions: Question[] = [
     question:
       'IQ scores in a certain population are approximately normally distributed with a mean of 100 and a standard deviation of 15. Using the empirical rule, the shaded region in the figure representing scores greater than 115 represents approximately what percentage of the population?',
     image: IQ_NORMAL_CURVE,
-    options: stripOptionPrefixes(['A) 2.5%', 'B) 13.5%', 'C) 16%', 'D) 34%', 'E) 50%']),
-    correctAnswer: 'C',
+    options: stripOptionPrefixes(['A) 16%', 'B) 13.5%', 'C) 2.5%', 'D) 34%', 'E) 50%']),
+    correctAnswer: 'A',
     explanation:
       '115 is exactly 1 standard deviation above the mean (100 + 15 = 115). By the empirical rule, 68% of values fall within 1 SD of the mean, leaving 32% split evenly between the two tails (16% above 115).',
   }
@@ -233,8 +233,8 @@ export const statsUnit2McqTestQuestions: Question[] = [
     question:
       'A researcher simulates a basketball player making 80% of free throws 500 times (10 throws each). 380 trials resulted in at least 8 makes. What is the estimated probability?',
     image: null,
-    options: stripOptionPrefixes(['A) 0.080', 'B) 0.380', 'C) 0.500', 'D) 0.760', 'E) 0.800']),
-    correctAnswer: 'D',
+    options: stripOptionPrefixes(['A) 0.080', 'B) 0.380', 'C) 0.500', 'D) 0.800', 'E) 0.760']),
+    correctAnswer: 'E',
     explanation: 'The estimated probability is the relative frequency: 380 / 500 = 0.76.',
   }
 ,
@@ -247,8 +247,8 @@ export const statsUnit2McqTestQuestions: Question[] = [
     question:
       'The histogram displays the probability distribution for X, the number of successes in 8 independent trials of a binomial random variable with probability of success p = 0.5 on each trial. Based on the histogram, which of the following is the best approximation for the standard deviation of X?',
     image: BINOMIAL_PROBABILITY_HISTOGRAM,
-    options: stripOptionPrefixes(['A) 0.50', 'B) 1.00', 'C) 1.41', 'D) 2.00', 'E) 4.00']),
-    correctAnswer: 'C',
+    options: stripOptionPrefixes(['A) 0.50', 'B) 1.00', 'C) 2.00', 'D) 1.41', 'E) 4.00']),
+    correctAnswer: 'D',
     explanation:
       'For a binomial distribution, the standard deviation is σ = √(np(1-p)) = √(8 × 0.5 × 0.5) = √2 ≈ 1.41.',
   }
@@ -263,13 +263,13 @@ export const statsUnit2McqTestQuestions: Question[] = [
       'A high school has 1,200 students, of whom 30% participate in a fall sport. A researcher selects a random sample of 15 students without replacement and records how many participate in a fall sport. Why can this be treated as approximately binomial?',
     image: null,
     options: stripOptionPrefixes([
-      'A) No, because sampling without replacement always violates independence.',
+      'A) Yes, because the sample size is less than 10% of the population.',
       'B) No, because np = 4.5, which is less than 10.',
-      'C) Yes, because the sample size is less than 10% of the population.',
+      'C) No, because sampling without replacement always violates independence.',
       'D) Yes, because every student has the same probability of participating.',
       'E) No, because the probability of success is not 0.5.',
     ]),
-    correctAnswer: 'C',
+    correctAnswer: 'A',
     explanation:
       'Since 15 is less than 10% of 1,200, the trials can be treated as approximately independent.',
   }
@@ -298,8 +298,8 @@ export const statsUnit2McqTestQuestions: Question[] = [
     question:
       'A multiple-choice quiz has 6 questions, each with 4 answer choices (one correct). If a student guesses randomly, what is the probability they get exactly 2 correct?',
     image: null,
-    options: stripOptionPrefixes(['A) 0.0879', 'B) 0.1318', 'C) 0.2966', 'D) 0.3115', 'E) 0.4392']),
-    correctAnswer: 'D',
+    options: stripOptionPrefixes(['A) 0.3115', 'B) 0.1318', 'C) 0.2966', 'D) 0.0879', 'E) 0.4392']),
+    correctAnswer: 'A',
     explanation:
       'Using the binomial formula with n=6, p=0.25, x=2: C(6,2) × (0.25)^2 × (0.75)^4 ≈ 0.3115.',
   }
@@ -315,12 +315,12 @@ export const statsUnit2McqTestQuestions: Question[] = [
     image: CLT_SAMPLING_DISTRIBUTION,
     options: stripOptionPrefixes([
       'A) As sample size increases, the sampling distribution becomes more skewed.',
-      'B) As sample size increases, the sampling distribution of the sample mean becomes approximately normal and less variable, illustrating the central limit theorem.',
+      'B) The shape change shown is due to bias introduced by larger sample sizes.',
       'C) As sample size increases, the population distribution becomes more normal.',
-      'D) The shape change shown is due to bias introduced by larger sample sizes.',
+      'D) As sample size increases, the sampling distribution of the sample mean becomes approximately normal and less variable, illustrating the central limit theorem.',
       'E) The histograms should all have the same shape and spread regardless of sample size.',
     ]),
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'This illustrates the central limit theorem: the sampling distribution of the sample mean becomes more normal and less variable as n increases.',
   }
@@ -348,8 +348,8 @@ export const statsUnit2McqTestQuestions: Question[] = [
     question:
       'Bolt lengths are normally distributed (mean 50 mm, SD 0.8 mm). A bolt is "long" if it is at or above the 95th percentile. What is the minimum length for a bolt to be "long"?',
     image: null,
-    options: stripOptionPrefixes(['A) 50.80', 'B) 51.32', 'C) 51.60', 'D) 52.40', 'E) 53.20']),
-    correctAnswer: 'B',
+    options: stripOptionPrefixes(['A) 50.80', 'B) 51.60', 'C) 51.32', 'D) 52.40', 'E) 53.20']),
+    correctAnswer: 'C',
     explanation: 'Using the 95th percentile z-score (1.645): x = 50 + 1.645(0.8) ≈ 51.32 mm.',
   }
 ,
@@ -362,8 +362,8 @@ export const statsUnit2McqTestQuestions: Question[] = [
     question:
       'A box contains 10 components, 3 of which are defective. If two are selected without replacement, what is the probability that both are defective?',
     image: null,
-    options: stripOptionPrefixes(['A) 0.06', 'B) 0.09', 'C) 0.067', 'D) 0.30', 'E) 0.233']),
-    correctAnswer: 'C',
+    options: stripOptionPrefixes(['A) 0.06', 'B) 0.09', 'C) 0.233', 'D) 0.30', 'E) 0.067']),
+    correctAnswer: 'E',
     explanation: 'P(both defective) = (3/10) × (2/9) = 6/90 ≈ 0.067.',
   }
 ,
@@ -378,13 +378,13 @@ export const statsUnit2McqTestQuestions: Question[] = [
     image: null,
     tableData: MARIA_TEST_SCORES_TABLE,
     options: stripOptionPrefixes([
-      'A) Math, because 620 > 580.',
+      'A) Verbal, because her z-score (1.625) is higher.',
       'B) Math, because her z-score (1.20) is lower.',
-      'C) Verbal, because her z-score (1.625) is higher.',
+      'C) Math, because 620 > 580.',
       'D) Cannot be compared.',
       'E) Verbal, because 580 is closer to a perfect score.',
     ]),
-    correctAnswer: 'C',
+    correctAnswer: 'A',
     explanation:
       'Math z = 1.20; Verbal z = 1.625. A higher z-score indicates better relative performance.',
   }

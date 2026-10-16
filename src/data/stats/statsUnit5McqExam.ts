@@ -323,8 +323,8 @@ export const statsUnit5McqTestQuestions: Question[] = [
     question:
       'A real estate agent builds a least-squares regression line to predict a home\'s sale price (y, in thousands of dollars) from its square footage (x): ŷ = 50 + 0.15x. One house in her listings has 2,000 square feet and actually sold for $380,000. What is the residual for this house?',
     image: null,
-    options: stripOptionPrefixes(['A) 350', 'B) 30', 'C) -30', 'D) 0.15', 'E) 50']),
-    correctAnswer: 'B',
+    options: stripOptionPrefixes(['A) 350', 'B) 50', 'C) -30', 'D) 0.15', 'E) 30']),
+    correctAnswer: 'E',
     explanation:
       'Predicted price is ŷ = 50 + 0.15(2000) = 350 (thousand). Observed price is y = 380 (thousand). Residual is y − ŷ = 380 − 350 = 30.',
   },
@@ -337,8 +337,8 @@ export const statsUnit5McqTestQuestions: Question[] = [
     question:
       'A nutritionist studies the relationship between daily fiber intake (grams) and reduction in LDL cholesterol (mg/dL) among a sample of patients and finds a correlation of r = -0.80. What proportion of the variation in cholesterol reduction is explained by the linear relationship with fiber intake?',
     image: null,
-    options: stripOptionPrefixes(['A) 0.20', 'B) 0.64', 'C) 0.80', 'D) 0.36', 'E) -0.64']),
-    correctAnswer: 'B',
+    options: stripOptionPrefixes(['A) 0.64', 'B) 0.20', 'C) 0.80', 'D) 0.36', 'E) -0.64']),
+    correctAnswer: 'A',
     explanation: 'The coefficient of determination is r². Here, (-0.80)² = 0.64.',
   },
   {
@@ -367,11 +367,11 @@ export const statsUnit5McqTestQuestions: Question[] = [
     options: stripOptionPrefixes([
       'A) Increase of 2.5 bushels per acre',
       'B) Increase of 6.5 bushels per acre',
-      'C) Increase of 10.0 bushels per acre',
-      'D) Increase of 1.6 bushels per acre',
+      'C) Increase of 1.6 bushels per acre',
+      'D) Increase of 10.0 bushels per acre',
       'E) Decrease of 10.0 bushels per acre',
     ]),
-    correctAnswer: 'C',
+    correctAnswer: 'D',
     explanation: 'The predicted change is slope × change in x: 2.5 × 4 = 10.0 bushels per acre.',
   },
   {
@@ -386,11 +386,11 @@ export const statsUnit5McqTestQuestions: Question[] = [
     options: stripOptionPrefixes([
       'A) The slope increases.',
       'B) The y-intercept decreases.',
-      'C) The regression line does not change.',
+      'C) The residual sum of squares increases.',
       'D) The correlation increases.',
-      'E) The residual sum of squares increases.',
+      'E) The regression line does not change.',
     ]),
-    correctAnswer: 'C',
+    correctAnswer: 'E',
     explanation:
       'The least-squares regression line always passes through (x̄, ȳ). Adding a point exactly at (x̄, ȳ) does not change the line.',
   },
@@ -404,13 +404,13 @@ export const statsUnit5McqTestQuestions: Question[] = [
       'A pediatrician models the relationship between a child\'s age in years (x) and height in centimeters (y) using the equation ŷ = 10 + 2x. Which of the following is an appropriate interpretation of the y-intercept in this model?',
     image: null,
     options: stripOptionPrefixes([
-      'A) The predicted height of a newborn (0 years old) is 10 cm.',
-      'B) The average height of all people is 10 cm.',
+      'A) The average height of all people is 10 cm.',
+      'B) The predicted height of a newborn (0 years old) is 10 cm.',
       'C) For every year of age, height increases by 10 cm.',
       'D) The height of a person when they stop growing.',
       'E) The intercept has no practical meaning.',
     ]),
-    correctAnswer: 'A',
+    correctAnswer: 'B',
     explanation: 'The y-intercept is the predicted value of y when x = 0.',
   },
   {
@@ -424,12 +424,12 @@ export const statsUnit5McqTestQuestions: Question[] = [
     image: RESIDUAL_PLOT_HIGH_R,
     options: stripOptionPrefixes([
       'A) Because r is close to 1, the linear model is appropriate despite the pattern in the residual plot.',
-      'B) The residual plot shows a curved pattern, indicating that a linear model may not be appropriate even though r is close to 1.',
-      'C) The correlation of 0.93 confirms that the residuals are randomly scattered.',
+      'B) The correlation of 0.93 confirms that the residuals are randomly scattered.',
+      'C) The residual plot shows a curved pattern, indicating that a linear model may not be appropriate even though r is close to 1.',
       'D) The curved pattern indicates that the correlation is actually negative.',
       'E) Because the residuals are all less than 10 in absolute value, the linear model provides a good fit.',
     ]),
-    correctAnswer: 'B',
+    correctAnswer: 'C',
     explanation:
       'A high correlation does not guarantee a linear model is appropriate. The residual plot shows a clear U-shaped (curved) pattern, which indicates the true relationship is non-linear even though r is close to 1.',
   },
@@ -445,11 +445,11 @@ export const statsUnit5McqTestQuestions: Question[] = [
     options: stripOptionPrefixes([
       'A) The data are perfectly linear.',
       'B) The model is a good fit.',
-      'C) The relationship between advertising spend and sales revenue is non-linear.',
-      'D) There are no outliers.',
+      'C) There are no outliers.',
+      'D) The relationship between advertising spend and sales revenue is non-linear.',
       'E) The correlation is -1.',
     ]),
-    correctAnswer: 'C',
+    correctAnswer: 'D',
     explanation:
       'A curved pattern in a residual plot indicates a linear model is not appropriate.',
   },
@@ -462,8 +462,8 @@ export const statsUnit5McqTestQuestions: Question[] = [
     question:
       'A physics student records the time elapsed (x) and remaining battery charge (y) for a device that drains power at a perfectly constant rate. When she plots her data, every point falls exactly on a line with a negative slope. What is the correlation coefficient r for this data set?',
     image: null,
-    options: stripOptionPrefixes(['A) 0', 'B) 1', 'C) -1', 'D) 0.5', 'E) -0.5']),
-    correctAnswer: 'C',
+    options: stripOptionPrefixes(['A) 0', 'B) 1', 'C) 0.5', 'D) -1', 'E) -0.5']),
+    correctAnswer: 'D',
     explanation: 'A perfect negative linear association has r = -1.',
   },
   {
@@ -477,12 +477,12 @@ export const statsUnit5McqTestQuestions: Question[] = [
     image: null,
     options: stripOptionPrefixes([
       'A) It has no effect.',
-      'B) It pulls the line toward itself, changing the slope and intercept.',
-      'C) It moves the line away from itself.',
+      'B) It moves the line away from itself.',
+      'C) It pulls the line toward itself, changing the slope and intercept.',
       'D) It only changes the y-intercept.',
       'E) It only changes the slope.',
     ]),
-    correctAnswer: 'B',
+    correctAnswer: 'C',
     explanation:
       'Influential outliers pull the least-squares regression line toward them, often substantially changing slope and intercept.',
   },
@@ -496,13 +496,13 @@ export const statsUnit5McqTestQuestions: Question[] = [
       'The scatterplot above shows the relationship between two variables for 10 observations, with the least-squares regression line drawn (all 10 points, including P, were used to fit this line). If the point labeled P is removed and the regression line is refit, which of the following would most likely happen?',
     image: INFLUENTIAL_POINT_SCATTERPLOT,
     options: stripOptionPrefixes([
-      'A) The slope would increase, and r would increase in magnitude.',
-      'B) The slope would increase, and r would decrease in magnitude.',
+      'A) The slope would increase, and r would decrease in magnitude.',
+      'B) The slope would increase, and r would increase in magnitude.',
       'C) The slope would decrease, and r would increase in magnitude.',
       'D) The slope would decrease, and r would decrease in magnitude.',
       'E) Neither the slope nor r would change because P is not an outlier.',
     ]),
-    correctAnswer: 'A',
+    correctAnswer: 'B',
     explanation:
       'Point P is a high-leverage point far to the right of the main cluster and well below the pattern formed by the other 9 points. It pulls the regression line down, flattening the slope and weakening the fit. Removing P allows the line to fit the tightly linear main cluster, so the slope increases (becomes steeper) and r increases in magnitude (closer to +1).',
   },
@@ -516,13 +516,13 @@ export const statsUnit5McqTestQuestions: Question[] = [
       'A pediatric researcher builds a scatterplot relating children\'s height (cm) to weight, originally measured in kilograms. If she converts the weight measurements to grams (1 kg = 1,000 g) before recalculating the correlation coefficient, what happens to r?',
     image: null,
     options: stripOptionPrefixes([
-      'A) r increases by 1000.',
+      'A) r stays the same.',
       'B) r decreases by 1000.',
       'C) r is multiplied by 1000.',
-      'D) r stays the same.',
+      'D) r increases by 1000.',
       'E) r becomes 0.',
     ]),
-    correctAnswer: 'D',
+    correctAnswer: 'A',
     explanation:
       'Correlation is unit-free and does not change under linear rescaling of either variable.',
   },
@@ -556,13 +556,13 @@ export const statsUnit5McqTestQuestions: Question[] = [
       'A college admissions office studies the relationship between applicants\' SAT scores and their first-year college GPA and finds a correlation of 0.85. Which of the following statements is a correct interpretation of this result?',
     image: null,
     options: stripOptionPrefixes([
-      'A) 85% of the variation in GPA is explained by the linear relationship with SAT scores.',
-      'B) 72.25% of the variation in GPA is explained by the linear relationship with SAT scores.',
+      'A) 72.25% of the variation in GPA is explained by the linear relationship with SAT scores.',
+      'B) 85% of the variation in GPA is explained by the linear relationship with SAT scores.',
       'C) 85% of students\' GPAs lie exactly on the regression line.',
       'D) The slope of the regression line is 0.85.',
       'E) SAT scores and GPA have a perfectly linear relationship.',
     ]),
-    correctAnswer: 'B',
+    correctAnswer: 'A',
     explanation: 'Explained variation is r². Here, (0.85)² = 0.7225 = 72.25%.',
   },
   {
@@ -577,11 +577,11 @@ export const statsUnit5McqTestQuestions: Question[] = [
     options: stripOptionPrefixes([
       'A) Appropriate, because substituting x = 25 into the equation of the line gives a predicted value of -$28,000, which makes sense for an old car.',
       'B) Appropriate, because the correlation between age and value appears strong and negative.',
-      'C) Not appropriate, because 25 years is outside the interval of ages (about 1 to 9 years) represented in the data, so the prediction would require extrapolation.',
+      'C) Not appropriate, because the y-intercept of $22,000 has no meaningful interpretation.',
       'D) Not appropriate, because the slope of the line is negative.',
-      'E) Not appropriate, because the y-intercept of $22,000 has no meaningful interpretation.',
+      'E) Not appropriate, because 25 years is outside the interval of ages (about 1 to 9 years) represented in the data, so the prediction would require extrapolation.',
     ]),
-    correctAnswer: 'C',
+    correctAnswer: 'E',
     explanation:
       'The data only cover ages from about 1 to 9 years. Using the line to predict at x = 25 requires extrapolating far beyond the observed x-values, which is unreliable — as shown by the nonsensical negative predicted value in choice A.',
   },
@@ -594,8 +594,8 @@ export const statsUnit5McqTestQuestions: Question[] = [
     question:
       'A marketing analyst fits a regression model relating monthly advertising budget to monthly sales using data from a sample of 50 franchise stores. The calculated slope is 0.5 with a standard error of 0.1. What is the t-statistic for testing whether the true slope differs from 0?',
     image: null,
-    options: stripOptionPrefixes(['A) 0.05', 'B) 0.5', 'C) 5', 'D) 0.1', 'E) 50']),
-    correctAnswer: 'C',
+    options: stripOptionPrefixes(['A) 0.05', 'B) 0.5', 'C) 50', 'D) 0.1', 'E) 5']),
+    correctAnswer: 'E',
     explanation: 'The t-statistic for slope is b / SE(b) = 0.5 / 0.1 = 5.',
   },
   {
@@ -609,12 +609,12 @@ export const statsUnit5McqTestQuestions: Question[] = [
     image: null,
     options: stripOptionPrefixes([
       'A) Plant height (the response variable) is always on the x-axis.',
-      'B) Sunlight exposure (the explanatory variable) is always on the x-axis.',
+      'B) The points must form a straight line.',
       'C) The axes must be measured in the same units.',
-      'D) The points must form a straight line.',
+      'D) Sunlight exposure (the explanatory variable) is always on the x-axis.',
       'E) The correlation must be positive.',
     ]),
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'By convention, the explanatory variable is on the x-axis and the response variable is on the y-axis.',
   },
@@ -647,8 +647,8 @@ export const statsUnit5McqTestQuestions: Question[] = [
     question:
       'Of the following scatterplots, which shows a correlation coefficient r closest to -0.9?',
     image: CORRELATION_COMPARISON_PLOTS,
-    options: stripOptionPrefixes(['A) Plot A', 'B) Plot B', 'C) Plot C', 'D) Plot D', 'E) Plot E']),
-    correctAnswer: 'B',
+    options: stripOptionPrefixes(['A) Plot A', 'B) Plot C', 'C) Plot B', 'D) Plot D', 'E) Plot E']),
+    correctAnswer: 'C',
     explanation:
       'Plot B shows a tight, strongly negative linear pattern with almost no scatter around the trend, consistent with r ≈ -0.9. Plot A is strongly positive, Plot C is only moderately negative, Plot D shows almost no linear association, and Plot E is weakly negative.',
   },

@@ -19,14 +19,14 @@ export const govUnit1McqPracticeQuestions: Question[] = [
       'The small size of the several states, and the nature of their governments, would render them unfit for the national government. . . . The people of America have been taught by experience but not by theory, that the powers of the federal government are too limited. —Alexander Hamilton, 1780\n\nBased on the text, which of the following statements would the author most likely support?',
     image: null,
     options: [
-      'The creation of a unicameral legislature where each state has one vote.',
       'The strengthening of the central government to address national concerns.',
+      'The creation of a unicameral legislature where each state has one vote.',
       'The preservation of the Articles of Confederation with minor amendments.',
       'The expansion of reserved powers to ensure state sovereignty.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'A',
     explanation:
-      'Hamilton argues that state governments are "unfit" for national governance and that federal powers are "too limited." This aligns with the Federalist position that a stronger central government was necessary. (A) describes the Articles of Confederation\'s structure, which Hamilton critiqued. (C) and (D) are Anti-Federalist leanings.',
+      'Hamilton argues that state governments are "unfit" for national governance and that federal powers are "too limited." This aligns with the Federalist position that a stronger central government was necessary. (B) describes the Articles of Confederation\'s structure, which Hamilton critiqued. (C) and (D) are Anti-Federalist leanings.',
   },
   {
     id: 6002,
@@ -38,12 +38,12 @@ export const govUnit1McqPracticeQuestions: Question[] = [
       'In Federalist No. 10, James Madison argues that the "mischiefs of faction" can be controlled by:',
     image: null,
     options: [
-      'Removing the liberty of citizens to form interest groups.',
-      'Creating a direct democracy where every citizen votes on every issue.',
       'A large republic that filters public views through elected representatives.',
+      'Creating a direct democracy where every citizen votes on every issue.',
+      'Removing the liberty of citizens to form interest groups.',
       'Ensuring an equal distribution of property among all citizens.',
     ],
-    correctAnswer: 'C',
+    correctAnswer: 'A',
     explanation:
       'Madison argues that you cannot remove the causes of faction (liberty) without destroying democracy; instead, you must control the effects. A large republic makes it difficult for a unified majority faction to form. (B) is rejected by Madison as prone to "turbulence." (D) is seen as impossible by Madison.',
   },
@@ -58,13 +58,13 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       'The federal government negotiates a trade treaty with China while California passes a law regulating local businesses.',
-      'The Internal Revenue Service (IRS) collects income taxes at the same time the state of Ohio collects a state sales tax.',
       'The President sends troops to a foreign conflict, and the Supreme Court rules on the constitutionality of a law.',
+      'The Internal Revenue Service (IRS) collects income taxes at the same time the state of Ohio collects a state sales tax.',
       'The state of Florida conducts a primary election while the federal government coins new currency.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'C',
     explanation:
-      'Concurrent powers are powers shared by both the state and federal governments. Taxation is the most common example. (A) and (D) involve exclusive powers (treaties and coining money are federal). (C) involves separation of powers between branches.',
+      'Concurrent powers are powers shared by both the state and federal governments. Taxation is the most common example. (A) and (D) involve exclusive powers (treaties and coining money are federal). (B) involves separation of powers between branches.',
   },
   {
     id: 6004,
@@ -77,11 +77,11 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       'United States v. Lopez (1995)',
-      'McCulloch v. Maryland (1819)',
-      'Marbury v. Madison (1803)',
       'Baker v. Carr (1962)',
+      'Marbury v. Madison (1803)',
+      'McCulloch v. Maryland (1819)',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'McCulloch established that the "Necessary and Proper Clause" allowed Congress to create a national bank to carry out its enumerated fiscal powers. (A) limited federal power under the Commerce Clause. (C) established judicial review.',
   },
@@ -95,12 +95,12 @@ export const govUnit1McqPracticeQuestions: Question[] = [
       'An Anti-Federalist would likely have viewed the "Supremacy Clause" in Article VI of the Constitution as:',
     image: null,
     options: [
-      'A necessary tool to prevent states from ignoring federal laws.',
       'A dangerous grant of power that could lead to the elimination of state sovereignty.',
+      'A necessary tool to prevent states from ignoring federal laws.',
       'A safeguard for individual liberties through the Bill of Rights.',
       'A means to ensure that the executive branch remained subordinate to the legislature.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'A',
     explanation:
       'Anti-Federalists feared that the Supremacy Clause, combined with the Necessary and Proper Clause, would give the federal government "absolute and uncontrollable power" over the states (as argued in Brutus No. 1).',
   },
@@ -114,11 +114,11 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       'The establishment of a three-branch government.',
-      'A bicameral legislature with different methods of representation in each house.',
       'The inclusion of a Bill of Rights to protect individual liberties.',
+      'A bicameral legislature with different methods of representation in each house.',
       'The agreement that enslaved persons would count as 60% of a person for representation.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'C',
     explanation:
       'The Great Compromise settled the debate between large and small states by creating a House (population-based) and a Senate (equal representation). (D) refers to the Three-Fifths Compromise.',
   },
@@ -133,11 +133,11 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       'A categorical grant',
-      'A block grant',
       'An unfunded mandate',
+      'A block grant',
       'Revenue sharing',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'C',
     explanation:
       'Block grants are federal funds provided for broad purposes with fewer "strings attached," favoring state discretion. (A) categorical grants are narrow and specific.',
   },
@@ -153,10 +153,10 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     options: [
       'The Tenth Amendment',
       'The Supremacy Clause',
-      'The Commerce Clause',
       'The Full Faith and Credit Clause',
+      'The Commerce Clause',
     ],
-    correctAnswer: 'C',
+    correctAnswer: 'D',
     explanation:
       'The Court ruled that Congress exceeded its authority under the Commerce Clause by passing the Gun-Free School Zones Act, stating that carrying a gun in a school zone is not an economic activity.',
   },
@@ -187,8 +187,8 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     question:
       'Ambition must be made to counteract ambition. The interest of the man must be connected with the constitutional rights of the place. —Federalist No. 51\n\nThis quote is describing which of the following principles?',
     image: null,
-    options: ['Federalism', 'Popular Sovereignty', 'Separation of Powers and Checks and Balances', 'Judicial Activism'],
-    correctAnswer: 'C',
+    options: ['Separation of Powers and Checks and Balances', 'Popular Sovereignty', 'Federalism', 'Judicial Activism'],
+    correctAnswer: 'A',
     explanation:
       'Madison is explaining how the internal structure of the government prevents one branch from becoming too powerful by giving each branch the power and motive to "check" the others.',
   },
@@ -217,11 +217,11 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       'The national judiciary frequently overrode state laws.',
-      'The central government lacked the power to regulate interstate commerce.',
-      'The executive branch used its veto power to block trade agreements.',
       'The Bill of Rights prevented federal interference in business.',
+      'The executive branch used its veto power to block trade agreements.',
+      'The central government lacked the power to regulate interstate commerce.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'Under the Articles, states acted as sovereign entities and often placed tariffs on one another; the national government had no authority to regulate this trade.',
   },
@@ -234,8 +234,8 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     question:
       'Governments are instituted among Men, deriving their just powers from the consent of the governed... —Declaration of Independence\n\nThis quote most clearly embodies which of the following political principles?',
     image: null,
-    options: ['Limited Government', 'Popular Sovereignty', 'Checks and Balances', 'Republicanism'],
-    correctAnswer: 'B',
+    options: ['Limited Government', 'Republicanism', 'Checks and Balances', 'Popular Sovereignty'],
+    correctAnswer: 'D',
     explanation:
       'Popular sovereignty is the principle that the authority of a government is created and sustained by the consent of its people.',
   },
@@ -250,10 +250,10 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     options: [
       'Proposed by 2/3 of state legislatures and ratified by 3/4 of Congress.',
       'Proposed by a national convention and ratified by popular vote.',
-      'Proposed by 2/3 of both houses of Congress and ratified by 3/4 of state legislatures.',
       'Proposed by the President and ratified by the Supreme Court.',
+      'Proposed by 2/3 of both houses of Congress and ratified by 3/4 of state legislatures.',
     ],
-    correctAnswer: 'C',
+    correctAnswer: 'D',
     explanation:
       'This is the standard process established in Article V and used for 26 of the 27 amendments.',
   },
@@ -268,11 +268,11 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       'The Federalists in Federalist No. 10.',
-      'The Anti-Federalists in Brutus No. 1.',
-      'The majority opinion in McCulloch v. Maryland.',
       'The authors of the Declaration of Independence.',
+      'The majority opinion in McCulloch v. Maryland.',
+      'The Anti-Federalists in Brutus No. 1.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'Both Lopez and Brutus No. 1 emphasize the limits of national power and the importance of preserving state authority.',
   },
@@ -287,13 +287,13 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       'The President can veto a Supreme Court decision.',
-      'The President nominates federal judges and justices.',
-      'The President can remove a justice for "bad behavior."',
       'The President can declare a law unconstitutional.',
+      'The President can remove a justice for "bad behavior."',
+      'The President nominates federal judges and justices.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
-      'The appointment power allows the executive to influence the long-term ideological direction of the courts. (A), (C), and (D) are not constitutional powers.',
+      'The appointment power allows the executive to influence the long-term ideological direction of the courts. (A), (C), and (B) are not constitutional powers.',
   },
   {
     id: 6017,
@@ -305,12 +305,12 @@ export const govUnit1McqPracticeQuestions: Question[] = [
       'The influence of factious leaders may kindle a flame within their particular States, but will be unable to spread a general conflagration through the other States. —Federalist No. 10\n\nWhich of the following summarizes Madison’s argument?',
     image: null,
     options: [
-      'State governments are better at handling local rebellions.',
       'A large republic prevents local factions from controlling the entire nation.',
+      'State governments are better at handling local rebellions.',
       'Factions are harmless as long as they stay within state borders.',
       'The Bill of Rights is necessary to prevent factious leaders.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'A',
     explanation:
       'Madison argued that the geographic size and diversity of a large republic make it unlikely for one faction to gain a national majority.',
   },
@@ -323,8 +323,8 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     question:
       'A state government passes a law requiring all students to pass a civics exam to graduate, despite no federal requirement. This is an example of:',
     image: null,
-    options: ['An exclusive power.', 'An implied power.', 'A reserved power.', 'A delegated power.'],
-    correctAnswer: 'C',
+    options: ['An exclusive power.', 'A reserved power.', 'An implied power.', 'A delegated power.'],
+    correctAnswer: 'B',
     explanation:
       'Under the Tenth Amendment, powers not delegated to the federal government (like education) are reserved to the states.',
   },
@@ -357,11 +357,11 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       'The President is elected by the House of Representatives.',
-      'Small states have disproportionate influence in the Senate compared to their population.',
-      'The Three-Fifths Compromise was abolished.',
       'Large states have equal representation in the House.',
+      'The Three-Fifths Compromise was abolished.',
+      'Small states have disproportionate influence in the Senate compared to their population.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'Equal representation in the Senate (two per state) gives voters in small states more relative power in that chamber than voters in large states.',
   },
@@ -395,11 +395,11 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       'The Tenth Amendment',
-      'The Supremacy Clause',
       'The Commerce Clause',
+      'The Supremacy Clause',
       'The Due Process Clause',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'C',
     explanation:
       'Chief Justice Marshall explicitly cited the Supremacy Clause to argue that state laws (like a tax) cannot interfere with legitimate federal institutions.',
   },
@@ -505,11 +505,11 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       'The number of Senators from Southern states.',
-      'The balance of power in the House of Representatives.',
       'The selection of Supreme Court justices.',
+      'The balance of power in the House of Representatives.',
       'The speed of the amendment process.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'C',
     explanation:
       'It increased the Southern states\' population count, giving them more seats in the House and more votes in the Electoral College.',
   },
@@ -543,11 +543,11 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       'Showed that state governments were too powerful.',
-      'Revealed that the national government could not protect citizens from domestic unrest.',
-      'Proved that the British were still a threat.',
       'Demonstrated that the people were ready for direct democracy.',
+      'Proved that the British were still a threat.',
+      'Revealed that the national government could not protect citizens from domestic unrest.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'The inability of the Confederation to quickly raise a force to stop the uprising in Massachusetts proved that the Articles were too weak to maintain order.',
   },
@@ -563,13 +563,13 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       'The separation of powers between the executive and legislative branches.',
-      'The shift toward a unitary system of government in the United States.',
       'The use of fiscal federalism to influence state policy.',
+      'The shift toward a unitary system of government in the United States.',
       'The protection of state sovereignty through the Tenth Amendment.',
     ],
-    correctAnswer: 'C',
+    correctAnswer: 'B',
     explanation:
-      'The table highlights billions in grants-in-aid, a core tool of fiscal federalism in which the national government funds states (often with conditions) to shape policy outcomes. (B) is incorrect because the U.S. remains federal, not unitary. (D) is incorrect because grants are a federal leverage mechanism, not primarily a protection of state sovereignty.',
+      'The table highlights billions in grants-in-aid, a core tool of fiscal federalism in which the national government funds states (often with conditions) to shape policy outcomes. (C) is incorrect because the U.S. remains federal, not unitary. (D) is incorrect because grants are a federal leverage mechanism, not primarily a protection of state sovereignty.',
   },
   {
     id: 6032,
@@ -582,14 +582,14 @@ export const govUnit1McqPracticeQuestions: Question[] = [
       'Questions 1-2 refer to the following table.\n\nFederal Grants-in-Aid to State and Local Governments (2010-2020)\nCategory | 2010 (Billions) | 2015 (Billions) | 2020 (Billions)\nHealth (Medicaid, etc.) | $273 | $350 | $448\nIncome Security | $112 | $105 | $108\nEducation & Training | $101 | $62 | $68\nTransportation | $61 | $63 | $69\n\nBased on the data in the table, which of the following is a likely consequence of the trend in health spending?',
     image: null,
     options: [
-      'States have gained more discretion over healthcare policy through block grants.',
       'The federal government has increased its influence over state healthcare systems via categorical grants.',
+      'States have gained more discretion over healthcare policy through block grants.',
       'The Supreme Court has limited the federal government’s power to regulate intrastate commerce.',
       'Revenue sharing has become the primary method of funding state health initiatives.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'A',
     explanation:
-      'Health is the largest and fastest-growing grants category in the table, and major health programs such as Medicaid are generally structured as categorical grants that let the federal government set policy conditions. (A) is incorrect because this trend does not indicate a move to block grants. (D) is incorrect because general revenue sharing is not the dominant contemporary tool.',
+      'Health is the largest and fastest-growing grants category in the table, and major health programs such as Medicaid are generally structured as categorical grants that let the federal government set policy conditions. (B) is incorrect because this trend does not indicate a move to block grants. (D) is incorrect because general revenue sharing is not the dominant contemporary tool.',
   },
   {
     id: 6033,
@@ -604,10 +604,10 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     options: [
       'A strong central government is necessary to protect citizens from the "mischiefs of faction."',
       'Large republics are superior because they refine and enlarge public views.',
-      'A centralized government over a large territory will inevitably lead to tyranny.',
       'Wealthy citizens are the most capable of governing a large and diverse nation.',
+      'A centralized government over a large territory will inevitably lead to tyranny.',
     ],
-    correctAnswer: 'C',
+    correctAnswer: 'D',
     explanation:
       'Brutus warns that in a large republic, concentrated power and unequal wealth can lead rulers to oppress citizens; this is a classic Anti-Federalist fear of distant centralized authority. (A) and (B) reflect Federalist arguments associated with Madison, not Brutus.',
   },
@@ -643,11 +643,11 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       'McCulloch v. Maryland (1819)',
-      'Marbury v. Madison (1803)',
       'United States v. Lopez (1995)',
+      'Marbury v. Madison (1803)',
       'Baker v. Carr (1962)',
     ],
-    correctAnswer: 'C',
+    correctAnswer: 'B',
     explanation:
       'In United States v. Lopez, the Court limited Congress’s Commerce Clause reach and reinforced that certain police powers remain with states, echoing Tenth Amendment federalism concerns. (A) generally expanded national power under Necessary and Proper and Supremacy reasoning.',
   },
@@ -662,12 +662,12 @@ export const govUnit1McqPracticeQuestions: Question[] = [
       'Questions 5-6 refer to the following excerpt.\n\n"The powers not delegated to the United States by the Constitution, nor prohibited by it to the States, are reserved to the States respectively, or to the people."\n—The Tenth Amendment\n\nWhich of the following pairs of constitutional provisions creates the most tension with the amendment cited in the excerpt?',
     image: null,
     options: [
-      'The Commerce Clause and the Necessary and Proper Clause.',
+      'The Advice and Consent Clause and the Vesting Clause.',
       'The Free Exercise Clause and the Establishment Clause.',
       'The Full Faith and Credit Clause and the Privileges and Immunities Clause.',
-      'The Advice and Consent Clause and the Vesting Clause.',
+      'The Commerce Clause and the Necessary and Proper Clause.',
     ],
-    correctAnswer: 'A',
+    correctAnswer: 'D',
     explanation:
       'The Tenth Amendment reserves undelegated powers to states, while Congress often relies on the Commerce Clause plus Necessary and Proper Clause to justify broader national legislation. That recurring overlap creates a central federalism tension.',
   },
@@ -699,12 +699,12 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     question: "The idea that legitimate government exists only because free individuals voluntarily agree to form it, and that people retain natural rights government cannot violate, is most closely associated with which political philosophy that influenced the Declaration of Independence?",
     image: null,
     options: [
-      "Social contract theory",
-      "Elite theory",
       "Pluralist theory",
+      "Elite theory",
+      "Social contract theory",
       "Federalist theory",
     ],
-    correctAnswer: "A",
+    correctAnswer: "C",
     explanation: "Social contract theory, drawn from thinkers like John Locke, holds that government derives its authority from the consent of the governed and exists to protect natural rights (life, liberty, and property). This philosophy underlies the Declaration of Independence's justification for revolution.",
   },
   {
@@ -733,12 +733,12 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     question: "One major reason Anti-Federalists initially opposed ratifying the Constitution was that:",
     image: null,
     options: [
-      "It failed to create a bicameral legislature.",
       "It lacked an explicit Bill of Rights protecting individual liberties from the new national government.",
+      "It failed to create a bicameral legislature.",
       "It gave state governments too much independent power over the military.",
       "It abolished the Electoral College in favor of direct popular election.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "A",
     explanation: "Anti-Federalists feared that without a specific, written list of protected individual rights, the strong national government created by the Constitution could infringe on liberties. This concern led directly to the promised addition of the Bill of Rights as a condition of ratification in several states.",
   },
   {
@@ -750,12 +750,12 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     question: "Under the Articles of Confederation, the national government's inability to levy taxes directly on citizens most directly caused which of the following problems?",
     image: null,
     options: [
-      "The government could not fund an army or pay its war debts, and had to rely on voluntary state contributions that often went unpaid.",
-      "The government was forced to establish a national bank to generate revenue.",
       "States were prohibited from collecting their own taxes.",
+      "The government was forced to establish a national bank to generate revenue.",
+      "The government could not fund an army or pay its war debts, and had to rely on voluntary state contributions that often went unpaid.",
       "The Supreme Court was granted the power to levy taxes instead.",
     ],
-    correctAnswer: "A",
+    correctAnswer: "C",
     explanation: "The Confederation Congress could only request funds from the states, not compel payment. This left the national government chronically underfunded, unable to pay Revolutionary War debts or maintain an effective military — a key weakness that helped motivate the Constitutional Convention.",
   },
   {
@@ -767,12 +767,12 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     question: "The creation of the Electoral College at the Constitutional Convention is best understood as a compromise between:",
     image: null,
     options: [
-      "Free states and enslaved states over taxation.",
       "Those who wanted Congress to select the president and those who wanted a direct national popular vote.",
+      "Free states and enslaved states over taxation.",
       "Large states and small states over the structure of the judiciary.",
       "Federalists and Anti-Federalists over the existence of a Bill of Rights.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "A",
     explanation: "Delegates disagreed over whether the president should be chosen by Congress (raising separation-of-powers concerns) or by direct popular vote (which many delegates distrusted given limited communication and information at the time). The Electoral College was designed as a middle path between these two positions.",
   },
   {
@@ -785,11 +785,11 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "Federalism, because two levels of government are involved.",
-      "Checks and balances, because the legislative branch can counteract the executive branch's formal power.",
-      "Judicial review, because the courts are validating the legislature's authority.",
       "Popular sovereignty, because voters directly decided the outcome.",
+      "Judicial review, because the courts are validating the legislature's authority.",
+      "Checks and balances, because the legislative branch can counteract the executive branch's formal power.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "D",
     explanation: "A veto override is a clear example of checks and balances: it allows the legislative branch to check the executive's veto power, ensuring no single branch has unilateral final say over lawmaking.",
   },
   {
@@ -801,12 +801,12 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     question: "Congress passes a law requiring all states to make costly infrastructure upgrades to public water systems but provides no federal funding to help cover the cost. This is an example of:",
     image: null,
     options: [
-      "A categorical grant",
-      "A block grant",
       "An unfunded mandate",
+      "A block grant",
+      "A categorical grant",
       "Revenue sharing",
     ],
-    correctAnswer: "C",
+    correctAnswer: "A",
     explanation: "An unfunded mandate is a federal requirement imposed on state or local governments without accompanying federal funding to cover the cost of compliance, often creating tension between the federal government and the states.",
   },
   {
@@ -820,10 +820,10 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     options: [
       "The Supremacy Clause",
       "The Necessary and Proper Clause",
-      "The Tenth Amendment's reservation of powers to the states",
       "The Commerce Clause",
+      "The Tenth Amendment's reservation of powers to the states",
     ],
-    correctAnswer: "C",
+    correctAnswer: "D",
     explanation: "Because regulating professional licensing is not a power delegated to the federal government by the Constitution, it falls to the states under the Tenth Amendment, which reserves all powers not given to the federal government (and not prohibited to the states) to the states or the people.",
   },
   {
@@ -872,11 +872,11 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "Small states, who feared losing influence to larger states.",
-      "Large states, who believed population-based representation would give them greater legislative power.",
-      "Anti-Federalists, who opposed a strong national legislature entirely.",
       "Southern states, who wanted enslaved persons excluded from population counts.",
+      "Anti-Federalists, who opposed a strong national legislature entirely.",
+      "Large states, who believed population-based representation would give them greater legislative power.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "D",
     explanation: "The Virginia Plan's proposal for representation based purely on population would have given larger states significantly more legislative power, making it the preferred proposal of large states like Virginia and Pennsylvania, in contrast to the New Jersey Plan favored by smaller states.",
   },
   {
@@ -889,11 +889,11 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "Any group of citizens who disagree with government policy.",
-      "A number of citizens united by a common interest adverse to the rights of other citizens or to the permanent interests of the community as a whole.",
       "A political party that has won a majority of seats in Congress.",
+      "A number of citizens united by a common interest adverse to the rights of other citizens or to the permanent interests of the community as a whole.",
       "A coalition of state governments opposed to federal authority.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "C",
     explanation: "Madison specifically defines a faction as a group — whether a majority or minority — united by a shared interest or passion that runs contrary to the rights of others or the broader public good, a definition central to his argument about controlling factions' effects rather than their causes.",
   },
   {
@@ -906,11 +906,11 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "Failed to include any mechanism for amending the document over time.",
-      "Lacked provisions for regular rotation in office, potentially allowing officials to entrench themselves in power indefinitely.",
       "Gave state governments too much control over the national military.",
+      "Lacked provisions for regular rotation in office, potentially allowing officials to entrench themselves in power indefinitely.",
       "Prohibited the formation of any future political parties.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "C",
     explanation: "Anti-Federalists worried that without mandatory rotation in office or term limits, elected officials could become a permanent, entrenched class disconnected from the citizens they represented — echoing their broader fear of a government drifting toward elite rule.",
   },
   {
@@ -940,11 +940,11 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "The Bill of Rights.",
-      "The Fourteenth Amendment.",
       "The Twenty-First Amendment, repealing Prohibition.",
+      "The Fourteenth Amendment.",
       "The Nineteenth Amendment, granting women's suffrage.",
     ],
-    correctAnswer: "C",
+    correctAnswer: "B",
     explanation: "The Twenty-First Amendment, which repealed Prohibition, is the only amendment ratified through state conventions rather than state legislatures — a method Congress chose specifically because it believed conventions would move more quickly than potentially \"dry\" state legislatures.",
   },
   {
@@ -956,12 +956,12 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     question: "The president negotiates a treaty with a foreign government, but the Senate refuses to ratify it by the required two-thirds vote. This scenario illustrates:",
     image: null,
     options: [
-      "The legislative branch checking the executive branch's power over foreign affairs.",
       "The judicial branch checking the executive branch.",
+      "The legislative branch checking the executive branch's power over foreign affairs.",
       "A violation of the Supremacy Clause.",
       "An unconstitutional exercise of congressional war powers.",
     ],
-    correctAnswer: "A",
+    correctAnswer: "B",
     explanation: "The Constitution requires Senate ratification (by a two-thirds vote) for treaties to take effect, giving the legislative branch a direct check on the executive's ability to conduct foreign policy through formal treaties.",
   },
   {
@@ -973,12 +973,12 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     question: "From the 1970s to the early 1980s, the federal government briefly experimented with \"general revenue sharing,\" a program that distributed federal funds to state and local governments with almost no restrictions on how the money could be spent. This program was most similar in structure to:",
     image: null,
     options: [
-      "A categorical grant.",
       "A block grant, but with even fewer conditions attached.",
+      "A categorical grant.",
       "An unfunded mandate.",
       "A concurrent power.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "A",
     explanation: "General revenue sharing gave state and local governments federal funds with virtually no strings attached, making it even less restrictive than a typical block grant, which usually still requires funds be spent within a broad policy area.",
   },
   {
@@ -990,12 +990,12 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     question: "Political scientists sometimes describe the mid-20th century shift in American federalism using the metaphor of moving from a \"layer cake\" to a \"marble cake.\" This metaphor illustrates the shift from:",
     image: null,
     options: [
-      "Cooperative federalism to dual federalism.",
       "Dual federalism, where state and federal responsibilities are clearly separated, to cooperative federalism, where responsibilities are blended and shared.",
+      "Cooperative federalism to dual federalism.",
       "Unitary government to confederal government.",
       "Concurrent powers to exclusive powers.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "A",
     explanation: "\"Dual federalism\" (the layer cake) describes an era where state and national governments operated in clearly separate spheres. \"Cooperative federalism\" (the marble cake) describes the blending and overlapping of state and federal responsibilities that has characterized American government since roughly the New Deal era.",
   },
   {
@@ -1025,11 +1025,11 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "Maximize national economic output.",
-      "Secure the unalienable rights of individuals, including life, liberty, and the pursuit of happiness.",
       "Ensure that only property-owning citizens participate in politics.",
+      "Secure the unalienable rights of individuals, including life, liberty, and the pursuit of happiness.",
       "Establish a permanent alliance with foreign powers.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "C",
     explanation: "The Declaration of Independence states that governments are instituted among men specifically \"to secure these rights\" — referring to the unalienable rights to life, liberty, and the pursuit of happiness — reflecting the social contract philosophy underlying the document.",
   },
 

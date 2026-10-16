@@ -18,10 +18,10 @@ export const govUnit5McqPracticeQuestions: Question[] = [
     options: [
       'Prospective voting',
       'Rational choice voting',
-      'Retrospective voting',
       'Straight-ticket voting',
+      'Retrospective voting',
     ],
-    correctAnswer: 'C',
+    correctAnswer: 'D',
     explanation:
       'Retrospective voting involves evaluating the candidate’s or party’s past performance ("what have they done for me lately?") to decide whether to keep them in power.',
   },
@@ -36,12 +36,12 @@ export const govUnit5McqPracticeQuestions: Question[] = [
       'Which of the following functions of political parties is most directly aimed at bridging the gap between citizen preferences and government policy?',
     image: null,
     options: [
-      'The creation of party platforms that aggregate diverse interests into a cohesive policy agenda.',
       'The appointment of non-partisan bureaucratic officials to federal agencies.',
+      'The creation of party platforms that aggregate diverse interests into a cohesive policy agenda.',
       'The use of judicial review to strike down legislation.',
       'The enforcement of state voter identification laws.',
     ],
-    correctAnswer: 'A',
+    correctAnswer: 'B',
     explanation:
       'Party platforms serve as the primary mechanism for linking public opinion to governance by organizing and articulating the group’s policy goals to voters and candidates.',
   },
@@ -56,12 +56,12 @@ export const govUnit5McqPracticeQuestions: Question[] = [
       'An interest group representing automobile manufacturers submits an *amicus curiae* brief to the Supreme Court regarding a case on emission standards. What is the group’s likely strategic goal?',
     image: null,
     options: [
-      'To directly lobby the president for a executive order.',
       'To provide the Court with additional information or arguments to influence the legal outcome.',
+      'To directly lobby the president for a executive order.',
       'To initiate a grassroots protest at the steps of the courthouse.',
       'To contribute directly to the justices’ personal campaign funds.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'A',
     explanation:
       'An *amicus curiae* ("friend of the court") brief is a formal way for interest groups to influence judicial policymaking by providing specialized expertise to the Court.',
   },
@@ -76,12 +76,12 @@ export const govUnit5McqPracticeQuestions: Question[] = [
       'In *Citizens United v. FEC* (2010), the Supreme Court ruled that political spending by corporations and labor unions is a form of protected speech. Which of the following is a direct consequence of this decision?',
     image: null,
     options: [
-      'A decrease in the amount of money spent on federal elections.',
       'The creation of Super PACs that can raise and spend unlimited sums of money independently of candidates.',
+      'A decrease in the amount of money spent on federal elections.',
       'A ban on all corporate contributions to political candidates.',
       'The total elimination of the Bipartisan Campaign Reform Act.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'A',
     explanation:
       'By equating political spending with protected speech, the Court allowed for the rise of independent expenditure committees, or Super PACs, which can spend unlimited funds.',
   },
@@ -97,11 +97,11 @@ export const govUnit5McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       'He argues that interest groups should be banned from political participation.',
-      'He suggests that a large republic dilutes the power of harmful "factions" by preventing them from dominating the entire nation.',
-      'He advocates for a small, localized democracy to ensure all interests are represented.',
       'He claims that the wealthy are the only group capable of participating in a republic.',
+      'He advocates for a small, localized democracy to ensure all interests are represented.',
+      'He suggests that a large republic dilutes the power of harmful "factions" by preventing them from dominating the entire nation.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'Madison’s core argument in Federalist No. 10 is that a large republic serves as a check on factions; competing interests in a vast nation make it difficult for any single faction to gain tyrannical control.',
   },
@@ -136,11 +136,11 @@ export const govUnit5McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       'It has made the party structure the central focus of all political messaging.',
-      'It has shifted power away from party leadership and toward individual candidates and their personal fundraising networks.',
-      'It has resulted in stricter party discipline and forced all candidates to adopt identical platforms.',
       'It has effectively eliminated the need for candidates to raise money.',
+      'It has resulted in stricter party discipline and forced all candidates to adopt identical platforms.',
+      'It has shifted power away from party leadership and toward individual candidates and their personal fundraising networks.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'Modern campaigns often focus on the candidate’s personal brand, social media presence, and individual donor networks, which weakens the party’s historical control over candidate selection.',
   },
@@ -175,11 +175,11 @@ export const govUnit5McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       'Automatic, same-day voter registration laws.',
-      'Strict photo identification requirements combined with limited polling station hours.',
-      'Universal mail-in balloting for all eligible voters.',
       'Holding elections on weekends.',
+      'Universal mail-in balloting for all eligible voters.',
+      'Strict photo identification requirements combined with limited polling station hours.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'Strict ID laws and limited polling hours are structural barriers that increase the "cost" of voting, often leading to lower turnout among marginalized groups.',
   },
@@ -194,12 +194,12 @@ export const govUnit5McqPracticeQuestions: Question[] = [
       'A major news outlet publishes a detailed investigative report on systemic corruption within a federal agency. Following the report, a congressional committee announces it will hold hearings to investigate the agency’s leadership. This scenario best demonstrates which role of the media?',
     image: null,
     options: [
-      'The media acting as a "scorekeeper" to focus purely on poll numbers.',
       'The media acting as a "watchdog" to hold government institutions accountable.',
+      'The media acting as a "scorekeeper" to focus purely on poll numbers.',
       'The media acting as a "gatekeeper" by deciding which candidates are eligible for the ballot.',
       'The media acting as a "horse-race" analyst to determine electoral trends.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'A',
     explanation:
       'The "watchdog" function of the media involves investigative journalism that monitors government actions, uncovers corruption, and compels legislative or executive responses.',
   },
@@ -214,11 +214,11 @@ export const govUnit5McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       'An increase in the number of citizens who consume centrist, neutral news.',
-      'A decrease in political knowledge among the electorate.',
       'Citizens may become more polarized as they consume content that reinforces their pre-existing beliefs.',
+      'A decrease in political knowledge among the electorate.',
       'Parties will become less relevant to the average voter.',
     ],
-    correctAnswer: 'C',
+    correctAnswer: 'B',
     explanation:
       'The current media landscape allows consumers to seek out news that confirms their existing biases, which reinforces ideological silos and reduces exposure to opposing views.',
   },
@@ -234,11 +234,11 @@ export const govUnit5McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       'The criteria for federal judicial appointments.',
-      'The drawing of congressional and state legislative district boundaries.',
-      'The length of time a senator can serve.',
       'The number of members in the House of Representatives.',
+      'The length of time a senator can serve.',
+      'The drawing of congressional and state legislative district boundaries.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'By allowing courts to hear apportionment cases, *Baker v. Carr* forced states to redraw boundaries that had previously been discriminatory or unequal.',
   },
@@ -272,12 +272,12 @@ export const govUnit5McqPracticeQuestions: Question[] = [
       'Which of the following best explains the trend of significantly higher voter turnout in presidential election years compared to midterm election years?',
     image: null,
     options: [
-      'Presidential elections feature higher national media visibility and a wider perception that the presidency has a greater impact on the average citizen\'s life.',
-      'Federal law mandates that midterm elections be held in alternate months, creating confusion for the electorate.',
       'States are constitutionally prohibited from opening polling stations for midterm elections.',
+      'Federal law mandates that midterm elections be held in alternate months, creating confusion for the electorate.',
+      'Presidential elections feature higher national media visibility and a wider perception that the presidency has a greater impact on the average citizen\'s life.',
       'Voter registration is automatically cancelled by the federal government at the end of a presidential term, requiring all voters to re-register.',
     ],
-    correctAnswer: 'A',
+    correctAnswer: 'C',
     explanation:
       'The "visibility" and the perceived stakes of the presidential office drive higher interest and engagement, whereas midterms often struggle with lower media focus.',
   },
@@ -291,12 +291,12 @@ export const govUnit5McqPracticeQuestions: Question[] = [
     question: 'Which of the following is an effective, modern technique political parties use to mobilize their base?',
     image: null,
     options: [
-      'Formally nominating candidates during private, invitation-only conventions that exclude the general public.',
       'Utilizing sophisticated voter databases to micro-target messages and send personalized digital outreach to low-propensity voters.',
+      'Formally nominating candidates during private, invitation-only conventions that exclude the general public.',
       'Directly appointing legislative committee chairs to bypass the primary election process.',
       'Passing state laws that make it illegal for voters to register for more than one party.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'A',
     explanation:
       'Parties use "Big Data" to identify voters who are infrequent participants but lean toward their party, then use targeted digital ads and canvassing to mobilize them.',
   },
@@ -330,12 +330,12 @@ export const govUnit5McqPracticeQuestions: Question[] = [
     question: "A voter decides to support a candidate based primarily on the specific policy proposals that candidate has promised to pursue if elected, rather than on the incumbent's past record. This voting behavior is best described as:",
     image: null,
     options: [
-      "Retrospective voting",
       "Prospective voting",
+      "Retrospective voting",
       "Straight-ticket voting",
       "Split-ticket voting",
     ],
-    correctAnswer: "B",
+    correctAnswer: "A",
     explanation: "Prospective voting involves evaluating a candidate based on future policy promises and positions, in contrast to retrospective voting, which evaluates a candidate or incumbent based on past performance.",
   },
   {
@@ -347,12 +347,12 @@ export const govUnit5McqPracticeQuestions: Question[] = [
     question: "Which of the following is most likely to increase voter turnout in a given state?",
     image: null,
     options: [
-      "Requiring in-person registration weeks before an election with limited registration locations.",
       "Allowing same-day voter registration at polling places.",
+      "Requiring in-person registration weeks before an election with limited registration locations.",
       "Holding elections only on a single weekday with limited polling hours.",
       "Requiring multiple forms of government-issued photographic identification.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "A",
     explanation: "Same-day registration reduces the \"cost\" of voting by removing an administrative barrier (needing to register well in advance), and is associated with higher voter turnout compared to states with stricter registration deadlines.",
   },
   {
@@ -365,11 +365,11 @@ export const govUnit5McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "A third-party candidate wins the presidency outright.",
-      "Long-term shifts occur in the coalition of voters supporting each major party, reshaping the political landscape for years to come.",
-      "Voter turnout is unusually low across all demographic groups.",
       "The Electoral College winner differs from the national popular vote winner.",
+      "Voter turnout is unusually low across all demographic groups.",
+      "Long-term shifts occur in the coalition of voters supporting each major party, reshaping the political landscape for years to come.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "D",
     explanation: "Critical or realigning elections mark a durable shift in the demographic and ideological coalitions that support each major party, often reshaping party competition for a generation or more (such as the New Deal realignment of the 1930s).",
   },
   {
@@ -382,11 +382,11 @@ export const govUnit5McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "A constitutional amendment explicitly banning third parties from federal elections.",
-      "The winner-take-all, single-member district electoral system, which discourages voters from \"wasting\" votes on parties unlikely to win outright.",
       "A federal law requiring all candidates to affiliate with one of two parties.",
+      "The winner-take-all, single-member district electoral system, which discourages voters from \"wasting\" votes on parties unlikely to win outright.",
       "The Supreme Court's ruling in Citizens United v. FEC.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "C",
     explanation: "In winner-take-all, single-member district systems, voters and donors tend to gravitate toward the two parties most likely to win, since votes for third parties rarely translate into representation — a dynamic often referred to as Duverger's Law.",
   },
   {
@@ -398,12 +398,12 @@ export const govUnit5McqPracticeQuestions: Question[] = [
     question: "An interest group organizes a nationwide letter-writing and phone-calling campaign, encouraging ordinary citizens to contact their representatives directly about a pending bill. This tactic is best described as:",
     image: null,
     options: [
-      "Direct lobbying",
       "Grassroots mobilization",
+      "Direct lobbying",
       "Litigation strategy",
       "An amicus curiae brief",
     ],
-    correctAnswer: "B",
+    correctAnswer: "A",
     explanation: "Grassroots mobilization involves activating ordinary citizens to contact their representatives or otherwise pressure policymakers, as opposed to direct lobbying, which involves interest group representatives contacting officials themselves.",
   },
   {
@@ -433,11 +433,11 @@ export const govUnit5McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "Both are subject to identical contribution limits set by federal law.",
-      "Traditional PACs face contribution limits, while Super PACs may raise and spend unlimited amounts as long as they do not coordinate directly with a candidate's campaign.",
-      "Only Super PACs are legally permitted to contribute directly to candidates.",
       "Traditional PACs may raise unlimited funds, while Super PACs face strict contribution limits.",
+      "Only Super PACs are legally permitted to contribute directly to candidates.",
+      "Traditional PACs face contribution limits, while Super PACs may raise and spend unlimited amounts as long as they do not coordinate directly with a candidate's campaign.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "D",
     explanation: "Following Citizens United v. FEC, independent-expenditure-only committees (Super PACs) may raise and spend unlimited sums on political advocacy provided they operate independently of candidate campaigns, unlike traditional PACs, which remain subject to federal contribution limits.",
   },
   {
@@ -450,11 +450,11 @@ export const govUnit5McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "Watchdog function",
-      "Agenda-setting function",
-      "Socialization function",
       "Gatekeeping function",
+      "Socialization function",
+      "Agenda-setting function",
     ],
-    correctAnswer: "B",
+    correctAnswer: "D",
     explanation: "Agenda-setting refers to the media's ability to influence which issues the public views as important simply through the volume and prominence of coverage given to those issues, distinct from directly telling audiences what opinion to hold.",
   },
   {
@@ -467,11 +467,11 @@ export const govUnit5McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "Retrospective evaluation",
-      "Selective exposure",
       "Political efficacy",
+      "Selective exposure",
       "Ticket splitting",
     ],
-    correctAnswer: "B",
+    correctAnswer: "C",
     explanation: "Selective exposure describes the tendency of individuals to seek out media content that confirms their existing beliefs while avoiding content that challenges them, a pattern that has intensified with the rise of ideologically segmented media outlets.",
   },
   {
@@ -483,12 +483,12 @@ export const govUnit5McqPracticeQuestions: Question[] = [
     question: "Which of the following is a key difference between a closed primary and an open primary?",
     image: null,
     options: [
-      "In a closed primary, only voters registered with a party may vote in that party's primary; in an open primary, any registered voter may participate regardless of party affiliation.",
-      "Closed primaries are held only in presidential election years; open primaries are held only in midterm years.",
       "Open primaries are used exclusively to select judicial nominees.",
+      "Closed primaries are held only in presidential election years; open primaries are held only in midterm years.",
+      "In a closed primary, only voters registered with a party may vote in that party's primary; in an open primary, any registered voter may participate regardless of party affiliation.",
       "Closed primaries allow write-in candidates, while open primaries do not.",
     ],
-    correctAnswer: "A",
+    correctAnswer: "C",
     explanation: "Closed primaries restrict voting to registered members of that political party, while open primaries allow any registered voter, regardless of party affiliation, to participate in choosing a party's nominee.",
   },
 
@@ -503,11 +503,11 @@ export const govUnit5McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "Split-ticket voting",
-      "Straight-ticket voting",
       "Prospective voting",
+      "Straight-ticket voting",
       "Retrospective voting",
     ],
-    correctAnswer: "B",
+    correctAnswer: "C",
     explanation: "Straight-ticket voting involves selecting candidates from a single party across all offices on the ballot, relying on party identification as the primary voting cue rather than evaluating each candidate individually.",
   },
   {
@@ -520,11 +520,11 @@ export const govUnit5McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "Lower levels of formal education.",
-      "Higher levels of formal education and income.",
       "Younger age, particularly among first-time eligible voters.",
+      "Higher levels of formal education and income.",
       "Recent relocation to a new state.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "C",
     explanation: "Numerous studies consistently show that higher levels of education and income are associated with higher voter turnout, likely due to greater access to information, stronger sense of political efficacy, and lower practical barriers to participation.",
   },
   {
@@ -536,12 +536,12 @@ export const govUnit5McqPracticeQuestions: Question[] = [
     question: "The Democratic and Republican parties both maintain formal national committees responsible for coordinating fundraising, campaign strategy, and candidate support across the country. Which of the following best describes the primary function these national party committees serve?",
     image: null,
     options: [
-      "Directly appointing candidates for federal office without any primary elections.",
       "Coordinating and supporting the party's electoral efforts nationwide, including fundraising and strategic messaging.",
+      "Directly appointing candidates for federal office without any primary elections.",
       "Serving as the final arbiter of all constitutional disputes involving elections.",
       "Replacing the role of individual state party organizations entirely.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "A",
     explanation: "National party committees primarily focus on coordinating fundraising, messaging, and strategic support for candidates across the country, working alongside — rather than replacing — state and local party organizations.",
   },
   {
@@ -571,11 +571,11 @@ export const govUnit5McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "Grassroots mobilization",
-      "Direct lobbying",
       "An amicus curiae brief",
+      "Direct lobbying",
       "A push poll",
     ],
-    correctAnswer: "B",
+    correctAnswer: "C",
     explanation: "Direct lobbying involves interest group representatives (often including former officials with insider access and expertise) directly contacting and attempting to influence lawmakers, as opposed to indirect strategies like grassroots mobilization.",
   },
   {
@@ -588,11 +588,11 @@ export const govUnit5McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "A constitutional requirement that presidents be elected by a direct national popular vote.",
-      "The Electoral College's state-by-state, largely winner-take-all system, which can produce a different result than the national popular vote.",
-      "A federal law requiring runoff elections whenever no candidate wins a true majority.",
       "The Twenty-Second Amendment's restrictions on presidential terms.",
+      "A federal law requiring runoff elections whenever no candidate wins a true majority.",
+      "The Electoral College's state-by-state, largely winner-take-all system, which can produce a different result than the national popular vote.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "D",
     explanation: "Because most states award all of their electoral votes to whichever candidate wins that state's popular vote, a candidate can accumulate enough electoral votes to win the presidency while losing the cumulative national popular vote — as occurred in 2000 and 2016.",
   },
   {
@@ -605,11 +605,11 @@ export const govUnit5McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "Eliminate all private financial contributions to political campaigns.",
-      "Promote transparency, allowing voters and watchdog groups to see who is financially supporting each candidate.",
       "Guarantee that all candidates receive equal amounts of campaign funding.",
+      "Promote transparency, allowing voters and watchdog groups to see who is financially supporting each candidate.",
       "Prevent candidates from accepting any donations from individuals outside their home state.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "C",
     explanation: "Campaign finance disclosure requirements are intended to promote transparency in the political process, allowing the public to see which individuals, organizations, or industries are financially backing a given candidate.",
   },
   {
@@ -622,11 +622,11 @@ export const govUnit5McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "Prior restraint",
-      "\"Horse race\" journalism",
       "Selective exposure",
+      "\"Horse race\" journalism",
       "Agenda-setting through investigative reporting",
     ],
-    correctAnswer: "B",
+    correctAnswer: "C",
     explanation: "\"Horse race\" journalism refers to media coverage that emphasizes the competitive, poll-driven aspects of a campaign — who is winning, who is falling behind — rather than substantive analysis of candidates' policy positions, a pattern often criticized for reducing the depth of public political knowledge.",
   },
   {

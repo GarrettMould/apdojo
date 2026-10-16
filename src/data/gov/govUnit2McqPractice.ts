@@ -39,11 +39,11 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       'Agreeing to a bipartisan compromise bill that delays national implementation of energy policy.',
-      'Issuing a rapid executive order directing federal agencies to secure critical supply chains during an international crisis.',
-      'Consulting with a massive cabinet of twenty advisors before ordering a strategic drone strike.',
       'Refusing to veto legislation that has clear, overwhelming popular support among citizens.',
+      'Consulting with a massive cabinet of twenty advisors before ordering a strategic drone strike.',
+      'Issuing a rapid executive order directing federal agencies to secure critical supply chains during an international crisis.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       "Hamilton's argument for an energetic single executive emphasizes speed and decisiveness in execution, especially during crises. Issuing a rapid executive order to secure critical supply chains directly reflects this execution style.",
   },
@@ -57,8 +57,8 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     question:
       'Questions 3-4 refer to the following excerpt.\n\n"In a single republic, all the power surrendered by the people is submitted to the administration of a single government; and the usurpations are guarded against by a division of the government into distinct and separate departments. In the compound republic of America, the power surrendered by the people is first divided between two distinct governments, and then the portion allotted to each subdivided among distinct and separate departments. Hence a double security arises to the rights of the people. The different governments will control each other, at the same time that each will be controlled by itself."\n—Publius (James Madison), Federalist No. 51, 1788\n\nWhich of the following principles of American government is best illustrated by the concept of a "compound republic" described in the excerpt?',
     image: null,
-    options: ['Elite democracy', 'Judicial review', 'Federalism', 'Bicameralism'],
-    correctAnswer: 'C',
+    options: ['Federalism', 'Judicial review', 'Elite democracy', 'Bicameralism'],
+    correctAnswer: 'A',
     explanation:
       'Madison describes a "compound republic" where power is divided between "two distinct governments" (national and state) and then subdivided into departments (branches). This division between two levels of government explicitly defines federalism.',
   },
@@ -74,11 +74,11 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       'Enumerated powers and the Bill of Rights',
-      'Separation of powers and federalism',
-      'Popular sovereignty and direct democracy',
       'Judicial review and executive agreements',
+      'Popular sovereignty and direct democracy',
+      'Separation of powers and federalism',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'The text explicitly notes a double security: first, division between two distinct governments (federalism), and second, subdivision among separate departments (separation of powers).',
   },
@@ -134,11 +134,11 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       'The House of Representatives choosing its own Speaker.',
-      'The Senate conducting a confirmation hearing for a Supreme Court nominee.',
       'A federal agency using its rulemaking authority to implement a vague statute.',
+      'The Senate conducting a confirmation hearing for a Supreme Court nominee.',
       'A member of Congress acting under the trustee model of representation.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'C',
     explanation:
       "Senate confirmation hearings are an operational check that gives the legislative branch the constitutional means to resist executive dominance over the judicial branch, directly matching Madison's definition of checks and balances.",
   },
@@ -154,11 +154,11 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       'Executive supremacy and federalism',
-      'Judicial review and institutional checks and balances',
-      'Judicial restraint and direct participatory democracy',
       'Delegated discretionary authority and gridlock',
+      'Judicial restraint and direct participatory democracy',
+      'Judicial review and institutional checks and balances',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       "The judge's action is an exercise of judicial review, and the president's ultimate compliance, despite disagreement, shows the functioning of systemic institutional checks and balances.",
   },
@@ -172,8 +172,8 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     question:
       'A member of the House of Representatives learns that 75% of her constituents oppose a new trade agreement. However, she believes the agreement will revitalize manufacturing in her district over the next decade. She casts her vote in favor of the trade agreement. Which model of representation is this lawmaker demonstrating?',
     image: null,
-    options: ['Delegate', 'Politico', 'Trustee', 'Virtual'],
-    correctAnswer: 'C',
+    options: ['Delegate', 'Trustee', 'Politico', 'Virtual'],
+    correctAnswer: 'B',
     explanation:
       'Under the trustee model, a representative votes based on their own knowledge, conscience, and judgment of long-term interests, even if it conflicts with immediate constituent preferences.',
   },
@@ -231,11 +231,11 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     optionTableHeaders: ['House', 'Senate'],
     options: [
       'Can introduce bills related to domestic policy only | Can introduce bills related to foreign policy only',
-      'Utilizes discharge petitions to bring bills to the floor | Utilizes unanimous consent agreements to manage debate',
       'Holds the sole power to try all institutional impeachments | Holds the sole power to initiate the impeachment process',
+      'Utilizes discharge petitions to bring bills to the floor | Utilizes unanimous consent agreements to manage debate',
       'Regulated entirely by a non-partisan Rules Committee | Regulated entirely by a rotating committee of senior state governors',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'C',
     explanation:
       'The House utilizes discharge petitions to bypass committee chairs and bring bills to the floor; the Senate relies heavily on unanimous consent agreements to manage its calendar.',
   },
@@ -251,11 +251,11 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       'The smaller size of the House allows individual representatives to delay national security legislation indefinitely.',
-      'The six-year term of senators isolates them more from short-term public passions than representatives serving two-year terms.',
       'The Senate\'s formal rules committee strictly regulates the length of debate on every single spending bill.',
+      'The six-year term of senators isolates them more from short-term public passions than representatives serving two-year terms.',
       'The requirement that all federal bills originate in the Senate makes it more powerful than the House in fiscal matters.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'C',
     explanation:
       'The longer six-year term of senators was explicitly designed to insulate them from rapid shifts in popular public mood, whereas the two-year House terms keep representatives tightly tied to immediate popular passions.',
   },
@@ -271,11 +271,11 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       'An immediate reduction in the size of the federal bureaucratic apparatus.',
-      'Increased legislative gridlock and intensified scrutiny during confirmation hearings.',
-      'A decrease in the president\'s use of informal powers like executive orders.',
       'The automatic expiration of all prior primary and secondary legal precedents.',
+      'A decrease in the president\'s use of informal powers like executive orders.',
+      'Increased legislative gridlock and intensified scrutiny during confirmation hearings.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       "Divided government (where the president's party does not control Congress) typically creates structural institutional friction, causing increased legislative gridlock and combative confirmation battles.",
   },
@@ -311,11 +311,11 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       'The Supreme Court relies entirely on the legislative branch to draft constitutional amendments when states resist rulings.',
-      'Executive and state non-compliance can significantly limit the immediate impact of judicial holdings.',
-      'Stare decisis prevents the Court from modifying or enforcing its own prior constitutional interpretations.',
       'Federal courts are structurally barred from ruling on matters involving public school infrastructure or local funding.',
+      'Stare decisis prevents the Court from modifying or enforcing its own prior constitutional interpretations.',
+      'Executive and state non-compliance can significantly limit the immediate impact of judicial holdings.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'The widespread resistance to Brown and the subsequent need for Brown II demonstrates that federal court decisions can be checked or limited in real-world environments by executive or state reluctance to enforce them.',
   },
@@ -331,11 +331,11 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       'Passing a resolution to strip the justices of their life tenure and force early retirement.',
-      'Introducing and passing a constitutional amendment alongside the states to alter the constitutional framework under review.',
-      'Mandating that the executive branch instantly defund the salaries of the dissenting justices.',
       'Issuing a dynamic executive order instructing federal courts to reverse their holding.',
+      'Mandating that the executive branch instantly defund the salaries of the dissenting justices.',
+      'Introducing and passing a constitutional amendment alongside the states to alter the constitutional framework under review.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'If the Court rules a law unconstitutional, Congress cannot overturn the ruling by standard statute or executive order. It must work to alter the underlying text via a constitutional amendment under Article V.',
   },
@@ -371,11 +371,11 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       'The Department of Defense requests an increase in defense spending during a congressional hearing.',
-      'The Securities and Exchange Commission (SEC) drafts and enforces specific technical regulations to define and punish insider trading under federal securities law.',
-      'The Supreme Court grants a writ of certiorari to hear a case involving an administrative fine.',
       'The Senate Foreign Relations Committee votes to approve a newly negotiated bilateral treaty.',
+      'The Supreme Court grants a writ of certiorari to hear a case involving an administrative fine.',
+      'The Securities and Exchange Commission (SEC) drafts and enforces specific technical regulations to define and punish insider trading under federal securities law.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'Rulemaking authority allows administrative agencies to write specific, legally binding regulations that fill in the gaps of broad statutory mandates passed by Congress. The SEC creating specific rules for insider trading is a classic example.',
   },
@@ -425,8 +425,8 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     question:
       'An ongoing alliance forms between a corporate agricultural interest group, the House Committee on Agriculture, and specialized analysts within the Department of Agriculture to maintain domestic farming subsidies. This stable, long-term relationship is best described as an example of:',
     image: null,
-    options: ['An iron triangle', 'An issue network', 'Elite polarization', 'Concurrent federalism'],
-    correctAnswer: 'A',
+    options: ['Elite polarization', 'An issue network', 'An iron triangle', 'Concurrent federalism'],
+    correctAnswer: 'C',
     explanation:
       'An iron triangle is defined as a stable, long-term relationship between a congressional committee, a bureaucratic agency, and an interest group working within a specific policy space.',
   },
@@ -441,12 +441,12 @@ export const govUnit2McqPracticeQuestions: Question[] = [
       'How do temporary issue networks differ from traditional iron triangles in the federal policymaking process?',
     image: null,
     options: [
-      'Issue networks focus exclusively on foreign policy, whereas iron triangles operate within domestic spending.',
       'Issue networks are less formal, contain a broader range of conflicting stakeholders, and disband once a specific policy issue is addressed.',
+      'Issue networks focus exclusively on foreign policy, whereas iron triangles operate within domestic spending.',
       'Issue networks are explicitly protected under Article III, whereas iron triangles are governed by executive orders.',
       'Issue networks completely exclude interest groups and media figures from participating in debate.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'A',
     explanation:
       'Issue networks are fluid, loose, and dynamic webs of activists, academics, media figures, and interest groups that form around a specific problem and disband when it changes, contrasting with the rigid, permanent tripartite structure of iron triangles.',
   },
@@ -462,11 +462,11 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       'The power to issue a writ of mandamus to agency directors.',
-      'The power of the purse to reduce or withhold the agency\'s budget appropriations.',
       'The power to alter the original appellate jurisdiction of the agency\'s internal hearings.',
+      'The power of the purse to reduce or withhold the agency\'s budget appropriations.',
       'The power to unilaterally appoint a new cabinet secretary without a vote.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'C',
     explanation:
       'The "power of the purse" is Congress\'s most powerful tool for bureaucratic accountability. If an agency misbehaves or mismanages funds, Congress can slash or condition its operational budget in the next appropriation cycle.',
   },
@@ -502,11 +502,11 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       'The requirement that all executive orders be approved by a majority of both houses.',
-      'The bicameral structure requiring identical versions of a bill to pass both chambers.',
       'The power of the Supreme Court to issue advisory opinions before a bill is formally voted upon.',
+      'The bicameral structure requiring identical versions of a bill to pass both chambers.',
       'The allocation of three mandatory seats per state within the House of Representatives.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'C',
     explanation:
       'The structural requirement of bicameralism ensures that both the House and the Senate must pass an identical version of a text before it can head to the president, acting as an intentional dynamic check against hasty lawmaking.',
   },
@@ -521,12 +521,12 @@ export const govUnit2McqPracticeQuestions: Question[] = [
       'A president enters into an arrangement with the Prime Minister of Great Britain to share intelligence data without submitting the arrangement to the Senate for a two-thirds ratification vote. This action is constitutionally permissible as a use of:',
     image: null,
     options: [
-      'A formal treaty',
       'An executive agreement',
+      'A formal treaty',
       'An executive directive under the 22nd Amendment',
       'The legislative veto',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'A',
     explanation:
       'Executive agreements are informal international agreements made by the president with foreign heads of state that carry the force of law but do not require Senate ratification.',
   },
@@ -561,12 +561,12 @@ export const govUnit2McqPracticeQuestions: Question[] = [
       'Based on the holding in United States v. Lopez (1995), which of the following areas of public policy remains primarily within the reserved powers of state governments rather than the implied powers of the federal government?',
     image: null,
     options: [
-      'The regulation of television and internet broadcasts across state boundaries.',
-      'The coining and printing of currency after an economic crisis.',
       'The management of local public school safety zones and general policing.',
+      'The coining and printing of currency after an economic crisis.',
+      'The regulation of television and internet broadcasts across state boundaries.',
       'The establishment of uniform naturalization standards for immigrants.',
     ],
-    correctAnswer: 'C',
+    correctAnswer: 'A',
     explanation:
       "The ruling in Lopez re-established boundaries on the federal government's use of the Commerce Clause, preserving traditional state police powers over local school areas and general public safety.",
   },
@@ -582,11 +582,11 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       'The political patronage system',
-      'The civil service merit system',
       'Executive compliance monitoring',
+      'The civil service merit system',
       'Congressional committee assignments',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'C',
     explanation:
       'The modern civil service merit system relies on competitive testing and objective qualifications to ensure bureaucratic neutrality and competence, directly counteracting the historical spoils/patronage system.',
   },
@@ -641,12 +641,12 @@ export const govUnit2McqPracticeQuestions: Question[] = [
       'A state legislature draws its congressional district boundaries in a highly irregular, jagged manner to ensure that a racial minority population is concentrated into a single district, guaranteeing their candidate wins that seat. Which required Supreme Court case established that such racial gerrymandering is subject to strict legal scrutiny under the Equal Protection Clause?',
     image: null,
     options: [
-      'Baker v. Carr (1961)',
       'Shaw v. Reno (1993)',
+      'Baker v. Carr (1961)',
       'Brown v. Board of Education (1954)',
       'Citizens United v. FEC (2010)',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'A',
     explanation:
       'Shaw v. Reno held that districts drawn with highly irregular or bizarre shapes designed solely to separate voters into racial blocks violate the Equal Protection Clause and must face strict judicial scrutiny.',
   },
@@ -662,11 +662,11 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       'Districts drawn with bizarre shapes solely to separate voters based on race violate the Fifteenth Amendment.',
-      'Claims challenging legislative malapportionment under the Fourteenth Amendment are justiciable in federal courts, leading to the "one person, one vote" principle.',
-      'The federal government has no authority to review state legislative maps because redistricting is a purely political question.',
       'Political action committees can make unlimited independent expenditures during state legislative elections.',
+      'The federal government has no authority to review state legislative maps because redistricting is a purely political question.',
+      'Claims challenging legislative malapportionment under the Fourteenth Amendment are justiciable in federal courts, leading to the "one person, one vote" principle.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       "Baker v. Carr established that legislative apportionment claims are justiciable in federal courts, opening the door for voters to challenge malapportionment under the Fourteenth Amendment's Equal Protection Clause.",
   },
@@ -682,11 +682,11 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       'The formal power of the line-item veto',
-      'The informal power of the bully pulpit',
-      'Delegated discretionary authority',
       'Institutional executive privilege',
+      'Delegated discretionary authority',
+      'The informal power of the bully pulpit',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'The "bully pulpit" is an informal presidential power that leverages the visibility and prestige of the office to manage public opinion and pressure other institutional actors to support an agenda.',
   },
@@ -701,12 +701,12 @@ export const govUnit2McqPracticeQuestions: Question[] = [
       'Congress passes an annual federal budget that includes $800 billion in mandatory spending for entitlement programs and $500 billion in discretionary spending for defense and infrastructure. Over time, as the cost of entitlement programs increases due to demographic shifts, which of the following long-term budgetary outcomes is most likely?',
     image: null,
     options: [
-      'The constitutional requirement to balance the budget automatically triggers a reduction in tax rates.',
       'Discretionary spending opportunities will decrease unless federal revenues are increased or the deficit expands.',
+      'The constitutional requirement to balance the budget automatically triggers a reduction in tax rates.',
       'Mandatory spending will automatically convert into pork-barrel legislation at the end of each fiscal cycle.',
       'The president will gain the constitutional authority to unilaterally adjust entitlement eligibility rules.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'A',
     explanation:
       'Mandatory spending is structurally legally required for entitlement programs. As these costs grow, they absorb a larger percentage of the overall budget, squeezing out discretionary spending unless revenues rise or the federal deficit expands.',
   },
@@ -751,12 +751,12 @@ export const govUnit2McqPracticeQuestions: Question[] = [
       'Which of the following scenarios demonstrates the constitutional concept of checks and balances limiting the power of the federal judiciary?',
     image: null,
     options: [
-      'A state governor issues an executive order expanding the size of the state\'s appellate court system.',
       'The Senate votes to reject a highly controversial judicial nominee chosen by the president to fill a Supreme Court vacancy.',
+      'A state governor issues an executive order expanding the size of the state\'s appellate court system.',
       'A federal district judge rules that an administrative regulation written by the EPA is unconstitutional.',
       'The House of Representatives files a discharge petition to bring a bill directly to the floor for a full vote.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'A',
     explanation:
       'Senate confirmation votes act as an explicit, core structural check by the legislative branch over the judicial branch, directly regulating who gets to hold a life-tenured seat.',
   },
@@ -771,12 +771,12 @@ export const govUnit2McqPracticeQuestions: Question[] = [
       'A president is frustrated that a federal statute prevents him from executing a key campaign promise. He orders the Department of Justice to simply stop prosecuting individuals who violate that specific statute. This scenario reflects an ongoing structural debate regarding:',
     image: null,
     options: [
-      'The boundaries of presidential executive authority versus Congress\'s power to pass laws.',
+      'The transitioning of a representative republic into a direct participatory democracy.',
       'The distinction between concurrent powers and exclusive state powers.',
       'The expansion of the Supreme Court\'s original jurisdiction over criminal matters.',
-      'The transitioning of a representative republic into a direct participatory democracy.',
+      'The boundaries of presidential executive authority versus Congress\'s power to pass laws.',
     ],
-    correctAnswer: 'A',
+    correctAnswer: 'D',
     explanation:
       'Under Article II, the president must ensure that laws are "faithfully executed." A sweeping executive choice to completely stop prosecuting an entire category of federal statutory law creates a profound structural confrontation with Congress\'s core power to make law.',
   },
@@ -805,11 +805,11 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "The House has 100 members; the Senate has 435 members.",
-      "House members serve six-year terms; senators serve two-year terms.",
       "All House seats are up for election every two years; only about one-third of Senate seats are up for election at a time.",
+      "House members serve six-year terms; senators serve two-year terms.",
       "The Senate exclusively handles revenue bills; the House exclusively ratifies treaties.",
     ],
-    correctAnswer: "C",
+    correctAnswer: "B",
     explanation: "The House's 435 members all face re-election every two years, making the whole chamber highly responsive to short-term shifts in public opinion. The Senate's 100 members serve staggered six-year terms, so only roughly a third of seats are contested in any election cycle, giving the chamber more institutional continuity.",
   },
   {
@@ -822,11 +822,11 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "The Supreme Court must certify that both versions are constitutional.",
-      "A conference committee made up of members from both chambers must reconcile the differences into a single version.",
-      "The president must choose which version to sign into law.",
       "The bill automatically fails and must be reintroduced in the next session.",
+      "The president must choose which version to sign into law.",
+      "A conference committee made up of members from both chambers must reconcile the differences into a single version.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "D",
     explanation: "Because of bicameralism, an identical bill text must pass both chambers before heading to the president. When the House and Senate versions differ, a conference committee is typically formed to negotiate a single compromise version for both chambers to vote on again.",
   },
   {
@@ -855,12 +855,12 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     question: "Which of the following is an accurate distinction between a formal and an informal presidential power?",
     image: null,
     options: [
-      "Signing a treaty is informal; issuing an executive order is formal.",
       "Vetoing legislation is formal, since it is explicitly granted in Article II; using the bully pulpit to shape public opinion is informal, since it developed through practice rather than constitutional text.",
+      "Signing a treaty is informal; issuing an executive order is formal.",
       "Appointing federal judges is informal; commanding the armed forces is formal.",
       "Both powers are explicitly listed in Article II and carry equal constitutional weight.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "A",
     explanation: "Formal powers are explicitly granted to the president by the Constitution (such as the veto). Informal powers, like using the bully pulpit to mobilize public opinion, are not written into the Constitution but have grown out of the practical exercise of the office over time.",
   },
   {
@@ -872,12 +872,12 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     question: "A president nominates a candidate for a federal judgeship, but the Senate Judiciary Committee refuses to schedule a confirmation hearing, effectively blocking the nomination without a formal vote. This illustrates:",
     image: null,
     options: [
-      "The Senate exercising a check on the executive's appointment power through its advice-and-consent role.",
+      "A violation of the Necessary and Proper Clause.",
       "An unconstitutional expansion of judicial power.",
       "The president's exclusive control over judicial appointments.",
-      "A violation of the Necessary and Proper Clause.",
+      "The Senate exercising a check on the executive's appointment power through its advice-and-consent role.",
     ],
-    correctAnswer: "A",
+    correctAnswer: "D",
     explanation: "The Senate's constitutional role of \"advice and consent\" over judicial nominations gives it the power to check the president's appointment authority — including, informally, the power to slow-walk or refuse to act on a nomination altogether.",
   },
   {
@@ -924,11 +924,11 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "Stare decisis",
-      "Judicial review",
       "Executive privilege",
+      "Judicial review",
       "Selective incorporation",
     ],
-    correctAnswer: "B",
+    correctAnswer: "C",
     explanation: "Judicial review — the power of courts to invalidate laws or executive actions that conflict with the Constitution — was established as an operational power of the judiciary in Marbury v. Madison (1803) and remains a foundational check on the other two branches.",
   },
   {
@@ -958,11 +958,11 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "An issue network, because the relationship is loose and temporary.",
-      "An iron triangle, because of the stable, long-term alliance among the agency, committee, and interest group.",
       "Judicial activism, because courts are directing agency policy.",
+      "An iron triangle, because of the stable, long-term alliance among the agency, committee, and interest group.",
       "A formal treaty negotiation process.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "C",
     explanation: "An iron triangle describes a durable, mutually reinforcing relationship among a bureaucratic agency, a congressional committee, and an interest group that all share a stake in a specific policy area — distinct from the more fluid, temporary coalitions found in issue networks.",
   },
 
@@ -1011,11 +1011,11 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "Reapportionment",
-      "Gerrymandering",
       "The Great Compromise",
+      "Gerrymandering",
       "Devolution",
     ],
-    correctAnswer: "B",
+    correctAnswer: "C",
     explanation: "Gerrymandering refers to the manipulation of district boundaries to favor one political party or group, often by \"packing\" opposing voters into few districts or \"cracking\" them across many districts to minimize their overall electoral influence.",
   },
   {
@@ -1079,11 +1079,11 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "Formal veto power.",
-      "Informal power to shape public opinion through visibility and media access.",
-      "Power to unilaterally ratify treaties.",
       "Power to appoint federal judges.",
+      "Power to unilaterally ratify treaties.",
+      "Informal power to shape public opinion through visibility and media access.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "D",
     explanation: "Using press conferences and public visibility to build support for policy initiatives is an informal presidential power — not explicitly granted by the Constitution, but developed through the practical use of the office's platform and media access.",
   },
   {
@@ -1095,12 +1095,12 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     question: "Which of the following best describes the outcome and long-term significance of Marbury v. Madison (1803)?",
     image: null,
     options: [
-      "The Court ruled in favor of Marbury and ordered the delivery of his commission, expanding executive power.",
       "The Court declined to order the delivery of Marbury's commission but, in doing so, established the judiciary's power to declare acts of Congress unconstitutional.",
+      "The Court ruled in favor of Marbury and ordered the delivery of his commission, expanding executive power.",
       "The Court ruled that the judiciary has no authority to review the constitutionality of federal laws.",
       "The Court ruled that only state courts, not federal courts, may exercise judicial review.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "A",
     explanation: "While the specific outcome denied Marbury his commission, Chief Justice Marshall's opinion established the far more significant precedent of judicial review — the power of federal courts to strike down laws that conflict with the Constitution.",
   },
   {
@@ -1130,11 +1130,11 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "An iron triangle.",
-      "An issue network.",
-      "A political action committee.",
       "A civil service system.",
+      "A political action committee.",
+      "An issue network.",
     ],
-    correctAnswer: "B",
+    correctAnswer: "D",
     explanation: "Unlike the stable, long-term structure of an iron triangle, an issue network is a loose, temporary, and often large coalition of diverse stakeholders that forms around a specific issue and dissolves once that issue is resolved or loses public attention.",
   },
 

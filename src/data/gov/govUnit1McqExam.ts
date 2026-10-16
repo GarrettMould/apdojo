@@ -31,12 +31,12 @@ export const govUnit1McqTestQuestions: Question[] = [
       'In Federalist No. 10, James Madison argues that the "mischiefs of faction" can be controlled by:',
     image: null,
     options: [
-      'Removing the liberty of citizens to form interest groups.',
-      'Creating a direct democracy where every citizen votes on every issue.',
       'A large republic that filters public views through elected representatives.',
+      'Creating a direct democracy where every citizen votes on every issue.',
+      'Removing the liberty of citizens to form interest groups.',
       'Ensuring an equal distribution of property among all citizens.',
     ],
-    correctAnswer: 'C',
+    correctAnswer: 'A',
     explanation:
       'Madison argues that a large republic makes it difficult for a unified majority faction to form and that representative government "refines" public views.',
   },
@@ -50,12 +50,12 @@ export const govUnit1McqTestQuestions: Question[] = [
       'An Anti-Federalist would likely have viewed the "Supremacy Clause" in Article VI of the Constitution as:',
     image: null,
     options: [
-      'A necessary tool to prevent states from ignoring federal laws.',
       'A dangerous grant of power that could lead to the elimination of state sovereignty.',
+      'A necessary tool to prevent states from ignoring federal laws.',
       'A safeguard for individual liberties through the Bill of Rights.',
       'A means to ensure that the executive branch remained subordinate to the legislature.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'A',
     explanation:
       'Anti-Federalists, as seen in Brutus No. 1, feared the Supremacy Clause would eventually grant the national government "absolute and uncontrollable power" over the states.',
   },
@@ -70,11 +70,11 @@ export const govUnit1McqTestQuestions: Question[] = [
     image: null,
     options: [
       'The creation of a unicameral legislature where each state has one vote.',
-      'The strengthening of the central government to address national concerns.',
-      'The preservation of the Articles of Confederation with minor amendments.',
       'The expansion of reserved powers to ensure state sovereignty.',
+      'The preservation of the Articles of Confederation with minor amendments.',
+      'The strengthening of the central government to address national concerns.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'Hamilton argues federal powers are "too limited," reflecting the Federalist desire to replace the weak Articles of Confederation with a stronger central authority.',
   },
@@ -88,11 +88,11 @@ export const govUnit1McqTestQuestions: Question[] = [
     image: null,
     options: [
       'The establishment of a three-branch government.',
-      'A bicameral legislature with different methods of representation in each house.',
       'The inclusion of a Bill of Rights to protect individual liberties.',
+      'A bicameral legislature with different methods of representation in each house.',
       'The agreement that enslaved persons would count as 60% of a person for representation.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'C',
     explanation:
       'The Great Compromise created a bicameral legislature with a population-based House and an equally representative Senate.',
   },
@@ -157,8 +157,8 @@ export const govUnit1McqTestQuestions: Question[] = [
     question:
       'In so extensive a republic, the great officers of government would soon become above the control of the people... —Brutus No. 1\n\nWhich model of representative democracy is the author most concerned will dominate in a large republic?',
     image: null,
-    options: ['Participatory democracy', 'Pluralist democracy', 'Elite democracy', 'Direct democracy'],
-    correctAnswer: 'C',
+    options: ['Elite democracy', 'Pluralist democracy', 'Participatory democracy', 'Direct democracy'],
+    correctAnswer: 'A',
     explanation:
       'Brutus argued that in a large territory, leaders would be detached from the people, leading to an elite class ruling for their own benefit.',
   },
@@ -173,11 +173,11 @@ export const govUnit1McqTestQuestions: Question[] = [
     image: null,
     options: [
       'The national judiciary frequently overrode state laws.',
-      'The central government lacked the power to regulate interstate commerce.',
-      'The executive branch used its veto power to block trade agreements.',
       'The Bill of Rights prevented federal interference in business.',
+      'The executive branch used its veto power to block trade agreements.',
+      'The central government lacked the power to regulate interstate commerce.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'The lack of power to regulate interstate commerce was a major weakness of the Articles, leading to "trade wars" and tariffs between states.',
   },
@@ -192,11 +192,11 @@ export const govUnit1McqTestQuestions: Question[] = [
     image: null,
     options: [
       'The President can veto a Supreme Court decision.',
-      'The President nominates federal judges and justices.',
-      'The President can remove a justice for "bad behavior."',
       'The President can declare a law unconstitutional.',
+      'The President can remove a justice for "bad behavior."',
+      'The President nominates federal judges and justices.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'The power to appoint judges (with Senate advice and consent) allows the President to check the judicial branch by influencing its long-term ideological composition.',
   },
@@ -209,8 +209,8 @@ export const govUnit1McqTestQuestions: Question[] = [
     question:
       'The federal government provides a grant to a state for "transportation," but allows the state significant discretion in how to spend the money—whether on highways, rail, or bridges. This is an example of:',
     image: null,
-    options: ['A categorical grant', 'A block grant', 'An unfunded mandate', 'Revenue sharing'],
-    correctAnswer: 'B',
+    options: ['A categorical grant', 'An unfunded mandate', 'A block grant', 'Revenue sharing'],
+    correctAnswer: 'C',
     explanation:
       'Block grants are broad grants with few "strings attached," giving states the discretion to decide how to allocate funds within a general policy area.',
   },
@@ -229,11 +229,11 @@ export const govUnit1McqTestQuestions: Question[] = [
     },
     options: [
       'Congress passed a constitutional amendment requiring states to fund their own programs.',
-      'The federal government expanded categorical grant funding as part of a strategy to increase national control.',
       'The federal government prioritized "devolution" and the use of block grants to reduce federal fiscal responsibility and discretion for state spending.',
+      'The federal government expanded categorical grant funding as part of a strategy to increase national control.',
       'The Supreme Court ruled that all forms of intergovernmental transfers were unconstitutional under the Tenth Amendment.',
     ],
-    correctAnswer: 'C',
+    correctAnswer: 'B',
     explanation:
       'The decline in the 1980s (the Reagan era) is widely associated with the "Devolution Revolution," which sought to reduce federal fiscal footprints by shifting from restrictive categorical grants toward broader, more flexible block grants, which typically involve less total federal spending.',
   },
@@ -271,11 +271,11 @@ export const govUnit1McqTestQuestions: Question[] = [
     image: null,
     options: [
       'The Federalists in Federalist No. 10.',
-      'The Anti-Federalists in Brutus No. 1.',
-      'The majority opinion in McCulloch v. Maryland.',
       'The authors of the Declaration of Independence.',
+      'The majority opinion in McCulloch v. Maryland.',
+      'The Anti-Federalists in Brutus No. 1.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'D',
     explanation:
       'Lopez restricted federal power in favor of state sovereignty, echoing the Anti-Federalist concerns about an overreaching central government expressed in Brutus No. 1.',
   },
@@ -289,11 +289,11 @@ export const govUnit1McqTestQuestions: Question[] = [
     image: null,
     options: [
       'It consolidates all policymaking into one location.',
-      'It allows groups to lobby at the local, state, and national levels.',
       'It ensures that only elite groups can influence the government.',
+      'It allows groups to lobby at the local, state, and national levels.',
       'It requires interest groups to be non-partisan.',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'C',
     explanation:
       'Federalism divides power between levels of government, creating multiple opportunities (access points) for interest groups to influence policy at different stages.',
   },
@@ -311,12 +311,12 @@ export const govUnit1McqTestQuestions: Question[] = [
       alt: 'Map showing which U.S. states have balanced budget requirements compared to the federal government',
     },
     options: [
-      'Dual federalism, because states and the federal government operate under completely identical fiscal rules',
-      'The Supremacy Clause, because federal budget law overrides state balanced budget requirements',
       'A key structural difference between state and federal governments, in which states face fiscal constraints that limit deficit spending unlike the national government',
+      'The Supremacy Clause, because federal budget law overrides state balanced budget requirements',
+      'Dual federalism, because states and the federal government operate under completely identical fiscal rules',
       'Cooperative federalism, because states and the federal government share responsibility for balancing the national budget',
     ],
-    correctAnswer: 'C',
+    correctAnswer: 'A',
     explanation:
       'This map illustrates the structural reality that states operate under sovereign limitations regarding debt and deficit spending that the federal government, with its control over monetary policy, does not face.',
   },
@@ -334,12 +334,12 @@ export const govUnit1McqTestQuestions: Question[] = [
       alt: 'Map showing which U.S. states have balanced budget requirements compared to the federal government',
     },
     options: [
-      'The president must sign an executive order directing the Treasury to balance the budget each fiscal year',
       'Congress must pass the amendment by a two-thirds vote in both chambers, followed by ratification by three-fourths of the states',
+      'The president must sign an executive order directing the Treasury to balance the budget each fiscal year',
       'The Supreme Court must first rule that deficit spending is unconstitutional before Congress can act',
       'A simple majority vote in both chambers of Congress is sufficient to amend the Constitution',
     ],
-    correctAnswer: 'B',
+    correctAnswer: 'A',
     explanation:
       'Article V of the U.S. Constitution sets a high bar for amendments, requiring a two-thirds supermajority in both houses of Congress and ratification by three-fourths of the state legislatures.',
   },

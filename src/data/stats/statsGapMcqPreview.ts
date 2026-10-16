@@ -22,10 +22,10 @@ export const statsGapMcqPreviewQuestions: Question[] = [
       "A histogram, because the table gives counts.",
       "A boxplot, because it shows how the counts are spread out.",
       "A stemplot, because each student gave one response.",
-      "A scatterplot, because the table has two columns of data.",
-      "A bar graph, because favorite lunch is a categorical variable."
+      "A bar graph, because favorite lunch is a categorical variable.",
+      "A scatterplot, because the table has two columns of data."
     ],
-    "correctAnswer": "E",
+    "correctAnswer": "D",
     "explanation": "Favorite lunch is a categorical variable, so a bar graph (or a pie chart) showing the count or percent in each category is appropriate. Histograms, boxplots, and stemplots are for quantitative variables. The counts in the table are numbers, but the variable being measured is still the lunch choice.",
     "videoExplanation": null
   },
@@ -41,8 +41,8 @@ export const statsGapMcqPreviewQuestions: Question[] = [
       "headers": ["Favorite Lunch", "Number of Students"],
       "rows": [["Pizza", "48"], ["Tacos", "36"], ["Salad", "12"], ["Burgers", "24"]]
     },
-    "options": ["12%", "30%", "36%", "48%", "75%"],
-    "correctAnswer": "B",
+    "options": ["12%", "75%", "36%", "48%", "30%"],
+    "correctAnswer": "E",
     "explanation": "Relative frequency = count / total = 36/120 = 0.30, or 30%. The value 36% treats the count as a percent, and 75% compares tacos to pizza (36/48) instead of to all students.",
     "videoExplanation": null
   },
@@ -58,8 +58,8 @@ export const statsGapMcqPreviewQuestions: Question[] = [
       "headers": ["Method of Getting to School", "Number of Students"],
       "rows": [["Bus", "90"], ["Walk", "45"], ["Car", "60"], ["Bike", "15"]]
     },
-    "options": ["7.1%", "21.4%", "28.6%", "42.9%", "50.0%"],
-    "correctAnswer": "C",
+    "options": ["28.6%", "21.4%", "7.1%", "42.9%", "50.0%"],
+    "correctAnswer": "A",
     "explanation": "Walkers and bikers total 45 + 15 = 60 students. 60/210 ≈ 0.286, or 28.6%. The value 21.4% counts walkers only, and 50.0% compares walkers and bikers to the 120 students who do not ride the bus.",
     "videoExplanation": null
   },
@@ -76,13 +76,13 @@ export const statsGapMcqPreviewQuestions: Question[] = [
       "rows": [["Band", "45%"], ["Robotics", "38%"], ["Drama", "27%"], ["Chess", "20%"]]
     },
     "options": [
-      "The percents add to more than 100% because students could belong to more than one club.",
       "Pie charts can be used only with quantitative variables.",
+      "The percents add to more than 100% because students could belong to more than one club.",
       "Percents can be displayed only in a bar graph.",
       "There are too few categories to make a pie chart.",
       "The largest category is less than 50%, so it cannot be shown as a slice."
     ],
-    "correctAnswer": "A",
+    "correctAnswer": "B",
     "explanation": "A pie chart shows how a whole is divided into categories that do not overlap, so the percents must total 100%. Here 45 + 38 + 27 + 20 = 130%, because students can appear in several clubs. A bar graph can show these percents.",
     "videoExplanation": null
   },
@@ -101,11 +101,11 @@ export const statsGapMcqPreviewQuestions: Question[] = [
     "options": [
       "Skewed left, because most of the data are on the left side of the display.",
       "Approximately symmetric, because every bin has at least one employee.",
-      "Bimodal, because the first two bins are tall.",
+      "Skewed right, with most commutes short and a tail toward longer times.",
       "Approximately uniform, because the frequencies decrease by a similar amount.",
-      "Skewed right, with most commutes short and a tail toward longer times."
+      "Bimodal, because the first two bins are tall."
     ],
-    "correctAnswer": "E",
+    "correctAnswer": "C",
     "explanation": "The frequencies are largest for the short commute times and trail off toward the longer times, so the long tail is on the right and the distribution is skewed right. Skewness is named for the direction of the tail, not for where most of the data are.",
     "videoExplanation": null
   },
@@ -122,13 +122,13 @@ export const statsGapMcqPreviewQuestions: Question[] = [
       "rows": [["40-49", "3"], ["50-59", "12"], ["60-69", "4"], ["70-79", "3"], ["80-89", "11"], ["90-99", "5"]]
     },
     "options": [
-      "Bimodal, with peaks at 50-59 and 80-89, which suggests that the scores may come from two different groups of students.",
       "Unimodal and symmetric, centered at 70-79.",
+      "Bimodal, with peaks at 50-59 and 80-89, which suggests that the scores may come from two different groups of students.",
       "Skewed right, with an outlier at 90-99.",
       "Uniform, because every bin contains some students.",
       "Skewed left, because the largest frequency is at 50-59."
     ],
-    "correctAnswer": "A",
+    "correctAnswer": "B",
     "explanation": "There are two separate peaks (12 students at 50-59 and 11 students at 80-89) with a dip between them. A distribution with two peaks is bimodal and often signals two subgroups.",
     "videoExplanation": null
   },
@@ -147,11 +147,11 @@ export const statsGapMcqPreviewQuestions: Question[] = [
     "options": [
       "A uniform distribution, because each value from 0 to 4 occurred at least twice.",
       "A bimodal distribution with peaks at 1 goal and 8 goals.",
-      "A skewed left distribution, because the mode is at 1 goal.",
       "A gap between 4 and 8 goals, with 8 goals a possible outlier.",
+      "A skewed left distribution, because the mode is at 1 goal.",
       "A symmetric distribution with no unusual values."
     ],
-    "correctAnswer": "D",
+    "correctAnswer": "C",
     "explanation": "No games had 5, 6, or 7 goals, and one game had 8, which is far from the rest of the data. That isolated value is a possible outlier. The bulk of the data are at 0 to 4 goals with a tail toward higher values, so the distribution is skewed right, not left.",
     "videoExplanation": null
   },
@@ -167,10 +167,10 @@ export const statsGapMcqPreviewQuestions: Question[] = [
       "Skewed right, with a tail toward the high scores.",
       "Approximately symmetric, with a center near 80.",
       "Bimodal, with peaks at 70s and 90s.",
-      "Approximately uniform, because every stem has at least one leaf.",
-      "Skewed left, with a tail toward the low scores."
+      "Skewed left, with a tail toward the low scores.",
+      "Approximately uniform, because every stem has at least one leaf."
     ],
-    "correctAnswer": "E",
+    "correctAnswer": "D",
     "explanation": "Most scores are in the 70s and 80s, and the data trail off through several low scores (42, 45, 50, 51, and 58), with only one score in the 90s. The longer tail is on the lower values, so the distribution is skewed left. The center is near 74, not 80.",
     "videoExplanation": null
   },
@@ -187,13 +187,13 @@ export const statsGapMcqPreviewQuestions: Question[] = [
       "rows": [["20-24", "6"], ["25-29", "1"], ["30-34", "0"], ["35-39", "1"], ["40-44", "7"]]
     },
     "options": [
-      "The two clusters of ages, near 20-24 and 40-44, separated by an almost empty middle.",
       "The total number of customers, because the bars would no longer add to 15.",
+      "The two clusters of ages, near 20-24 and 40-44, separated by an almost empty middle.",
       "The overall center, because a histogram with two bins has no center.",
       "The units of the variable.",
       "Any skewness, because only symmetric data can be placed in two bins."
     ],
-    "correctAnswer": "A",
+    "correctAnswer": "B",
     "explanation": "With width-5 bins the histogram shows two tall bars at the ends with almost nothing between them. With two wide bins the counts are 8 and 7, which looks nearly uniform and hides the clusters and the gap. Bin width can hide features of a distribution.",
     "videoExplanation": null
   },
@@ -209,8 +209,8 @@ export const statsGapMcqPreviewQuestions: Question[] = [
       "headers": ["Wait Time (minutes)", "Number of People"],
       "rows": [["0-9", "10"], ["10-19", "3"], ["20-29", "5"], ["30-39", "9"], ["40-49", "13"]]
     },
-    "options": ["0-9", "10-19", "20-29", "30-39", "40-49"],
-    "correctAnswer": "D",
+    "options": ["0-9", "10-19", "20-29", "40-49", "30-39"],
+    "correctAnswer": "E",
     "explanation": "With 40 values, the median is the mean of the 20th and 21st values. The cumulative counts are 10, 13, 18, and 27, so the 20th and 21st values are in the 30-39 bin. The tallest bar (40-49) is the mode bin, and 20-29 is just the middle bin by position.",
     "videoExplanation": null
   },
@@ -231,13 +231,13 @@ export const statsGapMcqPreviewQuestions: Question[] = [
       ]
     },
     "options": [
-      "The results can be generalized to all students at the school because 36 is a large sample.",
       "The results describe only the 36 volunteers and cannot be generalized to all students at the school.",
+      "The results can be generalized to all students at the school because 36 is a large sample.",
       "The results can be generalized to all AP students in the country.",
       "The results show that taking AP Statistics causes students to do more homework.",
       "The results can be generalized to the whole school if she repeats the survey next week."
     ],
-    "correctAnswer": "B",
+    "correctAnswer": "A",
     "explanation": "The sample was a convenience sample of volunteers from one class, so it may not represent all students at the school. A larger sample or a repeat survey of the same group does not fix this, and no comparison or experiment was done that would support a cause-and-effect claim.",
     "videoExplanation": null
   },
@@ -256,11 +256,11 @@ export const statsGapMcqPreviewQuestions: Question[] = [
     "options": [
       "Would getting more sleep cause these students' quiz scores to improve?",
       "Do all students in the state who sleep more earn higher quiz scores?",
-      "What is the favorite subject of these students?",
       "Is there an association between hours of sleep and quiz score for these students?",
+      "What is the favorite subject of these students?",
       "Why do some students sleep less than others?"
     ],
-    "correctAnswer": "D",
+    "correctAnswer": "C",
     "explanation": "The data contain two quantitative variables measured on the same students, so they can describe an association between them in this sample. They cannot show cause and effect (no experiment), cannot be generalized to all students (no random selection), and contain no information about subjects or reasons.",
     "videoExplanation": null
   },
@@ -277,13 +277,13 @@ export const statsGapMcqPreviewQuestions: Question[] = [
       "rows": [["Yes, build the skate park", "420"], ["No, do not build it", "80"]]
     },
     "options": [
-      "About 84% of all town residents support building the skate park.",
+      "84% of the people who voted said yes, but the results cannot be generalized to all town residents because the voters chose themselves.",
       "A majority of town residents would use the skate park.",
       "The poll is accurate because there were 500 responses.",
       "The council should build the skate park because the poll represents the town.",
-      "84% of the people who voted said yes, but the results cannot be generalized to all town residents because the voters chose themselves."
+      "About 84% of all town residents support building the skate park."
     ],
-    "correctAnswer": "E",
+    "correctAnswer": "A",
     "explanation": "420/500 = 84% of the respondents said yes. Because the poll was voluntary, the respondents may differ from the town as a whole, and a large number of responses does not remove that bias.",
     "videoExplanation": null
   },
@@ -300,13 +300,13 @@ export const statsGapMcqPreviewQuestions: Question[] = [
       "rows": [["Grade 11", "30", "90", "120"], ["Grade 12", "60", "20", "80"], ["Total", "90", "110", "200"]]
     },
     "options": [
-      "A segmented bar graph with one bar for each grade, showing the percent with a job and the percent without a job.",
       "A bar graph of the number of students with a job in each grade.",
+      "A segmented bar graph with one bar for each grade, showing the percent with a job and the percent without a job.",
       "A pie chart of all 200 students by grade.",
       "A histogram of the numbers in the table.",
       "A boxplot for each grade."
     ],
-    "correctAnswer": "A",
+    "correctAnswer": "B",
     "explanation": "The grades have different numbers of students, so the groups must be compared with percents. A segmented bar graph shows the conditional distribution of job status within each grade. A bar graph of counts would be misleading because there are more juniors than seniors.",
     "videoExplanation": null
   },
@@ -323,13 +323,13 @@ export const statsGapMcqPreviewQuestions: Question[] = [
       "rows": [["Grade 11", "30", "90", "120"], ["Grade 12", "60", "20", "80"], ["Total", "90", "110", "200"]]
     },
     "options": [
-      "30% have a job and 10% do not.",
       "75% have a job and 25% do not.",
+      "30% have a job and 10% do not.",
       "66.7% have a job and 33.3% do not.",
       "45% have a job and 55% do not.",
       "60 have a job and 20 do not."
     ],
-    "correctAnswer": "B",
+    "correctAnswer": "A",
     "explanation": "Among seniors, 60/80 = 75% have a job and 20/80 = 25% do not. The 30% and 10% values use the total of 200 as the denominator, 66.7% reverses the condition (60 of the 90 students with jobs are seniors), and 45% and 55% describe all students.",
     "videoExplanation": null
   },
@@ -348,11 +348,11 @@ export const statsGapMcqPreviewQuestions: Question[] = [
     "options": [
       "No, because more of the 200 students do not have a job than have one.",
       "No, because there are more juniors than seniors.",
-      "Yes, because the total number of students is 200.",
       "Yes, because the percent with a job differs by grade: 25% of the juniors and 75% of the seniors.",
+      "Yes, because the total number of students is 200.",
       "The table cannot show an association because it does not give percents."
     ],
-    "correctAnswer": "D",
+    "correctAnswer": "C",
     "explanation": "Variables are associated when the conditional distributions differ. Here 30/120 = 25% of juniors have a job compared to 60/80 = 75% of seniors. The overall number of students with or without jobs does not matter for the comparison.",
     "videoExplanation": null
   },
@@ -370,12 +370,12 @@ export const statsGapMcqPreviewQuestions: Question[] = [
     },
     "options": [
       "The \"has a job\" segment of the senior bar is twice as tall as the one for juniors, because 60 is twice 30.",
-      "The two bars are identical because both bars total 100%.",
+      "The \"has a job\" segment of the senior bar is three times as tall as the \"has a job\" segment of the junior bar.",
       "The senior bar is shorter than the junior bar because there are fewer seniors.",
       "The \"does not have a job\" segment is taller for seniors than for juniors.",
-      "The \"has a job\" segment of the senior bar is three times as tall as the \"has a job\" segment of the junior bar."
+      "The two bars are identical because both bars total 100%."
     ],
-    "correctAnswer": "E",
+    "correctAnswer": "B",
     "explanation": "Each bar shows percents. The \"has a job\" segment is 25% for juniors and 75% for seniors, so the senior segment is 3 times as tall. The bars have the same total height (100%), but the segments within them differ.",
     "videoExplanation": null
   },
@@ -410,8 +410,8 @@ export const statsGapMcqPreviewQuestions: Question[] = [
       "headers": ["Trial", "Digits"],
       "rows": [["1", "5 8"], ["2", "9 2"], ["3", "0 3"], ["4", "6 1"], ["5", "7 7"], ["6", "1 5"], ["7", "4 0"], ["8", "2 9"], ["9", "8 4"], ["10", "6 6"]]
     },
-    "options": ["2", "3", "4", "5", "6"],
-    "correctAnswer": "C",
+    "options": ["2", "3", "6", "5", "4"],
+    "correctAnswer": "E",
     "explanation": "Reading each pair: trial 1 (5 make, 8 miss) = 1 make; trial 2 (9 miss, 2 make) = 1; trial 8 (2 make, 9 miss) = 1; trial 9 (8 miss, 4 make) = 1. Trials 3, 4, 6, 7, and 10 have two makes, and trial 5 has none. Exactly one make occurred in 4 trials.",
     "videoExplanation": null
   },
@@ -444,8 +444,8 @@ export const statsGapMcqPreviewQuestions: Question[] = [
       "headers": ["Number of Made Shots (out of 5)", "Number of Trials"],
       "rows": [["0", "1"], ["1", "4"], ["2", "12"], ["3", "17"], ["4", "13"], ["5", "3"]]
     },
-    "options": ["0.06", "0.26", "0.32", "0.60", "0.68"],
-    "correctAnswer": "C",
+    "options": ["0.06", "0.26", "0.60", "0.32", "0.68"],
+    "correctAnswer": "D",
     "explanation": "The trials with at least 4 made shots are those with 4 or 5 makes: 13 + 3 = 16 trials. 16/50 = 0.32. The value 0.26 counts only the trials with exactly 4 makes, and 0.68 is the estimated probability of 3 or fewer.",
     "videoExplanation": null
   },
@@ -469,12 +469,12 @@ export const statsGapMcqPreviewQuestions: Question[] = [
     },
     "options": [
       "It is biased, because the mean of the simulated values (0.401) is not exactly 0.40.",
-      "It appears to be unbiased, because the simulated values of p̂ are centered at about the true value of 0.40.",
       "It is unbiased, because every sample produces a value of p̂ very close to 0.40.",
+      "It appears to be unbiased, because the simulated values of p̂ are centered at about the true value of 0.40.",
       "It is biased, because the standard deviation of the simulated values is not 0.",
       "Nothing can be concluded, because the sample size of 50 is too small."
     ],
-    "correctAnswer": "B",
+    "correctAnswer": "C",
     "explanation": "An unbiased estimator has a sampling distribution centered at the parameter. The mean of the 1,000 simulated values (0.401) is essentially 0.40. Some difference from 0.40 is expected from simulation, and the standard deviation measures variability, not bias.",
     "videoExplanation": null
   },
@@ -491,13 +491,13 @@ export const statsGapMcqPreviewQuestions: Question[] = [
       "rows": [["A", "0.50", "0.120"], ["B", "0.58", "0.040"], ["C", "0.46", "0.050"]]
     },
     "options": [
-      "Statistic B is unbiased because it has the smallest standard deviation.",
-      "Statistic C is unbiased because its mean is within 0.05 of 0.50.",
       "Statistic A is unbiased, even though it is the most variable.",
+      "Statistic C is unbiased because its mean is within 0.05 of 0.50.",
+      "Statistic B is unbiased because it has the smallest standard deviation.",
       "All three statistics are unbiased because each is computed from a random sample.",
       "None of the statistics can be unbiased because none has a standard deviation of 0."
     ],
-    "correctAnswer": "C",
+    "correctAnswer": "A",
     "explanation": "A statistic is an unbiased estimator when the mean of its sampling distribution equals the parameter. Only A has a mean of 0.50. Statistic B is precise but biased, because its sampling distribution is centered at 0.58.",
     "videoExplanation": null
   },
@@ -514,13 +514,13 @@ export const statsGapMcqPreviewQuestions: Question[] = [
       "rows": [["100", "0.600", "0.049"], ["400", "0.600", "0.025"]]
     },
     "options": [
-      "The bias decreases, and the variability decreases.",
+      "The estimator stays unbiased, and its variability is cut about in half.",
       "Both the bias and the variability stay the same.",
       "The estimator stays unbiased, and its variability is cut to one fourth.",
-      "The estimator stays unbiased, and its variability is cut about in half.",
+      "The bias decreases, and the variability decreases.",
       "The bias increases, and the variability decreases."
     ],
-    "correctAnswer": "D",
+    "correctAnswer": "A",
     "explanation": "The mean of p̂ is 0.600 for both sample sizes, so p̂ is unbiased in both cases. The standard deviation is √(0.6 × 0.4/n), which is 0.049 for n = 100 and 0.0245 for n = 400. Quadrupling n cuts the standard deviation in half.",
     "videoExplanation": null
   },
@@ -537,13 +537,13 @@ export const statsGapMcqPreviewQuestions: Question[] = [
       "rows": [["Proportion of households in a town that recycle, p", "0.35"], ["Sample size, n", "200"]]
     },
     "options": [
-      "Mean = 0.35, standard deviation ≈ 0.477",
+      "Mean = 0.35, standard deviation ≈ 0.034",
       "Mean = 0.35, standard deviation ≈ 0.0011",
       "Mean = 70, standard deviation ≈ 6.75",
       "Mean = 0.35, standard deviation ≈ 0.048",
-      "Mean = 0.35, standard deviation ≈ 0.034"
+      "Mean = 0.35, standard deviation ≈ 0.477"
     ],
-    "correctAnswer": "E",
+    "correctAnswer": "A",
     "explanation": "The mean of p̂ is p = 0.35. The standard deviation is √(p(1 - p)/n) = √(0.35 × 0.65/200) ≈ 0.034. The value 0.477 forgets to divide by n, 0.0011 is the variance, 70 and 6.75 are the mean and standard deviation of the count, and 0.048 uses n = 100.",
     "videoExplanation": null
   },
@@ -559,8 +559,8 @@ export const statsGapMcqPreviewQuestions: Question[] = [
       "headers": ["Scenario", "Population Size", "Sample Size"],
       "rows": [["A", "500", "60"], ["B", "2,000", "150"], ["C", "300", "40"], ["D", "1,200", "130"]]
     },
-    "options": ["Scenario B", "Scenario A", "Scenario C", "Scenario D", "All four scenarios"],
-    "correctAnswer": "A",
+    "options": ["Scenario D", "Scenario A", "Scenario C", "Scenario B", "All four scenarios"],
+    "correctAnswer": "D",
     "explanation": "The sample size must be at most 10% of the population size. Scenario B: 10% of 2,000 is 200, and 150 ≤ 200. For A, 10% of 500 is 50 (60 is too large). For C, 10% of 300 is 30 (40 is too large). For D, 10% of 1,200 is 120 (130 is too large).",
     "videoExplanation": null
   },
@@ -578,12 +578,12 @@ export const statsGapMcqPreviewQuestions: Question[] = [
     },
     "options": [
       "Scenario 1 only",
-      "Scenarios 1 and 3 only",
+      "All four scenarios",
       "Scenarios 1, 2, and 3",
       "Scenarios 2 and 4 only",
-      "All four scenarios"
+      "Scenarios 1 and 3 only"
     ],
-    "correctAnswer": "B",
+    "correctAnswer": "E",
     "explanation": "Both np and n(1 - p) must be at least 10. Scenario 1: 20 and 20. Scenario 2: np = 7.5, which fails. Scenario 3: np = 90 and n(1 - p) = 10, which passes. Scenario 4: np = 6, which fails.",
     "videoExplanation": null
   },
@@ -602,8 +602,8 @@ export const statsGapMcqPreviewQuestions: Question[] = [
         ["Sample size, n", "150"]
       ]
     },
-    "options": ["0.006", "0.106", "0.211", "0.459", "0.894"],
-    "correctAnswer": "B",
+    "options": ["0.006", "0.459", "0.211", "0.106", "0.894"],
+    "correctAnswer": "D",
     "explanation": "The standard deviation of p̂ is √(0.60 × 0.40/150) = 0.04. z = (0.55 - 0.60)/0.04 = -1.25, and P(z < -1.25) ≈ 0.106. The value 0.211 doubles the probability, 0.894 is P(p̂ > 0.55), 0.459 uses 0.49 instead of 0.04 as the standard deviation, and 0.006 uses a standard deviation of 0.02.",
     "videoExplanation": null
   },
@@ -619,8 +619,8 @@ export const statsGapMcqPreviewQuestions: Question[] = [
       "headers": ["Quantity", "Value"],
       "rows": [["Population proportion, p", "0.50"], ["Desired standard deviation of p̂", "0.025"]]
     },
-    "options": ["20", "40", "200", "400", "1,600"],
-    "correctAnswer": "D",
+    "options": ["20", "40", "200", "1,600", "400"],
+    "correctAnswer": "E",
     "explanation": "Solve √(0.5 × 0.5/n) = 0.025. Squaring both sides gives 0.25/n = 0.000625, so n = 400. A sample of 1,600 would give a standard deviation of 0.0125.",
     "videoExplanation": null
   },
@@ -638,12 +638,12 @@ export const statsGapMcqPreviewQuestions: Question[] = [
     },
     "options": [
       "Yes, because most of the values in the interval are positive.",
-      "Yes, because the sample proportions are different (0.64 and 0.55).",
       "No, because 0 is in the interval, so a difference of 0 is plausible.",
+      "Yes, because the sample proportions are different (0.64 and 0.55).",
       "No, because the interval is wide, which proves the two proportions are equal.",
       "Yes, because the confidence level is 95%."
     ],
-    "correctAnswer": "C",
+    "correctAnswer": "B",
     "explanation": "A difference of 0 means the proportions are equal. Since 0 is inside the interval, equal proportions are plausible, so the interval does not justify a claim of a difference. This does not prove that the proportions are equal.",
     "videoExplanation": null
   },
@@ -662,11 +662,11 @@ export const statsGapMcqPreviewQuestions: Question[] = [
     "options": [
       "The proportion of patients who improve is greater with the standard therapy than with the new therapy.",
       "The two therapies have the same proportion of patients who improve.",
-      "The new therapy improves exactly 13% more of the patients.",
       "The proportion of patients who improve is greater with the new therapy than with the standard therapy.",
+      "The new therapy improves exactly 13% more of the patients.",
       "There is a 95% probability that the new therapy will work for any given patient."
     ],
-    "correctAnswer": "D",
+    "correctAnswer": "C",
     "explanation": "The entire interval is above 0, so p(new) − p(standard) is plausibly positive only, which supports the claim that the new therapy has the higher proportion. The point estimate of 0.13 is not the true difference, and the interval says nothing about individual patients.",
     "videoExplanation": null
   },
@@ -684,12 +684,12 @@ export const statsGapMcqPreviewQuestions: Question[] = [
     },
     "options": [
       "Yes, because the entire interval is above 0.",
-      "Yes, because the sample difference (0.079) is greater than 0.05.",
+      "No, because the interval includes values less than 0.05.",
       "Yes, because the upper endpoint, 0.139, is greater than 0.05.",
       "No, because 0 is not in the interval.",
-      "No, because the interval includes values less than 0.05."
+      "Yes, because the sample difference (0.079) is greater than 0.05."
     ],
-    "correctAnswer": "E",
+    "correctAnswer": "B",
     "explanation": "The interval estimates plausible values of the true difference, and values from 0.020 to 0.050 are in it, so the true difference might be less than 0.05. The interval does justify a claim that the difference is greater than 0, but not that it is greater than 0.05.",
     "videoExplanation": null
   },
@@ -706,13 +706,13 @@ export const statsGapMcqPreviewQuestions: Question[] = [
       "rows": [["Group 1 (morning class)", "72", "10", "40"], ["Group 2 (afternoon class)", "68", "12", "50"]]
     },
     "options": [
-      "Mean = 4, standard deviation ≈ 2.32",
-      "Mean = 4, standard deviation ≈ 5.38",
       "Mean = 4, standard deviation ≈ 3.28",
+      "Mean = 4, standard deviation ≈ 5.38",
+      "Mean = 4, standard deviation ≈ 2.32",
       "Mean = 140, standard deviation ≈ 2.32",
       "Mean = 4, standard deviation ≈ 2.00"
     ],
-    "correctAnswer": "A",
+    "correctAnswer": "C",
     "explanation": "The mean is μ₁ − μ₂ = 72 − 68 = 4. For independent samples the variances add: √(10²/40 + 12²/50) = √(2.5 + 2.88) ≈ 2.32. The value 5.38 is the variance, 3.28 adds the two standard deviations, and 140 adds the means.",
     "videoExplanation": null
   },
@@ -735,12 +735,12 @@ export const statsGapMcqPreviewQuestions: Question[] = [
     },
     "options": [
       "Scenario A only",
-      "Scenarios A and C only",
       "Scenario C only",
+      "Scenarios A and C only",
       "Scenarios A, C, and D",
       "All four scenarios"
     ],
-    "correctAnswer": "B",
+    "correctAnswer": "C",
     "explanation": "The sampling distribution is approximately Normal if both populations are Normal, or if both sample sizes are large (at least 30) by the central limit theorem. Scenario A has Normal populations, and Scenario C has large samples. In B and D, at least one small sample comes from a skewed population.",
     "videoExplanation": null
   },
@@ -756,8 +756,8 @@ export const statsGapMcqPreviewQuestions: Question[] = [
       "headers": ["Group", "Population Standard Deviation", "Sample Size"],
       "rows": [["1", "6", "25"], ["2", "9", "36"]]
     },
-    "options": ["0.23", "0.48", "0.96", "1.92", "3.84"],
-    "correctAnswer": "C",
+    "options": ["0.96", "0.48", "0.23", "1.92", "3.84"],
+    "correctAnswer": "A",
     "explanation": "The standard deviation is √(σ1²/n1 + σ2²/n2). With the new sample sizes it is √(36/100 + 81/144) = √(0.36 + 0.5625) ≈ 0.96, which is half of 1.92. Quadrupling the sample sizes cuts the standard deviation in half, not to one fourth.",
     "videoExplanation": null
   },
@@ -775,12 +775,12 @@ export const statsGapMcqPreviewQuestions: Question[] = [
     },
     "options": [
       "Yes, because the sample mean for Class A is larger.",
-      "Yes, because the interval includes mostly positive values.",
       "No, because 0 is in the interval, so there is not convincing evidence of a difference.",
+      "Yes, because the interval includes mostly positive values.",
       "No, because the interval proves that the population means are equal.",
       "Yes, because 95% confidence is high enough to claim a difference."
     ],
-    "correctAnswer": "C",
+    "correctAnswer": "B",
     "explanation": "A difference of 0 is in the interval (-1.27, 7.47), so equal population means are plausible and the claim of a difference is not justified. The sample means differ (3.1 minutes), but that difference could be due to sampling variability.",
     "videoExplanation": null
   },
@@ -843,13 +843,13 @@ export const statsGapMcqPreviewQuestions: Question[] = [
       "rows": [["Class A", "32", "81.4", "9.6"], ["Class B", "30", "75.9", "10.2"]]
     },
     "options": [
-      "Reject H₀. There is convincing evidence that the mean exam scores differ for the two classes.",
       "Fail to reject H₀. There is not convincing evidence that the mean scores differ.",
+      "Reject H₀. There is convincing evidence that the mean exam scores differ for the two classes.",
       "Reject H₀. There is a 3.3% probability that the two class means are equal.",
       "Fail to reject H₀. The two classes have the same mean score.",
       "Reject H₀. The sample means are not equal."
     ],
-    "correctAnswer": "A",
+    "correctAnswer": "B",
     "explanation": "Since 0.033 < 0.05, we reject H₀. The data provide convincing evidence of a difference in the population means. The p-value is not the probability that H₀ is true, and the sample means will almost always differ, so that alone does not justify the conclusion.",
     "videoExplanation": null
   },
@@ -866,13 +866,13 @@ export const statsGapMcqPreviewQuestions: Question[] = [
       "rows": [["Fertilizer A", "25", "12.8", "3.1"], ["Fertilizer B", "28", "11.6", "3.4"]]
     },
     "options": [
-      "Reject H₀. There is convincing evidence that fertilizer A produces a greater mean growth.",
       "Fail to reject H₀. There is not convincing evidence that fertilizer A produces a greater mean growth than fertilizer B.",
+      "Reject H₀. There is convincing evidence that fertilizer A produces a greater mean growth.",
       "Fail to reject H₀. The two fertilizers produce the same mean growth.",
       "Accept H₀, because the p-value is greater than 0.05.",
       "Reject H₀, because the sample mean for fertilizer A is larger."
     ],
-    "correctAnswer": "B",
+    "correctAnswer": "A",
     "explanation": "Since 0.093 > 0.05, we fail to reject H₀. The sample difference of 1.2 inches could reasonably be due to chance. Failing to reject H₀ is not evidence that the means are equal, and we do not accept H₀.",
     "videoExplanation": null
   },
@@ -891,11 +891,11 @@ export const statsGapMcqPreviewQuestions: Question[] = [
     "options": [
       "A two-sample t-test comparing the mean of the old times to the mean of the new times, because there are two sets of times.",
       "A two-sample t-test with 10 degrees of freedom, because there are 12 times in all.",
-      "A paired t-test on the six differences, because each runner was measured twice.",
+      "A chi-square test of independence, because there are two variables.",
       "A two-proportion z-test, because the runners either improved or did not.",
-      "A chi-square test of independence, because there are two variables."
+      "A paired t-test on the six differences, because each runner was measured twice."
     ],
-    "correctAnswer": "C",
+    "correctAnswer": "E",
     "explanation": "The same runners are in both columns, so the two sets of times are not independent. The correct procedure is a one-sample t-test on the differences, with n = 6 pairs and df = 5. Treating the data as two independent samples ignores the pairing.",
     "videoExplanation": null
   },
@@ -1010,12 +1010,12 @@ export const statsGapMcqPreviewQuestions: Question[] = [
     },
     "options": [
       "For each additional mile from the beach, the nightly price decreases by exactly $18.60.",
-      "For each additional $18.60 in price, the predicted distance from the beach decreases by 1 mile.",
       "For each additional mile from the beach, the predicted nightly price decreases by about $18.60.",
+      "For each additional $18.60 in price, the predicted distance from the beach decreases by 1 mile.",
       "The nightly price of a hotel on the beach is $18.60.",
       "Each additional mile from the beach decreases the predicted price by 18.6%."
     ],
-    "correctAnswer": "C",
+    "correctAnswer": "B",
     "explanation": "The slope is the predicted change in y for a one-unit increase in x. Here the predicted price decreases by $18.60 per mile. The slope gives a predicted average change, not an exact change, and it is in dollars, not percent.",
     "videoExplanation": null
   },
@@ -1048,8 +1048,8 @@ export const statsGapMcqPreviewQuestions: Question[] = [
       "headers": ["Predictor", "Coef", "SE Coef", "T", "P"],
       "rows": [["Constant", "245.3", "12.8", "19.16", "0.000"], ["Distance", "-18.6", "3.1", "-6.00", "0.000"]]
     },
-    "options": ["$46.50", "$198.80", "$226.70", "$245.30", "$291.80"],
-    "correctAnswer": "B",
+    "options": ["$46.50", "$226.70", "$198.80", "$245.30", "$291.80"],
+    "correctAnswer": "C",
     "explanation": "Substitute x = 2.5 into the regression equation: predicted price = 245.3 - 18.6(2.5) = 245.3 - 46.5 = $198.80. The distance of 2.5 miles is within the range of the data, so this is interpolation.",
     "videoExplanation": null
   },
