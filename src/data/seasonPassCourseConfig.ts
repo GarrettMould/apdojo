@@ -2,13 +2,20 @@ export type SeasonPassPurchaseType = 'macro' | 'micro' | 'bundle' | 'gov' | 'sta
 
 const VALID_SEASON_PASS_TYPES = new Set<SeasonPassPurchaseType>(['macro', 'micro', 'bundle', 'gov', 'stats']);
 
-/** Coerce query param / route input to a supported checkout type (defaults to macro). */
-export function parseSeasonPassPurchaseType(raw: string | null | undefined): SeasonPassPurchaseType {
+/** Parse a query param only when it is a real checkout type. Missing/invalid → null. */
+export function tryParseSeasonPassPurchaseType(
+  raw: string | null | undefined
+): SeasonPassPurchaseType | null {
   const v = (raw ?? '').trim().toLowerCase();
   if (VALID_SEASON_PASS_TYPES.has(v as SeasonPassPurchaseType)) {
     return v as SeasonPassPurchaseType;
   }
-  return 'macro';
+  return null;
+}
+
+/** Coerce query param / route input to a supported checkout type (defaults to macro). */
+export function parseSeasonPassPurchaseType(raw: string | null | undefined): SeasonPassPurchaseType {
+  return tryParseSeasonPassPurchaseType(raw) ?? 'macro';
 }
 
 export const COURSE_CONFIG: Record<
@@ -77,36 +84,34 @@ export const COURSE_CONFIG: Record<
   },
   gov: {
     badge: 'AP U.S. GOVERNMENT SEASON PASS',
-    headline: 'The Complete AP Gov Toolkit for a 5.',
-    subheadline: 'Everything you need for AP U.S. Government and Politics — in one place.',
+    headline: 'AP Gov practice for the 2027 exam.',
+    subheadline: 'Unit tests, SCOTUS comparison, and interactive cheat sheets.',
     price: 29,
     originalPrice: 39,
     accentColor: 'text-violet-600',
     accentBg: 'bg-violet-600',
     features: [
-      'Full Unit MCQ Practice + Formal Unit Tests',
-      'SCOTUS Comparison & Gov FRQ Practice',
-      'Unit Cheat Sheets + Printable PDFs',
-      'Dojo AI Tutor on Cheat Sheets',
-      'Unlimited Practice Where Unlocked',
-      'Valid Through June 30, 2027',
+      'Formal unit MCQ tests for all 5 units',
+      'SCOTUS comparison essay practice',
+      'Stimulus FRQ packs',
+      'Interactive unit cheat sheets',
+      'Dojo AI tutor on cheat sheets',
     ],
   },
   stats: {
     badge: 'AP STATISTICS SEASON PASS',
-    headline: 'The Complete AP Stats Toolkit for a 5.',
-    subheadline: 'Everything you need for AP Statistics — in one place.',
+    headline: 'AP Stats practice for the 2027 exam.',
+    subheadline: 'Unit tests, FRQ packs, calculator drills, and the formula sheet.',
     price: 29,
     originalPrice: 39,
     accentColor: 'text-orange-600',
     accentBg: 'bg-orange-600',
     features: [
-      'Full Unit MCQ Practice + Formal Unit Tests',
-      'Unit FRQ Packs with Stimulus Practice',
-      'Unit Cheat Sheets + Printable PDFs',
-      'Dojo AI Tutor on Cheat Sheets',
-      'Unlimited Practice Where Unlocked',
-      'Valid Through June 30, 2027',
+      'Formal unit MCQ tests for all 5 units',
+      'Unit FRQ packs with stimulus practice',
+      'TI-84 calculator drills',
+      'Exam formula sheet',
+      'Interactive unit cheat sheets',
     ],
   },
 };

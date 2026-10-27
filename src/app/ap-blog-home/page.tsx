@@ -161,10 +161,10 @@ export default function BlogHomePage() {
       <div className="max-w-[720px] mx-auto px-4 py-12">
         <header className="mb-12 text-center">
           <h1 className="text-5xl sm:text-6xl font-black text-gray-900 mb-4 tracking-tight">
-            Economics Explained
+            AP Explained
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Deep dives into key concepts, expert tips for mastering difficult topics, and strategies to help you ace your AP Economics exams.
+            Deep dives into key concepts, graphs, and exam strategies for AP Macro, Micro, U.S. Government, and Statistics.
           </p>
         </header>
 

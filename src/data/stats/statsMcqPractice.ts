@@ -12,6 +12,7 @@ import {
   statsV2Unit5Questions,
 } from '@/data/stats/statsV2McqPreview';
 import { statsGapMcqPreviewQuestions } from '@/data/stats/statsGapMcqPreview';
+import { statsStimulusByUnit } from '@/data/stats/statsStimulusMcqPractice';
 
 const statsGapByUnit = (unit: number) =>
   statsGapMcqPreviewQuestions.filter((q) => q.unit === unit);
@@ -25,9 +26,11 @@ export const statsMcqPracticeQuestions: Question[] = [
   ...statsUnit1McqPracticeQuestions,
   ...statsV2Unit1Questions,
   ...statsGapByUnit(1),
+  ...statsStimulusByUnit(1),
   ...statsUnit2McqPracticeQuestions,
   ...statsV2Unit2Questions,
   ...statsGapByUnit(2),
+  ...statsStimulusByUnit(2),
   ...statsUnit3McqPracticeQuestions,
   ...statsV2Unit3Questions,
   ...statsGapByUnit(3),
@@ -37,4 +40,5 @@ export const statsMcqPracticeQuestions: Question[] = [
   ...statsUnit5McqPracticeQuestions,
   ...statsV2Unit5Questions,
   ...statsGapByUnit(5),
+  ...statsStimulusByUnit(5),
 ];

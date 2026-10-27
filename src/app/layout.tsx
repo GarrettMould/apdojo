@@ -7,6 +7,7 @@ import { AuthProvider } from '@/contexts/AuthContext'
 import { LayoutClientWrapper } from '@/components/LayoutClientWrapper'
 import { LayoutWrapper } from '@/components/LayoutWrapper'
 import Script from 'next/script'
+import { SITE_DESCRIPTION, SITE_KEYWORDS, SITE_NAME, SITE_TITLE } from '@/lib/siteMetadata';
 const inter = Inter({ subsets: ['latin'] });
 const permanentMarker = Permanent_Marker({
   weight: '400',
@@ -19,37 +20,26 @@ const permanentMarker = Permanent_Marker({
 export const metadata: Metadata = {
   metadataBase: new URL('https://apdojo.com'),
   title: {
-    default: 'AP Dojo | Free Economics Study Resources',
+    default: SITE_TITLE,
     template: '%s | AP Dojo',
   },
-  description: 'Free AP Macroeconomics and Microeconomics study guides, practice tests, and questions. Achieve top scores with comprehensive exam prep resources.',
-  keywords: [
-    'AP Macroeconomics',
-    'AP Microeconomics',
-    'AP Economics',
-    'AP exam prep',
-    'AP study guide',
-    'AP practice tests',
-    'AP economics cheat sheet',
-    'AP economics review',
-    'AP exam practice questions',
-    'free AP study materials',
-  ],
-  authors: [{ name: 'AP Dojo' }],
-  creator: 'AP Dojo',
-  publisher: 'AP Dojo',
+  description: SITE_DESCRIPTION,
+  keywords: SITE_KEYWORDS,
+  authors: [{ name: SITE_NAME }],
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
   openGraph: {
     type: 'website',
     locale: 'en_US',
     url: 'https://apdojo.com',
-    siteName: 'AP Dojo',
-    title: 'AP Dojo | Free Economics Study Resources',
-    description: 'Free AP Macroeconomics and Microeconomics study guides, practice tests, and questions. Achieve top scores with comprehensive exam prep resources.',
+    siteName: SITE_NAME,
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AP Dojo | Free Economics Study Resources',
-    description: 'Free AP Macroeconomics and Microeconomics study guides, practice tests, and questions. Achieve top scores with comprehensive exam prep resources.',
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
   },
   robots: {
     index: true,

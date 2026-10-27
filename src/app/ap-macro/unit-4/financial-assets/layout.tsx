@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Financial Assets Deep Dive: Understanding Stocks, Bonds, and Liquidity | AP Dojo',
+  title: 'Financial Assets Deep Dive: Understanding Stocks, Bonds, and Liquidity',
   description: 'Master financial assets including stocks, bonds, and liquidity. Learn the differences between equity and debt instruments and how they function in the economy.',
   openGraph: {
-    title: 'Financial Assets Deep Dive: Understanding Stocks, Bonds, and Liquidity | AP Dojo',
+    title: 'Financial Assets Deep Dive: Understanding Stocks, Bonds, and Liquidity',
     description: 'Master financial assets including stocks, bonds, and liquidity and how they function in the economy.',
   },
   alternates: {

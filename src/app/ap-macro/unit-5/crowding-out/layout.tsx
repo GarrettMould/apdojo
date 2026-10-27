@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Crowding Out Deep Dive | AP Dojo',
+  title: 'Crowding Out Deep Dive',
   description: 'Understand how government borrowing can crowd out private investment by raising interest rates in the loanable funds market.',
   openGraph: {
-    title: 'Crowding Out Deep Dive | AP Dojo',
+    title: 'Crowding Out Deep Dive',
     description: 'Understand how government borrowing crowds out private investment through higher interest rates.',
   },
   alternates: {

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { X, Loader2, Lock, ArrowRight, ChevronRight, Home, Pen } from 'lucide-react';
+import { X, Loader2, Lock, ArrowRight, ChevronRight, Home, Pen, Sigma } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useCreditSystem } from '@/hooks/useCreditSystem';
@@ -33,6 +33,8 @@ import {
   type CourseSubject,
 } from '@/lib/courseSubject';
 import { apQuestionSubjectTag } from '@/lib/courseSubject';
+import { statsMcqPracticeQuestions } from '@/data/stats/statsMcqPractice';
+import { govMcqPracticeQuestions } from '@/data/gov/govMcqPractice';
 import { SeasonPassModal } from '@/components/SeasonPassModal';
 import { hasValidSeasonPass } from '@/lib/utils';
 import { shufflePracticeQuestions } from '@/lib/shufflePracticeQuestions';
@@ -242,10 +244,25 @@ function Breadcrumb({ subject, unitNumber }: { subject: PracticeMcqSubject; unit
 interface PracticePageContentProps {
   subject: PracticeMcqSubject;
   unitNumber: number;
-  practiceQuestions: QuestionType[];
+  practiceQuestions?: QuestionType[];
+}
+
+function sameQuestionId(question: QuestionType, id: number) {
+  return Number(question.id) === id;
+}
+
+/** Client modules stay current across HMR; the server-passed bank can lag on Stats/Gov. */
+function livePracticeBank(
+  subject: PracticeMcqSubject,
+  passed: QuestionType[] | undefined
+): QuestionType[] {
+  if (subject === 'stats') return statsMcqPracticeQuestions;
+  if (subject === 'gov') return govMcqPracticeQuestions;
+  return passed ?? [];
 }
 
 export function PracticePageContent({ subject, unitNumber, practiceQuestions }: PracticePageContentProps) {
+  const practiceBank = livePracticeBank(subject, practiceQuestions);
   const router = useRouter();
   const { 
     user, 
@@ -271,6 +288,11 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
   const [isTutorOpen, setIsTutorOpen] = useState(false);
   const [scratchToggleSignal, setScratchToggleSignal] = useState(0);
   const [scratchActive, setScratchActive] = useState<'draw' | 'notes' | null>(null);
+  const [formulaToggleSignal, setFormulaToggleSignal] = useState(0);
+  const [formulaSheetOpen, setFormulaSheetOpen] = useState(false);
+  const [devJumpId, setDevJumpId] = useState('');
+  const [devJumpError, setDevJumpError] = useState<string | null>(null);
+  const pendingDevJumpId = useRef<number | null>(null);
   const [reviewState, setReviewState] = useState<ReviewFolderState>({
     version: 1,
     misses: [],
@@ -327,7 +349,7 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
       }
 
       if (cancelled) return;
-      next = filterReviewFolderBySubject(next, subject, practiceQuestions);
+      next = filterReviewFolderBySubject(next, subject, practiceBank);
       setReviewState(next);
       saveReviewFolder(reviewUserKey, subject, unitNumber, next);
       setJustFiledQuestionId(null);
@@ -347,9 +369,9 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
         const seeded = applyAnswerHistoryToReviewFolder(next, mcqAnswersData, {
           subject,
           unitNumber,
-          bankQuestions: practiceQuestions,
+          bankQuestions: practiceBank,
         });
-        const scoped = filterReviewFolderBySubject(seeded, subject, practiceQuestions);
+        const scoped = filterReviewFolderBySubject(seeded, subject, practiceBank);
         if (scoped.misses.length > 0) {
           setReviewState(scoped);
           persistReview(scoped);
@@ -389,9 +411,9 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
           const seeded = applyAnswerHistoryToReviewFolder(prev, mcqAnswersData, {
             subject,
             unitNumber,
-            bankQuestions: practiceQuestions,
+            bankQuestions: practiceBank,
           });
-          const scoped = filterReviewFolderBySubject(seeded, subject, practiceQuestions);
+          const scoped = filterReviewFolderBySubject(seeded, subject, practiceBank);
           void saveReviewFolderToCloud(user.uid, subject, unitNumber, scoped);
           saveReviewFolder(reviewUserKey, subject, unitNumber, scoped);
           return scoped;
@@ -570,7 +592,7 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
     setIsLoadingQuestionSet(true);
     const subjectFilter = apQuestionSubjectTag(subject as CourseSubject);
     
-    let questions: QuestionType[] = practiceQuestions.filter(q => 
+    let questions: QuestionType[] = practiceBank.filter(q => 
       q.subject === subjectFilter && 
       q.unit === unitNumber &&
       !q.isTest // Exclude test questions for practice mode
@@ -623,9 +645,27 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
     const shuffled = practiceMissedMode
       ? questions
       : shufflePracticeQuestions(questions);
-    setQuestionsForPractice(shuffled);
-    setTotalQuestionsInSet(shuffled.length);
-    setCurrentQuestionIndex(0);
+
+    const jumpId = pendingDevJumpId.current;
+    const jumpFromBank =
+      jumpId != null ? practiceBank.find((q) => sameQuestionId(q, jumpId)) : undefined;
+    const jumpInShuffle =
+      jumpId != null ? shuffled.findIndex((q) => sameQuestionId(q, jumpId)) : -1;
+
+    if (jumpId != null && jumpInShuffle >= 0) {
+      setQuestionsForPractice(shuffled);
+      setTotalQuestionsInSet(shuffled.length);
+      setCurrentQuestionIndex(jumpInShuffle);
+    } else if (jumpFromBank) {
+      const next = [jumpFromBank, ...shuffled.filter((q) => !sameQuestionId(q, jumpId))];
+      setQuestionsForPractice(next);
+      setTotalQuestionsInSet(next.length);
+      setCurrentQuestionIndex(0);
+    } else {
+      setQuestionsForPractice(shuffled);
+      setTotalQuestionsInSet(shuffled.length);
+      setCurrentQuestionIndex(0);
+    }
     setAnsweredQuestions({});
     
     // Set unit name for display
@@ -676,7 +716,7 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
       [questionId]: { selectedLetter: answerLetter, isCorrect }
     }));
 
-    const question = practiceQuestions.find(q => q.id === questionId);
+    const question = practiceBank.find(q => q.id === questionId);
     const lessons = lessonIDS || question?.lessonIDS || [];
 
     if (isCorrect) {
@@ -750,7 +790,7 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
       reviewState,
       subject,
       selected[0] ?? unitNumber,
-      practiceQuestions,
+      practiceBank,
       selected
     );
     if (draft.chapters.length === 0) {
@@ -854,6 +894,34 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
     setCurrentQuestionIndex(index);
   };
 
+  const handleDevJumpToId = (raw: string) => {
+    const id = Number.parseInt(raw.trim(), 10);
+    if (!Number.isFinite(id)) {
+      setDevJumpError('Enter a numeric ID');
+      return;
+    }
+
+    pendingDevJumpId.current = id;
+
+    const inSession = questionsForPractice.findIndex((q) => sameQuestionId(q, id));
+    if (inSession >= 0) {
+      setCurrentQuestionIndex(inSession);
+      setDevJumpError(null);
+      return;
+    }
+
+    const fromBank = practiceBank.find((q) => sameQuestionId(q, id));
+    if (!fromBank) {
+      setDevJumpError(`No ${subject} question ${id}`);
+      return;
+    }
+
+    setQuestionsForPractice((prev) => [fromBank, ...prev.filter((q) => !sameQuestionId(q, id))]);
+    setTotalQuestionsInSet((n) => n + 1);
+    setCurrentQuestionIndex(0);
+    setDevJumpError(null);
+  };
+
   const handleUnitChange = (nextUnit: number) => {
     if (subject === 'gov' && !isGovMcqPracticeUnitAvailable(nextUnit)) return;
     if (subject === 'stats' && !isStatsMcqPracticeUnitAvailable(nextUnit)) return;
@@ -951,6 +1019,48 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
             ) : (
               <div className="min-w-0 flex-1" />
             )}
+            {process.env.NODE_ENV === 'development' ? (
+              <form
+                className="flex flex-shrink-0 items-center gap-1.5 rounded border border-dashed border-amber-400 bg-amber-50 px-2 py-1"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleDevJumpToId(devJumpId);
+                }}
+              >
+                <label htmlFor="dev-mcq-id-jump" className="text-[10px] font-semibold uppercase tracking-wide text-amber-800">
+                  Dev ID
+                </label>
+                <input
+                  id="dev-mcq-id-jump"
+                  type="text"
+                  inputMode="numeric"
+                  value={devJumpId}
+                  onChange={(e) => {
+                    setDevJumpId(e.target.value);
+                    if (devJumpError) setDevJumpError(null);
+                  }}
+                  placeholder={
+                    questionsForPractice[currentQuestionIndex]?.id != null
+                      ? String(questionsForPractice[currentQuestionIndex].id)
+                      : 'id'
+                  }
+                  className="h-6 w-20 rounded border border-amber-300 bg-white px-1.5 text-xs text-gray-900 outline-none focus:border-amber-500"
+                />
+                <button
+                  type="submit"
+                  className="h-6 rounded bg-amber-500 px-1.5 text-[10px] font-semibold uppercase text-white hover:bg-amber-600"
+                >
+                  Go
+                </button>
+                {devJumpError ? (
+                  <span className="max-w-[10rem] truncate text-[10px] text-red-600">{devJumpError}</span>
+                ) : questionsForPractice[currentQuestionIndex]?.id != null ? (
+                  <span className="text-[10px] text-amber-800">
+                    now {questionsForPractice[currentQuestionIndex].id}
+                  </span>
+                ) : null}
+              </form>
+            ) : null}
             {!isLoadingQuestionSet && (questionsForPractice.length > 0 || reviewState.misses.length > 0) ? (
               <div className="flex flex-shrink-0 items-center gap-4">
                 {REMATCH_ENABLED ? (
@@ -962,21 +1072,40 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
                   />
                 ) : null}
                 {questionsForPractice.length > 0 ? (
-                  <button
-                    type="button"
-                    onClick={() => setScratchToggleSignal((n) => n + 1)}
-                    className={`inline-flex flex-shrink-0 items-center gap-1.5 text-sm transition-colors ${
-                      scratchActive
-                        ? 'text-gray-900 font-medium'
-                        : 'text-gray-500 hover:text-gray-800'
-                    }`}
-                    aria-pressed={!!scratchActive}
-                    aria-label={scratchActive ? 'Close scratch pad' : 'Open scratch pad'}
-                    title={scratchActive ? 'Close scratch pad' : 'Scratch pad (draw or notes)'}
-                  >
-                    <Pen className="h-4 w-4" />
-                    <span>Scratch pad</span>
-                  </button>
+                  <>
+                    {subject === 'stats' ? (
+                      <button
+                        type="button"
+                        onClick={() => setFormulaToggleSignal((n) => n + 1)}
+                        className={`inline-flex flex-shrink-0 items-center gap-1.5 text-sm transition-colors ${
+                          formulaSheetOpen
+                            ? 'text-gray-900 font-medium'
+                            : 'text-gray-500 hover:text-gray-800'
+                        }`}
+                        aria-pressed={formulaSheetOpen}
+                        aria-label={formulaSheetOpen ? 'Close formula sheet' : 'Open formula sheet'}
+                        title={formulaSheetOpen ? 'Close formula sheet' : 'Exam-style formula sheet'}
+                      >
+                        <Sigma className="h-4 w-4" />
+                        <span>Formulas</span>
+                      </button>
+                    ) : null}
+                    <button
+                      type="button"
+                      onClick={() => setScratchToggleSignal((n) => n + 1)}
+                      className={`inline-flex flex-shrink-0 items-center gap-1.5 text-sm transition-colors ${
+                        scratchActive
+                          ? 'text-gray-900 font-medium'
+                          : 'text-gray-500 hover:text-gray-800'
+                      }`}
+                      aria-pressed={!!scratchActive}
+                      aria-label={scratchActive ? 'Close scratch pad' : 'Open scratch pad'}
+                      title={scratchActive ? 'Close scratch pad' : 'Scratch pad (draw or notes)'}
+                    >
+                      <Pen className="h-4 w-4" />
+                      <span>Scratch pad</span>
+                    </button>
+                  </>
                 ) : null}
               </div>
             ) : null}
@@ -1083,6 +1212,8 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
               showFloatingScratchToolbar={false}
               scratchToggleSignal={scratchToggleSignal}
               onScratchActiveChange={setScratchActive}
+              formulaToggleSignal={formulaToggleSignal}
+              onFormulaActiveChange={setFormulaSheetOpen}
             />
           )}
         </div>

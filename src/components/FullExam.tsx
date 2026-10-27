@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Question, QuestionBank } from '@/data/questionBanks/types';
 import { Button } from "@/components/ui/button";
-import { Bookmark, BookmarkX, X, Clock, Maximize2, Minimize2, Calculator, Pen, Eraser, Expand, Trash2, Circle, CircleDot, Check, Lock, Brain, FileText, ChevronLeft, ChevronRight, ChevronsRight, Triangle, Strikethrough, Eye, EyeOff, Play, ChevronDown, ChevronUp, List, Pause, Play as PlayIcon, Highlighter, Copy, ArrowLeft } from 'lucide-react';
+import { Bookmark, BookmarkX, X, Clock, Maximize2, Minimize2, Calculator, Pen, Eraser, Expand, Trash2, Circle, CircleDot, Check, Lock, Brain, FileText, ChevronLeft, ChevronRight, ChevronsRight, Triangle, Strikethrough, Eye, EyeOff, Play, ChevronDown, ChevronUp, List, Pause, Play as PlayIcon, Highlighter, Copy, ArrowLeft, Sigma } from 'lucide-react';
 import Image, { StaticImageData } from 'next/image';
 import Link from 'next/link';
 import { redirectToCheckout } from '@/lib/stripe';
@@ -32,6 +32,7 @@ import { ExpandableQuestionImage } from './ExpandableQuestionImage';
 import { MathText } from './MathText';
 import { ExamTutorialModal } from './ExamTutorialModal';
 import { ExamToolsCalculator } from '@/components/exam/ExamToolsCalculator';
+import { StatsFormulaSheet } from '@/components/stats/StatsFormulaSheet';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, doc, updateDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 import { saveQuizResult } from '@/lib/quizHistory';
@@ -61,6 +62,59 @@ const Excalidraw = dynamic<any>(
     ssr: false,
   },
 );
+
+type ExamTool = 'calculator' | 'whiteboard' | 'formulas';
+
+function ExamToolIconButtons({
+  showToolsPanel,
+  activeTool,
+  onToggle,
+  showFormulas,
+}: {
+  showToolsPanel: boolean;
+  activeTool: ExamTool;
+  onToggle: (tool: ExamTool) => void;
+  showFormulas: boolean;
+}) {
+  const buttonClass = (tool: ExamTool) =>
+    `p-2 rounded-lg transition-colors ${
+      showToolsPanel && activeTool === tool ? 'bg-gray-300 hover:bg-gray-400' : 'hover:bg-gray-300'
+    }`;
+
+  return (
+    <div className="flex items-center gap-3">
+      <button
+        type="button"
+        onClick={() => onToggle('calculator')}
+        className={buttonClass('calculator')}
+        aria-label="Toggle calculator"
+        title="Toggle calculator"
+      >
+        <Calculator className="w-5 h-5 text-gray-900" />
+      </button>
+      <button
+        type="button"
+        onClick={() => onToggle('whiteboard')}
+        className={buttonClass('whiteboard')}
+        aria-label="Toggle drawing pad"
+        title="Toggle drawing pad"
+      >
+        <Pen className="w-5 h-5 text-gray-900" />
+      </button>
+      {showFormulas ? (
+        <button
+          type="button"
+          onClick={() => onToggle('formulas')}
+          className={buttonClass('formulas')}
+          aria-label="Toggle formula sheet"
+          title="Toggle formula sheet"
+        >
+          <Sigma className="w-5 h-5 text-gray-900" />
+        </button>
+      ) : null}
+    </div>
+  );
+}
 
 interface FullExamProps {
   questionBank: QuestionBank;
@@ -656,13 +710,15 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   const shouldShowToolsByDefault = false; // Tools panel starts closed - users can open manually
   const [showToolsPanel, setShowToolsPanel] = useState(shouldShowToolsByDefault);
   const [leftPanelWidth, setLeftPanelWidth] = useState(shouldShowToolsByDefault ? 65 : 100); // Percentage width for left panel when tools panel is open
-  // For all exam types, only show one tool at a time (calculator OR whiteboard)
-  const [activeTool, setActiveTool] = useState<'calculator' | 'whiteboard'>('calculator');
+  // For all exam types, only show one tool at a time
+  const [activeTool, setActiveTool] = useState<ExamTool>('calculator');
   const [scratchPadTab, setScratchPadTab] = useState<'draw' | 'text'>('draw');
   const [scratchNotes, setScratchNotes] = useState('');
   const [excalidrawKey, setExcalidrawKey] = useState(0);
+  const showStatsFormulas = examType === 'stats';
+  const statsFormulaUnit = Number.parseInt(String(examNumber), 10) || 0;
 
-  const handleToolToggle = (tool: 'calculator' | 'whiteboard') => {
+  const handleToolToggle = (tool: ExamTool) => {
     // If panel is closed, open it and set the requested tool.
     if (!showToolsPanel) {
       setActiveTool(tool);
@@ -681,16 +737,29 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
 
   const isStatsDesmosPanel =
     examType === 'stats' && activeTool === 'calculator';
-  const toolsPanelWidthClass = isStatsDesmosPanel ? 'w-[52%]' : 'w-[35%]';
+  const isStatsFormulaPanel = showStatsFormulas && activeTool === 'formulas';
+  const toolsPanelWidthClass = isStatsDesmosPanel
+    ? 'w-[52%]'
+    : isStatsFormulaPanel
+      ? 'w-[42%]'
+      : 'w-[35%]';
+  const toolsPanelTitle =
+    activeTool === 'calculator'
+      ? examType === 'stats'
+        ? 'Desmos (exam-style)'
+        : 'Calculator'
+      : activeTool === 'formulas'
+        ? 'Formula sheet'
+        : 'Drawing Pad';
 
   // Update leftPanelWidth when tools panel opens/closes (wider for Stats Desmos)
   useEffect(() => {
     if (showToolsPanel) {
-      setLeftPanelWidth(isStatsDesmosPanel ? 48 : 65);
+      setLeftPanelWidth(isStatsDesmosPanel ? 48 : isStatsFormulaPanel ? 58 : 65);
     } else {
       setLeftPanelWidth(100);
     }
-  }, [showToolsPanel, isStatsDesmosPanel]);
+  }, [showToolsPanel, isStatsDesmosPanel, isStatsFormulaPanel]);
 
   // Excalidraw state
   const [excalidrawElements, setExcalidrawElements] = useState<any[]>([]);
@@ -1912,11 +1981,42 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                 Save & Exit
               </button>
                   <button
+                    type="button"
                     onClick={() => handleToolToggle('whiteboard')}
-                    className="px-3 py-1.5 text-xs font-semibold border border-gray-300 rounded hover:bg-gray-50 text-gray-700 transition-colors"
+                    className={`px-3 py-1.5 text-xs font-semibold border rounded transition-colors ${
+                      showToolsPanel && activeTool === 'whiteboard'
+                        ? 'border-gray-400 bg-gray-100 text-gray-900'
+                        : 'border-gray-300 hover:bg-gray-50 text-gray-700'
+                    }`}
                   >
                     Scratch Paper
                   </button>
+                  {showStatsFormulas ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => handleToolToggle('formulas')}
+                        className={`px-3 py-1.5 text-xs font-semibold border rounded transition-colors ${
+                          showToolsPanel && activeTool === 'formulas'
+                            ? 'border-gray-400 bg-gray-100 text-gray-900'
+                            : 'border-gray-300 hover:bg-gray-50 text-gray-700'
+                        }`}
+                      >
+                        Formulas
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleToolToggle('calculator')}
+                        className={`px-3 py-1.5 text-xs font-semibold border rounded transition-colors ${
+                          showToolsPanel && activeTool === 'calculator'
+                            ? 'border-gray-400 bg-gray-100 text-gray-900'
+                            : 'border-gray-300 hover:bg-gray-50 text-gray-700'
+                        }`}
+                      >
+                        Calculator
+                      </button>
+                    </>
+                  ) : null}
                   {/* Text size control */}
                   <div className="flex items-center border border-gray-300 rounded overflow-hidden">
                     <button
@@ -1989,34 +2089,12 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                               Resume Test
                             </button>
                           </div>
-                          <div className="flex items-center gap-3">
-                            {/* Calculator Toggle Button */}
-                            <button
-                              onClick={() => handleToolToggle('calculator')}
-                              className={`p-2 rounded-lg transition-colors ${
-                                showToolsPanel 
-                                  ? 'bg-gray-300 hover:bg-gray-400' 
-                                  : 'hover:bg-gray-300'
-                              }`}
-                              aria-label="Toggle calculator and drawing pad"
-                              title="Toggle calculator and drawing pad"
-                            >
-                              <Calculator className="w-5 h-5 text-gray-900" />
-                            </button>
-                            {/* Drawing Pad Toggle Button */}
-                            <button
-                              onClick={() => handleToolToggle('calculator')}
-                              className={`p-2 rounded-lg transition-colors ${
-                                showToolsPanel 
-                                  ? 'bg-gray-300 hover:bg-gray-400' 
-                                  : 'hover:bg-gray-300'
-                              }`}
-                              aria-label="Toggle calculator and drawing pad"
-                              title="Toggle calculator and drawing pad"
-                            >
-                              <Pen className="w-5 h-5 text-gray-900" />
-                            </button>
-                          </div>
+                          <ExamToolIconButtons
+                            showToolsPanel={showToolsPanel}
+                            activeTool={activeTool}
+                            onToggle={handleToolToggle}
+                            showFormulas={showStatsFormulas}
+                          />
                         </>
                       ) : (
                         /* When not paused: Normal layout */
@@ -2047,34 +2125,12 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                               <Pause className="w-5 h-5" />
                             </button>
                           </div>
-                          <div className="flex items-center gap-3">
-                            {/* Calculator Toggle Button */}
-                            <button
-                              onClick={() => handleToolToggle('calculator')}
-                              className={`p-2 rounded-lg transition-colors ${
-                                showToolsPanel 
-                                  ? 'bg-gray-300 hover:bg-gray-400' 
-                                  : 'hover:bg-gray-300'
-                              }`}
-                              aria-label="Toggle calculator and drawing pad"
-                              title="Toggle calculator and drawing pad"
-                            >
-                              <Calculator className="w-5 h-5 text-gray-900" />
-                            </button>
-                            {/* Drawing Pad Toggle Button */}
-                            <button
-                              onClick={() => handleToolToggle('calculator')}
-                              className={`p-2 rounded-lg transition-colors ${
-                                showToolsPanel 
-                                  ? 'bg-gray-300 hover:bg-gray-400' 
-                                  : 'hover:bg-gray-300'
-                              }`}
-                              aria-label="Toggle calculator and drawing pad"
-                              title="Toggle calculator and drawing pad"
-                            >
-                              <Pen className="w-5 h-5 text-gray-900" />
-                            </button>
-                          </div>
+                          <ExamToolIconButtons
+                            showToolsPanel={showToolsPanel}
+                            activeTool={activeTool}
+                            onToggle={handleToolToggle}
+                            showFormulas={showStatsFormulas}
+                          />
                         </>
                       )}
                     </>
@@ -2092,34 +2148,12 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                               Resume Test
                             </button>
                           </div>
-                          <div className="flex items-center gap-3">
-                            {/* Calculator Toggle Button */}
-                            <button
-                              onClick={() => handleToolToggle('calculator')}
-                              className={`p-2 rounded-lg transition-colors ${
-                                showToolsPanel 
-                                  ? 'bg-gray-300 hover:bg-gray-400' 
-                                  : 'hover:bg-gray-300'
-                              }`}
-                              aria-label="Toggle calculator and drawing pad"
-                              title="Toggle calculator and drawing pad"
-                            >
-                              <Calculator className="w-5 h-5 text-gray-900" />
-                            </button>
-                            {/* Drawing Pad Toggle Button */}
-                            <button
-                              onClick={() => handleToolToggle('calculator')}
-                              className={`p-2 rounded-lg transition-colors ${
-                                showToolsPanel 
-                                  ? 'bg-gray-300 hover:bg-gray-400' 
-                                  : 'hover:bg-gray-300'
-                              }`}
-                              aria-label="Toggle calculator and drawing pad"
-                              title="Toggle calculator and drawing pad"
-                            >
-                              <Pen className="w-5 h-5 text-gray-900" />
-                            </button>
-                          </div>
+                          <ExamToolIconButtons
+                            showToolsPanel={showToolsPanel}
+                            activeTool={activeTool}
+                            onToggle={handleToolToggle}
+                            showFormulas={showStatsFormulas}
+                          />
                         </>
                       ) : (
                         /* When not paused and timer hidden: Normal layout */
@@ -2136,34 +2170,12 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                               <span className="text-sm font-semibold">Show Timer</span>
                             </button>
                           </div>
-                          <div className="flex items-center gap-3">
-                            {/* Calculator Toggle Button */}
-                            <button
-                              onClick={() => handleToolToggle('calculator')}
-                              className={`p-2 rounded-lg transition-colors ${
-                                showToolsPanel 
-                                  ? 'bg-gray-300 hover:bg-gray-400' 
-                                  : 'hover:bg-gray-300'
-                              }`}
-                              aria-label="Toggle calculator and drawing pad"
-                              title="Toggle calculator and drawing pad"
-                            >
-                              <Calculator className="w-5 h-5 text-gray-900" />
-                            </button>
-                            {/* Drawing Pad Toggle Button */}
-                            <button
-                              onClick={() => handleToolToggle('calculator')}
-                              className={`p-2 rounded-lg transition-colors ${
-                                showToolsPanel 
-                                  ? 'bg-gray-300 hover:bg-gray-400' 
-                                  : 'hover:bg-gray-300'
-                              }`}
-                              aria-label="Toggle calculator and drawing pad"
-                              title="Toggle calculator and drawing pad"
-                            >
-                              <Pen className="w-5 h-5 text-gray-900" />
-                            </button>
-                          </div>
+                          <ExamToolIconButtons
+                            showToolsPanel={showToolsPanel}
+                            activeTool={activeTool}
+                            onToggle={handleToolToggle}
+                            showFormulas={showStatsFormulas}
+                          />
                         </>
                       )}
                     </>
@@ -2172,33 +2184,13 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
               )}
               {/* For custom assignments: No timer, just calculator and drawing pad buttons */}
               {isCustomAssignment && (
-                <div className="flex items-center gap-3 ml-auto">
-                  {/* Calculator Toggle Button */}
-                  <button
-                    onClick={() => handleToolToggle('calculator')}
-                    className={`p-2 rounded-lg transition-colors ${
-                      showToolsPanel && activeTool === 'calculator'
-                        ? 'bg-gray-300 hover:bg-gray-400' 
-                        : 'hover:bg-gray-300'
-                    }`}
-                    aria-label="Toggle calculator"
-                    title="Calculator"
-                  >
-                    <Calculator className="w-5 h-5 text-gray-900" />
-                  </button>
-                  {/* Drawing Pad Toggle Button */}
-                  <button
-                    onClick={() => handleToolToggle('whiteboard')}
-                    className={`p-2 rounded-lg transition-colors ${
-                      showToolsPanel && activeTool === 'whiteboard'
-                        ? 'bg-gray-300 hover:bg-gray-400' 
-                        : 'hover:bg-gray-300'
-                    }`}
-                    aria-label="Toggle drawing pad"
-                    title="Drawing Pad"
-                  >
-                    <Pen className="w-5 h-5 text-gray-900" />
-                  </button>
+                <div className="ml-auto">
+                  <ExamToolIconButtons
+                    showToolsPanel={showToolsPanel}
+                    activeTool={activeTool}
+                    onToggle={handleToolToggle}
+                    showFormulas={showStatsFormulas}
+                  />
                 </div>
               )}
               </>
@@ -3421,11 +3413,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                     {/* Header */}
                     <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between flex-shrink-0">
                       <span className="text-sm font-semibold text-gray-900">
-                        {activeTool === 'calculator'
-                          ? examType === 'stats'
-                            ? 'Desmos (exam-style)'
-                            : 'Calculator'
-                          : 'Drawing Pad'}
+                        {toolsPanelTitle}
                       </span>
                       {shouldShowToolsByDefault && (
                         <button
@@ -3481,6 +3469,11 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                       {activeTool === 'calculator' && (
                         <ExamToolsCalculator examType={examType} accentClassName={accentFull} />
                       )}
+                      {activeTool === 'formulas' && showStatsFormulas && (
+                        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+                          <StatsFormulaSheet unit={statsFormulaUnit} />
+                        </div>
+                      )}
                     </>
                   </div>
                   </div>
@@ -3508,7 +3501,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                     >
                       {/* Header */}
                       <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between gap-3 flex-shrink-0">
-                        {isUnitTest ? (
+                        {isUnitTest && activeTool === 'whiteboard' ? (
                           <div className="flex items-baseline gap-8 flex-1 min-w-0 font-mono">
                             <button
                               type="button"
@@ -3534,7 +3527,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                             </button>
                           </div>
                         ) : (
-                          <span className="text-sm font-semibold text-gray-900">Drawing Pad & Scratch Paper</span>
+                          <span className="text-sm font-semibold text-gray-900">{toolsPanelTitle}</span>
                         )}
                         {!shouldShowToolsByDefault && (
                           <button
@@ -3552,6 +3545,11 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                         {/* Calculator Section */}
                         {activeTool === 'calculator' && (
                         <ExamToolsCalculator examType={examType} accentClassName={accentFull} />
+                      )}
+                      {activeTool === 'formulas' && showStatsFormulas && (
+                        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+                          <StatsFormulaSheet unit={statsFormulaUnit} />
+                        </div>
                       )}
 
                         {/* Excalidraw / Type Pad Section */}
@@ -3637,11 +3635,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                       </div>
                     ) : (
                       <span className="text-sm font-semibold text-gray-900">
-                        {activeTool === 'calculator'
-                          ? examType === 'stats'
-                            ? 'Desmos (exam-style)'
-                            : 'Calculator'
-                          : 'Drawing Pad'}
+                        {toolsPanelTitle}
                       </span>
                     )}
                     {!shouldShowToolsByDefault && (
@@ -3708,6 +3702,11 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                       {activeTool === 'calculator' && (
                         <ExamToolsCalculator examType={examType} accentClassName={accentFull} />
                       )}
+                      {activeTool === 'formulas' && showStatsFormulas && (
+                        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+                          <StatsFormulaSheet unit={statsFormulaUnit} />
+                        </div>
+                      )}
                       </>
                     ) : (
                       <>
@@ -3715,6 +3714,11 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                         {/* Calculator Section */}
                         {activeTool === 'calculator' && (
                         <ExamToolsCalculator examType={examType} accentClassName={accentFull} />
+                      )}
+                      {activeTool === 'formulas' && showStatsFormulas && (
+                        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+                          <StatsFormulaSheet unit={statsFormulaUnit} />
+                        </div>
                       )}
 
                         {/* Excalidraw Section */}
@@ -3964,6 +3968,15 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
             <Pen className="w-6 h-6 text-black" />
           </button>
         )}
+        {!showToolsPanel && showStatsFormulas ? (
+          <button
+            onClick={() => handleToolToggle('formulas')}
+            className="bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-3 hover:bg-gray-50 transition-all active:scale-95"
+            aria-label="Open formula sheet"
+          >
+            <Sigma className="w-6 h-6 text-black" />
+          </button>
+        ) : null}
       </div>
       )}
 

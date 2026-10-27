@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Balance of Payments Accounts Deep Dive | AP Dojo',
+  title: 'Balance of Payments Accounts Deep Dive',
   description: 'Master the balance of payments accounts including the current account and financial account. Understand how international transactions are recorded.',
   openGraph: {
-    title: 'Balance of Payments Accounts Deep Dive | AP Dojo',
+    title: 'Balance of Payments Accounts Deep Dive',
     description: 'Master the balance of payments accounts and how international transactions are recorded.',
   },
   alternates: {

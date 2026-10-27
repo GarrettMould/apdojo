@@ -1,30 +1,33 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'AP Economics Unit Practice Tests | AP Dojo',
-  description: 'Test your knowledge with full-length unit practice tests for AP Macroeconomics and AP Microeconomics. Each test covers all topics in a specific unit with detailed explanations.',
+  title: 'AP Unit Practice Tests',
+  description: 'Full-length unit practice tests for AP Macro, Micro, U.S. Government, and Statistics, with explanations after you finish.',
   keywords: [
-    'AP economics practice tests',
+    'AP practice tests',
     'AP macroeconomics unit tests',
     'AP microeconomics unit tests',
+    'AP government unit tests',
+    'AP statistics unit tests',
     'AP exam practice',
-    'AP economics exam prep',
-    'unit practice tests',
-    'AP economics review',
   ].join(', '),
   openGraph: {
-    title: 'AP Economics Unit Practice Tests | AP Dojo',
-    description: 'Test your knowledge with full-length unit practice tests for AP Macroeconomics and AP Microeconomics.',
+    title: 'AP Unit Practice Tests | AP Dojo',
+    description: 'Full-length unit practice tests for AP Macro, Micro, U.S. Government, and Statistics.',
     type: 'website',
     url: 'https://apdojo.com/unit-final-practice-tests',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AP Economics Unit Practice Tests | AP Dojo',
-    description: 'Test your knowledge with full-length unit practice tests for AP Macroeconomics and AP Microeconomics.',
+    title: 'AP Unit Practice Tests | AP Dojo',
+    description: 'Full-length unit practice tests for AP Macro, Micro, U.S. Government, and Statistics.',
+  },
+  robots: {
+    index: false,
+    follow: true,
   },
   alternates: {
-    canonical: 'https://apdojo.com/unit-final-practice-tests',
+    canonical: 'https://apdojo.com/ap-macro-practice-tests',
   },
 };
 

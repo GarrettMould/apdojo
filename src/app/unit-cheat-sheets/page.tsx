@@ -2,9 +2,9 @@ import type { Metadata } from 'next';
 import { UnitResourceLibraryPage } from '@/components/UnitResourceLibraryPage';
 
 export const metadata: Metadata = {
-  title: 'Printable Unit Cheat Sheets | AP Dojo',
+  title: 'Printable Unit Cheat Sheets',
   description:
-    'Printable AP Economics unit cheat sheets. One-page, high-yield review sheets for AP Macro units.',
+    'Printable one-page AP review sheets. Interactive unit cheat sheets are also available for Macro, Micro, Gov, and Stats.',
   alternates: {
     canonical: 'https://apdojo.com/unit-cheat-sheets',
   },

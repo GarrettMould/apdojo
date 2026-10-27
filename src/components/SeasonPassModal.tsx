@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, CheckCircle2, Zap, Sparkles } from 'lucide-react';
-import { loadStripe } from '@stripe/stripe-js';
 import { useAuthContext } from '@/contexts/AuthContext';
+import { startSeasonPassCheckout } from '@/lib/seasonPassCheckout';
 import type { CourseSubject } from '@/lib/courseSubject';
 import { displayCourseLabel } from '@/lib/courseSubject';
 import type { SeasonPassPurchaseType } from '@/data/seasonPassCourseConfig';
@@ -71,20 +71,11 @@ export function SeasonPassModal({ subject, onClose, showFeatureBlur = false }: S
     const setLoading = type === 'bundle' ? setIsBundleLoading : setIsLoading;
     setLoading(true);
     try {
-      const response = await fetch('/api/create-season-pass-checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ purchaseType: type, userId: user?.uid, cancelUrl: window.location.href }),
+      await startSeasonPassCheckout({
+        purchaseType: type,
+        userId: user?.uid,
+        cancelUrl: window.location.href,
       });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create checkout session');
-      }
-      const { sessionId } = await response.json();
-      const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
-      if (!stripe) throw new Error('Failed to load Stripe');
-      const { error } = await stripe.redirectToCheckout({ sessionId });
-      if (error) throw error;
     } catch (error) {
       alert(error instanceof Error ? error.message : 'Failed to start checkout. Please try again.');
       setLoading(false);

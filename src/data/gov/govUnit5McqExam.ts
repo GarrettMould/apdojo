@@ -79,7 +79,7 @@ export const govUnit5McqTestQuestions: Question[] = [
       'In *Citizens United v. FEC* (2010), the Supreme Court ruled that political spending by corporations and labor unions is a form of protected speech. Which of the following is a direct consequence of this decision?',
     image: null,
     options: [
-      'A decrease in the amount of money spent on federal elections.',
+      'A decrease in the amount of money spent on federal elections, because independent groups can no longer raise unlimited sums once they remain separate from a candidate.',
       'The creation of Super PACs that can raise and spend unlimited sums of money independently of candidates.',
       'A ban on all corporate contributions to political candidates.',
       'The total elimination of the Bipartisan Campaign Reform Act.',
@@ -99,7 +99,7 @@ export const govUnit5McqTestQuestions: Question[] = [
       'Questions 5-6 refer to the following excerpt.\n\n"The influence of factious leaders may kindle a flame within their particular States, but will be unable to spread a general conflagration through the other States... A rage for paper money, for an abolition of debts, for an equal division of property, or for any other improper or wicked project, will be less apt to pervade the whole body of the Union than a particular member of it."\n—Publius (Alexander Hamilton), Federalist No. 10, 1787\n\nHow does Madison’s argument in this excerpt address the modern role of interest groups?',
     image: null,
     options: [
-      'He argues that interest groups should be banned from political participation.',
+      'He argues that interest groups should be banned from political participation, because a large republic cannot control factions and must instead remove the liberty to form them.',
       'He suggests that a large republic dilutes the power of harmful "factions" by preventing them from dominating the entire nation.',
       'He advocates for a small, localized democracy to ensure all interests are represented.',
       'He claims that the wealthy are the only group capable of participating in a republic.',
@@ -144,7 +144,7 @@ export const govUnit5McqTestQuestions: Question[] = [
     options: [
       'The Constitution prohibits third party candidates from receiving electoral votes in presidential elections.',
       'The Federal Election Commission systematically excludes third party candidates from official vote counts.',
-      'Third party candidates are prohibited by federal law from appearing on the ballot in more than half of the states.',
+      'Third party candidates are prohibited by federal law from appearing on the ballot in more than half of the states, and the Constitution independently bars them from receiving electoral votes even when they win a state plurality, which is why scattered national support cannot become electors.',
       'The winner-take-all structure of the Electoral College means that a candidate must win a plurality in a state to receive any of its electoral votes, making it nearly impossible for third party candidates with diffuse national support to translate popular votes into electoral votes.',
     ],
     correctAnswer: 'D',
@@ -250,7 +250,7 @@ export const govUnit5McqTestQuestions: Question[] = [
     },
     options: [
       'States with automatic voter registration report higher levels of candidate spending per voter than states without it.',
-      'Research shows that the primary reason citizens do not vote is dissatisfaction with the available candidates rather than administrative barriers to registration.',
+      'Research shows that the primary reason citizens do not vote is dissatisfaction with the available candidates rather than administrative barriers to registration, so automatic voter registration cannot raise turnout among low-income or young eligible citizens.',
       'States without automatic voter registration consistently hold their elections on weekdays, which reduces turnout independent of registration requirements.',
       'Data shows that a significant percentage of eligible citizens who do not vote cite not being registered as their reason for not participating, and AVR states show measurably higher registration rates among low-income and young voters.',
     ],

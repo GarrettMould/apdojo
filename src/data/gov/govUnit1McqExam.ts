@@ -312,7 +312,7 @@ export const govUnit1McqTestQuestions: Question[] = [
     },
     options: [
       'A key structural difference between state and federal governments, in which states face fiscal constraints that limit deficit spending unlike the national government',
-      'The Supremacy Clause, because federal budget law overrides state balanced budget requirements',
+      'The Supremacy Clause, because federal budget law overrides state balanced budget requirements and forces states to run deficits whenever the national government does',
       'Dual federalism, because states and the federal government operate under completely identical fiscal rules',
       'Cooperative federalism, because states and the federal government share responsibility for balancing the national budget',
     ],

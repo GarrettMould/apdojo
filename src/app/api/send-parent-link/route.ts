@@ -28,10 +28,22 @@ export async function POST(request: Request) {
       );
     }
 
-    const productSlug = product === 'bundle' || product === 'micro' ? product : undefined;
+    const productSlug =
+      product === 'micro' || product === 'bundle' || product === 'gov' || product === 'stats'
+        ? product
+        : undefined;
     const isBundle = product === 'bundle';
     const price = isBundle ? 49 : 29;
-    const productLabel = isBundle ? 'Ultimate AP Bundle (Macro + Micro)' : 'Season Pass';
+    const productLabel =
+      product === 'bundle'
+        ? 'Ultimate AP Bundle (Macro + Micro)'
+        : product === 'micro'
+          ? 'AP Micro Season Pass'
+          : product === 'gov'
+            ? 'AP Gov Season Pass'
+            : product === 'stats'
+              ? 'AP Stats Season Pass'
+              : 'AP Macro Season Pass';
 
     const base = BASE_URL || request.headers.get('origin') || '';
     const path = `/parent-pay/${encodeURIComponent(studentId)}${productSlug ? `?product=${productSlug}` : ''}`;
@@ -60,7 +72,7 @@ export async function POST(request: Request) {
         </div>
 
         <p style="font-size: 13px; color: #6b7280; text-align: center; margin-top: 32px;">
-          Secure link via Stripe. If the button doesn't work, copy this URL:<br/>
+          Pay with a card, Alipay, or WeChat. If the button doesn't work, copy this URL into WeChat:<br/>
           <a href="${link}" style="color: #2563eb; text-decoration: underline;">${link}</a>
         </p>
       </div>

@@ -2,7 +2,7 @@ import type { Question } from '@/data/questionBanks/types';
 
 /**
  * AP U.S. Government & Politics — Unit 3 MCQ **practice** pool.
- * Practice IDs: 6077–6116. Merged via `govMcqPractice.ts` → `allQuestions`.
+ * Practice IDs: 6077, 7721–7730, 7821–7830, 7851–7862. Merged via `govMcqPractice.ts` → `allQuestions`.
  *
  * Unit 3 **formal unit test** uses `govUnit3McqTestQuestions` in `govUnit3McqExam.ts` (separate bank).
  */
@@ -54,7 +54,7 @@ export const govUnit3McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "Retain the right to symbolic speech, such as wearing armbands in protest, as long as it does not substantially disrupt the educational environment.",
-      "Have no First Amendment rights while on school property.",
+      "Have no First Amendment rights while on school property, including no protection for symbolic speech such as wearing armbands in a silent protest.",
       "Can be punished for any speech school administrators personally disagree with.",
       "Must obtain school board approval before engaging in any political expression.",
     ],
@@ -259,7 +259,7 @@ export const govUnit3McqPracticeQuestions: Question[] = [
     question: "Which of the following best explains why the Miranda warning requirement was extended to state and local police, and not just federal law enforcement?",
     image: null,
     options: [
-      "The Fourth Amendment's Establishment Clause was incorporated against the states.",
+      "The Fourth Amendment's Establishment Clause was incorporated against the states, requiring every state police department to read Miranda warnings as a matter of original constitutional text.",
       "The Fifth and Sixth Amendment protections at stake were incorporated against state governments through the Fourteenth Amendment's Due Process Clause.",
       "Congress passed a federal statute mandating Miranda warnings in all fifty states.",
       "The Supremacy Clause automatically applies all federal court procedures to state police.",
@@ -293,7 +293,7 @@ export const govUnit3McqPracticeQuestions: Question[] = [
     question: "The doctrine of \"separate but equal,\" established in Plessy v. Ferguson (1896) and later overturned by Brown v. Board of Education (1954), had originally permitted:",
     image: null,
     options: [
-      "Federal oversight of all state education systems.",
+      "Federal oversight of all state education systems, including a requirement that states abolish racially separate public facilities even when those facilities were equal in quality.",
       "The complete exclusion of racial minorities from all public services.",
       "State-mandated racial segregation in public facilities, provided the facilities were considered equal in quality.",
       "The abolition of the Equal Protection Clause.",
@@ -344,7 +344,7 @@ export const govUnit3McqPracticeQuestions: Question[] = [
     question: "Which of the following best describes the \"Lemon test,\" historically used by courts to determine whether a government action violates the Establishment Clause?",
     image: null,
     options: [
-      "A test asking whether a law was passed by a two-thirds majority of Congress.",
+      "A test asking whether a law was passed by a two-thirds majority of Congress, had a religious purpose, and was then approved by a national referendum on church-state relations nationwide.",
       "A three-part test examining whether a government action has a secular purpose, neither advances nor inhibits religion, and avoids excessive government entanglement with religion.",
       "A test determining whether a religious organization has more than 500 members.",
       "A requirement that all religious practices be approved by state legislatures.",
@@ -370,4 +370,239 @@ export const govUnit3McqPracticeQuestions: Question[] = [
     explanation: "Civil liberties are generally understood as individual freedoms protected from government interference (such as freedom of speech), while civil rights concern protections against discrimination and guarantees of equal treatment under the law.",
   },
 
+  // --- Moved from Unit 3 exam extras (ids 7851–7862) ---
+  {
+    id: 7851,
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDS: ['3.11'],
+    unitName: 'Civil Liberties and Civil Rights',
+    questionGroup: 'u3-practice-equal-protection-use',
+    question:
+      'The Equal Protection Clause of the Fourteenth Amendment has most often been used by the Supreme Court to:',
+    image: null,
+    options: [
+      'Invalidate state-mandated segregation and discriminatory voting practices.',
+      'Protect the economic interests of large corporations against state regulation.',
+      'Grant the federal government power to regulate interstate commerce.',
+      'Ensure that religious organizations do not receive tax-exempt status.',
+    ],
+    correctAnswer: 'A',
+    explanation:
+      'The Equal Protection Clause is the standard used to challenge laws that discriminate based on characteristics such as race, origin, or gender (e.g., *Brown v. Board*).',
+  },
+  {
+    id: 7852,
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDS: ['3.1'],
+    unitName: 'Civil Liberties and Civil Rights',
+    questionGroup: 'u3-practice-bill-of-rights',
+    question: 'The primary purpose of the Bill of Rights is to:',
+    image: null,
+    options: [
+      'Outline the specific responsibilities of the judicial branch.',
+      'Protect individual liberties and rights against arbitrary government interference.',
+      'Define the powers granted to the states within a federalist system.',
+      'Establish the procedure for how a bill becomes a law.',
+    ],
+    correctAnswer: 'B',
+    explanation:
+      'The Bill of Rights was explicitly designed as a set of amendments to restrict government power and secure individual freedoms from federal overreach.',
+  },
+  {
+    id: 7853,
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDS: ['3.2'],
+    unitName: 'Civil Liberties and Civil Rights',
+    questionGroup: 'u3-practice-free-exercise',
+    question: 'According to the Free Exercise Clause, individuals are entitled to:',
+    image: null,
+    options: [
+      'Financial support from the government for religious construction.',
+      'Exemptions from all federal laws if those laws conflict with their faith.',
+      'Practice their religious beliefs as they see fit, provided the actions do not harm public order or safety.',
+      'Deny services to others regardless of federal anti-discrimination statutes.',
+    ],
+    correctAnswer: 'C',
+    explanation:
+      'While religious *belief* is absolute, religious *actions* are subject to legal limitations if they violate a compelling state interest or threaten public safety.',
+  },
+  {
+    id: 7854,
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDS: ['3.6'],
+    unitName: 'Civil Liberties and Civil Rights',
+    questionGroup: 'u3-practice-eighth-amendment',
+    question:
+      'The Eighth Amendment’s protection against "cruel and unusual punishment" is most frequently debated in the context of:',
+    image: null,
+    options: [
+      'The length of prison sentences for non-violent drug offenses.',
+      'The use of solitary confinement for political prisoners.',
+      'The conditions of juvenile detention centers.',
+      'The application of the death penalty.',
+    ],
+    correctAnswer: 'D',
+    explanation:
+      'The legality of capital punishment is the primary constitutional battleground for Eighth Amendment claims regarding "cruel and unusual" standards.',
+  },
+  {
+    id: 7855,
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDS: ['3.8'],
+    unitName: 'Civil Liberties and Civil Rights',
+    questionGroup: 'u3-practice-procedural-due-process',
+    question: 'Which of the following is a key requirement of procedural due process?',
+    image: null,
+    options: [
+      'The government must follow established, non-arbitrary procedures before depriving a person of life, liberty, or property.',
+      'The government must provide a unanimous verdict for all criminal trials.',
+      'The government must provide financial compensation for all legal expenses incurred by the accused.',
+      'The government must bypass traditional court trials for matters involving national security.',
+    ],
+    correctAnswer: 'A',
+    explanation:
+      'Procedural due process focuses on the "how" of government action; it ensures the methods used by officials to deprive rights are fair and not arbitrary.',
+  },
+  {
+    id: 7856,
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDS: ['3.9'],
+    unitName: 'Civil Liberties and Civil Rights',
+    questionGroup: 'u3-practice-right-privacy',
+    question:
+      'The Supreme Court has interpreted the Due Process Clause of the Fourteenth Amendment to imply a right to privacy. Which of the following is a result of that interpretation?',
+    image: null,
+    options: [
+      'The right of the government to collect digital metadata without a warrant.',
+      'The right to protection from self-incrimination.',
+      'The recognition of unenumerated rights, such as those addressed in Griswold v. Connecticut.',
+      'The requirement that all citizens must have medical insurance.',
+    ],
+    correctAnswer: 'C',
+    explanation:
+      'While the word "privacy" does not appear in the Constitution, the Court has used substantive due process to recognize it as an unenumerated right.',
+  },
+  {
+    id: 7857,
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDS: ['3.10'],
+    unitName: 'Civil Liberties and Civil Rights',
+    questionGroup: 'u3-practice-equal-protection',
+    question: 'The "Equal Protection Clause" of the Fourteenth Amendment is the primary legal basis for:',
+    image: null,
+    options: [
+      'Establishing the federal income tax.',
+      'Regulating interstate commerce.',
+      'Combating discrimination based on race, gender, and other protected characteristics.',
+      'Managing the election process for the Electoral College.',
+    ],
+    correctAnswer: 'C',
+    explanation:
+      'The Equal Protection Clause serves as the constitutional backbone for civil rights, prohibiting states from denying any person equal protection under the law.',
+  },
+  {
+    id: 7858,
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDS: ['3.11'],
+    unitName: 'Civil Liberties and Civil Rights',
+    questionGroup: 'u3-practice-civil-rights-acts',
+    question:
+      'Which of the following is a primary difference between the Civil Rights Act of 1964 and the Voting Rights Act of 1965?',
+    image: null,
+    options: [
+      'The Civil Rights Act established a national education curriculum, while the Voting Rights Act regulated campaign finance.',
+      'The Civil Rights Act only applied to the North, while the Voting Rights Act only applied to the South.',
+      'The Civil Rights Act focused on public accommodations and employment, while the Voting Rights Act targeted racial discrimination in voting.',
+      'The Civil Rights Act required constitutional amendments, while the Voting Rights Act was passed by executive order.',
+    ],
+    correctAnswer: 'C',
+    explanation:
+      'The Civil Rights Act of 1964 largely addressed private/public discrimination in trade and hiring, while the Voting Rights Act specifically addressed barriers to the franchise.',
+  },
+  {
+    id: 7859,
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDS: ['3.6'],
+    unitName: 'Civil Liberties and Civil Rights',
+    questionGroup: 'u3-practice-compelling-interest',
+    question:
+      "In the debate over civil liberties and public order, the government is most likely to limit an individual's rights when:",
+    image: null,
+    options: [
+      'The individual is a member of a political party that does not hold the majority.',
+      "The individual's actions create a clear danger to the safety of others or the general welfare.",
+      'The individual is participating in a protest that is critical of the president.',
+      'The individual’s beliefs are considered unconventional by the public.',
+    ],
+    correctAnswer: 'B',
+    explanation:
+      'The Supreme Court uses the "compelling interest" test; if an individual’s action poses a direct threat to public safety, the government can restrict that specific action.',
+  },
+  {
+    id: 7860,
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDS: ['3.11'],
+    unitName: 'Civil Liberties and Civil Rights',
+    questionGroup: 'u3-practice-title-ix',
+    question: 'Title IX of the Education Amendments Act of 1972 is best known for:',
+    image: null,
+    options: [
+      'Requiring all schools to teach religious studies as a condition of receiving any federal education funding.',
+      'Forcing state governments to fund private religious schools.',
+      'Prohibiting sex-based discrimination in any education program or activity receiving federal funding.',
+      'Mandating that all students pass a federal test to graduate.',
+    ],
+    correctAnswer: 'C',
+    explanation:
+      'Title IX prevents institutions from excluding individuals from participation in or denying them benefits of educational programs based on sex.',
+  },
+  {
+    id: 7861,
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDS: ['3.10'],
+    unitName: 'Civil Liberties and Civil Rights',
+    questionGroup: 'u3-practice-14th-amendment',
+    question:
+      'Which constitutional interpretation has most significantly influenced the power of the federal government to enforce civil rights protections against the states?',
+    image: null,
+    options: [
+      'The interpretation of the Seventh Amendment’s right to a jury trial.',
+      'The interpretation of the Fourteenth Amendment’s Due Process and Equal Protection Clauses.',
+      'The interpretation of the Third Amendment’s prohibition on quartering soldiers.',
+      'The interpretation of the Twenty-Second Amendment’s term limits.',
+    ],
+    correctAnswer: 'B',
+    explanation:
+      'The 14th Amendment effectively created a national standard for civil rights that states cannot violate, greatly expanding federal judicial power.',
+  },
+  {
+    id: 7862,
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDS: ['3.10'],
+    unitName: 'Civil Liberties and Civil Rights',
+    questionGroup: 'u3-practice-social-movements',
+    question: 'A "social movement" is best defined as:',
+    image: null,
+    options: [
+      'A large, informal grouping of individuals and organizations focused on specific political or social issues to bring about change.',
+      'A government-created agency tasked with public outreach and staffed to mobilize voters around a single political or social issue.',
+      'A formal political party running candidates for office.',
+      'An elite group of lobbyists working in Washington, D.C.',
+    ],
+    correctAnswer: 'A',
+    explanation:
+      'Social movements are decentralized, collective efforts (like the Women’s Rights or LGBTQ+ movements) that pressure the government for change from the outside.',
+  },
 ];

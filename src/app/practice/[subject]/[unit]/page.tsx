@@ -49,8 +49,8 @@ export async function generateMetadata({ params }: PracticePageProps): Promise<M
 
   if (!subject || !unitNumber) {
     return {
-      title: 'Practice Questions | AP Dojo',
-      description: 'Practice AP Economics multiple-choice questions',
+      title: 'Practice Questions',
+      description: 'Practice AP Macro, Micro, Government, and Statistics multiple-choice questions',
     };
   }
 
@@ -59,7 +59,7 @@ export async function generateMetadata({ params }: PracticePageProps): Promise<M
   const unitName = unitDetails ? `Unit ${unitNumber}: ${unitDetails.title}` : `Unit ${unitNumber}`;
 
   return {
-    title: `${unitName} Practice Questions | ${subjectName} | AP Dojo`,
+    title: `${unitName} Practice Questions | ${subjectName}`,
     description: unitDetails
       ? `Practice ${subjectName} multiple-choice questions for ${unitName}. ${unitDetails.description}`
       : `Practice ${subjectName} multiple-choice questions for ${unitName}`,

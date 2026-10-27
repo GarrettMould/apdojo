@@ -6,7 +6,7 @@ import {
 } from '@/data/gov/scotusRequiredCases';
 
 export const metadata: Metadata = {
-  title: 'SCOTUS Comparison Practice | AP Gov | AP Dojo',
+  title: 'SCOTUS Comparison Practice | AP Gov',
   description:
     'Practice AP Gov SCOTUS comparison FRQs for all 14 required Supreme Court cases.',
 };

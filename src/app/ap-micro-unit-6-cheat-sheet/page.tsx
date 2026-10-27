@@ -5,10 +5,15 @@ import { microUnits } from '@/data/cheatSheets';
 const unit = microUnits.find(u => u.number === 6)!;
 
 export const metadata: Metadata = {
-  title: `AP Micro Unit 6 Cheat Sheet: ${unit.title} | AP Dojo`,
+  title: `AP Micro Unit 6 Cheat Sheet: ${unit.title}`,
   description: `Free AP Microeconomics Unit 6 cheat sheet covering ${unit.title}. Review key terms, definitions, formulas, graphs, and whiteboards. Practice questions included.`,
   openGraph: {
-    title: `AP Micro Unit 6 Cheat Sheet: ${unit.title} | AP Dojo`,
+    title: `AP Micro Unit 6 Cheat Sheet: ${unit.title}`,
+    description: `Free AP Microeconomics Unit 6 cheat sheet covering ${unit.title}.`,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `AP Micro Unit 6 Cheat Sheet: ${unit.title}`,
     description: `Free AP Microeconomics Unit 6 cheat sheet covering ${unit.title}.`,
   },
   alternates: {

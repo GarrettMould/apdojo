@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const caseTitle = prompt?.requiredCase ?? 'SCOTUS Comparison Practice';
 
   return {
-    title: `${caseTitle} | SCOTUS Comparison Practice | AP Dojo`,
+    title: `${caseTitle} | SCOTUS Comparison Practice`,
     description:
       'Practice AP Gov SCOTUS comparison FRQs with scaffolded prompts, A/B/C task flow, and structured writing support.',
   };

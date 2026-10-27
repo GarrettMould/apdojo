@@ -48,6 +48,8 @@ import {
 } from '@/components/cheat-sheet/studyBucketTypes';
 import { saveQuizResult } from '@/lib/quizHistory';
 import { hasValidSeasonPass, getUnitMCQTestUrl } from '@/lib/utils';
+import { listRegisteredLessons } from '@/data/lessonRegistry';
+import { getDeepDiveUrl } from '@/lib/routes';
 import { COURSE_CONFIG } from '@/data/seasonPassCourseConfig';
 import { getSubjectSlug, getUnitSlug } from '@/lib/practiceSlugs';
 import { Footer } from '@/components/Footer';
@@ -2187,6 +2189,29 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
             </span>
           </Link>
         </div>
+
+        {selectedSubject === 'macro' &&
+          listRegisteredLessons('ap-macro').some((item) => item.unit === String(activeUnitNum)) && (
+            <nav className="mb-8" aria-label="Lesson explainers">
+              <h2 className="mb-3 text-sm font-black uppercase tracking-wide text-gray-500">
+                Lesson explainers
+              </h2>
+              <ul className="grid gap-2 sm:grid-cols-2">
+                {listRegisteredLessons('ap-macro')
+                  .filter((item) => item.unit === String(activeUnitNum))
+                  .map((item) => (
+                    <li key={item.slug}>
+                      <Link
+                        href={getDeepDiveUrl('ap-macro', item.unit, item.slug)}
+                        className="block rounded-lg border border-gray-200 px-3 py-2 text-sm font-semibold text-gray-800 hover:border-black"
+                      >
+                        {item.id} {item.title}
+                      </Link>
+                    </li>
+                  ))}
+              </ul>
+            </nav>
+          )}
 
         {/* Unit navigation: dropdown on small screens, tab bar from md up */}
         <div className="mb-8 border-b-2 border-gray-200 flex flex-col gap-3 pb-3 md:flex-row md:items-end md:justify-between md:gap-0 md:pb-0">

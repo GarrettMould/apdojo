@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Question as QuestionType } from '@/data/questionBanks/types';
 import { Unit } from '@/data/cheatSheets';
-import { Check, X, Brain, FileText, ChevronDown, Triangle, Loader2, RefreshCw, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Clipboard, Lock, Play, Minus, Book, Lightbulb, Pen, Strikethrough, CheckCircle2, XCircle, Link2, Highlighter } from 'lucide-react';
+import { Check, X, Brain, FileText, ChevronDown, Triangle, Loader2, RefreshCw, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Clipboard, Lock, Play, Minus, Book, Lightbulb, Pen, Strikethrough, CheckCircle2, XCircle, Link2, Highlighter, Sigma } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
@@ -37,12 +37,27 @@ import { KeyTerm } from '@/data/allContent';
 import ReactMarkdown from 'react-markdown';
 import dynamic from 'next/dynamic';
 import { McqQuestionTutorFab } from './McqQuestionTutorFab';
+import { StatsFormulaSheet } from '@/components/stats/StatsFormulaSheet';
+import { ExpandableQuestionImage } from '@/components/ExpandableQuestionImage';
 import { courseSubjectFromQuestionSubject, type CourseSubject } from '@/lib/courseSubject';
 import '@excalidraw/excalidraw/index.css';
 
 import dojoIcon from "../../public/images/dojoIcon.png";
 
-type ScratchTool = 'draw' | 'notes';
+type ScratchTool = 'draw' | 'notes' | 'formulas';
+
+function questionImageSrc(image: QuestionType['image']): string | null {
+  if (!image) return null;
+  return typeof image === 'string' ? image : image.src;
+}
+
+function questionImageAlt(question: QuestionType): string {
+  const image = question.image;
+  if (image && typeof image === 'object' && 'alt' in image && image.alt) {
+    return image.alt;
+  }
+  return question.unitName || 'Question diagram';
+}
 
 const Excalidraw = dynamic<any>(
   async () => (await import('@excalidraw/excalidraw')).Excalidraw,
@@ -88,6 +103,9 @@ interface UnitMCQSProps {
   /** Increment to toggle the scratch panel open/closed (opens to drawing pad). */
   scratchToggleSignal?: number;
   onScratchActiveChange?: (active: 'draw' | 'notes' | null) => void;
+  /** Increment to toggle the exam-style formula sheet (Stats only). */
+  formulaToggleSignal?: number;
+  onFormulaActiveChange?: (active: boolean) => void;
 }
 
 // BeltHUD Component
@@ -154,14 +172,24 @@ const BeltHUD = ({ currentXP, nextBeltXP, currentBelt, percent }: BeltHUDProps) 
 interface TacticalToolbarProps {
   onDrawClick: () => void;
   onNotesClick: () => void;
+  onFormulasClick?: () => void;
 }
 
-const TacticalToolbar = ({ onDrawClick, onNotesClick }: TacticalToolbarProps) => {
+const TacticalToolbar = ({ onDrawClick, onNotesClick, onFormulasClick }: TacticalToolbarProps) => {
   return (
     <>
       {/* Desktop: Fixed on right side */}
       <div className="hidden lg:flex fixed right-4 top-1/2 -translate-y-1/2 z-30">
         <div className="bg-white border-2 border-black shadow-lg rounded-full p-2 flex flex-col gap-4">
+          {onFormulasClick ? (
+            <button
+              onClick={onFormulasClick}
+              className="p-3 rounded-full bg-white border-2 border-black hover:bg-gray-50 transition-all active:scale-95"
+              title="Open formula sheet"
+            >
+              <Sigma className="w-6 h-6 text-gray-900" />
+            </button>
+          ) : null}
           {/* Notes Button */}
           <button
             onClick={onNotesClick}
@@ -185,6 +213,15 @@ const TacticalToolbar = ({ onDrawClick, onNotesClick }: TacticalToolbarProps) =>
       {/* Mobile: Fixed bottom bar */}
       <div className="lg:hidden fixed bottom-4 left-4 right-4 z-30">
         <div className="bg-white border-2 border-black shadow-lg rounded-full p-2 flex flex-row gap-4 justify-center">
+          {onFormulasClick ? (
+            <button
+              onClick={onFormulasClick}
+              className="p-3 rounded-full bg-white border-2 border-black hover:bg-gray-50 transition-all active:scale-95"
+              title="Open formula sheet"
+            >
+              <Sigma className="w-6 h-6 text-gray-900" />
+            </button>
+          ) : null}
           <button
             onClick={onNotesClick}
             className="p-3 rounded-full bg-white border-2 border-black hover:bg-gray-50 transition-all active:scale-95"
@@ -815,12 +852,12 @@ const QuestionCard = ({
           })()}
 
             {/* Question Image Display */}
-            {question.image && (
-              <div className="my-4 rounded-lg overflow-hidden border border-gray-200">
-                <img
-                  src={typeof question.image === 'string' ? question.image : (question.image as any).src} 
-                  alt={question.unitName || 'Question related image'} 
-                  className="max-h-60 w-auto mx-auto object-contain"
+            {question.image && questionImageSrc(question.image) && (
+              <div className="my-4 rounded-lg border border-gray-200 bg-white p-2">
+                <ExpandableQuestionImage
+                  src={questionImageSrc(question.image)!}
+                  alt={questionImageAlt(question)}
+                  imageClassName="max-h-60 w-auto mx-auto object-contain"
                 />
               </div>
             )}
@@ -1371,12 +1408,12 @@ const QuestionArena = ({ question, onAnswerSelect, initialSelectedLetter, isAnsw
         )}
         
         {/* Question Image */}
-        {question.image && (
-          <div className="my-4 rounded-lg overflow-hidden border border-gray-200">
-            <img
-              src={typeof question.image === 'string' ? question.image : (question.image as any).src}
-              alt={question.unitName || 'Question related image'}
-              className="max-h-60 w-auto mx-auto object-contain"
+        {question.image && questionImageSrc(question.image) && (
+          <div className="my-4 rounded-lg border border-gray-200 bg-white p-2">
+            <ExpandableQuestionImage
+              src={questionImageSrc(question.image)!}
+              alt={questionImageAlt(question)}
+              imageClassName="max-h-60 w-auto mx-auto object-contain"
             />
           </div>
         )}
@@ -1438,7 +1475,16 @@ const QuestionArena = ({ question, onAnswerSelect, initialSelectedLetter, isAnsw
                 }`}>
                   {String.fromCharCode(65 + optIndex)}
                 </span>
-                {question.optionTableHeaders ? (
+                {question.optionImages && question.optionImages[optIndex] ? (
+                  <div className={`min-w-0 flex-1 ${isStruckThrough ? 'opacity-40' : ''}`}>
+                    <ExpandableQuestionImage
+                      src={question.optionImages[optIndex].src}
+                      alt={question.optionImages[optIndex].alt || `Option ${String.fromCharCode(65 + optIndex)}`}
+                      imageClassName="max-h-[220px] w-auto mx-auto object-contain"
+                      expandOnImageClick={false}
+                    />
+                  </div>
+                ) : question.optionTableHeaders ? (
                   <McqOptionTableCells
                     option={option}
                     struckThrough={isStruckThrough}
@@ -1593,6 +1639,8 @@ export function UnitMCQs({
   showFloatingScratchToolbar = true,
   scratchToggleSignal = 0,
   onScratchActiveChange,
+  formulaToggleSignal = 0,
+  onFormulaActiveChange,
 }: UnitMCQSProps) {
   const { login, signup, userData, loadingUserData, user, awardXp, totalXP, guestXp } = useAuthContext();
   const [aiExplanations, setAiExplanations] = useState<Record<number, string>>({});
@@ -1988,14 +2036,15 @@ export function UnitMCQs({
   }, [isTutorOpen]);
 
   useEffect(() => {
-    onScratchActiveChange?.(activeScratchTool);
-  }, [activeScratchTool, onScratchActiveChange]);
+    onScratchActiveChange?.(activeScratchTool === 'formulas' ? null : activeScratchTool);
+    onFormulaActiveChange?.(activeScratchTool === 'formulas');
+  }, [activeScratchTool, onScratchActiveChange, onFormulaActiveChange]);
 
   const scratchToggleSignalRef = useRef(0);
   useEffect(() => {
     if (!scratchToggleSignal || scratchToggleSignal === scratchToggleSignalRef.current) return;
     scratchToggleSignalRef.current = scratchToggleSignal;
-    if (activeScratchTool) {
+    if (activeScratchTool === 'draw' || activeScratchTool === 'notes') {
       setActiveScratchTool(null);
     } else {
       setTutorExternalCloseRequest((n) => n + 1);
@@ -2003,6 +2052,18 @@ export function UnitMCQs({
       setActiveScratchTool('draw');
     }
   }, [scratchToggleSignal, activeScratchTool]);
+
+  const formulaToggleSignalRef = useRef(0);
+  useEffect(() => {
+    if (!formulaToggleSignal || formulaToggleSignal === formulaToggleSignalRef.current) return;
+    formulaToggleSignalRef.current = formulaToggleSignal;
+    if (activeScratchTool === 'formulas') {
+      setActiveScratchTool(null);
+    } else {
+      setTutorExternalCloseRequest((n) => n + 1);
+      setActiveScratchTool('formulas');
+    }
+  }, [formulaToggleSignal, activeScratchTool]);
 
   const openScratchTool = (tool: ScratchTool) => {
     setTutorExternalCloseRequest((n) => n + 1);
@@ -2074,8 +2135,8 @@ export function UnitMCQs({
         aria-hidden={!activeScratchTool}
       >
         <div className="flex h-full flex-col overflow-hidden">
-          <div className="flex flex-shrink-0 items-center justify-between border-b border-gray-200 px-4 py-3">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-shrink-0 items-center justify-between gap-2 border-b border-gray-200 px-4 py-3">
+            <div className="flex flex-wrap items-center gap-2">
               <button
                 type="button"
                 onClick={() => openScratchTool('draw')}
@@ -2098,6 +2159,19 @@ export function UnitMCQs({
               >
                 Notes
               </button>
+              {subject === 'stats' ? (
+                <button
+                  type="button"
+                  onClick={() => openScratchTool('formulas')}
+                  className={`rounded-md px-3 py-1.5 text-sm font-semibold transition-colors ${
+                    activeScratchTool === 'formulas'
+                      ? 'bg-gray-900 text-white'
+                      : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  Formulas
+                </button>
+              ) : null}
             </div>
             <button
               type="button"
@@ -2117,6 +2191,8 @@ export function UnitMCQs({
                   className="h-full w-full resize-none rounded-lg border border-gray-300 p-3 text-sm text-gray-900 focus:border-gray-500 focus:outline-none"
                 />
               </div>
+            ) : activeScratchTool === 'formulas' ? (
+              <StatsFormulaSheet unit={currentUnit} />
             ) : activeScratchTool === 'draw' ? (
               <div className="absolute inset-0 h-full w-full">
                 <Excalidraw
@@ -2218,6 +2294,7 @@ export function UnitMCQs({
           <TacticalToolbar
             onDrawClick={handleDrawClick}
             onNotesClick={handleNotesClick}
+            onFormulasClick={subject === 'stats' ? () => openScratchTool('formulas') : undefined}
           />
         ) : null}
                       </div>

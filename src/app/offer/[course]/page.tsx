@@ -24,11 +24,11 @@ export function generateStaticParams(): { course: OfferCourseSlug }[] {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { course } = await params;
   if (!isOfferCourseSlug(course)) {
-    return { title: 'Course Offer | AP Dojo' };
+    return { title: 'Course Offer' };
   }
   const config = getOfferPageConfig(course);
   return {
-    title: `${config.courseLabel} Season Pass | AP Dojo`,
+    title: `${config.courseLabel} Season Pass`,
     description: config.supporting,
   };
 }

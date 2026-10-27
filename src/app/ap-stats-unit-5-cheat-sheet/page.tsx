@@ -5,11 +5,16 @@ import { statsUnits } from '@/data/cheatSheets';
 const unit = statsUnits.find((u) => u.number === 5)!;
 
 export const metadata: Metadata = {
-  title: `AP Stats Unit 5 Cheat Sheet: ${unit.title} | AP Dojo`,
+  title: `AP Stats Unit 5 Cheat Sheet: ${unit.title}`,
   description:
     `Free AP Statistics Unit 5 cheat sheet covering ${unit.title}. Review key terms, definitions, and unit-aligned practice.`,
   openGraph: {
-    title: `AP Stats Unit 5 Cheat Sheet: ${unit.title} | AP Dojo`,
+    title: `AP Stats Unit 5 Cheat Sheet: ${unit.title}`,
+    description: `Free AP Statistics Unit 5 cheat sheet covering ${unit.title}.`,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `AP Stats Unit 5 Cheat Sheet: ${unit.title}`,
     description: `Free AP Statistics Unit 5 cheat sheet covering ${unit.title}.`,
   },
   alternates: {

@@ -188,7 +188,7 @@ export const govUnit2McqPracticeQuestions: Question[] = [
       'Which of the following scenarios best depicts a member of Congress acting according to the politico model of representation?',
     image: null,
     options: [
-      'A senator strictly follows her own conscience on highly technical environmental bills but votes exactly as her party leadership demands on high-profile social issues.',
+      'A senator strictly follows her own conscience on highly technical environmental bills but votes exactly as her party leadership demands on high-profile social issues, never consulting district opinion even when constituents are closely divided.',
       'A representative sends a mass poll to his district and pledges to vote exactly in accordance with the majority response on an upcoming tax bill.',
       'A senator votes to confirm a judicial nominee she personally dislikes because her state\'s voters overwhelmingly favor the candidate, while using her own judgment on low-profile infrastructure spending bills.',
       'A representative uniformly votes against every piece of defense spending because he campaigned as a non-interventionist candidate.',
@@ -370,7 +370,7 @@ export const govUnit2McqPracticeQuestions: Question[] = [
       'Which of the following scenarios best demonstrates a bureaucratic agency exercising its delegated discretionary and rulemaking authority?',
     image: null,
     options: [
-      'The Department of Defense requests an increase in defense spending during a congressional hearing.',
+      'The Department of Defense requests an increase in defense spending during a congressional hearing and then writes and passes the appropriations bill that funds the request without a vote in Congress.',
       'The Senate Foreign Relations Committee votes to approve a newly negotiated bilateral treaty.',
       'The Supreme Court grants a writ of certiorari to hear a case involving an administrative fine.',
       'The Securities and Exchange Commission (SEC) drafts and enforces specific technical regulations to define and punish insider trading under federal securities law.',
@@ -822,7 +822,7 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "The Supreme Court must certify that both versions are constitutional.",
-      "The bill automatically fails and must be reintroduced in the next session.",
+      "The bill automatically fails and must be reintroduced in the next session, because the Constitution forbids the two chambers from reconciling different versions of the same bill.",
       "The president must choose which version to sign into law.",
       "A conference committee made up of members from both chambers must reconcile the differences into a single version.",
     ],
@@ -840,7 +840,7 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     options: [
       "The general election, since the opposing party has no realistic path to victory.",
       "The primary election, where a more ideologically extreme challenger from within their own party can pose the greater risk.",
-      "A special election called by the governor.",
+      "A special election called by the governor, because an incumbent in a lopsided district is more likely to lose that contest than a primary challenge from inside the party.",
       "A recall election initiated by the Senate.",
     ],
     correctAnswer: "B",
@@ -856,7 +856,7 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "Vetoing legislation is formal, since it is explicitly granted in Article II; using the bully pulpit to shape public opinion is informal, since it developed through practice rather than constitutional text.",
-      "Signing a treaty is informal; issuing an executive order is formal.",
+      "Signing a treaty is an informal power that developed only through custom, whereas issuing an executive order is a formal power because Article II expressly lists executive orders as an enumerated presidential tool alongside the veto.",
       "Appointing federal judges is informal; commanding the armed forces is formal.",
       "Both powers are explicitly listed in Article II and carry equal constitutional weight.",
     ],
@@ -872,7 +872,7 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     question: "A president nominates a candidate for a federal judgeship, but the Senate Judiciary Committee refuses to schedule a confirmation hearing, effectively blocking the nomination without a formal vote. This illustrates:",
     image: null,
     options: [
-      "A violation of the Necessary and Proper Clause.",
+      "A violation of the Necessary and Proper Clause, because the Senate has no constitutional role in confirming presidential nominees to the federal courts.",
       "An unconstitutional expansion of judicial power.",
       "The president's exclusive control over judicial appointments.",
       "The Senate exercising a check on the executive's appointment power through its advice-and-consent role.",
@@ -907,7 +907,7 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "Going public — using direct appeals to citizens to build pressure on Congress.",
-      "Executive privilege.",
+      "Executive privilege, by withholding documents from Congress in order to force a vote on the president's preferred bill.",
       "A formal treaty negotiation.",
       "Judicial activism.",
     ],
@@ -957,7 +957,7 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     question: "A federal agency uses authority delegated to it by Congress to write detailed technical regulations implementing a broadly worded statute. Over time, this agency, a specific congressional subcommittee, and an industry trade association develop a stable, mutually beneficial working relationship. This scenario best illustrates:",
     image: null,
     options: [
-      "An issue network, because the relationship is loose and temporary.",
+      "An issue network, because the relationship is loose and temporary rather than a stable, long-term alliance among an agency, a committee, and an interest group.",
       "Judicial activism, because courts are directing agency policy.",
       "An iron triangle, because of the stable, long-term alliance among the agency, committee, and interest group.",
       "A formal treaty negotiation process.",
@@ -1063,7 +1063,7 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     options: [
       "Expand the president's authority to declare war without congressional approval.",
       "Limit the president's ability to commit U.S. forces to prolonged military conflict without congressional authorization.",
-      "Transfer the power to declare war entirely to the Supreme Court.",
+      "Transfer the power to declare war entirely to the Supreme Court and expand the president's authority to commit forces without any further role for Congress.",
       "Eliminate the president's role as Commander-in-Chief.",
     ],
     correctAnswer: "B",
@@ -1096,7 +1096,7 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "The Court declined to order the delivery of Marbury's commission but, in doing so, established the judiciary's power to declare acts of Congress unconstitutional.",
-      "The Court ruled in favor of Marbury and ordered the delivery of his commission, expanding executive power.",
+      "The Court ruled in favor of Marbury and ordered the delivery of his commission, expanding executive power and declining to claim any authority to declare acts of Congress unconstitutional.",
       "The Court ruled that the judiciary has no authority to review the constitutionality of federal laws.",
       "The Court ruled that only state courts, not federal courts, may exercise judicial review.",
     ],
@@ -1112,7 +1112,7 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     question: "A newly appointed Supreme Court justice votes to overturn a decades-old precedent, arguing that the original ruling was based on a flawed reading of the Constitution and no longer serves justice. Critics accuse the justice of undermining the stability of the law. This debate centers on the tension between:",
     image: null,
     options: [
-      "Federalism and separation of powers.",
+      "Federalism and separation of powers, which together require the Court to leave even a fundamentally flawed precedent in place rather than revisit it.",
       "Stare decisis and the belief that some precedents should be revisited and corrected when fundamentally flawed.",
       "Judicial restraint and executive privilege.",
       "The Elastic Clause and the Tenth Amendment.",

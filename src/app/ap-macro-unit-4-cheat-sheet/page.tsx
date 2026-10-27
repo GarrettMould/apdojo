@@ -5,10 +5,15 @@ import { macroUnits } from '@/data/cheatSheets';
 const unit = macroUnits.find(u => u.number === 4)!;
 
 export const metadata: Metadata = {
-  title: `AP Macro Unit 4 Cheat Sheet: ${unit.title} | AP Dojo`,
+  title: `AP Macro Unit 4 Cheat Sheet: ${unit.title}`,
   description: `Free AP Macroeconomics Unit 4 cheat sheet covering ${unit.title}. Review key terms, definitions, formulas, graphs, and whiteboards. Practice questions included.`,
   openGraph: {
-    title: `AP Macro Unit 4 Cheat Sheet: ${unit.title} | AP Dojo`,
+    title: `AP Macro Unit 4 Cheat Sheet: ${unit.title}`,
+    description: `Free AP Macroeconomics Unit 4 cheat sheet covering ${unit.title}.`,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `AP Macro Unit 4 Cheat Sheet: ${unit.title}`,
     description: `Free AP Macroeconomics Unit 4 cheat sheet covering ${unit.title}.`,
   },
   alternates: {

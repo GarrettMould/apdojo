@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Long-Run Aggregate Supply (LRAS) Deep Dive: Understanding Potential Output | AP Dojo',
+  title: 'Long-Run Aggregate Supply (LRAS) Deep Dive: Understanding Potential Output',
   description: 'Master Long-Run Aggregate Supply (LRAS) and understand how the economy operates at full employment in the long run. Learn about potential output and the vertical LRAS curve.',
   openGraph: {
-    title: 'Long-Run Aggregate Supply (LRAS) Deep Dive: Understanding Potential Output | AP Dojo',
+    title: 'Long-Run Aggregate Supply (LRAS) Deep Dive: Understanding Potential Output',
     description: 'Master Long-Run Aggregate Supply (LRAS) and understand how the economy operates at full employment in the long run.',
   },
   alternates: {

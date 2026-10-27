@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { X, ArrowRight, Lock, Loader2 } from 'lucide-react';
+import { X, ArrowRight, Lock, Loader2, Copy, Check } from 'lucide-react';
+import type { SeasonPassPurchaseType } from '@/data/seasonPassCourseConfig';
 
-export type ParentPayProduct = 'macro' | 'micro' | 'bundle';
+export type ParentPayProduct = SeasonPassPurchaseType;
 
 interface ParentPaymentModalProps {
   open: boolean;
@@ -25,7 +26,24 @@ export function ParentPaymentModal({
   const [parentEmail, setParentEmail] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const paymentLink = () => {
+    const productQuery = product ? `?product=${product}` : '';
+    return `${window.location.origin}/parent-pay/${encodeURIComponent(studentId)}${productQuery}`;
+  };
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(paymentLink());
+      setCopied(true);
+      setError(null);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setError('Could not copy the link. Select it from the page and paste it into WeChat.');
+    }
+  };
 
   const onClose = () => {
     onOpenChange(false);
@@ -110,7 +128,7 @@ export function ParentPaymentModal({
                 </button>
               </div>
               <p className="text-gray-500 font-medium">
-                Send a secure checkout link directly to your parent.
+                Email a checkout link, or copy it into WeChat.
               </p>
             </div>
 
@@ -154,6 +172,15 @@ export function ParentPaymentModal({
               )}
 
               {/* 3. BIG BLACK BUTTON */}
+              <button
+                type="button"
+                onClick={handleCopy}
+                className="w-full py-3 bg-white border-2 border-black text-black rounded-lg font-bold text-base flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+              >
+                {copied ? <Check size={18} /> : <Copy size={18} />}
+                {copied ? 'Link copied' : 'Copy link for WeChat'}
+              </button>
+
               <button
                 type="button"
                 onClick={handleSend}

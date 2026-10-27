@@ -391,6 +391,7 @@ export function McqQuestionTutorFab({
       unitNameFromQuestion: question.unitName,
       selectedLetter: selectedLetter ?? null,
       hasSubmittedAnswer: answered,
+      tableData: question.tableData ?? null,
     }),
     [question, selectedLetter, answered]
   );
@@ -426,6 +427,11 @@ export function McqQuestionTutorFab({
       const outbound = (outboundText ?? displayText).trim();
       const display = displayText.trim();
       if (!outbound || sending) return;
+      // Chip labels are what the student asked. The hidden prompt can point at the next example.
+      const apiContent =
+        outbound !== display
+          ? `What the learner actually asked (authoritative — answer this exact item before any later trial, row, or choice): ${display}\n\n${outbound}`
+          : outbound;
 
       const prior = toApiTurns(messagesRef.current);
 
@@ -437,7 +443,7 @@ export function McqQuestionTutorFab({
           id: userId,
           role: 'user',
           content: display,
-          ...(needsOutbound ? { outboundContent: outbound } : {}),
+          ...(needsOutbound ? { outboundContent: apiContent } : {}),
         },
       ]);
       setInput('');
@@ -455,7 +461,7 @@ export function McqQuestionTutorFab({
             subject,
             unitNumber,
             unitTitle: unitTitle || question.unitName,
-            messages: [...prior, { role: 'user', content: outbound }],
+            messages: [...prior, { role: 'user', content: apiContent }],
             mcqContext,
           }),
         });

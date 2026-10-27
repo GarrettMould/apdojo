@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { MathSolverClient } from '@/components/MathSolverClient';
 
 export const metadata: Metadata = {
-  title: 'AI Math Problem Solver | AP Dojo',
+  title: 'AI Math Problem Solver',
   description:
     'Upload a photo or PDF of any math problem and get a step-by-step solution instantly. Free AI math solver for AP Statistics, Calculus, and more.',
   robots: {
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     follow: false,
   },
   openGraph: {
-    title: 'AI Math Problem Solver | AP Dojo',
+    title: 'AI Math Problem Solver',
     description:
       'Upload a photo or PDF of any math problem and get a step-by-step solution instantly.',
   },

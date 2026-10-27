@@ -10,43 +10,46 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
-      lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 1,
     },
     {
       url: `${baseUrl}/ap-macro-practice-tests`,
-      lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.9,
     },
     {
       url: `${baseUrl}/ap-micro-practice-tests`,
-      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/ap-gov-practice-tests`,
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/ap-stats-practice-tests`,
       changeFrequency: 'weekly',
       priority: 0.9,
     },
     {
       url: `${baseUrl}/ap-macro-mcq-practice-test-1`,
-      lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.9,
     },
     {
       url: `${baseUrl}/ap-micro-mcq-practice-test-1`,
-      lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.9,
     },
     {
       url: `${baseUrl}/full-frq-exam`,
-      lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.9,
     },
     {
       url: `${baseUrl}/unit-cheat-sheets`,
-      lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.9,
     },
@@ -56,13 +59,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const studyGuidePages: MetadataRoute.Sitemap = [
     ...macroUnits.map(unit => ({
       url: `${baseUrl}/study-guides/AP-macroeconomics-unit-${unit.number}`,
-      lastModified: new Date(),
       changeFrequency: 'monthly' as const,
       priority: 0.8,
     })),
     ...microUnits.map(unit => ({
       url: `${baseUrl}/study-guides/AP-microeconomics-unit-${unit.number}`,
-      lastModified: new Date(),
       changeFrequency: 'monthly' as const,
       priority: 0.8,
     })),
@@ -72,13 +73,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const unitPages: MetadataRoute.Sitemap = [
     ...macroUnits.map(unit => ({
       url: `${baseUrl}/unit/${unit.number}`,
-      lastModified: new Date(),
       changeFrequency: 'monthly' as const,
       priority: 0.8,
     })),
     ...microUnits.map(unit => ({
       url: `${baseUrl}/unit/${unit.number}`,
-      lastModified: new Date(),
       changeFrequency: 'monthly' as const,
       priority: 0.8,
     })),
@@ -88,25 +87,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const cheatSheetPages: MetadataRoute.Sitemap = [
     ...macroUnits.map(unit => ({
       url: `${baseUrl}/ap-macro-unit-${unit.number}-cheat-sheet`,
-      lastModified: new Date(),
       changeFrequency: 'monthly' as const,
       priority: 0.8,
     })),
     ...microUnits.map(unit => ({
       url: `${baseUrl}/ap-micro-unit-${unit.number}-cheat-sheet`,
-      lastModified: new Date(),
       changeFrequency: 'monthly' as const,
       priority: 0.8,
     })),
     ...govUnits.map(unit => ({
       url: `${baseUrl}/ap-gov-unit-${unit.number}-cheat-sheet`,
-      lastModified: new Date(),
       changeFrequency: 'monthly' as const,
       priority: 0.8,
     })),
     ...statsUnits.map(unit => ({
       url: `${baseUrl}/ap-stats-unit-${unit.number}-cheat-sheet`,
-      lastModified: new Date(),
       changeFrequency: 'monthly' as const,
       priority: 0.8,
     })),
@@ -166,7 +161,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const deepDivePages: MetadataRoute.Sitemap = macroDeepDives.map(page => ({
     url: `${baseUrl}/ap-macro/unit-${page.unit}/${page.slug}`,
-    lastModified: new Date(),
     changeFrequency: 'monthly' as const,
     priority: 0.7,
   }));
@@ -174,7 +168,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Blog post pages — dynamically generated from blogPosts data
   const blogPostPages: MetadataRoute.Sitemap = Object.values(blogPosts).map(post => ({
     url: `${baseUrl}/blog/${generateSeoUrl(post.slug, post.subject, post.unit)}`,
-    lastModified: new Date(),
     changeFrequency: 'monthly' as const,
     priority: 0.8,
   }));

@@ -750,7 +750,7 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     question: "Under the Articles of Confederation, the national government's inability to levy taxes directly on citizens most directly caused which of the following problems?",
     image: null,
     options: [
-      "States were prohibited from collecting their own taxes.",
+      "States were prohibited from collecting their own taxes, so the national government could fund an army and pay war debts without relying on the states.",
       "The government was forced to establish a national bank to generate revenue.",
       "The government could not fund an army or pay its war debts, and had to rely on voluntary state contributions that often went unpaid.",
       "The Supreme Court was granted the power to levy taxes instead.",
@@ -853,7 +853,7 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "Giving Southern states more seats in the House of Representatives and more votes in the Electoral College than their free population alone would have provided.",
-      "Preventing Southern states from participating in presidential elections.",
+      "Preventing Southern states from participating in presidential elections and reducing their representation in the House below what their free population alone would have provided.",
       "Equalizing representation between Northern and Southern states in the Senate.",
       "Granting enslaved persons full citizenship rights under the Constitution.",
     ],
@@ -888,7 +888,7 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     question: "In Federalist No. 10, Madison defines a \"faction\" as:",
     image: null,
     options: [
-      "Any group of citizens who disagree with government policy.",
+      "Any group of citizens who disagree with government policy, including a fleeting majority assembled around a single election rather than a lasting common interest.",
       "A political party that has won a majority of seats in Congress.",
       "A number of citizens united by a common interest adverse to the rights of other citizens or to the permanent interests of the community as a whole.",
       "A coalition of state governments opposed to federal authority.",
@@ -905,7 +905,7 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     question: "Beyond the absence of a Bill of Rights, Anti-Federalists also expressed concern that the new Constitution:",
     image: null,
     options: [
-      "Failed to include any mechanism for amending the document over time.",
+      "Failed to include any mechanism for amending the document over time, leaving later generations with no constitutional path to correct defects in the original design.",
       "Gave state governments too much control over the national military.",
       "Lacked provisions for regular rotation in office, potentially allowing officials to entrench themselves in power indefinitely.",
       "Prohibited the formation of any future political parties.",
@@ -922,7 +922,7 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     question: "Congress passes a law setting minimum safety standards for interstate trucking companies. This exercise of authority is best classified as an example of:",
     image: null,
     options: [
-      "An enumerated power, since regulating trucking is explicitly listed in the Constitution.",
+      "An enumerated power, since regulating trucking is explicitly listed in the Constitution as a power of Congress independent of the commerce power or the Necessary and Proper Clause.",
       "An implied power, derived from Congress's enumerated authority to regulate interstate commerce combined with the Necessary and Proper Clause.",
       "A reserved power belonging exclusively to the states.",
       "A concurrent power shared equally with state governments.",
@@ -991,7 +991,7 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "Dual federalism, where state and federal responsibilities are clearly separated, to cooperative federalism, where responsibilities are blended and shared.",
-      "Cooperative federalism to dual federalism.",
+      "Cooperative federalism, where state and federal responsibilities are blended and shared, to dual federalism, where those responsibilities are clearly separated and rarely overlap.",
       "Unitary government to confederal government.",
       "Concurrent powers to exclusive powers.",
     ],
@@ -1007,7 +1007,7 @@ export const govUnit1McqPracticeQuestions: Question[] = [
     question: "Justice Louis Brandeis famously described individual states as \"laboratories of democracy.\" This phrase is best understood to mean that:",
     image: null,
     options: [
-      "States must always defer to federal policy experiments before adopting their own.",
+      "States must always defer to federal policy experiments before adopting their own, so federalism exists mainly to copy national programs rather than to try new approaches first.",
       "Federalism allows individual states to try new policies on a smaller scale, which can later inform national policy if successful.",
       "Only university researchers are qualified to design effective state policy.",
       "States compete with one another to attract federal grant funding exclusively.",

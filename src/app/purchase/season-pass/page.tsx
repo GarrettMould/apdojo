@@ -3,12 +3,16 @@
 import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { EmbeddedCheckoutPage } from '@/components/EmbeddedCheckoutPage';
-import { parseSeasonPassPurchaseType } from '@/data/seasonPassCourseConfig';
+import { SeasonPassCourseChooser } from '@/components/SeasonPassShowcase';
+import { tryParseSeasonPassPurchaseType } from '@/data/seasonPassCourseConfig';
 import { Loader2 } from 'lucide-react';
 
 function PurchaseSeasonPassContent() {
   const searchParams = useSearchParams();
-  const courseType = parseSeasonPassPurchaseType(searchParams.get('courseType'));
+  const courseType = tryParseSeasonPassPurchaseType(searchParams.get('courseType'));
+  if (!courseType) {
+    return <SeasonPassCourseChooser />;
+  }
   return <EmbeddedCheckoutPage courseType={courseType} />;
 }
 

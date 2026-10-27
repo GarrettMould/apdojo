@@ -93,7 +93,7 @@ export const UNIT_TEST_META: SubjectTestMeta = {
   gov: [
     govUnitMeta(1, 18), // 27 min
     govUnitMeta(2, 18), // 27 min
-    govUnitMeta(3, 18), // 27 min
+    govUnitMeta(3, 20), // 30 min
     govUnitMeta(4, 22), // 33 min
     govUnitMeta(5, 18), // 27 min
   ],

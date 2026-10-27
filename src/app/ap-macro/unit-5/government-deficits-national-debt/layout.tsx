@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Government Deficits and the National Debt Deep Dive | AP Dojo',
+  title: 'Government Deficits and the National Debt Deep Dive',
   description: 'Understand the difference between budget deficits and national debt, and how government borrowing affects interest rates and private investment.',
   openGraph: {
-    title: 'Government Deficits and the National Debt Deep Dive | AP Dojo',
+    title: 'Government Deficits and the National Debt Deep Dive',
     description: 'Understand budget deficits, national debt, and their economic consequences.',
   },
   alternates: {

@@ -7,7 +7,15 @@ let cached: Question[] | null = null;
 let pending: Promise<Question[]> | null = null;
 
 export function loadQuestionBank(): Promise<Question[]> {
-  if (cached) return Promise.resolve(cached);
+  // Dev HMR can add items after the first import; don't freeze a stale bank.
+  if (process.env.NODE_ENV !== 'development' && cached) return Promise.resolve(cached);
+  if (process.env.NODE_ENV === 'development') {
+    pending = import('@/data/unitPracticeProblems/unitPracticeProblems').then((mod) => {
+      cached = mod.allQuestions;
+      return mod.allQuestions;
+    });
+    return pending;
+  }
   if (!pending) {
     pending = import('@/data/unitPracticeProblems/unitPracticeProblems').then((mod) => {
       cached = mod.allQuestions;

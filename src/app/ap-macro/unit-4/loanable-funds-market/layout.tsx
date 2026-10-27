@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'The Loanable Funds Market Deep Dive: Understanding Saving and Investment | AP Dojo',
+  title: 'The Loanable Funds Market Deep Dive: Understanding Saving and Investment',
   description: 'Master the loanable funds market model. Learn how savers supply funds, borrowers demand funds, and how the real interest rate balances saving and investment.',
   openGraph: {
-    title: 'The Loanable Funds Market Deep Dive: Understanding Saving and Investment | AP Dojo',
+    title: 'The Loanable Funds Market Deep Dive: Understanding Saving and Investment',
     description: 'Master the loanable funds market model and how the real interest rate balances saving and investment.',
   },
   alternates: {

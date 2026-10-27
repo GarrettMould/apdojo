@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'The Foreign Exchange Market Deep Dive | AP Dojo',
+  title: 'The Foreign Exchange Market Deep Dive',
   description: 'Master the foreign exchange market and how supply and demand determine exchange rates. Understand what causes currency appreciation and depreciation.',
   openGraph: {
-    title: 'The Foreign Exchange Market Deep Dive | AP Dojo',
+    title: 'The Foreign Exchange Market Deep Dive',
     description: 'Master the foreign exchange market and how supply and demand determine exchange rates.',
   },
   alternates: {

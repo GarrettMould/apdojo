@@ -97,6 +97,11 @@ function parseAttachment(body: { attachment?: unknown }): {
   return { mimeType, data: compact, fileName };
 }
 
+type McqTableForTutor = {
+  headers: string[];
+  rows: string[][];
+};
+
 type McqContextForTutor = {
   questionId: number;
   stem: string;
@@ -106,6 +111,7 @@ type McqContextForTutor = {
   unitNameFromQuestion: string;
   selectedLetter: string | null;
   hasSubmittedAnswer: boolean;
+  table: McqTableForTutor | null;
 };
 
 type ScotusPromptContext = {
@@ -250,6 +256,32 @@ function normalizeKeyedMcqAnswer(raw: unknown): string {
   return '';
 }
 
+function parseMcqTable(raw: unknown): McqTableForTutor | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const o = raw as Record<string, unknown>;
+  if (!Array.isArray(o.headers) || !Array.isArray(o.rows)) return null;
+  const headers = o.headers
+    .slice(0, 12)
+    .map((h) => (typeof h === 'string' ? h.trim().slice(0, 80) : ''))
+    .filter(Boolean);
+  const rows: string[][] = [];
+  for (const row of o.rows.slice(0, 40)) {
+    if (!Array.isArray(row)) continue;
+    rows.push(
+      row
+        .slice(0, 12)
+        .map((cell) => (typeof cell === 'string' ? cell.trim().slice(0, 200) : String(cell ?? '').slice(0, 200)))
+    );
+  }
+  if (headers.length === 0 || rows.length === 0) return null;
+  return { headers, rows };
+}
+
+function formatMcqTable(table: McqTableForTutor): string {
+  const lines = [table.headers.join(' | '), ...table.rows.map((row) => row.join(' | '))];
+  return `\nStimulus table (the stem’s “table”; use this, not the explanation, when they name a trial or row):\n${lines.join('\n')}`;
+}
+
 function parseMcqContext(raw: unknown): McqContextForTutor | null {
   if (raw == null || typeof raw !== 'object') return null;
   const o = raw as Record<string, unknown>;
@@ -298,6 +330,7 @@ function parseMcqContext(raw: unknown): McqContextForTutor | null {
     unitNameFromQuestion,
     selectedLetter,
     hasSubmittedAnswer,
+    table: parseMcqTable(o.tableData),
   };
 }
 
@@ -329,12 +362,14 @@ function formatMcqBlock(ctx: McqContextForTutor): string {
       : 'Learner’s selection (if any): (not chosen yet)';
   const submitted = ctx.hasSubmittedAnswer ? 'yes' : 'no';
   const expl = ctx.explanation.trim()
-    ? `\nAuthor explanation (from content bank):\n${ctx.explanation.trim()}`
+    ? `\nAuthor explanation (reasoning aid only — not a script to recite in order):\n${ctx.explanation.trim()}`
     : '\n(No author explanation text in the bank.)';
+  const table = ctx.table ? formatMcqTable(ctx.table) : '';
   return `[MCQ item id ${ctx.questionId}; unit label from content: ${ctx.unitNameFromQuestion || 'n/a'}]
 
 Stem:
 ${ctx.stem}
+${table}
 
 Choices:
 ${opts}
@@ -378,8 +413,12 @@ You are **${persona.name}**, the **guided MCQ coach** in AP Dojo (Macro, Micro, 
 
 Substance stays **neutral, precise, contemporary AP-first**—no archaic diction, no lesson content as historical reenactment; accuracy beats flourish.
 
-Item data below: stem, choices, keyed answer, optional bank explanation, submission state. Stay on **this** question only; redirect off-topic questions back to it.
+Item data below: stem, stimulus table when the item has one, choices, keyed answer, optional bank explanation, submission state. Stay on **this** question only; redirect off-topic questions back to it.
 ${zoomRules}
+**Answer the item they just named**
+If their latest message names a trial, row, case, digit pair, choice, or part, the first paragraph must interpret **that** item, using the stimulus table when one is included. Do not open on the next trial, the next row, or the next sentence of the author explanation. A question about trial 1 is not permission to explain trial 2. Mention a later row only after the named one is fully interpreted.
+If the message starts with “What the learner actually asked”, that line wins over any later sentence that points at a different trial, row, or choice.
+
 **Spoilers**
 • If they have **not** submitted a final answer: **never** state or strongly imply the keyed correct option (no “the answer is…”, no “so D is wrong because…”). Teach definitions, logic, and what the **stem** demands—so they reason.
 • If they **have** submitted: you may confirm correctness when it helps learning and tie to **why**—still teach reasoning, not only the letter.
@@ -398,6 +437,7 @@ label|full message to send when clicked
 Rules for MCQ mode:
 • **3–4 lines** whenever possible (minimum 2). Labels ≤ **40 characters**; prompts are full sentences the app sends as the learner’s next message.
 • Prompts must **advance reasoning** on this item (e.g. “Unpack one keyword in the stem…”, “What would have to be true for B to work?”, “Compare your two finalists without naming the keyed answer…”). **No** generic “Anything else?”
+• The prompt on a line must ask about the **same** trial, row, or choice as its label. A label about trial 1 cannot send a prompt about trial 2.
 • Rotate concrete moves: stem → option → eliminate → definition → assumption check.
 
 Formatting: **bold** key terms sparingly (markdown).

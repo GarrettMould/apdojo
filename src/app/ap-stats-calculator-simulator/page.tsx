@@ -2,11 +2,11 @@ import type { Metadata } from 'next';
 import { CalculatorDrillSession } from '@/components/ti84/CalculatorDrillSession';
 
 export const metadata: Metadata = {
-  title: 'Calculator Drills | AP Stats | AP Dojo',
+  title: 'Calculator Drills | AP Stats',
   description:
     'AP Statistics calculator drills with exam-style College Board Desmos and TI-84 handheld practice.',
   openGraph: {
-    title: 'Calculator Drills | AP Stats | AP Dojo',
+    title: 'Calculator Drills | AP Stats',
     description:
       'AP Statistics calculator drills with exam-style College Board Desmos and TI-84 handheld practice.',
   },

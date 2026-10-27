@@ -155,12 +155,32 @@ const TWO_SAMPLE_TABLE = {
   ],
 };
 
+const ONLINE_INPERSON_BOXPLOTS = {
+  src: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unit_mcq_images/ap_stats/u4_28409.svg',
+  alt: 'Side-by-side boxplots of final exam scores for Online and In Person students',
+};
+
 const CAR_OUTPUT_TABLE = {
   headers: ['Predictor', 'Coef', 'SE Coef', 'T', 'P'],
   rows: [
     ['Constant', '21500', '850', '25.29', '0.000'],
     ['Age', '-1450', '180', '-8.06', '0.000'],
   ],
+};
+
+const CLASS_TRANSPORT_SEGMENTED_BARS = {
+  src: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unit_mcq_images/ap_stats/u2_28201.svg',
+  alt: 'Segmented bar graph of transportation method by class standing. Each bar totals 100 percent.',
+};
+
+const USED_CAR_SCATTERPLOT = {
+  src: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unit_mcq_images/ap_stats/u5_28501.svg',
+  alt: 'Scatterplot of used-car age versus price with least-squares regression line',
+};
+
+const RESIDUAL_PLOT_RANDOM = {
+  src: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unit_mcq_images/ap_stats/u5_28522.svg',
+  alt: 'Residual plot with no clear pattern for a linear regression model',
 };
 
 const STUDY_OUTPUT_TABLE = {
@@ -524,6 +544,72 @@ export const statsV2Unit1Questions: Question[] = [
       'Warm temperatures increase both ice cream purchases and the number of people swimming. A confounding variable can create an association between two variables even when neither causes the other.',
     videoExplanation: null,
   },
+  {
+    id: 28131,
+    subject: 'ap_statistics',
+    unit: 1,
+    lessonIDS: ['1.9'],
+    unitName: 'Exploring One-Variable Data and Collecting Data',
+    questionGroup: 'online-inperson-boxplots',
+    question:
+      'A researcher randomly assigned students to an online course or an in-person course and recorded each student\'s final exam score. The boxplots of the scores are shown. Which statement is best supported by the graph?',
+    image: ONLINE_INPERSON_BOXPLOTS,
+    options: stripOptionPrefixes([
+      'A) The online group has a higher median score than the in-person group.',
+      'B) The in-person group has a higher median score than the online group.',
+      'C) The two groups have the same median score.',
+      'D) Every online student scored higher than every in-person student.',
+      'E) The in-person scores are much more spread out than the online scores.',
+    ]),
+    correctAnswer: 'A',
+    explanation:
+      'The line inside the online box sits higher than the line inside the in-person box, so the online median is higher. The whiskers overlap, so some in-person scores are higher than some online scores. The two boxes are similar in height, so the in-person scores are not much more spread out.',
+    videoExplanation: null,
+  },
+  {
+    id: 28132,
+    subject: 'ap_statistics',
+    unit: 1,
+    lessonIDS: ['1.9'],
+    unitName: 'Exploring One-Variable Data and Collecting Data',
+    questionGroup: 'online-inperson-boxplots',
+    question:
+      'A researcher randomly assigned students to an online course or an in-person course and recorded each student\'s final exam score. The boxplots of the scores are shown. Which statement about the two distributions is best supported by the graph?',
+    image: ONLINE_INPERSON_BOXPLOTS,
+    options: stripOptionPrefixes([
+      'A) The two distributions overlap a great deal, and neither group is much more spread out than the other.',
+      'B) The two distributions do not overlap.',
+      'C) The online scores have a much smaller range than the in-person scores.',
+      'D) The in-person scores have a much larger range than the online scores.',
+      'E) Both distributions are strongly skewed left, with long lower whiskers and short upper whiskers.',
+    ]),
+    correctAnswer: 'A',
+    explanation:
+      'Both boxes and both whiskers cover much of the same part of the score scale, so the distributions overlap. The boxes are about the same height and the whiskers are about the same length, so neither group is much more spread out. The median in each box is near the middle of the box, so neither plot is strongly skewed.',
+    videoExplanation: null,
+  },
+  {
+    id: 28133,
+    subject: 'ap_statistics',
+    unit: 1,
+    lessonIDS: ['1.9'],
+    unitName: 'Exploring One-Variable Data and Collecting Data',
+    questionGroup: 'online-inperson-boxplots',
+    question:
+      'A researcher randomly assigned students to an online course or an in-person course and recorded each student\'s final exam score. The boxplots of the scores are shown. A student claims that every online student scored higher than every in-person student. Which conclusion is best supported by the graph?',
+    image: ONLINE_INPERSON_BOXPLOTS,
+    options: stripOptionPrefixes([
+      'A) The claim is not supported, because the two distributions overlap.',
+      'B) The claim is supported, because the online median is higher.',
+      'C) The claim is supported, because the online maximum is higher.',
+      'D) The claim is not supported, because the in-person median is higher.',
+      'E) The graph cannot be used to compare the two groups.',
+    ]),
+    correctAnswer: 'A',
+    explanation:
+      'A higher median, or a higher maximum, does not mean every value in one group is above every value in the other. The whiskers cover a shared stretch of scores, so some in-person scores are higher than some online scores.',
+    videoExplanation: null,
+  },
 ];
 
 export const statsV2Unit2Questions: Question[] = [
@@ -635,6 +721,72 @@ export const statsV2Unit2Questions: Question[] = [
     correctAnswer: 'D',
     explanation:
       'P(Walk or Under) = P(Walk) + P(Under) - P(Walk and Under) = 0.25 + 0.60 - 0.15 = 0.70. Adding without subtracting the overlap would give 0.85.',
+    videoExplanation: null,
+  },
+  {
+    id: 28231,
+    subject: 'ap_statistics',
+    unit: 2,
+    lessonIDS: ['2.1'],
+    unitName: 'Probability, Random Variables, and Probability Distributions',
+    questionGroup: 'class-transport-segmented-bars',
+    question:
+      'A random sample of high school students was classified by class standing and by how they usually get to school. The segmented bar graph shows the percent of students in each class standing who use each method. Which statement is best supported by the graph?',
+    image: CLASS_TRANSPORT_SEGMENTED_BARS,
+    options: stripOptionPrefixes([
+      'A) A greater percent of upperclassmen than underclassmen usually ride in a car.',
+      'B) A greater percent of underclassmen than upperclassmen usually walk.',
+      'C) About the same percent of each group usually rides the bus.',
+      'D) Most upperclassmen usually walk.',
+      'E) The two groups have the same distribution of transportation methods.',
+    ]),
+    correctAnswer: 'A',
+    explanation:
+      'The car segment is about half of the upperclassman bar and a much smaller slice of the underclassman bar. The walk segments are about the same height. The bus segment is much larger for underclassmen. The two bars do not have the same segment sizes.',
+    videoExplanation: null,
+  },
+  {
+    id: 28232,
+    subject: 'ap_statistics',
+    unit: 2,
+    lessonIDS: ['2.1'],
+    unitName: 'Probability, Random Variables, and Probability Distributions',
+    questionGroup: 'class-transport-segmented-bars',
+    question:
+      'A random sample of high school students was classified by class standing and by how they usually get to school. The segmented bar graph shows the percent of students in each class standing who use each method. Which statement about walking is best supported by the graph?',
+    image: CLASS_TRANSPORT_SEGMENTED_BARS,
+    options: stripOptionPrefixes([
+      'A) About the same percent of underclassmen and upperclassmen usually walk.',
+      'B) A much greater percent of underclassmen than upperclassmen usually walk.',
+      'C) A much greater percent of upperclassmen than underclassmen usually walk.',
+      'D) Almost no students in either group usually walk.',
+      'E) Walking is the most common method for both groups.',
+    ]),
+    correctAnswer: 'A',
+    explanation:
+      'The walk segment is about one quarter of each bar, so the conditional percent who walk is about the same in both groups. Walking is not the largest segment in either bar.',
+    videoExplanation: null,
+  },
+  {
+    id: 28233,
+    subject: 'ap_statistics',
+    unit: 2,
+    lessonIDS: ['2.1'],
+    unitName: 'Probability, Random Variables, and Probability Distributions',
+    questionGroup: 'class-transport-segmented-bars',
+    question:
+      'A random sample of high school students was classified by class standing and by how they usually get to school. The segmented bar graph shows the percent of students in each class standing who use each method. For underclassmen, which method accounts for the greatest percent?',
+    image: CLASS_TRANSPORT_SEGMENTED_BARS,
+    options: stripOptionPrefixes([
+      'A) Bus',
+      'B) Walk',
+      'C) Car',
+      'D) Walk and car are about equal, and both are greater than bus.',
+      'E) The graph does not show which method is most common among underclassmen.',
+    ]),
+    correctAnswer: 'A',
+    explanation:
+      'In the underclassman bar, the bus segment is the tallest. It is more than half the bar. The walk segment is about a quarter, and the car segment is the smallest.',
     videoExplanation: null,
   },
   {
@@ -1905,6 +2057,72 @@ export const statsV2Unit5Questions: Question[] = [
     videoExplanation: null,
   },
   {
+    id: 28531,
+    subject: 'ap_statistics',
+    unit: 5,
+    lessonIDS: ['5.1'],
+    unitName: 'Regression Analysis',
+    questionGroup: 'used-car-scatterplot',
+    question:
+      'A used-car dealer recorded the age, in years, and the price, in dollars, of 30 cars. The scatterplot shows the data with the least-squares regression line. Which statement best describes the association?',
+    image: USED_CAR_SCATTERPLOT,
+    options: stripOptionPrefixes([
+      'A) Negative, roughly linear, and strong.',
+      'B) Positive, roughly linear, and strong.',
+      'C) Negative and clearly curved.',
+      'D) Positive and clearly curved.',
+      'E) There is no association between age and price.',
+    ]),
+    correctAnswer: 'A',
+    explanation:
+      'The line and the cloud of points slope downward, so the association is negative. The points follow a straight line rather than a curve, and they stay fairly close to the line, so the linear association is strong.',
+    videoExplanation: null,
+  },
+  {
+    id: 28532,
+    subject: 'ap_statistics',
+    unit: 5,
+    lessonIDS: ['5.4'],
+    unitName: 'Regression Analysis',
+    questionGroup: 'used-car-scatterplot',
+    question:
+      'A used-car dealer recorded the age, in years, and the price, in dollars, of 30 cars. The scatterplot shows the data with the least-squares regression line. One point is a 4-year-old car that sold for $14,000. Which statement about that car is best supported by the graph?',
+    image: USED_CAR_SCATTERPLOT,
+    options: stripOptionPrefixes([
+      'A) It sold for less than the price predicted by the line, so its residual is negative.',
+      'B) It sold for more than the price predicted by the line, so its residual is positive.',
+      'C) It falls on the line, so its residual is 0.',
+      'D) It is an outlier in the x-direction because its age is far from the other ages.',
+      'E) It shows that the slope of the line is positive.',
+    ]),
+    correctAnswer: 'A',
+    explanation:
+      'At age 4, the $14,000 point sits below the line. A point below the line has an actual price smaller than the predicted price, so the residual is negative. Age 4 is inside the range of ages on the plot.',
+    videoExplanation: null,
+  },
+  {
+    id: 28533,
+    subject: 'ap_statistics',
+    unit: 5,
+    lessonIDS: ['5.1'],
+    unitName: 'Regression Analysis',
+    questionGroup: 'used-car-scatterplot',
+    question:
+      'A used-car dealer recorded the age, in years, and the price, in dollars, of 30 cars. The scatterplot shows the data with the least-squares regression line. Why is using this line to predict the price of a 15-year-old car a problem?',
+    image: USED_CAR_SCATTERPLOT,
+    options: stripOptionPrefixes([
+      'A) Age 15 is outside the ages shown on the plot, so the prediction is an extrapolation.',
+      'B) The association is positive, so an older car should be predicted to cost more.',
+      'C) The plot shows no linear pattern, so a line should not be drawn.',
+      'D) The line has a positive slope.',
+      'E) The plot shows that price does not change as age changes.',
+    ]),
+    correctAnswer: 'A',
+    explanation:
+      'The ages on the plot run from 0 to 9 years. A prediction at age 15 uses the line beyond the data, which is extrapolation. The plotted association is negative and roughly linear.',
+    videoExplanation: null,
+  },
+  {
     id: 28510,
     subject: 'ap_statistics',
     unit: 5,
@@ -2009,6 +2227,27 @@ export const statsV2Unit5Questions: Question[] = [
     correctAnswer: 'B',
     explanation:
       'Correlation does not imply causation. Larger fires cause both more damage and more firefighters being sent, so the size of the fire is a lurking variable.',
+    videoExplanation: null,
+  },
+  {
+    id: 28522,
+    subject: 'ap_statistics',
+    unit: 5,
+    lessonIDS: ['5.3'],
+    unitName: 'Regression Analysis',
+    question:
+      'The residual plot from a least-squares regression is shown. Which of the following is the best conclusion?',
+    image: RESIDUAL_PLOT_RANDOM,
+    options: stripOptionPrefixes([
+      'A) A linear model is not appropriate because some residuals are negative.',
+      'B) A linear model is appropriate because the residuals show no clear pattern.',
+      'C) A linear model is not appropriate because the residuals are randomly scattered.',
+      'D) The correlation must be close to 0 because the residuals vary above and below 0.',
+      'E) An outlier should be removed before interpreting the residual plot.',
+    ]),
+    correctAnswer: 'B',
+    explanation:
+      'A residual plot with no clear pattern (random scatter about 0) supports using a linear model. Negative residuals are expected and do not by themselves mean the model is inappropriate.',
     videoExplanation: null,
   },
 ];

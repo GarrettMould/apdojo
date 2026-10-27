@@ -70,7 +70,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
   
   if (!graphPost && !regularPost) {
     return {
-      title: 'Blog Post Not Found | AP Dojo',
+      title: 'Blog Post Not Found',
       description: 'The requested blog post could not be found.',
     };
   }

@@ -16,7 +16,7 @@ export const govUnit4McqPracticeQuestions: Question[] = [
     question: "The tension between \"equality of opportunity\" and \"equality of outcome\" in American political culture is best illustrated by which of the following debates?",
     image: null,
     options: [
-      "Whether states should have equal representation in the Senate versus the House.",
+      "Whether states should have equal representation in the Senate versus the House, a debate that also determines whether government should guarantee equal educational opportunity or equal incomes.",
       "Whether the government should ensure everyone has access to public education versus whether it should guarantee everyone achieves the same level of income.",
       "Whether federal judges should serve life terms versus fixed terms.",
       "Whether the president should be elected by popular vote versus the Electoral College.",
@@ -101,7 +101,7 @@ export const govUnit4McqPracticeQuestions: Question[] = [
     question: "A political campaign conducts a survey that asks: \"Given that your opponent's tax plan would harm working families, do you support the incumbent's fairer approach?\" This is an example of:",
     image: null,
     options: [
-      "A random sample designed to minimize bias.",
+      "A random sample designed to minimize bias, even though the question's wording is written to push the respondent toward a particular candidate.",
       "A benchmark poll used only at the start of a campaign.",
       "A push poll, since the question's framing is designed to influence the respondent's opinion rather than measure it objectively.",
       "An exit poll conducted after voting concludes.",
@@ -222,7 +222,7 @@ export const govUnit4McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "An employee adopting more favorable views toward organized labor after joining a unionized workforce and discussing collective bargaining with coworkers.",
-      "A person's political views being entirely determined by their family's voting history.",
+      "A person's political views being entirely determined by their family's voting history, with no later role for workplaces, unions, or other adult social environments.",
       "A citizen changing their opinion after watching a single campaign commercial.",
       "A student memorizing the Bill of Rights for a class exam.",
     ],
@@ -256,7 +256,7 @@ export const govUnit4McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "The true level of support could reasonably fall within a range that makes the race very close, given the overlap between the margin of error and the reported lead.",
-      "The candidate is certain to win the election.",
+      "The candidate is certain to win the election, because a lead larger than zero is conclusive even when it falls inside the poll's margin of error.",
       "The poll is invalid because the margin of error is too large to be meaningful.",
       "The margin of error only applies to the losing candidate's numbers.",
     ],
@@ -306,7 +306,7 @@ export const govUnit4McqPracticeQuestions: Question[] = [
     question: "Research shows that older Americans are generally more likely than younger Americans to vote consistently in every election, including midterms. Which of the following best explains this pattern through a life cycle lens?",
     image: null,
     options: [
-      "Older citizens are legally required to vote in every election under federal law.",
+      "Older citizens are legally required to vote in every election under federal law and therefore turnout at higher rates regardless of property, retirement benefits, healthcare, or work schedules.",
       "Older citizens have accumulated greater personal stakes in government policy (such as property, retirement benefits, and healthcare), along with more stable schedules that make voting easier.",
       "Younger citizens are constitutionally barred from voting in midterm elections.",
       "Voting habits have no relationship to a person's stage of life.",
@@ -341,7 +341,7 @@ export const govUnit4McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       "Individual economic liberty and the government's interest in regulating for the public welfare.",
-      "Popular sovereignty and judicial supremacy.",
+      "Popular sovereignty and judicial supremacy, which together decide how far government may go in regulating markets for the public welfare.",
       "Federalism and unitary government.",
       "Bicameralism and unicameralism.",
     ],

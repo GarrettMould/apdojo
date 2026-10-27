@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Money Growth and Inflation Deep Dive | AP Dojo',
+  title: 'Money Growth and Inflation Deep Dive',
   description: 'Understand the relationship between money supply growth and inflation. Learn the quantity theory of money and the classical dichotomy.',
   openGraph: {
-    title: 'Money Growth and Inflation Deep Dive | AP Dojo',
+    title: 'Money Growth and Inflation Deep Dive',
     description: 'Understand the relationship between money supply growth and inflation using the quantity theory of money.',
   },
   alternates: {

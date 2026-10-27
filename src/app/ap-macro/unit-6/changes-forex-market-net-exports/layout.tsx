@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Changes in the Foreign Exchange Market and Net Exports Deep Dive | AP Dojo',
+  title: 'Changes in the Foreign Exchange Market and Net Exports Deep Dive',
   description: 'Understand how currency appreciation and depreciation affect net exports and aggregate demand.',
   openGraph: {
-    title: 'Changes in the Foreign Exchange Market and Net Exports Deep Dive | AP Dojo',
+    title: 'Changes in the Foreign Exchange Market and Net Exports Deep Dive',
     description: 'Understand how currency changes affect net exports and aggregate demand.',
   },
   alternates: {

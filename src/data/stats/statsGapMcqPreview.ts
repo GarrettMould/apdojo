@@ -93,7 +93,10 @@ export const statsGapMcqPreviewQuestions: Question[] = [
     "lessonIDS": ["1.5"],
     "unitName": "Exploring One-Variable Data and Collecting Data",
     "question": "The table summarizes the commute times of the 32 employees of a company. Which of the following best describes the shape of the distribution?",
-    "image": null,
+    "image": {
+      "src": "https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unit_mcq_images/ap_stats/u1_28121.svg",
+      "alt": "Histogram of commute times for 32 employees"
+    },
     "tableData": {
       "headers": ["Commute Time (minutes)", "Number of Employees"],
       "rows": [["0-9", "14"], ["10-19", "9"], ["20-29", "5"], ["30-39", "3"], ["40-49", "1"]]

@@ -120,7 +120,7 @@ export const govUnit3McqTestQuestions: Question[] = [
     image: null,
     options: [
       'They are identical in wording and have no difference in application.',
-      'The Fifth Amendment only applies to civil cases, whereas the Fourteenth Amendment applies to all cases.',
+      'The Fifth Amendment only applies to civil cases, whereas the Fourteenth Amendment applies to all cases and completely replaces the Fifth Amendment\'s due process guarantee.',
       'The Fifth Amendment protects the accused from the national government, while the Fourteenth Amendment protects the accused from state governments.',
       'The Fourteenth Amendment supersedes and completely replaces the Fifth Amendment.',
     ],
@@ -139,7 +139,7 @@ export const govUnit3McqTestQuestions: Question[] = [
       'A state law prohibits the carrying of firearms in public spaces. A citizen challenges the law, arguing it violates the Second Amendment. Which of the following constitutional doctrines would the Supreme Court most likely use to evaluate this claim against the state government?',
     image: null,
     options: [
-      'The Supremacy Clause, because federal law automatically overrides state law',
+      'The Supremacy Clause, because federal law automatically overrides state law and because the Second Amendment has never been incorporated against the states',
       "Selective incorporation via the 14th Amendment's Due Process Clause, because the Second Amendment has been incorporated against the states",
       'The Necessary and Proper Clause, because gun regulation is implied in federal power',
       'The 10th Amendment, because states retain exclusive authority over public safety',
@@ -243,7 +243,7 @@ export const govUnit3McqTestQuestions: Question[] = [
     },
     options: [
       'Shifting public attitudes about cruel and unusual punishment, increased awareness of wrongful convictions, and changing social norms have contributed to declining support over time.',
-      'The Supreme Court ruled capital punishment unconstitutional for all crimes in 1994, which shifted public opinion.',
+      'The Supreme Court ruled capital punishment unconstitutional for all crimes in 1994, which shifted public opinion and accounts for the entire decline in support shown in the data.',
       'Congress passed legislation banning the death penalty in federal cases, which influenced state-level public opinion.',
       'The decline reflects a generational effect in which all Americans born after 1980 oppose capital punishment.',
     ],
@@ -265,7 +265,7 @@ export const govUnit3McqTestQuestions: Question[] = [
       alt: 'Line graph showing public support for the death penalty over time since 1994',
     },
     options: [
-      'The incorporation doctrine, which requires states to apply federal standards for capital punishment.',
+      'The incorporation doctrine, which requires states to apply federal standards for capital punishment and forbids the Court from considering changing public views of cruelty.',
       'The equal protection clause, which prohibits the application of the death penalty to any protected class.',
       'The due process clause, which requires unanimous jury verdicts before a death sentence can be imposed.',
       'The principle of evolving standards of decency, in which the Supreme Court considers shifting public opinion when evaluating whether a punishment constitutes cruel and unusual punishment.',
@@ -285,7 +285,7 @@ export const govUnit3McqTestQuestions: Question[] = [
     image: null,
     options: [
       "Substantive due process focuses on the fairness of the laws themselves, while procedural focuses on the fairness of the government's methods.",
-      'Substantive due process only applies to the federal government, while procedural applies to states.',
+      'Substantive due process only applies to the federal government, while procedural applies to states, and the two terms are otherwise legally interchangeable.',
       'Substantive due process is only used in civil cases, while procedural is only used in criminal cases.',
       'There is no difference; the terms are legally interchangeable.',
     ],
@@ -308,7 +308,7 @@ export const govUnit3McqTestQuestions: Question[] = [
     },
     options: [
       'The Supreme Court\'s use of the Due Process and Equal Protection Clauses to strike down laws restricting same-sex relationships reflected and reinforced a broader shift in public attitudes toward equal treatment under the law.',
-      'The Supreme Court\'s decision in Engel v. Vitale expanded the right to privacy to include personal relationship choices.',
+      'The Supreme Court\'s decision in Engel v. Vitale expanded the right to privacy to include personal relationship choices and required states to recognize same-sex marriages on that basis alone.',
       'Congress passed the Defense of Marriage Act in 1996, which accelerated public support for same-sex marriage by drawing national attention to the issue.',
       'The incorporation of the First Amendment\'s free exercise clause to the states required state governments to recognize same-sex marriages performed in other states.',
     ],
@@ -351,7 +351,7 @@ export const govUnit3McqTestQuestions: Question[] = [
     image: null,
     options: [
       'Brown v. Board of Education (1954), because separate public schools are inherently unequal regardless of physical conditions',
-      'Plessy v. Ferguson (1896), because the state has ensured truly equal facilities',
+      'Plessy v. Ferguson (1896), because the state has ensured truly equal facilities and because separate public schools can still satisfy equal protection',
       'Shaw v. Reno (1993), because the law draws electoral district lines based on race',
       'Engel v. Vitale (1962), because the state is imposing religious practices in schools',
     ],
@@ -370,7 +370,7 @@ export const govUnit3McqTestQuestions: Question[] = [
       'The Supreme Court ruled in Gitlow v. New York (1925) that the First Amendment applies to state governments. This decision is historically significant because it:',
     image: null,
     options: [
-      'Established that the Bill of Rights was always intended to apply automatically to all levels of government',
+      'Established that the Bill of Rights was always intended to apply automatically to all levels of government, without any need for the Fourteenth Amendment or selective incorporation',
       'Granted Congress the authority to pass laws directly regulating state court procedures',
       'Overturned the precedent set by Brown v. Board of Education regarding state authority',
       "Marked one of the earliest applications of selective incorporation, using the 14th Amendment's Due Process Clause to extend a federal right to the states",
@@ -379,30 +379,53 @@ export const govUnit3McqTestQuestions: Question[] = [
     explanation:
       '*Gitlow* was an early incorporation case in which the Court used the 14th Amendment’s Due Process Clause to apply a Bill of Rights protection—the freedom of speech—to state governments.',
   },
-];
-
-/** Dropped from the Unit 3 test — retained for reference or future use. */
-export const extras: Question[] = [
   {
-    id: 6304,
+    id: 6313,
     subject: 'ap_us_government',
     unit: 3,
-    lessonIDS: ['3.11'],
+    lessonIDS: ['3.2'],
     unitName: 'Civil Liberties and Civil Rights',
-    questionGroup: 'u3-stim-14th-amend',
-    question:
-      'The Equal Protection Clause of the Fourteenth Amendment has most often been used by the Supreme Court to:',
+    questionGroup: 'u3-concept-establishment-clause',
+    question: 'The Establishment Clause of the First Amendment is interpreted to mean that:',
     image: null,
     options: [
-      'Invalidate state-mandated segregation and discriminatory voting practices.',
-      'Protect the economic interests of large corporations against state regulation.',
-      'Grant the federal government power to regulate interstate commerce.',
-      'Ensure that religious organizations do not receive tax-exempt status.',
+      'The government may choose one religion as the official state religion.',
+      'All religious institutions are exempt from federal taxation.',
+      'The government cannot create a national church or favor one religion over another.',
+      'Private schools must adhere to the same curriculum as public schools.',
     ],
-    correctAnswer: 'A',
+    correctAnswer: 'C',
     explanation:
-      'The Equal Protection Clause is the standard used to challenge laws that discriminate based on characteristics such as race, origin, or gender (e.g., *Brown v. Board*).',
+      'The Establishment Clause creates a "wall of separation" between church and state, prohibiting the government from sanctioning or favoring religious practice.',
   },
+  {
+    id: 6328,
+    subject: 'ap_us_government',
+    unit: 3,
+    lessonIDS: ['3.13'],
+    unitName: 'Civil Liberties and Civil Rights',
+    questionGroup: 'u3-concept-affirmative-action',
+    question:
+      'Affirmative action policies in higher education have been constitutionally debated under which framework?',
+    image: null,
+    options: [
+      'The Necessary and Proper Clause.',
+      'The Fourth Amendment’s protection against search and seizure.',
+      'The Equal Protection Clause of the Fourteenth Amendment.',
+      'The First Amendment’s Freedom of Assembly.',
+    ],
+    correctAnswer: 'C',
+    explanation:
+      'The core legal debate in affirmative action is whether race-conscious admissions violate the Equal Protection Clause by discriminating against other groups.',
+  },
+];
+
+/**
+ * Left on the cutting-room floor: wrong unit, orphaned stimulus, duplicate of
+ * a required-doc exam set, near-duplicate of practice 7730, or a bad key.
+ * Usable leftovers were moved to `govUnit3McqPractice.ts` as 7851–7862.
+ */
+export const extras: Question[] = [
   {
     id: 6305,
     subject: 'ap_us_government',
@@ -464,63 +487,6 @@ export const extras: Question[] = [
       'The freedom of the press is fundamental to a democracy because it allows for the investigation and critique of government action without fear of prior restraint.',
   },
   {
-    id: 6311,
-    subject: 'ap_us_government',
-    unit: 3,
-    lessonIDS: ['3.1'],
-    unitName: 'Civil Liberties and Civil Rights',
-    questionGroup: 'u3-concept-bill-of-rights',
-    question: 'The primary purpose of the Bill of Rights is to:',
-    image: null,
-    options: [
-      'Outline the specific responsibilities of the judicial branch.',
-      'Protect individual liberties and rights against arbitrary government interference.',
-      'Define the powers granted to the states within a federalist system.',
-      'Establish the procedure for how a bill becomes a law.',
-    ],
-    correctAnswer: 'B',
-    explanation:
-      'The Bill of Rights was explicitly designed as a set of amendments to restrict government power and secure individual freedoms from federal overreach.',
-  },
-  {
-    id: 6313,
-    subject: 'ap_us_government',
-    unit: 3,
-    lessonIDS: ['3.2'],
-    unitName: 'Civil Liberties and Civil Rights',
-    questionGroup: 'u3-concept-establishment-clause',
-    question: 'The Establishment Clause of the First Amendment is interpreted to mean that:',
-    image: null,
-    options: [
-      'The government may choose one religion as the official state religion.',
-      'All religious institutions are exempt from federal taxation.',
-      'The government cannot create a national church or favor one religion over another.',
-      'Private schools must adhere to the same curriculum as public schools.',
-    ],
-    correctAnswer: 'C',
-    explanation:
-      'The Establishment Clause creates a "wall of separation" between church and state, prohibiting the government from sanctioning or favoring religious practice.',
-  },
-  {
-    id: 6314,
-    subject: 'ap_us_government',
-    unit: 3,
-    lessonIDS: ['3.2'],
-    unitName: 'Civil Liberties and Civil Rights',
-    questionGroup: 'u3-concept-free-exercise',
-    question: 'According to the Free Exercise Clause, individuals are entitled to:',
-    image: null,
-    options: [
-      'Financial support from the government for religious construction.',
-      'Exemptions from all federal laws if those laws conflict with their faith.',
-      'Practice their religious beliefs as they see fit, provided the actions do not harm public order or safety.',
-      'Deny services to others regardless of federal anti-discrimination statutes.',
-    ],
-    correctAnswer: 'C',
-    explanation:
-      'While religious *belief* is absolute, religious *actions* are subject to legal limitations if they violate a compelling state interest or threaten public safety.',
-  },
-  {
     id: 6315,
     subject: 'ap_us_government',
     unit: 3,
@@ -539,84 +505,6 @@ export const extras: Question[] = [
     correctAnswer: 'B',
     explanation:
       'Symbolic speech is protected under the First Amendment; by contrast, obscenity, defamation, and fighting words are considered exceptions to free speech protection.',
-  },
-  {
-    id: 6319,
-    subject: 'ap_us_government',
-    unit: 3,
-    lessonIDS: ['3.6'],
-    unitName: 'Civil Liberties and Civil Rights',
-    questionGroup: 'u3-concept-eighth-amendment',
-    question:
-      'The Eighth Amendment’s protection against "cruel and unusual punishment" is most frequently debated in the context of:',
-    image: null,
-    options: [
-      'The length of prison sentences for non-violent drug offenses.',
-      'The use of solitary confinement for political prisoners.',
-      'The conditions of juvenile detention centers.',
-      'The application of the death penalty.',
-    ],
-    correctAnswer: 'D',
-    explanation:
-      'The legality of capital punishment is the primary constitutional battleground for Eighth Amendment claims regarding "cruel and unusual" standards.',
-  },
-  {
-    id: 6320,
-    subject: 'ap_us_government',
-    unit: 3,
-    lessonIDS: ['3.8'],
-    unitName: 'Civil Liberties and Civil Rights',
-    questionGroup: 'u3-concept-procedural-due-process',
-    question: 'Which of the following is a key requirement of procedural due process?',
-    image: null,
-    options: [
-      'The government must follow established, non-arbitrary procedures before depriving a person of life, liberty, or property.',
-      'The government must provide a unanimous verdict for all criminal trials.',
-      'The government must provide financial compensation for all legal expenses incurred by the accused.',
-      'The government must bypass traditional court trials for matters involving national security.',
-    ],
-    correctAnswer: 'A',
-    explanation:
-      'Procedural due process focuses on the "how" of government action; it ensures the methods used by officials to deprive rights are fair and not arbitrary.',
-  },
-  {
-    id: 6322,
-    subject: 'ap_us_government',
-    unit: 3,
-    lessonIDS: ['3.9'],
-    unitName: 'Civil Liberties and Civil Rights',
-    questionGroup: 'u3-concept-right-privacy',
-    question:
-      'The Supreme Court has interpreted the Due Process Clause of the Fourteenth Amendment to imply a right to privacy. Which of the following is a result of that interpretation?',
-    image: null,
-    options: [
-      'The right of the government to collect digital metadata without a warrant.',
-      'The right to protection from self-incrimination.',
-      'The recognition of unenumerated rights, such as those addressed in Griswold v. Connecticut.',
-      'The requirement that all citizens must have medical insurance.',
-    ],
-    correctAnswer: 'C',
-    explanation:
-      'While the word "privacy" does not appear in the Constitution, the Court has used substantive due process to recognize it as an unenumerated right.',
-  },
-  {
-    id: 6324,
-    subject: 'ap_us_government',
-    unit: 3,
-    lessonIDS: ['3.10'],
-    unitName: 'Civil Liberties and Civil Rights',
-    questionGroup: 'u3-concept-equal-protection',
-    question: 'The "Equal Protection Clause" of the Fourteenth Amendment is the primary legal basis for:',
-    image: null,
-    options: [
-      'Establishing the federal income tax.',
-      'Regulating interstate commerce.',
-      'Combating discrimination based on race, gender, and other protected characteristics.',
-      'Managing the election process for the Electoral College.',
-    ],
-    correctAnswer: 'C',
-    explanation:
-      'The Equal Protection Clause serves as the constitutional backbone for civil rights, prohibiting states from denying any person equal protection under the law.',
   },
   {
     id: 6325,
@@ -639,46 +527,6 @@ export const extras: Question[] = [
       'The letter provides a philosophical defense of civil disobedience and the nonviolent approach to challenging systemic racial injustice.',
   },
   {
-    id: 6326,
-    subject: 'ap_us_government',
-    unit: 3,
-    lessonIDS: ['3.11'],
-    unitName: 'Civil Liberties and Civil Rights',
-    questionGroup: 'u3-concept-civil-rights-acts',
-    question:
-      'Which of the following is a primary difference between the Civil Rights Act of 1964 and the Voting Rights Act of 1965?',
-    image: null,
-    options: [
-      'The Civil Rights Act established a national education curriculum, while the Voting Rights Act regulated campaign finance.',
-      'The Civil Rights Act only applied to the North, while the Voting Rights Act only applied to the South.',
-      'The Civil Rights Act focused on public accommodations and employment, while the Voting Rights Act targeted racial discrimination in voting.',
-      'The Civil Rights Act required constitutional amendments, while the Voting Rights Act was passed by executive order.',
-    ],
-    correctAnswer: 'C',
-    explanation:
-      'The Civil Rights Act of 1964 largely addressed private/public discrimination in trade and hiring, while the Voting Rights Act specifically addressed barriers to the franchise.',
-  },
-  {
-    id: 6328,
-    subject: 'ap_us_government',
-    unit: 3,
-    lessonIDS: ['3.13'],
-    unitName: 'Civil Liberties and Civil Rights',
-    questionGroup: 'u3-concept-affirmative-action',
-    question:
-      'Affirmative action policies in higher education have been constitutionally debated under which framework?',
-    image: null,
-    options: [
-      'The Necessary and Proper Clause.',
-      'The Fourth Amendment’s protection against search and seizure.',
-      'The Equal Protection Clause of the Fourteenth Amendment.',
-      'The First Amendment’s Freedom of Assembly.',
-    ],
-    correctAnswer: 'C',
-    explanation:
-      'The core legal debate in affirmative action is whether race-conscious admissions violate the Equal Protection Clause by discriminating against other groups.',
-  },
-  {
     id: 6329,
     subject: 'ap_us_government',
     unit: 3,
@@ -689,91 +537,13 @@ export const extras: Question[] = [
     image: null,
     options: [
       'It states that the existence of specific rights in the Constitution does not deny other rights retained by the people.',
-      'It reserves all powers not delegated to the federal government to the states.',
+      'It reserves all powers not delegated to the federal government to the states and denies that people retain any rights beyond those listed in the Constitution.',
       'It clarifies the definition of citizenship.',
       'It outlines the process for presidential succession.',
     ],
     correctAnswer: 'A',
     explanation:
       'The Ninth Amendment is a vital safeguard that prevents the government from arguing that because a right isn’t explicitly listed, it doesn’t exist.',
-  },
-  {
-    id: 6330,
-    subject: 'ap_us_government',
-    unit: 3,
-    lessonIDS: ['3.6'],
-    unitName: 'Civil Liberties and Civil Rights',
-    questionGroup: 'u3-concept-compelling-interest',
-    question:
-      "In the debate over civil liberties and public order, the government is most likely to limit an individual's rights when:",
-    image: null,
-    options: [
-      'The individual is a member of a political party that does not hold the majority.',
-      "The individual's actions create a clear danger to the safety of others or the general welfare.",
-      'The individual is participating in a protest that is critical of the president.',
-      'The individual’s beliefs are considered unconventional by the public.',
-    ],
-    correctAnswer: 'B',
-    explanation:
-      'The Supreme Court uses the "compelling interest" test; if an individual’s action poses a direct threat to public safety, the government can restrict that specific action.',
-  },
-  {
-    id: 6331,
-    subject: 'ap_us_government',
-    unit: 3,
-    lessonIDS: ['3.11'],
-    unitName: 'Civil Liberties and Civil Rights',
-    questionGroup: 'u3-concept-title-ix',
-    question: 'Title IX of the Education Amendments Act of 1972 is best known for:',
-    image: null,
-    options: [
-      'Requiring all schools to teach religious studies.',
-      'Forcing state governments to fund private religious schools.',
-      'Prohibiting sex-based discrimination in any education program or activity receiving federal funding.',
-      'Mandating that all students pass a federal test to graduate.',
-    ],
-    correctAnswer: 'C',
-    explanation:
-      'Title IX prevents institutions from excluding individuals from participation in or denying them benefits of educational programs based on sex.',
-  },
-  {
-    id: 6332,
-    subject: 'ap_us_government',
-    unit: 3,
-    lessonIDS: ['3.10'],
-    unitName: 'Civil Liberties and Civil Rights',
-    questionGroup: 'u3-concept-14th-amendment',
-    question:
-      'Which constitutional interpretation has most significantly influenced the power of the federal government to enforce civil rights protections against the states?',
-    image: null,
-    options: [
-      'The interpretation of the Seventh Amendment’s right to a jury trial.',
-      'The interpretation of the Fourteenth Amendment’s Due Process and Equal Protection Clauses.',
-      'The interpretation of the Third Amendment’s prohibition on quartering soldiers.',
-      'The interpretation of the Twenty-Second Amendment’s term limits.',
-    ],
-    correctAnswer: 'B',
-    explanation:
-      'The 14th Amendment effectively created a national standard for civil rights that states cannot violate, greatly expanding federal judicial power.',
-  },
-  {
-    id: 6335,
-    subject: 'ap_us_government',
-    unit: 3,
-    lessonIDS: ['3.10'],
-    unitName: 'Civil Liberties and Civil Rights',
-    questionGroup: 'u3-concept-social-movements',
-    question: 'A "social movement" is best defined as:',
-    image: null,
-    options: [
-      'A large, informal grouping of individuals and organizations focused on specific political or social issues to bring about change.',
-      'A government-created agency tasked with public outreach.',
-      'A formal political party running candidates for office.',
-      'An elite group of lobbyists working in Washington, D.C.',
-    ],
-    correctAnswer: 'A',
-    explanation:
-      'Social movements are decentralized, collective efforts (like the Women’s Rights or LGBTQ+ movements) that pressure the government for change from the outside.',
   },
   // Original versions of revised active questions:
   // 6312 — selective incorporation (definitional)

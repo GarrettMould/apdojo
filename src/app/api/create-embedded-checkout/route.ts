@@ -32,10 +32,10 @@ export async function POST(req: Request) {
 
     const courseType = purchaseType === 'bundle' ? 'bundle' : purchaseType;
 
-    const session = await stripe.checkout.sessions.create({
-      ui_mode: 'embedded',
+    const sessionBase = {
+      ui_mode: 'embedded' as const,
       line_items: [{ price: priceId, quantity: 1 }],
-      mode: 'payment',
+      mode: 'payment' as const,
       client_reference_id: userId,
       metadata: {
         purchaseType: 'season-pass',
@@ -44,7 +44,36 @@ export async function POST(req: Request) {
         source: userId ? 'student_purchase' : 'guest_checkout',
       },
       return_url: `${baseUrl}/season-pass/claim?session_id={CHECKOUT_SESSION_ID}`,
-    });
+    };
+
+    const attempts: Array<{
+      payment_method_types: Array<'card' | 'alipay' | 'wechat_pay'>;
+      payment_method_options?: { wechat_pay: { client: 'web' } };
+    }> = [
+      {
+        payment_method_types: ['card', 'alipay', 'wechat_pay'],
+        payment_method_options: { wechat_pay: { client: 'web' } },
+      },
+      { payment_method_types: ['card', 'alipay'] },
+      { payment_method_types: ['card'] },
+    ];
+
+    let session = null as Awaited<ReturnType<typeof stripe.checkout.sessions.create>> | null;
+    let lastError: unknown;
+    for (const attempt of attempts) {
+      try {
+        session = await stripe.checkout.sessions.create({
+          ...sessionBase,
+          ...attempt,
+        });
+        break;
+      } catch (error) {
+        lastError = error;
+        const message = error instanceof Error ? error.message : '';
+        if (!/alipay|wechat|payment method/i.test(message)) throw error;
+      }
+    }
+    if (!session) throw lastError;
 
     return NextResponse.json({ clientSecret: session.client_secret });
   } catch (error: any) {

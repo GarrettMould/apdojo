@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Nominal vs. Real Interest Rates Deep Dive: Understanding Interest Rates and Inflation | AP Dojo',
+  title: 'Nominal vs. Real Interest Rates Deep Dive: Understanding Interest Rates and Inflation',
   description: 'Master the difference between nominal and real interest rates. Learn how to calculate real rates and understand the Fisher Effect.',
   openGraph: {
-    title: 'Nominal vs. Real Interest Rates Deep Dive: Understanding Interest Rates and Inflation | AP Dojo',
+    title: 'Nominal vs. Real Interest Rates Deep Dive: Understanding Interest Rates and Inflation',
     description: 'Master the difference between nominal and real interest rates and how inflation affects them.',
   },
   alternates: {

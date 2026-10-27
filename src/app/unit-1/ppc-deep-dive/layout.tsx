@@ -1,14 +1,14 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'PPC and Opportunity Cost Deep Dive: Production Possibilities Curve Explained | AP Dojo',
+  title: 'PPC and Opportunity Cost Deep Dive: Production Possibilities Curve Explained',
   description: 'Master the Production Possibilities Curve (PPC) and understand how opportunity cost shapes economic decisions. Learn about bowed-out curves, efficiency, and economic growth.',
   openGraph: {
-    title: 'PPC and Opportunity Cost Deep Dive: Production Possibilities Curve Explained | AP Dojo',
+    title: 'PPC and Opportunity Cost Deep Dive: Production Possibilities Curve Explained',
     description: 'Master the Production Possibilities Curve (PPC) and understand how opportunity cost shapes economic decisions.',
   },
   alternates: {
-    canonical: 'https://apdojo.com/unit-1/ppc-deep-dive',
+    canonical: 'https://apdojo.com/ap-macro/unit-1/production-possibilities-curve',
   },
 };
 

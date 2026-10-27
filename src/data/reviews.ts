@@ -1,9 +1,19 @@
+import type { SeasonPassPurchaseType } from '@/data/seasonPassCourseConfig';
+
 export interface Review {
   text: string;
   author: string;
   lessonCount?: number; // For old tutoring reviews
   badge?: string; // For new platform reviews (e.g., "Parent", "Student")
   title?: string;
+  /** Omit to show on every checkout. Otherwise only those purchase types. */
+  courses?: SeasonPassPurchaseType[];
+}
+
+const ECON_COURSES: SeasonPassPurchaseType[] = ['macro', 'micro', 'bundle'];
+
+export function reviewsForPurchase(courseType: SeasonPassPurchaseType): Review[] {
+  return reviews.filter((review) => !review.courses || review.courses.includes(courseType));
 }
 
 // Old tutoring session reviews (kept for backward compatibility)
@@ -112,25 +122,29 @@ export const reviews: Review[] = [
     text: "My kid was struggling with her online AP Macro class. AP Dojo was the perfect supplement—the lessons are professional, concise, and focused purely on the exam. I love that many of the hardest questions came with video explanations.",
     author: "I-Wen",
     badge: "Parent",
-    title: "Perfect supplement to school"
+    title: "Perfect supplement to school",
+    courses: ECON_COURSES,
   },
   {
     text: "The step-by-step simulations made the AD-AS diagrams actually make sense. The platform is super organized, and having practice questions right next to the graphs is a game-changer. Definitely the best resource I've found.",
     author: "Meldev",
     badge: "Student",
-    title: "Finally understand the graphs"
+    title: "Finally understand the graphs",
+    courses: ECON_COURSES,
   },
   {
     text: "I couldn't have prepped for AP Micro without this site. It covered every unit thoroughly, and the exam strategies were spot on. The explanations for market structures were particularly helpful. I ended up getting a 5 on the exam!",
     author: "Michelle",
     badge: "Student",
-    title: "Achieved a 5 on the exam!"
+    title: "Achieved a 5 on the exam!",
+    courses: ['micro', 'bundle'],
   },
   {
     text: "My daughter struggled with supply and demand curves, but AP Dojo's interactive graphs finally made it click. Being able to actually move the lines and see the shifts in real-time helped her connect theory to practice.",
     author: "Priyanka S.",
     badge: "Parent",
-    title: "Interactive graphs are amazing"
+    title: "Interactive graphs are amazing",
+    courses: ECON_COURSES,
   },
   {
     text: "We bought the Season Pass about 6 weeks before the AP exam. The structured 'Belt System' was exactly what my son needed—it covers all the key topics systematically without wasting time. He went from nervous to confident.",
@@ -142,24 +156,28 @@ export const reviews: Review[] = [
     text: "My son was falling behind in Macro and we were worried he wouldn't pass. AP Dojo turned things around completely. The platform explains concepts in multiple ways—video, text, and graph—until it clicks.",
     author: "Kristal",
     badge: "Parent",
-    title: "Turned things around completely"
+    title: "Turned things around completely",
+    courses: ['macro', 'bundle'],
   },
   {
     text: "An outstanding resource. My daughter has gone from struggling to excelling in AP Micro. What sets AP Dojo apart is how well-structured the modules are. She says the explanations are clearer than her textbook.",
     author: "Kim Y.",
     badge: "Parent",
-    title: "Clearer than the textbook"
+    title: "Clearer than the textbook",
+    courses: ['micro', 'bundle'],
   },
   {
     text: "My daughter was initially overwhelmed by all the graphs, but AP Dojo has a way of making everything clear. The 'Concept Checks' after every video ensure she actually gets it before moving on. Her teacher has noticed a huge improvement.",
     author: "Li Chen",
     badge: "Parent",
-    title: "Great follow-up and structure"
+    title: "Great follow-up and structure",
+    courses: ECON_COURSES,
   },
   {
     text: "I was struggling with fiscal policy, but AP Dojo explained it step-by-step. The diagrams finally clicked for me. It's very organized and always prepared with practice questions. After just a few modules, I felt much more confident.",
     author: "Jen",
     badge: "Student",
-    title: "Confidence improved significantly"
+    title: "Confidence improved significantly",
+    courses: ['macro', 'bundle'],
   }
 ]; 

@@ -5,11 +5,16 @@ import { govUnits } from '@/data/cheatSheets';
 const unit = govUnits.find((u) => u.number === 5)!;
 
 export const metadata: Metadata = {
-  title: `AP Gov Unit 5 Cheat Sheet: ${unit.title} | AP Dojo`,
+  title: `AP Gov Unit 5 Cheat Sheet: ${unit.title}`,
   description:
     `Free AP U.S. Government Unit 5 cheat sheet covering ${unit.title}. Review key terms, definitions, required cases, and unit-aligned practice.`,
   openGraph: {
-    title: `AP Gov Unit 5 Cheat Sheet: ${unit.title} | AP Dojo`,
+    title: `AP Gov Unit 5 Cheat Sheet: ${unit.title}`,
+    description: `Free AP U.S. Government Unit 5 cheat sheet covering ${unit.title}.`,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `AP Gov Unit 5 Cheat Sheet: ${unit.title}`,
     description: `Free AP U.S. Government Unit 5 cheat sheet covering ${unit.title}.`,
   },
   alternates: {

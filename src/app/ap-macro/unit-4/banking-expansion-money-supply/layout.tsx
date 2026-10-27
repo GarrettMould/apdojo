@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Banking and the Expansion of the Money Supply Deep Dive | AP Dojo',
+  title: 'Banking and the Expansion of the Money Supply Deep Dive',
   description: 'Master fractional reserve banking and how banks create money through the lending process. Learn about the money multiplier and how the money supply expands.',
   openGraph: {
-    title: 'Banking and the Expansion of the Money Supply Deep Dive | AP Dojo',
+    title: 'Banking and the Expansion of the Money Supply Deep Dive',
     description: 'Master fractional reserve banking and how banks create money through the lending process.',
   },
   alternates: {

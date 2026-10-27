@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'The Phillips Curve Deep Dive | AP Dojo',
+  title: 'The Phillips Curve Deep Dive',
   description: 'Master the Short-Run and Long-Run Phillips Curves. Understand the trade-off between inflation and unemployment and how policy affects both curves.',
   openGraph: {
-    title: 'The Phillips Curve Deep Dive | AP Dojo',
+    title: 'The Phillips Curve Deep Dive',
     description: 'Master the Short-Run and Long-Run Phillips Curves and the trade-off between inflation and unemployment.',
   },
   alternates: {

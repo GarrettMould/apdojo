@@ -140,8 +140,21 @@ const nextConfig = {
       });
     }
 
-    // Redirect bare practice-tests URL to macro pretty URL (legacy bookmarks).
-    // Do NOT redirect when ?subject= is present — those URLs must load Gov/Micro/etc.
+    // Point every practice-tests variant at the pretty subject URL Google should index.
+    const practiceTestDestinations: Record<string, string> = {
+      macro: '/ap-macro-practice-tests',
+      micro: '/ap-micro-practice-tests',
+      gov: '/ap-gov-practice-tests',
+      stats: '/ap-stats-practice-tests',
+    };
+    for (const [subject, destination] of Object.entries(practiceTestDestinations)) {
+      redirects.push({
+        source: '/unit-final-practice-tests',
+        has: [{ type: 'query', key: 'subject', value: subject }],
+        destination,
+        permanent: true,
+      } as any);
+    }
     redirects.push(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Next supports `missing`; inferred redirect array type does not.
       {
@@ -251,23 +264,7 @@ const nextConfig = {
       destination: '/preview/micro/frq/1',
     });
 
-    // Practice tests page rewrites
-    rewrites.push({
-      source: '/ap-macro-practice-tests',
-      destination: '/unit-final-practice-tests?subject=macro',
-    });
-    rewrites.push({
-      source: '/ap-micro-practice-tests',
-      destination: '/unit-final-practice-tests?subject=micro',
-    });
-    rewrites.push({
-      source: '/ap-gov-practice-tests',
-      destination: '/unit-final-practice-tests?subject=gov',
-    });
-    rewrites.push({
-      source: '/ap-stats-practice-tests',
-      destination: '/unit-final-practice-tests?subject=stats',
-    });
+    // Pretty practice-test URLs are real routes now so they can have their own canonicals.
 
     return rewrites;
   },

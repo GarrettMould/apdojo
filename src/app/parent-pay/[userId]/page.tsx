@@ -2,12 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
-import { loadStripe } from '@stripe/stripe-js';
 import { motion } from 'framer-motion';
 import { ShieldCheck, CheckCircle2, Loader2, Star, Trophy, ChevronRight } from 'lucide-react';
-
-// Initialize Stripe
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+import { startSeasonPassCheckout } from '@/lib/seasonPassCheckout';
 
 // CONFIGURATION — listPrice = price before discount; discount = listPrice - price
 const PRODUCTS = {
@@ -44,6 +41,28 @@ const PRODUCTS = {
       'AI-Powered FRQ Grading',
     ]
   },
+  gov: {
+    name: 'AP Gov Season Pass',
+    price: 29,
+    listPrice: 39,
+    features: [
+      'Unit MCQ practice and formal unit tests',
+      'SCOTUS comparison and Gov FRQ practice',
+      'Unit cheat sheets and printable PDFs',
+      'Valid through June 30, 2027',
+    ]
+  },
+  stats: {
+    name: 'AP Stats Season Pass',
+    price: 29,
+    listPrice: 39,
+    features: [
+      'Unit MCQ practice and formal unit tests',
+      'Unit FRQ packs',
+      'Unit cheat sheets and printable PDFs',
+      'Valid through June 30, 2027',
+    ]
+  },
 };
 
 export default function ParentPayPage() {
@@ -52,7 +71,10 @@ export default function ParentPayPage() {
 
   // 1. Determine Product based on URL (?product=bundle)
   const productSlug = searchParams.get('product');
-  const productKey = (productSlug === 'bundle' || productSlug === 'micro') ? productSlug : 'macro';
+  const productKey =
+    productSlug === 'bundle' || productSlug === 'micro' || productSlug === 'gov' || productSlug === 'stats'
+      ? productSlug
+      : 'macro';
   const product = PRODUCTS[productKey as keyof typeof PRODUCTS];
 
   // 2. State
@@ -89,26 +111,11 @@ export default function ParentPayPage() {
     if (!userId) return;
     setPayLoading(true);
     try {
-      const response = await fetch('/api/create-season-pass-checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          purchaseType: productKey, // 'bundle', 'macro', or 'micro'
-          userId,
-          isParentGift: true,
-        }),
+      await startSeasonPassCheckout({
+        purchaseType: productKey,
+        userId,
+        isParentGift: true,
       });
-      const data = await response.json();
-      if (!response.ok) {
-        const msg = data.error || data.details || 'Failed to start checkout';
-        throw new Error(typeof msg === 'string' ? msg : JSON.stringify(msg));
-      }
-
-      const stripe = await stripePromise;
-      if (!stripe) throw new Error('Payment system unavailable. Missing Stripe key.');
-      if (!data.sessionId) throw new Error('No checkout session received.');
-      const result = await stripe.redirectToCheckout({ sessionId: data.sessionId });
-      if (result?.error) throw new Error(result.error.message || 'Redirect to payment failed.');
     } catch (e) {
       const message = e instanceof Error ? e.message : 'Payment initialization failed. Please try again.';
       alert(message);
@@ -197,7 +204,7 @@ export default function ParentPayPage() {
                 <div className="pt-6 space-y-4 border-t border-gray-200 mt-6">
                   <p className="text-sm font-bold text-gray-700">What happens next</p>
                   <ol className="text-sm text-gray-600 space-y-2 list-decimal list-inside">
-                    <li>Complete payment securely with your card.</li>
+                    <li>Pay with a card, Alipay, or WeChat.</li>
                     <li>Your student&apos;s account is upgraded immediately.</li>
                     <li>Receipt and confirmation sent to your email.</li>
                   </ol>
@@ -227,7 +234,7 @@ export default function ParentPayPage() {
                 </motion.button>
                 <div className="mt-4 flex justify-center items-center gap-2 text-xs text-gray-400">
                   <ShieldCheck size={14} />
-                  <span>Processed securely via Stripe. Receipt sent via email.</span>
+                  <span>Secure checkout. Card, Alipay, or WeChat. Receipt sent by email.</span>
                 </div>
               </div>
             </div>

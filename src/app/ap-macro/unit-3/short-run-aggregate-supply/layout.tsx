@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Short-Run Aggregate Supply (SRAS) Deep Dive: Understanding Short-Run Production | AP Dojo',
+  title: 'Short-Run Aggregate Supply (SRAS) Deep Dive: Understanding Short-Run Production',
   description: 'Master Short-Run Aggregate Supply (SRAS) and understand how firms respond to price level changes in the short run. Learn about the SRAS curve and its determinants.',
   openGraph: {
-    title: 'Short-Run Aggregate Supply (SRAS) Deep Dive: Understanding Short-Run Production | AP Dojo',
+    title: 'Short-Run Aggregate Supply (SRAS) Deep Dive: Understanding Short-Run Production',
     description: 'Master Short-Run Aggregate Supply (SRAS) and understand how firms respond to price level changes in the short run.',
   },
   alternates: {

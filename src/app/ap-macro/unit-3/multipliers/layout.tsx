@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Multipliers Deep Dive: Understanding the Spending and Tax Multipliers | AP Dojo',
+  title: 'Multipliers Deep Dive: Understanding the Spending and Tax Multipliers',
   description: 'Master the concept of multipliers in macroeconomics. Learn how changes in spending and taxes have amplified effects on aggregate demand and economic output.',
   openGraph: {
-    title: 'Multipliers Deep Dive: Understanding the Spending and Tax Multipliers | AP Dojo',
+    title: 'Multipliers Deep Dive: Understanding the Spending and Tax Multipliers',
     description: 'Master the concept of multipliers in macroeconomics and how changes in spending and taxes affect the economy.',
   },
   alternates: {

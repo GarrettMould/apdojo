@@ -3,8 +3,8 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle2, Star, ShieldCheck } from 'lucide-react';
-import { loadStripe } from '@stripe/stripe-js';
 import { useAuthContext } from '@/contexts/AuthContext';
+import { startSeasonPassCheckout } from '@/lib/seasonPassCheckout';
 import { ParentPaymentModal } from '@/components/ParentPaymentModal';
 import { SeasonPassCourseSwitcher } from '@/components/EmbeddedCheckoutPage';
 import { reviews } from '@/data/reviews';
@@ -29,34 +29,10 @@ export function BundlePurchasePage() {
     setIsLoading(true);
     try {
       // Create bundle checkout session
-      const response = await fetch('/api/create-season-pass-checkout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          purchaseType: 'bundle',
-          userId: user.uid,
-        }),
+      await startSeasonPassCheckout({
+        purchaseType: 'bundle',
+        userId: user.uid,
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create checkout session');
-      }
-
-      const { sessionId } = await response.json();
-      
-      // Redirect to Stripe Checkout
-      const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
-      if (!stripe) {
-        throw new Error('Failed to load Stripe');
-      }
-
-      const { error } = await stripe.redirectToCheckout({ sessionId });
-      if (error) {
-        throw error;
-      }
     } catch (error) {
       console.error('Error initiating purchase:', error);
       alert(error instanceof Error ? error.message : 'Failed to start checkout. Please try again.');
@@ -191,7 +167,7 @@ export function BundlePurchasePage() {
               >
                 <span>Don&apos;t have a credit card?</span>
                 <span className="underline decoration-dotted underline-offset-4 group-hover:text-blue-600 font-medium">
-                  Email cart to parent
+                  Send a parent the payment link
                 </span>
               </button>
             </div>

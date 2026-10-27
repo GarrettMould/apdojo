@@ -68,7 +68,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   
   if (!guide) {
     return {
-      title: 'Study Guide Not Found | AP Dojo',
+      title: 'Study Guide Not Found',
       description: 'The requested study guide could not be found.',
     };
   }

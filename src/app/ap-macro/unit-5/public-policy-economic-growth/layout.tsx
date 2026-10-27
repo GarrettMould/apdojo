@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Public Policy and Economic Growth Deep Dive | AP Dojo',
+  title: 'Public Policy and Economic Growth Deep Dive',
   description: 'Learn how public policies such as education investment, infrastructure spending, and R&D incentives promote long-run economic growth.',
   openGraph: {
-    title: 'Public Policy and Economic Growth Deep Dive | AP Dojo',
+    title: 'Public Policy and Economic Growth Deep Dive',
     description: 'Learn how public policies promote long-run economic growth.',
   },
   alternates: {

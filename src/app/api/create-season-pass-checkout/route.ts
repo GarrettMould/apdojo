@@ -75,30 +75,58 @@ export async function POST(req: Request) {
     // Bundle should add both 'macro' and 'micro' to seasonPass
     const courseType = purchaseType === 'bundle' ? 'bundle' : purchaseType;
     
-    // Create checkout session using the Stripe Price ID
-    const session = await stripe.checkout.sessions.create({
+    // Card, plus Alipay and WeChat for parents paying from China.
+    // If a wallet is not turned on in the Stripe dashboard, drop it and retry.
+    const sessionBase = {
       line_items: [
         {
-          price: priceId, // Use the Price ID from your Stripe product
+          price: priceId,
           quantity: 1,
         },
       ],
-      mode: 'payment',
-      // client_reference_id is optional; include when we know the app user
+      mode: 'payment' as const,
       client_reference_id: userId,
       metadata: {
         purchaseType: 'season-pass',
-        courseType: courseType, // 'macro', 'micro', or 'bundle'
+        courseType: courseType,
         userId: userId ?? '',
         source: isParentGift ? 'parent_gift' : userId ? 'student_purchase' : 'guest_checkout',
       },
-      // After payment, send users to a claim page that can attach the pass
-      // to an account using the Checkout session ID and email.
       success_url: `${baseUrl}/season-pass/claim?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: cancelUrl || `${baseUrl}/`,
-    });
+    };
 
-    return NextResponse.json({ sessionId: session.id });
+    const attempts: Array<{
+      payment_method_types: Array<'card' | 'alipay' | 'wechat_pay'>;
+      payment_method_options?: { wechat_pay: { client: 'web' } };
+    }> = [
+      {
+        payment_method_types: ['card', 'alipay', 'wechat_pay'],
+        payment_method_options: { wechat_pay: { client: 'web' } },
+      },
+      { payment_method_types: ['card', 'alipay'] },
+      { payment_method_types: ['card'] },
+    ];
+
+    let session: Stripe.Checkout.Session | null = null;
+    let lastError: unknown;
+    for (const attempt of attempts) {
+      try {
+        session = await stripe.checkout.sessions.create({
+          ...sessionBase,
+          ...attempt,
+        });
+        break;
+      } catch (error) {
+        lastError = error;
+        const message = error instanceof Error ? error.message : '';
+        const walletRejected = /alipay|wechat|payment method/i.test(message);
+        if (!walletRejected) throw error;
+      }
+    }
+    if (!session) throw lastError;
+
+    return NextResponse.json({ sessionId: session.id, url: session.url });
   } catch (error) {
     console.error('Error creating season pass checkout session:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';

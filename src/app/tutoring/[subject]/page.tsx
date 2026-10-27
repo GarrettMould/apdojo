@@ -16,11 +16,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { subject: raw } = await params;
   const subject = parseTutoringSubject(raw);
   if (!subject) {
-    return { title: 'Tutoring | AP Dojo' };
+    return { title: 'Tutoring' };
   }
   const config = getTutoringPageConfig(subject);
   return {
-    title: `${config.courseLabel} Tutoring | AP Dojo`,
+    title: `${config.courseLabel} Tutoring`,
     description: config.supporting,
   };
 }

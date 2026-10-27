@@ -59,7 +59,7 @@ export const govUnit4McqTestQuestions: Question[] = [
       'Which of the following scenarios best illustrates the "generational effect" on political socialization?',
     image: null,
     options: [
-      'A person’s political views shift to the right as they enter retirement.',
+      'A person’s political views shift to the right as they enter retirement, which is a life-cycle change rather than a generational pattern that stays stable over a lifetime.',
       'A voter changing their stance on an issue due to a specific scandal involving a single candidate.',
       'A student changing their party identification after taking a college course.',
       'A group of voters who came of age during the Great Depression consistently favoring a larger federal role in the economy throughout their lives.',
@@ -169,7 +169,7 @@ export const govUnit4McqTestQuestions: Question[] = [
     image: null,
     options: [
       'They act as external shocks that can shift the ideological focus of a generation or change the public’s view of government’s proper role.',
-      'They force the government to dissolve all political parties.',
+      'They force the government to dissolve all political parties and freeze every generation\'s ideology in place from childhood onward.',
       'They ensure that all citizens will adopt the exact same ideology.',
       'They have no impact on political ideology, as socialization ends at age eighteen.',
     ],
@@ -230,7 +230,7 @@ export const govUnit4McqTestQuestions: Question[] = [
       alt: 'Line graph showing public trust in the federal government over time since the 1960s',
     },
     options: [
-      'The claim is valid because declining response rates in modern polling make all survey data from after 1980 statistically unreliable.',
+      'The claim is valid because declining response rates in modern polling make all survey data from after 1980 statistically unreliable, even when multiple independent organizations show the same long-term decline.',
       'The claim is valid because social desirability bias causes respondents to overreport trust in government, meaning actual trust levels are even lower than the graph shows.',
       'The claim is not well supported because the consistent downward trend across multiple independent polling organizations over decades suggests the data reflects a genuine shift in public attitudes rather than a methodological problem.',
       'The claim cannot be evaluated because public trust is a qualitative concept that cannot be accurately captured through survey research.',
@@ -328,7 +328,7 @@ export const govUnit4McqTestQuestions: Question[] = [
       'A teenager who primarily consumes political content through social media algorithms begins to hold increasingly extreme views compared to their parents. Which of the following best explains this divergence through the lens of political socialization?',
     image: null,
     options: [
-      'The life cycle effect, because teenagers naturally adopt more extreme views as they age.',
+      'The life cycle effect, because teenagers naturally adopt more extreme views as they age and because social media cannot act as a new agent of political socialization.',
       'The influence of a new socialization agent — social media — exposing the teenager to a narrower, more polarized information environment than traditional media.',
       'A generational effect, because all teenagers in this era will permanently hold more extreme views.',
       'Peer pressure from classmates overriding the family as the primary socialization agent.',
@@ -349,7 +349,7 @@ export const govUnit4McqTestQuestions: Question[] = [
     image: null,
     options: [
       'The senator raises a valid methodological concern, because sampling bias toward urban residents could systematically overstate support for environmental regulation.',
-      'The senator\'s critique is irrelevant because a margin of error of ±3% guarantees the sample is representative.',
+      'The senator\'s critique is irrelevant because a margin of error of ±3% guarantees the sample is representative even if urban residents were systematically oversampled.',
       'The senator\'s critique is invalid because polls with large sample sizes are always accurate.',
       'The senator is correct that all polls overstate support for environmental regulation due to social desirability bias.',
     ],
@@ -368,7 +368,7 @@ export const govUnit4McqTestQuestions: Question[] = [
       'A campaign releases an internal poll two weeks before an election showing their candidate leading by 12 points. A week later, a neutral university releases a poll showing the same candidate leading by only 3 points. Which of the following best explains how a political scientist should interpret these results?',
     image: null,
     options: [
-      'The campaign\'s internal poll is more accurate because it had access to more voter data.',
+      'The campaign\'s internal poll is more accurate because it had access to more voter data and because internal polls are designed to be independent of the campaign\'s strategic incentives.',
       'Both polls are equally valid because they were conducted in the same election cycle.',
       'The university poll should be weighted more heavily because it comes from an independent source with transparent methodology, while internal campaign polls may reflect motivated reasoning.',
       'Neither poll is reliable because they were conducted before Election Day.',
@@ -435,7 +435,7 @@ export const govUnit4McqTestQuestions: Question[] = [
       'Research consistently shows that younger voters are more likely to support expansive government social programs than older voters. Which of the following best explains this pattern using concepts from political socialization?',
     image: null,
     options: [
-      'Older voters have lower levels of education and are therefore less informed about social programs.',
+      'Older voters have lower levels of education and are therefore less informed about social programs, which fully explains why younger voters prefer a larger government role in the economy.',
       'A combination of life cycle effects — where younger people have less accumulated wealth and property to protect — and generational effects from coming of age in a period of rising economic inequality.',
       'Younger voters are more influenced by peer groups, which always favor liberal policies.',
       'Older voters consistently vote at lower rates, reducing the influence of their preferences on policy.',

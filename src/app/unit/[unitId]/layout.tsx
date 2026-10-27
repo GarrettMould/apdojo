@@ -74,7 +74,7 @@ export async function generateMetadata({ params }: { params: Promise<{ unitId: s
   
   if (isNaN(unitId) || unitId < 1 || unitId > 6) {
     return {
-      title: 'Unit Not Found | AP Dojo',
+      title: 'Unit Not Found',
       description: 'The requested unit could not be found.',
     };
   }
@@ -83,7 +83,7 @@ export async function generateMetadata({ params }: { params: Promise<{ unitId: s
   const meta = UNIT_META.macro[unitId];
   
   return {
-    title: `${meta.title} | AP Dojo`,
+    title: meta.title,
     description: meta.description,
     keywords: [...meta.keywords, 'AP Dojo', 'AP economics cheat sheet', 'free AP study materials', 'AP exam prep 2026'].join(', '),
     openGraph: {

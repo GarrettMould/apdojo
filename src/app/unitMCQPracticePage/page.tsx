@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { X, Loader2, Lock, ArrowRight, CheckCircle2, Star, ShieldCheck, Pen } from 'lucide-react';
+import { X, Loader2, Lock, ArrowRight, CheckCircle2, Star, ShieldCheck, Pen, Sigma } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { SeasonPassModal } from '@/components/SeasonPassModal';
@@ -12,6 +12,8 @@ import { useCreditSystem } from '@/hooks/useCreditSystem';
 import { UnitMCQs } from '@/components/unitMCQS';
 import { useQuestionBank } from '@/hooks/useQuestionBank';
 import { Question as QuestionType } from '@/data/questionBanks/types';
+import { statsMcqPracticeQuestions } from '@/data/stats/statsMcqPractice';
+import { govMcqPracticeQuestions } from '@/data/gov/govMcqPractice';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp, doc, updateDoc, increment, getDoc } from 'firebase/firestore';
 import dojoIcon from "../../../public/images/dojoIcon.png"
@@ -436,6 +438,8 @@ function UnitMCQPracticeContent() {
   // Review folder + scratch pad (same chrome as /mcq-practice/...)
   const [scratchToggleSignal, setScratchToggleSignal] = useState(0);
   const [scratchActive, setScratchActive] = useState<'draw' | 'notes' | null>(null);
+  const [formulaToggleSignal, setFormulaToggleSignal] = useState(0);
+  const [formulaSheetOpen, setFormulaSheetOpen] = useState(false);
   const [reviewState, setReviewState] = useState<ReviewFolderState>({
     version: 1,
     misses: [],
@@ -456,6 +460,8 @@ function UnitMCQPracticeContent() {
 
   // Developer tool: Test specific question by ID
   const [testQuestionId, setTestQuestionId] = useState<string>("");
+  const [devJumpId, setDevJumpId] = useState('');
+  const [devJumpError, setDevJumpError] = useState<string | null>(null);
   const isDeveloper = user?.email === 'garrett@apdojo.com' || user?.email === 'garrettmould@gmail.com' || (typeof window !== 'undefined' && window.location.hostname === 'localhost');
   
   // Track previous filter criteria to prevent unnecessary reloads
@@ -1060,6 +1066,38 @@ function UnitMCQPracticeContent() {
     setCurrentQuestionIndex(index);
   };
 
+  const handleDevJumpToId = (raw: string) => {
+    const id = Number.parseInt(raw.trim(), 10);
+    if (!Number.isFinite(id)) {
+      setDevJumpError('Enter a numeric ID');
+      return;
+    }
+
+    const inSession = questionsForPractice.findIndex((q) => Number(q.id) === id);
+    if (inSession >= 0) {
+      setCurrentQuestionIndex(inSession);
+      setDevJumpError(null);
+      return;
+    }
+
+    const bank =
+      subject === 'stats'
+        ? statsMcqPracticeQuestions
+        : subject === 'gov'
+          ? govMcqPracticeQuestions
+          : allQuestions;
+    const fromBank = bank.find((q) => Number(q.id) === id);
+    if (!fromBank) {
+      setDevJumpError(`No ${subject} question ${id}`);
+      return;
+    }
+
+    setQuestionsForPractice((prev) => [fromBank, ...prev.filter((q) => Number(q.id) !== id)]);
+    setTotalQuestionsInSet((n) => n + 1);
+    setCurrentQuestionIndex(0);
+    setDevJumpError(null);
+  };
+
   const handleUnitChange = (unitNumber: number) => {
     setCurrentUnit(unitNumber);
     setCurrentQuestionIndex(0);
@@ -1162,6 +1200,48 @@ function UnitMCQPracticeContent() {
         <div className="max-w-7xl mx-auto px-4 py-8 pt-8">
           {!isLoadingQuestionSet && (questionsForPractice.length > 0 || reviewState.misses.length > 0) ? (
             <div className="mb-6 flex items-center justify-end gap-4">
+              {process.env.NODE_ENV === 'development' ? (
+                <form
+                  className="flex flex-shrink-0 items-center gap-1.5 rounded border border-dashed border-amber-400 bg-amber-50 px-2 py-1"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleDevJumpToId(devJumpId);
+                  }}
+                >
+                  <label htmlFor="dev-mcq-id-jump-legacy" className="text-[10px] font-semibold uppercase tracking-wide text-amber-800">
+                    Dev ID
+                  </label>
+                  <input
+                    id="dev-mcq-id-jump-legacy"
+                    type="text"
+                    inputMode="numeric"
+                    value={devJumpId}
+                    onChange={(e) => {
+                      setDevJumpId(e.target.value);
+                      if (devJumpError) setDevJumpError(null);
+                    }}
+                    placeholder={
+                      questionsForPractice[currentQuestionIndex]?.id != null
+                        ? String(questionsForPractice[currentQuestionIndex].id)
+                        : 'id'
+                    }
+                    className="h-6 w-20 rounded border border-amber-300 bg-white px-1.5 text-xs text-gray-900 outline-none focus:border-amber-500"
+                  />
+                  <button
+                    type="submit"
+                    className="h-6 rounded bg-amber-500 px-1.5 text-[10px] font-semibold uppercase text-white hover:bg-amber-600"
+                  >
+                    Go
+                  </button>
+                  {devJumpError ? (
+                    <span className="max-w-[10rem] truncate text-[10px] text-red-600">{devJumpError}</span>
+                  ) : questionsForPractice[currentQuestionIndex]?.id != null ? (
+                    <span className="text-[10px] text-amber-800">
+                      now {questionsForPractice[currentQuestionIndex].id}
+                    </span>
+                  ) : null}
+                </form>
+              ) : null}
               {REMATCH_ENABLED ? (
                 <ReviewFolderButton
                   count={reviewState.misses.length}
@@ -1171,21 +1251,40 @@ function UnitMCQPracticeContent() {
                 />
               ) : null}
               {questionsForPractice.length > 0 ? (
-                <button
-                  type="button"
-                  onClick={() => setScratchToggleSignal((n) => n + 1)}
-                  className={`inline-flex flex-shrink-0 items-center gap-1.5 text-sm transition-colors ${
-                    scratchActive
-                      ? 'text-gray-900 font-medium'
-                      : 'text-gray-500 hover:text-gray-800'
-                  }`}
-                  aria-pressed={!!scratchActive}
-                  aria-label={scratchActive ? 'Close scratch pad' : 'Open scratch pad'}
-                  title={scratchActive ? 'Close scratch pad' : 'Scratch pad (draw or notes)'}
-                >
-                  <Pen className="h-4 w-4" />
-                  <span>Scratch pad</span>
-                </button>
+                <>
+                  {subject === 'stats' ? (
+                    <button
+                      type="button"
+                      onClick={() => setFormulaToggleSignal((n) => n + 1)}
+                      className={`inline-flex flex-shrink-0 items-center gap-1.5 text-sm transition-colors ${
+                        formulaSheetOpen
+                          ? 'text-gray-900 font-medium'
+                          : 'text-gray-500 hover:text-gray-800'
+                      }`}
+                      aria-pressed={formulaSheetOpen}
+                      aria-label={formulaSheetOpen ? 'Close formula sheet' : 'Open formula sheet'}
+                      title={formulaSheetOpen ? 'Close formula sheet' : 'Exam-style formula sheet'}
+                    >
+                      <Sigma className="h-4 w-4" />
+                      <span>Formulas</span>
+                    </button>
+                  ) : null}
+                  <button
+                    type="button"
+                    onClick={() => setScratchToggleSignal((n) => n + 1)}
+                    className={`inline-flex flex-shrink-0 items-center gap-1.5 text-sm transition-colors ${
+                      scratchActive
+                        ? 'text-gray-900 font-medium'
+                        : 'text-gray-500 hover:text-gray-800'
+                    }`}
+                    aria-pressed={!!scratchActive}
+                    aria-label={scratchActive ? 'Close scratch pad' : 'Open scratch pad'}
+                    title={scratchActive ? 'Close scratch pad' : 'Scratch pad (draw or notes)'}
+                  >
+                    <Pen className="h-4 w-4" />
+                    <span>Scratch pad</span>
+                  </button>
+                </>
               ) : null}
             </div>
           ) : null}
@@ -1274,6 +1373,8 @@ function UnitMCQPracticeContent() {
               showFloatingScratchToolbar={false}
               scratchToggleSignal={scratchToggleSignal}
               onScratchActiveChange={setScratchActive}
+              formulaToggleSignal={formulaToggleSignal}
+              onFormulaActiveChange={setFormulaSheetOpen}
             />
           )}
         </div>

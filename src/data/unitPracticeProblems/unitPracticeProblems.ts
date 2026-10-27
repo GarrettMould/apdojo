@@ -3,6 +3,8 @@ import { govMcqPracticeQuestions } from '@/data/gov/govMcqPractice';
 import { statsMcqPracticeQuestions } from '@/data/stats/statsMcqPractice';
 import { microTableMcqPreviewQuestions } from '@/data/micro/microTableMcqPreview';
 import { macroV2McqPreviewQuestions } from '@/data/macro/macroV2McqPreview';
+import { macroStimulusByUnit } from '@/data/macro/macroStimulusMcqPractice';
+import { microStimulusByUnit } from '@/data/micro/microStimulusMcqPractice';
 
 /** v2 micro table MCQs (ids 25xxx). Appended into each micro unit practice array. */
 const microV2TableByUnit = (unit: number) =>
@@ -695,7 +697,8 @@ const macroUnit1Questions = [
     "correctAnswer": "C",
     "explanation": "To move from Combination B to Combination C, the production of Heavy Trucks increases from 10,000 to 20,000. However, the production of Patrol Boats decreases from 18,000 to 15,000. The opportunity cost is the amount of the alternative good given up: $18,000 - 15,000 = 3,000$ Patrol Boats.",
     "videoExplanation": null
-  }
+  },
+  ...macroStimulusByUnit(1),
 ]
 
 
@@ -1827,6 +1830,7 @@ const macroUnit2Questions = [
     "videoExplanation": null
   },
   ...macroV2TableByUnit(2),
+  ...macroStimulusByUnit(2),
 ]
 
 
@@ -2743,6 +2747,7 @@ const macroUnit3Questions = [
     "videoExplanation": null
     },
   ...macroV2TableByUnit(3),
+  ...macroStimulusByUnit(3),
 ]
 
 
@@ -3488,6 +3493,7 @@ const macroUnit4Questions = [
     "videoExplanation": null
     },
   ...macroV2TableByUnit(4),
+  ...macroStimulusByUnit(4),
 ]
 
 
@@ -4233,6 +4239,7 @@ const macroUnit5Questions = [
 "videoExplanation": null
 },
   ...macroV2TableByUnit(5),
+  ...macroStimulusByUnit(5),
 ]
 
 
@@ -4508,6 +4515,7 @@ const macroUnit6Questions = [
     "videoExplanation": null
   },
   ...macroV2TableByUnit(6),
+  ...macroStimulusByUnit(6),
 ]
 
 
@@ -5251,6 +5259,7 @@ const microUnit2Questions = [
     "videoExplanation": null
   },
   ...microV2TableByUnit(2),
+  ...microStimulusByUnit(2),
 ]
 
 
@@ -8110,7 +8119,7 @@ export const allQuestions: QuestionType[] = [
     "unit": 3,
     "lessonIDS": ["3.7"],
     "unitName": "National Income and Price Determination",
-    "question": "If an economy is experiencing an inflationary gap (actual output > potential output), how will the economy typically self-adjust back to long-run equilibrium assuming no government intervention?",
+    "question": "If an economy is experiencing an inflationary gap, how will the economy typically self-adjust back to long-run equilibrium assuming no government intervention?",
     "image": null,
     "options": [
       "Nominal wages will fall, shifting SRAS right.",

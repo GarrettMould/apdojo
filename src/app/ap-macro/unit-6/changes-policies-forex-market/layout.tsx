@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Effect of Changes in Policies and Economic Conditions on the Foreign Exchange Market Deep Dive | AP Dojo',
+  title: 'Effect of Changes in Policies and Economic Conditions on the Foreign Exchange Market Deep Dive',
   description: 'Understand how fiscal and monetary policy affect exchange rates through interest rates and capital flows.',
   openGraph: {
-    title: 'Effect of Changes in Policies and Economic Conditions on the Foreign Exchange Market Deep Dive | AP Dojo',
+    title: 'Effect of Changes in Policies and Economic Conditions on the Foreign Exchange Market Deep Dive',
     description: 'Understand how fiscal and monetary policy affect exchange rates.',
   },
   alternates: {

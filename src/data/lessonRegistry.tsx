@@ -425,3 +425,20 @@ export function getLessonData(
 ): LessonContent | null {
   return registry.get(key(subject, unit, slug)) ?? null;
 }
+
+export function listRegisteredLessons(subject: string): Array<{
+  unit: string;
+  slug: string;
+  id: string;
+  title: string;
+}> {
+  const prefix = `${subject}:`;
+  const results: Array<{ unit: string; slug: string; id: string; title: string }> = [];
+  for (const [registryKey, lesson] of registry.entries()) {
+    if (!registryKey.startsWith(prefix)) continue;
+    const [, unit, slug] = registryKey.split(':');
+    if (!unit || !slug) continue;
+    results.push({ unit, slug, id: lesson.id, title: lesson.title });
+  }
+  return results;
+}

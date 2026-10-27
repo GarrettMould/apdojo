@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Automatic Stabilizers Deep Dive: Understanding Built-In Economic Stabilizers | AP Dojo',
+  title: 'Automatic Stabilizers Deep Dive: Understanding Built-In Economic Stabilizers',
   description: 'Master automatic stabilizers and understand how programs like unemployment insurance and progressive taxes automatically help stabilize the economy during economic fluctuations.',
   openGraph: {
-    title: 'Automatic Stabilizers Deep Dive: Understanding Built-In Economic Stabilizers | AP Dojo',
+    title: 'Automatic Stabilizers Deep Dive: Understanding Built-In Economic Stabilizers',
     description: 'Master automatic stabilizers and understand how programs automatically help stabilize the economy during economic fluctuations.',
   },
   alternates: {

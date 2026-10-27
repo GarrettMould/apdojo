@@ -77,7 +77,7 @@ export const govUnit5McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       'The creation of Super PACs that can raise and spend unlimited sums of money independently of candidates.',
-      'A decrease in the amount of money spent on federal elections.',
+      'A decrease in the amount of money spent on federal elections, because independent groups can no longer raise unlimited sums once they remain separate from a candidate.',
       'A ban on all corporate contributions to political candidates.',
       'The total elimination of the Bipartisan Campaign Reform Act.',
     ],
@@ -96,7 +96,7 @@ export const govUnit5McqPracticeQuestions: Question[] = [
       'Questions 5-6 refer to the following excerpt.\n\n"The influence of factious leaders may kindle a flame within their particular States, but will be unable to spread a general conflagration through the other States... A rage for paper money, for an abolition of debts, for an equal division of property, or for any other improper or wicked project, will be less apt to pervade the whole body of the Union than a particular member of it."\n—Publius (Alexander Hamilton), Federalist No. 10, 1787\n\nHow does Madison’s argument in this excerpt address the modern role of interest groups?',
     image: null,
     options: [
-      'He argues that interest groups should be banned from political participation.',
+      'He argues that interest groups should be banned from political participation, because a large republic cannot control factions and must instead remove the liberty to form them.',
       'He claims that the wealthy are the only group capable of participating in a republic.',
       'He advocates for a small, localized democracy to ensure all interests are represented.',
       'He suggests that a large republic dilutes the power of harmful "factions" by preventing them from dominating the entire nation.',
@@ -364,7 +364,7 @@ export const govUnit5McqPracticeQuestions: Question[] = [
     question: "A \"critical election\" or \"realigning election\" is best defined as an election in which:",
     image: null,
     options: [
-      "A third-party candidate wins the presidency outright.",
+      "A third-party candidate wins the presidency outright, producing only a short-term disruption rather than a lasting shift in the coalitions backing each major party.",
       "The Electoral College winner differs from the national popular vote winner.",
       "Voter turnout is unusually low across all demographic groups.",
       "Long-term shifts occur in the coalition of voters supporting each major party, reshaping the political landscape for years to come.",
@@ -384,7 +384,7 @@ export const govUnit5McqPracticeQuestions: Question[] = [
       "A constitutional amendment explicitly banning third parties from federal elections.",
       "A federal law requiring all candidates to affiliate with one of two parties.",
       "The winner-take-all, single-member district electoral system, which discourages voters from \"wasting\" votes on parties unlikely to win outright.",
-      "The Supreme Court's ruling in Citizens United v. FEC.",
+      "The Supreme Court's ruling in Citizens United v. FEC, which required states to award House seats by proportional representation instead of winner-take-all districts.",
     ],
     correctAnswer: "C",
     explanation: "In winner-take-all, single-member district systems, voters and donors tend to gravitate toward the two parties most likely to win, since votes for third parties rarely translate into representation — a dynamic often referred to as Duverger's Law.",
@@ -432,7 +432,7 @@ export const govUnit5McqPracticeQuestions: Question[] = [
     question: "Under current federal campaign finance law, which of the following is true regarding contributions to a traditional political action committee (PAC) versus an independent-expenditure-only committee (Super PAC)?",
     image: null,
     options: [
-      "Both are subject to identical contribution limits set by federal law.",
+      "Both are subject to identical contribution limits set by federal law, and Super PACs may donate those limited sums directly to a candidate's campaign committee.",
       "Traditional PACs may raise unlimited funds, while Super PACs face strict contribution limits.",
       "Only Super PACs are legally permitted to contribute directly to candidates.",
       "Traditional PACs face contribution limits, while Super PACs may raise and spend unlimited amounts as long as they do not coordinate directly with a candidate's campaign.",
@@ -483,7 +483,7 @@ export const govUnit5McqPracticeQuestions: Question[] = [
     question: "Which of the following is a key difference between a closed primary and an open primary?",
     image: null,
     options: [
-      "Open primaries are used exclusively to select judicial nominees.",
+      "Open primaries are used exclusively to select judicial nominees, while closed primaries are reserved for legislative and executive offices and never use party registration as a screen.",
       "Closed primaries are held only in presidential election years; open primaries are held only in midterm years.",
       "In a closed primary, only voters registered with a party may vote in that party's primary; in an open primary, any registered voter may participate regardless of party affiliation.",
       "Closed primaries allow write-in candidates, while open primaries do not.",
@@ -587,7 +587,7 @@ export const govUnit5McqPracticeQuestions: Question[] = [
     question: "In the 2000 and 2016 presidential elections, the winner of the national popular vote did not win the presidency. This outcome is possible because of:",
     image: null,
     options: [
-      "A constitutional requirement that presidents be elected by a direct national popular vote.",
+      "A constitutional requirement that presidents be elected by a direct national popular vote, which would make a popular-vote/Electoral College split impossible under the current system.",
       "The Twenty-Second Amendment's restrictions on presidential terms.",
       "A federal law requiring runoff elections whenever no candidate wins a true majority.",
       "The Electoral College's state-by-state, largely winner-take-all system, which can produce a different result than the national popular vote.",
@@ -638,7 +638,7 @@ export const govUnit5McqPracticeQuestions: Question[] = [
     question: "The proliferation of cable news networks and online media outlets with distinct, often opposing partisan identities has most directly contributed to which of the following trends in American political behavior?",
     image: null,
     options: [
-      "A significant decrease in overall political polarization among the electorate.",
+      "A significant decrease in overall political polarization among the electorate, as citizens use more news sources to challenge rather than reinforce their existing beliefs.",
       "An increased ability for citizens to consume news that reinforces their existing political beliefs, potentially deepening polarization.",
       "The complete elimination of political bias from national news coverage.",
       "A mandatory requirement that all citizens consume balanced news from multiple outlets.",

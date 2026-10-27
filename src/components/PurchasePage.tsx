@@ -4,8 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, Play, FileText, Monitor, Star, ShieldCheck, Sparkles, Quote } from 'lucide-react';
 import { ParentPaymentModal } from '@/components/ParentPaymentModal';
-import { loadStripe } from '@stripe/stripe-js';
 import { useAuthContext } from '@/contexts/AuthContext';
+import { startSeasonPassCheckout } from '@/lib/seasonPassCheckout';
 import Image from 'next/image';
 import Link from 'next/link';
 import { reviews } from '@/data/reviews';
@@ -79,35 +79,11 @@ export function PurchasePage({ courseType }: PurchasePageProps) {
     setIsLoading(true);
     try {
       // Create season pass checkout session (guest checkout supported — no login required)
-      const response = await fetch('/api/create-season-pass-checkout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          purchaseType: courseType,
-          userId: user?.uid,
-          cancelUrl: window.location.href,
-        }),
+      await startSeasonPassCheckout({
+        purchaseType: courseType,
+        userId: user?.uid,
+        cancelUrl: window.location.href,
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create checkout session');
-      }
-
-      const { sessionId } = await response.json();
-      
-      // Redirect to Stripe Checkout
-      const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
-      if (!stripe) {
-        throw new Error('Failed to load Stripe');
-      }
-
-      const { error } = await stripe.redirectToCheckout({ sessionId });
-      if (error) {
-        throw error;
-      }
     } catch (error) {
       console.error('Error initiating purchase:', error);
       alert(error instanceof Error ? error.message : 'Failed to start checkout. Please try again.');
@@ -247,7 +223,7 @@ export function PurchasePage({ courseType }: PurchasePageProps) {
                 >
                   <span>Don&apos;t have a credit card?</span>
                   <span className="underline decoration-dotted underline-offset-4 group-hover:text-blue-600 font-medium">
-                    Email cart to parent
+                    Send a parent the payment link
                   </span>
                 </button>
               </div>
@@ -394,7 +370,7 @@ export function PurchasePage({ courseType }: PurchasePageProps) {
                 className="text-xs text-gray-500 hover:text-gray-900 transition-colors group"
               >
                 <span className="underline decoration-dotted underline-offset-4 group-hover:text-blue-600 font-medium">
-                  Email cart to parent
+                  Send a parent the payment link
                 </span>
               </button>
             </div>
