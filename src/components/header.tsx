@@ -15,6 +15,7 @@ import { hasValidSeasonPass, getPracticeTestsUrl } from '@/lib/utils';
 import type { CourseSubject } from '@/lib/courseSubject';
 import { defaultCheatSheetUrl, isCourseSubject, isEconCourse } from '@/lib/courseSubject';
 import { useSubjectSwitchNavigation } from '@/hooks/useSubjectSwitchNavigation';
+import { SCOTUS_CASE_LANDING_HUB } from '@/data/gov/scotusRequiredCases';
 
 export function Header() {
   const {
@@ -168,7 +169,6 @@ export function Header() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isPracticeDropdownOpen]);
-
   return (
     <header className="bg-white sticky top-0 z-[120] shadow-md">
       <div className="px-4 sm:px-8 lg:px-12">
@@ -191,13 +191,13 @@ export function Header() {
           </div>
 
           {/* Desktop Navigation, XP, and Auth Buttons */}
-          <div className="hidden lg:flex items-center gap-x-8">
-            <nav className="flex items-center space-x-10">
+          <div className="hidden xl:flex items-center gap-x-6 2xl:gap-x-8">
+            <nav className="flex items-center space-x-6 2xl:space-x-10">
               <div className="relative" ref={practiceDropdownRef}>
                 <button
                   type="button"
                   onClick={() => setIsPracticeDropdownOpen(prev => !prev)}
-                  className={`flex items-center gap-1 text-lg text-gray-700 transition-colors font-bold ${navHoverClass}`}
+                  className={`flex items-center gap-1 whitespace-nowrap text-lg text-gray-700 transition-colors font-bold ${navHoverClass}`}
                 >
                   Practice
                   <ChevronDown className={`w-5 h-5 transition-transform ${isPracticeDropdownOpen ? 'rotate-180' : ''}`} />
@@ -267,29 +267,38 @@ export function Header() {
                 <Link
                   href="/graph-gym-dashboard"
                   prefetch={false}
-                  className={`text-lg text-gray-700 transition-colors font-bold ${navHoverClass}`}
+                  className={`whitespace-nowrap text-lg text-gray-700 transition-colors font-bold ${navHoverClass}`}
                 >
                   Graphing Practice
                 </Link>
               ) : displaySubject === 'gov' ? (
                 <Link
                   href="/scotus-essay-practice"
-                  className={`text-lg text-gray-700 transition-colors font-bold ${navHoverClass}`}
+                  className={`whitespace-nowrap text-lg text-gray-700 transition-colors font-bold ${navHoverClass}`}
                 >
                   SCOTUS Practice
                 </Link>
               ) : displaySubject === 'stats' ? (
                 <Link
                   href="/ap-stats-calculator-simulator"
-                  className={`text-lg text-gray-700 transition-colors font-bold ${navHoverClass}`}
+                  className={`whitespace-nowrap text-lg text-gray-700 transition-colors font-bold ${navHoverClass}`}
                 >
                   Calculator Drills
                 </Link>
               ) : null}
 
+              {displaySubject === 'gov' ? (
+                <Link
+                  href={SCOTUS_CASE_LANDING_HUB}
+                  className={`whitespace-nowrap text-lg text-gray-700 transition-colors font-bold ${navHoverClass}`}
+                >
+                  Required Cases
+                </Link>
+              ) : null}
+
               <Link
                 href={defaultCheatSheetUrl(displaySubject)}
-                className={`text-lg text-gray-700 transition-colors font-bold ${navHoverClass}`}
+                className={`whitespace-nowrap text-lg text-gray-700 transition-colors font-bold ${navHoverClass}`}
               >
                 Cheat Sheets
               </Link>
@@ -298,7 +307,7 @@ export function Header() {
               {(!user || !isPremium) && (
                 <Link
                   href={`/purchase/season-pass?courseType=${displaySubject}`}
-                  className="text-lg text-gray-700 hover:text-blue-600 transition-colors font-bold"
+                  className="whitespace-nowrap text-lg text-gray-700 hover:text-blue-600 transition-colors font-bold"
                 >
                   Season Pass
                 </Link>
@@ -446,7 +455,7 @@ export function Header() {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="lg:hidden">
+          <div className="xl:hidden">
             <button
               onClick={toggleMobileMenu}
               className="p-2 text-gray-700 hover:text-blue-600 transition-colors"
@@ -459,7 +468,7 @@ export function Header() {
 
         {/* Mobile Navigation — Full-screen overlay */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden fixed inset-0 z-[125] bg-white flex flex-col overflow-y-auto">
+          <div className="xl:hidden fixed inset-0 z-[125] bg-white flex flex-col overflow-y-auto">
 
             {/* Overlay header row */}
             <div className="flex items-center justify-between px-5 h-20 border-b border-gray-100 flex-shrink-0">
@@ -522,6 +531,19 @@ export function Header() {
                 Full Practice Tests
               </Link>
               <div className="my-3 border-t border-gray-100" />
+
+              {displaySubject === 'gov' ? (
+                <>
+                  <Link
+                    href={SCOTUS_CASE_LANDING_HUB}
+                    onClick={closeMobileMenu}
+                    className="rounded-xl px-4 py-4 text-xl font-bold text-gray-800 transition-colors hover:bg-violet-50 hover:text-violet-600"
+                  >
+                    Required Cases
+                  </Link>
+                  <div className="my-3 border-t border-gray-100" />
+                </>
+              ) : null}
 
               {/* Practice */}
               <p className="text-xs font-bold text-gray-400 uppercase tracking-widest px-1 mb-1">Practice</p>

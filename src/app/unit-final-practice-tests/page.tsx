@@ -13,6 +13,7 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import { usePathname, useSearchParams } from 'next/navigation';
 import type { CourseSubject } from '@/lib/courseSubject';
 import { getUnitMCQTestUrl, getFullFRQTestUrl, getUnitTestPreviewUrl } from '@/lib/utils';
+import { formatTestTime, getUnitTestMeta, unitFrqTimeLimitSeconds } from '@/data/unitTestMeta';
 import { loadTestProgress } from '@/lib/testProgress';
 import { getUnitMCQTest } from '@/data/unitMCQTests';
 import { getGovUnitStimulusFrqs, getGovUnitFrqFormatLabels } from '@/data/gov/govUnitStimulusFrqs';
@@ -194,14 +195,6 @@ function UnitFinalPracticeTestsContent() {
         ? 'text-green-700'
         : 'text-blue-700';
 
-  const accentLink = isGov
-    ? 'text-violet-700 hover:text-violet-900'
-    : isStats
-      ? 'text-orange-700 hover:text-orange-900'
-      : isMicro
-        ? 'text-green-700 hover:text-green-900'
-        : 'text-blue-700 hover:text-blue-900';
-
   const accentSoft = isGov
     ? 'bg-violet-50 text-violet-800'
     : isStats
@@ -217,6 +210,20 @@ function UnitFinalPracticeTestsContent() {
       : isMicro
         ? 'hover:bg-green-50/40'
         : 'hover:bg-blue-50/40';
+
+  const accentButton = isGov
+    ? 'border-violet-700 bg-violet-700 text-white hover:border-violet-800 hover:bg-violet-800'
+    : isStats
+      ? 'border-orange-600 bg-orange-600 text-white hover:border-orange-700 hover:bg-orange-700'
+      : isMicro
+        ? 'border-green-700 bg-green-700 text-white hover:border-green-800 hover:bg-green-800'
+        : 'border-blue-700 bg-blue-700 text-white hover:border-blue-800 hover:bg-blue-800';
+
+  const fullExamFacts = isStats
+    ? { mcq: '40 questions · 90 min', frq: '6 questions · 90 min' }
+    : isGov
+      ? { mcq: '55 questions · 80 min', frq: '4 questions · 100 min' }
+      : { mcq: '60 questions · 70 min', frq: '3 questions · 60 min' };
 
   const fullExamsComingSoon = isGov || isStats;
 
@@ -257,6 +264,12 @@ function UnitFinalPracticeTestsContent() {
         : isStats && frqPackAvailable
           ? ['Investigative Task', 'Free Response']
           : [];
+    const mcqMeta = getUnitTestMeta(effectiveSubject, unit.number);
+    const frqCount = frqPackAvailable ? unitStimulusFrqs.length : 0;
+    const frqSeconds =
+      frqCount > 0 && (isGov || isStats)
+        ? unitFrqTimeLimitSeconds(frqCount, isGov ? 'gov' : 'stats')
+        : 0;
 
     return (
       <article
@@ -285,6 +298,30 @@ function UnitFinalPracticeTestsContent() {
               <p className="mt-1.5 max-w-xl text-[0.9375rem] leading-relaxed text-gray-500">
                 {unit.description}
               </p>
+              {isAvailable && mcqMeta ? (
+                <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm font-medium text-gray-800">
+                  <span>
+                    MCQ · {mcqMeta.questionCount} questions · {formatTestTime(mcqMeta.timeLimitSeconds)}
+                  </span>
+                  {frqCount > 0 ? (
+                    <>
+                      <span className="text-gray-300" aria-hidden>
+                        ·
+                      </span>
+                      <span>
+                        FRQ · {frqCount} {frqCount === 1 ? 'question' : 'questions'} · {formatTestTime(frqSeconds)}
+                      </span>
+                    </>
+                  ) : showEconFrqPracticeCard ? (
+                    <>
+                      <span className="text-gray-300" aria-hidden>
+                        ·
+                      </span>
+                      <span>FRQ practice</span>
+                    </>
+                  ) : null}
+                </p>
+              ) : null}
 
               {showResume && resume ? (
                 <div className="mt-4 max-w-md">
@@ -311,15 +348,13 @@ function UnitFinalPracticeTestsContent() {
                   className={`group/link inline-flex items-center justify-between gap-3 rounded-lg border px-3.5 py-2.5 text-sm font-semibold transition ${
                     showResume
                       ? 'border-emerald-200 bg-emerald-50 text-emerald-900 hover:border-emerald-300 hover:bg-emerald-100'
-                      : `border-gray-200 bg-white text-gray-900 hover:border-gray-300 hover:bg-gray-50 ${
-                          unitProgressLoading && user?.uid ? 'opacity-70' : ''
-                        }`
+                      : `${accentButton} ${unitProgressLoading && user?.uid ? 'opacity-70' : ''}`
                   }`}
                 >
                   <span>{showResume ? 'Resume MCQ test' : 'Start MCQ test'}</span>
                   <ArrowRight
                     className={`h-3.5 w-3.5 shrink-0 transition-transform group-hover/link:translate-x-0.5 ${
-                      showResume ? 'text-emerald-700' : accentText
+                      showResume ? 'text-emerald-700' : 'text-white'
                     }`}
                   />
                 </Link>
@@ -360,49 +395,66 @@ function UnitFinalPracticeTestsContent() {
     );
   };
 
+  const notPostedBadge = (
+    <span className="inline-flex rounded-md bg-gray-100 px-2.5 py-1.5 text-xs font-semibold uppercase tracking-wide text-gray-500">
+      Not posted yet
+    </span>
+  );
+
   const fullExamsSection = (
     <section className={fullExamsComingSoon ? 'mt-16 sm:mt-20' : 'mb-16 sm:mb-20'}>
       <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-gray-500">
         Full practice exams
       </h2>
+      <p className="mt-2 max-w-2xl text-base text-gray-600">
+        {fullExamsComingSoon
+          ? 'A full exam in the official format is not posted yet. The unit tests above are ready.'
+          : 'One multiple-choice exam and one free-response exam in the official format.'}
+      </p>
       <div className="mt-4 divide-y divide-gray-200 border-y border-gray-200">
-        <div className="flex flex-col gap-3 py-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
+        <div className="flex flex-col gap-4 py-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
           <div className="min-w-0">
             <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Section I</p>
             <h3 className="mt-1 text-xl font-semibold text-gray-950 sm:text-2xl">Full MCQ Exam 1</h3>
+            <p className="mt-1.5 text-sm font-medium text-gray-800">{fullExamFacts.mcq}</p>
             <p className="mt-1.5 text-base text-gray-600">
-              Comprehensive multiple-choice exam across all units.
+              Multiple-choice exam across all units.
             </p>
           </div>
           <div className="shrink-0">
-            {fullExamsComingSoon ? null : (
+            {fullExamsComingSoon ? (
+              notPostedBadge
+            ) : (
               <Link
                 href={`/full-mcq-exam-preview?subject=${effectiveSubject}&num=1`}
-                className={`inline-flex items-center gap-1.5 text-base font-semibold underline underline-offset-4 ${accentLink}`}
+                className={`inline-flex items-center justify-between gap-3 rounded-lg border px-3.5 py-2.5 text-sm font-semibold transition ${accentButton}`}
               >
                 View exam
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className="h-3.5 w-3.5 text-white" />
               </Link>
             )}
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 py-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
+        <div className="flex flex-col gap-4 py-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
           <div className="min-w-0">
             <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">Section II</p>
             <h3 className="mt-1 text-xl font-semibold text-gray-950 sm:text-2xl">Full FRQ Exam 1</h3>
+            <p className="mt-1.5 text-sm font-medium text-gray-800">{fullExamFacts.frq}</p>
             <p className="mt-1.5 text-base text-gray-600">
-              Free-response exam covering key course topics.
+              Free-response exam covering the course.
             </p>
           </div>
           <div className="shrink-0">
-            {fullExamsComingSoon ? null : (
+            {fullExamsComingSoon ? (
+              notPostedBadge
+            ) : (
               <Link
                 href={getFullFRQTestUrl(effectiveSubject)}
-                className={`inline-flex items-center gap-1.5 text-base font-semibold underline underline-offset-4 ${accentLink}`}
+                className="group/link inline-flex items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white px-3.5 py-2.5 text-sm font-semibold text-gray-900 transition hover:border-gray-300 hover:bg-gray-50"
               >
                 Start exam
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className={`h-3.5 w-3.5 ${accentText}`} />
               </Link>
             )}
           </div>

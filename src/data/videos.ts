@@ -2664,6 +2664,36 @@ export const videos: Video[] = [
         accessLevel: "free",
         questions: [],
       },
+      {
+        id: "stats-u5-vid1",
+        title: "5.1 - Characteristics of a Scatterplot",
+        description:
+          "Learn how to describe the relationship between two quantitative variables in a scatterplot by direction, form, strength, and unusual features.",
+        videoSlug: "stats-u5-characteristics-of-a-scatterplot",
+        subjects: ["AP Statistics"],
+        unit: "5",
+        lessonIDS: ["5.1"],
+        tags: ["Unit 5", "Scatterplots", "Two Quantitative Variables", "Regression"],
+        videoUrl:
+          "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/stats/unit_5/Unit+5+-+Topic+1.mp4",
+        accessLevel: "free",
+        questions: [],
+      },
+      {
+        id: "stats-u5-vid2",
+        title: "5.2 - Correlation",
+        description:
+          "Learn how the correlation coefficient r measures the direction and strength of a linear relationship between two quantitative variables.",
+        videoSlug: "stats-u5-correlation",
+        subjects: ["AP Statistics"],
+        unit: "5",
+        lessonIDS: ["5.2"],
+        tags: ["Unit 5", "Correlation", "Two Quantitative Variables", "Regression"],
+        videoUrl:
+          "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/stats/unit_5/Unit+5+-+Topic+2.mp4",
+        accessLevel: "free",
+        questions: [],
+      },
   ];
   
 const macroUnitVideos = videos

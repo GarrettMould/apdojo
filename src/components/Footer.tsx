@@ -44,10 +44,10 @@ export function Footer() {
 
             <div className="flex flex-col gap-3">
               <span className="text-sm font-bold text-gray-900">Tools</span>
+              <Link href="/ap-gov/supreme-court-cases" className={footerLinkClass}>SCOTUS Cases</Link>
               <Link href="/scotus-essay-practice" className={footerLinkClass}>SCOTUS Practice</Link>
               <Link href="/ap-stats-calculator-simulator" className={footerLinkClass}>Stats Calculator</Link>
               <Link href="/select-practice-units" className={footerLinkClass}>MCQ Practice</Link>
-              <Link href="/ap-blog-home" className={footerLinkClass}>Blog</Link>
               <Link href="/feedback" className={footerLinkClass}>Leave Feedback</Link>
             </div>
 

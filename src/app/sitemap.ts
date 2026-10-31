@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next';
 import { govUnits, macroUnits, microUnits, statsUnits } from '@/data/cheatSheets';
+import { AP_GOV_REQUIRED_SCOTUS_CASES, SCOTUS_CASE_LANDING_HUB, scotusCaseLandingPath } from '@/data/gov/scotusRequiredCases';
 import { blogPosts } from '@/data/blogPosts';
 import { generateSeoUrl } from '@/utils/blogUrls';
 
@@ -159,6 +160,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { unit: 6, slug: 'real-interest-rates-international-capital-flows' },
   ];
 
+  const scotusCasePages: MetadataRoute.Sitemap = [
+    {
+      url: `${baseUrl}${SCOTUS_CASE_LANDING_HUB}`,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    ...AP_GOV_REQUIRED_SCOTUS_CASES.map((requiredCase) => ({
+      url: `${baseUrl}${scotusCaseLandingPath(requiredCase.id)}`,
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
+    })),
+  ];
+
   const deepDivePages: MetadataRoute.Sitemap = macroDeepDives.map(page => ({
     url: `${baseUrl}/ap-macro/unit-${page.unit}/${page.slug}`,
     changeFrequency: 'monthly' as const,
@@ -175,7 +189,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // IMPORTANT: Only return canonical URLs we actually want indexed.
   // Older /unit/{number} and /study-guides/... routes either duplicate or redirect
   // to these cheat sheet pages and should NOT be listed here to avoid redirect errors.
-  return [...staticPages, ...cheatSheetPages, ...deepDivePages, ...blogPostPages];
+  return [...staticPages, ...cheatSheetPages, ...deepDivePages, ...scotusCasePages, ...blogPostPages];
 }
 
 

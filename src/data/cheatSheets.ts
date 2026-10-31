@@ -18,11 +18,27 @@ export const macroUnits: Unit[] = [
     { number: 6, title: "Open Economy—International Trade and Finance", description: "How international trade, finance, and exchange rates affect an economy.", pdfUrl: "/cheat-sheets/macro/AP_Dojo_Macro_U6.pdf", subject: 'macro', price: 4.99 },
   ];
   
+const govUnitDescriptions: Record<number, string> = {
+  1: 'Constitutional principles, the founding debate, and how federalism divides power.',
+  2: 'How Congress, the presidency, the courts, and the bureaucracy check one another.',
+  3: 'The Bill of Rights, due process, and the fight for equal protection.',
+  4: 'How people form political opinions, and how ideology shapes policy.',
+  5: 'Voting, parties, interest groups, campaigns, and the media.',
+};
+
+const statsUnitDescriptions: Record<number, string> = {
+  1: 'Graphs, summary statistics, and how studies and experiments collect data.',
+  2: 'Probability rules, random variables, and common probability distributions.',
+  3: 'Confidence intervals and significance tests for proportions, including chi-square.',
+  4: 'Confidence intervals and significance tests for means, including paired and two-sample data.',
+  5: 'Scatterplots, correlation, least-squares regression, and residuals.',
+};
+
 /** AP U.S. Government — unit titles from `courseCurriculumOutline` (PDFs / cheat content TBD). */
 export const govUnits: Unit[] = govCurriculumOutline.units.map((u) => ({
   number: u.unitNumber,
   title: u.unitName,
-  description: `Unit ${u.unitNumber} of the AP U.S. Government and Politics course framework.`,
+  description: govUnitDescriptions[u.unitNumber] ?? u.unitName,
   pdfUrl: '',
   subject: 'gov' as const,
   price: 4.99,
@@ -32,7 +48,7 @@ export const govUnits: Unit[] = govCurriculumOutline.units.map((u) => ({
 export const statsUnits: Unit[] = statsCurriculumOutline.units.map((u) => ({
   number: u.unitNumber,
   title: u.unitName,
-  description: `Unit ${u.unitNumber} of the AP Statistics course framework.`,
+  description: statsUnitDescriptions[u.unitNumber] ?? u.unitName,
   pdfUrl: '',
   subject: 'stats' as const,
   price: 4.99,

@@ -60,7 +60,8 @@ export function getScotusCaseRecord(requiredCase: ScotusRequiredCase): GovSuprem
 }
 
 export function formatScotusCaseTitle(requiredCase: ScotusRequiredCase): string {
-  return `${requiredCase.caseName} (${requiredCase.year})`;
+  const name = requiredCase.caseName.replace(/\s*\([^)]*\)\s*$/, '');
+  return `${name} (${requiredCase.year})`;
 }
 
 /** Live SCOTUS comparison FRQ slugs (matches `scotusEssayPrompts[].id`). */
@@ -70,6 +71,13 @@ export function getLiveScotusPracticeCaseIds(): string[] {
 
 export function scotusPracticeCasePath(caseId: string): string {
   return `/scotus-essay-practice/${caseId}`;
+}
+
+export const SCOTUS_CASE_LANDING_HUB = '/ap-gov/supreme-court-cases';
+
+/** Public landing page for one required case. */
+export function scotusCaseLandingPath(caseId: string): string {
+  return `${SCOTUS_CASE_LANDING_HUB}/${caseId}`;
 }
 
 /** Pick a random live case; pass `excludeId` to avoid re-picking the current case when shuffling. */
