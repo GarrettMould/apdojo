@@ -11,6 +11,7 @@
     "generate:cheat-sheet-previews": "node scripts/generate-cheat-sheet-pdf-previews.mjs"
   },
   "dependencies": {
+    "@calcom/embed-react": "1.5.3",
     "@excalidraw/excalidraw": "^0.18.0",
     "@google/generative-ai": "^0.24.1",
     "@heroicons/react": "^2.2.0",

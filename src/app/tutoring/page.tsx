@@ -7,6 +7,7 @@ import {
   TUTORING_SESSION_TYPES,
   calBookingUrl,
 } from '@/data/tutoring';
+import { TutoringBookingEmbed } from '@/components/tutoring/TutoringBookingEmbed';
 
 const card = 'rounded-3xl border-4 border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]';
 const sectionHeading = 'text-3xl font-black tracking-tight text-gray-900 sm:text-4xl';
@@ -146,16 +147,17 @@ export default function TutoringPage() {
           <h2 id="book-heading" className={sectionHeading}>
             Pick a time
           </h2>
-          <div className={`${card} flex min-h-[200px] items-center justify-center p-6`}>
+          <TutoringBookingEmbed sessions={TUTORING_SESSION_TYPES} />
+          <noscript>
             <a
               href={calBookingUrl(primarySession.calLink)}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-2xl border-4 border-black bg-white px-6 py-3 text-base font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
+              className="inline-flex items-center gap-2 text-base font-black underline"
             >
               Open the booking page <ArrowRight className="h-4 w-4" aria-hidden />
             </a>
-          </div>
+          </noscript>
           <p className="text-sm font-medium text-gray-600">
             Times are shown in your time zone. You&apos;ll get a confirmation email with your Google Meet link.
           </p>
