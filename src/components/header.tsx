@@ -242,6 +242,13 @@ export function Header() {
                       >
                         Create a Quiz
                       </Link>
+                      <Link
+                        href="/tutoring"
+                        className={`block 2xl:hidden px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 transition-colors ${navHoverClass}`}
+                        onClick={() => setIsPracticeDropdownOpen(false)}
+                      >
+                        1-on-1 Tutoring
+                      </Link>
                       {isEconCourse(displaySubject) ? (
                         <>
                           <Link
@@ -314,9 +321,10 @@ export function Header() {
                 </Link>
               ) : null}
 
+              {/* Top-level only where the bar has room; narrower desktops get it in the Practice menu. */}
               <Link
                 href="/tutoring"
-                className={`whitespace-nowrap text-lg text-gray-700 transition-colors font-bold ${navHoverClass}`}
+                className={`hidden 2xl:inline whitespace-nowrap text-lg text-gray-700 transition-colors font-bold ${navHoverClass}`}
               >
                 Tutoring
               </Link>
