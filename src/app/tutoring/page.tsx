@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight, Check } from 'lucide-react';
 import {
@@ -8,6 +9,19 @@ import {
   calBookingUrl,
 } from '@/data/tutoring';
 import { TutoringBookingEmbed } from '@/components/tutoring/TutoringBookingEmbed';
+
+const description =
+  'Live AP tutoring over Google Meet with a real AP teacher. Get help with graphs, FRQs and exam prep. Book online.';
+const socialTitle = '1-on-1 AP Tutoring | AP Dojo';
+
+export const metadata: Metadata = {
+  // The root layout's template adds "| AP Dojo", so the brand appears once.
+  title: '1-on-1 AP Tutoring',
+  description,
+  alternates: { canonical: 'https://apdojo.com/tutoring' },
+  openGraph: { title: socialTitle, description, url: 'https://apdojo.com/tutoring', type: 'website' },
+  twitter: { card: 'summary_large_image', title: socialTitle, description },
+};
 
 const card = 'rounded-3xl border-4 border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]';
 const sectionHeading = 'text-3xl font-black tracking-tight text-gray-900 sm:text-4xl';

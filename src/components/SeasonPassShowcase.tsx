@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, ArrowRight, Sparkles, ShieldCheck, GraduationCap, CalendarCheck, Lightbulb } from 'lucide-react';
+import { TutoringCallout } from '@/components/tutoring/TutoringCallout';
 
 type CourseCardType = 'macro' | 'micro' | 'gov' | 'stats';
 
@@ -344,6 +345,7 @@ export function SeasonPassCourseChooser() {
         </div>
         <TrustStrip />
         <BundleBanner />
+        <TutoringCallout placement="season_pass_chooser" className="mt-8 text-center" />
       </div>
     </div>
   );

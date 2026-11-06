@@ -95,6 +95,7 @@ export function Header() {
     { label: 'Cheat Sheets', href: defaultCheatSheetUrl(displaySubject) },
     ...(displaySubject === 'macro' ? [{ label: 'Explainers', href: '/ap-macro/explainers' }] : []),
     ...(isEconCourse(displaySubject) ? [{ label: 'Blog', href: '/ap-blog-home' }] : []),
+    { label: 'Tutoring', href: '/tutoring' },
   ];
 
   const toggleMobileMenu = () => {
@@ -312,6 +313,13 @@ export function Header() {
                   Explainers
                 </Link>
               ) : null}
+
+              <Link
+                href="/tutoring"
+                className={`whitespace-nowrap text-lg text-gray-700 transition-colors font-bold ${navHoverClass}`}
+              >
+                Tutoring
+              </Link>
 
               {/* Season Pass - Only show if user is not logged in or not premium */}
               {(!user || !isPremium) && (
