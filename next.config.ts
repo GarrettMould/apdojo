@@ -68,6 +68,12 @@ const nextConfig = {
   async redirects() {
     const redirects = [
       {
+        // Subject tutoring pages were replaced by one /tutoring page.
+        source: '/tutoring/:subject(macro|micro|gov|stats)',
+        destination: '/tutoring',
+        permanent: true,
+      },
+      {
         source: '/cheat-sheets/macro/AP_Dojo_Macro_U1.pdf',
         destination: '/ap-macro-unit-1-cheat-sheet',
         permanent: true,

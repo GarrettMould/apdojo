@@ -96,9 +96,8 @@ export function getUrlForSubjectSwitch(
     return subjectHomeUrl(newSubject);
   }
 
-  const tutoringMatch = path.match(/^\/tutoring\/(macro|micro|gov|stats)$/);
-  if (tutoringMatch || path === '/tutoring') {
-    return `/tutoring/${newSubject}`;
+  if (path === '/tutoring') {
+    return '/tutoring';
   }
 
   if (path.startsWith('/offer/')) {
