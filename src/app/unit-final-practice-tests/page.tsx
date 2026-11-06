@@ -13,13 +13,24 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import { usePathname, useSearchParams } from 'next/navigation';
 import type { CourseSubject } from '@/lib/courseSubject';
 import { getUnitMCQTestUrl, getFullFRQTestUrl, getUnitTestPreviewUrl } from '@/lib/utils';
-import { formatTestTime, getUnitTestMeta, unitFrqTimeLimitSeconds } from '@/data/unitTestMeta';
+import {
+  formatTestTime,
+  getUnitTestMeta,
+  unitFrqTimeLimitSeconds,
+  unitMcqTimeLimitSeconds,
+  STATS_UNIT_MCQ_SECONDS_PER_QUESTION,
+} from '@/data/unitTestMeta';
 import { loadTestProgress } from '@/lib/testProgress';
 import { getUnitMCQTest } from '@/data/unitMCQTests';
 import { getGovUnitStimulusFrqs, getGovUnitFrqFormatLabels } from '@/data/gov/govUnitStimulusFrqs';
 import { getStatsUnitStimulusFrqs, getStatsUnitFrqFormatLabels } from '@/data/stats/statsUnitStimulusFrqs';
 import { isStatsFrqTestUnitAvailable } from '@/lib/courseSubject';
+import { STATS_FULL_MCQ_EXAM_1_IDS } from '@/data/stats/statsFullMcqExam1Ids';
 import { isGovMcqTestUnitAvailable, isStatsMcqTestUnitAvailable } from '@/lib/courseSubject';
+
+/** Same pacing as the Stats full exam timer in FullExam. */
+const statsFullMcqMinutes =
+  unitMcqTimeLimitSeconds(STATS_FULL_MCQ_EXAM_1_IDS.length, STATS_UNIT_MCQ_SECONDS_PER_QUESTION) / 60;
 
 /** In-progress unit MCQ saved in Firestore (same testId as FullExam). */
 type UnitMcqResumeInfo = {
@@ -220,12 +231,14 @@ function UnitFinalPracticeTestsContent() {
         : 'border-blue-700 bg-blue-700 text-white hover:border-blue-800 hover:bg-blue-800';
 
   const fullExamFacts = isStats
-    ? { mcq: '40 questions · 90 min', frq: '6 questions · 90 min' }
+    ? { mcq: `${STATS_FULL_MCQ_EXAM_1_IDS.length} questions · ${statsFullMcqMinutes} min`, frq: '6 questions · 90 min' }
     : isGov
       ? { mcq: '55 questions · 80 min', frq: '4 questions · 100 min' }
       : { mcq: '60 questions · 70 min', frq: '3 questions · 60 min' };
 
-  const fullExamsComingSoon = isGov || isStats;
+  const fullMcqComingSoon = isGov;
+  const fullFrqComingSoon = isGov || isStats;
+  const fullExamsComingSoon = fullMcqComingSoon && fullFrqComingSoon;
 
   const { availableUnits, unavailableUnits } = useMemo(() => {
     const available: (typeof units)[number][] = [];
@@ -409,7 +422,9 @@ function UnitFinalPracticeTestsContent() {
       <p className="mt-2 max-w-2xl text-base text-gray-600">
         {fullExamsComingSoon
           ? 'A full exam in the official format is not posted yet. The unit tests above are ready.'
-          : 'One multiple-choice exam and one free-response exam in the official format.'}
+          : fullFrqComingSoon
+            ? 'A multiple-choice exam across all units. The free-response exam is not posted yet.'
+            : 'One multiple-choice exam and one free-response exam in the official format.'}
       </p>
       <div className="mt-4 divide-y divide-gray-200 border-y border-gray-200">
         <div className="flex flex-col gap-4 py-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
@@ -422,7 +437,7 @@ function UnitFinalPracticeTestsContent() {
             </p>
           </div>
           <div className="shrink-0">
-            {fullExamsComingSoon ? (
+            {fullMcqComingSoon ? (
               notPostedBadge
             ) : (
               <Link
@@ -446,7 +461,7 @@ function UnitFinalPracticeTestsContent() {
             </p>
           </div>
           <div className="shrink-0">
-            {fullExamsComingSoon ? (
+            {fullFrqComingSoon ? (
               notPostedBadge
             ) : (
               <Link

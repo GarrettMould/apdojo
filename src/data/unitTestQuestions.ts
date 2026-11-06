@@ -990,9 +990,9 @@ export const unitTestQuestions: QuestionType[] = [
     options: [
       "An economy is in a recessionary gap when actual output is greater than potential output",
       "Long-run aggregate supply shifts to the right when price level decreases",
-      "Inflationary expectations",
+      "An increase in inflationary expectations shifts the short-run aggregate supply curve to the right",
       "When an economy is in an inflationary gap, actual unemployment is less than the natural rate of unemployment",
-      "Long-equilibrium can always be found where the aggregate demand curve and the short-run aggregate supply curve intersect"
+      "Long-run equilibrium can always be found where the aggregate demand curve and the short-run aggregate supply curve intersect"
     ],
     correctAnswer: "D",
     explanationVideo: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/Unit_MCQ_Explanations/U3Q6.mp4"

@@ -131,6 +131,11 @@ export function isEconCourse(subject: CourseSubject): boolean {
   return subject === 'macro' || subject === 'micro';
 }
 
+/** Courses with a full-length MCQ exam (`/ap-{subject}-mcq-practice-test-1`). Gov's is not posted yet. */
+export function hasFullMcqExam(subject: CourseSubject): boolean {
+  return subject === 'macro' || subject === 'micro' || subject === 'stats';
+}
+
 /** First unit cheat sheet URL for the course (pretty route). */
 export function defaultCheatSheetUrl(subject: CourseSubject): string {
   return cheatSheetUrlForUnit(subject, 1);

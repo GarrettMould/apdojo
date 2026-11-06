@@ -44,6 +44,8 @@ export interface TestResult {
   score: number;
   totalQuestions: number;
   completedAt: any;
+  /** Macro unit tests: lessons tagged on missed questions, so explainer wrap-ups can point back to them. */
+  missedLessonIds?: string[];
 }
 
 // Save test progress in real-time
@@ -163,6 +165,24 @@ export async function hasUnitFrqTestResult(
   } catch (error) {
     console.error('[hasUnitFrqTestResult] Error checking FRQ completion:', error);
     return false;
+  }
+}
+
+export function getUnitMcqTestId(unitNumber: number, subject: CourseSubject): string {
+  return `unit_${unitNumber}_${subject}`;
+}
+
+/** Most recent saved result for a test, or null (sorted client-side to avoid a composite index). */
+export async function getLatestTestResult(userId: string, testId: string): Promise<TestResult | null> {
+  try {
+    const resultsRef = collection(doc(db, 'userTestResults', userId), 'results');
+    const snapshot = await getDocs(query(resultsRef, where('testId', '==', testId)));
+    const results = snapshot.docs.map((d) => d.data() as TestResult);
+    results.sort((a, b) => (b.completedAt?.toMillis?.() ?? 0) - (a.completedAt?.toMillis?.() ?? 0));
+    return results[0] ?? null;
+  } catch (error) {
+    console.error('[getLatestTestResult] Error loading result:', error);
+    return null;
   }
 }
 

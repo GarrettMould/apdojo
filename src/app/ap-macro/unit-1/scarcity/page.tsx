@@ -1,5 +1,5 @@
-import { RegisteredLessonDeepDive } from '@/components/RegisteredLessonDeepDive';
+import { GuidedLesson } from '@/components/guidedLesson/GuidedLesson';
 
 export default function ScarcityPage() {
-  return <RegisteredLessonDeepDive subject="ap-macro" unit="1" slug="scarcity" />;
+  return <GuidedLesson lessonId="1.1" />;
 }

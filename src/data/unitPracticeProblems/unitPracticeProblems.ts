@@ -202,6 +202,42 @@ const macroUnit1Questions = [
     "videoExplanation": null
   },
   {
+    "id": 2131,
+    "unit": 1,
+    "lessonIDS": ["1.5"],
+    "unitName": "Basic Economic Concepts",
+    "question": "Corn and soybeans can be grown on the same farmland. If the price of soybeans rises sharply, which of the following will most likely happen in the market for corn, ceteris paribus?",
+    "image": null,
+    "options": [
+      "The supply of corn will decrease.",
+      "The supply of corn will increase.",
+      "The quantity of corn supplied will increase as farmers move along the supply curve.",
+      "The demand for corn will increase.",
+      "There will be no change in the market for corn."
+    ],
+    "correctAnswer": "A",
+    "explanation": "Soybeans are an alternative good the same farmers could produce. When soybeans become more profitable, farmers shift land away from corn, so the supply of corn decreases (the supply curve shifts left). The price of corn itself has not changed, so this is a shift, not a movement along the curve.",
+    "videoExplanation": null
+  },
+  {
+    "id": 2132,
+    "unit": 1,
+    "lessonIDS": ["1.5"],
+    "unitName": "Basic Economic Concepts",
+    "question": "Which of the following would cause a movement along the supply curve for coffee rather than a shift of the supply curve?",
+    "image": null,
+    "options": [
+      "A frost destroys a large share of coffee plants.",
+      "The government gives coffee growers a per-unit subsidy.",
+      "The market price of coffee rises because demand for coffee increases.",
+      "The wages paid to coffee pickers increase.",
+      "More firms begin growing coffee."
+    ],
+    "correctAnswer": "C",
+    "explanation": "Only a change in the good's own price moves producers along the supply curve, changing quantity supplied. The frost, the subsidy, higher wages and more firms are all non-price determinants of supply, so each one shifts the whole supply curve.",
+    "videoExplanation": null
+  },
+  {
     "id": 9,
     "unit": 1,
     "lessonIDS": ["1.6"], 
@@ -13286,17 +13322,17 @@ export const allQuestions: QuestionType[] = [
                     "unit": 4,
                     "lessonIDS": ["4.4"],
                     "unitName": "Financial Sector",
-                    "question": "Assuming banks hold no excess reserves and individuals hold no currency, if the required reserve ratio is 10%, what is the maximum possible expansion of the money supply resulting from a $1,000 new deposit into the banking system?",
+                    "question": "A customer deposits $1,000 in cash into a checking account. The required reserve ratio is 10%, banks lend out all excess reserves, and borrowers hold no cash. What is the maximum possible increase in the money supply from the banks' lending?",
                     "image": null,
                     "options": [
                       "$100",
                       "$1,000",
                       "$9,000",
-                      "$10,000", // Correct (Total MS); or $9,000 if asking for *increase*
+                      "$10,000",
                       "$900"
                     ],
-                    "correctAnswer": "D", // Assuming question asks for total potential money supply based on the deposit
-                    "explanation": "The simple money multiplier is 1 / Required Reserve Ratio = 1 / 0.10 = 10. The maximum potential money supply that can be supported by the initial $1,000 deposit (which becomes reserves) is Multiplier * Initial Deposit = 10 * $1,000 = $10,000. (Note: If the question asked for the *increase* or *change*, it would be $9,000, as the initial $1,000 was already money)."
+                    "correctAnswer": "C",
+                    "explanation": "Take the initial change in excess reserves and multiply it by the money multiplier. The bank must keep 10% of the $1,000 deposit as required reserves ($100), so excess reserves increase by $900. The money multiplier is 1 / 0.10 = 10. Maximum increase in the money supply = $900 × 10 = $9,000. It isn't $10,000 because the $1,000 was already money: depositing cash only moves it from currency into checkable deposits, so the deposit itself doesn't change the money supply."
                   },
                   {
                     "id": 306,

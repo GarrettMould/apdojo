@@ -3,9 +3,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, ArrowRight, Sparkles } from 'lucide-react';
+import { CheckCircle2, ArrowRight, Sparkles, ShieldCheck, GraduationCap, CalendarCheck, Lightbulb } from 'lucide-react';
 
 type CourseCardType = 'macro' | 'micro' | 'gov' | 'stats';
+
+/** Same three rows on every card so the passes compare like for like. */
+type IncludedRow = { label: 'Tests' | 'FRQs and essays' | 'Study tools'; text: string };
+
+const SEASON_LABEL = 'Covers the May 2027 AP exams. Access through June 30, 2027.';
 
 const COURSE_CONFIG: Record<
   CourseCardType,
@@ -15,9 +20,8 @@ const COURSE_CONFIG: Record<
     subtitle: string;
     price: number;
     originalPrice: number;
-    validUntilLabel: string;
     theme: 'blue' | 'green' | 'violet' | 'orange';
-    features: Array<{ text: string; key: string }>;
+    included: IncludedRow[];
   }
 > = {
   macro: {
@@ -26,15 +30,14 @@ const COURSE_CONFIG: Record<
     subtitle: 'Everything you need to score a 5 in AP Macro.',
     price: 29,
     originalPrice: 39,
-    validUntilLabel: 'Valid until June 30, 2027',
     theme: 'blue',
-    features: [
-      { text: 'Full Practice Exams based on 2027 AP Macro CED', key: 'Full Practice Exams' },
-      { text: 'Endless AP-Style MCQ Bank', key: 'Endless' },
-      { text: 'AI-Graded FRQs with Graphing Help', key: 'AI-Graded' },
-      { text: 'Interactive Graphing Simulators', key: 'Interactive Graphing Simulators' },
-      { text: 'Interactive Cheat Sheets + Downloadable PDFs', key: 'Interactive Cheat Sheets' },
-      { text: 'Upload Notes to Create Quizzes', key: 'Upload Notes' },
+    included: [
+      { label: 'Tests', text: 'Full practice exams and unit tests on the 2027 CED, plus an endless AP-style MCQ bank' },
+      { label: 'FRQs and essays', text: 'AI-graded FRQs with graphing help' },
+      {
+        label: 'Study tools',
+        text: 'Guided explainers, interactive graphing simulators, cheat sheets with PDFs, and quizzes from your own notes',
+      },
     ],
   },
   micro: {
@@ -43,15 +46,14 @@ const COURSE_CONFIG: Record<
     subtitle: 'Everything you need to score a 5 in AP Micro.',
     price: 29,
     originalPrice: 39,
-    validUntilLabel: 'Valid until June 30, 2027',
     theme: 'green',
-    features: [
-      { text: 'Full Practice Exams based on 2027 AP Micro CED', key: 'Full Practice Exams' },
-      { text: 'Endless AP-Style MCQ Bank', key: 'Endless' },
-      { text: 'AI-Graded FRQs with Graphing Help', key: 'AI-Graded' },
-      { text: 'Interactive Graphing Simulators', key: 'Interactive Graphing Simulators' },
-      { text: 'Interactive Cheat Sheets + Downloadable PDFs', key: 'Interactive Cheat Sheets' },
-      { text: 'Upload Notes to Create Quizzes', key: 'Upload Notes' },
+    included: [
+      { label: 'Tests', text: 'Full practice exams and unit tests on the 2027 CED, plus an endless AP-style MCQ bank' },
+      { label: 'FRQs and essays', text: 'AI-graded FRQs with graphing help' },
+      {
+        label: 'Study tools',
+        text: 'Interactive graphing simulators, cheat sheets with PDFs, and quizzes from your own notes',
+      },
     ],
   },
   gov: {
@@ -60,14 +62,14 @@ const COURSE_CONFIG: Record<
     subtitle: 'Everything you need to score a 5 in AP Gov.',
     price: 29,
     originalPrice: 39,
-    validUntilLabel: 'Valid until June 30, 2027',
     theme: 'violet',
-    features: [
-      { text: 'Formal unit MCQ tests for all 5 units', key: 'Formal unit MCQ tests' },
-      { text: 'SCOTUS comparison essay practice', key: 'SCOTUS comparison' },
-      { text: 'Stimulus FRQ packs with scoring guides', key: 'Stimulus FRQ packs' },
-      { text: 'Interactive unit cheat sheets', key: 'Interactive unit cheat sheets' },
-      { text: 'Dojo AI tutor on every cheat sheet', key: 'Dojo AI tutor' },
+    included: [
+      { label: 'Tests', text: 'Unit MCQ tests for all 5 units' },
+      {
+        label: 'FRQs and essays',
+        text: 'Stimulus FRQ packs with scoring guides, and SCOTUS comparison essays with AI feedback',
+      },
+      { label: 'Study tools', text: 'Interactive cheat sheets for every unit, each with the Dojo AI tutor' },
     ],
   },
   stats: {
@@ -76,14 +78,14 @@ const COURSE_CONFIG: Record<
     subtitle: 'Everything you need to score a 5 in AP Stats.',
     price: 29,
     originalPrice: 39,
-    validUntilLabel: 'Valid until June 30, 2027',
     theme: 'orange',
-    features: [
-      { text: 'Formal unit MCQ tests for all 5 units', key: 'Formal unit MCQ tests' },
-      { text: 'Unit FRQ packs with stimulus practice', key: 'Unit FRQ packs' },
-      { text: 'TI-84 calculator drills', key: 'TI-84 calculator drills' },
-      { text: 'Exam formula sheet on every unit', key: 'Exam formula sheet' },
-      { text: 'Interactive unit cheat sheets', key: 'Interactive unit cheat sheets' },
+    included: [
+      { label: 'Tests', text: 'Unit MCQ tests for all 5 units' },
+      { label: 'FRQs and essays', text: 'Unit FRQ packs with stimulus practice' },
+      {
+        label: 'Study tools',
+        text: 'TI-84 calculator drills, the exam formula sheet on every unit, and interactive cheat sheets',
+      },
     ],
   },
 };
@@ -145,7 +147,8 @@ function SeasonPassCard({ courseType }: { courseType: CourseCardType }) {
           <span className={`text-5xl sm:text-6xl font-black ${theme.accent}`}>${config.price}</span>
           <span className="text-lg text-gray-400 line-through">${config.originalPrice}</span>
         </div>
-        <p className="mt-2 text-sm text-gray-600">{config.validUntilLabel}</p>
+        <p className="mt-2 text-sm font-semibold text-gray-700">One-time payment, no subscription.</p>
+        <p className="mt-1 text-sm text-gray-600">{SEASON_LABEL}</p>
 
         <Link
           href={`/purchase/season-pass?courseType=${courseType}`}
@@ -153,23 +156,23 @@ function SeasonPassCard({ courseType }: { courseType: CourseCardType }) {
         >
           Get started <ArrowRight className="w-5 h-5" />
         </Link>
+        <p className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-gray-700">
+          <ShieldCheck className={`w-4 h-4 ${theme.accent}`} aria-hidden />
+          100% money-back guarantee
+        </p>
 
         <div className="mt-8 w-full text-left">
           <p className="text-base font-black text-black mb-4">Includes:</p>
-          <ul className="space-y-3">
-            {config.features.map((feature, idx) => {
-              const parts = feature.text.split(feature.key);
-              return (
-                <li key={idx} className="flex items-start gap-3">
-                  <CheckCircle2 className={`w-5 h-5 mt-0.5 flex-shrink-0 ${theme.accent}`} />
-                  <span className="text-sm sm:text-base font-semibold text-gray-900 leading-relaxed">
-                    {parts[0]}
-                    <strong>{feature.key}</strong>
-                    {parts[1]}
-                  </span>
-                </li>
-              );
-            })}
+          <ul className="space-y-4">
+            {config.included.map((row) => (
+              <li key={row.label} className="flex items-start gap-3">
+                <CheckCircle2 className={`w-5 h-5 mt-0.5 flex-shrink-0 ${theme.accent}`} />
+                <span className="text-sm sm:text-base text-gray-900 leading-relaxed">
+                  <strong className="block font-black">{row.label}</strong>
+                  <span className="font-medium">{row.text}</span>
+                </span>
+              </li>
+            ))}
           </ul>
         </div>
       </div>
@@ -242,6 +245,55 @@ function MobileSeasonPassCarousel() {
   );
 }
 
+const TRUST_POINTS = [
+  {
+    icon: GraduationCap,
+    title: 'Built by AP tutors',
+    text: 'Shaped by years of one-on-one AP tutoring, around the mistakes students really make.',
+  },
+  {
+    icon: CalendarCheck,
+    title: 'Matches the 2027 exam',
+    text: 'Questions and practice exams follow the current Course and Exam Description.',
+  },
+  {
+    icon: Lightbulb,
+    title: 'Explanations, not just answers',
+    text: 'See why each answer is right or wrong, so every miss teaches you something.',
+  },
+  {
+    icon: ShieldCheck,
+    title: '100% money-back guarantee',
+    text: 'Not happy with your pass? Email service@apdojo.com for a full refund.',
+  },
+] as const;
+
+function TrustStrip() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.45 }}
+      className="mt-10 bg-white border-4 border-black rounded-2xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] p-6 sm:p-8"
+    >
+      <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {TRUST_POINTS.map(({ icon: Icon, title, text }) => (
+          <li key={title} className="flex items-start gap-3">
+            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border-2 border-black bg-blue-50 text-blue-600">
+              <Icon className="h-5 w-5" aria-hidden />
+            </span>
+            <div className="min-w-0">
+              <p className="font-black text-black leading-snug">{title}</p>
+              <p className="mt-1 text-sm font-medium text-gray-600 leading-relaxed">{text}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </motion.div>
+  );
+}
+
 function BundleBanner() {
   const savings = Math.max(0, COURSE_CONFIG.macro.price + COURSE_CONFIG.micro.price - BUNDLE.price);
   return (
@@ -290,6 +342,7 @@ export function SeasonPassCourseChooser() {
             <SeasonPassCard key={type} courseType={type} />
           ))}
         </div>
+        <TrustStrip />
         <BundleBanner />
       </div>
     </div>
@@ -311,7 +364,7 @@ export function SeasonPassShowcase() {
             Four AP courses. Pick your <span className="text-blue-500">Season Pass</span>
           </h2>
           <p className="mt-4 text-lg sm:text-xl text-gray-600 font-medium">
-            Macro, Micro, Gov, and Stats — $29 each through June 30, 2027.
+            $29 each, paid once. Each pass covers the May 2027 AP exam season, with a 100% money-back guarantee.
           </p>
         </motion.div>
 
@@ -323,6 +376,7 @@ export function SeasonPassShowcase() {
           ))}
         </div>
 
+        <TrustStrip />
         <BundleBanner />
       </div>
     </div>

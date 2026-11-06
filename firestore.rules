@@ -14,11 +14,23 @@ service cloud.firestore {
           data.roles.size() == 1 &&
           data.roles[0] == 'user'
         )
-      );
+      ) && !data.keys().hasAny(serverOnlyUserFields());
+    }
+
+    // Paid access and graded progress: written only by server routes (Admin SDK bypasses these rules).
+    function serverOnlyUserFields() {
+      return [
+        'seasonPass',
+        'seasonPassExpiration',
+        'purchases',
+        'purchasedTests',
+        'guidedLessonProgress',
+        'guidedGradingUsage'
+      ];
     }
 
     function doesNotMutateAccessFields() {
-      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['admin', 'role', 'roles']);
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['admin', 'role', 'roles'] + serverOnlyUserFields());
     }
 
     // Rule for the users collection

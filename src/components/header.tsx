@@ -93,6 +93,7 @@ export function Header() {
           ? [{ label: 'Calculator Drills', href: '/ap-stats-calculator-simulator' }]
           : []),
     { label: 'Cheat Sheets', href: defaultCheatSheetUrl(displaySubject) },
+    ...(displaySubject === 'macro' ? [{ label: 'Explainers', href: '/ap-macro/explainers' }] : []),
     ...(isEconCourse(displaySubject) ? [{ label: 'Blog', href: '/ap-blog-home' }] : []),
   ];
 
@@ -302,6 +303,15 @@ export function Header() {
               >
                 Cheat Sheets
               </Link>
+
+              {displaySubject === 'macro' ? (
+                <Link
+                  href="/ap-macro/explainers"
+                  className={`whitespace-nowrap text-lg text-gray-700 transition-colors font-bold ${navHoverClass}`}
+                >
+                  Explainers
+                </Link>
+              ) : null}
 
               {/* Season Pass - Only show if user is not logged in or not premium */}
               {(!user || !isPremium) && (

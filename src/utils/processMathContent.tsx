@@ -251,8 +251,14 @@ export const HIGHLIGHT_BG: Record<HighlightColor, string> = {
   green: 'rgb(187 247 208)',
 };
 
-/** Single-asterisk emphasis (`*case name*`) used in Gov MCQ copy. */
-const SINGLE_EMPHASIS_PATTERN = /\*([^*]+)\*/g;
+/**
+ * Single-asterisk emphasis (`*case name*`) used in Gov MCQ copy. Kept non-global: each scan builds its own
+ * global copy, because these functions recurse into each other and a shared `lastIndex` would be reset
+ * mid-scan, looping forever.
+ */
+const SINGLE_EMPHASIS_PATTERN = /(^|[^A-Za-z0-9])\*([^*\s](?:[^*]*[^*\s])?)\*(?![A-Za-z0-9])/;
+// Group 1 is the character before the opening `*` (no lookbehind, for older Safari). Asterisks touching a
+// letter or digit are not emphasis, so statistics notation such as `z*` and `t*` stays plain text.
 
 function applyHighlightsToPlainText(
   segment: string,
@@ -262,9 +268,7 @@ function applyHighlightsToPlainText(
 ): React.ReactNode {
   // Only recurse into emphasis rendering when a valid *...* pair exists.
   // Plain stray asterisks (e.g. "p*") should be treated as normal text.
-  SINGLE_EMPHASIS_PATTERN.lastIndex = 0;
   if (SINGLE_EMPHASIS_PATTERN.test(segment)) {
-    SINGLE_EMPHASIS_PATTERN.lastIndex = 0;
     return renderEmphasisWithHighlights(
       segment,
       segmentOffset,
@@ -328,14 +332,15 @@ function renderEmphasisWithHighlights(
   let lastIndex = 0;
   let key = 0;
   let match: RegExpExecArray | null;
-  SINGLE_EMPHASIS_PATTERN.lastIndex = 0;
+  const pattern = new RegExp(SINGLE_EMPHASIS_PATTERN.source, 'g');
 
-  while ((match = SINGLE_EMPHASIS_PATTERN.exec(text)) !== null) {
-    if (match.index > lastIndex) {
+  while ((match = pattern.exec(text)) !== null) {
+    const emStart = match.index + match[1].length;
+    if (emStart > lastIndex) {
       parts.push(
         <React.Fragment key={`em-plain-${key++}`}>
           {applyHighlightsToPlainText(
-            text.slice(lastIndex, match.index),
+            text.slice(lastIndex, emStart),
             textOffset + lastIndex,
             highlights,
             onRemoveHighlight,
@@ -344,8 +349,8 @@ function renderEmphasisWithHighlights(
       );
     }
 
-    const inner = match[1];
-    const innerOffset = textOffset + match.index + 1;
+    const inner = match[2];
+    const innerOffset = textOffset + emStart + 1;
     parts.push(
       <em key={`em-${key++}`} className="italic">
         {applyHighlightsToPlainText(inner, innerOffset, highlights, onRemoveHighlight)}

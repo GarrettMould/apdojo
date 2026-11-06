@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Question, QuestionBank } from '@/data/questionBanks/types';
 import { Button } from "@/components/ui/button";
-import { Bookmark, BookmarkX, X, Clock, Maximize2, Minimize2, Calculator, Pen, Eraser, Expand, Trash2, Circle, CircleDot, Check, Lock, Brain, FileText, ChevronLeft, ChevronRight, ChevronsRight, Triangle, Strikethrough, Eye, EyeOff, Play, ChevronDown, ChevronUp, List, Pause, Play as PlayIcon, Highlighter, Copy, ArrowLeft, Sigma } from 'lucide-react';
+import { Bookmark, BookmarkX, X, Clock, Maximize2, Minimize2, Calculator, Pen, Eraser, Expand, Trash2, Circle, CircleDot, Check, Lock, Brain, FileText, ChevronLeft, ChevronRight, ChevronsRight, Triangle, Strikethrough, Eye, EyeOff, Play, ChevronDown, ChevronUp, List, Pause, Play as PlayIcon, Highlighter, Copy, ArrowLeft, Sigma, LogOut } from 'lucide-react';
 import Image, { StaticImageData } from 'next/image';
 import Link from 'next/link';
 import { redirectToCheckout } from '@/lib/stripe';
@@ -37,6 +37,7 @@ import { db } from '@/lib/firebase';
 import { collection, addDoc, doc, updateDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 import { saveQuizResult } from '@/lib/quizHistory';
 import { saveTestResult, saveTestProgress, loadTestProgress, hasUnitFrqTestResult, TestProgress } from '@/lib/testProgress';
+import { getMissedGuidedLessons, guidedUnitWrapUpHref, hasGuidedUnit } from '@/data/guidedLessons/lessonLinks';
 import {
   apQuestionSubjectTag,
   cheatSheetUrlForUnit,
@@ -47,7 +48,12 @@ import {
   unitsForCourseSubject,
   type CourseSubject,
 } from '@/lib/courseSubject';
-import { getUnitTestMeta, unitMcqTimeLimitSeconds, ECON_UNIT_MCQ_SECONDS_PER_QUESTION } from '@/data/unitTestMeta';
+import {
+  getUnitTestMeta,
+  unitMcqTimeLimitSeconds,
+  ECON_UNIT_MCQ_SECONDS_PER_QUESTION,
+  STATS_UNIT_MCQ_SECONDS_PER_QUESTION,
+} from '@/data/unitTestMeta';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
@@ -328,7 +334,10 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
         return 70 * 60;
       }
       if (isFullLengthMcqExamNumber(examNumber)) {
-        return 70 * 60;
+        // Stats paces by question count (AP Section I: 90 min for ~42 Q); Econ is a fixed 70-minute section.
+        return examType === 'stats'
+          ? unitMcqTimeLimitSeconds(questions.length, STATS_UNIT_MCQ_SECONDS_PER_QUESTION)
+          : 70 * 60;
       }
       const unitNumber = parseInt(examNumber, 10);
       if (Number.isFinite(unitNumber)) {
@@ -687,22 +696,29 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
       cheatSheetHref: cheatSheetUrlForUnit(examType, unitNumber),
     };
   }, [isUnitTest, examNumber, examType, questions]);
+
+  /** Macro unit tests: explainer lessons behind each missed (or skipped) question. */
+  const missedGuidedLessons = useMemo(() => {
+    if (!isUnitTest || isCustomAssignment || examType !== 'macro') return [];
+    return getMissedGuidedLessons(
+      questions.flatMap((q, index) =>
+        answers[q.id] === q.correctAnswer ? [] : [{ questionNumber: index + 1, lessonIds: q.lessonIDS ?? [] }],
+      ),
+    );
+  }, [isUnitTest, isCustomAssignment, examType, questions, answers]);
   // Show top bar and bottom navigation for unit tests, preview exams, and full exams
   const shouldShowTestUI = isUnitTest || isPreviewExam || isFullExam || isCustomAssignment;
   /** Live session only: apply tutor/builder-style UI (rounded cards, shadow-xl, indigo/slate). Do not use for logic. */
   const isLiveSession = !!(liveSessionId && liveStudentId);
 
   // Determine if this exam requires season pass (unit tests and full exams, but not custom assignments).
-  // AP Gov is fully open for now — no season pass gate.
-  const requiresSeasonPass =
-    (isUnitTest || isFullExam || isPreviewExam) &&
-    !isCustomAssignment &&
-    examType !== 'gov';
+  // Same free tier for every course: Econ, Gov and Stats.
+  const requiresSeasonPass = (isUnitTest || isFullExam || isPreviewExam) && !isCustomAssignment;
 
   // Check if user has season pass access for this exam type
   // For unit tests and full exams, check season pass. For custom assignments, always allow.
   const hasSeasonPassAccess = useMemo(() => {
-    if (isCustomAssignment || examType === 'gov') return true;
+    if (isCustomAssignment) return true;
     if (!user || !userData) return false;
     return hasValidSeasonPass(userData, examType);
   }, [user, userData, examType, isCustomAssignment]);
@@ -845,7 +861,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
 
   // Timer countdown effect
   useEffect(() => {
-    if (showResults || timeRemaining <= 0 || isTimerPaused || showSeasonPassModal || showSaveProgressModal) return;
+    if (showResults || timeRemaining <= 0 || isTimerPaused || showSeasonPassModal || showSaveProgressModal || showTutorial) return;
 
     const interval = setInterval(() => {
       setTimeRemaining(prev => {
@@ -857,7 +873,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [showResults, timeRemaining, isTimerPaused, showSeasonPassModal, showSaveProgressModal]);
+  }, [showResults, timeRemaining, isTimerPaused, showSeasonPassModal, showSaveProgressModal, showTutorial]);
 
   // Notify parent of time updates
   useEffect(() => {
@@ -1306,7 +1322,10 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
           testId,
           score,
           totalQuestions: questions.length,
-          completedAt: new Date()
+          completedAt: new Date(),
+          ...(isUnitTest && examType === 'macro'
+            ? { missedLessonIds: missedGuidedLessons.map((l) => l.lessonId) }
+            : {}),
         });
         console.log(`[FullExam] Successfully saved test result: ${testType} - ${testId} - Score: ${score}%`);
 
@@ -1839,7 +1858,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
       )}
 
       {/* Debug Button - Only in Development */}
-      {!showResults && isMounted && (
+      {!showResults && isMounted && !isUnitTest && (
         (typeof window !== 'undefined' && (
           window.location.hostname === 'localhost' || 
           window.location.hostname === '127.0.0.1' || 
@@ -1932,7 +1951,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
         <div className={`flex w-full flex-col relative ${shouldShowTestUI ? 'min-h-screen' : isCustomAssignment ? '' : 'lg:h-[calc(100vh-5rem)]'} ${shouldShowTestUI ? '' : 'overflow-hidden'}`}>
           {/* Top Bar */}
           {shouldShowTestUI && (!showResults || (showResults && showFullResults && isUnitTest)) && (
-            <div className={`w-full flex items-center justify-between flex-shrink-0 fixed left-0 right-0 z-40 ${isUnitTest ? 'top-0 bg-white border-b border-gray-200 h-14 px-6 py-0' : 'top-20 bg-gray-200 px-6 py-4 border-b-4 border-black shadow-lg'}`}>
+            <div className={`w-full flex items-center justify-between flex-shrink-0 fixed left-0 right-0 z-40 ${isUnitTest ? 'top-0 bg-white border-b border-gray-200 h-14 px-3 sm:px-6 py-0' : 'top-20 bg-gray-200 px-6 py-4 border-b-4 border-black shadow-lg'}`}>
             {/* ── UNIT TEST: Fiveable-style header ── */}
             {isUnitTest && (
               showResults ? (
@@ -1962,58 +1981,66 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                 >
                   <Image src="/images/dojoIconJan26.svg" alt="" width={26} height={26} unoptimized />
                   {isCustomAssignment ? (
-                    <span className="text-sm font-black text-gray-900 tracking-wide">Custom Assignment</span>
+                    <span className="hidden sm:inline text-sm font-black text-gray-900 tracking-wide">Custom Assignment</span>
                   ) : (
-                    <span className="text-sm font-black text-gray-900 tracking-wide">AP Dojo</span>
+                    <span className="hidden sm:inline text-sm font-black text-gray-900 tracking-wide">AP Dojo</span>
                   )}
                 </button>
                 {/* Center: section label */}
                 <span className="text-sm font-medium text-gray-500 hidden sm:block">
                   {isCustomAssignment ? `${questions.length} Questions` : 'Section I – Multiple Choice'}
                 </span>
-                {/* Right: controls */}
-                <div className="flex items-center gap-1.5">
+                {/* Right: controls (icon-only below sm so the bar fits on phones) */}
+                <div className="flex items-center gap-1 sm:gap-1.5">
               <button
                 type="button"
                 onClick={handleUnitTestSaveAndExit}
-                className="px-3 py-1.5 text-xs font-semibold border border-gray-300 rounded hover:bg-gray-50 text-gray-700 transition-colors"
+                className="px-2 sm:px-3 py-1.5 text-xs font-semibold border border-gray-300 rounded hover:bg-gray-50 text-gray-700 transition-colors flex items-center gap-1"
+                aria-label="Save and exit"
               >
-                Save & Exit
+                <LogOut className="w-3.5 h-3.5 sm:hidden" aria-hidden />
+                <span className="hidden sm:inline">Save & Exit</span>
               </button>
                   <button
                     type="button"
                     onClick={() => handleToolToggle('whiteboard')}
-                    className={`px-3 py-1.5 text-xs font-semibold border rounded transition-colors ${
+                    className={`px-2 sm:px-3 py-1.5 text-xs font-semibold border rounded transition-colors ${
                       showToolsPanel && activeTool === 'whiteboard'
                         ? 'border-gray-400 bg-gray-100 text-gray-900'
                         : 'border-gray-300 hover:bg-gray-50 text-gray-700'
                     }`}
+                    aria-label="Scratch paper"
                   >
-                    Scratch Paper
+                    <Pen className="w-3.5 h-3.5 sm:hidden" aria-hidden />
+                    <span className="hidden sm:inline">Scratch Paper</span>
                   </button>
                   {showStatsFormulas ? (
                     <>
                       <button
                         type="button"
                         onClick={() => handleToolToggle('formulas')}
-                        className={`px-3 py-1.5 text-xs font-semibold border rounded transition-colors ${
+                        className={`px-2 sm:px-3 py-1.5 text-xs font-semibold border rounded transition-colors ${
                           showToolsPanel && activeTool === 'formulas'
                             ? 'border-gray-400 bg-gray-100 text-gray-900'
                             : 'border-gray-300 hover:bg-gray-50 text-gray-700'
                         }`}
+                        aria-label="Formulas"
                       >
-                        Formulas
+                        <Sigma className="w-3.5 h-3.5 sm:hidden" aria-hidden />
+                        <span className="hidden sm:inline">Formulas</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => handleToolToggle('calculator')}
-                        className={`px-3 py-1.5 text-xs font-semibold border rounded transition-colors ${
+                        className={`px-2 sm:px-3 py-1.5 text-xs font-semibold border rounded transition-colors ${
                           showToolsPanel && activeTool === 'calculator'
                             ? 'border-gray-400 bg-gray-100 text-gray-900'
                             : 'border-gray-300 hover:bg-gray-50 text-gray-700'
                         }`}
+                        aria-label="Calculator"
                       >
-                        Calculator
+                        <Calculator className="w-3.5 h-3.5 sm:hidden" aria-hidden />
+                        <span className="hidden sm:inline">Calculator</span>
                       </button>
                     </>
                   ) : null}
@@ -2025,7 +2052,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                       className="px-2 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors border-r border-gray-300"
                       title="Decrease text size"
                     >−</button>
-                    <span className="px-2 text-xs font-semibold text-gray-700 select-none">Aa</span>
+                    <span className="px-1.5 sm:px-2 text-xs font-semibold text-gray-700 select-none">Aa</span>
                     <button
                       onClick={() => setQuestionFontSize(s => Math.min(FONT_SIZE_MAX, s + 1))}
                       disabled={questionFontSize === FONT_SIZE_MAX}
@@ -2036,22 +2063,24 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                   {!isTimerPaused ? (
                     <button
                       onClick={() => setIsTimerPaused(true)}
-                      className="px-3 py-1.5 text-xs font-semibold border border-gray-300 rounded hover:bg-gray-50 text-gray-700 transition-colors flex items-center gap-1"
+                      className="px-2 sm:px-3 py-1.5 text-xs font-semibold border border-gray-300 rounded hover:bg-gray-50 text-gray-700 transition-colors flex items-center gap-1"
+                      aria-label="Pause"
                     >
-                      <Pause className="w-3 h-3" /> Pause
+                      <Pause className="w-3 h-3" /> <span className="hidden sm:inline">Pause</span>
                     </button>
                   ) : (
                     <button
                       onClick={() => setIsTimerPaused(false)}
-                      className="px-3 py-1.5 text-xs font-semibold border border-gray-300 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors flex items-center gap-1"
+                      className="px-2 sm:px-3 py-1.5 text-xs font-semibold border border-gray-300 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors flex items-center gap-1"
+                      aria-label="Resume"
                     >
-                      <Play className="w-3 h-3" /> Resume
+                      <Play className="w-3 h-3" /> <span className="hidden sm:inline">Resume</span>
                     </button>
                   )}
                   {showTimer ? (
                     <button
                       onClick={() => setShowTimer(false)}
-                      className={`px-3 py-1.5 text-xs font-mono font-bold rounded border ${timeRemaining <= 300 && timeRemaining > 0 ? 'border-red-400 text-red-600 bg-red-50' : 'border-gray-300 text-gray-900 bg-white'} min-w-[72px] text-center`}
+                      className={`px-2 sm:px-3 py-1.5 text-xs font-mono font-bold rounded border ${timeRemaining <= 300 && timeRemaining > 0 ? 'border-red-400 text-red-600 bg-red-50' : 'border-gray-300 text-gray-900 bg-white'} min-w-[56px] sm:min-w-[72px] text-center`}
                       title="Hide timer"
                     >
                       {formatTime(timeRemaining)}
@@ -2279,8 +2308,8 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
              } ${shouldShowTestUI ? 'pb-24' : ''}`}>
             {!showResults ? (
               <>
-              {/* Progress Bar - Mobile Only */}
-              {!(showVideoModal && videoUrl) && (
+              {/* Progress Bar - Mobile Only (test UI already has the bottom-bar navigator) */}
+              {!shouldShowTestUI && !(showVideoModal && videoUrl) && (
               <div className="border-b border-gray-200 mb-6 lg:hidden">
                 <div className="p-6">
                   <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
@@ -2369,13 +2398,13 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                           : isCustomAssignment
                             ? 'border-2 border-black rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] p-6 md:p-8'
                           : isUnitTest
-                            ? 'p-8'
+                            ? 'p-4 md:p-8'
                             : 'rounded-lg shadow-md border border-gray-200 p-6 md:p-8'
                       }`}>
                         {/* Main Question Content */}
-                        <div className={isUnitTest ? 'grid grid-cols-2 gap-x-0 gap-y-4' : 'space-y-6'}>
+                        <div className={isUnitTest ? 'grid grid-cols-1 lg:grid-cols-2 gap-x-0 gap-y-6 lg:gap-y-4' : 'space-y-6'}>
                           {/* Question Number, Bookmark, and Question Text */}
-                          <div className={isUnitTest ? 'col-start-1 row-start-1 pr-8 border-r border-gray-100' : 'w-full'}>
+                          <div className={isUnitTest ? 'lg:col-start-1 lg:row-start-1 lg:pr-8 lg:border-r border-gray-100' : 'w-full'}>
                             <div className="flex items-start gap-3">
                               {/* Question Number */}
                               {isUnitTest ? (
@@ -2505,7 +2534,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
 
                           {/* Visual Content - Directly Below Question Text */}
                           {hasVisualContent && !isCustomAssignment && !(showVideoModal && videoUrl) && (
-                            <div className={isUnitTest ? 'col-start-1 row-start-2 pr-8 border-r border-gray-100' : 'w-full'}>
+                            <div className={isUnitTest ? 'lg:col-start-1 lg:row-start-2 lg:pr-8 lg:border-r border-gray-100' : 'w-full'}>
                               {question.image && (
                                 <div className="bg-white rounded-lg border border-gray-200 p-4">
                                   <ExpandableQuestionImage
@@ -2734,7 +2763,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
 
                             {/* Answer Options */}
                             {question.optionTableHeaders ? (
-                              <div className={`space-y-3 ${isUnitTest ? `[grid-column:2] ${hasVisualContent ? '[grid-row:1_/_span_2]' : '[grid-row:1]'} pl-8 overflow-y-auto self-start` : ''}`}>
+                              <div className={`space-y-3 ${isUnitTest ? `lg:[grid-column:2] ${hasVisualContent ? 'lg:[grid-row:1_/_span_2]' : 'lg:[grid-row:1]'} lg:pl-8 overflow-y-auto self-start` : ''}`}>
                                 {/* Column Headers */}
                                 <div className="grid grid-cols-[auto_1fr_1fr_auto] gap-3 px-3 pb-2 border-b-2 border-gray-300">
                                   <div className="w-8"></div>
@@ -2833,7 +2862,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                 })}
                               </div>
                             ) : (
-                              <div className={`space-y-3 ${isUnitTest ? `[grid-column:2] ${hasVisualContent ? '[grid-row:1_/_span_2]' : '[grid-row:1]'} pl-8 pt-1 overflow-y-auto self-start` : ''}`}>
+                              <div className={`space-y-3 ${isUnitTest ? `lg:[grid-column:2] ${hasVisualContent ? 'lg:[grid-row:1_/_span_2]' : 'lg:[grid-row:1]'} lg:pl-8 pt-1 overflow-y-auto self-start` : ''}`}>
                                 {question.options.map((option, index) => {
                                   const isStruckThrough = strikethroughState[question.id]?.includes(index);
                                   // Only show as selected if NOT struck through (strikethrough takes priority)
@@ -3384,6 +3413,43 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                           )}
                         </div>
                       ) : null}
+                      {missedGuidedLessons.length > 0 ? (
+                        <div className="mt-5 w-full rounded-xl border-2 border-black bg-white px-4 py-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:px-5 sm:py-5">
+                          <p className="text-base font-bold text-gray-900 sm:text-lg">Review these lessons</p>
+                          <p className="mt-1 text-sm text-gray-600">
+                            Each explainer walks through the idea behind the questions you missed.
+                          </p>
+                          <ul className="mt-3 flex flex-col divide-y divide-gray-200">
+                            {missedGuidedLessons.map((lesson) => (
+                              <li key={lesson.lessonId}>
+                                <Link
+                                  href={lesson.href}
+                                  className="flex items-center justify-between gap-3 py-2.5 text-sm hover:bg-gray-50 sm:text-base"
+                                >
+                                  <span className="min-w-0">
+                                    <span className="font-bold text-gray-900">
+                                      {lesson.lessonId} {lesson.name}
+                                    </span>
+                                    <span className="block text-xs text-gray-500 sm:text-sm">
+                                      Missed {lesson.questionNumbers.length === 1 ? 'question' : 'questions'}{' '}
+                                      {lesson.questionNumbers.join(', ')}
+                                    </span>
+                                  </span>
+                                  <ChevronRight className={`h-4 w-4 shrink-0 ${resultsBackLinkClass}`} aria-hidden />
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
+                          {unitTestResultsSubtitle && hasGuidedUnit(unitTestResultsSubtitle.unitNumber) ? (
+                            <Link
+                              href={guidedUnitWrapUpHref(unitTestResultsSubtitle.unitNumber)}
+                              className={`mt-2 inline-flex items-center gap-1 text-sm font-black underline underline-offset-2 sm:text-base ${resultsBackLinkClass}`}
+                            >
+                              Unit {unitTestResultsSubtitle.unitNumber} wrap-up →
+                            </Link>
+                          ) : null}
+                        </div>
+                      ) : null}
                     </div>
                   ) : null}
                   <div className="rounded-2xl border-2 border-black bg-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
@@ -3850,7 +3916,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
               </motion.div>
             )}
           </AnimatePresence>
-          <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+          <div className="max-w-7xl mx-auto px-3 sm:px-4 py-3 flex items-center justify-between gap-2 sm:gap-4">
             {/* Sec label (unit test only) */}
             {isUnitTest && (
               <span className="hidden sm:block text-xs text-gray-400 font-normal shrink-0">
@@ -3862,7 +3928,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
               <button
                 onClick={() => setShowQuestionNavigator(!showQuestionNavigator)}
                 disabled={isTimerPaused && !isCustomAssignment}
-                className={`w-full px-4 py-2.5 rounded-lg font-normal flex items-center justify-between transition-colors ${
+                className={`w-full px-3 sm:px-4 py-2.5 rounded-lg font-normal flex items-center justify-between transition-colors ${
                   isTimerPaused && !isCustomAssignment
                     ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
                     : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
@@ -3870,7 +3936,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
               >
                 <div className="flex items-center gap-2">
                   <List className="w-5 h-5" />
-                  <span>Question {currentPage + 1} of {questions.length}</span>
+                  <span className="whitespace-nowrap"><span className="hidden sm:inline">Question </span>{currentPage + 1} of {questions.length}</span>
                 </div>
                 {showQuestionNavigator ? (
                   <ChevronUp className="w-5 h-5" />
@@ -3882,12 +3948,12 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
             </div>
 
             {/* Navigation Buttons */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               {/* Previous Button */}
               <button
                 onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
                 disabled={currentPage === 0 || (isTimerPaused && !isCustomAssignment)}
-                className={`px-6 py-2.5 rounded font-normal transition-colors flex items-center gap-2 ${
+                className={`px-4 sm:px-6 py-2.5 rounded font-normal transition-colors flex items-center gap-2 ${
                   currentPage === 0 || (isTimerPaused && !isCustomAssignment)
                     ? 'border border-gray-200 text-gray-300 cursor-not-allowed'
                     : isUnitTest
@@ -3921,7 +3987,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                     }
                   }}
                   disabled={(isTimerPaused && !isCustomAssignment) || (isPreviewMode && currentPage === questions.length - 1)}
-                  className={`px-6 py-2.5 rounded font-normal transition-colors flex items-center gap-2 ${
+                  className={`px-4 sm:px-6 py-2.5 rounded font-normal transition-colors flex items-center gap-2 ${
                     (isTimerPaused && !isCustomAssignment) || (isPreviewMode && currentPage === questions.length - 1)
                       ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                       : currentPage === questions.length - 1

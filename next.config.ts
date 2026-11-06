@@ -245,6 +245,12 @@ const nextConfig = {
       destination: '/preview/micro/mcq/1',
     });
 
+    // Stats: /ap-stats-mcq-practice-test-1 → /preview/stats/mcq/1
+    rewrites.push({
+      source: '/ap-stats-mcq-practice-test-1',
+      destination: '/preview/stats/mcq/1',
+    });
+
     // Full FRQ practice tests
     // Macro: /ap-macro-frq-practice-test-1 → /preview/macro/frq/1
     rewrites.push({
