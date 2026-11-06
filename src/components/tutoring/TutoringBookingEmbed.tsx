@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { ArrowRight, Loader2 } from 'lucide-react';
 import { calBookingUrl, type TutoringSessionType } from '@/data/tutoring';
 import { trackEvent } from '@/lib/analytics';
+import { secondaryButton } from '@/components/guidedLesson/styles';
 
 // Browser only: the embed script and iframe never run on the server.
 const Cal = dynamic(() => import('@calcom/embed-react'), { ssr: false });
@@ -97,8 +98,10 @@ export function TutoringBookingEmbed({ sessions }: { sessions: TutoringSessionTy
                 setActiveId(s.id);
                 setStatus(s.calLink ? 'waiting' : 'failed');
               }}
-              className={`rounded-xl border-2 border-black px-4 py-2 text-sm font-black transition ${
-                s.id === active.id ? 'bg-blue-600 text-white' : 'bg-white text-gray-900 hover:bg-gray-100'
+              className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                s.id === active.id
+                  ? 'border-blue-600 bg-blue-600 text-white'
+                  : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
               }`}
             >
               {s.name}
@@ -109,7 +112,7 @@ export function TutoringBookingEmbed({ sessions }: { sessions: TutoringSessionTy
 
       <div
         ref={containerRef}
-        className={`relative overflow-hidden rounded-3xl border-4 border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] ${
+        className={`relative overflow-hidden rounded-[20px] border border-slate-200 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)] ${
           status === 'failed' ? '' : 'min-h-[680px]'
         }`}
       >
@@ -118,7 +121,7 @@ export function TutoringBookingEmbed({ sessions }: { sessions: TutoringSessionTy
         ) : (
           <>
             {status !== 'ready' ? (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-gray-500" aria-live="polite">
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-slate-500" aria-live="polite">
                 <Loader2 className="h-6 w-6 animate-spin" aria-hidden />
                 <span className="text-sm font-semibold">Loading available times…</span>
               </div>
@@ -142,14 +145,14 @@ export function TutoringBookingEmbed({ sessions }: { sessions: TutoringSessionTy
 function FallbackLink({ href }: { href: string }) {
   return (
     <div className="flex min-h-[260px] flex-col items-center justify-center gap-4 p-6 text-center">
-      <p className="max-w-sm text-base font-semibold text-gray-700">
+      <p className="max-w-sm text-[15px] leading-relaxed text-slate-600">
         The booking calendar didn&apos;t load here. You can book directly on Cal.com instead.
       </p>
       <a
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-2 rounded-2xl border-4 border-black bg-white px-6 py-3 text-base font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-300"
+        className={secondaryButton}
       >
         Open the booking page <ArrowRight className="h-4 w-4" aria-hidden />
       </a>
