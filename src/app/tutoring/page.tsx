@@ -9,6 +9,7 @@ import {
   calBookingUrl,
 } from '@/data/tutoring';
 import { TutoringBookingEmbed } from '@/components/tutoring/TutoringBookingEmbed';
+import { TutoringBookLink, TutoringPageView } from '@/components/tutoring/TutoringTracking';
 
 const description =
   'Live AP tutoring over Google Meet with a real AP teacher. Get help with graphs, FRQs and exam prep. Book online.';
@@ -43,6 +44,7 @@ export default function TutoringPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
+      <TutoringPageView />
       <div className="mx-auto flex max-w-5xl flex-col gap-16 px-4 pb-24 pt-12 sm:gap-20 sm:px-6 sm:pt-16">
         {/* 1. Hero */}
         <section className="flex flex-col items-start gap-6">
@@ -56,12 +58,12 @@ export default function TutoringPage() {
             Stuck on graphs, FRQs or a whole unit? Book a live session over Google Meet and work through it together.
           </p>
           <div className="flex flex-wrap items-center gap-4">
-            <a
-              href="#book"
+            <TutoringBookLink
+              source="hero"
               className="inline-flex items-center gap-2 rounded-2xl border-4 border-black bg-blue-600 px-7 py-4 text-lg font-black text-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-0.5 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-300"
             >
               Book a session <ArrowRight className="h-5 w-5" aria-hidden />
-            </a>
+            </TutoringBookLink>
             <Link
               href="/season-pass#season-pass"
               className="text-base font-black text-gray-900 underline underline-offset-4 hover:text-blue-700"

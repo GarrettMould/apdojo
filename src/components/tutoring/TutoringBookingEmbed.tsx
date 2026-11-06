@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { ArrowRight, Loader2 } from 'lucide-react';
 import { calBookingUrl, type TutoringSessionType } from '@/data/tutoring';
+import { trackEvent } from '@/lib/analytics';
 
 // Browser only: the embed script and iframe never run on the server.
 const Cal = dynamic(() => import('@calcom/embed-react'), { ssr: false });
@@ -39,6 +40,7 @@ export function TutoringBookingEmbed({ sessions }: { sessions: TutoringSessionTy
   useEffect(() => {
     if (!inView || !active?.calLink) return;
     let cancelled = false;
+    let detach: (() => void) | null = null;
     setStatus('loading');
     const timeout = window.setTimeout(() => {
       if (!cancelled) setStatus((s) => (s === 'ready' ? s : 'failed'));
@@ -54,8 +56,18 @@ export function TutoringBookingEmbed({ sessions }: { sessions: TutoringSessionTy
           hideEventTypeDetails: false,
           layout: 'month_view',
         });
-        cal('on', { action: 'linkReady', callback: () => !cancelled && setStatus('ready') });
-        cal('on', { action: 'linkFailed', callback: () => !cancelled && setStatus('failed') });
+        const onReady = () => !cancelled && setStatus('ready');
+        const onFailed = () => !cancelled && setStatus('failed');
+        // Booking details stay out of analytics; only the session type is sent.
+        const onBooked = () => void trackEvent('tutoring_booking_completed', { session_type: active.id });
+        cal('on', { action: 'linkReady', callback: onReady });
+        cal('on', { action: 'linkFailed', callback: onFailed });
+        cal('on', { action: 'bookingSuccessfulV2', callback: onBooked });
+        detach = () => {
+          cal('off', { action: 'linkReady', callback: onReady });
+          cal('off', { action: 'linkFailed', callback: onFailed });
+          cal('off', { action: 'bookingSuccessfulV2', callback: onBooked });
+        };
       })
       .catch(() => {
         if (!cancelled) setStatus('failed');
@@ -64,8 +76,9 @@ export function TutoringBookingEmbed({ sessions }: { sessions: TutoringSessionTy
     return () => {
       cancelled = true;
       window.clearTimeout(timeout);
+      detach?.();
     };
-  }, [inView, active?.calLink, namespace]);
+  }, [inView, active?.calLink, active?.id, namespace]);
 
   if (!active) return null;
   const bookingUrl = calBookingUrl(active.calLink);
