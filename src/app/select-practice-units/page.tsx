@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import {
@@ -39,14 +39,21 @@ function SelectPracticeUnitsContent() {
     user,
     userData,
     guestXp,
+    loading,
+    loadingUserData,
   } = useAuthContext();
 
   const subjectParam = searchParams.get('subject');
+  // Apply each ?subject= once, after the saved course has loaded. Re-applying it whenever selectedSubject
+  // changes would undo a course picked in the header while the old ?subject= is still in the address bar.
+  const appliedSubjectParamRef = useRef<string | null>(null);
   useEffect(() => {
-    if (subjectParam && isCourseSubject(subjectParam) && subjectParam !== selectedSubject) {
-      setSelectedSubject(subjectParam);
-    }
-  }, [subjectParam, selectedSubject, setSelectedSubject]);
+    if (!subjectParam || !isCourseSubject(subjectParam)) return;
+    if (appliedSubjectParamRef.current === subjectParam) return;
+    if (loading || (user && loadingUserData)) return;
+    appliedSubjectParamRef.current = subjectParam;
+    if (subjectParam !== selectedSubject) setSelectedSubject(subjectParam);
+  }, [subjectParam, selectedSubject, setSelectedSubject, loading, user, loadingUserData]);
 
   const subject = selectedSubject;
 

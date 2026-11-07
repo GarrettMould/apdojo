@@ -68,6 +68,12 @@ const nextConfig = {
   async redirects() {
     const redirects = [
       {
+        // Subject tutoring pages were replaced by one /tutoring page.
+        source: '/tutoring/:subject(macro|micro|gov|stats)',
+        destination: '/tutoring',
+        permanent: true,
+      },
+      {
         source: '/cheat-sheets/macro/AP_Dojo_Macro_U1.pdf',
         destination: '/ap-macro-unit-1-cheat-sheet',
         permanent: true,
@@ -245,6 +251,12 @@ const nextConfig = {
       destination: '/preview/micro/mcq/1',
     });
 
+    // Stats: /ap-stats-mcq-practice-test-1 → /preview/stats/mcq/1
+    rewrites.push({
+      source: '/ap-stats-mcq-practice-test-1',
+      destination: '/preview/stats/mcq/1',
+    });
+
     // Full FRQ practice tests
     // Macro: /ap-macro-frq-practice-test-1 → /preview/macro/frq/1
     rewrites.push({
@@ -262,6 +274,12 @@ const nextConfig = {
     rewrites.push({
       source: '/ap-micro-frq-practice-test-1',
       destination: '/preview/micro/frq/1',
+    });
+
+    // Stats: /ap-stats-frq-practice-test-1 → /preview/stats/frq/1
+    rewrites.push({
+      source: '/ap-stats-frq-practice-test-1',
+      destination: '/preview/stats/frq/1',
     });
 
     // Pretty practice-test URLs are real routes now so they can have their own canonicals.

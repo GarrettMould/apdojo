@@ -107,6 +107,8 @@ interface FullExamFRQProps {
   unitNumber?: number;
   /** Hide the bottom “Question N of M” dropdown + numbered grid; use Prev/Next only. */
   hideExpandingQuestionNav?: boolean;
+  /** Overrides the default session length (e.g. a full-length exam). */
+  timeLimitSeconds?: number;
 }
 
 /** Macro/Micro FRQ practice sessions default. */
@@ -148,13 +150,15 @@ export function FullExamFRQ({
   backUrl,
   unitNumber,
   hideExpandingQuestionNav = false,
+  timeLimitSeconds,
 }: FullExamFRQProps) {
   const router = useRouter();
   const { user } = useAuthContext();
   const frqSessionTotalSeconds =
-    examType === 'gov' || examType === 'stats'
+    timeLimitSeconds ??
+    (examType === 'gov' || examType === 'stats'
       ? unitFrqTimeLimitSeconds(questions.questions.length, examType)
-      : DEFAULT_FRQ_TOTAL_SECONDS;
+      : DEFAULT_FRQ_TOTAL_SECONDS);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [textAnswers, setTextAnswers] = useState<Record<string, string>>({});
   const [drawingAnswers, setDrawingAnswers] = useState<Record<string, string>>({});
@@ -763,7 +767,9 @@ export function FullExamFRQ({
                   </div>
                   {part.answer && (
                     <div className="mt-3">
-                      <p className="text-xs font-semibold uppercase tracking-widest text-green-600 mb-1.5">Correct answer</p>
+                      <p className="text-xs font-semibold uppercase tracking-widest text-green-600 mb-1.5">
+                        {examType === 'stats' ? 'Model answer and scoring' : 'Correct answer'}
+                      </p>
                       <div className="p-3 bg-green-50 rounded border border-green-200 text-sm text-gray-800 whitespace-pre-line">
                         {typeof part.answer === 'string' ? part.answer : ''}
                       </div>

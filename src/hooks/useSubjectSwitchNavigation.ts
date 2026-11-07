@@ -28,14 +28,16 @@ export function useSubjectSwitchNavigation() {
       });
       const here = currentLocationKey(pathname ?? '/', searchParams);
 
-      await setSelectedSubject(newSubject);
+      // State updates synchronously; navigate before the Firestore save resolves so pages that follow
+      // their URL's ?subject= never see the new course with the old URL and switch it back.
+      const saving = setSelectedSubject(newSubject);
 
       if (targetUrl !== here && targetUrl !== pathname) {
         router.push(targetUrl);
-        return;
+      } else {
+        router.refresh();
       }
-
-      router.refresh();
+      await saving;
     },
     [pathname, router, searchParams, selectedSubject, setSelectedSubject, user],
   );

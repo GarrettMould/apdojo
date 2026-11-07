@@ -3,6 +3,7 @@ import { govUnits, macroUnits, microUnits, statsUnits } from '@/data/cheatSheets
 import { AP_GOV_REQUIRED_SCOTUS_CASES, SCOTUS_CASE_LANDING_HUB, scotusCaseLandingPath } from '@/data/gov/scotusRequiredCases';
 import { blogPosts } from '@/data/blogPosts';
 import { generateSeoUrl } from '@/utils/blogUrls';
+import { FEATURES } from '@/lib/featureFlags';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://apdojo.com';
@@ -49,6 +50,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'weekly',
       priority: 0.9,
     },
+    ...(FEATURES.tutoring
+      ? [{ url: `${baseUrl}/tutoring`, changeFrequency: 'monthly' as const, priority: 0.8 }]
+      : []),
     {
       url: `${baseUrl}/unit-cheat-sheets`,
       changeFrequency: 'weekly',

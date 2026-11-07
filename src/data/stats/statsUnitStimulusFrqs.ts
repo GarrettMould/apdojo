@@ -70,7 +70,7 @@ const TYPE_X_WEIGHTS =
 export const statsUnit1StimulusFrqs: StatsStimulusFrq[] = [
   {
     id: 'u1-frq-stats-bakery',
-    title: 'FRQ: Quantitative Data Analysis',
+    title: 'FRQ 1: Quantitative Data Analysis',
     scenario: `A bakery manager produces two types of artisanal sourdough loaves, Type X and Type Y. She wants to compare the weights of the two types and takes independent random samples of 16 loaves from each type. The weight, in grams, of each loaf is measured. The weights of the 16 Type X loaves are recorded below.
 
 Weights of Type X Loaves (grams):
@@ -237,7 +237,7 @@ export const statsUnit2StimulusFrqs: StatsStimulusFrq[] = [
   },
   {
     id: 'u2-frq-3-manufacturing-components',
-    title: 'FRQ 3: Binomial and Normal Distributions',
+    title: 'FRQ 2: Binomial and Normal Distributions',
     scenario:
       'A manufacturing company produces electronic components. It is known that 12% of the components produced are defective.',
     parts: [

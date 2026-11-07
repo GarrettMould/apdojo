@@ -4,6 +4,8 @@ import {
   defaultCheatSheetUrl,
   getCheatSheetUrlForSubjectSwitch,
   isEconCourse,
+  hasFullMcqExam,
+  hasFullFrqExam,
 } from '@/lib/courseSubject';
 import {
   getFullFRQTestUrl,
@@ -95,9 +97,8 @@ export function getUrlForSubjectSwitch(
     return subjectHomeUrl(newSubject);
   }
 
-  const tutoringMatch = path.match(/^\/tutoring\/(macro|micro|gov|stats)$/);
-  if (tutoringMatch || path === '/tutoring') {
-    return `/tutoring/${newSubject}`;
+  if (path === '/tutoring') {
+    return '/tutoring';
   }
 
   if (path.startsWith('/offer/')) {
@@ -107,27 +108,29 @@ export function getUrlForSubjectSwitch(
     return subjectHomeUrl(newSubject);
   }
 
-  const previewMatch = path.match(/^\/preview\/(macro|micro)\/(mcq|frq)\/(\d+)$/);
+  const previewMatch = path.match(/^\/preview\/(macro|micro|stats)\/(mcq|frq)\/(\d+)$/);
   if (previewMatch) {
     const format = previewMatch[2] as 'mcq' | 'frq';
     const num = parseInt(previewMatch[3], 10);
+    if (format === 'mcq' && hasFullMcqExam(newSubject)) return getFullMCQTestUrl(newSubject, num);
+    if (format === 'frq' && hasFullFrqExam(newSubject)) return getFullFRQTestUrl(newSubject, isEconCourse(newSubject) ? num : 1);
     if (isEconCourse(newSubject)) {
       return format === 'mcq' ? getFullMCQTestUrl(newSubject, num) : getFullFRQTestUrl(newSubject, num);
     }
     return getUnitFinalPracticeTestsUrl(newSubject);
   }
 
-  const fullMcqPretty = path.match(/^\/ap-(macro|micro)-mcq-practice-test-(\d+)$/);
+  const fullMcqPretty = path.match(/^\/ap-(macro|micro|stats)-mcq-practice-test-(\d+)$/);
   if (fullMcqPretty) {
     const num = parseInt(fullMcqPretty[2], 10);
-    if (isEconCourse(newSubject)) return getFullMCQTestUrl(newSubject, num);
+    if (hasFullMcqExam(newSubject)) return getFullMCQTestUrl(newSubject, num);
     return getUnitFinalPracticeTestsUrl(newSubject);
   }
 
-  const fullFrqPretty = path.match(/^\/ap-(macro|micro)-frq-practice-test-(\d+)$/);
+  const fullFrqPretty = path.match(/^\/ap-(macro|micro|stats)-frq-practice-test-(\d+)$/);
   if (fullFrqPretty) {
     const num = parseInt(fullFrqPretty[2], 10);
-    if (isEconCourse(newSubject)) return getFullFRQTestUrl(newSubject, num);
+    if (hasFullFrqExam(newSubject)) return getFullFRQTestUrl(newSubject, isEconCourse(newSubject) ? num : 1);
     return getUnitFinalPracticeTestsUrl(newSubject);
   }
 

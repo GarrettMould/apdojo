@@ -1,7 +1,7 @@
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams, useRouter, notFound } from 'next/navigation';
 import { PlayCircle, Clock, PauseCircle, PenLine, EyeOff, RotateCcw } from 'lucide-react';
 import Image from 'next/image';
 import { useAuthContext } from '@/contexts/AuthContext';
@@ -10,6 +10,9 @@ import {
   getFullMCQExamTestId,
   getFullMCQTestUrl,
 } from '@/lib/utils';
+import { STATS_FULL_MCQ_SECONDS } from '@/data/unitTestMeta';
+import { STATS_FULL_MCQ_EXAM_1_IDS } from '@/data/stats/statsFullMcqExam1Ids';
+import { FEATURES } from '@/lib/featureFlags';
 
 const RULES = [
   'Each question has one correct answer — select the best choice.',
@@ -25,20 +28,33 @@ const TOOLS = [
   { icon: <PauseCircle className="w-4 h-4" />, label: 'Pause Test', desc: 'Pause the timer at any time' },
 ];
 
-const TOTAL_QUESTIONS = 60;
-const TIME_LABEL = '70 min';
+type FullMcqSubject = 'macro' | 'micro' | 'stats';
+
+const EXAM_INFO: Record<FullMcqSubject, { name: string; accentBg: string; badge: string; questions: number; minutes: number }> = {
+  macro: { name: 'Macroeconomics', accentBg: 'bg-blue-600', badge: 'bg-blue-50 text-blue-700', questions: 60, minutes: 70 },
+  micro: { name: 'Microeconomics', accentBg: 'bg-green-600', badge: 'bg-green-50 text-green-700', questions: 60, minutes: 70 },
+  // Matches the Stats timer in FullExam: question count at AP Stats pacing.
+  stats: {
+    name: 'Statistics',
+    accentBg: 'bg-orange-600',
+    badge: 'bg-orange-50 text-orange-700',
+    questions: STATS_FULL_MCQ_EXAM_1_IDS.length,
+    minutes: STATS_FULL_MCQ_SECONDS / 60,
+  },
+};
 
 function FullMCQExamPreviewContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { user } = useAuthContext();
 
-  const subject = (searchParams.get('subject') as 'macro' | 'micro') || 'macro';
+  const subjectParam = searchParams.get('subject');
+  const subject: FullMcqSubject = subjectParam === 'micro' || subjectParam === 'stats' ? subjectParam : 'macro';
+  if (subject === 'stats' && !FEATURES.statsFullMcqExam) notFound();
   const examNum = parseInt(searchParams.get('num') || '1');
 
-  const isMicro = subject === 'micro';
-  const subjectName = isMicro ? 'Microeconomics' : 'Macroeconomics';
-  const accentBg = isMicro ? 'bg-green-600' : 'bg-blue-600';
+  const { name: subjectName, accentBg, badge, questions: TOTAL_QUESTIONS, minutes } = EXAM_INFO[subject];
+  const TIME_LABEL = `${minutes} min`;
 
   const testUrl = getFullMCQTestUrl(subject, examNum);
   const testId = getFullMCQExamTestId(subject, examNum);
@@ -81,7 +97,7 @@ function FullMCQExamPreviewContent() {
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight tracking-tight">
             AP {subjectName} Full MCQ Exam {examNum}
           </h1>
-          <span className={`inline-block mt-3 text-[11px] font-semibold uppercase tracking-widest px-2.5 py-1 rounded ${isMicro ? 'bg-green-50 text-green-700' : 'bg-blue-50 text-blue-700'}`}>
+          <span className={`inline-block mt-3 text-[11px] font-semibold uppercase tracking-widest px-2.5 py-1 rounded ${badge}`}>
             AP {subjectName} · Full Exam
           </span>
           <p className="text-gray-500 mt-3 text-sm leading-relaxed">

@@ -9,6 +9,8 @@ const firebaseConfig = {
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  // Optional: Analytics also finds it through the linked Google Analytics property when unset.
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
   // Always use the Firebase project auth domain (e.g. project-id.firebaseapp.com).
   // Overriding with localhost in dev breaks Google sign-in; add localhost under Authorized domains instead.
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,

@@ -1,4 +1,5 @@
 import type { Question } from '@/data/questionBanks/types';
+import { STATS_FULL_MCQ_EXAM_1_IDS } from './statsFullMcqExam1Ids';
 
 /**
  * Stimulus-based AP Statistics practice MCQs.
@@ -262,7 +263,7 @@ export const statsStimulusMcqPracticeQuestions: Question[] = [
     id: 9714,
     subject: 'ap_statistics',
     unit: 2,
-    lessonIDS: ['2.3'],
+    lessonIDS: ['2.3', '2.8'],
     unitName: 'Probability, Random Variables, and Probability Distributions',
     questionGroup: 's06-simulated-distributions',
     question:
@@ -277,5 +278,6 @@ export const statsStimulusMcqPracticeQuestions: Question[] = [
   },
 ];
 
+/** Live practice by unit. Questions on the full MCQ exam are left out so students don't see them first. */
 export const statsStimulusByUnit = (unit: number) =>
-  statsStimulusMcqPracticeQuestions.filter((q) => q.unit === unit);
+  statsStimulusMcqPracticeQuestions.filter((q) => q.unit === unit && !STATS_FULL_MCQ_EXAM_1_IDS.includes(q.id));
