@@ -29,8 +29,11 @@ service cloud.firestore {
       ];
     }
 
+    // Two separate hasAny checks: the rules language has no `+` for lists, and an evaluation error
+    // denies the request, which blocked every user-document update (course choice, onboarding, XP).
     function doesNotMutateAccessFields() {
-      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['admin', 'role', 'roles'] + serverOnlyUserFields());
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['admin', 'role', 'roles'])
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(serverOnlyUserFields());
     }
 
     // Rule for the users collection
