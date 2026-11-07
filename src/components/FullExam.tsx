@@ -38,6 +38,7 @@ import { collection, addDoc, doc, updateDoc, query, where, getDocs, serverTimest
 import { saveQuizResult } from '@/lib/quizHistory';
 import { saveTestResult, saveTestProgress, loadTestProgress, hasUnitFrqTestResult, TestProgress } from '@/lib/testProgress';
 import { getMissedGuidedLessons, guidedUnitWrapUpHref, hasGuidedUnit } from '@/data/guidedLessons/lessonLinks';
+import { FEATURES } from '@/lib/featureFlags';
 import {
   apQuestionSubjectTag,
   cheatSheetUrlForUnit,
@@ -3413,7 +3414,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                           )}
                         </div>
                       ) : null}
-                      {missedGuidedLessons.length > 0 ? (
+                      {FEATURES.guidedExplainers && missedGuidedLessons.length > 0 ? (
                         <div className="mt-5 w-full rounded-xl border-2 border-black bg-white px-4 py-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:px-5 sm:py-5">
                           <p className="text-base font-bold text-gray-900 sm:text-lg">Review these lessons</p>
                           <p className="mt-1 text-sm text-gray-600">

@@ -26,6 +26,7 @@ import { getGovUnitStimulusFrqs, getGovUnitFrqFormatLabels } from '@/data/gov/go
 import { getStatsUnitStimulusFrqs, getStatsUnitFrqFormatLabels } from '@/data/stats/statsUnitStimulusFrqs';
 import { isStatsFrqTestUnitAvailable } from '@/lib/courseSubject';
 import { STATS_FULL_MCQ_EXAM_1_IDS } from '@/data/stats/statsFullMcqExam1Ids';
+import { FEATURES } from '@/lib/featureFlags';
 import { isGovMcqTestUnitAvailable, isStatsMcqTestUnitAvailable } from '@/lib/courseSubject';
 
 /** Same pacing as the Stats full exam timer in FullExam. */
@@ -236,7 +237,7 @@ function UnitFinalPracticeTestsContent() {
       ? { mcq: '55 questions · 80 min', frq: '4 questions · 100 min' }
       : { mcq: '60 questions · 70 min', frq: '3 questions · 60 min' };
 
-  const fullMcqComingSoon = isGov;
+  const fullMcqComingSoon = isGov || (isStats && !FEATURES.statsFullMcqExam);
   const fullFrqComingSoon = isGov || isStats;
   const fullExamsComingSoon = fullMcqComingSoon && fullFrqComingSoon;
 

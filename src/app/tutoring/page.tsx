@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import { ArrowRight, Check, ChevronDown } from 'lucide-react';
 import {
   FREE_SEASON_PASS_LINE,
@@ -11,6 +12,7 @@ import {
 import { TutoringBookingEmbed } from '@/components/tutoring/TutoringBookingEmbed';
 import { TutoringBookLink, TutoringPageView } from '@/components/tutoring/TutoringTracking';
 import { primaryButton } from '@/components/guidedLesson/styles';
+import { FEATURES } from '@/lib/featureFlags';
 
 const description =
   'Live AP tutoring over Google Meet with a real AP teacher. Get help with graphs, FRQs and exam prep. Book online.';
@@ -42,6 +44,7 @@ const SESSION_STEPS = [
 ];
 
 export default function TutoringPage() {
+  if (!FEATURES.tutoring) notFound();
   const primarySession = TUTORING_SESSION_TYPES[0];
 
   return (

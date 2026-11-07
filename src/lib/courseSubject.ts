@@ -1,4 +1,5 @@
 import type { Unit } from '@/data/cheatSheets';
+import { FEATURES } from '@/lib/featureFlags';
 import { govUnits, macroUnits, microUnits, statsUnits } from '@/data/cheatSheets';
 import { getGovUnitStimulusFrqs } from '@/data/gov/govUnitStimulusFrqs';
 import { getStatsUnitStimulusFrqs } from '@/data/stats/statsUnitStimulusFrqs';
@@ -133,7 +134,7 @@ export function isEconCourse(subject: CourseSubject): boolean {
 
 /** Courses with a full-length MCQ exam (`/ap-{subject}-mcq-practice-test-1`). Gov's is not posted yet. */
 export function hasFullMcqExam(subject: CourseSubject): boolean {
-  return subject === 'macro' || subject === 'micro' || subject === 'stats';
+  return subject === 'macro' || subject === 'micro' || (subject === 'stats' && FEATURES.statsFullMcqExam);
 }
 
 /** First unit cheat sheet URL for the course (pretty route). */

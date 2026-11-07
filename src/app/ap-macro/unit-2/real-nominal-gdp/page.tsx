@@ -1,5 +1,5 @@
-import { GuidedLesson } from '@/components/guidedLesson/GuidedLesson';
+import { RegisteredLessonDeepDive } from '@/components/RegisteredLessonDeepDive';
 
 export default function RealNominalGdpPage() {
-  return <GuidedLesson lessonId="2.6" />;
+  return <RegisteredLessonDeepDive subject="ap-macro" unit="2" slug="real-nominal-gdp" />;
 }

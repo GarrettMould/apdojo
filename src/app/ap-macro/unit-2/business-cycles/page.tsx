@@ -1,5 +1,5 @@
-import { GuidedLesson } from '@/components/guidedLesson/GuidedLesson';
+import { RegisteredLessonDeepDive } from '@/components/RegisteredLessonDeepDive';
 
 export default function BusinessCyclesPage() {
-  return <GuidedLesson lessonId="2.7" />;
+  return <RegisteredLessonDeepDive subject="ap-macro" unit="2" slug="business-cycles" />;
 }

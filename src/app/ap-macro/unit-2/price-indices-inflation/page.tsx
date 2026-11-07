@@ -1,5 +1,5 @@
-import { GuidedLesson } from '@/components/guidedLesson/GuidedLesson';
+import { RegisteredLessonDeepDive } from '@/components/RegisteredLessonDeepDive';
 
 export default function PriceIndicesInflationPage() {
-  return <GuidedLesson lessonId="2.4" />;
+  return <RegisteredLessonDeepDive subject="ap-macro" unit="2" slug="price-indices-inflation" />;
 }

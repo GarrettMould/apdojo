@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { MacroExplainersHub } from '@/components/guidedLesson/MacroExplainersHub';
+import { FEATURES } from '@/lib/featureFlags';
 
 const title = 'AP Macro Explainers';
 const description =
@@ -16,5 +18,6 @@ export const metadata: Metadata = {
 };
 
 export default function MacroExplainersPage() {
+  if (!FEATURES.guidedExplainers) notFound();
   return <MacroExplainersHub />;
 }

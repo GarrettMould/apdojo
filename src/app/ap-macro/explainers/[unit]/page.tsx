@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { MacroUnitWrapUp } from '@/components/guidedLesson/MacroUnitWrapUp';
 import { isWrapUpPreview } from '@/components/guidedLesson/wrapUpPreview';
+import { FEATURES } from '@/lib/featureFlags';
 import { getGuidedCourseUnits, hasGuidedUnit } from '@/data/guidedLessons';
 
 /** `/ap-macro/explainers/unit-3` → 3, or null for anything else. */
@@ -38,7 +39,7 @@ export default async function MacroUnitWrapUpPage({
   searchParams: Promise<{ preview?: string }>;
 }) {
   const unit = parseUnit((await params).unit);
-  if (unit === null) notFound();
+  if (unit === null || !FEATURES.guidedExplainers) notFound();
   const { preview } = await searchParams;
   return <MacroUnitWrapUp unit={unit} preview={isWrapUpPreview(preview) ? preview : undefined} />;
 }

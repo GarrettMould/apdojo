@@ -1,5 +1,5 @@
-import { GuidedLesson } from '@/components/guidedLesson/GuidedLesson';
+import { RegisteredLessonDeepDive } from '@/components/RegisteredLessonDeepDive';
 
 export default function ComparativeAdvantagePage() {
-  return <GuidedLesson lessonId="1.3" />;
+  return <RegisteredLessonDeepDive subject="ap-macro" unit="1" slug="comparative-advantage" />;
 }

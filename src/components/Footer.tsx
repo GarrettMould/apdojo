@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import { FEATURES } from '@/lib/featureFlags';
 import dojoIcon from "../../public/images/dojoIcon.png"
 import { Mail } from 'lucide-react'
 import Link from 'next/link'
@@ -48,7 +49,7 @@ export function Footer() {
               <Link href="/scotus-essay-practice" className={footerLinkClass}>SCOTUS Practice</Link>
               <Link href="/ap-stats-calculator-simulator" className={footerLinkClass}>Stats Calculator</Link>
               <Link href="/select-practice-units" className={footerLinkClass}>MCQ Practice</Link>
-              <Link href="/tutoring" className={footerLinkClass}>Tutoring</Link>
+              {FEATURES.tutoring ? <Link href="/tutoring" className={footerLinkClass}>Tutoring</Link> : null}
               <Link href="/feedback" className={footerLinkClass}>Leave Feedback</Link>
             </div>
 

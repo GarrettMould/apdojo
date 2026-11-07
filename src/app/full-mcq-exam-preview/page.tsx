@@ -1,7 +1,7 @@
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams, useRouter, notFound } from 'next/navigation';
 import { PlayCircle, Clock, PauseCircle, PenLine, EyeOff, RotateCcw } from 'lucide-react';
 import Image from 'next/image';
 import { useAuthContext } from '@/contexts/AuthContext';
@@ -12,6 +12,7 @@ import {
 } from '@/lib/utils';
 import { unitMcqTimeLimitSeconds, STATS_UNIT_MCQ_SECONDS_PER_QUESTION } from '@/data/unitTestMeta';
 import { STATS_FULL_MCQ_EXAM_1_IDS } from '@/data/stats/statsFullMcqExam1Ids';
+import { FEATURES } from '@/lib/featureFlags';
 
 const RULES = [
   'Each question has one correct answer — select the best choice.',
@@ -49,6 +50,7 @@ function FullMCQExamPreviewContent() {
 
   const subjectParam = searchParams.get('subject');
   const subject: FullMcqSubject = subjectParam === 'micro' || subjectParam === 'stats' ? subjectParam : 'macro';
+  if (subject === 'stats' && !FEATURES.statsFullMcqExam) notFound();
   const examNum = parseInt(searchParams.get('num') || '1');
 
   const { name: subjectName, accentBg, badge, questions: TOTAL_QUESTIONS, minutes } = EXAM_INFO[subject];

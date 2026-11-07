@@ -1,5 +1,5 @@
-import { GuidedLesson } from '@/components/guidedLesson/GuidedLesson';
+import { RegisteredLessonDeepDive } from '@/components/RegisteredLessonDeepDive';
 
 export default function CircularFlowGdpPage() {
-  return <GuidedLesson lessonId="2.1" />;
+  return <RegisteredLessonDeepDive subject="ap-macro" unit="2" slug="circular-flow-gdp" />;
 }
