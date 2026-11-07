@@ -115,12 +115,12 @@ export function getFullMCQTestUrl(subject: CourseSubject, testNumber: number = 1
 }
 
 /** examNumber prop for FullExam full-length MCQ tests (e.g. full-macro-mcq-1). */
-export function getFullMCQExamNumber(subject: 'macro' | 'micro', testNumber: number = 1): string {
+export function getFullMCQExamNumber(subject: 'macro' | 'micro' | 'stats', testNumber: number = 1): string {
   return `full-${subject}-mcq-${testNumber}`;
 }
 
 /** Firestore progress key for full-length MCQ exams using the unit-test UI. */
-export function getFullMCQExamTestId(subject: 'macro' | 'micro', testNumber: number = 1): string {
+export function getFullMCQExamTestId(subject: 'macro' | 'micro' | 'stats', testNumber: number = 1): string {
   return `unit_${getFullMCQExamNumber(subject, testNumber)}_${subject}`;
 }
 
@@ -130,7 +130,7 @@ export function getLegacyFullMCQExamTestId(subject: 'macro' | 'micro'): string {
 }
 
 export function isFullLengthMcqExamNumber(examNumber?: string): boolean {
-  return !!examNumber && /^full-(macro|micro)-mcq-\d+$/.test(examNumber);
+  return !!examNumber && /^full-(macro|micro|stats)-mcq-\d+$/.test(examNumber);
 }
 
 /** Landing page before a full-length MCQ exam (Begin / Resume). */

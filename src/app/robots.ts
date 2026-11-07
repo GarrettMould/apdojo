@@ -14,7 +14,6 @@ export default function robots(): MetadataRoute.Robots {
           '/purchase/',
           '/success/',
           '/cancel/',
-          '/tutoring/',
           '/availability/',
           '/feedback/',
           '/block/',

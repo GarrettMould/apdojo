@@ -14,11 +14,26 @@ service cloud.firestore {
           data.roles.size() == 1 &&
           data.roles[0] == 'user'
         )
-      );
+      ) && !data.keys().hasAny(serverOnlyUserFields());
     }
 
+    // Paid access and graded progress: written only by server routes (Admin SDK bypasses these rules).
+    function serverOnlyUserFields() {
+      return [
+        'seasonPass',
+        'seasonPassExpiration',
+        'purchases',
+        'purchasedTests',
+        'guidedLessonProgress',
+        'guidedGradingUsage'
+      ];
+    }
+
+    // Two separate hasAny checks: the rules language has no `+` for lists, and an evaluation error
+    // denies the request, which blocked every user-document update (course choice, onboarding, XP).
     function doesNotMutateAccessFields() {
-      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['admin', 'role', 'roles']);
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['admin', 'role', 'roles'])
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(serverOnlyUserFields());
     }
 
     // Rule for the users collection

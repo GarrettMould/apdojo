@@ -15,6 +15,7 @@ import { hasValidSeasonPass, getPracticeTestsUrl } from '@/lib/utils';
 import type { CourseSubject } from '@/lib/courseSubject';
 import { defaultCheatSheetUrl, isCourseSubject, isEconCourse } from '@/lib/courseSubject';
 import { useSubjectSwitchNavigation } from '@/hooks/useSubjectSwitchNavigation';
+import { FEATURES } from '@/lib/featureFlags';
 import { SCOTUS_CASE_LANDING_HUB } from '@/data/gov/scotusRequiredCases';
 
 export function Header() {
@@ -93,7 +94,11 @@ export function Header() {
           ? [{ label: 'Calculator Drills', href: '/ap-stats-calculator-simulator' }]
           : []),
     { label: 'Cheat Sheets', href: defaultCheatSheetUrl(displaySubject) },
+    ...(FEATURES.guidedExplainers && displaySubject === 'macro'
+      ? [{ label: 'Explainers', href: '/ap-macro/explainers' }]
+      : []),
     ...(isEconCourse(displaySubject) ? [{ label: 'Blog', href: '/ap-blog-home' }] : []),
+    ...(FEATURES.tutoring ? [{ label: 'Tutoring', href: '/tutoring' }] : []),
   ];
 
   const toggleMobileMenu = () => {
@@ -240,6 +245,15 @@ export function Header() {
                       >
                         Create a Quiz
                       </Link>
+                      {FEATURES.tutoring ? (
+                        <Link
+                          href="/tutoring"
+                          className={`block 2xl:hidden px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 transition-colors ${navHoverClass}`}
+                          onClick={() => setIsPracticeDropdownOpen(false)}
+                        >
+                          1-on-1 Tutoring
+                        </Link>
+                      ) : null}
                       {isEconCourse(displaySubject) ? (
                         <>
                           <Link
@@ -302,6 +316,25 @@ export function Header() {
               >
                 Cheat Sheets
               </Link>
+
+              {FEATURES.guidedExplainers && displaySubject === 'macro' ? (
+                <Link
+                  href="/ap-macro/explainers"
+                  className={`whitespace-nowrap text-lg text-gray-700 transition-colors font-bold ${navHoverClass}`}
+                >
+                  Explainers
+                </Link>
+              ) : null}
+
+              {/* Top-level only where the bar has room; narrower desktops get it in the Practice menu. */}
+              {FEATURES.tutoring ? (
+                <Link
+                  href="/tutoring"
+                  className={`hidden 2xl:inline whitespace-nowrap text-lg text-gray-700 transition-colors font-bold ${navHoverClass}`}
+                >
+                  Tutoring
+                </Link>
+              ) : null}
 
               {/* Season Pass - Only show if user is not logged in or not premium */}
               {(!user || !isPremium) && (

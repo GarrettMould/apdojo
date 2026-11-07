@@ -68,6 +68,12 @@ const nextConfig = {
   async redirects() {
     const redirects = [
       {
+        // Subject tutoring pages were replaced by one /tutoring page.
+        source: '/tutoring/:subject(macro|micro|gov|stats)',
+        destination: '/tutoring',
+        permanent: true,
+      },
+      {
         source: '/cheat-sheets/macro/AP_Dojo_Macro_U1.pdf',
         destination: '/ap-macro-unit-1-cheat-sheet',
         permanent: true,
@@ -243,6 +249,12 @@ const nextConfig = {
     rewrites.push({
       source: '/ap-micro-mcq-practice-test-1',
       destination: '/preview/micro/mcq/1',
+    });
+
+    // Stats: /ap-stats-mcq-practice-test-1 → /preview/stats/mcq/1
+    rewrites.push({
+      source: '/ap-stats-mcq-practice-test-1',
+      destination: '/preview/stats/mcq/1',
     });
 
     // Full FRQ practice tests

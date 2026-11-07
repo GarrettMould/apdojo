@@ -7,6 +7,7 @@ import { CheckCircle, ArrowRight, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { getPracticeTestsUrl } from '@/lib/utils';
+import { TutoringCallout } from '@/components/tutoring/TutoringCallout';
 
 function SuccessContent() {
   const searchParams = useSearchParams();
@@ -63,6 +64,7 @@ function SuccessContent() {
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         </Link>
+        <TutoringCallout placement="purchase_success" className="mt-6" />
       </div>
     </div>
   );

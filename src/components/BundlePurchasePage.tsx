@@ -8,6 +8,7 @@ import { startSeasonPassCheckout } from '@/lib/seasonPassCheckout';
 import { ParentPaymentModal } from '@/components/ParentPaymentModal';
 import { SeasonPassCourseSwitcher } from '@/components/EmbeddedCheckoutPage';
 import { reviews } from '@/data/reviews';
+import { TutoringCallout } from '@/components/tutoring/TutoringCallout';
 
 export function BundlePurchasePage() {
   const { user, setShowSignupModal, setRedirectOnLogin } = useAuthContext();
@@ -170,6 +171,7 @@ export function BundlePurchasePage() {
                   Send a parent the payment link
                 </span>
               </button>
+              <TutoringCallout placement="bundle_checkout" className="mt-3 text-center" />
             </div>
           </div>
 

@@ -11,6 +11,7 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import { ParentPaymentModal } from '@/components/ParentPaymentModal';
 import { reviewsForPurchase, type Review } from '@/data/reviews';
 import { COURSE_CONFIG, type SeasonPassPurchaseType } from '@/data/seasonPassCourseConfig';
+import { TutoringCallout } from '@/components/tutoring/TutoringCallout';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -290,6 +291,8 @@ export function EmbeddedCheckoutPage({ courseType }: EmbeddedCheckoutPageProps) 
                 </span>
               )}
             </button>
+
+            <TutoringCallout placement="season_pass_checkout" />
 
             <p className="text-sm font-semibold text-gray-600 lg:hidden">
               1,000+ students helped

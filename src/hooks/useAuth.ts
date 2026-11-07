@@ -16,6 +16,7 @@ import { doc, setDoc, serverTimestamp, collection, query, getDocs, onSnapshot, g
 import { UnitDetails } from '@/components/UnitPerformanceDisplay'
 import { getSubjectXP } from './useUserProgress'
 import type { CourseSubject } from '@/lib/courseSubject'
+import type { GuidedLessonProgressEntry } from '@/lib/guidedLessonProgress'
 import { nextCourseSubject, normalizeCourseSubject, getUserEnrolledSubjects } from '@/lib/courseSubject'
 
 // Define the structure of your MCQ answer data
@@ -62,7 +63,9 @@ export interface UserData {
   xp_gov?: number;
   xp_stats?: number;
   // Add the new map field for MCQ answer status
-  mcqAnswerStatus?: { [key: string]: boolean }; 
+  mcqAnswerStatus?: { [key: string]: boolean };
+  /** Written by /api/guided-lesson-grade, keyed by guidedLessonProgressKey(). */
+  guidedLessonProgress?: Record<string, GuidedLessonProgressEntry>;
   // Keep viewedMcqIds for now if needed elsewhere, remove later if redundant
   viewedMcqIds?: (string | number)[]; 
   // Add purchases field for premium features
@@ -387,15 +390,19 @@ export function useAuth() {
     }
   };
 
-  // Keep active subject inside enrolled list when user has selectedSubjects
+  // Keep active subject inside enrolled list when user has selectedSubjects.
+  // Skip while the saved course is enrolled but not yet applied: on load, state still holds the 'macro'
+  // default for a render, and correcting that would overwrite the user's saved course.
   useEffect(() => {
     if (!user || !userData) return;
     const enrolled = getUserEnrolledSubjects(true, userData);
     if (!enrolled?.length) return;
+    const saved = userData.selectedSubject ? normalizeCourseSubject(userData.selectedSubject as string) : null;
+    if (saved && saved !== selectedSubject && enrolled.includes(saved)) return;
     if (!enrolled.includes(selectedSubject)) {
       void setSelectedSubject(enrolled[0]);
     }
-  }, [user, userData?.selectedSubjects, selectedSubject]);
+  }, [user, userData?.selectedSubjects, userData?.selectedSubject, selectedSubject]);
 
   // Function to toggle between macro and micro
   const toggleSubject = () => {
