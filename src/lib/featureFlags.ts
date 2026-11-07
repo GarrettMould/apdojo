@@ -3,16 +3,10 @@
  * its pages return 404. Flip to true to launch.
  */
 export const FEATURES = {
-  /**
-   * AP Stats Full MCQ Exam 1 (/ap-stats-mcq-practice-test-1). On in local dev only for review; set to
-   * true to launch on the live site.
-   */
-  statsFullMcqExam: process.env.NODE_ENV !== 'production',
-  /**
-   * AP Stats Full FRQ Exam 1 (/ap-stats-frq-practice-test-1). On in local dev only for review; set to
-   * true to launch on the live site.
-   */
-  statsFullFrqExam: process.env.NODE_ENV !== 'production',
+  /** AP Stats Full MCQ Exam 1 (/ap-stats-mcq-practice-test-1). */
+  statsFullMcqExam: true,
+  /** AP Stats Full FRQ Exam 1 (/ap-stats-frq-practice-test-1). */
+  statsFullFrqExam: true,
   /** 1-on-1 tutoring page (/tutoring) and its nav, footer and purchase-page links. */
   tutoring: false,
   /**
