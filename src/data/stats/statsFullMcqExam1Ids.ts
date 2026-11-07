@@ -3,12 +3,13 @@
  * Built to `examStimulusPolicy`: at most 2 questions per graph or table, at most 1 per picture-option set.
  * Exam questions must not also appear in practice; `statsStimulusMcqPractice.ts` filters these out.
  *
- * 40 questions, close to the real Section I mix: ~55% text-only scenario and inference items
- * (`statsFullMcqExamText.ts`), with the rest on graphs, tables and computer output.
+ * 42 questions in 90 minutes (2027 CED), close to the real Section I mix: about half text-only scenario and
+ * inference items (`statsFullMcqExamText.ts`), with the rest on graphs, tables and computer output.
+ * Unit mix 11/9/9/7/6 (26/21/21/17/14%), inside the CED ranges of 20–30/15–25/15–25/10–20/10–20%.
  */
 export const STATS_FULL_MCQ_EXAM_1_IDS: readonly number[] = [
   // Unit 1
-  9522, 9547, 9601, 9534, 9801, 9802, 9803, 9804, 9820,
+  9522, 9547, 9601, 9534, 9509, 9511, 9801, 9802, 9803, 9804, 9820,
   // Unit 2
   9526, 9525, 9549, 9714, 9805, 9806, 9807, 9808, 9822,
   // Unit 3

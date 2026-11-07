@@ -10,7 +10,7 @@ import {
   getFullMCQExamTestId,
   getFullMCQTestUrl,
 } from '@/lib/utils';
-import { unitMcqTimeLimitSeconds, STATS_UNIT_MCQ_SECONDS_PER_QUESTION } from '@/data/unitTestMeta';
+import { STATS_FULL_MCQ_SECONDS } from '@/data/unitTestMeta';
 import { STATS_FULL_MCQ_EXAM_1_IDS } from '@/data/stats/statsFullMcqExam1Ids';
 import { FEATURES } from '@/lib/featureFlags';
 
@@ -39,7 +39,7 @@ const EXAM_INFO: Record<FullMcqSubject, { name: string; accentBg: string; badge:
     accentBg: 'bg-orange-600',
     badge: 'bg-orange-50 text-orange-700',
     questions: STATS_FULL_MCQ_EXAM_1_IDS.length,
-    minutes: unitMcqTimeLimitSeconds(STATS_FULL_MCQ_EXAM_1_IDS.length, STATS_UNIT_MCQ_SECONDS_PER_QUESTION) / 60,
+    minutes: STATS_FULL_MCQ_SECONDS / 60,
   },
 };
 

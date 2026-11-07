@@ -276,6 +276,12 @@ const nextConfig = {
       destination: '/preview/micro/frq/1',
     });
 
+    // Stats: /ap-stats-frq-practice-test-1 → /preview/stats/frq/1
+    rewrites.push({
+      source: '/ap-stats-frq-practice-test-1',
+      destination: '/preview/stats/frq/1',
+    });
+
     // Pretty practice-test URLs are real routes now so they can have their own canonicals.
 
     return rewrites;

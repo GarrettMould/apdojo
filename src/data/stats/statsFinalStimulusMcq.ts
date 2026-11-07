@@ -161,13 +161,13 @@ export const statsFinalStimulusQuestions: Question[] = [
     question: "Which of the following is the most reasonable interpretation of the two peaks in the histogram?",
     image: IMG("s03_histogram_bimodal", "Histogram titled Bakery Customer Arrivals with classes of width 10 minutes from 0 to 90 after opening. Frequencies are 4, 11, 18, 10, 5, 7, 15, 17, 8, showing two peaks near 20 to 30 minutes and 70 to 80 minutes."),
     options: [
-      "Customers tend to arrive in two groups, one early and one late after opening.",
       "Most customers arrive about 45 minutes after opening because that is the center of the data.",
+      "Customers tend to arrive in two groups, one early and one late after opening.",
       "The data contain two outliers.",
-      "The bakery had two different owners during the study.",
+      "The distribution is skewed to the right, so most customers arrive late.",
       "Customers arrive at random times throughout the morning.",
     ],
-    correctAnswer: "A",
+    correctAnswer: "B",
     explanation:
       "Two peaks suggest two clusters (an early rush and a later rush). The mean or median (around 45 minutes) falls in a valley where few customers actually arrive, so it would be a poor \"typical\" arrival time.",
     videoExplanation: null,

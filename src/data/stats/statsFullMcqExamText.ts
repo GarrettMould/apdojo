@@ -145,7 +145,7 @@ export const statsFullMcqExamTextQuestions: Question[] = [
     lessonIDS: ['2.7'],
     unitName: U2,
     question:
-      'At a bakery, a customer buys bread with probability 0.50 and a pastry with probability 0.40. For a randomly selected customer, let A be the event that the customer buys bread and let B be the event that the customer buys a pastry. Suppose the probability that a customer buys both bread and a pastry is 0.20. Consider the following statements.\n\nI. Events A and B are independent.\nII. Events A and B are mutually exclusive.\nIII. Given that a customer bought a pastry, the probability that the customer also bought bread is 0.50.\n\nWhich of the statements must be true?',
+      'At a bookstore, a customer buys a book with probability 0.50 and a greeting card with probability 0.40. For a randomly selected customer, let A be the event that the customer buys a book and let B be the event that the customer buys a greeting card. Suppose the probability that a customer buys both a book and a greeting card is 0.20. Consider the following statements.\n\nI. Events A and B are independent.\nII. Events A and B are mutually exclusive.\nIII. Given that a customer bought a greeting card, the probability that the customer also bought a book is 0.50.\n\nWhich of the statements must be true?',
     image: null,
     options: ['I and III only', 'I only', 'II only', 'II and III only', 'I, II, and III'],
     correctAnswer: 'A',
@@ -202,14 +202,14 @@ export const statsFullMcqExamTextQuestions: Question[] = [
     lessonIDS: ['3.6'],
     unitName: U3,
     question:
-      'A baker claims that at least 90% of the loaves she bakes are fully baked in the center. A health inspector randomly selects 150 loaves from a large day\'s production and finds that 128 of them are fully baked. The inspector tests H₀: p = 0.90 versus Hₐ: p < 0.90, where p is the proportion of all loaves that are fully baked, and obtains a p-value of 0.028. Which of the following is a correct interpretation of this p-value?',
+      'A seed company claims that at least 90% of its tomato seeds germinate. An agricultural inspector randomly selects 150 seeds from a large shipment, plants them, and finds that 128 of them germinate. The inspector tests H₀: p = 0.90 versus Hₐ: p < 0.90, where p is the proportion of all seeds in the shipment that germinate, and obtains a p-value of 0.028. Which of the following is a correct interpretation of this p-value?',
     image: null,
     options: [
-      'The probability that the baker\'s claim is true is 0.028.',
-      'If the true proportion of fully baked loaves is less than 0.90, there is a 0.028 probability of getting a sample result this low.',
-      'Of the 150 loaves in the sample, 2.8% were not fully baked.',
+      'The probability that the company\'s claim is true is 0.028.',
+      'If the true proportion of seeds that germinate is less than 0.90, there is a 0.028 probability of getting a sample result this low.',
+      'Of the 150 seeds in the sample, 2.8% did not germinate.',
       'There is a 2.8% chance that the inspector has made a Type I error.',
-      'If 90% of all loaves are fully baked, the probability of getting a sample proportion as small as 128/150 or smaller by chance is 0.028.',
+      'If 90% of all seeds in the shipment germinate, the probability of getting a sample proportion as small as 128/150 or smaller by chance is 0.028.',
     ],
     correctAnswer: 'E',
     explanation:
@@ -385,7 +385,7 @@ export const statsFullMcqExamTextQuestions: Question[] = [
     lessonIDS: ['4.5'],
     unitName: U4,
     question:
-      'A bakery states that the mean weight of its loaves is 500 grams. A consumer agency suspects the loaves weigh less than that. The agency weighs a random sample of 16 loaves selected from a large day\'s production and finds a sample mean of 489 grams and a sample standard deviation of 20 grams. A dotplot of the 16 weights shows no strong skewness or outliers. The agency tests H₀: μ = 500 versus Hₐ: μ < 500, where μ is the mean weight of all of the bakery\'s loaves. Which of the following is closest to the p-value of the test?',
+      'A rice company states that the mean weight of its bags of rice is 500 grams. A consumer agency suspects the bags weigh less than that. The agency weighs a random sample of 16 bags selected from a large day\'s production and finds a sample mean of 489 grams and a sample standard deviation of 20 grams. A dotplot of the 16 weights shows no strong skewness or outliers. The agency tests H₀: μ = 500 versus Hₐ: μ < 500, where μ is the mean weight of all of the company\'s bags of rice. Which of the following is closest to the p-value of the test?',
     image: null,
     options: ['0.014', '0.022', '0.044', '0.956', '0.978'],
     correctAnswer: 'B',

@@ -53,7 +53,7 @@ import {
   getUnitTestMeta,
   unitMcqTimeLimitSeconds,
   ECON_UNIT_MCQ_SECONDS_PER_QUESTION,
-  STATS_UNIT_MCQ_SECONDS_PER_QUESTION,
+  STATS_FULL_MCQ_SECONDS,
 } from '@/data/unitTestMeta';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -335,10 +335,8 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
         return 70 * 60;
       }
       if (isFullLengthMcqExamNumber(examNumber)) {
-        // Stats paces by question count (AP Section I: 90 min for ~42 Q); Econ is a fixed 70-minute section.
-        return examType === 'stats'
-          ? unitMcqTimeLimitSeconds(questions.length, STATS_UNIT_MCQ_SECONDS_PER_QUESTION)
-          : 70 * 60;
+        // Stats Section I is a fixed 90 minutes; Econ is a fixed 70-minute section.
+        return examType === 'stats' ? STATS_FULL_MCQ_SECONDS : 70 * 60;
       }
       const unitNumber = parseInt(examNumber, 10);
       if (Number.isFinite(unitNumber)) {

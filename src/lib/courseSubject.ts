@@ -137,6 +137,11 @@ export function hasFullMcqExam(subject: CourseSubject): boolean {
   return subject === 'macro' || subject === 'micro' || (subject === 'stats' && FEATURES.statsFullMcqExam);
 }
 
+/** Courses with a full-length FRQ exam (`/ap-{subject}-frq-practice-test-N`). */
+export function hasFullFrqExam(subject: CourseSubject): boolean {
+  return subject === 'macro' || subject === 'micro' || (subject === 'stats' && FEATURES.statsFullFrqExam);
+}
+
 /** First unit cheat sheet URL for the course (pretty route). */
 export function defaultCheatSheetUrl(subject: CourseSubject): string {
   return cheatSheetUrlForUnit(subject, 1);

@@ -5,6 +5,7 @@ import {
   getCheatSheetUrlForSubjectSwitch,
   isEconCourse,
   hasFullMcqExam,
+  hasFullFrqExam,
 } from '@/lib/courseSubject';
 import {
   getFullFRQTestUrl,
@@ -112,6 +113,7 @@ export function getUrlForSubjectSwitch(
     const format = previewMatch[2] as 'mcq' | 'frq';
     const num = parseInt(previewMatch[3], 10);
     if (format === 'mcq' && hasFullMcqExam(newSubject)) return getFullMCQTestUrl(newSubject, num);
+    if (format === 'frq' && hasFullFrqExam(newSubject)) return getFullFRQTestUrl(newSubject, isEconCourse(newSubject) ? num : 1);
     if (isEconCourse(newSubject)) {
       return format === 'mcq' ? getFullMCQTestUrl(newSubject, num) : getFullFRQTestUrl(newSubject, num);
     }
@@ -125,10 +127,10 @@ export function getUrlForSubjectSwitch(
     return getUnitFinalPracticeTestsUrl(newSubject);
   }
 
-  const fullFrqPretty = path.match(/^\/ap-(macro|micro)-frq-practice-test-(\d+)$/);
+  const fullFrqPretty = path.match(/^\/ap-(macro|micro|stats)-frq-practice-test-(\d+)$/);
   if (fullFrqPretty) {
     const num = parseInt(fullFrqPretty[2], 10);
-    if (isEconCourse(newSubject)) return getFullFRQTestUrl(newSubject, num);
+    if (hasFullFrqExam(newSubject)) return getFullFRQTestUrl(newSubject, isEconCourse(newSubject) ? num : 1);
     return getUnitFinalPracticeTestsUrl(newSubject);
   }
 
