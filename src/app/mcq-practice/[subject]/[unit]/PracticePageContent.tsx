@@ -636,8 +636,9 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
     return `${yyyy}-${mm}-${dd}`;
   };
 
+  // Free questions are counted per subject: 3 a day each for Macro, Micro, Gov and Stats.
   const getDailyLimitStorageKey = (uid: string | null | undefined) =>
-    `dailyQuestionsAnswered:${uid ?? 'guest'}`;
+    `dailyQuestionsAnswered:${uid ?? 'guest'}:${subject}`;
 
   const isPremiumEffective = Boolean(user) && isPremium;
 
@@ -700,7 +701,7 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
       localStorage.setItem(key, JSON.stringify({ date: today, count: 0 }));
       setDailyQuestionsAnswered(0);
     }
-  }, [user, isPremiumEffective, hasDismissedSeasonPassModal]);
+  }, [user, subject, isPremiumEffective, hasDismissedSeasonPassModal]);
 
   const unitsData =
     subject === 'gov'
@@ -767,8 +768,28 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
   /** Re-inserted positions whose earlier answer is cleared when the student reaches them. */
   const pendingResetRef = useRef<Record<number, number>>({});
   const dailyLimit = DAILY_FREE_ANSWERS + (goldLoopOn ? goldBonus : 0);
+  /** The unanswered question a free user is on is golden when it would be their 3rd answer today. */
+  const liveGoldKind = (idx: number): GoldSlotKind | null => {
+    const q = questionsForPractice[idx];
+    if (!goldLoopOn || isPremiumEffective || !q || answeredQuestions[q.id] || goldDayAnswered) return null;
+    if (dailyQuestionsAnswered !== GOLD_FREE_QUESTION_NUMBER - 1) return null;
+    return redeemId !== null && Number(q.id) === redeemId ? 'goldRedeem' : 'gold';
+  };
+  /** What a position in the set is: the recorded kind once answered, otherwise golden or redemption. */
+  const kindAt = (idx: number): GoldSlotKind | null =>
+    slotOutcomes[idx]?.kind ?? liveGoldKind(idx) ?? slotKinds[idx] ?? null;
   /** Free questions are used up and the last answer's result has had time to show. */
   const [outPanelReady, setOutPanelReady] = useState(false);
+  /** Until this time, the last answer's result stays on screen (clicks can't skip to the panel). */
+  const resultHoldUntilRef = useRef(0);
+  const showOutPanelSoon = () => {
+    const wait = resultHoldUntilRef.current - Date.now();
+    if (wait <= 0) setOutPanelReady(true);
+  };
+  /** Today's golden question (this subject) has been answered. */
+  const [goldDayAnswered, setGoldDayAnswered] = useState(false);
+  /** Yesterday's missed golden question, which is today's golden question when it comes up. */
+  const [redeemId, setRedeemId] = useState<number | null>(null);
   const purchasedTests = (userData?.purchasedTests || []) as string[];
 
   // Track previous filter criteria to prevent unnecessary reloads
@@ -878,47 +899,42 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
     if (plannedRef.current === planKey) return;
     plannedRef.current = planKey;
 
-    let list = questionsForPractice;
+    const list = questionsForPractice;
     const kinds: Record<number, GoldSlotKind> = {};
-    let goldRedeemSlot: number | null = null;
 
-    if (!isPremiumEffective) {
-      const day = readGoldDay(user?.uid);
-      setGoldBonus(day.bonus);
-      // The golden question is always the day's 3rd free question.
-      const thirdFreeSlot = GOLD_FREE_QUESTION_NUMBER - 1 - readDailyCount();
-      if (!day.answered && thirdFreeSlot >= 0) {
-        const redeem = readGoldRedeem(user?.uid, subject);
-        const redeemQuestion =
-          redeem && redeem.savedOn < localDateKey()
-            ? practiceBank.find((q) => sameQuestionId(q, redeem.questionId))
-            : undefined;
-        if (redeemQuestion) {
-          const rest = list.filter((q) => !sameQuestionId(q, redeemQuestion.id));
-          const slot = Math.min(thirdFreeSlot, rest.length);
-          list = [...rest.slice(0, slot), redeemQuestion, ...rest.slice(slot)];
-          goldRedeemSlot = slot;
-          setQuestionsForPractice(list);
-          setTotalQuestionsInSet(list.length);
-        } else {
-          if (thirdFreeSlot < list.length) kinds[thirdFreeSlot] = 'gold';
-        }
-      }
-    }
-
-    // Questions already in the review folder are redemption rounds, unless they are golden.
+    // Questions already in the review folder are redemption rounds.
     const missIds = new Set(reviewState.misses.map((m) => m.questionId));
     list.forEach((q, i) => {
-      if (!kinds[i] && missIds.has(q.id)) kinds[i] = 'redeem';
+      if (missIds.has(q.id)) kinds[i] = 'redeem';
     });
-    if (goldRedeemSlot !== null) kinds[goldRedeemSlot] = 'goldRedeem';
     setSlotKinds(kinds);
   }, [buildId, isPremiumEffective, loadingUserData, isLoadingQuestionSet]);
 
-  // Keep today's bonus in sync when the signed-in user changes.
+  // Keep today's golden-question state in sync with the signed-in user and subject.
   useEffect(() => {
-    if (goldLoopOn) setGoldBonus(readGoldDay(user?.uid).bonus);
-  }, [user?.uid]);
+    if (!goldLoopOn) return;
+    const day = readGoldDay(user?.uid, subject);
+    setGoldBonus(day.bonus);
+    setGoldDayAnswered(day.answered);
+    const redeem = readGoldRedeem(user?.uid, subject);
+    setRedeemId(redeem && redeem.savedOn < localDateKey() ? Number(redeem.questionId) : null);
+  }, [user?.uid, subject]);
+
+  // When the golden question comes up and yesterday's golden question was missed, show that one.
+  useEffect(() => {
+    if (!goldLoopOn || isPremiumEffective || goldDayAnswered || redeemId === null) return;
+    if (dailyQuestionsAnswered !== GOLD_FREE_QUESTION_NUMBER - 1) return;
+    const current = questionsForPractice[currentQuestionIndex];
+    if (!current || answeredQuestions[current.id] || Number(current.id) === redeemId) return;
+    const redeemQuestion = practiceBank.find((q) => sameQuestionId(q, redeemId));
+    if (!redeemQuestion) return;
+    const at = currentQuestionIndex;
+    setQuestionsForPractice((prev) => [...prev.slice(0, at), redeemQuestion, ...prev.slice(at)]);
+    setTotalQuestionsInSet((n) => n + 1);
+    setSlotKinds((prev) => shiftSlots(prev, at));
+    setSlotOutcomes((prev) => shiftSlots(prev, at));
+    pendingResetRef.current = shiftSlots(pendingResetRef.current, at);
+  }, [dailyQuestionsAnswered, currentQuestionIndex, redeemId, goldDayAnswered, isPremiumEffective, questionsForPractice]);
 
   // Reaching a re-inserted question clears its earlier answer so it can be tried again.
   useEffect(() => {
@@ -945,7 +961,18 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
     const question = practiceBank.find(q => q.id === questionId);
     const lessons = lessonIDS || question?.lessonIDS || [];
     const freeLimitNow = () =>
-      DAILY_FREE_ANSWERS + (goldLoopOn ? readGoldDay(user?.uid).bonus : 0);
+      DAILY_FREE_ANSWERS + (goldLoopOn ? readGoldDay(user?.uid, subject).bonus : 0);
+    // Golden if this is the day's 3rd free answer in this subject and today's gold isn't used yet.
+    const goldKindNow: GoldSlotKind | null =
+      goldLoopOn &&
+      isNewQuestion &&
+      !isPremiumEffective &&
+      readDailyCount() === GOLD_FREE_QUESTION_NUMBER - 1 &&
+      !readGoldDay(user?.uid, subject).answered
+        ? redeemId !== null && Number(questionId) === redeemId
+          ? 'goldRedeem'
+          : 'gold'
+        : null;
     
     // Daily free-answer limit for ALL non-premium users
     let nextFreeCount: number | null = null;
@@ -953,7 +980,7 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
       const currentCount = readDailyCount();
       if (currentCount >= freeLimitNow()) {
         if (goldLoopOn) {
-          setOutPanelReady(true);
+          showOutPanelSoon();
         } else if (!hasDismissedSeasonPassModal) {
           setShowSeasonPassModal(true);
         }
@@ -966,18 +993,22 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
 
     // Golden question / redemption round outcome for this position in the set.
     const slotIndex = currentQuestionIndex;
-    const slotKind = goldLoopOn && isNewQuestion ? slotKinds[slotIndex] ?? null : null;
+    const slotKind = goldLoopOn && isNewQuestion ? goldKindNow ?? slotKinds[slotIndex] ?? null : null;
     if (goldLoopOn && isNewQuestion) {
       const isGold = slotKind === 'gold' || slotKind === 'goldRedeem';
       let bonus = 0;
       let backTomorrow = false;
       let backSoon = false;
       if (isGold && !isPremiumEffective) {
-        const day = recordGoldAnswer(user?.uid, isCorrect);
+        const day = recordGoldAnswer(user?.uid, subject, isCorrect);
         setGoldBonus(day.bonus);
+        setGoldDayAnswered(true);
         if (isCorrect) {
           bonus = GOLD_BONUS_QUESTIONS;
-          if (slotKind === 'goldRedeem') clearGoldRedeem(user?.uid, subject);
+          if (slotKind === 'goldRedeem') {
+            clearGoldRedeem(user?.uid, subject);
+            setRedeemId(null);
+          }
         } else {
           saveGoldRedeem(user?.uid, subject, questionId);
           backTomorrow = true;
@@ -1005,7 +1036,10 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
     if (nextFreeCount !== null && nextFreeCount === freeLimitNow()) {
       if (goldLoopOn) {
         // Show the out-of-questions panel once the student has seen this answer's result.
-        window.setTimeout(() => setOutPanelReady(true), slotKind ? 3500 : 2000);
+        // Golden/redemption result shows for 3 seconds, a normal one for 2, then the panel.
+        const delay = slotKind ? 3000 : 2000;
+        resultHoldUntilRef.current = Date.now() + delay;
+        window.setTimeout(() => setOutPanelReady(true), delay);
       } else if (!hasDismissedSeasonPassModal) {
         window.setTimeout(() => {
           if (!hasDismissedSeasonPassModal) {
@@ -1451,7 +1485,7 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
               onLoginPrompt={() => {
                 if (!isPremiumEffective && dailyQuestionsAnswered >= dailyLimit) {
                   if (goldLoopOn) {
-                    setOutPanelReady(true);
+                    showOutPanelSoon();
                   } else if (!hasDismissedSeasonPassModal) {
                     setShowSeasonPassModal(true);
                   }
@@ -1467,16 +1501,16 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
               formulaToggleSignal={formulaToggleSignal}
               onFormulaActiveChange={setFormulaSheetOpen}
               questionTone={
-                goldLoopOn && slotKinds[currentQuestionIndex]
+                goldLoopOn && kindAt(currentQuestionIndex)
                   ? slotOutcomes[currentQuestionIndex] && !slotOutcomes[currentQuestionIndex].correct
                     ? 'missed'
-                    : slotKinds[currentQuestionIndex] === 'redeem'
+                    : kindAt(currentQuestionIndex) === 'redeem'
                       ? 'redeem'
                       : 'gold'
                   : null
               }
               answerFeedback={
-                goldLoopOn && slotKinds[currentQuestionIndex] && slotOutcomes[currentQuestionIndex]
+                goldLoopOn && kindAt(currentQuestionIndex) && slotOutcomes[currentQuestionIndex]
                   ? slotOutcomes[currentQuestionIndex].correct
                     ? 'correct'
                     : 'incorrect'
@@ -1489,14 +1523,14 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
                 (outPanelReady || !answeredQuestions[questionsForPractice[currentQuestionIndex]?.id]) ? (
                   <OutOfQuestionsPanel
                     missedGold={readGoldRedeem(user?.uid, subject)?.savedOn === localDateKey()}
-                    onUnlock={() => setShowSeasonPassModal(true)}
+                    onUnlock={() => router.push(`/purchase/season-pass?courseType=${subject}`)}
                   />
                 ) : null
               }
               questionBanner={
-                goldLoopOn && slotKinds[currentQuestionIndex] ? (
+                goldLoopOn && kindAt(currentQuestionIndex) ? (
                   <GoldQuestionBanner
-                    kind={slotKinds[currentQuestionIndex]}
+                    kind={kindAt(currentQuestionIndex)!}
                     outcome={slotOutcomes[currentQuestionIndex]}
                   />
                 ) : null

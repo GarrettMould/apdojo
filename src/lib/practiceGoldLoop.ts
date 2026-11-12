@@ -1,7 +1,7 @@
 /**
  * Golden questions and redemption rounds in MCQ practice.
  *
- * Free users: the 3rd free question each day is golden. Answer it right to unlock bonus free
+ * Free users: the 3rd free question each day, in each subject, is golden. Answer it right to unlock bonus free
  * questions for the day; miss it and it comes back tomorrow as that day's golden question.
  * Season Pass users: a question missed in a session comes back a few questions later as a
  * redemption round. Questions already in the review folder show as redemption rounds for everyone.
@@ -63,22 +63,23 @@ function removeKey(key: string) {
   }
 }
 
-const dayKey = (uid: string | null | undefined) => `apdojo_gold_day_v1:${uid ?? 'guest'}`;
+const dayKey = (uid: string | null | undefined, subject: string) => `apdojo_gold_day_v2:${uid ?? 'guest'}:${subject}`;
 const redeemKey = (uid: string | null | undefined, subject: string) =>
   `apdojo_gold_redeem_v1:${uid ?? 'guest'}:${subject}`;
 
-export function readGoldDay(uid: string | null | undefined): GoldDay {
+/** Today's golden-question state for one subject (each subject has its own free questions). */
+export function readGoldDay(uid: string | null | undefined, subject: string): GoldDay {
   const today = localDateKey();
-  const saved = typeof window === 'undefined' ? null : readJson<GoldDay>(dayKey(uid));
+  const saved = typeof window === 'undefined' ? null : readJson<GoldDay>(dayKey(uid, subject));
   if (!saved || saved.date !== today) return { date: today, answered: false, bonus: 0 };
   return { date: today, answered: Boolean(saved.answered), bonus: Math.max(0, Number(saved.bonus) || 0) };
 }
 
 /** Records today's golden question as answered, adding the bonus when it was right. */
-export function recordGoldAnswer(uid: string | null | undefined, correct: boolean): GoldDay {
-  const day = readGoldDay(uid);
+export function recordGoldAnswer(uid: string | null | undefined, subject: string, correct: boolean): GoldDay {
+  const day = readGoldDay(uid, subject);
   const next: GoldDay = { ...day, answered: true, bonus: day.bonus + (correct ? GOLD_BONUS_QUESTIONS : 0) };
-  writeJson(dayKey(uid), next);
+  writeJson(dayKey(uid, subject), next);
   return next;
 }
 
