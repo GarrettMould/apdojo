@@ -1,21 +1,8 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import { macroLessonPageMetadata } from '@/lib/macroLessonMetadata';
 
-export const metadata: Metadata = {
-  title: 'Multipliers Deep Dive: Understanding the Spending and Tax Multipliers',
-  description: 'Master the concept of multipliers in macroeconomics. Learn how changes in spending and taxes have amplified effects on aggregate demand and economic output.',
-  openGraph: {
-    title: 'Multipliers Deep Dive: Understanding the Spending and Tax Multipliers',
-    description: 'Master the concept of multipliers in macroeconomics and how changes in spending and taxes affect the economy.',
-  },
-  alternates: {
-    canonical: 'https://apdojo.com/ap-macro/unit-3/multipliers',
-  },
-};
+export const metadata: Metadata = macroLessonPageMetadata('3.2');
 
-export default function MultipliersDeepDiveLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return <>{children}</>;
+export default function LessonLayout({ children }: { children: React.ReactNode }) {
+  return children;
 }

@@ -22,6 +22,8 @@ export interface TestProgress {
     // For MCQ exams
     answeredQuestions?: Record<string, {
       selectedAnswer: number;
+      /** The chosen option's text, so restores survive a reorder of the options. */
+      selectedText?: string;
       isCorrect: boolean;
     }>;
     // For FRQ exams

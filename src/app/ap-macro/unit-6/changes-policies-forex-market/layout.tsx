@@ -1,21 +1,8 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import { macroLessonPageMetadata } from '@/lib/macroLessonMetadata';
 
-export const metadata: Metadata = {
-  title: 'Effect of Changes in Policies and Economic Conditions on the Foreign Exchange Market Deep Dive',
-  description: 'Understand how fiscal and monetary policy affect exchange rates through interest rates and capital flows.',
-  openGraph: {
-    title: 'Effect of Changes in Policies and Economic Conditions on the Foreign Exchange Market Deep Dive',
-    description: 'Understand how fiscal and monetary policy affect exchange rates.',
-  },
-  alternates: {
-    canonical: 'https://apdojo.com/ap-macro/unit-6/changes-policies-forex-market',
-  },
-};
+export const metadata: Metadata = macroLessonPageMetadata('6.4');
 
-export default function ChangesPoliciesForexMarketDeepDiveLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return <>{children}</>;
+export default function LessonLayout({ children }: { children: React.ReactNode }) {
+  return children;
 }

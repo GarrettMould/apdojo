@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
-import { macroLessonMetadata } from '@/lib/macroLessonMetadata';
+import { macroLessonPageMetadata } from '@/lib/macroLessonMetadata';
 
-export const metadata: Metadata = macroLessonMetadata('1', 'supply');
+export const metadata: Metadata = macroLessonPageMetadata('1.5');
 
-export default function SupplyLayout({ children }: { children: React.ReactNode }) {
+export default function LessonLayout({ children }: { children: React.ReactNode }) {
   return children;
 }

@@ -1,21 +1,8 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import { macroLessonPageMetadata } from '@/lib/macroLessonMetadata';
 
-export const metadata: Metadata = {
-  title: 'The Foreign Exchange Market Deep Dive',
-  description: 'Master the foreign exchange market and how supply and demand determine exchange rates. Understand what causes currency appreciation and depreciation.',
-  openGraph: {
-    title: 'The Foreign Exchange Market Deep Dive',
-    description: 'Master the foreign exchange market and how supply and demand determine exchange rates.',
-  },
-  alternates: {
-    canonical: 'https://apdojo.com/ap-macro/unit-6/foreign-exchange-market',
-  },
-};
+export const metadata: Metadata = macroLessonPageMetadata('6.3');
 
-export default function ForeignExchangeMarketDeepDiveLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return <>{children}</>;
+export default function LessonLayout({ children }: { children: React.ReactNode }) {
+  return children;
 }

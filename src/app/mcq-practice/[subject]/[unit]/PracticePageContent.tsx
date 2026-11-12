@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { X, Loader2, Lock, ArrowRight, ChevronRight, Home, Pen, Sigma } from 'lucide-react';
+import { X, Check, Loader2, Lock, ArrowRight, ChevronRight, Home, Pen, Sigma, Sparkles, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useCreditSystem } from '@/hooks/useCreditSystem';
@@ -38,6 +38,20 @@ import { govMcqPracticeQuestions } from '@/data/gov/govMcqPractice';
 import { SeasonPassModal } from '@/components/SeasonPassModal';
 import { hasValidSeasonPass } from '@/lib/utils';
 import { shufflePracticeQuestions } from '@/lib/shufflePracticeQuestions';
+import { FEATURES } from '@/lib/featureFlags';
+import {
+  GOLD_BONUS_QUESTIONS,
+  GOLD_FREE_QUESTION_NUMBER,
+  clearGoldRedeem,
+  localDateKey,
+  readGoldDay,
+  readGoldRedeem,
+  recordGoldAnswer,
+  redemptionInsertIndex,
+  saveGoldRedeem,
+  shiftSlots,
+  type GoldSlotKind,
+} from '@/lib/practiceGoldLoop';
 import { REMATCH_ENABLED } from '@/lib/reviewFolder';
 import { ReviewFolderButton } from '@/components/review-folder/ReviewFolderButton';
 import { ReviewFolderPanel } from '@/components/review-folder/ReviewFolderPanel';
@@ -213,7 +227,7 @@ function Breadcrumb({ subject, unitNumber }: { subject: PracticeMcqSubject; unit
   const subjectSlug = getSubjectSlug(subject);
   
   return (
-    <nav className="flex min-w-0 flex-1 flex-wrap items-center gap-2 text-sm" aria-label="Breadcrumb">
+    <nav className="flex w-full min-w-0 flex-wrap items-center gap-2 text-sm sm:w-auto sm:flex-1" aria-label="Breadcrumb">
       <Link 
         href="/" 
         className="text-gray-600 hover:text-gray-900 transition-colors flex items-center gap-1"
@@ -261,6 +275,189 @@ function livePracticeBank(
   return passed ?? [];
 }
 
+type GoldOutcome = {
+  kind: GoldSlotKind | null;
+  correct: boolean;
+  /** Bonus free questions unlocked by this answer. */
+  bonus: number;
+  /** Free user missed today's golden question: it returns tomorrow. */
+  backTomorrow: boolean;
+  /** Season Pass user missed it: it returns later in this session. */
+  backSoon: boolean;
+  lessonIds: string[];
+};
+
+const BURST = Array.from({ length: 12 }, (_, i) => {
+  const angle = (i / 12) * Math.PI * 2;
+  return { x: Math.cos(angle) * (46 + (i % 3) * 14), y: Math.sin(angle) * (30 + (i % 2) * 12) };
+});
+
+/** Header strip across the top of a golden or redemption question card. It shows the result once answered. */
+function GoldQuestionBanner({
+  kind,
+  outcome,
+}: {
+  kind: GoldSlotKind;
+  outcome?: GoldOutcome;
+}) {
+  const redeem = kind === 'redeem';
+  const state: 'open' | 'right' | 'wrong' = !outcome ? 'open' : outcome.correct ? 'right' : 'wrong';
+  const label = redeem ? 'Redemption round' : kind === 'goldRedeem' ? 'Golden question · Yesterday\'s miss' : 'Golden question';
+
+  let title: string;
+  let detail: string | null = null;
+  if (state === 'open') {
+    title = redeem
+      ? 'You missed this one before. Get it right to clear it from your review folder.'
+      : `Get it right to unlock ${GOLD_BONUS_QUESTIONS} bonus questions today.`;
+  } else if (state === 'right') {
+    if (redeem) {
+      title = 'Redeemed! Cleared from your review folder.';
+    } else if (outcome!.bonus > 0) {
+      title = `Correct! ${outcome!.bonus} bonus questions unlocked.`;
+    } else {
+      title = 'Correct!';
+    }
+  } else {
+    title = 'Not this time.';
+    detail = outcome!.backTomorrow
+      ? 'It will be back tomorrow as your golden question, with another shot at the bonus.'
+      : outcome!.backSoon
+        ? 'You will get another shot at it in a few questions.'
+        : redeem
+          ? 'It stays in your review folder for another try.'
+          : null;
+  }
+
+  const tone =
+    state === 'wrong'
+      ? 'bg-gradient-to-r from-slate-600 to-slate-500 text-white'
+      : redeem
+        ? state === 'right'
+          ? 'bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-400 text-white'
+          : 'bg-gradient-to-r from-sky-500 via-sky-400 to-cyan-400 text-white'
+        : 'bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-300 text-amber-950';
+  const Icon = state === 'wrong' ? X : state === 'right' ? Check : redeem ? RotateCcw : Sparkles;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: 'easeOut' }}
+      className={`relative -mx-4 -mt-4 mb-5 overflow-hidden rounded-t-[7px] px-4 py-3.5 transition-colors duration-500 md:-mx-5 md:-mt-5 md:px-5 ${tone}`}
+      aria-live="polite"
+    >
+      {/* Shimmer sweep when the card appears, and again on a right answer */}
+      {state !== 'wrong' ? (
+        <motion.span
+          key={state}
+          aria-hidden
+          initial={{ x: '-120%' }}
+          animate={{ x: '320%' }}
+          transition={{ duration: 1.1, delay: state === 'open' ? 0.25 : 0, ease: 'easeInOut' }}
+          className="pointer-events-none absolute inset-y-0 left-0 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/60 to-transparent"
+        />
+      ) : null}
+      <div className="relative flex items-center gap-3">
+        <span className="relative flex h-9 w-9 shrink-0 items-center justify-center">
+          {state === 'right'
+            ? BURST.map((p, i) => (
+                <motion.span
+                  key={i}
+                  aria-hidden
+                  initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
+                  animate={{ x: p.x, y: p.y, opacity: 0, scale: 0.4 }}
+                  transition={{ duration: 0.8, ease: 'easeOut' }}
+                  className={`absolute h-1.5 w-1.5 rounded-full ${redeem ? 'bg-white' : i % 2 ? 'bg-white' : 'bg-amber-600'}`}
+                />
+              ))
+            : null}
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.span
+              key={state}
+              initial={{ scale: 0.3, rotate: state === 'right' ? -40 : 0, opacity: 0 }}
+              animate={{ scale: 1, rotate: 0, opacity: 1 }}
+              exit={{ scale: 0.3, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 420, damping: 18 }}
+              className={`flex h-9 w-9 items-center justify-center rounded-full ${
+                state === 'wrong' || redeem ? 'bg-white/20' : 'bg-white/60'
+              }`}
+            >
+              <Icon className="h-[18px] w-[18px]" strokeWidth={state === 'open' ? 2 : 3} aria-hidden />
+            </motion.span>
+          </AnimatePresence>
+        </span>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={state}
+            initial={{ opacity: 0, x: 8 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -8 }}
+            transition={{ duration: 0.2 }}
+            className="min-w-0"
+          >
+            <p className="text-[11px] font-black uppercase tracking-[0.18em] opacity-80">{label}</p>
+            <p className="text-[15px] font-bold leading-snug sm:text-base">{title}</p>
+            {detail ? <p className="mt-0.5 text-sm font-medium opacity-90">{detail}</p> : null}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </motion.div>
+  );
+}
+
+/** Replaces the question card when a free user has used today's free questions. */
+function OutOfQuestionsPanel({ missedGold, onUnlock }: { missedGold: boolean; onUnlock: () => void }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: 'easeOut' }}
+      className="flex flex-col items-center px-1 py-8 text-center sm:py-10"
+    >
+      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 text-amber-600">
+        <Sparkles className="h-6 w-6" aria-hidden />
+      </span>
+      <h2 className="mt-4 text-2xl font-extrabold tracking-tight text-gray-900">
+        That&apos;s your free questions for today
+      </h2>
+      <p className="mt-2 max-w-md text-base leading-relaxed text-gray-600">
+        {missedGold
+          ? 'Good effort. Your golden question comes back tomorrow, with another shot at the bonus.'
+          : `Nice work. Come back tomorrow for ${DAILY_FREE_ANSWERS_DEFAULT} more, plus a new golden question.`}
+      </p>
+      <div className="mt-6 flex w-full max-w-sm flex-col gap-3">
+        <button
+          type="button"
+          onClick={onUnlock}
+          className="rounded-xl bg-blue-600 px-5 py-3.5 text-base font-bold text-white shadow-sm transition hover:bg-blue-700"
+        >
+          Unlock Unlimited Questions
+        </button>
+        <Link
+          href="/"
+          className="rounded-xl border-2 border-gray-200 bg-white px-5 py-3 text-base font-semibold text-gray-700 transition hover:border-gray-300 hover:bg-gray-50"
+        >
+          Return home
+        </Link>
+      </div>
+    </motion.div>
+  );
+}
+
+/** Under an ordinary question a Season Pass user missed: it comes back later in the session. */
+function GoldOutcomeNote({ outcome }: { outcome: GoldOutcome }) {
+  if (outcome.kind || outcome.correct || !outcome.backSoon) return null;
+  return (
+    <div className="mt-4 flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+      <RotateCcw className="h-4 w-4 shrink-0 text-sky-600" aria-hidden />
+      You will get another shot at this one in a few questions.
+    </div>
+  );
+}
+
+const DAILY_FREE_ANSWERS_DEFAULT = 3;
+
 export function PracticePageContent({ subject, unitNumber, practiceQuestions }: PracticePageContentProps) {
   const practiceBank = livePracticeBank(subject, practiceQuestions);
   const router = useRouter();
@@ -281,7 +478,7 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
   // Access Control State
   const [hasAccess, setHasAccess] = useState(false);
   const [isVerifying, setIsVerifying] = useState(true);
-  const DAILY_FREE_ANSWERS = 3;
+  const DAILY_FREE_ANSWERS = DAILY_FREE_ANSWERS_DEFAULT;
   const [dailyQuestionsAnswered, setDailyQuestionsAnswered] = useState(0);
   const [showSeasonPassModal, setShowSeasonPassModal] = useState(false);
   const [hasDismissedSeasonPassModal, setHasDismissedSeasonPassModal] = useState(false);
@@ -290,9 +487,6 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
   const [scratchActive, setScratchActive] = useState<'draw' | 'notes' | null>(null);
   const [formulaToggleSignal, setFormulaToggleSignal] = useState(0);
   const [formulaSheetOpen, setFormulaSheetOpen] = useState(false);
-  const [devJumpId, setDevJumpId] = useState('');
-  const [devJumpError, setDevJumpError] = useState<string | null>(null);
-  const pendingDevJumpId = useRef<number | null>(null);
   const [reviewState, setReviewState] = useState<ReviewFolderState>({
     version: 1,
     misses: [],
@@ -495,7 +689,7 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
       setDailyQuestionsAnswered(dailyCount);
       
       // If user has already reached their limit and hasn't dismissed the modal, show it
-      if (!isPremiumEffective && dailyCount >= DAILY_FREE_ANSWERS && !hasDismissedSeasonPassModal) {
+      if (!goldLoopOn && !isPremiumEffective && dailyCount >= DAILY_FREE_ANSWERS && !hasDismissedSeasonPassModal) {
         // Small delay to ensure component is fully rendered
         const timer = setTimeout(() => {
           setShowSeasonPassModal(true);
@@ -562,6 +756,19 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
   const [totalQuestionsInSet, setTotalQuestionsInSet] = useState(0);
   const [currentUnitName, setCurrentUnitName] = useState('');
   const [showAllQuestions, setShowAllQuestions] = useState(false);
+  // Golden questions and redemption rounds (see src/lib/practiceGoldLoop.ts), keyed by position in the set.
+  const goldLoopOn = FEATURES.practiceGoldLoop;
+  const [buildId, setBuildId] = useState(0);
+  const [slotKinds, setSlotKinds] = useState<Record<number, GoldSlotKind>>({});
+  const [slotOutcomes, setSlotOutcomes] = useState<Record<number, GoldOutcome>>({});
+  const [goldBonus, setGoldBonus] = useState(0);
+  const plannedRef = useRef('');
+  const reinsertedIdsRef = useRef<Set<number>>(new Set());
+  /** Re-inserted positions whose earlier answer is cleared when the student reaches them. */
+  const pendingResetRef = useRef<Record<number, number>>({});
+  const dailyLimit = DAILY_FREE_ANSWERS + (goldLoopOn ? goldBonus : 0);
+  /** Free questions are used up and the last answer's result has had time to show. */
+  const [outPanelReady, setOutPanelReady] = useState(false);
   const purchasedTests = (userData?.purchasedTests || []) as string[];
 
   // Track previous filter criteria to prevent unnecessary reloads
@@ -646,34 +853,84 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
       ? questions
       : shufflePracticeQuestions(questions);
 
-    const jumpId = pendingDevJumpId.current;
-    const jumpFromBank =
-      jumpId != null ? practiceBank.find((q) => sameQuestionId(q, jumpId)) : undefined;
-    const jumpInShuffle =
-      jumpId != null ? shuffled.findIndex((q) => sameQuestionId(q, jumpId)) : -1;
-
-    if (jumpId != null && jumpInShuffle >= 0) {
-      setQuestionsForPractice(shuffled);
-      setTotalQuestionsInSet(shuffled.length);
-      setCurrentQuestionIndex(jumpInShuffle);
-    } else if (jumpFromBank) {
-      const next = [jumpFromBank, ...shuffled.filter((q) => !sameQuestionId(q, jumpId))];
-      setQuestionsForPractice(next);
-      setTotalQuestionsInSet(next.length);
-      setCurrentQuestionIndex(0);
-    } else {
-      setQuestionsForPractice(shuffled);
-      setTotalQuestionsInSet(shuffled.length);
-      setCurrentQuestionIndex(0);
-    }
+    setQuestionsForPractice(shuffled);
+    setTotalQuestionsInSet(shuffled.length);
+    setCurrentQuestionIndex(0);
     setAnsweredQuestions({});
     
     // Set unit name for display
     const unit = unitsData.find(u => u.number === unitNumber);
     setCurrentUnitName(unit ? `Unit ${unitNumber}: ${unit.title}` : `Unit ${unitNumber}`);
 
+    setSlotKinds({});
+    setSlotOutcomes({});
+    reinsertedIdsRef.current = new Set();
+    pendingResetRef.current = {};
+    setBuildId((n) => n + 1);
     setIsLoadingQuestionSet(false);
   }, [subject, unitNumber, showAllQuestions, practiceMissedMode, practiceMissedUnitFilter, reviewState.misses, reviewUserKey, user, loadingMcqData, mcqAnswersData]);
+
+  // Plan golden questions and redemption rounds for each new question set.
+  useEffect(() => {
+    if (!goldLoopOn || isLoadingQuestionSet || buildId === 0) return;
+    if (user && loadingUserData) return;
+    const planKey = `${buildId}:${isPremiumEffective}`;
+    if (plannedRef.current === planKey) return;
+    plannedRef.current = planKey;
+
+    let list = questionsForPractice;
+    const kinds: Record<number, GoldSlotKind> = {};
+    let goldRedeemSlot: number | null = null;
+
+    if (!isPremiumEffective) {
+      const day = readGoldDay(user?.uid);
+      setGoldBonus(day.bonus);
+      // The golden question is always the day's 3rd free question.
+      const thirdFreeSlot = GOLD_FREE_QUESTION_NUMBER - 1 - readDailyCount();
+      if (!day.answered && thirdFreeSlot >= 0) {
+        const redeem = readGoldRedeem(user?.uid, subject);
+        const redeemQuestion =
+          redeem && redeem.savedOn < localDateKey()
+            ? practiceBank.find((q) => sameQuestionId(q, redeem.questionId))
+            : undefined;
+        if (redeemQuestion) {
+          const rest = list.filter((q) => !sameQuestionId(q, redeemQuestion.id));
+          const slot = Math.min(thirdFreeSlot, rest.length);
+          list = [...rest.slice(0, slot), redeemQuestion, ...rest.slice(slot)];
+          goldRedeemSlot = slot;
+          setQuestionsForPractice(list);
+          setTotalQuestionsInSet(list.length);
+        } else {
+          if (thirdFreeSlot < list.length) kinds[thirdFreeSlot] = 'gold';
+        }
+      }
+    }
+
+    // Questions already in the review folder are redemption rounds, unless they are golden.
+    const missIds = new Set(reviewState.misses.map((m) => m.questionId));
+    list.forEach((q, i) => {
+      if (!kinds[i] && missIds.has(q.id)) kinds[i] = 'redeem';
+    });
+    if (goldRedeemSlot !== null) kinds[goldRedeemSlot] = 'goldRedeem';
+    setSlotKinds(kinds);
+  }, [buildId, isPremiumEffective, loadingUserData, isLoadingQuestionSet]);
+
+  // Keep today's bonus in sync when the signed-in user changes.
+  useEffect(() => {
+    if (goldLoopOn) setGoldBonus(readGoldDay(user?.uid).bonus);
+  }, [user?.uid]);
+
+  // Reaching a re-inserted question clears its earlier answer so it can be tried again.
+  useEffect(() => {
+    const id = pendingResetRef.current[currentQuestionIndex];
+    if (id === undefined) return;
+    const { [currentQuestionIndex]: _reached, ...rest } = pendingResetRef.current;
+    pendingResetRef.current = rest;
+    setAnsweredQuestions((prev) => {
+      const { [id]: _old, ...others } = prev;
+      return others;
+    });
+  }, [currentQuestionIndex]);
 
   // Access control check
   useEffect(() => {
@@ -685,24 +942,71 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
     logger.debug('[UnitMCQ] handleAnswer called:', { questionId, answerLetter, isCorrect, hasAwardXp: !!awardXp });
     
     const isNewQuestion = !answeredQuestions[questionId];
+    const question = practiceBank.find(q => q.id === questionId);
+    const lessons = lessonIDS || question?.lessonIDS || [];
+    const freeLimitNow = () =>
+      DAILY_FREE_ANSWERS + (goldLoopOn ? readGoldDay(user?.uid).bonus : 0);
     
     // Daily free-answer limit for ALL non-premium users
+    let nextFreeCount: number | null = null;
     if (!isPremiumEffective && isNewQuestion) {
       const currentCount = readDailyCount();
-      if (currentCount >= DAILY_FREE_ANSWERS) {
-        if (!hasDismissedSeasonPassModal) {
+      if (currentCount >= freeLimitNow()) {
+        if (goldLoopOn) {
+          setOutPanelReady(true);
+        } else if (!hasDismissedSeasonPassModal) {
           setShowSeasonPassModal(true);
         }
         return;
       }
-      const nextCount = currentCount + 1;
-      writeDailyCount(nextCount);
-      setDailyQuestionsAnswered(nextCount);
+      nextFreeCount = currentCount + 1;
+      writeDailyCount(nextFreeCount);
+      setDailyQuestionsAnswered(nextFreeCount);
+    }
 
-      if (
-        nextCount === DAILY_FREE_ANSWERS &&
-        !hasDismissedSeasonPassModal
-      ) {
+    // Golden question / redemption round outcome for this position in the set.
+    const slotIndex = currentQuestionIndex;
+    const slotKind = goldLoopOn && isNewQuestion ? slotKinds[slotIndex] ?? null : null;
+    if (goldLoopOn && isNewQuestion) {
+      const isGold = slotKind === 'gold' || slotKind === 'goldRedeem';
+      let bonus = 0;
+      let backTomorrow = false;
+      let backSoon = false;
+      if (isGold && !isPremiumEffective) {
+        const day = recordGoldAnswer(user?.uid, isCorrect);
+        setGoldBonus(day.bonus);
+        if (isCorrect) {
+          bonus = GOLD_BONUS_QUESTIONS;
+          if (slotKind === 'goldRedeem') clearGoldRedeem(user?.uid, subject);
+        } else {
+          saveGoldRedeem(user?.uid, subject, questionId);
+          backTomorrow = true;
+        }
+      }
+
+      // Season Pass: a miss comes back a few questions later, once per session.
+      if (!isCorrect && isPremiumEffective && question && !reinsertedIdsRef.current.has(questionId)) {
+        reinsertedIdsRef.current.add(questionId);
+        const at = redemptionInsertIndex(slotIndex, questionsForPractice.length);
+        setQuestionsForPractice((prev) => [...prev.slice(0, at), question, ...prev.slice(at)]);
+        setTotalQuestionsInSet((n) => n + 1);
+        setSlotKinds((prev) => ({ ...shiftSlots(prev, at), [at]: 'redeem' }));
+        setSlotOutcomes((prev) => shiftSlots(prev, at));
+        pendingResetRef.current = { ...shiftSlots(pendingResetRef.current, at), [at]: questionId };
+        backSoon = true;
+      }
+
+      setSlotOutcomes((prev) => ({
+        ...prev,
+        [slotIndex]: { kind: slotKind, correct: isCorrect, bonus, backTomorrow, backSoon, lessonIds: lessons },
+      }));
+    }
+
+    if (nextFreeCount !== null && nextFreeCount === freeLimitNow()) {
+      if (goldLoopOn) {
+        // Show the out-of-questions panel once the student has seen this answer's result.
+        window.setTimeout(() => setOutPanelReady(true), slotKind ? 3500 : 2000);
+      } else if (!hasDismissedSeasonPassModal) {
         window.setTimeout(() => {
           if (!hasDismissedSeasonPassModal) {
             setShowSeasonPassModal(true);
@@ -715,9 +1019,6 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
       ...prev,
       [questionId]: { selectedLetter: answerLetter, isCorrect }
     }));
-
-    const question = practiceBank.find(q => q.id === questionId);
-    const lessons = lessonIDS || question?.lessonIDS || [];
 
     if (isCorrect) {
       setJustFiledQuestionId((prev) => (prev === questionId ? null : prev));
@@ -894,34 +1195,6 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
     setCurrentQuestionIndex(index);
   };
 
-  const handleDevJumpToId = (raw: string) => {
-    const id = Number.parseInt(raw.trim(), 10);
-    if (!Number.isFinite(id)) {
-      setDevJumpError('Enter a numeric ID');
-      return;
-    }
-
-    pendingDevJumpId.current = id;
-
-    const inSession = questionsForPractice.findIndex((q) => sameQuestionId(q, id));
-    if (inSession >= 0) {
-      setCurrentQuestionIndex(inSession);
-      setDevJumpError(null);
-      return;
-    }
-
-    const fromBank = practiceBank.find((q) => sameQuestionId(q, id));
-    if (!fromBank) {
-      setDevJumpError(`No ${subject} question ${id}`);
-      return;
-    }
-
-    setQuestionsForPractice((prev) => [fromBank, ...prev.filter((q) => !sameQuestionId(q, id))]);
-    setTotalQuestionsInSet((n) => n + 1);
-    setCurrentQuestionIndex(0);
-    setDevJumpError(null);
-  };
-
   const handleUnitChange = (nextUnit: number) => {
     if (subject === 'gov' && !isGovMcqPracticeUnitAvailable(nextUnit)) return;
     if (subject === 'stats' && !isStatsMcqPracticeUnitAvailable(nextUnit)) return;
@@ -941,7 +1214,7 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
         showLoginModal ||
         showSignupModal ||
         showSeasonPassModal ||
-        (!isPremiumEffective && dailyQuestionsAnswered >= DAILY_FREE_ANSWERS)
+        (!isPremiumEffective && dailyQuestionsAnswered >= dailyLimit)
       ) {
         return;
       }
@@ -959,7 +1232,7 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [currentQuestionIndex, questionsForPractice.length, showLoginModal, showSignupModal, showSeasonPassModal, isPremiumEffective, dailyQuestionsAnswered]);
+  }, [currentQuestionIndex, questionsForPractice.length, showLoginModal, showSignupModal, showSeasonPassModal, isPremiumEffective, dailyQuestionsAnswered, dailyLimit]);
 
   const handleAuthSuccess = () => {
     setShowLoginModal(false);
@@ -1013,57 +1286,34 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 py-8 pt-8">
 
-          <div className="mb-6 flex items-center justify-between gap-3">
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
             {!isTutorOpen ? (
               <Breadcrumb subject={subject} unitNumber={unitNumber} />
             ) : (
               <div className="min-w-0 flex-1" />
             )}
-            {process.env.NODE_ENV === 'development' ? (
-              <form
-                className="flex flex-shrink-0 items-center gap-1.5 rounded border border-dashed border-amber-400 bg-amber-50 px-2 py-1"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleDevJumpToId(devJumpId);
-                }}
-              >
-                <label htmlFor="dev-mcq-id-jump" className="text-[10px] font-semibold uppercase tracking-wide text-amber-800">
-                  Dev ID
-                </label>
-                <input
-                  id="dev-mcq-id-jump"
-                  type="text"
-                  inputMode="numeric"
-                  value={devJumpId}
-                  onChange={(e) => {
-                    setDevJumpId(e.target.value);
-                    if (devJumpError) setDevJumpError(null);
-                  }}
-                  placeholder={
-                    questionsForPractice[currentQuestionIndex]?.id != null
-                      ? String(questionsForPractice[currentQuestionIndex].id)
-                      : 'id'
-                  }
-                  className="h-6 w-20 rounded border border-amber-300 bg-white px-1.5 text-xs text-gray-900 outline-none focus:border-amber-500"
-                />
-                <button
-                  type="submit"
-                  className="h-6 rounded bg-amber-500 px-1.5 text-[10px] font-semibold uppercase text-white hover:bg-amber-600"
-                >
-                  Go
-                </button>
-                {devJumpError ? (
-                  <span className="max-w-[10rem] truncate text-[10px] text-red-600">{devJumpError}</span>
-                ) : questionsForPractice[currentQuestionIndex]?.id != null ? (
-                  <span className="text-[10px] text-amber-800">
-                    now {questionsForPractice[currentQuestionIndex].id}
+            {!isLoadingQuestionSet && (questionsForPractice.length > 0 || reviewState.misses.length > 0) ? (
+              <div className="flex flex-shrink-0 flex-wrap items-center gap-x-4 gap-y-2">
+                {!isPremiumEffective && !scratchActive ? (
+                  <span
+                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-semibold tabular-nums ${
+                      dailyQuestionsAnswered >= dailyLimit
+                        ? 'border-red-200 bg-red-50 text-red-700'
+                        : goldBonus > 0
+                          ? 'border-amber-300 bg-amber-50 text-amber-900'
+                          : 'border-gray-200 bg-white text-gray-700'
+                    }`}
+                    aria-live="polite"
+                  >
+                    {goldBonus > 0 ? <Sparkles className="h-3.5 w-3.5 text-amber-600" aria-hidden /> : null}
+                    <span>
+                      {Math.max(0, dailyLimit - dailyQuestionsAnswered)} of {dailyLimit}{' '}
+                      <span className="sm:hidden">free left</span>
+                      <span className="hidden sm:inline">free questions left today</span>
+                    </span>
                   </span>
                 ) : null}
-              </form>
-            ) : null}
-            {!isLoadingQuestionSet && (questionsForPractice.length > 0 || reviewState.misses.length > 0) ? (
-              <div className="flex flex-shrink-0 items-center gap-4">
-                {REMATCH_ENABLED ? (
+                {REMATCH_ENABLED && !scratchActive ? (
                   <ReviewFolderButton
                     count={reviewState.misses.length}
                     pulseKey={reviewPulseKey}
@@ -1196,17 +1446,19 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
                 }
               }}
               isAnswerDisabled={
-                (!isPremiumEffective && dailyQuestionsAnswered >= DAILY_FREE_ANSWERS)
+                (!isPremiumEffective && dailyQuestionsAnswered >= dailyLimit)
               }
               onLoginPrompt={() => {
-                if (!isPremiumEffective && dailyQuestionsAnswered >= DAILY_FREE_ANSWERS) {
-                  if (!hasDismissedSeasonPassModal) {
+                if (!isPremiumEffective && dailyQuestionsAnswered >= dailyLimit) {
+                  if (goldLoopOn) {
+                    setOutPanelReady(true);
+                  } else if (!hasDismissedSeasonPassModal) {
                     setShowSeasonPassModal(true);
                   }
                 }
               }}
               isNavigationDisabled={
-                (!isPremiumEffective && dailyQuestionsAnswered >= DAILY_FREE_ANSWERS)
+                (!isPremiumEffective && dailyQuestionsAnswered >= dailyLimit)
               }
               onTutorOpenChange={setIsTutorOpen}
               showFloatingScratchToolbar={false}
@@ -1214,6 +1466,46 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
               onScratchActiveChange={setScratchActive}
               formulaToggleSignal={formulaToggleSignal}
               onFormulaActiveChange={setFormulaSheetOpen}
+              questionTone={
+                goldLoopOn && slotKinds[currentQuestionIndex]
+                  ? slotOutcomes[currentQuestionIndex] && !slotOutcomes[currentQuestionIndex].correct
+                    ? 'missed'
+                    : slotKinds[currentQuestionIndex] === 'redeem'
+                      ? 'redeem'
+                      : 'gold'
+                  : null
+              }
+              answerFeedback={
+                goldLoopOn && slotKinds[currentQuestionIndex] && slotOutcomes[currentQuestionIndex]
+                  ? slotOutcomes[currentQuestionIndex].correct
+                    ? 'correct'
+                    : 'incorrect'
+                  : null
+              }
+              replacementPanel={
+                goldLoopOn &&
+                !isPremiumEffective &&
+                dailyQuestionsAnswered >= dailyLimit &&
+                (outPanelReady || !answeredQuestions[questionsForPractice[currentQuestionIndex]?.id]) ? (
+                  <OutOfQuestionsPanel
+                    missedGold={readGoldRedeem(user?.uid, subject)?.savedOn === localDateKey()}
+                    onUnlock={() => setShowSeasonPassModal(true)}
+                  />
+                ) : null
+              }
+              questionBanner={
+                goldLoopOn && slotKinds[currentQuestionIndex] ? (
+                  <GoldQuestionBanner
+                    kind={slotKinds[currentQuestionIndex]}
+                    outcome={slotOutcomes[currentQuestionIndex]}
+                  />
+                ) : null
+              }
+              answerFooter={
+                goldLoopOn && slotOutcomes[currentQuestionIndex] ? (
+                  <GoldOutcomeNote outcome={slotOutcomes[currentQuestionIndex]} />
+                ) : null
+              }
             />
           )}
         </div>

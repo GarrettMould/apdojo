@@ -264,6 +264,13 @@ export interface Whiteboard {
 
   ];
 
+  /**
+   * AP Macro Unit 6 (Open Economy). Empty until the boards are made. To use one in an explainer, add it
+   * here (lessonID, unit 6, a unique topic, its S3 url) and put the topic in that lesson's walkthrough
+   * `boards` in src/data/guidedLessons/macroUnit6.ts.
+   */
+  export const apMacroUnit6Whiteboards: Whiteboard[] = [];
+
   export const apMicroUnit3Whiteboards: Whiteboard[] = [
     { lessonID: "3.1", unit: 3, topic: "Diminishing Marginal Returns", url: "https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Micro_Unit_3/3.1_wb1.jpg" },
     { lessonID: "3.1", unit: 3, topic: "Marginal and Average Product", url: "https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/AP_Micro_Unit_3/3.1_wb2.jpg" },

@@ -1,21 +1,8 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import { macroLessonPageMetadata } from '@/lib/macroLessonMetadata';
 
-export const metadata: Metadata = {
-  title: 'Balance of Payments Accounts Deep Dive',
-  description: 'Master the balance of payments accounts including the current account and financial account. Understand how international transactions are recorded.',
-  openGraph: {
-    title: 'Balance of Payments Accounts Deep Dive',
-    description: 'Master the balance of payments accounts and how international transactions are recorded.',
-  },
-  alternates: {
-    canonical: 'https://apdojo.com/ap-macro/unit-6/balance-of-payments-accounts',
-  },
-};
+export const metadata: Metadata = macroLessonPageMetadata('6.1');
 
-export default function BalanceOfPaymentsAccountsDeepDiveLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return <>{children}</>;
+export default function LessonLayout({ children }: { children: React.ReactNode }) {
+  return children;
 }

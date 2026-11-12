@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, ArrowRight, Sparkles, ShieldCheck, GraduationCap, CalendarCheck, Lightbulb } from 'lucide-react';
 import { TutoringCallout } from '@/components/tutoring/TutoringCallout';
+import { FEATURES } from '@/lib/featureFlags';
 
 type CourseCardType = 'macro' | 'micro' | 'gov' | 'stats';
 
@@ -37,7 +38,9 @@ const COURSE_CONFIG: Record<
       { label: 'FRQs and essays', text: 'AI-graded FRQs with graphing help' },
       {
         label: 'Study tools',
-        text: 'Guided explainers, interactive graphing simulators, cheat sheets with PDFs, and quizzes from your own notes',
+        text: FEATURES.guidedExplainers && FEATURES.showExplainersInNav
+          ? 'Guided explainers, interactive graphing simulators, cheat sheets with PDFs, and quizzes from your own notes'
+          : 'Interactive graphing simulators, cheat sheets with PDFs, and quizzes from your own notes',
       },
     ],
   },
@@ -98,22 +101,22 @@ const BUNDLE = {
 const THEME_CLASSES = {
   blue: {
     accent: 'text-blue-600',
-    badgeBg: 'bg-blue-600',
+    badgeTint: 'bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-200',
     buttonBg: 'bg-blue-600 hover:bg-blue-700',
   },
   green: {
     accent: 'text-green-600',
-    badgeBg: 'bg-green-600',
+    badgeTint: 'bg-green-50 text-green-700 ring-1 ring-inset ring-green-200',
     buttonBg: 'bg-green-600 hover:bg-green-700',
   },
   violet: {
     accent: 'text-violet-600',
-    badgeBg: 'bg-violet-600',
+    badgeTint: 'bg-violet-50 text-violet-700 ring-1 ring-inset ring-violet-200',
     buttonBg: 'bg-violet-600 hover:bg-violet-700',
   },
   orange: {
     accent: 'text-orange-600',
-    badgeBg: 'bg-orange-600',
+    badgeTint: 'bg-orange-50 text-orange-700 ring-1 ring-inset ring-orange-200',
     buttonBg: 'bg-orange-600 hover:bg-orange-700',
   },
 } as const;
@@ -128,11 +131,11 @@ function SeasonPassCard({ courseType }: { courseType: CourseCardType }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5 }}
-      className="bg-white border-4 border-black rounded-3xl shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] p-6 sm:p-8 h-full"
+      className="bg-white border border-slate-200 rounded-3xl shadow-[0_10px_30px_rgba(15,23,42,0.08)] p-6 sm:p-8 h-full"
     >
       <div className="flex flex-col items-center text-center h-full">
         <span
-          className={`inline-flex items-center justify-center px-4 py-2 ${theme.badgeBg} text-white font-bold text-xs uppercase tracking-wider border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rounded-lg`}
+          className={`inline-flex items-center justify-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wider ${theme.badgeTint}`}
         >
           {config.badge}
         </span>
@@ -153,9 +156,9 @@ function SeasonPassCard({ courseType }: { courseType: CourseCardType }) {
 
         <Link
           href={`/purchase/season-pass?courseType=${courseType}`}
-          className={`mt-6 w-full inline-flex items-center justify-center gap-2 ${theme.buttonBg} text-white font-black text-lg py-5 rounded-2xl border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1`}
+          className={`mt-6 w-full inline-flex items-center justify-center gap-2 ${theme.buttonBg} text-white font-semibold text-base py-3.5 rounded-xl shadow-[0_6px_16px_rgba(15,23,42,0.10)] transition-all hover:-translate-y-px`}
         >
-          Get started <ArrowRight className="w-5 h-5" />
+          Get started <ArrowRight className="w-4 h-4" />
         </Link>
         <p className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-gray-700">
           <ShieldCheck className={`w-4 h-4 ${theme.accent}`} aria-hidden />
@@ -276,12 +279,12 @@ function TrustStrip() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.45 }}
-      className="mt-10 bg-white border-4 border-black rounded-2xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] p-6 sm:p-8"
+      className="mt-10 bg-white border border-slate-200 rounded-2xl shadow-[0_10px_30px_rgba(15,23,42,0.08)] p-6 sm:p-8"
     >
       <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {TRUST_POINTS.map(({ icon: Icon, title, text }) => (
           <li key={title} className="flex items-start gap-3">
-            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border-2 border-black bg-blue-50 text-blue-600">
+            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-300 bg-blue-50 text-blue-600">
               <Icon className="h-5 w-5" aria-hidden />
             </span>
             <div className="min-w-0">
@@ -303,7 +306,7 @@ function BundleBanner() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.45 }}
-      className="mt-10 bg-yellow-50 border-4 border-black rounded-2xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+      className="mt-10 bg-yellow-50 border border-yellow-200 rounded-2xl shadow-[0_10px_30px_rgba(15,23,42,0.08)] p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
     >
       <div>
         <div className="flex items-center gap-2 mb-1">
@@ -318,7 +321,7 @@ function BundleBanner() {
       </div>
       <Link
         href="/purchase/bundle"
-        className="inline-flex items-center justify-center gap-2 bg-white border-4 border-black rounded-xl px-5 py-3 font-black text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1 whitespace-nowrap"
+        className="inline-flex items-center justify-center gap-2 bg-white border border-slate-200 rounded-xl px-5 py-3 font-black text-black shadow-[0_2px_8px_rgba(15,23,42,0.06)] hover:shadow-[0_14px_36px_rgba(15,23,42,0.12)] transition-all hover:-translate-y-1 whitespace-nowrap"
       >
         View Bundle <ArrowRight className="w-5 h-5" />
       </Link>
@@ -353,7 +356,7 @@ export function SeasonPassCourseChooser() {
 
 export function SeasonPassShowcase() {
   return (
-    <div id="season-pass" className="w-full scroll-mt-24 pt-24 sm:pt-32 pb-8 sm:pb-12">
+    <div id="season-pass" className="w-full scroll-mt-24 py-20 sm:py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 10 }}

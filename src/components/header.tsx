@@ -94,11 +94,11 @@ export function Header() {
           ? [{ label: 'Calculator Drills', href: '/ap-stats-calculator-simulator' }]
           : []),
     { label: 'Cheat Sheets', href: defaultCheatSheetUrl(displaySubject) },
-    ...(FEATURES.guidedExplainers && displaySubject === 'macro'
+    ...(FEATURES.guidedExplainers && FEATURES.showExplainersInNav && displaySubject === 'macro'
       ? [{ label: 'Explainers', href: '/ap-macro/explainers' }]
       : []),
     ...(isEconCourse(displaySubject) ? [{ label: 'Blog', href: '/ap-blog-home' }] : []),
-    ...(FEATURES.tutoring ? [{ label: 'Tutoring', href: '/tutoring' }] : []),
+    ...(FEATURES.tutoring && FEATURES.showTutoringInNav && isEconCourse(displaySubject) ? [{ label: 'Tutoring', href: '/tutoring' }] : []),
   ];
 
   const toggleMobileMenu = () => {
@@ -245,7 +245,7 @@ export function Header() {
                       >
                         Create a Quiz
                       </Link>
-                      {FEATURES.tutoring ? (
+                      {FEATURES.tutoring && FEATURES.showTutoringInNav && isEconCourse(displaySubject) ? (
                         <Link
                           href="/tutoring"
                           className={`block 2xl:hidden px-5 py-3.5 text-lg font-medium text-gray-700 hover:bg-gray-50 transition-colors ${navHoverClass}`}
@@ -317,7 +317,7 @@ export function Header() {
                 Cheat Sheets
               </Link>
 
-              {FEATURES.guidedExplainers && displaySubject === 'macro' ? (
+              {FEATURES.guidedExplainers && FEATURES.showExplainersInNav && displaySubject === 'macro' ? (
                 <Link
                   href="/ap-macro/explainers"
                   className={`whitespace-nowrap text-lg text-gray-700 transition-colors font-bold ${navHoverClass}`}
@@ -327,7 +327,7 @@ export function Header() {
               ) : null}
 
               {/* Top-level only where the bar has room; narrower desktops get it in the Practice menu. */}
-              {FEATURES.tutoring ? (
+              {FEATURES.tutoring && FEATURES.showTutoringInNav && isEconCourse(displaySubject) ? (
                 <Link
                   href="/tutoring"
                   className={`hidden 2xl:inline whitespace-nowrap text-lg text-gray-700 transition-colors font-bold ${navHoverClass}`}
@@ -356,7 +356,8 @@ export function Header() {
 
             {/* User Icon & Auth Buttons */}
             <div className="relative z-[51] flex items-center gap-3">
-              {/* Account icon — opens belt/XP dropdown */}
+              {/* Account icon — opens belt/XP dropdown (signed-in users only) */}
+              {user ? (
               <div className="flex items-center relative" ref={beltDropdownRef}>
                 {(() => {
                   const xp = user ? getSubjectXP(userData, displaySubject) : (guestXp ?? 0);
@@ -474,6 +475,7 @@ export function Header() {
                   );
                 })()}
               </div>
+              ) : null}
 
               {!user && (
                 <button

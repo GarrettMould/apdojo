@@ -1,21 +1,8 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import { macroLessonPageMetadata } from '@/lib/macroLessonMetadata';
 
-export const metadata: Metadata = {
-  title: 'Exchange Rates Deep Dive',
-  description: 'Understand exchange rates, currency appreciation, and currency depreciation. Learn how exchange rates affect international trade.',
-  openGraph: {
-    title: 'Exchange Rates Deep Dive',
-    description: 'Understand exchange rates and how currency appreciation and depreciation affect trade.',
-  },
-  alternates: {
-    canonical: 'https://apdojo.com/ap-macro/unit-6/exchange-rates',
-  },
-};
+export const metadata: Metadata = macroLessonPageMetadata('6.2');
 
-export default function ExchangeRatesDeepDiveLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return <>{children}</>;
+export default function LessonLayout({ children }: { children: React.ReactNode }) {
+  return children;
 }

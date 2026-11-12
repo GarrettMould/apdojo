@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Question, QuestionBank } from '@/data/questionBanks/types';
 import { Button } from "@/components/ui/button";
-import { Bookmark, BookmarkX, X, Clock, Maximize2, Minimize2, Calculator, Pen, Eraser, Expand, Trash2, Circle, CircleDot, Check, Lock, Brain, FileText, ChevronLeft, ChevronRight, ChevronsRight, Triangle, Strikethrough, Eye, EyeOff, Play, ChevronDown, ChevronUp, List, Pause, Play as PlayIcon, Highlighter, Copy, ArrowLeft, Sigma, LogOut } from 'lucide-react';
+import { Bookmark, BookmarkX, X, Clock, Maximize2, Minimize2, Calculator, Pen, Eraser, Expand, Trash2, Circle, CircleDot, Check, Lock, Brain, FileText, ChevronLeft, ChevronRight, ChevronsRight, Triangle, Strikethrough, Eye, EyeOff, Play, ChevronDown, ChevronUp, List, Pause, Play as PlayIcon, Highlighter, Copy, ArrowLeft, ArrowRight, Sigma, LogOut } from 'lucide-react';
 import Image, { StaticImageData } from 'next/image';
 import Link from 'next/link';
 import { redirectToCheckout } from '@/lib/stripe';
@@ -58,6 +58,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
+import { migrateLegacyAnswerIndex } from '@/data/answerOrderMigrations';
 import '@excalidraw/excalidraw/index.css';
 
 /** Set when a guest uses Save & Exit so we persist to Firestore after they sign in (same tab or post-redirect). */
@@ -256,8 +257,8 @@ function UnitTestSharePrepRow() {
   */
 
   return (
-    <div className="mt-6 border-t border-gray-200 pt-6">
-      <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-4 sm:px-5">
+    <div className="border-t border-gray-100">
+      <div className="px-6 py-4 sm:px-8">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           <div className="min-w-0 flex-1">
             <p className="text-sm font-medium text-gray-900">
@@ -403,6 +404,18 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
           ? 'text-orange-700 hover:text-orange-900'
           : 'text-violet-700 hover:text-violet-900';
 
+  const resultsRingClass =
+    examType === 'macro' ? 'text-blue-600' : examType === 'micro' ? 'text-green-600' : examType === 'stats' ? 'text-orange-500' : 'text-violet-600';
+
+  const resultsNextButtonClass =
+    examType === 'macro'
+      ? 'bg-blue-700 text-white hover:bg-blue-800'
+      : examType === 'micro'
+        ? 'bg-green-700 text-white hover:bg-green-800'
+        : examType === 'stats'
+          ? 'bg-orange-600 text-white hover:bg-orange-700'
+          : 'bg-violet-700 text-white hover:bg-violet-800';
+
   // Restore guest progress on mount (including timer)
   // This works for both guests AND logged-in users who were guests when they started the exam
   // (e.g., started as guest, signed up during purchase, then returned)
@@ -447,17 +460,36 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   // Check if this is a full MCQ exam that should have save progress functionality
   const isFullMCQExam = examNumber === 'full' && questionType === 'mcq' && !isCustomAssignment;
 
+  /**
+   * Option index for a saved answer. Newer saves carry the option text, which is matched against the
+   * current options so a reorder cannot move the answer; older saves only have a position, which
+   * `migrateLegacyAnswerIndex` adjusts for questions reordered since.
+   */
+  const restoredAnswerIndex = (questionId: number, answerData: any): number | null => {
+    const question = questions.find((q) => q.id === questionId);
+    if (typeof answerData?.selectedText === 'string' && question?.options) {
+      const byText = question.options.findIndex((o) => o === answerData.selectedText);
+      if (byText >= 0) return byText;
+    }
+    if (typeof answerData?.selectedAnswer !== 'number') return null;
+    return migrateLegacyAnswerIndex(examType, questionId, answerData.selectedAnswer);
+  };
+
   // Save unit test progress to Firestore
   const saveUnitTestProgress = async (): Promise<boolean> => {
     if (!user || !isUnitTest || showResults) return false;
     try {
       const testId = `unit_${examNumber}_${examType}`;
-      const answeredQuestions: Record<string, { selectedAnswer: number; isCorrect: boolean }> = {};
+      const answeredQuestions: Record<string, { selectedAnswer: number; selectedText?: string; isCorrect: boolean }> = {};
       Object.entries(answers).forEach(([questionId, answer]) => {
         const question = questions.find(q => q.id === parseInt(questionId));
         if (question && answer) {
+          const selectedAnswer = answer.charCodeAt(0) - 65;
+          const selectedText = question.options?.[selectedAnswer];
           answeredQuestions[questionId] = {
-            selectedAnswer: answer.charCodeAt(0) - 65,
+            selectedAnswer,
+            // Text lets a restore survive a later reorder of this question's options.
+            ...(typeof selectedText === 'string' && selectedText ? { selectedText } : {}),
             isCorrect: answer === question.correctAnswer,
           };
         }
@@ -579,9 +611,8 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
           if (savedProgress.answeredQuestions) {
             const restoredAnswers: Answers = {};
             Object.entries(savedProgress.answeredQuestions).forEach(([qIndex, answerData]: [string, any]) => {
-              if (typeof answerData.selectedAnswer === 'number') {
-                restoredAnswers[parseInt(qIndex)] = String.fromCharCode(65 + answerData.selectedAnswer);
-              }
+              const index = restoredAnswerIndex(parseInt(qIndex), answerData);
+              if (index !== null) restoredAnswers[parseInt(qIndex)] = String.fromCharCode(65 + index);
             });
             setAnswers(restoredAnswers);
           }
@@ -614,10 +645,9 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
           if (savedProgress.answeredQuestions) {
             const restoredAnswers: Answers = {};
             Object.entries(savedProgress.answeredQuestions).forEach(([qIndex, answerData]: [string, any]) => {
-              // Convert selectedAnswer (0, 1, 2, 3) back to letter format ('A', 'B', 'C', 'D')
-              if (typeof answerData.selectedAnswer === 'number') {
-                restoredAnswers[parseInt(qIndex)] = String.fromCharCode(65 + answerData.selectedAnswer);
-              }
+              // Convert the saved answer back to letter format ('A', 'B', ...)
+              const index = restoredAnswerIndex(parseInt(qIndex), answerData);
+              if (index !== null) restoredAnswers[parseInt(qIndex)] = String.fromCharCode(65 + index);
             });
             setAnswers(restoredAnswers);
           }
@@ -1111,15 +1141,17 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
     
     try {
       const testId = `full_${examType}_mcq`;
-      const answeredQuestions: Record<string, { selectedAnswer: number; isCorrect: boolean }> = {};
+      const answeredQuestions: Record<string, { selectedAnswer: number; selectedText?: string; isCorrect: boolean }> = {};
       
       // Convert answers to the format expected by TestProgress
       Object.entries(answers).forEach(([questionId, answer]) => {
         const question = questions.find(q => q.id === parseInt(questionId));
         if (question && answer) {
           const answerIndex = answer.charCodeAt(0) - 65; // Convert 'A' to 0, 'B' to 1, etc.
+          const selectedText = question.options?.[answerIndex];
           answeredQuestions[questionId] = {
             selectedAnswer: answerIndex,
+            ...(typeof selectedText === 'string' && selectedText ? { selectedText } : {}),
             isCorrect: answer === question.correctAnswer
           };
         }
@@ -3025,8 +3057,8 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
             ) : (() => {
               const resultsInner = (
                 <>
-            {/* Compact results summary (title lives outside this card on unit tests & full exam column) */}
-            {showResults && showFullResults && (
+            {/* Compact results summary (unit tests show the results card above instead) */}
+            {showResults && showFullResults && !isUnitTest && (
               <div
                 className={`rounded-2xl bg-white p-5 md:p-6 ${
                   isUnitTest ? 'border border-gray-200 shadow-sm' : 'border border-slate-200 shadow-sm'
@@ -3339,81 +3371,117 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
               return isUnitTest ? (
                 <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 py-6 pb-24 space-y-10 sm:space-y-12">
                   {showResults && showFullResults ? (
-                    <div className="px-1 pt-4 pb-0 sm:px-2 sm:pt-8 sm:pb-0 md:pt-10 md:pb-0">
-                      <h1 className="text-4xl font-black leading-[1.05] tracking-tight text-black sm:text-5xl md:text-6xl">
-                        Assessment Results
-                      </h1>
-                      {unitTestResultsSubtitle ? (
-                        <p className="mt-3 text-base font-semibold text-gray-600 sm:text-lg">
-                          {unitTestResultsSubtitle.subjectLabel} · Unit {unitTestResultsSubtitle.unitNumber}
-                          {unitTestResultsSubtitle.unitName ? (
-                            <>
-                              <span className="text-gray-400"> · </span>
-                              {unitTestResultsSubtitle.unitName}
-                            </>
-                          ) : null}
-                        </p>
-                      ) : null}
-                      {unitTestResultsSubtitle ? (
-                        <div className="mt-5 w-full rounded-xl border-2 border-black bg-white px-4 py-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:px-5 sm:py-5">
-                          {percentScore < 80 ? (
-                            <>
-                              <p className="text-base font-bold text-gray-900 sm:text-lg">
-                                Ready to improve your Unit {unitTestResultsSubtitle.unitNumber} performance? Let&apos;s do this!
-                              </p>
-                              <Link
-                                href={unitTestResultsSubtitle.cheatSheetHref}
-                                className={`mt-2 inline-flex items-center gap-1 text-sm font-black underline underline-offset-2 sm:text-base ${resultsBackLinkClass}`}
-                              >
-                                Review the Unit {unitTestResultsSubtitle.unitNumber} cheat sheet →
-                              </Link>
-                            </>
-                          ) : (
-                            <>
-                              <p className="text-base font-bold text-gray-900 sm:text-lg">
-                                {unitTestCongratsPhrase}{' '}
-                                {isUnitFrqPackAvailable(examType, unitTestResultsSubtitle.unitNumber) &&
-                                unitFrqHasResult === false
-                                  ? `Ready to tackle the FRQ section of Unit ${unitTestResultsSubtitle.unitNumber}?`
-                                  : isUnitMcqTestAvailable(examType, unitTestResultsSubtitle.unitNumber + 1)
-                                    ? `Ready for Unit ${unitTestResultsSubtitle.unitNumber + 1}?`
-                                    : 'Great work — keep the momentum going!'}
-                              </p>
-                              {isUnitFrqPackAvailable(examType, unitTestResultsSubtitle.unitNumber) &&
-                              unitFrqHasResult === false ? (
-                                <Link
-                                  href={getUnitTestPreviewUrl(
-                                    unitTestResultsSubtitle.unitNumber,
-                                    examType,
-                                    'frq'
-                                  )}
-                                  className={`mt-2 inline-flex items-center gap-1 text-sm font-black underline underline-offset-2 sm:text-base ${resultsBackLinkClass}`}
-                                >
-                                  Start Unit {unitTestResultsSubtitle.unitNumber} FRQ Pack →
-                                </Link>
-                              ) : unitFrqHasResult !== null &&
-                                isUnitMcqTestAvailable(examType, unitTestResultsSubtitle.unitNumber + 1) ? (
-                                <Link
-                                  href={getUnitTestPreviewUrl(
-                                    unitTestResultsSubtitle.unitNumber + 1,
-                                    examType,
-                                    'mcq'
-                                  )}
-                                  className={`mt-2 inline-flex items-center gap-1 text-sm font-black underline underline-offset-2 sm:text-base ${resultsBackLinkClass}`}
-                                >
-                                  View Unit {unitTestResultsSubtitle.unitNumber + 1} test →
-                                </Link>
-                              ) : user?.uid &&
-                                isUnitFrqPackAvailable(examType, unitTestResultsSubtitle.unitNumber) &&
-                                unitFrqHasResult === null ? (
-                                <p className="mt-2 text-sm font-semibold text-gray-500">Checking your progress…</p>
-                              ) : null}
-                            </>
-                          )}
-                        </div>
-                      ) : null}
+                    <div className="pt-2 sm:pt-6">
+                      {(() => {
+                        const unitNumber = unitTestResultsSubtitle?.unitNumber ?? null;
+                        let message: string | null = null;
+                        let cta: { href: string; label: string } | null = null;
+                        let checking = false;
+                        if (unitTestResultsSubtitle && unitNumber !== null) {
+                          const frqPackPending =
+                            isUnitFrqPackAvailable(examType, unitNumber) && unitFrqHasResult === false;
+                          const nextUnitReady = isUnitMcqTestAvailable(examType, unitNumber + 1);
+                          if (percentScore < 80) {
+                            message = `Review the Unit ${unitNumber} key ideas, then take the test again.`;
+                            cta = { href: unitTestResultsSubtitle.cheatSheetHref, label: `Unit ${unitNumber} cheat sheet` };
+                          } else if (frqPackPending) {
+                            message = `Ready to tackle the Unit ${unitNumber} free-response questions?`;
+                            cta = { href: getUnitTestPreviewUrl(unitNumber, examType, 'frq'), label: `Start Unit ${unitNumber} FRQ pack` };
+                          } else if (nextUnitReady) {
+                            message = `Ready for Unit ${unitNumber + 1}?`;
+                            if (unitFrqHasResult !== null) {
+                              cta = { href: getUnitTestPreviewUrl(unitNumber + 1, examType, 'mcq'), label: `Unit ${unitNumber + 1} test` };
+                            } else if (user?.uid && isUnitFrqPackAvailable(examType, unitNumber)) {
+                              checking = true;
+                            }
+                          } else {
+                            message = 'Keep the momentum going with another unit.';
+                          }
+                        }
+                        const verdict =
+                          percentScore >= 80
+                            ? `${unitTestCongratsPhrase || 'Great work!'} You know this unit well.`
+                            : percentScore >= 60
+                              ? 'Solid work. A little review will push this higher.'
+                              : 'A good starting point. Review, then try again.';
+                        const ringRadius = 52;
+                        const ringLength = 2 * Math.PI * ringRadius;
+                        const ringOffset = ringLength * (1 - Math.max(0, Math.min(100, percentScore)) / 100);
+                        return (
+                          <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
+                            <div className="flex flex-col-reverse gap-6 p-6 sm:flex-row sm:items-center sm:justify-between sm:gap-10 sm:p-8">
+                              <div className="min-w-0">
+                                <p className={`text-sm font-semibold ${resultsBackLinkClass}`}>
+                                  {unitTestResultsSubtitle
+                                    ? `${unitTestResultsSubtitle.subjectLabel} · Unit ${unitTestResultsSubtitle.unitNumber} test`
+                                    : 'Unit test'}
+                                </p>
+                                <h1 className="mt-1 text-3xl font-bold leading-tight tracking-tight text-gray-950 sm:text-4xl">
+                                  {unitTestResultsSubtitle?.unitName || 'Your results'}
+                                </h1>
+                                <p className="mt-3 text-base leading-relaxed text-gray-600">{verdict}</p>
+                                <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-gray-600">
+                                  <span>
+                                    <span className="font-semibold tabular-nums text-gray-950">{correctAnswersCount}</span> of{' '}
+                                    <span className="tabular-nums">{totalQuestionsCount}</span> correct
+                                  </span>
+                                  <span className="inline-flex items-center gap-1.5">
+                                    <Image src="/images/flame100.png" alt="" width={16} height={16} className="h-4 w-4" />
+                                    <span className="font-semibold tabular-nums text-gray-950">+{earnedXp}</span> XP
+                                  </span>
+                                </div>
+                              </div>
+                              <div className={`relative h-32 w-32 shrink-0 sm:h-36 sm:w-36 ${resultsRingClass}`}>
+                                <svg viewBox="0 0 120 120" className="h-full w-full -rotate-90" aria-hidden>
+                                  <circle cx="60" cy="60" r={ringRadius} fill="none" strokeWidth="10" className="stroke-gray-100" />
+                                  <circle
+                                    cx="60"
+                                    cy="60"
+                                    r={ringRadius}
+                                    fill="none"
+                                    strokeWidth="10"
+                                    strokeLinecap="round"
+                                    stroke="currentColor"
+                                    strokeDasharray={ringLength}
+                                    strokeDashoffset={ringOffset}
+                                    className="transition-[stroke-dashoffset] duration-700"
+                                  />
+                                </svg>
+                                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                  <span className="text-3xl font-bold tabular-nums tracking-tight text-gray-950 sm:text-4xl">
+                                    {percentScore}%
+                                  </span>
+                                  <span className="text-xs font-medium text-gray-500">score</span>
+                                </div>
+                              </div>
+                            </div>
+                            {message ? (
+                              <div className="flex flex-col gap-4 border-t border-gray-100 bg-gray-50/70 px-6 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+                                <div className="min-w-0">
+                                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-gray-500">
+                                    {percentScore < 80 ? 'Keep practicing' : 'Next step'}
+                                  </p>
+                                  <p className="mt-0.5 text-base font-semibold text-gray-900">{message}</p>
+                                </div>
+                                {cta ? (
+                                  <Link
+                                    href={cta.href}
+                                    className={`group inline-flex shrink-0 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors ${resultsNextButtonClass}`}
+                                  >
+                                    {cta.label}
+                                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
+                                  </Link>
+                                ) : checking ? (
+                                  <p className="shrink-0 text-sm font-medium text-gray-500">Checking your progress…</p>
+                                ) : null}
+                              </div>
+                            ) : null}
+                            <UnitTestSharePrepRow />
+                          </section>
+                        );
+                      })()}
                       {FEATURES.guidedExplainers && missedGuidedLessons.length > 0 ? (
-                        <div className="mt-5 w-full rounded-xl border-2 border-black bg-white px-4 py-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] sm:px-5 sm:py-5">
+                        <div className="mt-4 w-full rounded-2xl border border-gray-200 bg-white p-5 sm:p-6">
                           <p className="text-base font-bold text-gray-900 sm:text-lg">Review these lessons</p>
                           <p className="mt-1 text-sm text-gray-600">
                             Each explainer walks through the idea behind the questions you missed.
@@ -3451,9 +3519,12 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                       ) : null}
                     </div>
                   ) : null}
-                  <div className="rounded-2xl border-2 border-black bg-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
-                    <div className="p-4 sm:p-6 space-y-8 w-full">{resultsInner}</div>
-                  </div>
+                  <section>
+                    {showResults && showFullResults ? (
+                      <h2 className="mb-4 text-xl font-semibold tracking-tight text-gray-950">Review your answers</h2>
+                    ) : null}
+                    <div className="w-full space-y-6">{resultsInner}</div>
+                  </section>
                 </div>
               ) : (
                 <div className="space-y-8 max-w-4xl mx-auto w-full">

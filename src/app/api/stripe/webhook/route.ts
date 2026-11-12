@@ -30,8 +30,10 @@ export async function POST(req: Request) {
       const { userId, unitIds, examId } = paymentIntent.metadata;
       
       if (!userId) {
-        console.error(`Webhook Error: Missing userId for payment intent ${paymentIntent.id}`);
-        return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
+        // Not an AP Dojo unit/exam purchase (e.g. a Cal.com tutoring payment or a Checkout-created
+        // intent handled under checkout.session.completed). Acknowledge so Stripe doesn't retry.
+        console.log(`Ignoring payment intent ${paymentIntent.id}: no AP Dojo userId in metadata`);
+        return NextResponse.json({ received: true, ignored: true });
       }
 
       try {

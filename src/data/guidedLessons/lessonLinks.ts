@@ -4,6 +4,7 @@ import { macroUnit2GuidedLessons } from './macroUnit2';
 import { macroUnit3GuidedLessons } from './macroUnit3';
 import { macroUnit4GuidedLessons } from './macroUnit4';
 import { macroUnit5GuidedLessons } from './macroUnit5';
+import { macroUnit6GuidedLessons } from './macroUnit6';
 import type { GuidedLessonContent } from './types';
 
 /**
@@ -16,6 +17,7 @@ export const MACRO_GUIDED_LESSONS: GuidedLessonContent[] = [
   ...macroUnit3GuidedLessons,
   ...macroUnit4GuidedLessons,
   ...macroUnit5GuidedLessons,
+  ...macroUnit6GuidedLessons,
 ];
 
 export function guidedLessonHref(content: GuidedLessonContent): string {

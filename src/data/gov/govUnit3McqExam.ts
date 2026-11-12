@@ -307,12 +307,12 @@ export const govUnit3McqTestQuestions: Question[] = [
       alt: 'Line graph showing public support for legal recognition of same-sex marriage over time',
     },
     options: [
-      'The Supreme Court\'s use of the Due Process and Equal Protection Clauses to strike down laws restricting same-sex relationships reflected and reinforced a broader shift in public attitudes toward equal treatment under the law.',
-      'The Supreme Court\'s decision in Engel v. Vitale expanded the right to privacy to include personal relationship choices and required states to recognize same-sex marriages on that basis alone.',
       'Congress passed the Defense of Marriage Act in 1996, which accelerated public support for same-sex marriage by drawing national attention to the issue.',
+      'The Supreme Court\'s decision in Engel v. Vitale expanded the right to privacy to include personal relationship choices and required states to recognize same-sex marriages on that basis alone.',
+      'The Supreme Court\'s use of the Due Process and Equal Protection Clauses to strike down laws restricting same-sex relationships reflected and reinforced a broader shift in public attitudes toward equal treatment under the law.',
       'The incorporation of the First Amendment\'s free exercise clause to the states required state governments to recognize same-sex marriages performed in other states.',
     ],
-    correctAnswer: 'A',
+    correctAnswer: 'C',
     explanation:
       'Judicial decisions like Obergefell v. Hodges used the Due Process and Equal Protection clauses to protect marriage rights, mirroring and encouraging the trend of increasing public acceptance for equality.',
   },

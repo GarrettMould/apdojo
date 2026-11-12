@@ -1,21 +1,8 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import { macroLessonPageMetadata } from '@/lib/macroLessonMetadata';
 
-export const metadata: Metadata = {
-  title: 'Short-Run Aggregate Supply (SRAS) Deep Dive: Understanding Short-Run Production',
-  description: 'Master Short-Run Aggregate Supply (SRAS) and understand how firms respond to price level changes in the short run. Learn about the SRAS curve and its determinants.',
-  openGraph: {
-    title: 'Short-Run Aggregate Supply (SRAS) Deep Dive: Understanding Short-Run Production',
-    description: 'Master Short-Run Aggregate Supply (SRAS) and understand how firms respond to price level changes in the short run.',
-  },
-  alternates: {
-    canonical: 'https://apdojo.com/ap-macro/unit-3/short-run-aggregate-supply',
-  },
-};
+export const metadata: Metadata = macroLessonPageMetadata('3.3');
 
-export default function ShortRunAggregateSupplyDeepDiveLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return <>{children}</>;
+export default function LessonLayout({ children }: { children: React.ReactNode }) {
+  return children;
 }

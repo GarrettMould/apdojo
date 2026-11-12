@@ -1,21 +1,8 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import { macroLessonPageMetadata } from '@/lib/macroLessonMetadata';
 
-export const metadata: Metadata = {
-  title: 'The Money Market Deep Dive: Understanding Money Supply and Demand',
-  description: 'Master the money market model. Learn how the supply and demand for money determine the equilibrium interest rate and how changes affect the economy.',
-  openGraph: {
-    title: 'The Money Market Deep Dive: Understanding Money Supply and Demand',
-    description: 'Master the money market model and how supply and demand for money determine interest rates.',
-  },
-  alternates: {
-    canonical: 'https://apdojo.com/ap-macro/unit-4/money-market',
-  },
-};
+export const metadata: Metadata = macroLessonPageMetadata('4.5');
 
-export default function MoneyMarketDeepDiveLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return <>{children}</>;
+export default function LessonLayout({ children }: { children: React.ReactNode }) {
+  return children;
 }

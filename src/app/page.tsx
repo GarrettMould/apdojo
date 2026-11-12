@@ -2,7 +2,7 @@
 
 import { useAuthContext } from "@/contexts/AuthContext";
 import { CourseProvider } from "@/contexts/CourseContext";
-import { SeasonPassHome } from "@/components/seasonPassHome";
+import { SeasonPassHomeNew } from "@/components/home/SeasonPassHomeNew";
 import dynamic from "next/dynamic";
 
 function HomePageLoadingFallback() {
@@ -47,7 +47,7 @@ function Home() {
     );
   }
 
-  return <SeasonPassHome />;
+  return <SeasonPassHomeNew />;
 }
 
 export default Home;

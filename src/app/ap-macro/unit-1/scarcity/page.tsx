@@ -1,5 +1,6 @@
-import { RegisteredLessonDeepDive } from '@/components/RegisteredLessonDeepDive';
+import { MacroLessonRoute } from '@/components/guidedLesson/MacroLessonRoute';
+import LegacyLesson from './legacy';
 
-export default function ScarcityPage() {
-  return <RegisteredLessonDeepDive subject="ap-macro" unit="1" slug="scarcity" />;
+export default function Page() {
+  return <MacroLessonRoute lessonId="1.1" legacy={<LegacyLesson />} />;
 }

@@ -1,21 +1,8 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import { macroLessonPageMetadata } from '@/lib/macroLessonMetadata';
 
-export const metadata: Metadata = {
-  title: 'Government Deficits and the National Debt Deep Dive',
-  description: 'Understand the difference between budget deficits and national debt, and how government borrowing affects interest rates and private investment.',
-  openGraph: {
-    title: 'Government Deficits and the National Debt Deep Dive',
-    description: 'Understand budget deficits, national debt, and their economic consequences.',
-  },
-  alternates: {
-    canonical: 'https://apdojo.com/ap-macro/unit-5/government-deficits-national-debt',
-  },
-};
+export const metadata: Metadata = macroLessonPageMetadata('5.4');
 
-export default function GovernmentDeficitsNationalDebtDeepDiveLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return <>{children}</>;
+export default function LessonLayout({ children }: { children: React.ReactNode }) {
+  return children;
 }

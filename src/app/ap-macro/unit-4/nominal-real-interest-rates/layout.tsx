@@ -1,21 +1,8 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import { macroLessonPageMetadata } from '@/lib/macroLessonMetadata';
 
-export const metadata: Metadata = {
-  title: 'Nominal vs. Real Interest Rates Deep Dive: Understanding Interest Rates and Inflation',
-  description: 'Master the difference between nominal and real interest rates. Learn how to calculate real rates and understand the Fisher Effect.',
-  openGraph: {
-    title: 'Nominal vs. Real Interest Rates Deep Dive: Understanding Interest Rates and Inflation',
-    description: 'Master the difference between nominal and real interest rates and how inflation affects them.',
-  },
-  alternates: {
-    canonical: 'https://apdojo.com/ap-macro/unit-4/nominal-real-interest-rates',
-  },
-};
+export const metadata: Metadata = macroLessonPageMetadata('4.2');
 
-export default function NominalRealInterestRatesDeepDiveLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return <>{children}</>;
+export default function LessonLayout({ children }: { children: React.ReactNode }) {
+  return children;
 }

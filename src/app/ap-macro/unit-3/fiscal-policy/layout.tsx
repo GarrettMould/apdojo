@@ -1,21 +1,8 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import { macroLessonPageMetadata } from '@/lib/macroLessonMetadata';
 
-export const metadata: Metadata = {
-  title: 'Fiscal Policy Deep Dive: Understanding Government Spending and Taxation',
-  description: 'Master fiscal policy and understand how government spending and taxation affect aggregate demand, economic output, and price levels. Learn about expansionary and contractionary fiscal policy.',
-  openGraph: {
-    title: 'Fiscal Policy Deep Dive: Understanding Government Spending and Taxation',
-    description: 'Master fiscal policy and understand how government spending and taxation affect aggregate demand and economic output.',
-  },
-  alternates: {
-    canonical: 'https://apdojo.com/ap-macro/unit-3/fiscal-policy',
-  },
-};
+export const metadata: Metadata = macroLessonPageMetadata('3.8');
 
-export default function FiscalPolicyDeepDiveLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return <>{children}</>;
+export default function LessonLayout({ children }: { children: React.ReactNode }) {
+  return children;
 }

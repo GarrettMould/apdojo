@@ -9,6 +9,7 @@ import { keyTerms as allContentKeyTerms, whiteboardImages as allContentWhiteboar
 import { macroUnits as allMacroUnits, microUnits as allMicroUnits, govUnits as allGovUnits, statsUnits as allStatsUnits } from '@/data/cheatSheets';
 import { useAuthContext } from '@/contexts/AuthContext';
 import Link from 'next/link';
+import { macroLessonHref } from '@/data/macroLessonPages';
 import { keyTerms as apMacroTerms } from '@/data/apMacroTerms';
 import { keyTerms as apMicroTerms } from '@/data/apMicroTerms';
 import { keyTerms as apGovTerms, govUnitSupremeCourtCases } from '@/data/apGovTerms';
@@ -639,6 +640,8 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
   /** `/ap-macro-unit-N-cheat-sheet` and `/ap-micro-unit-N-cheat-sheet` entry promo (not `/unit/N`). */
   const [entrySeasonPassPromoVisible, setEntrySeasonPassPromoVisible] = useState(false);
   const [entrySeasonPassPromoDismissed, setEntrySeasonPassPromoDismissed] = useState(false);
+  /** Phones get a slim bottom banner instead of the full-screen offer (Google penalises covering popups on mobile). */
+  const [entrySeasonPassPromoAsBanner, setEntrySeasonPassPromoAsBanner] = useState(false);
   const [unitMcqAnsweredIds, setUnitMcqAnsweredIds] = useState<Set<number>>(new Set());
   const [chatPromptText, setChatPromptText] = useState<string>('');
   const [chatPromptDisplayText, setChatPromptDisplayText] = useState<string>('');
@@ -654,7 +657,8 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
     !entrySeasonPassPromoDismissed &&
     !(userData && hasValidSeasonPass(userData));
 
-  // Season Pass entry modal: 5s delay on pretty cheat sheet URLs (once per tab for any cheat sheet; never for premium).
+  // Season Pass entry offer on pretty cheat sheet URLs: shown once the student has scrolled through a good
+  // part of the sheet (not on arrival), once per tab for any cheat sheet, never for premium.
   useEffect(() => {
     if (!isPrettyCheatSheetRoute) {
       setEntrySeasonPassPromoVisible(false);
@@ -666,15 +670,23 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
     if (user && loadingUserData) return;
     if (userData && hasValidSeasonPass(userData)) return;
 
-    const delayMs = 5000;
-    const timer = window.setTimeout(() => {
+    // The sheet scrolls inside a panel, not the window, so listen in the capture phase and measure
+    // whichever element scrolled. Small scrollers (chat, menus) are ignored.
+    const SCROLL_SHARE = 0.4;
+    const onScroll = (event: Event) => {
+      const el =
+        event.target instanceof HTMLElement ? event.target : document.scrollingElement ?? document.documentElement;
+      if (el.scrollHeight < 2000) return;
+      const scrollable = el.scrollHeight - el.clientHeight;
+      if (scrollable <= 0 || el.scrollTop / scrollable < SCROLL_SHARE) return;
+      document.removeEventListener('scroll', onScroll, true);
       if (prettyCheatSheetEntryModalAlreadyShown()) return;
-      if (userData && hasValidSeasonPass(userData)) return;
       markPrettyCheatSheetEntryModalShown();
+      setEntrySeasonPassPromoAsBanner(window.innerWidth < 640);
       setEntrySeasonPassPromoVisible(true);
-    }, delayMs);
-
-    return () => window.clearTimeout(timer);
+    };
+    document.addEventListener('scroll', onScroll, { capture: true, passive: true });
+    return () => document.removeEventListener('scroll', onScroll, true);
   }, [isPrettyCheatSheetRoute, loading, loadingUserData, user, userData]);
 
   // Reset unit MCQ count when switching unit or subject
@@ -726,7 +738,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
       showPacketSeasonPassModal ||
       showShuffleLimitModal ||
       showJoinDojoModal ||
-      showEntrySeasonPassPromo ||
+      (showEntrySeasonPassPromo && !entrySeasonPassPromoAsBanner) ||
       scrollPopupVisible ||
       shuffleModalOpen ||
       showFullscreen ||
@@ -742,6 +754,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
     showShuffleLimitModal,
     showJoinDojoModal,
     showEntrySeasonPassPromo,
+    entrySeasonPassPromoAsBanner,
     showScrollPopup,
     shuffleModalOpen,
     showFullscreen,
@@ -2767,6 +2780,7 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                     <React.Fragment key={lessonId}>
                       <div id={`lesson-${lessonId.replace('.', '-')}`} className="space-y-8 scroll-mt-24">
               {/* Lesson Header — drag into study bucket to quiz the whole lesson */}
+              <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2 border-b border-gray-200 pb-2">
               <h2
                 draggable
                 onDragStart={(e) => {
@@ -2780,10 +2794,24 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
                   });
                 }}
                 title="Drag into the study bucket to quiz this whole lesson"
-                className="cursor-grab text-2xl font-bold text-gray-800 pb-2 border-b border-gray-200 active:cursor-grabbing"
+                className="cursor-grab text-2xl font-bold text-gray-800 active:cursor-grabbing"
               >
                 {lessonId}{lessonName ? ` - ${lessonName}` : ''}
               </h2>
+              {(() => {
+                const lessonHref = selectedSubject === 'macro' ? macroLessonHref(lessonId) : null;
+                if (!lessonHref) return null;
+                return (
+                  <Link
+                    href={lessonHref}
+                    className="group mb-1 inline-flex shrink-0 items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1 text-sm font-semibold text-gray-700 transition-colors hover:border-gray-900 hover:text-gray-900"
+                  >
+                    Full lesson
+                    <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                  </Link>
+                );
+              })()}
+              </div>
 
               {/* Lesson Video — compact, alternates left/right with title + blurb beside */}
               {(() => {
@@ -3282,6 +3310,45 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
               </>
           ))()}
         </div>
+
+        {/* Lesson pages for this unit (AP Macro) */}
+        {(() => {
+          if (selectedSubject !== 'macro') return null;
+          const unitLessons = sortedLessons.flatMap(({ lessonId }) => {
+            const href = macroLessonHref(lessonId);
+            return href ? [{ lessonId, href, name: getLessonName(lessonId) }] : [];
+          });
+          if (unitLessons.length === 0) return null;
+          return (
+            <section aria-labelledby="unit-lessons-heading" className="mt-16 rounded-2xl border border-gray-200 bg-gray-50/60 p-5 sm:p-8">
+              <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Go deeper</p>
+              <h2 id="unit-lessons-heading" className="mt-1 text-2xl font-black tracking-tight text-gray-900">
+                Unit {activeUnitNum} lessons
+              </h2>
+              <p className="mt-1.5 max-w-2xl text-sm text-gray-600">
+                A full lesson on each topic: the video, the key ideas walked through, and practice to check yourself.
+              </p>
+              <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {unitLessons.map(({ lessonId, href, name }) => (
+                  <li key={lessonId}>
+                    <Link
+                      href={href}
+                      className="group flex h-full items-center gap-4 rounded-xl border border-gray-200 bg-white p-4 transition-all hover:-translate-y-0.5 hover:border-gray-300 hover:shadow-sm"
+                    >
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gray-900 text-sm font-bold tabular-nums text-white">
+                        {lessonId}
+                      </span>
+                      <span className="min-w-0 flex-1 text-[15px] font-semibold leading-snug text-gray-900">
+                        {name || `Lesson ${lessonId}`}
+                      </span>
+                      <ArrowRight className="h-4 w-4 shrink-0 text-gray-400 transition-all group-hover:translate-x-0.5 group-hover:text-gray-900" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          );
+        })()}
 
         {/* Unit Navigation - Previous/Next Buttons */}
         {(() => {
@@ -4620,7 +4687,35 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
         )}
       </AnimatePresence>
 
-      {showEntrySeasonPassPromo && (propSubject === 'macro' || propSubject === 'micro') && (
+      {showEntrySeasonPassPromo && entrySeasonPassPromoAsBanner && (propSubject === 'macro' || propSubject === 'micro') && (
+        <div
+          role="region"
+          aria-label="Season Pass offer"
+          className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 shadow-[0_-8px_24px_rgba(15,23,42,0.08)] backdrop-blur"
+        >
+          <div className="mx-auto flex max-w-xl items-center gap-3">
+            <p className="min-w-0 flex-1 text-sm leading-snug text-gray-700">
+              <span className="font-semibold text-gray-900">Aiming for a 5?</span> Practice exams, AI-graded FRQs and every video with the AP {propSubject === 'macro' ? 'Macro' : 'Micro'} Season Pass.
+            </p>
+            <Link
+              href={`/purchase/season-pass?courseType=${propSubject}`}
+              className="shrink-0 rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+            >
+              See it
+            </Link>
+            <button
+              type="button"
+              aria-label="Dismiss"
+              onClick={() => setEntrySeasonPassPromoDismissed(true)}
+              className="-mr-1 shrink-0 rounded-md p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showEntrySeasonPassPromo && !entrySeasonPassPromoAsBanner && (propSubject === 'macro' || propSubject === 'micro') && (
         <SeasonPassEntryWideModal
           subject={propSubject}
           onClose={() => {

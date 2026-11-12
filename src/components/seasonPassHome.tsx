@@ -14,11 +14,13 @@ import { SeasonPassShowcase } from '@/components/SeasonPassShowcase';
 import { HomeDojoDrills } from '@/components/HomeDojoDrills';
 import { HeroSection } from '@/components/HeroSection';
 import { HomeSocialProofSection } from '@/components/HomeSocialProofSection';
+import { TutoringPromo } from '@/components/tutoring/TutoringPromo';
+import { useAuthContext } from '@/contexts/AuthContext';
 import dynamic from 'next/dynamic';
 
 const QuestionListSection = dynamic(
   () => import('./HomeQuestionList').then((m) => m.QuestionListSection),
-  { loading: () => <div className="bg-gray-50 py-16 sm:py-24" /> }
+  { loading: () => <div className="py-20 sm:py-24" /> }
 );
 
 interface FeatureItem {
@@ -46,24 +48,46 @@ const microFeatures: FeatureItem[] = [
   { icon: <Award className="w-5 h-5" />, text: 'Full Practice Tests' },
 ];
 
+/** One homepage section: alternating white / light-grey background with a hairline on top. */
+function HomeBand({ tint = false, children }: { tint?: boolean; children: React.ReactNode }) {
+  return <div className={`border-t border-slate-200/70 ${tint ? 'bg-slate-50' : 'bg-white'}`}>{children}</div>;
+}
+
 export function SeasonPassHome() {
+  const { selectedSubject } = useAuthContext();
+  const showTutoring = selectedSubject === 'macro' || selectedSubject === 'micro';
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-white">
       <HeroSection />
 
       {/* Social proof section (reviews) */}
-      <HomeSocialProofSection />
+      <HomeBand tint>
+        <HomeSocialProofSection />
+      </HomeBand>
 
       {/* Season Pass Showcase */}
-      <SeasonPassShowcase />
+      <HomeBand>
+        <SeasonPassShowcase />
+      </HomeBand>
+
+      {/* 1-on-1 tutoring (AP Macro and Micro only) */}
+      {showTutoring ? (
+        <HomeBand tint>
+          <TutoringPromo variant="band" course={selectedSubject} placement="home_logged_out" />
+        </HomeBand>
+      ) : null}
 
       {/* Home Dojo Drills Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 sm:pt-12 pb-16 sm:pb-24">
-        <HomeDojoDrills />
-      </div>
+      <HomeBand tint={!showTutoring}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-24">
+          <HomeDojoDrills />
+        </div>
+      </HomeBand>
 
       {/* Question List Section */}
-      <QuestionListSection />
+      <HomeBand tint={showTutoring}>
+        <QuestionListSection />
+      </HomeBand>
     </div>
   );
 }

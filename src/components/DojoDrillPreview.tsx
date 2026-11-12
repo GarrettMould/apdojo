@@ -18,6 +18,8 @@ interface DojoDrillPreviewProps {
   buttonText?: string; // Optional custom button text
   comingSoon?: boolean; // If true, show "Coming Soon" with lock icon
   onReset?: () => void; // Optional reset handler
+  /** Lighter card (thin border, soft shadow, normal-case title) for the logged-out homepage. */
+  soft?: boolean;
 }
 
 const learningPathItems = [
@@ -37,6 +39,7 @@ function DojoDrillPreview({
   buttonText,
   comingSoon = false,
   onReset,
+  soft = false,
 }: DojoDrillPreviewProps) {
   // Check if all stages are completed
   const isCompleted = progress?.stage1 && progress?.stage2 && progress?.stage3;
@@ -49,19 +52,28 @@ function DojoDrillPreview({
     : (buttonText || (isCompleted ? 'Restart Drill' : (isInProgress ? 'Resume Drill' : (isLocked ? 'Locked (Season Pass)' : 'Start Drill'))));
   
   return (
-    <div className="bg-white border-4 border-black rounded-3xl shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] p-8 sm:p-12 flex flex-col h-full"
+    <div
+      className={`flex h-full flex-col rounded-3xl bg-white p-8 sm:p-12 ${
+        soft
+          ? 'border border-slate-200 shadow-[0_10px_30px_rgba(15,23,42,0.08)]'
+          : 'border-4 border-black shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]'
+      }`}
     >
       {/* Header Section */}
       <div className="mb-6">
         {/* Massive Title */}
-        <h2 className="text-4xl font-black uppercase tracking-tighter text-gray-900 mb-3">
+        <h2
+          className={`mb-3 text-gray-900 ${
+            soft ? 'text-3xl font-extrabold tracking-tight' : 'text-4xl font-black uppercase tracking-tighter'
+          }`}
+        >
           {title}
         </h2>
         
         {/* Meta Row */}
         <div className="flex items-center gap-3 mb-4">
           {/* XP Badge */}
-          <div className="bg-yellow-400 border-2 border-black rounded-full px-3 py-1">
+          <div className={`rounded-full bg-yellow-400 px-3 py-1 ${soft ? '' : 'border-2 border-black'}`}>
             <span className="text-sm font-bold text-gray-900">
               {xpReward} XP
             </span>

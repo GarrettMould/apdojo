@@ -1,21 +1,8 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import { macroLessonPageMetadata } from '@/lib/macroLessonMetadata';
 
-export const metadata: Metadata = {
-  title: 'Real Interest Rates and International Capital Flows Deep Dive',
-  description: 'Understand how real interest rates affect international capital flows and exchange rates. Learn the connection between interest rates, currency values, and net exports.',
-  openGraph: {
-    title: 'Real Interest Rates and International Capital Flows Deep Dive',
-    description: 'Understand how real interest rates affect international capital flows and exchange rates.',
-  },
-  alternates: {
-    canonical: 'https://apdojo.com/ap-macro/unit-6/real-interest-rates-international-capital-flows',
-  },
-};
+export const metadata: Metadata = macroLessonPageMetadata('6.6');
 
-export default function RealInterestRatesInternationalCapitalFlowsDeepDiveLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return <>{children}</>;
+export default function LessonLayout({ children }: { children: React.ReactNode }) {
+  return children;
 }

@@ -1,21 +1,8 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import { macroLessonPageMetadata } from '@/lib/macroLessonMetadata';
 
-export const metadata: Metadata = {
-  title: 'Economic Growth Deep Dive',
-  description: 'Understand the sources of economic growth and how increases in resources, technology, and institutions shift the LRAS curve to increase potential output.',
-  openGraph: {
-    title: 'Economic Growth Deep Dive',
-    description: 'Understand the sources of economic growth and how they increase potential output.',
-  },
-  alternates: {
-    canonical: 'https://apdojo.com/ap-macro/unit-5/economic-growth',
-  },
-};
+export const metadata: Metadata = macroLessonPageMetadata('5.6');
 
-export default function EconomicGrowthDeepDiveLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return <>{children}</>;
+export default function LessonLayout({ children }: { children: React.ReactNode }) {
+  return children;
 }

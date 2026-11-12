@@ -1,5 +1,6 @@
-import { RegisteredLessonDeepDive } from '@/components/RegisteredLessonDeepDive';
+import { MacroLessonRoute } from '@/components/guidedLesson/MacroLessonRoute';
+import LegacyLesson from './legacy';
 
-export default function MarketEquilibriumPage() {
-  return <RegisteredLessonDeepDive subject="ap-macro" unit="1" slug="market-equilibrium" />;
+export default function Page() {
+  return <MacroLessonRoute lessonId="1.6" legacy={<LegacyLesson />} />;
 }

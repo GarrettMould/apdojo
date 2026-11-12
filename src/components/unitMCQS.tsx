@@ -106,6 +106,16 @@ interface UnitMCQSProps {
   /** Increment to toggle the exam-style formula sheet (Stats only). */
   formulaToggleSignal?: number;
   onFormulaActiveChange?: (active: boolean) => void;
+  /** Tints the question card (golden question or redemption round). */
+  questionTone?: 'gold' | 'redeem' | 'missed' | null;
+  /** Plays a pop (correct) or shake (incorrect) on the question card once it is answered. */
+  answerFeedback?: 'correct' | 'incorrect' | null;
+  /** Shown at the top of the question card. */
+  questionBanner?: React.ReactNode;
+  /** Shown under the question once it is answered. */
+  answerFooter?: React.ReactNode;
+  /** Replaces the question (and the Previous/Next buttons), e.g. when free questions run out. */
+  replacementPanel?: React.ReactNode;
 }
 
 // BeltHUD Component
@@ -1641,6 +1651,11 @@ export function UnitMCQs({
   onScratchActiveChange,
   formulaToggleSignal = 0,
   onFormulaActiveChange,
+  questionTone = null,
+  answerFeedback = null,
+  replacementPanel,
+  questionBanner,
+  answerFooter,
 }: UnitMCQSProps) {
   const { login, signup, userData, loadingUserData, user, awardXp, totalXP, guestXp } = useAuthContext();
   const [aiExplanations, setAiExplanations] = useState<Record<number, string>>({});
@@ -1677,6 +1692,9 @@ export function UnitMCQs({
   }, [currentQuestionIndex, questions, totalQuestions]);
 
   const currentQuestion = questions[currentQuestionIndex];
+  // The out-of-questions panel sits in a plain card.
+  const cardTone = replacementPanel ? null : questionTone;
+  const cardFeedback = replacementPanel ? null : answerFeedback;
   const currentAnswerState = currentQuestion ? answeredQuestions[currentQuestion.id] : undefined;
   const displayUnitId = currentQuestion?.unit ?? currentUnit;
 
@@ -2236,7 +2254,28 @@ export function UnitMCQs({
 
             {/* Center: QuestionArena */}
             {currentQuestion && (
-              <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-md md:p-5">
+              <motion.div
+                animate={
+                  cardFeedback === 'incorrect'
+                    ? { x: [0, -12, 12, -9, 9, -5, 5, 0] }
+                    : cardFeedback === 'correct'
+                      ? { scale: [1, 1.03, 0.99, 1] }
+                      : { x: 0, scale: 1 }
+                }
+                transition={{ duration: cardFeedback === 'incorrect' ? 0.5 : 0.45, ease: 'easeOut' }}
+                className={`rounded-lg border bg-white p-4 shadow-md transition-[box-shadow,border-color] duration-500 md:p-5 ${
+                  cardTone === 'gold'
+                    ? 'border-amber-300 ring-4 ring-amber-300/50 shadow-[0_0_48px_rgba(251,191,36,0.45)]'
+                    : cardTone === 'redeem'
+                      ? 'border-sky-300 ring-4 ring-sky-300/40 shadow-[0_0_48px_rgba(56,189,248,0.4)]'
+                      : cardTone === 'missed'
+                        ? 'border-slate-300 ring-4 ring-slate-200'
+                        : 'border-gray-200'
+                }`}
+              >
+                {replacementPanel ?? (
+                <>
+                {questionBanner}
                 <QuestionArena
                   question={currentQuestion}
                   onAnswerSelect={handleAnswerSelection}
@@ -2251,11 +2290,14 @@ export function UnitMCQs({
                   onLoginPrompt={onLoginPrompt}
                   subject={subject}
                 />
-              </div>
+                {currentAnswerState ? answerFooter : null}
+                </>
+                )}
+              </motion.div>
             )}
 
             {/* Bottom: Navigation Buttons */}
-            <div className="mt-3 flex shrink-0 gap-4">
+            <div className={`mt-3 flex shrink-0 gap-4 ${replacementPanel ? 'hidden' : ''}`}>
               <button
               onClick={() => {
                 if (isNavigationDisabled) return;

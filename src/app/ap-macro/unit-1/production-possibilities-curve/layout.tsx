@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
-import { macroLessonMetadata } from '@/lib/macroLessonMetadata';
+import { macroLessonPageMetadata } from '@/lib/macroLessonMetadata';
 
-export const metadata: Metadata = macroLessonMetadata('1', 'production-possibilities-curve');
+export const metadata: Metadata = macroLessonPageMetadata('1.2');
 
-export default function ProductionPossibilitiesCurveLayout({ children }: { children: React.ReactNode }) {
+export default function LessonLayout({ children }: { children: React.ReactNode }) {
   return children;
 }

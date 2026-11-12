@@ -1,21 +1,8 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import { macroLessonPageMetadata } from '@/lib/macroLessonMetadata';
 
-export const metadata: Metadata = {
-  title: 'Fiscal and Monetary Policy Actions in the Short Run Deep Dive',
-  description: 'Master how fiscal and monetary policy affect aggregate demand, output, and interest rates in the short run. Learn how policy combinations create different economic outcomes.',
-  openGraph: {
-    title: 'Fiscal and Monetary Policy Actions in the Short Run Deep Dive',
-    description: 'Master how fiscal and monetary policy affect aggregate demand, output, and interest rates in the short run.',
-  },
-  alternates: {
-    canonical: 'https://apdojo.com/ap-macro/unit-5/fiscal-monetary-policy-short-run',
-  },
-};
+export const metadata: Metadata = macroLessonPageMetadata('5.1');
 
-export default function FiscalMonetaryPolicyShortRunDeepDiveLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return <>{children}</>;
+export default function LessonLayout({ children }: { children: React.ReactNode }) {
+  return children;
 }

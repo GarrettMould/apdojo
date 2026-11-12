@@ -1,21 +1,8 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import { macroLessonPageMetadata } from '@/lib/macroLessonMetadata';
 
-export const metadata: Metadata = {
-  title: 'Changes in the Foreign Exchange Market and Net Exports Deep Dive',
-  description: 'Understand how currency appreciation and depreciation affect net exports and aggregate demand.',
-  openGraph: {
-    title: 'Changes in the Foreign Exchange Market and Net Exports Deep Dive',
-    description: 'Understand how currency changes affect net exports and aggregate demand.',
-  },
-  alternates: {
-    canonical: 'https://apdojo.com/ap-macro/unit-6/changes-forex-market-net-exports',
-  },
-};
+export const metadata: Metadata = macroLessonPageMetadata('6.5');
 
-export default function ChangesForexMarketNetExportsDeepDiveLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return <>{children}</>;
+export default function LessonLayout({ children }: { children: React.ReactNode }) {
+  return children;
 }

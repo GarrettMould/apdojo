@@ -1,21 +1,8 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import { macroLessonPageMetadata } from '@/lib/macroLessonMetadata';
 
-export const metadata: Metadata = {
-  title: 'Long-Run Aggregate Supply (LRAS) Deep Dive: Understanding Potential Output',
-  description: 'Master Long-Run Aggregate Supply (LRAS) and understand how the economy operates at full employment in the long run. Learn about potential output and the vertical LRAS curve.',
-  openGraph: {
-    title: 'Long-Run Aggregate Supply (LRAS) Deep Dive: Understanding Potential Output',
-    description: 'Master Long-Run Aggregate Supply (LRAS) and understand how the economy operates at full employment in the long run.',
-  },
-  alternates: {
-    canonical: 'https://apdojo.com/ap-macro/unit-3/long-run-aggregate-supply',
-  },
-};
+export const metadata: Metadata = macroLessonPageMetadata('3.4');
 
-export default function LongRunAggregateSupplyDeepDiveLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return <>{children}</>;
+export default function LessonLayout({ children }: { children: React.ReactNode }) {
+  return children;
 }

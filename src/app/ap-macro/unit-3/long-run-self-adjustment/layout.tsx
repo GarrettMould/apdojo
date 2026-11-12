@@ -1,21 +1,8 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import { macroLessonPageMetadata } from '@/lib/macroLessonMetadata';
 
-export const metadata: Metadata = {
-  title: 'Long-Run Self-Adjustment Deep Dive: Understanding Economic Recovery',
-  description: 'Master how the economy self-adjusts in the long run after short-run shocks. Learn about the automatic return to full employment and potential output.',
-  openGraph: {
-    title: 'Long-Run Self-Adjustment Deep Dive: Understanding Economic Recovery',
-    description: 'Master how the economy self-adjusts in the long run after short-run shocks and returns to full employment.',
-  },
-  alternates: {
-    canonical: 'https://apdojo.com/ap-macro/unit-3/long-run-self-adjustment',
-  },
-};
+export const metadata: Metadata = macroLessonPageMetadata('3.7');
 
-export default function LongRunSelfAdjustmentDeepDiveLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return <>{children}</>;
+export default function LessonLayout({ children }: { children: React.ReactNode }) {
+  return children;
 }

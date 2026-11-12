@@ -3,6 +3,7 @@ import {
   apMacroUnit3Whiteboards,
   apMacroUnit4Whiteboards,
   apMacroUnit5Whiteboards,
+  apMacroUnit6Whiteboards,
   unit1Whiteboards,
 } from '@/data/whiteboards';
 import { keyTerms as apMacroTerms } from '@/data/apMacroTerms';
@@ -28,6 +29,7 @@ const macroBoardUrlByTopic = new Map(
     ...apMacroUnit3Whiteboards,
     ...apMacroUnit4Whiteboards,
     ...apMacroUnit5Whiteboards,
+    ...apMacroUnit6Whiteboards,
   ].map((w) => [w.topic, w.url]),
 );
 
@@ -44,6 +46,8 @@ export interface ResolvedGuidedLesson {
   lessonName: string;
   video: { url: string; title: string } | null;
   walkthrough: ResolvedWalkthroughStep[];
+  /** Every key term tagged with this lesson, for the server-rendered lesson notes. */
+  keyTerms: { term: string; definition: string }[];
 }
 
 export interface GuidedUnitPathItem {
@@ -91,6 +95,7 @@ export function getGuidedLesson(lessonId: string): ResolvedGuidedLesson | null {
     lessonName: macroLessonName(lessonId),
     video: video ? { url: video.videoUrl, title: video.title } : null,
     walkthrough,
+    keyTerms: termsForLesson.map((t) => ({ term: t.term, definition: t.definition })),
   };
 }
 

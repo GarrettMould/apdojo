@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { trackEvent } from '@/lib/analytics';
 import { FEATURES } from '@/lib/featureFlags';
+import { TUTOR } from '@/data/tutoring';
 
 /** Quiet link to /tutoring on Season Pass purchase pages and the thank-you page; tracks clicks by placement. */
 export function TutoringCallout({ placement, className = '' }: { placement: string; className?: string }) {
@@ -15,7 +16,7 @@ export function TutoringCallout({ placement, className = '' }: { placement: stri
         onClick={() => void trackEvent('tutoring_callout_click', { placement })}
         className="font-medium text-gray-700 underline decoration-dotted underline-offset-4 hover:text-blue-600"
       >
-        Book a session with Garrett.
+        Book a session with {TUTOR.name}
       </Link>
     </p>
   );

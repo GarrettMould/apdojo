@@ -85,6 +85,7 @@ function MobileDrillStack({
               className={isLast ? 'cursor-pointer' : ''}
             >
               <DojoDrillPreview
+                soft
                 title={drill.title}
                 description={drill.description}
                 xpReward={drill.xpReward.total}
@@ -207,6 +208,7 @@ export function HomeDojoDrills() {
               onClick={() => handleStart(drill.id)}
             >
               <DojoDrillPreview
+                soft
                 title={drill.title}
                 description={drill.description}
                 xpReward={drill.xpReward.total}

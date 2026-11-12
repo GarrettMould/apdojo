@@ -350,7 +350,8 @@ export const unitTestQuestions: QuestionType[] = [
       "2.4%",
       "3.2%",
       "4.0%",
-      "5.2%"
+      "5.2%",
+      "8.4%"
     ],
     correctAnswer: "B",
      explanationVideo: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/Unit_MCQ_Explanations/U2Q1.mp4"
@@ -770,12 +771,12 @@ export const unitTestQuestions: QuestionType[] = [
     image: null,
     options: [
       "A surplus of available apartments.",
-      "A shortage of available apartments.",
+      "Allocative efficiency in the housing market.",
       "An increase in the quality of rental units.",
       "An increase in producer surplus for landlords.",
-      "Allocative efficiency in the housing market."
+      "A shortage of available apartments."
     ],
-    correctAnswer: "B",
+    correctAnswer: "E",
     explanation: "A binding price ceiling is set below the equilibrium price. At this artificially low price, the quantity demanded by renters exceeds the quantity supplied by landlords, resulting in a persistent shortage."
   },
   {
@@ -843,12 +844,12 @@ export const unitTestQuestions: QuestionType[] = [
     image: { src: "/images/unitTestImages/Q2013.svg", alt: "Graph showing price floor at P3" },
     options: [
       "A shortage equal to Q3 - Q1.",
-      "A surplus equal to Q3 - Q1.",
+      "A shortage equal to Q2 - Q1.",
       "A surplus equal to Q3 - Q2.",
       "The market remains in equilibrium at Q2.",
-      "A shortage equal to Q2 - Q1."
+      "A surplus equal to Q3 - Q1."
     ],
-    correctAnswer: "B",
+    correctAnswer: "E",
     explanation: "A price floor set above the equilibrium price (at P3) is binding. At this higher price, producers are willing to supply Q3, but consumers only demand Q1. This creates an excess supply, or surplus, equal to the difference between quantity supplied and quantity demanded (Q3 - Q1)."
   },
   {
@@ -860,13 +861,13 @@ export const unitTestQuestions: QuestionType[] = [
     question: "A country opens its domestic market for steel to international trade. The world price for steel is lower than the domestic equilibrium price. Which of the following will occur?",
     image: null,
     options: [
-      "The country will export steel.",
-      "The quantity of steel produced domestically will increase.",
       "Domestic producer surplus will decrease.",
+      "The quantity of steel produced domestically will increase.",
+      "The country will export steel.",
       "Domestic consumer surplus will decrease.",
       "The total economic surplus in the domestic market will decrease."
     ],
-    correctAnswer: "C",
+    correctAnswer: "A",
     explanation: "Since the world price is lower, the country will import steel. Domestic consumers benefit from lower prices (CS increases), but domestic producers lose because they must sell at the lower world price, reducing their surplus."
   },
   {
@@ -1115,12 +1116,12 @@ export const unitTestQuestions: QuestionType[] = [
     image: { src: "/images/unitTestImages/unit3/U3ID1043.svg", alt: "Total expenditures for Country X" },
     options: [
       "T → R → S",
-      "T → U → S",
       "T → V → S",
+      "T → U → S",
       "T → S → U",
       "T → U → V"
     ],
-    correctAnswer: "B"
+    correctAnswer: "C"
   }, 
 
   {
@@ -1134,11 +1135,11 @@ export const unitTestQuestions: QuestionType[] = [
   options: [
     "The economy is producing at full employment with no cyclical unemployment.",
     "A rightward shift of short-run aggregate supply has reduced both prices and unemployment.",
-    "Aggregate demand has shifted right, leading to higher prices and greater output than potential GDP.",
     "Actual output is below potential output, and the economy is experiencing a recessionary gap.",
+    "Aggregate demand has shifted right, leading to higher prices and greater output than potential GDP.",
     "Actual output exceeds potential output, and the economy is in an inflationary gap."
   ],
-    correctAnswer: "D"
+    correctAnswer: "C"
   }, 
   {
     id: 1045,
@@ -1215,13 +1216,13 @@ export const unitTestQuestions: QuestionType[] = [
     question: "Which of the following describes the relationship between the Marginal Product (MP) and Average Product (AP) curves?",
     image: null,
     options: [
-      "The MP curve intersects the AP curve at the maximum of the AP curve.",
+      "When MP is less than AP, AP is rising.",
       "The MP curve intersects the AP curve at the maximum of the MP curve.",
       "When MP is greater than AP, AP is falling.",
-      "When MP is less than AP, AP is rising.",
+      "The MP curve intersects the AP curve at the maximum of the AP curve.",
       "MP and AP are always parallel to each other."
     ],
-    correctAnswer: "A",
+    correctAnswer: "D",
     explanation: "Mathematically, the marginal value pulls the average. If the marginal is above the average, it pulls the average up. If the marginal is below the average, it pulls it down. Therefore, the only time the average is neither rising nor falling (at its peak) is when the marginal equals the average."
   },
   {
@@ -1269,13 +1270,13 @@ export const unitTestQuestions: QuestionType[] = [
     question: "As a firm increases its output in the short run, what happens to the vertical distance between the Average Total Cost (ATC) and Average Variable Cost (AVC) curves?",
     image: null,
     options: [
-      "It decreases because Average Fixed Cost (AFC) declines as output rises.",
-      "It stays constant because fixed costs do not change.",
       "It increases because of diminishing marginal returns.",
+      "It stays constant because fixed costs do not change.",
+      "It decreases because Average Fixed Cost (AFC) declines as output rises.",
       "It is zero because ATC equals AVC in the long run.",
       "It fluctuates randomly."
     ],
-    correctAnswer: "A",
+    correctAnswer: "C",
     explanation: "ATC = AVC + AFC. Therefore, the vertical gap between ATC and AVC is exactly equal to the Average Fixed Cost. Since Total Fixed Cost is constant, dividing it by an increasing quantity (Q) results in a continuously decreasing AFC."
   },
   {
@@ -1548,13 +1549,13 @@ options: [
     question: "Sofia is comparing the prices of two different laptops. One costs $1,000 and the other costs $1,200. By using prices to evaluate which laptop gives her better value, Sofia is using money primarily as which of the following?",
   image: null,
   options: [
-    "A source of liquidity",
-    "A medium of exchange",
     "A unit of account",
+    "A medium of exchange",
+    "A source of liquidity",
     "A store of value",
     "A measure of wealth",
   ],
-    correctAnswer: "C"
+    correctAnswer: "A"
 }, 
 {
     id: 1052,
@@ -1599,13 +1600,13 @@ options: [
     question: "If the central bank of a country sells government bonds in the open market, what will be the likely effect on the nominal interest rate, aggregate demand, and the unemployment rate?",
   image: null,
   options: [
-    "Increase, Increase, Decrease",
-    "Increase, Decrease, Decrease",
     "Increase, Decrease, Increase",
+    "Increase, Decrease, Decrease",
+    "Increase, Increase, Decrease",
     "Decrease, Increase, Increase", 
     "Decrease, Decrease, Decrease",
   ],
-    correctAnswer: "C"
+    correctAnswer: "A"
 }, 
 {
     id: 1055,
@@ -1821,12 +1822,12 @@ options: [
     image: null,
     options: [
       "A leftward shift of the short-run Phillips curve",
-      "A rightward shift of the short-run Phillips curve",
+      "A leftward shift of the long-run Phillips curve",
       "A downward movement along the short-run Phillips curve",
       "An upward movement along the short-run Phillips curve",
-      "A leftward shift of the long-run Phillips curve"
+      "A rightward shift of the short-run Phillips curve"
     ],
-    correctAnswer: "B"
+    correctAnswer: "E"
   },
 {
     id: 1068,
@@ -1889,13 +1890,13 @@ options: [
     question: "If a government that initially has a balanced budget increases government spending and reduces taxes at the same time, which of the following will occur?",
     image: null,
     options: [
-      "The government will continue to have a balanced budget, and aggregate demand will not change.",
       "The government will run a budget deficit, and aggregate demand will increase.",
+      "The government will continue to have a balanced budget, and aggregate demand will not change.",
       "The government will run a budget surplus, and aggregate demand will increase.",
       "The government will run a budget deficit, but aggregate demand will decrease.",
       "The government will continue to have a balanced budget, and aggregate demand will decrease."
     ],
-    correctAnswer: "B"
+    correctAnswer: "A"
   },
 {
     id: 1072,
@@ -1941,12 +1942,12 @@ options: [
     image: null,
     options: [
       "High levels of emigration.",
-      "High levels of investment in science and technology research.",
       "High levels of consumption spending.",
+      "High levels of investment in science and technology research.",
       "Low levels of unemployment.",
       "Low level of foreign direct investment (FDI)."
     ],
-    correctAnswer: "B"
+    correctAnswer: "C"
   },
 {
     id: 1075,
@@ -2270,13 +2271,13 @@ options: [
     question: "If a government regulator forces a natural monopoly to set its price equal to its Average Total Cost, what will be the result?",
     image: null,
     options: [
-      "The firm will earn zero economic profit.",
+      "The firm will maximize its total revenue.",
       "The firm will incur an economic loss and require a subsidy.",
       "The firm will achieve allocative efficiency.",
-      "The firm will maximize its total revenue.",
+      "The firm will earn zero economic profit.",
       "The firm will produce less than the unregulated monopoly quantity."
     ],
-    correctAnswer: "A",
+    correctAnswer: "D",
     explanation: "Fair-return pricing sets P = ATC. At this point, Total Revenue equals Total Cost, meaning the firm earns a normal profit (zero economic profit). This allows the firm to stay in business without a subsidy, though it is still not allocatively efficient (P > MC).",
   },
   {
@@ -2410,11 +2411,11 @@ options: [
     options: [
       "FizzCo has a dominant strategy to Maintain Price.",
       "PopInc has a dominant strategy to Maintain Price.",
-      "Both firms have a dominant strategy to Lower Price.",
       "Neither firm has a dominant strategy.",
+      "Both firms have a dominant strategy to Lower Price.",
       "FizzCo has a dominant strategy to Lower Price, but PopInc does not."
     ],
-    correctAnswer: "C",
+    correctAnswer: "D",
     explanation: "To find the dominant strategy, look at the choices for each firm independently. \nFor FizzCo: If PopInc maintains, FizzCo compares $1,000 (Maintain) vs $1,500 (Lower). Lower is better. If PopInc lowers, FizzCo compares $400 (Maintain) vs $600 (Lower). Lower is better. FizzCo has a dominant strategy to Lower.\nFor PopInc: If FizzCo maintains, PopInc compares $1,000 (Maintain) vs $1,500 (Lower). Lower is better. If FizzCo lowers, PopInc compares $400 (Maintain) vs $600 (Lower). Lower is better. PopInc also has a dominant strategy to Lower.",
   },
   {
@@ -2457,12 +2458,12 @@ options: [
     image: null,
     options: [
       "Allocative efficiency in the long run.",
-      "Mutual interdependence among firms.",
-      "A single seller with no close substitutes.",
       "Easy entry and exit.",
+      "A single seller with no close substitutes.",
+      "Mutual interdependence among firms.",
       "A horizontal demand curve for the individual firm."
     ],
-    correctAnswer: "B",
+    correctAnswer: "D",
     explanation: "Oligopolies are characterized by a few large firms. Because there are so few of them, the actions of one firm (changing price or output) directly affect the profits of the others. This strategic dependence is called mutual interdependence.",
   },
   {
@@ -2641,12 +2642,12 @@ options: [
     image: null,
     options: [
       "An increase in the salaries paid to accountants.",
-      "An increase in the salaries paid to financial analysts (a substitute job).",
+      "An increase in the number of students graduating with accounting degrees.",
       "A decrease in the cost of obtaining an accounting degree.",
       "An increase in the demand for accounting services.",
-      "An increase in the number of students graduating with accounting degrees."
+      "An increase in the salaries paid to financial analysts (a substitute job)."
     ],
-    correctAnswer: "B",
+    correctAnswer: "E",
     explanation: "Labor supply shifts when the willingness or ability of workers to enter the profession changes. If a substitute profession (financial analyst) offers higher wages, potential accountants will switch careers to become analysts. This decreases the supply of accountants, shifting the curve to the left.",
     videoExplanation: null
   },
@@ -2739,13 +2740,13 @@ options: [
     question: "Refer to the graph below. Suppose the government imposes a price floor at P2. Compared to the unregulated monopsony outcome, how will the wage rate and the number of workers hired change?",
     image: { src: "/images/unitTestImages/Q5012.svg", alt: "Monopsony labor market graph" },
     options: [
-      "Wage Rate: Increases | Quantity Hired: Increases",
+      "Wage Rate: Unchanged | Quantity Hired: Unchanged",
       "Wage Rate: Increases | Quantity Hired: Decreases",
       "Wage Rate: Decreases | Quantity Hired: Increases",
-      "Wage Rate: Unchanged | Quantity Hired: Unchanged",
+      "Wage Rate: Increases | Quantity Hired: Increases",
       "Wage Rate: Increases | Quantity Hired: Unchanged"
     ],
-    correctAnswer: "A",
+    correctAnswer: "D",
     explanation: "The unregulated monopsony pays wage P2 and hires Q2 workers. If a price floor is set at P3 (the competitive equilibrium price), the firm becomes a price taker at that wage rate. The firm's new Marginal Resource Cost (MRC) is equal to the minimum wage (P3) up to the supply limit. The firm will hire workers until the new MRC (P3) equals the Marginal Revenue Product (Demand). This intersection occurs at Q3. Therefore, both the wage rate (P2 to P3) and the quantity of workers hired (Q2 to Q3) will increase.",
     videoExplanation: null
   },
@@ -2889,13 +2890,13 @@ options: [
     question: "A market is characterized by a positive consumption externality. If the government imposes a binding price ceiling in this market, what is the likely impact on deadweight loss?",
     image: null,
     options: [
-      "Deadweight loss will be eliminated because the price is lower.",
-      "Deadweight loss will decrease because consumers can afford more.",
       "Deadweight loss will increase or persist because the quantity supplied will decrease.",
+      "Deadweight loss will decrease because consumers can afford more.",
+      "Deadweight loss will be eliminated because the price is lower.",
       "The market will reach allocative efficiency.",
       "The external benefit will increase."
     ],
-    correctAnswer: "C",
+    correctAnswer: "A",
     explanation: "A positive consumption externality means the market is already under-producing the good (Socially Optimal Q > Market Q). A binding price ceiling holds the price below equilibrium, which causes producers to reduce the quantity supplied even further. This widens the gap between the quantity actually traded and the socially optimal quantity, thereby increasing (or at least failing to fix) the deadweight loss.",
     videoExplanation: null
   },
@@ -2949,11 +2950,11 @@ options: [
     options: [
       "Rival and Excludable.",
       "Non-rival and Non-excludable.",
-      "Rival and Non-excludable.",
+      "Provided by the government.",
       "Non-rival and Excludable.",
-      "Provided by the government."
+      "Rival and Non-excludable."
     ],
-    correctAnswer: "C",
+    correctAnswer: "E",
     explanation: "The Tragedy of the Commons arises with common resources (like fish in the ocean or public pasture land). These goods are non-excludable (anyone can use them) but rival (one person's use reduces what is available for others). This leads to overuse and depletion because individuals have no incentive to conserve the resource.",
     videoExplanation: null
   },

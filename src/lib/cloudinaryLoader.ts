@@ -24,6 +24,9 @@ export default function cloudinaryLoader({ src, width, quality }: { src: string;
   // CHECK: If image is from any S3 bucket or excluded domains, return with width query param
   // These images should NOT go through Cloudinary - return them as-is with width param to satisfy Next.js
   if (src.startsWith('http')) {
+    // Escape spaces and commas: srcSet splits candidates on them, so a filename like
+    // "1.6_Equilibrium 3, shortage.jpg" would otherwise produce a broken image URL.
+    src = src.replace(/ /g, '%20').replace(/,/g, '%2C');
     // For all S3 buckets (thumbnailslarge, apdojowhiteboards, apdojovideos) and cdn.sanity.io, 
     // return URL as-is with width as query param (bypass Cloudinary)
     if (src.includes('thumbnailslarge.s3') || 

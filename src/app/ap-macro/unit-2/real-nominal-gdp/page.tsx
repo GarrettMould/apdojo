@@ -1,5 +1,6 @@
-import { RegisteredLessonDeepDive } from '@/components/RegisteredLessonDeepDive';
+import { MacroLessonRoute } from '@/components/guidedLesson/MacroLessonRoute';
+import LegacyLesson from './legacy';
 
-export default function RealNominalGdpPage() {
-  return <RegisteredLessonDeepDive subject="ap-macro" unit="2" slug="real-nominal-gdp" />;
+export default function Page() {
+  return <MacroLessonRoute lessonId="2.6" legacy={<LegacyLesson />} />;
 }

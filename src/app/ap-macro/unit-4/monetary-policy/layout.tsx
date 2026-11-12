@@ -1,21 +1,8 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import { macroLessonPageMetadata } from '@/lib/macroLessonMetadata';
 
-export const metadata: Metadata = {
-  title: 'Monetary Policy Deep Dive: Understanding Central Bank Tools',
-  description: 'Master monetary policy and the tools the central bank uses to influence the money supply and interest rates. Learn about open market operations, reserve requirements, and the discount rate.',
-  openGraph: {
-    title: 'Monetary Policy Deep Dive: Understanding Central Bank Tools',
-    description: 'Master monetary policy and the tools the central bank uses to influence the money supply and interest rates.',
-  },
-  alternates: {
-    canonical: 'https://apdojo.com/ap-macro/unit-4/monetary-policy',
-  },
-};
+export const metadata: Metadata = macroLessonPageMetadata('4.6');
 
-export default function MonetaryPolicyDeepDiveLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return <>{children}</>;
+export default function LessonLayout({ children }: { children: React.ReactNode }) {
+  return children;
 }

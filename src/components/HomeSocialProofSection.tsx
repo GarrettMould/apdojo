@@ -9,7 +9,7 @@ const REVIEW_PEEK_H = [60, 80] as const;
 
 function ReviewCard({ r }: { r: Review }) {
   return (
-    <div className="bg-white border-4 border-black rounded-2xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 flex flex-col">
+    <div className="bg-white border border-slate-200 rounded-2xl shadow-[0_10px_30px_rgba(15,23,42,0.08)] p-6 flex flex-col">
       <div className="flex items-start justify-between gap-3 mb-4">
         <div className="flex items-center gap-1">
           {[...Array(5)].map((_, i) => (
@@ -17,7 +17,7 @@ function ReviewCard({ r }: { r: Review }) {
           ))}
         </div>
         {r.badge && (
-          <span className="text-xs font-black uppercase tracking-wider bg-gray-100 border-2 border-black px-3 py-1 rounded-full whitespace-nowrap">
+          <span className="text-xs font-black uppercase tracking-wider bg-gray-100 border border-slate-300 px-3 py-1 rounded-full whitespace-nowrap">
             {r.badge}
           </span>
         )}
@@ -41,7 +41,7 @@ function ReviewCard({ r }: { r: Review }) {
         </p>
       </div>
 
-      <div className="mt-5 pt-4 border-t-2 border-black flex items-center justify-between gap-3">
+      <div className="mt-5 pt-4 border-t border-slate-200 flex items-center justify-between gap-3">
         <p className="text-sm font-black text-gray-900">— {r.author}</p>
       </div>
     </div>
@@ -88,7 +88,7 @@ export function HomeSocialProofSection() {
   const featured = reviews.slice(0, 6);
 
   return (
-    <section className="bg-gray-50 py-16 sm:py-24">
+    <section className="py-20 sm:py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 12 }}

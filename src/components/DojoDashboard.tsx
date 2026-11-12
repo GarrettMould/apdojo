@@ -7,6 +7,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useCourseContext } from '@/contexts/CourseContext';
+import { TutoringPromo } from '@/components/tutoring/TutoringPromo';
 import { dojoDrills, drillAppliesToSubject, getDrillUnitForSubject } from '@/data/dojoDrills';
 import { frqExams } from '@/data/frqQuestions';
 import { loadDojoDrillProgress, getDrillProgress, DojoDrillProgress } from '@/lib/dojoDrillProgress';
@@ -709,6 +710,12 @@ export function DojoDashboard() {
           <h1 className="text-4xl sm:text-5xl font-black text-gray-900 mb-2">Your Library</h1>
           <p className="text-lg text-gray-600 font-medium">Continue learning with your saved content</p>
         </motion.div>
+
+        {!hasCourseAccess ? (
+          <div className="mb-8">
+            <TutoringPromo variant="card" course={currentCourse} placement="dashboard_free" />
+          </div>
+        ) : null}
 
         <AnimatePresence mode="wait">
           <motion.div

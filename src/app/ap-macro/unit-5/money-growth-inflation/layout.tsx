@@ -1,21 +1,8 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import { macroLessonPageMetadata } from '@/lib/macroLessonMetadata';
 
-export const metadata: Metadata = {
-  title: 'Money Growth and Inflation Deep Dive',
-  description: 'Understand the relationship between money supply growth and inflation. Learn the quantity theory of money and the classical dichotomy.',
-  openGraph: {
-    title: 'Money Growth and Inflation Deep Dive',
-    description: 'Understand the relationship between money supply growth and inflation using the quantity theory of money.',
-  },
-  alternates: {
-    canonical: 'https://apdojo.com/ap-macro/unit-5/money-growth-inflation',
-  },
-};
+export const metadata: Metadata = macroLessonPageMetadata('5.3');
 
-export default function MoneyGrowthInflationDeepDiveLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return <>{children}</>;
+export default function LessonLayout({ children }: { children: React.ReactNode }) {
+  return children;
 }
